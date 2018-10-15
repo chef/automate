@@ -1,7 +1,7 @@
 +++
-title = "ServiceNow Integration"
+title = "ServiceNow Incident Creation Integration"
 description = "Installing and Configuring the Automate ServiceNow Integration for Incident Management"
-draft = false
+draft = false 
 bref = ""
 toc = true
 [menu]
@@ -109,7 +109,7 @@ Setting the value to `cookbook` creates an incident for the failed cookbook. All
 
 ![CCR Failed Cookbook Description](/images/docs/SNOW_Failed_Cookbook.png)
 
-The associated client runs are shown on the 'Chef Client runs' tab of the incident.
+The associated client runs are shown on the ‘Chef Client runs’ tab of the incident.
 
 Setting the value to `node` creates an incident for each failed node. All failing Chef Client runs for a node are associated with the corresponding incident. The short description of the incident will indicate the failed node:
 
@@ -128,15 +128,15 @@ The short description of the incident indicates the failed profile:
 
 ![Scan Failed Profile Description](/images/docs/SNOW_Failed_Profile_Scan.png)
 
-The associated InSpec scans are shown on the 'Chef InSpec scans' tab of the incident.
+The associated InSpec scans are shown on the ‘Chef InSpec scans’ tab of the incident.
 
-Setting the value to `node` creates an incident for each failed node. All InSpec scans failing for a node will be associated with the corresponding incident.
+Setting the value to `node` creates an incident for each failed node. All InSpec scans failing for a node will be associated with the corresponding incident. 
 
 The short description of the incident indicates the failed node:
 
 ![Scan Failed Node Description](/images/docs/SNOW_Failed_Node_Scan.png)
 
-The associated InSpec scans are shown on the 'Chef InSpec scans' tab of the incident.
+The associated InSpec scans are shown on the ‘Chef InSpec scans’ tab of the incident.
 
 #### Property x_chef_incident.assigned_to
 
@@ -191,10 +191,10 @@ The Chef Automate notifications configuration UI for client runs
 To report failed client runs on nodes managed by Chef Automate:
 
 * Navigate to the notification settings page in the Chef Automate UI
-* Select the 'Add Notification' button
+* Click the ‘Add Notification’ button
 * Select the ServiceNow notification type
 * Assign a unique name for the notification
-* Select 'Chef Client run failures' as the failure type
+* Select ‘Chef Client run failures’ as the failure type
 * Enter the ServiceNow client run API address in the ServiceNow webhook field
 * Enter the credentials of a user with the x_chef_incident.api role
 * Save the notification
@@ -208,10 +208,10 @@ The Chef Automate notifications configuration UI for InSpec scans
 To report failed InSpec scans on node managed by Chef Automate:
 
 * Navigate to the notification settings page in the Chef Automate UI
-* Select the 'Add Notification' button
+* Click the ‘Add Notification’ button
 * Select the ServiceNow notification type
 * Assign a unique name for the notification
-* Select 'InSpec scan failures' as the failure type
+* Select ‘InSpec scan failures’ as the failure type
 * Enter the ServiceNow InSpec scan API address in the ServiceNow webhook field
 * enter the credentials of a user with the x_chef_incident.api role
 * Save the notification
@@ -221,5 +221,5 @@ To report failed InSpec scans on node managed by Chef Automate:
 To uninstall the application:
 
 * In the ServiceNow instance, navigate to the System Applications > Applications menu
-* From the Downloads tab, select the Chef Automate Incident Creation link
-* In the Related Links section, select uninstall
+* From the Downloads tab, click on the Chef Automate Incident Creation link
+* In the Related Links section, click uninstall
