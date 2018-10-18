@@ -14,14 +14,14 @@ toc = true
 
 This guide helps you set up a ServiceNow instance that syncs asset data from Chef Automate runs to your ServiceNow CMDB.
 
-### Chef Automate - ServiceNow Integration
+### Chef Automate - ServiceNow CMDB Sync Integration
 
 The integration between a Chef Automate server and a ServiceNow instance requires the following:
 
 * Chef Automate
-* Chef Automate CMDB Sync Application in ServiceNow
+* Chef CMDB Sync Application in ServiceNow
 
-The Chef Automate CMDB Sync application is a ServiceNow certified scoped application available from the ServiceNow store. [Chef Automate](https://www.chef.io/automate/) provides a full suite of enterprise capabilities for workflow, node visibility, and compliance. Once configured, the Chef Automate server sends HTTPS JSON notifications to the Chef Automate CMDB Sync Application in a ServiceNow instance to populate the CMDB.
+The Chef CMDB Sync application is a ServiceNow certified scoped application available from the ServiceNow store. [Chef Automate](https://www.chef.io/automate/) provides a full suite of enterprise capabilities for workflow, node visibility, and compliance. Once configured, the Chef Automate server sends HTTPS JSON notifications to the Chef CMDB Sync Application in a ServiceNow instance to populate the CMDB.
 
 ![ServiceNow and Automate Flow](/images/docs/SNOW_Automate_diagram.png)
 
@@ -33,12 +33,12 @@ The Chef Automate CMDB Sync application is a ServiceNow certified scoped applica
 
 ## Configuration
 
-### Install Chef Automate CMDB Sync Application in ServiceNow
+### Install Chef CMDB Sync Application in ServiceNow
 
-The Chef Automate CMDB Sync application exposes the REST API endpoints that facilitate communication between Chef Automate and the ServiceNow instance.
+The Chef CMDB Sync application exposes the REST API endpoints that facilitate communication between Chef Automate and the ServiceNow instance.
 
 * Visit the ServiceNow store at [https://store.servicenow.com](https://store.servicenow.com)
-* Get the Chef Automate CMDB Sync application
+* Get the Chef CMDB Sync application
 * In the ServiceNow instance, navigate to the System Applications > Applications menu
 * From the Downloads tab, install the Chef Automate CMDB Sync application
 
@@ -85,7 +85,7 @@ The `x_chef_cmdb.api` role should be assigned to a user that is responsible for 
 
 The application properties can be configured by users with admin or `x_chef_cmdb.admin` roles. Select the Chef CMDB > Properties menu item to navigate to the properties configuration UI.
 
-![ServiceNow Config Page](/images/docs/SNOW_config_page.png)
+![ServiceNow Config Page](/images/docs/SNOW_cmdb_properties_page.png)
 
 The application system properties are:
 
