@@ -1,7 +1,7 @@
 +++
 title = "ServiceNow CMDB Sync Integration"
 description = "Installing and Configuring the Automate ServiceNow Integration for CMDB Sync"
-draft = false 
+draft = true 
 bref = ""
 toc = true
 [menu]
