@@ -34,6 +34,28 @@ or you can edit it to specify desired FQDN, login name, and so on.
 See [Configuring Chef Automate]({{< relref "configuration.md" >}}) for more information
 on configuration settings.
 
+{{< warning >}}
+Chef Automate's default memory configuration for the embedded Elasticsearch is too small for
+uses other than POC or testing.
+{{< /warning >}}
+
+To configure it properly, assuming you have 16GB of memory or greater, create a patch toml
+like the following examples and apply it following the instructions at
+[Elasticsearch heap size]({{< relref "configuration.md#setting-elasticsearch-heap" >}})
+Consult with Chef support before exceeding 25% of total RAM on your Chef Automate system.
+
+```toml
+[elasticsearch.v1.sys.runtime]
+  heapsize = "4g"
+```
+
+If you have 32GB, this is also acceptable
+
+```toml
+[elasticsearch.v1.sys.runtime]
+  heapsize = "8g"
+```
+
 ## Deploy Chef Automate
 
 ```shell
