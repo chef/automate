@@ -35,21 +35,21 @@ See [Configuring Chef Automate]({{< relref "configuration.md" >}}) for more info
 on configuration settings.
 
 {{< warning >}}
-Chef Automate's default memory configuration for the embedded Elasticsearch is too small for
-uses other than POC or testing.
+Chef Automate has a small embedded Elasticsearch default memory configuration, which is intended for proof-of-concept demonstrations or testing. For other uses, set the embedded Elasticsearch memory to a larger size.
 {{< /warning >}}
 
-To configure it properly, assuming you have 16GB of memory or greater, create a patch toml
-like the following examples and apply it following the instructions at
-[Elasticsearch heap size]({{< relref "configuration.md#setting-elasticsearch-heap" >}})
-Consult with Chef support before exceeding 25% of total RAM on your Chef Automate system.
+Chef Automate requires the embedded Elasticsearch memory to have at least 16GB of memory for uses beyond a proof-of-concept or testing.
+To configure the Elasticsearch `heapsize`, create a patch `.toml` following the examples below and apply it according to the instructions at [Setting Elasticsearch Heap]({{< relref "configuration.md#setting-elasticsearch-heap" >}}).
+Exceeding 25% of the total RAM on your Chef Automate system may cause issues with your installation. Consult with Chef support before exceeding 25% of total RAM on your Chef Automate system, for example if you would like to use more than 4GB of 16GB RAM, or more than 8GB of 32GB RAM.
+
+If you have 16GB available:
 
 ```toml
 [elasticsearch.v1.sys.runtime]
   heapsize = "4g"
 ```
 
-If you have 32GB, this is also acceptable
+If you have 32GB:
 
 ```toml
 [elasticsearch.v1.sys.runtime]
