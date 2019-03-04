@@ -94,10 +94,15 @@ type execMock struct {
 }
 
 func expectHabCommand(cmd string, args ...string) command.ExpectedCommand {
+	timeout := HabTimeoutDefault
+	if len(args) > 1 && args[1] == "install" {
+		timeout = HabTimeoutInstallPackage
+	}
 	return command.ExpectedCommand{
-		Cmd:  cmd,
-		Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
-		Args: args,
+		Cmd:     cmd,
+		Timeout: timeout,
+		Env:     []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+		Args:    args,
 	}
 }
 

@@ -1,6 +1,8 @@
 package target
 
 import (
+	"time"
+
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/lib/platform/command"
 )
@@ -11,6 +13,21 @@ var stdHabOptions = []command.Opt{
 	// Don't use progress bars in output
 	command.Envvar("HAB_NONINTERACTIVE", "true"),
 }
+
+const (
+	// HabTimeoutInstallPackage is the timeout for InstallPackage
+	// commands. Since package installs also install dependencies,
+	// a given package installation can often take considerable
+	// time.
+	HabTimeoutInstallPackage = 1200 * time.Second
+	// HabTimeoutIsInstalled is the timeout for
+	// IsInstalled. IsInstalled runs hab pkg path which we expect
+	// to be very fast typically.
+	HabTimeoutIsInstalled = 60 * time.Second
+	// HabTimeoutDefault is the timeout for hab commands that
+	// don't have other timeouts.
+	HabTimeoutDefault = 300 * time.Second
+)
 
 // A HabCmd runs the `hab` command-line tool with a standard set of
 // options.
@@ -98,15 +115,18 @@ func (c *habCmd) InstallPackage(pkg habpkg.Installable, channel string) (string,
 	if channel != "" {
 		args = append(args, "--channel", channel)
 	}
-
-	return c.executor.CombinedOutput("hab", append(opts, command.Args(args...))...)
+	opts = append(opts, command.Timeout(HabTimeoutInstallPackage), command.Args(args...))
+	return c.executor.CombinedOutput("hab", opts...)
 }
 
 // IsInstalled checks if a package is already installed
 func (c *habCmd) IsInstalled(pkg habpkg.VersionedPackage) (bool, error) {
-	err := c.executor.Run("hab",
-		append(standardHabOptions(),
-			command.Args("pkg", "path", habpkg.Ident(pkg)))...)
+	args := command.Args("pkg", "path", habpkg.Ident(pkg))
+	cmdOpts := append(standardHabOptions(),
+		command.Timeout(HabTimeoutIsInstalled),
+		args)
+
+	err := c.executor.Run("hab", cmdOpts...)
 	if err != nil {
 		return false, nil
 	}
@@ -117,7 +137,11 @@ func (c *habCmd) IsInstalled(pkg habpkg.VersionedPackage) (bool, error) {
 // BinlinkPackage binlinks an executable from a Habitat package
 func (c *habCmd) BinlinkPackage(pkg habpkg.VersionedPackage, exe string) (string, error) {
 	args := command.Args("pkg", "binlink", "--force", habpkg.Ident(pkg), exe)
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), args)...)
+	cmdOpts := append(standardHabOptions(),
+		command.Timeout(HabTimeoutDefault),
+		args)
+
+	return c.executor.CombinedOutput("hab", cmdOpts...)
 }
 
 func (c *habCmd) LoadService(svc habpkg.VersionedPackage, opts ...LoadOption) (string, error) {
@@ -125,22 +149,36 @@ func (c *habCmd) LoadService(svc habpkg.VersionedPackage, opts ...LoadOption) (s
 	for _, o := range opts {
 		args = o(args)
 	}
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), command.Args(args...))...)
+	cmdOpts := append(standardHabOptions(),
+		command.Timeout(HabTimeoutDefault),
+		command.Args(args...))
+	return c.executor.CombinedOutput("hab", cmdOpts...)
 }
 
 func (c *habCmd) UnloadService(svc habpkg.VersionedPackage) (string, error) {
 	args := command.Args("svc", "unload", habpkg.ShortIdent(svc))
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), args)...)
+	cmdOpts := append(standardHabOptions(),
+		command.Timeout(HabTimeoutDefault),
+		args)
+
+	return c.executor.CombinedOutput("hab", cmdOpts...)
 }
 
 func (c *habCmd) StartService(svc habpkg.VersionedPackage) (string, error) {
 	args := command.Args("svc", "start", habpkg.ShortIdent(svc))
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), args)...)
+	cmdOpts := append(standardHabOptions(),
+		command.Timeout(HabTimeoutDefault),
+		args)
+	return c.executor.CombinedOutput("hab", cmdOpts...)
 }
 
 func (c *habCmd) StopService(svc habpkg.VersionedPackage) (string, error) {
 	args := command.Args("svc", "stop", habpkg.ShortIdent(svc))
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), args)...)
+	cmdOpts := append(standardHabOptions(),
+		command.Timeout(HabTimeoutDefault),
+		args)
+
+	return c.executor.CombinedOutput("hab", cmdOpts...)
 }
 
 func standardHabOptions() []command.Opt {

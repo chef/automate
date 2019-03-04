@@ -351,6 +351,7 @@ func (t *LocalTarget) unloadServiceWithHabVersion(svc habpkg.VersionedPackage, b
 	output, err := t.Executor.CombinedOutput("hab",
 		command.Args("pkg", "exec", habpkg.Ident(&binPkg),
 			"hab", "svc", "unload", svcIdent),
+		command.Timeout(HabTimeoutDefault),
 		command.Envvar("HAB_SUP_BINARY", habSupBin))
 	if err != nil {
 		logrus.WithError(err).WithFields(logrus.Fields{
@@ -1126,7 +1127,7 @@ func (t *LocalTarget) getHabBin(releaseManifest manifest.ReleaseManifest) (strin
 // in the bin/ directory.
 func (t *LocalTarget) getBinPath(pkg habpkg.HabPkg, bin string) (string, error) {
 	pkgIdent := habpkg.Ident(&pkg)
-	output, err := t.Executor.Output("hab", command.Args("pkg", "path", pkgIdent))
+	output, err := t.Executor.Output("hab", command.Args("pkg", "path", pkgIdent), command.Timeout(HabTimeoutIsInstalled))
 	if err != nil {
 		return "", errors.Wrapf(err, "failed looking up package path from %q", pkgIdent)
 	}
@@ -1223,7 +1224,10 @@ func (t *LocalTarget) waitForHabSupToStart(releaseManifest manifest.ReleaseManif
 			return errors.Wrap(lastErr, m)
 		}
 		tries++
-		output, err := t.Executor.CombinedOutput(habBin, command.Args("svc", "status"), command.Envvar("HAB_SUP_BINARY", habSupBin))
+		output, err := t.Executor.CombinedOutput(habBin,
+			command.Args("svc", "status"),
+			command.Timeout(HabTimeoutDefault),
+			command.Envvar("HAB_SUP_BINARY", habSupBin))
 		if err != nil {
 			lastErr = errors.Wrapf(err, "hab svc status failed with output: %s", output)
 			time.Sleep(habStatusRetryWait)
