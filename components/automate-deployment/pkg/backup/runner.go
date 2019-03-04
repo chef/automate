@@ -551,7 +551,7 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 		return
 	}
 
-	if err = r.restoreAutomateCLI(backupManifest); err != nil {
+	if err = r.restoreAutomateCLI(ctx, backupManifest); err != nil {
 		r.failf(err, "Failed to restore automate-cli")
 		return
 	}
@@ -587,7 +587,7 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 }
 
 // Install and binlink automate-cli if it exists in the given manifest
-func (r *Runner) restoreAutomateCLI(manifest manifest.ReleaseManifest) error {
+func (r *Runner) restoreAutomateCLI(ctx context.Context, manifest manifest.ReleaseManifest) error {
 	svc := deployment.ServiceFromManifest(manifest, "automate-cli")
 	if svc == nil {
 		// NOTE(ssd) 2019-02-19: Do we have backups where
@@ -597,12 +597,12 @@ func (r *Runner) restoreAutomateCLI(manifest manifest.ReleaseManifest) error {
 	}
 
 	channel := r.lockedDeployment.Config.GetDeployment().GetV1().GetSvc().GetChannel().GetValue()
-	err := r.target.InstallService(svc, channel)
+	err := r.target.InstallService(ctx, svc, channel)
 	if err != nil {
 		return errors.Wrap(err, "failed to install automate-cli")
 	}
 
-	cmdOutput, err := r.target.BinlinkPackage(svc, "chef-automate")
+	cmdOutput, err := r.target.BinlinkPackage(ctx, svc, "chef-automate")
 	if err != nil {
 		return errors.Wrapf(err, "failed to binlink automate-cli: %s", cmdOutput)
 	}
@@ -627,7 +627,7 @@ func (r *Runner) restoreServices(desiredServices []*deployment.Service, restoreC
 		r.infof("Restoring %s", svc.Name())
 
 		// Install the package
-		err := r.target.InstallService(svc, channel)
+		err := r.target.InstallService(restoreCtx.ctx, svc, channel)
 		if err != nil {
 			r.failf(err, "Failed to install habitat package for %s", svc.Name())
 			return err
@@ -636,7 +636,7 @@ func (r *Runner) restoreServices(desiredServices []*deployment.Service, restoreC
 		// Install any binlinks for this package
 		binlinks := services.BinlinksForPackage(svc.Name())
 		for _, cmd := range binlinks {
-			cmdOutput, err := r.target.BinlinkPackage(svc, cmd)
+			cmdOutput, err := r.target.BinlinkPackage(restoreCtx.ctx, svc, cmd)
 			if err != nil {
 				r.failf(err, "failed to binlink command %q for service %q: %s", cmd, svc.Name(), cmdOutput)
 				return err
@@ -721,7 +721,7 @@ func (r *Runner) restoreServices(desiredServices []*deployment.Service, restoreC
 
 		// Now that all data has been restored we need start the service up
 		// and wait for it to come up healthy.
-		if err := r.target.LoadService(svc, target.BindMode(bindInfo.Mode), target.Binds(bindInfo.Specs)); err != nil {
+		if err := r.target.LoadService(restoreCtx.ctx, svc, target.BindMode(bindInfo.Mode), target.Binds(bindInfo.Specs)); err != nil {
 			r.failf(err, "Failed to load service %s", svc.Name())
 			return err
 		}
@@ -818,7 +818,7 @@ func (r *Runner) unloadServices(ctx context.Context, svcs []*deployment.Service)
 
 	// Unload the services
 	for _, svc := range svcs {
-		if err := r.target.UnloadService(svc); err != nil {
+		if err := r.target.UnloadService(ctx, svc); err != nil {
 			return err
 		}
 
@@ -831,7 +831,7 @@ func (r *Runner) unloadServices(ctx context.Context, svcs []*deployment.Service)
 		select {
 		case <-ctx.Done():
 			b := strings.Builder{}
-			status := r.target.Status(context.Background(), svcNames)
+			status := r.target.Status(ctx, svcNames)
 
 			for _, ss := range status.Services {
 				if ss.State != api.ServiceState_DOWN {
@@ -841,7 +841,7 @@ func (r *Runner) unloadServices(ctx context.Context, svcs []*deployment.Service)
 
 			return errors.Wrapf(ctx.Err(), "Timed out waiting for %s to unload", b.String())
 		case <-ticker.C:
-			status := r.target.Status(context.Background(), svcNames)
+			status := r.target.Status(ctx, svcNames)
 
 			unloaded := true
 			for _, ss := range status.Services {

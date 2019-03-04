@@ -268,7 +268,7 @@ func (phase *InstallPhase) Run(writer *eventWriter) error {
 			"install-arg": step.pkg.InstallIdent(),
 		})
 
-		isInstalled, err := step.target.IsInstalled(step.pkg)
+		isInstalled, err := step.target.IsInstalled(context.TODO(), step.pkg)
 		if err != nil {
 			err = errors.Wrapf(err, "failure occurred checking if package %q is installed", step.pkg)
 			logCtx.WithError(err).Error("Failed checking if package was installed")
@@ -276,7 +276,7 @@ func (phase *InstallPhase) Run(writer *eventWriter) error {
 			return err
 		}
 		if !isInstalled {
-			err = step.target.InstallService(step.pkg, "")
+			err = step.target.InstallService(context.TODO(), step.pkg, "")
 			if err != nil {
 				err = errors.Wrapf(err, "failed to install package %q", step.pkg)
 				logCtx.WithError(err).Error("Unable to install package")
@@ -298,7 +298,7 @@ func (phase *InstallPhase) Run(writer *eventWriter) error {
 			}
 
 			if !isBinlinked {
-				cmdOutput, err := step.target.BinlinkPackage(step.pkg, cmd)
+				cmdOutput, err := step.target.BinlinkPackage(context.TODO(), step.pkg, cmd)
 				if err != nil {
 					logCtx.WithError(err).Warnf("failed to binlink command %q in pkg %q - hab output: %s",
 						cmd, habpkg.Ident(step.pkg), cmdOutput)
@@ -356,7 +356,7 @@ func (phase *SelfUpgradePhase) Run(writer *eventWriter) error {
 		// and would be stuck at that old version until another promotion,
 		// or possibly forever.
 		logCtx.Info("Requesting self upgrade")
-		err = phase.target.LoadDeploymentService(desiredPackage)
+		err = phase.target.LoadDeploymentService(context.TODO(), desiredPackage)
 		if err != nil {
 			return errors.Wrap(err, "Failed to start service")
 		}
@@ -522,7 +522,7 @@ func (phase *RunningPhase) Run(writer *eventWriter) error {
 		}
 
 		if reloadNeeded {
-			err := step.target.UnloadService(step.pkg)
+			err := step.target.UnloadService(context.TODO(), step.pkg)
 			if err != nil {
 				err = errors.Wrap(err, "failed to unload service")
 				writer.StartingFailed(step.pkg, err)
@@ -546,7 +546,7 @@ func (phase *RunningPhase) Run(writer *eventWriter) error {
 		}
 
 		if reloadNeeded {
-			err := step.target.LoadService(step.pkg, target.BindMode(step.bindMode), target.Binds(step.binds))
+			err := step.target.LoadService(context.TODO(), step.pkg, target.BindMode(step.bindMode), target.Binds(step.binds))
 			if err != nil {
 				err = errors.Wrap(err, "Failed to start service")
 				writer.StartingFailed(step.pkg, err)
@@ -740,7 +740,7 @@ func (phase *SupervisorUpgradePhase) restartHabSup(w *eventWriter, target target
 		for i, svc := range services {
 			serviceList[i] = svc.Name
 		}
-		waitForFullRestart, err := target.HabSupRestart(serviceList)
+		waitForFullRestart, err := target.HabSupRestart(context.TODO(), serviceList)
 		if err != nil {
 			err = errors.Wrap(err, "failed to restart Habitat supervisor")
 			w.RestartingHabSupFailed(err)
@@ -767,7 +767,7 @@ func (phase *SupervisorUpgradePhase) installHabPackages(w *eventWriter, target t
 
 	for _, expectedPackage := range expectedPackages {
 		w.InstallingPackage(expectedPackage)
-		isInstalled, err := target.IsInstalled(expectedPackage)
+		isInstalled, err := target.IsInstalled(context.TODO(), expectedPackage)
 		if err != nil {
 			err := errors.Wrapf(err, "failed to get current install state of %s", habpkg.Ident(expectedPackage))
 			w.InstallingPackageFailed(expectedPackage, err)
@@ -775,7 +775,7 @@ func (phase *SupervisorUpgradePhase) installHabPackages(w *eventWriter, target t
 		}
 
 		if !isInstalled {
-			err := target.InstallService(expectedPackage, "")
+			err := target.InstallService(context.TODO(), expectedPackage, "")
 			if err != nil {
 				err = errors.Wrapf(err, "failed to install %s", habpkg.Ident(expectedPackage))
 				w.InstallingPackageFailed(expectedPackage, err)
@@ -789,7 +789,7 @@ func (phase *SupervisorUpgradePhase) installHabPackages(w *eventWriter, target t
 
 	}
 
-	output, err := target.BinlinkPackage(&binPkg, "hab")
+	output, err := target.BinlinkPackage(context.TODO(), &binPkg, "hab")
 	if err != nil {
 		logrus.Debugf("Binlink of %q failed with output: %q", habpkg.Ident(&binPkg), output)
 		logrus.Warnf("Could not binlink %q, some hab commands may not work", habpkg.Ident(&binPkg))
@@ -887,7 +887,7 @@ func stopService(writer *eventWriter, t target.Target, pkg habpkg.Installable) e
 	logrus.WithFields(logrus.Fields{
 		"pkg": pkg,
 	}).Info("Unloading service. Desired state was not running.")
-	err := t.UnloadService(pkg)
+	err := t.UnloadService(context.TODO(), pkg)
 	if err != nil {
 		err = errors.Wrap(err, "Failed to unload service")
 		writer.UnloadingFailed(pkg, err)

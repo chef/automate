@@ -35,19 +35,19 @@ type DeployedService struct {
 type Bootstrapper interface {
 	// InstallHabitat should install the `hab` binary, using the
 	// version specified in the manifest.
-	InstallHabitat(manifest.ReleaseManifest, cli.BodyWriter) error
+	InstallHabitat(context.Context, manifest.ReleaseManifest, cli.BodyWriter) error
 	// InstallDeploymentService installs the deployment-service
 	// package specified in the manifest.
-	InstallDeploymentService(*dc.ConfigRequest, manifest.ReleaseManifest) error
+	InstallDeploymentService(context.Context, *dc.ConfigRequest, manifest.ReleaseManifest) error
 	// SetupSupervisor should install our habitat supervisor
 	// configuration into the systems init system. If this
 	// function completes without error, the Habitat supervisor
 	// should be available to load further Chef Automate services.
-	SetupSupervisor(*dc.ConfigRequest, manifest.ReleaseManifest, cli.FormatWriter) error
+	SetupSupervisor(context.Context, *dc.ConfigRequest, manifest.ReleaseManifest, cli.FormatWriter) error
 	// DeployDeploymentService configures and starts the
 	// deployment-service. If this function exits without an
 	// error, the deployment-service should be loaded via Habitat.
-	DeployDeploymentService(*dc.ConfigRequest, manifest.ReleaseManifest, cli.BodyWriter) error
+	DeployDeploymentService(context.Context, *dc.ConfigRequest, manifest.ReleaseManifest, cli.BodyWriter) error
 	// SetHabitatEnvironment is a work-around for backwards
 	// compatibility. It should set the PATH and HAB_SUP_BINARY
 	// environment variables in the current process to ensure that
@@ -60,15 +60,15 @@ type Bootstrapper interface {
 // but without the output return since Target is currently
 // responsible for logging.
 type ServiceManager interface {
-	IsInstalled(habpkg.VersionedPackage) (bool, error)
+	IsInstalled(context.Context, habpkg.VersionedPackage) (bool, error)
 	IsBinlinked(habpkg.VersionedPackage, string) (bool, error)
-	BinlinkPackage(habpkg.VersionedPackage, string) (string, error)
-	InstallService(habpkg.Installable, string) error
-	RemoveService(habpkg.VersionedPackage) error
-	LoadService(habpkg.VersionedPackage, ...LoadOption) error
-	UnloadService(habpkg.VersionedPackage) error
-	StartService(habpkg.VersionedPackage) error
-	StopService(habpkg.VersionedPackage) error
+	BinlinkPackage(context.Context, habpkg.VersionedPackage, string) (string, error)
+	InstallService(context.Context, habpkg.Installable, string) error
+	RemoveService(context.Context, habpkg.VersionedPackage) error
+	LoadService(context.Context, habpkg.VersionedPackage, ...LoadOption) error
+	UnloadService(context.Context, habpkg.VersionedPackage) error
+	StartService(context.Context, habpkg.VersionedPackage) error
+	StopService(context.Context, habpkg.VersionedPackage) error
 }
 
 // Target encapsulates all commands interacting with a2 stack
@@ -76,12 +76,12 @@ type Target interface {
 	Bootstrapper
 	ServiceManager
 
-	LoadDeploymentService(habpkg.VersionedPackage) error
+	LoadDeploymentService(context.Context, habpkg.VersionedPackage) error
 
 	DeployedServices(ctx context.Context) (map[string]DeployedService, error)
 	Status(ctx context.Context, serviceNames []string) *api.ServiceStatus
 
-	Stop() error
+	Stop(ctx context.Context) error
 	EnsureStopped() error
 	Disable() error
 	EnsureDisabled() error
@@ -109,7 +109,7 @@ type Target interface {
 	SystemdRunning() (bool, error)
 
 	HabSupRestartRequired(habpkg.HabPkg) (bool, error)
-	HabSupRestart([]string) (bool, error)
+	HabSupRestart(context.Context, []string) (bool, error)
 
 	CommandExecutor() command.Executor
 	HabAPIClient() *habapi.Client

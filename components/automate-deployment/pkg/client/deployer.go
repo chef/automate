@@ -708,7 +708,7 @@ func (d *deployer) bootstrap() {
 	}
 
 	b := bootstrap.NewCompatBootstrapper(d.target)
-	d.err = bootstrap.FullBootstrap(b, m, d.mergedCfg.Deployment, d.writer)
+	d.err = bootstrap.FullBootstrap(d.ctx, b, m, d.mergedCfg.Deployment, d.writer)
 }
 
 func (d *deployer) waitForDeploymentService() {

@@ -138,7 +138,7 @@ func runBootstrapCmd(cmd *cobra.Command, args []string) error {
 	client.SetProxyEnvironment(conf.Deployment)
 
 	b := bootstrap.NewCompatBootstrapper(tgt)
-	err = bootstrap.FullBootstrap(b, m, mergedCfg.GetDeployment(), writer)
+	err = bootstrap.FullBootstrap(context.TODO(), b, m, mergedCfg.GetDeployment(), writer)
 	if err != nil {
 		return status.Annotate(err, status.DeployError)
 	}
@@ -750,7 +750,7 @@ func runGRPCurl(cmd *cobra.Command, args []string) error {
 
 	grpcPkg := habpkg.New("core", "grpcurl")
 	habcmd := target.NewHabCmd(command.DefaultExecutor, false)
-	installed, err := habcmd.IsInstalled(&grpcPkg)
+	installed, err := habcmd.IsInstalled(ctx, &grpcPkg)
 	if err != nil {
 		return status.Wrap(
 			err,

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -48,7 +49,7 @@ func runSetup(cmd *cobra.Command, args []string) {
 	setupLogging()
 	setupEnvironment()
 
-	err := target.SetupSupervisor(conf, manifest, writer)
+	err := target.SetupSupervisor(context.TODO(), conf, manifest, writer)
 	if err != nil {
 		writer.FailWrap(err, "setup failed")
 		os.Exit(1)
@@ -62,7 +63,7 @@ func runDeploy(cmd *cobra.Command, args []string) {
 	setupEnvironment()
 
 	target := target.NewLocalTarget(airgap.AirgapInUse())
-	err := target.DeployDeploymentService(conf, manifest, writer)
+	err := target.DeployDeploymentService(context.TODO(), conf, manifest, writer)
 	if err != nil {
 		writer.FailWrap(err, "setup failed")
 		os.Exit(1)

@@ -1,6 +1,10 @@
 package target
 
 import (
+	"context"
+	"strings"
+	"time"
+
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/lib/platform/command"
 )
@@ -14,35 +18,50 @@ var stdHabOptions = []command.Opt{
 	command.Envvar("HAB_LICENSE", "accept-no-persist"),
 }
 
+const (
+	// HabTimeoutInstallPackage is the timeout for InstallPackage
+	// commands. Since package installs also install dependencies,
+	// a given package installation can often take considerable
+	// time.
+	HabTimeoutInstallPackage = 1 * time.Hour
+	// HabTimeoutIsInstalled is the timeout for
+	// IsInstalled. IsInstalled runs hab pkg path which we expect
+	// to be very fast typically.
+	HabTimeoutIsInstalled = 1 * time.Minute
+	// HabTimeoutDefault is the timeout for hab commands that
+	// don't have other timeouts.
+	HabTimeoutDefault = 5 * time.Minute
+)
+
 // A HabCmd runs the `hab` command-line tool with a standard set of
 // options.
 type HabCmd interface {
 	// InstallPackage installs an Installable habitat package
 	// (a hartifact or a package from the Depot)
-	InstallPackage(habpkg.Installable, string) (string, error)
+	InstallPackage(context.Context, habpkg.Installable, string) (string, error)
 	// IsInstalled returns true if the specified package is
 	// installed and false otherwise.  An error is returned when
 	// the underlying habitat commands have failed.
-	IsInstalled(habpkg.VersionedPackage) (bool, error)
+	IsInstalled(context.Context, habpkg.VersionedPackage) (bool, error)
 	// BinlinkPackage binlinks a binary in the given Habitat
 	// package. An error is returned if the underlying hab command
 	// failed.
-	BinlinkPackage(habpkg.VersionedPackage, string) (string, error)
+	BinlinkPackage(context.Context, habpkg.VersionedPackage, string) (string, error)
 
 	// LoadService loads the given habpkg.VersionedPackage as a service
 	// with the provided options.
-	LoadService(habpkg.VersionedPackage, ...LoadOption) (string, error)
+	LoadService(context.Context, habpkg.VersionedPackage, ...LoadOption) (string, error)
 	// UnloadService unloads a given habpkg.VersionedPackage
-	UnloadService(habpkg.VersionedPackage) (string, error)
+	UnloadService(context.Context, habpkg.VersionedPackage) (string, error)
 	// StartService starts an already-loaded service identified by
 	// the given habpkg.VersionedPackage.
-	StartService(habpkg.VersionedPackage) (string, error)
+	StartService(context.Context, habpkg.VersionedPackage) (string, error)
 	// StopService stops an already-loaded service identified by
 	// the given habpkg.VersionedPackage.
-	StopService(habpkg.VersionedPackage) (string, error)
+	StopService(context.Context, habpkg.VersionedPackage) (string, error)
 
 	// Terminate supervisor, does not block
-	SupTerm() error
+	SupTerm(context.Context) error
 }
 
 type LoadOption func([]string) []string
@@ -91,9 +110,11 @@ func NewHabCmd(c command.Executor, offlineMode bool) HabCmd {
 //
 // TODO(ssd) 2018-07-16: Can we rip channel out of here?  I don't
 // think anything really uses channel anymore.
-func (c *habCmd) InstallPackage(pkg habpkg.Installable, channel string) (string, error) {
+func (c *habCmd) InstallPackage(ctx context.Context, pkg habpkg.Installable, channel string) (string, error) {
 	args := []string{"pkg", "install", pkg.InstallIdent()}
 	opts := standardHabOptions()
+	ctx, cancel := context.WithTimeout(ctx, HabTimeoutInstallPackage)
+	defer cancel()
 
 	if c.offlineMode {
 		args = append(args, "--offline")
@@ -104,14 +125,19 @@ func (c *habCmd) InstallPackage(pkg habpkg.Installable, channel string) (string,
 		args = append(args, "--channel", channel)
 	}
 
-	return c.executor.CombinedOutput("hab", append(opts, command.Args(args...))...)
+	opts = append(opts, command.Context(ctx), command.Args(args...))
+	return c.executor.CombinedOutput("hab", opts...)
 }
 
 // IsInstalled checks if a package is already installed
-func (c *habCmd) IsInstalled(pkg habpkg.VersionedPackage) (bool, error) {
-	err := c.executor.Run("hab",
-		append(standardHabOptions(),
-			command.Args("pkg", "path", habpkg.Ident(pkg)))...)
+func (c *habCmd) IsInstalled(ctx context.Context, pkg habpkg.VersionedPackage) (bool, error) {
+	args := command.Args("pkg", "path", habpkg.Ident(pkg))
+	ctx, cancel := context.WithTimeout(ctx, HabTimeoutIsInstalled)
+	defer cancel()
+
+	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
+
+	err := c.executor.Run("hab", cmdOpts...)
 	if err != nil {
 		return false, nil
 	}
@@ -120,37 +146,75 @@ func (c *habCmd) IsInstalled(pkg habpkg.VersionedPackage) (bool, error) {
 }
 
 // BinlinkPackage binlinks an executable from a Habitat package
-func (c *habCmd) BinlinkPackage(pkg habpkg.VersionedPackage, exe string) (string, error) {
+func (c *habCmd) BinlinkPackage(ctx context.Context, pkg habpkg.VersionedPackage, exe string) (string, error) {
 	args := command.Args("pkg", "binlink", "--force", habpkg.Ident(pkg), exe)
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), args)...)
+	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
+	defer cancel()
+
+	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
+
+	return c.executor.CombinedOutput("hab", cmdOpts...)
 }
 
-func (c *habCmd) LoadService(svc habpkg.VersionedPackage, opts ...LoadOption) (string, error) {
+func (c *habCmd) LoadService(ctx context.Context, svc habpkg.VersionedPackage, opts ...LoadOption) (string, error) {
 	args := []string{"svc", "load", "--force", habpkg.Ident(svc), "--strategy", "none"}
 	for _, o := range opts {
 		args = o(args)
 	}
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), command.Args(args...))...)
+
+	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
+	defer cancel()
+
+	cmdOpts := append(standardHabOptions(), command.Context(ctx), command.Args(args...))
+
+	return c.executor.CombinedOutput("hab", cmdOpts...)
 }
 
-func (c *habCmd) UnloadService(svc habpkg.VersionedPackage) (string, error) {
+func (c *habCmd) UnloadService(ctx context.Context, svc habpkg.VersionedPackage) (string, error) {
 	args := command.Args("svc", "unload", habpkg.ShortIdent(svc))
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), args)...)
+	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
+	defer cancel()
+
+	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
+	output, err := c.executor.CombinedOutput("hab", cmdOpts...)
+
+	// NOTE: hab <= 0.79 returned 0 if the service was already unloaded.
+	// Beginning with 0.80, hab will exit 1 if the service was already unloaded.
+	// As we need to support mixed versions because of upgrades we'll do our
+	// best to handle backwards compatibility of this interface.
+	if err != nil {
+		if strings.Contains(output, "not loaded") {
+			return output, nil
+		}
+	}
+
+	return output, err
 }
 
-func (c *habCmd) StartService(svc habpkg.VersionedPackage) (string, error) {
+func (c *habCmd) StartService(ctx context.Context, svc habpkg.VersionedPackage) (string, error) {
 	args := command.Args("svc", "start", habpkg.ShortIdent(svc))
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), args)...)
+	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
+	defer cancel()
+
+	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
+
+	return c.executor.CombinedOutput("hab", cmdOpts...)
 }
 
-func (c *habCmd) StopService(svc habpkg.VersionedPackage) (string, error) {
+func (c *habCmd) StopService(ctx context.Context, svc habpkg.VersionedPackage) (string, error) {
 	args := command.Args("svc", "stop", habpkg.ShortIdent(svc))
-	return c.executor.CombinedOutput("hab", append(standardHabOptions(), args)...)
+	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
+	defer cancel()
+
+	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
+
+	return c.executor.CombinedOutput("hab", cmdOpts...)
 }
 
-func (c *habCmd) SupTerm() error {
-	args := command.Args("sup", "term")
-	_, err := c.executor.Start("hab", append(standardHabOptions(), args)...)
+func (c *habCmd) SupTerm(ctx context.Context) error {
+	cmdOpts := append(standardHabOptions(), command.Context(ctx), command.Args("sup", "term"))
+
+	_, err := c.executor.Start("hab", cmdOpts...)
 	return err
 }
 

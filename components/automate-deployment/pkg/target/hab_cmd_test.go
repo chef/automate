@@ -1,6 +1,7 @@
 package target_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -16,6 +17,8 @@ func TestInstallPackage(t *testing.T) {
 	pkgIdent := "origin/name/0.1.0/20180101010101"
 	pkg, err := habpkg.FromString(pkgIdent)
 	require.NoError(t, err)
+	ctx := context.Background()
+
 	t.Run("it runs hab pkg install with the NOCOLORING and NONINTERACTIVE environment variables", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
 		installer := target.NewHabCmd(mockExecutor, false)
@@ -30,7 +33,7 @@ func TestInstallPackage(t *testing.T) {
 				"--channel", "current"},
 		}).Return("test command output", nil)
 
-		_, err := installer.InstallPackage(&pkg, "current")
+		_, err := installer.InstallPackage(ctx, &pkg, "current")
 		require.NoError(t, err)
 		mockExecutor.AssertAllCalled()
 	})
@@ -49,7 +52,7 @@ func TestInstallPackage(t *testing.T) {
 			},
 		}).Return("test command output", nil)
 
-		_, err := installer.InstallPackage(&pkg, "current")
+		_, err := installer.InstallPackage(ctx, &pkg, "current")
 		require.NoError(t, err)
 		mockExecutor.AssertAllCalled()
 	})
@@ -66,7 +69,7 @@ func TestInstallPackage(t *testing.T) {
 			},
 		}).Return("test command output", nil)
 
-		_, err := installer.InstallPackage(&pkg, "")
+		_, err := installer.InstallPackage(ctx, &pkg, "")
 		require.NoError(t, err)
 		mockExecutor.AssertAllCalled()
 	})
@@ -84,7 +87,7 @@ func TestInstallPackage(t *testing.T) {
 			},
 		}).Return("test command output", errors.New("test command failure"))
 
-		_, err := installer.InstallPackage(&pkg, "")
+		_, err := installer.InstallPackage(ctx, &pkg, "")
 		assert.Error(t, err)
 		mockExecutor.AssertAllCalled()
 	})
@@ -95,6 +98,7 @@ func TestIsInstalled(t *testing.T) {
 	pkgIdent := "origin/name/0.1.0/20180101010101"
 	pkg, err := habpkg.FromString(pkgIdent)
 	require.NoError(t, err)
+	ctx := context.Background()
 
 	t.Run("it runs hab pkg path with the NOCOLORING and NONINTERACTIVE environment variables", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
@@ -106,7 +110,7 @@ func TestIsInstalled(t *testing.T) {
 			Args: []string{"pkg", "path", pkgIdent},
 		}).Return(nil)
 
-		_, err := installer.IsInstalled(&pkg)
+		_, err := installer.IsInstalled(ctx, &pkg)
 		require.NoError(t, err)
 		mockExecutor.AssertAllCalled()
 	})
@@ -121,7 +125,7 @@ func TestIsInstalled(t *testing.T) {
 			Args: []string{"pkg", "path", pkgIdent},
 		}).Return(nil)
 
-		isInstalled, err := installer.IsInstalled(&pkg)
+		isInstalled, err := installer.IsInstalled(ctx, &pkg)
 		require.NoError(t, err)
 		assert.True(t, isInstalled)
 		mockExecutor.AssertAllCalled()
@@ -137,7 +141,7 @@ func TestIsInstalled(t *testing.T) {
 			Args: []string{"pkg", "path", pkgIdent},
 		}).Return(errors.New("no such package"))
 
-		isInstalled, err := installer.IsInstalled(&pkg)
+		isInstalled, err := installer.IsInstalled(ctx, &pkg)
 		require.NoError(t, err)
 		assert.False(t, isInstalled)
 		mockExecutor.AssertAllCalled()
@@ -148,6 +152,7 @@ func TestBinlinkPackage(t *testing.T) {
 	pkgIdent := "origin/name/0.1.0/20180101010101"
 	pkg, err := habpkg.FromString(pkgIdent)
 	require.NoError(t, err)
+	ctx := context.Background()
 
 	t.Run("it runs hab pkg binlink with the NOCOLORING and NONINTERACTIVE environment variables", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
@@ -159,7 +164,7 @@ func TestBinlinkPackage(t *testing.T) {
 			Args: []string{"pkg", "binlink", "--force", pkgIdent, "some_exe"},
 		}).Return("test command output", nil)
 
-		_, err := installer.BinlinkPackage(&pkg, "some_exe")
+		_, err := installer.BinlinkPackage(ctx, &pkg, "some_exe")
 		require.NoError(t, err)
 		mockExecutor.AssertAllCalled()
 	})
@@ -174,7 +179,7 @@ func TestBinlinkPackage(t *testing.T) {
 			Args: []string{"pkg", "binlink", "--force", pkgIdent, "some_exe"},
 		}).Return("test command output", errors.New("test command error"))
 
-		output, err := installer.BinlinkPackage(&pkg, "some_exe")
+		output, err := installer.BinlinkPackage(ctx, &pkg, "some_exe")
 		assert.Error(t, err)
 		assert.Equal(t, "test command output", output)
 		mockExecutor.AssertAllCalled()
