@@ -53,7 +53,7 @@ type upgradeCmdFlagSet struct {
 	skipSAMLCheck             bool
 	skipWorkflowCheck         bool
 	airgap                    string
-	// airgapPreflight only applies to the preflight-check upgrade-from-v1
+	// airgapPreflight only applies to the preflight-check migrate-from-v1
 	// subcommand; we want to reuse all the skip*Check options there but for
 	// preflight-check airgap is on/off vs. path to airgap bundle for the actual
 	// upgrade.
@@ -65,15 +65,16 @@ type upgradeCmdFlagSet struct {
 var upgradeCmdFlags = upgradeCmdFlagSet{}
 
 var upgradeFrom1Cmd = &cobra.Command{
-	Use:   "upgrade-from-v1 [/path/to/automate-deploy.toml]",
-	Short: "Upgrade from Chef Automate v1",
-	Long:  upgradeFrom1Long,
-	Args:  cobra.MaximumNArgs(3),
-	RunE:  runUpgradeFromV1Cmd,
+	Use:     "migrate-from-v1 [/path/to/automate-deploy.toml]",
+	Short:   "Migrate from Chef Automate v1",
+	Long:    upgradeFrom1Long,
+	Args:    cobra.MaximumNArgs(3),
+	RunE:    runUpgradeFromV1Cmd,
+	Aliases: []string{"upgrade-from-v1"},
 }
 
 var upgradeFrom1StatusCmd = &cobra.Command{
-	Use:   "upgrade-from-v1-status",
+	Use:   "migrate-from-v1-status",
 	Short: "Watch the status of the migration to Chef Automate 2",
 	RunE:  runUpgradeFromV1StatusCmd,
 }
@@ -86,7 +87,7 @@ var generateCfgCmd = &cobra.Command{
 }
 
 func init() {
-	// upgrade-from-v1 flags
+	// migrate-from-v1 flags
 	upgradeFrom1Cmd.PersistentFlags().BoolVar(
 		&upgradeCmdFlags.upgradeSkipPreflight,
 		"skip-preflight",
@@ -205,7 +206,7 @@ func init() {
 		panic(":(")
 	}
 
-	// a1 upgrade with Chef Server is only supported for the all-in-one topology
+	// a1 migration with Chef Server is only supported for the all-in-one topology
 	// used in OWCA and marketplace images; we do not support that configuration
 	// for other customers, so it's hidden.
 	err = upgradeFrom1Cmd.PersistentFlags().MarkHidden("enable-chef-server")
@@ -228,12 +229,12 @@ func init() {
 		panic(":(")
 	}
 
-	// upgrade-from-v1 gen-config flags
+	// migrate-from-v1 gen-config flags
 	generateCfgCmd.PersistentFlags().StringVarP(
 		&upgradeCmdFlags.upgradeTomlPath,
 		"out",
 		"o",
-		"./automate-upgrade.toml",
+		"./automate-migrate.toml",
 		"Output file")
 	upgradeFrom1Cmd.PersistentFlags().BoolVar(
 		&upgradeCmdFlags.skipBackupCheck,

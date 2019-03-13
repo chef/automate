@@ -7,8 +7,10 @@ import (
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
+	"github.com/chef/automate/lib/io/fileutils"
 )
 
 var upgradeCmd = &cobra.Command{
@@ -37,7 +39,26 @@ var upgradeStatusCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(0),
 }
 
+var a1RunningMsg = "You have a running Chef Automate v1 installation. Did you mean to type `chef-automate upgrade-from-v1` (alias for: `chef-automate migrate-from-v1`)?"
+
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
+	a1IsRunning, err := isA1Running()
+	if err != nil {
+		return status.Annotate(err, status.FileAccessError)
+	}
+
+	if a1IsRunning {
+		yes, err := writer.Confirm(a1RunningMsg)
+
+		if err != nil {
+			return status.Annotate(err, status.UpgradeError)
+		}
+
+		if yes {
+			return status.New(status.UpgradeError, "`chef-automate upgrade-from-v1` (alias for: `chef-automate migrate-from-v1`) intended.")
+		}
+	}
+
 	offlineMode := upgradeRunCmdFlags.airgap != ""
 	if upgradeRunCmdFlags.version != "" && offlineMode {
 		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
@@ -140,6 +161,28 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func isA1Running() (bool, error) {
+	var A1VersionManifestPath = "/opt/delivery/version-manifest.txt"
+	ok, err := fileutils.PathExists(A1VersionManifestPath)
+	if err != nil {
+		// early return and stop the upgrade because of the error
+		return false, err
+	}
+
+	if !ok {
+		// Chef Automate 1 is not installed; early return to continue upgrade
+		return false, nil
+	}
+
+	err = a1upgrade.AutomateCtlStatus()
+	if err != nil {
+		// Chef Automate 1 is not running; early return to continue upgrade
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func init() {

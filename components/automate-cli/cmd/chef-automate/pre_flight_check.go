@@ -53,9 +53,9 @@ var upgradePreflightCmdFlags = upgradeCmdFlagSet{}
 
 func newUpgradePreflightCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "upgrade-from-v1",
+		Use:   "migrate-from-v1",
 		RunE:  runUpgradePreflight,
-		Short: "Run preflight checks specific to upgrading from Chef Automate v1",
+		Short: "Run preflight checks specific to migrating from Chef Automate v1",
 	}
 
 	cmd.PersistentFlags().StringVarP(
