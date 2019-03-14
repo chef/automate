@@ -88,3 +88,5 @@ inherited_options:
 see_also:
 - chef-automate - Chef Automate CLI
 - gen-config - Generate a config file
+aliases:
+- upgrade-from-v1

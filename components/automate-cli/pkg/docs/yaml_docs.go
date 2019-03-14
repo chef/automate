@@ -53,6 +53,7 @@ type cmdDoc struct {
 	InheritedOptions []cmdOption `yaml:"inherited_options,omitempty"`
 	Example          string      `yaml:",omitempty"`
 	SeeAlso          []string    `yaml:"see_also,omitempty"`
+	Aliases          []string    `yaml:"aliases,omitempty"`
 }
 
 type statusDoc struct {
@@ -129,6 +130,10 @@ func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) str
 	yamlDoc.Synopsis = forceMultiLine(cmd.Short)
 	yamlDoc.Description = forceMultiLine(cmd.Long)
 	yamlDoc.Usage = forceMultiLine(cmd.UseLine())
+
+	if len(cmd.Aliases) > 0 {
+		yamlDoc.Aliases = cmd.Aliases
+	}
 
 	if len(cmd.Example) > 0 {
 		yamlDoc.Example = cmd.Example
