@@ -608,7 +608,7 @@ func (d *deployer) summarizeSteps(acceptDefaults bool) {
 
 	d.writer.Titlef("Your Chef Automate v2 configuration has been written to %s\n", d.configPath)
 	d.writer.Print(editConfigInstructions)
-	d.writer.Printf("chef-automate upgrade-from-v1 --config %s\n", d.configPath)
+	d.writer.Printf("chef-automate migrate-from-v1 --config %s\n", d.configPath)
 
 	userReady, err := d.writer.Confirm("Are you ready to continue?")
 	if err != nil {
@@ -1524,7 +1524,7 @@ func (d *deployer) startNonDataServices() {
 
 const initialMigrationCompleteFmt = `Some data will be upgraded in the background. To monitor the status of the upgrade, run
 
-  chef-automate upgrade-from-v1-status
+  chef-automate migrate-from-v1-status
 
 You can access Chef Automate using your existing credentials at
 

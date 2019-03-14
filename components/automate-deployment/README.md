@@ -106,7 +106,7 @@ studio or the vagrant-based test environment using automate-cli's
 `--self-test` flag:
 
 ```
-chef-automate upgrade-from-v1 --self-test
+chef-automate migrate-from-v1 --self-test
 ```
 
 In some cases, it is necessary to test the real migration code paths

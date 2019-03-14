@@ -29,7 +29,7 @@ function install_from_results_or_depot() {
 }
 
 install_from_results_or_depot automate-cli dev "$HARTIFACT_DIR"
-chef-automate upgrade-from-v1 \
+chef-automate migrate-from-v1 \
 	--channel dev \
 	--upgrade-strategy none \
 	--override-origin "${HAB_ORIGIN}" \

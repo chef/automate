@@ -164,13 +164,13 @@ contact your Chef account representative for a Chef Automate 2 license.
    run the command:
 
     ```shell
-    ./chef-automate upgrade-from-v1 --channel current
+    ./chef-automate migrate-from-v1 --channel current
     ```
 
     If your host is airgapped, run the command:
 
     ```shell
-    ./chef-automate upgrade-from-v1 --airgap-bundle </path/to/bundle>
+    ./chef-automate migrate-from-v1 --airgap-bundle </path/to/bundle>
     ```
 
 After the upgrade runs the preflight checks and analyzes your Chef Automate 1 configuration, it asks for confirmation to continue. Review the generated configuration file and if it is correct, type `yes` to continue.

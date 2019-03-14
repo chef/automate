@@ -185,7 +185,7 @@ func (m mockDB) StringQuery(query string, args ...interface{}) (string, error) {
 		//
 		// htpasswd -bnBC 12 "" migrated-builder-password | sed s/:\$2y/\$2a/
 		//
-		// The migrated_users controls of the a2-upgrade-from-v1-integration inspec
+		// The migrated_users controls of the a2-migrate-from-v1-integration inspec
 		// suite depend on these passwords. The admin-password is made available for
 		// inspec in integration/tests/[airgap_]a1migration.sh.
 		return `[{"name":"admin","first_name":null,"last_name":null,
@@ -271,7 +271,7 @@ func setupRabbitAPIServer() *http.Server {
 func setupEsAPIServer() *http.Server {
 	mux := http.NewServeMux()
 	// We actually are emulating the internal load balancer because
-	// upgrade-from-v1 talks to that instead of hitting es directly
+	// migrate-from-v1 talks to that instead of hitting es directly
 	// therefore we have /elasticsearch/ prepended to everything.
 	// Emulated ES APIs:
 	// - snapshot status API: note that we set backup type to fs in the test

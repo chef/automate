@@ -90,7 +90,7 @@ osQYj4UQRiMOwQfFY7R9rjdWHdrYeBS6BvWMu6NZY105upZfKVWhAD0=
 -----END RSA PRIVATE KEY-----`
 
 // StartTestHarness does what is necessary to be able to run the
-// `upgrade-from-v1` code against a host that doesn't actually have A1
+// `migrate-from-v1` code against a host that doesn't actually have A1
 // installed. The test harness consists of these things:
 // * sanity checks to make sure we actually don't have a1 installed, just in
 //   case.

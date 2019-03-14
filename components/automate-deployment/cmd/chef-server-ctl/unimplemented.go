@@ -18,7 +18,7 @@ func init() {
 const unsupportedCmdErr = `Most likely you are running this by mistake :(
 
 This copy of chef-server-ctl exists to support the
-'chef-automate upgrade-from-v1 --self-test' mode. It is here to provide a stub
+'chef-automate migrate-from-v1 --self-test' mode. It is here to provide a stub
 implementation of the 'chef-server-ctl stop' subcommand only. You probably
 meant to run the copy of 'chef-server-ctl' provided by A2's Chef Server
 integration. When everything is working correctly, you can find that copy of

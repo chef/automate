@@ -1,4 +1,4 @@
-name: a2-upgrade-from-v1-integration
+name: a2-migrate-from-v1-integration
 title: InSpec Profile
 maintainer: Chef Software, Inc.
 copyright: Chef Software, Inc.
