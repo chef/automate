@@ -51,6 +51,8 @@ do_deploy() {
 }
 
 do_prepare_upgrade() {
-    automate-ctl stop
+    # The a1stub test harness in the old version of A2 does not clean up the A1 version
+    # manifest it creates.
+    rm -f /opt/delivery/version-manifest.txt
     do_prepare_upgrade_default
 }
