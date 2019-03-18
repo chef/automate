@@ -10,13 +10,13 @@ toc = true
     weight = 30
 +++
 
-Migrating Standalone Automate 2 to an External Elasticsearch Cluster
+#Migrating Standalone Automate 2 to an External Elasticsearch Cluster
 
-Setup your external cluster
-Install Elasticsearch on all of your cluster members using version 6.2.2, with the cluster_name set to "chef-insights". Elastic provides instructions for configuring Elasticsearch here https://www.elastic.co/guide/en/elasticsearch/reference/6.2/_installation.html.
-We will need the IP address of each node for the later steps. In my example it’s a 3 node cluster and the IPs are 10.1.1.11, 10.1.1.12, 10.1.1.13.
+##1. Setup your external cluster
+Install Elasticsearch on all of your cluster members using version 6.2.2, with the cluster_name set to "chef-insights". Elastic provides [instructions for configuring Elasticsearch here](https://www.elastic.co/guide/en/elasticsearch/reference/6.2/_installation.html).
+We will need the IP address of each node for the later steps. In this example, it’s a 3 node cluster, and the IPs are `10.1.1.11`, `10.1.1.12`, and `10.1.1.13`.
 
-You can test that it’s working correctly like so
+You can test that it is working correctly like so:
 ```
 curl 10.1.1.11:9200/_cluster/health?pretty
 {
@@ -37,16 +37,12 @@ curl 10.1.1.11:9200/_cluster/health?pretty
   "active_shards_percent_as_number" : 100.0
 }
 ```
-You want to make sure status is green, and number_of_nodes is however many nodes you stood up.
+Make sure status is green, and know that "number_of_nodes" is equal to however many nodes you set up.
 
+##2. Join A2 to your External Cluster
 
-
-
-
-
-2. Join A2 to your External Cluster.
-Create a toml file that contains the settings for A2s internal Elasticsearch to join your cluster.
-In this example I’ll name the file “join_cluster.toml”
+Create a `toml` file that contains the settings for A2's internal Elasticsearch to join your cluster.
+In this example, I’ll name the file “join_cluster.toml”
 ```
 [elasticsearch.v1.sys.node]
   master = true
@@ -70,7 +66,7 @@ Applying deployment configuration
   Configured automate-elasticsearch
 Success: Configuration patched
 ```
-You can check that this worked by running this command on your A2 server.
+You can check that this configuration set-up worked by running the following command on your A2 server:
 
 ```
 curl localhost:10141/_cluster/health?pretty
@@ -95,20 +91,19 @@ curl localhost:10141/_cluster/health?pretty
   "active_shards_percent_as_number" : 100.0
 }
 ```
-You want to make sure the health is Green. You will notice that it is relocating 2 shards. Currently Elasticsearch is trying to rebalance data equally between your 3 ES nodes and the built in ES in Automate. You do not need to wait for this to finish before moving to the next step.
+You want to make sure the health is Green. You will notice that it is relocating 2 shards. Currently, Elasticsearch is trying to rebalance data equally between your 3 Elasticsearch nodes and the built in ES in Automate. You do not need to wait for this to finish before moving to the next step.
 
-3. Move all data out of Automate’s built in Elasticsearch.
+##3. Move all data out of Automate’s built in Elasticsearch
 
+Use curl to change Elasticsearch’s configuration so that it moves all data out to your ES cluster nodes. In this example, there are three things you will need to consider:
 
-Use curl to change Elasticsearch’s configuration so that it moves all data out to your ES cluster nodes. In this example there are three things you will need to consider.
-
-cluster.routing.allocation.exclude._ip: This needs to be the IP address your Automate server uses to communicate with the elasticsearch servers.
+ - `cluster.routing.allocation.exclude._ip`: This needs to be the IP address your Automate server uses to communicate with the elasticsearch servers.
 When in doubt this command will tell you which IP is being used
 `curl -s localhost:10141/_nodes/_local?pretty | grep transport_address`
 
-cluster.routing.allocation.cluster_concurrent_rebalance: The number of shards to move at a time. The default is 2, we’re planning to do 10 at a time to speed things along.
+- `cluster.routing.allocation.cluster_concurrent_rebalance`: The number of shards to move at a time. The default is 2, we’re planning to do 10 at a time to speed things along.
 
-Indices.recovery.max_bytes_per_sec: We set the limit to 80 MB/s, which is a bit over half of a 1Gbps link. Feel free to tweak this based on how much bandwidth you have. The default is 40.
+- `Indices.recovery.max_bytes_per_sec`: We set the limit to 80 MB/s, which is a bit over half of a 1Gbps link. Feel free to tweak this based on how much bandwidth you have. The default is 40.
 
 ```
 curl -XPUT localhost:10141/_cluster/settings -H 'Content-Type: application/json' -d '{
@@ -125,19 +120,18 @@ curl -XPUT localhost:10141/_cluster/settings -H 'Content-Type: application/json'
 {"acknowledged":true,"persistent":{},"transient":{"cluster":{"routing":{"allocation":{"cluster_concurrent_rebalance":"10","exclude":{"_ip":"10.1.1.10"}}}},"indices":{"recovery":{"max_bytes_per_sec":"80mb"}}}}
 ```
 
-To check on progress, get node name of built in ES with
+To check on progress, get node name of built in Elasticsearch with:
 ```
 curl -s localhost:10141/_nodes/_local?pretty | grep \"name\" | head -1
 ```
-Then when you have the uniq name
+Then, when you have the uniq name:
 ```
 watch 'curl -s localhost:10141/_cat/shards | grep 7gPK9oY | sort'
 ```
-When everything has moved that should return nothing.
+When everything has moved, that command should return nothing.
 
 
-4. Set Final Configuration for Automate’s Built in Elasticsearch.
-
+##4. Set Final Configuration for Automate’s Built in Elasticsearch
 
 The last step will be to configure Elasticsearch to be a coordinating only node, similar to how Elastic recommends for Kibana here. https://www.elastic.co/guide/en/kibana/6.2/production.html
 
@@ -167,7 +161,7 @@ Update your “join_cluster.toml” from earlier and change master and data to �
 [elasticsearch.v1.sys.discovery]
   ping_unicast_hosts = "[10.1.1.11, 10.1.1.12, 10.1.1.13]"
 ```
-Apply the patch the same way as before,
+Apply the patch the same way as before:
 
 ```
 chef-automate config patch join_cluster.toml
@@ -208,4 +202,4 @@ curl localhost:10141/_cluster/health?pretty
 number_of_data_nodes should equal the number of nodes in your external cluster.
 number_of_nodes should be equal number of ES nodes + your Automate server.
 
-If everything looks good, Congratulations your done.
+If everything looks good, then congratulations, you are done!
