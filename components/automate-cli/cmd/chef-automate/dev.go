@@ -472,23 +472,23 @@ func newDumpA1PGCmd() *cobra.Command {
 		Short: "Dump an A1 postgres database using the same method the actual upgrade does",
 	}
 	cmd.PersistentFlags().StringVarP(
-		&upgradeCmdFlags.a2ConfigPath,
+		&migrateCmdFlags.a2ConfigPath,
 		"config",
 		"c",
 		"",
 		"Path to an automate-deploy.toml")
 	cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.enableChefServer,
+		&migrateCmdFlags.enableChefServer,
 		"enable-chef-server",
 		false,
 		"Enable integrated Chef Server migration and deployment; only valid for all-in-one topology")
 	cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.enableWorkflow,
+		&migrateCmdFlags.enableWorkflow,
 		"enable-workflow",
 		false,
 		"Enable integrated Workflow Server migration and deployment; only valid for all-in-one topology")
 	cmd.PersistentFlags().IntVar(
-		&upgradeCmdFlags.pgDumpSeconds,
+		&migrateCmdFlags.pgDumpSeconds,
 		"postgres-dump-wait-seconds",
 		300,
 		"Optional max wait for Chef Automate v1 PostgreSQL dump (default = 300 seconds)")
@@ -503,13 +503,13 @@ func newExtractA1UserData() *cobra.Command {
 		Short: "Extract A1 User Data",
 	}
 	cmd.PersistentFlags().StringVarP(
-		&upgradeCmdFlags.a2ConfigPath,
+		&migrateCmdFlags.a2ConfigPath,
 		"config",
 		"c",
 		"",
 		"Path to an automate-deploy.toml")
 	cmd.PersistentFlags().IntVar(
-		&upgradeCmdFlags.pgDumpSeconds,
+		&migrateCmdFlags.pgDumpSeconds,
 		"postgres-dump-wait-seconds",
 		300,
 		"Optional max wait for Chef Automate v1 PostgreSQL dump (default = 300 seconds)")
@@ -518,12 +518,12 @@ func newExtractA1UserData() *cobra.Command {
 }
 
 func runDumpA1PG(cmd *cobra.Command, _ []string) error {
-	upgrade, err := newLocalUpgrade()
+	migration, err := newLocalMigration()
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Configuring database dump operation failed")
 	}
 
-	if err = client.A1PgDump(writer, upgrade); err != nil {
+	if err = client.A1PgDump(writer, migration); err != nil {
 		return status.Wrap(err, status.UpgradeError, "Database dump failed")
 	}
 
@@ -531,16 +531,16 @@ func runDumpA1PG(cmd *cobra.Command, _ []string) error {
 }
 
 func runExtractA1UserData(cmd *cobra.Command, _ []string) error {
-	upgrade, err := newLocalUpgrade()
+	migration, err := newLocalMigration()
 	if err != nil {
 		return status.Wrap(err, status.ConfigError, "Configuring database user data extraction failed")
 	}
 
-	if err = client.A1ExtractUserData(writer, upgrade); err != nil {
+	if err = client.A1ExtractUserData(writer, migration); err != nil {
 		return status.Wrap(err, status.UpgradeError, "Database user data extraction failed")
 	}
 
-	if err = client.A1ExtractUserRolesData(writer, upgrade); err != nil {
+	if err = client.A1ExtractUserRolesData(writer, migration); err != nil {
 		return status.Wrap(err, status.UpgradeError, "Database user roles data extraction failed")
 	}
 

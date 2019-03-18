@@ -24,15 +24,15 @@ import (
 	"github.com/chef/automate/lib/version"
 )
 
-var upgradeFrom1Long = `Upgrade an existing Chef Automate v1 deployment to Chef Automate v2.
+var migrateFrom1Long = `Migrate an existing Chef Automate v1 deployment to Chef Automate v2.
 	- <CONFIG_FILE> must be a valid path to a TOML formatted configuration file`
 
-type upgradeCmdFlagSet struct {
-	upgradeSkipPreflight      bool
+type migrateCmdFlagSet struct {
+	migrateSkipPreflight      bool
 	deliveryRunningPath       string
 	deliverySecretsPath       string
 	chefServerRunningPath     string
-	upgradeTomlPath           string
+	migrateTomlPath           string
 	a2ConfigPath              string
 	hartifactsPath            string
 	manifestDir               string
@@ -56,27 +56,27 @@ type upgradeCmdFlagSet struct {
 	// airgapPreflight only applies to the preflight-check migrate-from-v1
 	// subcommand; we want to reuse all the skip*Check options there but for
 	// preflight-check airgap is on/off vs. path to airgap bundle for the actual
-	// upgrade.
+	// migration.
 	airgapPreflight  bool
 	enableChefServer bool
 	enableWorkflow   bool
 }
 
-var upgradeCmdFlags = upgradeCmdFlagSet{}
+var migrateCmdFlags = migrateCmdFlagSet{}
 
-var upgradeFrom1Cmd = &cobra.Command{
+var migrateFrom1Cmd = &cobra.Command{
 	Use:     "migrate-from-v1 [/path/to/automate-deploy.toml]",
 	Short:   "Migrate from Chef Automate v1",
-	Long:    upgradeFrom1Long,
+	Long:    migrateFrom1Long,
 	Args:    cobra.MaximumNArgs(3),
-	RunE:    runUpgradeFromV1Cmd,
+	RunE:    runMigrateFromV1Cmd,
 	Aliases: []string{"upgrade-from-v1"},
 }
 
-var upgradeFrom1StatusCmd = &cobra.Command{
+var migrateFrom1StatusCmd = &cobra.Command{
 	Use:   "migrate-from-v1-status",
 	Short: "Watch the status of the migration to Chef Automate 2",
-	RunE:  runUpgradeFromV1StatusCmd,
+	RunE:  runMigrationFromV1StatusCmd,
 }
 
 var generateCfgCmd = &cobra.Command{
@@ -88,119 +88,119 @@ var generateCfgCmd = &cobra.Command{
 
 func init() {
 	// migrate-from-v1 flags
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.upgradeSkipPreflight,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.migrateSkipPreflight,
 		"skip-preflight",
 		false,
 		"Deploy regardless of pre-flight conditions")
-	upgradeFrom1Cmd.PersistentFlags().StringVarP(
-		&upgradeCmdFlags.deliverySecretsPath,
+	migrateFrom1Cmd.PersistentFlags().StringVarP(
+		&migrateCmdFlags.deliverySecretsPath,
 		"delivery-secrets",
 		"s",
 		"/etc/delivery/delivery-secrets.json",
 		"Path to delivery-secrets.json")
-	upgradeFrom1Cmd.PersistentFlags().StringVarP(
-		&upgradeCmdFlags.deliveryRunningPath,
+	migrateFrom1Cmd.PersistentFlags().StringVarP(
+		&migrateCmdFlags.deliveryRunningPath,
 		"delivery-running",
 		"r",
 		"/etc/delivery/delivery-running.json",
 		"Path to delivery-running.json")
-	upgradeFrom1Cmd.PersistentFlags().StringVar(
-		&upgradeCmdFlags.chefServerRunningPath,
+	migrateFrom1Cmd.PersistentFlags().StringVar(
+		&migrateCmdFlags.chefServerRunningPath,
 		"chef-server-running",
 		"/etc/opscode/chef-server-running.json",
 		"Path to chef-server-running.json")
-	upgradeFrom1Cmd.PersistentFlags().StringVarP(
-		&upgradeCmdFlags.a2ConfigPath,
+	migrateFrom1Cmd.PersistentFlags().StringVarP(
+		&migrateCmdFlags.a2ConfigPath,
 		"config",
 		"c",
 		"",
 		"Path to an automate-deploy.toml")
-	upgradeFrom1Cmd.PersistentFlags().StringVar(
-		&upgradeCmdFlags.hartifactsPath,
+	migrateFrom1Cmd.PersistentFlags().StringVar(
+		&migrateCmdFlags.hartifactsPath,
 		"hartifacts",
 		"",
 		"Optional path to cache of local .hart packages")
-	upgradeFrom1Cmd.PersistentFlags().StringVar(
-		&upgradeCmdFlags.overrideOrigin,
+	migrateFrom1Cmd.PersistentFlags().StringVar(
+		&migrateCmdFlags.overrideOrigin,
 		"override-origin",
 		"",
 		"Optional origin to install local .hart packages from")
-	upgradeFrom1Cmd.PersistentFlags().StringVar(
-		&upgradeCmdFlags.manifestDir,
+	migrateFrom1Cmd.PersistentFlags().StringVar(
+		&migrateCmdFlags.manifestDir,
 		"manifest-dir",
 		"",
 		"Directory of manifest files")
-	upgradeFrom1Cmd.PersistentFlags().StringVar(
-		&upgradeCmdFlags.channel,
+	migrateFrom1Cmd.PersistentFlags().StringVar(
+		&migrateCmdFlags.channel,
 		"channel",
 		"",
 		"Optional channel to use when installing packages from the depot")
-	upgradeFrom1Cmd.PersistentFlags().StringVar(
-		&upgradeCmdFlags.upgradeStrategy,
+	migrateFrom1Cmd.PersistentFlags().StringVar(
+		&migrateCmdFlags.upgradeStrategy,
 		"upgrade-strategy",
 		"",
 		"Optional upgrade strategy to use when configuring the deployment service")
-	upgradeFrom1Cmd.PersistentFlags().IntVar(
-		&upgradeCmdFlags.pgDumpSeconds,
+	migrateFrom1Cmd.PersistentFlags().IntVar(
+		&migrateCmdFlags.pgDumpSeconds,
 		"postgres-dump-wait-seconds",
 		0,
 		"Optional timeout for Chef Automate v1 PostgreSQL dump (0 to disable timeout)")
-	upgradeFrom1Cmd.PersistentFlags().IntVar(
-		&upgradeCmdFlags.pgRestoreSeconds,
+	migrateFrom1Cmd.PersistentFlags().IntVar(
+		&migrateCmdFlags.pgRestoreSeconds,
 		"postgres-restore-wait-seconds",
 		0,
 		"Optional timeout for Chef Automate v1 PostgreSQL restore (0 to disable timeout)")
-	upgradeFrom1Cmd.PersistentFlags().IntVar(
-		&upgradeCmdFlags.fileMoveTimeout,
+	migrateFrom1Cmd.PersistentFlags().IntVar(
+		&migrateCmdFlags.fileMoveTimeout,
 		"file-move-timeout",
 		0,
-		"Optional timeout for moving elasticsearch, compliance, and notifications files during Chef Automate v1 upgrade (0 to disable timeout)")
-	upgradeFrom1Cmd.PersistentFlags().BoolVarP(
-		&upgradeCmdFlags.yes,
+		"Optional timeout for moving elasticsearch, compliance, and notifications files during Chef Automate v1 migration (0 to disable timeout)")
+	migrateFrom1Cmd.PersistentFlags().BoolVarP(
+		&migrateCmdFlags.yes,
 		"yes",
 		"y",
 		false,
 		"Do not prompt for confirmation; accept defaults and continue")
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.skipBackup,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.skipBackup,
 		"skip-backup",
 		false,
 		"Optionally skip backup of your Chef Automate v1 installation (default = false)")
-	upgradeFrom1Cmd.PersistentFlags().StringVar(
-		&upgradeCmdFlags.adminPassword,
+	migrateFrom1Cmd.PersistentFlags().StringVar(
+		&migrateCmdFlags.adminPassword,
 		"admin-password",
 		"",
 		"The password for the initial admin user. Auto-generated by default.")
 
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.selfTestMode,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.selfTestMode,
 		"self-test",
 		false,
-		"(DEV ONLY) execute upgrade against a test harness")
+		"(DEV ONLY) execute migration against a test harness")
 
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.enableChefServer,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.enableChefServer,
 		"enable-chef-server",
 		false,
 		"Enable integrated Chef Server migration and deployment; only valid for all-in-one topology")
 
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.enableWorkflow,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.enableWorkflow,
 		"enable-workflow",
 		false,
 		"Enable integrated Workflow migration and deployment; only valid for all-in-one topology")
 
-	// passwords are not validated until the end of the upgrade, which makes this
+	// passwords are not validated until the end of the migration, which makes this
 	// feature dangerous. But we still want to have it in Ci, so we mark it as
 	// hidden
-	err := upgradeFrom1Cmd.PersistentFlags().MarkHidden("admin-password")
+	err := migrateFrom1Cmd.PersistentFlags().MarkHidden("admin-password")
 	if err != nil {
 		fmt.Printf("failed configuring cobra: %s\n", err.Error())
 		panic(":(")
 	}
 	// end users don't have any use for self-test, so don't show them
-	err = upgradeFrom1Cmd.PersistentFlags().MarkHidden("self-test")
+	err = migrateFrom1Cmd.PersistentFlags().MarkHidden("self-test")
 	if err != nil {
 		fmt.Printf("failed configuring cobra: %s\n", err.Error())
 		panic(":(")
@@ -209,21 +209,21 @@ func init() {
 	// a1 migration with Chef Server is only supported for the all-in-one topology
 	// used in OWCA and marketplace images; we do not support that configuration
 	// for other customers, so it's hidden.
-	err = upgradeFrom1Cmd.PersistentFlags().MarkHidden("enable-chef-server")
+	err = migrateFrom1Cmd.PersistentFlags().MarkHidden("enable-chef-server")
 	if err != nil {
 		fmt.Printf("failed configuring cobra: %s\n", err.Error())
 		panic(":(")
 	}
 
-	// a1 upgrade with Workflow Server will be hidden until it is fully completed
-	err = upgradeFrom1Cmd.PersistentFlags().MarkHidden("enable-workflow")
+	// a1 migration with Workflow Server will be hidden until it is fully completed
+	err = migrateFrom1Cmd.PersistentFlags().MarkHidden("enable-workflow")
 	if err != nil {
 		fmt.Printf("failed configuring cobra: %s\n", err.Error())
 		panic(":(")
 	}
 
 	// Also hide this because it's related to the chef-server feature
-	err = upgradeFrom1Cmd.PersistentFlags().MarkHidden("chef-server-running")
+	err = migrateFrom1Cmd.PersistentFlags().MarkHidden("chef-server-running")
 	if err != nil {
 		fmt.Printf("failed configuring cobra: %s\n", err.Error())
 		panic(":(")
@@ -231,44 +231,44 @@ func init() {
 
 	// migrate-from-v1 gen-config flags
 	generateCfgCmd.PersistentFlags().StringVarP(
-		&upgradeCmdFlags.upgradeTomlPath,
+		&migrateCmdFlags.migrateTomlPath,
 		"out",
 		"o",
 		"./automate-migrate.toml",
 		"Output file")
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.skipBackupCheck,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.skipBackupCheck,
 		"skip-backup-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has backups configured (default = false)")
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.skipDisasterRecoveryCheck,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.skipDisasterRecoveryCheck,
 		"skip-disaster-recovery-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has disaster recovery configured (default = false)")
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.skipExternalESCheck,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.skipExternalESCheck,
 		"skip-external-es-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has external Elasticsearch configured (default = false)")
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.skipFIPSCheck,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.skipFIPSCheck,
 		"skip-fips-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has FIPS configured (default = false)")
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.skipSAMLCheck,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.skipSAMLCheck,
 		"skip-saml-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has SAML configured (default = false)")
-	upgradeFrom1Cmd.PersistentFlags().BoolVar(
-		&upgradeCmdFlags.skipWorkflowCheck,
+	migrateFrom1Cmd.PersistentFlags().BoolVar(
+		&migrateCmdFlags.skipWorkflowCheck,
 		"skip-workflow-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has workflow configured (default = false)")
 
-	upgradeFrom1Cmd.PersistentFlags().StringVar(
-		&upgradeCmdFlags.airgap,
+	migrateFrom1Cmd.PersistentFlags().StringVar(
+		&migrateCmdFlags.airgap,
 		"airgap-bundle",
 		"",
 		"Path to an airgap install bundle")
@@ -279,7 +279,7 @@ func init() {
 			"hartifacts",
 			"manifest-dir",
 		} {
-			err := upgradeFrom1Cmd.PersistentFlags().MarkHidden(flagName)
+			err := migrateFrom1Cmd.PersistentFlags().MarkHidden(flagName)
 			if err != nil {
 				fmt.Printf("failed configuring cobra: %s\n", err.Error())
 				panic(":(")
@@ -287,20 +287,20 @@ func init() {
 		}
 	}
 
-	upgradeFrom1Cmd.AddCommand(generateCfgCmd)
-	RootCmd.AddCommand(upgradeFrom1Cmd)
-	RootCmd.AddCommand(upgradeFrom1StatusCmd)
+	migrateFrom1Cmd.AddCommand(generateCfgCmd)
+	RootCmd.AddCommand(migrateFrom1Cmd)
+	RootCmd.AddCommand(migrateFrom1StatusCmd)
 }
 
-func runUpgradeFromV1Cmd(cmd *cobra.Command, args []string) error {
+func runMigrateFromV1Cmd(cmd *cobra.Command, args []string) error {
 	cleanup := func() {
-		if upgradeCmdFlags.selfTestMode {
+		if migrateCmdFlags.selfTestMode {
 			a1stub.CleanupTestHarness()
 		}
 	}
 	defer cleanup()
 
-	if upgradeCmdFlags.selfTestMode {
+	if migrateCmdFlags.selfTestMode {
 		err := a1stub.StartTestHarness()
 		if err != nil {
 			return status.Wrap(
@@ -311,19 +311,19 @@ func runUpgradeFromV1Cmd(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Initialize a new upgrade:
+	// Initialize a new migration:
 	//   * Load the given delivery-running.json and delivery-secrets.json files
 	//   * Generate an A2 Config if an A2 configuration file was not passed.
-	upgrade, err := newLocalUpgrade()
+	migration, err := newLocalMigration()
 	if err != nil {
 		return err
 	}
 
-	offlineMode := upgradeCmdFlags.airgap != ""
+	offlineMode := migrateCmdFlags.airgap != ""
 	manifestPath := ""
 	if offlineMode {
 		writer.Title("Installing airgap artifact")
-		metadata, err := airgap.Unpack(upgradeCmdFlags.airgap)
+		metadata, err := airgap.Unpack(migrateCmdFlags.airgap)
 		if err != nil {
 			return status.Annotate(err, status.AirgapUnpackInstallBundleError)
 		}
@@ -337,15 +337,15 @@ func runUpgradeFromV1Cmd(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	} else {
-		manifestPath = upgradeCmdFlags.manifestDir
+		manifestPath = migrateCmdFlags.manifestDir
 	}
 
 	manifestProvider := manifest.NewLocalHartManifestProvider(
 		mc.NewDefaultClient(manifestPath),
-		upgradeCmdFlags.hartifactsPath,
-		upgradeCmdFlags.overrideOrigin)
+		migrateCmdFlags.hartifactsPath,
+		migrateCmdFlags.overrideOrigin)
 
-	err = client.A1Upgrade(writer, upgrade, upgradeCmdFlags.yes, manifestProvider, version.BuildTime, offlineMode)
+	err = client.A1Upgrade(writer, migration, migrateCmdFlags.yes, manifestProvider, version.BuildTime, offlineMode)
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.UpgradeError)
 	}
@@ -353,7 +353,7 @@ func runUpgradeFromV1Cmd(cmd *cobra.Command, args []string) error {
 	return err
 }
 
-func runUpgradeFromV1StatusCmd(cmd *cobra.Command, args []string) error {
+func runMigrationFromV1StatusCmd(cmd *cobra.Command, args []string) error {
 	conn, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
 		return err
@@ -364,7 +364,7 @@ func runUpgradeFromV1StatusCmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(
 			err,
 			status.DeploymentServiceCallError,
-			"Acquiring upgrade status failed",
+			"Acquiring migration status failed",
 		)
 	}
 
@@ -386,7 +386,7 @@ func runUpgradeFromV1StatusCmd(cmd *cobra.Command, args []string) error {
 			return status.Wrap(
 				err,
 				status.DeploymentServiceCallError,
-				"Reading message from the upgrade status stream failed",
+				"Reading message from the migration status stream failed",
 			)
 		}
 
@@ -396,7 +396,7 @@ func runUpgradeFromV1StatusCmd(cmd *cobra.Command, args []string) error {
 			return status.Wrap(
 				err,
 				status.UpgradeError,
-				"Streaming upgrade status failed",
+				"Streaming migration status failed",
 			)
 		}
 
@@ -409,12 +409,12 @@ func runUpgradeFromV1StatusCmd(cmd *cobra.Command, args []string) error {
 }
 
 func runGenerateCfgCmd(cmd *cobra.Command, args []string) error {
-	upgrade, err := newLocalUpgrade()
+	migration, err := newLocalMigration()
 	if err != nil {
 		return err
 	}
 
-	if err = upgrade.A2Config.MarshalToTOMLFile(upgradeCmdFlags.upgradeTomlPath, 0600); err != nil {
+	if err = migration.A2Config.MarshalToTOMLFile(migrateCmdFlags.migrateTomlPath, 0600); err != nil {
 		return status.Wrap(
 			err,
 			status.MarshalError,
@@ -425,55 +425,55 @@ func runGenerateCfgCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func newLocalUpgrade() (*a1upgrade.A1Upgrade, error) {
+func newLocalMigration() (*a1upgrade.A1Upgrade, error) {
 	u, err := a1upgrade.NewA1Upgrade(
-		a1upgrade.WithDeliveryRunning(upgradeCmdFlags.deliveryRunningPath),
+		a1upgrade.WithDeliveryRunning(migrateCmdFlags.deliveryRunningPath),
 
-		a1upgrade.WithDeliverySecrets(upgradeCmdFlags.deliverySecretsPath),
+		a1upgrade.WithDeliverySecrets(migrateCmdFlags.deliverySecretsPath),
 
-		a1upgrade.WithChefServerRunning(upgradeCmdFlags.chefServerRunningPath, upgradeCmdFlags.enableChefServer),
+		a1upgrade.WithChefServerRunning(migrateCmdFlags.chefServerRunningPath, migrateCmdFlags.enableChefServer),
 
-		a1upgrade.WithA2ConfigPath(upgradeCmdFlags.a2ConfigPath,
-			dc.WithHartifacts(upgradeCmdFlags.hartifactsPath),
-			dc.WithOrigin(upgradeCmdFlags.overrideOrigin)),
+		a1upgrade.WithA2ConfigPath(migrateCmdFlags.a2ConfigPath,
+			dc.WithHartifacts(migrateCmdFlags.hartifactsPath),
+			dc.WithOrigin(migrateCmdFlags.overrideOrigin)),
 
-		a1upgrade.WithHartifactsPath(upgradeCmdFlags.hartifactsPath),
+		a1upgrade.WithHartifactsPath(migrateCmdFlags.hartifactsPath),
 
-		a1upgrade.WithOverrideOrigin(upgradeCmdFlags.overrideOrigin),
+		a1upgrade.WithOverrideOrigin(migrateCmdFlags.overrideOrigin),
 
-		a1upgrade.WithManifestDir(upgradeCmdFlags.manifestDir),
+		a1upgrade.WithManifestDir(migrateCmdFlags.manifestDir),
 
-		a1upgrade.WithChannel(upgradeCmdFlags.channel),
+		a1upgrade.WithChannel(migrateCmdFlags.channel),
 
-		a1upgrade.WithUpgradeStrategy(upgradeCmdFlags.upgradeStrategy),
+		a1upgrade.WithUpgradeStrategy(migrateCmdFlags.upgradeStrategy),
 
-		a1upgrade.WithAdminPassword(upgradeCmdFlags.adminPassword),
+		a1upgrade.WithAdminPassword(migrateCmdFlags.adminPassword),
 
-		a1upgrade.SkipUpgradePreflight(upgradeCmdFlags.upgradeSkipPreflight),
+		a1upgrade.SkipUpgradePreflight(migrateCmdFlags.migrateSkipPreflight),
 
-		a1upgrade.SetPostgresDumpWait(upgradeCmdFlags.pgDumpSeconds),
+		a1upgrade.SetPostgresDumpWait(migrateCmdFlags.pgDumpSeconds),
 
-		a1upgrade.SetPostgresRestoreWait(upgradeCmdFlags.pgRestoreSeconds),
+		a1upgrade.SetPostgresRestoreWait(migrateCmdFlags.pgRestoreSeconds),
 
-		a1upgrade.SetFileMoveTimeout(upgradeCmdFlags.fileMoveTimeout),
+		a1upgrade.SetFileMoveTimeout(migrateCmdFlags.fileMoveTimeout),
 
-		a1upgrade.SkipUpgradeBackup(upgradeCmdFlags.skipBackup),
+		a1upgrade.SkipUpgradeBackup(migrateCmdFlags.skipBackup),
 
-		a1upgrade.SkipBackupConfiguredCheck(upgradeCmdFlags.skipBackupCheck),
+		a1upgrade.SkipBackupConfiguredCheck(migrateCmdFlags.skipBackupCheck),
 
-		a1upgrade.SkipDisasterRecoveryConfiguredCheck(upgradeCmdFlags.skipDisasterRecoveryCheck),
+		a1upgrade.SkipDisasterRecoveryConfiguredCheck(migrateCmdFlags.skipDisasterRecoveryCheck),
 
-		a1upgrade.SkipExternalESConfiguredCheck(upgradeCmdFlags.skipExternalESCheck),
+		a1upgrade.SkipExternalESConfiguredCheck(migrateCmdFlags.skipExternalESCheck),
 
-		a1upgrade.SkipFIPSConfiguredCheck(upgradeCmdFlags.skipFIPSCheck),
+		a1upgrade.SkipFIPSConfiguredCheck(migrateCmdFlags.skipFIPSCheck),
 
-		a1upgrade.SkipSAMLConfiguredCheck(upgradeCmdFlags.skipSAMLCheck),
+		a1upgrade.SkipSAMLConfiguredCheck(migrateCmdFlags.skipSAMLCheck),
 
-		a1upgrade.SkipWorkflowConfiguredCheck(upgradeCmdFlags.skipWorkflowCheck),
+		a1upgrade.SkipWorkflowConfiguredCheck(migrateCmdFlags.skipWorkflowCheck),
 
-		a1upgrade.WithChefServerEnabled(upgradeCmdFlags.enableChefServer),
+		a1upgrade.WithChefServerEnabled(migrateCmdFlags.enableChefServer),
 
-		a1upgrade.WithWorkflowEnabled(upgradeCmdFlags.enableWorkflow),
+		a1upgrade.WithWorkflowEnabled(migrateCmdFlags.enableWorkflow),
 	)
 
 	if err != nil {
@@ -484,7 +484,7 @@ func newLocalUpgrade() (*a1upgrade.A1Upgrade, error) {
 		)
 	}
 
-	if err := u.GenerateA2ConfigIfNoneProvided(upgradeCmdFlags.a2ConfigPath); err != nil {
+	if err := u.GenerateA2ConfigIfNoneProvided(migrateCmdFlags.a2ConfigPath); err != nil {
 		return nil, status.Wrap(err, status.ConfigError, "Generating Chef Automate configuration failed")
 	}
 

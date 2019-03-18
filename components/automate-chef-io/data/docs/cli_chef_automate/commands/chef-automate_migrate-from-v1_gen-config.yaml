@@ -36,7 +36,7 @@ inherited_options:
 - name: file-move-timeout
   default_value: "0"
   usage: |
-    Optional timeout for moving elasticsearch, compliance, and notifications files during Chef Automate v1 upgrade (0 to disable timeout)
+    Optional timeout for moving elasticsearch, compliance, and notifications files during Chef Automate v1 migration (0 to disable timeout)
 - name: no-check-version
   default_value: "false"
   usage: Disable version check
