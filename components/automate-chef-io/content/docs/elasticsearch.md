@@ -93,19 +93,19 @@ curl localhost:10141/_cluster/health?pretty
   "active_shards_percent_as_number" : 100.0
 }
 ```
-You want to make sure the health is Green. You will notice that it is relocating 2 shards. Currently, Elasticsearch is trying to rebalance data equally between your 3 Elasticsearch nodes and the built in ES in Automate. You do not need to wait for this to finish before moving to the next step.
+You want to make sure the health is Green. You will notice that it is relocating 2 shards. Currently, Elasticsearch is trying to rebalance data equally between your 3 Elasticsearch nodes and the built-in Elasticsearch in Automate. You do not need to wait for this to finish before moving to the next step.
 
 ##3. Move all data out of Automate’s built in Elasticsearch
 
-Use curl to change Elasticsearch’s configuration so that it moves all data out to your ES cluster nodes. In this example, there are three things you will need to consider:
+Use curl to change Elasticsearch’s configuration so that it moves all data out to your Elasticsearch cluster nodes. In this example, there are three things you will need to consider:
 
- - `cluster.routing.allocation.exclude._ip`: This needs to be the IP address your Automate server uses to communicate with the elasticsearch servers.
-When in doubt this command will tell you which IP is being used
+ - `cluster.routing.allocation.exclude._ip`: This needs to be the IP address your Automate server uses to communicate with the elasticsearch servers. When in doubt, this command will tell you which IP is being used:
+
 `curl -s localhost:10141/_nodes/_local?pretty | grep transport_address`
 
-- `cluster.routing.allocation.cluster_concurrent_rebalance`: The number of shards to move at a time. The default is 2, we’re planning to do 10 at a time to speed things along.
+- `cluster.routing.allocation.cluster_concurrent_rebalance`: The number of shards to move at a time. The default is 2. We’re planning to do 10 at a time to speed things along.
 
-- `Indices.recovery.max_bytes_per_sec`: We set the limit to 80 MB/s, which is a bit over half of a 1Gbps link. Feel free to tweak this based on how much bandwidth you have. The default is 40.
+- `Indices.recovery.max_bytes_per_sec`: We set the limit to 80 MB/s, which is a bit over half of a 1 Gbps link. Feel free to tweak this based on how much bandwidth you have. The default is 40.
 
 ```
 curl -XPUT localhost:10141/_cluster/settings -H 'Content-Type: application/json' -d '{
@@ -135,7 +135,7 @@ When everything has moved, that command should return nothing.
 
 The last step will be to configure Elasticsearch to be a coordinating only node, similar to how Elastic recommends for Kibana here. https://www.elastic.co/guide/en/kibana/6.2/production.html
 
-Before running this step verify again that all data has been moved off of A2s built in Elasticsearch.
+Before running this step verify again that all data has been moved off of A2's built-in Elasticsearch.
 ```
 curl localhost:10141/_cluster/health?pretty
 ```
@@ -199,7 +199,7 @@ curl localhost:10141/_cluster/health?pretty
   "active_shards_percent_as_number" : 100.0
 }
 ```
-number_of_data_nodes should equal to the number of nodes in your external cluster.
+number_of_data_nodes should be equal to the number of nodes in your external cluster.
 number_of_nodes should be equal to the number of ES nodes + your Automate server.
 
 If everything looks good, then congratulations, you are done!
