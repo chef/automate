@@ -175,7 +175,7 @@ Applying deployment configuration
 Success: Configuration patched
 ```
 
-At this point you should be finished. Verify that Elasticsearch is in a good state.
+At this point, you should be finished. Verify that Elasticsearch is in a good state.
 ```
 curl localhost:10141/_cluster/health?pretty
 ```
@@ -199,7 +199,7 @@ curl localhost:10141/_cluster/health?pretty
   "active_shards_percent_as_number" : 100.0
 }
 ```
-number_of_data_nodes should equal the number of nodes in your external cluster.
-number_of_nodes should be equal number of ES nodes + your Automate server.
+number_of_data_nodes should equal to the number of nodes in your external cluster.
+number_of_nodes should be equal to the number of ES nodes + your Automate server.
 
 If everything looks good, then congratulations, you are done!
