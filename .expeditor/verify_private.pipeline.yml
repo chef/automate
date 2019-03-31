@@ -175,6 +175,9 @@ steps:
         HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
           account: aws/chef-cd
           field: session_token
+        HAB_STUDIO_SECRET_GOOGLE_CREDS_JSON:
+          path: secret/testing/tmp-google-credentials
+          field: json
       executor:
         docker:
           privileged: true

@@ -52,6 +52,9 @@ func CheckForCreds(credsType string) bool {
 	if credsType == "azure" {
 		environmentVars = []string{"AZURE_CLIENT_ID", "AZURE_CLIENT_SECRET", "AZURE_TENANT_ID"}
 	}
+	if credsType == "gcp" {
+		environmentVars = []string{"GOOGLE_CREDS_JSON"}
+	}
 	for _, envVar := range environmentVars {
 		if _, ok := os.LookupEnv(envVar); !ok {
 			return false
@@ -99,6 +102,18 @@ func AddAzureManager(ctx context.Context, mgrClient manager.NodeManagerServiceCl
 	}
 
 	return mgrClient.Create(ctx, &azureMgr)
+}
+
+func AddGCPManager(ctx context.Context, mgrClient manager.NodeManagerServiceClient, mgrType string) (*manager.Ids, error) {
+	gcpMgr := manager.NodeManager{
+		Name: fmt.Sprintf("my test %s mgr", mgrType),
+		Type: mgrType,
+		CredentialData: []*common.Kv{
+			{Key: "GOOGLE_CREDENTIALS_JSON", Value: os.Getenv("GOOGLE_CREDS_JSON")},
+		},
+	}
+
+	return mgrClient.Create(ctx, &gcpMgr)
 }
 
 func GetManagerConn() (*grpc.ClientConn, error) {
