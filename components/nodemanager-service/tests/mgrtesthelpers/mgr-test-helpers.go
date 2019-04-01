@@ -2,6 +2,7 @@ package mgrtesthelpers
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"strings"
@@ -105,11 +106,19 @@ func AddAzureManager(ctx context.Context, mgrClient manager.NodeManagerServiceCl
 }
 
 func AddGCPManager(ctx context.Context, mgrClient manager.NodeManagerServiceClient, mgrType string) (*manager.Ids, error) {
+	// decode our encoded key
+	decoded, err := base64.StdEncoding.DecodeString(os.Getenv("GOOGLE_CREDS_JSON"))
+	if err != nil {
+		return nil, err
+	}
+	escaped := strings.ReplaceAll(string(decoded), "\n", "\\n")
+	formatted := strings.TrimSuffix(escaped, "\\n")
+
 	gcpMgr := manager.NodeManager{
 		Name: fmt.Sprintf("my test %s mgr", mgrType),
 		Type: mgrType,
 		CredentialData: []*common.Kv{
-			{Key: "GOOGLE_CREDENTIALS_JSON", Value: os.Getenv("GOOGLE_CREDS_JSON")},
+			{Key: "GOOGLE_CREDENTIALS_JSON", Value: formatted},
 		},
 	}
 
