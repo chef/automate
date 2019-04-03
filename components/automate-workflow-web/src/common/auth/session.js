@@ -2,6 +2,7 @@ import ng from 'angular';
 import Store from '../store/store';
 import ngCookies from 'angular-cookies';
 import moment from 'moment';
+import * as jwtDecode from 'jwt-decode';
 import { upgradeAdapter } from '../../upgrade-adapter.ts';
 
 Session.$inject = [
@@ -13,7 +14,12 @@ Session.$inject = [
 
 function Session ($http, $location, Store, $cookies) {
 
-  var a2key = 'chef-automate-user';
+  const a2key = 'chef-automate-user';
+  const HTTP_STATUS_OK = 200;
+  const HTTP_STATUS_UNAUTHORIZED = 401;
+  const XHR_DONE = 4;
+  const minute = 60 * 1000;
+
   var session;
   session = Store.get('session') || {};
 
@@ -37,6 +43,67 @@ function Session ($http, $location, Store, $cookies) {
   };
 
   loadA2User();
+
+  var callbackFunction = function (event) {
+    var xhr = event.target;
+    if (xhr.readyState === XHR_DONE) {
+      if (xhr.status === HTTP_STATUS_OK) {
+        ingestIDToken(xhr.response.id_token);
+        loadA2User();
+      } else if (xhr.status === HTTP_STATUS_UNAUTHORIZED) {
+        logout();
+      } else {
+        // TODO 2017/12/15 (sr): is there anything we could do that's better than
+        // this?
+        console.log(`Session refresh failed: ${xhr.statusText}`);
+      }
+    }
+  };
+
+  window.setInterval(() => {
+    /* Using XMLHttpRequest instead of angular/http to avoid
+       dependency hell. */
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = callbackFunction.bind(this);
+    xhr.open('GET', '/session/refresh', true);
+    xhr.responseType = 'json';
+    xhr.setRequestHeader('Authorization', `Bearer ${session.token}`);
+    xhr.send(null);
+  }, minute);
+
+  function ingestIDToken(idToken) {
+    var id;
+    try {
+      id = jwtDecode(idToken);
+      if (id === null) {
+        return;
+      }
+      setA2Session(id.sub, id.name,
+      // What dex considers email, we consider username (for local users at least)
+      // We might have to revisit this given more information about actual LDAP/SAML
+      // usage.
+        id.email, idToken, id.groups);
+    }
+    catch (e) {
+      return null;
+    }
+  }
+
+  function setA2Session(uuid, fullname, username, id_token, groups) {
+    const user = {
+      uuid: uuid,
+      fullname: fullname,
+      username: username,
+      groups: groups,
+      id_token: id_token
+    };
+    localStorage.setItem(a2key, JSON.stringify(user));
+  }
+
+  function logout(url = '/') {
+    remove();
+    window.location.href = `/session/new?state=${url}`;
+  }
 
   function setHeaders() {
     $http.defaults.headers.common['chef-delivery-user'] = session.username;
@@ -86,6 +153,18 @@ function Session ($http, $location, Store, $cookies) {
     localStorage.removeItem(a2key);
   }
 
+  function remove() {
+    session = {};
+    $cookies.remove('chef-delivery-user', cookieOpts);
+    $cookies.remove('chef-delivery-token', cookieOpts);
+    $cookies.remove('chef-delivery-enterprise', cookieOpts);
+
+    unloadA2User();
+
+    session.enterprise = enterprise;
+    return session;
+  }
+
   if (hasSession()) {
     setHeaders();
   }
@@ -94,6 +173,8 @@ function Session ($http, $location, Store, $cookies) {
     hasSession: hasSession,
 
     setCookies: setCookies,
+
+    remove: remove,
 
     set: function (obj) {
       session = ng.extend(session, obj);
@@ -110,18 +191,6 @@ function Session ($http, $location, Store, $cookies) {
       } else {
         return session;
       }
-    },
-
-    remove: function () {
-      session = {};
-      $cookies.remove('chef-delivery-user', cookieOpts);
-      $cookies.remove('chef-delivery-token', cookieOpts);
-      $cookies.remove('chef-delivery-enterprise', cookieOpts);
-
-      unloadA2User();
-
-      session.enterprise = enterprise;
-      return session;
     }
   };
 }

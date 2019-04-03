@@ -32,6 +32,7 @@
     "eventsource-polyfill": "^0.9.6",
     "font-awesome": "=4.7.0",
     "highlight.js": "=8.3.0",
+    "jwt-decode": "^2.2.0",
     "keymaster": "=1.6.2",
     "lodash": "=4.2.1",
     "marked": "=0.3.6",
