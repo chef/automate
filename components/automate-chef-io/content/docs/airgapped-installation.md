@@ -30,7 +30,7 @@ prepare an Airgap Installation Bundle.
 
 ### Obtain Chef Automate installation and admin tool
 
-Download the Chef Automate command-line tool from the `current` [release channel]({{<relref "install.md#release-channels" >}}).
+Download the Chef Automate command-line tool from the `current` [release channel]({{< relref "install.md#release-channels" >}}).
 
 ```shell
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate

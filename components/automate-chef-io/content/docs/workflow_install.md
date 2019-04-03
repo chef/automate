@@ -1,5 +1,5 @@
 +++
-title = "Install Workflow"
+title = "Upgrade Workflow"
 description = ""
 draft = false
 bref = ""
@@ -25,27 +25,37 @@ This will have a minimum of three machines:
 * Chef Server - 8GB RAM recommended
 * Workflow Runner - 20GB disk space recommended
 
-## Installation
+## Backup
 
-### Build an Automate server
+1. Backup your Chef Automate 1 install, to minimize the amount of data that will need to be backed up while the system is down:
 
-Create an Automate server following the instructions in the:
-[Quickstart Demo]({{< ref "quickstart.md" >}}) or [Installation Guide]({{< ref "install.md" >}})
+    ```shell
+    automate-ctl create-backup
+    ```
 
-On the Automate server:
+## Upgrading
+
+{{< warning >}}
+Migration of Workflow data must happen during your upgrade to Chef Automate 2.
+{{< /warning >}}
 
 1. Deploy the Workflow server:
 
     ```shell
-    chef-automate deploy --enable-workflow
+    chef-automate upgrade-from-v1 --enable-workflow
     ```
 
-    You will need to add `--skip-preflight` if you have already deployed Automate
+    After the upgrade runs the preflight checks and analyzes your Chef Automate 1 configuration, it asks for confirmation to continue. Review the generated configuration file and if it is correct, type `yes` to continue.
+
+    The upgrade process backs up your Chef Automate 1 data, shuts down Chef Automate 1, imports your data to Chef Automate 2, then starts Chef Automate 2.
+    At this point, you can use your existing Chef Automate 1 user credentials to login to Chef Automate 2.
+    If you've been using LDAP for authenticating users, that configuration will have been migrated as well, and you can use your LDAP credentials to login.
+    Historical data will be migrated in the background.
 
 2. Create a workflow enterprise:
 
     ```text
-    workflow-ctl create-enterprise my-enterprise-name --ssh-pub-key-file=/hab/svc/automate-workflow-server/var/etc/builder_key.pub
+    automate-ctl create-enterprise my-enterprise-name --ssh-pub-key-file=/hab/svc/automate-workflow-server/var/etc/builder_key.pub
     ```
 
 ### Build a Standalone Chef Server
