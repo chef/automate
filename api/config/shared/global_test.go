@@ -3,6 +3,7 @@ package shared
 import (
 	"testing"
 
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -289,6 +290,30 @@ format = "json"
 `)
 		res := c.Validate()
 		assert.Nil(t, res)
+	})
+
+	t.Run("with mixed http and https external elasticsearch nodes", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Elasticsearch: &External_Elasticsearch{
+						Enable: w.Bool(true),
+						Nodes: []*wrappers.StringValue{
+							w.String("http://server1:9200"),
+							w.String("https://server2:9200"),
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		expected := NewInvalidConfigError()
+		expected.AddInvalidValue("global.v1.external.elasticsearch.nodes", "Cannot mix http and https nodes")
+		assert.EqualError(t, cfgErr, expected.Error(), "")
 	})
 }
 

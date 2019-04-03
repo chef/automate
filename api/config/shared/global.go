@@ -182,6 +182,20 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 		cfgErr.AddInvalidValue("global.v1.external.data_collector.auth.scheme", "scheme must be one of '', 'token'")
 	}
 
+	if externalES := c.GetV1().GetExternal().GetElasticsearch(); externalES.GetEnable().GetValue() {
+		nodes := externalES.GetNodes()
+		httpsNodes := make([]string, 0)
+		for _, n := range nodes {
+			ns := n.GetValue()
+			if strings.Contains(ns, "https") {
+				httpsNodes = append(httpsNodes, ns)
+			}
+		}
+		if len(httpsNodes) > 0 && len(httpsNodes) < len(nodes) {
+			cfgErr.AddInvalidValue("global.v1.external.elasticsearch.nodes", "Cannot mix http and https nodes")
+		}
+	}
+
 	if cfgErr.IsEmpty() {
 		return nil
 	}
