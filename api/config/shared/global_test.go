@@ -315,6 +315,30 @@ format = "json"
 		expected.AddInvalidValue("global.v1.external.elasticsearch.nodes", "Cannot mix http and https nodes")
 		assert.EqualError(t, cfgErr, expected.Error(), "")
 	})
+
+	t.Run("with both root_cert and root_cert_file set", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Elasticsearch: &External_Elasticsearch{
+						Enable: w.Bool(true),
+						Ssl: &External_Elasticsearch_SSL{
+							RootCert:     w.String("rootcert"),
+							RootCertFile: w.String("rootcertfile"),
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		expected := NewInvalidConfigError()
+		expected.AddInvalidValue("global.v1.external.elasticsearch.ssl", "Specify either global.v1.external.elasticsearch.ssl.root_cert or global.v1.external.elasticsearch.ssl.root_cert_file, but not both.")
+		assert.EqualError(t, cfgErr, expected.Error(), "")
+	})
 }
 
 func loadFromToml(s string) *GlobalConfig {
