@@ -16,7 +16,6 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
-	"github.com/gofrs/uuid"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
@@ -167,11 +166,9 @@ func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) {
 	endTime := time.Now()
 	// Insert reports
 	for _, report := range reports {
-		id, err := uuid.NewV4()
-		if err != nil {
-			os.Exit(3)
-		}
-		err = s.ingesticESClient.InsertInspecReport(context.Background(), id.String(), endTime, report)
+		id := newUUID()
+
+		err = s.ingesticESClient.InsertInspecReport(context.Background(), id, endTime, report)
 		if err != nil {
 			os.Exit(3)
 		}
