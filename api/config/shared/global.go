@@ -208,7 +208,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 		if scheme != "" {
 			// External ES uses a supported auth scheme
 			if scheme != "basic_auth" {
-				cfgErr.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Should be basic_auth.")
+				cfgErr.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Scheme should be 'basic_auth'.")
 			}
 
 			// Username and password specified in config if using basic auth
@@ -224,6 +224,34 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 			}
 		}
 
+	}
+
+	if externalPG := c.GetV1().GetExternal().GetPostgresql(); externalPG.GetEnable().GetValue() {
+		if auth := c.GetV1().GetExternal().GetPostgresql().GetAuth(); auth.GetScheme().GetValue() != "password" {
+			// use supported auth scheme (currently only password auth is
+			// supported for postgres)
+			cfgErr.AddInvalidValue("global.v1.external.postgresql.auth.scheme", "Scheme should be 'password'.")
+		} else {
+			// superuser username and password
+			su := auth.GetPassword().GetSuperuser().GetUsername().GetValue()
+			sp := auth.GetPassword().GetSuperuser().GetPassword().GetValue()
+			if su == "" {
+				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.superuser.username")
+			}
+			if sp == "" {
+				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.superuser.password")
+			}
+
+			// dbuser username and password
+			du := auth.GetPassword().GetSuperuser().GetUsername().GetValue()
+			dp := auth.GetPassword().GetSuperuser().GetPassword().GetValue()
+			if du == "" {
+				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.dbuser.username")
+			}
+			if dp == "" {
+				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.dbuser.password")
+			}
+		}
 	}
 
 	if cfgErr.IsEmpty() {

@@ -359,7 +359,7 @@ format = "json"
 		cfgErr, ok := err.(Error)
 		require.True(t, ok)
 		expected := NewInvalidConfigError()
-		expected.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Should be basic_auth.")
+		expected.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Scheme should be 'basic_auth'.")
 		assert.EqualError(t, cfgErr, expected.Error(), "")
 	})
 
@@ -384,6 +384,57 @@ format = "json"
 		require.True(t, ok)
 		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.basic_auth.username")
 		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.basic_auth.password")
+	})
+
+	t.Run("with external postgres and unsupported auth scheme", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Postgresql: &External_Postgresql{
+						Enable: w.Bool(true),
+						Auth: &External_Postgresql_Authentication{
+							Scheme: w.String("nonexistent_auth"),
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		expected := NewInvalidConfigError()
+		expected.AddInvalidValue("global.v1.external.postgresql.auth.scheme", "Scheme should be 'password'.")
+		assert.EqualError(t, cfgErr, expected.Error(), "")
+	})
+
+	t.Run("with external password auth but no superuser and dbuser username and password set", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Postgresql: &External_Postgresql{
+						Enable: w.Bool(true),
+						Auth: &External_Postgresql_Authentication{
+							Scheme: w.String("password"),
+							Password: &External_Postgresql_Authentication_PasswordAuthentication{
+								Superuser: &External_Postgresql_Authentication_PasswordAuthentication_User{},
+								Dbuser:    &External_Postgresql_Authentication_PasswordAuthentication_User{},
+							},
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.postgresql.auth.password.superuser.username")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.postgresql.auth.password.superuser.password")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.postgresql.auth.password.dbuser.username")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.postgresql.auth.password.dbuser.password")
 	})
 
 }
