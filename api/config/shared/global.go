@@ -183,7 +183,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 	}
 
 	if externalES := c.GetV1().GetExternal().GetElasticsearch(); externalES.GetEnable().GetValue() {
-		// Make sure external ES nodes all either have https urls or https urls
+		// External ES nodes all either have https urls or https urls
 		nodes := externalES.GetNodes()
 		httpsNodes := make([]string, 0)
 		for _, n := range nodes {
@@ -196,13 +196,34 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 			cfgErr.AddInvalidValue("global.v1.external.elasticsearch.nodes", "Cannot mix http and https nodes")
 		}
 
-		// Make sure that only one of root_cert or root_cert_file has been
-		// specified
+		// Only one of root_cert or root_cert_file has been specified
 		rc := c.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCert().GetValue()
 		rcf := c.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCertFile().GetValue()
-		if len(rc) > 0 && len(rcf) > 0 {
+		if rc != "" && rcf != "" {
 			cfgErr.AddInvalidValue("global.v1.external.elasticsearch.ssl", "Specify either global.v1.external.elasticsearch.ssl.root_cert or global.v1.external.elasticsearch.ssl.root_cert_file, but not both.")
 		}
+
+		auth := c.GetV1().GetExternal().GetElasticsearch().GetAuth()
+		scheme := auth.GetScheme().GetValue()
+		if scheme != "" {
+			// External ES uses a supported auth scheme
+			if scheme != "basic_auth" {
+				cfgErr.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Should be basic_auth.")
+			}
+
+			// Username and password specified in config if using basic auth
+			if scheme == "basic_auth" {
+				u := auth.GetBasicAuth().GetUsername().GetValue()
+				p := auth.GetBasicAuth().GetPassword().GetValue()
+				if u == "" {
+					cfgErr.AddMissingKey("global.v1.external.elasticsearch.basic_auth.username")
+				}
+				if p == "" {
+					cfgErr.AddMissingKey("global.v1.external.elasticsearch.basic_auth.password")
+				}
+			}
+		}
+
 	}
 
 	if cfgErr.IsEmpty() {

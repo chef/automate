@@ -339,6 +339,53 @@ format = "json"
 		expected.AddInvalidValue("global.v1.external.elasticsearch.ssl", "Specify either global.v1.external.elasticsearch.ssl.root_cert or global.v1.external.elasticsearch.ssl.root_cert_file, but not both.")
 		assert.EqualError(t, cfgErr, expected.Error(), "")
 	})
+
+	t.Run("with invalid auth scheme for external elasticsearch", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Elasticsearch: &External_Elasticsearch{
+						Enable: w.Bool(true),
+						Auth: &External_Elasticsearch_Authentication{
+							Scheme: w.String("mystery_auth"),
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		expected := NewInvalidConfigError()
+		expected.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Should be basic_auth.")
+		assert.EqualError(t, cfgErr, expected.Error(), "")
+	})
+
+	t.Run("with external elasticsearch basic auth but no username and password set", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Elasticsearch: &External_Elasticsearch{
+						Enable: w.Bool(true),
+						Auth: &External_Elasticsearch_Authentication{
+							Scheme:    w.String("basic_auth"),
+							BasicAuth: &External_Elasticsearch_Authentication_BasicAuth{},
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.basic_auth.username")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.basic_auth.password")
+	})
+
 }
 
 func loadFromToml(s string) *GlobalConfig {
