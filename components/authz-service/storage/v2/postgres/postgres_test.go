@@ -246,10 +246,9 @@ func TestGetPolicy(t *testing.T) {
 			require.NoError(t, err)
 
 			// insert projects in statements
-			_, err = db.Exec(`
-			INSERT INTO iam_statement_projects (statement_id, project_id)
-			  VALUES ($1, $3), ($2, $3), ($2, $4);`, sID0, sID1, projID0, projID1)
-			require.NoError(t, err)
+			insertStatementProject(t, db, sID0, projID0)
+			insertStatementProject(t, db, sID1, projID0)
+			insertStatementProject(t, db, sID1, projID1)
 
 			// insert members
 			member0 := insertTestPolicyMember(t, db, polID, "user:local:charmander")
@@ -509,10 +508,7 @@ func TestListPolicies(t *testing.T) {
 			require.NoError(t, err)
 
 			// associate statement with project
-			_, err = db.Exec(`
-			INSERT INTO iam_statement_projects (statement_id, project_id)
-			  VALUES ($1, $2);`, sID0, projID0)
-			require.NoError(t, err)
+			insertStatementProject(t, db, sID0, projID0)
 
 			// insert second policy with statement
 			_, err = db.Exec(`
@@ -525,10 +521,8 @@ func TestListPolicies(t *testing.T) {
 			require.NoError(t, err)
 
 			// associate statement with projects
-			_, err = db.Exec(`
-			INSERT INTO iam_statement_projects (statement_id, project_id)
-			  VALUES ($1, $2), ($1, $3);`, sID1, projID0, projID1)
-			require.NoError(t, err)
+			insertStatementProject(t, db, sID1, projID0)
+			insertStatementProject(t, db, sID1, projID1)
 
 			member0 := insertTestPolicyMember(t, db, polID0, "user:local:albertine0")
 			member1 := insertTestPolicyMember(t, db, polID1, "user:local:albertine1")
@@ -702,10 +696,8 @@ func TestDeletePolicy(t *testing.T) {
 			require.NoError(t, err)
 
 			// insert project into statements
-			_, err = db.Exec(`
-			INSERT INTO iam_statement_projects (statement_id, project_id)
-			  VALUES ($1, $2), ($1, $3);`, sID0, projID0, projID1)
-			require.NoError(t, err)
+			insertStatementProject(t, db, sID0, projID0)
+			insertStatementProject(t, db, sID0, projID1)
 
 			insertTestPolicyMember(t, db, polID, "user:local:eevee")
 
@@ -4210,6 +4202,14 @@ func insertTestProject(t *testing.T, db *testDB, id string, name string, projTyp
 	require.NoError(t, err)
 
 	return proj
+}
+
+func insertStatementProject(t *testing.T, db *testDB, statementID uuid.UUID, projectId string) {
+	t.Helper()
+	_, err := db.Exec(`
+			INSERT INTO iam_statement_projects (statement_id, project_id) VALUES ($1, $2);`,
+		statementID, projectId)
+	require.NoError(t, err)
 }
 
 func setup(t *testing.T) (storage.Storage, *testDB, *prng.Prng) {
