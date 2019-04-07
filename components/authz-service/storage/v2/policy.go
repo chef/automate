@@ -15,6 +15,7 @@ type Policy struct {
 	Members    []Member    `json:"members"`
 	Statements []Statement `json:"statements"`
 	Type       Type        `json:"type"`
+	Projects   []string    `json:"projects"`
 }
 
 // Scan implements pq Scan interface for an Policy reference

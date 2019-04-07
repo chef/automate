@@ -65,6 +65,26 @@ func TestGetPolicy(t *testing.T) {
 			assert.Nil(t, resp)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
+		"policy with projects": func(t *testing.T) {
+			targetProject := "p1"
+			db_id, polID := insertTestPolicy(t, db, "testpolicy")
+			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
+			insertTestProject(t, db, targetProject, "test project 1", storage.Custom)
+			// also test the invalid case  where a specified project does not exist
+			insertPolicyProject(t, db, db_id, targetProject)
+
+			resp, err := store.GetPolicy(ctx, polID)
+			require.NoError(t, err)
+
+			pol := storage.Policy{
+				ID:         polID,
+				Name:       "testpolicy",
+				Members:    []storage.Member{member},
+				Statements: []storage.Statement{},
+				Projects:   []string{targetProject},
+			}
+			assert.Equal(t, &pol, resp)
+		},
 		"policy with no statements": func(t *testing.T) {
 			_, polID := insertTestPolicy(t, db, "testpolicy")
 			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
@@ -77,6 +97,7 @@ func TestGetPolicy(t *testing.T) {
 				Name:       "testpolicy",
 				Members:    []storage.Member{member},
 				Statements: []storage.Statement{},
+				Projects:   []string{},
 			}
 			assert.Equal(t, &pol, resp)
 		},
@@ -4089,6 +4110,7 @@ func assertPolicy(t *testing.T, expectedPolicy, returnedPolicy *storage.Policy) 
 	assert.Equal(t, expectedPolicy.Name, returnedPolicy.Name)
 	assert.Equal(t, expectedPolicy.Type, returnedPolicy.Type)
 	assert.ElementsMatch(t, expectedPolicy.Members, returnedPolicy.Members)
+	assert.ElementsMatch(t, expectedPolicy.Projects, returnedPolicy.Projects)
 	assert.ElementsMatch(t, expectedPolicy.Statements, returnedPolicy.Statements)
 }
 
@@ -4202,6 +4224,14 @@ func insertTestProject(t *testing.T, db *testDB, id string, name string, projTyp
 	require.NoError(t, err)
 
 	return proj
+}
+
+func insertPolicyProject(t *testing.T, db *testDB, policyID int, projectId string) {
+	t.Helper()
+	_, err := db.Exec(`
+			INSERT INTO iam_policy_projects (policy_id, project_id) VALUES ($1, $2);`,
+		policyID, projectId)
+	require.NoError(t, err)
 }
 
 func insertStatementProject(t *testing.T, db *testDB, statementID uuid.UUID, projectId string) {
