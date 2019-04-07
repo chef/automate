@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/chef/automate/components/authz-service/constants/v2"
+	v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/prng"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -32,113 +32,23 @@ CREATE SCHEMA public;
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO public;`
 
+// Note: to set up PG locally for running these tests,
+// run the following from your command line from the components/authz-service folder:
+//
+// To start postgres in a docker container:
+//
+// make setup_docker_pg
+//
+// To run the tests, you can run this multiple times:
+//
+// make test_with_db
+//
+// When you are done testing, spin down the postgres container:
+//
+// make kill_docker_pg
+
 type testDB struct {
 	*sql.DB
-}
-
-func (d *testDB) flush(t *testing.T) {
-	_, err := d.Exec(`DELETE FROM iam_policies CASCADE; DELETE FROM iam_members CASCADE;
-		DELETE FROM iam_roles CASCADE; DELETE FROM iam_projects CASCADE; DELETE FROM iam_role_projects CASCADE;
-		DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
-	require.NoError(t, err)
-}
-
-func (d *testDB) close(t *testing.T) {
-	t.Helper()
-	require.NoError(t, d.Close())
-}
-
-func setup(t *testing.T) (storage.Storage, *testDB, *prng.Prng) {
-	t.Helper()
-	ctx := context.Background()
-	// Note: to set up PG locally for running these tests,
-	// run the following from your command line from the components/authz-service folder:
-	//
-	// To start postgres in a docker container:
-	//
-	// make setup_docker_pg
-	//
-	// To run the tests, you can run this multiple times:
-	//
-	// make test_with_db
-	//
-	// When you are done testing, spin down the postgres container:
-	//
-	// make kill_docker_pg
-	l, err := logger.NewLogger("text", "error")
-	require.NoError(t, err, "init logger for postgres storage")
-
-	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/migration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	if migrationConfig == nil && dataMigrationConfig == nil {
-		t.Skipf("start pg container and set PG_URL to run")
-	}
-
-	// reset database the hard way -- we do this to ensure that our comparison
-	// between database content and hardcoded storage default policies actually
-	// compares the migrated policies with the hardcoded ones (and NOT the
-	// hardcoded policies with the hardcoded policies).
-	db := openDB(t)
-	_, err = db.ExecContext(ctx, resetDatabaseStatement)
-	require.NoError(t, err, "error resetting database")
-	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
-	require.NoError(t, err, "error creating extension")
-
-	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
-	require.NoError(t, err)
-	return backend, &testDB{DB: db}, prng.Seed(t)
-}
-
-// Will fail on conflict with existing name.
-func insertTestPolicyMember(t *testing.T, db *testDB, polID string, memberName string) storage.Member {
-	member := genMember(t, memberName)
-
-	_, err := db.Exec(`INSERT INTO iam_members (id, name) values ($1, $2)`, member.ID, member.Name)
-	require.NoError(t, err)
-	_, err = db.Exec(`INSERT INTO iam_policy_members (policy_id, member_id) values($1, $2)`, polID, member.ID)
-	require.NoError(t, err)
-
-	return member
-}
-
-func insertTestRole(t *testing.T,
-	db *testDB, id string, name string, actions []string, projects []string) storage.Role {
-
-	role := genRole(t, id, name, actions, projects)
-
-	row := db.QueryRow(`INSERT INTO iam_roles (id, name, type, actions)  VALUES ($1, $2, $3, $4)
-	RETURNING db_id;`,
-		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
-	var dbID string
-	err := row.Scan(&dbID)
-	require.NoError(t, err)
-
-	for _, project := range role.Projects {
-		_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id) VALUES ($1, $2)`,
-			&dbID, &project)
-		require.NoError(t, err)
-	}
-
-	return role
-}
-
-func insertTestPolicy(t *testing.T, db *testDB, policyName string) string {
-	row := db.QueryRow(fmt.Sprintf("INSERT INTO iam_policies "+
-		"(id, name) VALUES (uuid_generate_v4(), '%s') "+
-		"RETURNING id", policyName))
-	require.NotNil(t, row)
-	var polID string
-	err := row.Scan(&polID)
-	require.NoError(t, err)
-	return polID
 }
 
 func TestGetPolicy(t *testing.T) {
@@ -4278,6 +4188,96 @@ func genRole(t *testing.T, id string, name string, actions []string, projects []
 	return *role
 }
 
+func insertTestPolicy(t *testing.T, db *testDB, policyName string) string {
+	row := db.QueryRow(fmt.Sprintf("INSERT INTO iam_policies "+
+		"(id, name) VALUES (uuid_generate_v4(), '%s') "+
+		"RETURNING id", policyName))
+	require.NotNil(t, row)
+	var polID string
+	err := row.Scan(&polID)
+	require.NoError(t, err)
+	return polID
+}
+
+// Will fail on conflict with existing name.
+func insertTestPolicyMember(t *testing.T, db *testDB, polID string, memberName string) storage.Member {
+	member := genMember(t, memberName)
+
+	_, err := db.Exec(`INSERT INTO iam_members (id, name) values ($1, $2)`, member.ID, member.Name)
+	require.NoError(t, err)
+	_, err = db.Exec(`INSERT INTO iam_policy_members (policy_id, member_id) values($1, $2)`, polID, member.ID)
+	require.NoError(t, err)
+
+	return member
+}
+
+func insertTestRole(t *testing.T,
+	db *testDB, id string, name string, actions []string, projects []string) storage.Role {
+
+	role := genRole(t, id, name, actions, projects)
+
+	row := db.QueryRow(`INSERT INTO iam_roles (id, name, type, actions)  VALUES ($1, $2, $3, $4)
+	RETURNING db_id;`,
+		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
+	var dbID string
+	err := row.Scan(&dbID)
+	require.NoError(t, err)
+
+	for _, project := range role.Projects {
+		_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id) VALUES ($1, $2)`,
+			&dbID, &project)
+		require.NoError(t, err)
+	}
+
+	return role
+}
+
+func insertTestProject(t *testing.T, db *testDB, id string, name string) storage.Project {
+	t.Helper()
+	proj, err := storage.NewProject(id, name, storage.Custom)
+	require.NoError(t, err)
+
+	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type) values ($1, $2, $3)`, proj.ID, proj.Name, proj.Type.String())
+	require.NoError(t, err)
+
+	return proj
+}
+
+func setup(t *testing.T) (storage.Storage, *testDB, *prng.Prng) {
+	t.Helper()
+	ctx := context.Background()
+	l, err := logger.NewLogger("text", "error")
+	require.NoError(t, err, "init logger for postgres storage")
+
+	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/migration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
+	}
+
+	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/datamigration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
+	}
+
+	if migrationConfig == nil && dataMigrationConfig == nil {
+		t.Skipf("start pg container and set PG_URL to run")
+	}
+
+	// reset database the hard way -- we do this to ensure that our comparison
+	// between database content and hardcoded storage default policies actually
+	// compares the migrated policies with the hardcoded ones (and NOT the
+	// hardcoded policies with the hardcoded policies).
+	db := openDB(t)
+	_, err = db.ExecContext(ctx, resetDatabaseStatement)
+	require.NoError(t, err, "error resetting database")
+	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+	require.NoError(t, err, "error creating extension")
+
+	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
+	require.NoError(t, err)
+	return backend, &testDB{DB: db}, prng.Seed(t)
+}
+
 // migrationConfigIfPGTestsToBeRun either returns the pg migration config
 // if PG_URL is set or we are in CI, otherwise it returns nil, indicating
 // postgres based tests shouldn't be run.
@@ -4329,4 +4329,16 @@ func openDB(t *testing.T) *sql.DB {
 func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
 		[]string{}, projects, "resource", "action", "pol"))
+}
+
+func (d *testDB) flush(t *testing.T) {
+	_, err := d.Exec(`DELETE FROM iam_policies CASCADE; DELETE FROM iam_members CASCADE;
+		DELETE FROM iam_roles CASCADE; DELETE FROM iam_projects CASCADE; DELETE FROM iam_role_projects CASCADE;
+		DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
+	require.NoError(t, err)
+}
+
+func (d *testDB) close(t *testing.T) {
+	t.Helper()
+	require.NoError(t, d.Close())
 }
