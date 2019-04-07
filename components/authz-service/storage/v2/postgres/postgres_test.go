@@ -232,8 +232,8 @@ func TestGetPolicy(t *testing.T) {
 			sID0, sID1 := genUUID(t), genUUID(t)
 
 			// insert projects
-			project0 := insertTestProject(t, db, projID0, "test project 1")
-			project1 := insertTestProject(t, db, projID1, "test project 2")
+			project0 := insertTestProject(t, db, projID0, "test project 1", storage.Custom)
+			project1 := insertTestProject(t, db, projID1, "test project 2", storage.Custom)
 
 			// insert policy with statements
 			_, err := db.Exec(`
@@ -495,8 +495,8 @@ func TestListPolicies(t *testing.T) {
 			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 
 			// insert projects
-			project0 := insertTestProject(t, db, projID0, "test project 1")
-			project1 := insertTestProject(t, db, projID1, "test project 2")
+			project0 := insertTestProject(t, db, projID0, "test project 1", storage.Custom)
+			project1 := insertTestProject(t, db, projID1, "test project 2", storage.Custom)
 
 			// insert first policy with statement
 			_, err := db.Exec(`
@@ -689,8 +689,8 @@ func TestDeletePolicy(t *testing.T) {
 			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 
 			// insert projects
-			insertTestProject(t, db, projID0, "let's go eevee - prod")
-			insertTestProject(t, db, projID1, "let's go eevee - dev")
+			insertTestProject(t, db, projID0, "let's go eevee - prod", storage.Custom)
+			insertTestProject(t, db, projID1, "let's go eevee - dev", storage.Custom)
 
 			// insert policy with statements
 			_, err := db.Exec(`
@@ -1036,7 +1036,7 @@ func TestCreatePolicy(t *testing.T) {
 			resources0, actions0 := []string{"iam:teams"}, []string{"iam:teams:create", "iam:teams:delete"}
 			resources1, actions1 := []string{"infra:nodes"}, []string{"infra:nodes:delete", "infra:nodes:rerun"}
 
-			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret")
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
 			statement0 := storage.Statement{
 				ID:        sID0,
@@ -1926,7 +1926,7 @@ func TestUpdatePolicy(t *testing.T) {
 			require.NoError(t, err)
 
 			member := insertTestPolicyMember(t, db, polID, "user:local:totodile")
-			insertTestProject(t, db, projID, "pokemon crystal")
+			insertTestProject(t, db, projID, "pokemon crystal", storage.Custom)
 
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			statement := storage.Statement{
@@ -2305,16 +2305,16 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"returns project not found with several projects in database", func(t *testing.T) {
 			ctx := context.Background()
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			err := store.DeleteProject(ctx, "test-project")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		}},
 		{"deletes project with one project in database", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
 
 			err := store.DeleteProject(ctx, "test-project")
 
@@ -2323,10 +2323,10 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"deletes project with several projects in database", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			err := store.DeleteProject(ctx, "test-project")
 
@@ -2336,10 +2336,10 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"deletes project with several projects in database with a project filter", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"foo", "test-project"})
 
@@ -2351,10 +2351,10 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"deletes project with several projects in database with a project filter of *", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
@@ -2366,10 +2366,10 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"returns not found when the project filter excludes the project in question", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"my-id-1", "my-id-2"})
 
@@ -2386,18 +2386,6 @@ func TestDeleteProject(t *testing.T) {
 		t.Run(test.desc, test.f)
 		db.flush(t)
 	}
-}
-
-func insertTestProject(t *testing.T, db *testDB, id string, name string) storage.Project {
-	t.Helper()
-	proj, err := storage.NewProject(id, name, storage.Custom)
-	require.NoError(t, err)
-
-	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) values ($1, $2, $3, $4)`,
-		proj.ID, proj.Name, proj.Type.String(), pq.Array([]string{id}))
-	require.NoError(t, err)
-
-	return proj
 }
 
 func TestListProjects(t *testing.T) {
@@ -4233,12 +4221,12 @@ func insertTestRole(t *testing.T,
 	return role
 }
 
-func insertTestProject(t *testing.T, db *testDB, id string, name string) storage.Project {
+func insertTestProject(t *testing.T, db *testDB, id string, name string, projType storage.Type) storage.Project {
 	t.Helper()
-	proj, err := storage.NewProject(id, name, storage.Custom)
+	proj, err := storage.NewProject(id, name, projType)
 	require.NoError(t, err)
 
-	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type) values ($1, $2, $3)`, proj.ID, proj.Name, proj.Type.String())
+	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type) values ($1, $2, $3)`, proj.ID, proj.Name, projType.String())
 	require.NoError(t, err)
 
 	return proj
