@@ -2093,8 +2093,7 @@ func TestUpdateProject(t *testing.T) {
 	cases := map[string]func(*testing.T){
 		"successfully updates existing custom project": func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
 				ID:       "foo",
@@ -2110,8 +2109,7 @@ func TestUpdateProject(t *testing.T) {
 		},
 		"successfully updates existing custom project with a project filter": func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
 				ID:       "foo",
@@ -2128,8 +2126,7 @@ func TestUpdateProject(t *testing.T) {
 		},
 		"successfully updates existing custom project with a project filter of *": func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
 				ID:       "foo",
@@ -2199,9 +2196,7 @@ func TestGetProject(t *testing.T) {
 		}},
 		{"when a chef-managed project exists, returns that project", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
@@ -2215,25 +2210,7 @@ func TestGetProject(t *testing.T) {
 		}},
 		{"when a custom project exists, returns that project", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
-
-			p, err := store.GetProject(ctx, "foo")
-			require.NoError(t, err)
-			expectedProject := storage.Project{
-				ID:       "foo",
-				Name:     "my foo project",
-				Type:     storage.Custom,
-				Projects: []string{"foo"},
-			}
-			assert.Equal(t, &expectedProject, p)
-		}},
-		{"when a custom project exists with a project filter, returns that project", func(t *testing.T) {
-			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 
@@ -2469,6 +2446,8 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 
 			ctx = insertProjectsIntoContext(ctx, []string{})
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -4226,7 +4205,8 @@ func insertTestProject(t *testing.T, db *testDB, id string, name string, projTyp
 	proj, err := storage.NewProject(id, name, projType)
 	require.NoError(t, err)
 
-	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type) values ($1, $2, $3)`, proj.ID, proj.Name, projType.String())
+	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) values ($1, $2, $3, $4)`,
+		proj.ID, proj.Name, projType.String(), pq.Array([]string{proj.ID}))
 	require.NoError(t, err)
 
 	return proj
