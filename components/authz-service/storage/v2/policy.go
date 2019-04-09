@@ -39,6 +39,7 @@ func NewPolicy(
 	typeVal Type,
 	members []Member,
 	statements []Statement,
+	projects []string,
 ) (Policy, error) {
 
 	if id == "" {
@@ -54,5 +55,6 @@ func NewPolicy(
 		Type:       typeVal,
 		Members:    members,
 		Statements: statements,
+		Projects:   projects,
 	}, nil
 }

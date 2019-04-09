@@ -125,7 +125,14 @@ func (s *policyServer) CreatePolicy(
 
 	// API requests always create custom policies.
 
-	pol, err := policyFromAPI(req.Id, req.Name, storage.Custom, req.Members, req.Statements)
+	pol, err := policyFromAPI(
+		req.Id,
+		req.Name,
+		storage.Custom,
+		req.Members,
+		req.Statements,
+		req.Projects)
+
 	if err != nil {
 		if errors.Cause(err) == storage_errors.ErrGenerateUUID {
 			return nil, status.Errorf(codes.Internal,
@@ -233,7 +240,7 @@ func (s *policyServer) UpdatePolicy(
 
 	// Assume custom policy for API requests.
 	storagePolicy, err := storage.NewPolicy(req.Id,
-		req.Name, storage.Custom, members, statements)
+		req.Name, storage.Custom, members, statements, req.Projects)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "parse policy with ID %q: %s", req.Id, err.Error())
 	}
@@ -806,7 +813,7 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 func policyFromAPI(ID, name string, typeVal storage.Type,
-	membersToAttach []string, statementsToAttach []*api.Statement) (storage.Policy, error) {
+	membersToAttach []string, statementsToAttach []*api.Statement, inProjects []string) (storage.Policy, error) {
 
 	statements := make([]storage.Statement, len(statementsToAttach))
 	for i, statement := range statementsToAttach {
@@ -826,7 +833,7 @@ func policyFromAPI(ID, name string, typeVal storage.Type,
 		members[i] = memberInt
 	}
 
-	return storage.NewPolicy(ID, name, typeVal, members, statements)
+	return storage.NewPolicy(ID, name, typeVal, members, statements, inProjects)
 }
 
 func policyFromInternal(pol *storage.Policy) (*api.Policy, error) {
@@ -836,6 +843,7 @@ func policyFromInternal(pol *storage.Policy) (*api.Policy, error) {
 		Type:       typeFromInternal(pol.Type),
 		Members:    storage.MemberSliceToStringSlice(pol.Members),
 		Statements: statementsFromInternal(pol.Statements),
+		Projects:   pol.Projects,
 	}
 
 	return resp, nil
