@@ -108,6 +108,27 @@ func TestValidationCreatePolicy(t *testing.T) {
 			Id:      "test-id",
 			Members: []string{"tls:other:a:b"},
 		},
+		// projects
+		"whitespace projects list": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"     ", "test"},
+		},
+		"repeated projects in list": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"repeat", "repeat"},
+		},
+		"Project has invalid characters": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"valid", "wrong~"},
+		},
+		"Project has spaces": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"valid", "wrong space"},
+		},
+		"project has uppercase characters": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"valid", "PROJECT1"},
+		},
 	}
 	positiveCases := map[string]*v2.CreatePolicyReq{
 		// ID
@@ -183,7 +204,23 @@ func TestValidationCreatePolicy(t *testing.T) {
 				},
 			},
 		},
-		// resources
+		// Projects
+		"without projects": &v2.CreatePolicyReq{
+			Id: "test-id",
+		},
+		"empty projects": &v2.CreatePolicyReq{
+			Id:       "test-id",
+			Projects: []string{},
+		},
+		"a single project": &v2.CreatePolicyReq{
+			Id:       "test-id",
+			Projects: []string{"project-1"},
+		},
+		"multiple projects": &v2.CreatePolicyReq{
+			Id:       "test-id",
+			Projects: []string{"project-1", "project-2", "project-3"},
+		},
+		// Resources
 		"no resources (validated in server.go)": &v2.CreatePolicyReq{
 			Id:      "test-id",
 			Members: []string{"user:local:member1", "user:local:member2", "user:local:member3"},
