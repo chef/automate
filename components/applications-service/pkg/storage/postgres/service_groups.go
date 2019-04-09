@@ -124,7 +124,7 @@ func (sgh *serviceGroupHealth) OverallHealth() string {
 	return storage.Ok
 }
 
-// getServiceFromUniqueFields retreives a service from the db without the need of an id
+// getServiceFromUniqueFields retrieve a service from the db without the need of an id
 func (db *postgres) GetServiceGroups(
 	sortField string, sortAsc bool,
 	page int32, pageSize int32,
@@ -208,7 +208,7 @@ func (sgh *serviceGroupHealth) ReleaseString() string {
 	}
 }
 
-// GetServiceGroupsHealthCounts retreives the health counts from all service groups in the database
+// GetServiceGroupsHealthCounts retrieves the health counts from all service groups in the database
 func (db *postgres) GetServiceGroupsHealthCounts() (*storage.HealthCounts, error) {
 	var sgHealthCounts storage.HealthCounts
 	err := db.SelectOne(&sgHealthCounts, selectServiceGroupsHealthCounts)
@@ -222,13 +222,13 @@ func (db *postgres) GetServiceGroupsHealthCounts() (*storage.HealthCounts, error
 func queryFromStatusFilter(text string) (string, error) {
 	// Make sure that we always have uppercase text
 	switch strings.ToUpper(text) {
-	case "OK":
+	case storage.Ok:
 		return selectServiceGroupHealthFilterOK, nil
-	case "CRITICAL":
+	case storage.Critical:
 		return selectServiceGroupHealthFilterCRITICAL, nil
-	case "WARNING":
+	case storage.Warning:
 		return selectServiceGroupHealthFilterWARNING, nil
-	case "UNKNOWN":
+	case storage.Unknown:
 		return selectServiceGroupHealthFilterUNKNOWN, nil
 	default:
 		return "", errors.Errorf("invalid status filter '%s'", text)

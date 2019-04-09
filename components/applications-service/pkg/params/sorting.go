@@ -1,41 +1,90 @@
 package params
 
-import "github.com/chef/automate/api/external/common/query"
-
-const (
-	DEFAULT_SORT_FIELD     = "name"
-	DEFAULT_SORT_ASCENDING = true
+import (
+	"github.com/chef/automate/api/external/common/query"
+	"github.com/pkg/errors"
 )
 
-func GetSortParams(s *query.Sorting) (string, bool) {
-	var (
-		sortField = DEFAULT_SORT_FIELD
-		sortAsc   = DEFAULT_SORT_ASCENDING
-	)
+// SortField defines our valid sorting fields
+type SortField int
 
-	if s != nil {
-		if s.GetField() != "" {
-			sortField = s.Field
-		}
-		if s.GetOrder().String() == "DESC" {
-			sortAsc = false
-		}
+const (
+	DefaultSortFieldForServiceGroups = "name"
+	DefaultSortFieldForServices      = "status"
+	DefaultSortAscending             = true
+
+	// Define here your sort fields
+	DefaultField SortField = iota
+	PercentOkField
+	NameField
+	StatusField
+)
+
+var (
+	// Add the defined sort fields to the right mapping
+	validSortFieldsForServiceGroups = map[string]SortField{
+		"name":       NameField,
+		"percent_ok": PercentOkField,
+		"":           DefaultField,
 	}
-	return sortField, sortAsc
+	validSortFieldsForServices = map[string]SortField{
+		"status": StatusField,
+		"":       DefaultField,
+	}
+)
+
+// GetSortParamsForServices returns valid sorting parameters for services from the sort query
+func GetSortParamsForServices(s *query.Sorting) (sortField string, sortAsc bool, err error) {
+	sortField = DefaultSortFieldForServices
+	sortAsc = DefaultSortAscending
+
+	if !isValidSortFieldForServices(s) {
+		err = errors.Errorf("Invalid sort field '%s'.", s.GetField())
+		return
+	}
+
+	if s.GetField() != "" {
+		sortField = s.Field
+	}
+
+	if s.GetOrder().String() == "DESC" {
+		sortAsc = false
+	}
+
+	return
 }
 
-func IsValidSortField(s *query.Sorting) bool {
-	if s != nil {
-		switch s.Field {
-		case "name":
-			return true
-		case "percent_ok":
-			return true
-		case "": // Use default sorting
-			return true
-		default:
-			return false
-		}
-	} // If there is no sort field we will use default sorting
-	return true
+// GetSortParamsForServiceGroups returns valid sorting parameters for service_groups from the sort query
+func GetSortParamsForServiceGroups(s *query.Sorting) (sortField string, sortAsc bool, err error) {
+	sortField = DefaultSortFieldForServiceGroups
+	sortAsc = DefaultSortAscending
+
+	if !isValidSortFieldForServiceGroups(s) {
+		err = errors.Errorf("Invalid sort field '%s'.", s.GetField())
+		return
+	}
+
+	if s.GetField() != "" {
+		sortField = s.Field
+	}
+
+	if s.GetOrder().String() == "DESC" {
+		sortAsc = false
+	}
+
+	return
+}
+
+func isValidSortFieldForServices(s *query.Sorting) bool {
+	if _, ok := validSortFieldsForServices[s.GetField()]; ok {
+		return true
+	}
+	return false
+}
+
+func isValidSortFieldForServiceGroups(s *query.Sorting) bool {
+	if _, ok := validSortFieldsForServiceGroups[s.GetField()]; ok {
+		return true
+	}
+	return false
 }

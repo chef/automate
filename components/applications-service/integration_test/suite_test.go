@@ -104,6 +104,15 @@ func (s *Suite) IngestService(event *applications.HabService) {
 	}
 }
 
+// GetServiceGroups retrieve the service_groups from the database
+func (s *Suite) GetServiceGroups() []*storage.ServiceGroupDisplay {
+	sgList, err := s.StorageClient.GetServiceGroups("name", true, 1, 100, nil)
+	if err != nil {
+		fmt.Printf("Error trying to retrieve service_groups from db: %s\n", err)
+	}
+	return sgList
+}
+
 // IngestServices ingests multiple HabService messages into the database
 func (s *Suite) IngestServices(events []*applications.HabService) {
 	for _, e := range events {

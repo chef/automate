@@ -51,25 +51,20 @@ func (a *ApplicationsServer) GetVersion(
 func (a *ApplicationsServer) GetServiceGroups(c context.Context,
 	request *applications.ServiceGroupsReq) (*applications.ServiceGroups, error) {
 
-	if !params.IsValidSortField(request.GetSorting()) {
-		return new(applications.ServiceGroups),
-			status.Error(codes.InvalidArgument,
-				fmt.Sprintf("Invalid sort field '%s'.", request.GetSorting().GetField()))
-	}
-
-	var (
-		sortField, sortAsc = params.GetSortParams(request.GetSorting())
-		page, pageSize     = params.GetPageParams(request.GetPagination())
-	)
-
 	filters, err := params.FormatFilters(request.GetFilter())
 	if err != nil {
 		return new(applications.ServiceGroups), status.Error(codes.InvalidArgument, err.Error())
 	}
+	sortField, sortAsc, err := params.GetSortParamsForServiceGroups(request.GetSorting())
+	if err != nil {
+		return new(applications.ServiceGroups), status.Error(codes.InvalidArgument, err.Error())
+	}
+	page, pageSize := params.GetPageParams(request.GetPagination())
+
 	serviceGroupsList, err := a.storageClient.GetServiceGroups(sortField, sortAsc, page, pageSize, filters)
 	if err != nil {
 		log.WithError(err).Error("Error retrieving service groups")
-		return new(applications.ServiceGroups), err
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	if len(serviceGroupsList) == 0 {
@@ -118,8 +113,8 @@ func (app *ApplicationsServer) GetServiceGroupsHealthCounts(
 
 	svcsHealthCounts, err := app.storageClient.GetServiceGroupsHealthCounts()
 	if err != nil {
-		// Transform into gRPC error
-		return nil, err
+		log.WithError(err).Error("Error retrieving service groups health counts")
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &applications.HealthCounts{
@@ -129,4 +124,91 @@ func (app *ApplicationsServer) GetServiceGroupsHealthCounts(
 		Critical: svcsHealthCounts.Critical,
 		Unknown:  svcsHealthCounts.Unknown,
 	}, nil
+}
+
+// GetServicesBySG returns a list of services within a service-group
+func (app *ApplicationsServer) GetServicesBySG(
+	c context.Context, request *applications.ServicesBySGReq,
+) (*applications.ServicesBySGRes, error) {
+
+	sortField, sortAsc, err := params.GetSortParamsForServices(request.GetSorting())
+	if err != nil {
+		return new(applications.ServicesBySGRes), status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	var (
+		page, pageSize = params.GetPageParams(request.GetPagination())
+		filters        map[string][]string
+	)
+
+	// In the database we will never have ID=0
+	if request.GetServiceGroupId() != 0 {
+		filters = map[string][]string{
+			"service_group_id": []string{fmt.Sprint(request.GetServiceGroupId())},
+		}
+	}
+
+	services, err := app.storageClient.GetServices(sortField, sortAsc, page, pageSize, filters)
+	if err != nil {
+		log.WithError(err).Error("Error retrieving services by service_group(s)")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(services) == 0 {
+		return new(applications.ServicesBySGRes), nil
+	}
+
+	return &applications.ServicesBySGRes{
+		Group:    "",
+		Services: convertStorageServicesToApplicationsServices(services),
+	}, nil
+}
+
+func (app *ApplicationsServer) GetServices(
+	c context.Context, request *applications.ServicesReq,
+) (*applications.ServicesRes, error) {
+
+	filters, err := params.FormatFilters(request.GetFilter())
+	if err != nil {
+		return new(applications.ServicesRes), status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	sortField, sortAsc, err := params.GetSortParamsForServices(request.GetSorting())
+	if err != nil {
+		return new(applications.ServicesRes), status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	page, pageSize := params.GetPageParams(request.GetPagination())
+
+	services, err := app.storageClient.GetServices(sortField, sortAsc, page, pageSize, filters)
+	if err != nil {
+		log.WithError(err).Error("Error retrieving services")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	if len(services) == 0 {
+		return new(applications.ServicesRes), nil
+	}
+
+	return &applications.ServicesRes{
+		Services: convertStorageServicesToApplicationsServices(services),
+	}, nil
+}
+
+// Converte storage.Service array to applications.Service array
+func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*applications.Service {
+	services := make([]*applications.Service, len(svcs))
+	for i, svc := range svcs {
+		services[i] = &applications.Service{
+			SupervisorId: svc.SupMemberID,
+			Release:      svc.FullReleaseString(),
+			Group:        svc.Group,
+			HealthCheck:  applications.HealthStatus(applications.HealthStatus_value[svc.Health]),
+			Status:       applications.ServiceStatus(applications.ServiceStatus_value[svc.Status]),
+			Application:  svc.Application,
+			Environment:  svc.Environment,
+			Fqdn:         svc.Fqdn,
+		}
+	}
+	return services
 }

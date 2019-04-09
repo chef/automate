@@ -77,6 +77,62 @@ func init() {
         ]
       }
     },
+    "/beta/applications/service-groups/{service_group_id}": {
+      "get": {
+        "operationId": "GetServicesBySG",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsServicesBySGRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "service_group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sorting.field",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sorting.order",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "default": "ASC"
+          }
+        ],
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
+    },
     "/beta/applications/service_groups_health_counts": {
       "get": {
         "operationId": "GetServiceGroupsHealthCounts",
@@ -147,6 +203,35 @@ func init() {
       "default": "OK",
       "title": "The HealthStatus enum matches the habitat implementation for health-check status:\n=\u003e https://www.habitat.sh/docs/reference/#health-check"
     },
+    "applicationsService": {
+      "type": "object",
+      "properties": {
+        "supervisor_id": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "health_check": {
+          "$ref": "#/definitions/applicationsHealthStatus"
+        },
+        "status": {
+          "$ref": "#/definitions/applicationsServiceStatus"
+        },
+        "application": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "string"
+        },
+        "fqdn": {
+          "type": "string"
+        }
+      }
+    },
     "applicationsServiceGroup": {
       "type": "object",
       "properties": {
@@ -181,6 +266,42 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/applicationsServiceGroup"
+          }
+        }
+      }
+    },
+    "applicationsServiceStatus": {
+      "type": "string",
+      "enum": [
+        "RUNNING",
+        "INITIALIZING",
+        "DEPLOYING",
+        "DOWN"
+      ],
+      "default": "RUNNING",
+      "title": "The ServiceStatus enum describes the status of the service\n@afiune have we defined these states somewhere?"
+    },
+    "applicationsServicesBySGRes": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/applicationsService"
+          }
+        }
+      }
+    },
+    "applicationsServicesRes": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/applicationsService"
           }
         }
       }
