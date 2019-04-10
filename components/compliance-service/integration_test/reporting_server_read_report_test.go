@@ -29,7 +29,7 @@ func TestReadReport(t *testing.T) {
 
 	reportId := reportIds[0]
 
-	cases := []struct {
+	successCases := []struct {
 		description     string
 		allowedProjects []string
 		expectedId      string
@@ -49,28 +49,28 @@ func TestReadReport(t *testing.T) {
 			allowedProjects: []string{"project1"},
 			expectedId:      reportId,
 		},
-		{
-			description:     "Projects: user does not have access to any projects a report belongs to",
-			allowedProjects: []string{"project3"},
-			expectedId:      "",
-		},
 	}
 
-	for _, test := range cases {
-		t.Run(test.description,
-			func(t *testing.T) {
-				ctx := contextWithProjects(test.allowedProjects)
-				response, err := server.ReadReport(ctx, &reporting.Query{Id: reportId})
-				assert.NoError(t, err)
+	for _, test := range successCases {
+		t.Run(test.description, func(t *testing.T) {
+			ctx := contextWithProjects(test.allowedProjects)
 
-				require.NotNil(t, response)
+			response, err := server.ReadReport(ctx, &reporting.Query{Id: reportId})
 
-				if len(test.expectedId) == 0 {
-					assert.Nil(t, response)
-				} else {
-					assert.NotNil(t, response)
-					assert.Equal(t, test.expectedId, response.Id)
-				}
-			})
+			assert.NoError(t, err)
+			require.NotNil(t, response)
+			assert.Equal(t, test.expectedId, response.Id)
+		})
 	}
+
+	description := "Projects: user does not have access to any projects a report belongs to"
+	allowedProjects := []string{"project3"}
+	t.Run(description, func(t *testing.T) {
+		ctx := contextWithProjects(allowedProjects)
+
+		response, err := server.ReadReport(ctx, &reporting.Query{Id: reportId})
+
+		assert.Error(t, err)
+		assert.Nil(t, response)
+	})
 }
