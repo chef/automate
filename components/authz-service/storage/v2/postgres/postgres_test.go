@@ -1128,6 +1128,30 @@ func TestCreatePolicy(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 		},
+		"policy with empty projects": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+
+			name, members, typeVal := "toBeCreated", []storage.Member{}, storage.Custom
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Type:     typeVal,
+				Members:  members,
+				Projects: []string{},
+			}
+			resp, err := store.CreatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, &pol, resp)
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
 		"policy with single project": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
 
@@ -2109,6 +2133,190 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1 AND statement_id=$2`, polID, sID))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4`,
 				sID, pq.Array(resources), pq.Array(actions), "allow"))
+		},
+		"policy with no projects to some projects": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: []string{projID},
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []string{projID}, resp.Projects)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
+		"policy with project to no projects": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			expProjs := []string{}
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: expProjs,
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, expProjs, resp.Projects)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
+		"policy with projects to same projects": func(t *testing.T) {
+			// TODO optimize opt-out if they're the same?
+
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
+			insertPolicyProject(t, db, polID, projID2)
+			initPolProjCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID)
+			assertCount(t, 2, initPolProjCount)
+
+			expProjs := []string{projID, projID2}
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: expProjs,
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, expProjs, resp.Projects)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			expPolProjCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID)
+			assertCount(t, 2, expPolProjCount)
+		},
+		"policy with single project to diff project": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: []string{projID2},
+			}
+
+			expProjs := []string{projID2}
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, expProjs, resp.Projects)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
+		"policy with one project to additional project": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			projID2 := "another-project"
+			insertTestProject(t, db, projID2, "more", storage.Custom)
+
+			expProjs := []string{projID, projID2}
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: expProjs,
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, expProjs, resp.Projects)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+
+			projCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID)
+			assertCount(t, 2, projCount)
+		},
+		"policy with project to add non-existent project fails": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: []string{projID, "not-real"},
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.Equal(t, "non-existent projects cannot be included in policies", err.Error())
+			assert.Nil(t, resp)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
 		},
 	}
 
