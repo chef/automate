@@ -1,4 +1,4 @@
-<chef-sidebar>
+<chef-sidebar [attr.major-version]="iamMajorVersion$ | async" [attr.minor-version]="iamMinorVersion$ | async">
   <div class="nav-items">
    <div class="group" *ngIf="notifications.visible || integrations.visible || credentials.visible || lifecycle.visible">Node Management</div>
     <app-authorized #notifications [anyOf]="['/notifications/rules', 'get']">
