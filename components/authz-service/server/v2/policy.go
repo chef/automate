@@ -400,13 +400,6 @@ func (s *policyServer) CreateRole(
 func (s *policyServer) ListRoles(ctx context.Context,
 	_ *api.ListRolesReq) (*api.ListRolesResp, error) {
 
-	// TODO (TC): This is an example of how we can get the projects in the domain to filter on.
-	// projects, err := auth_context.ProjectsFromIncomingContext(ctx)
-	// if err != nil {
-	// 	return nil, status.Error(codes.Internal, err.Error())
-	// }
-	// s.log.Infof("PROJECTS: here are the authorized projects for this request: %s", projects)
-
 	internalRoles, err := s.store.ListRoles(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error listing roles: %s", err.Error())
