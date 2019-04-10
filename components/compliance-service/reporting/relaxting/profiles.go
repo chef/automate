@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/jsonpb"
-	elastic "github.com/olivere/elastic"
+	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
@@ -19,7 +19,6 @@ import (
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/lib/stringutils"
 )
 
 type ESInspecControl struct {
@@ -309,6 +308,9 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 }
 
 //GetProfileSummaryByProfileId across nodes - report 8 - top
+//this is the summary that appears at the top of the page when you select a profile from profiles list at the moment
+// this one does not immediately need to be deep aware as the only things that are used from it in a2 api are version, maintainer and license
+// todo - deep filtering - this should be made depth aware as this still needs to be consumed by api users
 func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters map[string][]string) (*stats.ProfileSummary, error) {
 	esIndex, err := GetEsIndex(filters, false, false)
 	if err != nil {
@@ -467,32 +469,6 @@ func (backend *ES2Backend) getProfileMetadata(profileID string) (*stats.ProfileS
 			logrus.Errorf("getProfileMetadata unmarshal error: %s", err.Error())
 		}
 
-		//leveraging this [expensive] call to get failure/total for profile summary
-		profileIDFilterMap := make(map[string][]string)
-		profileIDFilterMap["profile_id"] = []string{profileID}
-
-		//todo todoId1 start
-		//  IMPORTANT - do we even need this  here?  this never succeeds.. it always returns an error.. need to figure
-		// out if we really want this to work and if so, fix it, if not then don't call it!
-		// taking this out until we know more.
-		//nodes, _, err := backend.getAllNodesForProfile(
-		//	0, 0, profileIDFilterMap, "latest_report.end_time", false)
-		//
-		//if err != nil {
-		//	logrus.Error("getProfileMetadata could not retrieve nodes info")
-		//}
-		//
-		//failures := 0
-		//for _, node := range nodes {
-		//	if node.LatestReport.Status == "failed" {
-		//		failures++
-		//	}
-		//}
-		//
-		//prof.Stats.TotalNodes = int32(len(nodes))
-		//prof.Stats.FailedNodes = int32(failures)
-		//todo ^todoId1 end
-
 		return prof, nil
 	}
 
@@ -572,11 +548,11 @@ func (backend *ES2Backend) getControlsMetadata(profileId string) (map[string]Con
 //GetAllProfilesFromNodes - list all of the profiles from scan data
 func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filters map[string][]string, sort_field string,
 	sort_asc bool) ([]*reportingapi.ProfileMin, *reportingapi.ProfileCounts, error) {
-
+	myName := "GetAllProfilesFromNodes"
 	client, err := backend.ES2Client()
 
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "GetAllProfilesFromNodes, cannot connect to ElasticSearch")
+		return nil, nil, errors.Wrapf(err, "%s, cannot connect to ElasticSearch", myName)
 	}
 
 	var inspecProfilesQuery elastic.Query
@@ -585,7 +561,7 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 	//if one of the "other" filters are sent in, regardless of profile_id, we need to get the ids from scans
 	profileMins, counts, err := backend.getProfileMinsFromNodes(filters)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "GetAllProfilesFromNodes, cannot get profileIDs from nodes")
+		return nil, nil, errors.Wrapf(err, "%s, cannot get profileIDs from nodes", myName)
 	}
 
 	profileIDs := make([]string, 0)
@@ -611,11 +587,11 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "GetAllProfilesFromNodes unable to get Source")
+		return nil, nil, errors.Wrapf(err, "%s unable to get Source", myName)
 	}
 
 	esIndex := CompProfilesIndex
-	LogQueryPartMin(esIndex, source, "GetAllProfilesFromNodes query searchSource")
+	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query searchSource", myName))
 
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
@@ -627,13 +603,13 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 			"hits.hits._source").
 		Do(context.Background())
 
-	LogQueryPartMin(esIndex, searchResult, "GetAllProfilesFromNodes - search result")
+	LogQueryPartMin(esIndex, searchResult, fmt.Sprintf("%s - search result", myName))
 
 	profiles := make([]*reportingapi.ProfileMin, 0)
 	if err != nil {
 		// should we be returning the error here...instead of logging it and then returning nil for the error?
-		logrus.Errorf("GetAllProfilesFromNodes: Error while trying to get data from ES for index: %s error: %s",
-			esIndex, err.Error())
+		logrus.Errorf("%s: Error while trying to get data from ES for index: %s error: %s",
+			myName, esIndex, err.Error())
 		return profiles, nil, nil
 	}
 
@@ -647,141 +623,64 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 					profile.Status = profileMins[profile.Id].Status
 					profiles = append(profiles, &profile)
 				} else {
-					logrus.Errorf("GetAllProfilesFromNodes unmarshal error: %s", err.Error())
+					logrus.Errorf("%s unmarshal error: %s", myName, err.Error())
 				}
 			}
 		}
 		return profiles, counts, nil
 	}
 
-	logrus.Debugf("GetAllProfilesFromNodes, found no profiles\n")
+	logrus.Debugf("%s, found no profiles\n", myName)
 	return profiles, counts, nil
 }
 
 func (backend ES2Backend) getProfileMinsFromNodes(
 	filters map[string][]string) (map[string]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
+	myName := "getProfileMinsFromNodes"
 
 	profileMins := make(map[string]reporting.ProfileMin)
 
 	for filterName, filterValue := range filters {
-		logrus.Debugf("getProfileMinsFromNodes, filter: name=>%s value=>%s\n", filterName, filterValue)
-	}
-
-	client, err := backend.ES2Client()
-	if err != nil {
-		return profileMins, nil, errors.Wrap(err, "getProfileMinsFromNodes, cannot connect to ElasticSearch")
+		logrus.Debugf("%s, filter: name=>%s value=>%s\n", myName, filterName, filterValue)
 	}
 
 	statusFilters := filters["status"]
 	// clearing the filters because we want to filter profiles based on their status not the overall scan status
 	filters["status"] = make([]string, 0)
 
-	esIndex, err := GetEsIndex(filters, true, false)
+	depth, err := backend.NewDepth(filters, false, true)
 	if err != nil {
-		return profileMins, nil, errors.Wrap(err, "getProfileMinsFromNodes")
+		return profileMins, nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
 
-	filtQuery := backend.getFiltersQuery(filters, true, true)
-
-	termsQuery := elastic.NewTermsAggregation().
-		Field("profiles.profile").Size(reporting.ESize)
-	termsQuery.SubAggregation("failures", elastic.NewSumAggregation().
-		Field("profiles.controls_sums.failed.total"))
-	termsQuery.SubAggregation("passed", elastic.NewSumAggregation().
-		Field("profiles.controls_sums.passed.total"))
-	termsQuery.SubAggregation("skipped", elastic.NewSumAggregation().
-		Field("profiles.controls_sums.skipped.total"))
-	termsQuery.SubAggregation("status", elastic.NewTermsAggregation().
-		Field("profiles.status"))
-
-	aggs := elastic.NewNestedAggregation().Path("profiles").
-		SubAggregation("totals", termsQuery)
+	queryInfo := depth.getQueryInfo()
 
 	searchSource := elastic.NewSearchSource().
-		Query(filtQuery).
-		Aggregation("profiles", aggs).
+		Query(queryInfo.filtQuery).
 		Size(0)
+
+	for aggName, agg := range depth.getProfileMinsFromNodesAggs(filters) {
+		searchSource.Aggregation(aggName, agg)
+	}
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "getProfileMinsFromNodes unable to get Source")
+		return nil, nil, errors.Wrapf(err, "%s unable to get Source", myName)
 	}
-	LogQueryPartMin(esIndex, source, "getProfileMinsFromNodes query")
+	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query", myName))
 
-	searchResult, err := client.Search().
-		Index(esIndex).
+	searchResult, err := queryInfo.client.Search().
+		Index(queryInfo.esIndex).
 		SearchSource(searchSource).
-		FilterPath(
-			"took",
-			"aggregations.profiles.totals.buckets.key",
-			"aggregations.profiles.totals.buckets").
 		Do(context.Background())
 
 	if err != nil {
-		return profileMins, nil, errors.Wrap(err, "getProfileMinsFromNodes unable to complete search")
+		return profileMins, nil, errors.Wrapf(err, "%s unable to complete search", myName)
 	}
-	LogQueryPartMin(esIndex, searchResult, "getProfileMinsFromNodes - search results")
 
-	statusMap := make(map[string]int, 3)
-	outermostAgg, _ := searchResult.Aggregations.Nested("profiles")
-	if outermostAgg != nil {
-		totalsAgg, _ := outermostAgg.Terms("totals")
-		if totalsAgg != nil {
-			for _, bucket := range totalsAgg.Buckets {
-				profile_name, profile_id := rightSplit(string(bucket.KeyNumber), "|") // bucket.KeyNumber
+	LogQueryPartMin(queryInfo.esIndex, searchResult, fmt.Sprintf("%s - search results", myName))
 
-				if profilesFilterArray, found := filters["profile_id"]; found {
-					if !stringutils.SliceContains(profilesFilterArray, profile_id) {
-						continue
-					}
-				}
-
-				// Using the status of the profile, introduced with inspec 3.0 to overwrite the status calculations from totals
-				profileStatusHash := make(map[string]int64, 0)
-				statuses, _ := bucket.Aggregations.Terms("status")
-				if statuses.Buckets != nil {
-					for _, statusBucket := range statuses.Buckets {
-						status := statusBucket.Key.(string)
-						profileStatusHash[status] = statusBucket.DocCount
-					}
-				}
-
-				var profileStatus string
-				if profileStatusHash["skipped"] > 0 && profileStatusHash["loaded"] == 0 && profileStatusHash[""] == 0 {
-					profileStatus = "skipped"
-					logrus.Debugf("getProfileMinsFromNodes profile_name=%q, status=%q", profile_name, profileStatus)
-				} else {
-					sumFailures, _ := bucket.Aggregations.Sum("failures")
-					sumPassed, _ := bucket.Aggregations.Sum("passed")
-					sumSkipped, _ := bucket.Aggregations.Sum("skipped")
-					profileStatus = computeStatus(int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value))
-					logrus.Debugf("getProfileMinsFromNodes profile_name=%s, status=%s (sumFailures=%d, sumPassed=%d, sumSkipped=%d)", profile_name, profileStatus, int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value))
-				}
-
-				if len(statusFilters) > 0 && !stringutils.SliceContains(statusFilters, profileStatus) {
-					continue
-				}
-
-				statusMap[profileStatus]++
-
-				summary := reporting.ProfileMin{
-					Name:   profile_name,
-					ID:     profile_id,
-					Status: profileStatus,
-				}
-				profileMins[profile_id] = summary
-			}
-		}
-	}
-	logrus.Debugf("Done with statusMap=%+v", statusMap)
-	logrus.Debugf("Done with statusMap['something']=%+v", statusMap["passed"])
-	counts := &reportingapi.ProfileCounts{
-		Total:   int32(statusMap["failed"] + statusMap["passed"] + statusMap["skipped"]),
-		Failed:  int32(statusMap["failed"]),
-		Passed:  int32(statusMap["passed"]),
-		Skipped: int32(statusMap["skipped"]),
-	}
-	return profileMins, counts, nil
+	return depth.getProfileMinsFromNodesResults(filters, searchResult, statusFilters)
 }
 
 func computeStatus(failed int32, passed int32, skipped int32) string {

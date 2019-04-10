@@ -29,15 +29,15 @@ if !ENV['NO_STATS_TESTS']
       ])
 
       expected_data = {
-        "profiles": [],
-        "platforms": [
+        "profiles" => [],
+        "platforms" => [
           {
-            "name": "debian",
-            "failures": 1
+            "name" => "debian",
+            "failures" => 1
           }
         ],
-        "controls": [],
-        "environments": []
+        "controls" => [],
+        "environments" => []
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -48,13 +48,13 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles": [],
-        "platforms": [],
-        "controls": [],
-        "environments": [
+        "profiles" => [],
+        "platforms" => [],
+        "controls" => [],
+        "environments" => [
           {
-            "name": "DevSec Prod Zeta",
-            "failures": 1
+            "name" => "DevSec Prod Zeta",
+            "failures" => 1
           }
         ]
       }
@@ -67,13 +67,13 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles": [],
-        "platforms": [],
-        "controls": [],
-        "environments": [
+        "profiles" => [],
+        "platforms" => [],
+        "controls" => [],
+        "environments" => [
           {
-            "name": "DevSec Prod Zeta",
-            "failures": 1
+            "name" => "DevSec Prod Zeta",
+            "failures" => 1
           }
         ]
       }
@@ -86,13 +86,13 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles": [],
-        "platforms": [],
-        "controls": [],
-        "environments": [
+        "profiles" => [],
+        "platforms" => [],
+        "controls" => [],
+        "environments" => [
           {
-            "name": "DevSec Prod Zeta",
-            "failures": 1
+            "name" => "DevSec Prod Zeta",
+            "failures" => 1
           }
         ]
       }
@@ -106,15 +106,15 @@ if !ENV['NO_STATS_TESTS']
       ],
                                                                  size: 1)
       expected_data = {
-        "profiles": [],
-        "platforms": [
+        "profiles" => [],
+        "platforms" => [
           {
-            "name": "debian",
-            "failures": 1
+            "name" => "debian",
+            "failures" => 1
           }
         ],
-        "controls": [],
-        "environments": []
+        "controls" => [],
+        "environments" => []
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -125,25 +125,25 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles": [],
-        "platforms": [
+        "profiles" => [],
+        "platforms" => [
           {
-            "name": "debian",
-            "failures": 1
+            "name" => "debian",
+            "failures" => 1
           }
         ],
-        "controls": [],
-        "environments": [
+        "controls" => [],
+        "environments" => [
           {
-            "name": "DevSec Prod Zeta",
-            "failures": 1
+            "name" => "DevSec Prod Zeta",
+            "failures" => 1
           }
         ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
 
-      # todo - this one is in the deep test: 04_cfilt_stats_spec.rb::test3::line:57
+      # todo - this one is in the deep test: 04_deep_stats_spec.rb::test3::line:57
       # Get failures by profile
       actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
         Stats::ListFilter.new(type: "types", values: ["profile"]),
@@ -151,103 +151,73 @@ if !ENV['NO_STATS_TESTS']
       ],
                                                                  size: 1)
       expected_data = {
-        "profiles": [
+        "profiles" => [
           {
-            "name": "linux-baseline",
-            "failures": 1,
-            "id": "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"
+            "name" => "linux-baseline",
+            "failures" => 1,
+            "id" => "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"
           }
         ],
-        "platforms": [],
-        "controls": [],
-        "environments": []
-      }
-      assert_equal_json_content(expected_data, actual_data)
-
-      actual_data = GRPC stats, :read_profiles, Stats::Query.new()
-      expected_data = {
-        "profileList": [],
-        "controlStats": []
-      }
-      assert_equal_json_content(expected_data, actual_data)
-
-      actual_data = GRPC stats, :read_profiles, Stats::Query.new(size: 2)
-      expected_data = {
-        "profileList": [],
-        "controlStats": []
+        "platforms" => [],
+        "controls" => [],
+        "environments" => []
       }
       assert_equal_json_content(expected_data, actual_data)
 
 
-      # Use environment filter
-      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
-        Stats::ListFilter.new(type: "environment", values: ["DevSec Prod Zeta"]),
-        Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-      ])
-      expected_data = {
-        "profileList": [
-          {
-            "name": "apache-baseline",
-            "id": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
-            "skipped": 14
-          }
-        ],
-        "controlStats": []
-      }
-      assert_equal_json_content(expected_data, actual_data)
 
-      # todo - this one is in the deep test: 04_cfilt_stats_spec.rb::test1::line78
+      # todo - this one is in the deep test: 04_deep_stats_spec.rb::test1::line78
       # Use control type
       actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
         Stats::ListFilter.new(type: "types", values: ["control"]),
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles": [],
-        "platforms": [],
-        "controls": [
+        "profiles" => [],
+        "platforms" => [],
+        "controls" => [
           {
-            "name": "os-02",
-            "failures": 1
+            "name" => "os-02",
+            "failures" => 1
           },
           {
-            "name": "os-05",
-            "failures": 1
+            "name" => "os-05",
+            "failures" => 1
           },
           {
-            "name": "sysctl-01",
-            "failures": 1
+            "name" => "sysctl-01",
+            "failures" => 1
           },
           {
-            "name": "sysctl-05",
-            "failures": 1
+            "name" => "sysctl-05",
+            "failures" => 1
           },
           {
-            "name": "sysctl-06",
-            "failures": 1
+            "name" => "sysctl-06",
+            "failures" => 1
           },
           {
-            "name": "sysctl-07",
-            "failures": 1
+            "name" => "sysctl-07",
+            "failures" => 1
           },
           {
-            "name": "sysctl-08",
-            "failures": 1
+            "name" => "sysctl-08",
+            "failures" => 1
           },
           {
-            "name": "sysctl-09",
-            "failures": 1
+            "name" => "sysctl-09",
+            "failures" => 1
           },
           {
-            "name": "sysctl-10",
-            "failures": 1
+            "name" => "sysctl-10",
+            "failures" => 1
           },
           {
-            "name": "sysctl-15",
-            "failures": 1
+            "name" => "sysctl-15",
+            "failures" => 1
           }
         ],
-        "environments": []
+        "environments" => []
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -277,10 +247,95 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
       ])
       expected_data = {
-        "profiles": [],
-        "platforms": [],
-        "controls": [],
-        "environments": []
+        "profiles" => [],
+        "platforms" => [],
+        "controls" => [],
+        "environments" => []
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      # todo - this one is in the deep test: 04_deep_stats_spec.rb::test1::line36
+      # multiple filters, one match
+      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "types", values: ["platform"]),
+          Stats::ListFilter.new(type: "environment", values: ["DevSec Prod Zeta"]),
+          Stats::ListFilter.new(type: "node_id", values: ["34cbbb4c-c502-4971-b193-00e987b4678c"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
+      ])
+      expected_data = {
+          "profiles" => [],
+          "platforms" => [
+              {
+                  "name" => "debian",
+                  "failures" => 1
+              }
+          ],
+          "controls" => [],
+          "environments" => []
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      # Target missing environment that contains special characters
+      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "types", values: ["platform"]),
+          Stats::ListFilter.new(type: "environment", values: ["Dev&Test Trouble+Maker:Env"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+      ])
+      expected_data = {
+          "profiles" => [],
+          "platforms" => [],
+          "controls" => [],
+          "environments" => []
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      # Use start_time in the future and expect no matches  !!!!!! profile
+      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "types", values: ["platform"]),
+          Stats::ListFilter.new(type: "start_time", values: ["3000-03-03T03:03:03Z"])
+      ])
+      expected_data = {
+          "profiles" => [],
+          "platforms" => [],
+          "controls" => [],
+          "environments" => []
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      ##read profiles
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new()
+      expected_data = {
+          "profileList" => [],
+          "controlStats" => []
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(size: 2)
+      expected_data = {
+          "profileList" => [],
+          "controlStats" => []
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      # Use environment filter
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "environment", values: ["DevSec Prod Zeta"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+      ])
+      expected_data = {
+          "profileList" => [
+              {
+                  "name" => "apache-baseline",
+                  "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                  "skipped" => 14
+              }
+          ],
+          "controlStats" => []
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -291,29 +346,29 @@ if !ENV['NO_STATS_TESTS']
       ])
       expected_data =
       {
-        "profileList": [
+        "profileList" => [
           {
-            "name": "apache-baseline",
-            "id": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
-            "failures": 1,
-            "criticals": 1,
-            "skipped": 69
+            "name" => "apache-baseline",
+            "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+            "failures" => 1,
+            "criticals" => 1,
+            "skipped" => 69
           },
           {
-            "name": "nginx-baseline",
-            "id": "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-            "failures": 5,
-            "majors": 3,
-            "criticals": 2,
-            "passed": 7,
-            "skipped": 4
+            "name" => "nginx-baseline",
+            "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+            "failures" => 5,
+            "majors" => 3,
+            "criticals" => 2,
+            "passed" => 7,
+            "skipped" => 4
           },
           {
-            "name": "fake-baseline",
-            "id": "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9"
+            "name" => "fake-baseline",
+            "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9"
           }
         ],
-        "controlStats": []
+        "controlStats" => []
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -324,14 +379,14 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
       ])
       expected_data = {
-        "profileList": [
+        "profileList" => [
           {
-            "name": "apache-baseline",
-            "id": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
-            "skipped": 14
+            "name" => "apache-baseline",
+            "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+            "skipped" => 14
           }
         ],
-        "controlStats": []
+        "controlStats" => []
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -342,16 +397,16 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profileList": [
+        "profileList" => [
           {
-            "name": "linux-baseline",
-            "id": "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
-            "failures": 22,
-            "criticals": 22,
-            "passed": 23
+            "name" => "linux-baseline",
+            "id" => "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
+            "failures" => 22,
+            "criticals" => 22,
+            "passed" => 23
           }
         ],
-        "controlStats": []
+        "controlStats" => []
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -365,8 +420,8 @@ if !ENV['NO_STATS_TESTS']
         id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
       expected_data = {
-        "profileList": [],
-        "controlStats": []
+        "profileList" => [],
+        "controlStats" => []
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -379,31 +434,31 @@ if !ENV['NO_STATS_TESTS']
         id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
       expected_data = {
-        "profileList": [],
-        "controlStats": [
+        "profileList" => [],
+        "controlStats" => [
           {
-            "control": "nginx-01",
-            "title": "Running worker process as non-privileged user",
-            "passed": 1,
-            "impact": 1
+            "control" => "nginx-01",
+            "title" => "Running worker process as non-privileged user",
+            "passed" => 1,
+            "impact" => 1
           },
           {
-            "control": "nginx-02",
-            "title": "Check NGINX config file owner, group and permissions.",
-            "passed": 1,
-            "impact": 1
+            "control" => "nginx-02",
+            "title" => "Check NGINX config file owner, group and permissions.",
+            "passed" => 1,
+            "impact" => 1
           },
           {
-            "control": "nginx-03",
-            "title": "Check NGINX three.",
-            "skipped": 1,
-            "impact": 1
+            "control" => "nginx-03",
+            "title" => "Check NGINX three.",
+            "skipped" => 1,
+            "impact" => 1
           },
           {
-            "control": "nginx-04",
-            "title": "Check NGINX four",
-            "passed": 1,
-            "impact": 0.5
+            "control" => "nginx-04",
+            "title" => "Check NGINX four",
+            "passed" => 1,
+            "impact" => 0.5
           }
         ]
       }
@@ -448,112 +503,37 @@ if !ENV['NO_STATS_TESTS']
         type: "controls",
         id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
-
       expected_data = {
-        "profileList": [],
-        "controlStats": [
+        "profileList" => [],
+        "controlStats" => [
           {
-            "control": "nginx-01",
-            "title": "Running worker process as non-privileged user",
-            "passed": 2,
-            "impact": 1
+            "control" => "nginx-01",
+            "title" => "Running worker process as non-privileged user",
+            "passed" => 2,
+            "impact" => 1
           },
           {
-            "control": "nginx-02",
-            "title": "Check NGINX config file owner, group and permissions.",
-            "passed": 2,
-            "impact": 1
+            "control" => "nginx-02",
+            "title" => "Check NGINX config file owner, group and permissions.",
+            "passed" => 2,
+            "impact" => 1
           },
           {
-            "control": "nginx-03",
-            "title": "Check NGINX three.",
-            "skipped": 2,
-            "impact": 1
+            "control" => "nginx-03",
+            "title" => "Check NGINX three.",
+            "skipped" => 2,
+            "impact" => 1
           },
           {
-            "control": "nginx-04",
-            "title": "Check NGINX four",
-            "passed": 1,
-            "failed": 1,
-            "impact": 0.5
+            "control" => "nginx-04",
+            "title" => "Check NGINX four",
+            "passed" => 1,
+            "failed" => 1,
+            "impact" => 0.5
           }
         ]
       }
       assert_equal_json_content(expected_data, profile_controls)
-
-
-      # todo - this one is in the deep test: 04_cfilt_stats_spec.rb::test1::line36
-      # multiple filters, one match
-      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
-        Stats::ListFilter.new(type: "types", values: ["platform"]),
-        Stats::ListFilter.new(type: "environment", values: ["DevSec Prod Zeta"]),
-        Stats::ListFilter.new(type: "node_id", values: ["34cbbb4c-c502-4971-b193-00e987b4678c"]),
-        Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
-      ])
-      expected_data = {
-        "profiles": [],
-        "platforms": [
-          {
-            "name": "debian",
-            "failures": 1
-          }
-        ],
-        "controls": [],
-        "environments": []
-      }
-      assert_equal_json_content(expected_data, actual_data)
-
-
-      # Target missing environment that contains special characters
-      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
-        Stats::ListFilter.new(type: "types", values: ["platform"]),
-        Stats::ListFilter.new(type: "environment", values: ["Dev&Test Trouble+Maker:Env"]),
-        Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-      ])
-      expected_data = {
-        "profiles": [],
-        "platforms": [],
-        "controls": [],
-        "environments": []
-      }
-      assert_equal_json_content(expected_data, actual_data)
-
-
-      # todo - this one is in the deep test: 04_cfilt_stats_spec.rb::test1::line14
-      # Use profile_id, env and end_time filters, whoaaa
-      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
-        Stats::ListFilter.new(type: "types", values: ["environment"]),
-        Stats::ListFilter.new(type: "profile_id", values: ["41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8"]),
-        Stats::ListFilter.new(type: "environment", values: ["DevSec Prod Zeta"]),
-        Stats::ListFilter.new(type: 'end_time', values: ['2018-02-07T23:59:59Z']),
-        Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
-      ])
-      expected_data = {
-        "profiles": [],
-        "platforms": [],
-        "controls": [],
-        "environments": [
-          {
-            "name": "DevSec Prod Zeta",
-            "failures": 1
-          }
-        ]
-      }
-      assert_equal_json_content(expected_data, actual_data)
-
-
-      # Use start_time in the future and expect no matches  !!!!!! profile
-      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
-        Stats::ListFilter.new(type: "types", values: ["platform"]),
-        Stats::ListFilter.new(type: "start_time", values: ["3000-03-03T03:03:03Z"])
-      ])
-      expected_data = {
-        "profiles": [],
-        "platforms": [],
-        "controls": [],
-        "environments": []
-      }
-      assert_equal_json_content(expected_data, actual_data)
 
 
       # Compliance Summary without filters
@@ -561,11 +541,11 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
       ])
       expected_data = {
-        "nodeSummary": {
-          "compliant": 1,
-          "skipped": 1,
-          "noncompliant": 3,
-          "highRisk": 3
+        "nodeSummary" => {
+          "compliant" => 1,
+          "skipped" => 1,
+          "noncompliant" => 3,
+          "highRisk" => 3
         }
       }
       assert_equal_json_content(expected_data, actual_data)
@@ -580,8 +560,8 @@ if !ENV['NO_STATS_TESTS']
         ]
       )
       expected_data = {
-        "nodeSummary": {
-          "compliant": 1
+        "nodeSummary" => {
+          "compliant" => 1
         }
       }
       assert_equal_json_content(expected_data, actual_data)
@@ -596,8 +576,8 @@ if !ENV['NO_STATS_TESTS']
         ]
       )
       expected_data = {
-        "nodeSummary": {
-          "skipped": 1
+        "nodeSummary" => {
+          "skipped" => 1
         }
       }
       assert_equal_json_content(expected_data, actual_data)
@@ -612,9 +592,9 @@ if !ENV['NO_STATS_TESTS']
         ]
       )
       expected_data = {
-        "nodeSummary": {
-          "noncompliant": 1,
-          "highRisk": 1
+        "nodeSummary" => {
+          "noncompliant" => 1,
+          "highRisk" => 1
         }
       }
       assert_equal_json_content(expected_data, actual_data)
@@ -629,13 +609,15 @@ if !ENV['NO_STATS_TESTS']
         ]
       )
       expected_data = {
-        "controlsSummary": {
-          "passed": 3,
-          "skipped": 15
+        "controlsSummary" => {
+          "passed" => 3,
+          "skipped" => 15
         }
       }
       assert_equal_json_content(expected_data, actual_data)
 
+
+      exit
 
       # Global Compliancy across all controls for nodes that failed the scan
       actual_data = GRPC stats, :read_summary, Stats::Query.new(
@@ -647,11 +629,11 @@ if !ENV['NO_STATS_TESTS']
         ]
       )
       expected_data = {
-        "controlsSummary": {
-          "failures": 22,
-          "criticals": 22,
-          "passed": 24,
-          "skipped": 13
+        "controlsSummary" => {
+          "failures" => 22,
+          "criticals" => 22,
+          "passed" => 24,
+          "skipped" => 13
         }
       }
       assert_equal_json_content(expected_data, actual_data)
@@ -665,13 +647,13 @@ if !ENV['NO_STATS_TESTS']
         ]
       )
       expected_data = {
-        "reportSummary": {
-          "status": "failed",
-          "stats": {
-            "nodes": 1,
-            "platforms": 1,
-            "environments": 1,
-            "profiles": 2
+        "reportSummary" => {
+          "status" => "failed",
+          "stats" => {
+            "nodes" => 1,
+            "platforms" => 1,
+            "environments" => 1,
+            "profiles" => 2
           }
         }
       }
@@ -687,8 +669,8 @@ if !ENV['NO_STATS_TESTS']
         ]
       )
       expected_data = {
-        "nodeSummary": {
-          "skipped": 1
+        "nodeSummary" => {
+          "skipped" => 1
         }
       }
       assert_equal_json_content(expected_data, actual_data)

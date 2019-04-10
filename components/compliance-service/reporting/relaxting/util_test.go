@@ -67,26 +67,35 @@ func TestRemove(t *testing.T) {
 	assert.Equal(t, []string{"item3"}, arr)
 }
 
-//todo - get rid of this.
-//func TestGetEsIndex(t *testing.T) {
-//	var filters map[string][]string
-//	assert.Equal(t, CompSumLatestIndexAccumulated, GetEsIndex(filters))
-//
-//	filters = map[string][]string{
-//		"job_id": []string{"12345-6789"},
-//	}
-//	assert.Equal(t, true, strings.HasPrefix(GetEsIndex(filters), fmt.Sprintf("%s2017", CompDailySumIndexPrefix)))
-//
-//	filters = map[string][]string{
-//		"end_time": []string{time.Now().UTC().Format(time.RFC3339)},
-//	}
-//	assert.Equal(t, CompSumLatestIndexAccumulated, GetEsIndex(filters))
-//
-//	filters = map[string][]string{
-//		"end_time": []string{"2017-02-02T09:18:41Z"},
-//	}
-//	expectedEsIndex := fmt.Sprintf(fmt.Sprintf("%[1]s2017.01*,%[1]s2017.02.01*,%[1]s2017.02.02*",
-//		CompDailySumIndexPrefix))
-//	actualEsIndex := GetEsIndex(filters)
-//	assert.Equal(t, expectedEsIndex, actualEsIndex)
-//}
+func TestDeDupSlice(t *testing.T) {
+	arr := []string{"item1", "item2", "item2"}
+	arr = deDupSlice(arr)
+	assert.Equal(t, []string{"item1", "item2"}, arr)
+
+	arr = []string{"item1"}
+	arr = deDupSlice(arr)
+	assert.Equal(t, []string{"item1"}, arr)
+
+	arr = []string{}
+	arr = deDupSlice(arr)
+	assert.Equal(t, []string{}, arr)
+
+	arr = []string{"item1", "item1", "item1", "item3", "item2", "item2"}
+	arr = deDupSlice(arr)
+	assert.Equal(t, []string{"item1", "item3", "item2"}, arr)
+}
+
+func TestDeDupFilters(t *testing.T) {
+	filters := make(map[string][]string)
+	filters["profile_id"] = []string{"prof1", "prof2"}
+	deDupFilters(filters)
+	assert.Equal(t, []string{"prof1", "prof2"}, filters["profile_id"])
+
+	filters["profile_id"] = []string{"prof1", "prof2", "prof2"}
+	deDupFilters(filters)
+	assert.Equal(t, []string{"prof1", "prof2"}, filters["profile_id"])
+
+	filters["profile_id"] = []string{"prof1", "prof2", "prof2", "prof1", "prof11"}
+	deDupFilters(filters)
+	assert.Equal(t, []string{"prof1", "prof2", "prof11"}, filters["profile_id"])
+}
