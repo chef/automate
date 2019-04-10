@@ -1128,6 +1128,90 @@ func TestCreatePolicy(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 		},
+		"policy with single project": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+
+			name, members, typeVal := "toBeCreated", []storage.Member{}, storage.Custom
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Type:     typeVal,
+				Members:  members,
+				Projects: []string{projID},
+			}
+			resp, err := store.CreatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, &pol, resp)
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
+		"policy with multiple projects": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "so ordinary", storage.Custom)
+
+			name, members, typeVal := "toBeCreated", []storage.Member{}, storage.Custom
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Type:     typeVal,
+				Members:  members,
+				Projects: []string{projID, projID2},
+			}
+			resp, err := store.CreatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, &pol, resp)
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+
+			projCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID)
+			assertCount(t, 2, projCount)
+		},
+		"policy with non-existent project fails": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+
+			projID := "not-real-project"
+
+			name, members, typeVal := "toBeCreated", []storage.Member{}, storage.Custom
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Type:     typeVal,
+				Members:  members,
+				Projects: []string{projID},
+			}
+			resp, err := store.CreatePolicy(ctx, &pol)
+			assert.Equal(t, "non-existent projects cannot be included in policies", err.Error())
+			assert.Nil(t, resp)
+
+			assertEmpty(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
 	}
 
 	for name, test := range cases {
