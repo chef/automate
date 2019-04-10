@@ -561,17 +561,47 @@ func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
 }
 
 func (p *pg) DeleteRole(ctx context.Context, id string) error {
-	_, err := p.queryRole(ctx, id)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return p.processError(err)
 	}
 
-	_, err = p.db.ExecContext(ctx,
+	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	doesIntersect, err := checkIfRoleIntersectsProjectsFilter(ctx, tx, id, projectsFilter)
+	if err != nil {
+		return p.processError(err)
+	}
+	if !doesIntersect {
+		return storage_errors.ErrNotFound
+	}
+
+	// TODO (TC): Can't we just do that from delete itself?
+	// Check if role exists
+	var role v2.Role
+	row := tx.QueryRowContext(ctx, `SELECT query_role($1)`, id)
+	err = row.Scan(&role)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx,
 		`DELETE FROM iam_roles WHERE id=$1;`,
 		id,
 	)
 	if err != nil {
 		return p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewErrTxCommit(err)
 	}
 
 	return nil
@@ -646,14 +676,16 @@ func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
 	id string, projectsFilter []string) (bool, error) {
 
 	// If no filter was specified, do not filter.
-	if len(projectsFilter) == 0 {
+	if projectsFilter == nil || len(projectsFilter) == 0 {
 		return true, nil
 	}
 
 	row := q.QueryRowContext(ctx,
-		`SELECT array_agg(rp.project_id) && $2 AS intersection FROM iam_roles AS r
-    	LEFT OUTER JOIN iam_role_projects AS rp ON rp.role_id=r.db_id
-    	WHERE r.id = $1 AND rp.role_id IS NOT NULL GROUP BY rp.project_id;`,
+		`SELECT COALESCE(array_agg(rp.project_id)
+				FILTER (WHERE rp.project_id IS NOT NULL), '{(unassigned)}') && $2 AS intersection
+			FROM iam_roles AS r
+			LEFT OUTER JOIN iam_role_projects AS rp ON rp.role_id=r.db_id
+			WHERE r.id = $1 GROUP BY rp.project_id;`,
 		id, pq.Array(projectsFilter))
 
 	var result bool
@@ -662,17 +694,6 @@ func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
 		return false, err
 	}
 	return result, nil
-}
-
-// queryRole returns a role based on id or an error.
-func (p *pg) queryRole(ctx context.Context, id string) (*v2.Role, error) {
-	var role v2.Role
-	row := p.db.QueryRowContext(ctx, `SELECT query_role($1)`, id)
-	err := row.Scan(&role)
-	if err != nil {
-		return nil, err
-	}
-	return &role, nil
 }
 
 func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier) error {

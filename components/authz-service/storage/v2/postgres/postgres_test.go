@@ -3035,6 +3035,171 @@ func TestDeleteRole(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 		},
+		"deletes role with several roles in database and projects filter has intersection": func(t *testing.T) {
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			project3 := storage.Project{
+				ID:       "project-3",
+				Name:     "name3",
+				Type:     storage.Custom,
+				Projects: []string{"project-3"},
+			}
+			_, err = store.CreateProject(ctx, &project3)
+			require.NoError(t, err)
+
+			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID, project3.ID})
+			insertTestRole(t, db, "my-id-2", "name", []string{"action2"}, []string{project1.ID})
+			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
+			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{project1.ID, project2.ID}, "resource", "action", "pol"))
+
+			err = store.DeleteRole(ctx, role.ID)
+
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_roles`))
+		},
+		"deletes role with no projects assigned and projects filter has intersection": func(t *testing.T) {
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			project3 := storage.Project{
+				ID:       "project-3",
+				Name:     "name3",
+				Type:     storage.Custom,
+				Projects: []string{"project-3"},
+			}
+			_, err = store.CreateProject(ctx, &project3)
+			require.NoError(t, err)
+
+			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
+			insertTestRole(t, db, "my-id-2", "name", []string{"action2"}, []string{project1.ID})
+			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
+			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{"(unassigned)"}, "resource", "action", "pol"))
+
+			err = store.DeleteRole(ctx, role.ID)
+
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_roles`))
+		},
+		"deletes role with several roles in database and projects filter is *": func(t *testing.T) {
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			project3 := storage.Project{
+				ID:       "project-3",
+				Name:     "name3",
+				Type:     storage.Custom,
+				Projects: []string{"project-3"},
+			}
+			_, err = store.CreateProject(ctx, &project3)
+			require.NoError(t, err)
+
+			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID, project3.ID})
+			insertTestRole(t, db, "my-id-2", "name", []string{"action2"}, []string{project1.ID})
+			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
+			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{"*"}, "resource", "action", "pol"))
+
+			err = store.DeleteRole(ctx, role.ID)
+
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_roles`))
+		},
+		"returns NotFound when project filter has no intersection": func(t *testing.T) {
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			project3 := storage.Project{
+				ID:       "project-3",
+				Name:     "name3",
+				Type:     storage.Custom,
+				Projects: []string{"project-3"},
+			}
+			_, err = store.CreateProject(ctx, &project3)
+			require.NoError(t, err)
+
+			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID, project3.ID})
+			insertTestRole(t, db, "my-id-2", "name", []string{"action2"}, []string{project1.ID})
+			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
+			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{project2.ID}, "resource", "action", "pol"))
+
+			err = store.DeleteRole(ctx, role.ID)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+		},
 	}
 
 	for name, test := range cases {
@@ -3326,6 +3491,28 @@ func TestUpdateRole(t *testing.T) {
 			assert.Equal(t, storage.Custom, updatedRole.Type)
 			assert.ElementsMatch(t, []string{"newaction"}, updatedRole.Actions)
 			assert.ElementsMatch(t, []string{project1.ID}, updatedRole.Projects)
+		},
+		"updates successfully when a role has no projects": func(t *testing.T) {
+			ctx := context.Background()
+
+			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
+
+			r := storage.Role{
+				ID:       dbRole.ID,
+				Name:     dbRole.Name,
+				Actions:  []string{"newaction"},
+				Projects: []string{},
+			}
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{"(unassigned)"}, "resource", "action", "pol"))
+			updatedRole, err := store.UpdateRole(ctx, &r)
+
+			require.NoError(t, err)
+			assert.Equal(t, dbRole.ID, updatedRole.ID)
+			assert.Equal(t, dbRole.Name, updatedRole.Name)
+			assert.Equal(t, storage.Custom, updatedRole.Type)
+			assert.ElementsMatch(t, []string{"newaction"}, updatedRole.Actions)
+			assert.ElementsMatch(t, []string{}, updatedRole.Projects)
 		},
 		"updates the projects of a role to contain projects from empty": func(t *testing.T) {
 			ctx := context.Background()
