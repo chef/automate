@@ -284,6 +284,36 @@ func (p *pg) insertPolicyStatementsWithQuerier(ctx context.Context,
 	return nil
 }
 
+// insertPolicyProjectsWithQuerier creates new associations between a policy and its projects.
+func (p *pg) insertPolicyProjectsWithQuerier(ctx context.Context,
+	policyID string, inProjects []string,
+	q Querier) error {
+
+	// TODO this might be simplified as we modify how projects are assigned
+	// Drop any existing associations.
+	_, err := q.ExecContext(ctx,
+		`DELETE FROM iam_policy_projects WHERE policy_id=$1;`, policyID)
+	if err != nil {
+		return err
+	}
+	for _, project := range inProjects {
+		_, err := q.ExecContext(ctx,
+			`INSERT INTO iam_policy_projects (policy_id, project_id) VALUES ($1, $2)`,
+			&policyID, &project)
+		if err != nil {
+			err = p.processError(err)
+			switch err {
+			case storage_errors.ErrForeignKey: // occurs when a project in the policy does not exist
+				return errors.New("non-existent projects cannot be included in policies")
+			default:
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 // queryPolicy returns a policy based on id or an error.
 func (p *pg) queryPolicy(ctx context.Context, id string) (*v2.Policy, error) {
 	var pol v2.Policy
