@@ -1,5 +1,7 @@
 title 'ingest-service/JobScheduler REST API integration tests'
 
+
+
 control 'ingest-job-scheduler' do
   title 'check ingest job-scheduler endpoints'
   desc 'Verifies configuration of jobs inside the ingest scheduler'
@@ -53,6 +55,16 @@ control 'ingest-job-scheduler' do
         }
       end
 
+      let(:elasticsearch_url) do
+        ENV['ELASTICSEARCH_URL'] || "http://localhost:10144"
+      end
+
+      def refresh_elasticsearch()
+        request = inspec.http("#{elasticsearch_url}/_refresh")
+        failed_count = JSON.parse(request.body, symbolize_names: true)[:_shards][:failed]
+        expect(failed_count).to eq 0
+      end
+
       it 'if update has running == true, run the job' do
         # turn off missing node job
         expect(automate_api_request(
@@ -71,7 +83,7 @@ control 'ingest-job-scheduler' do
         ).to eq 200
 
         # wait for elastic search to update
-        sleep 5
+        refresh_elasticsearch()
 
         # turn on node missing with a day old threshold
         expect(automate_api_request(
@@ -82,7 +94,7 @@ control 'ingest-job-scheduler' do
         ).to eq 200
 
         # wait for elastic search to update
-        sleep 5
+        refresh_elasticsearch()
 
         # # check that the node added is missing
         expect(get_test_node.http_status).to eq 200
@@ -117,7 +129,7 @@ control 'ingest-job-scheduler' do
         ).to eq 200
 
         # wait for elastic search to update
-        sleep 5
+        refresh_elasticsearch()
 
         # update node missing job config with a day old threshold
         expect(automate_api_request(
@@ -128,7 +140,7 @@ control 'ingest-job-scheduler' do
         ).to eq 200
 
         # wait for elastic search to update
-        sleep 5
+        refresh_elasticsearch()
 
         # check that the node added is not missing
         expect(get_test_node.http_status).to eq 200
