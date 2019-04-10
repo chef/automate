@@ -162,13 +162,16 @@ func (s *Suite) WaitForESJobToComplete(esJobID string) {
 }
 
 // InsertInspecReports ingests a number of reports and at the end, refreshes the report index
-func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) {
+func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) []string {
+	ids := make([]string, len(reports))
+
 	endTime := time.Now()
 	// Insert reports
-	for _, report := range reports {
+	for i, report := range reports {
 		id := newUUID()
+		ids[i] = id
 
-		err = s.ingesticESClient.InsertInspecReport(context.Background(), id, endTime, report)
+		err := s.ingesticESClient.InsertInspecReport(context.Background(), id, endTime, report)
 		if err != nil {
 			os.Exit(3)
 		}
@@ -178,6 +181,8 @@ func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) {
 
 	// Refresh Indices
 	s.RefreshIndices(index)
+
+	return ids
 }
 
 // InsertInspecSummaries ingests a number of summaries and at the end, refreshes the summary index
@@ -185,11 +190,9 @@ func (s *Suite) InsertInspecSummaries(summaries []*relaxting.ESInSpecSummary) {
 	endTime := time.Now()
 	// Insert summaries
 	for _, summary := range summaries {
-		id, err := uuid.NewV4()
-		if err != nil {
-			os.Exit(3)
-		}
-		err = s.ingesticESClient.InsertInspecSummary(context.Background(), id.String(), endTime, summary)
+		id := newUUID()
+
+		err := s.ingesticESClient.InsertInspecSummary(context.Background(), id, endTime, summary)
 		if err != nil {
 			os.Exit(3)
 		}
