@@ -2169,8 +2169,7 @@ func TestUpdateProject(t *testing.T) {
 		},
 		"returns ErrNotFound if the project exists but does not have a project in the project filter list": func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
 				ID:       "foo",
@@ -2210,6 +2209,7 @@ func TestGetProject(t *testing.T) {
 		{"when a chef-managed project exists, returns that project", func(t *testing.T) {
 			ctx := context.Background()
 			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			ctx := context.Background()
 
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
@@ -2239,9 +2239,7 @@ func TestGetProject(t *testing.T) {
 		}},
 		{"when a custom project exists with a project filter of *, returns that project", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
@@ -2257,9 +2255,7 @@ func TestGetProject(t *testing.T) {
 		}},
 		{"when a custom project exists but the project filter does not overlap, return NotFoundErr", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"wrong", "project"})
 
@@ -2395,10 +2391,8 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"when two projects (custom and chef-managed) exist, returns them", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('bar', 'my bar project', 'custom', array['bar'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -2421,12 +2415,9 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"when multiple projects exist, filter based on projects lists", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('bar', 'my bar project', 'custom', array['bar'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('baz', 'my baz project', 'custom', array['baz'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 
@@ -2451,16 +2442,68 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('bar', 'my bar project', 'custom', array['bar'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('baz', 'my baz project', 'custom', array['baz'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{})
 			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+			expectedProjects := []*storage.Project{
+				&storage.Project{
+					ID:       "foo",
+					Name:     "my foo project",
+					Type:     storage.ChefManaged,
+					Projects: []string{"foo"},
+				},
+				&storage.Project{
+					ID:       "bar",
+					Name:     "my bar project",
+					Type:     storage.Custom,
+					Projects: []string{"bar"},
+				},
+			}
+
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"when multiple projects exist, filter based on projects lists", func(t *testing.T) {
+			ctx := context.Background()
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{"foo", "bar"}, "resource", "action", "pol"))
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+			expectedProjects := []*storage.Project{
+				&storage.Project{
+					ID:       "foo",
+					Name:     "my foo project",
+					Type:     storage.ChefManaged,
+					Projects: []string{"foo"},
+				},
+				&storage.Project{
+					ID:       "bar",
+					Name:     "my bar project",
+					Type:     storage.Custom,
+					Projects: []string{"bar"},
+				},
+			}
+
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
+			ctx := context.Background()
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{}, "resource", "action", "pol"))
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -2489,12 +2532,9 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"when multiple projects exist, returns all projects will * filter passed", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('bar', 'my bar project', 'custom', array['bar'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('baz', 'my baz project', 'custom', array['baz'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
