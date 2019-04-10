@@ -55,7 +55,7 @@ Recipe
 ### Deep Filtering
 
 Deep Filtering allows you to view the state of your infrastructure from the perspective of a single profile, or a single profile and one of its child controls.  
-Adding a profile filter will modify all compliance reporting screens to display the status of that profile across all nodes that executed that profile. Adding a filter for a child control of that profile will modify all compliance reporting screens to display the status of that control.
+Adding a profile filter will modify all compliance reporting screens to display the status of that profile across all nodes executing that profile. Adding a filter for a child control of that profile will modify all compliance reporting screens to display the status of that child control.
 
 Please note the only supported filters for deep filtering are:
 
