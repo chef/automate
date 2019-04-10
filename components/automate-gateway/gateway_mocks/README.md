@@ -67,7 +67,7 @@ To run just a subset of the test, for example if you are working on an specific 
 
 ```
 [1][default:/src:0]# enter_go_workspace
-[2][default:/hab/cache/src/go/src/github.com/chef/automate:130]# go test -v -cover github.com/chef/a2/components/automate-gateway/gateway -run TestDataCollectorHandler
+[2][default:/hab/cache/src/go/src/github.com/chef/automate:130]# go test -v -cover github.com/chef/automate/components/automate-gateway/gateway -run TestDataCollectorHandler
 ```
 
 ## Mocking Patterns

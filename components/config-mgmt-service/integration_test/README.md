@@ -42,7 +42,7 @@ Lets assume you are creating a rpc function for a new functionality called `Foo(
 create a test function called (for example) `TestFooEmptyRequest()`, in order to run just that single test you
 can execute:
 ```
-[3][default:/hab/cache/src/go/src/github.com/chef/automate/components/config-mgmt-service:0]# go test -v github.com/chef/a2/components/config-mgmt-service/integration_test -run TestFooEmptyRequest
+[3][default:/hab/cache/src/go/src/github.com/chef/automate/components/config-mgmt-service:0]# go test -v github.com/chef/automate/components/config-mgmt-service/integration_test -run TestFooEmptyRequest
 === RUN   TestFooEmptyRequest
 --- PASS: TestFooEmptyRequest (0.00s)
 PASS
@@ -63,7 +63,7 @@ Now lets imagine that you continue writing more test cases for the same new func
 If you would like to run all these tests at once, you can just provide a regex that matches the tests names,
 for example you can use `TestFoo` and it will run all tests that starts with that pattern:
 ```
-[3][default:/hab/cache/src/go/src/github.com/chef/automate/components/config-mgmt-service:0]# go test -v github.com/chef/a2/components/config-mgmt-service/integration_test -run TestFoo
+[3][default:/hab/cache/src/go/src/github.com/chef/automate/components/config-mgmt-service:0]# go test -v github.com/chef/automate/components/config-mgmt-service/integration_test -run TestFoo
 ```
 
 Follow this [link](https://golang.org/pkg/testing/#hdr-Subtests_and_Sub_benchmarks) to know more about available regex to match tests or sub-tests.
