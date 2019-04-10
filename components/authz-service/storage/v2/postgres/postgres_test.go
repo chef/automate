@@ -2779,16 +2779,17 @@ func TestListRoles(t *testing.T) {
 	store, db, _ := setup(t)
 	defer db.close(t)
 	defer store.Close()
-	ctx := context.Background()
 
 	cases := map[string]func(*testing.T){
 		"successfully returns empty list when the database is empty": func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := store.ListRoles(ctx)
 
 			require.NoError(t, err)
 			assert.Nil(t, resp)
 		},
 		"successfully returns list with role when the database has one role": func(t *testing.T) {
+			ctx := context.Background()
 			roles := []*storage.Role{{
 				ID:       "my-id-1",
 				Name:     "name1",
@@ -2804,6 +2805,7 @@ func TestListRoles(t *testing.T) {
 			assert.ElementsMatch(t, roles, resp)
 		},
 		"successfully returns list with roles when the database has several roles": func(t *testing.T) {
+			ctx := context.Background()
 			project1 := storage.Project{
 				ID:       "project-1",
 				Name:     "name1",
@@ -2849,6 +2851,280 @@ func TestListRoles(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.ElementsMatch(t, roles, resp)
+		},
+		"successfully returns filtered list when rows intersect with projects filter": func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			project3 := storage.Project{
+				ID:       "project-3",
+				Name:     "name3",
+				Type:     storage.Custom,
+				Projects: []string{"project-3"},
+			}
+			_, err = store.CreateProject(ctx, &project3)
+			require.NoError(t, err)
+
+			roles := []*storage.Role{{
+				ID:       "my-id-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Actions:  []string{"action1", "action2"},
+				Projects: []string{},
+			}, {
+				ID:       "my-id-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Actions:  []string{"action3", "action4"},
+				Projects: []string{project1.ID},
+			}, {
+				ID:       "my-id-3",
+				Name:     "name3",
+				Type:     storage.Custom,
+				Actions:  []string{"action5", "action6"},
+				Projects: []string{project1.ID, project2.ID},
+			}, {
+				ID:       "my-id-4",
+				Name:     "name4",
+				Type:     storage.Custom,
+				Actions:  []string{"action7", "action8"},
+				Projects: []string{project3.ID},
+			}, {
+				ID:       "my-id-5",
+				Name:     "name5",
+				Type:     storage.Custom,
+				Actions:  []string{"action7", "action8"},
+				Projects: []string{project2.ID},
+			}}
+			for _, role := range roles {
+				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
+			}
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{project1.ID, project2.ID}, "resource", "action", "pol"))
+			resp, err := store.ListRoles(ctx)
+
+			require.NoError(t, err)
+			expected := []*storage.Role{
+				{
+					ID:       "my-id-2",
+					Name:     "name2",
+					Type:     storage.Custom,
+					Actions:  []string{"action3", "action4"},
+					Projects: []string{project1.ID},
+				},
+				{
+					ID:       "my-id-3",
+					Name:     "name3",
+					Type:     storage.Custom,
+					Actions:  []string{"action5", "action6"},
+					Projects: []string{project1.ID, project2.ID},
+				},
+				{
+					ID:       "my-id-5",
+					Name:     "name5",
+					Type:     storage.Custom,
+					Actions:  []string{"action7", "action8"},
+					Projects: []string{project2.ID},
+				},
+			}
+			assert.ElementsMatch(t, expected, resp)
+		},
+		"successfully returns all projects when filter is *": func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			project3 := storage.Project{
+				ID:       "project-3",
+				Name:     "name3",
+				Type:     storage.Custom,
+				Projects: []string{"project-3"},
+			}
+			_, err = store.CreateProject(ctx, &project3)
+			require.NoError(t, err)
+
+			roles := []*storage.Role{{
+				ID:       "my-id-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Actions:  []string{"action1", "action2"},
+				Projects: []string{},
+			}, {
+				ID:       "my-id-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Actions:  []string{"action3", "action4"},
+				Projects: []string{project1.ID},
+			}, {
+				ID:       "my-id-3",
+				Name:     "name3",
+				Type:     storage.Custom,
+				Actions:  []string{"action5", "action6"},
+				Projects: []string{project1.ID, project2.ID},
+			}, {
+				ID:       "my-id-4",
+				Name:     "name4",
+				Type:     storage.Custom,
+				Actions:  []string{"action7", "action8"},
+				Projects: []string{project3.ID},
+			}, {
+				ID:       "my-id-5",
+				Name:     "name5",
+				Type:     storage.Custom,
+				Actions:  []string{"action7", "action8"},
+				Projects: []string{project2.ID},
+			}}
+			for _, role := range roles {
+				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
+			}
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{"*"}, "resource", "action", "pol"))
+			resp, err := store.ListRoles(ctx)
+
+			require.NoError(t, err)
+			assert.ElementsMatch(t, roles, resp)
+		},
+		"successfully returns roles with unassigned projects": func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			roles := []*storage.Role{{
+				ID:       "my-id-2",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Actions:  []string{"action1", "action2"},
+				Projects: []string{},
+			}, {
+				ID:       "my-id-3",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Actions:  []string{"action3", "action4"},
+				Projects: []string{project1.ID},
+			}, {
+				ID:       "my-id-4",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Actions:  []string{"action5", "action6"},
+				Projects: []string{project1.ID, project2.ID},
+			}}
+			for _, role := range roles {
+				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
+			}
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{"(unassigned)"}, "resource", "action", "pol"))
+			resp, err := store.ListRoles(ctx)
+
+			expected := []*storage.Role{
+				{
+					ID:       "my-id-2",
+					Name:     "name1",
+					Type:     storage.Custom,
+					Actions:  []string{"action1", "action2"},
+					Projects: []string{},
+				},
+			}
+			require.NoError(t, err)
+			assert.ElementsMatch(t, expected, resp)
+		},
+		"returns empty list if projects filter all objects": func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			roles := []*storage.Role{{
+				ID:       "my-id-2",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Actions:  []string{"action1", "action2"},
+				Projects: []string{},
+			}, {
+				ID:       "my-id-3",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Actions:  []string{"action3", "action4"},
+				Projects: []string{project1.ID},
+			}, {
+				ID:       "my-id-4",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Actions:  []string{"action5", "action6"},
+				Projects: []string{project1.ID, project2.ID},
+			}}
+			for _, role := range roles {
+				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
+			}
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{"some-other-project"}, "resource", "action", "pol"))
+			resp, err := store.ListRoles(ctx)
+
+			require.NoError(t, err)
+			assert.ElementsMatch(t, []*storage.Role{}, resp)
 		},
 	}
 

@@ -525,8 +525,13 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 }
 
 func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	var roles []*v2.Role
-	rows, err := p.db.QueryContext(ctx, `SELECT query_roles from query_roles();`)
+	rows, err := p.db.QueryContext(ctx, `SELECT query_roles from query_roles($1);`, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
 	}
