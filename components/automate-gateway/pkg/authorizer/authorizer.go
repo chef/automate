@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authz/common"
+	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 )
@@ -21,16 +22,16 @@ func NewAuthorizer(v1, v2 middleware.AuthorizationHandler) middleware.SwitchingA
 }
 
 func (a *state) Handle(ctx context.Context,
-	subjects []string, projects []string, req interface{}) (context.Context, error) {
+	subjects []string, projects []string, req interface{}, version *v2.Version) (context.Context, error) {
 
-	newCtx, err := a.next.Handle(ctx, subjects, projects, req)
+	newCtx, err := a.next.Handle(ctx, subjects, projects, req, version)
 	st := status.Convert(err)
 	switch st.Code() {
 	case codes.OK:
 		return newCtx, nil
 	case codes.FailedPrecondition:
 		if a.fromStatus(st) {
-			return a.Handle(ctx, subjects, projects, req)
+			return a.Handle(ctx, subjects, projects, req, version)
 		}
 		fallthrough
 	default: // any other error status

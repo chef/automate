@@ -24,7 +24,7 @@ type client struct {
 // with incoming project headers, inject headers for downstream, etc.
 
 func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter []string,
-	req interface{},
+	req interface{}, version *authz.Version,
 ) (context.Context, error) {
 	log := ctxlogrus.Extract(ctx)
 	method, ok := grpc.Method(ctx)
@@ -55,10 +55,10 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 	})
 
 	var projects []string
-	// TODO (TC) Needs feature flag work to be implemented before
-	// we can toggle between 2.0 and 2.1 aka enable projects AuthZ.
 
-	// if minorVersion == "0" {
+	if version.Minor == authz.Version_V0 {
+		projects = []string{auth_context.AllProjectsKey}
+	}
 
 	// Note: if ANYTHING goes wrong, 403 is the error we return. This is done
 	// on purpose, so our authz response doesn't leak information about what
@@ -82,37 +82,31 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 			"unauthorized action %q on resource %q for subjects %q",
 			action, resource, subjects)
 	}
-	// Projects are only relevant in v2.1
-	projects = []string{}
 
-	// } // TODO This should be an else instead of two `if`s but leaving as is for clarity for now.
-
-	// TODO (TC): This code should replace IsAuthorized call when in
-	// v2.1 mode. Need feature flag work to land first.
-	// if minorVersion == "1" {
-	// resp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
-	// 	Subjects:       subjects,
-	// 	Resource:       resource,
-	// 	Action:         action,
-	// 	ProjectsFilter: projectsToFilter,
-	// })
-	// if err != nil {
-	// 	if status.Convert(err).Code() == codes.FailedPrecondition {
-	// 		return nil, err
-	// 	}
-	// 	log.WithError(err).Error("error authorizing request")
-	// 	return nil, status.Errorf(codes.PermissionDenied,
-	// 		"error authorizing action %q on resource %q for subjects %q: %s",
-	// 		action, resource, subjects, err.Error())
-	// }
-	// if len(resp.Projects) == 0 {
-	// 	return nil, status.Errorf(codes.PermissionDenied,
-	// 		"unauthorized: subjects %q has no project access for action %q on resource %q "+
-	// 			"(filtered by project list %q)",
-	// 		action, resource, subjects, projectsToFilter)
-	// }
-	// projects = resp.Projects
-	// }
+	if version.Minor == authz.Version_V1 {
+		filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
+			Subjects:       subjects,
+			Resource:       resource,
+			Action:         action,
+			ProjectsFilter: projectsToFilter,
+		})
+		if err != nil {
+			if status.Convert(err).Code() == codes.FailedPrecondition {
+				return nil, err
+			}
+			log.WithError(err).Error("error authorizing request")
+			return nil, status.Errorf(codes.PermissionDenied,
+				"error authorizing action %q on resource %q for subjects %q filtered by project list %q: %s",
+				action, resource, subjects, projectsToFilter, err.Error())
+		}
+		if len(filteredResp.Projects) == 0 {
+			return nil, status.Errorf(codes.PermissionDenied,
+				"unauthorized: subjects %q has no project access for action %q on resource %q "+
+					"(filtered by project list %q)",
+				action, resource, subjects, projectsToFilter)
+		}
+		projects = filteredResp.Projects
+	}
 
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()), nil
 }

@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
 	"github.com/chef/automate/components/automate-gateway/api/authz/policy"
@@ -21,7 +22,7 @@ type client struct {
 }
 
 func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
-	req interface{},
+	req interface{}, _ *v2.Version,
 ) (context.Context, error) {
 	log := ctxlogrus.Extract(ctx)
 
