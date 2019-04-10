@@ -13,6 +13,7 @@ import (
 	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/event"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	cfgBackend "github.com/chef/automate/components/config-mgmt-service/backend"
 	cfgElastic "github.com/chef/automate/components/config-mgmt-service/backend/elastic"
@@ -118,6 +119,10 @@ func (esc *EventServiceClientMock) Start(ctx context.Context, in *automate_event
 func (esc *EventServiceClientMock) Stop(ctx context.Context, in *automate_event.StopRequest,
 	opts ...grpc.CallOption) (*automate_event.StopResponse, error) {
 	return &automate_event.StopResponse{}, nil
+}
+func (pm *ProjectsClientMock) HandleEvent(ctx context.Context, in *event.EventMsg,
+	opts ...grpc.CallOption) (*event.EventResponse, error) {
+	return &event.EventResponse{}, nil
 }
 
 // Initialize the test suite

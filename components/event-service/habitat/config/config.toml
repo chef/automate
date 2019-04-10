@@ -29,3 +29,4 @@ root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
 [handlers]
 feed = "{{cfg.handlers.feed}}"
 cfgingest = "{{cfg.handlers.cfgingest}}"
+authz = "{{cfg.handlers.authz}}"

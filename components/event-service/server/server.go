@@ -62,6 +62,7 @@ func (s *Server) initRegistry() map[string][]string {
 	registry[ProfileDeleted] = []string{config.FEED_KEY}
 	registry[NodeTerminated] = []string{config.CFG_KEY}
 	registry[ProjectRulesUpdate] = []string{config.CFG_KEY, config.COMPLIANCE_INGEST_KEY}
+	registry[ProjectRulesUpdateStatus] = []string{config.AUTHZ}
 	logrus.Debug("Registry of events to handler types initialized...")
 	return registry
 }

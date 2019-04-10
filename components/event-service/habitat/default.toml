@@ -27,3 +27,4 @@ level = "info"
 [handlers]
 feed = "0.0.0.0:10121"
 cfgingest = "0.0.0.0:10122"
+authz = "0.0.0.0:10130"

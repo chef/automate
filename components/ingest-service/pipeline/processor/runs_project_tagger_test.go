@@ -10,6 +10,7 @@ import (
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	rules_tags "github.com/chef/automate/lib/authz"
@@ -1120,4 +1121,9 @@ func (pm *projectsClientMock) ListProjectRules(ctx context.Context, in *iam_v2.L
 
 func (pm *projectsClientMock) GetProjectRules(ctx context.Context, in *iam_v2.GetProjectRulesReq, opts ...grpc.CallOption) (*iam_v2.GetProjectRulesResp, error) {
 	return &iam_v2.GetProjectRulesResp{}, nil
+}
+
+func (pm *projectsClientMock) HandleEvent(ctx context.Context, in *event.EventMsg,
+	opts ...grpc.CallOption) (*event.EventResponse, error) {
+	return &event.EventResponse{}, nil
 }

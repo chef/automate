@@ -48,6 +48,7 @@ message ConfigRequest {
 			message Handlers {
 				google.protobuf.StringValue feed = 1;
 				google.protobuf.StringValue cfgingest = 2;
+				google.protobuf.StringValue authz = 3;
 			}
 		}
 		// V1.Service can currently only be used for deployment-service

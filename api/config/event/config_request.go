@@ -35,6 +35,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Log.Format = w.String("text")
 	c.V1.Sys.Handlers.Feed = w.String("0.0.0.0:10121")
 	c.V1.Sys.Handlers.Cfgingest = w.String("0.0.0.0:10122")
+	c.V1.Sys.Handlers.Authz = w.String("0.0.0.0:10130")
 	return c
 }
 

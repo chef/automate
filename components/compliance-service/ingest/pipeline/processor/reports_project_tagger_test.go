@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	rules_tags "github.com/chef/automate/lib/authz"
@@ -1053,4 +1054,9 @@ func (pm *projectsClientMock) ListProjectRules(ctx context.Context, in *iam_v2.L
 
 func (pm *projectsClientMock) GetProjectRules(ctx context.Context, in *iam_v2.GetProjectRulesReq, opts ...grpc.CallOption) (*iam_v2.GetProjectRulesResp, error) {
 	return &iam_v2.GetProjectRulesResp{}, nil
+}
+
+func (pm *projectsClientMock) HandleEvent(ctx context.Context, in *event.EventMsg,
+	opts ...grpc.CallOption) (*event.EventResponse, error) {
+	return &event.EventResponse{}, nil
 }
