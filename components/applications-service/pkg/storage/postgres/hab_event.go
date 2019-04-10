@@ -1,16 +1,72 @@
 package postgres
 
 import (
+	"time"
+
 	"github.com/chef/automate/api/external/applications"
 	dblib "github.com/chef/automate/lib/db"
 	"github.com/go-gorp/gorp"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	labelSuccess = "succeeded"
+	labelFailure = "failed"
+)
+
+var (
+	opsInFlight = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "applications_ingest_ops_inflight",
+		Help: "The number of applications events currently being ingested",
+	})
+
+	timeLastEventSeen = float64(time.Now().Unix())
+
+	timeLastEventSeenCounter = promauto.NewCounterFunc(prometheus.CounterOpts{
+		Name: "applications_ingest_ops_last_time",
+		Help: "Time when the last applications message was accepted for ingestion",
+	},
+		func() float64 { return timeLastEventSeen },
+	)
+
+	ingestDurations = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "applications_ingest_ops_duration",
+		Help: "Application events ingestion duration distributions",
+		// LinearBuckets(start, width float64, count int)
+		// so 0.1s * 20 = 2s
+		Buckets: prometheus.LinearBuckets(0, 0.1, 20),
+	},
+		[]string{"result"},
+	)
+)
+
 // IngestHabEvents process habitat events and store them into the database
 func (db *postgres) IngestHabEvent(event *applications.HabService) error {
+	opsInFlight.Inc()
+	defer opsInFlight.Dec()
+	processingStart := time.Now()
+	timeLastEventSeen = float64(processingStart.Unix())
+	err := db.IngestHabEventWithoutMetrics(event)
+	duration := time.Since(processingStart)
+
+	var label string
+	if err == nil {
+		label = labelSuccess
+	} else {
+		label = labelFailure
+	}
+
+	ingestDurations.With(prometheus.Labels{"result": label}).Observe(duration.Seconds())
+
+	return err
+}
+
+// IngestHabEvents process habitat events and store them into the database
+func (db *postgres) IngestHabEventWithoutMetrics(event *applications.HabService) error {
 	log.WithFields(log.Fields{
 		"storage": "postgres",
 		"message": event,
