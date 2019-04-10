@@ -1,7 +1,7 @@
 # About:
 
 This is a quick way to spin the A2 habitat based development environment in AWS.
-Once the requirements are fulfilled, it takes around 5 minutes to have your a2 branch running in ec2.
+Once the requirements are fulfilled, it takes around 5 minutes to have your automate branch running in ec2.
 
 
 # Requirements:
@@ -42,7 +42,7 @@ Pick previous build timestamps from the three supported channels from here:
 
 ## Load SSH private key identity
 
-Add to the ssh agent the private key that is allowed to clone the `a2` github repo:
+Add to the ssh agent the private key that is allowed to clone the `automate` github repo:
 ```
 ssh-add
 ```
@@ -65,7 +65,7 @@ vagrant destroy -f; AWS_SSH_KEY_NAME='apop' VERSION='dev' vagrant up; vagrant ss
 ```
 
 This will create the EC2 instance and connect to it via SSH.
-It will automatically checkout your a2 branch, install and setup habitat with `ubuntu` HAB_ORIGIN.
+It will automatically checkout your automate branch, install and setup habitat with `ubuntu` HAB_ORIGIN.
 It will enter the hab studio and provide these two final steps:
 ```
 >>> TWO MORE STEPS NEEDED TO RUN A2 <<<
@@ -74,7 +74,7 @@ It will enter the hab studio and provide these two final steps:
 ```
 Your A2 UI URL will be different ^
 
-Additionally, you can build/rebuild a2 components, for example:
+Additionally, you can build/rebuild automate components, for example:
 ```
 rebuild components/ingest-service
 hab svc status
@@ -107,7 +107,7 @@ chef-automate upgrade status
 
 ## SSH into the server
 
-Can be done via `vagrant ssh` from the `ec2` directory of the a2 repository. This will use the `ubuntu` user which will enter `hab studio` automatically.
+Can be done via `vagrant ssh` from the `ec2` directory of the automate repository. This will use the `ubuntu` user which will enter `hab studio` automatically.
 
 To bypass the hab studio, you can login as user `root` using the private key associated with the public key specified via ENV variable `AWS_SSH_KEY_NAME`.
 

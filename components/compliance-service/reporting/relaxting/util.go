@@ -2,10 +2,13 @@ package relaxting
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,6 +27,13 @@ type ReportingTransport struct {
 }
 
 var err error
+
+const (
+	InvalidLevel = iota - 1
+	ReportLevel
+	ProfileLevel
+	ControlLevel
+)
 
 func (backend *ES2Backend) getHttpClient() *http.Client {
 	var httpClient *http.Client
@@ -161,4 +171,36 @@ func GetEsIndex(filters map[string][]string, useSummaryIndex bool, useStartTime 
 
 	logrus.Debugf("GetEsIndex, using indices: %s", esIndex)
 	return esIndex, err
+}
+
+func GetFilterDepth(filters map[string][]string) int {
+	if len(filters["profile_id"]) == 1 && len(filters["control"]) == 1 {
+		return ControlLevel
+	} else if len(filters["profile_id"]) == 1 && len(filters["control"]) == 0 {
+		return ProfileLevel
+	}
+	//right now, if provide no profiles and no control or more than profile or control.. don't go deep.. we'll stay on the report level in this case
+	//this may need to be clarified so that customers do not get confused.
+	//todo - in the future, it will be best to support multiple profiles/controls while staying deep, which is more difficult than it would seem.
+	return ReportLevel
+
+	//todo - decide if more than one profile or control is invalid and if so use what we have below instead
+	//return InvalidLevel, errors.New("currently, for filter, only 1 profile and 1 control are allowed Or 1 profile and no control Or no profile and no control")
+}
+
+func computeIndexDate(endTime string) (string, error) {
+	var indexDate time.Time
+
+	if len(endTime) > 0 {
+		endTimeAsTime, err := time.Parse(time.RFC3339, endTime)
+		if err != nil {
+			return "", errors.New(fmt.Sprintf("computeIndexDate - could not parse end_time %s.", endTime))
+		}
+
+		indexDate = endTimeAsTime
+	} else {
+		indexDate = time.Now().UTC()
+	}
+
+	return indexDate.Format(time.RFC3339), nil
 }

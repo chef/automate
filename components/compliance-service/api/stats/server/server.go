@@ -44,10 +44,7 @@ func (srv *Server) ReadSummary(ctx context.Context, in *stats.Query) (*stats.Sum
 		summary.NodeSummary = nodeSummary
 	}
 	if in.Type == "controls" {
-		// from what i can tell, the int the following function requires as an argument
-		// is never actually user. before i rip stuff that requirement out, i'm faking
-		// it with a 0 in case im wrong
-		controlSummary, err := srv.es.GetStatsSummaryControls(formattedFilters, 0)
+		controlSummary, err := srv.es.GetStatsSummaryControls(formattedFilters)
 		if err != nil {
 			err = utils.FormatErrorMsg(err, "")
 			return nil, err
@@ -147,7 +144,7 @@ func (srv *Server) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Fa
 		err = utils.FormatErrorMsg(err, "")
 		return nil, err
 	}
-	return &failures, nil
+	return failures, nil
 }
 
 func validateTrendData(in *stats.Query, filters map[string][]string) (err error) {

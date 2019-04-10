@@ -49,7 +49,7 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	formattedFilters := formatFilters(in.Filters)
-	reportsList, total, err := srv.es.GetAllReports(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
+	reportsList, total, err := srv.es.GetReports(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, "")
 	}
@@ -60,17 +60,18 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 
 // ReadReport returns a reports based on id
 func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*reporting.Report, error) {
-	var report reporting.Report
 	formattedFilters := formatFilters(in.Filters)
-	if len(formattedFilters["profile_name"]) > 1 {
-		return nil, status.Error(codes.InvalidArgument, "Only one 'profile_name' filter is allowed")
+	//todo - deep filtering - should we open this up to more than just one?  only for ReadReport?
+	if len(formattedFilters["profile_id"]) > 1 {
+		return nil, status.Error(codes.InvalidArgument, "Only one 'profile_id' filter is allowed")
 	}
 	// Using ComplianceTwenty as the report might not be in the latest index
+	//todo - decide if we should be using the end_time filter if it exists here. if not, then by all means.. use all
 	report, err := srv.es.GetReport(relaxting.ComplianceDailyRepTwenty, in.Id, formattedFilters)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, in.Id)
 	}
-	return &report, nil
+	return report, nil
 }
 
 // ListSuggestions returns a list of suggestions based on query
@@ -168,7 +169,7 @@ func exportReports(filters map[string][]string, esr *relaxting.ES2Backend, sendR
 		if err != nil {
 			return status.Error(codes.NotFound, fmt.Sprintf("Failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs[idx], err))
 		}
-		err = sendResult(&cur)
+		err = sendResult(cur)
 		if err != nil {
 			return status.Error(codes.Internal, fmt.Sprintf("Failed to stream report %d/%d with ID %s . Error: %s", idx, total, reportIDs[idx], err))
 		}
@@ -283,6 +284,7 @@ func formatFilters(filters []*reporting.ListFilter) map[string][]string {
 	for _, filter := range filters {
 		formattedFilters[filter.Type] = append(formattedFilters[filter.Type], filter.Values...)
 	}
+	utils.DeDupFilters(formattedFilters)
 	return formattedFilters
 }
 

@@ -90,13 +90,16 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 }
 
 func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
-	esIndex, err := GetEsIndex(filters, true, true)
+	//here, we base our decision on which index set (det or summary) to use for querying suggestions
+	// the reason this is necessary is in the where a control has already been added to the query and therefore
+	// the query needs to dive down to the control depth.. requiring the detailed indices.
+	// in other words, only use summary here if there are no controls in the filter
+	esIndex, err := GetEsIndex(filters, len(filters["control"]) == 0, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAggSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, true, false)
-	//boolQuery := elastic.NewBoolQuery()
+	boolQuery := backend.getFiltersQuery(filters, true)
 	lowerText := strings.ToLower(text)
 
 	if len(text) >= 2 {
@@ -194,12 +197,16 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 }
 
 func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
-	esIndex, err := GetEsIndex(filters, true, true)
+	//here, we base our decision on which index set (det or summary) to use for querying suggestions
+	// the reason this is necessary is in the where a control has already been added to the query and therefore
+	// the query needs to dive down to the control depth.. requiring the detailed indices.
+	// in other words, only use summary here if there are no controls in the filter
+	esIndex, err := GetEsIndex(filters, len(filters["control"]) == 0, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getArrayAggSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, true, false)
+	boolQuery := backend.getFiltersQuery(filters, true)
 
 	// We don't filter unless the text has at least 2 chars
 	if len(text) >= 2 {
@@ -268,12 +275,14 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 }
 
 func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
+	//the reason we may use summary index here is because we always throw away the current profile filter when
+	// getting a suggestion for profile.. if we didn't then we'd only ever see the filter that's in our filter!
 	esIndex, err := GetEsIndex(filters, true, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getProfileSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, true, true)
+	boolQuery := backend.getFiltersQuery(filters, true)
 	lowerText := strings.ToLower(text)
 
 	var innerQuery elastic.Query
@@ -374,7 +383,7 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, false, true)
+	boolQuery := backend.getFiltersQuery(filters, true)
 
 	var innerQuery elastic.Query
 	if len(text) >= 2 {

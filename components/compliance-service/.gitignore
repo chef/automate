@@ -9,6 +9,7 @@ dist
 .tmp
 .vscode/
 .idea/
+tests.iml
 cli/debug
 results/
 compliance/compliance
