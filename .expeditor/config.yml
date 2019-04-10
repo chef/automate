@@ -891,7 +891,6 @@ subscriptions:
     actions:
       - bash:.expeditor/update_habitat.sh:
           post_commit: false
-  # End of A2 Workflow Subscriptions
   - workload: schedule_triggered:chef/automate:master:nightly_tests:*
     actions:
       - trigger_pipeline:a1-migration/dev
