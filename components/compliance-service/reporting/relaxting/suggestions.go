@@ -99,7 +99,7 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 		return nil, errors.Wrap(err, "getAggSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, false)
+	boolQuery := backend.getFiltersQuery(filters, true)
 	lowerText := strings.ToLower(text)
 
 	if len(text) >= 2 {
@@ -206,7 +206,7 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 		return nil, errors.Wrap(err, "getArrayAggSuggestions unable to get index dates")
 	}
 
-	boolQuery := backend.getFiltersQuery(filters, false)
+	boolQuery := backend.getFiltersQuery(filters, true)
 
 	// We don't filter unless the text has at least 2 chars
 	if len(text) >= 2 {

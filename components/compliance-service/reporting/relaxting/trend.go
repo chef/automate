@@ -51,7 +51,9 @@ func (backend ES2Backend) getTrendBucketsRoundDown(filters map[string][]string, 
 	})
 
 	// Because first bucket to the left has no start time
-	trendBuckets[0].StartTime = nil
+	if len(trendBuckets) > 0 {
+		trendBuckets[0].StartTime = nil
+	}
 
 	return trendBuckets, nil
 }
