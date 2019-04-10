@@ -52,6 +52,16 @@ Role
 Recipe
 : Filter by Chef recipe, on all applicable nodes.
 
+### Deep Filtering
+
+Deep Filtering allows you to view the state of your infrastructure from the perspective of a single profile or a single profile and one of its child controls.  
+Adding a profile filter will modify all compliance reporting screens to display the status of that profile across all nodes that executed that profile. Adding a filter for a child control of that profile will modify all compliance reporting screens to display the status of that control.
+
+Please note the only supported filters for deep filtering are:
+
+    * one profile
+    * one profile and one of its child controls
+
 ### Download Report Results
 
 The download button located to the right of the search bar allows the user to download a JSON or CSV format of the reports, based on all currently applied filters (including end time selected in calendar).
