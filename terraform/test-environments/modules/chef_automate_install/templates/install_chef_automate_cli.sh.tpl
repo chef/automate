@@ -117,9 +117,13 @@ fi
 # Update to whatever the lastest version of hab that got installed is
 hab pkg binlink core/hab --force
 
-if [[ "${enable_iamv2}" == "true" ]]; then
+if [[ "${enable_iam}" != "v1" ]]; then
     if [[ ! -f /root/a2-iamv2-enabled ]]; then
-        chef-automate iam upgrade-to-v2
+        if [[ "${enable_iam}" == "v2.1" ]]; then
+            chef-automate iam upgrade-to-v2 --beta2.1
+        else
+            chef-automate iam upgrade-to-v2
+        fi
         touch /root/a2-iamv2-enabled
     fi
 fi

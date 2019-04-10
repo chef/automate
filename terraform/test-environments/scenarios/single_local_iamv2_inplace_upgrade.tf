@@ -53,5 +53,5 @@ module "single_local_iamv2_inplace_upgrade_deploy" {
   channel         = "${var.channel}"
   deployment_type = "local"
   upgrade         = "true"
-  enable_iamv2    = "true"
+  enable_iam      = "v2"
 }
