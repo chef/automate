@@ -53,6 +53,10 @@ control 'ingest-job-scheduler' do
         }
       end
 
+      let(:elasticsearch_url) do
+        ENV['ELASTICSEARCH_URL'] || "http://localhost:10144"
+      end
+
       it 'if update has running == true, run the job' do
         # turn off missing node job
         expect(automate_api_request(
@@ -71,7 +75,9 @@ control 'ingest-job-scheduler' do
         ).to eq 200
 
         # wait for elastic search to update
-        sleep 5
+        request = inspec.http("#{elasticsearch_url}/_refresh")
+        failed_count = JSON.parse(request.body, symbolize_names: true)[:_shards][:failed]
+        expect(failed_count).to eq 0
 
         # turn on node missing with a day old threshold
         expect(automate_api_request(
@@ -82,7 +88,9 @@ control 'ingest-job-scheduler' do
         ).to eq 200
 
         # wait for elastic search to update
-        sleep 5
+        request = inspec.http("#{elasticsearch_url}/_refresh")
+        failed_count = JSON.parse(request.body, symbolize_names: true)[:_shards][:failed]
+        expect(failed_count).to eq 0
 
         # # check that the node added is missing
         expect(get_test_node.http_status).to eq 200
@@ -117,7 +125,9 @@ control 'ingest-job-scheduler' do
         ).to eq 200
 
         # wait for elastic search to update
-        sleep 5
+        request = inspec.http("#{elasticsearch_url}/_refresh")
+        failed_count = JSON.parse(request.body, symbolize_names: true)[:_shards][:failed]
+        expect(failed_count).to eq 0
 
         # update node missing job config with a day old threshold
         expect(automate_api_request(
@@ -128,7 +138,9 @@ control 'ingest-job-scheduler' do
         ).to eq 200
 
         # wait for elastic search to update
-        sleep 5
+        request = inspec.http("#{elasticsearch_url}/_refresh")
+        failed_count = JSON.parse(request.body, symbolize_names: true)[:_shards][:failed]
+        expect(failed_count).to eq 0
 
         # check that the node added is not missing
         expect(get_test_node.http_status).to eq 200
