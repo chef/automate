@@ -70,7 +70,7 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 		return nil, p.processError(err)
 	}
 
-	err = p.insertPolicyProjectsWithQuerier(ctx, pol.ID, pol.Projects, tx)
+	err = p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, tx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -219,6 +219,12 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 		return nil, p.processError(err)
 	}
 
+	// Update policy's projects
+	err = p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	// Also replace any existing policy members and update with new members.
 	err = p.replacePolicyMembersWithQuerier(ctx, pol.ID, pol.Members, tx)
 	if err != nil {
@@ -285,7 +291,7 @@ func (p *pg) insertPolicyStatementsWithQuerier(ctx context.Context,
 }
 
 // insertPolicyProjectsWithQuerier creates new associations between a policy and its projects.
-func (p *pg) insertPolicyProjectsWithQuerier(ctx context.Context,
+func (p *pg) associatePolicyWithProjects(ctx context.Context,
 	policyID string, inProjects []string,
 	q Querier) error {
 
