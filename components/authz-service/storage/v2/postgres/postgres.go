@@ -613,21 +613,16 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 		return storage_errors.ErrNotFound
 	}
 
-	// TODO (TC): Can't we just do that from delete itself?
-	// Check if role exists
-	var role v2.Role
-	row := tx.QueryRowContext(ctx, `SELECT query_role($1)`, id)
-	err = row.Scan(&role)
+	res, err := tx.ExecContext(ctx, `DELETE FROM iam_roles WHERE id=$1;`, id)
 	if err != nil {
 		return p.processError(err)
 	}
 
-	_, err = tx.ExecContext(ctx,
-		`DELETE FROM iam_roles WHERE id=$1;`,
-		id,
-	)
+	count, err := res.RowsAffected()
 	if err != nil {
 		return p.processError(err)
+	} else if count != 1 {
+		return storage_errors.ErrNotFound
 	}
 
 	err = tx.Commit()

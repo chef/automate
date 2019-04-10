@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/prng"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -2208,8 +2209,7 @@ func TestUpdateProject(t *testing.T) {
 				Type:     storage.Custom,
 				Projects: []string{"foo"},
 			}
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"foo", "bar"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 			resp, err := store.UpdateProject(ctx, &project)
 			require.NoError(t, err)
 			require.Equal(t, &project, resp)
@@ -2227,8 +2227,8 @@ func TestUpdateProject(t *testing.T) {
 				Type:     storage.Custom,
 				Projects: []string{"foo"},
 			}
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"*"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+
 			resp, err := store.UpdateProject(ctx, &project)
 			require.NoError(t, err)
 			require.Equal(t, &project, resp)
@@ -2258,8 +2258,8 @@ func TestUpdateProject(t *testing.T) {
 				Type:     storage.Custom,
 				Projects: []string{"foo"},
 			}
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"wrong", "projects"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{"wrong", "projects"})
+
 			resp, err := store.UpdateProject(ctx, &project)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assert.Nil(t, resp)
@@ -2325,8 +2325,7 @@ func TestGetProject(t *testing.T) {
 				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
 			require.NoError(t, err)
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"foo", "bar"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
@@ -2344,8 +2343,7 @@ func TestGetProject(t *testing.T) {
 				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
 			require.NoError(t, err)
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"*"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
@@ -2363,8 +2361,7 @@ func TestGetProject(t *testing.T) {
 				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
 			require.NoError(t, err)
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"wrong", "project"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{"wrong", "project"})
 
 			p, err := store.GetProject(ctx, "foo")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
@@ -2434,8 +2431,7 @@ func TestDeleteProject(t *testing.T) {
 			insertTestProject(t, db, "my-id-2", "name")
 			insertTestProject(t, db, "my-id-3", "name")
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"foo", "test-project"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{"foo", "test-project"})
 
 			err := store.DeleteProject(ctx, "test-project")
 
@@ -2450,8 +2446,7 @@ func TestDeleteProject(t *testing.T) {
 			insertTestProject(t, db, "my-id-2", "name")
 			insertTestProject(t, db, "my-id-3", "name")
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"*"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
 			err := store.DeleteProject(ctx, "test-project")
 
@@ -2466,8 +2461,7 @@ func TestDeleteProject(t *testing.T) {
 			insertTestProject(t, db, "my-id-2", "name")
 			insertTestProject(t, db, "my-id-3", "name")
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"my-id-1", "my-id-2"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{"my-id-1", "my-id-2"})
 
 			err := store.DeleteProject(ctx, "test-project")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
@@ -2546,8 +2540,7 @@ func TestListProjects(t *testing.T) {
 			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('baz', 'my baz project', 'custom', array['baz'])`)
 			require.NoError(t, err)
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"foo", "bar"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -2577,8 +2570,7 @@ func TestListProjects(t *testing.T) {
 			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('baz', 'my baz project', 'custom', array['baz'])`)
 			require.NoError(t, err)
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{})
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -2614,8 +2606,7 @@ func TestListProjects(t *testing.T) {
 			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('baz', 'my baz project', 'custom', array['baz'])`)
 			require.NoError(t, err)
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"*"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -2916,8 +2907,7 @@ func TestListRoles(t *testing.T) {
 				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
 			}
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{project1.ID, project2.ID}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{project1.ID, project2.ID})
 			resp, err := store.ListRoles(ctx)
 
 			require.NoError(t, err)
@@ -3010,8 +3000,7 @@ func TestListRoles(t *testing.T) {
 				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
 			}
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"*"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			resp, err := store.ListRoles(ctx)
 
 			require.NoError(t, err)
@@ -3060,8 +3049,7 @@ func TestListRoles(t *testing.T) {
 				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
 			}
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"(unassigned)"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
 			resp, err := store.ListRoles(ctx)
 
 			expected := []*storage.Role{
@@ -3119,8 +3107,7 @@ func TestListRoles(t *testing.T) {
 				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
 			}
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"some-other-project"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{"some-other-project"})
 			resp, err := store.ListRoles(ctx)
 
 			require.NoError(t, err)
@@ -3224,8 +3211,7 @@ func TestGetRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{project1.ID})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{project1.ID, project2.ID}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{project1.ID, project2.ID})
 			resp, err := store.GetRole(ctx, "my-id-1")
 
 			require.NoError(t, err)
@@ -3259,8 +3245,7 @@ func TestGetRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{project1.ID})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"*"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			resp, err := store.GetRole(ctx, "my-id-1")
 
 			require.NoError(t, err)
@@ -3285,8 +3270,7 @@ func TestGetRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{project1.ID})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"*"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			resp, err := store.GetRole(ctx, "my-id-1")
 
 			require.NoError(t, err)
@@ -3311,8 +3295,7 @@ func TestGetRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{project1.ID})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"(unassigned)"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
 			resp, err := store.GetRole(ctx, "my-id-1")
 
 			require.NoError(t, err)
@@ -3346,8 +3329,7 @@ func TestGetRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{project1.ID})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{project1.ID}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{project1.ID})
 			resp, err := store.GetRole(ctx, "my-id-1")
 
 			assert.Nil(t, resp)
@@ -3505,9 +3487,7 @@ func TestDeleteRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{project1.ID, project2.ID}, "resource", "action", "pol"))
-
+			ctx = insertProjectsIntoContext(ctx, []string{project1.ID, project2.ID})
 			err = store.DeleteRole(ctx, role.ID)
 
 			require.NoError(t, err)
@@ -3548,9 +3528,7 @@ func TestDeleteRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"(unassigned)"}, "resource", "action", "pol"))
-
+			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
 			err = store.DeleteRole(ctx, role.ID)
 
 			require.NoError(t, err)
@@ -3591,9 +3569,7 @@ func TestDeleteRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"*"}, "resource", "action", "pol"))
-
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			err = store.DeleteRole(ctx, role.ID)
 
 			require.NoError(t, err)
@@ -3634,9 +3610,7 @@ func TestDeleteRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{project2.ID}, "resource", "action", "pol"))
-
+			ctx = insertProjectsIntoContext(ctx, []string{project2.ID})
 			err = store.DeleteRole(ctx, role.ID)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
@@ -3847,8 +3821,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions:  []string{"newaction"},
 				Projects: []string{project2.ID},
 			}
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{project1.ID}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{project1.ID})
 			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			assert.Nil(t, updatedRole)
@@ -3891,8 +3864,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions:  []string{"newaction"},
 				Projects: []string{project2.ID},
 			}
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{project2.ID, project1.ID}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{project2.ID, project1.ID})
 			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
@@ -3921,8 +3893,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions:  []string{"newaction"},
 				Projects: []string{project1.ID},
 			}
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"*"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
@@ -3943,8 +3914,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions:  []string{"newaction"},
 				Projects: []string{},
 			}
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"(unassigned)"}, "resource", "action", "pol"))
+			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
 			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
@@ -4372,4 +4342,9 @@ func openDB(t *testing.T) *sql.DB {
 	require.NoError(t, err, "error pinging db")
 
 	return db
+}
+
+func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
+	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+		[]string{}, projects, "resource", "action", "pol"))
 }

@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION
       -- if _projects_filter intersects with projects list for row, return row
       OR t.projects && _projects_filter
       -- if projects list for row is empty, set it to'{(unassigned)}'
-      -- and see if ti intersects with _projects_filter, if so, return row
+      -- and see if it intersects with _projects_filter, if so, return row
       OR COALESCE(t.projects, '{(unassigned)}') && _projects_filter;
 
 $$ LANGUAGE sql;
