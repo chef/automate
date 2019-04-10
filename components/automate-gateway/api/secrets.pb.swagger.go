@@ -1,0 +1,275 @@
+package api
+
+func init() {
+	Swagger.Add("secrets", `{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/external/secrets/secrets.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/secrets": {
+      "post": {
+        "operationId": "Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsId"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/secretsSecret"
+            }
+          }
+        ],
+        "tags": [
+          "SecretsService"
+        ]
+      }
+    },
+    "/secrets/id/{id}": {
+      "get": {
+        "operationId": "Read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsSecret"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "SecretsService"
+        ]
+      },
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "SecretsService"
+        ]
+      },
+      "patch": {
+        "operationId": "Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/secretsSecret"
+            }
+          }
+        ],
+        "tags": [
+          "SecretsService"
+        ]
+      }
+    },
+    "/secrets/search": {
+      "post": {
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsSecrets"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/secretsQuery"
+            }
+          }
+        ],
+        "tags": [
+          "SecretsService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "QueryOrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "secretsDeleteResponse": {
+      "type": "object"
+    },
+    "secretsFilter": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "secretsId": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "secretsKv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "secretsQuery": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/secretsFilter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/QueryOrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "secretsSecret": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "last_modified": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/secretsKv"
+          }
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/secretsKv"
+          }
+        }
+      }
+    },
+    "secretsSecrets": {
+      "type": "object",
+      "properties": {
+        "secrets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/secretsSecret"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "secretsUpdateResponse": {
+      "type": "object"
+    }
+  }
+}
+`)
+}

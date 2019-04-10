@@ -166,9 +166,9 @@ version command on this service, ensure that you are setting the Version
 and GitRef at link time in your Habitat plan:
 
     GIT_SHA=$(git rev-parse HEAD)
-    GO_LDFLAGS=" -X ${scaffolding_go_base_path}/a2/lib/version.Version=${pkg_release}"
-    GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/a2/lib/version.GitSHA=${GIT_SHA}"
-    GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/a2/lib/version.BuildTime=${pkg_release}"
+    GO_LDFLAGS=" -X ${scaffolding_go_base_path}/automate/lib/version.Version=${pkg_release}"
+    GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.GitSHA=${GIT_SHA}"
+    GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
 
 
 Or, if your service needs more customized version information add a

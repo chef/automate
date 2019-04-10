@@ -12,7 +12,7 @@ for i in "${non_vendor_files[@]}"; do
 done
 
 echo "Changing chef/a2 -> chef/automate"
-for pattern in "s#github.com/chef/a2#github.com/chef/automate#" "s#scaffolding_go_repo_name=a2#scaffolding_go_repo_name=automate#" "s#github.com:chef/a2#github.com:chef/automate#" "s#chef/a2:master#chef/automate:master#"; do
+for pattern in "s#github.com/chef/a2#github.com/chef/automate#" "s#scaffolding_go_repo_name=a2#scaffolding_go_repo_name=automate#" "s#github.com:chef/a2#github.com:chef/automate#" "s#chef/a2:master#chef/automate:master#" "s#a2/lib#automate/lib#"; do
     echo " - $SED -i $pattern"
     <files_list xargs -0 $SED -i "$pattern"
 done

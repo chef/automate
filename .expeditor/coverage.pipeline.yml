@@ -3,7 +3,7 @@ steps:
       - .expeditor/coverage/automate-ui.sh
     label: "Automate UI"
     concurrency: 1
-    concurrency_group: chef-a2-master/deploy/$CHANNEL
+    concurrency_group: chef-automate-master/deploy/$CHANNEL
     expeditor:
       accounts:
         - aws/chef-cd

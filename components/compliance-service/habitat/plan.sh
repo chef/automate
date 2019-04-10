@@ -65,9 +65,9 @@ scaffolding_go_binary_list=(
 do_prepare() {
   # Injecting Version, SHA and Build Time to the go linker
   GIT_SHA=$(git rev-parse HEAD)
-  GO_LDFLAGS=" -X ${scaffolding_go_base_path}/a2/lib/version.Version=${pkg_release}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/a2/lib/version.GitSHA=${GIT_SHA}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/a2/lib/version.BuildTime=${pkg_release}"
+  GO_LDFLAGS=" -X ${scaffolding_go_base_path}/automate/lib/version.Version=${pkg_release}"
+  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.GitSHA=${GIT_SHA}"
+  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
   GO_LDFLAGS="${GO_LDFLAGS} -X main.EXECUTABLE_PATH=$(pkg_path_for chef/inspec)/bin/inspec"
   export GO_LDFLAGS
   build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"

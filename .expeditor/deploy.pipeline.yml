@@ -2,7 +2,7 @@ steps:
   - label: ":terraform:"
     command: .expeditor/buildkite/terraform.sh
     concurrency: 1
-    concurrency_group: chef-a2-master/deploy/$CHANNEL
+    concurrency_group: chef-automate-master/deploy/$CHANNEL
     timeout_in_minutes: 60
     expeditor:
       accounts:
@@ -16,7 +16,7 @@ steps:
   - label: ":inspec:"
     command: .expeditor/buildkite/inspec.sh
     concurrency: 1
-    concurrency_group: chef-a2-master/deploy/$CHANNEL
+    concurrency_group: chef-automate-master/deploy/$CHANNEL
     timeout_in_minutes: 30
     expeditor:
       secrets:
@@ -29,7 +29,7 @@ steps:
   - label: ":cypress:"
     command: .expeditor/buildkite/cypress.sh
     concurrency: 1
-    concurrency_group: chef-a2-master/deploy/$CHANNEL
+    concurrency_group: chef-automate-master/deploy/$CHANNEL
     timeout_in_minutes: 30
     expeditor:
       secrets:
