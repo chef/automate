@@ -26,9 +26,7 @@ func CreateBackup(conTimeout, reqTimeout time.Duration, _ cli.FormatWriter) (*ap
 		)
 	}
 
-	res, err := con.CreateBackup(ctx, &api.CreateBackupRequest{
-		BackupTimeoutSeconds: int64(reqTimeout.Seconds()),
-	})
+	res, err := con.CreateBackup(ctx, &api.CreateBackupRequest{})
 	if err != nil {
 		err = status.Wrap(
 			err,
@@ -149,6 +147,60 @@ func ShowBackup(conTimeout, reqTimeout time.Duration, id *api.BackupTask) (*api.
 			status.DeploymentServiceCallError,
 			"Request to show backup %s failed",
 			id.TaskID(),
+		)
+	}
+
+	return res, err
+}
+
+// BackupStatus makes a gRPC request to the deployment-service for the
+// backup runner status
+func BackupStatus(conTimeout, reqTimeout time.Duration) (*api.BackupStatusResponse, error) {
+	con, ctx, cancel, err := newCon(conTimeout, reqTimeout)
+	defer cancel()
+
+	if err != nil {
+		return &api.BackupStatusResponse{}, status.Wrap(
+			err,
+			status.DeploymentServiceUnreachableError,
+			"Connection to deployment-service failed",
+		)
+	}
+
+	req := &api.BackupStatusRequest{}
+	res, err := con.BackupStatus(ctx, req)
+	if err != nil {
+		err = status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request for backup status failed",
+		)
+	}
+
+	return res, err
+}
+
+// CancelBackup makes a gRPC request to the deployment-service and cancels the
+// the running backup operation
+func CancelBackup(conTimeout, reqTimeout time.Duration) (*api.CancelBackupResponse, error) {
+	con, ctx, cancel, err := newCon(conTimeout, reqTimeout)
+	defer cancel()
+
+	if err != nil {
+		return &api.CancelBackupResponse{}, status.Wrap(
+			err,
+			status.DeploymentServiceUnreachableError,
+			"Connection to deployment-service failed",
+		)
+	}
+
+	req := &api.CancelBackupRequest{}
+	res, err := con.CancelBackup(ctx, req)
+	if err != nil {
+		err = status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to cancel backup failed",
 		)
 	}
 

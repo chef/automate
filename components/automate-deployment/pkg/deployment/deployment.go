@@ -191,10 +191,23 @@ func initExpectedServices(c *dc.ConfigRequest) ([]*Service, error) {
 	return allServices, nil
 }
 
-// Lock takes an exclusive lock of the deployment struct for
-// writing. It will block until the lock is available.
+// Lock takes an exclusive lock of the deployment struct for writing. It will
+// block until the lock is available.
 func (d *Deployment) Lock() {
 	d.mu.Lock()
+}
+
+// AcquireLock returns a channel that will be closed when the deployment is
+// locked.
+func (d *Deployment) AcquireLock() <-chan struct{} {
+	c := make(chan struct{})
+
+	go func() {
+		d.Lock()
+		close(c)
+	}()
+
+	return c
 }
 
 // Unlock releases a previously help lock.  Panics if called when the

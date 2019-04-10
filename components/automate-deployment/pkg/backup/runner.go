@@ -32,7 +32,6 @@ import (
 type Runner struct {
 	eventSender      events.EventSender
 	specs            []Spec
-	timeout          time.Duration
 	eventChan        chan api.DeployEvent_Backup_Operation
 	eventTerm        chan struct{}
 	errChan          chan error
@@ -44,7 +43,10 @@ type Runner struct {
 	// map[task-id][service-name] = operation-status
 	TaskOperations map[string]map[string]api.DeployEvent_Backup_Operation
 	// map[task-id] = cancel()
-	TaskCancellation map[string]func()
+
+	// Since we rely on a deployment lock for operations that change state
+	// we only need to track a single task and don't need another mutex.
+	runningTask *CancellableTask
 
 	pgConnInfo      pg.ConnInfo
 	esSidecarInfo   ESSidecarConnInfo
@@ -66,8 +68,6 @@ func NewRunner(opts ...RunnerOpt) *Runner {
 	runner := &Runner{
 		TaskOperations:      map[string]map[string]api.DeployEvent_Backup_Operation{},
 		taskOperationsMutex: &sync.Mutex{},
-		TaskCancellation:    map[string]func(){},
-		timeout:             120 * time.Minute,
 		configRenderer: func(*deployment.Service) (string, error) {
 			return "", errors.New("invalid config renderer")
 		},
@@ -80,25 +80,23 @@ func NewRunner(opts ...RunnerOpt) *Runner {
 	return runner
 }
 
-// WithLockedDeployment configures the runner to unlock the given deployment.
-func WithLockedDeployment(deployment *deployment.Deployment) RunnerOpt {
-	return func(runner *Runner) {
-		runner.lockedDeployment = deployment
+// Configure updates the instance with RunnerOpt's
+func (r *Runner) Configure(opts ...RunnerOpt) *Runner {
+	if r == nil {
+		return nil
 	}
+
+	for _, opt := range opts {
+		opt(r)
+	}
+
+	return r
 }
 
 // WithConfigRenderer configures the runner to unlock the given deployment.
 func WithConfigRenderer(f func(*deployment.Service) (string, error)) RunnerOpt {
 	return func(runner *Runner) {
 		runner.configRenderer = f
-	}
-}
-
-// WithEventSender configures the event sender to for submitting backup task
-// events
-func WithEventSender(sender events.EventSender) RunnerOpt {
-	return func(runner *Runner) {
-		runner.eventSender = sender
 	}
 }
 
@@ -109,26 +107,10 @@ func WithSpecs(specs []Spec) RunnerOpt {
 	}
 }
 
-// WithTimeout configures the timeout for waiting for backup operations
-func WithTimeout(time time.Duration) RunnerOpt {
-	return func(runner *Runner) {
-		runner.timeout = time
-	}
-}
-
 // WithBackupLocationSpecification sets the backup-gateway location
 func WithBackupLocationSpecification(locationSpec LocationSpecification) RunnerOpt {
 	return func(runner *Runner) {
 		runner.locationSpec = locationSpec
-	}
-}
-
-// WithBackupRestoreLocationSpecification sets the remote backup restore location.
-// It will be used to bootstrap the backup-gateway before the gateway takes
-// over for all operations.
-func WithBackupRestoreLocationSpecification(locationSpec LocationSpecification) RunnerOpt {
-	return func(runner *Runner) {
-		runner.restoreLocationSpec = locationSpec
 	}
 }
 
@@ -153,13 +135,6 @@ func WithEsSidecarInfo(esSidecarInfo ESSidecarConnInfo) RunnerOpt {
 	}
 }
 
-// WithRestoreTask sets the runners restore task
-func WithRestoreTask(task *api.BackupRestoreTask) RunnerOpt {
-	return func(runner *Runner) {
-		runner.restoreTask = task
-	}
-}
-
 // WithTarget sets the runners deployment target
 func WithTarget(target target.Target) RunnerOpt {
 	return func(runner *Runner) {
@@ -175,25 +150,44 @@ func WithReleaseManifest(releaseManifest manifest.ReleaseManifest) RunnerOpt {
 }
 
 // CreateBackup creates an Automate Backup
-func (r *Runner) CreateBackup() (*api.BackupTask, error) {
+func (r *Runner) CreateBackup(ctx context.Context, dep *deployment.Deployment, sender events.EventSender) (*api.BackupTask, error) {
 	r.backupTask = &api.BackupTask{Id: ptypes.TimestampNow()}
 
 	r.infof("Backup running")
+	r.eventSender = sender
+	r.lockedDeployment = dep
 	r.publishBackupEvent(r.backupTask.TaskID(), api.DeployEvent_RUNNING)
 
-	go r.startBackupOperations()
+	go r.startBackupOperations(ctx)
 
 	return r.backupTask, nil
 }
 
-func (r *Runner) DeleteBackups(backupTasks []*api.BackupTask) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
+// DeleteBackups deletes one or many Automate Backups
+func (r *Runner) DeleteBackups(ctx context.Context, dep *deployment.Deployment, backupTasks []*api.BackupTask) error {
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	// Build a context that we can pass to each operation
+	var err error
 
+	r.lockedDeployment = dep
+	defer r.unlockDeployment()
+
+	taskIDs := []string{}
+	for _, t := range backupTasks {
+		taskIDs = append(taskIDs, t.TaskID())
+	}
+	r.runningTask, err = newCancellableTask(api.BackupStatusResponse_DELETE, taskIDs, cancel)
+	if err != nil {
+		return errors.Wrap(err, "Failed to configure operation cancellation")
+	}
+	defer r.clearRunningTask()
+
+	// Build a context that we can pass to each operation
 	for _, backupTask := range backupTasks {
 		logrus.Infof("Delete backup %s", backupTask.TaskID())
+
+		r.eventTerm = make(chan struct{})
 
 		deleteCtx := NewContext(
 			WithContextCtx(ctx),
@@ -255,50 +249,42 @@ func (r *Runner) DeleteBackups(backupTasks []*api.BackupTask) error {
 
 			return nil
 		})
+
 		if err != nil {
 			return errors.Wrapf(err, "failed to delete backup %s", backupTask.TaskID())
 		}
 
-		err = retry(3, 5*time.Second, func() error {
-			// If any objects remain, something bad has happened
-			remainingObjs, _, err := deleteCtx.bucket.List(ctx, "", false)
-			if err != nil {
-				logrus.WithError(err).Warn("Failed to get remaining objects")
-				return err
-			}
+		// Retry deleting remaining objects until the timeout expires.
+		go func() {
+			for {
+				// If any objects remain, something bad has happened
+				remainingObjs, _, err := deleteCtx.bucket.List(ctx, "", false)
+				if err != nil {
+					logrus.WithError(err).Warn("Failed to get remaining objects")
+					time.Sleep(5 * time.Second)
+					continue
+				}
 
-			if len(remainingObjs) > 0 {
-				err := errors.Errorf("Failed to delete backup %s. The following files remain: %v", backupTask.TaskID(), remainingObjs)
-				logrus.WithError(err).Error("Backup delete failed")
-				return err
-			}
-			return nil
-		})
+				if len(remainingObjs) > 0 {
+					err := errors.Errorf("Failed to delete backup %s. The following files remain: %v", backupTask.TaskID(), remainingObjs)
+					logrus.WithError(err).Error("Backup delete failed")
+					time.Sleep(5 * time.Second)
+					continue
+				}
 
-		if err != nil {
-			return err
+				close(r.eventTerm)
+				return
+			}
+		}()
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-r.eventTerm:
 		}
 	}
+
 	return nil
-}
-
-func retry(tries int, backoff time.Duration, f func() error) error {
-	var err error
-	for tries > 0 {
-		err = f()
-		if err == nil {
-			return nil
-		}
-		tries--
-		if tries > 0 {
-			logrus.WithError(err).Warn("Retryable")
-			time.Sleep(backoff)
-		} else {
-			logrus.WithError(err).Error("Retryable failed")
-			break
-		}
-	}
-	return err
 }
 
 func (r *Runner) backupTaskFromSharedPrefix(sharedPrefix string) *api.BackupTask {
@@ -319,15 +305,18 @@ func (r *Runner) backupTaskFromSharedPrefix(sharedPrefix string) *api.BackupTask
 }
 
 // ListBackups lists all of the available backups
-func (r *Runner) ListBackups() ([]*api.BackupTask, error) {
-	bucket := r.locationSpec.ToBucket("")
+func (r *Runner) ListBackups(ctx context.Context) ([]*api.BackupTask, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
+	bucket := r.locationSpec.ToBucket("")
 	tasks := []*api.BackupTask{}
+
 	// TODO: this is not very efficient. We don't want to scan all
 	// the keys. We can make this faster by searching for .incomplete/20
 	// and 20 key prefixes. bucket.List currently assumes the key prefix
 	// it's searching for ends in '/'
-	_, sharedPrefixes, err := bucket.List(context.TODO(), "", true)
+	_, sharedPrefixes, err := bucket.List(ctx, "", true)
 	if err != nil {
 		return nil, err
 	}
@@ -345,7 +334,7 @@ func (r *Runner) ListBackups() ([]*api.BackupTask, error) {
 			t := r.backupTaskFromSharedPrefix(prefixStr)
 			state := api.BackupTask_IN_PROGRESS
 
-			reader, err := bucket.NewReader(context.TODO(), path.Join(prefixStr, ".status"), &NoOpObjectVerifier{})
+			reader, err := bucket.NewReader(ctx, path.Join(prefixStr, ".status"), &NoOpObjectVerifier{})
 			if err != nil {
 				if IsNotExist(err) {
 					state = api.BackupTask_COMPLETED
@@ -377,10 +366,9 @@ func (r *Runner) ListBackups() ([]*api.BackupTask, error) {
 		}
 	}
 	return tasks, nil
-
 }
 
-func (r *Runner) ShowBackup(t *api.BackupTask) (*api.BackupDescription, error) {
+func (r *Runner) ShowBackup(ctx context.Context, t *api.BackupTask) (*api.BackupDescription, error) {
 	bucket := r.locationSpec.ToBucket(t.TaskID())
 	sha256, err := ShowBackupChecksum(bucket)
 	if err != nil {
@@ -393,13 +381,59 @@ func (r *Runner) ShowBackup(t *api.BackupTask) (*api.BackupDescription, error) {
 	return desc, nil
 }
 
-// RestoreBackups starts a backup restoration in a go routine and returns the
+// RunningTask returns the currently running backup task
+func (r *Runner) RunningTask(ctx context.Context) *CancellableTask {
+	if r.runningTask == nil {
+		r.clearRunningTask()
+	}
+
+	return r.runningTask
+}
+
+// Cancel cancels the currently running backup operation. If the current operation
+// is IDLE it will return an error.
+func (r *Runner) Cancel(ctx context.Context) error {
+	task := r.RunningTask(ctx)
+	if task == nil {
+		return errors.New("no configured task")
+	}
+
+	if task.Status.GetOpType() == api.BackupStatusResponse_IDLE {
+		return errors.New("unable to cancel backup operation because runner is idle")
+	}
+
+	task.Cancel()
+	r.clearRunningTask()
+
+	return nil
+}
+
+// RestoreBackup starts a backup restoration in a go routine and returns the
 // task.
-func (r *Runner) RestoreBackup() (*api.BackupRestoreTask, error) {
+func (r *Runner) RestoreBackup(
+	ctx context.Context,
+	dep *deployment.Deployment,
+	sender events.EventSender,
+	bgw LocationSpecification,
+	remote LocationSpecification,
+	rt *api.BackupRestoreTask) (*api.BackupRestoreTask, error) {
+
+	r.lockedDeployment = dep
+	r.eventSender = sender
+	r.locationSpec = bgw
+	r.restoreLocationSpec = remote
+	r.restoreTask = rt
+	r.pgConnInfo = &pg.A2ConnInfo{
+		Host:  dep.Config.GetPostgresql().GetV1().GetSys().GetService().GetHost().GetValue(),
+		Port:  uint64(dep.Config.GetPostgresql().GetV1().GetSys().GetService().GetPort().GetValue()),
+		User:  dep.Config.GetPostgresql().GetV1().GetSys().GetSuperuser().GetName().GetValue(),
+		Certs: pg.A2SuperuserCerts,
+	}
+
 	r.infof("Backup restore running")
 	r.publishBackupEvent(r.restoreTask.TaskID(), api.DeployEvent_RUNNING)
 
-	go r.startRestoreOperations()
+	go r.startRestoreOperations(ctx)
 
 	return r.restoreTask, nil
 }
@@ -408,12 +442,17 @@ func (r *Runner) RestoreBackup() (*api.BackupRestoreTask, error) {
 // manifest and builds a slice of topologically sorted services that are to be
 // restored. By restoring them in this order we ensure that any dependent
 // services are operational for each service as it is restored.
-func (r *Runner) startRestoreOperations() {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
+func (r *Runner) startRestoreOperations(ctx context.Context) {
+	var err error
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		deadline = time.Now().Add(2 * time.Hour)
+	}
+	ctx, cancel := context.WithDeadline(context.Background(), deadline)
+
 	r.eventChan = make(chan api.DeployEvent_Backup_Operation)
 	r.eventTerm = make(chan struct{})
 	r.errChan = make(chan error, 1)
-
 	defer func() {
 		cancel()
 
@@ -434,9 +473,14 @@ func (r *Runner) startRestoreOperations() {
 		r.unlockDeployment()
 		close(r.errChan)
 		close(r.eventTerm)
+		r.clearRunningTask()
 	}()
 
-	r.TaskCancellation[r.restoreTask.TaskID()] = cancel
+	r.runningTask, err = newCancellableTask(api.BackupStatusResponse_RESTORE, []string{r.restoreTask.TaskID()}, cancel)
+	if err != nil {
+		r.failf(err, "Failed to configure operation cancellation")
+		return
+	}
 
 	// Start the event publisher
 	r.startRestoreEventPublisher()
@@ -490,8 +534,7 @@ func (r *Runner) startRestoreOperations() {
 	}
 
 	r.infof("Unloading services")
-	// TODO: Make this timeout user configurable.
-	if err = r.unloadServices(desiredServices, 60*time.Second); err != nil {
+	if err = r.unloadServices(restoreCtx.ctx, desiredServices); err != nil {
 		r.failf(err, "Failed to unload services")
 		return
 	}
@@ -650,7 +693,7 @@ func (r *Runner) restoreServices(desiredServices []*deployment.Service, restoreC
 			return err
 		}
 
-		if err := r.waitForHealthy(svc.Name(), 60*time.Second); err != nil {
+		if err := r.waitForHealthy(restoreCtx.ctx, svc.Name()); err != nil {
 			r.failf(err, "Timed out waiting for service %s to start", svc.Name())
 			return err
 		}
@@ -719,14 +762,13 @@ func (r *Runner) defaultFields() logrus.Fields {
 	return fields
 }
 
-func (r *Runner) waitForHealthy(serviceName string, t time.Duration) error { // nolint:unparam
-	timeout := time.After(t)
+func (r *Runner) waitForHealthy(ctx context.Context, serviceName string) error {
 	ticker := time.NewTicker(250 * time.Millisecond)
 	defer ticker.Stop()
 	for {
 		select {
-		case <-timeout:
-			return errors.Errorf("Timed out waiting for service %s to be healthy", serviceName)
+		case <-ctx.Done():
+			return errors.Wrapf(ctx.Err(), "Timed out waiting for service %s to be healthy", serviceName)
 		case <-ticker.C:
 			status := r.target.Status(context.Background(), []string{serviceName})
 
@@ -738,7 +780,7 @@ func (r *Runner) waitForHealthy(serviceName string, t time.Duration) error { // 
 }
 
 // unloadServices unloads the services and waits for them to be down
-func (r *Runner) unloadServices(svcs []*deployment.Service, t time.Duration) error {
+func (r *Runner) unloadServices(ctx context.Context, svcs []*deployment.Service) error {
 	svcNames := []string{}
 
 	// Unload the services
@@ -750,12 +792,11 @@ func (r *Runner) unloadServices(svcs []*deployment.Service, t time.Duration) err
 		svcNames = append(svcNames, svc.Name())
 	}
 
-	timeout := time.After(t)
 	ticker := time.NewTicker(250 * time.Millisecond)
 	defer ticker.Stop()
 	for {
 		select {
-		case <-timeout:
+		case <-ctx.Done():
 			b := strings.Builder{}
 			status := r.target.Status(context.Background(), svcNames)
 
@@ -765,7 +806,7 @@ func (r *Runner) unloadServices(svcs []*deployment.Service, t time.Duration) err
 				}
 			}
 
-			return errors.Errorf("Timed out waiting for %s to unload", b.String())
+			return errors.Wrapf(ctx.Err(), "Timed out waiting for %s to unload", b.String())
 		case <-ticker.C:
 			status := r.target.Status(context.Background(), svcNames)
 
@@ -819,10 +860,41 @@ func (r *Runner) unlockDeployment() {
 	}
 }
 
-func (r *Runner) startBackupOperations() {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
+func (r *Runner) clearRunningTask() {
+	var err error
+	r.runningTask, err = newCancellableTask(api.BackupStatusResponse_IDLE, []string{}, func() {})
+	if err != nil {
+		r.failf(err, "Failed to clear running task")
+	}
+}
 
+func (r *Runner) startBackupOperations(ctx context.Context) {
+	var err error
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		deadline = time.Now().Add(2 * time.Hour)
+	}
+	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()
+
+	r.eventChan = make(chan api.DeployEvent_Backup_Operation)
+	r.eventTerm = make(chan struct{})
+	r.errChan = make(chan error, 1)
+	r.runningTask, err = newCancellableTask(api.BackupStatusResponse_CREATE, []string{r.backupTask.TaskID()}, cancel)
+	if err != nil {
+		r.failf(err, "Failed to configure operation cancellation")
+		return
+	}
+
+	// Make sure that the event publisher always exits and that any listeners
+	// on the event stream will get the task complete signal.
+	defer func() {
+		r.unlockDeployment()
+		r.eventSender.TaskComplete()
+		close(r.eventTerm)
+		r.clearRunningTask()
+	}()
+
 	backupCtx := NewContext(
 		WithContextCtx(ctx),
 		WithContextBackupLocationSpecification(r.locationSpec),
@@ -832,17 +904,6 @@ func (r *Runner) startBackupOperations() {
 		WithContextConnFactory(r.connFactory),
 		WithContextReleaseManifest(r.releaseManifest),
 	)
-	r.eventChan = make(chan api.DeployEvent_Backup_Operation)
-	r.eventTerm = make(chan struct{})
-	r.errChan = make(chan error, 1)
-
-	// Make sure that the event publisher always exits and that any listeners
-	// on the event stream will get the task complete signal.
-	defer r.unlockDeployment()
-	defer r.eventSender.TaskComplete()
-	defer close(r.eventTerm)
-
-	r.TaskCancellation[r.backupTask.TaskID()] = cancel
 
 	// Start the event publisher
 	r.startBackupEventPublisher()
