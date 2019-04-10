@@ -581,9 +581,22 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
+	}
+
+	doesIntersect, err := checkIfRoleIntersectsProjectsFilter(ctx, tx, role.ID, projectsFilter)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+	if !doesIntersect {
+		return nil, storage_errors.ErrNotFound
 	}
 
 	row := tx.QueryRowContext(ctx,
@@ -627,6 +640,28 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 	}
 
 	return role, nil
+}
+
+func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
+	id string, projectsFilter []string) (bool, error) {
+
+	// If no filter was specified, do not filter.
+	if len(projectsFilter) == 0 {
+		return true, nil
+	}
+
+	row := q.QueryRowContext(ctx,
+		`SELECT array_agg(rp.project_id) && $2 AS intersection FROM iam_roles AS r
+    	LEFT OUTER JOIN iam_role_projects AS rp ON rp.role_id=r.db_id
+    	WHERE r.id = $1 AND rp.role_id IS NOT NULL GROUP BY rp.project_id;`,
+		id, pq.Array(projectsFilter))
+
+	var result bool
+	err := row.Scan(&result)
+	if err != nil {
+		return false, err
+	}
+	return result, nil
 }
 
 // queryRole returns a role based on id or an error.
