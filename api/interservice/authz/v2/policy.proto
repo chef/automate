@@ -12,6 +12,7 @@ message Policy {
     Type type = 3;
     repeated string members = 4;
     repeated Statement statements = 5;
+    repeated string projects = 6;
 }
 
 message Role {
@@ -34,6 +35,14 @@ message CreatePolicyReq {
         }
        }];
     repeated Statement statements = 4;
+    repeated string projects = 5 [(validate.rules).repeated = {
+        unique: true,
+        items: {
+            string: {
+                pattern: "^[a-z0-9-]{1,64}$"
+            }
+        }
+       }];
 }
 
 message DeletePolicyReq {
@@ -88,6 +97,14 @@ message UpdatePolicyReq {
        }];
     repeated Statement statements = 3;
     string name = 8;
+    repeated string projects = 9 [(validate.rules).repeated = {
+        unique: true,
+        items: {
+            string: {
+                pattern: "^[a-z0-9-]{1,64}$"
+            }
+        }
+       }];
 }
 
 message ReplacePolicyMembersReq {

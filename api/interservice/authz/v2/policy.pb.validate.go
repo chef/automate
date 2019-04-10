@@ -248,6 +248,29 @@ func (m *CreatePolicyReq) Validate() error {
 
 	}
 
+	_CreatePolicyReq_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
+
+	for idx, item := range m.GetProjects() {
+		_, _ = idx, item
+
+		if _, exists := _CreatePolicyReq_Projects_Unique[item]; exists {
+			return CreatePolicyReqValidationError{
+				field:  fmt.Sprintf("Projects[%v]", idx),
+				reason: "repeated value must contain unique items",
+			}
+		} else {
+			_CreatePolicyReq_Projects_Unique[item] = struct{}{}
+		}
+
+		if !_CreatePolicyReq_Projects_Pattern.MatchString(item) {
+			return CreatePolicyReqValidationError{
+				field:  fmt.Sprintf("Projects[%v]", idx),
+				reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -308,6 +331,8 @@ var _ interface {
 var _CreatePolicyReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
 
 var _CreatePolicyReq_Members_Pattern = regexp.MustCompile("^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$")
+
+var _CreatePolicyReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
 
 // Validate checks the field values on DeletePolicyReq with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -840,6 +865,29 @@ func (m *UpdatePolicyReq) Validate() error {
 
 	// no validation rules for Name
 
+	_UpdatePolicyReq_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
+
+	for idx, item := range m.GetProjects() {
+		_, _ = idx, item
+
+		if _, exists := _UpdatePolicyReq_Projects_Unique[item]; exists {
+			return UpdatePolicyReqValidationError{
+				field:  fmt.Sprintf("Projects[%v]", idx),
+				reason: "repeated value must contain unique items",
+			}
+		} else {
+			_UpdatePolicyReq_Projects_Unique[item] = struct{}{}
+		}
+
+		if !_UpdatePolicyReq_Projects_Pattern.MatchString(item) {
+			return UpdatePolicyReqValidationError{
+				field:  fmt.Sprintf("Projects[%v]", idx),
+				reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -900,6 +948,8 @@ var _ interface {
 var _UpdatePolicyReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
 
 var _UpdatePolicyReq_Members_Pattern = regexp.MustCompile("^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$")
+
+var _UpdatePolicyReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
 
 // Validate checks the field values on ReplacePolicyMembersReq with the rules
 // defined in the proto definition for this message. If any rules are
