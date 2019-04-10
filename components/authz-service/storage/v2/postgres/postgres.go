@@ -70,6 +70,11 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 		return nil, p.processError(err)
 	}
 
+	err = p.insertPolicyProjectsWithQuerier(ctx, pol.ID, pol.Projects, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	err = p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, tx)
 	if err != nil {
 		return nil, p.processError(err)

@@ -1,7 +1,5 @@
-ALTER TABLE iam_policies ADD COLUMN db_id SERIAL unique;
-
 CREATE TABLE iam_policy_projects (
-  policy_id INTEGER REFERENCES iam_policies (db_id) ON DELETE CASCADE,
+  policy_id TEXT REFERENCES iam_policies ON DELETE CASCADE,
   project_id TEXT REFERENCES iam_projects ON DELETE CASCADE,
   PRIMARY KEY (policy_id, project_id)
 );
@@ -48,7 +46,7 @@ CREATE OR REPLACE FUNCTION
       ( SELECT COALESCE(json_agg(proj.id) FILTER ( WHERE proj.id IS NOT NULL), '[]')
         FROM iam_policy_projects AS pol_projs
         LEFT OUTER JOIN iam_projects AS proj ON pol_projs.project_id = proj.id
-        WHERE pol_projs.policy_id = pol.db_id
+        WHERE pol_projs.policy_id = pol.id
       ) AS projects
     FROM iam_policies as pol
     WHERE pol.id = _policy_id
