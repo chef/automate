@@ -713,7 +713,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		startTime string
 	)
 
-	deDupFilters(filters)
+	utils.DeDupFilters(filters)
 
 	typeQuery := elastic.NewTypeQuery(mappings.DocType)
 
@@ -826,7 +826,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 //			filters - is a map of filters that serve as the source for generated es query filters
 //    return *elastic.BoolQuery
 func (backend ES2Backend) getFiltersQueryForDeepReport(reportId string, filters map[string][]string) *elastic.BoolQuery {
-	deDupFilters(filters)
+	utils.DeDupFilters(filters)
 	typeQuery := elastic.NewTypeQuery(mappings.DocType)
 
 	boolQuery := elastic.NewBoolQuery()

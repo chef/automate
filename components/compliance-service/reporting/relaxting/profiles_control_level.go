@@ -44,7 +44,7 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 	var counts *reportingapi.ProfileCounts
 
 	if aggRoot, found := depth.unwrap(&searchResult.Aggregations); found {
-		if impactBuckets, found := aggRoot.Aggregations.Terms("impact"); found {
+		if impactBuckets, found := aggRoot.Aggregations.Terms("impact"); found && len(impactBuckets.Buckets) > 0 {
 			summary := stats.ProfileList{}
 			//there can only be one
 			impact := impactBuckets.Buckets[0]
@@ -72,12 +72,15 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 				summary.Skipped = int32(skippedResult.DocCount)
 			}
 			if profileResult, found := impact.Aggregations.ReverseNested("profile"); found {
-				if profileInfoResult, found := profileResult.Terms("profile-info"); found {
+				if profileInfoResult, found := profileResult.Terms("profile-info"); found &&
+					len(profileInfoResult.Buckets) > 0 {
+
 					profileInfoBucket := profileInfoResult.Buckets[0]
 					name := profileInfoBucket.KeyNumber
 					summary.Name = string(name)
 
-					if profileShaResult, found := profileInfoBucket.Terms("sha"); found {
+					if profileShaResult, found := profileInfoBucket.Terms("sha"); found &&
+						len(profileShaResult.Buckets) > 0 {
 						sha := profileShaResult.Buckets[0].KeyNumber
 						summary.Id = string(sha)
 					}

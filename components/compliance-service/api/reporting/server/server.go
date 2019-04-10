@@ -288,6 +288,7 @@ func formatFilters(filters []*reporting.ListFilter) map[string][]string {
 	for _, filter := range filters {
 		formattedFilters[filter.Type] = append(formattedFilters[filter.Type], filter.Values...)
 	}
+	utils.DeDupFilters(formattedFilters)
 	return formattedFilters
 }
 
