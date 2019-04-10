@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package chef.automate.domain.license_control;
+option go_package = "github.com/chef/automate/api/interservice/license_control";
+
+import "google/protobuf/timestamp.proto";
+import "github.com/chef/automate/lib/license/license.proto";
+
+service LicenseControl {
+  rpc License (LicenseRequest) returns (LicenseResponse);
+  rpc Policy (PolicyRequest) returns (PolicyResponse);
+  rpc Status (StatusRequest) returns (StatusResponse);
+  rpc Update (UpdateRequest) returns (UpdateResponse);
+  rpc Telemetry (TelemetryRequest) returns (TelemetryResponse);
+}
+
+message LicenseRequest {
+}
+
+message LicenseResponse {
+  license.License license = 1;
+}
+
+message PolicyRequest {
+}
+
+message PolicyResponse {
+  Policy Policy = 1;
+}
+
+message Policy {
+  string license_id                       = 1;
+  bool valid                              = 2;
+  repeated Capability capabilities        = 3;
+  map<string,string> rules                = 4;
+  google.protobuf.Timestamp configured_at = 5;
+}
+
+message Capability {
+  string name    = 1; // ComplianceReporting
+  string measure = 2; // nodes
+  sint64 limit   = 3; // 50
+
+  google.protobuf.Timestamp start = 4; // date capability becomes active
+  google.protobuf.Timestamp end   = 5; // date capability is no longer active
+}
+
+message StatusRequest {
+}
+
+message StatusResponse {
+	string license_id = 1;
+	google.protobuf.Timestamp configured_at = 2;
+	DateRange licensed_period = 3;
+	string customer_name = 4;
+}
+
+message DateRange {
+  google.protobuf.Timestamp start = 1;
+  google.protobuf.Timestamp end   = 2;
+}
+
+message UpdateRequest {
+	string license_data = 1;
+	bool   force = 2;
+}
+
+message UpdateResponse {
+	bool   updated = 1;
+	string message = 2;
+	bool   duplicate = 3;
+}
+
+message TelemetryRequest {
+}
+
+message TelemetryResponse {
+  bool telemetry_enabled = 1;
+  string telemetry_url = 2;
+}

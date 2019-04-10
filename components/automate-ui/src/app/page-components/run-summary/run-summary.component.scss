@@ -1,0 +1,82 @@
+@import "~styles/variables";
+
+.node-run-message {
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: bold;
+
+  chef-button {
+    margin: 0 0 0 1em;
+  }
+}
+
+.node-run-summary {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  border-radius: $global-radius;
+  background: $chef-white;
+  box-shadow: 0 0 24px 0 rgba(63, 83, 100 , 0.2);
+
+  .flex-block {
+    padding: 0 30px;
+  }
+
+  .node-info-column {
+    border-left: 1px solid $chef-light-grey;
+  }
+
+  .run-metadata {
+    display: flex;
+    font-size: 13px;
+
+    .label {
+      font-weight: bold;
+      color: $chef-dark-grey;
+      width: 120px;
+      padding-right: 20px;
+      padding-bottom: 0;
+    }
+  }
+
+  @media (max-width: 1600px) {
+    .run-metadata {
+      flex-wrap: wrap;
+    }
+  }
+}
+
+@media (max-width: 1120px) {
+  .node-run-summary {
+    flex-wrap: wrap;
+  }
+}
+
+chef-radial-chart {
+  width: 200px;
+  height: 200px;
+
+  ::ng-deep .success {
+    color: $chef-success;
+  }
+
+  ::ng-deep .failure {
+    color: $chef-critical;
+  }
+
+  ::ng-deep .other {
+    color: $chef-grey;
+  }
+
+  ::ng-deep .innerText {
+    font-size: 13px;
+    font-weight: bold;
+    color: $chef-dark-grey;
+  }
+
+  ::ng-deep .chart-label-number {
+    display: block;
+    font-size: 16px;
+    color: $chef-success;
+  }
+}

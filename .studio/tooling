@@ -1,0 +1,107 @@
+#!/bin/bash
+#
+# This file is meant to have wrapper functions for all our dev tooling,
+# the main idea is to create functions that will install the binary if it
+# doesn't already exist. Then call the underlying binary. (a wrapper :smile:)
+
+document "grpcurl" <<DOC
+  Like cURL, but for gRPC: Command-line tool for interacting with gRPC servers
+
+  Example: List the GRPC functions for the config-mgmt-service
+  ----------------------------------------------------
+  $ grpcurl --insecure -cert dev/certs/config-mgmt-service.crt -key dev/certs/config-mgmt-service.key localhost:1234 list service.CfgMgmt
+
+  For more documentation go to: https://github.com/fullstorydev/grpcurl#grpcurl
+DOC
+function grpcurl() {
+  local TOOL_BIN
+  TOOL_BIN=$(type -P grpcurl);
+  if [[ "x${TOOL_BIN}" == "x" ]]; then
+    install_if_missing core/grpcurl grpcurl;
+    TOOL_BIN=$(type -P grpcurl);
+  fi;
+  $TOOL_BIN "$@"
+}
+
+document "dep" <<DOC
+  Go dependency management tool.
+
+  For more documentation go to: https://golang.github.io/dep/docs/FAQ.html
+DOC
+function dep() {
+  local TOOL_BIN
+  TOOL_BIN=$(type -P dep);
+  if [[ "x${TOOL_BIN}" == "x" ]]; then
+    install_if_missing "core/dep/$GO_DEP_VERSION" dep;
+    TOOL_BIN=$(type -P dep);
+  fi;
+  $TOOL_BIN "$@"
+}
+
+function ps() {
+  install_if_missing core/procps-ng ps;
+  TOOL_BIN=$(type -P ps);
+  $TOOL_BIN "$@"
+}
+
+document "channel_contains_commit" <<DOC
+  Given a "commit-ish" git identifier, it shows which channels (dev, acceptance, current) the commit is present in.
+DOC
+function channel_contains_commit() {
+    commit=$1
+
+    install_if_missing core/jq-static jq
+    install_if_missing core/curl curl
+    install_if_missing core/git git
+
+    dev=$(curl https://packages.chef.io/manifests/dev/automate/latest.json 2>/dev/null | jq -r '.git_sha')
+    current=$(curl https://packages.chef.io/manifests/current/automate/latest.json 2>/dev/null | jq -r '.git_sha')
+    acceptance=$(curl https://packages.chef.io/manifests/acceptance/automate/latest.json 2>/dev/null | jq -r '.git_sha')
+
+    if git merge-base --is-ancestor "$commit" "$dev"; then
+        echo -e '       dev: \033[0;32m✓\033[0m'
+    else
+        echo -e '       dev: \033[0;91m✗\033[0m'
+    fi
+
+    if git merge-base --is-ancestor "$commit" "$acceptance"; then
+        echo -e 'acceptance: \033[0;32m✓\033[0m'
+    else
+        echo -e 'acceptance: \033[0;91m✗\033[0m'
+    fi
+
+    if git merge-base --is-ancestor "$commit" "$current"; then
+        echo -e '   current: \033[0;32m✓\033[0m'
+    else
+        echo -e '   current: \033[0;91m✗\033[0m'
+    fi
+}
+
+
+document "get_release_diff_url" <<DOC
+  Provides the latest github URL for commits that are in acceptance but not released.
+
+  Here is an example URL https://github.com/chef/automate/compare/4ede7d8bdc20eb84bc803f0de5f8c5ac67709905...dda2a1c5116857ed4d9774e1b11879a6dd3aa596
+DOC
+function get_release_diff_url()
+{
+    install_if_missing core/jq-static jq
+    install_if_missing core/curl curl
+    current=$(curl https://packages.chef.io/manifests/current/automate/latest.json 2>/dev/null | jq -r '.git_sha')
+    acceptance=$(curl https://packages.chef.io/manifests/acceptance/automate/latest.json 2>/dev/null | jq -r '.git_sha')
+
+    echo "https://github.com/chef/automate/compare/$current...$acceptance"
+}
+
+document "generate_expeditor_config" <<DOC
+  Generate an updated expeditor config.
+DOC
+function generate_expeditor_config()
+{
+  (
+    setup_go_workspace
+    enter_go_workspace
+    echo "Generating updated expeditor config. It takes a couple of minutes."
+    go run ./tools/expeditor-config-gen/main.go
+  )
+}

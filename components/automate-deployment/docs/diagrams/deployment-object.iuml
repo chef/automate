@@ -1,0 +1,38 @@
+@startuml
+object "Hooli Production" as deployment {
+  type = "Deployment"
+}
+object "HA-SSH" as hassh {
+    type = "Topology"
+}
+object "Automate Host A" as automatea {
+    type = "Target"
+    provisioner = "SSH"
+}
+object "automate-ui" as aui {
+    type = "Service"
+}
+object "automate-ui-config" as auicfg {
+    type = "Configuration"
+}
+object "Automate Host B" as automateb {
+    type = "Target"
+    provisioner = "SSH"
+}
+object "config-mgmt-service" as cosvc {
+    type = "Service"
+}
+object "config-mgmt-service-config" as cosvcc {
+    type = "Configuration"
+}
+
+deployment --> hassh
+hassh --> automatea
+hassh --> automateb
+
+automatea --> aui
+aui --> auicfg
+
+automateb --> cosvc
+cosvc --> cosvcc
+@enduml

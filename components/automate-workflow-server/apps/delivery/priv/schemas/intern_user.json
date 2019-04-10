@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string",
+            "required": true,
+            "minLength": 1
+        },
+        "user_type": {
+            "type": "string",
+            "required": true
+        },
+        "first": {
+            "type": "string",
+            "minLength": 1
+        },
+        "last": {
+            "type": "string",
+            "minLength": 1
+        },
+        "email": {
+            "type": "string",
+            "minLength": 5
+        },
+        "ssh_pub_key": {
+            "type": "string"
+        },
+        "telemetry_enabled": {
+            "type": [ "boolean", "null" ]
+        },
+        "_links" :{
+            "type": "object"
+        }
+    }
+}

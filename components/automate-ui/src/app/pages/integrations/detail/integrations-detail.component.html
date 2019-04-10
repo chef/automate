@@ -1,0 +1,64 @@
+<app-admin-sidebar></app-admin-sidebar>
+<div class="container" *ngIf="(managerDetail$ | async) as managerDetail">
+  <main *ngIf="managerDetail.manager">
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/settings/node-integrations']">Node Integrations</chef-breadcrumb>
+      Node Manager: {{ managerDetail.manager.name }}
+    </chef-breadcrumbs>
+
+    <chef-page-header>
+      <chef-heading>{{ managerDetail.manager.name }}</chef-heading>
+
+      <table id="manager-info">
+        <thead>
+          <tr>
+            <th>Manager</th>
+            <th>Status</th>
+            <th>Node Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ managerDetail.manager.type }}</td>
+            <td>{{ managerDetail.manager.status }}</td>
+            <td>{{ managerDetail.managerNodesTotal }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <chef-tab-selector id="manager-tabs" value="nodes">
+        <chef-option value="nodes">Nodes</chef-option>
+        <!-- TODO: Configuration tab for external nodemanagers -->
+        <!-- <chef-option value="config">Configuration</chef-option> -->
+      </chef-tab-selector>
+    </chef-page-header>
+
+    <div class="page-body">
+      <chef-table id="manager-nodes-list">
+        <chef-thead>
+          <chef-tr>
+            <chef-th>Name</chef-th>
+            <chef-th>Platform</chef-th>
+            <chef-th>Status</chef-th>
+          </chef-tr>
+        </chef-thead>
+        <chef-tbody>
+          <chef-tr *ngFor="let node of managerDetail.managerNodes">
+            <chef-td>{{ node.name }}</chef-td>
+            <chef-td>{{ node.platform }}</chef-td>
+            <chef-td>{{ node.status }}</chef-td>
+          </chef-tr>
+        </chef-tbody>
+      </chef-table>
+
+      <app-page-picker
+        class="manager-nodes-list-paging"
+        [total]="managerDetail.managerNodesTotal"
+        [perPage]="managerDetail.managerNodesPerPage"
+        [page]="managerDetail.managerNodesPage"
+        (pageChanged)="onPageChanged($event)">
+      </app-page-picker>
+    </div>
+
+  </main>
+</div>

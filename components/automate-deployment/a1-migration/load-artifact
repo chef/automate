@@ -1,0 +1,78 @@
+#!/bin/bash
+
+set -ex
+
+automate-ctl stop
+chef-server-ctl stop
+
+## mitigate intermittent "Unable to spawn Supervisor, Text file busy (os error 26)" error
+(hab sup run || sleep 5; hab sup run || sleep 5; hab sup run) &
+
+set +x
+until hab svc status &> /dev/null; do
+  sleep 1
+done
+set -x
+
+## This package contains data with es2 indices in it so we test the reindex
+## code path
+## see https://chefio.atlassian.net/wiki/spaces/ENG/pages/455147533/Migrating+A1+Elasticsearch+data
+## and https://drive.google.com/open?id=1dtdt8kRXywDAE9G03WX7a3mWQoAWsYY1
+DATA_PACKAGE_RELEASE="20181210102316"
+# hab pkg install /a1-migration/results/devchef-a1-migration-data-full-0.0.1-${DATA_PACKAGE_RELEASE}-x86_64-linux.hart
+hab pkg install "devchef/a1-migration-data-full/0.0.1/$DATA_PACKAGE_RELEASE" --channel unstable
+hab svc load "devchef/a1-migration-data-full/0.0.1/$DATA_PACKAGE_RELEASE" &
+
+echo "waiting for migration data to sync..."
+
+until [[ -f /etc/delivery/.a1-migration-data-ready ]]; do
+  # print dots?
+  ls /etc/delivery || true
+  sleep 1
+done
+
+echo "done!"
+
+# kill off the data package, lest it be resurrected and break things at a bad time
+hab svc unload devchef/a1-migration-data-full
+
+# Kill off our background job and the hab-launcher as well. This
+# appears necessary as of hab-launcher 8282/hab 0.62.1
+kill %1
+kill "$(cat /hab/sup/default/LOCK)"
+
+# Wait for the supervisor tree to die and any open file handles to free up.
+sleep 5
+
+# In case our a1 artifact has an old license in it
+[[ ! -d /var/opt/delivery/license ]] && mkdir -p /var/opt/delivery/license
+cp /a1-migration/delivery.license /var/opt/delivery/license/delivery.license
+
+# loading the data can leave us with incorrect rabbit password among other
+# things, reconfigure fixes it
+automate-ctl reconfigure
+
+# reconfigure doesn't start statistics service tho?
+automate-ctl start
+
+chef-server-ctl reconfigure
+chef-server-ctl start
+
+function wait_for_healthy_status() {
+  for attempt in {1..4}; do
+    if curl -skL "$1" && curl -skL "$1" | grep pong && curl -skL "$1" | grep -v fail; then
+      break
+    fi
+
+    if [ $attempt -eq 4 ]; then
+      echo "Timed out waiting for healhty status for $1"
+      exit 1
+    fi
+
+    sleep $(( attempt**attempt ))
+  done
+}
+
+# Wait for A1 and Chef server to come up healthy
+wait_for_healthy_status https://localhost/api/_status
+wait_for_healthy_status https://localhost/_status

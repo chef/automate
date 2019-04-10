@@ -1,0 +1,25 @@
+<app-admin-sidebar></app-admin-sidebar>
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/settings/node-integrations']">Node Integrations</chef-breadcrumb>
+      Add new
+    </chef-breadcrumbs>
+
+    <chef-page-header>
+      <chef-heading>Add a new cloud management service</chef-heading>
+      <chef-subheading>Select a cloud management service and add your credentials for the account.</chef-subheading>
+      <div slot="header-buttons">
+        <chef-button primary [disabled]="!integrationsForm.valid || isSaving()" (click)="handleSave()">Save Integration</chef-button>
+        <chef-button tertiary [routerLink]="['/settings/node-integrations']">Cancel</chef-button>
+      </div>
+    </chef-page-header>
+
+    <div class="page-body">
+      <chef-loading-spinner *ngIf="isSaving()" size="50"></chef-loading-spinner>
+
+      <app-integrations-form [integrationsForm]="integrationsForm"></app-integrations-form>
+    </div>
+
+  </main>
+</div>

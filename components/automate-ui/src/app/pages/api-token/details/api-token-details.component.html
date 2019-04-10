@@ -1,0 +1,48 @@
+<app-admin-sidebar></app-admin-sidebar>
+
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/settings/tokens']">API Tokens</chef-breadcrumb>
+      {{ token?.name }}
+    </chef-breadcrumbs>
+    <chef-page-header>
+      <chef-heading>{{ token?.name }}</chef-heading>
+      <table>
+        <thead>
+          <tr class="detail-row">
+            <th class="header-column">ID</th>
+            <th class="header-column">Date Created</th>
+            <th class="header-column">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="detail-row">
+            <td class="header-column">{{ token?.id }}</td>
+            <td class="header-column">{{ token?.created_at | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</td>
+            <td class="header-column">{{ status }}</td>
+          </tr>
+        </tbody>
+      </table>
+        <chef-tab-selector [value]="tabValue">
+          <chef-option value='details'>Details</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+    <section class="page-body">
+      <form [formGroup]="updateNameForm">
+        <chef-form-field>
+          <label>Name *</label>
+          <input chefInput formControlName="name" type="text" (keyup)="handleNameChange()">
+        </chef-form-field>
+      </form>
+      <chef-button primary [disabled]="disableSave || saveInProgress" (click)="saveNameChange()">
+        <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+        <ng-container *ngIf="!saveInProgress">
+          <span *ngIf="disableSave">Saved</span>
+          <span *ngIf="!disableSave">Save</span>
+        </ng-container>
+        <span *ngIf="saveInProgress">Saving...</span>
+      </chef-button>
+    </section>
+  </main>
+</div>

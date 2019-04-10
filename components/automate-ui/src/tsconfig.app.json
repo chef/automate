@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/app",
+    "baseUrl": "./",
+    "module": "es2015"
+  },
+  "exclude": [
+    "test.ts",
+    "wallabyTest.ts",
+    "**/*.spec.ts",
+    "**/*.mock.ts",
+    "assets/chef-ui-library/**/*.*"
+  ],
+  "angularCompilerOptions": {
+    "preserveWhitespaces": true
+  }
+}

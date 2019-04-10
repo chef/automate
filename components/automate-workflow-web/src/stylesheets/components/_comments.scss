@@ -1,0 +1,237 @@
+.comments {
+  list-style: none;
+  padding: 0;
+  margin: .5rem 0;
+  overflow: hidden;
+  background: $white;
+
+  li {
+    display: block;
+    clear: both;
+  }
+
+  .comments {
+    padding: 0 0 0 50px;
+    overflow: visible;
+  }
+}
+
+.comment {
+
+  &.ng-enter {
+    transition: all 0.4s;
+    opacity: 0;
+  }
+
+  &.ng-enter-active {
+    opacity: 1;
+  }
+
+  .comment-container {
+    position: relative;
+    padding-left: 50px;
+    margin: 10px 0;
+    clear: both;
+
+    .comment-actions {
+      padding-left: 5px;
+      display: inline-block;
+
+      .button {
+        width: auto;
+        background-color: transparent;
+        margin-top: -9px;
+      }
+    }
+  }
+
+  .comment-author {
+    display: block;
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    text-decoration: none;
+    left: 0;
+    top: 0;
+    background: $chef-blue-dark;
+    color: $white;
+    border-radius: 50%;
+  }
+
+  .comment-body {
+    padding: .5rem 1rem;
+    border: 1px solid $gray-pale;
+    color: $gray;
+    border-radius: $global-radius;
+    font-size: .875rem;
+
+    p {
+      margin: 0 0 1rem;
+    }
+  }
+
+  .active .comment-body {
+    background: darken($white, 4%);
+    border-color: $gray;
+  }
+
+  .comment-header {
+    overflow: hidden;
+  }
+
+  .comment-text {
+    margin: .5rem 0;
+    padding: .5rem;
+    border: 1px solid $gray-pale;
+    border-radius: $global-radius;
+    color: $chef-blue-dark;
+    background-color: $gray-less-pale;
+  }
+
+  .comment-meta {
+    float: left;
+  }
+
+  .comment-collapse {
+    float: right;
+    text-decoration: none;
+    color: gray;
+
+    .icon {
+      @extend .icon-circle-dash;
+    }
+  }
+
+  .comment-footer {
+    overflow: hidden;
+  }
+
+  .comment-reply-form {
+    margin-top: 10px;
+
+
+    /* While !important is typically a no-no,
+       we were unable to find a way around it.
+       We should remove this in a future refactor
+       of the CSS.
+    */
+    margin-left: 1rem !important;
+    max-width: 100% !important;
+    width: 100% !important;
+
+    textarea {
+      margin: 0;
+      width: 100%;
+      max-width: 100%;
+      border: 1px solid $lightgray;
+    }
+
+    .reply-form-footer {
+      overflow: hidden;
+      margin-top: 10px;
+
+      .btn-secondary {
+        float: right;
+      }
+
+      button + button {
+        margin-left: .5rem;
+      }
+    }
+  }
+
+  &.collapsed {
+
+    .comment-text,
+    .comment-footer,
+    .comment-reply-form,
+    .comments {
+      display: none;
+    }
+
+    .comment-collapse .icon {
+      @extend .icon-circle-plus;
+    }
+  }
+}
+
+.comment-form {
+  margin-top: 2rem;
+  padding: 0 0 1rem 0;
+  border-top: 1px solid $gray-pale;
+
+  /* While !important is typically a no-no,
+     we were unable to find a way around it.
+     We should remove this in a future refactor
+     of the CSS.
+  */
+  form {
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    width: 100% !important;
+    float: none !important;
+  }
+
+  textarea {
+    margin: 0 0 1rem 0;
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid $lightgray;
+  }
+
+  .ace_editor {
+    margin: 0;
+  }
+
+  .controls {
+    margin-top: 1rem;
+    overflow: hidden;
+  }
+
+  [cd-markdown] {
+    padding: 0;
+  }
+}
+
+.line-comments {
+  background: $white;
+  border: 1px solid lightgray;
+  font-family: $helvetica;
+  font-size: 14px;
+  white-space: normal;
+  margin: 7px -8px -5px -8px;
+
+  .line-comments-header {
+    padding: 15px 15px 0 15px;
+    overflow: hidden;
+
+    h4 {
+      float: left;
+      margin: 0;
+      font-weight: 300;
+      text-transform: uppercase;
+      color: lighten($darkblue, 10%);
+      line-height: 20px;
+    }
+
+    .close {
+      display: block;
+      float: right;
+      text-decoration: none;
+      color: inherit;
+      font-size: 20px;
+    }
+  }
+
+  > .comments {
+    padding: 0 5px;
+    font-size: 14px;
+  }
+
+  .comment-form {
+    padding: 5px 15px 15px 15px;
+  }
+}

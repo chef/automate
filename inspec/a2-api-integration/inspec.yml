@@ -1,0 +1,11 @@
+name: a2-api-integration
+title: InSpec Automate REST API Integration Profile
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: engineering@chef.io
+license: All Rights Reserved
+summary: An InSpec profile for integration testing Automate's REST API
+version: 0.1.0
+depends:
+  - name: a2-resource-pack
+    path: ../a2-resource-pack

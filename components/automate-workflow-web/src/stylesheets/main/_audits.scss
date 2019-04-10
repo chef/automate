@@ -1,0 +1,34 @@
+.automate-ui {
+
+  .audit-filter {
+    margin: 20px 0;
+  }
+}
+
+.audit-filter {
+  vertical-align: middle;
+  position: relative;
+  width: 400px;
+  height: 31px;
+  margin-bottom: 14px;
+
+  input.filter {
+    position: absolute;
+    left: 0;
+  }
+
+  .button.tiny.square {
+    position: absolute;
+    width: auto;
+    height: auto;
+    top: 7px;
+    right: 5px;
+    padding: 1px 3px 2px 2px;
+  }
+}
+
+.audit-container {
+  padding: 0 2em 1.5em;
+
+  @extend %table-base;
+}

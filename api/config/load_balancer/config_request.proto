@@ -1,0 +1,105 @@
+// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
+syntax = "proto3";
+
+package chef.automate.infra.load_balancer;
+option go_package = "github.com/chef/automate/api/config/load_balancer";
+
+import "api/config/shared/global.proto";
+import "api/config/shared/tls.proto";
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+message ConfigRequest {
+  option (chef.automate.api.service_config) = {name: "automate-load-balancer"};
+
+	reserved 1 to 2;
+
+	V1 v1 = 3;
+
+	message V1 {
+		System sys = 1;
+		Service svc =  2;
+
+		// The load balancer is an infrastructure service so we're going to configure
+		// it via hab. Therefore, it's configuration will live in the System struct.
+		message System {
+			chef.automate.infra.config.Mlsa mlsa = 1;
+			chef.automate.infra.config.TLSCredentials tls = 2;
+			Service service = 3;
+			Logger log = 4;
+			Nginx ngx = 5;
+			chef.automate.infra.config.Proxy proxy = 6;
+			repeated chef.automate.infra.config.FrontendTLSCredential frontend_tls = 7;
+
+			message Service {
+				google.protobuf.StringValue host = 1;
+				google.protobuf.Int32Value https_port = 2 [ (chef.automate.api.port) = { name: "https", default: 443, protocol: "https" } ];
+				google.protobuf.Int32Value http_port = 3 [ (chef.automate.api.port) = { name: "http", default: 80, protocol: "http" } ];
+				google.protobuf.StringValue external_fqdn = 4;
+				google.protobuf.BoolValue maintenance_mode = 5;
+			}
+
+			message Logger {
+				google.protobuf.StringValue level = 1;
+			}
+
+			message Nginx {
+				// We've omitted the 'server', 'location', 'upstream' and other
+				// smaller sub-contexts because they are always contained within
+				// another context and are either not generalizable or can have
+				// a default within a parent context.
+				Main main = 1;
+				Events events = 2;
+				Http http = 3;
+				Mail mail = 4;
+
+				message Main {
+					google.protobuf.Int32Value worker_processes = 1;
+					google.protobuf.StringValue error_log = 2;
+				}
+
+				message Events {
+					google.protobuf.Int32Value worker_connections = 1;
+					// use $worker_processor_method;
+					google.protobuf.StringValue worker_processor_method = 2;
+					google.protobuf.StringValue multi_accept = 3;
+				}
+
+				message Http {
+					google.protobuf.StringValue access_log = 1;
+					google.protobuf.StringValue access_log_buffer_size = 2;
+					google.protobuf.StringValue access_log_flush_time = 3;
+					google.protobuf.StringValue client_max_body_size = 20;
+					google.protobuf.StringValue client_body_buffer_size = 23;
+					google.protobuf.StringValue default_type = 4;
+					google.protobuf.Int32Value keepalive_timeout = 5;
+					google.protobuf.Int32Value keepalive_requests = 6;
+					google.protobuf.StringValue gzip = 7;
+					google.protobuf.StringValue gzip_comp_level = 8;
+					google.protobuf.StringValue gzip_disable = 9;
+					google.protobuf.StringValue gzip_http_version = 10;
+					google.protobuf.Int32Value gzip_min_length = 11;
+					google.protobuf.StringValue gzip_proxied = 12;
+					google.protobuf.StringValue gzip_types = 13;
+					google.protobuf.StringValue gzip_vary = 14;
+					google.protobuf.StringValue large_client_header_buffers_size = 21;
+					google.protobuf.Int32Value large_client_header_buffers_number = 22;
+					google.protobuf.StringValue sendfile = 15;
+					google.protobuf.StringValue ssl_ciphers = 16;
+					google.protobuf.StringValue ssl_protocols = 17;
+					google.protobuf.StringValue tcp_nodelay = 18;
+					google.protobuf.StringValue tcp_nopush = 19;
+
+					// Auto-calculated
+					google.protobuf.BoolValue ipv6_supported = 24;
+				}
+
+				message Mail {
+				}
+			}
+		}
+
+		message Service {
+		}
+	}
+}

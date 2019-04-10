@@ -1,0 +1,90 @@
+# If we have a config pointing to an specific host,
+# lets use it, otherwise use the ipaddress of the server
+{{~#if cfg.service.host}}
+host = "{{cfg.service.host}}"
+{{else~}}
+host = "{{sys.ip}}"
+{{~/if}}
+port = "{{cfg.service.port}}"
+log_level = "{{cfg.log.level}}"
+
+# Listen to what our gossip protocol whispers
+#
+# We have modified our plan to have a hard dependency to
+# elasticsearch, that will ensure that we will always start
+# our service with the required bindings
+#
+# Elasticsearch
+{{~#eachAlive bind.automate-es-gateway.members as |gwmember|}}
+  {{~#if @last}}
+    {{~#if gwmember.cfg.http-host}}
+elasticsearch_url = "http://{{gwmember.sys.ip}}:{{gwmember.cfg.http-port}}"
+    {{else}}
+elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
+    {{~/if}}
+  {{~/if}}
+{{~/eachAlive}}
+
+{{~#eachAlive bind.automate-elasticsearch.members as |member|}}
+  {{~#if @last}}
+    {{~#if member.cfg.deprecated_external_es}}
+[backups]
+  backend = "fs"
+      {{~#if cfg.backups.fs.root_location}}
+[backups.fs]
+  root_location = "{{cfg.backups.fs.root_location}}"
+        {{~#if cfg.backups.fs.max_snapshot_bytes_per_sec}}
+  max_snapshot_bytes_per_sec = "{{cfg.backups.fs.max_snapshot_bytes_per_sec}}"
+        {{~/if}}
+        {{~#if cfg.backups.fs.max_restore_bytes_per_sec}}
+  max_restore_bytes_per_sec = "{{cfg.backups.fs.max_restore_bytes_per_sec}}"
+        {{~/if}}
+      {{~/if}}
+    {{else}}
+      {{~#if cfg.backups.backend}}
+[backups]
+  backend = "{{cfg.backups.backend}}"
+      {{~/if}}
+    {{~/if}}
+  {{~/if}}
+{{~/eachAlive}}
+
+{{~#if cfg.backups.s3.bucket}}
+[backups.s3]
+  name = "{{cfg.backups.s3.bucket}}"
+  {{~#if cfg.backups.s3.client_name}}
+  client = "{{cfg.backups.s3.client}}"
+  {{~/if}}
+  {{~#if cfg.backups.s3.base_path}}
+  base_path = "{{cfg.backups.s3.base_path}}"
+  {{~/if}}
+  {{~#if cfg.backups.s3.es.compress}}
+  compress = {{cfg.backups.s3.es.compress}}
+  {{~/if}}
+  {{~#if cfg.backups.s3.es.server_side_encryption}}
+  server_side_encryption = "{{cfg.backups.s3.es.server_side_encryption}}"
+  {{~/if}}
+  {{~#if cfg.backups.s3.es.buffer_size}}
+  buffer_size = "{{cfg.backups.s3.es.buffer_size}}"
+  {{~/if}}
+  {{~#if cfg.backups.s3.es.canned_acl}}
+  canned_acl = "{{cfg.backups.s3.es.canned_acl}}"
+  {{~/if}}
+  {{~#if cfg.backups.s3.es.storage_class}}
+  storage_class = "{{cfg.backups.s3.es.storage_class}}"
+  {{~/if}}
+  {{~#if cfg.backups.s3.es.max_snapshot_bytes_per_sec}}
+  max_snapshot_bytes_per_sec = "{{cfg.backups.s3.es.max_snapshot_bytes_per_sec}}"
+  {{~/if}}
+  {{~#if cfg.backups.s3.es.max_restore_bytes_per_sec}}
+  max_restore_bytes_per_sec = "{{cfg.backups.s3.es.max_restore_bytes_per_sec}}"
+  {{~/if}}
+  {{~#if cfg.backups.s3.es.chunk_size}}
+  chunk_size = "{{cfg.backups.s3.es.chunk_size}}"
+  {{~/if}}
+{{~/if}}
+
+[tls]
+  cert_path = "{{pkg.svc_config_path}}/service.crt"
+  key_path = "{{pkg.svc_config_path}}/service.key"
+  root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"

@@ -1,0 +1,135 @@
+@import "~styles/variables";
+
+.jobs-list-table {
+  .new-row {
+    font-size: 14px;
+  }
+
+  chef-td:last-child {
+    justify-content: flex-end;
+  }
+
+  chef-loading-spinner {
+    display: block;
+    margin: 100px auto;
+    width: 100px;
+  }
+}
+
+.jobs-list-paging {
+  margin: 0 0 35px;
+}
+
+.side-panel {
+  chef-button {
+    margin: 0;
+  }
+
+  .side-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background: $chef-white;
+    border-bottom: 1px solid $chef-grey;
+
+    .header-icon {
+      font-size: 2em;
+      color: $chef-dark-grey;
+    }
+
+    .header-text {
+      margin: 0 1em;
+      flex-grow: 1;
+
+      p {
+        margin: 0;
+        color: $chef-dark-grey;
+      }
+    }
+  }
+
+  .side-panel-body-header {
+    display: flex;
+    padding: 1em;
+    border-bottom: 1px solid $chef-grey;
+    align-items: center;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .results-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .results-list-item {
+    border-bottom: 1px solid $chef-grey;
+    background: $chef-white;
+
+    chef-icon {
+      &.failed {
+        color: $chef-critical;
+      }
+
+      &.passed {
+        color: $chef-success;
+      }
+
+      &.skipped {
+        color: $chef-dark-grey;
+      }
+    }
+  }
+
+  .list-item-summary {
+    display: flex;
+    align-items: center;
+    padding: 1em;
+
+    .list-item-text {
+      margin: 0 1em;
+      flex-grow: 1;
+
+      p {
+        margin: 0;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .list-item-detail {
+    border-top: 1px solid $chef-grey;
+    border-left: 4px solid $chef-critical;
+    padding: 1em;
+
+    pre {
+      margin: 0;
+      padding: 1em;
+      border: 1px solid $chef-grey;
+      border-radius: $global-radius;
+      background: $chef-lightest-grey;
+      font-size: 14px;
+    }
+  }
+}
+
+#delete-prompt {
+  #{--modal-width}: 500px;
+  #{--title-size}: 18px;
+  text-align: center;
+
+  [slot=title] {
+    color: $chef-critical;
+    font-weight: bold;
+    margin-top: 2em;
+    padding-bottom: 12px;
+  }
+
+  .options {
+    margin-top: 30px;
+  }
+}

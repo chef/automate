@@ -1,0 +1,10 @@
+// This adds the icons to the user's context menu
+.cd-menu {
+  .logout:before {
+    @extend .icon;
+    @extend .icon-exit;
+    font-size: 2em;
+    padding-right: 5px;
+    vertical-align: -5px;
+  }
+}

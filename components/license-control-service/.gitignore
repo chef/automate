@@ -1,0 +1,8 @@
+/.env.*
+/dummy*
+/license-control-service
+/vendor/
+/results
+.secrets
+
+client/client

@@ -1,0 +1,5 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+chmod 0600 {{pkg.svc_config_path}}/service.crt
+chmod 0600 {{pkg.svc_config_path}}/service.key
+chmod 0600 {{pkg.svc_config_path}}/root_ca.crt

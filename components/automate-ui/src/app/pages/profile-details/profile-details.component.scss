@@ -1,0 +1,106 @@
+@import "~styles/variables";
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+}
+
+.metadata {
+  display: flex;
+  padding: 1em 35px 2em;
+  background: $chef-white;
+  justify-content: space-between;
+
+  chef-card {
+    width: 50%;
+  }
+
+  chef-table {
+    chef-tr {
+      margin: 0;
+
+      chef-th,
+      chef-td {
+        padding: 0.25em 0;
+        border: none;
+        background-color: transparent;
+      }
+
+      chef-td {
+        flex-grow: 3;
+      }
+
+      chef-icon {
+        margin-right: 10px;
+        color: $chef-grey;
+      }
+    }
+  }
+}
+
+.controls-table {
+  margin: 2em 35px;
+
+  chef-th,
+  chef-td {
+    &:first-child {
+      flex-grow: 5;
+      word-break: break-all;
+
+      strong {
+        display: block;
+      }
+    }
+
+    &:last-child {
+      justify-content: flex-end;
+    }
+  }
+
+  .control-detail {
+    background: $chef-white;
+    padding: 1em;
+    transform: translateY(-0.5em);
+    border: 1px solid $chef-grey;
+    border-top: none;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+
+    chef-snippet {
+      border: 1px solid $chef-grey;
+      border-radius: 4px;
+      background: $chef-lightest-grey;
+
+      ::ng-deep pre {
+        background: transparent;
+      }
+    }
+  }
+
+  .critical {
+    color: $chef-critical;
+  }
+
+  .major {
+    color: $chef-major;
+  }
+
+  .minor {
+    color: $chef-minor;
+  }
+}
+
+#delete-modal {
+  text-align: center;
+
+  [slot=title] {
+    font-weight: bold;
+    margin-top: 1em;
+    padding-bottom: 12px;
+  }
+
+  .options {
+    margin-top: 30px;
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "filter": {
+    "must": [],
+    "should": [
+      { "key_1": "value_1" },
+      { "key_2": "value_2" }
+    ]
+  }
+}

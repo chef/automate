@@ -1,0 +1,91 @@
+{
+  "id": "run_id",
+  "node_id": "uuid",
+  "node_name": "human-readable-name",
+  "environment": "optional",
+
+  "version": "1.30.0",
+  "profiles": [{
+    "name": "ssh",
+    "title": "Basic SSH",
+    "maintainer": "Chef Software, Inc.",
+    "copyright": "Chef Software, Inc.",
+    "copyright_email": "support@chef.io",
+    "license": "Proprietary, All rights reserved",
+    "summary": "Verify that SSH Server and SSH Client are configured securely",
+    "version": "1.1.0",
+    "supports": [{
+      "os-family": "unix"
+    }],
+    "controls": [{
+      "title": "/etc/ssh should be owned by root",
+      "desc": "The OpenSSH configuration folder should be owned\nby the root user. It is an important step towards making\nsure, that configuration files are only changed by\npriviledged users.",
+      "impact": 1.0,
+      "refs": [],
+      "tags": {},
+      "code": "control 'basic-2' do\n  impact 1.0\n  title '/etc/ssh should be owned by root'\n  desc '\n    The OpenSSH configuration folder should be owned\n    by the root user. It is an important step towards making\n    sure, that configuration files are only changed by\n    priviledged users.\n  '\n  describe file('/etc/ssh') do\n    it { should be_owned_by 'root' }\n  end\nend\n",
+      "source_location": {
+        "ref": "base/ssh/controls/ssh_folder_spec.rb",
+        "line": 23
+      },
+      "id": "basic-2",
+      "results": [{
+        "status": "passed",
+        "code_desc": "File /etc/ssh should be owned by \"root\"",
+        "run_time": 0.026845,
+        "start_time": "2017-07-05 14:08:05 +0200"
+      }]
+    }, {
+      "title": "/etc/ssh should have limited access to 0755",
+      "desc": "The OpenSSH configuration folder should have restricted\naccess permissions. It is an important step towards making\nsure, that configuration files are only changed by\npriviledged users, while leaving them readable for the\nSSH client.",
+      "impact": 0.01,
+      "refs": [],
+      "tags": {},
+      "code": "control 'basic-3' do\n  impact 0.5\n  title '/etc/ssh should have limited access to 0755'\n  desc '\n    The OpenSSH configuration folder should have restricted\n    access permissions. It is an important step towards making\n    sure, that configuration files are only changed by\n    priviledged users, while leaving them readable for the\n    SSH client.\n  '\n  describe file('/etc/ssh') do\n    it { should_not be_writable.by('group') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_readable.by('others') }\n  end\nend\n",
+      "source_location": {
+        "ref": "base/ssh/controls/ssh_folder_spec.rb",
+        "line": 37
+      },
+      "id": "basic-3",
+      "results": [{
+        "status": "passed",
+        "code_desc": "File /etc/ssh should not be writable by group",
+        "run_time": 0.000469,
+        "start_time": "2017-07-05 14:08:05 +0200"
+      }, {
+        "status": "passed",
+        "code_desc": "File /etc/ssh should not be writable by others",
+        "run_time": 0.000217,
+        "start_time": "2017-07-05 14:08:05 +0200"
+      }, {
+        "status": "failed",
+        "code_desc": "File /etc/ssh should not be readable by others",
+        "run_time": 0.003424,
+        "start_time": "2017-07-05 14:08:05 +0200",
+        "message": "expected File /etc/ssh not to be readable by others"
+      }]
+    }],
+    "groups": [{
+      "title": "SSH Folder Configuration",
+      "controls": ["basic-1", "basic-2", "basic-3"],
+      "id": "controls/ssh_folder_spec.rb"
+    }, {
+      "title": "SSH Client Config",
+      "controls": ["basic-6", "ssh-1", "ssh-3", "ssh-4", "ssh-5", "ssh-6", "ssh-7", "ssh-8", "ssh-9", "ssh-10", "ssh-11", "ssh-12", "ssh-13", "ssh-14", "ssh-15", "ssh-16", "ssh-19", "ssh-20"],
+      "id": "controls/ssh_spec.rb"
+    }, {
+      "title": "SSH Server Config",
+      "controls": ["basic-4", "basic-4.1", "basic-5", "basic-6.1", "basic-6.2", "sshd-7", "sshd-8", "sshd-9", "sshd-10", "sshd-11", "sshd-12", "sshd-14.1", "sshd-14.2", "sshd-15", "sshd-16", "sshd-17", "sshd-18", "sshd-19", "sshd-20", "sshd-21", "sshd-22", "sshd-23", "sshd-24", "sshd-25", "sshd-26", "sshd-27", "sshd-28", "sshd-29", "sshd-30", "sshd-31", "sshd-32", "sshd-34", "sshd-38", "sshd-39", "sshd-40", "sshd-41", "sshd-42", "sshd-43", "sshd-44", "sshd-45", "sshd-46"],
+      "id": "controls/sshd_spec.rb"
+    }],
+    "attributes": [],
+    "sha256": "f56ef31e9e8be7c9064e84f1db699d3f0175924a0ee4517e3a626c38727ebf93"
+  }],
+  "platform": {
+    "name": "mac_os_x",
+    "release": "10.12.5"
+  },
+  "statistics": {
+    "duration": 0.348947
+  }
+}

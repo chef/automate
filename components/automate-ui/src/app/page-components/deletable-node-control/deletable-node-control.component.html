@@ -1,0 +1,24 @@
+<chef-button *ngIf=isVisible primary caution class="delete-button"
+  label="Delete checked nodes"
+  (click)="showConfModal()"
+  [disabled]="selectedNodesIsEmpty()">
+    Delete {{nodesSelectedForDelete.size }} node{{ nodesSelectedForDelete.size | i18nPlural: pluralMapping }}
+</chef-button>
+<span *ngIf="selectedNodesNonEmpty()">
+  <!-- {{nodesSelectedForDelete.size }} item{{ nodesSelectedForDelete.size | i18nPlural: pluralMapping }} selected -->
+</span>
+
+<chef-modal label="confirm-delete-modal-label" [visible]="deleteConfirmModalVisible" (close)="closeModal(false)">
+  <div class="status-modal">
+    <h2 id="confirm-delete-modal-label" class="status-modal-heading">Warning</h2>
+    <p>
+      You are about to delete
+      <strong>{{nodesSelectedForDelete.size}} node{{ nodesSelectedForDelete.size | i18nPlural: pluralMapping }}</strong>.
+    </p>
+    <p>This action can not be undone.</p>
+    <chef-button primary caution (click)="closeModal(true)">
+      Delete {{nodesSelectedForDelete.size }} node{{ nodesSelectedForDelete.size | i18nPlural: pluralMapping }}
+    </chef-button>
+    <chef-button tertiary (click)="closeModal(false)">Cancel</chef-button>
+  </div>
+</chef-modal>

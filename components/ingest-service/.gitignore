@@ -1,0 +1,24 @@
+vendor*
+dist
+bin
+results
+.secrets
+
+# Avoid adding the binary
+ingest-service
+# But make sure to add the cmd/ingest-service/ dir
+!ingest-service/
+
+test/chef-solo-data-generator/chef-client/backup/*
+test/chef-solo-data-generator/chef-client/cache/*
+test/chef-solo-data-generator/chef-client/cache-policyfile/*
+test/chef-solo-data-generator/chef-client/cache-uppercase/*
+test/chef-solo-data-generator/chef-client/cookbooks/*
+test/chef-solo-data-generator/chef-client/nodes/*
+test/chef-solo-data-generator/Berksfile.lock
+test/chef-solo-data-generator/Gemfile.lock
+
+.tmp
+.idea
+node_modules/*
+src

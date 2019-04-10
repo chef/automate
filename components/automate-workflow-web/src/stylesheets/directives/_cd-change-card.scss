@@ -1,0 +1,199 @@
+.change-card {
+  position: relative;
+  background-color: $white;
+
+  &.open {
+    .badge {
+      background-color: $chef-green;
+    }
+  }
+
+  &.merged {
+    .badge {
+      background-color: lighten($darkblue, 50%);
+    }
+  }
+
+  .badge {
+    color: $white;
+    padding: .25rem 1rem;
+    font-size: .75rem;
+    font-weight: normal;
+    display: inline-block;
+    margin-left: 1rem;
+    margin-bottom: 4px;
+    border-radius: $global-radius;
+    text-transform: capitalize;
+    vertical-align: middle;
+    float: right;
+  }
+
+  header {
+
+    .overview-header {
+      margin-bottom: 4px;
+
+      .card-title {
+        margin-top: 0;
+        font-weight: bold;
+        font-size: .875rem;
+
+        a {
+          color: $chef-blue;
+          text-decoration: none;
+        }
+      }
+    }
+
+    .overview-meta {
+      font-size: 13px;
+      line-height: 1.3rem;
+      color: #666;
+    }
+  }
+
+  .commit-msgs {
+    @include span-columns(9 of 12);
+    margin: 0;
+
+    .commit-msg {
+      font-size: .875rem;
+      background-color: $white;
+
+      h5 {
+        float: none;
+      }
+
+      .msg-header {
+        border: none;
+      }
+
+      &.expandable {
+
+        .msg-header {
+          position: relative;
+          cursor: pointer;
+
+          h5 {
+            padding-left: 20px;
+          }
+
+          &:before {
+            content: '\e60c';
+            position: absolute;
+            top: 0;
+            left: 1px;
+            height: 12px;
+            width: 12px;
+            line-height: 50px;
+            text-align: center;
+            @extend .icon;
+          }
+        }
+
+        .msg-body {
+          font-size: .75rem;
+          padding: 0;
+          background: none;
+          margin-left: 20px;
+          margin-top: 1rem;
+          border: 1px solid lighten($darkblue, 50%);
+          border-radius: $global-radius;
+
+          .commit-items {
+            border-radius: $global-radius;
+            padding: 1rem;
+            background-color: $white;
+
+            .commit-item:not(:last-child) {
+              border-bottom: 1px solid $gray-less-pale;
+              margin-bottom: 1rem;
+            }
+          }
+
+          section {
+
+            header {
+              margin-bottom: .5rem;
+            }
+
+            [cd-markdown] {
+              padding: 2px 0;
+            }
+          }
+
+          .submitted-at {
+            font-size: .75rem;
+            color: $white;
+            padding: .5rem;
+            background-color: lighten($darkblue, 50%);
+          }
+        }
+      }
+    }
+  }
+
+  .overview-body {
+    @include clearfix();
+    margin-right: 20px;
+    margin-bottom: 20px;
+
+    .status {
+      color: $grayblue;
+      padding: 5px;
+
+      strong {
+        display: inline-block;
+        color: $regalblue;
+        background-color: $hoopblue;
+        padding: 5px;
+        margin-top: -5px;
+        vertical-align: middle;
+        font-weight: lighter;
+      }
+    }
+  }
+}
+
+.automate-ui .change-card {
+
+  header .overview-header .card-title a {
+    font-family: $heading-font;
+  }
+
+  .commit-msgs .commit-msg {
+
+    .msg-header {
+      height: auto;
+    }
+
+    &.expandable {
+      .msg-header {
+        h5 {
+          font-size: .875rem;
+        }
+
+        &:before {
+          display: none;
+        }
+      }
+
+      .msg-body {
+        margin-left: 0;
+        border: 1px solid lighten($darkblue, 10%);
+
+        .commit-items {
+          border-radius: 0;
+        }
+
+        section header {
+          font-family: $heading-font;
+        }
+
+        .submitted-at {
+          background-color: lighten($darkblue, 10%);
+        }
+      }
+    }
+  }
+}

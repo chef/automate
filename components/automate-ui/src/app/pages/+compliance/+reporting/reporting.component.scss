@@ -1,0 +1,189 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.reporting-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 35px 35px 0 35px;
+  background: $chef-white;
+
+  app-reporting-searchbar {
+    flex: 1;
+    margin-right: 10px;
+  }
+
+  .download-report {
+    position: relative;
+
+    .dropdown-toggle {
+      @include base-box-shadow();
+      display: flex;
+      margin: 0;
+      width: 50px;
+      height: 50px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dropdown {
+      right: 0;
+    }
+  }
+}
+
+.nav-tabs-list {
+  margin: 0;
+  padding: 0 35px;
+  background: $chef-white;
+}
+
+.nav-tabs-item {
+  display: inline-block;
+  position: relative;
+  list-style: none;
+  margin-right: 8px;
+}
+
+.nav-tab {
+  display: inline-block;
+  font-size: 16px;
+  line-height: 32px;
+  min-width: 72px;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+
+  // Underline
+  &:before {
+    display: block;
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    height: 2px;
+    left: 0;
+    width: 100%;
+    background: transparent;
+  }
+
+  &.active {
+    &:before {
+      background: $chef-primary-bright;
+    }
+  }
+
+  &:hover,
+  &:focus {
+    background: $chef-lightest-grey;
+  }
+
+  &:active {
+    background: $chef-light-grey;
+  }
+}
+
+.reporting-summary {
+  padding: 2em 35px;
+  background: $chef-white;
+
+  .summary {
+    @include base-box-shadow();
+    background: $chef-white;
+    border-radius: $global-radius;
+  }
+
+  .summary-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em 0;
+    border-radius: $global-radius;
+    cursor: pointer;
+
+    p {
+      display: flex;
+      margin: 0;
+      align-items: center;
+      color: $chef-white;
+    }
+
+    chef-icon {
+      margin: 0 1em;
+      color: $chef-white;
+    }
+  }
+
+  .failed .summary-toggle {
+    background: $chef-critical;
+  }
+
+  .passed .summary-toggle {
+    background: $chef-success;
+  }
+
+  .skipped .summary-toggle {
+    background: $chef-dark-grey;
+  }
+
+  .unknown .summary-toggle {
+    background: $chef-grey;
+  }
+
+  .summary-body {
+    display: flex;
+    padding: 1em;
+    background: $chef-white;
+
+    chef-table {
+      flex-grow: 1;
+      flex-basis: 50%;
+
+      &:first-child {
+        padding-right: 2em;
+        border-right: 1px solid $chef-grey;
+      }
+
+      &:last-child {
+        padding-left: 2em;
+      }
+
+      chef-tr {
+        margin: 0;
+
+        chef-th,
+        chef-td {
+          padding: 0.25em 0;
+          border: none;
+          background-color: transparent;
+          word-break: break-all;
+        }
+
+        chef-td {
+          flex-grow: 2;
+        }
+
+        chef-icon {
+          margin-right: 10px;
+          color: $chef-light-grey;
+        }
+      }
+    }
+  }
+
+  .empty-summary {
+    padding: 1em;
+    border: 1px dashed $chef-grey;
+    background: $chef-lightest-grey;
+    border-radius: $global-radius;
+
+    p {
+      margin: 0;
+      color: $chef-dark-grey;
+    }
+  }
+}
+
+#download-modal {
+  text-align: center;
+}

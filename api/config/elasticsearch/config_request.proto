@@ -1,0 +1,193 @@
+// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
+syntax = "proto3";
+
+package chef.automate.infra.elasticsearch;
+option go_package = "github.com/chef/automate/api/config/elasticsearch;es";
+import "api/config/shared/tls.proto";
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+message ConfigRequest {
+	option (chef.automate.api.service_config) = {name: "automate-elasticsearch"};
+
+	reserved 1 to 2;
+	V1 v1 = 3;
+
+	message V1 {
+		System sys = 1;
+		Service svc = 2;
+
+		message System {
+			reserved 3;
+
+			ProxyConfig proxy = 2;
+			Cluster cluster = 1;
+			Node node = 4;
+			Path path = 5;
+			Indices indices = 6;
+			Bootstrap bootstrap = 7;
+			Network network = 8;
+			Transport transport = 9;
+			Discovery discovery = 10;
+			Gateway gateway = 11;
+			Action action = 12;
+			Logger logger = 13;
+			Plugins plugins = 14;
+			Runtime runtime = 15;
+			S3 s3 = 16;
+			chef.automate.infra.config.TLSCredentials tls = 17;
+			Deprecated deprecated = 18;
+
+			google.protobuf.BoolValue disable = 19; // If set to true, automate-elasticsearch will noop. Derived from the global config
+		}
+
+		message Service {}
+
+		message ProxyConfig {
+			reserved 1 to 5;
+			google.protobuf.StringValue host = 6;
+			google.protobuf.Int32Value port = 7;
+			google.protobuf.StringValue user = 8;
+			google.protobuf.StringValue password = 9;
+			repeated google.protobuf.StringValue no_proxy = 10;
+		}
+
+		message Cluster {
+			reserved 1;
+			google.protobuf.StringValue name = 3;
+			Routing routing = 2;
+		}
+
+		message Node {
+			reserved 1 to 6;
+			google.protobuf.StringValue name = 7;
+			google.protobuf.StringValue rack_id = 8;
+			google.protobuf.StringValue zone = 9;
+			google.protobuf.Int32Value max_local_storage_nodes = 10;
+			google.protobuf.BoolValue master = 11;
+			google.protobuf.BoolValue data = 12;
+		}
+
+		message Path {
+			reserved 1 to 2;
+			google.protobuf.StringValue data = 3;
+			google.protobuf.StringValue logs = 4;
+			google.protobuf.StringValue repo = 5;
+		}
+
+		message Indices {
+			Recovery recovery = 1;
+			Fielddata fielddata = 2;
+			Breaker breaker = 3;
+		}
+
+		message Bootstrap {
+			reserved 1;
+			google.protobuf.BoolValue memory_lock = 2;
+		}
+
+		message Network {
+			google.protobuf.StringValue host = 1;
+			google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10141, protocol: "http" } ];
+		}
+
+		message Transport {
+			reserved 1;
+			// the transport port is actually a range of ports
+			// e.g. 9300-9400
+			google.protobuf.StringValue port = 2 [ (chef.automate.api.port) = { name: "transport", default: 10142, protocol: "es" } ];
+		}
+
+		message Discovery {
+			reserved 1 to 3;
+			google.protobuf.StringValue ping_unicast_hosts = 4;
+			google.protobuf.Int32Value minimum_master_nodes = 5;
+			google.protobuf.StringValue zen_fd_ping_timeout = 6;
+		}
+
+		message Gateway {
+			google.protobuf.Int32Value recover_after_nodes = 1;
+			google.protobuf.Int32Value expected_nodes = 2;
+			google.protobuf.Int32Value expected_master_nodes = 3;
+			google.protobuf.Int32Value expected_data_nodes = 4;
+			google.protobuf.StringValue recover_after_time = 5;
+		}
+
+		message Action {
+			reserved 1;
+			google.protobuf.BoolValue destructive_requires_name = 2;
+		}
+
+		message Logger {
+			reserved 1;
+			google.protobuf.StringValue level = 2;
+		}
+
+		message Plugins {
+			reserved 1;
+			google.protobuf.StringValue cloud_aws_signer = 2;
+		}
+
+		message Runtime {
+			reserved 1 to 5;
+
+			google.protobuf.StringValue max_open_files = 6;
+			google.protobuf.StringValue max_locked_memory = 7;
+			google.protobuf.Int32Value es_startup_sleep_time = 8;
+			google.protobuf.StringValue es_java_opts = 9;
+			google.protobuf.StringValue heapsize = 10;
+		}
+
+		message Routing {
+			Allocation allocation = 1;
+		}
+
+		message Allocation {
+			reserved 1 to 4;
+
+			google.protobuf.Int32Value node_concurrent_recoveries = 5;
+			google.protobuf.Int32Value node_initial_primaries_recoveries = 6;
+			google.protobuf.BoolValue same_shard_host = 7;
+			google.protobuf.StringValue awareness_attributes = 8;
+		}
+
+		message Recovery {
+			reserved 1;
+
+			google.protobuf.StringValue max_bytes_per_sec = 2;
+		}
+
+		message Fielddata {
+			reserved 1;
+
+			google.protobuf.StringValue cache_size = 2;
+		}
+
+		message Breaker {
+			reserved 1 to 5;
+
+			google.protobuf.StringValue total_limit = 6;
+			google.protobuf.StringValue fielddata_limit = 7;
+			google.protobuf.StringValue fielddata_overhead = 8;
+			google.protobuf.StringValue request_limit = 9;
+			google.protobuf.StringValue request_overhead = 10;
+		}
+
+		message S3 {
+			Client client = 1;
+
+			message Client {
+				reserved 2 to 5; // access_key, secret_key, endpoint, protocol
+
+				google.protobuf.StringValue name = 1;
+				google.protobuf.StringValue read_timeout = 6;
+				google.protobuf.Int32Value max_retries = 7;
+				google.protobuf.BoolValue use_throttle_retries = 8;
+			}
+		}
+
+		message Deprecated {
+				google.protobuf.BoolValue external_es = 1;
+		}
+	}
+}

@@ -1,0 +1,102 @@
+
+// Draws a box with a dashed line. Typically used to
+// convey that something can be added to a list.
+.empty {
+  #{--border-color}: chef-hsl(var(--chef-grey));
+  border: 1px dashed var(--border-color);
+  border-radius: var(--chef-border-radius);
+}
+
+// Layout for a chef-tr in a chef-table that represents an
+// element that can be added. usually used with .empty.
+// @example
+// <chef-tr class="empty new-row">
+//   <span class="cta">Call to action</span>
+//   <span class="action">
+//     <chef-button primary>Do some action</chef-button>
+//   </span>
+// </chef-tr>
+.new-row {
+  display: flex;
+  align-items: center;
+
+  .cta {
+    flex: 1 0;
+    padding: 1em;
+    color: chef-hsl(var(--chef-primary-bright));
+  }
+
+  .action {
+    flex: 0 1;
+    padding: 0 1em;
+
+    chef-button {
+      margin: 0;
+    }
+  }
+}
+
+// Layout and styling for standard form fields. Can
+// be applied to a div wrapping the label and input
+// or a label wrapping the input. If applied to a
+// label, specify the field label in an element using
+// the .label class. chef-inputs are set to 100% the
+// width of the form field.
+// @example
+// <label class="form-field">
+//   <span class="label">My Label</span>
+//   <chef-input></chef-input>
+// </label>
+.form-field {
+  display: block;
+  font-size: 13px;
+  padding: 0.8em 0;
+
+  chef-input {
+    width: 100%;
+  }
+}
+
+.form-field > label, .label {
+  display: block;
+  padding-bottom: 0.75em;
+  font-weight: bold;
+  color: chef-hsl(var(--chef-primary-dark));
+}
+
+// Used to make sure groups of columns clear each other properly.
+%clearfix {
+  zoom: 1;
+
+  &:before,
+  &:after {
+    content: " ";
+    display: table;
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+// Adapted from https://codepen.io/cnunciato/pen/PyQvKR
+$primary-default: #3864F2;
+$primary-caution: #DC267F;
+
+$max-shade-step: 10;
+$min-shade-step: 1;
+$mid-shade-step: 5;
+
+$dark-shade-total: $mid-shade-step - $min-shade-step;
+$light-shade-total: $max-shade-step - $dark-shade-total;
+
+@function palette($base, $step) {
+  $increment: ((1 - lightness($base) / 100%) / $light-shade-total) * 100;
+
+  @if $step <= $mid-shade-step {
+    @return darken($base, ($mid-shade-step - $step) * $increment);
+  }
+  @if $step >= $mid-shade-step {
+    @return lighten($base, ($step - $mid-shade-step) * $increment);
+  }
+}

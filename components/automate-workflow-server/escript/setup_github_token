@@ -1,0 +1,46 @@
+#!/usr/bin/env escript
+%%! -name github_tokenh@127.0.0.1
+
+-define(SELF, 'github_tokenh@127.0.0.1').
+-define(TARGET, 'delivery@127.0.0.1').
+
+main(Args) ->
+    init_network(),
+    [OauthAppName, EntName] = parse_args(Args),
+    case rpc_call(?TARGET, deliv_github_api, get_token_for_enterprise, [OauthAppName, EntName]) of
+        {ok, String} ->
+            io:format("~nSuccess! Please visit this link to retrieve the token: ~s~n~n", [String]);
+        {error, Why} ->
+            perror(io:format("~nError: ~s~n~n", [Why]))
+    end.
+
+init_network() ->
+    {ok, _} = net_kernel:start([?SELF, longnames]),
+    true = erlang:set_cookie(node(), get_cookie()),
+    pong = net_adm:ping(?TARGET).
+
+parse_args([_OauthAppName, _EntName] = Args) ->
+    Args;
+parse_args(Other) ->
+    perror(io:format("Invalid Arguments: ~p~n", [Other])).
+
+rpc_call(Node, Module, Function, Args) ->
+    case rpc:call(Node, Module, Function, Args) of
+        {badrpc, Reason} ->
+            perror(io_lib:format("RPC call ~p:~p:~p:~p failed with error ~p~n",
+                                 [Node, Module, Function, Args, Reason]));
+        Res ->
+            Res
+    end.
+
+perror(Msg) ->
+    io:format(Msg),
+    erlang:halt(1).
+
+get_cookie() ->
+    case os:getenv("ERL_COOKIE") of
+        false ->
+            'delivery';
+        Cookie ->
+            list_to_atom(Cookie)
+    end.

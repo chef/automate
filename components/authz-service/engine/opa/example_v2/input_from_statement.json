@@ -1,0 +1,7 @@
+{
+  "subjects": [
+    "team:local:admins"
+  ],
+  "action": "infra:nodes:delete",
+  "resource": "infra:nodes"
+}

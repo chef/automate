@@ -1,0 +1,31 @@
+@import "~styles/variables";
+
+:host ::ng-deep {
+  @import "~diff2html/dist/diff2html";
+
+  .d2h-wrapper {
+    margin-top: 1em;
+  }
+
+  .d2h-file-wrapper {
+    border-radius: 0;
+  }
+
+  .d2h-file-name-wrapper {
+    font-family: $monospace;
+    font-size: 12px;
+  }
+
+  .d2h-tag {
+    font-size: 9px;
+  }
+
+  .d2h-diff-table {
+    font-family: $monospace;
+    font-size: 12px;
+  }
+
+  .d2h-diff-tbody > tr > td {
+    height: 49px;
+  }
+}

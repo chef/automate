@@ -1,0 +1,15 @@
+@import "~styles/variables";
+
+.library-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.content-container {
+  flex: 1 1 20%;
+  height: 100%;
+  padding: 0 20px;
+  overflow: auto;
+}

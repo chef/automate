@@ -1,0 +1,15 @@
+export SQERL_DBHOST="{{pg_gateway_host}}"
+export SQERL_DBPORT="{{pg_gateway_port}}"
+export SQERL_DBUSER="{{pg_svc_user}}"
+{{- if is_external_pg }}
+    {{- if eq "password" .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetScheme.GetValue }}
+export SQERL_DBPASSWORD="{{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetPassword.GetValue }}"
+      {{- if eq "disable" .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetMode.GetValue }}
+export SQERL_NO_SSL="true"
+      {{- else }}
+        {{ fail "unsupported ssl mode" }}
+      {{- end }}
+    {{- else }}
+      {{ fail "unsupported auth scheme" }}
+    {{- end }}
+{{- end }}

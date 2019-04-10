@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+package chef.automate.domain.authn;
+option go_package = "github.com/chef/automate/api/interservice/authn";
+
+message CreateTokenReq {
+  // Match either a completely empty string or a valid id.
+  string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$|^$"];
+  string description = 2;
+  bool active = 3;
+  repeated string projects = 4 [(validate.rules).repeated = {
+    unique: true,
+    items: {string: {pattern: "^[a-z0-9-]{1,64}$"}}
+   }];
+};
+
+message CreateTokenWithValueReq {
+  string id = 1;
+  string description = 2;
+  bool active = 3;
+  string value = 4;
+  repeated string projects = 5 [(validate.rules).repeated = {
+    unique: true,
+    items: {string: {pattern: "^[a-z0-9-]{1,64}$"}}
+   }];
+};
+
+message UpdateTokenReq {
+  string id = 1;
+  bool active = 2;
+  string description = 3;
+  repeated string projects = 4 [(validate.rules).repeated = {
+    unique: true,
+    items: {string: {pattern: "^[a-z0-9-]{1,64}$"}}
+   }];
+};
+
+message Token {
+  string id = 1;
+  string description = 2;
+  string value = 3;
+  bool active = 4;
+  string created = 5;
+  string updated = 6;
+  repeated string projects = 7;
+};
+
+message Tokens {
+  repeated Token tokens = 1;
+}
+
+message Value {
+  string value = 1;
+}
+
+message GetTokenReq {
+  string id = 1;
+}
+
+message GetTokensReq {}
+
+message DeleteTokenReq {
+  string id = 1;
+}
+
+message DeleteTokenResp {}
+
+service TokensMgmt {
+  rpc GetTokens (GetTokensReq) returns (Tokens) {};
+  rpc CreateToken (CreateTokenReq) returns (Token) {};
+  rpc CreateTokenWithValue (CreateTokenWithValueReq) returns (Token) {};
+  rpc UpdateToken (UpdateTokenReq) returns (Token) {};
+  rpc GetToken (GetTokenReq) returns (Token) {};
+  rpc DeleteToken (DeleteTokenReq) returns (DeleteTokenResp) {};
+}

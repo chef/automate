@@ -1,0 +1,10 @@
+[mlsa]
+accept = false
+
+[service]
+host = "localhost"
+port = 2000
+grpc_port = 2001
+external_fqdn = "localhost"
+trial_license_url = "https://licensing.chef.io" # note: this is set in the configuration request, so the value here will only be used if not using 'chef-automate' to deploy.
+enable_apps_feature = false

@@ -1,0 +1,82 @@
+digraph G {
+    layout = dot
+    compound = true
+    ranksep = "1.0 equally"
+    spline = ortho
+
+    subgraph cluster_infrastructure {
+        label = <<font point-size="20">Infrastructure</font>>
+        style = "filled"
+        fillcolor = "#f18b21"
+        node [shape = "rectangle" style="filled" fillcolor="white"]
+        subgraph inf_a {
+            rank = same
+            "Edge Load Balancing"
+            "Salesforce"
+            "postgres"
+            "S3"
+            "Upstream Identity Provider"
+        }
+        subgraph inf_b {
+            rank = same
+            "elasticsearch"
+            "elasticsearch-curator"
+            "Slack"
+            "Webhook"
+        }
+        "postgres" -> "Slack" [style=invis lhead="inf_a" ltail="inf_b"]
+    }
+
+    subgraph cluster_ui {
+        label = <<font point-size="20">User Interface</font>>
+        style = "filled"
+        fillcolor = "#fdb714"
+        node [shape = "rectangle" style="filled" fillcolor="white"]
+        "deployment-cli" 
+        "automate-ui" 
+    }
+
+    subgraph cluster_application {
+        label = <<font point-size="20" color="white">Application</font>>
+        style = "filled"
+        fillcolor = "#3897D3"
+        node [shape = "rectangle" style="filled" fillcolor="white"]
+        dex_alpha [label="dex"]
+        "automate-gateway"
+        deployment_cli_2 [label="deployment-cli"]
+    }
+
+    subgraph cluster_domain {
+        label = <<font point-size="20" color="white">Domain</font>>
+        style = "filled"
+        fillcolor = "#1FB899"
+        node [shape = "rectangle" style="filled" fillcolor="white"]
+        rank = same
+        subgraph dom_a {
+            rank = same
+            "deployment-service"
+            "license"
+            "license-control-service"
+            "config-mgmt-service"
+            "ingest-service"
+            "compliance-scanner-service"
+            "user-token-service"
+        }
+        subgraph dom_b {
+            rank = same
+            "automate-dex"
+            dex_beta [label="dex"]
+            "authz-service"
+            "notifications-service"
+            "compliance-policy-service"
+            "compliance-reporting-service"
+        }
+        "config-mgmt-service" -> "authz-service" [style=invis lhead="dom_a" ltail="dom_b"]
+    }
+
+    "elasticsearch-curator" -> "automate-ui" [ltail=cluster_infrastructure, lhead=cluster_ui] 
+    "elasticsearch-curator" -> dex_alpha [ltail=cluster_infrastructure, lhead=cluster_application] 
+    "elasticsearch-curator" -> "compliance-scanner-service" [ltail=cluster_infrastructure, lhead=cluster_domain] 
+    "automate-ui" -> "automate-gateway" [ltail=cluster_ui, lhead=cluster_application]
+    "automate-gateway" -> "config-mgmt-service" [ltail=cluster_application, lhead=cluster_domain]
+}

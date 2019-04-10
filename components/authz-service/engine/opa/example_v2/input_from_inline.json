@@ -1,0 +1,7 @@
+{
+  "subjects": [
+    "team:local:admins"
+  ],
+  "action": "iam:teams:create",
+  "resource": "iam:teams"
+}

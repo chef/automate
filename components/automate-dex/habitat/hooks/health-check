@@ -1,0 +1,16 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+# query dex health check endpoint
+output=$(curl --fail --cacert {{pkg.svc_config_path}}/root_ca.crt \
+  --resolve automate-dex:{{cfg.service.port}}:{{sys.ip}} \
+  --noproxy automate-dex \
+  https://automate-dex:{{cfg.service.port}}/dex/healthz 2>&1)
+res=$?
+
+# potential curl exit codes are various, see https://ec.haxx.se/usingcurl-returns.html
+# we translate everything != 0 to exit code 2 ("critical")
+if test "$res" != "0"; then
+   echo "health check curl command returned exit code ${res}:"
+   echo $output
+   exit 2
+fi

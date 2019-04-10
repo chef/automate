@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.service;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/service";
+
+import "google/protobuf/struct.proto";
+
+import "api/interservice/cfgmgmt/response/root.proto";
+import "api/interservice/cfgmgmt/response/stats.proto";
+import "api/interservice/cfgmgmt/response/nodes.proto";
+import "api/interservice/cfgmgmt/response/actions.proto";
+import "api/interservice/cfgmgmt/response/event.proto";
+import "api/interservice/cfgmgmt/response/eventstrings.proto";
+import "api/interservice/cfgmgmt/response/inventory_nodes.proto";
+
+import "api/interservice/cfgmgmt/request/root.proto";
+import "api/interservice/cfgmgmt/request/stats.proto";
+import "api/interservice/cfgmgmt/request/nodes.proto";
+import "api/interservice/cfgmgmt/request/parameters.proto";
+import "api/interservice/cfgmgmt/request/actions.proto";
+import "api/interservice/cfgmgmt/request/event.proto";
+import "api/interservice/cfgmgmt/request/eventstrings.proto";
+import "api/interservice/cfgmgmt/request/inventory_nodes.proto";
+import "api/interservice/cfgmgmt/request/node_export.proto";
+
+service CfgMgmt {
+	rpc GetVersion (chef.automate.domain.cfgmgmt.request.VersionInfo) returns (chef.automate.domain.cfgmgmt.response.VersionInfo);
+	rpc GetHealth (chef.automate.domain.cfgmgmt.request.Health) returns (chef.automate.domain.cfgmgmt.response.Health);
+	rpc GetNodesCounts (chef.automate.domain.cfgmgmt.request.NodesCounts) returns (chef.automate.domain.cfgmgmt.response.NodesCounts);
+	rpc GetRunsCounts (chef.automate.domain.cfgmgmt.request.RunsCounts) returns (chef.automate.domain.cfgmgmt.response.RunsCounts);
+	rpc GetNodeRun (chef.automate.domain.cfgmgmt.request.NodeRun) returns (chef.automate.domain.cfgmgmt.response.Run);
+	rpc GetNodes (chef.automate.domain.cfgmgmt.request.Nodes) returns (google.protobuf.ListValue);
+	rpc GetRuns (chef.automate.domain.cfgmgmt.request.Runs) returns (google.protobuf.ListValue);
+	rpc GetSuggestions (chef.automate.domain.cfgmgmt.request.Suggestion) returns (google.protobuf.ListValue);
+	rpc GetOrganizations (chef.automate.domain.cfgmgmt.request.Organizations) returns (google.protobuf.ListValue);
+	rpc GetSourceFqdns (chef.automate.domain.cfgmgmt.request.SourceFQDNS) returns (google.protobuf.ListValue);
+	rpc GetAttributes (chef.automate.domain.cfgmgmt.request.Node) returns (chef.automate.domain.cfgmgmt.response.NodeAttribute);
+	rpc GetPolicyCookbooks(chef.automate.domain.cfgmgmt.request.PolicyRevision) returns (chef.automate.domain.cfgmgmt.response.PolicyCookbooks);
+	rpc GetEventFeed(chef.automate.domain.cfgmgmt.request.EventFilter) returns (chef.automate.domain.cfgmgmt.response.Events);
+	rpc GetEventTypeCounts(chef.automate.domain.cfgmgmt.request.EventCountsFilter) returns (chef.automate.domain.cfgmgmt.response.EventCounts);
+	rpc GetEventTaskCounts(chef.automate.domain.cfgmgmt.request.EventCountsFilter) returns (chef.automate.domain.cfgmgmt.response.EventCounts);
+	rpc GetEventStringBuckets(chef.automate.domain.cfgmgmt.request.EventStrings) returns (chef.automate.domain.cfgmgmt.response.EventStrings);
+	rpc GetInventoryNodes(chef.automate.domain.cfgmgmt.request.InventoryNodes) returns (chef.automate.domain.cfgmgmt.response.InventoryNodes);
+	rpc NodeExport(chef.automate.domain.cfgmgmt.request.NodeExport) returns (stream chef.automate.domain.cfgmgmt.response.ExportData);
+}

@@ -1,0 +1,185 @@
+#!/usr/bin/env ruby
+
+class VDemo
+  NFO = "\033[35m"
+  ERR = "\033[31m"
+  OK = "\033[36m"
+  WRN = "\033[33m"
+  RST = "\033[0m"
+  DBG = "\033[37m"
+  def stage arg
+    puts "#{OK}----> #{arg}#{RST}"
+  end
+  def error msg
+    puts "#{ERR} err  #{msg}#{RST}"
+  end
+  def debug msg
+    puts "#{DBG}#{msg}#{RST}"
+  end
+
+  def images
+    @images ||= Dir["*/Dockerfile"].map{|x| File::dirname x}
+  end
+  def print_images
+    puts "      "+images.join("  ")
+  end
+  def build names
+    images_of(names).each{|x| build_one x}
+  end
+  def start names
+    images_of(names).each{|x| start_one x}
+  end
+  def stop names
+    images_of(names).each{|x| stop_one x}
+  end
+  def restart names
+    stop names
+    start names
+  end
+  def status names
+    images_of(names).sort.each{|x| status_one x}
+  end
+  def reload names
+    stop names
+    build names
+    start names
+  end
+
+  def print_help
+    puts "
+#{$0} [start|stop|restart|status|build|reload] [<images>]
+      Leave images empty to run this on all images.
+      Start only starts images that have been built before.
+
+      typically you do:
+
+        build + start + status + restart ...
+
+      Also note:
+
+        reload == stop + rebuild + start
+
+Available images:
+"
+    print_images
+    puts ""
+  end
+
+  private
+
+  def img_name name
+    (name.include? ':') ? name : "#{name}:latest"
+  end
+
+  def images_of names
+    x = Array(names)
+    x = images if x.empty?
+    x
+  end
+
+  def build_one name
+    unless exists_blueprint?(name)
+      error "Don't know how to build #{name}"
+      return
+    end
+    stage "build #{name}"
+    system "cd #{name} && docker build . -t #{name}"
+  end
+
+  def start_one name
+    exists_image?(name) || return
+    c = docker_container_for name
+    unless c.nil?
+      debug "skip #{name}, a container is running since #{c[:up]}"
+      return
+    end
+    stage "start #{name}"
+    system "cd #{name} && ./run"
+  end
+
+  def stop_one name
+    docker_containers(true).
+      find_all{|x| x[:img] == img_name(name)}.
+      each do |x|
+        stage "stop #{name} #{RST}#{x[:name]}"
+        system "docker stop #{x[:name]}"
+        system "docker rm #{x[:name]}"
+      end
+  end
+
+  def status_one name
+    c = docker_container_for name
+    if c.nil?
+      puts "%20s -> #{ERR}not running#{RST}" % name
+    else
+      puts "%20s -> #{OK}up #{c[:up]}#{RST}" % name
+    end
+  end
+
+  def docker_container_for name
+    docker_containers.find{|x| x[:img] == img_name(name)}
+  end
+
+  def docker_images
+    images = `docker images`.
+      split("\n").
+      map{|x| x.match /^(?<name>[^ ]+)\s+(?<version>[^ ]+)/}.
+      compact
+  end
+
+  def docker_containers all=false
+    ma = all ? "-a" : ""
+    containers = `docker ps #{ma}`.
+      split("\n").
+      map{|x| x.match /^(?<name>[^ ]+)\s+(?<img>[^ ]+).+Up (?<up>.*?)\s\s/}.
+      compact
+  end
+
+  def exists_blueprint? name
+    if name.nil? || name.empty?
+      error "You must provide an instance name to start:"
+      print_images
+      return false
+    end
+    unless images.include?(name)
+      error "Don't know any image called #{WRN}#{name}#{ERR}"
+      print_images
+      return false
+    end
+    unless File::directory? name
+      error "Can't find configuration folder for image #{WRN}#{name}#{ERR}"
+      return false
+    end
+    return true
+  end
+
+  def exists_image? name
+    return false unless exists_blueprint?(name)
+    name, version = img_name(name).split(":")
+    if docker_images.find{|x| x[:name] == name && x[:version] == version }.nil?
+      error "Can't find image #{WRN}#{name}#{ERR} in docker registry."
+      return false
+    end
+    true
+  end
+
+end
+
+vdemo = VDemo.new
+args=ARGV.drop(1)
+case ARGV[0]
+when 'build'
+  vdemo.build args
+when 'start'
+  vdemo.start args
+when 'restart'
+  vdemo.restart args
+when 'stop'
+  vdemo.stop args
+when 'status'
+  vdemo.status args
+when 'reload'
+  vdemo.reload args
+else
+  vdemo.print_help
+end

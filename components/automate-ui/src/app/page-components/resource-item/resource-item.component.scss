@@ -1,0 +1,87 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.resource {
+  @include modal-box();
+  border-radius: 0;
+  font-size: 14px;
+  margin-bottom: 1em;
+  padding: 1em;
+  border: 1px solid $chef-light-grey;
+  box-shadow: 0 0 16px 0 $chef-light-grey;
+
+  .step {
+    min-width: 61px;
+  }
+
+  .status {
+    width: 4.6%;
+  }
+
+  .type, .action, .view {
+    width: 11%;
+  }
+
+  .name {
+    width: 30%;
+  }
+
+  .cookbook {
+    width: 17%;
+  }
+
+  .view-action {
+    min-width: 70px;
+    text-align: center;
+  }
+
+  chef-icon {
+    padding-left: 15px;
+    font-size: 1.2em;
+    line-height: inherit;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+
+
+    > div {
+      position: relative;
+      word-break: break-all;
+
+      .link {
+        background-color: $chef-critical;
+        border-radius: $global-radius;
+        color: $white;
+        cursor: pointer;
+        font-size: .75em;
+        padding: .5em 1em;
+      }
+
+      &.updated { // Successful
+        color: $chef-success;
+      }
+
+      &.failed { // Failed
+        color: $chef-critical;
+      }
+
+      &.skipped, &.up-to-date, // Unchanged
+      &.unprocessed { // Unprocessed
+        color: $chef-dark-grey;
+      }
+
+      &.step {
+        font-weight: bold;
+        color: $chef-primary-dark;
+      }
+
+    }
+  }
+
+  .delta {
+    margin-bottom: 24px;
+  }
+}
+

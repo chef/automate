@@ -1,0 +1,95 @@
+<div class="organizations card-view">
+  <header class="page-header">
+    <div class="page-header-title">
+      <h2>Email Setup</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="form-container">
+    <form class="smtp-setup" name="smtpSetupForm">
+      <fieldset>
+        <legend>SMTP Email Server Setup</legend>
+        <div class="smtp-setup-forbidden" ng-show="!authorized">
+          <p>You must be an admin in the '{{ enterprise }}' enterprise to setup an outgoing email server.</p>
+        </div>
+        <div class="smtp-setup-fields" ng-show="authorized">
+          <fieldset>
+            <div class="field">
+              <div class="little-title">Outbound SMTP Host</div>
+              <em class="required-indicator">*</em>
+              <input type="text" ng-model="config.host" placeholder="smtp.example.com" required>
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <div class="little-title">Port Number</div>
+              <em class="required-indicator">*</em>
+              <input type="number" ng-model="config.port" placeholder="25" required>
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <div class="little-title">SMTP Login</div>
+              <input type="text" ng-model="config.smtp_login" placeholder="login@example.com">
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <div class="little-title">Password</div>
+              <input ng-change="editPassword()" type="password" ng-model="config.password" placeholder="Password">
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <div class="little-title">Sender's Email</div>
+              <em class="required-indicator">*</em>
+              <input type="text" ng-model="config.sender_email" placeholder="chef@example.com" required>
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <div class="little-title">Sender's Name</div>
+              <input type="text" ng-model="config.sender_name" placeholder="Chef Notifications">
+            </div>
+          </fieldset>
+          <div class="field smtp-test">
+            <div class="button-container" ng-attr-title="{{ (!userEmail() && 'Please add an email address to your Delivery user') || '' }}">
+              <button class="button test-button tertiary"
+                  ng-disabled="smtpSetupForm.$invalid || !userEmail()"
+                  ng-click="testSmtp()">
+                Send Test
+              </button>
+              <span ng-if="userEmail()">
+                to {{ userEmail() }}
+              </span>
+            </div>
+            <div class="result" ng-switch="testResult">
+              <span us-spinner="{scale: 0.5, width: 4, lines: 12, color: '#4a5969', left: '8px'}"
+                spinner-on="testRunning"></span>
+              <span class="success" ng-switch-when="success">
+                <span icon="checkmark"></span>
+                <span class="message">Test message sent!</span>
+              </span>
+              <span class="error" ng-switch-when="error">
+                <span icon="x"></span>
+                <span class="message">Something went wrong. Please check your credentials and try again.</span>
+              </span>
+            </div>
+          </div>
+          <div class="form-controls">
+            <button class="button primary" ng-click="save()">
+              Save
+            </button>
+            <button
+              type="button"
+              class="button destroy"
+              ng-if="configExists"
+              ng-click="confirmDelete()">Remove Configuration</button>
+          </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<div class="dropdown">
+  <div class="dropdown-container">
+    <div (click)="dropdownOpen=!dropdownOpen" class="dropdown-description">
+      {{selectedDate}}
+      <chef-icon>keyboard_arrow_down</chef-icon>
+    </div>
+    <div class="dropdown-menu dropdown-select" *ngIf="dropdownOpen">
+      <ul>
+        <li *ngFor="let date of dates" (click)="onSelect(date)" [ngClass]="{selected: date === inSelection}">
+          {{date}}
+        </li>
+      </ul>
+      <div class="button-container">
+        <chef-button primary (click)="apply()">Apply</chef-button>
+        <chef-button tertiary (click)="cancel()">Cancel</chef-button>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,134 @@
+// Global table styles
+%table-base {
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 1em;
+    font-size: .875rem;
+    font-weight: 300;
+
+    tbody {
+      tr:hover > td, tr:hover > th {
+        cursor: default;
+      }
+
+      tr:hover > td:first-child {
+        box-shadow: inset 16px 0 0 $chef-blue-dark;
+        transition: all .2s;
+      }
+    }
+
+    thead {
+      th {
+        background-color: $chef-blue-dark;
+        text-align: left;
+        padding: .75rem .5rem;
+        font-family: $heading-font;
+        font-size: .875rem;
+        font-weight: 300;
+        color: $white;
+
+        > i {
+          margin-right: .5em;
+        }
+
+        &:first-child {
+          border-radius: $global-radius 0 0 $global-radius;
+        }
+
+        &:last-child {
+          border-radius: 0 $global-radius $global-radius 0;
+        }
+
+        &.center {
+          text-align: center;
+        }
+
+        &.sort {
+          cursor: pointer;
+
+          .fa-sort-asc, .fa-sort-desc {
+            margin-left: .5em;
+            color: $white;
+          }
+
+          .fa-sort {
+            margin-left: .5em;
+            color: $gray;
+          }
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        box-shadow: 0 0 20px rgba($gray-light, .20);
+        transition: all .2s;
+
+        &:hover {
+          box-shadow: 0 0 24px rgba($gray-light, .40);
+        }
+
+        td:first-child {
+          box-shadow: inset 2px 0 0 $chef-blue-dark;
+          transition: all .2s;
+        }
+      }
+
+      td {
+        background-color: $white;
+        border-bottom: 0px;
+        font-family: $heading-font;
+        font-size: .875rem;
+        white-space: normal;
+        padding: .75rem .5rem;
+
+        &.stage,
+        &.phase,
+        &.status {
+          text-transform: capitalize;
+        }
+
+        &.center {
+          text-align: center;
+        }
+
+        i {
+          font-size: 1em;
+        }
+
+      }
+    }
+
+    th, td {
+      &:first-child {
+          padding-left: 2rem;
+      }
+
+      &.status, &[data-field="status"] {
+        text-align: center;
+
+        span {
+          display: inline-block;
+        }
+      }
+
+      &[data-field] {
+        span {
+
+          &:hover {
+            cursor: pointer;
+          }
+
+          &:not([status-icon]) {
+            color: darken($dusk, 10%);
+
+            &:hover {
+              color: darken($linkblue, 10%);
+            }
+          }
+        }
+      }
+    }
+  }
+}

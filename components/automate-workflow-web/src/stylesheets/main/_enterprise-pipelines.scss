@@ -1,0 +1,131 @@
+.enterprise-pipelines {
+  background: $white;
+
+  .pipelines-header {
+    @include clearfix;
+    border-bottom: 1px solid $lightgray;
+
+    .pipelines-filter {
+      width: 80%;
+      float: left;
+      padding: 15px 10px;
+    }
+
+    .pipelines-sort {
+      width: 20%;
+      float: left;
+      padding: 15px 10px;
+
+      .cd-select {
+        width: 100%;
+        position: relative;
+
+        .selection {
+          width: 100%;
+          height: 34px;
+          line-height: 34px;
+          font-size: 14px;
+
+          &:after {
+            float: right;
+            margin-right: 5px;
+            line-height: 34px;
+            overflow: hidden;
+          }
+        }
+
+        .options {
+          width: 100%;
+        }
+
+        .cd-option {
+          font-size: 14px;
+          line-height: 34px;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .pipelines {
+    width: 100%;
+
+    td {
+      padding: 15px 10px;
+      vertical-align: middle;
+      border-bottom: 1px solid $lightgray;
+    }
+
+    .pipe-name {
+
+      a {
+        font-size: 14px;
+      }
+    }
+
+    .pipe-status {
+
+      > span {
+        float: left;
+        width: 50%;
+        font-size: 12px;
+
+        > span {
+          line-height: 20px;
+          position: relative;
+          padding: 0 45px 0 25px;
+          display: block;
+        }
+
+        > span::before {
+          content: '';
+          display: block;
+          width: 20px;
+          height: 20px;
+          position: absolute;
+          left: 0;
+          top: 0;
+        }
+
+        &.pipe-build > span::after {
+          content: '';
+          display: block;
+          width: 20px;
+          height: 20px;
+          background: url(../images/right-arrow-icon.svg) center left no-repeat;
+          position: absolute;
+          right: 20px;
+          top: 0;
+        }
+
+        &.failed > span::before {
+          background: url(../images/error-icon.svg) center left no-repeat;
+        }
+
+        &.pipe-build.passed > span::before {
+          background: url(../images/passed-icon.svg) center left no-repeat;
+        }
+
+        &.pipe-build.running > span::before {
+          background: url(../images/build-icon.svg) center left no-repeat;
+        }
+
+        &.pipe-acceptance.running > span::before {
+          background: url(../images/caution-icon.svg) center left no-repeat;
+        }
+
+        &.pipe-acceptance.passed > span::before {
+          background: url(../images/passed-icon.svg) center left no-repeat;
+        }
+      }
+    }
+
+    .pipe-timestamps {
+      > span {
+        font-size: 11px;
+        display: block;
+        text-align: right;
+      }
+    }
+  }
+}

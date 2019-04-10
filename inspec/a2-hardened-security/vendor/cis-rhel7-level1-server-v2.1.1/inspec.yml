@@ -1,0 +1,10 @@
+---
+name: cis-rhel7-level1-server
+title: CIS Red Hat Enterprise Linux 7 Benchmark Level 1 - Server
+summary: CIS Red Hat Enterprise Linux 7 Benchmark Level 1 - Server translated from
+  SCAP
+version: 2.1.1-9
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: support@chef.io
+license: Proprietary, All rights reserved

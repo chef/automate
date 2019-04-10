@@ -1,0 +1,9 @@
+{
+  "filter": {
+    "should": [
+      {
+        "key_1": { "nested_key": "nested_value" }
+      }
+    ]
+  }
+}

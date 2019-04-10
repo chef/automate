@@ -1,0 +1,28 @@
+upstream = "https://localhost"
+
+[mlsa]
+accept = false
+
+[service]
+host = "localhost"
+port = 9091
+external_fqdn = "localhost"
+# service.a1_data_collector_token will be populated by user.toml from
+# deploy service if we have a data collector token to migrate.
+
+[oidc]
+issuer = "https://localhost/dex"
+client_id = "automate-api"
+
+[http1]
+host = "localhost"
+port = 10162
+
+[logger]
+format = "json"
+level = "info"
+
+[storage]
+database = "chef_authn_service"
+user = "authn"
+max_connections = 5

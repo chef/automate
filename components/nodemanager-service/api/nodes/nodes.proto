@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package chef.automate.domain.nodemanager.api.nodes;
+option go_package = "github.com/chef/automate/components/nodemanager-service/api/nodes";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+import "components/compliance-service/api/common/common.proto";
+
+service NodesService {
+	rpc Create(Node) returns (Id) {};
+	rpc Read(Id) returns (Node) {};
+	rpc Update(Node) returns (google.protobuf.Empty) {};
+	rpc Delete(Id) returns (google.protobuf.Empty) {};
+	rpc List(Query) returns (Nodes) {};
+	rpc BulkDelete(Query) returns (BulkDeleteResponse) {};
+	rpc BulkCreate(Nodes) returns (Ids) {};
+	rpc UpdateNodeDetectInfo(NodeDetectJobInfo) returns (google.protobuf.Empty) {};
+	rpc UpdateNodeConnectionError(NodeError) returns (google.protobuf.Empty) {};
+	rpc BulkDeleteById(Ids) returns (BulkDeleteResponse) {};
+}
+message NodeError {
+	string node_id = 1;
+	string connection_error = 2;
+}
+message NodeDetectJobInfo {
+	string node_id = 1;
+	string platform_name = 2;
+	string platform_release = 3;
+	string node_status = 4;
+	google.protobuf.Timestamp job_end_time = 5;
+	string job_id = 6;
+	string node_state = 7;
+	string job_type = 8;
+}
+message RerunResponse {}
+
+message Ids {
+	repeated string ids = 1;
+}
+message Id {
+	string id = 1;
+}
+message Query {
+	repeated chef.automate.domain.compliance.api.common.Filter filters = 20;
+	enum OrderType {
+		ASC = 0;
+		DESC = 1;
+	}
+	OrderType order = 21;
+	string sort = 22;
+	int32 page = 23;
+	int32 per_page = 24;
+}
+
+message TargetConfig {
+	repeated string secrets = 20;
+	string format = 21;
+	string backend = 22;
+	string host = 23;
+	int32 port = 24;
+	string path = 25;
+	bool sudo = 26;
+	bool ssl = 27;
+	bool self_signed = 28;
+	string user = 29;
+	string password = 30;
+	repeated string key_files = 31;
+	string sudo_password = 32;
+	string sudo_options = 33;
+	string region = 34;
+	string subscription_id = 35;
+	string aws_user = 36;
+	string aws_password = 37;
+	repeated NodeSecrets secrets_arr = 38;
+	string gcp_creds_json = 39;
+	repeated string hosts = 40;
+}
+// TODO: there is clearly some repetition between these two msg types
+// that needs to be addressed; it will involve some refactoring that i'm afraid
+// will bloat the current change i am working on, so leaving that for another day
+message NodeSecrets {
+	string user = 1;
+	string password = 2;
+	repeated string key_files = 3;
+	string sudo_password = 4;
+	string sudo_options = 5;
+	string aws_user = 6;
+	string aws_password = 7;
+	string azure_client_id = 8;
+	string azure_client_secret = 9;
+	string azure_tenant_id = 10;
+}
+
+message Node {
+	string id = 1;
+	string name = 2;
+	string platform = 3;
+	string platform_version = 4;
+	string manager = 5;
+	repeated chef.automate.domain.compliance.api.common.Kv tags = 20;
+	google.protobuf.Timestamp last_contact = 21;
+	string status = 22;
+	ResultsRow last_job = 23;
+	TargetConfig target_config = 99;
+	repeated string manager_ids = 24;
+	string connection_error = 25;
+	string state = 26;
+	string name_prefix = 27;
+	repeated string projects = 28;
+}
+
+message Nodes {
+	repeated Node nodes = 1;
+	int32 total = 20;
+	int32 total_unreachable = 21;
+	int32 total_reachable = 22;
+	int32 total_unknown = 23;
+}
+
+message ResultsRow {
+	string node_id = 1;
+	string report_id = 2;
+	string status = 3;
+	string result = 4;
+	string job_id = 5;
+	google.protobuf.Timestamp start_time = 20;
+	google.protobuf.Timestamp end_time = 21;
+}
+
+message BulkDeleteResponse {
+	repeated string names = 1;
+}

@@ -1,0 +1,26 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<header>
+  <img src="/assets/img/logo-{{channel}}.svg" class="logo" />
+  <div class="tooltip build_version">Build Version: {{build_version}}
+    <ul class="tooltiptext">
+      <li *ngFor="let package of packages">{{package}}</li>
+    </ul>
+  </div>
+</header>
+<main>
+  <div class="notification" *ngIf="deploy_in_progress">
+    <span class="deploy-in-progress">There is an automated deployment in progress. Some environments may be impacted as they are upgraded.  You can follow the logs <a href="{{deploy_logs_url}}" target="_blank">here</a>.</span>
+  </div>
+  <div *ngFor="let server of servers" id="{{server.id}}" class="server">
+    <div class="server-header">
+      <img src="/assets/img/type-{{server.type}}.svg" class="scenario-logo" />
+      {{server.title}}
+    </div>
+    <div class="server-desc">
+      {{server.description}}
+    </div>
+    <div class="server-link">
+      <a href="https://{{server.fqdn}}" target="_blank">{{server.fqdn}}</a>
+    </div>
+  </div>
+</main>

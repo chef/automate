@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+# Helper methods specific for the es-sidecar
+
+# Run Integration tests for the es-sidecar
+document "es_sidecar_service_integration" <<DOC
+  Runs the integration tests for the es-sidecar
+DOC
+function es_sidecar_service_integration() {
+  check_if_deployinate_started || return 1
+  ulimit -n 65536
+  go_test "github.com/chef/automate/components/es-sidecar-service/integration_test"
+}
+
+document "go_build_es_sidecar" <<DOC
+  A wrapper around the go_build to specifically build the es_sidecar service
+DOC
+function go_build_es_sidecar() {
+  go_build_component es-sidecar
+}
+
+document "go_update_es_sidecar" <<DOC
+  Build and update the running es-sidecar
+DOC
+function go_update_es_sidecar() {
+  local component="es-sidecar"
+  if hab pkg path "$HAB_ORIGIN/$component" 2>/dev/null 1>&2; then
+    go_update_component $component
+  else
+    error "You must first run start_es_sidecar"
+    return 1
+  fi
+}

@@ -1,0 +1,33 @@
+---
+version: '2'
+services:
+  chef-server:
+    image: devchef/chef-server-12:12.18.14
+    ports:
+      - "443:443"
+    volumes:
+      - keys:/volumes/keys
+    environment:
+      - CHEF_FQDN=chef-server
+      - CHEF_USER=test-admin
+      - "CHEF_NAME=Test Admin"
+      - "CHEF_PASS=password123!"
+      - CHEF_EMAIL=test-admin@chef.io
+      - CHEF_ORG_SHORT=test
+      - CHEF_ORG_FULL=Test
+  basic-a1:
+    image: devchef/basic-a1
+    privileged: true
+    volumes:
+     - keys:/volumes/keys
+     - ./:/basic-a1
+     - ../../..:/a2
+    depends_on:
+      - chef-server
+  start_chef_server:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - chef-server
+    command: chef-server:443
+volumes:
+  keys:

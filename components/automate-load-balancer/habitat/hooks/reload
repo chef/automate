@@ -1,0 +1,4 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -ex
+
+PID=$(cat {{pkg.svc_var_path}}/pid)
+kill -HUP $PID

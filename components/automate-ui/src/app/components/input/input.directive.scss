@@ -1,0 +1,58 @@
+// Note: chef-input is a directive and cannot contain html or css so this is
+// actually included in with the chef-form-field component.
+
+@import '../../../styles/variables.scss';
+
+:host {
+  display: block;
+}
+
+::ng-deep label {
+  display: block;
+  color: $chef-primary-dark;
+  font-size: 0.75em;
+  font-weight: bold;
+  padding-bottom: 0.5em;
+}
+
+::ng-deep .chef-input, ::ng-deep [compound-input] {
+  width: 100%;
+  background-color: $white;
+  padding: 1em;
+  font-size: 0.75em;
+  border: 1px solid $chef-light-grey;
+  border-radius: $global-radius;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border 0.4s ease;
+
+  &:focus,
+  &:active {
+    border-color: $chef-primary-bright;
+  }
+
+  .error & {
+    border-color: $chef-critical;
+    border-radius: $global-radius $global-radius 0 0;
+  }
+}
+
+::ng-deep [compound-input] {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0;
+
+  input {
+    flex: 0 100%;
+    padding: 0.75em;
+    border-width: 0;
+    background-color: transparent;
+    min-width: 0;
+  }
+
+  .separator {
+    flex: 0 1em;
+  }
+
+}

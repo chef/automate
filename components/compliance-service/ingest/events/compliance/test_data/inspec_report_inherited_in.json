@@ -1,0 +1,314 @@
+{
+  "version": "2.1.67",
+  "profiles": [
+    {
+      "name": "myprofile2",
+      "title": "My Profile 2 title",
+      "maintainer": "Demo, Inc.",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "license": "Apache-2.0",
+      "summary": "My Profile 2 summary",
+      "version": "2.0.0",
+      "supports": [ { "inspec": "~> 1.0" } ],
+      "attributes": [
+        {
+          "name": "role_name",
+          "options": {
+            "default": "base",
+            "description": "Chef Role"
+          }
+        }
+      ],
+      "controls": [
+        {
+          "title": "Profile 2 - Control 1",
+          "desc": "Profile 2 - Control 1 description",
+          "impact": 0.3,
+          "refs": [
+            {
+              "url": "https://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf",
+              "ref": "NSA-RH6-STIG - Section 3.5.2.1"
+            },
+            {
+              "ref": "http://people.redhat.com/swells/scap-security-guide/RHEL/6/output/ssg-centos6-guide-C2S.html"
+            }
+          ],
+          "tags": {
+            "our_criticality": 98,
+            "reviewed": true,
+            "cce": ["CCE-27072-8","CCE-27072-9"]
+          },
+          "code": "control 'pro2-con1' do\n  impact 0.3\n  title 'Profile 2 - Control 1'\n  desc 'Profile 2 - Control 1 description'\n  describe file('c:\\Windows') do\n    it { should exist }\n  end\n  only_if { os.windows? }\nend\n",
+          "source_location": {
+            "ref": "controls/profile2.rb",
+            "line": 1
+          },
+          "id": "pro2-con1",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000019686,
+              "start_time": "2017-06-29 14:09:46 +0000"
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "controls": [
+            "pro2-con1"
+          ],
+          "id": "controls/profile2.rb"
+        }
+      ],
+      "sha256": "e4930e2d434407fdd5fb6d42bf73aa4a822a2b081b42feb901842cd6c1e5f406"
+    },
+    {
+      "name": "myrapper-father",
+      "title": "Linux Wrapper Father Profile",
+      "maintainer": "Demo, Inc.",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "license": "Apache-2.0",
+      "summary": "Base profile that wraps other profiles",
+      "version": "0.6.6",
+      "depends": [
+        {
+          "name": "myrapper-child",
+          "url": "https://s3-eu-west-1.amazonaws.com/apop-bucket/profiles/myrapper-child-0.5.5.tar.gz"
+        }
+      ],
+      "supports": [],
+      "controls": [
+        {
+          "title": "The father of all controls",
+          "desc": "The father of all controls description",
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'myrap-father-control1' do\n  impact 0.5\n  title 'The father of all controls'\n  desc 'The father of all controls description'\n  describe file('/etc/group') do\n    it { should exist }\n  end\nend\n",
+          "source_location": {
+            "ref": "controls/defaut.rb",
+            "line": 3
+          },
+          "id": "myrap-father-control1",
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/group should exist",
+              "run_time": 0.001294245,
+              "start_time": "2017-06-29 14:09:46 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Profile 1 - Control 1",
+          "desc": "Profile 1 - Control 1 description",
+          "impact": 0.8,
+          "refs": [],
+          "results": [],
+          "tags": {
+            "hosts": null,
+            "file": null,
+            "cce": "CCE-27072-8"
+          },
+          "code": "",
+          "source_location": {
+            "ref": "controls/profile1.rb",
+            "line": 1
+          },
+          "id": "pro1-con1"
+        },
+        {
+          "title": "Profile 1 - Control 2",
+          "desc": "Profile 1 - Control 2 description",
+          "impact": 0.9,
+          "refs": [],
+          "results": [],
+          "tags": {
+            "password": null
+          },
+          "code": "",
+          "source_location": {
+            "ref": "controls/profile1.rb",
+            "line": 12
+          },
+          "id": "pro1-con2"
+        }
+      ],
+      "groups": [
+        {
+          "controls": [
+            "myrap-father-control1"
+          ],
+          "id": "controls/defaut.rb"
+        },
+        {
+          "controls": [
+            "pro1-con1",
+            "pro1-con2"
+          ],
+          "id": "controls/profile1.rb"
+        }
+      ],
+      "attributes": [],
+      "sha256": "bebfe8ae7742e6ea9e09765eb0110f77b602d1c35442d3f59516f3957d40ac13"
+    },
+    {
+      "name": "myrapper-child",
+      "title": "Linux Wrapper Child Profile",
+      "maintainer": "Demo, Inc.",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "license": "Apache-2.0",
+      "summary": "Profile that wraps other profiles",
+      "version": "0.5.5",
+      "depends": [
+        {
+          "name": "myprofile1",
+          "url": "https://s3-eu-west-1.amazonaws.com/apop-bucket/profiles/myprofile1-1.0.0.tar.gz"
+        }
+      ],
+      "supports": [],
+      "controls": [
+        {
+          "title": "Profile 1 - Control 1",
+          "desc": "Profile 1 - Control 1 description",
+          "impact": 0.8,
+          "refs": [],
+          "results": [],
+          "tags": {
+            "hosts": null,
+            "file": null,
+            "cce": "CCE-27072-8"
+          },
+          "code": "",
+          "source_location": {
+            "ref": "controls/profile1.rb",
+            "line": 1
+          },
+          "id": "pro1-con1"
+        },
+        {
+          "title": "Profile 1 - Control 2",
+          "desc": "Profile 1 - Control 2 description",
+          "impact": 0.9,
+          "refs": [],
+          "results": [],
+          "tags": {
+            "password": null
+          },
+          "code": "",
+          "source_location": {
+            "ref": "controls/profile1.rb",
+            "line": 12
+          },
+          "id": "pro1-con2"
+        }
+      ],
+      "groups": [
+        {
+          "controls": [
+            "pro1-con1",
+            "pro1-con2"
+          ],
+          "id": "controls/profile1.rb"
+        }
+      ],
+      "attributes": [],
+      "sha256": "d4fca25bc5b32fc426104c7b51cb54e4ba0a65d69b5b721a25ae318321ebb76f"
+    },
+    {
+      "name": "myprofile1",
+      "title": "My Profile 1 title",
+      "maintainer": "Demo, Inc.",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "license": "Apache-2.0",
+      "summary": "My Profile 1 summary",
+      "version": "1.0.0",
+      "supports": [],
+      "controls": [
+        {
+          "title": "Profile 1 - Control 1",
+          "desc": "Profile 1 - Control 1 description",
+          "impact": 0.8,
+          "refs": [],
+          "tags": {
+            "hosts": null,
+            "file": null,
+            "cce": "CCE-27072-8"
+          },
+          "code": "control 'pro1-con1' do\n  impact 0.8\n  title 'Profile 1 - Control 1'\n  desc 'Profile 1 - Control 1 description'\n  tag 'hosts','file'\n  tag cce: 'CCE-27072-8'\n  describe file('/etc/hosts') do\n    its('mode') { should eq 0644 }\n  end\nend\n",
+          "source_location": {
+            "ref": "controls/profile1.rb",
+            "line": 1
+          },
+          "id": "pro1-con1",
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/hosts mode should eq 420",
+              "run_time": 0.019268517,
+              "start_time": "2017-06-29 14:09:46 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Profile 1 - Control 2",
+          "desc": "Profile 1 - Control 2 description",
+          "impact": 0.9,
+          "refs": [],
+          "tags": {
+            "password": null
+          },
+          "code": "control 'pro1-con2' do\n  impact 0.9\n  title 'Profile 1 - Control 2'\n  desc 'Profile 1 - Control 2 description'\n  tag 'password'\n  describe file('/etc/passwdddddddddd') do\n    it { should exist }\n  end\nend\n",
+          "source_location": {
+            "ref": "controls/profile1.rb",
+            "line": 12
+          },
+          "id": "pro1-con2",
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should exist",
+              "run_time": 0.000288037,
+              "start_time": "2017-06-29 14:09:46 +0000"
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "controls": [
+            "pro1-con1",
+            "pro1-con2"
+          ],
+          "id": "controls/profile1.rb"
+        }
+      ],
+      "attributes": [],
+      "sha256": "f364fd64eb0d132e6ba4f6b985951f9ddab894f28f2ff3939745e18c4dd76954"
+    }
+  ],
+  "platform": {
+    "name": "centos",
+    "release": "6.6"
+  },
+  "statistics": {
+    "duration": 0.004522604
+  },
+
+  "node_uuid": "4567abcd-c628-4f82-86df-61c43866db6a",
+  "report_uuid": "34567890-36d6-439e-ac70-a41504242605",
+  "job_uuid": "12345678-36d6-439e-ac70-a41504242605",
+  "node_name": "My Compliant Node",
+  "environment": "DevSec Prod Beta",
+  "roles": ["base_linux", "apache_linux", "linux-hardening-prod", "dot.role"],
+  "recipes": ["apache_extras", "apache_extras::harden", "java::default", "nagios::fix"],
+  "end_time": "2017-10-09T10:18:41Z"
+}

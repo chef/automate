@@ -1,0 +1,58 @@
+<div ng-if="providers.length > 1">
+  <legend>Source Code Provider</legend>
+  <div class="field">
+    <div class="button-bar">
+      <a ng-repeat="provider in providers" class="button secondary small"
+        ng-class="{ active: selectedProvider.type === provider.type }"
+        ng-click="selectProvider(provider)">
+        {{ provider.name }}
+      </a>
+    </div>
+  </div>
+  <div class="providers">
+    <div ng-switch on="selectedProvider.type" ng-class="selectedProvider.type">
+      <div ng-switch-when="delivery">
+      </div>
+      <div ng-switch-when="github">
+        <fieldset>
+          <div class="field">
+            <input type="text" ng-model="project.scm.organization" placeholder="GitHub Owner/Organization">
+          </div>
+        </fieldset>
+        <fieldset>
+          <div class="field">
+            <input type="text" ng-model="project.scm.project" placeholder="GitHub Project Name">
+          </div>
+        </fieldset>
+        <fieldset>
+          <div class="field">
+            <input type="text" ng-model="project.scm.branch" placeholder="Pipeline Branch (e.g., master)">
+          </div>
+        </fieldset>
+      </div>
+      <div ng-switch-when="bitbucket">
+        <div ng-if="project.scm.scmSetupConfigs.length > 0">
+          <fieldset>
+            <div class="field">
+              <input type="text" ng-model="project.scm.project_key" placeholder="Bitbucket Project Key">
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <input type="text" ng-model="project.scm.repo_name" placeholder="Bitbucket Repository Name">
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <input type="text" ng-model="project.scm.pipeline_branch" placeholder="Pipeline Branch (e.g., master)">
+            </div>
+          </fieldset>
+        </div>
+        <div ng-if="project.scm.scmSetupConfigs.length === 0" class="project-scm-instructions field">
+          <p>To add a project that connects to a Bitbucket repo, a Delivery administrator must first
+          configure the link with Bitbucket in <a ui-sref="main.enterprise.scm_setup">SCM Setup</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,156 @@
+@import "~styles/variables";
+
+.event-feed-upper {
+  background-color: $chef-white;
+}
+
+// This is temporary until we can hide the whole page
+.permission-denied-banner {
+  position: fixed;
+  top: $navigation-height;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($chef-white, 0.85);
+  z-index: 190;
+  padding-top: 38vh;
+  text-align: center;
+  font-weight: bold;
+
+  & > p {
+    margin: 0;
+    line-height: 1.6;
+    color: $chef-dark-grey;
+  }
+}
+
+.app-event-feed-guitar-strings {
+  margin-bottom: 35px;
+  min-width: 540px;
+}
+
+.event-summary-bar {
+  display: flex;
+  min-width: 540px;
+  border: 1px solid $chef-light-grey;
+  border-bottom: 0;
+  border-radius: $global-radius;
+  height: 68px;
+  justify-content: flex-start;
+  align-items: center;
+
+  & > chef-button {
+    margin-left: auto;
+  }
+}
+
+
+.summary-totals {
+  display: inline-flex;
+  margin: 5px;
+}
+
+.summary {
+  margin: 0.5em 2em 0.5em 0.5em;
+  line-height: 1.5em;
+
+  .title {
+    color: $chef-dark-grey;
+  }
+}
+
+.summary.circle {
+  .total {color: $chef-success;
+
+    &::before {
+      display: inline-block;
+      margin-right: 5px;
+      content: "";
+      height: 10px;
+      width: 10px;
+      background-color: $chef-success;
+      border-radius: 50%;
+    }
+  }
+}
+
+.summary.outline {
+  .total {color: $chef-critical;
+
+    &::before {
+      display: inline-block;
+      margin-right: 5px;
+      content: "";
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      border: 1px solid $chef-critical;
+    }
+  }
+}
+
+.summary.rhombus {
+  .total {color: $chef-major;
+
+    &::before {
+      display: inline-block;
+      margin-right: 5px;
+      content: "";
+      height: 8px;
+      width: 8px;
+      background-color: $chef-major;
+      transform: rotate(45deg);
+    }
+  }
+}
+
+.reset-button[disabled] {
+  background: $chef-grey;
+  color: $chef-dark-grey;
+  border-color: transparent;
+}
+
+.event-feed-header {
+  display: flex;
+  margin-bottom: 14px;
+  align-items: center;
+}
+
+.event-feed-heading {
+  margin: 0 0 0 20px;
+  min-width: 270px;
+  color: $chef-primary-dark;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.event-feed-subheading {
+  margin-bottom: 0;
+  color: $chef-dark-grey;
+  font-size: 14px;
+}
+
+.load-more-text {
+  font-weight: bold;
+  line-height: 12pt;
+  padding-top: 6px;
+}
+
+.load-more-index {
+  font-size: .675em;
+  line-height: 12pt;
+  padding-bottom: 6px;
+}
+
+.load-more {
+  margin-top: 10px;
+
+  chef-button {
+    flex-direction: column;
+  }
+}
+
+chef-loading-spinner {
+  display: block;
+  text-align: center;
+}

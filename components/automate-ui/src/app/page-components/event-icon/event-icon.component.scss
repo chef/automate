@@ -1,0 +1,67 @@
+@import "~styles/variables";
+
+.event-task {
+  line-height: 30px;
+  text-align: center;
+}
+
+.event-task:not(.edit) {
+  width: 35px;
+  height: 35px;
+
+  &.delete {
+    border-radius: 50%;
+    color: $chef-critical;
+    border: 1px solid $chef-critical;
+
+    &.group {
+      box-shadow: inset 0 0 0 3px $chef-white, inset 0 0 0 4px $chef-critical;
+    }
+  }
+
+  &.create {
+    background: $chef-success;
+    border-radius: 50%;
+    color: $chef-white;
+
+    &.group {
+      box-shadow: inset 0 0 0 1px $chef-success, inset 0 0 0 4px $chef-white;
+    }
+  }
+}
+
+.event-task.edit {
+  position: relative;
+  left: 2px;
+  width: 30px;
+  height: 30px;
+  color: $chef-white;
+  border-radius: 2px;
+  background: $chef-major;
+  transform: rotate(45deg);
+
+  &.group {
+    box-shadow: inset 0 0 0 1px $chef-major, inset 0 0 0 4px $chef-white;
+
+    & > .event-task-icon {
+      top: 1px;
+      font-size: 0.8em;
+    }
+  }
+
+  & > .event-task-icon {
+    transform: rotate(-45deg);
+    top: 1px;
+    font-size: 0.9em;
+  }
+}
+
+.event-task-icon {
+  position: relative;
+  top: 4px;
+
+  .group > & {
+    top: 3px;
+    font-size: 0.8em;
+  }
+}

@@ -1,0 +1,72 @@
+// Global mixins that may also be re-used in other mixin files
+// Automate mixins
+
+@mixin base-box-shadow($blurRadius: 14px, $shadowColor: $gray-pale) {
+  box-shadow: 0 1px $blurRadius $shadowColor;
+}
+
+// Empty state list item
+@mixin empty-item() {
+  border: 1px dashed $gray-light;
+  border-radius: $global-radius;
+  color: $gray;
+  font-family: $heading-font;
+  font-size: .75rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+// Buttons
+@mixin base-button($bgColor: transparent, $borderColor: $gray-pale, $padding1: 1em, $padding2: 1em, $hasBorder: true) {
+  display: inline-block;
+  padding: $padding1 $padding2;
+  background-color: $bgColor;
+  @if $hasBorder == true {
+    border: 1px solid $borderColor;
+  } @else {
+    border: 0;
+  }
+  border-radius: $global-radius;
+  text-align: center;
+  transition: box-shadow .2s;
+
+  &:hover {
+    @include base-box-shadow();
+  }
+}
+
+@mixin cta-button($padding1: .75rem, $padding2: 1.5rem, $hasShadow: true) {
+  @extend %primary-gradient;
+  display: inline-block;
+  border: 0;
+  color: $white;
+  font-size: .875rem;
+  line-height: 1.333rem;
+  padding: $padding1 $padding2;
+  border-radius: $global-radius;
+  text-align: center;
+  text-transform: uppercase;
+  transition: box-shadow .2s;
+
+  @if $hasShadow == true {
+    @include base-box-shadow($blurRadius: 8px, $shadowColor: darken($gray-pale, 10));
+
+  } @else {
+    box-shadow: none;
+  }
+
+  &:hover {
+    box-shadow: none;
+  }
+}
+
+
+// Popover modal box
+@mixin modal-box() {
+  @include base-box-shadow();
+  background-color: $white;
+  border: 1px solid $gray-pale;
+  border-radius: $global-radius;
+  padding: 1.5em;
+}

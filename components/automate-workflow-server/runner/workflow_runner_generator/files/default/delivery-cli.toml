@@ -1,0 +1,7 @@
+api_protocol = "http"
+enterprise = "cd"
+git_port = "8989"
+organization = "test"
+pipeline = "master"
+server = "localhost"
+user = "tester"

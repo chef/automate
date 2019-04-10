@@ -1,0 +1,311 @@
+.review-diff {
+  @include base-box-shadow;
+  margin-top: 1rem;
+
+  .diff-header {
+    background: $white;
+    border: 1px solid $lightgray;
+    border-left: none;
+    position: relative;
+    z-index: 10;
+
+    .diff-header-container {
+      overflow: hidden;
+    }
+
+    button, span {
+      display: block;
+      float: left;
+      border: none;
+      border-left: 1px solid $lightgray;
+      background: transparent;
+      padding: 10px 18px;
+      color: lighten($darkblue, 10%);
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .review-file-menu {
+      float: left;
+
+      a:first-child {
+        border-left: none;
+      }
+    }
+
+    .review-comments-menu {
+      float: right;
+    }
+  }
+
+  .diff-container {
+    background: $white;
+    margin: -1px 0;
+    overflow: hidden;
+  }
+
+  .diff-files-container,
+  .diff-lines-container,
+  .diff-comments-container {
+    transition: height 0.4s;
+    overflow: scroll;
+    position: relative;
+  }
+
+  .diff-lines-container {
+    border: 1px solid $lightgray;
+    height: 100%;
+  }
+
+  .diff-files-container,
+  .diff-comments-container {
+    height: 0;
+  }
+
+  .diff {
+    border-collapse: collapse;
+    white-space: pre-wrap;
+    width: 100%;
+    background: darken($white, 3%);
+    border-bottom: 1px solid $lightgray;
+    margin-bottom: -1px;
+
+    th, td {
+      font-size: 12px;
+    }
+
+    thead {
+      border-bottom: 1px solid $lightgray;
+      background: darken($white, 3%);
+
+      th {
+        padding: 5px 7px;
+        text-align: left;
+        font-weight: 300;
+        text-transform: uppercase;
+        color: gray;
+      }
+    }
+
+    tbody {
+      th, td {
+        font-family: $monospace;
+        font-weight: 300;
+        padding: 5px 7px;
+        vertical-align: top;
+        color: gray;
+        position: relative;
+      }
+
+      th {
+        text-align: right;
+        width: 2%;
+        border-left: 1px solid $lightgray;
+        border-right: 1px solid $lightgray;
+        cursor: pointer;
+
+        &:first-child {
+          border-left: none;
+        }
+      }
+
+      td {
+        width: 48%;
+      }
+
+      .number,
+      .content {
+        transition: background 0.2s;
+      }
+
+      .chunk {
+        .content {
+          text-align: left;
+          border-bottom: 1px solid $lightgray;
+          border-top: 1px solid $lightgray;
+        }
+
+        &:first-child .content {
+          border-top: none;
+        }
+      }
+
+      .normal {
+        .content {
+          background: $white;
+        }
+      }
+
+      .del {
+        .content {
+          background: lighten(#E99, 16%);
+        }
+      }
+
+      .add {
+        .content {
+          background: lighten(#9E9, 16%);
+        }
+      }
+
+      .is-hovered,
+      .is-active,
+      .is-commenting {
+        .number,
+        .content {
+          background: rgba(lighten($cheforange, 30%), 0.5);
+        }
+
+        .number .annotate {
+          opacity: 0.5;
+        }
+      }
+
+      .has-comments {
+        .number .annotate,
+        .number:hover .annotate {
+          opacity: 1;
+        }
+      }
+
+      .number {
+        white-space: normal;
+        text-align: right;
+        padding-left: 20px;
+
+        .annotate {
+          display: block;
+          text-align: center;
+          position: absolute;
+          width: 20px;
+          left: 0;
+          opacity: 0;
+        }
+      }
+    }
+  }
+
+  button {
+    opacity: 1;
+    transition: opacity 0.4s;
+    outline: none;
+  }
+
+  button[disabled] {
+    opacity: 0.7;
+  }
+}
+
+.diff-files {
+  width: 100%;
+  background: $white;
+  border-bottom: 1px solid $lightgray;
+  margin-bottom: -1px;
+  margin-top: -1px;
+
+  a {
+    text-decoration: none;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+
+  thead {
+    th {
+      text-align: left;
+      background: darken($white, 3%);
+      font-weight: normal;
+      font-size: 14px;
+      border-top: 1px solid $lightgray;
+      border-bottom: 1px solid $lightgray;
+    }
+  }
+
+  tbody {
+    tr:nth-child(even) td {
+      background: darken($white, 3%);
+    }
+  }
+
+  .file-status {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: $lightgray;
+    color: $white;
+    font-size: 12px;
+    text-align: center;
+    line-height: 20px;
+    border-radius: 2px;
+
+    &.m {
+      background: $redlight;
+    }
+
+    &.a {
+      background: $happygreen;
+    }
+
+    &.d {
+      background: $grey3;
+    }
+  }
+
+  .comments-count {
+    color: $regalblue;
+  }
+
+  .comments-count-none {
+
+    i {
+      opacity: 0;
+    }
+  }
+}
+
+.diff-comments {
+  background: darken($white, 3%);
+  height: 100%;
+  padding-top: 50px;
+  overflow: scroll;
+  border-bottom: 1px solid $lightgray;
+}
+
+.diff-comments-header {
+  overflow: hidden;
+  background: darken($white, 3%);
+  border-bottom: 1px solid $lightgray;
+  border-right: 1px solid $lightgray;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+
+  button, span {
+    display: block;
+    float: left;
+    border: none;
+    border-left: 1px solid $lightgray;
+    background: transparent;
+    padding: 10px 18px;
+    color: lighten($darkblue, 10%);
+  }
+
+  .diff-comments-menu {
+    float: left;
+
+    li {
+      float: left;
+      border-right: 1px solid $lightgray;
+    }
+  }
+
+  .diff-comments-close {
+    float: right;
+    border-left: 1px solid $lightgray;
+  }
+}

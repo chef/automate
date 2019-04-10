@@ -1,0 +1,303 @@
+@import '../../global/misc';
+
+// Reset styles for the inner button.
+// Most styling should be done on the parent. This should
+// make it easier for folks to tweak the styles if needed
+// during implementation.
+chef-button {
+
+  button,
+  a {
+    background: transparent;
+    border: 0px solid transparent;
+    color: inherit;
+    cursor: inherit;
+    display: inherit;
+    align-items: inherit;
+    justify-content: inherit;
+    flex-direction: inherit;
+    flex-wrap: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    height: inherit;
+    line-height: inherit;
+    margin: 0;
+    padding: 0 12px;
+    pointer-events: inherit;
+    text-decoration: inherit;
+    width: inherit;
+    min-width: inherit;
+    max-width: inherit;
+    height: inherit;
+    min-height: inherit;
+    max-height: inherit;
+  }
+}
+
+chef-button {
+  #{--background-color}: chef-hsl(var(--chef-dark-grey));
+  #{--border-color}: chef-hsl(var(--chef-dark-grey));
+  #{--color}: chef-hsl(var(--chef-white));
+}
+
+chef-button {
+  background-color: var(--background-color);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--border-color);
+  border-radius: var(--chef-border-radius);
+  color: var(--color);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  font-size: 14px;
+  margin: 8px;
+  min-height: 32px;
+  min-width: 32px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: top;
+
+  chef-icon,
+  chef-loading-spinner {
+    margin: 0 8px;
+    font-size: 16px;
+    pointer-events: none;
+
+    // when icon is the first child
+    &:first-child {
+      margin: 0 8px 0 -4px;
+    }
+
+    // when icon is the last child
+    &:last-child {
+      margin: 0 -4px 0 8px;
+    }
+
+    // when icon is an only child
+    &:first-child:last-child {
+      margin: 0 -4px;
+    }
+
+    // when icon is directly after another icon
+    & + chef-icon,
+    & + chef-loading-spinner {
+      margin: 0 8px 0 0;
+
+      // and is the last child
+      &:last-child {
+        margin: 0 -4px 0 0;
+      }
+    }
+  }
+
+  &[disabled] {
+    pointer-events: none;
+  }
+}
+
+chef-button[primary] {
+  #{--background-color}: palette($primary-default, 5);
+  #{--border-color}: palette($primary-default, 5);
+  #{--color}: chef-hsl(var(--chef-white));
+
+  &:hover {
+    #{--background-color}: palette($primary-default, 4);
+    #{--border-color}: palette($primary-default, 4);
+    #{--color}: chef-hsl(var(--chef-white));
+  }
+
+  &:active {
+    #{--background-color}: palette($primary-default, 3);
+    #{--border-color}: palette($primary-default, 3);
+    #{--color}: chef-hsl(var(--chef-white));
+  }
+
+  &[disabled] {
+    #{--background-color}: palette($primary-default, 9);
+    #{--border-color}: palette($primary-default, 9);
+    #{--color}: chef-hsl(var(--chef-white));
+
+    chef-loading-spinner {
+      #{--fill}: chef-hsl(var(--chef-white));
+      #{--fill-alt}: palette($primary-default, 10);
+    }
+  }
+
+  chef-loading-spinner {
+    #{--fill}: palette($primary-default, 10);
+    #{--fill-alt}: palette($primary-default, 9);
+  }
+
+  &[caution] {
+    #{--background-color}: palette($primary-caution, 5);
+    #{--border-color}: palette($primary-caution, 5);
+    #{--color}: chef-hsl(var(--chef-white));
+
+    &:hover {
+      #{--background-color}: palette($primary-caution, 4);
+      #{--border-color}: palette($primary-caution, 4);
+      #{--color}: chef-hsl(var(--chef-white));
+    }
+
+    &:active {
+      #{--background-color}: palette($primary-caution, 3);
+      #{--border-color}: palette($primary-caution, 3);
+      #{--color}: chef-hsl(var(--chef-white));
+    }
+
+    &[disabled] {
+      #{--background-color}: palette($primary-caution, 9);
+      #{--border-color}: palette($primary-caution, 9);
+      #{--color}: chef-hsl(var(--chef-white));
+
+      chef-loading-spinner {
+        #{--fill}: chef-hsl(var(--chef-white));
+        #{--fill-alt}: palette($primary-caution, 10);
+      }
+    }
+
+    chef-loading-spinner {
+      #{--fill}: palette($primary-caution, 10);
+      #{--fill-alt}: palette($primary-caution, 9);
+    }
+  }
+}
+
+chef-button[secondary] {
+  #{--background-color}: chef-hsl(var(--chef-white));
+  #{--border-color}: palette($primary-default, 5);
+  #{--color}: palette($primary-default, 5);
+
+  &:hover {
+    #{--background-color}: palette($primary-default, 10);
+    #{--border-color}: palette($primary-default, 4);
+    #{--color}: palette($primary-default, 4);
+  }
+
+  &:active {
+    #{--background-color}: palette($primary-default, 9);
+    #{--border-color}: palette($primary-default, 3);
+    #{--color}: palette($primary-default, 3);
+  }
+
+  &[disabled] {
+    #{--background-color}: chef-hsl(var(--chef-white));
+    #{--border-color}: palette($primary-default, 9);
+    #{--color}: palette($primary-default, 9);
+
+    chef-loading-spinner {
+      #{--fill}: palette($primary-default, 8);
+      #{--fill-alt}: palette($primary-default, 9);
+    }
+  }
+
+  chef-loading-spinner {
+    #{--fill}: palette($primary-default, 5);
+    #{--fill-alt}: palette($primary-default, 6);
+  }
+
+  &[caution] {
+    #{--background-color}: chef-hsl(var(--chef-white));
+    #{--border-color}: palette($primary-caution, 5);
+    #{--color}: palette($primary-caution, 5);
+
+    &:hover {
+      #{--background-color}: palette($primary-caution, 10);
+      #{--border-color}: palette($primary-caution, 4);
+      #{--color}: palette($primary-caution, 4);
+    }
+
+    &:active {
+      #{--background-color}: palette($primary-caution, 9);
+      #{--border-color}: palette($primary-caution, 3);
+      #{--color}: palette($primary-caution, 3);
+    }
+
+    &[disabled] {
+      #{--background-color}: chef-hsl(var(--chef-white));
+      #{--border-color}: palette($primary-caution, 9);
+      #{--color}: palette($primary-caution, 9);
+
+      chef-loading-spinner {
+        #{--fill}: palette($primary-caution, 8);
+        #{--fill-alt}: palette($primary-caution, 9);
+      }
+    }
+
+    chef-loading-spinner {
+      #{--fill}: palette($primary-caution, 5);
+      #{--fill-alt}: palette($primary-caution, 6);
+    }
+  }
+}
+
+chef-button[tertiary] {
+  #{--background-color}: transparent;
+  #{--border-color}: transparent;
+  #{--color}: palette($primary-default, 5);
+
+  &:hover {
+    #{--background-color}: palette($primary-default, 10);
+    #{--border-color}: transparent;
+    #{--color}: palette($primary-default, 4);
+  }
+
+  &:active {
+    #{--background-color}: palette($primary-default, 9);
+    #{--border-color}: transparent;
+    #{--color}: palette($primary-default, 3);
+  }
+
+  &[disabled] {
+    #{--background-color}: transparent;
+    #{--border-color}: transparent;
+    #{--color}: palette($primary-default, 9);
+
+    chef-loading-spinner {
+      #{--fill}: palette($primary-default, 8);
+      #{--fill-alt}: palette($primary-default, 9);
+    }
+  }
+
+  chef-loading-spinner {
+    #{--fill}: palette($primary-default, 5);
+    #{--fill-alt}: palette($primary-default, 6);
+  }
+
+  &[caution] {
+    #{--background-color}: transparent;
+    #{--border-color}: transparent;
+    #{--color}: palette($primary-caution, 5);
+
+    &:hover {
+      #{--background-color}: palette($primary-caution, 10);
+      #{--border-color}: transparent;
+      #{--color}: palette($primary-caution, 4);
+    }
+
+    &:active {
+      #{--background-color}: palette($primary-caution, 9);
+      #{--border-color}: transparent;
+      #{--color}: palette($primary-caution, 3);
+    }
+
+    &[disabled] {
+      #{--background-color}: transparent;
+      #{--border-color}: transparent;
+      #{--color}: palette($primary-caution, 9);
+
+      chef-loading-spinner {
+        #{--fill}: palette($primary-caution, 8);
+        #{--fill-alt}: palette($primary-caution, 9);
+      }
+    }
+
+    chef-loading-spinner {
+      #{--fill}: palette($primary-caution, 5);
+      #{--fill-alt}: palette($primary-caution, 6);
+    }
+  }
+}

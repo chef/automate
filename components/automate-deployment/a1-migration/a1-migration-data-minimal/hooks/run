@@ -1,0 +1,32 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+set -ex
+
+# Linking this data would be faster but it would also be destructive, which
+# would require us to re-install the package any time we want to re-test
+# with the same data. Therefore, we'll rsync the data from our package to the
+# install locations each time the service is started. On a service restart
+# we'll update it to reflect the initial state.
+
+echo "Loading A1 configuration and data"
+# Right now we're just copying the data back into the A1 data and config
+# directories. We'll need to change this to the actual locations that the
+# deployment service will move data on a per service basis.
+
+mkdir -p /etc/delivery
+mkdir -p /var/opt/delivery
+{{pkgPathFor "core/rsync"}}/bin/rsync -chaz --delete {{pkg.path}}/etc/delivery/ /etc/delivery
+{{pkgPathFor "core/rsync"}}/bin/rsync -chaz --delete {{pkg.path}}/var/opt/delivery/ /var/opt/delivery
+
+[[ -d {{pkg.path}}/etc/opscode ]] && mkdir -p /etc/opscode
+[[ -d {{pkg.path}}/var/opt/opscode ]] && mkdir -p /var/opt/opscode
+[[ -d /etc/opscode ]] && {{pkgPathFor "core/rsync"}}/bin/rsync -chaz --delete {{pkg.path}}/etc/opscode/ /etc/opscode
+[[ -d /etc/opscode ]] && {{pkgPathFor "core/rsync"}}/bin/rsync -chaz --delete {{pkg.path}}/var/opt/opscode/ /var/opt/opscode
+
+# Here so Ci can detect if we're done w/ the sync.
+touch /etc/delivery/.a1-migration-data-ready
+
+echo "A1 configuration and data loaded"
+
+# Run forever
+set +x
+while :; do sleep 1; done

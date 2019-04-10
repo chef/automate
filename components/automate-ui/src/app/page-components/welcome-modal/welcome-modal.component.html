@@ -1,0 +1,44 @@
+<div *ngIf="isVisible" class="modal-overlay" (click)="closeModal()"></div>
+<div *ngIf="isVisible" class="welcome-modal modal" (keydown.esc)="closeModal()">
+  <chef-trap-focus>
+    <chef-button secondary class="close-button" label="close" (click)="closeModal()" data-cy="close-x">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+    <div class="modal-header">
+      <h2 class="display2" data-cy="welcome-title">Welcome to Chef Automate</h2>
+    </div>
+    <div class="modal-content">
+      <p>How can we help you get started?</p>
+      <ul>
+        <li>
+          <a href="https://automate.chef.io/docs" target="_blank">
+            I'm familiar with Chef, but I need help getting started with Chef Automate.
+            <chef-icon>launch</chef-icon>
+          </a>
+        </li>
+        <li>
+          <a href="https://learn.chef.io/" target="_blank">
+            Teach me everything!
+            <chef-icon>launch</chef-icon>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="modal-button">
+      <chef-button primary (click)="closeModal()" data-cy="close-welcome">
+        It's okay, I know what I'm doing.
+      </chef-button>
+    </div>
+
+    <div class="modal-footer">
+      <chef-checkbox class="show-again-checkbox"
+        (change)="toggleShowAgain()"
+        [checked]="showAtStartPref">
+        Show this window on launch
+      </chef-checkbox>
+      <app-telemetry-checkbox></app-telemetry-checkbox>
+    </div>
+
+  </chef-trap-focus>
+</div>

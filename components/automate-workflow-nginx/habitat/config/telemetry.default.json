@@ -1,0 +1,12 @@
+{
+  "telemetry_api": "https://telemetry.chef.io",
+  "telemetry_enabled": true,
+  "connectivity": {
+    "reachable": false,
+    "proxy": false
+  },
+  "identity": {
+    "license_id": "cdac24ad-7565-4537-9b69-4efdddff5150",
+    "install_id": "INSTALL_ID"
+  }
+}

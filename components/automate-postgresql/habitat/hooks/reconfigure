@@ -1,0 +1,10 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+
+{{#if cfg.disable ~}}
+exit 0
+{{~else}}
+source {{pkg.svc_config_path}}/functions.sh
+
+ensure_key_ownership
+{{~/if}}

@@ -1,0 +1,28 @@
+---
+version: '2.1'
+services:
+  external-es:
+    hostname: external-es.test
+    image: chef/a2-external-es
+    build: ./build
+    mem_limit: 4G
+    networks:
+      - esnet
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./shared-data:/mnt/shared-data
+  a2:
+    hostname: a2.test
+    image: solita/ubuntu-systemd:16.04
+    mem_limit: 4G
+    networks:
+      - esnet
+    volumes:
+     - ./shared-data:/mnt/shared-data
+    # TODO: We'll rely on expeditor building the hartifacts. We need to make the
+    # results directory shares so that when we deploy the hartifacts and manifest
+    # we want to test are available.
+    # command:

@@ -1,0 +1,36 @@
+<ol class="phase-list title">
+  <li class="phase-list-item">
+    <div class="phase-list-item">
+      <div class="phase-details" ng-click="toggle()">
+        <span class="phase-status-icon status-icon" ng-class="(open || logOpen) ? 'minus' : 'plus'"></span>
+        <span class="phase-status-icon status-icon" ng-class="phase.status"></span>
+        <span class="phase-title">{{ phase.name | capitalize }}</span>
+        <span class="phase-status" ng-class="phase.status">
+          {{ phase.status | capitalize }}
+        </span>
+      </div>
+      <div
+        ng-if="phase.runDetails.length === 1"
+        class="phase-cancel">
+        <button
+           ng-disabled="!jobIsCancelable()"
+           ng-click="cancelPhase()">
+          <i class="fa fa-fw fa-trash"></i></button>
+      </div>
+    </div>
+    <div
+      class="phase-expanded-details"
+      ng-if="phase.runDetails.length === 1 && logOpen"
+      cd-log
+      log-href="phase.runDetails[0].href">
+    </div>
+    <div
+      class="phase-expanded-details"
+      ng-if="phase.runDetails.length > 1 && open"
+      ng-repeat="detail in phase.runDetails track by $index"
+      cd-run-detail-item
+      run-detail-item="detail"
+      phase-name="phase.name">
+    </div>
+  </li>
+</ol>

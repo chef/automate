@@ -1,0 +1,84 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+export ZONEINFO={{pkgPathFor "core/glibc"}}/share/zoneinfo
+
+{{~#eachAlive bind.authz-service.members as |authz|}}
+{{~#if @last}}
+# Add authz-service to no_proxy
+addNoProxy {{authz.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.authn-service.members as |authn|}}
+{{~#if @last}}
+# Add authn-service to no_proxy
+addNoProxy {{authn.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.compliance-service.members as |compliance|}}
+{{~#if @last}}
+# Add compliance-service to no_proxy
+addNoProxy {{compliance.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.config-mgmt-service.members as |cfgmgmt|}}
+{{~#if @last}}
+# Add cfgmgmt service to no_proxy
+addNoProxy {{cfgmgmt.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.deployment-service.members as |deployment|}}
+{{~#if @last}}
+# Add deployment-service to no_proxy
+addNoProxy {{deployment.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+# Add ingest-service to no_proxy
+{{~#eachAlive bind.ingest-service.members as |ingest|}}
+{{~#if @last}}
+addNoProxy {{ingest.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.license-control-service.members as |license|}}
+{{~#if @last}}
+# Add license-control-service to no_proxy
+addNoProxy {{license.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.local-user-service.members as |local-user|}}
+{{~#if @last}}
+# Add local-user-service to no_proxy
+addNoProxy {{local-user.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.notifications-service.members as |notifications|}}
+{{~#if @last}}
+# Add notifications-service to no_proxy
+addNoProxy {{notifications.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.teams-service.members as |teams|}}
+{{~#if @last}}
+# Add teams-service to no_proxy
+addNoProxy {{teams.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.secrets-service.members as |secrets|}}
+{{~#if @last}}
+# Add secrets-service to no_proxy
+addNoProxy {{secrets.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.nodemanager-service.members as |manager|}}
+ {{~#if @last}}
+ # Add nodemanager to no_proxy
+ addNoProxy {{manager.sys.ip}}
+ {{~/if}}
+ {{~/eachAlive}}
+
+# Start our service
+exec automate-gateway serve --config {{pkg.svc_config_path}}/config.toml

@@ -1,0 +1,8 @@
+
+<a [routerLink]="route"
+  routerLinkActive="active" [routerLinkActiveOptions]="{exact: isExactPresent()}">
+  <chef-icon class="sidebar-icon" *ngIf="icon"
+    [style.transform]="'rotate(' + (iconRotation ? iconRotation : 0) + 'deg)'">{{icon}}</chef-icon>
+  <ng-content></ng-content>
+  <chef-icon class="arrow">play_arrow</chef-icon>
+</a>

@@ -1,0 +1,14 @@
+[service]
+host = "0.0.0.0"
+port = 18427
+
+[logger]
+format = "json"
+level = "info"
+
+[license_gen]
+url = "https://lic-gen-server.com"
+auth_token = "opensesame"
+
+[tracking]
+segmentio_write_key = "randomrandom"

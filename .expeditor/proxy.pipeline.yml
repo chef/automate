@@ -1,0 +1,19 @@
+steps:
+
+  #
+  # A2 proxy test
+  #
+
+  #
+  # Run this on buildkite via https://buildkite.com/chef/chef-slash-a2-master-a2-proxy-slash-dev
+  #
+
+  - label: A2 proxy test
+    command:
+      - scripts/nightly_proxy.sh
+    timeout_in_minutes: 30
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true

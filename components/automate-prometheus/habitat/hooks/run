@@ -1,0 +1,8 @@
+#!/bin/bash
+
+exec 2>&1
+
+exec {{pkgPathFor "core/prometheus"}}/bin/prometheus \
+  --config.file={{pkg.svc_config_path}}/prometheus.yml \
+  --web.listen-address=":{{cfg.port}}" \
+  --storage.tsdb.path="{{pkg.svc_data_path}}"

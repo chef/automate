@@ -1,0 +1,31 @@
+listen_address = "{{cfg.service.host}}"
+port = {{cfg.service.port}}
+log_level = "{{cfg.logger.level}}"
+
+# "hh:mm:ss" in UTC
+daily_run_at = "{{cfg.service.daily_run_at}}"
+
+[tls]
+
+  cert_path = "{{pkg.svc_config_path}}/service.crt"
+  key_path = "{{pkg.svc_config_path}}/service.key"
+  root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
+
+# Managed Services
+# These services will have their Data Lifecycle Management interface
+# called (purge, backup, etc) by the Data Lifecycle Service.
+[managed]
+{{~#eachAlive bind.ingest-service.members as |ingest|}}
+  {{~#if @last}}
+  [managed.ingest-service]
+  Address = "{{ingest.sys.ip}}:{{ingest.cfg.port}}"
+  Secure = true
+  {{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.compliance-service.members as |compliance|}}
+  {{~#if @last}}
+  [managed.compliance-service]
+  Address = "{{compliance.sys.ip}}:{{compliance.cfg.port}}"
+  Secure = true
+  {{~/if}}
+{{~/eachAlive}}

@@ -1,0 +1,574 @@
+#!/bin/bash
+#
+# Helper methods specific for the automate-gateway
+
+# TODO (tc) These tests should be run against the same deployed environment as
+# the inspec tests in CI.
+#
+# TODO: These tests should live somewhere else but for now
+# this is verifying at least that we can send messages
+# through the ingest pipeline as well as the legacy endpoint.
+#
+# Run Integration tests for automate-gateway.
+document "gateway_integration" <<DOC
+  Runs the integration tests for automate-gateway
+DOC
+function gateway_integration() {
+  set -o pipefail # don't let the jq-pipe ruin the return 1
+  install_if_missing core/jq-static jq
+
+  check_if_deployinate_started || return 1
+  # The main tests here is to send a ChefRun Message and a
+  # Inspec Message through the legacy endpoint, so we need
+  # the relevant services up and running:
+  wait_or_fail_for_port_to_listen $GATEWAY_PORT
+  # Make sure that the gateway is accepting requests
+  wait_for_success gateway_get /gateway/version || return 1
+  log_line "The automate-gateway version"
+  gateway_version || return 1
+
+  local viewer_token="$(get_api_token_with_policy viewer-access)"
+
+  log_line "Sending 30 Chef Action Messages"
+  for i in {1..30}; do
+    send_chef_action_example || return 1
+  done
+  log_line "List Cfgmgmt Nodes (Empty)"
+  gateway_get /cfgmgmt/nodes "$viewer_token" | jq || return 1
+  log_line "Sending a Chef Run Message"
+  send_chef_run_example || return 1
+  log_line "Sending an Inspec Message through the Legacy endpoint"
+  send_inspec_example legacy || return 1
+  log_line "List Cfgmgmt Nodes (Displays the ingested node)"
+  # wait for 5 secs to index the node
+  sleep 5 && gateway_get /cfgmgmt/nodes "$viewer_token" | jq || return 1
+  log_line "List Event Feed (Displays the ingested actions)"
+  gateway_get '/eventfeed?collapse=true&page_size=1000' "$viewer_token" | jq || return 1
+
+  set +o pipefail # reset
+}
+
+document "gateway_version" <<DOC
+  Display the automate-gateway service version.
+
+  Runs:
+  => curl $GATEWAY_URL/version
+DOC
+function gateway_version() {
+  install_if_missing core/jq-static jq;
+
+  log_line "Gateway"
+  gateway_get /gateway/version | jq .
+
+  log_line "Ingest"
+  gateway_get /ingest/version | jq .
+
+  log_line "ConfigMgmt"
+  gateway_get /cfgmgmt/version | jq .
+
+  log_line "Compliance"
+  gateway_get /compliance/reporting/version | jq .
+}
+
+document "gateway_get" <<DOC
+  Sends a Gateway GET Request to the $GATEWAY_URL URL and the provided endpoint
+
+  Example: Send a GET Request to $GATEWAY_URL/version
+  ---------------------------------------------------
+  # gateway_get "/version"
+
+  Example: Send a GET Request to $GATEWAY_URL/version using a specific token
+  --------------------------------------------------------------------------
+  # gateway_get "/version" "$TOKEN"
+DOC
+function gateway_get() {
+  install_if_missing core/curl curl >/dev/null 2>&1
+  # use admin token only if not provided as second argument
+  local api_token="${2:-$(get_admin_token)}"
+  curl -fsS --insecure -H "api-token: ${api_token}" ${GATEWAY_URL}${1}
+}
+
+document "send_chef_action_example" <<DOC
+  Sends a Chef Action example to the chef action rest endpoint.
+
+  Example: Send a random Chef Action example:
+  --------------------------------------------------------
+  # send_chef_action_example
+
+  Example: Send a Chef Action example with specific type and task:
+  --------------------------------------------------------
+  # send_chef_action_example cookbook create
+DOC
+function send_chef_action_example() {
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
+
+  local event_types=(cookbook bag client node policyfile role scanjobs profile)
+  local event_type=${event_types[$(($RANDOM % 8))]}
+  local event_tasks=(update create delete)
+  local event_task=${event_tasks[$(($RANDOM % 3))]}
+  if [[ "$1" != "" ]]; then
+    event_type=$1
+  fi
+  if [[ "$2" != "" ]]; then
+    event_task=$2
+  fi
+  local endpoint="/events/data-collector"
+  local examples_path="/src/components/ingest-service/examples"
+  local tmp_action_json
+  local rfc_time=$(date --rfc-3339=seconds  -d "$(($RANDOM % 144)) hour ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
+
+  # Update the 'recorded_at' time from the ChefAction Example; and set entity_type and task
+  tmp_action_json="$(jq --arg event_task "$event_task" --arg rfc_time "$rfc_time" --arg event_type "$event_type" \
+    '.task = $event_task | .recorded_at = $rfc_time | .entity_type = $event_type' < $examples_path/chef_action.json)"
+
+  # note: this needs to be fed in via stdin, as passing it in as --data "$tmp_action_json"
+  # will exceed argmax
+  curl -f --insecure -H "api-token: $(get_api_token)" \
+    --data "@-" ${GATEWAY_URL}${endpoint} <<< "$tmp_action_json"
+}
+
+document "send_chef_run_example" <<DOC
+  Send the example chef run message to the chef run rest endpoint.
+
+  Options: by default the message is send directly to the gateway chef/run endpoint 
+    legacy - send the message directly to the gateway legacy endpoint
+    lb - send the message through the load balancer
+
+  By default the components/ingest-service/examples/converge-success-report.json is send.
+  To send a different JSON message use the JSON_FILE variable.
+
+  Example: Send a Chef Run with looping roles:
+  --------------------------------------------------------
+  # JSON_FILE="/src/components/ingest-service/examples/looping_roles_ccr.json" send_chef_run_example
+
+  Example: Send a Chef Run example to the legacy endpoint:
+  --------------------------------------------------------
+  # send_chef_run_example legacy
+
+  Example: Send a Chef Run example to the load balancer endpoint:
+  --------------------------------------------------------
+  # send_chef_run_example lb
+DOC
+function send_chef_run_example() {
+  install_if_missing core/curl curl
+
+  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/converge-success-report.json};
+
+  if [[ "$1" == "legacy" ]]; then
+    endpoint=${GATEWAY_URL}"/events/data-collector"
+  elif [[ "$1" == "lb" ]]; then
+    endpoint="https://localhost/data-collector/v0"
+  else
+    endpoint=${GATEWAY_URL}"/ingest/events/chef/run"
+  fi
+
+  uuid=$(uuidgen)
+  entity_uuid=$(uuidgen)
+
+  tmp_ccr_json="$(jq --arg id "$uuid" '.id = $id' <$examples_json_path)"
+  tmp_ccr_json="$(echo $tmp_ccr_json | jq --arg id "$entity_uuid" '.entity_uuid = $id')"
+
+  echo "$tmp_ccr_json" \
+       | curl -f --insecure -H "api-token: $(get_admin_token)" \
+       --data "@-" ${endpoint}
+}
+
+document "send_chef_run_start_example" <<DOC
+  Send the example chef run start message to the chef run rest endpoint.
+
+  Arguments: by default the message is send directly to the gateway chef/run endpoint 
+    legacy - send the message directly to the gateway legacy endpoint
+    lb - send the message through the load balancer 
+
+  Example: Send a Chef Run start to the legacy endpoint:
+  --------------------------------------------------------
+  # send_chef_run_start_example legacy
+
+  Example: Send a Chef Run start to the load balancer endpoint:
+  --------------------------------------------------------
+  # send_chef_run_start_example lb
+DOC
+function send_chef_run_start_example() {
+  install_if_missing core/curl curl;
+
+  local examples_path="/src/components/ingest-service/examples";
+  if [[ "$1" == "legacy" ]]; then
+    endpoint=${GATEWAY_URL}"/events/data-collector"
+  elif [[ "$1" == "lb" ]]; then
+    endpoint="https://localhost/data-collector/v0"
+  else
+    endpoint=${GATEWAY_URL}"/ingest/events/chef/run"
+  fi
+
+  curl -f --insecure -H "api-token: $(get_api_token)" \
+       --data @$examples_path/chef_client_run_start.json ${endpoint}
+}
+
+document "get_service_versions" <<DOC
+  Get all the service versions running in automate
+DOC
+function get_service_versions() {
+  curl -f --insecure -H "api-token: $(get_api_token)" ${GATEWAY_URL}"/deployment/service_versions"
+}
+
+document "send_chef_run_failure_example" <<DOC
+  Send the example chef run converge failure message to the chef run rest endpoint.
+
+  Example: Send a Chef Run example to the legacy endpoint:
+  --------------------------------------------------------
+  # send_chef_run_failure_example legacy
+DOC
+function send_chef_run_failure_example() {
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
+
+  uuid=$(uuidgen)
+
+  local examples_path="/src/components/ingest-service/examples";
+  [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/run"
+
+  # Update the 'id'
+  tmp_ccr_json="$(jq --arg id "$uuid" '.id = $id' <$examples_path/converge-failure-report.json)"
+
+  echo "$tmp_ccr_json" \
+       | curl -f --insecure -H "api-token: $(get_api_token)" \
+       --data "@-" "${GATEWAY_URL}${endpoint}"
+}
+
+document "send_chef_liveness_example" <<DOC
+  Send the example chef liveness message to the chef run rest endpoint.
+
+  Example: Send a Chef liveness example to the legacy endpoint:
+  --------------------------------------------------------
+  # send_chef_liveness_example legacy
+DOC
+function send_chef_liveness_example() {
+  install_if_missing core/curl curl;
+
+  local examples_path="/src/components/ingest-service/examples";
+  [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/liveness"
+
+  curl -f --insecure -H "api-token: $(get_api_token)" \
+       --data @$examples_path/liveness_ping.json "${GATEWAY_URL}${endpoint}"
+}
+
+document "delete_multiple_nodes" <<DOC
+  Delete multiple nodes
+
+  Example: Send a multiple delete commands:
+  --------------------------------------------------------
+  # delete_multiple_nodes 0271e125-97dd-498a-b026-8448ee60aafe 9c139ad0-89a5-44bc-942c-d7f248b155ba
+DOC
+function delete_multiple_nodes() {
+  install_if_missing core/curl curl
+  install_if_missing core/jo jo
+
+  endpoint="/ingest/events/chef/node-multiple-deletes"
+
+  jo node_ids=$(jo -a "$@") \
+    | curl -X POST -f --insecure -H "api-token: $(get_api_token)" \
+    --data "@-" "${GATEWAY_URL}${endpoint}"
+}
+
+document "send_inspec_example" <<DOC
+  Send the example inspec message to the inspec rest endpoint.
+DOC
+function send_inspec_example() {
+  install_if_missing core/curl curl;
+
+  local examples_path="/src/";
+  local endpoint="/events/data-collector"
+
+  curl -f --insecure -H "api-token: $(get_api_token)" \
+       --data @$examples_path/${JSON_FILE:-components/compliance-service/ingest/examples/compliance-success-tiny-report.json} "${GATEWAY_URL}${endpoint}"
+}
+
+document "send_inspec_failure_example" <<DOC
+  Send the example failure inspec message to the inspec rest endpoint.
+DOC
+function send_inspec_failure_example() {
+  install_if_missing core/curl curl;
+
+  local examples_path="/src/components/compliance-service/ingest/examples"
+  local endpoint="/events/data-collector"
+  local uuid=$(uuidgen)
+
+  # Update the 'report_uuid'
+  tmp_report_json="$(jq --arg uuid "$uuid" '.report_uuid = $uuid' <$examples_path/compliance-failure-big-report.json)"
+  curl -f --insecure -H "api-token: $(get_api_token)" \
+    --data "@-" "${GATEWAY_URL}${endpoint}" <<< "$tmp_report_json"
+}
+
+document "debug_automate_gateway" <<DOC
+  Attaches a remote debugger to automate-gateway
+DOC
+function debug_automate_gateway() {
+  check_if_deployinate_started || return 1
+  debug_go_service automate-gateway
+}
+
+document "gateway_list_secrets" <<DOC
+  List the secrets stored in the secrets service
+DOC
+function gateway_list_secrets() {
+  install_if_missing core/curl curl;
+  install_if_missing core/jq-static jq;
+
+  endpoint="/secrets/search"
+
+  curl -X POST -f --insecure -H "api-token: $(get_admin_token)" "${GATEWAY_URL}${endpoint}" | jq
+}
+
+document "gateway_create_secret" <<DOC
+  create a secret in the secrets service
+
+  arg 1 - username optional
+  art 2 - password optional
+DOC
+function gateway_create_secret() {
+  local username=${1:-"default"}
+  local password=${2:-"super_secret"}
+
+  install_if_missing core/curl curl;
+  install_if_missing core/jq-static jq;
+
+  endpoint="/secrets"
+
+  echo '{"name": "bob", "type": "service_now", "data": [{"key": "username", "value": "'$username'"}, {"key": "password", "value": "'$password'"}] }' |\
+    curl -X POST -f --insecure -H "api-token: $(get_admin_token)" \
+    --data "@-" "${GATEWAY_URL}${endpoint}" | jq
+}
+
+document "gateway_delete_secret" <<DOC
+  Delete one secret with the given ID
+
+  arg 1 - ID required
+DOC
+function gateway_delete_secret() {
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+
+  install_if_missing core/curl curl;
+  local id=$1
+
+  endpoint="/secrets/id/$id"
+
+  echo '{"id": "'$id'"}' |\
+    curl -X DELETE -f --insecure -H "api-token: $(get_admin_token)" \
+    --data "@-" "${GATEWAY_URL}${endpoint}"
+}
+
+document "gateway_read_secret" <<DOC
+  Read one secret with the given ID
+
+  arg 1 - ID required
+DOC
+function gateway_read_secret() {
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  local id=$1
+
+  install_if_missing core/curl curl;
+  install_if_missing core/jq-static jq;
+
+  endpoint="/secrets/id/$id"
+
+  echo '{"id": "'$id'"}' |\
+    curl -X GET -f --insecure -H "api-token: $(get_admin_token)" \
+    --data "@-" "${GATEWAY_URL}${endpoint}" | jq
+}
+
+document "gateway_update_secret" <<DOC
+  Update the username and password for one secret with the given ID
+
+  arg 1 - ID required
+  arg 2 - username optional
+  art 3 - password optional
+DOC
+function gateway_update_secret() {
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  local id=$1
+  local username=${2:-"default"}
+  local password=${3:-"super_secret"}
+
+  endpoint="/secrets/id/$id"
+
+  echo '{"id": "'$id'", "name": "bob", "type": "service_now", "data": [{"key": "username", "value": "'$username'"}, {"key": "password", "value": "'$password'"}] }' |\
+    curl -X PATCH -f --insecure -H "api-token: $(get_admin_token)" \
+    --data "@-" ${GATEWAY_URL}${endpoint} | jq
+}
+
+document "gateway_delete_notification_rule" <<DOC
+  Delete a notification with the given ID
+
+  arg 1 - ID required
+DOC
+function gateway_delete_notification_rule() {
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  local id=$1
+
+  install_if_missing core/curl curl;
+  install_if_missing core/jq-static jq;
+
+  endpoint="/notifications/rules/$id"
+
+  echo '{"id": "'$id'"}' |\
+    curl -X DELETE -f --insecure -H "api-token: $(get_admin_token)" \
+    --data "@-" ${GATEWAY_URL}${endpoint} | jq
+}
+
+document "gateway_create_notification_rule" <<DOC
+  Create a notification rule
+DOC
+function gateway_create_notification_rule() {
+  install_if_missing core/curl curl;	
+  install_if_missing core/jq-static jq;
+
+  endpoint="/notifications/rules"
+
+  echo '{"rule": { "name": "'$name'", "event": "CCRFailure", "SlackAlert": { "url": "http://localhost:55565"} }}' |\
+    curl -X POST -f --insecure -H "api-token: $(get_admin_token)" \
+    --data "@-" ${GATEWAY_URL}${endpoint} | jq
+}
+
+document "gateway_get_notification_rule" <<DOC
+  Get a notification rule with the given ID
+
+  arg 1 - ID required
+DOC
+function gateway_get_notification_rule() {
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  local id=$1
+
+  install_if_missing core/curl curl;
+  install_if_missing core/jq-static jq;
+
+  endpoint="/notifications/rules/$id"
+
+  echo '{"id": "'$id'"}' |\
+    curl -X GET -f --insecure -H "api-token: $(get_admin_token)" \
+    --data "@-" ${GATEWAY_URL}${endpoint} | jq
+}
+
+
+document "gateway_notification_validate_connection" <<DOC
+  Validate a target for a notification rule
+
+  arg 1 - URL required
+DOC
+function gateway_notification_validate_connection() {
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  local url=$1
+
+  install_if_missing core/curl curl;
+
+  endpoint="/notifications/webhook"
+
+  # There are three cases for testing a url: with a secret ID, with a username:password, no creds needed
+  # message='{"url": "'$url'", "secret_id": {"id": "kdfkdfj"}}'
+  message='{"url": "'$url'", "username_password": {"username": "bob", "password": "super_secret"}}'
+  # message='{"url": "'$url'", "none": {}}'
+
+  curl -f --insecure -H "api-token: $(get_admin_token)" --data ${message} ${GATEWAY_URL}${endpoint}
+}
+
+document "gateway_grpcurl_list_services" <<DOC
+  Display the list of RPC services inside the automate-gateway.
+
+  @(arg:1) Optional: An RPC service to inspec
+
+  Example: Inspect the JobScheduler service
+  -----------------------------
+  gateway_grpcurl_list_services chef.automate.api.ingest.JobScheduler
+DOC
+function gateway_grpcurl_list_services() {
+  grpcurl -insecure "$GATEWAY_HOST:$GATEWAY_PORT" list "$1"
+}
+
+document "gateway_grpcurl_get" <<DOC
+  Make a grpcurl GET request to the provided GRPC function, using an admin
+  token.
+
+  @(arg:1) Required: A GRPC function
+
+  Example: Get the status of the JobScheduler
+  -----------------------------
+  gateway_grpcurl_get chef.automate.api.ingest.JobScheduler.GetStatusJobScheduler
+
+  NOTE: Run 'gateway_grpcurl_list_services' to inspect the RPC services.
+DOC
+function gateway_grpcurl_get() {
+  grpcurl -insecure -rpc-header "api-token: $(get_admin_token)" \
+	  -cert /hab/svc/automate-gateway/config/service.crt \
+	  -key /hab/svc/automate-gateway/config/service.key "$GATEWAY_HOST:$GATEWAY_PORT" "$1"
+}
+
+document "get_api_token" <<DOC
+  This will idempotently generate an API token that has enough access for data ingestion.
+
+  Note: if using IAM v2, this token will NOT be an admin token; but one that is a member
+  of the default ingest-access policy.
+DOC
+function get_api_token() {
+  check_if_deployinate_started || return 1
+  if [ -f /tmp/api_token ]; then
+    cat /tmp/api_token
+  else
+    chef-automate admin-token >/tmp/api_token
+    if [ $? -ne 0 ]; then
+      get_api_token_with_policy ingest-access >/tmp/api_token || return 1
+    fi
+    cat /tmp/api_token
+  fi
+}
+
+document "get_api_token_with_policy" <<DOC
+  This will idempotently generate an API token that is a member of the policy
+  passed as an argument.
+
+  Example: get a token with editor-access
+  ----------------------------------------------------
+  # get_api_token_with_policy editor-access
+
+  Note: if NOT using IAM v2, this token will just be an admin token.
+DOC
+function get_api_token_with_policy() {
+  check_if_deployinate_started || return 1
+
+  local policy=${1:?"usage: get_api_token_with_policy POLICYNAME"}
+  local iam_version="$(chef-automate iam version | awk '{print $2}')"
+  local token_description="api-token-$$-${policy}"
+  local token_file="/tmp/api_token_${iam_version}_${policy}"
+
+  if [ -f "$token_file" ]; then
+    cat "$token_file"
+  else
+    if [ "$iam_version" == "v1.0" ]; then
+      chef-automate admin-token >"$token_file"
+    else
+      # create standard api token
+      chef-automate iam token create "$token_description" >"$token_file" || return 1
+      # retrieve the tokens' ID
+      local token_id="$(curl -fsS --insecure -H "api-token: $(get_admin_token)" \
+       "${GATEWAY_URL}/auth/tokens" |\
+         jq -er --arg token "$token_description" '[.tokens[] | select(.description == $token) | .id] | first' )"
+      # and add it to policy
+      curl -fsS --insecure -H "api-token: $(get_admin_token)" \
+        --data "$(jq -nc --arg token "$token_id"  '{ members: [ "token:\($token)" ]}')" \
+       "${GATEWAY_URL}/apis/iam/v2beta/policies/${policy}/members:add" >/dev/null
+    fi
+    cat "$token_file"
+  fi
+}
+
+document "remove_legacy_v1_policies" <<DOC
+  This will idempotently remove any migrated v1 policies you might have.
+DOC
+function remove_legacy_v1_policies() {
+  install_if_missing core/jq-static jq
+
+  for id in $(gateway_get /apis/iam/v2beta/policies |\
+                jq -rc '.policies[] | select(.name | startswith("[Legacy]")) | .id'); do
+    echo "Deleting legacy policy $id..."
+    curl -fsS --insecure -H "api-token: $(get_admin_token)" -XDELETE "${GATEWAY_URL}/apis/iam/v2beta/policies/$id"
+  done
+}

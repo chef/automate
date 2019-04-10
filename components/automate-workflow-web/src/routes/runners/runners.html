@@ -1,0 +1,30 @@
+<div class="runners tabbed-view">
+  <header class="page-header">
+    <div class="page-header-title">
+      <h2>Runners</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="tabs">
+    <ul>
+      <li class="tab jobs-queue" ui-sref-active="active" ui-sref="main.enterprise.runners.queue">
+        <span>Job Queue</span>
+      </li>
+      <li class="tab manage-runners" ui-sref-active="active" ui-sref="main.enterprise.runners.manage">
+        <span>Manage Runners</span>
+      </li>
+      <li class="tab runners-docs">
+        <a class="more-info" href="https://docs.chef.io/job_dispatch.html" target="_blank">
+            <span class="field-tooltip icon-circle-info more-info"
+                  bs-tooltip data-title="Click for more information around managing your runners."
+                  data-trigger="hover" data-placement="bottom">
+            </span>
+          </a>
+      </li>
+    </ul>
+    <div class="tab-content runners-container">
+      <div ui-view>
+    </div>
+  </div>
+</div>

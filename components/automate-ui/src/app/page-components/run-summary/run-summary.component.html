@@ -1,0 +1,96 @@
+
+<div class="node-run-message">
+  <chef-alert type="error" *ngIf="nodeRun.status === 'failure'">
+    This run failed on {{renderDate(nodeRun.endTime)}} at {{renderTime(nodeRun.endTime)}}  &nbsp;
+    <span *ngIf="nodeRun.error?.description?.title">
+      because there was a {{nodeRun.error?.description?.title}} &nbsp;
+    </span>
+    <chef-button secondary (click)="activateModal()">View error log</chef-button>
+  </chef-alert>
+  <chef-alert type="success" *ngIf="nodeRun.status === 'success'">
+    This run succeeded on {{renderDate(nodeRun.endTime)}} at {{renderTime(nodeRun.endTime)}}.
+    All resources ran successfully!
+  </chef-alert>
+</div>
+<div class="node-run-summary">
+  <div class="radial-column flex-block">
+    <chef-radial-chart>
+      <span slot="innerText">
+        <span class="chart-label-number">{{chartSucceeded}}%</span>
+        Run Progress
+      </span>
+      <chef-data-point [value]="chartOther" class="other">Other {{chartFailed}}</chef-data-point>
+      <chef-data-point [value]="chartFailed" class="failure">Failed {{chartFailed}}</chef-data-point>
+      <chef-data-point [value]="chartSucceeded" class="success">Succeeded {{chartSucceeded}}</chef-data-point>
+    </chef-radial-chart>
+  </div>
+  <div class="run-detail-labels flex-block">
+    <div class="run-metadata">
+      <div class="label">Run Duration</div>
+      <div class="value">{{ renderTime(nodeRun.startTime) }} - {{ renderTime(nodeRun.endTime) }}</div>
+    </div>
+    <div class="run-metadata">
+      <div class="label">Run Initiator</div>
+      <div class="value">Not Available</div>
+    </div>
+    <div class="run-metadata">
+      <div class="label">Run Type</div>
+      <div class="value">Not Available</div>
+    </div>
+    <div class="run-metadata">
+      <div class="label">Node ID</div>
+      <div class="value">{{ nodeRun.nodeId }}</div>
+    </div>
+    <div class="run-metadata">
+      <div class="label">Run ID</div>
+      <div class="value">{{ nodeRun.runId }}</div>
+    </div>
+    <div class="run-metadata">
+      <div class="label">Deprecations</div>
+      <div class="value">{{ nodeRunDeprecations(nodeRun.deprecations) }}</div>
+    </div>
+  </div>
+  <div class="node-info-column flex-block">
+    <div class="run-metadata">
+      <div class="label">Uptime</div>
+      <div class="value">{{renderDuration(nodeRun.uptimeSeconds)}}</div>
+    </div>
+    <ng-container *ngIf="nodeRun.policyName">
+      <div class="run-metadata">
+        <div class="label">Policy Group</div>
+        <div class="value">{{nodeRun.policyGroup}}</div>
+      </div>
+      <div class="run-metadata">
+        <div class="label">Policy Name</div>
+        <div class="value">{{nodeRun.policyName}}</div>
+      </div>
+      <div class="run-metadata">
+        <div class="label">Policy Revision</div>
+        <div class="value">{{nodeRun.policyRevision}}</div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!nodeRun.policyName">
+      <div class="run-metadata">
+        <div class="label">Environment</div>
+        <div class="value">{{nodeRun.environment}}</div>
+      </div>
+    </ng-container>
+    <div class="run-metadata">
+      <div class="label">Platform(s)</div>
+      <div class="value">{{nodeRun.platform}}</div>
+    </div>
+    <div class="run-metadata">
+      <div class="label">IP Address</div>
+      <div class="value">{{nodeRun.ipaddress}}</div>
+    </div>
+    <div class="run-metadata">
+      <div class="label">FQDN</div>
+      <div class="value">{{nodeRun.fqdn || 'Not Available'}}</div>
+    </div>
+    <div class="run-metadata">
+      <div class="label">Chef Client Version</div>
+      <div class="value">{{nodeRun.chefVersion || 'Not Available'}}</div>
+    </div>
+  </div>
+</div>
+

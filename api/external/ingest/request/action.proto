@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package chef.automate.api.ingest.request;
+option go_package = "github.com/chef/automate/api/external/ingest/request";
+
+message Action {
+  // ID of the action message itself
+  string id = 1;
+  string message_type = 2;
+  string message_version = 3;
+  string entity_name = 4;
+  string entity_type = 5;
+  string task = 6;
+  string organization_name = 7;
+  string remote_hostname = 8;
+  string run_id = 9;
+  // This new field called 'content' is being used to send the entire raw JSON
+  // message in bytes, this field is heavily used by the gateway for the DataCollector
+  // Func Handler that will send the Action message to the (receiver) ingest-service
+  // that will manually unmarshal the message from this field if it is provided.
+  // The main purpose of this field it to improve the performance of ingestion when
+  // the requests comes in REST/HTTP format.
+  bytes content = 10;
+  string node_id = 16; // Not available from Chef Server
+  string recorded_at = 17;
+  string remote_request_id = 18;
+  string request_id = 19;
+  string requestor_name = 20;
+  string requestor_type = 21;
+  string service_hostname = 22;
+  string user_agent = 23;
+  string parent_type = 24;
+  string parent_name = 25;
+  reserved 26;
+  string revision_id = 27;
+}
+
+message Delete {
+  // ID of the action message itself
+  string id = 1;
+  string node_name = 4;
+  string organization_name = 7;
+  string remote_hostname = 8;
+  string service_hostname = 9;
+  string node_id = 16; // Not available from Chef Server
+}
+
+message MultipleNodeDeleteRequest {
+  repeated string node_ids = 1;
+}

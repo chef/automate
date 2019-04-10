@@ -1,0 +1,27 @@
+<div class="patchset">
+  <header class="patchset-header">
+    <h2
+      class="patchset-title"
+      bs-collapse-toggle>Patchset {{ patchset.sequenceNumber }}
+    </h2>
+  </header>
+  <div bs-collapse-target>
+    <cd-diff-files class="patchset-files"></cd-diff-files>
+    <div>
+      <ol class="comments">
+        <li
+          class="comment"
+          ng-repeat="
+            comment in getPatchsetComments(patchset) | orderBy:'datetime' 
+            track by comment.id"
+          cd-comment="comment">
+        </li>
+      </ol>
+      <cd-comment-form data-change="change" data-patchset="patchset"></cd-comment-form>
+      <div
+        ng-repeat="file in filesWithComments(patchset) track by $index"
+        cd-file-comments>
+      </div>
+    </div>
+  </div>
+</div>

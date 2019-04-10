@@ -1,0 +1,23 @@
+@import '../../component-library-mixins.scss';
+
+:host .cl-content {
+  @include section-content();
+}
+
+:host .cl-header ::ng-deep h3 {
+  font-weight: bold;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+}
+
+::ng-deep h4 {
+  font-style: italic;
+  font-weight: bold;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+::ng-deep ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}

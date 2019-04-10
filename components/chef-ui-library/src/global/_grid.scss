@@ -1,0 +1,51 @@
+// grid variables
+$grid-columns: 12;
+$grid-max-width: 70em;
+$grid-gutter: 1.5%;
+// breakpoints
+$breakpoint-small: "only screen and (min-width: 20em)";
+$breakpoint-medium: "only screen and (min-width: 30em)";
+
+.chef-flex-wrapper,
+.chef-flex-row {
+  flex-flow: row wrap;
+  width: 100%;
+
+  @media #{$breakpoint-medium} {
+    display: flex;
+    justify-content: space-between;
+
+    &.justify-left {
+      justify-content: left;
+
+      [class*='chef-col-'] {
+        margin-right: $grid-gutter;
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}
+
+[class*='chef-col-'] {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  margin: 0;
+}
+
+@media #{$breakpoint-medium} {
+
+  @for $i from 1 through $grid-columns {
+
+    .chef-flex-wrapper {
+      max-width: $grid-max-width;
+    }
+
+    .chef-col-#{$i} {
+      width: (100% / $grid-columns * $i) - $grid-gutter;
+    }
+  }
+}

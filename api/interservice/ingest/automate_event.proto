@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package chef.automate.domain.ingest;
+option go_package = "github.com/chef/automate/api/interservice/ingest";
+
+
+import "api/interservice/event/event.proto";
+
+service EventHandler {
+  rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
+}

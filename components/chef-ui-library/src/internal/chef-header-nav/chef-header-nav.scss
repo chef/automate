@@ -1,0 +1,70 @@
+chef-header-nav {
+  display: block;
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: chef-hsl(var(--chef-white));
+  box-shadow: var(--chef-box-shadow);
+
+  .navigation-wrapper {
+    display: flex;
+    justify-content: space-between;
+
+    .left-nav {
+      display: flex;
+    }
+
+    .navigation-menu {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-link,
+    .nav-link {
+      margin: 10px 1em;
+
+      a {
+        color: chef-hsl(var(--chef-primary-dark));
+        text-decoration: none;
+
+        &:hover {
+          color: chef-hsl(var(--chef-primary-bright));
+        }
+      }
+    }
+
+    .logo-link a {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      text-decoration: none;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 50px;
+        height: 50px;
+        margin-right: 1em;
+        background: url(/assets/code-book.svg);
+        background-size: contain;
+      }
+
+      h2 {
+        margin: 0;
+      }
+    }
+
+    .nav-link a {
+      padding-bottom: 20px;
+
+      &:hover,
+      &:focus,
+      &.active {
+        color: chef-hsl(var(--chef-primary-bright));
+        border-bottom: 2px solid chef-hsl(var(--chef-primary-bright));
+      }
+    }
+  }
+}

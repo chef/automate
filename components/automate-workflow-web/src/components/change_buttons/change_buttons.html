@@ -1,0 +1,44 @@
+<div class="change-toolbar" ng-switch on="change.state">
+  <div ng-switch-when="open">
+    <div class="change-btns">
+      <button
+        class="button approve"
+        ng-class="promoteClass()"
+        ng-disabled="!change.links.approve"
+        ng-click="approve(change)">
+        Approve</button>
+      <button
+        class="button destroy"
+        ng-disabled="!change.links.delete"
+        ng-click="delete()">Delete</button>
+    </div>
+    <div ng-if="promoteDiscouraged()" class="promotion-status">
+      <a ui-sref="main.dashboard" >{{ promoteMessage() }}</a>
+      Promote with caution.
+    </div>
+  </div>
+  <div ng-switch-when="merged">
+    <div class="change-btns">
+      <button
+        class="button deliver"
+        ng-class="promoteClass()"
+        ng-show="allowPromotion()"
+        ng-disabled="!change.links.deliver"
+        ng-click="deliver(change)">
+        Deliver
+      </button>
+    </div>
+    <div class="promotion-status" ng-switch="promoteStatusReason()">
+      <div ng-switch-when="pipeline_union_failure">
+        <a ui-sref="main.dashboard">{{ promoteMessage() }}</a>
+        Promote with caution.
+      </div>
+      <div ng-switch-when="change_superseded">
+        Superseded by
+        <a class="superseding-change-link"
+          ui-sref="main.enterprise.organizations.organization.project.change({ change: change.supersedingChange.id })">
+          {{ change.supersedingChange.title }}</a>.
+      </div>
+    </div>
+  </div>
+</div>

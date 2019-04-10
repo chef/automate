@@ -1,0 +1,308 @@
+%syntax-version=1.0.0
+%project=delivery
+%uri=https://github.com/opscode/delivery
+
+cd_timestamp                                                                                                        2014-04-08T18:42:54Z Seth Falcon <seth@getchef.com>     # cd_timestamp DOMAIN
+ssh_pub_key                                                                                                         2014-04-08T18:57:59Z Seth Falcon <seth@getchef.com>     # ssh_pub_key DOMAIN
+hash_type                                                                                                           2014-04-08T19:04:30Z Seth Falcon <seth@getchef.com>     # password_hash_type DOMAIN
+enterprises                                                                                                         2014-04-05T06:07:38Z Seth Falcon <seth@getchef.com>     # enterprises 0
+
+user_type                                                                                                           2014-06-02T15:05:02Z Christopher Maier <cm@getchef.com> # Add user_type enum
+
+users                               [enterprises cd_timestamp ssh_pub_key user_type] 2014-04-05T06:08:00Z Seth Falcon <seth@getchef.com>     # users
+user_passwords                      [users hash_type] 2014-06-02T15:46:52Z Christopher Maier <cm@getchef.com> # Add user_passwords table
+
+token_prefix                                                                                                        2014-06-04T14:56:19Z Christopher Maier <cm@getchef.com> # Add token_prefix domain
+user_tokens                         [users cd_timestamp] 2014-06-02T15:49:09Z Christopher Maier <cm@getchef.com> # Add user_tokens table
+candidate_tokens                [users enterprises user_tokens token_prefix] 2014-06-04T15:04:58Z Christopher Maier <cm@getchef.com> # Add candidate_tokens function
+
+user_cache                          [users cd_timestamp] 2014-06-02T15:56:25Z Christopher Maier <cm@getchef.com> # Add user_cache table
+
+internal_users                      [users user_passwords user_tokens] 2014-06-02T17:01:07Z Christopher Maier <cm@getchef.com> # Add internal_users view
+insert_internal_user                                                                                                2014-06-03T14:25:22Z Christopher Maier <cm@getchef.com> # Add insert_internal_user trigger function
+delete_internal_user                                                                                                2014-06-03T14:30:23Z Christopher Maier <cm@getchef.com> # Add delete_internal_user trigger function
+update_internal_user                                                                                                2014-06-03T14:43:34Z Christopher Maier <cm@getchef.com> # Add update_internal_user trigger function
+internal_user_triggers              [internal_users insert_internal_user delete_internal_user update_internal_user] 2014-06-03T14:57:47Z Christopher Maier <cm@getchef.com> # Add INSERT, UPDATE, DELETE triggers to internal_user view
+
+organizations                       [enterprises] 2014-04-11T05:29:28Z Seth Falcon <seth@getchef.com>     # orgs initial
+delivery_role                                                                                                       2014-05-14T21:26:21Z Christopher Maier <cm@getchef.com> # Add delivery_role enum
+enterprise_user_roles               [delivery_role users enterprises] 2014-05-14T21:28:34Z Christopher Maier <cm@getchef.com> # Add enterprise_user_roles table
+organization_user_roles             [delivery_role users organizations] 2014-05-14T21:29:44Z Christopher Maier <cm@getchef.com> # Add organization_user_roles table
+ensure_role_membership_prerequisite [enterprise_user_roles organization_user_roles] 2014-05-14T21:32:54Z Christopher Maier <cm@getchef.com> # Add ensure_role_membership_prerequisite trigger function
+role_triggers                       [ensure_role_membership_prerequisite] 2014-05-14T21:41:35Z Christopher Maier <cm@getchef.com> # Add role triggers
+update_token_birthday                                                                                               2014-05-15T15:14:08Z Christopher Maier <cm@getchef.com> # Add update_token_birthday trigger function
+token_birthday_trigger              [update_token_birthday user_tokens] 2014-05-15T17:36:45Z Christopher Maier <cm@getchef.com> # Add trigger to update token "birthday"
+
+@0.0.1 2014-05-16T19:12:14Z Christopher Maier <cm@getchef.com> # Tag as base for reworking
+
+projects                            [organizations] 2014-05-16T19:12:51Z Christopher Maier <cm@getchef.com> # Add projects table
+project_user_roles                  [projects delivery_role] 2014-05-16T20:02:04Z Christopher Maier <cm@getchef.com> # Add project_user_roles table
+pipelines                           [projects] 2014-05-19T14:37:30Z Christopher Maier <cm@getchef.com> # Add pipelines table
+pipeline_user_roles                 [pipelines delivery_role] 2014-05-19T14:49:21Z Christopher Maier <cm@getchef.com> # Add pipeline_user_roles table
+ensure_role_membership_prerequisite [ensure_role_membership_prerequisite@0.0.1 project_user_roles pipeline_user_roles] 2014-05-16T20:11:08Z Christopher Maier <cm@getchef.com> # add project roles to the function
+project_and_pipeline_role_triggers  [ensure_role_membership_prerequisite] 2014-05-16T20:28:42Z Christopher Maier <cm@getchef.com> # Add role trigger for projects and pipelines
+assign_token [users enterprises user_tokens] 2014-06-04T20:41:19Z Christopher Maier <cm@getchef.com> # Add assign_token function
+invalidate_tokens_and_passwords [users enterprises user_tokens user_passwords] 2014-06-05T15:52:22Z Christopher Maier <cm@getchef.com> # Add invalidation functions for tokens and passwords
+revoke_token [users enterprises user_tokens] 2014-06-06T13:39:02Z Christopher Maier <cm@getchef.com> # Add revoke_token function for logout
+raise_user_type_change_exception [users enterprises] 2014-06-17T15:48:08Z Christopher Maier <cm@getchef.com># Exception-raising function for user type switches
+prevent_type_switch_trigger [raise_user_type_change_exception] 2014-06-17T15:54:55Z Christopher Maier <cm@getchef.com> # Add prevent_type_switch trigger
+
+assign_roles_at_enterprise [enterprise_user_roles] 2014-06-24T01:42:10Z Christopher Maier <cm@getchef.com> # Add assign_roles_at_enterprise function
+
+effective_roles_at_enterprise [enterprise_user_roles] 2014-07-09T18:48:15Z Christopher Maier <cm@getchef.com># Add effective_roles_at_enterprise
+delivery_scope 2014-07-11T10:24:38Z Christopher Maier <cm@getchef.com> # Add delivery_scope enum
+
+to_ids [delivery_scope enterprises users organizations projects pipelines] 2014-07-16T10:26:29Z Christopher Maier <cm@getchef.com> # Add a to_ids function
+scoped_roles [delivery_scope delivery_role to_ids enterprise_user_roles organization_user_roles project_user_roles pipeline_user_roles] 2014-07-10T20:45:21Z Christopher Maier <cm@getchef.com> # Add scoped_roles function
+
+grant_roles [delivery_scope to_ids enterprise_user_roles organization_user_roles project_user_roles pipeline_user_roles] 2014-07-16T14:30:23Z Christopher Maier <cm@getchef.com> # Add grant_roles function
+revoke_roles [delivery_scope to_ids enterprise_user_roles organization_user_roles project_user_roles pipeline_user_roles] 2014-07-16T16:14:18Z Christopher Maier <cm@getchef.com> # Add revoke_roles function
+set_roles [grant_roles revoke_roles] 2014-07-16T17:46:17Z Christopher Maier <cm@getchef.com> # Add set_roles function
+
+update_project_guid [projects] 2014-07-17T21:01:06Z Jean Rouge <jean@getchef.com> # Adding update_project_guid trigger function
+project_guid_trigger [update_project_guid] 2014-07-17T21:01:11Z Jean Rouge <jean@getchef.com> # Adding a trigger on projects to create GUIDs
+
+changes [pipelines] 2014-07-28T22:11:26Z Jean Rouge <jean@getchef.com> # Add changes table
+cd_patchset_status 2014-08-08T15:42:59Z Jean Rouge <jean@getchef.com> # Add cd_patchset_status type
+patchsets [changes users] 2014-08-08T15:36:08Z Jean Rouge <jean@getchef.com> # Add patchsets table
+create_patchset_and_change [patchsets] 2014-07-28T16:13:46Z Jean Rouge <jean@getchef.com> # Add create_patchset_and_change function
+reviews [cd_patchset_status patchsets users] 2014-08-08T16:57:01Z Jean Rouge <jean@getchef.com> # Add reviews table
+
+cd_comment_type 2014-08-08T16:12:39Z Jean Rouge <jean@getchef.com> # Add cd_comment_type type
+cd_comment_status 2014-08-08T16:12:41Z Jean Rouge <jean@getchef.com> # Add cd_comment_status type
+comments [cd_comment_status cd_comment_type patchsets users] 2014-08-08T17:00:03Z Jean Rouge <jean@getchef.com> # Add comments table
+update_comment [comments] 2014-08-28T19:42:17Z Jean Rouge <jean@getchef.com> # update_comment trigger definition
+update_comment_trigger [update_comment comments] 2014-08-28T19:42:32Z Jean Rouge <jean@getchef.com> # activate the update trigger on the comments table
+
+assert_patchset_in_change [patchsets] 2014-09-18T00:45:33Z Jean Rouge <jean@getchef.com>
+patchset_id_from_seq_number [patchsets] 2014-09-23T22:51:50Z Jean Rouge <jean@getchef.com>
+insert_or_update_comment [comments assert_patchset_in_change patchset_id_from_seq_number] 2014-09-17T00:52:21Z Jean Rouge <jean@getchef.com>
+fetch_comments [comments assert_patchset_in_change patchset_id_from_seq_number] 2014-09-17T21:06:56Z Jean Rouge <jean@getchef.com>
+
+stage_runs [changes] 2014-08-19T13:00:00Z Seth Falcon <seth@getchef.com>
+phase_runs [stage_runs] 2014-08-19T13:00:00Z Seth Falcon <seth@getchef.com>
+
+submission_timestamp_for_change [patchsets] 2014-08-26T16:20:02Z Christopher Maier <cm@getchef.com> # Add submission_timestamp_for_change function
+get_changes [enterprises organizations projects pipelines cd_patchset_status changes submission_timestamp_for_change] 2014-08-25T18:36:13Z Christopher Maier <cm@getchef.com> # Add get_changes function
+get_change [changes pipelines patchsets users cd_patchset_status] 2014-09-05T10:00:42Z Christopher Maier <cm@getchef.com> # Add get_change function
+
+get_latest_patchset [cd_patchset_status changes patchsets] 2014-09-16T15:02:38Z Christopher Maier <cm@getchef.com> # Add get_latest_patchset function
+get_patchsets_for_change [get_latest_patchset] 2014-09-16T14:41:35Z Christopher Maier <cm@getchef.com># Add 'get_patchsets_for_change' function
+stage_ordering 2014-10-02T22:25:50Z Christopher Maier <cm@getchef.com> # Add a stage_ordering table
+phase_run_summary [stage_ordering stage_runs phase_runs] 2014-10-03T00:37:19Z Christopher Maier <cm@getchef.com> # Add phase_run_summary procedure
+all_stages [stage_ordering] 2014-10-03T19:08:06Z Christopher Maier <cm@getchef.com> # Add all_stages function
+phases_for_stage [stage_ordering] 2014-10-03T19:19:54Z Christopher Maier <cm@getchef.com> # Add phases_for_stagefunction
+
+@0.1.0 2014-10-13T19:20:57Z Christopher Maier <cm@getchef.com> # Tag for future work; everything is reworks from here out
+stage_ordering [stage_ordering@0.1.0] 2014-10-13T19:32:21Z Christopher Maier <cm@getchef.com># Add some forgotten phases
+
+patchset_changed_files [patchsets] 2014-10-14T20:01:29Z Jean Rouge <jean@getchef.com>
+patchset_diffstats [patchsets] 2014-10-14T20:01:37Z Jean Rouge <jean@getchef.com>
+project_commits [projects] 2014-10-14T20:01:45Z Jean Rouge <jean@getchef.com>
+patchset_project_commits [patchsets project_commits] 2014-10-14T20:01:47Z Jean Rouge <jean@getchef.com>
+insert_patchset_commit [patchset_project_commits] 2014-10-14T20:37:52Z Jean Rouge <jean@getchef.com>
+patchset_commits [patchset_project_commits] 2014-10-15T18:30:10Z Jean Rouge <jean@getchef.com>
+
+utility_schema 2014-11-13T19:29:40Z Christopher Maier <cm@getchef.com> # Add a utility schema
+internal_to_external [utility_schema users user_passwords] 2014-11-14T20:20:26Z Christopher Maier <cm@getchef.com> # Add internal_to_external stored procedure
+cascade_stage_runs_change_id_fkey [stage_runs] 2014-11-17T15:13:50Z Christopher Maier <cm@getchef.com> # The stage_runs_change_id_fkey should cascade
+get_changes [get_changes@0.1.0] 2014-11-19T17:40:59Z Jon Anderson <janderson@remjanderson01.local># For merge_sha changes
+get_change [get_change@0.1.0] 2014-11-19T22:12:49Z Jon Anderson <janderson@remjanderson01.local># For merge_sha changes
+get_patchsets_for_change [get_patchsets_for_change@0.1.0] 2014-11-24T18:17:05Z Jon Anderson <janderson@remjanderson01.local># change for withdraw change API
+changes_in_verify 2014-11-21T19:00:18Z Christopher Maier <cm@getchef.com> # Create changes_in_verify stored procedure
+
+@0.1.1 2014-12-02T19:09:36Z Christopher Maier <cm@getchef.com> # Let's tag another version!
+changes_in_verify [changes_in_verify@0.1.1] 2014-12-02T19:10:03Z Christopher Maier <cm@getchef.com># Need to only operate on open changes
+update_production_to_delivered 2014-12-09T03:15:57Z Jon Morrow <jon@Jons-MacBook-Pro.local> # Rename production to delivered.
+stage_run_summary 2014-12-11T04:32:43Z Jon Morrow <jon@Jons-MacBook-Pro.local> # Stored proc to get stage run summary.
+changes_add_title_and_description [changes] 2014-12-17T00:11:03Z Jordan Wilberding <jordan@getchef.io># Add a title and description column to changes.
+update_release_to_publish [stage_ordering stage_runs phase_runs] 2015-01-20T20:52:59Z Jon Anderson <janderson@chef.io> # Rename of 'release' stage to 'build' and its 'release' phase to 'publish' migration.
+fix_spurious_withdrawn_patchsets 2015-02-07T01:46:54Z Christopher Maier <cm@chef.io> # Not quite sure how this even happened...
+most_recent_patchsets_view 2015-02-04T14:02:15Z Christopher Maier <cm@chef.io> # Add a 'most_recent_patchsets' view
+open_changes_view [most_recent_patchsets_view] 2015-02-04T19:11:56Z Christopher Maier <cm@chef.io> # Add an open_changes view
+scoped_stage_runs_view [organizations projects pipelines changes stage_runs] 2015-02-05T14:47:40Z Christopher Maier <cm@chef.io> # Add a scoped_stage_runs view
+current_pipeline_snapshot_for_enterprise [scoped_stage_runs_view open_changes_view] 2015-02-05T17:01:17Z Christopher Maier <cm@chef.io> # Add a current_pipeline_snapshot_for_enterprise procedure
+current_pipelines_stats_for_enterprise [scoped_stage_runs_view] 2015-02-11T23:03:40Z Jon Morrow <jmorrow@chef.io> # Add pipeline statistics stored procedure.
+stage_runs_to_restart_view [scoped_stage_runs_view] 2015-02-17T02:40:02Z Jon Morrow <jmorrow@chef.io> # View that list stage runs to restart.
+get_changes [get_changes@0.1.1] 2015-02-10T17:08:30Z Jon Anderson <janderson@remjanderson01.local># Remove 'withdraw' from the system.
+get_patchsets_for_change [get_patchsets_for_change@0.1.1] 2015-02-10T18:35:29Z Jon Anderson <janderson@remjanderson01.local># Remove 'withdraw' from the system.
+delete_withdrawn_changes [get_changes get_patchsets_for_change] 2015-02-17T15:07:09Z Jon Anderson <janderson@remjanderson01.local> # Delete withdrawn changes at upgrade.
+rename_success [phase_runs stage_runs] 2015-03-06T19:01:06Z Tom Duffield <tom@chef.io> # Replace occurrences of success and successful with passed in phase/stage_runs tables
+@0.1.2 2015-03-06T19:28:30Z Tom Duffield <tom@chef.io> # Let's tag another version.
+current_pipelines_stats_for_enterprise [current_pipelines_stats_for_enterprise@0.1.2] 2015-03-06T19:29:36Z Tom Duffield <tom@chef.io># Changing 'success' and 'successful' to 'passed'
+add_approver_to_change [changes open_changes_view] 2015-04-01T13:03:45Z Jon Anderson <janderson@chef.io> # Add approved_by column to the changes table.
+get_changes [get_changes@0.1.2] 2015-04-01T13:27:02Z Jon Anderson <janderson@chef.io># Add approved_by.
+get_change [get_change@0.1.2] 2015-04-01T16:09:29Z Jon Anderson <janderson@chef.io># Add approve_by.
+open_changes_view [open_changes_view@0.1.2 changes] 2015-04-02T14:54:08Z Jon Anderson <janderson@remjanderson01.local># add changes dependency.
+
+@0.1.3 2015-04-06T22:25:22Z Jean Rouge <jean@chef.io>
+cd_changeset_status 2015-04-10T20:20:11Z Jean Rouge <jean@chef.io>
+changesets [pipelines cd_changeset_status] 2015-04-06T22:27:06Z Jean Rouge <jean@chef.io> # Adding a changesets table
+add_changeset_fk_to_changes [changes changesets] 2015-04-06T23:01:57Z Jean Rouge <jean@chef.io> # Adding a changeset_id column to changes
+get_changes [get_changes@0.1.3] 2015-04-06T23:01:57Z Jean Rouge <jean@chef.io>
+get_change [get_change@0.1.3] 2015-04-06T23:01:57Z Jean Rouge <jean@chef.io>
+open_changes_view [open_changes_view@0.1.3 changes] 2015-04-06T23:01:57Z Jean Rouge <jean@chef.io>
+merge_change [changes changesets] 2015-04-07T20:12:44Z Jean Rouge <jean@chef.io>
+current_pipeline_status_for_enterprise 2015-05-07T17:43:06Z Jon Anderson <janderson@remjanderson01.local> # Changes in URD stages for pipeline visualization
+@0.1.4 2015-05-21T17:39:06Z Oliver Ferrigni <oliver@chef.io># 0.1.4
+current_pipeline_status_for_enterprise [current_pipeline_status_for_enterprise@0.1.4] 2015-05-21T17:39:15Z Oliver Ferrigni <oliver@chef.io># Adding delivered_at, approved_by and started
+
+@0.1.5 2015-06-03T19:32:06Z Jean Rouge <jean@chef.io> # Tagging to be able to rework current_pipeline_status_for_enterprise
+current_pipeline_status_for_enterprise [current_pipeline_status_for_enterprise@0.1.5] 2015-06-03T19:32:46Z Jean Rouge <jean@chef.io> # Making current_pipeline_status_for_enterprise return all stages' status, not just URD
+project_github_metadata [projects] 2015-06-16T22:22:38Z Jean Rouge <jean@chef.io> # Adding the project_github_metadata table
+upsert_project_github_metadata [project_github_metadata] 2015-06-17T19:02:58Z Jean Rouge <jean@chef.io> # Adding an upsert procedure for github metadata
+cd_project_type 2015-06-22T21:49:38Z Tom Duffield <tom@chef.io> # Add cd_project_type
+projects_add_type [projects cd_project_type] 2015-06-12T19:06:17Z Tom Duffield <tom@chef.io> # Add type field to projects table
+phase_run_summary [phase_run_summary@0.1.5] 2015-06-24T21:43:50Z Jon Anderson <janderson@remjanderson01.local># Add return of search_query
+github_patchsets [patchsets] 2015-06-16T18:12:52Z Tom Duffield <tom@chef.io> # Add github_patchsets table
+
+@0.1.6 2015-07-30T17:57:39Z Oliver Ferrigni <oliver@chef.io> # Tagging patchset info update
+add_patchset_info_to_changes 2015-07-27T20:38:40Z Oliver Ferrigni <oliver@chef.io># This adds latest_patchset_status, latest_patchset, submitted_at, submitted_by to changes
+open_changes_view [open_changes_view@0.1.6] 2015-07-27T16:46:17Z Oliver Ferrigni <oliver@chef.io># Add latest_patchset, latest_patchset_status, submitted_by, submitted_at
+create_patchset_and_change [create_patchset_and_change@0.1.6] 2015-07-27T22:03:18Z Oliver Ferrigni <oliver@chef.io># Update change with patch info
+merge_change [merge_change@0.1.6] 2015-07-28T18:04:20Z Oliver Ferrigni <oliver@chef.io># Rework merge change
+
+@0.1.7 2015-07-31T19:28:25Z Oliver Ferrigni <oliver@chef.io> # Tagging open_changes_view removal
+current_pipeline_snapshot_for_enterprise [current_pipeline_snapshot_for_enterprise@0.1.7] 2015-07-31T19:21:19Z Oliver Ferrigni <oliver@chef.io># DROP function as unused
+open_changes_view [open_changes_view@0.1.7] 2015-07-31T19:29:54Z Oliver Ferrigni <oliver@chef.io># DROP open_changes_view
+add_search_desc_to_phase_runs 2015-08-03T19:25:51Z Jon Morrow <jmorrow@chef.io> # Adding search_description to phase_runs
+
+@0.1.8 2015-08-03T19:38:12Z Jon Morrow <jmorrow@chef.io> # Tagging to be able to re-work phase_run_summary.
+phase_run_summary [phase_run_summary@0.1.8 add_search_desc_to_phase_runs] 2015-08-03T19:43:27Z Jon Morrow <jmorrow@chef.io> # Return search_description.
+fix_change_patchset_info [add_patchset_info_to_changes] 2015-08-03T20:58:47Z Tom Duffield <tom@chef.io> # Fix the timestamp and seq_num in the changes table
+get_changes [get_changes@0.1.8 add_patchset_info_to_changes] 2015-08-03T17:47:26Z Tom Duffield <tom@chef.io> # Rework get_changes to leverage new columns in changes
+get_change [get_change@0.1.8] 2015-08-03T21:30:55Z Tom Duffield <tom@chef.io> # Leverage new change table
+changes_in_verify [changes_in_verify@0.1.8 fix_change_patchset_info] 2015-08-03T21:37:39Z Tom Duffield <tom@chef.io> # Leverage new change table values
+submission_timestamp_for_change [submission_timestamp_for_change@0.1.8 fix_change_patchset_info] 2015-08-04T14:35:28Z Tom Duffield <tom@chef.io> # Remove function as it is no longer needed
+merge_change [merge_change@0.1.8 fix_change_patchset_info] 2015-08-04T18:58:22Z Tom Duffield <tom@chef.io> # Update status when change is merged
+get_latest_patchset [get_latest_patchset@0.1.8 fix_change_patchset_info] 2015-08-04T20:51:13Z Tom Duffield <tom@chef.io> # Leverage new change table
+add_status_comment_id_to_github_patchsets 2015-08-05T17:04:24Z Jessica Mink <jmink@remmink01.local> # Adding status_comment_id to github_patchsets.
+external_oauth_applications 2015-08-07T18:34:50Z Tom Duffield <tom@chef.io> # Add table to hold OAuth configuration
+oauth_tokens [external_oauth_applications] 2015-08-11T19:02:54Z Tom Duffield <tom@chef.io> # Add new generic table to handle OAuth tokens
+oauth_user_aliases [users external_oauth_applications] 2015-08-14T01:47:27Z Tom Duffield <tom@chef.io> # Add table to handle user aliases from OAuth integrations
+oauth_integrations [external_oauth_applications oauth_tokens] 2015-08-17T13:27:05Z Tom Duffield <tom@chef.io> # Create view of oauth_tokens with oauth_application data
+oauth_user_aliases_id [oauth_user_aliases] 2015-08-19T21:12:31Z Tom Duffield <tom@chef.io> # Add id PK to oauth_user_aliases table
+
+@0.1.9 2015-08-28T19:21:42Z Christopher Maier <cm@chef.io> # Prep for changeset addition bugfix
+merge_change [merge_change@0.1.9] 2015-08-28T19:22:30Z Christopher Maier <cm@chef.io> # Remove changeset manipulation code
+add_to_changeset [changesets] 2015-08-28T19:42:53Z Christopher Maier <cm@chef.io> # Add a change to a changeset
+delivered_stats_on_change [changes] 2015-09-03T17:02:17Z Christopher Maier <cm@chef.io> # Add delivered_by and delivered_at columns to changes table
+add_pipeline_name_to_changes 2015-09-04T13:05:10Z Oliver Ferrigni <oliver@chef.io># Add invariant pipeline name to changes
+create_patchset_and_change [create_patchset_and_change@0.1.9] 2015-09-04T13:52:22Z Oliver Ferrigni <oliver@chef.io># Add pipeline_name_at_creation to change
+get_changes [get_changes@0.1.9] 2015-09-04T14:55:40Z Christopher Maier <cm@chef.io> # Make get_changes use compute-on-write data for changes
+get_change [get_change@0.1.9] 2015-09-04T19:09:40Z Christopher Maier <cm@chef.io> # Rip out get_change
+audit_stage_events 2015-09-11T15:42:36Z Oliver Ferrigni <oliver@chef.io># Create audit_stage_events table
+add_order_to_audit 2015-09-14T22:44:26Z Oliver Ferrigni <oliver@chef.io># Add sequence number to audit for ordering
+@0.1.10 2015-09-16T15:19:09Z Oliver Ferrigni <oliver@chef.io> # Tagging to fix bug in current_pipeline_status_for_enterprise
+current_pipeline_status_for_enterprise [current_pipeline_status_for_enterprise@0.1.10] 2015-09-16T15:19:54Z Oliver Ferrigni <oliver@chef.io># Update current_pipeline_status_for_enterprise to reflect changeset lifecyle
+@0.1.11 2015-09-16T22:11:23Z Oliver Ferrigni <oliver@chef.io> # Tagging to fix bug in bug fix for current_pipeline_status_for_enterprise
+current_pipeline_status_for_enterprise [current_pipeline_status_for_enterprise@0.1.11] 2015-09-16T22:11:26Z Oliver Ferrigni <oliver@chef.io># Exclude superseded changes
+@0.1.12 2015-09-21T01:40:19Z Oliver Ferrigni <oliver@chef.io> # Tagging to filter out merged failed builds
+current_pipeline_status_for_enterprise [current_pipeline_status_for_enterprise@0.1.12] 2015-09-21T01:40:23Z Oliver Ferrigni <oliver@chef.io># Filter out failed builds that have been superseded
+default_changesets [add_patchset_info_to_changes] 2015-09-21T13:37:44Z Oliver Ferrigni <oliver@chef.io># Add default_changesets
+add_to_changeset [add_to_changeset@0.1.12] 2015-09-22T17:42:13Z Oliver Ferrigni <oliver@chef.io># Add merged changes with failed builds to changeset
+@0.1.13 2015-09-24T14:35:10Z Oliver Ferrigni <oliver@chef.io> # Tagging to filter out verify stages from add_to_changeset
+add_to_changeset [add_to_changeset@0.1.13] 2015-09-24T14:35:12Z Oliver Ferrigni <oliver@chef.io># Match change_id from scoped_stage_run to only select changes with failed builds
+projects_full_scm_module [projects_add_type] 2015-09-24T16:54:35Z Tom Duffield <tom@chef.io> # Use full SCM module name instead of type
+create_scm_project 2015-09-24T20:40:53Z Tom Duffield <tom@chef.io> # Adding function to create external SCM backed projects
+@0.1.14 2015-09-28T15:31:01Z David McCown <dmccown@chef.io> # Tagging 0.1.14 to remove github_metadata upsert
+upsert_project_github_metadata [upsert_project_github_metadata@0.1.14] 2015-09-28T15:32:33Z David McCown <dmccown@chef.io> # Removing function. It has been replaced with create_scm_project.
+@0.1.15 2015-09-30T23:10:55Z David McCown <dmccown@chef.io> # Tagging 0.1.15 so we can change current_pipeline_status_for_enterprise to return changeset id
+current_pipeline_status_for_enterprise [current_pipeline_status_for_enterprise@0.1.15] 2015-09-30T23:16:40Z David McCown <dmccown@chef.io> # Adding changeset id to returned values.
+changes_for_changeset_ids 2015-10-01T19:53:19Z David McCown <dmccown@chef.io> # Adding way to find all changes related to a changeset id.
+@0.1.16 2015-10-13T19:09:58Z David McCown <dmccown@chef.io> # Tagging at 0.1.16 to fix changeset_for_changeset_ids function
+changes_for_changeset_ids [changes_for_changeset_ids@0.1.16] 2015-10-13T19:11:29Z David McCown <dmccown@chef.io> # Fixing bug where too many changes are being returned.
+enterprise_default_searches 2015-10-15T14:21:57Z Oliver Ferrigni <oliver@chef.io># Add table for default searches against an enterprise
+add_dependencies_to_changesets 2015-10-12T15:04:30Z Tom Duffield <tom@chef.io> # Add the json column dependencies to the table changesets
+dependencies_by_project 2015-10-13T16:01:35Z Davida Marion <davidamarion@eboiardisealoaner11> # Add dependencies_by_project function
+@0.1.17 2015-10-22T16:24:47Z Tom Duffield <tom@chef.io> # Tagging to insert dependencies into add_to_changeset
+add_to_changeset [add_to_changeset@0.1.17 changesets] 2015-10-22T16:26:02Z Tom Duffield <tom@chef.io> # Update add_to_changeset to support inserting dependencies
+dependencies_by_project [dependencies_by_project@0.1.17] 2015-10-22T19:28:26Z Claire McQuin <claire@local> # Returns dependencies and consumers
+add_inserts_deletes_to_changed_file 2015-10-23T13:32:46Z Oliver Ferrigni <oliver@chef.io># Add inserts and deletes to changed file
+@0.1.18 2015-10-28T18:42:23Z Claire McQuin <claire@local> # tag to rework dependencies_by_project to return deps from latest changeset to hit union
+dependencies_by_project [dependencies_by_project@0.1.18] 2015-10-28T18:43:04Z Claire McQuin <claire@local> # dependencies_by_project returns deps from latest changeset to hit union
+add_superseding_change_id_to_change 2015-10-22T19:55:04Z Scott Christopherson <scott@chef.io> # Adding superseding change id to changes table
+set_superseded_changes 2015-10-23T15:51:55Z Scott Christopherson <scott@chef.io> # Adding function to set superseded changes
+@0.1.19 2015-10-28T20:51:03Z Tom Duffield <tom@chef.io> # tag to rework dependencies_by_project
+dependencies_by_project [dependencies_by_project@0.1.19] 2015-10-28T20:51:28Z Tom Duffield <tom@chef.io> # fix bug that returns duplicate pipeline ids for consumers
+@0.1.20 2015-10-30T17:42:44Z Tom Duffield <tom@chef.io> # Tagging 0.1.20 to fix bug in dependencies_by_project
+dependencies_by_project [dependencies_by_project@0.1.20] 2015-10-30T17:43:15Z Tom Duffield <tom@chef.io> # fix but to only return current consumers
+add_latest_change_to_changesets [changesets] 2015-10-30T18:59:41Z Tom Duffield <tom@chef.io> # Keep track of latest change in the changesets table
+add_to_changeset [add_to_changeset@0.1.20] 2015-10-30T19:04:53Z Tom Duffield <tom@chef.io> # Save latest change_id in table
+consumer_change_ids_by_pipeline 2015-11-03T19:27:20Z Jessica Mink <jmink@remmink01.local> # Add function to find the change id of the latest change in union for each of the consumers of a pipeline
+add_description_to_phase_runs 2015-11-10T20:39:07Z Jessica Mink <jmink@remmink01.local> # Add an overall description field for the phase run
+phase_run_summary [phase_run_summary@0.1.20] 2015-11-12T17:41:27Z Claire McQuin <claire@local> # Return description
+@0.1.21 2015-11-16T17:05:42Z Claire McQuin <claire@local> # Tag to rework dependencies_by_project to return pipeline_id
+dependencies_by_project [dependencies_by_project@0.1.21] 2015-11-16T17:06:42Z Claire McQuin <claire@local> # Return dependencies and consumers for project pipelines by pipeline_id
+external_basic_auth_applications 2015-11-18T23:05:16Z Scott <scott@chef.io> # Adding table for external basic auth applications
+project_bitbucket_metadata [projects] 2015-11-23T18:29:32Z Jon Morrow <jmorrow@chef.io> # Adding table for bitbucket project metadata.
+create_bitbucket_scm_project [project_bitbucket_metadata] 2015-11-23T18:53:36Z Jon Morrow <jmorrow@chef.io> # Adding stored proc to create bitbucket scm projects.
+migrate_null_dependencies [add_dependencies_to_changesets] 2015-11-23T18:33:06Z Claire McQuin <claire@local> # Migrate null dependencies to empty list
+add_ent_id_to_external_basic_auth_applications 2015-11-23T21:05:31Z Oliver Ferrigni <oliver@chef.io># Add enterprise id to external basic auth
+add_to_changeset [add_to_changeset@0.1.21] 2015-12-02T18:18:14Z Davida Marion <davidamarion@Ettores-MacBook-Pro-4.local> # Fixing bug
+changes_for_changeset_ids [changes_for_changeset_ids@0.1.21] 2015-12-02T19:28:37Z Davida Marion <davidamarion@Ettores-MacBook-Pro-4.local> # Returning changes in build as well as acceptance
+@0.1.22 2015-12-02T22:52:16Z Davida Marion <davidamarion@Ettores-MacBook-Pro-4.local> # Tag to: 1.rework changes_for_changeset_ids to include changes in build 2. updated add_to_changeset to update changes in build that have been superseded to a changeset
+set_superseded_changes [set_superseded_changes@0.1.22] 2015-12-15T20:55:21Z Davida Marion <davidamarion@Ettores-MacBook-Pro-4.local> # Setting superseding change's superseded_change_id to null to prevent superseded_change loops
+change_bitbucket_metadata [changes] 2016-01-12T23:24:14Z Davida Marion <dmarion@chef.io> # Adding change_bitbucket_metadata table
+dependency_failures 2016-01-26T04:11:31Z Oliver Ferrigni <oliver@chef.io># Add dependency_failures table
+convert_to_bb [projects project_bitbucket_metadata] 2016-01-29T19:08:27Z Davida Marion <davidamarion@Ettores-MacBook-Pro-4.local> # Adding convert_to_bb function
+convert_to_local [project_bitbucket_metadata change_bitbucket_metadata changes pipelines projects] 2016-01-29T21:50:37Z Scott Christopherson <scott@chef.io> # Adding a function to convert bitbucket project to a local one
+add_approved_at_to_change [changes] 2016-02-09T21:36:37Z Davida Marion <dmarion@chef.io> # Add an approved_at column to changes table
+@0.1.23 2016-02-10T22:10:45Z Davida Marion <dmarion@chef.io> # Tagged to update set_superseded_changes
+set_superseded_changes [set_superseded_changes@0.1.23] 2016-02-10T22:10:47Z Davida Marion <davidamarion@Ettores-MacBook-Pro-5.local> # Add timestamp comparison to only supersede changes that were approved before the superseding change
+merge_change [merge_change@0.1.23] 2016-02-23T00:29:03Z Tom Duffield <tom@chef.io> # Set approver when merging the change
+@0.1.24 2016-02-25T19:54:54Z Tom Duffield <tom@chef.io> # Tagging 0.1.24
+set_superseded_changes [set_superseded_changes@0.1.24] 2016-02-25T19:55:42Z Tom Duffield <tom@chef.io> # Don't return null change when no changes were superseded
+notification_config 2016-02-24T00:18:36Z Kyleen MacGugan <kmacgugan@seakmacgugan01> # Create table for notification configuration
+notification_config_constraints [notification_config] 2016-03-03T18:38:12Z Kyleen MacGugan <kmacgugan@seakmacgugan01> # Add unique constraint to organization_id, drop project_id column.
+upsert_notification_config [notification_config notification_config_constraints] 2016-03-08T18:38:17Z Kyleen MacGugan <kmacgugan@seakmacgugan01> # Add upsert funciton for notification_config records
+@0.1.25 2016-03-11T18:44:17Z Kyleen MacGugan <kmacgugan@seakmacgugan01> # Tag to: Rework notification_config to support email
+notification_config_support_smtp 2016-03-11T18:44:59Z Kyleen MacGugan <kmacgugan@seakmacgugan01> # Adding enterprise_id to notification_config for supporting email, dropping not null on name
+upsert_notification_config [upsert_notification_config@0.1.25 notification_config_support_smtp] 2016-03-11T18:59:12Z Kyleen MacGugan <kmacgugan@seakmacgugan01> # Rework to support email configuration at enterprise level
+notification_subscriptions 2016-03-23T18:47:56Z Christian Nunciato <cnunciato@chef.io> # Create notification_subscriptions table
+phase_run_logs [phase_runs] 2016-03-23T17:41:41Z Victoria Jeffrey <vjeffrey@vjeffrey01> # Create table for phase_run_logs that will store phase run log objects
+@0.1.26 2016-03-29T22:36:44Z Christian Nunciato <cnunciato@chef.io> # Tag to add column categories to notification_subscriptions
+
+add_categories_to_notifications [notification_subscriptions] 2016-03-29T22:37:48Z Christian Nunciato <cnunciato@chef.io> # Add column categories to notification_subscriptions
+upsert_notification_subscription [notification_subscriptions] 2016-03-30T17:08:11Z Christian Nunciato <cnunciato@chef.io> # Add function for inserting notification subscriptions
+add_project_notification_config_constraints [notification_config_constraints notification_config] 2016-04-06T20:08:30Z Claire McQuin <mcquincl@gmail.com> # Add column project_id
+upsert_notification_config [upsert_notification_config@0.1.26] 2016-04-06T20:23:01Z Claire McQuin <mcquincl@gmail.com> # Add column project_id
+add_saml_to_user_type 2016-04-25T18:41:25Z Salim Alam <salam@chef.io> # Adds the user type 'saml' to the user type enum
+add_saml_config_table 2016-04-26T21:16:16Z Kyleen MacGugan <kmacgugan@seakmacgugan01> # support SAML configuration
+upsert_saml_config 2016-05-04T20:56:00Z Kyleen MacGugan <kmacgugan@seakmacgugan01> # create upsert function for saml configurations
+remove_user_type_change_exception 2016-05-09T14:08:32Z Stephen Lauck <lauck@chef.io> # Remove the trigger that raises exception when changing user type.\n\nUser type change is validated by the API and an additional trigger is not needed.
+internal_to_external [internal_to_external@0.1.26] 2016-05-12T08:20:58Z Stephan Renatus <srenatus@chef.io> # Change internal_to_external to work without prevent_type_switch trigger
+@0.1.27 2016-05-25T23:17:23Z Kyleen MacGugan <kmacgugan@seakmacgugan01.local> # rework upsert saml config funciton
+add_name_id_saml_config 2016-05-25T23:21:23Z Kyleen MacGugan <kmacgugan@seakmacgugan01.local> # Add name_id column to saml_config table
+upsert_saml_config [upsert_saml_config@0.1.27] 2016-05-25T23:17:36Z Kyleen MacGugan <kmacgugan@seakmacgugan01.local> # Adding name_id to upsert saml_config function
+add_metadata_url_and_xml_saml_config 2016-06-16T13:14:26Z Stephan Renatus <srenatus@chef.io> # add metadata xml and url columns to saml_config
+@0.1.28 2016-06-16T14:22:40Z Stephan Renatus <stephan@Stephans-MacBook-Pro> # Tag to add metadata url and xml to saml_config
+upsert_saml_config [upsert_saml_config@0.1.28] 2016-06-16T14:22:46Z Stephan Renatus <stephan@Stephans-MacBook-Pro> # Adding metadata_url and metadata_xml to upsert saml_config function
+jobs_runners_table 2016-08-03T09:00:22Z Stephan Renatus <srenatus@chef.io> # add table for job dispatch runners
+add_enterprise_to_jobs_runners [jobs_runners_table] 2016-08-09T19:48:43Z Tyler Ball <tball@chef.io> # Adding the enterprise_id reference to the jobs_runners table
+teams 2016-08-15T17:15:17Z Mark Anderson <mark@chef.io> # Add teams table
+convert_to_githubV2 [project_github_metadata] 2016-08-22T21:18:00Z Prajakta Purohit <prajaktapurohit@Prajaktas-MacBook-Pro-2.local> # Adding convert_to_githubV2 function
+team_creators_team_created_at 2016-08-23T20:47:09Z Rachel Adler <radler@chef.io> # Update team attributes
+rename_table_change_bitbucket_metadata [change_bitbucket_metadata convert_to_local] 2016-08-23T22:05:53Z Matt Campbell <mattcampbell@remmcampbell01.local> # Rename table since it is being reused outside Bitbucket
+add_default_roles_to_saml_config 2016-08-24T20:39:56Z Davida Marion <davidamarion@Ettores-MacBook-Pro-9.local> # Add default_roles column to saml_config table_
+@0.1.29 2016-08-24T21:32:48Z Davida Marion <davidamarion@Ettores-MacBook-Pro-9.local> # Tag to add default_roles to saml_config
+upsert_saml_config [upsert_saml_config@0.1.29] 2016-08-24T21:32:52Z Davida Marion <davidamarion@Ettores-MacBook-Pro-9.local> # Add default_roles to upsert_saml_config
+team_members 2016-08-29T21:41:00Z Rachel Adler <radler@chef.io> # Add team members table
+jobs_runner_os_info 2016-08-31T23:50:21Z Tyler Cloke <tyler@seatyler> # Add os info to the jobs_runner table.
+convert_ghv2_to_local 2016-09-13T22:50:30Z Prajakta Purohit <prajakta@chef.io> # Adding convert_ghv2_to_local function
+update_comment [update_comment@0.1.29] 2016-12-05T20:47:21Z Davida Marion <davidamarion@Ettores-MacBook-Pro-9.local> # Removing conditional around published vs draft comments
+password_reset_tokens 2016-12-19T09:08:25Z Stephan Renatus <srenatus@chef.io> # Add password_reset_tokens table for password reset
+assign_password_reset_token [password_reset_tokens] 2016-12-19T09:26:16Z Stephan Renatus <srenatus@chef.io> # Add assign_reset_token function for password reset
+use_password_reset_token [password_reset_tokens] 2016-12-19T10:09:36Z Stephan Renatus <srenatus@chef.io> # Add revoke_password_reset_token function for password reset
+add_telemetry_enabled_to_users 2017-03-21T22:41:29Z Kartik Cating-Subramanian <ksubramanian@hells-kitchen.local> # Add a column to track if the user has opted in/out of telemetry data collection
+add_timestamps_to_stage_runs [scoped_stage_runs_view] 2017-03-23T18:15:23Z Christian Nunciato <cnunciato@chef.io> # Add timestamps to stage_runs
+set_users_telemetry_enabled_to_null 2017-04-20T18:35:18Z Kyleen MacGugan <kmacgugan@seakmacgugan01> # Users that have telemetry_enabled=false will be updated to null
+add_timestamps_to_phase_runs [phase_runs] 2017-04-14T19:00:08Z Pete Higgins <phiggins@chef.io> # Add timestamps to phase_runs.
+scanner 2017-08-25T19:22:14Z Victoria Jeffrey <vjeffrey@vjeffrey01> # Add tables for scanner data
+scanner_add_nodes_secrets 2017-09-06T16:57:18Z Alex Pop <apop@mymac> # Add nodes_secrets link and remove job_profiles on cascade delete
+scanner_add_results_table 2017-09-11T10:15:22Z Alex Pop <apop@mymac> # Add compliance scanner results table
+scanner_add_node_managers 2017-10-11T23:33:26Z Victoria Jeffrey <vjeffrey@vjeffrey01> # Add nodes_managers to scanner tables and add column to jobs
+scanner_alter_secrets 2017-10-11T23:34:14Z Victoria Jeffrey <vjeffrey@vjeffrey01> # change secrets table because we now do this in a service oriented way
+add_scheduler_to_jobs 2017-11-27T22:25:40Z Victoria Jeffrey <vjeffrey@vjeffrey01> # add scheduling information to jobs
+scanner_add_nodes_last_scan 2017-12-05T21:00:06Z Alex Pop <apop@mymac> # Add a last_scan reference
+extend_user_type 2018-09-20T19:20:27Z Prajakta Purohit <prajaktapurohit@Prajaktas-MacBook-Pro-2.local> # Extend the current user_type to include a2

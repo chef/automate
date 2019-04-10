@@ -1,0 +1,46 @@
+<div class="log-toolbar">
+  <div class="log-download" ng-show="changeView === 'Compliance' ">
+    <a
+      class="btn-download"
+      ng-href="{{ downloadHref }}"
+      title="Save log to file">
+      <span class="icon-download"></span> Download
+    </a>
+    <input type="checkbox" id="log-color" ng-model="colorize">
+    <label for="log-color">Include color in download</label>
+  </div>
+  <div class="report-view" ng-show="changeView === 'Log' && isOn('compliance-report')">Compliance Report</div>
+<div class="log-nav">
+    <button
+      class="btn-switch"
+      type="button"
+      ng-show="viewPlugin === 'compliance' && isOn('compliance-report')"
+      ng-click="switchView()"
+      title="Switch views"
+      <span class="switch">View {{changeView}} Report</span>
+    </button>
+    <button
+      class="btn-top"
+      type="button"
+      ng-click="scrollToTop()"
+      title="Jump to the top of the log">
+      <span class="icon-up"></span>
+    </button>
+    <button
+      class="btn-bottom"
+      type="button"
+      ng-click="scrollToBottom()"
+      title="Jump to the bottom of the log">
+      <span class="icon-down"></span>
+    </button>
+    <button
+      class="btn-close"
+      type="button"
+      ng-click="close($event)"
+      title="Close the log">
+      <span class="icon-close"></span>
+    </button>
+  </div>
+</div>
+ <div cd-cli-log log="log" scrollable="scrollable" ng-show="!viewCompliance || !isOn('compliance-report')"></div>
+ <div cd-compliance-report log="log" json="json" ng-show="viewCompliance && isOn('compliance-report')"></div>

@@ -1,0 +1,7 @@
+guard :shell, :all_on_start => true do
+  watch(%r{^sql/.+}){`make`}
+end
+
+guard :shell do
+  watch(%r{^t/.+}){`make install_tests test`}
+end

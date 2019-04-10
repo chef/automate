@@ -1,0 +1,64 @@
+// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
+syntax = "proto3";
+
+package chef.automate.infra.postgresql;
+option go_package = "github.com/chef/automate/api/config/postgresql;pg";
+
+import "api/config/shared/tls.proto";
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+message ConfigRequest {
+  option (chef.automate.api.service_config) = {name: "automate-postgresql"};
+
+	reserved 1 to 2;
+	V1 v1 = 3;
+
+	message V1 {
+		System sys = 1;
+		Service svc = 2;
+
+		message Service {
+
+		}
+		message System {
+			Service service = 1;
+			PGConfig pg = 2;
+			Logger logger = 3;
+			Superuser superuser = 4;
+			chef.automate.infra.config.TLSCredentials tls = 5;
+			google.protobuf.BoolValue disable = 6; // If set to true, automate-postgresql will noop. Derived from the global config
+
+			message Logger {
+				google.protobuf.StringValue level = 1;
+			}
+
+			message Service {
+				google.protobuf.StringValue host = 1;
+				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "pgsql", default: 5432, protocol: "pgsql" } ];
+			}
+
+			message PGConfig {
+				reserved 1 to 2;
+				google.protobuf.StringValue max_wal_size = 3;
+				google.protobuf.StringValue min_wal_size = 4;
+				google.protobuf.Int32Value wal_keep_segments = 5;
+				google.protobuf.StringValue checkpoint_timeout = 6;
+				google.protobuf.FloatValue checkpoint_completion_target = 7;
+				google.protobuf.StringValue checkpoint_warning = 8;
+				google.protobuf.StringValue effective_cache_size = 9;
+				google.protobuf.Int32Value max_connections = 10;
+				google.protobuf.Int32Value max_locks_per_transaction = 11;
+				repeated string md5_auth_cidr_addresses = 12;
+				google.protobuf.StringValue shared_buffers = 13;
+				google.protobuf.StringValue work_mem = 14;
+				google.protobuf.StringValue ssl_ciphers = 15;
+			}
+
+			message Superuser {
+				reserved 2;
+				google.protobuf.StringValue name = 1;
+			}
+		}
+	}
+}

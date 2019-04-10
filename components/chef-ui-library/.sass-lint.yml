@@ -1,0 +1,55 @@
+# Linter Options
+options:
+  # Don't merge default rules
+  merge-default-rules: false
+# File Options
+files:
+  include: 'src/**/*.s+(a|c)ss'
+  ignore:
+    - 'node_modules/**/*.*'
+# Rule Configuration
+rules:
+  # Extends
+  extends-before-mixins: 2
+  extends-before-declarations: 2
+
+  # Mixins
+  mixins-before-declarations:
+    - 2
+    - exclude:
+        - breakpoint
+        - mq
+
+  # Line Spacing
+  one-declaration-per-line: 2
+  empty-line-between-blocks: 2
+
+  # Nesting Depth: Avoid nesting selectors too deeply.
+  nesting-depth:
+    - 1
+    - max-depth: 3
+
+  # Disallows
+  no-warn: 2
+  no-debug: 2
+  no-important: 2
+  no-trailing-whitespace: 2
+  hex-notation:
+    - 2
+    - style: uppercase
+  indentation:
+    - 2
+    - size: 2
+
+  # Inner Spacing
+  space-after-comma: 2
+  space-before-colon: 2
+  space-after-colon: 2
+  space-before-brace: 2
+  space-before-bang: 2
+  space-after-bang: 2
+  space-between-parens: 2
+  space-around-operator: 2
+
+  # Final Items
+  trailing-semicolon: 2

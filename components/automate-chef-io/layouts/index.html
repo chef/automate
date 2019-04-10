@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+{{ partial "automate/head" . }}
+<body>
+  <div class="off-canvas-wrapper">
+    <div class="off-canvas-content" data-off-canvas-content>
+      <div id="menu" class="cell small-12" data-sticky-container>
+        {{ partial "automate/header" . }}
+      </div>
+      <div class="cell small-12">
+        {{ partial "hero" . }}
+      </div>
+      <div id="main-content" class="cell small-12">
+        <div class="content padding-top">
+          {{ partial "cards" . }}
+        </div>
+      </div>
+      <div id="footer" class="cell small-12">
+        <nav>
+          {{ partial "automate/footer" . }}
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script src="{{ "js/scripts-all.js" | relURL }}"></script>
+</body>
+</html>

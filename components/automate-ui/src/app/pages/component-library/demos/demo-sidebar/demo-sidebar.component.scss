@@ -1,0 +1,25 @@
+app-cl-section {
+  ::ng-deep  chef-sidebar aside {
+
+    // Need to yield to the dark side to manipulate the fixed-position sidebar
+    // into a container on the library page.
+
+    // sass-lint:disable no-important
+    position: relative !important;
+    top: 0px !important;
+
+    // This provides better UX when scrolling the page--forcing the demo to scroll away
+    // *under* the header, like everything else on the page.
+    z-index: 0 !important;
+    // sass-lint:enable no-important
+  }
+
+  .sidebar-container {
+    display: flex;
+    margin-top: 1em;
+
+    & .sidebar-example {
+      margin-right: 2em;
+    }
+  }
+}

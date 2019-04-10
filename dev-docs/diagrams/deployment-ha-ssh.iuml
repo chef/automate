@@ -1,0 +1,88 @@
+@startuml
+object "Automate Host A (customer) 2..*" as automate_host_a <<Linux, Habitat>>{
+	+automate-ui
+	+edge load balancer
+	automate-gateway
+	deployment-cli
+	deployment-service
+	license-control-service
+	compliance-scanner-service
+	notifications-service
+	authz-service
+	user-token-service
+}
+
+object "Automate Host B (customer) 2..*" as automate_host_b <<Linux, Habitat>>{
+	+config-mgmt-service
+	+ingest-service
+	+compliance-policy-service
+	+compliance-reporting-service
+}
+
+object "Automate Host PG A (customer)" as automate_host_pg_a <<Linux, Habitat>> {
+	+postgres
+}
+
+object "Automate Host PG B (customer)" as automate_host_pg_b <<Linux, Habitat>> {
+	+postgres
+}
+
+object "Automate Host PG C (customer)" as automate_host_pg_c <<Linux, Habitat>> {
+	+postgres
+}
+
+object "Automate Host ES A (customer)" as automate_host_es_a <<Linux, Habitat>> {
+	+elasticsearch
+	elasticsearch-curator
+}
+
+object "Automate Host ES B (customer)" as automate_host_es_b <<Linux, Habitat>> {
+	+elasticsearch
+	elasticsearch-curator
+}
+
+object "Automate Host ES C (customer)" as automate_host_es_c <<Linux, Habitat>> {
+	+elasticsearch
+	elasticsearch-curator
+}
+
+object "Workstation (customer)" as workstation <<Linux, Habitat>> {
+    +deployment-cli
+    deployment-service
+}
+
+object "License Host (chef)" as license <<Linux, Habitat, External>> {
+    +license
+}
+
+object "Chef" as chef <<External>> 
+object "Inspec" as inspec <<External>> 
+object "Web Browser" as browser <<External>> 
+
+automate_host_a <-> automate_host_b : grpc
+
+workstation --> automate_host_a : ssh
+workstation --> automate_host_b : ssh
+workstation --> automate_host_pg_a : ssh
+workstation --> automate_host_pg_b : ssh
+workstation --> automate_host_pg_c : ssh
+workstation --> automate_host_es_a : ssh
+workstation --> automate_host_es_b : ssh
+workstation --> automate_host_es_c : ssh
+
+license -> workstation : manual copy
+chef --> automate_host_b : https/rest
+inspec --> automate_host_b : https/rest
+browser <-> automate_host_a : https/rest
+
+automate_host_a <--> automate_host_pg_a : tcp/ssl
+automate_host_b <--> automate_host_es_a : tcp/ssl
+
+automate_host_pg_a <-- automate_host_pg_b : replication
+automate_host_pg_a <-- automate_host_pg_c : replication
+
+automate_host_es_a <-- automate_host_es_b : replication
+automate_host_es_a <-- automate_host_es_c : replication
+
+
+@enduml

@@ -1,0 +1,36 @@
+@import '../../global/misc';
+
+chef-loading-spinner {
+  #{--fill}: palette($primary-default, 5);
+  #{--fill-alt}: palette($primary-default, 6);
+}
+
+chef-loading-spinner {
+  display: inline-block;
+  overflow: hidden;
+
+  svg {
+    float: left;
+  }
+
+  path {
+    fill: var(--fill);
+  }
+
+  path.alt {
+    fill: var(--fill-alt);
+  }
+}
+
+chef-loading-spinner[fixed] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: chef-hsla(var(--chef-grey), 0.65);
+  z-index: 200;
+}

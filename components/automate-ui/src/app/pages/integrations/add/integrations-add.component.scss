@@ -1,0 +1,14 @@
+header {
+  display: flex;
+  padding: 1em 0 0 35px;
+
+  &>div {
+    flex: 0 1 100%;
+  }
+
+  &>.form-controls {
+    flex: 0 1 auto;
+    white-space: nowrap;
+    padding-right: 1em;
+  }
+}

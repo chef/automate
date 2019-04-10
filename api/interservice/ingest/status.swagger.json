@@ -1,0 +1,110 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/interservice/ingest/status.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "GetHealth",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestHealth"
+            }
+          }
+        },
+        "tags": [
+          "IngestStatus"
+        ]
+      }
+    },
+    "/migration": {
+      "get": {
+        "operationId": "GetMigrationStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestMigrationStatus"
+            }
+          }
+        },
+        "tags": [
+          "IngestStatus"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ingestHealth": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      },
+      "description": "The ingest-service health is constructed with:\n* Status:\n           =\u003e ok:             Everything is alright\n           =\u003e initialization: The service is in its initialization process\n           =\u003e warning:        Something might be wrong?\n           =\u003e critical:       Something is wrong!\n\n@afiune: Here we can add more health information to the response",
+      "title": "Health message"
+    },
+    "ingestMetrics": {
+      "type": "object",
+      "properties": {
+        "uptime": {
+          "type": "number",
+          "format": "double"
+        },
+        "pipeline": {
+          "$ref": "#/definitions/ingestPipelineMetrics"
+        }
+      },
+      "title": "Metrics message"
+    },
+    "ingestMigrationStatus": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "completed": {
+          "type": "string",
+          "format": "int64"
+        },
+        "status": {
+          "type": "string"
+        },
+        "finished": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      },
+      "title": "Migration message"
+    },
+    "ingestPipelineMetrics": {
+      "type": "object",
+      "properties": {
+        "total_run_messages": {
+          "type": "string",
+          "format": "int64"
+        },
+        "total_action_messages": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    }
+  }
+}

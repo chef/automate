@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+import "api/external/common/version/version.proto";
+
+package chef.automate.domain.teams.v1;
+option go_package = "github.com/chef/automate/api/interservice/teams/v1";
+
+message CreateTeamReq {
+    string name = 1;
+    string description = 2;
+}
+
+message CreateTeamResp {
+    Team team = 1;
+}
+
+message UpdateTeamReq {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+}
+
+message UpdateTeamResp {
+    Team team = 1;
+}
+
+message DeleteTeamReq {
+    string id = 1;
+}
+
+message DeleteTeamResp {
+    Team team = 1;
+}
+
+message GetTeamsReq {}
+
+message GetTeamsResp {
+    repeated Team teams = 1;
+}
+
+message GetTeamReq {
+    string id = 1;
+}
+
+message GetTeamResp {
+    Team team = 1;
+}
+
+message Team {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+}
+
+message AddUsersReq {
+    string id = 1;
+    repeated string user_ids = 2;
+}
+
+message AddUsersResp {
+    Team team = 1;
+}
+
+message RemoveUsersReq {
+    string id = 1;
+    repeated string user_ids = 2;
+}
+
+message RemoveUsersResp {
+    Team team = 1;
+}
+
+message PurgeUserMembershipReq {
+    string user_id = 1;
+}
+
+message PurgeUserMembershipResp {
+    repeated string ids = 1;
+}
+
+message GetTeamsForUserReq {
+    string user_id = 1;
+}
+
+message GetTeamsForUserResp {
+    repeated Team teams = 1;
+}
+
+message GetTeamByNameReq {
+    string name = 1;
+}
+
+message GetTeamByNameResp {
+    Team team = 1;
+}
+
+message GetUsersReq {
+    string id = 1;
+}
+
+message GetUsersResp {
+    repeated string user_ids = 1;
+}
+
+service TeamsV1 {
+    rpc GetVersion (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
+    rpc CreateTeam (CreateTeamReq) returns (CreateTeamResp) {};
+    rpc UpdateTeam (UpdateTeamReq) returns (UpdateTeamResp) {};
+    rpc DeleteTeam (DeleteTeamReq) returns (DeleteTeamResp) {};
+    rpc GetTeams (GetTeamsReq) returns (GetTeamsResp) {};
+    rpc GetTeam (GetTeamReq) returns (GetTeamResp) {};
+    rpc AddUsers (AddUsersReq) returns (AddUsersResp) {};
+    rpc RemoveUsers (RemoveUsersReq) returns (RemoveUsersResp) {};
+    rpc GetTeamsForUser (GetTeamsForUserReq) returns (GetTeamsForUserResp) {};
+    rpc GetUsers (GetUsersReq) returns (GetUsersResp) {};
+    // Domain-specific functions not used in gateway API.
+    // TODO (tc) We should add V2 versions if we wanna deprecate this GRPC service.
+    // We'll also need to update any domain-service that uses these functions / this service
+    // to use the V2 service.
+    rpc PurgeUserMembership (PurgeUserMembershipReq) returns (PurgeUserMembershipResp) {};
+    rpc GetTeamByName (GetTeamByNameReq) returns (GetTeamByNameResp) {};
+}

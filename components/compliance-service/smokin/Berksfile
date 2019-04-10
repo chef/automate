@@ -1,0 +1,9 @@
+source 'https://supermarket.chef.io'
+
+cookbook 'audit'
+
+# or use a specific version:
+#cookbook 'audit', '= 3.1.0'
+
+# or use a local version:
+#cookbook 'audit', path: '../../../../audit'

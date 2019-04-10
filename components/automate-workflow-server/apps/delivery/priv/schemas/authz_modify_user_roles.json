@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema#",
+  "type": "object",
+  "description":
+  "Roles can either be granted, revoked, or set. Granting and revoking will add or remove, respectively, the specified roles from the user at the given scope. Other roles not mentioned are unaffected. Setting roles, however, will ensure that a user has only those roles that are listed, and no others. All actions are marked as optional, but one (and only one) must be present.",
+  "properties": {
+    "grant": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string",
+        "enum": ["admin",
+                 "committer",
+                 "reviewer",
+                 "shipper",
+                 "observer"]
+      }
+    },
+    "revoke": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string",
+        "enum": ["admin",
+                 "committer",
+                 "reviewer",
+                 "shipper",
+                 "observer"]
+      }
+    },
+    "set": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string",
+        "enum": ["admin",
+                 "committer",
+                 "reviewer",
+                 "shipper",
+                 "observer"]
+      }
+    }
+  },
+  "additionalProperties": false
+}

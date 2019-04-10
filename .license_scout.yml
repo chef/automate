@@ -1,0 +1,273 @@
+---
+name: a2
+directories:
+  - ./
+  - ./components/applications-service
+  - ./components/authn-service
+  - ./components/authz-service
+  - ./components/automate-chef-io
+  - ./components/automate-cli
+  - ./components/automate-cs-bookshelf
+  - ./components/automate-cs-nginx
+  - ./components/automate-cs-oc-bifrost
+  - ./components/automate-cs-oc-erchef
+  - ./components/automate-debug
+  - ./components/automate-deployment
+  - ./components/automate-dex
+  - ./components/automate-elasticsearch
+  - ./components/automate-es-gateway
+  - ./components/automate-gateway
+  - ./components/automate-grpc
+  - ./components/automate-load-balancer
+  - ./components/automate-pg-gateway
+  - ./components/automate-platform-tools
+  - ./components/automate-postgresql
+  - ./components/automate-prometheus
+  - ./components/automate-ui
+  - ./components/automate-ui-devproxy
+  - ./components/automate-workflow-ctl
+  - ./components/automate-workflow-web
+  - ./components/automate-workflow-nginx
+  - ./components/automate-workflow-server
+  - ./components/backup-gateway
+  - ./components/chef-ui-library
+  - ./components/compliance-service
+  - ./components/config-mgmt-service
+  - ./components/data-lifecycle-service
+  - ./components/es-sidecar-service
+  - ./components/event-service
+  - ./components/ingest-service
+  - ./components/license-control-service
+  - ./components/local-user-service
+  - ./components/nodemanager-service
+  - ./components/notifications-client
+  - ./components/notifications-service
+  - ./components/notifications-service/server
+  - ./components/pg-sidecar-service
+  - ./components/release-mgmt-dashboard
+  - ./components/secrets-service
+  - ./components/session-service
+  - ./components/teams-service
+  - ./components/trial-license-service
+
+habitat:
+  channel_for_origin:
+    - origin: chef
+      channel: dev
+allowed_licenses:
+  - Apache-1.0
+  - Apache-1.1
+  - Apache-2.0
+  - Artistic-2.0
+  - BSD-2-Clause
+  - BSD-3-Clause
+  - BSD-3-Clause-Attribution
+  - BSD-Source-Code
+  - BSL-2.0
+  - bzip2-1.0.6
+  - CC0-1.0
+  - CC-BY-2.0
+  - CC-BY-3.0
+  - CC-BY-4.0
+  - curl
+  - gnuplot
+  - ICU
+  - ISC
+  - MIT
+  - MPL-2.0
+  - OpenSSL
+  - PHP-3.0
+  - PHP-3.01
+  - PostgreSQL
+  - Python-2.0
+  - SAX-PD
+  - Unlicense
+  - WTFPL
+  - Zlib
+
+fallbacks:
+  golang:
+    - name: github.com/ghodss/yaml
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/ghodss/yaml/master/LICENSE
+    - name: github.com/golang/protobuf
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/golang/protobuf/master/LICENSE
+    - name: github.com/inconshreveable/mousetrap
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/inconshreveable/mousetrap/master/LICENSE
+    - name: github.com/jmespath/go-jmespath
+      license_id: Apache-2.0
+      license_content: https://raw.githubusercontent.com/jmespath/go-jmespath/master/LICENSE
+    - name: github.com/lib/pq
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/lib/pq/master/LICENSE.md
+    - name: github.com/magiconair/properties
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/magiconair/properties/master/LICENSE
+    - name: github.com/mattes/migrate
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/mattes/migrate/master/LICENSE
+    - name: github.com/pmezard/go-difflib
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/pmezard/go-difflib/master/LICENSE
+    - name: github.com/rcrowley/go-metrics
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/rcrowley/go-metrics/master/LICENSE
+    - name: github.com/segmentio/backo-go
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/segmentio/backo-go/master/README.md
+    - name: github.com/stretchr/objx
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/stretchr/objx/master/LICENSE
+    - name: github.com/stretchr/testify
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/stretchr/testify/master/LICENSE
+    - name: gopkg.in/asn1-ber.v1
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/go-asn1-ber/asn1-ber/v1.2/LICENSE
+    - name: gopkg.in/ldap.v2
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/go-ldap/ldap/v2.5.1/LICENSE
+    - name: github.com/beevik/etree
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/beevik/etree/master/LICENSE
+    - name: github.com/gogo/protobuf
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/gogo/protobuf/master/LICENSE
+  habitat:
+    - name: chef/mlsa
+      license_id: Chef-MLSA
+      license_content: https://gist.githubusercontent.com/chef-ci/6cd978229702e9cb35dbd7d29a162a22/raw/c4377c5875af52228e459e68f137d3035793c9cd/chef-mlsa.txt
+    - name: core/ruby
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/ruby/ruby/trunk/COPYING
+    - name: core/cacerts
+      license_id: MPL-2.0
+      license_content: https://curl.haxx.se/docs/caextract.html
+    - name: core/mpfr (3.1.4-*)
+      license_id: LGPL-3.0-or-later
+      license_content: http://www.mpfr.org
+    - name: core/bundler
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/bundler/bundler/master/LICENSE.md
+    - name: core/sqitch_pg
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/sqitchers/sqitch/master/LICENSE.md
+  nodejs:
+    - name: arraybuffer.slice
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/rase-/arraybuffer.slice/master/LICENCE
+    - name: better-assert
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/tj/better-assert/master/LICENSE
+    - name: bytes
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/visionmedia/bytes.js/master/LICENSE
+    - name: component-bind
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/component/bind/master/LICENSE
+    - name: options
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/einaros/options.js/master/README.md
+    - name: uglify-js (2.3.6)
+      license_id: BSD-2-Clause
+      license_content: https://raw.githubusercontent.com/mishoo/UglifyJS2/v2.3.6/LICENSE
+    - name: rrule
+      license_id: BSD-3-Clause
+      license_content: https://raw.githubusercontent.com/jakubroztocil/rrule/master/LICENCE
+  ruby:
+    - name: syslog-logger
+      license_id: MIT
+      license_content: https://raw.githubusercontent.com/ngmoco/syslog_logger/master/README.rdoc
+    - name: net-telnet
+      license_id: Ruby
+      license_content: https://raw.githubusercontent.com/ruby/net-telnet/master/LICENSE.txt
+
+exceptions:
+  habitat:
+    - name: chef/mlsa
+      reason: Chef MLSA licensed
+    - name: core/attr
+      reason: Exception made by Chef Legal
+    - name: core/bash
+      reason: Exception made by Chef Legal
+    - name: core/busybox-static
+      reason: Exception made by Chef Legal
+    - name: core/coreutils-static
+      reason: Exception made by Chef Legal
+    - name: core/coreutils
+      reason: Exception made by Chef Legal
+    - name: core/findutils
+      reason: Exception made by Chef Legal
+    - name: core/gawk
+      reason: Exception made by Chef Legal
+    - name: core/gcc-libs
+      reason: Exception made by Chef Legal
+    - name: core/gdbm
+      reason: Exception made by Chef Legal
+    - name: core/glibc
+      reason: Exception made by Chef Legal
+    - name: core/gmp
+      reason: Exception made by Chef Legal
+    - name: core/grep
+      reason: Exception made by Chef Legal
+    - name: core/inetutils
+      reason: Exception made by Chef Legal
+    - name: core/less
+      reason: Exception made by Chef Legal
+    - name: core/libcap
+      reason: Exception made by Chef Legal
+    - name: core/libtool
+      reason: Exception made by Chef Legal
+    - name: core/linux-headers
+      reason: Exception made by Chef Legal
+    - name: core/mpfr
+      reason: Exception made by Chef Legal
+    - name: core/mysql-client
+      reason: Exception made by Chef Legal
+    - name: core/net-tools
+      reason: Exception made by Chef Legal
+    - name: core/netcat
+      reason: Exception made by Chef Legal
+    - name: core/readline
+      reason: Exception made by Chef Legal
+    - name: core/rsync
+      reason: Exception made by Chef Legal
+    - name: core/sed
+      reason: Exception made by Chef Legal
+    - name: core/tar
+      reason: Exception made by Chef Legal
+    - name: core/git
+      reason: (sf) Shell out only (already ship git in A1)
+    - name: core/gettext
+      reason: (sf) dep of core/git shell out only
+    - name: core/xz
+      reason: (sf) dep of core/git shell out only
+    - name: core/wget
+      reason: (sf) dep of core/elasticsearch for health_check shell out only
+    - name: core/libidn
+      reason: (sf) dep of core/wget shell out only
+    - name: core/util-linux
+      reason: (sd) Shell out only
+    - name: core/haproxy
+      reason: (sd) Binary use only. Already shipped in chef-server. Exception made by Chef Legal
+  ruby:
+    - name: highline
+      reason: Ruby license (previously shipped in Automate 1)
+    - name: httpclient
+      reason: Ruby license (previously shipped in Automate 1)
+    - name: json
+      reason: Ruby license (previously shipped in Automate 1)
+    - name: net-telnet
+      reason: Ruby license (previously shipped in Automate 1)
+    - name: rubyzip
+      reason: BSD-1-Clause license (previously shipped in Automate 1)
+    - name: sfl
+      reason: Ruby license (previously shipped in Automate 1)
+    - name: systemu
+      reason: Ruby license (previously shipped in Automate 1)
+
+  nodejs:
+    - name: jschardet
+      reason: Exception made by Chef Legal

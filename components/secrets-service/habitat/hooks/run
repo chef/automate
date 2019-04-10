@@ -1,0 +1,25 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+export COMPLIANCE_DBNAME="{{cfg.storage.compliance_database}}"
+export A1_DBNAME="{{cfg.storage.a1_database}}"
+export DBNAME="{{cfg.storage.database}}"
+
+source {{pkg.svc_path}}/hooks/reconfigure
+source {{pkg.svc_config_path}}/migration.sh
+
+trigger_migrations
+
+pg-helper ensure-service-database "$DBNAME" || exit 1
+
+# Copy the migrations files
+cp -r {{pkg.path}}/migrations/* {{pkg.svc_static_path}}/
+
+secrets-service init "{{pkg.svc_data_path}}/secrets_key" || exit 1
+
+# Start our service
+exec secrets-service serve --config {{pkg.svc_config_path}}/config.toml

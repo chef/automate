@@ -1,0 +1,23 @@
+.new-project-form {
+  font-size: 16px;
+  padding: 10px;
+
+  .new-project-header {
+    overflow: hidden;
+
+    h2 {
+      color: $cheforange;
+      font-weight: normal;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    > .icon {
+      display: block;
+      font-size: 100px;
+      float: left;
+      color: $cheforange;
+      margin-right: 10px;
+    }
+  }
+}

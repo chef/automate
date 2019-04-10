@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response";
+
+import "components/automate-gateway/api/iam/v2beta/common/tokens.proto";
+
+message CreateTokenResp {
+  Token token = 1;
+}
+
+message GetTokenResp {
+  Token token = 1;
+}
+
+message UpdateTokenResp {
+  Token token = 1;
+}
+
+message DeleteTokenResp {}
+
+message ListTokensResp {
+  repeated Token tokens = 1;
+}

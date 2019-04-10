@@ -1,0 +1,24 @@
+# NOTE(ssd) 2018-07-25: These two are not exposed in public-facing
+# configuration as changing them would break everything.
+fips_enabled = false
+ip_mode = "ipv4"
+
+[network]
+port=10202
+listen_ip="0.0.0.0"
+
+[log]
+level = "info"
+rotation_max_bytes = 104857600
+rotation_max_files = 10
+rotation_max_megabytes = 100
+max_error_logs_per_second = 1000
+
+[sql]
+user="automate-cs-oc-bifrost"
+db_name="automate-cs-oc-bifrost"
+timeout=5000
+pool_max_size=20
+pool_init_size=20
+pool_queue_max=200
+pool_queue_timeout=2000

@@ -1,0 +1,5 @@
+ALTER TABLE IF EXISTS jobs
+  DROP COLUMN IF EXISTS scheduled_time,
+  DROP COLUMN IF EXISTS recurrence,
+  DROP COLUMN IF EXISTS parent_id,
+  DROP COLUMN IF EXISTS job_count;

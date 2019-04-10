@@ -1,0 +1,56 @@
+<app-component-library-screen>
+
+  <app-cl-section>
+    <p>
+      <token>chefInput</token> is a directive applied to
+      the native <token>input</token> and <token>textarea</token> elements.
+      <token>chefInput</token> should be wrapped in a
+      <a [routerLink]="['/component_library/form-field']"><token>chef-form-field</token></a>.
+    </p>
+    <p>
+      Note: Currently the <token>chefInput</token> directive does very little.
+      It's here only as a holder for now so you won't notice any differing behavior
+      if you don't use it. However, <token>chefInput</token> will be necessary when
+      more complex behaviors are implemented, so don't neglect adding it.
+    </p>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Working Example</h3>
+
+    <chef-form-field>
+      <label>Test Field</label>
+      <input chefInput required #testfield type="text" placeholder="Type 'error' to see an example error." >
+      <chef-error *ngIf="testfield.value == 'error'">This is an example error</chef-error>
+    </chef-form-field>
+  </app-cl-section>
+
+  <app-cl-code-section>
+    <h3>Angular Template Code Example</h3>
+
+    <pre>&lt;chef-form-field&gt;
+  &lt;label&gt;Test Field&lt;label&gt;
+  &lt;input chefInput #testfield id="test" required type="text" placeholder="Type 'error' to see an example error."&gt;
+  &lt;chef-error *ngIf="testfield.value == 'error'"&gt;This is an example error&lt;/chef-error&gt;
+&lt;/chef-form-field&gt;</pre>
+  </app-cl-code-section>
+
+  <app-cl-section>
+    <h3>Accessibility</h3>
+
+    This component has not been evaluated for accessibility support.
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Browser Compatibility</h3>
+
+    <ul>
+      <li>Chrome 61 - OK</li>
+      <li>Firefox 52 - OK</li>
+      <li>Safari 11 - OK</li>
+      <li>Edge 40 - OK</li>
+      <li>IE 11 - OK</li>
+    </ul>
+  </app-cl-section>
+
+</app-component-library-screen>

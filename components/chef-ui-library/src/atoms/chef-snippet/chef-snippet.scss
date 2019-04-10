@@ -1,0 +1,129 @@
+chef-snippet {
+  display: block;
+
+  // Copied the default Prism.js theme and tweaked it
+  pre {
+    padding: 1em;
+    margin: 0;
+    overflow: auto;
+    font-family: Consolas, Menlo, Monaco, Courier, monospace;
+    font-size: 14px;
+    background: chef-hsl(var(--chef-white));
+    color: chef-hsl(var(--chef-dark-grey));
+    line-height: 1.5em;
+    direction: ltr;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+  }
+
+  // Syntax token colors
+  --token-comment: #898EA4;
+  --token-punctuation: #5E6687;
+  --token-operator: #C76B29;
+  --token-property: #C08B30;
+  --token-tag: #3D8FD1;
+  --token-string: #22A2C9;
+  --token-selector: #6679CC;
+  --token-attr-name: #C76B29;
+  --token-attr-value: #AC9739;
+  --token-entity: #22A2C9;
+  --token-statement: #22A2C9;
+  --token-placeholder: #3D8FD1;
+  --token-inserted: #202746;
+  --token-important: #C94922;
+
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: var(--token-comment);
+  }
+
+  .token.punctuation {
+    color: var(--token-punctuation);
+  }
+
+  .token.namespace {
+    opacity: 0.7;
+  }
+
+  .token.operator,
+  .token.boolean,
+  .token.number {
+    color: var(--token-operator);
+  }
+
+  .token.property {
+    color: var(--token-property);
+  }
+
+  .token.tag {
+    color: var(--token-tag);
+  }
+
+  .token.string {
+    color: var(--token-string);
+  }
+
+  .token.selector {
+    color: var(--token-selector);
+  }
+
+  .token.attr-name {
+    color: var(--token-attr-name);
+  }
+
+  .token.attr-value,
+  .token.keyword,
+  .token.control,
+  .token.directive,
+  .token.unit {
+    color: var(--token-attr-value);
+  }
+
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string {
+    color: var(--token-entity);
+  }
+
+  .token.statement,
+  .token.regex,
+  .token.atrule {
+    color: var(--token-statement);
+  }
+
+  .token.placeholder,
+  .token.variable {
+    color: var(--token-placeholder);
+  }
+
+  .token.deleted {
+    text-decoration: line-through;
+  }
+
+  .token.inserted {
+    border-bottom: 1px dotted var(--token-inserted);
+    text-decoration: none;
+  }
+
+  .token.italic {
+    font-style: italic;
+  }
+
+  .token.important,
+  .token.bold {
+    font-weight: bold;
+  }
+
+  .token.important {
+    color: var(--token-important);
+  }
+
+  .token.entity {
+    cursor: help;
+  }
+}

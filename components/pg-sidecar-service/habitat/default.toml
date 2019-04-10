@@ -1,0 +1,9 @@
+[mlsa]
+accept = false
+
+[service]
+host = "localhost"
+port = 10100
+
+[log]
+level = "info"

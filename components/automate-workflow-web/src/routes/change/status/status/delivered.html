@@ -1,0 +1,18 @@
+<div class="stage-step delivered" ng-class="change.stages[5].status">
+  <div class="stage-step-header">
+    <span class="stage-title">
+      <span class="status-icon" ng-class="change.stages[5].status"></span> Delivered
+    </span>
+    <button
+      type="button"
+      class="stage-rerun button"
+      ng-click="change.rerun(rerunLink(change.stages[5]))"
+      ng-if="rerunLink(change.stages[5]) && showRerunLink">
+      <span class="icon icon-reload"></span> Re-Run
+    </button>
+  </div>
+  <div
+    ng-repeat="phase in change.stages[5].phases track by phase.name"
+    cd-grouped-phase-list="phase">
+  </div>
+</div>

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
+
+import "api/interservice/cfgmgmt/request/parameters.proto";
+
+message NodeExport {
+  repeated string filter  = 1;
+  Sorting sorting         = 2;
+  string output_type      = 3;
+}

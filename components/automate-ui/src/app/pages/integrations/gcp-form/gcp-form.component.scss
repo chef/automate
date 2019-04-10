@@ -1,0 +1,27 @@
+@import "~styles/variables";
+
+.credential-toggle {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+
+  .label {
+    padding-bottom: 0;
+    padding-left: 0.5em;
+  }
+}
+
+textarea {
+  width: 100%;
+  min-height: 15em;
+  padding: 1em;
+  border: 1px solid $chef-grey;
+  border-radius: $global-radius;
+  transition: border-color 0.5s ease;
+
+  &:focus {
+    border-color: $chef-primary-bright;
+    outline: none;
+  }
+}

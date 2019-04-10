@@ -1,0 +1,148 @@
+-module(jobs_runner_json_tests).
+
+-include("jobs_types.hrl").
+-include_lib("hoax/include/hoax.hrl").
+
+-compile(export_all).
+
+jobs_runner_test_() ->
+    [
+     hoax:fixture(?MODULE, "to_json_")
+    ].
+
+to_json_from_runner_record_with_undefined_health_status_and_undefined_job_returns_ejson() ->
+    SshPublicKey = <<"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAAQk= job_runner@one.runner\n">>,
+    Runner = #runner{id = <<"uuid">>,
+                     hostname = <<"one.runner">>,
+                     public_key = SshPublicKey,
+                     os = <<"linux">>,
+                     platform = <<"ubuntu">>,
+                     platform_family = <<"debian">>,
+                     platform_version = <<"14.04">>},
+    Expected = {[{<<"id">>, <<"uuid">>},
+                 {<<"hostname">>, <<"one.runner">>},
+                 {<<"job">>, {[]}},
+                 {<<"openssh_public_key">>, SshPublicKey},
+                 {<<"health">>, {[]}},
+                 {<<"os">>, <<"linux">>},
+                 {<<"platform">>, <<"ubuntu">>},
+                 {<<"platform_family">>, <<"debian">>},
+                 {<<"platform_version">>, <<"14.04">>}]},
+    ?assertEqual(Expected, jobs_runner_json:to_json(Runner)).
+
+to_json_from_runner_record_with_health_status_ok_and_no_job_returns_ejson() ->
+    SshPublicKey = <<"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAAQk= job_runner@one.runner\n">>,
+    Runner = #runner{id = <<"uuid">>,
+                     hostname = <<"one.runner">>,
+                     health_status = ok,
+                     health_output = <<"some cmd output">>,
+                     public_key = SshPublicKey,
+                     os = <<"linux">>,
+                     platform = <<"ubuntu">>,
+                     platform_family = <<"debian">>,
+                     platform_version = <<"14.04">>},
+    Expected = {[{<<"id">>, <<"uuid">>},
+                 {<<"hostname">>, <<"one.runner">>},
+                 {<<"job">>, {[]}},
+                 {<<"openssh_public_key">>, SshPublicKey},
+                 {<<"health">>, {[{<<"status">>, <<"ok">>},
+                 {<<"command_output">>, <<"some cmd output">>}]}},
+                 {<<"os">>, <<"linux">>},
+                 {<<"platform">>, <<"ubuntu">>},
+                 {<<"platform_family">>, <<"debian">>},
+                 {<<"platform_version">>, <<"14.04">>}]},
+    ?assertEqual(Expected, jobs_runner_json:to_json(Runner)).
+
+to_json_from_runner_record_with_health_status_ok_and_a_running_job_returns_ejson() ->
+    SshPublicKey = <<"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAAQk= job_runner@one.runner\n">>,
+    ChangeId = <<"changeId">>,
+    ProjName = <<"project">>,
+    OrgName = <<"organization">>,
+    ChangeTitle = <<"a nice change">>,
+    DelivChangeInfo = #deliv_change_info{id = ChangeId,
+                                         project = ProjName,
+                                         org = OrgName,
+                                         title = ChangeTitle},
+    Runner = #runner{id = <<"uuid">>,
+                     hostname = <<"one.runner">>,
+                     job = #job{deliv_change_info = DelivChangeInfo},
+                     health_status = ok,
+                     health_output = <<"some cmd output">>,
+                     public_key = SshPublicKey,
+                     os = <<"linux">>,
+                     platform = <<"ubuntu">>,
+                     platform_family = <<"debian">>,
+                     platform_version = <<"14.04">>},
+    Expected = {[{<<"id">>, <<"uuid">>},
+                 {<<"hostname">>, <<"one.runner">>},
+                 {<<"job">>, {[
+                   {<<"id">>, ChangeId},
+                   {<<"title">>, ChangeTitle},
+                   {<<"org">>, OrgName},
+                   {<<"project">>, ProjName}
+                 ]}},
+                 {<<"openssh_public_key">>, SshPublicKey},
+                 {<<"health">>, {[{<<"status">>, <<"ok">>},
+                                  {<<"command_output">>, <<"some cmd output">>}]}},
+                 {<<"os">>, <<"linux">>},
+                 {<<"platform">>, <<"ubuntu">>},
+                 {<<"platform_family">>, <<"debian">>},
+                 {<<"platform_version">>, <<"14.04">>}]},
+    ?assertEqual(Expected, jobs_runner_json:to_json(Runner)).
+
+    to_json_from_runner_record_with_health_status_ok_and_a_running_health_job_returns_ejson() ->
+    SshPublicKey = <<"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAAQk= job_runner@one.runner\n">>,
+    Runner = #runner{id = <<"uuid">>,
+                     hostname = <<"one.runner">>,
+                     job = #health_job{},
+                     health_status = ok,
+                     health_output = <<"some cmd output">>,
+                     public_key = SshPublicKey,
+                     os = <<"linux">>,
+                     platform = <<"ubuntu">>,
+                     platform_family = <<"debian">>,
+                     platform_version = <<"14.04">>},
+    Expected = {[{<<"id">>, <<"uuid">>},
+                 {<<"hostname">>, <<"one.runner">>},
+                 {<<"job">>, {[]}},
+                 {<<"openssh_public_key">>, SshPublicKey},
+                 {<<"health">>, {[{<<"status">>, <<"ok">>},
+                                  {<<"command_output">>, <<"some cmd output">>}]}},
+                 {<<"os">>, <<"linux">>},
+                 {<<"platform">>, <<"ubuntu">>},
+                 {<<"platform_family">>, <<"debian">>},
+                 {<<"platform_version">>, <<"14.04">>}]},
+    ?assertEqual(Expected, jobs_runner_json:to_json(Runner)).
+
+to_json_from_list_of_runner_records_returns_ejson() ->
+    SshPublicKey1 = <<"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAAQk= job_runner@one.runner\n">>,
+    SshPublicKey2 = <<"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAAQk= job_runner@two.runner\n">>,
+    Runner1 = #runner{id = <<"uuid1">>, hostname = <<"one.runner">>,
+                      public_key = SshPublicKey1,
+                      os = <<"linux">>,
+                      platform = <<"ubuntu">>,
+                      platform_family = <<"debian">>,
+                      platform_version = <<"14.04">>},
+    Runner2 = #runner{id = <<"uuid2">>, hostname = <<"two.runner">>,
+                      public_key = SshPublicKey2,
+                      os = <<"linux">>,
+                      platform = <<"centos">>,
+                      platform_family = <<"rhel">>,
+                      platform_version = <<"7">>},
+    EJson1 = {[{<<"id">>, <<"uuid1">>}, {<<"hostname">>, <<"one.runner">>},
+               {<<"job">>, {[]}},
+               {<<"openssh_public_key">>, SshPublicKey1},
+               {<<"health">>, {[]}},
+               {<<"os">>, <<"linux">>},
+               {<<"platform">>, <<"ubuntu">>},
+               {<<"platform_family">>, <<"debian">>},
+               {<<"platform_version">>, <<"14.04">>}]},
+    EJson2 = {[{<<"id">>, <<"uuid2">>}, {<<"hostname">>, <<"two.runner">>},
+               {<<"job">>, {[]}},
+               {<<"openssh_public_key">>, SshPublicKey2},
+               {<<"health">>, {[]}},
+               {<<"os">>, <<"linux">>},
+               {<<"platform">>, <<"centos">>},
+               {<<"platform_family">>, <<"rhel">>},
+               {<<"platform_version">>, <<"7">>}]},
+    ?assertEqual([EJson1, EJson2], jobs_runner_json:to_json([Runner1, Runner2])).

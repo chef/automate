@@ -1,0 +1,63 @@
+<app-admin-sidebar></app-admin-sidebar>
+<chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+
+<div class="container">
+  <main>
+    <app-delete-object-modal
+      [visible]="modalVisible"
+      objectNoun="team"
+      [objectName]="(iamMajorVersion$ | async) === 'v1' ? teamToDelete?.id : teamToDelete?.name"
+      (close)="closeModal()"
+      (deleteClicked)="deleteTeam()">
+    </app-delete-object-modal>
+    <chef-page-header>
+      <chef-heading>Teams</chef-heading>
+      <chef-subheading>Chef Automate only displays local teams.</chef-subheading>
+    </chef-page-header>
+    <div class="page-body">
+      <section>
+        <chef-toolbar>
+          <app-authorized [allOf]="['/auth/teams', 'post']">
+            <chef-button primary [routerLink]="['/settings/add-team']">Create Team</chef-button>
+          </app-authorized>
+        </chef-toolbar>
+        <div id="table-container">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th class="id-column">
+                  <span *ngIf="(iamMajorVersion$ | async) === 'v1'">Name</span>
+                  <span *ngIf="(iamMajorVersion$ | async) !== 'v1'">ID</span>
+                </chef-th>
+                <chef-th class="name-column">
+                  <span *ngIf="(iamMajorVersion$ | async) === 'v1'">Description</span>
+                  <span *ngIf="(iamMajorVersion$ | async) !== 'v1'">Name</span>
+                </chef-th>
+                <chef-th class="button-column"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let team of sortedTeams$ | async">
+                <chef-td class="id-column">
+                  <!-- we must continue to use the guid as the identifier for teams while on v1 -->
+                  <a *ngIf="(iamMajorVersion$ | async) === 'v1'" [routerLink]="['/settings/teams', team.guid]">{{ team.id }}</a>
+                  <a *ngIf="(iamMajorVersion$ | async) !== 'v1'" [routerLink]="['/settings/teams', team.id]">{{ team.id }}</a>
+                </chef-td>
+                <chef-td class="name-column">
+                  {{ team.name }}
+                </chef-td>
+                <chef-td class="button-column">
+                  <!-- <app-authorized [allOf]="[`/auth/teams/${team.id}`, 'delete']"> -->
+                  <chef-control-menu>
+                    <chef-option (click)="startTeamDelete(team)">Delete Team</chef-option>
+                  </chef-control-menu>
+                  <!-- <app-authorized -->
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

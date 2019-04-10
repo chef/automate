@@ -1,0 +1,70 @@
+<ul class="event-feed-table">
+  <caption class="visually-hidden">Event Feed Table</caption>
+  <li *ngFor="let event of events; index as i" tabindex="0" class="event-row">
+    <div class="event-date-time">
+      <div class="event-time">{{event.startTime | date:'h:mm a' }}</div>
+      <div class="event-day">{{event.startTime | date:'EEEE' }},</div>
+      <div class="event-date">{{event.startTime | date:'LLLL d' }}</div>
+    </div>
+    <div class="event-info">
+      <div class="event-chat-bubble">
+        <div class="event-icon">
+          <app-event-icon
+            [group]="isGroup(event)"
+            [type]="event.eventType"
+            [task]="event.task">
+          </app-event-icon>
+        </div>
+        <div class="event-type">
+          {{getEventTypeLabel(event) | capitalize}} {{getFormattedEventType(event)}}
+        </div>
+        <div class="event-description">
+          <ng-container *ngIf="!isGroup(event)">
+            <span [innerHTML]="getEventDescription(event)"></span>
+          </ng-container>
+
+          <ng-container *ngIf="isGroup(event)">
+            <button class="event-group-button" (click)="getGroupedEvents(event, $event)" [attr.id]="'event-button-' + i">{{event.eventCount}} {{getEventTypeLabel(event)}}</button>
+            were {{getFormattedEventType(event)}} {{displayRequestorPreposition(event.requestorName)}} <b>{{displayRequestorName(event.requestorName)}}</b>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </li>
+</ul>
+
+<chef-click-outside omit="event-group-button" (clickOutside)="clickedOutsidePanel()">
+  <chef-side-panel #groupSidePanel [visible]="showEventGroupPanel" tabindex="0" role="dialog">
+    <chef-button secondary label="close" (click)="hideGroupedEvents()"><chef-icon>close</chef-icon></chef-button>
+
+    <ul class="event-group-list" *ngIf="groupedEvent">
+      <li class="event-group-item" tabindex="0">
+        <div class="event-icon">
+          <app-event-icon
+            [group]="isGroup(groupedEvent)"
+            [type]="groupedEvent.eventType"
+            [task]="groupedEvent.task">
+          </app-event-icon>
+        </div>
+
+        <p class="event-group-text">
+          <strong>{{groupedEvent.eventCount}} {{getEventTypeLabel(groupedEvent)}}</strong>
+          {{getFormattedEventType(groupedEvent)}} {{displayRequestorPreposition(groupedEvent.requestorName)}} <em>{{displayRequestorName(groupedEvent.requestorName)}}</em>
+        </p>
+      </li>
+      <li *ngFor="let event of groupedEvents" class="event-group-item" tabindex="0">
+        <div class="event-icon">
+          <app-event-icon
+            [group]="isGroup(groupedEvent)"
+            [type]="groupedEvent.eventType"
+            [task]="groupedEvent.task">
+          </app-event-icon>
+        </div>
+        <p class="event-group-text">
+          <strong>{{getEventGroupText(event)}}</strong>
+          {{event.startTime | date:'EE' }}, {{event.startTime | date:'MMM d yyyy' }} at {{event.startTime | date:'h:mm a' }}
+        </p>
+      </li>
+    </ul>
+  </chef-side-panel>
+</chef-click-outside>

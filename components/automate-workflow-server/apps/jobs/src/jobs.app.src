@@ -1,0 +1,14 @@
+{application, jobs,
+ [
+  {description, "Automate's own job dispatch service"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  sqerl,
+                  chef_common
+                 ]},
+  {mod, { jobs_app, []}},
+  {env, []}
+ ]}.

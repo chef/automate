@@ -1,0 +1,9 @@
+chef-aside {
+  grid-area: aside;
+
+  // Styles for IE fallback of CSS Grids
+  -ms-grid-row: 2;
+  -ms-grid-column: 1;
+  -ms-grid-row-span: 2;
+  display: block;
+}

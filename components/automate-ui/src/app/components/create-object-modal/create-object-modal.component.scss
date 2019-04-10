@@ -1,0 +1,56 @@
+@import "~styles/variables";
+
+chef-modal {
+
+  [slot=title] {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 1em;
+    padding-bottom: 12px;
+  }
+
+  .flex-container {
+    display: flex;
+    justify-content: center;
+
+    .margin {
+      margin-bottom: 30px;
+    }
+
+    form {
+      flex-basis: 60%;
+
+      input {
+        font-size: 1em;
+      }
+
+      label {
+        padding-bottom: 0;
+      }
+
+      .detail {
+        color: $chef-primary-dark;
+        font-size: 12px;
+      }
+
+      #id-fields {
+        font-size: 0.75em;
+        margin-bottom: 3px;
+
+        .key-label {
+          font-weight: bold;
+        }
+      }
+    }
+
+    #button-bar {
+      text-align: center;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+}

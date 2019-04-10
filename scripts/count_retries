@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -xe
+
+url="${BUILDKITE_BUILD_URL}#${BUILDKITE_JOB_ID}"
+
+if command -v buildkite-agent
+then
+    if [ "$BUILDKITE_RETRY_COUNT" -eq 1 ]
+    then
+        cat << EOF | buildkite-agent annotate --style "warning" --context "job-retries-$BUILDKITE_LABEL"
+[\`$BUILDKITE_LABEL\` retried once]($url)
+EOF
+    fi
+    if [ "$BUILDKITE_RETRY_COUNT" -gt 1 ]
+    then
+        cat << EOF | buildkite-agent annotate --style "warning" --context "job-retries-$BUILDKITE_LABEL"
+[\`$BUILDKITE_LABEL\` retried $BUILDKITE_RETRY_COUNT times]($url)
+EOF
+    fi
+fi

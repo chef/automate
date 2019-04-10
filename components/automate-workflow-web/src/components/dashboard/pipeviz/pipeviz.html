@@ -1,0 +1,149 @@
+<div class="stages">
+  <div class="stage">
+    <div class="heading">
+      <span class="name">Verify</span>
+    </div>
+    <div class="detail two">
+      <div class="status"
+        ng-class="{ running: pipeStats.verify.running > 0, active: pipeStats.verify.running > 0 }"
+        ng-click="applyFilter('stage:verify status:running')"
+        bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ pipeStats.verify.running }} running in Verify">
+        <span class="status-icon" ng-class="idleAddition('running', pipeStats.verify.running)"></span>
+        <span class="count">{{ pipeStats.verify.running }}</span>
+      </div>
+      <div class="status"
+        ng-class="{ failed: pipeStats.verify.failed > 0, active: pipeStats.verify.failed > 0 }"
+        ng-click="applyFilter('stage:verify status:failed')"
+        bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ pipeStats.verify.failed }} failed in Verify">
+        <span class="status-icon" ng-class="idleAddition('failed', pipeStats.verify.failed)"></span>
+        <span class="count">{{ pipeStats.verify.failed }}</span>
+      </div>
+    </div>
+    <div class="ribbon-caret">
+      <i class="fa fa-arrow-right"></i>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="heading">
+      <span class="name">Approve</span>
+    </div>
+    <div class="detail one">
+      <div class="status"
+        ng-class="{ passed: pipeStats.verify.passed > 0, active: pipeStats.verify.passed > 0 }"
+        ng-click="applyFilter('stage:verify status:passed')"
+        bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ pipeStats.verify.passed }} ready to approve">
+        <span class="status-icon" ng-class="idleAddition('waiting', pipeStats.verify.passed)"></span>
+        <span class="count">{{ pipeStats.verify.passed }}</span>
+      </div>
+    </div>
+    <div class="ribbon-caret">
+      <i class="fa fa-arrow-right"></i>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="heading">
+      <span class="name">Build</span>
+    </div>
+    <div class="detail two">
+      <div class="status"
+        ng-class="{ running: pipeStats.build.running > 0, active: pipeStats.build.running > 0 }"
+        ng-click="applyFilter('stage:build status:running')"
+        bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ pipeStats.build.running }} running in Build">
+        <span class="status-icon" ng-class="idleAddition('running', pipeStats.build.running)"></span>
+        <span class="count">{{ pipeStats.build.running }}</span>
+      </div>
+      <div class="status"
+        ng-class="{ failed: pipeStats.build.failed > 0, active: pipeStats.build.failed > 0 }"
+        ng-click="applyFilter('stage:build status:failed')"
+        bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ pipeStats.build.failed }} failed in Build">
+        <span class="status-icon" ng-class="idleAddition('failed', pipeStats.build.failed)"></span>
+        <span class="count">{{ pipeStats.build.failed }}</span>
+      </div>
+    </div>
+    <div class="ribbon-caret">
+      <i class="fa fa-arrow-right"></i>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="heading">
+      <span class="name">Acceptance</span>
+    </div>
+    <div class="detail two">
+      <div class="status"
+        ng-class="{ running: pipeStats.acceptance.running > 0, active: pipeStats.acceptance.running > 0 }"
+        ng-click="applyFilter('stage:acceptance status:running')"
+        bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ pipeStats.acceptance.running }} running in Acceptance">
+        <span class="status-icon" ng-class="idleAddition('running', pipeStats.acceptance.running)"></span>
+        <span class="count">{{ pipeStats.acceptance.running }}</span>
+      </div>
+      <div class="status"
+        ng-class="{ failed: pipeStats.acceptance.failed > 0, active: pipeStats.acceptance.failed > 0 }"
+        ng-click="applyFilter('stage:acceptance status:failed')"
+        bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ pipeStats.acceptance.failed }} failed in Acceptance">
+        <span class="status-icon" ng-class="idleAddition('failed', pipeStats.acceptance.failed)"></span>
+        <span class="count">{{ pipeStats.acceptance.failed }}</span>
+      </div>
+    </div>
+    <div class="ribbon-caret">
+      <i class="fa fa-arrow-right"></i>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="heading">
+      <span class="name">Deliver</span>
+    </div>
+    <div class="detail one">
+      <div class="status"
+        ng-class="{ passed: pipeStats.acceptance.passed > 0, active: pipeStats.acceptance.passed > 0 }"
+        ng-click="applyFilter('stage:acceptance status:passed')"
+        bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ pipeStats.acceptance.passed }} ready to deliver">
+        <span class="status-icon" ng-class="idleAddition('waiting', pipeStats.acceptance.passed)"></span>
+        <span class="count">{{ pipeStats.acceptance.passed }}</span>
+      </div>
+    </div>
+    <div class="ribbon-caret">
+      <i class="fa fa-arrow-right"></i>
+    </div>
+  </div>
+  <div class="stage" ng-class="urdClassName(pipeStats.union)">
+    <div class="heading">
+      <span class="name">Union</span>
+    </div>
+    <div class="detail big" bs-tooltip data-delay="800" data-placement="left"
+      data-title="{{ pipeStats.union }}">
+      <div icon="union"></div>
+    </div>
+    <div class="ribbon-caret">
+      <i class="fa fa-arrow-right"></i>
+    </div>
+  </div>
+  <div class="stage" ng-class="urdClassName(pipeStats.rehearsal)">
+    <div class="heading">
+      <span class="name">Rehearsal</span>
+    </div>
+    <div class="detail big" bs-tooltip data-delay="800" data-placement="left"
+      data-title="{{ pipeStats.rehearsal }}">
+      <div icon="rehearsal" ></div>
+    </div>
+    <div class="ribbon-caret">
+      <i class="fa fa-arrow-right"></i>
+    </div>
+  </div>
+  <div class="stage" ng-class="urdClassName(pipeStats.delivered)">
+    <div class="heading">
+      <span class="name">Delivered</span>
+    </div>
+    <div class="detail big" bs-tooltip data-delay="800" data-placement="left"
+      data-title="{{ pipeStats.delivered }}">
+      <div icon="delivered"></div>
+    </div>
+  </div>
+</div>

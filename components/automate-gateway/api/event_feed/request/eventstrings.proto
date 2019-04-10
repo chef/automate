@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package chef.automate.api.event_feed.request;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/event_feed/request";
+
+message EventStrings {
+    string start = 1;
+    string end = 2;
+    string timezone = 3;
+    int32 hours_between = 4;
+    repeated string filter = 5;
+}
+

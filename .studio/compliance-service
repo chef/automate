@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# Helper methods specific for the compliance-service
+
+# Run Integration tests for the feeds service
+document "feed_integration" <<DOC
+  Runs the integration tests for the feeds service
+DOC
+function feed_integration() {
+  go_test -v "github.com/chef/automate/components/compliance-service/feed/integration_test"
+}
+
+document "send_ingest_report_compliance" <<DOC
+  Send an inspec report through to ingest.
+DOC
+function send_ingest_report_compliance() {
+  go_test "github.com/chef/automate/components/compliance-service/examples/ingest/test"
+}
+
+document "compliance_unit_tests" <<DOC
+  Runs the unit tests for the compliance-service
+
+  The reason the compliance service can not use the 'go_component_unit' it needs to remove the
+  'examples' folder.
+DOC
+function compliance_unit_tests() {
+  setup_go_workspace
+  # Run the tests
+  pushd $scaffolding_go_pkg_path >/dev/null;
+    local GO_PACKAGES=$(go list ./components/compliance-service/... |  grep -v '/examples/');
+    log_line "Executing Go test";
+    eval go test -v $GO_PACKAGES -cover;
+    local EXIT_CODE=$?;
+  popd >/dev/null;
+
+  return $EXIT_CODE;
+}
+
+document "compliance_integration" <<DOC
+  Runs the integration tests for the compliance_integration.
+DOC
+function compliance_integration() {
+  # Go based integration tests
+  go_test "github.com/chef/automate/components/compliance-service/integration_test"
+}
+
+document "go_update_compliance_service" <<DOC
+  Go update will generate a new compliance-service binary (go_build) and force load it (reload_binary).
+
+  The compliance-service can not use the generic 'go_update_component' function because it need a specific build function
+DOC
+function go_update_compliance_service() {
+  check_if_deployinate_started || return 1
+  local component="compliance-service"
+  go_build_component $component
+  reload_component_binary $component
+}
+
+document "auto_go_update_compliance_service" <<DOC
+  Watch for file changes in a component and on change build and update the service.
+
+  The compliance-service can not use the generic 'auto_go_update_component' function because it need a specific build function
+DOC
+function auto_go_update_compliance_service() {
+  local component="compliance-service"
+
+  setup_go_workspace
+
+  install_if_missing core/inotify-tools inotifywait
+  log_line "Starting file watch for $component"
+  while inotifywait -r /src/components/$component; do
+        log_line "File change in $component"
+
+        go_update_compliance_service
+  done
+}

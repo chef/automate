@@ -1,0 +1,11 @@
+---
+version: '2'
+services:
+  a1-migration:
+    extends:
+      file: docker-compose-services.yml
+      service: a1-migration
+    networks:
+      default:
+        aliases:
+          - a1-migration.test

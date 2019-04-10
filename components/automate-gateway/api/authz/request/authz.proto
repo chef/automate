@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package chef.automate.api.authz.request;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/authz/request";
+
+message IsAuthorizedReq {
+    string subject = 1;
+    string resource = 2;
+    string action = 3;
+}
+
+message CreatePolicyReq {
+    string action = 2;
+    repeated string subjects = 3;
+    string resource = 4;
+}
+
+message ListPoliciesReq {
+
+}
+
+message DeletePolicyReq {
+    string id = 1;
+}
+
+message IntrospectAllReq {
+}
+
+message IntrospectSomeReq {
+    repeated string paths = 1;
+}
+
+message IntrospectReq {
+    string path = 1;
+    repeated string parameters = 2;
+}
+
+message IntrospectAllProjectsReq {
+}

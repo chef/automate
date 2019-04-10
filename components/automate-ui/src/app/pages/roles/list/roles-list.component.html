@@ -1,0 +1,36 @@
+<app-admin-sidebar></app-admin-sidebar>
+<chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+
+<div class="container">
+  <main>
+    <chef-page-header>
+      <chef-heading>Roles</chef-heading>
+      <chef-subheading>
+        Roles are named groups of actions used to define policies.
+      </chef-subheading>
+    </chef-page-header>
+    <section *ngIf="(iamMajorVersion$ | async) === 'v1'" class="page-body">
+      Currently, you are using IAM v1. Roles are only available when using IAM v2.
+    </section>
+    <section *ngIf="(iamMajorVersion$ | async) !== 'v1'" class="page-body">
+      <app-authorized [allOf]="['/iam/v2beta/roles', 'get']">
+        <chef-table>
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Name</chef-th>
+              <chef-th>Type</chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let role of sortedRoles$ | async">
+                <chef-td>
+                  <a [routerLink]="['/settings/roles', role.id]">{{ role.name }}</a>
+                </chef-td>
+                <chef-td>{{ role.type | iamType }}</chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </app-authorized>
+    </section>
+  </main>
+</div>

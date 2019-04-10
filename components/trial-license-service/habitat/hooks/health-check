@@ -1,0 +1,11 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+output=$(curl --max-time 2 --fail --head http://{{sys.ip}}:{{cfg.service.port}}/status 2>&1)
+
+if [[ "$?" != "0" ]]; then
+  echo "health check curl command returned exit code ${res}:"
+  echo $output
+  exit 2
+fi
+
+exit 0

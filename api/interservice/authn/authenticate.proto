@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package chef.automate.domain.authn;
+option go_package = "github.com/chef/automate/api/interservice/authn";
+
+import "google/api/annotations.proto";
+
+message AuthenticateRequest {};
+
+message AuthenticateResponse {
+  // This could be either "user:{local,ldap,saml}:<some-id>",
+  // "tls:service:<some-id> or "token:<some-id>",
+  // depending on the authentication method that was successful.
+  string subject = 1;
+  // Only human users have teams. The teams are provided either by the external
+  // IdP (in which case they're extracted from the id_token; TODO), or, for local
+  // users, by teams-service (TODO).
+  repeated string teams = 2;
+};
+
+service Authentication {
+
+  // Authenticate inspects the request's metadata -- for this, an empty argument
+  // is just enough. Getting a response means it was authenticated successfully.
+  // If the metadata does not contain what is needed to authenticate the
+  // request, or the tokens are wrong, the AuthenticationService will return the
+  // corresponding error code, with details in the message.
+  rpc Authenticate (AuthenticateRequest) returns (AuthenticateResponse) {
+    option (google.api.http).get = "/api/authenticate";
+  };
+}

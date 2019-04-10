@@ -1,0 +1,49 @@
+.cd-tabset {
+  @include clearfix();
+  position: relative;
+  width: 100%;
+  background-color: $lightgrayblue;
+
+  .cd-tab {
+    display: inline;
+
+    .tablink {
+      display: inline-block;
+      font-size: 13px;
+      padding: 15px;
+      background-color: $lightgrayblue;
+      color: $white;
+      cursor: pointer;
+      vertical-align: text-bottom;
+      position: relative;
+      border-right: 1px solid $white;
+      margin-right: -5px;
+
+      .icon {
+        padding-right: 0.5em;
+        font-size: 13px;
+        vertical-align: text-bottom;
+      }
+    }
+
+    .tabcontent {
+      display: none;
+      float: left;
+      background-color: $white;
+      padding: 10px 20px;
+    }
+
+    &.active-tab {
+      .tablink {
+        background-color: $white;
+        color: $cheforange;
+      }
+
+      .tabcontent {
+        display: block;
+        width: 100%;
+        @include clearfix;
+      }
+    }
+  }
+}

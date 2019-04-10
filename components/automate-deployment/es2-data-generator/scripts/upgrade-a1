@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -ex
+
+pushd /var/cache/es2-data-generator
+
+curl -LO  https://packages.chef.io/files/stable/automate/1.8.38/ubuntu/16.04/automate_1.8.38-1_amd64.deb
+dpkg -i automate_1.8.38-1_amd64.deb
+
+popd
+
+automate-ctl reconfigure
+

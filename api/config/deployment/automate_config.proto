@@ -1,0 +1,89 @@
+// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
+syntax = "proto3";
+
+package chef.automate.domain.deployment;
+option go_package = "github.com/chef/automate/api/config/deployment";
+
+import "api/config/applications/config_request.proto";
+import "api/config/authn/config_request.proto";
+import "api/config/authz/config_request.proto";
+import "api/config/backup_gateway/config_request.proto";
+import "api/config/bifrost/config_request.proto";
+import "api/config/bookshelf/config_request.proto";
+import "api/config/erchef/config_request.proto";
+import "api/config/event/config_request.proto";
+import "api/config/cfgmgmt/config_request.proto";
+import "api/config/compliance/config_request.proto";
+import "api/config/shared/global.proto";
+import "api/config/cs_nginx/config_request.proto";
+import "api/config/data_lifecycle/config_request.proto";
+import "api/config/deployment/config_request.proto";
+import "api/config/dex/config_request.proto";
+import "api/config/elasticsearch/config_request.proto";
+import "api/config/esgateway/config_request.proto";
+import "api/config/es_sidecar/config_request.proto";
+import "api/config/gateway/config_request.proto";
+import "api/config/ingest/config_request.proto";
+import "api/config/license_control/config_request.proto";
+import "api/config/load_balancer/config_request.proto";
+import "api/config/local_user/config_request.proto";
+import "api/config/nodemanager/config_request.proto";
+import "api/config/notifications/config_request.proto";
+import "api/config/postgresql/config_request.proto";
+import "api/config/pg_gateway/config_request.proto";
+import "api/config/pg_sidecar/config_request.proto";
+import "api/config/prometheus/config_request.proto";
+import "api/config/secrets/config_request.proto";
+import "api/config/session/config_request.proto";
+import "api/config/teams/config_request.proto";
+import "api/config/ui/config_request.proto";
+import "api/config/workflow_nginx/config_request.proto";
+import "api/config/workflow_server/config_request.proto";
+import "api/config/event_gateway/config_request.proto";
+import "api/config/data_feed/config_request.proto";
+
+message AutomateConfig {
+	reserved 26; // automate-blob-store
+
+	chef.automate.infra.config.GlobalConfig global = 19;
+	chef.automate.domain.authn.ConfigRequest auth_n = 1;
+	chef.automate.domain.authz.ConfigRequest auth_z = 2;
+	chef.automate.domain.compliance.config.ConfigRequest compliance = 10;
+	chef.automate.domain.cfgmgmt.ConfigRequest config_mgmt = 6;
+	chef.automate.domain.deployment.ConfigRequest deployment = 3;
+	chef.automate.domain.dex.ConfigRequest dex = 4;
+	chef.automate.infra.elasticsearch.ConfigRequest elasticsearch = 7;
+	chef.automate.infra.esgateway.ConfigRequest esgateway = 31;
+	chef.automate.infra.es_sidecar.ConfigRequest es_sidecar = 11;
+	chef.automate.api.config.ConfigRequest gateway = 5;
+	chef.automate.domain.ingest.ConfigRequest ingest = 13;
+	chef.automate.infra.load_balancer.ConfigRequest load_balancer = 8;
+	chef.automate.domain.local_user.ConfigRequest local_user = 12;
+	chef.automate.domain.license_control.ConfigRequest license_control = 16;
+	chef.automate.domain.notifications.ConfigRequest notifications = 14;
+	chef.automate.infra.postgresql.ConfigRequest postgresql = 15;
+	chef.automate.domain.session.ConfigRequest session = 17;
+	chef.automate.domain.teams.ConfigRequest teams = 18;
+	chef.automate.ui.ConfigRequest u_i = 9;
+	chef.automate.domain.data_lifecycle.ConfigRequest data_lifecycle = 20;
+	chef.automate.domain.secrets.ConfigRequest secrets = 21;
+	chef.automate.infra.backup_gateway.ConfigRequest backup_gateway = 29;
+	chef.automate.infra.pg_sidecar.ConfigRequest pg_sidecar = 35;
+	chef.automate.infra.pg_gateway.ConfigRequest pg_gateway = 34;
+	chef.automate.domain.applications.ConfigRequest applications = 36;
+
+	chef.automate.domain.bookshelf.ConfigRequest bookshelf = 22;
+	chef.automate.domain.bifrost.ConfigRequest bifrost = 23;
+	chef.automate.domain.erchef.ConfigRequest erchef = 24;
+	chef.automate.domain.cs_nginx.ConfigRequest cs_nginx = 25;
+
+	chef.automate.domain.workflow_server.ConfigRequest workflow = 27;
+	chef.automate.domain.workflow_nginx.ConfigRequest workflow_nginx = 28;
+
+	chef.automate.domain.event.ConfigRequest event_service = 30;
+	chef.automate.domain.nodemanager.ConfigRequest nodemanager = 33;
+	chef.automate.domain.event_gateway.ConfigRequest event_gateway = 37;
+
+	chef.automate.infra.prometheus.ConfigRequest prometheus = 32;
+	chef.automate.domain.data_feed.ConfigRequest data_feed_service = 38;
+}

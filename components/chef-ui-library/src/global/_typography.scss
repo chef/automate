@@ -1,0 +1,266 @@
+
+:root {
+  font-size: var(--chef-base-font-size, 16px);
+}
+
+// ------------------------------------------------------------------------------------- //
+// Imports & Functions
+// specified typography weights for Muli
+$bold-weight: 700;
+$regular-weight: 400;
+$light-weight: 300;
+
+@font-face {
+  font-family: "MuliBold";
+  src: url("/assets/fonts/muli/Muli-Bold.ttf");
+  font-weight: $bold-weight;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Muli";
+  src: url("/assets/fonts/muli/Muli-Regular.ttf");
+  font-weight: $regular-weight;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MuliItalic";
+  src: url("/assets/fonts/muli/Muli-Italic.ttf");
+  font-weight: $regular-weight;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "MuliLight";
+  src: url("/assets/fonts/muli/Muli-Light.ttf");
+  font-weight: $light-weight;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MuliLightItalic";
+  src: url("/assets/fonts/muli/Muli-LightItalic.ttf");
+  font-weight: $light-weight;
+  font-style: italic;
+}
+
+.regular {
+  font-family: 'Muli', arial, sans-serif;
+  font-weight: $regular-weight;
+  font-style: normal;
+}
+
+.light {
+  font-family: 'MuliLight', arial, sans-serif;
+  font-weight: $light-weight;
+  font-style: normal;
+}
+
+.light-italic {
+  font-family: 'MuliLightItalic', arial, sans-serif;
+  font-weight: $light-weight;
+  font-style: italic;
+}
+
+.italic {
+  font-family: 'MuliRegularItalic', arial, sans-serif;
+  font-weight: $light-weight;
+  font-style: italic;
+}
+
+.strong {
+  font-family: 'MuliBold', arial, sans-serif;
+  font-weight: $bold-weight;
+  font-style: normal;
+}
+
+.strong-italic {
+  font-family: 'MuliBoldItalic', arial, sans-serif;
+  font-weight: $bold-weight;
+  font-style: italic;
+}
+
+
+// ------------------------------------------------------------------------------------- //
+// Typography Settings
+
+// Font Family
+$font-family: var(--chef-font-family, "Muli", Helvetica, Arial, sans-serif);
+
+// Typography Color Variables
+$default-type: chef-hsl(var(--chef-primary-dark));
+$disabled-type: chef-hsl(var(--chef-dark-grey));
+$contrast-type: chef-hsl(var(--chef-white));
+$header-color: chef-hsl(var(--chef-primary-dark));
+
+// Paragraph Styles <p>
+$paragraph-color: chef-hsl(var(--chef-primary-dark));
+$paragraph-size: 14px;
+$paragraph-line-height: 1.25em;
+$paragraph-margin: 1em;
+$double-margin: $paragraph-margin * 1.5;
+// Header Styles <h1 - h6>
+$header-size: 36px;
+$header-line-height: 1.25em;
+$header-margin: $paragraph-margin * 1.2;
+// <hr>
+$hr-margin: 1.2em;
+
+// ------------------------------------------------------------------------------------- //
+// Type Set
+
+html,
+body {
+  font-family: $font-family;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+// Headers
+h1, h2, h3, h4, h5, h6 {
+  color: $header-color;
+  line-height: $header-line-height;
+  font-weight: $regular-weight;
+  margin: 0.25em 0;
+}
+
+h1, .display1 {
+  font-size: $header-size; // 36px
+}
+
+h2, .display2 {
+  font-size: $header-size / 1.5; // 24px
+}
+
+h3, .display3 {
+  font-size: $header-size / 2; //18px
+}
+
+h4, .display4 {
+  font-size: $header-size / 2.57; //14px
+}
+
+h5, .display5 {
+  font-size: $header-size / 2.77; //13px
+}
+
+h6, .display6 {
+  font-size: $header-size / 3; // 12px
+}
+
+// Paragraphs
+p {
+  margin-top: $paragraph-margin;
+  font-size: $paragraph-size;
+  line-height: $paragraph-line-height;
+  color: $paragraph-color;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}
+
+.regular {
+  margin-top: $paragraph-margin;
+  font-size: $paragraph-size;
+  line-height: $paragraph-line-height;
+  color: $paragraph-color;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}
+
+.small {
+  margin-top: $paragraph-margin;
+  font-size: $paragraph-size - 1;
+  line-height: $paragraph-line-height;
+  color: $paragraph-color;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}
+
+// Action Colors
+.default {
+  color: $default-type;
+}
+
+.disabled {
+  color: $disabled-type;
+}
+
+.contrast {
+  color: $contrast-type;
+}
+
+// Lists
+ul, ol {
+
+  li {
+    line-height: $paragraph-line-height;
+  }
+
+  ul, ol {
+    margin-top: 0;
+  }
+}
+
+
+// hr
+hr {
+  margin: $hr-margin 0;
+  height: 1px;
+  border: none;
+  background-color: var(--chef-grey);
+}
+
+// Tables
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  font-weight: $bold-weight;
+}
+
+th, td {
+  padding: 15px;
+}
+
+// Code
+pre {
+  display: block;
+  padding: 0 1em;
+  overflow: auto;
+
+  code {
+    position: static;
+    padding: 0;
+    border: none;
+    line-height: 1.5em;
+  }
+}
+
+code {
+  position: relative;
+  font-family: Courier New, Courier, monospace;
+  font-size: $paragraph-size * 1.2;
+  line-height: 1em;
+
+}
+
+// Suppress an IE and Edge feature of displaying a right-justified clear "x" button inside an input when non-empty.
+// As the first reference indicates, it is not an ideal solution but it makes our UX more consistent across browsers.
+// Furthermore, this removes the burden of having to handle the event generated by using that clear button,
+// because it is *not* the same behavior as manually emptying the field with backspace or Cmd+x.
+// https://developer.mozilla.org/en-US/docs/Web/CSS/::-ms-clear
+// https://stackoverflow.com/a/18270721
+input[type=text]::-ms-clear {
+  display: none;
+}

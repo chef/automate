@@ -1,0 +1,29 @@
+{
+  "filter" : {
+    "must" : [
+      {
+        "cookbooks" : "cookbook_name"
+      },
+      {
+        "roles" : "role_name"
+      },
+      {
+        "not_listed" : "not_listed_name"
+      },
+      {
+        "wildcard_case" : "*wild*"
+      }
+    ],
+    "should" :  [
+      {
+        "cookbooks" : "cookbook_name_2"
+      },
+      {
+        "roles" : "role_name_2"
+      },
+      {
+        "wildcard_case" : "*wild_2*"
+      }
+    ]
+  }
+}

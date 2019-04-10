@@ -1,0 +1,32 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+#
+# health-check for HAProxy
+#
+# This health check connects to the status socket and ensures that it
+# gets back a JSON response. It does not check the health of any
+# particular upstream.
+#
+# We don't set -e here to make it easier to remap return codes
+set -uo pipefail
+exec 2>&1
+
+rc=0
+STATUS_SOCK={{pkg.svc_var_path}}/status.sock
+JQ_FILTER=".[] | select(.field.name == \"Name\").value.value"
+
+name=$(echo "show info json" | nc -U $STATUS_SOCK | jq -r "$JQ_FILTER")
+case $? in
+    0)
+        if [[ "$name" == "HAProxy" ]]; then
+            rc=0
+        else
+            echo "Unexpected HAProxy name field: $name"
+            rc=2
+        fi
+        ;;
+    *)
+        rc=2
+        ;;
+esac
+
+exit $rc

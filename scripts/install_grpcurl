@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+export HAB_NONINTERACTIVE=true
+export HAB_NOCOLORING=true
+
+install_grpcurl() {
+  hab pkg install core/grpcurl -b -f
+}
+
+install_grpcurl

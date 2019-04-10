@@ -1,0 +1,69 @@
+/*
+
+This is the context map for Chef Automate 2. 
+
+As you add items, you will likely need to tweak "K" to find a layout that fits.
+
+Additionally, don't be afraid to add direction for edges to tweak the lines. A little passthrough
+is fine, as long as the labels are clear.
+
+*/
+
+digraph "context_map" {
+	fontsize = "60"
+	layout = fdp 
+	overlap = scale 
+	splines = curved
+	compound = true
+	K=4
+	maxiter=1
+	start=1
+
+	node [shape=circle, height=3, fontsize=30]
+	
+	edge [arrowhead = none, labeldistance=3, minlen=5, fontsize=16]
+
+		subgraph cluster_supporting {
+			style=invis
+			label=""
+			node [style="filled"]
+			ingestion [label="Ingestion"]
+			reporting [label="Reporting"]
+			deployment [label="Deployment"]
+			notifications [label="Notifications"]
+			licensing [label="Licensing"]
+			auth [label="Authentication\n & Authorization"]
+		}
+
+		subgraph cluster_generic {
+			legal [label="Legal"]
+			style=invis
+			label=""
+			salesandmarketing [label="Sales & Marketing"]
+		}
+
+		subgraph cluster_converge {
+			label="Converge"
+			fontsize="40"
+			style=filled
+			fillcolor="#F3F6F8"
+			node [style="filled" color="#3897D3" fillcolor="#3897D3"]
+			converge [style=invis]
+		}
+
+		subgraph cluster_co {
+			label="Compliance"
+			fontsize="40"
+			style=filled
+			fillcolor="#F3F6F8"
+			//fillcolor="#fdb714"
+			node [style="filled" color="#fdb714" fillcolor="#fdb714"]
+			coprofiles [label="Profiles"]
+			coscanner [label="Scanner"]
+		}
+
+	cluster_co -> ingestion
+	cluster_co -> reporting:s
+	cluster_converge -> ingestion:se
+	cluster_converge -> reporting:e
+}

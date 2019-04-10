@@ -1,0 +1,96 @@
+.details-header {
+  $height: 62px;
+  background-color: $grayblue;
+  position: relative;
+  @include clearfix();
+
+  &>.icon {
+    float: left;
+    font-size: $height;
+    font-size: 1.9em;
+    height: 1.75em;
+    width: 1.75em;
+    display: inline-block;
+    background-color: $darkblue;
+    color: $grayblue;
+    border-radius: 50%;
+    line-height: 1.55em;
+    text-align: center;
+    margin: 14px;
+  }
+
+  h2 {
+    float: left;
+    font-size: 2.6em;
+    display: inline-block;
+    margin: 0;
+    background-color: $white;
+    min-width: 320px;
+    line-height: $height;
+    padding: 0 15px;
+    font-weight: 300;
+  }
+
+  .nav, .actions {
+    height: $height;
+    float: left;
+
+    li {
+      float: left;
+      border-right: 1px solid $white;
+
+      a {
+        display: block;
+        width: $height + 5;
+        height: $height;
+        background-color: $lightgrayblue;
+        font-size: 1.2em;
+        font-weight: 400;
+        cursor: pointer;
+        position: relative;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      span {
+        display: block;
+        text-align: center;
+      }
+
+      .nib {
+        position: absolute;
+        top: 2px;
+        left: 5px;
+        font-weight: bold;
+      }
+
+      .icon {
+        font-size: 1.5em;
+        padding-bottom: 5px;
+        padding-top: 19px;
+      }
+
+      .icon-eye {
+        font-size: 1.2em;
+        padding-top: 22px;
+      }
+
+      &.active {
+        background-color: $white;
+      }
+    }
+  }
+
+  .actions {
+    float: right;
+
+    .delete {
+      border-left: 1px solid $white;
+
+      a {
+        background-color: $alertpink;
+        color: $alertred;
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+syntax = "proto3";
+package chef.automate.domain.service_without_methods;
+option go_package = "github.com/chef/automate/components/mock-service/mock";
+
+service NotDoingMuch {}

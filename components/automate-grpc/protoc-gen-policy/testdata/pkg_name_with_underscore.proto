@@ -1,0 +1,13 @@
+syntax = "proto3";
+package chef.automate.domain.pkg_name_with_underscore;
+option go_package = "github.com/chef/automate/components/mock-service/pkg_name_with_underscore";
+import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
+
+message Foo {}
+
+service Mock {
+  rpc MockMethod (Foo) returns (Foo) {
+    option (chef.automate.api.policy).resource = "mock:foo";
+    option (chef.automate.api.policy).action = "action";
+  };
+}

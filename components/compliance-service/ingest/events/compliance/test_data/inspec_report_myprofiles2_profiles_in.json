@@ -1,0 +1,61 @@
+[
+  {
+    "name": "myprofile2",
+    "title": "My Profile 2 title",
+    "maintainer": "Demo, Inc.",
+    "copyright": "Demo, Inc.",
+    "copyright_email": "support@example.com",
+    "license": "Apache-2.0",
+    "summary": "My Profile 2 summary",
+    "version": "2.0.0",
+    "supports": [],
+    "controls": [
+      {
+        "title": "Profile 2 - Control 1",
+        "desc": "Profile 2 - Control 1 description",
+        "impact": 0.3,
+        "refs": [
+          {
+            "url": "https://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf",
+            "ref": "NSA-RH6-STIG - Section 3.5.2.1"
+          },
+          {
+            "ref": "http://people.redhat.com/swells/scap-security-guide/RHEL/6/output/ssg-centos6-guide-C2S.html"
+          }
+        ],
+        "tags": {
+          "our_criticality": 98,
+          "reviewed": true,
+          "cce": "CCE-27072-8"
+        },
+        "code": "control 'pro2-con1' do\n  impact 0.3\n  title 'Profile 2 - Control 1'\n  desc 'Profile 2 - Control 1 description'\n  tag 'our_criticality': 98\n  tag 'reviewed': true\n  tag cce: 'CCE-27072-8'\n  ref 'NSA-RH6-STIG - Section 3.5.2.1', url: 'https://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf'\n  ref 'http://people.redhat.com/swells/scap-security-guide/RHEL/6/output/ssg-centos6-guide-C2S.html'\n  describe file('c:\\Windows') do\n    it { should exist }\n  end\n  only_if { os.windows? }\nend\n",
+        "source_location": {
+          "ref": "myprofile2/controls/profile2.rb",
+          "line": 1
+        },
+        "id": "pro2-con1",
+        "results": [
+          {
+            "status": "skipped",
+            "code_desc": "Operating System Detection",
+            "skip_message": "Skipped control due to only_if condition.",
+            "resource": "Operating System Detection",
+            "run_time": 1.2e-05,
+            "start_time": "2017-10-25 10:23:26 +0100"
+          }
+        ]
+      }
+    ],
+    "groups": [
+      {
+        "title": null,
+        "controls": [
+          "pro2-con1"
+        ],
+        "id": "controls/profile2.rb"
+      }
+    ],
+    "attributes": [],
+    "sha256": "5c697eba4412c874ae3f68454627e5901d5293e506c11ebd04a2b39d6f400324"
+  }
+]

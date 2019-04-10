@@ -1,0 +1,17 @@
+#!/bin/bash
+
+document "start_event_service" <<DOC
+  Build and start the local event-service
+DOC
+function start_event_service() {
+  build components/event-service
+  start_deployment_service
+  chef-automate dev deploy-some $HAB_ORIGIN/event-service --with-deps
+}
+
+document "event_integration" <<DOC
+  Run event service integration tests
+DOC
+function event_integration() {
+  go_test -v "github.com/chef/automate/components/event-service/integration_test"
+}

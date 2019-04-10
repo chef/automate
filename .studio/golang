@@ -1,0 +1,261 @@
+#!/bin/bash
+#
+# This file is meant to have all the helper methods that
+# Go components will use like the config_mgmt/ingest/etc
+
+# Run Unit tests
+document "go_component_unit" <<DOC
+  Runs unit testing for the specified component
+
+  Example: Run the unit tests for the config-mgmt-service
+  ----------------------------------------------------
+  $ go_component_unit config-mgmt-service
+
+  By default, the output will only show failures.
+  You can optionally turn on verbose mode to see output from all tests
+  but, depending on the component, it will be much harder to find failures
+  mixed in with a large stream of output.
+
+  Example: Run the unit tests for the authz-service with verbosity enabled
+  ----------------------------------------------------
+  $ go_component_unit -v config-mgmt-service
+  
+  The command provides tab-completion, so if you type this...
+
+  $ go_component_unit<space><tab><tab>
+
+  ... it will list all available components--except for "api",
+  the one pseudo-component that you can also test.
+
+  Finally, invoke the command with no arguments to see a concise usage message.
+DOC
+function go_component_unit() {
+  VERBOSE_TESTS=
+  if [[ "$1" == "-v" ]]; then
+      VERBOSE_TESTS=$1
+      shift
+  fi
+  if [[ "$1" == "" ]]; then
+    echo "usage: go_component_unit [ -v ] <component-name> | api"
+    return 1
+  fi
+
+  local GO_PACKAGES
+  setup_go_workspace
+  log_line "Running '${YELLOW}$1${NC}' unit tests"
+  pushd "$scaffolding_go_pkg_path" >/dev/null
+    if [[ "$1" == "api" ]]; then
+      SPEC=./api/... 
+    else
+      SPEC=./components/$1/...
+    fi
+    GO_PACKAGES=$(go list $SPEC | grep -v integration)
+  popd >/dev/null
+  go_test $GO_PACKAGES
+}
+complete -F _component_auto_complete go_component_unit
+
+# TODO: (@afiune) Document the use of go_test and maybe put in ci-studio-common
+function go_test() {
+  setup_go_workspace
+  install_if_missing core/go go
+  install_if_missing core/git git
+
+  pushd "$scaffolding_go_pkg_path" >/dev/null
+    log_line "Executing Go test";
+    # The default behavior is to run the package at the root of the
+    # repository which is just as if we run: 'go test -cover'
+    go test "$@" -cover $VERBOSE_TESTS
+    local EXIT_CODE=$?
+  popd >/dev/null
+  return $EXIT_CODE
+}
+
+document "go_build_pkg" <<DOC
+  Build one or more go packages within the a2 codebase
+
+  Examples:
+
+      go_build_pkg components/automate-deployment/cmd/automate-ctl
+      go_build_pkg components/automate-deployment/pkg/server
+DOC
+function go_build_pkg() {
+  if [[ "$1" == "" ]]; then
+      error "Missing package path; try 'describe ${FUNCNAME[0]}'"
+      return 1
+  fi
+
+  setup_go_workspace
+  [[ ! -d /src/bin ]] && mkdir /src/bin
+
+  local pkg_path="github.com/chef/automate/$1"
+
+  pushd /src/bin >/dev/null
+    log_line " go build $pkg_path"
+    go build -i "$pkg_path"
+    # Save the exit code to return it later.
+    # This will make the function exit with
+    # a non-zero code and don't process from there.
+    EXIT_CODE=$?
+  popd >/dev/null
+  return $EXIT_CODE
+}
+
+document "go_build_component" <<DOC
+  A wrapper around the go_build to build a specific component.
+DOC
+function go_build_component() {
+  [[ "$1" == "" ]] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  verify_component $1 || return $?
+  local component=$1
+
+  # Create bin folder if missing
+  [[ ! -d /src/bin ]] && mkdir /src/bin
+
+  go_build "components/${component}/cmd/${component}/*.go" "/src/bin/${component}"
+}
+# Adding auto tab complete
+complete -F _component_auto_complete go_build_component
+
+document "reload_component_binary" <<DOC
+  Reloads the component binary from the '/src' directory. (Build a binary with 'go_build')
+
+  This helper will force load a binary located at '/src/bin/\$component' into your already installed
+  habitat package. If no package have been installed, it will try to install one.
+DOC
+function reload_component_binary() {
+  [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
+  verify_component $1 || return $?
+  local component=$1
+
+  component_path=$(hab pkg path $HAB_ORIGIN/$component 2> /dev/null)
+  if [[ $? -ne 0 ]]; then
+    component_path=$(hab pkg path chef/$component 2> /dev/null)
+    if [[ $? -ne 0 ]]; then
+      error "Could not find $component deployed under either your origin ($HAB_ORIGIN) or chef origin."
+      error "Deploy A2 and try again."
+      return 1
+    fi
+  fi
+
+  [ ! -f /src/bin/${component} ] && go_build_component $component
+
+  # TODO: (@afiune) This is a bit too extreme but what we are trying to avoid is to
+  # be polling to the depot for newer packages, since we disable that functionality
+  # we have to force load the binary like this. Maybe I'll revisit this latter.
+  log_line " Reloading $component binary"
+  # we need to unlink the old one so that the new one my be updated and then relinked
+  unlink ${component_path}/bin/${component}
+  kill_running_service $component
+  cp /src/bin/${component} ${component_path}/bin/${component}
+  if [[ $? != 0 ]]; then
+    error "There was a problem trying to reload the $component binary."
+    error "Run 'go_build_component $component' and try again."
+    error "Or run 'go_update_component $component' to build and reload the binary."
+    return 1
+  fi
+
+  return 0
+}
+
+# Adding auto tab complete
+complete -F _component_auto_complete reload_component_binary
+
+document "go_update_component" <<DOC
+  Go update will generate a new binary (go_build) and force load it (reload_binary).
+
+  To just build the Go binary without running the dependency solver:
+  => GO_FAST=true go_update_component [COMPONENT_NAME]
+DOC
+function go_update_component() {
+  [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
+  verify_component $1 || return $?
+  local component=$1
+
+  hab pkg path $HAB_ORIGIN/$component 2>/dev/null 1>&2 || hab pkg path chef/$component 2>/dev/null 1>&2
+  if [ $? -eq 0 ] ; then
+    go_build_component $component
+    reload_component_binary $component
+  else
+    error "You must first deploy A2."
+    return 1
+  fi
+}
+# Adding auto tab complete
+complete -F _component_auto_complete go_update_component
+
+function kill_running_service() {
+  [[ "$1" == "" ]] && error "Missing component name argument" && return 1;
+  verify_component $1 || return $?
+  local component=$1;
+  SERVICE_PID=$(grep_component_pid $component)
+  if [[ ! -z ${SERVICE_PID} ]]; then
+    kill $SERVICE_PID
+  fi
+}
+# Adding auto tab complete
+complete -F _component_auto_complete kill_running_service
+
+# Helper function to search for the PID of the service
+function grep_component_pid {
+  [[ "$1" == "" ]] && error "Missing component name argument" && return 1;
+  install_if_missing core/busybox-static pgrep >/dev/null
+  pgrep $1
+}
+
+document "auto_go_update_component" <<DOC
+  Watch for file changes in a component and on change build and update the service.
+DOC
+function auto_go_update_component() {
+  [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
+  verify_component $1 || return $?
+  local component=$1;
+
+  setup_go_workspace
+
+  install_if_missing core/inotify-tools inotifywait
+  log_line "Starting file watch for $component"
+  inotifywait -m -r /src/components/$component -e create -e moved_to -e close_write |
+    while read path action file; do
+        if [[ "$file" =~ .*go$ ]]; then
+          log_line "File: $file change in $component"
+          go_update_component $component
+          log_line "Finished update"
+        fi
+    done
+}
+# Adding auto tab complete
+complete -F _component_auto_complete auto_go_update_component
+
+document "go_component_static_tests" <<DOC
+  Runs the static tests for a component
+DOC
+function go_component_static_tests() {
+  [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
+  verify_component $1 || return $?
+  local component=$1
+
+  log_line "Collecting ${component}'s go files"
+  local gofiles=$(find components/$component/ -maxdepth 3 -name '*.go');
+  [ -z "$gofiles" ] && return 0
+
+  log_line "Installing gofmt"
+  install_if_missing core/go gofmt
+
+  log_line "Testing $component go files"
+  unformatted=$(gofmt -l "$gofiles")
+  if [ -z "$unformatted" ]
+  then
+    log_line "Success!! $component"
+    return 0
+  fi
+
+  echo >&2 "Failure: Go files must be formatted with gofmt. Please run:"
+  for fn in $unformatted; do
+    echo >&2 "  gofmt -w $PWD/$fn"
+  done
+
+  return 1
+}
+# Adding auto tab complete
+complete -F _component_auto_complete go_component_static_tests

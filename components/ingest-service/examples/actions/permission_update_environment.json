@@ -1,0 +1,21 @@
+{
+  "id": "2681b7ef-05ac-4257-80ae-ab21b1d53267",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "grant",
+  "entity_type": "permission",
+  "parent_name": "krasnow",
+  "parent_type": "environment",
+  "task": "update",
+  "organization_name": "testing",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-03-28T21:26:59Z",
+  "remote_request_id": "aed0c3bd-a2c1-4124-a11e-34693d3bd9db",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAANYuEYsAAEAAAAA",
+  "requestor_name": "mkrasnow",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Manage/11.16.2 (ruby-2.3.5-p376; ohai-7.4.1; x86_64-linux; +http://opscode.com)",
+  "data": "{\"grant\":{\"actors\":[\"mkrasnow\",\"pivotal\"],\"groups\":[\"admins\",\"users\"]}}"
+}

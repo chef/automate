@@ -1,0 +1,11 @@
+@import "~styles/variables";
+
+:host {
+  display: block;
+  padding: 25px 35px 0;
+  background: $chef-white;
+
+  p {
+    margin-bottom: 0;
+  }
+}

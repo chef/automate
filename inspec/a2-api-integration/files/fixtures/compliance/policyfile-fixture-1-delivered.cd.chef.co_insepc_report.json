@@ -1,0 +1,3183 @@
+{
+  "version": "2.42.3",
+  "other_checks": [],
+  "profiles": [
+    {
+      "name": "cd-infrastructure-base",
+      "title": "Meta profile for chef-cd infrastructure",
+      "maintainer": "Chef Software Inc",
+      "copyright": "Chef Software Inc",
+      "copyright_email": "engineering@chef.io",
+      "license": "All Rights Reserved",
+      "summary": "This profile collects all compliance and security related requirements for chef-cd infrastructure",
+      "version": "0.1.0",
+      "depends": [
+        {
+          "name": "linux-baseline",
+          "url": "https://github.com/dev-sec/linux-baseline/archive/master.tar.gz"
+        },
+        {
+          "name": "ssh-baseline",
+          "url": "https://github.com/dev-sec/ssh-baseline/archive/master.tar.gz"
+        },
+        {
+          "name": "ssl-baseline",
+          "url": "https://github.com/dev-sec/ssl-baseline/archive/master.tar.gz"
+        }
+      ],
+      "supports": [],
+      "controls": [
+        {
+          "title": "Check login.defs - RedHat specific",
+          "desc": "Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-05b' do\n  impact 1.0\n  title 'Check login.defs - RedHat specific'\n  desc 'Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs'\n  describe file('/etc/login.defs') do\n    it { should_not be_writable }\n  end\n  describe login_defs do\n    its('SYS_UID_MIN') { should eq '100' }\n    its('SYS_UID_MAX') { should eq '999' }\n    its('SYS_GID_MIN') { should eq '100' }\n    its('SYS_GID_MAX') { should eq '999' }\n  end\n  only_if { os.redhat? }\nend\n",
+          "source_location": {
+            "ref": "controls/hardening.rb",
+            "line": 27
+          },
+          "id": "os-05b",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000012658,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Inspec::Version=1.42.3",
+          "desc": null,
+          "impact": 0.0,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 66
+          },
+          "id": "debugging"
+        },
+        {
+          "title": "Disable SSL 2 from all exposed SSL ports.",
+          "desc": null,
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 82
+          },
+          "id": "ssl2"
+        },
+        {
+          "title": "Disable SSL 3 from all exposed SSL ports.",
+          "desc": null,
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 97
+          },
+          "id": "ssl3"
+        },
+        {
+          "title": "Disable TLS 1.0 on exposed ports.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 112
+          },
+          "id": "tls1.0"
+        },
+        {
+          "title": "Disable TLS 1.1 on exposed ports.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 127
+          },
+          "id": "tls1.1"
+        },
+        {
+          "title": "Enable TLS 1.2 on exposed ports.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 142
+          },
+          "id": "tls1.2"
+        },
+        {
+          "title": "Enable ECDH as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 161
+          },
+          "id": "kx-ecdh"
+        },
+        {
+          "title": "Disable RSA as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 176
+          },
+          "id": "kx-rsa"
+        },
+        {
+          "title": "Disable DH as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 191
+          },
+          "id": "kx-dh"
+        },
+        {
+          "title": "Disable KRB5 as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 206
+          },
+          "id": "kx-krb5"
+        },
+        {
+          "title": "Disable PSK as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 221
+          },
+          "id": "kx-psk"
+        },
+        {
+          "title": "Disable GOSTR as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 236
+          },
+          "id": "kx-gostr"
+        },
+        {
+          "title": "Disable SRP as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 251
+          },
+          "id": "kx-srp"
+        },
+        {
+          "title": "Enable ECDSA or RSA as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 271
+          },
+          "id": "au-ecdsa-rsa"
+        },
+        {
+          "title": "Disable ANON as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 286
+          },
+          "id": "au-anon"
+        },
+        {
+          "title": "Disable DSS as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 301
+          },
+          "id": "au-dss"
+        },
+        {
+          "title": "Disable PSK as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 316
+          },
+          "id": "au-psk"
+        },
+        {
+          "title": "Disable EXPORT as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 331
+          },
+          "id": "au-export"
+        },
+        {
+          "title": "Enable AES256 or AES128 or AES256-GCM or AES128-GCM or CHACHA20 as Enc",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 352
+          },
+          "id": "enc-aes-gcm-chacha20"
+        },
+        {
+          "title": "Disable CBC as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 367
+          },
+          "id": "enc-cbc"
+        },
+        {
+          "title": "Disable RC4 as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 382
+          },
+          "id": "enc-rc4"
+        },
+        {
+          "title": "Disable EXPORT as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 397
+          },
+          "id": "enc-export"
+        },
+        {
+          "title": "Disable DES, 3DES as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 412
+          },
+          "id": "enc-des"
+        },
+        {
+          "title": "Disable eNULL as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 427
+          },
+          "id": "enc-enull"
+        },
+        {
+          "title": "Disable CAMELLIA as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 442
+          },
+          "id": "enc-camellia"
+        },
+        {
+          "title": "Disable SEED as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 457
+          },
+          "id": "enc-seed"
+        },
+        {
+          "title": "Disable IDEA as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 472
+          },
+          "id": "enc-idea"
+        },
+        {
+          "title": "Disable AES-CCM from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 487
+          },
+          "id": "enc-aes-ccm"
+        },
+        {
+          "title": "Enable SHA384 or SHA256 or POLY1305 as Mac from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 507
+          },
+          "id": "mac-sha384-sha256-poly1305"
+        },
+        {
+          "title": "Disable MD5 Mac from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 522
+          },
+          "id": "mac-md5"
+        },
+        {
+          "title": "Disable SHA(1) Mac from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 537
+          },
+          "id": "mac-sha"
+        },
+        {
+          "title": "Disable NULL Mac from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 552
+          },
+          "id": "mac-null"
+        }
+      ],
+      "groups": [
+        {
+          "title": null,
+          "controls": [
+            "os-05b"
+          ],
+          "id": "controls/hardening.rb"
+        },
+        {
+          "title": null,
+          "controls": [
+            "debugging",
+            "ssl2",
+            "ssl3",
+            "tls1.0",
+            "tls1.1",
+            "tls1.2",
+            "kx-ecdh",
+            "kx-rsa",
+            "kx-dh",
+            "kx-krb5",
+            "kx-psk",
+            "kx-gostr",
+            "kx-srp",
+            "au-ecdsa-rsa",
+            "au-anon",
+            "au-dss",
+            "au-psk",
+            "au-export",
+            "enc-aes-gcm-chacha20",
+            "enc-cbc",
+            "enc-rc4",
+            "enc-export",
+            "enc-des",
+            "enc-enull",
+            "enc-camellia",
+            "enc-seed",
+            "enc-idea",
+            "enc-aes-ccm",
+            "mac-sha384-sha256-poly1305",
+            "mac-md5",
+            "mac-sha",
+            "mac-null"
+          ],
+          "id": "ssl-baseline-master/controls/ssl_test.rb"
+        }
+      ],
+      "attributes": [],
+      "sha256": "9756663cfb3076c87008c4c2e557861d6849daaef96aaa4fd04b4ead3f378cad"
+    },
+    {
+      "name": "linux-baseline",
+      "title": "DevSec Linux Security Baseline",
+      "maintainer": "DevSec Hardening Framework Team",
+      "copyright": "DevSec Hardening Framework Team",
+      "copyright_email": "hello@dev-sec.io",
+      "license": "Apache 2 license",
+      "summary": "Test-suite for best-preactice Linux OS hardening",
+      "version": "2.1.1",
+      "supports": [
+        {
+          "os-family": "linux"
+        }
+      ],
+      "controls": [
+        {
+          "title": "Trusted hosts login",
+          "desc": "Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-01' do\n  impact 1.0\n  title 'Trusted hosts login'\n  desc \"Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.\"\n  describe command('find / -name \\'.rhosts\\'') do\n    its('stdout') { should be_empty }\n  end\n  describe command('find / -name \\'hosts.equiv\\' ') do\n    its('stdout') { should be_empty }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 76
+          },
+          "id": "os-01"
+        },
+        {
+          "title": "Check owner and permissions for /etc/shadow",
+          "desc": "Check periodically the owner and permissions for /etc/shadow",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-02' do\n  impact 1.0\n  title 'Check owner and permissions for /etc/shadow'\n  desc 'Check periodically the owner and permissions for /etc/shadow'\n  describe file('/etc/shadow') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    its('group') { should eq shadow_group }\n    it { should_not be_executable }\n    it { should be_writable.by('owner') }\n    it { should be_readable.by('owner') }\n    it { should_not be_readable.by('other') }\n  end\n  if os.redhat?\n    describe file('/etc/shadow') do\n      it { should_not be_readable.by('group') }\n    end\n  elsif os.debian?\n    describe file('/etc/shadow') do\n      it { should be_readable.by('group') }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 88
+          },
+          "id": "os-02"
+        },
+        {
+          "title": "Check owner and permissions for /etc/passwd",
+          "desc": "Check periodically the owner and permissions for /etc/passwd",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-03' do\n  impact 1.0\n  title 'Check owner and permissions for /etc/passwd'\n  desc 'Check periodically the owner and permissions for /etc/passwd'\n  describe file('/etc/passwd') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    its('group') { should eq 'root' }\n    it { should_not be_executable }\n    it { should be_writable.by('owner') }\n    it { should_not be_writable.by('group') }\n    it { should_not be_writable.by('other') }\n    it { should be_readable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should be_readable.by('other') }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 113
+          },
+          "id": "os-03"
+        },
+        {
+          "title": "Dot in PATH variable",
+          "desc": "Do not include the current working directory in PATH variable. This makes it easier for an attacker to gain extensive rigths by executing a Trojan program",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-04' do\n  impact 1.0\n  title 'Dot in PATH variable'\n  desc 'Do not include the current working directory in PATH variable. This makes it easier for an attacker to gain extensive rigths by executing a Trojan program'\n  describe os_env('PATH') do\n    its('split') { should_not include('') }\n    its('split') { should_not include('.') }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 132
+          },
+          "id": "os-04"
+        },
+        {
+          "title": "Check login.defs",
+          "desc": "Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-05' do\n  impact 1.0\n  title 'Check login.defs'\n  desc 'Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs'\n  describe file('/etc/login.defs') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    its('group') { should eq 'root' }\n    it { should_not be_executable }\n    it { should be_readable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should be_readable.by('other') }\n  end\n  describe login_defs do\n    its('ENV_SUPATH') { should include('/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin') }\n    its('ENV_PATH') { should include('/usr/local/bin:/usr/bin:/bin') }\n    its('UMASK') { should include(login_defs_umask) }\n    its('PASS_MAX_DAYS') { should eq login_defs_passmaxdays }\n    its('PASS_MIN_DAYS') { should eq login_defs_passmindays }\n    its('PASS_WARN_AGE') { should eq login_defs_passwarnage }\n    its('LOGIN_RETRIES') { should eq '5' }\n    its('LOGIN_TIMEOUT') { should eq '60' }\n    its('UID_MIN') { should eq '1000' }\n    its('GID_MIN') { should eq '1000' }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 142
+          },
+          "id": "os-05"
+        },
+        {
+          "title": "Check login.defs - RedHat specific",
+          "desc": "Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-05b' do\n  impact 1.0\n  title 'Check login.defs - RedHat specific'\n  desc 'Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs'\n  describe file('/etc/login.defs') do\n    it { should_not be_writable }\n  end\n  describe login_defs do\n    its('SYS_UID_MIN') { should eq '100' }\n    its('SYS_UID_MAX') { should eq '999' }\n    its('SYS_GID_MIN') { should eq '100' }\n    its('SYS_GID_MAX') { should eq '999' }\n  end\n  only_if { os.redhat? }\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 170
+          },
+          "id": "os-05b"
+        },
+        {
+          "title": "Check for SUID/ SGID blacklist",
+          "desc": "Find blacklisted SUID and SGID files to ensure that no rogue SUID and SGID files have been introduced into the system",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-06' do\n  impact 1.0\n  title 'Check for SUID/ SGID blacklist'\n  desc 'Find blacklisted SUID and SGID files to ensure that no rogue SUID and SGID files have been introduced into the system'\n\n  output = command('find / -perm -4000 -o -perm -2000 -type f ! -path \\'/proc/*\\' ! -path \\'/var/lib/lxd/containers/*\\' -print 2>/dev/null | grep -v \\'^find:\\'')\n  diff = output.stdout.split(/\\r?\\n/) & blacklist\n  describe diff do\n    it { should be_empty }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 186
+          },
+          "id": "os-06"
+        },
+        {
+          "title": "Unique uid and gid",
+          "desc": "Check for unique uids gids",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-07' do\n  impact 1.0\n  title 'Unique uid and gid'\n  desc 'Check for unique uids gids'\n  describe passwd do\n    its('uids') { should_not contain_duplicates }\n  end\n  describe etc_group do\n    its('gids') { should_not contain_duplicates }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 198
+          },
+          "id": "os-07"
+        },
+        {
+          "title": "Entropy",
+          "desc": "Check system has enough entropy - greater than 1000",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-08' do\n  impact 1.0\n  title 'Entropy'\n  desc 'Check system has enough entropy - greater than 1000'\n  describe file('/proc/sys/kernel/random/entropy_avail').content.to_i do\n    it { should >= 1000 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 210
+          },
+          "id": "os-08"
+        },
+        {
+          "title": "Check for .rhosts and .netrc file",
+          "desc": "Find .rhosts and .netrc files - CIS Benchmark 9.2.9-10",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'os-09' do\n  impact 1.0\n  title 'Check for .rhosts and .netrc file'\n  desc 'Find .rhosts and .netrc files - CIS Benchmark 9.2.9-10'\n\n  output = command('find / \\( -iname .rhosts -o -iname .netrc \\) -print 2>/dev/null | grep -v \\'^find:\\'')\n  out = output.stdout.split(/\\r?\\n/)\n  describe out do\n    it { should be_empty }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/os_spec.rb",
+            "line": 219
+          },
+          "id": "os-09"
+        },
+        {
+          "title": "Do not run deprecated inetd or xinetd",
+          "desc": "http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.1",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'package-01' do\n  impact 1.0\n  title 'Do not run deprecated inetd or xinetd'\n  desc 'http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.1'\n  describe package('inetd') do\n    it { should_not be_installed }\n  end\n  describe package('xinetd') do\n    it { should_not be_installed }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/package_spec.rb",
+            "line": 22
+          },
+          "id": "package-01"
+        },
+        {
+          "title": "Do not install Telnet server",
+          "desc": "Telnet protocol uses unencrypted communication, that means the passowrd and other sensitive data are unencrypted. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.2",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'package-02' do\n  impact 1.0\n  title 'Do not install Telnet server'\n  desc 'Telnet protocol uses unencrypted communication, that means the passowrd and other sensitive data are unencrypted. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.2'\n  describe package('telnetd') do\n    it { should_not be_installed }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/package_spec.rb",
+            "line": 34
+          },
+          "id": "package-02"
+        },
+        {
+          "title": "Do not install rsh server",
+          "desc": "The r-commands suffers same problem as telnet. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.3",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'package-03' do\n  impact 1.0\n  title 'Do not install rsh server'\n  desc 'The r-commands suffers same problem as telnet. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.3'\n  describe package('telnetd') do\n    it { should_not be_installed }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/package_spec.rb",
+            "line": 43
+          },
+          "id": "package-03"
+        },
+        {
+          "title": "Do not install ypserv server (NIS)",
+          "desc": "Network Information Service (NIS) has some security design weaknesses like inadequate protection of important authentication information. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.4",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'package-05' do\n  impact 1.0\n  title 'Do not install ypserv server (NIS)'\n  desc 'Network Information Service (NIS) has some security design weaknesses like inadequate protection of important authentication information. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.4'\n  describe package('ypserv') do\n    it { should_not be_installed }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/package_spec.rb",
+            "line": 52
+          },
+          "id": "package-05"
+        },
+        {
+          "title": "Do not install tftp server",
+          "desc": "tftp-server provides little security http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.5",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'package-06' do\n  impact 1.0\n  title 'Do not install tftp server'\n  desc 'tftp-server provides little security http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.5'\n  describe package('tftp-server') do\n    it { should_not be_installed }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/package_spec.rb",
+            "line": 61
+          },
+          "id": "package-06"
+        },
+        {
+          "title": "Install syslog server package",
+          "desc": "Syslog server is required to receive system and applications logs",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'package-07' do\n  impact 1.0\n  title 'Install syslog server package'\n  desc 'Syslog server is required to receive system and applications logs'\n  describe package(val_syslog_pkg) do\n    it { should be_installed }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/package_spec.rb",
+            "line": 70
+          },
+          "id": "package-07"
+        },
+        {
+          "title": "Install auditd",
+          "desc": "auditd provides extended logging capacities on recent distribution",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'package-08' do\n  impact 1.0\n  title 'Install auditd'\n  desc 'auditd provides extended logging capacities on recent distribution'\n  audit_pkg = os.redhat? ? 'audit' : 'auditd'\n  describe package(audit_pkg) do\n    it { should be_installed }\n  end\n  describe auditd_conf do\n    its('log_file') { should cmp '/var/log/audit/audit.log' }\n    its('log_format') { should cmp 'raw' }\n    its('flush') { should match(/^INCREMENTAL|INCREMENTAL_ASYNC$/) }\n    its('max_log_file_action') { should cmp 'ROTATE' }\n    its('space_left') { should cmp 75 }\n    its('action_mail_acct') { should cmp 'root' }\n    its('space_left_action') { should cmp 'SYSLOG' }\n    its('admin_space_left') { should cmp 50 }\n    its('admin_space_left_action') { should cmp 'SUSPEND' }\n    its('disk_full_action') { should cmp 'SUSPEND' }\n    its('disk_error_action') { should cmp 'SUSPEND' }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/package_spec.rb",
+            "line": 79
+          },
+          "id": "package-08"
+        },
+        {
+          "title": "IPv4 Forwarding",
+          "desc": "If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-01' do\n  impact 1.0\n  title 'IPv4 Forwarding'\n  desc \"If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.\"\n  describe kernel_parameter('net.ipv4.ip_forward') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.all.forwarding') do\n    its(:value) { should eq 0 }\n  end\n  only_if { sysctl_forwarding == false }\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 23
+          },
+          "id": "sysctl-01"
+        },
+        {
+          "title": "Reverse path filtering",
+          "desc": "The rp_filter can reject incoming packets if their source address doesn't match the network interface that they're arriving on, which helps to prevent IP spoofing.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-02' do\n  impact 1.0\n  title 'Reverse path filtering'\n  desc \"The rp_filter can reject incoming packets if their source address doesn't match the network interface that they're arriving on, which helps to prevent IP spoofing.\"\n  describe kernel_parameter('net.ipv4.conf.all.rp_filter') do\n    its(:value) { should eq 1 }\n  end\n  describe kernel_parameter('net.ipv4.conf.default.rp_filter') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 36
+          },
+          "id": "sysctl-02"
+        },
+        {
+          "title": "ICMP ignore bogus error responses",
+          "desc": "Sometimes routers send out invalid responses to broadcast frames. This is a violation of RFC 1122 and the kernel will logged this. To avoid filling up your logfile with unnecessary stuff, you can tell the kernel not to issue these warnings",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-03' do\n  impact 1.0\n  title 'ICMP ignore bogus error responses'\n  desc 'Sometimes routers send out invalid responses to broadcast frames. This is a violation of RFC 1122 and the kernel will logged this. To avoid filling up your logfile with unnecessary stuff, you can tell the kernel not to issue these warnings'\n  describe kernel_parameter('net.ipv4.icmp_ignore_bogus_error_responses') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 48
+          },
+          "id": "sysctl-03"
+        },
+        {
+          "title": "ICMP echo ignore broadcasts",
+          "desc": "Blocking ICMP ECHO requests to broadcast addresses",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-04' do\n  impact 1.0\n  title 'ICMP echo ignore broadcasts'\n  desc 'Blocking ICMP ECHO requests to broadcast addresses'\n  describe kernel_parameter('net.ipv4.icmp_echo_ignore_broadcasts') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 57
+          },
+          "id": "sysctl-04"
+        },
+        {
+          "title": "ICMP ratelimit",
+          "desc": "icmp_ratelimit defines how many packets that match the icmp_ratemask per second",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-05' do\n  impact 1.0\n  title 'ICMP ratelimit'\n  desc 'icmp_ratelimit defines how many packets that match the icmp_ratemask per second'\n  describe kernel_parameter('net.ipv4.icmp_ratelimit') do\n    its(:value) { should eq 100 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 66
+          },
+          "id": "sysctl-05"
+        },
+        {
+          "title": "ICMP ratemask",
+          "desc": "Ratemask is a logical OR of all ICMP codes to rate limit",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-06' do\n  impact 1.0\n  title 'ICMP ratemask'\n  desc 'Ratemask is a logical OR of all ICMP codes to rate limit'\n  describe kernel_parameter('net.ipv4.icmp_ratemask') do\n    its(:value) { should eq 88089 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 75
+          },
+          "id": "sysctl-06"
+        },
+        {
+          "title": "TCP timestamps",
+          "desc": "It is possible to estimate the current uptime of a Linux system. It's preferable to disable TCP timestamps on your systems.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-07' do\n  impact 1.0\n  title 'TCP timestamps'\n  desc \"It is possible to estimate the current uptime of a Linux system. It's preferable to disable TCP timestamps on your systems.\"\n  describe kernel_parameter('net.ipv4.tcp_timestamps') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 84
+          },
+          "id": "sysctl-07"
+        },
+        {
+          "title": "ARP ignore",
+          "desc": "Reply only if the target IP address is local address configured on the incoming interface.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-08' do\n  impact 1.0\n  title 'ARP ignore'\n  desc 'Reply only if the target IP address is local address configured on the incoming interface.'\n  describe kernel_parameter('net.ipv4.conf.all.arp_ignore') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 93
+          },
+          "id": "sysctl-08"
+        },
+        {
+          "title": "ARP announce",
+          "desc": "Always use the best local address for this target. In this mode we ignore the source address in the IP packet and try to select local address that we prefer for talks with\tthe target host.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-09' do\n  impact 1.0\n  title 'ARP announce'\n  desc 'Always use the best local address for this target. In this mode we ignore the source address in the IP packet and try to select local address that we prefer for talks with\tthe target host.'\n  describe kernel_parameter('net.ipv4.conf.all.arp_announce') do\n    its(:value) { should eq 2 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 102
+          },
+          "id": "sysctl-09"
+        },
+        {
+          "title": "TCP RFC1337 Protect Against TCP Time-Wait",
+          "desc": "This enables a fix for time-wait assassination hazards in tcp, described in RFC 1337. If enabled, this causes the kernel to drop RST packets for sockets in the time-wait state.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-10' do\n  impact 1.0\n  title 'TCP RFC1337 Protect Against TCP Time-Wait'\n  desc 'This enables a fix for time-wait assassination hazards in tcp, described in RFC 1337. If enabled, this causes the kernel to drop RST packets for sockets in the time-wait state.'\n  describe kernel_parameter('net.ipv4.tcp_rfc1337') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 111
+          },
+          "id": "sysctl-10"
+        },
+        {
+          "title": "Protection against SYN flood attacks",
+          "desc": "A SYN-Attack is a denial of service (DoS) attack that consumes resources on your system forcing you to reboot.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-11' do\n  impact 1.0\n  title 'Protection against SYN flood attacks'\n  desc 'A SYN-Attack is a denial of service (DoS) attack that consumes resources on your system forcing you to reboot.'\n  describe kernel_parameter('net.ipv4.tcp_syncookies') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 120
+          },
+          "id": "sysctl-11"
+        },
+        {
+          "title": "Shared Media IP Architecture",
+          "desc": "Send(router) or accept(host) RFC1620 shared media redirects. If it is not set the kernel does not assume that different subnets on this device can communicate directly.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-12' do\n  impact 1.0\n  title 'Shared Media IP Architecture'\n  desc 'Send(router) or accept(host) RFC1620 shared media redirects. If it is not set the kernel does not assume that different subnets on this device can communicate directly.'\n  describe kernel_parameter('net.ipv4.conf.all.shared_media') do\n    its(:value) { should eq 1 }\n  end\n  describe kernel_parameter('net.ipv4.conf.default.shared_media') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 129
+          },
+          "id": "sysctl-12"
+        },
+        {
+          "title": "Disable Source Routing",
+          "desc": "The accept_source_route option causes network interfaces to accept packets with the Strict Source Route (SSR) or Loose Source Routing (LSR) option set. An attacker is able to send a source routed packet into the network, then he could intercept the replies and your server might not know that it is not communicating with a trusted server",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-13' do\n  impact 1.0\n  title 'Disable Source Routing'\n  desc 'The accept_source_route option causes network interfaces to accept packets with the Strict Source Route (SSR) or Loose Source Routing (LSR) option set. An attacker is able to send a source routed packet into the network, then he could intercept the replies and your server might not know that it is not communicating with a trusted server'\n  describe kernel_parameter('net.ipv4.conf.all.accept_source_route') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.default.accept_source_route') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 141
+          },
+          "id": "sysctl-13"
+        },
+        {
+          "title": "Disable acceptance of all IPv4 redirected packets",
+          "desc": "Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-14' do\n  impact 1.0\n  title 'Disable acceptance of all IPv4 redirected packets'\n  desc 'Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.'\n  describe kernel_parameter('net.ipv4.conf.default.accept_redirects') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.all.accept_redirects') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 153
+          },
+          "id": "sysctl-14"
+        },
+        {
+          "title": "Disable acceptance of all secure redirected packets",
+          "desc": "Disable acceptance of all secure redirected packets these prevents Man-in-the-Middle attacks.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-15' do\n  impact 1.0\n  title 'Disable acceptance of all secure redirected packets'\n  desc 'Disable acceptance of all secure redirected packets these prevents Man-in-the-Middle attacks.'\n  describe kernel_parameter('net.ipv4.conf.all.secure_redirects') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.default.secure_redirects') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 165
+          },
+          "id": "sysctl-15"
+        },
+        {
+          "title": "Disable sending of redirects packets",
+          "desc": "Disable sending of redirects packets",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-16' do\n  impact 1.0\n  title 'Disable sending of redirects packets'\n  desc 'Disable sending of redirects packets'\n  describe kernel_parameter('net.ipv4.conf.default.send_redirects') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.all.send_redirects') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 177
+          },
+          "id": "sysctl-16"
+        },
+        {
+          "title": "Disable log martians",
+          "desc": "log_martians can cause a denial of service attack to the host",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-17' do\n  impact 1.0\n  title 'Disable log martians'\n  desc 'log_martians can cause a denial of service attack to the host'\n  describe kernel_parameter('net.ipv4.conf.all.log_martians') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 189
+          },
+          "id": "sysctl-17"
+        },
+        {
+          "title": "Disable IPv6 if it is not needed",
+          "desc": "Disable IPv6 if it is not needed",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-18' do\n  impact 1.0\n  title 'Disable IPv6 if it is not needed'\n  desc 'Disable IPv6 if it is not needed'\n  describe kernel_parameter('net.ipv6.conf.all.disable_ipv6') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 198
+          },
+          "id": "sysctl-18"
+        },
+        {
+          "title": "IPv6 Forwarding",
+          "desc": "If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-19' do\n  impact 1.0\n  title 'IPv6 Forwarding'\n  desc \"If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.\"\n  describe kernel_parameter('net.ipv6.conf.all.forwarding') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 207
+          },
+          "id": "sysctl-19"
+        },
+        {
+          "title": "Disable acceptance of all IPv6 redirected packets",
+          "desc": "Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-20' do\n  impact 1.0\n  title 'Disable acceptance of all IPv6 redirected packets'\n  desc 'Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.'\n  describe kernel_parameter('net.ipv6.conf.default.accept_redirects') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv6.conf.all.accept_redirects') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 216
+          },
+          "id": "sysctl-20"
+        },
+        {
+          "title": "Disable acceptance of IPv6 router solicitations messages",
+          "desc": "The router solicitations setting determines how many router solicitations are sent when bringing up the interface. If addresses are statically assigned, there is no need to send any solicitations.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-21' do\n  impact 1.0\n  title 'Disable acceptance of IPv6 router solicitations messages'\n  desc 'The router solicitations setting determines how many router solicitations are sent when bringing up the interface. If addresses are statically assigned, there is no need to send any solicitations.'\n  describe kernel_parameter('net.ipv6.conf.default.router_solicitations') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 228
+          },
+          "id": "sysctl-21"
+        },
+        {
+          "title": "Disable Accept Router Preference from router advertisement",
+          "desc": "Disable Accept Router Preference from router advertisement",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-22' do\n  impact 1.0\n  title 'Disable Accept Router Preference from router advertisement'\n  desc 'Disable Accept Router Preference from router advertisement'\n  describe kernel_parameter('net.ipv6.conf.default.accept_ra_rtr_pref') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 237
+          },
+          "id": "sysctl-22"
+        },
+        {
+          "title": "Disable learning Prefix Information from router advertisement",
+          "desc": "The accept_ra_pinfo setting controls whether the system will accept prefix info from the router.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-23' do\n  impact 1.0\n  title 'Disable learning Prefix Information from router advertisement'\n  desc 'The accept_ra_pinfo setting controls whether the system will accept prefix info from the router.'\n  describe kernel_parameter('net.ipv6.conf.default.accept_ra_pinfo') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 246
+          },
+          "id": "sysctl-23"
+        },
+        {
+          "title": "Disable learning Hop limit from router advertisement",
+          "desc": "The accept_ra_defrtr setting controls whether the system will accept Hop Limit settings from a router advertisement. Setting it to 0 prevents a router from changing your default IPv6 Hop Limit for outgoing packets.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-24' do\n  impact 1.0\n  title 'Disable learning Hop limit from router advertisement'\n  desc 'The accept_ra_defrtr setting controls whether the system will accept Hop Limit settings from a router advertisement. Setting it to 0 prevents a router from changing your default IPv6 Hop Limit for outgoing packets.'\n  describe kernel_parameter('net.ipv6.conf.default.accept_ra_defrtr') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 255
+          },
+          "id": "sysctl-24"
+        },
+        {
+          "title": "Disable the system`s acceptance of router advertisement",
+          "desc": "Setting controls whether the system will accept router advertisement",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-25' do\n  impact 1.0\n  title 'Disable the system`s acceptance of router advertisement'\n  desc 'Setting controls whether the system will accept router advertisement'\n  describe kernel_parameter('net.ipv6.conf.all.accept_ra') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv6.conf.default.accept_ra') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 264
+          },
+          "id": "sysctl-25"
+        },
+        {
+          "title": "Disable IPv6 autoconfiguration",
+          "desc": "The autoconf setting controls whether router advertisements can cause the system to assign a global unicast address to an interface.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-26' do\n  impact 1.0\n  title 'Disable IPv6 autoconfiguration'\n  desc 'The autoconf setting controls whether router advertisements can cause the system to assign a global unicast address to an interface.'\n  describe kernel_parameter('net.ipv6.conf.default.autoconf') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 276
+          },
+          "id": "sysctl-26"
+        },
+        {
+          "title": "Disable neighbor solicitations to send out per address",
+          "desc": "The dad_transmits setting determines how many neighbor solicitations to send out per address (global and link-local) when bringing up an interface to ensure the desired address is unique on the network.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-27' do\n  impact 1.0\n  title 'Disable neighbor solicitations to send out per address'\n  desc 'The dad_transmits setting determines how many neighbor solicitations to send out per address (global and link-local) when bringing up an interface to ensure the desired address is unique on the network.'\n  describe kernel_parameter('net.ipv6.conf.default.dad_transmits') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 285
+          },
+          "id": "sysctl-27"
+        },
+        {
+          "title": "Assign one global unicast IPv6 addresses to each interface",
+          "desc": "The max_addresses setting determines how many global unicast IPv6 addresses can be assigned to each interface. The default is 16, but it should be set to exactly the number of statically configured global addresses required.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-28' do\n  impact 1.0\n  title 'Assign one global unicast IPv6 addresses to each interface'\n  desc 'The max_addresses setting determines how many global unicast IPv6 addresses can be assigned to each interface. The default is 16, but it should be set to exactly the number of statically configured global addresses required.'\n  describe kernel_parameter('net.ipv6.conf.default.max_addresses') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 294
+          },
+          "id": "sysctl-28"
+        },
+        {
+          "title": "Disable loading kernel modules",
+          "desc": "The sysctl key kernel.modules_disabled is very straightforward. If it contains a \"1\" it will disable loading new modules, where a \"0\" will still allow loading them. Using this option will be a great protection against loading malicious kernel modules.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-29' do\n  impact 1.0\n  title 'Disable loading kernel modules'\n  desc 'The sysctl key kernel.modules_disabled is very straightforward. If it contains a \"1\" it will disable loading new modules, where a \"0\" will still allow loading them. Using this option will be a great protection against loading malicious kernel modules.'\n  describe kernel_parameter('kernel.modules_disabled') do\n    its(:value) { should eq kernel_modules_disabled }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 303
+          },
+          "id": "sysctl-29"
+        },
+        {
+          "title": "Magic SysRq",
+          "desc": "Kernel.sysreg is a 'magical' key combo you can hit which the kernel will respond to regardless of whatever else it is doing, unless it is completely locked up.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-30' do\n  impact 1.0\n  title 'Magic SysRq'\n  desc \"Kernel.sysreg is a 'magical' key combo you can hit which the kernel will respond to regardless of whatever else it is doing, unless it is completely locked up.\"\n  describe kernel_parameter('kernel.sysrq') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 312
+          },
+          "id": "sysctl-30"
+        },
+        {
+          "title": "Secure Core Dumps - dump settings",
+          "desc": "Ensure that core dumps can never be made by setuid programs",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-31a' do\n  impact 1.0\n  title 'Secure Core Dumps - dump settings'\n  desc 'Ensure that core dumps can never be made by setuid programs'\n\n  describe kernel_parameter('fs.suid_dumpable') do\n    its(:value) { should cmp(/(0|2)/) }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 321
+          },
+          "id": "sysctl-31a"
+        },
+        {
+          "title": "Secure Core Dumps - dump path",
+          "desc": "Ensure that core dumps are done with fully qualified path",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-31b' do\n  impact 1.0\n  title 'Secure Core Dumps - dump path'\n  desc 'Ensure that core dumps are done with fully qualified path'\n  only_if { kernel_parameter('fs.suid_dumpable').value == 2 }\n\n  describe kernel_parameter('kernel.core_pattern') do\n    its(:value) { should match %r{^/.*} }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 331
+          },
+          "id": "sysctl-31b"
+        },
+        {
+          "title": "kernel.randomize_va_space",
+          "desc": "kernel.randomize_va_space",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-32' do\n  impact 1.0\n  title 'kernel.randomize_va_space'\n  desc 'kernel.randomize_va_space'\n  describe kernel_parameter('kernel.randomize_va_space') do\n    its(:value) { should eq 2 }\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 342
+          },
+          "id": "sysctl-32"
+        },
+        {
+          "title": "CPU No execution Flag or Kernel ExecShield",
+          "desc": "Kernel features and CPU flags provide a protection against buffer overflows. The CPU NX Flag and the kernel parameter exec-shield prevents code execution on a per memory page basis. If the CPU supports the NX-Flag then this should be used instead of the kernel parameter exec-shield.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sysctl-33' do\n  impact 1.0\n  title 'CPU No execution Flag or Kernel ExecShield'\n  desc 'Kernel features and CPU flags provide a protection against buffer overflows. The CPU NX Flag and the kernel parameter exec-shield prevents code execution on a per memory page basis. If the CPU supports the NX-Flag then this should be used instead of the kernel parameter exec-shield.'\n\n  # parse for cpu flags\n  flags = parse_config_file('/proc/cpuinfo', assignment_regex: /^([^:]*?)\\s+:\\s+(.*?)$/).flags\n  flags ||= ''\n  flags = flags.split(' ')\n\n  describe '/proc/cpuinfo' do\n    it 'Flags should include NX' do\n      expect(flags).to include('nx')\n    end\n  end\n\n  unless flags.include?('nx')\n    # if no nx flag is present, we require exec-shield\n    describe kernel_parameter('kernel.exec-shield') do\n      its(:value) { should eq 1 }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "linux-baseline-master/controls/sysctl_spec.rb",
+            "line": 351
+          },
+          "id": "sysctl-33"
+        }
+      ],
+      "groups": [
+        {
+          "title": null,
+          "controls": [
+            "os-01",
+            "os-02",
+            "os-03",
+            "os-04",
+            "os-05",
+            "os-05b",
+            "os-06",
+            "os-07",
+            "os-08",
+            "os-09"
+          ],
+          "id": "controls/os_spec.rb"
+        },
+        {
+          "title": null,
+          "controls": [
+            "package-01",
+            "package-02",
+            "package-03",
+            "package-05",
+            "package-06",
+            "package-07",
+            "package-08"
+          ],
+          "id": "controls/package_spec.rb"
+        },
+        {
+          "title": null,
+          "controls": [
+            "sysctl-01",
+            "sysctl-02",
+            "sysctl-03",
+            "sysctl-04",
+            "sysctl-05",
+            "sysctl-06",
+            "sysctl-07",
+            "sysctl-08",
+            "sysctl-09",
+            "sysctl-10",
+            "sysctl-11",
+            "sysctl-12",
+            "sysctl-13",
+            "sysctl-14",
+            "sysctl-15",
+            "sysctl-16",
+            "sysctl-17",
+            "sysctl-18",
+            "sysctl-19",
+            "sysctl-20",
+            "sysctl-21",
+            "sysctl-22",
+            "sysctl-23",
+            "sysctl-24",
+            "sysctl-25",
+            "sysctl-26",
+            "sysctl-27",
+            "sysctl-28",
+            "sysctl-29",
+            "sysctl-30",
+            "sysctl-31a",
+            "sysctl-31b",
+            "sysctl-32",
+            "sysctl-33"
+          ],
+          "id": "controls/sysctl_spec.rb"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "login_defs_umask",
+          "options": {
+            "default": "027",
+            "description": "Default umask to set in login.defs"
+          }
+        },
+        {
+          "name": "login_defs_passmaxdays",
+          "options": {
+            "default": "60",
+            "description": "Default password maxdays to set in login.defs"
+          }
+        },
+        {
+          "name": "login_defs_passmindays",
+          "options": {
+            "default": "7",
+            "description": "Default password mindays to set in login.defs"
+          }
+        },
+        {
+          "name": "login_defs_passwarnage",
+          "options": {
+            "default": "7",
+            "description": "Default password warnage (days) to set in login.defs"
+          }
+        },
+        {
+          "name": "blacklist",
+          "options": {
+            "default": [
+              "/usr/bin/rcp",
+              "/usr/bin/rlogin",
+              "/usr/bin/rsh",
+              "/usr/libexec/openssh/ssh-keysign",
+              "/usr/lib/openssh/ssh-keysign",
+              "/sbin/netreport",
+              "/usr/sbin/usernetctl",
+              "/usr/sbin/userisdnctl",
+              "/usr/sbin/pppd",
+              "/usr/bin/lockfile",
+              "/usr/bin/mail-lock",
+              "/usr/bin/mail-unlock",
+              "/usr/bin/mail-touchlock",
+              "/usr/bin/dotlockfile",
+              "/usr/bin/arping",
+              "/usr/sbin/arping",
+              "/usr/sbin/uuidd",
+              "/usr/bin/mtr",
+              "/usr/lib/evolution/camel-lock-helper-1.2",
+              "/usr/lib/pt_chown",
+              "/usr/lib/eject/dmcrypt-get-device",
+              "/usr/lib/mc/cons.saver"
+            ],
+            "description": "blacklist of suid/sgid program on system"
+          }
+        },
+        {
+          "name": "syslog_pkg",
+          "options": {
+            "default": "rsyslog",
+            "description": "syslog package to ensure present (default: rsyslog, alternative: syslog-ng..."
+          }
+        },
+        {
+          "name": "sysctl_forwarding",
+          "options": {
+            "default": false,
+            "description": "Is network forwarding needed?"
+          }
+        },
+        {
+          "name": "kernel_modules_disabled",
+          "options": {
+            "default": 0,
+            "description": "Should loading of kernel modules be disabled?"
+          }
+        }
+      ],
+      "sha256": "1063159debd65221b6eadb76520d024855c3bca3fc618f97baf75c4abc25ab9b"
+    },
+    {
+      "name": "ssh-baseline",
+      "title": "DevSec SSH Baseline",
+      "maintainer": "DevSec Hardening Framework Team",
+      "copyright": "DevSec Hardening Framework Team",
+      "copyright_email": "hello@dev-sec.io",
+      "license": "Apache 2 license",
+      "summary": "Test-suite for best-practice SSH hardening",
+      "version": "2.2.0",
+      "supports": [
+        {
+          "os-family": "unix"
+        }
+      ],
+      "controls": [
+        {
+          "title": "client: Check ssh_config owner, group and permissions.",
+          "desc": "The ssh_config should owned by root, only be writable by owner and readable to all.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-01' do\n  impact 1.0\n  title 'client: Check ssh_config owner, group and permissions.'\n  desc 'The ssh_config should owned by root, only be writable by owner and readable to all.'\n\n  describe file('/etc/ssh/ssh_config') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into os.darwin? ? 'wheel' : 'root' }\n    it { should_not be_executable }\n    it { should be_readable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should be_readable.by('other') }\n    it { should be_writable.by('owner') }\n    it { should_not be_writable.by('group') }\n    it { should_not be_writable.by('other') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 25
+          },
+          "id": "ssh-01"
+        },
+        {
+          "title": "Client: Specify the AddressFamily to your need",
+          "desc": "OpenSSH should be configured to the network family. Set it to inet if you use IPv4 only. For IPv6 only set it to inet6.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-02' do\n  impact 1.0\n  title 'Client: Specify the AddressFamily to your need'\n  desc 'OpenSSH should be configured to the network family. Set it to inet if you use IPv4 only. For IPv6 only set it to inet6.'\n  describe ssh_config do\n    its('AddressFamily') { should match(/inet|inet6|any/) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 45
+          },
+          "id": "ssh-02"
+        },
+        {
+          "title": "Client: Specify expected ssh port",
+          "desc": "Always specify which port the SSH client should connect. Prevent unexpected settings.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-03' do\n  impact 1.0\n  title 'Client: Specify expected ssh port'\n  desc 'Always specify which port the SSH client should connect. Prevent unexpected settings.'\n  describe ssh_config do\n    its('Port') { should eq('22') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 54
+          },
+          "id": "ssh-03"
+        },
+        {
+          "title": "Client: Specify protocol version 2",
+          "desc": "Only SSH protocol version 2 connections should be permitted. Version 1 of the protocol contains security vulnerabilities. Don't use legacy insecure SSHv1 connections anymore.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-04' do\n  impact 1.0\n  title 'Client: Specify protocol version 2'\n  desc \"Only SSH protocol version 2 connections should be permitted. Version 1 of the protocol contains security vulnerabilities. Don't use legacy insecure SSHv1 connections anymore.\"\n  describe ssh_config do\n    its('Protocol') { should eq('2') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 63
+          },
+          "id": "ssh-04"
+        },
+        {
+          "title": "Client: Disable batch mode",
+          "desc": "Avoid batch mode in the default configuration.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-05' do\n  impact 1.0\n  title 'Client: Disable batch mode'\n  desc 'Avoid batch mode in the default configuration.'\n  describe ssh_config do\n    its('BatchMode') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 72
+          },
+          "id": "ssh-05"
+        },
+        {
+          "title": "Client: Check Host IPs",
+          "desc": "Make sure that SSH checks the host IP address in the known_hosts file, to avoid DNS spoofing effects.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-06' do\n  impact 1.0\n  title 'Client: Check Host IPs'\n  desc 'Make sure that SSH checks the host IP address in the known_hosts file, to avoid DNS spoofing effects.'\n  describe ssh_config do\n    its('CheckHostIP') { should eq('yes') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 81
+          },
+          "id": "ssh-06"
+        },
+        {
+          "title": "Client: Ask when checking host keys",
+          "desc": "Don't automatically add new hosts keys to the list of known hosts.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-07' do\n  impact 1.0\n  title 'Client: Ask when checking host keys'\n  desc \"Don't automatically add new hosts keys to the list of known hosts.\"\n  describe ssh_config do\n    its('StrictHostKeyChecking') { should match(/ask|yes/) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 90
+          },
+          "id": "ssh-07"
+        },
+        {
+          "title": "Client: Check for secure ssh ciphers",
+          "desc": "Configure a list of ciphers to the best secure ciphers (avoid older and weaker ciphers)",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-08' do\n  impact 1.0\n  title 'Client: Check for secure ssh ciphers'\n  desc 'Configure a list of ciphers to the best secure ciphers (avoid older and weaker ciphers)'\n  describe ssh_config do\n    its('Ciphers') { should eq(ssh_crypto.valid_ciphers) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 99
+          },
+          "id": "ssh-08"
+        },
+        {
+          "title": "Client: Check for secure ssh Key-Exchange Algorithm",
+          "desc": "Configure a list of Key-Exchange Algorithms (Kexs) to the best secure Kexs (avoid older and weaker Key-Exchange Algorithm)",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-09' do\n  impact 1.0\n  title 'Client: Check for secure ssh Key-Exchange Algorithm'\n  desc 'Configure a list of Key-Exchange Algorithms (Kexs) to the best secure Kexs (avoid older and weaker Key-Exchange Algorithm)'\n  describe ssh_config do\n    its('KexAlgorithms') { should eq(ssh_crypto.valid_kexs) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 108
+          },
+          "id": "ssh-09"
+        },
+        {
+          "title": "Client: Check for secure ssh Message Authentication Codes",
+          "desc": "Configure a list of Message Authentication Codes (MACs) to the best secure MACs (avoid older and weaker Message Authentication Codes)",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-10' do\n  impact 1.0\n  title 'Client: Check for secure ssh Message Authentication Codes'\n  desc 'Configure a list of Message Authentication Codes (MACs) to the best secure MACs (avoid older and weaker Message Authentication Codes)'\n  describe ssh_config do\n    its('MACs') { should eq(ssh_crypto.valid_macs) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 117
+          },
+          "id": "ssh-10"
+        },
+        {
+          "title": "Client: Disable agent forwarding",
+          "desc": "Prevent agent forwarding by default, as it can be used in a limited way to enable attacks.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-11' do\n  impact 1.0\n  title 'Client: Disable agent forwarding'\n  desc 'Prevent agent forwarding by default, as it can be used in a limited way to enable attacks.'\n  describe ssh_config do\n    its('ForwardAgent') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 126
+          },
+          "id": "ssh-11"
+        },
+        {
+          "title": "Client: Disable X11Forwarding",
+          "desc": "Prevent X11 forwarding by default, as it can be used in a limited way to enable attacks.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-12' do\n  impact 1.0\n  title 'Client: Disable X11Forwarding'\n  desc 'Prevent X11 forwarding by default, as it can be used in a limited way to enable attacks.'\n  describe ssh_config do\n    its('ForwardX11') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 135
+          },
+          "id": "ssh-12"
+        },
+        {
+          "title": "Client: Disable HostbasedAuthentication",
+          "desc": "This option is a weak way for authentication and provide attacker more ways to enter the system.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-13' do\n  impact 1.0\n  title 'Client: Disable HostbasedAuthentication'\n  desc 'This option is a weak way for authentication and provide attacker more ways to enter the system.'\n  describe ssh_config do\n    its('HostbasedAuthentication') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 144
+          },
+          "id": "ssh-13"
+        },
+        {
+          "title": "Client: Disable rhosts-based authentication",
+          "desc": "Avoid rhosts-based authentication, as it opens more ways for an attacker to enter a system.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-14' do\n  impact 1.0\n  title 'Client: Disable rhosts-based authentication'\n  desc 'Avoid rhosts-based authentication, as it opens more ways for an attacker to enter a system.'\n  describe ssh_config do\n    its('RhostsRSAAuthentication') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 153
+          },
+          "id": "ssh-14"
+        },
+        {
+          "title": "Client: Enable RSA authentication",
+          "desc": "Make sure RSA authentication is used by default.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-15' do\n  impact 1.0\n  title 'Client: Enable RSA authentication'\n  desc 'Make sure RSA authentication is used by default.'\n  describe ssh_config do\n    its('RSAAuthentication') { should eq('yes') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 162
+          },
+          "id": "ssh-15"
+        },
+        {
+          "title": "Client: Disable password-based authentication",
+          "desc": "Avoid password-based authentications.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-16' do\n  impact 1.0\n  title 'Client: Disable password-based authentication'\n  desc 'Avoid password-based authentications.'\n  describe ssh_config do\n    its('PasswordAuthentication') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 171
+          },
+          "id": "ssh-16"
+        },
+        {
+          "title": "Client: Disable GSSAPIAuthentication",
+          "desc": "If you do not use GSSAPI authentication then disable it.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-17' do\n  impact 1.0\n  title 'Client: Disable GSSAPIAuthentication'\n  desc 'If you do not use GSSAPI authentication then disable it.'\n  describe ssh_config do\n    its('GSSAPIAuthentication') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 180
+          },
+          "id": "ssh-17"
+        },
+        {
+          "title": "Client: Disable GSSAPIDelegateCredentials",
+          "desc": "If you do not use GSSAPI authentication then disable it.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-18' do\n  impact 1.0\n  title 'Client: Disable GSSAPIDelegateCredentials'\n  desc 'If you do not use GSSAPI authentication then disable it.'\n  describe ssh_config do\n    its('GSSAPIDelegateCredentials') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 189
+          },
+          "id": "ssh-18"
+        },
+        {
+          "title": "Client: Disable tunnels",
+          "desc": "Avoid using SSH tunnels.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-19' do\n  impact 1.0\n  title 'Client: Disable tunnels'\n  desc 'Avoid using SSH tunnels.'\n  describe ssh_config do\n    its('Tunnel') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 198
+          },
+          "id": "ssh-19"
+        },
+        {
+          "title": "Client: Do not permit local commands",
+          "desc": "Do not permit any local command execution.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-20' do\n  impact 1.0\n  title 'Client: Do not permit local commands'\n  desc 'Do not permit any local command execution.'\n  describe ssh_config do\n    its('PermitLocalCommand') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 207
+          },
+          "id": "ssh-20"
+        },
+        {
+          "title": "Client: Do not allow Roaming",
+          "desc": "Workaround for SSH Client Bug CVE-2016-0777 and CVE-2016-0778",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssh-21' do\n  impact 1.0\n  title 'Client: Do not allow Roaming'\n  desc 'Workaround for SSH Client Bug CVE-2016-0777 and CVE-2016-0778'\n  describe ssh_config do\n    its('UseRoaming') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/ssh_spec.rb",
+            "line": 216
+          },
+          "id": "ssh-21"
+        },
+        {
+          "title": "Server: Check for secure ssh ciphers",
+          "desc": "Configure a list of ciphers to the best secure ciphers (avoid older and weaker ciphers)",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-01' do\n  impact 1.0\n  title 'Server: Check for secure ssh ciphers'\n  desc 'Configure a list of ciphers to the best secure ciphers (avoid older and weaker ciphers)'\n  describe sshd_config do\n    its('Ciphers') { should eq(ssh_crypto.valid_ciphers) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 25
+          },
+          "id": "sshd-01"
+        },
+        {
+          "title": "Server: Check for secure ssh Key-Exchange Algorithm",
+          "desc": "Configure a list of Key-Exchange Algorithms (Kexs) to the best secure Kexs (avoid older and weaker Key-Exchange Algorithm)",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-02' do\n  impact 1.0\n  title 'Server: Check for secure ssh Key-Exchange Algorithm'\n  desc 'Configure a list of Key-Exchange Algorithms (Kexs) to the best secure Kexs (avoid older and weaker Key-Exchange Algorithm)'\n  describe sshd_config do\n    its('KexAlgorithms') { should eq(ssh_crypto.valid_kexs) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 34
+          },
+          "id": "sshd-02"
+        },
+        {
+          "title": "Server: Check for secure ssh Message Authentication Codes",
+          "desc": "Configure a list of Message Authentication Codes (MACs) to the best secure MACs (avoid older and weaker Message Authentication Codes)",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-03' do\n  impact 1.0\n  title 'Server: Check for secure ssh Message Authentication Codes'\n  desc 'Configure a list of Message Authentication Codes (MACs) to the best secure MACs (avoid older and weaker Message Authentication Codes)'\n  describe sshd_config do\n    its('MACs') { should eq(ssh_crypto.valid_macs) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 43
+          },
+          "id": "sshd-03"
+        },
+        {
+          "title": "Server: Check SSH folder owner, group and permissions.",
+          "desc": "The SSH folder should owned by root, only be writable by owner and readable by others.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-04' do\n  impact 1.0\n  title 'Server: Check SSH folder owner, group and permissions.'\n  desc 'The SSH folder should owned by root, only be writable by owner and readable by others.'\n  describe file('/etc/ssh') do\n    it { should exist }\n    it { should be_directory }\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into os.darwin? ? 'wheel' : 'root' }\n    it { should be_executable }\n    it { should be_readable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should be_readable.by('other') }\n    it { should be_writable.by('owner') }\n    it { should_not be_writable.by('group') }\n    it { should_not be_writable.by('other') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 52
+          },
+          "id": "sshd-04"
+        },
+        {
+          "title": "Server: Check sshd_config owner, group and permissions.",
+          "desc": "The sshd_config should owned by root, only be writable/readable by owner and not be executable.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-05' do\n  impact 1.0\n  title 'Server: Check sshd_config owner, group and permissions.'\n  desc 'The sshd_config should owned by root, only be writable/readable by owner and not be executable.'\n\n  describe file('/etc/ssh/sshd_config') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into os.darwin? ? 'wheel' : 'root' }\n    it { should_not be_executable }\n    it { should be_readable.by('owner') }\n    it { should_not be_readable.by('group') }\n    it { should_not be_readable.by('other') }\n    it { should be_writable.by('owner') }\n    it { should_not be_writable.by('group') }\n    it { should_not be_writable.by('other') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 71
+          },
+          "id": "sshd-05"
+        },
+        {
+          "title": "Server: Do not permit root-based login or do not allow password and keyboard-interactive authentication",
+          "desc": "Reduce the potential risk to gain full privileges access of the system because of weak password and keyboard-interactive authentication, do not allow logging in as the root user or with password authentication.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-06' do\n  impact 1.0\n  title 'Server: Do not permit root-based login or do not allow password and keyboard-interactive authentication'\n  desc 'Reduce the potential risk to gain full privileges access of the system because of weak password and keyboard-interactive authentication, do not allow logging in as the root user or with password authentication.'\n  describe sshd_config do\n    its('PermitRootLogin') { should match(/no|without-password/) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 91
+          },
+          "id": "sshd-06"
+        },
+        {
+          "title": "Server: Specify the listen ssh Port",
+          "desc": "Always specify which port the SSH server should listen to. Prevent unexpected settings.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-07' do\n  impact 1.0\n  title 'Server: Specify the listen ssh Port'\n  desc 'Always specify which port the SSH server should listen to. Prevent unexpected settings.'\n  describe sshd_config do\n    its('Port') { should eq('22') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 100
+          },
+          "id": "sshd-07"
+        },
+        {
+          "title": "Server: Specify the AddressFamily to your need",
+          "desc": "OpenSSH should be configured to the network family. Set it to inet if you use IPv4 only. For IPv6 only set it to inet6.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-08' do\n  impact 1.0\n  title 'Server: Specify the AddressFamily to your need'\n  desc 'OpenSSH should be configured to the network family. Set it to inet if you use IPv4 only. For IPv6 only set it to inet6.'\n  describe sshd_config do\n    its('AddressFamily') { should match(/inet|inet6|any/) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 109
+          },
+          "id": "sshd-08"
+        },
+        {
+          "title": "Server: Specify ListenAddress",
+          "desc": "Limit the SSH server to listen to a specific address. Don't let it listen on all interfaces to avoid logins from unexpected sources.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-09' do\n  impact 1.0\n  title 'Server: Specify ListenAddress'\n  desc \"Limit the SSH server to listen to a specific address. Don't let it listen on all interfaces to avoid logins from unexpected sources.\"\n  describe sshd_config do\n    its('ListenAddress') { should match(/.*/) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 118
+          },
+          "id": "sshd-09"
+        },
+        {
+          "title": "Server: Specify protocol version 2",
+          "desc": "Only SSH protocol version 2 connections should be permitted. Version 1 of the protocol contains security vulnerabilities. Don't use legacy insecure SSHv1 connections anymore.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-10' do\n  impact 1.0\n  title 'Server: Specify protocol version 2'\n  desc \"Only SSH protocol version 2 connections should be permitted. Version 1 of the protocol contains security vulnerabilities. Don't use legacy insecure SSHv1 connections anymore.\"\n  describe sshd_config do\n    its('Protocol') { should eq('2') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 127
+          },
+          "id": "sshd-10"
+        },
+        {
+          "title": "Server: Enable StrictModes",
+          "desc": "Prevent the use of insecure home directory and key file permissions.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-11' do\n  impact 1.0\n  title 'Server: Enable StrictModes'\n  desc 'Prevent the use of insecure home directory and key file permissions.'\n  describe sshd_config do\n    its('StrictModes') { should eq('yes') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 136
+          },
+          "id": "sshd-11"
+        },
+        {
+          "title": "Server: Specify SyslogFacility to AUTH",
+          "desc": "Logging should be set to go to the /var/log/auth.log facility by using the SysLog AUTH parameter. This will ensure that any problems around invalid logins or the like are forwarded to a central security file for auditing purposes",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-12' do\n  impact 1.0\n  title 'Server: Specify SyslogFacility to AUTH'\n  desc 'Logging should be set to go to the /var/log/auth.log facility by using the SysLog AUTH parameter. This will ensure that any problems around invalid logins or the like are forwarded to a central security file for auditing purposes'\n  describe sshd_config do\n    its('SyslogFacility') { should eq('AUTH') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 145
+          },
+          "id": "sshd-12"
+        },
+        {
+          "title": "Server: Specify LogLevel to VERBOSE",
+          "desc": "Be verbose in logging, to allow analysis in case of unexpected behavior.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-13' do\n  impact 1.0\n  title 'Server: Specify LogLevel to VERBOSE'\n  desc 'Be verbose in logging, to allow analysis in case of unexpected behavior.'\n  describe sshd_config do\n    its('LogLevel') { should eq('VERBOSE') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 154
+          },
+          "id": "sshd-13"
+        },
+        {
+          "title": "Server: Specify SSH HostKeys",
+          "desc": "Specify HostKey for protection against Man-In-The-Middle Attacks",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-14' do\n  impact 1.0\n  title 'Server: Specify SSH HostKeys'\n  desc 'Specify HostKey for protection against Man-In-The-Middle Attacks'\n  describe sshd_config do\n    its('HostKey') { should cmp ssh_crypto.valid_hostkeys }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 163
+          },
+          "id": "sshd-14"
+        },
+        {
+          "title": "Server: Specify UseLogin to NO",
+          "desc": "Disable legacy login mechanism and do not use login for interactive login sessions.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-15' do\n  impact 1.0\n  title 'Server: Specify UseLogin to NO'\n  desc 'Disable legacy login mechanism and do not use login for interactive login sessions.'\n  describe sshd_config do\n    its('UseLogin') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 172
+          },
+          "id": "sshd-15"
+        },
+        {
+          "title": "Server: Use privilege separation",
+          "desc": "UsePrivilegeSeparation is an option, when enabled will allow the OpenSSH server to run a small (necessary) amount of code as root and the of the code in a chroot jail environment. This enables ssh to deal incoming network traffic in an unprivileged child process to avoid privilege escalation by an attacker.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-16' do\n  impact 1.0\n  title 'Server: Use privilege separation'\n  desc 'UsePrivilegeSeparation is an option, when enabled will allow the OpenSSH server to run a small (necessary) amount of code as root and the of the code in a chroot jail environment. This enables ssh to deal incoming network traffic in an unprivileged child process to avoid privilege escalation by an attacker.'\n  describe sshd_config do\n    its('UsePrivilegeSeparation') { should eq(ssh_crypto.valid_privseparation) }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 181
+          },
+          "id": "sshd-16"
+        },
+        {
+          "title": "Server: Disable PermitUserEnvironment",
+          "desc": "Enabling environment processing may enable users to bypass access restrictions in some configurations using mechanisms such as LD_PRELOAD.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-17' do\n  impact 1.0\n  title 'Server: Disable PermitUserEnvironment'\n  desc 'Enabling environment processing may enable users to bypass access restrictions in some configurations using mechanisms such as LD_PRELOAD.'\n  describe sshd_config do\n    its('PermitUserEnvironment') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 190
+          },
+          "id": "sshd-17"
+        },
+        {
+          "title": "Server: Specify LoginGraceTime",
+          "desc": "The LoginGraceTime gives the user 30 seconds to accomplish a login. This could be used to conduct a Denial of Service (DoS) against a running SSH daemon.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-18' do\n  impact 1.0\n  title 'Server: Specify LoginGraceTime'\n  desc 'The LoginGraceTime gives the user 30 seconds to accomplish a login. This could be used to conduct a Denial of Service (DoS) against a running SSH daemon.'\n  describe sshd_config do\n    its('LoginGraceTime') { should eq('30s') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 199
+          },
+          "id": "sshd-18"
+        },
+        {
+          "title": "Server: Specify Limit for maximum authentication retries",
+          "desc": "MaxAuthTries limits the user to three wrong attempts before the login attempt is denied. This avoid resource starvation attacks.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-19' do\n  impact 1.0\n  title 'Server: Specify Limit for maximum authentication retries'\n  desc 'MaxAuthTries limits the user to three wrong attempts before the login attempt is denied. This avoid resource starvation attacks.'\n  describe sshd_config do\n    its('MaxAuthTries') { should eq('2') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 208
+          },
+          "id": "sshd-19"
+        },
+        {
+          "title": "Server: Specify maximum sessions",
+          "desc": "Specifies the maximum number of open sessions permitted per network connection. This could be used to conduct a Denial of Service (DoS) against a running SSH daemon.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-20' do\n  impact 1.0\n  title 'Server: Specify maximum sessions'\n  desc 'Specifies the maximum number of open sessions permitted per network connection. This could be used to conduct a Denial of Service (DoS) against a running SSH daemon.'\n  describe sshd_config do\n    its('MaxSessions') { should eq('10') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 217
+          },
+          "id": "sshd-20"
+        },
+        {
+          "title": "Server: Specify maximum startups",
+          "desc": "Limit the number of concurrent unauthenticated sessions to prevent Denial of Service (DoS) against a running SSH daemon.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-21' do\n  impact 1.0\n  title 'Server: Specify maximum startups'\n  desc 'Limit the number of concurrent unauthenticated sessions to prevent Denial of Service (DoS) against a running SSH daemon.'\n  describe sshd_config do\n    its('MaxStartups') { should eq('10:30:100') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 226
+          },
+          "id": "sshd-21"
+        },
+        {
+          "title": "Server: Enable PubkeyAuthentication",
+          "desc": "Prefer public key authentication mechanisms, because other methods are weaker (e.g. passwords).",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-22' do\n  impact 1.0\n  title 'Server: Enable PubkeyAuthentication'\n  desc 'Prefer public key authentication mechanisms, because other methods are weaker (e.g. passwords).'\n  describe sshd_config do\n    its('PubkeyAuthentication') { should eq('yes') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 235
+          },
+          "id": "sshd-22"
+        },
+        {
+          "title": "Server: Disable IgnoreRhosts",
+          "desc": "Ignore legacy .rhosts configuration, because rhosts are a weak way to authenticate systems and provide attacker more ways to enter the system.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-23' do\n  impact 1.0\n  title 'Server: Disable IgnoreRhosts'\n  desc 'Ignore legacy .rhosts configuration, because rhosts are a weak way to authenticate systems and provide attacker more ways to enter the system.'\n  describe sshd_config do\n    its('IgnoreRhosts') { should eq('yes') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 244
+          },
+          "id": "sshd-23"
+        },
+        {
+          "title": "Server: Enable IgnoreUserKnownHosts",
+          "desc": "This option is a weak way for authentication and provide attacker more ways to enter the system.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-24' do\n  impact 1.0\n  title 'Server: Enable IgnoreUserKnownHosts'\n  desc 'This option is a weak way for authentication and provide attacker more ways to enter the system.'\n  describe sshd_config do\n    its('IgnoreUserKnownHosts') { should eq('yes') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 253
+          },
+          "id": "sshd-24"
+        },
+        {
+          "title": "Server: Disable HostbasedAuthentication",
+          "desc": "This option is a weak way for authentication and provide attacker more ways to enter the system.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-25' do\n  impact 1.0\n  title 'Server: Disable HostbasedAuthentication'\n  desc 'This option is a weak way for authentication and provide attacker more ways to enter the system.'\n  describe sshd_config do\n    its('HostbasedAuthentication') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 262
+          },
+          "id": "sshd-25"
+        },
+        {
+          "title": "Server: Disable password-based authentication",
+          "desc": "Avoid password-based authentications.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-27' do\n  impact 1.0\n  title 'Server: Disable password-based authentication'\n  desc 'Avoid password-based authentications.'\n  describe sshd_config do\n    its('PasswordAuthentication') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 271
+          },
+          "id": "sshd-27"
+        },
+        {
+          "title": "Server: Disable PermitEmptyPasswords",
+          "desc": "Accounts should be protected and users should be accountable. For this reason the usage of empty passwords should never be allowed.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-28' do\n  impact 1.0\n  title 'Server: Disable PermitEmptyPasswords'\n  desc 'Accounts should be protected and users should be accountable. For this reason the usage of empty passwords should never be allowed.'\n  describe sshd_config do\n    its('PermitEmptyPasswords') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 280
+          },
+          "id": "sshd-28"
+        },
+        {
+          "title": "Server: Disable ChallengeResponseAuthentication",
+          "desc": "Avoid challenge-response and password-based authentications.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-29' do\n  impact 1.0\n  title 'Server: Disable ChallengeResponseAuthentication'\n  desc 'Avoid challenge-response and password-based authentications.'\n  describe sshd_config do\n    its('ChallengeResponseAuthentication') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 289
+          },
+          "id": "sshd-29"
+        },
+        {
+          "title": "Server: Disable Kerberos",
+          "desc": "Avoid kerberos authentication.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-30' do\n  impact 1.0\n  title 'Server: Disable Kerberos'\n  desc 'Avoid kerberos authentication.'\n  describe sshd_config do\n    its('KerberosAuthentication') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 298
+          },
+          "id": "sshd-30"
+        },
+        {
+          "title": "Server: Disable Kerberos or Local Password",
+          "desc": "Avoid kerberos authentication because it use password-based authentication as fallback.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-31' do\n  impact 1.0\n  title 'Server: Disable Kerberos or Local Password'\n  desc 'Avoid kerberos authentication because it use password-based authentication as fallback.'\n  describe sshd_config do\n    its('KerberosOrLocalPasswd') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 307
+          },
+          "id": "sshd-31"
+        },
+        {
+          "title": "Server: Enable KerberosTicketCleanup",
+          "desc": "Specifies whether to automatically destroy the user's ticket cache file on logout.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-32' do\n  impact 1.0\n  title 'Server: Enable KerberosTicketCleanup'\n  desc \"Specifies whether to automatically destroy the user's ticket cache file on logout.\"\n  describe sshd_config do\n    its('KerberosTicketCleanup') { should eq('yes') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 316
+          },
+          "id": "sshd-32"
+        },
+        {
+          "title": "Server: Disable GSSAPIAuthentication",
+          "desc": "If you do not use GSSAPI authentication then disable it.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-33' do\n  impact 1.0\n  title 'Server: Disable GSSAPIAuthentication'\n  desc 'If you do not use GSSAPI authentication then disable it.'\n  describe sshd_config do\n    its('GSSAPIAuthentication') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 325
+          },
+          "id": "sshd-33"
+        },
+        {
+          "title": "Server: Enable GSSAPICleanupCredentials",
+          "desc": "Automatically destroy the user's credentials cache on logout.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-34' do\n  impact 1.0\n  title 'Server: Enable GSSAPICleanupCredentials'\n  desc \"Automatically destroy the user's credentials cache on logout.\"\n  describe sshd_config do\n    its('GSSAPICleanupCredentials') { should eq('yes') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 334
+          },
+          "id": "sshd-34"
+        },
+        {
+          "title": "Server: Disable TCPKeepAlive",
+          "desc": "Avoid the TCPKeepAlive messages to see if the client is still alive, because they are sent over unencrypted connection and are spoofable.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-35' do\n  impact 1.0\n  title 'Server: Disable TCPKeepAlive'\n  desc 'Avoid the TCPKeepAlive messages to see if the client is still alive, because they are sent over unencrypted connection and are spoofable.'\n  describe sshd_config do\n    its('TCPKeepAlive') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 343
+          },
+          "id": "sshd-35"
+        },
+        {
+          "title": "Server: Set a client alive interval",
+          "desc": "ClientAlive messages are sent over encrypted connection and are not spoofable.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-36' do\n  impact 1.0\n  title 'Server: Set a client alive interval'\n  desc 'ClientAlive messages are sent over encrypted connection and are not spoofable.'\n  describe sshd_config do\n    its('ClientAliveInterval') { should eq('600') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 352
+          },
+          "id": "sshd-36"
+        },
+        {
+          "title": "Server: Configure a few client alive counters",
+          "desc": "This indicates the total number of checkalive message sent by the ssh server without getting any response from the ssh client. ClientAlive messages are sent over encrypted connection and are not spoofable.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-37' do\n  impact 1.0\n  title 'Server: Configure a few client alive counters'\n  desc 'This indicates the total number of checkalive message sent by the ssh server without getting any response from the ssh client. ClientAlive messages are sent over encrypted connection and are not spoofable.'\n  describe sshd_config do\n    its('ClientAliveCountMax') { should eq('3') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 361
+          },
+          "id": "sshd-37"
+        },
+        {
+          "title": "Server: Disable tunnels",
+          "desc": "Avoid to use tunnels.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-38' do\n  impact 1.0\n  title 'Server: Disable tunnels'\n  desc 'Avoid to use tunnels.'\n  describe sshd_config do\n    its('PermitTunnel') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 370
+          },
+          "id": "sshd-38"
+        },
+        {
+          "title": "Server: Disable TCP forwarding",
+          "desc": "If you use TCP forwarding in an uncontrolled manner then you can bypass the firewalls",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-39' do\n  impact 1.0\n  title 'Server: Disable TCP forwarding'\n  desc 'If you use TCP forwarding in an uncontrolled manner then you can bypass the firewalls'\n  describe sshd_config do\n    its('AllowTcpForwarding') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 379
+          },
+          "id": "sshd-39"
+        },
+        {
+          "title": "Server: Disable Agent forwarding",
+          "desc": "Users with the ability to bypass file permissions on the remote host (for the agent's UNIX-domain socket) can access the local agent through the forwarded connection. An attacker cannot obtain key material from the agent, however they can perform operations on the keys that enable them to authenticate using the identities loaded into the agent.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-40' do\n  impact 1.0\n  title 'Server: Disable Agent forwarding'\n  desc \"Users with the ability to bypass file permissions on the remote host (for the agent's UNIX-domain socket) can access the local agent through the forwarded connection. An attacker cannot obtain key material from the agent, however they can perform operations on the keys that enable them to authenticate using the identities loaded into the agent.\"\n  describe sshd_config do\n    its('AllowAgentForwarding') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 388
+          },
+          "id": "sshd-40"
+        },
+        {
+          "title": "Server: Disable gateway ports",
+          "desc": "Prevent remote hosts from connecting to forwarded ports on the node.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-41' do\n  impact 1.0\n  title 'Server: Disable gateway ports'\n  desc 'Prevent remote hosts from connecting to forwarded ports on the node.'\n  describe sshd_config do\n    its('GatewayPorts') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 397
+          },
+          "id": "sshd-41"
+        },
+        {
+          "title": "Server: Disable X11Forwarding",
+          "desc": "Prevent X11 forwarding by default, as it can be used in a limited way to enable attacks.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-42' do\n  impact 1.0\n  title 'Server: Disable X11Forwarding'\n  desc 'Prevent X11 forwarding by default, as it can be used in a limited way to enable attacks.'\n  describe sshd_config do\n    its('X11Forwarding') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 406
+          },
+          "id": "sshd-42"
+        },
+        {
+          "title": "Server: Enable X11UseLocalhost",
+          "desc": "SSH daemon should bind the X11 forwarding server to the loopback address. This prevents remote hosts from connecting to the proxy display and reduce the attack surface",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-43' do\n  impact 1.0\n  title 'Server: Enable X11UseLocalhost'\n  desc 'SSH daemon should bind the X11 forwarding server to the loopback address. This prevents remote hosts from connecting to the proxy display and reduce the attack surface'\n  describe sshd_config do\n    its('X11UseLocalhost') { should eq('yes') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 415
+          },
+          "id": "sshd-43"
+        },
+        {
+          "title": "Server: Disable PrintMotd",
+          "desc": "This specifies that the SSH daemon itself should not read and display the message of the day file.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-44' do\n  impact 1.0\n  title 'Server: Disable PrintMotd'\n  desc 'This specifies that the SSH daemon itself should not read and display the message of the day file.'\n  describe sshd_config do\n    its('PrintMotd') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 424
+          },
+          "id": "sshd-44"
+        },
+        {
+          "title": "Server: PrintLastLog",
+          "desc": "This tells the SSH daemon to print out information about the last time you logged in.",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-45' do\n  impact 1.0\n  title 'Server: PrintLastLog'\n  desc 'This tells the SSH daemon to print out information about the last time you logged in.'\n  describe sshd_config do\n    its('PrintLastLog') { should eq('no') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 433
+          },
+          "id": "sshd-45"
+        },
+        {
+          "title": "Server: Banner",
+          "desc": "Specifies a banner file to serve before authentication succeeds",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-46' do\n  impact 1.0\n  title 'Server: Banner'\n  desc 'Specifies a banner file to serve before authentication succeeds'\n  describe sshd_config do\n    its('Banner') { should eq('none') }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 442
+          },
+          "id": "sshd-46"
+        },
+        {
+          "title": "Server: DebianBanner",
+          "desc": "Specifies whether to include OS distribution in version information",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-47' do\n  impact 1.0\n  title 'Server: DebianBanner'\n  desc 'Specifies whether to include OS distribution in version information'\n  case os[:family]\n  when 'debian' then\n    describe sshd_config do\n      its('DebianBanner') { should eq('no') }\n    end\n  else\n    describe file(sshd_config.path) do\n      its('content') { should_not match(/DebianBanner/) }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 451
+          },
+          "id": "sshd-47"
+        },
+        {
+          "title": "Server: DH primes",
+          "desc": "Verifies if strong DH primes are used in /etc/ssh/moduli",
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'sshd-48' do\n  impact 1.0\n  title 'Server: DH primes'\n  desc 'Verifies if strong DH primes are used in /etc/ssh/moduli'\n  describe command(\"test $(awk '$5 < 2047 && $5 ~ /^[0-9]+$/ { print $5 }' /etc/ssh/moduli | uniq | wc -c) -eq 0\") do\n    its('exit_status') { should eq 0 }\n    its('stdout') { should eq '' }\n    its('stderr') { should eq '' }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssh-baseline-master/controls/sshd_spec.rb",
+            "line": 467
+          },
+          "id": "sshd-48"
+        }
+      ],
+      "groups": [
+        {
+          "title": "SSH client config",
+          "controls": [
+            "ssh-01",
+            "ssh-02",
+            "ssh-03",
+            "ssh-04",
+            "ssh-05",
+            "ssh-06",
+            "ssh-07",
+            "ssh-08",
+            "ssh-09",
+            "ssh-10",
+            "ssh-11",
+            "ssh-12",
+            "ssh-13",
+            "ssh-14",
+            "ssh-15",
+            "ssh-16",
+            "ssh-17",
+            "ssh-18",
+            "ssh-19",
+            "ssh-20",
+            "ssh-21"
+          ],
+          "id": "controls/ssh_spec.rb"
+        },
+        {
+          "title": "SSH server config",
+          "controls": [
+            "sshd-01",
+            "sshd-02",
+            "sshd-03",
+            "sshd-04",
+            "sshd-05",
+            "sshd-06",
+            "sshd-07",
+            "sshd-08",
+            "sshd-09",
+            "sshd-10",
+            "sshd-11",
+            "sshd-12",
+            "sshd-13",
+            "sshd-14",
+            "sshd-15",
+            "sshd-16",
+            "sshd-17",
+            "sshd-18",
+            "sshd-19",
+            "sshd-20",
+            "sshd-21",
+            "sshd-22",
+            "sshd-23",
+            "sshd-24",
+            "sshd-25",
+            "sshd-27",
+            "sshd-28",
+            "sshd-29",
+            "sshd-30",
+            "sshd-31",
+            "sshd-32",
+            "sshd-33",
+            "sshd-34",
+            "sshd-35",
+            "sshd-36",
+            "sshd-37",
+            "sshd-38",
+            "sshd-39",
+            "sshd-40",
+            "sshd-41",
+            "sshd-42",
+            "sshd-43",
+            "sshd-44",
+            "sshd-45",
+            "sshd-46",
+            "sshd-47",
+            "sshd-48"
+          ],
+          "id": "controls/sshd_spec.rb"
+        }
+      ],
+      "attributes": [],
+      "sha256": "0c052dde532045628f2afb086f56319929915c24c77453a59bcccba79aa5f99f"
+    },
+    {
+      "name": "ssl-baseline",
+      "title": "DevSec SSL/TLS Baseline",
+      "summary": "Ensures a secure configuration for TCP ports",
+      "maintainer": "DevSec Hardening Framework Team",
+      "copyright": "DevSec Hardening Framework Team & Chef Software Inc.",
+      "copyright_email": "hello@dev-sec.io",
+      "license": "Apache 2 license",
+      "version": "1.3.0",
+      "supports": [
+        {
+          "inspec": ">= 0.33.2"
+        }
+      ],
+      "controls": [
+        {
+          "title": "Inspec::Version=1.42.3",
+          "desc": null,
+          "impact": 0.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'debugging' do\n  title \"Inspec::Version=#{Inspec::VERSION}\"\n  impact 0.0\n  describe \"tcpports=\\n#{tcpports.join(\"\\n\")}\" do\n    it { should_not eq nil }\n  end\n  describe \"sslports=\\n#{sslports.join(\"\\n\")}\" do\n    it { should_not eq nil }\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 66
+          },
+          "id": "debugging",
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "tcpports=\n{:port=>22, :socket=>#<struct port=22, address=\"0.0.0.0\", protocol=\"tcp\", process=\"sshd\", pid=1185, :listening?=nil>}\n{:port=>22, :socket=>#<struct port=22, address=\"::\", protocol=\"tcp6\", process=\"sshd\", pid=1185, :listening?=nil>}\n{:port=>25, :socket=>#<struct port=25, address=\"127.0.0.1\", protocol=\"tcp\", process=\"master\", pid=17942, :listening?=nil>}\n{:port=>3030, :socket=>#<struct port=3030, address=\"127.0.0.1\", protocol=\"tcp\", process=\"sensu-client\", pid=13089, :listening?=nil>}\n{:port=>4330, :socket=>#<struct port=4330, address=\"0.0.0.0\", protocol=\"tcp\", process=\"pmlogger\", pid=16870, :listening?=nil>}\n{:port=>4330, :socket=>#<struct port=4330, address=\"::\", protocol=\"tcp6\", process=\"pmlogger\", pid=16870, :listening?=nil>}\n{:port=>44321, :socket=>#<struct port=44321, address=\"0.0.0.0\", protocol=\"tcp\", process=\"pmcd\", pid=1669, :listening?=nil>}\n{:port=>44322, :socket=>#<struct port=44322, address=\"0.0.0.0\", protocol=\"tcp\", process=\"pmproxy\", pid=1526, :listening?=nil>}\n{:port=>44323, :socket=>#<struct port=44323, address=\"0.0.0.0\", protocol=\"tcp\", process=\"pmwebd\", pid=1555, :listening?=nil>}\n{:port=>44323, :socket=>#<struct port=44323, address=\"::\", protocol=\"tcp6\", process=\"pmwebd\", pid=1555, :listening?=nil>} should not eq nil",
+              "run_time": 0.000600339,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            },
+            {
+              "status": "passed",
+              "code_desc": "sslports=\n should not eq nil",
+              "run_time": 0.000097766,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable SSL 2 from all exposed SSL ports.",
+          "desc": null,
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssl2' do\n  title 'Disable SSL 2 from all exposed SSL ports.'\n  impact 1.0\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).protocols('ssl2') do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 82
+          },
+          "id": "ssl2",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000005297,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable SSL 3 from all exposed SSL ports.",
+          "desc": null,
+          "impact": 1.0,
+          "refs": [],
+          "tags": {},
+          "code": "control 'ssl3' do\n  title 'Disable SSL 3 from all exposed SSL ports.'\n  impact 1.0\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).protocols('ssl3') do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 97
+          },
+          "id": "ssl3",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003834,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable TLS 1.0 on exposed ports.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'tls1.0' do\n  title 'Disable TLS 1.0 on exposed ports.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).protocols('tls1.0') do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 112
+          },
+          "id": "tls1.0",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003808,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable TLS 1.1 on exposed ports.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'tls1.1' do\n  title 'Disable TLS 1.1 on exposed ports.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).protocols('tls1.1') do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 127
+          },
+          "id": "tls1.1",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003486,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Enable TLS 1.2 on exposed ports.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'tls1.2' do\n  title 'Enable TLS 1.2 on exposed ports.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).protocols('tls1.2') do\n      it(proc_desc) { should be_enabled }\n      it { should be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 142
+          },
+          "id": "tls1.2",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003161,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Enable ECDH as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'kx-ecdh' do\n  title 'Enable ECDH as KX from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/^TLS_ECDH/i) do\n      it(proc_desc) { should be_enabled }\n      it { should be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 161
+          },
+          "id": "kx-ecdh",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003392,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable RSA as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'kx-rsa' do\n  title 'Disable RSA as KX from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/^TLS_RSA/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 176
+          },
+          "id": "kx-rsa",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003515,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable DH as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'kx-dh' do\n  title 'Disable DH as KX from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/^TLS_DH/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 191
+          },
+          "id": "kx-dh",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003372,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable KRB5 as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'kx-krb5' do\n  title 'Disable KRB5 as KX from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/^TLS_KRB5/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 206
+          },
+          "id": "kx-krb5",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003386,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable PSK as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'kx-psk' do\n  title 'Disable PSK as KX from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/^TLS_PSK/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 221
+          },
+          "id": "kx-psk",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.00000318,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable GOSTR as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'kx-gostr' do\n  title 'Disable GOSTR as KX from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/^TLS_GOSTR/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 236
+          },
+          "id": "kx-gostr",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003559,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable SRP as KX from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'kx-srp' do\n  title 'Disable SRP as KX from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/^TLS_SRP/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 251
+          },
+          "id": "kx-srp",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003503,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Enable ECDSA or RSA as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'au-ecdsa-rsa' do\n  title 'Enable ECDSA or RSA as AU from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/(RSA|ECDSA)_WITH/i) do\n      it(proc_desc) { should be_enabled }\n      it { should be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 271
+          },
+          "id": "au-ecdsa-rsa",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.00000322,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable ANON as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'au-anon' do\n  title 'Disable ANON as AU from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/ANON_WITH/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 286
+          },
+          "id": "au-anon",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003722,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable DSS as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'au-dss' do\n  title 'Disable DSS as AU from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/DSS_WITH/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 301
+          },
+          "id": "au-dss",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003467,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable PSK as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'au-psk' do\n  title 'Disable PSK as AU from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/PSK_WITH/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 316
+          },
+          "id": "au-psk",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.00000344,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable EXPORT as AU from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'au-export' do\n  title 'Disable EXPORT as AU from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/((EXPORT)(\\d*)_WITH)/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 331
+          },
+          "id": "au-export",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003306,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Enable AES256 or AES128 or AES256-GCM or AES128-GCM or CHACHA20 as Enc",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-aes-gcm-chacha20' do\n  title 'Enable AES256 or AES128 or AES256-GCM or AES128-GCM or CHACHA20 as Enc'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/WITH_(AES_256|AES_128|CHACHA20|AES_256_GCM|AES_128_GCM)/i) do\n      it(proc_desc) { should be_enabled }\n      it { should be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 352
+          },
+          "id": "enc-aes-gcm-chacha20",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003619,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable CBC as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-cbc' do\n  title 'Disable CBC as ENC from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/(WITH_(\\w+)_(CBC))/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 367
+          },
+          "id": "enc-cbc",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.00000315,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable RC4 as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-rc4' do\n  title 'Disable RC4 as ENC from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/WITH_RC4/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 382
+          },
+          "id": "enc-rc4",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003183,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable EXPORT as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-export' do\n  title 'Disable EXPORT as ENC from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/WITH_EXPORT/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 397
+          },
+          "id": "enc-export",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000040384,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable DES, 3DES as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-des' do\n  title 'Disable DES, 3DES as ENC from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/(WITH_(\\d*)(des))/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 412
+          },
+          "id": "enc-des",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003896,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable eNULL as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-enull' do\n  title 'Disable eNULL as ENC from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/WITH_NULL/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 427
+          },
+          "id": "enc-enull",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003292,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable CAMELLIA as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-camellia' do\n  title 'Disable CAMELLIA as ENC from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/WITH_CAMELLIA/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 442
+          },
+          "id": "enc-camellia",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003216,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable SEED as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-seed' do\n  title 'Disable SEED as ENC from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/WITH_SEED/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 457
+          },
+          "id": "enc-seed",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.00000354,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable IDEA as ENC from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-idea' do\n  title 'Disable IDEA as ENC from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/WITH_IDEA/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 472
+          },
+          "id": "enc-idea",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003155,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable AES-CCM from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'enc-aes-ccm' do\n  title 'Disable AES-CCM from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/(WITH_AES_(\\w+)_(CCM))/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 487
+          },
+          "id": "enc-aes-ccm",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003245,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Enable SHA384 or SHA256 or POLY1305 as Mac from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'mac-sha384-sha256-poly1305' do\n  title 'Enable SHA384 or SHA256 or POLY1305 as Mac from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/_(SHA384|SHA256|POLY1305)$/i) do\n      it(proc_desc) { should be_enabled }\n      it { should be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 507
+          },
+          "id": "mac-sha384-sha256-poly1305",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.00000341,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable MD5 Mac from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'mac-md5' do\n  title 'Disable MD5 Mac from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/_MD5$/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 522
+          },
+          "id": "mac-md5",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000007319,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable SHA(1) Mac from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'mac-sha' do\n  title 'Disable SHA(1) Mac from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/_SHA$/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 537
+          },
+          "id": "mac-sha",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003789,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Disable NULL Mac from all exposed SSL/TLS ports and versions.",
+          "desc": null,
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'mac-null' do\n  title 'Disable NULL Mac from all exposed SSL/TLS ports and versions.'\n  impact 0.5\n  only_if { sslports.length > 0 }\n\n  sslports.each do |sslport|\n    # create a description\n    proc_desc = \"on node == #{target_hostname} running #{sslport[:socket].process.inspect} (#{sslport[:socket].pid})\"\n    describe ssl(sslport).ciphers(/_NULL$/i) do\n      it(proc_desc) { should_not be_enabled }\n      it { should_not be_enabled }\n    end\n  end\nend\n",
+          "source_location": {
+            "ref": "ssl-baseline-master/controls/ssl_test.rb",
+            "line": 552
+          },
+          "id": "mac-null",
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "skip_message": "Skipped control due to only_if condition.",
+              "resource": "Operating System Detection",
+              "run_time": 0.000003584,
+              "start_time": "2017-11-14 21:05:58 +0000"
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": null,
+          "controls": [
+            "debugging",
+            "ssl2",
+            "ssl3",
+            "tls1.0",
+            "tls1.1",
+            "tls1.2",
+            "kx-ecdh",
+            "kx-rsa",
+            "kx-dh",
+            "kx-krb5",
+            "kx-psk",
+            "kx-gostr",
+            "kx-srp",
+            "au-ecdsa-rsa",
+            "au-anon",
+            "au-dss",
+            "au-psk",
+            "au-export",
+            "enc-aes-gcm-chacha20",
+            "enc-cbc",
+            "enc-rc4",
+            "enc-export",
+            "enc-des",
+            "enc-enull",
+            "enc-camellia",
+            "enc-seed",
+            "enc-idea",
+            "enc-aes-ccm",
+            "mac-sha384-sha256-poly1305",
+            "mac-md5",
+            "mac-sha",
+            "mac-null"
+          ],
+          "id": "controls/ssl_test.rb"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "invalid_targets",
+          "options": {
+            "default": [
+              "127.0.0.1",
+              "0.0.0.0",
+              "::1",
+              "::"
+            ],
+            "description": "Array of IPv4 and IPv6 Addresses to exclude"
+          }
+        },
+        {
+          "name": "exclude_ports",
+          "options": {
+            "default": [],
+            "description": "Array of TCP ports to exclude from SSL checking"
+          }
+        },
+        {
+          "name": "target_hostname",
+          "options": {
+            "default": "ip-172-21-116-232",
+            "description": "Target hostname to check"
+          }
+        }
+      ],
+      "sha256": "58c02f7f13670467218e014c3308a6f311ed0c7075c31eb743489df2dad6752b"
+    }
+  ],
+  "platform": {
+    "name": "ubuntu",
+    "release": "16.04"
+  },
+  "statistics": {
+    "duration": 0.003896758
+  },
+  "type": "inspec_report",
+  "node_name": "policyfile-fixture-1-delivered.cd.chef.co",
+  "end_time": "2017-11-14T21:05:59+00:00",
+  "node_uuid": "e4ba56f7-eb7f-43a6-a908-9288ff0f68a5",
+  "environment": "_default",
+  "roles": [],
+  "recipes": [
+    "chefops-base::default",
+    "audit::default"
+  ],
+  "report_uuid": "07284906-4afb-4c08-8aed-e2ad40614ea2"
+}

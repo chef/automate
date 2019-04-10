@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run -p 11024:22 -d c6:latest

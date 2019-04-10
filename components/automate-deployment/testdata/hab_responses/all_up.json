@@ -1,0 +1,940 @@
+[
+  {
+    "service_group": "deployment-service.default",
+    "bldr_url": "https://bldr.habitat.sh",
+    "channel": "stable",
+    "spec_file": "/hab/sup/default/specs/deployment-service.spec",
+    "spec_ident": {
+      "origin": "ssd",
+      "name": "deployment-service",
+      "version": "0.1.0",
+      "release": "20180215154831"
+    },
+    "start_style": "Persistent",
+    "topology": "standalone",
+    "update_strategy": "none",
+    "cfg": {
+      "gather_logs": {
+        "staging_dir": ""
+      },
+      "log": {
+        "level": "info"
+      },
+      "mlsa": {
+        "accept": true
+      },
+      "service": {
+        "listen_address": "0.0.0.0",
+        "port": 10160
+      }
+    },
+    "pkg": {
+      "ident": "ssd/deployment-service/0.1.0/20180215154831",
+      "origin": "ssd",
+      "name": "deployment-service",
+      "version": "0.1.0",
+      "release": "20180215154831",
+      "deps": [
+        {
+          "origin": "chef",
+          "name": "mlsa",
+          "version": "1.0.1",
+          "release": "20170915011238"
+        },
+        {
+          "origin": "core",
+          "name": "acl",
+          "version": "2.2.52",
+          "release": "20170513213108"
+        },
+        {
+          "origin": "core",
+          "name": "attr",
+          "version": "2.4.47",
+          "release": "20170513213059"
+        },
+        {
+          "origin": "core",
+          "name": "bash",
+          "version": "4.3.42",
+          "release": "20170513213519"
+        },
+        {
+          "origin": "core",
+          "name": "certstrap",
+          "version": "v1.1.1",
+          "release": "20171031124354"
+        },
+        {
+          "origin": "core",
+          "name": "coreutils",
+          "version": "8.25",
+          "release": "20170513213226"
+        },
+        {
+          "origin": "core",
+          "name": "findutils",
+          "version": "4.4.2",
+          "release": "20170513214305"
+        },
+        {
+          "origin": "core",
+          "name": "gcc-libs",
+          "version": "5.2.0",
+          "release": "20170513212920"
+        },
+        {
+          "origin": "core",
+          "name": "glibc",
+          "version": "2.22",
+          "release": "20170513201042"
+        },
+        {
+          "origin": "core",
+          "name": "gmp",
+          "version": "6.1.0",
+          "release": "20170513202112"
+        },
+        {
+          "origin": "core",
+          "name": "libcap",
+          "version": "2.24",
+          "release": "20170513213120"
+        },
+        {
+          "origin": "core",
+          "name": "linux-headers",
+          "version": "4.3",
+          "release": "20170513200956"
+        },
+        {
+          "origin": "core",
+          "name": "ncurses",
+          "version": "6.0",
+          "release": "20170513213009"
+        },
+        {
+          "origin": "core",
+          "name": "readline",
+          "version": "6.3.8",
+          "release": "20170513213506"
+        },
+        {
+          "origin": "core",
+          "name": "tar",
+          "version": "1.29",
+          "release": "20170513213607"
+        }
+      ],
+      "env": {
+        "PATH": "/hab/pkgs/ssd/deployment-service/0.1.0/20180215154831/bin:/hab/pkgs/chef/mlsa/1.0.1/20170915011238/bin:/hab/pkgs/core/ncurses/6.0/20170513213009/bin:/hab/pkgs/core/glibc/2.22/20170513201042/bin:/hab/pkgs/core/bash/4.3.42/20170513213519/bin:/hab/pkgs/core/tar/1.29/20170513213607/bin:/hab/pkgs/core/attr/2.4.47/20170513213059/bin:/hab/pkgs/core/acl/2.2.52/20170513213108/bin:/hab/pkgs/core/findutils/4.4.2/20170513214305/bin:/hab/pkgs/core/coreutils/8.25/20170513213226/bin:/hab/pkgs/core/libcap/2.24/20170513213120/bin:/hab/pkgs/core/certstrap/v1.1.1/20171031124354/bin:/hab/pkgs/core/busybox-static/1.24.2/20170513215502/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      },
+      "exposes": [],
+      "exports": {},
+      "path": "/hab/pkgs/ssd/deployment-service/0.1.0/20180215154831",
+      "svc_path": "/hab/svc/deployment-service",
+      "svc_config_path": "/hab/svc/deployment-service/config",
+      "svc_data_path": "/hab/svc/deployment-service/data",
+      "svc_files_path": "/hab/svc/deployment-service/files",
+      "svc_static_path": "/hab/svc/deployment-service/static",
+      "svc_var_path": "/hab/svc/deployment-service/var",
+      "svc_pid_file": "/hab/svc/deployment-service/PID",
+      "svc_run": "/hab/svc/deployment-service/run",
+      "svc_user": "root",
+      "svc_group": "hab"
+    },
+    "sys": {
+      "version": "0.53.0/20180205214321",
+      "member_id": "83893c6114ea4b7cb3089b6b2b452400",
+      "ip": "10.0.2.15",
+      "hostname": "automate-deployment",
+      "gossip_ip": "0.0.0.0",
+      "gossip_port": 9638,
+      "http_gateway_ip": "0.0.0.0",
+      "http_gateway_port": 9631,
+      "permanent": false
+    },
+    "initialized": true,
+    "user_config_updated": false,
+    "health_check": "Unknown",
+    "last_election_status": "None",
+    "needs_reload": false,
+    "needs_reconfiguration": false,
+    "smoke_check": "Pending",
+    "binds": [],
+    "hooks": {
+      "health_check": null,
+      "init": null,
+      "file_updated": null,
+      "reload": null,
+      "reconfigure": null,
+      "suitability": null,
+      "run": {
+        "render_pair": "/hab/svc/deployment-service/hooks/run",
+        "stdout_log_path": "/hab/svc/deployment-service/logs/run.stdout.log",
+        "stderr_log_path": "/hab/svc/deployment-service/logs/run.stderr.log"
+      },
+      "post_run": null,
+      "smoke_test": null,
+      "post_stop": null
+    },
+    "config_from": null,
+    "manager_fs_cfg": {
+      "butterfly_data_path": "/hab/sup/default/data/butterfly.dat",
+      "census_data_path": "/hab/sup/default/data/census.dat",
+      "services_data_path": "/hab/sup/default/data/services.dat",
+      "data_path": "/hab/sup/default/data",
+      "specs_path": "/hab/sup/default/specs",
+      "composites_path": "/hab/sup/default/composites",
+      "member_id_file": "/hab/sup/default/MEMBER_ID",
+      "proc_lock_file": "/hab/sup/default/LOCK"
+    },
+    "process": {
+      "pid": 27446,
+      "state": "Up",
+      "state_entered": 1518709853
+    },
+    "svc_encrypted_password": null,
+    "composite": null
+  },
+  {
+    "service_group": "automate-postgresql.default",
+    "bldr_url": "https://bldr.habitat.sh",
+    "channel": "dev",
+    "spec_file": "/hab/sup/default/specs/automate-postgresql.spec",
+    "spec_ident": {
+      "origin": "chef",
+      "name": "automate-postgresql",
+      "version": null,
+      "release": null
+    },
+    "start_style": "Transient",
+    "topology": "standalone",
+    "update_strategy": "none",
+    "cfg": {
+      "log_level": "ERROR",
+      "log_line_prefix": "%t [%p]: [%l-1] user=%u,db=%d,client=%h %r (%x:%e)",
+      "logging_collector": "off",
+      "max_connections": 100,
+      "max_locks_per_transaction": 64,
+      "port": 5432,
+      "network": {
+        "port": 10140
+      },
+      "replication": {
+        "enable": false,
+        "lag_health_threshold": 1048576,
+        "name": "replication",
+        "password": "replication"
+      },
+      "superuser": {
+        "name": "automate",
+        "password": "pokemon"
+      }
+    },
+    "pkg": {
+      "ident": "chef/automate-postgresql/9.6.6/20180209193636",
+      "origin": "chef",
+      "name": "automate-postgresql",
+      "version": "9.6.6",
+      "release": "20180209193636",
+      "deps": [
+        {
+          "origin": "core",
+          "name": "acl",
+          "version": "2.2.52",
+          "release": "20170513213108"
+        },
+        {
+          "origin": "core",
+          "name": "attr",
+          "version": "2.4.47",
+          "release": "20170513213059"
+        },
+        {
+          "origin": "core",
+          "name": "bash",
+          "version": "4.3.42",
+          "release": "20170513213519"
+        },
+        {
+          "origin": "core",
+          "name": "bzip2",
+          "version": "1.0.6",
+          "release": "20170513212938"
+        },
+        {
+          "origin": "core",
+          "name": "cacerts",
+          "version": "2017.09.20",
+          "release": "20171014212239"
+        },
+        {
+          "origin": "core",
+          "name": "coreutils",
+          "version": "8.25",
+          "release": "20170513213226"
+        },
+        {
+          "origin": "core",
+          "name": "db",
+          "version": "5.3.28",
+          "release": "20170513213734"
+        },
+        {
+          "origin": "core",
+          "name": "gcc-libs",
+          "version": "5.2.0",
+          "release": "20170513212920"
+        },
+        {
+          "origin": "core",
+          "name": "gdal",
+          "version": "2.2.1",
+          "release": "20171025112525"
+        },
+        {
+          "origin": "core",
+          "name": "gdbm",
+          "version": "1.11",
+          "release": "20170513213716"
+        },
+        {
+          "origin": "core",
+          "name": "geos",
+          "version": "3.6.2",
+          "release": "20171025112556"
+        },
+        {
+          "origin": "core",
+          "name": "glibc",
+          "version": "2.22",
+          "release": "20170513201042"
+        },
+        {
+          "origin": "core",
+          "name": "gmp",
+          "version": "6.1.0",
+          "release": "20170513202112"
+        },
+        {
+          "origin": "core",
+          "name": "less",
+          "version": "481",
+          "release": "20170513213936"
+        },
+        {
+          "origin": "core",
+          "name": "libcap",
+          "version": "2.24",
+          "release": "20170513213120"
+        },
+        {
+          "origin": "core",
+          "name": "libossp-uuid",
+          "version": "1.6.2",
+          "release": "20170514001348"
+        },
+        {
+          "origin": "core",
+          "name": "libxml2",
+          "version": "2.9.6",
+          "release": "20171025112053"
+        },
+        {
+          "origin": "core",
+          "name": "linux-headers",
+          "version": "4.3",
+          "release": "20170513200956"
+        },
+        {
+          "origin": "core",
+          "name": "ncurses",
+          "version": "6.0",
+          "release": "20170513213009"
+        },
+        {
+          "origin": "core",
+          "name": "openssl",
+          "version": "1.0.2l",
+          "release": "20171014213633"
+        },
+        {
+          "origin": "core",
+          "name": "pcre",
+          "version": "8.38",
+          "release": "20170513213423"
+        },
+        {
+          "origin": "core",
+          "name": "perl",
+          "version": "5.22.1",
+          "release": "20170513213942"
+        },
+        {
+          "origin": "core",
+          "name": "postgresql",
+          "version": "9.6.6",
+          "release": "20180208190339"
+        },
+        {
+          "origin": "core",
+          "name": "proj",
+          "version": "4.9.3",
+          "release": "20171025112633"
+        },
+        {
+          "origin": "core",
+          "name": "readline",
+          "version": "6.3.8",
+          "release": "20170513213506"
+        },
+        {
+          "origin": "core",
+          "name": "zlib",
+          "version": "1.2.8",
+          "release": "20170513201911"
+        }
+      ],
+      "env": {
+        "PATH": "/hab/pkgs/core/postgresql/9.6.6/20180208190339/bin:/hab/pkgs/core/gdal/2.2.1/20171025112525/bin:/hab/pkgs/core/glibc/2.22/20170513201042/bin:/hab/pkgs/core/proj/4.9.3/20171025112633/bin:/hab/pkgs/core/geos/3.6.2/20171025112556/bin:/hab/pkgs/core/libxml2/2.9.6/20171025112053/bin:/hab/pkgs/core/libossp-uuid/1.6.2/20170514001348/bin:/hab/pkgs/core/ncurses/6.0/20170513213009/bin:/hab/pkgs/core/perl/5.22.1/20170513213942/bin:/hab/pkgs/core/pcre/8.38/20170513213423/bin:/hab/pkgs/core/libcap/2.24/20170513213120/bin:/hab/pkgs/core/less/481/20170513213936/bin:/hab/pkgs/core/gdbm/1.11/20170513213716/bin:/hab/pkgs/core/db/5.3.28/20170513213734/bin:/hab/pkgs/core/coreutils/8.25/20170513213226/bin:/hab/pkgs/core/bzip2/1.0.6/20170513212938/bin:/hab/pkgs/core/attr/2.4.47/20170513213059/bin:/hab/pkgs/core/acl/2.2.52/20170513213108/bin:/hab/pkgs/core/openssl/1.0.2l/20171014213633/bin:/hab/pkgs/core/bash/4.3.42/20170513213519/bin:/hab/pkgs/core/busybox-static/1.24.2/20170513215502/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      },
+      "exposes": [
+        "5432"
+      ],
+      "exports": {
+        "port": "port",
+        "superuser_name": "superuser.name",
+        "superuser_password": "superuser.password"
+      },
+      "path": "/hab/pkgs/chef/automate-postgresql/9.6.6/20180209193636",
+      "svc_path": "/hab/svc/automate-postgresql",
+      "svc_config_path": "/hab/svc/automate-postgresql/config",
+      "svc_data_path": "/hab/svc/automate-postgresql/data",
+      "svc_files_path": "/hab/svc/automate-postgresql/files",
+      "svc_static_path": "/hab/svc/automate-postgresql/static",
+      "svc_var_path": "/hab/svc/automate-postgresql/var",
+      "svc_pid_file": "/hab/svc/automate-postgresql/PID",
+      "svc_run": "/hab/svc/automate-postgresql/run",
+      "svc_user": "hab",
+      "svc_group": "hab"
+    },
+    "sys": {
+      "version": "0.53.0/20180205214321",
+      "member_id": "83893c6114ea4b7cb3089b6b2b452400",
+      "ip": "10.0.2.15",
+      "hostname": "automate-deployment",
+      "gossip_ip": "0.0.0.0",
+      "gossip_port": 9638,
+      "http_gateway_ip": "0.0.0.0",
+      "http_gateway_port": 9631,
+      "permanent": false
+    },
+    "initialized": true,
+    "user_config_updated": false,
+    "health_check": "Unknown",
+    "last_election_status": "None",
+    "needs_reload": false,
+    "needs_reconfiguration": false,
+    "smoke_check": "Pending",
+    "binds": [],
+    "hooks": {
+      "health_check": {
+        "render_pair": "/hab/svc/automate-postgresql/hooks/health_check",
+        "stdout_log_path": "/hab/svc/automate-postgresql/logs/health_check.stdout.log",
+        "stderr_log_path": "/hab/svc/automate-postgresql/logs/health_check.stderr.log"
+      },
+      "init": {
+        "render_pair": "/hab/svc/automate-postgresql/hooks/init",
+        "stdout_log_path": "/hab/svc/automate-postgresql/logs/init.stdout.log",
+        "stderr_log_path": "/hab/svc/automate-postgresql/logs/init.stderr.log"
+      },
+      "file_updated": null,
+      "reload": null,
+      "reconfigure": {
+        "render_pair": "/hab/svc/automate-postgresql/hooks/reconfigure",
+        "stdout_log_path": "/hab/svc/automate-postgresql/logs/reconfigure.stdout.log",
+        "stderr_log_path": "/hab/svc/automate-postgresql/logs/reconfigure.stderr.log"
+      },
+      "suitability": {
+        "render_pair": "/hab/svc/automate-postgresql/hooks/suitability",
+        "stdout_log_path": "/hab/svc/automate-postgresql/logs/suitability.stdout.log",
+        "stderr_log_path": "/hab/svc/automate-postgresql/logs/suitability.stderr.log"
+      },
+      "run": {
+        "render_pair": "/hab/svc/automate-postgresql/hooks/run",
+        "stdout_log_path": "/hab/svc/automate-postgresql/logs/run.stdout.log",
+        "stderr_log_path": "/hab/svc/automate-postgresql/logs/run.stderr.log"
+      },
+      "post_run": null,
+      "smoke_test": null,
+      "post_stop": null
+    },
+    "config_from": null,
+    "manager_fs_cfg": {
+      "butterfly_data_path": "/hab/sup/default/data/butterfly.dat",
+      "census_data_path": "/hab/sup/default/data/census.dat",
+      "services_data_path": "/hab/sup/default/data/services.dat",
+      "data_path": "/hab/sup/default/data",
+      "specs_path": "/hab/sup/default/specs",
+      "composites_path": "/hab/sup/default/composites",
+      "member_id_file": "/hab/sup/default/MEMBER_ID",
+      "proc_lock_file": "/hab/sup/default/LOCK"
+    },
+    "process": {
+      "pid": 27676,
+      "state": "Up",
+      "state_entered": 1518709865
+    },
+    "svc_encrypted_password": null,
+    "composite": null
+  },
+  {
+    "service_group": "local-user-service.default",
+    "bldr_url": "https://bldr.habitat.sh",
+    "channel": "stable",
+    "spec_file": "/hab/sup/default/specs/local-user-service.spec",
+    "spec_ident": {
+      "origin": "chef",
+      "name": "local-user-service",
+      "version": "0.1.0",
+      "release": "20180214165011"
+    },
+    "start_style": "Transient",
+    "topology": "standalone",
+    "update_strategy": "none",
+    "cfg": {
+      "logger": {
+        "format": "json",
+        "level": "info"
+      },
+      "mlsa": {
+        "accept": true
+      },
+      "service": {
+        "cert_contents": "-----BEGIN CERTIFICATE-----\nMIIEQTCCAimgAwIBAgIQMAAr9rPigovZluFWqiVn1TANBgkqhkiG9w0BAQsFADAp\nMScwJQYDVQQDEx5DaGVmIEF1dG9tYXRlIGE2ZWViYjk2OTEyOWIzNjMwHhcNMTgw\nMjE1MTU1MDU3WhcNMTkwODE1MTU1MDUzWjAdMRswGQYDVQQDExJsb2NhbC11c2Vy\nLXNlcnZpY2UwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDZFx+K2qZT\n0D+P7Ps1LIQFlb2vkUHX64gp0Gh/lquNOncQxWECkpznOrtZkH/4cq10WyC18gSM\nyWGhYoq8bjQbNJFC3luwX9Qy3Z9mguRjyV7Fk4oW80guVsDtFj6wtbpwKMt4WpTN\n4IqWNY/Ozc4VrcR6eRhqDUSYdYQ4jeD/m/4jfe3OJho2rVGfYmqIlHm+DKbnbpP/\nYYYsujIrfQaHf6YXrkG3kqAUGwSgLmu/9OEVecNFdNsN9AFAXdNvKNciyVrxp6iO\nmRCNhQCpX7XAjTKzZpX3YwlzKOp3jwcqftfhtbus9xh8BUVVrHNdamR5K/ZKW8qg\n7T0ys0fajEyVAgMBAAGjcTBvMA4GA1UdDwEB/wQEAwIDuDAdBgNVHSUEFjAUBggr\nBgEFBQcDAQYIKwYBBQUHAwIwHQYDVR0OBBYEFGxIbPEp28FNcXh1NBAAdGiCx1fC\nMB8GA1UdIwQYMBaAFI0V9OvZykKdSKFzVEYkAM2hVVwWMA0GCSqGSIb3DQEBCwUA\nA4ICAQA/oHZNDa9AEGKCDfRdhxUyka7rKsgRo9m/Tgkhr7khmszH5/f36h+VoslT\nkPpKiSzCug1QR2ZyDsSi+rRF43bQARr7ykzVv14Qxjgpu1FFEswynHwhrSxkacbZ\nGGd7E+oyClE2D6NLa1SxcxsZ46ejOuufnC9H7noF936tJBvMCcJ4OLMzTbJBQhLT\nM7UcjJLQV2Fjm7i9EPnBALZCqECh3W712bpDBI9Peh+lcQ/EpNMHL07xn+yOHfdW\nwYyOCrNSyq5a6C7tFjy/Y1XeCJc3zBxO3bu1zG3Rr9KR/gboyj7S7Y8l68RL0rdn\noQixeoeIRDR2kT+i0e1h6KcmHDSezf44DvSzs/BGtOCg/qnCFxkg2WtAiWNqXURB\nnQMmkGVIxYFVz7GV9Op5/PUy26J2HY0KxjRD1YzLdlQAoMkjGsUtxLd4flx47NV5\nZAQeUUpo+PCXLao9NTqvh/kGGMwkQfQrdJGt6M9j8dVaevcJrRsFTnOgHlim1IF7\naoIPYg1/3cYTgEiTwPiuDQEoN8FR0+MFs83nyKOpNzLYkloZIPVGOSs6QPpZvfkP\nwPXzeY3F+ODWzYLaNmms9BmZWwYY8abyPzzL1bsnuCzsO7fJX6dYSSlRk09EM2Uj\nRgcnofQymOTxmsxCASIbGrgQdYnOqpWC17qkoKa5XfbqH3M4XQ==\n-----END CERTIFICATE-----\n",
+        "host": "0.0.0.0",
+        "key_contents": "-----BEGIN RSA PRIVATE KEY-----\nMIIEpgIBAAKCAQEA2RcfitqmU9A/j+z7NSyEBZW9r5FB1+uIKdBof5arjTp3EMVh\nApKc5zq7WZB/+HKtdFsgtfIEjMlhoWKKvG40GzSRQt5bsF/UMt2fZoLkY8lexZOK\nFvNILlbA7RY+sLW6cCjLeFqUzeCKljWPzs3OFa3EenkYag1EmHWEOI3g/5v+I33t\nziYaNq1Rn2JqiJR5vgym526T/2GGLLoyK30Gh3+mF65Bt5KgFBsEoC5rv/ThFXnD\nRXTbDfQBQF3TbyjXIsla8aeojpkQjYUAqV+1wI0ys2aV92MJcyjqd48HKn7X4bW7\nrPcYfAVFVaxzXWpkeSv2SlvKoO09MrNH2oxMlQIDAQABAoIBAQDMsevw/pgkoVC9\nwgNgMRhPN9FC0WFXWePrIXLXE1ew8/a+3o3JYjsGIK/1FLZFqsP42dAvHwPBSEWB\naaxNXlBNcrSha47i8IjiaWxauYLmwEJXY/WqDDz8TJrfMsFr1/7ysNSiKC71LQsf\n9WMi6ZWvhUik/rfRj68lXnGM7eLAwDWnF6HMDypa+wb9li6SzIko+S1/d/Pa4SSz\nuCGprALzHsjV4owK8C3ZoUZWOij9xz0+z7zv3W7pOaFC6UNpBcdDAARm0x7oJeX/\nyEePQqcz2xBOv6km7APZJoVZOA0TBhaHGDMReMCLsDqfyH1MPiNsCd6JjWWe8Vmv\n9k3ZT4gFAoGBAN/Za/rEHER+FXvEJU7rFmImmEPjpdJlIRTQS4tOXlza8y/4NnPa\nuXvvGVZJKLqY92jsBSajxTjqpBAGC34gqu2al4q5xlcCnUPAAMzb3Xb70BpxO+cV\nJwt08p0/dQ66dfDXpHxo5BdpjgF5hIyV/ooqlbCHAQRyH9NDgIUOIUtrAoGBAPhF\nL0WmklYJkchwkAx+i8A7VNNUbcnyWuzE+Hdny3yTYfg4+0HmBw9hycZnKQZBtKPd\nBr9oRTt+s+qyVqYMF2UiquQpe2RVPgu5UcefFZ7yuuo95lyU83ZScuhfre9kzIyG\nKOsDLunndxxJ4Cc4YzmPXquo+3QPYUHHEETzxsf/AoGBAINWWhiDv+If6BL5/rnT\nDQsBgg0zIDPVyhcgL3LIxGzOuijHBYvsJTAmFUOfIRp6bY9OC6ekJy9B3IjaQxv5\nptBKB+gJH+olSohZux53UfVhwbQCBBeNPZ9nOoIwnUnK9TAeFhA4qrth30PWPIMP\n7oy6d6FfVKV7IFkgHePzam2JAoGBAMc9Lmyk+rcVQusqek+slpaUhsR58wmn9xQg\nFo4su/6jgHHluK3v3iaYAYe5bhDZVhBS5oFhOn4+dkCZEjR7a6L8KUylhaLFTd+2\nv0yF/KHshdhKCL6vwppoHFMjxcBikk0LtXa0vUd1O/91we93rxmYVw9Hs1Q2q4RQ\nLlxHjnUdAoGBALdWRuXVL/X3XcIV3dY8HymnDiZWxIPGqBclyjEmrJ3uosibB7mq\nhT8fK/YOuU7p95a3qu8+D412/NQl93ozUAtaR31OvobIxMPD8mH/d9VbyQkZYFmm\niEE3U10s9cumR65g9a/gLTQjVnjx7KnaSmapeV21G6zf7suGcoiLpY/w\n-----END RSA PRIVATE KEY-----\n",
+        "port": 10127,
+        "root_cert_contents": "-----BEGIN CERTIFICATE-----\nMIIFEjCCAvqgAwIBAgIBATANBgkqhkiG9w0BAQsFADApMScwJQYDVQQDEx5DaGVm\nIEF1dG9tYXRlIGE2ZWViYjk2OTEyOWIzNjMwHhcNMTgwMjE1MTU1MDU0WhcNMTkw\nODE1MTU1MDU0WjApMScwJQYDVQQDEx5DaGVmIEF1dG9tYXRlIGE2ZWViYjk2OTEy\nOWIzNjMwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC7jAsj9NY/49ey\nSfpXq2hRMSwR9yA+5hb/ynq30N+Pdp9hkcDwlt/qm2ZA6VlW0adsS63/gEWO+zqY\n+auUGt5Nv3DOVz/Vn9yW6vZfU4XaILRtQsFat2ACxWtPcaHpHpTUIf3VJRQHB48m\nNrWL0DqEbKGXoADmVYs8kM5pRK2FsXuJKOKeY1QoUxh0m1tfw8OHwhyeYK0Y7q23\ncpLotWGw+N5Qq3PKhBP5MUVsdcn8ZblYGgSqpDTZbTOdxBgZa63CD0xUmt5ReDvh\nPVIalAjf22ZL9WlRrt1y+sxeu2cGlauPrvXlrZgkz2v1j7tEOjVSV9nZSBaG+fnB\nL2BUewJrBVwZuTonY4nKWuG6yJjbZ5JhUBhbb2kpGjFBaGTUr/LERP73FIAkVai7\nX0CZ3cu4Ggi/IfNxTGN/KX2z836ktVYBi9I6Jk5S4rB+XY0/XuU/v8PxK127asvc\nu2gbDjA2soYO7eO1cxiZWYtYJVkVhkAcTGyu6BTuNwlV+wLvzocX+p5j+IfDUdc5\nbVvO9wnBXAmeJQyaC6dL48wUNtUjG7e2oagT+LQ+45wkOSue4P2bM9spPwPnqBYR\nzJwIdIG5kG9uVo0n6tKz9H24KEYVd/zJDK/NArb8maJD7fc84yTr/+Ihrl7Du1FB\nXpG5cGWjAuG8VMcefer3Mo1FLzlcYQIDAQABo0UwQzAOBgNVHQ8BAf8EBAMCAQYw\nEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHQ4EFgQUjRX069nKQp1IoXNURiQAzaFV\nXBYwDQYJKoZIhvcNAQELBQADggIBAI77eRk9uhz8vsaM5lWFv9PvenZOibAJuKQd\ncivyI4Q6wmSZJsjzc8pf5ndwLyv1JdNENUSDoax+0Yem/dSUHy4ejuqG7IA8m4r9\nB0QNpvWN3W1SA97y7F4Cr0Al+PetskZVwxKR0jVthlf0VxAfe7KH06hWivVUelqP\nZIsipFxAfSAgIooW5yQli9Z5KuITYtFnvJs7Z6/qBbfZkdr7PCgi2zwSUAUBZduc\nRUdJlnlSg2zxmPxn7JVBXaO9MCTZdrv86sh2gM69mwlWOAtYPbBpETKOOLqQXVwH\nfUalbGSlLwuR4iZ76uTGSUt4861iGEBgecqg9fuU6ZnPD+M/Vwr1zFd6pheAMcDf\nWRKaUWYAnamqC17fz7PzeiAi6M71fbGrucYf78ErVThRbkOdw1C9ZesHbZNaV048\nwbmJr1oAtDSmWiUQGl2pwch5t/EwGgWhxXT/t8/52+P032QGkBhqQkxeWDHtMX3p\nhQHjkNvN5UtFcwm+FAQcaKWkDsX9kAzKwGAkaGWMeX2LjuIwgkqTRqSsHlRHPvnn\nFlGo19im6roN3BrjwDvCt7OuNnMYbGngfEuyFWtoo+HXQXotQ0Jz6/lRww31czis\nMvDvCKfo3LeaO8M2536Hc6bl9qORfUVCJqQwRQaLKwhua81WmjrYXtNkrz/BuWCS\nPTR05ZYW\n-----END CERTIFICATE-----\n"
+      }
+    },
+    "pkg": {
+      "ident": "chef/local-user-service/0.1.0/20180214165011",
+      "origin": "chef",
+      "name": "local-user-service",
+      "version": "0.1.0",
+      "release": "20180214165011",
+      "deps": [
+        {
+          "origin": "chef",
+          "name": "mlsa",
+          "version": "1.0.1",
+          "release": "20170915011238"
+        },
+        {
+          "origin": "core",
+          "name": "bash",
+          "version": "4.3.42",
+          "release": "20170513213519"
+        },
+        {
+          "origin": "core",
+          "name": "gcc-libs",
+          "version": "5.2.0",
+          "release": "20170513212920"
+        },
+        {
+          "origin": "core",
+          "name": "glibc",
+          "version": "2.22",
+          "release": "20170513201042"
+        },
+        {
+          "origin": "core",
+          "name": "linux-headers",
+          "version": "4.3",
+          "release": "20170513200956"
+        },
+        {
+          "origin": "core",
+          "name": "ncurses",
+          "version": "6.0",
+          "release": "20170513213009"
+        },
+        {
+          "origin": "core",
+          "name": "readline",
+          "version": "6.3.8",
+          "release": "20170513213506"
+        }
+      ],
+      "env": {
+        "PATH": "/hab/pkgs/chef/local-user-service/0.1.0/20180214165011/bin:/hab/pkgs/core/bash/4.3.42/20170513213519/bin:/hab/pkgs/core/ncurses/6.0/20170513213009/bin:/hab/pkgs/core/glibc/2.22/20170513201042/bin:/hab/pkgs/chef/mlsa/1.0.1/20170915011238/bin:/hab/pkgs/core/busybox-static/1.24.2/20170513215502/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      },
+      "exposes": [
+        "9092"
+      ],
+      "exports": {
+        "port": "service.port"
+      },
+      "path": "/hab/pkgs/chef/local-user-service/0.1.0/20180214165011",
+      "svc_path": "/hab/svc/local-user-service",
+      "svc_config_path": "/hab/svc/local-user-service/config",
+      "svc_data_path": "/hab/svc/local-user-service/data",
+      "svc_files_path": "/hab/svc/local-user-service/files",
+      "svc_static_path": "/hab/svc/local-user-service/static",
+      "svc_var_path": "/hab/svc/local-user-service/var",
+      "svc_pid_file": "/hab/svc/local-user-service/PID",
+      "svc_run": "/hab/svc/local-user-service/run",
+      "svc_user": "hab",
+      "svc_group": "hab"
+    },
+    "sys": {
+      "version": "0.53.0/20180205214321",
+      "member_id": "83893c6114ea4b7cb3089b6b2b452400",
+      "ip": "10.0.2.15",
+      "hostname": "automate-deployment",
+      "gossip_ip": "0.0.0.0",
+      "gossip_port": 9638,
+      "http_gateway_ip": "0.0.0.0",
+      "http_gateway_port": 9631,
+      "permanent": false
+    },
+    "initialized": true,
+    "user_config_updated": false,
+    "health_check": "Unknown",
+    "last_election_status": "None",
+    "needs_reload": false,
+    "needs_reconfiguration": false,
+    "smoke_check": "Pending",
+    "binds": [
+      "automate-dex:automate-dex.default"
+    ],
+    "hooks": {
+      "health_check": {
+        "render_pair": "/hab/svc/local-user-service/hooks/health_check",
+        "stdout_log_path": "/hab/svc/local-user-service/logs/health_check.stdout.log",
+        "stderr_log_path": "/hab/svc/local-user-service/logs/health_check.stderr.log"
+      },
+      "init": {
+        "render_pair": "/hab/svc/local-user-service/hooks/init",
+        "stdout_log_path": "/hab/svc/local-user-service/logs/init.stdout.log",
+        "stderr_log_path": "/hab/svc/local-user-service/logs/init.stderr.log"
+      },
+      "file_updated": null,
+      "reload": null,
+      "reconfigure": null,
+      "suitability": null,
+      "run": {
+        "render_pair": "/hab/svc/local-user-service/hooks/run",
+        "stdout_log_path": "/hab/svc/local-user-service/logs/run.stdout.log",
+        "stderr_log_path": "/hab/svc/local-user-service/logs/run.stderr.log"
+      },
+      "post_run": null,
+      "smoke_test": null,
+      "post_stop": null
+    },
+    "config_from": null,
+    "manager_fs_cfg": {
+      "butterfly_data_path": "/hab/sup/default/data/butterfly.dat",
+      "census_data_path": "/hab/sup/default/data/census.dat",
+      "services_data_path": "/hab/sup/default/data/services.dat",
+      "data_path": "/hab/sup/default/data",
+      "specs_path": "/hab/sup/default/specs",
+      "composites_path": "/hab/sup/default/composites",
+      "member_id_file": "/hab/sup/default/MEMBER_ID",
+      "proc_lock_file": "/hab/sup/default/LOCK"
+    },
+    "process": {
+      "pid": 27847,
+      "state": "Up",
+      "state_entered": 1518709870
+    },
+    "svc_encrypted_password": null,
+    "composite": null
+  },
+  {
+    "service_group": "teams-service.default",
+    "bldr_url": "https://bldr.habitat.sh",
+    "channel": "dev",
+    "spec_file": "/hab/sup/default/specs/teams-service.spec",
+    "spec_ident": {
+      "origin": "chef",
+      "name": "teams-service",
+      "version": null,
+      "release": null
+    },
+    "start_style": "Transient",
+    "topology": "standalone",
+    "update_strategy": "none",
+    "cfg": {
+      "logger": {
+        "format": "json",
+        "level": "info"
+      },
+      "mlsa": {
+        "accept": true
+      },
+      "service": {
+        "cert_contents": "-----BEGIN CERTIFICATE-----\nMIIEPTCCAiWgAwIBAgIRAOutu+jYNhmnm6nReUyKBN8wDQYJKoZIhvcNAQELBQAw\nKTEnMCUGA1UEAxMeQ2hlZiBBdXRvbWF0ZSBhNmVlYmI5NjkxMjliMzYzMB4XDTE4\nMDIxNTE1NTEwMFoXDTE5MDgxNTE1NTA1M1owGDEWMBQGA1UEAxMNdGVhbXMtc2Vy\ndmljZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ4/tUwcRaRbPTO9\nRq+Uj1d7+guPbElXC/UHw3bMPwafI9fM+xHuLbOtldHlrOdQByXXEdfy0G7jQDnG\n+8VBr7Z0I3EU6W0OvPpTadvZrA07j/cf5P+dfkqQ7klCWuTAg2dkBbhQYWcoiHMQ\nZ8USx534dwB2KP5oB6n/DimCBciltGTbYNTDgvz+Z9bKLqsO2LgxsCdgdOfQsR1Q\nRSNXiq2z0EmesAJDiiS2F0A+zBJoyaoEdxXlA5Qg5eNlZOTJQ01LlITEMKD2NZ7/\n2YHKl5+teR5JbXe9F2kVANlLmh3rHNOEuAQtVWnBaCD5INNc8myIpsz9XjNRLWEb\nv7mBgcUCAwEAAaNxMG8wDgYDVR0PAQH/BAQDAgO4MB0GA1UdJQQWMBQGCCsGAQUF\nBwMBBggrBgEFBQcDAjAdBgNVHQ4EFgQU6uRP2fdyqNvseGo/jGbg9lyooQgwHwYD\nVR0jBBgwFoAUjRX069nKQp1IoXNURiQAzaFVXBYwDQYJKoZIhvcNAQELBQADggIB\nAB0Z01z1bSpeEqZguqHx9lVs5ihXjPIEL3wk5y+lluGiU6HDD0MmQIevGkSSoI4I\nyTQt2SGC9zXYkQXccuzTAA0fnKFQOd9f/OgExxHCLw1jRgHBJ9z4TU6y6sOGKJup\n+MpiBM2XwFNI9CPAU3dVk7FTALYENBsHWxAqy+BUUaNXI805mhfikGG4Uei3hNQU\n9EWNjDfGF88U0s1SgoN5PhgxuDH1+eYEUsJDfpOa9tP8DRGk1e6SYp3p2AeOl1XW\nN+C34r33STA+3nz/kjK1xRZdXRQXX1NlWxARiP5VDiMnOZ+ogiYiru0fRcNHD8b0\ntNA4nThMiV5R+ZPhZIirmKQuyUXdvBCptRbQKCOr0MlRKaBcaADqmvzoERjIiIpT\nzUEfchWxhqXMElLW6fzHOYtQriXKNUN6uMlY8tF6YBzC5DM0FyiQfErkmt6UTiDR\nFl9614bRdsYN/MYPFJiwMWAwAm0fDhvp3/JCT2IN5R6nhB/x0YrcOM46T6G4fmsR\neMS2IRsq+4p5yXKvLALPzafx4KVZtwTAIxvjf/fGiuM52jDY8B7Wl+Vr/VXGfmdl\nMyO6gIpoBX04RSzY2UJmQxjIIBfurHmyIF2l/R+ezgck4ooBEX5sL+2VXU0L1Bcj\n3iSitfWaxDx2/Uq+5GvivUDkHvn8arvbBENnKA6I9+sx\n-----END CERTIFICATE-----\n",
+        "host": "0.0.0.0",
+        "key_contents": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAnj+1TBxFpFs9M71Gr5SPV3v6C49sSVcL9QfDdsw/Bp8j18z7\nEe4ts62V0eWs51AHJdcR1/LQbuNAOcb7xUGvtnQjcRTpbQ68+lNp29msDTuP9x/k\n/51+SpDuSUJa5MCDZ2QFuFBhZyiIcxBnxRLHnfh3AHYo/mgHqf8OKYIFyKW0ZNtg\n1MOC/P5n1souqw7YuDGwJ2B059CxHVBFI1eKrbPQSZ6wAkOKJLYXQD7MEmjJqgR3\nFeUDlCDl42Vk5MlDTUuUhMQwoPY1nv/ZgcqXn615Hkltd70XaRUA2UuaHesc04S4\nBC1VacFoIPkg01zybIimzP1eM1EtYRu/uYGBxQIDAQABAoIBAFw+krXM/SNzM9fH\nCz8p/+xlDjpS3jJaFVQ9tEi5gjuf5ErU571p8yX7l4uEsCcd1SzPk00n8yvQOA31\n2akAQya9yDMQl4jEwI/Cs8A9wDbuc1sAMoJ2EbnxhZUaotUZCv/npBXudPim/fLk\nqziLW+TPgr64Iek6Rs1nKaA0dJ6iXg51mwB4SxZje7Bk88X21GdYX+r+ifwIdHO6\nArGWK9uausy/qO3Zdu/bNFH45Ripig6/2PXW48c0yZ/y97v+MgpBZ9oQb1FFTO6m\nPYtmUb9sfeZYgKWhmyrpy4eU0NGoXORoakqTGzU570GdBuRgKwOgF5pM0CvBZtph\nIz2xfTkCgYEA0Z3P1wEJzBjrOPOYSs1cNIjc1QRG3Nt3D90kb963nzZqNVTNw8So\nRoMbgm6otLasZMVZpzOEBZy6QBJ7zURA9O+wKX2H7GKP1nGUyzabQaoqooBMPhjF\nvTZOTIIO8JhRpBjmlLgHjjAmAVLz8Sje5zrdkBE463JgtxPJLyjMmosCgYEAwUQQ\ntyB1igdEEyHA0AY1mBg/S+H2B9xoGezOERlo0AvLx83rTQy9EsHShZzJM3PsTZIw\ncyDLh9YvmSwxSLhxX9N1XipcfXzPl82VN/bbkBZOJP0vD/D77jz7fmMAgmWgc1l0\nZeM147CIWn2vI58GsveWj7piVtiSF2oLRCpw7u8CgYEAl8+bfzOZTN+fPBfv6/zf\nEo0sonn+eGXZzPt0MDE0+3IFaaqJe4cp+Cdr/QL33CmQoUrsq1N8AjSID29Tik4s\nXThadTIdBu47DiwkfyiFOQFs71PL5A086NQz0OVAvK8UMax3Eq5Vin0EiWDym23m\nQcE4ReazOpITyYPi6Oy7ghECgYBDC2i9Dn6X/oNIG8p2n+DRvX+fxGiEO5rFe5fU\n6LqqiZ0M2EuLdCLXMfPlNAm8VregBVnXZoYUvmHOwjzqnEmAU6wAmbNyOO0PHVtp\nibKLXqGHRWmhHxlWgUNBifiwQ68QtPSjL9oO/bufoMA0HEPHrApIHAFnXUP46Wm1\nIQACcwKBgHucVf26zJovKN0SBh7Mm+TqGQqS394qSjTGk45K6OR3vhDPNe98Dqps\nSy/1b+SpypaSOkYmFEGAyO47X5KZHlELlihXz3XxvaCqzlQ6xYZsN6QMsns4H4qK\n/XjcZ7IcRRIDcAQxzcJvR8OdrnsjXfdiMKALLCPw8qHblwlQmTGc\n-----END RSA PRIVATE KEY-----\n",
+        "port": 10128,
+        "root_cert_contents": "-----BEGIN CERTIFICATE-----\nMIIFEjCCAvqgAwIBAgIBATANBgkqhkiG9w0BAQsFADApMScwJQYDVQQDEx5DaGVm\nIEF1dG9tYXRlIGE2ZWViYjk2OTEyOWIzNjMwHhcNMTgwMjE1MTU1MDU0WhcNMTkw\nODE1MTU1MDU0WjApMScwJQYDVQQDEx5DaGVmIEF1dG9tYXRlIGE2ZWViYjk2OTEy\nOWIzNjMwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC7jAsj9NY/49ey\nSfpXq2hRMSwR9yA+5hb/ynq30N+Pdp9hkcDwlt/qm2ZA6VlW0adsS63/gEWO+zqY\n+auUGt5Nv3DOVz/Vn9yW6vZfU4XaILRtQsFat2ACxWtPcaHpHpTUIf3VJRQHB48m\nNrWL0DqEbKGXoADmVYs8kM5pRK2FsXuJKOKeY1QoUxh0m1tfw8OHwhyeYK0Y7q23\ncpLotWGw+N5Qq3PKhBP5MUVsdcn8ZblYGgSqpDTZbTOdxBgZa63CD0xUmt5ReDvh\nPVIalAjf22ZL9WlRrt1y+sxeu2cGlauPrvXlrZgkz2v1j7tEOjVSV9nZSBaG+fnB\nL2BUewJrBVwZuTonY4nKWuG6yJjbZ5JhUBhbb2kpGjFBaGTUr/LERP73FIAkVai7\nX0CZ3cu4Ggi/IfNxTGN/KX2z836ktVYBi9I6Jk5S4rB+XY0/XuU/v8PxK127asvc\nu2gbDjA2soYO7eO1cxiZWYtYJVkVhkAcTGyu6BTuNwlV+wLvzocX+p5j+IfDUdc5\nbVvO9wnBXAmeJQyaC6dL48wUNtUjG7e2oagT+LQ+45wkOSue4P2bM9spPwPnqBYR\nzJwIdIG5kG9uVo0n6tKz9H24KEYVd/zJDK/NArb8maJD7fc84yTr/+Ihrl7Du1FB\nXpG5cGWjAuG8VMcefer3Mo1FLzlcYQIDAQABo0UwQzAOBgNVHQ8BAf8EBAMCAQYw\nEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHQ4EFgQUjRX069nKQp1IoXNURiQAzaFV\nXBYwDQYJKoZIhvcNAQELBQADggIBAI77eRk9uhz8vsaM5lWFv9PvenZOibAJuKQd\ncivyI4Q6wmSZJsjzc8pf5ndwLyv1JdNENUSDoax+0Yem/dSUHy4ejuqG7IA8m4r9\nB0QNpvWN3W1SA97y7F4Cr0Al+PetskZVwxKR0jVthlf0VxAfe7KH06hWivVUelqP\nZIsipFxAfSAgIooW5yQli9Z5KuITYtFnvJs7Z6/qBbfZkdr7PCgi2zwSUAUBZduc\nRUdJlnlSg2zxmPxn7JVBXaO9MCTZdrv86sh2gM69mwlWOAtYPbBpETKOOLqQXVwH\nfUalbGSlLwuR4iZ76uTGSUt4861iGEBgecqg9fuU6ZnPD+M/Vwr1zFd6pheAMcDf\nWRKaUWYAnamqC17fz7PzeiAi6M71fbGrucYf78ErVThRbkOdw1C9ZesHbZNaV048\nwbmJr1oAtDSmWiUQGl2pwch5t/EwGgWhxXT/t8/52+P032QGkBhqQkxeWDHtMX3p\nhQHjkNvN5UtFcwm+FAQcaKWkDsX9kAzKwGAkaGWMeX2LjuIwgkqTRqSsHlRHPvnn\nFlGo19im6roN3BrjwDvCt7OuNnMYbGngfEuyFWtoo+HXQXotQ0Jz6/lRww31czis\nMvDvCKfo3LeaO8M2536Hc6bl9qORfUVCJqQwRQaLKwhua81WmjrYXtNkrz/BuWCS\nPTR05ZYW\n-----END CERTIFICATE-----\n"
+      }
+    },
+    "pkg": {
+      "ident": "chef/teams-service/0.1.0/20180215162042",
+      "origin": "chef",
+      "name": "teams-service",
+      "version": "0.1.0",
+      "release": "20180215162042",
+      "deps": [
+        {
+          "origin": "chef",
+          "name": "automate-postgresql",
+          "version": "9.6.3",
+          "release": "20180206180730"
+        },
+        {
+          "origin": "chef",
+          "name": "mlsa",
+          "version": "1.0.1",
+          "release": "20170915011238"
+        },
+        {
+          "origin": "core",
+          "name": "acl",
+          "version": "2.2.52",
+          "release": "20170513213108"
+        },
+        {
+          "origin": "core",
+          "name": "attr",
+          "version": "2.4.47",
+          "release": "20170513213059"
+        },
+        {
+          "origin": "core",
+          "name": "bash",
+          "version": "4.3.42",
+          "release": "20170513213519"
+        },
+        {
+          "origin": "core",
+          "name": "bzip2",
+          "version": "1.0.6",
+          "release": "20170513212938"
+        },
+        {
+          "origin": "core",
+          "name": "cacerts",
+          "version": "2017.09.20",
+          "release": "20171014212239"
+        },
+        {
+          "origin": "core",
+          "name": "coreutils",
+          "version": "8.25",
+          "release": "20170513213226"
+        },
+        {
+          "origin": "core",
+          "name": "db",
+          "version": "5.3.28",
+          "release": "20170513213734"
+        },
+        {
+          "origin": "core",
+          "name": "gcc-libs",
+          "version": "5.2.0",
+          "release": "20170513212920"
+        },
+        {
+          "origin": "core",
+          "name": "gdal",
+          "version": "2.2.1",
+          "release": "20171025112525"
+        },
+        {
+          "origin": "core",
+          "name": "gdbm",
+          "version": "1.11",
+          "release": "20170513213716"
+        },
+        {
+          "origin": "core",
+          "name": "geos",
+          "version": "3.6.2",
+          "release": "20171025112556"
+        },
+        {
+          "origin": "core",
+          "name": "glibc",
+          "version": "2.22",
+          "release": "20170513201042"
+        },
+        {
+          "origin": "core",
+          "name": "gmp",
+          "version": "6.1.0",
+          "release": "20170513202112"
+        },
+        {
+          "origin": "core",
+          "name": "less",
+          "version": "481",
+          "release": "20170513213936"
+        },
+        {
+          "origin": "core",
+          "name": "libcap",
+          "version": "2.24",
+          "release": "20170513213120"
+        },
+        {
+          "origin": "core",
+          "name": "libossp-uuid",
+          "version": "1.6.2",
+          "release": "20170514001348"
+        },
+        {
+          "origin": "core",
+          "name": "libxml2",
+          "version": "2.9.6",
+          "release": "20171025112053"
+        },
+        {
+          "origin": "core",
+          "name": "linux-headers",
+          "version": "4.3",
+          "release": "20170513200956"
+        },
+        {
+          "origin": "core",
+          "name": "ncurses",
+          "version": "6.0",
+          "release": "20170513213009"
+        },
+        {
+          "origin": "core",
+          "name": "openssl",
+          "version": "1.0.2l",
+          "release": "20171014213633"
+        },
+        {
+          "origin": "core",
+          "name": "pcre",
+          "version": "8.38",
+          "release": "20170513213423"
+        },
+        {
+          "origin": "core",
+          "name": "perl",
+          "version": "5.22.1",
+          "release": "20170513213942"
+        },
+        {
+          "origin": "core",
+          "name": "postgresql",
+          "version": "9.6.3",
+          "release": "20180122233153"
+        },
+        {
+          "origin": "core",
+          "name": "proj",
+          "version": "4.9.3",
+          "release": "20171025112633"
+        },
+        {
+          "origin": "core",
+          "name": "readline",
+          "version": "6.3.8",
+          "release": "20170513213506"
+        },
+        {
+          "origin": "core",
+          "name": "zlib",
+          "version": "1.2.8",
+          "release": "20170513201911"
+        }
+      ],
+      "env": {
+        "PATH": "/hab/pkgs/chef/teams-service/0.1.0/20180215162042/bin:/hab/pkgs/core/bash/4.3.42/20170513213519/bin:/hab/pkgs/core/ncurses/6.0/20170513213009/bin:/hab/pkgs/core/glibc/2.22/20170513201042/bin:/hab/pkgs/core/postgresql/9.6.3/20180122233153/bin:/hab/pkgs/core/gdal/2.2.1/20171025112525/bin:/hab/pkgs/core/proj/4.9.3/20171025112633/bin:/hab/pkgs/core/geos/3.6.2/20171025112556/bin:/hab/pkgs/core/libxml2/2.9.6/20171025112053/bin:/hab/pkgs/core/libossp-uuid/1.6.2/20170514001348/bin:/hab/pkgs/core/perl/5.22.1/20170513213942/bin:/hab/pkgs/core/openssl/1.0.2l/20171014213633/bin:/hab/pkgs/chef/mlsa/1.0.1/20170915011238/bin:/hab/pkgs/core/busybox-static/1.24.2/20170513215502/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      },
+      "exposes": [
+        "9093"
+      ],
+      "exports": {
+        "port": "service.port"
+      },
+      "path": "/hab/pkgs/chef/teams-service/0.1.0/20180215162042",
+      "svc_path": "/hab/svc/teams-service",
+      "svc_config_path": "/hab/svc/teams-service/config",
+      "svc_data_path": "/hab/svc/teams-service/data",
+      "svc_files_path": "/hab/svc/teams-service/files",
+      "svc_static_path": "/hab/svc/teams-service/static",
+      "svc_var_path": "/hab/svc/teams-service/var",
+      "svc_pid_file": "/hab/svc/teams-service/PID",
+      "svc_run": "/hab/svc/teams-service/run",
+      "svc_user": "hab",
+      "svc_group": "hab"
+    },
+    "sys": {
+      "version": "0.53.0/20180205214321",
+      "member_id": "83893c6114ea4b7cb3089b6b2b452400",
+      "ip": "10.0.2.15",
+      "hostname": "automate-deployment",
+      "gossip_ip": "0.0.0.0",
+      "gossip_port": 9638,
+      "http_gateway_ip": "0.0.0.0",
+      "http_gateway_port": 9631,
+      "permanent": false
+    },
+    "initialized": true,
+    "user_config_updated": false,
+    "health_check": "Unknown",
+    "last_election_status": "None",
+    "needs_reload": false,
+    "needs_reconfiguration": false,
+    "smoke_check": "Pending",
+    "binds": [
+      "automate-postgresql:automate-postgresql.default"
+    ],
+    "hooks": {
+      "health_check": null,
+      "init": null,
+      "file_updated": null,
+      "reload": null,
+      "reconfigure": null,
+      "suitability": null,
+      "run": {
+        "render_pair": "/hab/svc/teams-service/hooks/run",
+        "stdout_log_path": "/hab/svc/teams-service/logs/run.stdout.log",
+        "stderr_log_path": "/hab/svc/teams-service/logs/run.stderr.log"
+      },
+      "post_run": null,
+      "smoke_test": null,
+      "post_stop": null
+    },
+    "config_from": null,
+    "manager_fs_cfg": {
+      "butterfly_data_path": "/hab/sup/default/data/butterfly.dat",
+      "census_data_path": "/hab/sup/default/data/census.dat",
+      "services_data_path": "/hab/sup/default/data/services.dat",
+      "data_path": "/hab/sup/default/data",
+      "specs_path": "/hab/sup/default/specs",
+      "composites_path": "/hab/sup/default/composites",
+      "member_id_file": "/hab/sup/default/MEMBER_ID",
+      "proc_lock_file": "/hab/sup/default/LOCK"
+    },
+    "process": {
+      "pid": 31180,
+      "state": "Up",
+      "state_entered": 1518711694
+    },
+    "svc_encrypted_password": null,
+    "composite": null
+  }
+]

@@ -1,0 +1,121 @@
+chef-colors {
+  display: block;
+  padding: 1rem;
+
+  h3,
+  h4,
+  p {
+    display: block;
+    max-width: 40rem;
+    width: 100%;
+  }
+
+  .chef-card-item {
+    margin-bottom: 2rem;
+    background-color: chef-hsl(var(--chef-white));
+    border-radius: var(--chef-border-radius);
+    box-shadow: var(--chef-box-shadow);
+  }
+
+  .chef-color-swatch {
+    display: block;
+    height: 2rem;
+    width: 100%;
+    border-radius: var(--chef-border-radius)  var(--chef-border-radius) 0 0;
+  }
+
+  .chef-card-info {
+    padding: 1rem;
+
+    ul {
+      margin: 1rem 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      font-size: .75rem;
+      color: chef-hsl(var(--chef-dark-grey));
+    }
+
+    span {
+      font-size: .875rem;
+    }
+  }
+
+  //Primary colors
+  .chef-primary {
+    background-color: chef-hsl(var(--chef-primary));
+  }
+
+  .chef-primary-dark {
+    background-color: chef-hsl(var(--chef-primary-dark));
+  }
+
+  .chef-primary-bright {
+    background-color: chef-hsl(var(--chef-primary-bright));
+  }
+
+  .chef-primary-light {
+    background-color: chef-hsl(var(--chef-primary-light));
+  }
+
+  //Secondary colors
+  .chef-critical {
+    background-color: chef-hsl(var(--chef-critical));
+  }
+
+  .chef-major {
+    background-color: chef-hsl(var(--chef-major));
+  }
+
+  .chef-minor {
+    background-color: chef-hsl(var(--chef-minor));
+  }
+
+  .chef-success {
+    background-color: chef-hsl(var(--chef-success));
+  }
+
+  //Grayscale colors
+  .chef-dark-grey {
+    background-color: chef-hsl(var(--chef-dark-grey));
+  }
+
+  .chef-grey {
+    background-color: chef-hsl(var(--chef-grey));
+  }
+
+  .chef-light-grey {
+    background-color: chef-hsl(var(--chef-light-grey));
+  }
+
+  .chef-lightest-grey {
+    background-color: chef-hsl(var(--chef-lightest-grey));
+  }
+
+  .chef-white {
+    background-color: chef-hsl(var(--chef-white));
+  }
+
+  .chef-black {
+    background-color: chef-hsl(var(--chef-black));
+  }
+
+  //Font colors
+  .chef-text-base {
+    color: chef-hsl(var(--chef-primary-dark));
+  }
+
+  .chef-text-dull {
+    color: chef-hsl(var(--chef-dark-grey));
+  }
+
+  .chef-text-active {
+    color: chef-hsl(var(--chef-primary-bright));
+  }
+
+  .chef-text-contrast {
+    color: chef-hsl(var(--chef-white));
+  }
+}

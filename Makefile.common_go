@@ -1,0 +1,38 @@
+# Note: this looks weird -- it's because this Makefile is to be included from
+# components/xyz-service/Makefile
+REPOROOT?=../..
+
+LIBRARY_PATH = github.com/chef/automate/lib
+
+UNAME_S:=$(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+  PLATFORM:=linux-amd64
+endif
+ifeq ($(UNAME_S),Darwin)
+  PLATFORM:=darwin-amd64
+endif
+GOLANGCILINTVERSION?=1.15.0
+GOLANGCILINTTARBALL:=golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM).tar.gz
+
+LINTERARGS?=./...
+
+$(REPOROOT)/cache/$(GOLANGCILINTTARBALL):
+	curl -L https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCILINTVERSION)/$(GOLANGCILINTTARBALL) > $(REPOROOT)/cache/$(GOLANGCILINTTARBALL)
+
+$(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint: $(REPOROOT)/cache/$(GOLANGCILINTTARBALL)
+	tar zxf $(REPOROOT)/cache/$(GOLANGCILINTTARBALL) -C $(REPOROOT)/cache/
+	touch $(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint
+
+lint: $(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint
+	$(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint run -c $(REPOROOT)/.golangci.toml $(LINTERARGS)
+
+golang_version_check:
+	@$(REPOROOT)/scripts/golang_version_check.sh
+
+fmt:
+	@gofmt -w -l ./
+
+fmt-check:
+	@test -z $(shell gofmt -l ./cmd/ ./pkg/)
+
+.PHONY: lint fmt fmt-check golang_version_check

@@ -1,0 +1,11 @@
+vendor
+.secrets
+results
+main
+.idea
+src
+
+# Avoid adding the binary
+automate-gateway
+# But make sure to add the cmd/automate-gateway/ dir
+!automate-gateway/

@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run -p 11031:22 -d "u14-04-2:latest"

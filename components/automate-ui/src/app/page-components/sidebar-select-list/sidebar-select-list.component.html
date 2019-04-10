@@ -1,0 +1,27 @@
+<div class="select-list">
+  <div role="region">
+    <h4 class="title">Select below to filter nodes</h4>
+    <input #filterList tabindex="0"
+    (keyup.enter)="filterList.value"
+    placeholder="search {{label.toLowerCase()}}...">
+  </div>
+  <ul>
+    <li (click)="clearSelections($event)" class="pos-relative">
+      All Chef {{label}} ({{total}})
+      <chef-icon *ngIf="selectedItems.length === 0">check</chef-icon>
+    </li>
+
+    <li title="{{item}}"
+      *ngFor="let item of (allItems | selectListInput:filterList.value)"
+      (click)="updateSelection($event, item)"
+      class="pos-relative">
+      <app-select-list-item [item]="item" [filter]="filterList.value" tabindex="0"></app-select-list-item>
+      <chef-icon *ngIf="isSelected(item)">check</chef-icon>
+    </li>
+    <!-- TODO:eng-ex pull this logic into the .ts file, this
+         is wayyyy too complex for the markup. -->
+    <li *ngIf="(allItems | selectListInput:filterList.value)?.length === 0 && filterList.value.length > 0" class="not-found">
+      No results for "<b>{{filterList.value}}</b>"
+    </li>
+  </ul>
+</div>

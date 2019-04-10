@@ -1,0 +1,37 @@
+chef-sort-toggle {
+  display: inline-block;
+
+  chef-button {
+    margin: 0;
+
+    button {
+      padding: 0;
+      height: 32px;
+      flex-direction: column;
+    }
+
+    .asc-icon {
+      transform: translateY(4px);
+    }
+
+    .desc-icon {
+      transform: translateY(-4px);
+    }
+
+    .asc-icon,
+    .desc-icon {
+      &:first-child,
+      &:last-child {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1;
+        transition: opacity 0.4s;
+      }
+    }
+  }
+
+  &[order='asc'] .desc-icon,
+  &[order='desc'] .asc-icon {
+    opacity: 0;
+  }
+}

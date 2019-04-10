@@ -1,0 +1,10 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+{{#if cfg.backup.filesystem.path ~}}
+if [[ ! -d "{{cfg.backup.filesystem.path}}" ]]; then
+  mkdir -p "{{cfg.backup.filesystem.path}}"
+  chown hab:hab "{{cfg.backup.filesystem.path}}"
+fi
+{{/if ~}}

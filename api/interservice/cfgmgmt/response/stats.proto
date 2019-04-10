@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.response;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response";
+
+message RunsCounts {
+  int32 total = 1;
+  int32 success = 2;
+  int32 failure = 3;
+}
+
+message NodesCounts {
+  int32 total = 1;
+  int32 success = 2;
+  int32 failure = 3;
+  int32 missing = 4;
+}

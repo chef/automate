@@ -1,0 +1,155 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 19px 35px;
+  border-bottom: 1px solid $chef-grey;
+  background-color: $chef-white;
+}
+
+.history-heading {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.close-button {
+  margin: 0;
+}
+
+app-date-selector {
+  .date-selector .selector {
+    border: 1px solid $gray-shadow;
+  }
+}
+
+.filter-selectors {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: stretch;
+  padding: 15px 0 0 35px;
+
+  .selector {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 58px;
+    height: 60px;
+    border-color: $chef-grey;
+    border-radius: 4px;
+
+  }
+
+  .all {
+    color: $chef-primary-bright;
+    background-color: $chef-white;
+
+    &.active {
+      color: $chef-white;
+      background-color: $chef-primary-bright;
+    }
+  }
+
+  .failed {
+    color: $chef-critical;
+    background-color: $chef-white;
+
+    &.active {
+      color: $chef-white;
+      background-color: $chef-critical;
+    }
+  }
+
+  .successful, .passed {
+    color: $chef-primary-bright;
+    background-color: $chef-white;
+
+    &.active {
+      color: $chef-white;
+      background-color: $chef-primary-bright;
+    }
+  }
+
+  .skipped {
+    color: $chef-grey;
+
+    &:hover, &.active {
+      background-color: lighten($gray, 10%);
+    }
+  }
+}
+
+.history-item {
+  @include modal-box();
+  display: block;
+  margin-bottom: .25em;
+  margin-left: 1em;
+  padding: .5em;
+  position: relative;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all .2s;
+
+  &:hover {
+    margin-left: .75em;
+    margin-right: .25em;
+    transition: all .2s;
+  }
+
+  .arrow {
+    display: inline-block;
+    font-size: 1.5em;
+    left: -0.5em;
+    position: absolute;
+  }
+
+  .status {
+    display: inline-block;
+    font-size: .875em;
+    margin-right: .5em;
+    position: relative;
+
+    & > chef-icon {
+      position: relative;
+      top: 2px;
+    }
+  }
+
+  .date-time {
+    display: inline-block;
+    margin-left: 2.5em;
+    position: relative;
+    width: 80%;
+    color: $gray;
+    font-size: .625em;
+  }
+
+  .duration {
+    display: inline-block;
+    font-size: .75em;
+    font-style: italic;
+    position: relative;
+    width: 80%;
+  }
+
+  > div span {
+    position: absolute;
+    right: 0;
+  }
+}
+
+.no-runs-small {
+  @include empty-item();
+  border: 0;
+  list-style: none;
+  margin-top: 0;
+  padding: 2em;
+}
+
+.history-pagination {
+  margin-bottom: 1em;
+  justify-content: center;
+}

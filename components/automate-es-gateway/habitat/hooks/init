@@ -1,0 +1,35 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# *** WARNING ***
+# Please put potentially long-running and/or complex operations in the init hook rather
+# than the run hook until the issue described in
+#
+# https://github.com/habitat-sh/habitat/issues/1973
+#
+# has been resolved.
+# Currently, the Habitat `init` and `health_check` hooks run directly from the main loop
+# of the Habitat supervisor. If these hooks hang or take too long to run, they can block
+# execution of the supervisor.
+#
+
+for dir in logs tmp; do
+  mkdir -pv "{{pkg.svc_var_path}}/$dir"
+done
+
+for dir in ca cache cache-tmp tmp; do
+  mkdir -pv "{{pkg.svc_data_path}}/$dir"
+done
+
+chown -R hab:hab "{{pkg.svc_config_path}}" "{{pkg.svc_data_path}}" \
+  "{{pkg.svc_var_path}}"
+
+# This file is for openssl to put random bits into when doing key generation.
+export RANDFILE="{{pkg.svc_data_path}}/.rnd"
+touch $RANDFILE
+
+dhparam_file="{{pkg.svc_data_path}}/dhparams.pem"
+if [[ ! -f "$dhparam_file" ]]; then
+  openssl dhparam -dsaparam -out $dhparam_file 2048
+fi

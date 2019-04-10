@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS nodes
+  DROP COLUMN IF EXISTS source_id;

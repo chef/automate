@@ -1,0 +1,16 @@
+<svg:g [attr.transform]="'translate(' + x + ',' + y + ')'">
+  <svg:rect 
+  [attr.width]="width"
+  [attr.height]="'110'"
+  [attr.class]="className">
+  </svg:rect>
+
+  <svg:text
+    class="date-label"
+    [attr.x]="width/2"
+    [attr.alignment-baseline]="'middle'" 
+    [attr.text-anchor]="'middle'"
+    [attr.y]="126" >
+    <ng-content></ng-content>
+  </svg:text>
+</svg:g>

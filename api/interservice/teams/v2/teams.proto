@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+package chef.automate.domain.teams.v2;
+option go_package = "github.com/chef/automate/api/interservice/teams/v2";
+
+message Team {
+  string id = 1;
+  string name = 2;
+  repeated string projects = 3;
+}
+
+message GetTeamReq {
+  // TODO (tc): We can't make this more restrictive until we migrate
+  // existing IDs post-GA.
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
+}
+
+message GetTeamResp {
+  Team team = 1;
+}
+
+message GetTeamsReq {}
+
+message GetTeamsResp {
+  repeated Team teams = 1;
+}
+
+message UpdateTeamReq {
+  // TODO (tc): We can't make this more restrictive until we migrate
+  // existing IDs post-GA.
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
+  string name = 2 [(validate.rules).string.pattern = "\\S"];
+  repeated string projects = 3 [(validate.rules).repeated = {
+    unique: true,
+    items: {
+        string: {
+            pattern: "^[a-z0-9-]{1,64}$"
+        }
+    }
+   }];
+}
+
+message UpdateTeamResp {
+  Team team = 1;
+}
+
+message DeleteTeamReq {
+  // TODO (tc): We can't make this more restrictive until we migrate
+  // existing IDs post-GA.
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
+}
+
+message DeleteTeamResp {
+  Team team = 1;
+}
+
+message CreateTeamReq {
+  string id = 1 [(validate.rules).string.min_len = 1,
+                 (validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+  string name = 2 [(validate.rules).string.pattern = "\\S"];
+  repeated string projects = 3 [(validate.rules).repeated = {
+    unique: true,
+    items: {
+        string: {
+            pattern: "^[a-z0-9-]{1,64}$"
+        }
+    }
+   }];
+}
+
+message CreateTeamResp {
+  Team team = 1;
+}
+
+message AddTeamMembersReq {
+  // TODO (tc): We can't make this more restrictive until we migrate
+  // existing IDs post-GA.
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
+  // However, this regex works for V1 and V2 User IDs.
+  repeated string user_ids = 2 [(validate.rules).repeated = {
+    min_items: 1,
+    unique: true,
+    items: {
+        string: {
+            pattern: "^[[:alnum:]_.+@-]+$"
+        }
+    }
+   }];
+}
+
+message AddTeamMembersResp {
+  repeated string user_ids = 1;
+}
+
+message RemoveTeamMembersReq {
+  // TODO (tc): We can't make this more restrictive until we migrate
+  // existing IDs post-GA.
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
+  // However, this regex works for V1 and V2 User IDs.
+  repeated string user_ids = 2 [(validate.rules).repeated = {
+    unique: true,
+    min_items: 1,
+    items: {
+        string: {
+            pattern: "^[[:alnum:]_.+@-]+$"
+        }
+    }
+   }];
+}
+
+message RemoveTeamMembersResp {
+  repeated string user_ids = 1;
+}
+
+message GetTeamsForMemberReq {
+  string user_id = 1 [(validate.rules).string.pattern = "^[[:alnum:]_.+@-]+$"];
+}
+
+message GetTeamsForMemberResp {
+  repeated Team teams = 1;
+}
+
+message GetTeamMembershipReq {
+  // TODO (tc): We can't make this more restrictive until we migrate
+  // existing IDs post-GA.
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
+}
+
+message GetTeamMembershipResp {
+  repeated string user_ids = 1;
+}
+
+message UpgradeToV2Req { }
+
+message UpgradeToV2Resp { }
+
+service TeamsV2 {
+  rpc GetTeam (GetTeamReq) returns (GetTeamResp) {};
+  rpc GetTeams (GetTeamsReq) returns (GetTeamsResp) {};
+  rpc CreateTeam (CreateTeamReq) returns (CreateTeamResp) {};
+  rpc UpdateTeam (UpdateTeamReq) returns (UpdateTeamResp) {};
+  rpc DeleteTeam (DeleteTeamReq) returns (DeleteTeamResp) {};
+  rpc AddTeamMembers (AddTeamMembersReq) returns (AddTeamMembersResp) {};
+  rpc RemoveTeamMembers (RemoveTeamMembersReq) returns (RemoveTeamMembersResp) {};
+  rpc GetTeamsForMember (GetTeamsForMemberReq) returns (GetTeamsForMemberResp) {};
+  rpc GetTeamMembership (GetTeamMembershipReq) returns (GetTeamMembershipResp) {};
+  rpc UpgradeToV2 (UpgradeToV2Req) returns (UpgradeToV2Resp) {};
+}

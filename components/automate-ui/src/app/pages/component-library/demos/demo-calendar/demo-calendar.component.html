@@ -1,0 +1,192 @@
+<app-component-library-screen title="Button">
+
+  <app-cl-section>
+    <p><token>chef-calendar</token> is a relatively low level calendar implementation. It
+      doesn't keep track of its state and thus isn't really designed to be used directly
+      in the application. Instead it should be used as a building block for more complex
+      components; like a date picker for example.</p>
+    <p>That said, there is nothing that prevents you from using it directly in the app. If
+      it provides the necessary functionality then you should by all means utilize it. But
+      be aware that you are responsible for keeping track of the calendar's state.</p>
+    <p>Note: The calendar is built around the <a href="https://momentjs.com">moment js</a>
+      library. For more information on how moment handles things, make sure to read their
+      docs.</p>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Basic Examples</h3>
+
+    <div class="examples">
+
+      <p>The calendar is pretty simple. It just renders a calendar based on the input that is
+        provided. If no input is provided, then it renders a calendar representing the
+        current month.</p>
+
+      <code>&lt;chef-calendar&gt;&lt;/chef-calendar&gt;</code>
+      <chef-calendar></chef-calendar>
+
+      <p>To specify the month, use the <token>month</token> property. You can
+        use a month's full name, standard 3-character abbreviation, or a number.
+        But note, when using a number that months are zero-indexed; so January is 0, February
+        is 1, and so on.</p>
+
+      <code>&lt;chef-calendar <strong>month="September"</strong>&gt;&lt;/chef-calendar&gt;</code>
+      <chef-calendar month="September"></chef-calendar>
+
+      <p>You can specify the year with the <token>year</token> property.</p>
+
+      <code>&lt;chef-calendar month="September" <strong>year="2018"</strong>&gt;&lt;/chef-calendar&gt;</code>
+      <chef-calendar month="September" year="2018"></chef-calendar>
+
+      <p>To select a date use the <token>selected</token> property.</p>
+
+      <code>&lt;chef-calendar month="September" year="2018" <strong>selected="20"</strong>&gt;&lt;/chef-calendar&gt;</code>
+      <chef-calendar month="September" year="2018" selected="20"></chef-calendar>
+
+      <p>To save some typing, you can specify all three of the previous properties with <token>date</token>,
+        specified as a valid ISO formatted string. We use <a href="https://momentjs.com/docs/#/parsing/">moment</a> as
+        the underlying date parsing library, so read up on that if you are unfamiliar with the proper format. It's also important to
+        note that you should never use the <token>date</token> property in combination with <token>month</token>, <token>year</token>
+        or <token>selected</token>. Unexpected behavior is likely to occur.</p>
+
+      <code>&lt;chef-calendar <strong>date="2018-04-14"</strong>&gt;&lt;/chef-calendar&gt;</code>
+      <chef-calendar date="2018-04-14"></chef-calendar>
+
+    </div>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Controlling the calendar</h3>
+
+    <p>The calendar emits three different events: <token>onNextMonth</token>, <token>onPrevMonth</token>
+      and <token>onDaySelect</token>. <token>onNextMonth</token> and <token>onPrevMonth</token> are
+      called with an array containing the next or previous month's ordinal and year. Clicking <token>next month</token> when
+      the current month is March 2017 calls <token>onNextMonth</token> with '[3, 2017]' (Remember that
+      months are zero-indexed.) <token>onDaySelect</token> is called with the date that was clicked. By binding to
+      those outputs, and setting the proper inputs, you should have pretty complete control over the calendar.</p>
+
+    <p>The selected date is <strong>{{ date.format('dddd MMMM D, YYYY') }}</strong></p>
+
+    <div class="binding-example">
+        <chef-calendar
+          [date]="date.toISOString()"
+          (onNextMonth)="handleMonthClick($event)"
+          (onPrevMonth)="handleMonthClick($event)"
+          (onDaySelect)="handleDaySelect($event)">
+        </chef-calendar>
+
+        <chef-calendar
+          [date]="date.toISOString()"
+          (onNextMonth)="handleMonthClick($event)"
+          (onPrevMonth)="handleMonthClick($event)"
+          (onDaySelect)="handleDaySelect($event)">
+        </chef-calendar>
+    </div>
+
+    <div class="binding-example">
+      <div>
+        <h4>HTML</h4>
+        <code>
+          <pre>&lt;chef-calendar
+  [date]="date.toISOString()"
+  (onNextMonth)="handleMonthClick($event)"
+  (onPrevMonth)="handleMonthClick($event)"
+  (onDaySelect)="handleDaySelect($event)"&gt;
+&lt;/chef-calendar&gt;
+
+&lt;chef-calendar
+  [date]="date.toISOString()"
+  (onNextMonth)="handleMonthClick($event)"
+  (onPrevMonth)="handleMonthClick($event)"
+  (onDaySelect)="handleDaySelect($event)"&gt;
+&lt;/chef-calendar&gt;</pre>
+        </code>
+      </div>
+
+      <div>
+        <h4>TypeScript</h4>
+        <code>
+          <pre>
+import {{'{'}} Component {{'}'}} from '@angular/core';
+import * as moment from 'moment';
+
+@Component({{'{'}}
+  selector: 'app-demo-calendar',
+  templateUrl: './demo-calendar.component.html',
+  styleUrls: ['./demo-calendar.component.scss']
+{{'}'}})
+export class DemoCalendarComponent {{'{'}}
+
+  date = moment();
+
+  handleMonthClick([month, year]) {{'{'}}
+    this.date.month(month);
+    this.date.year(year);
+  {{'}'}}
+
+  handleDaySelect(day) {{'{'}}
+    this.date.date(day);
+  {{'}'}}
+{{'}'}}
+          </pre>
+        </code>
+      </div>
+    </div>
+
+
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>API</h3>
+    The <token>&lt;chef-calendar&gt;</token> element has no child content.
+
+    <app-cl-api>
+      <api-prop name="month" type="String | Number">
+        Sets the calendar month.
+      </api-prop>
+
+      <api-prop name="year" type="Number">
+        Sets the calendar year.
+      </api-prop>
+
+      <api-prop name="selected" type="Number">
+        Sets the selected date.
+      </api-prop>
+
+      <api-prop name="date" type="ISO Formatted Date String">
+        Sets the month, year and selected date. Note: This property should not be used with <token>month</token>, <token>year</token> or <token>selected</token>.
+      </api-prop>
+
+      <api-prop name="onNextMonth" type="Function([number, number]):void">
+        Emits when the <token>next month</token> button is clicked. Called with an array containing the month ordinal and year for the next month.
+      </api-prop>
+
+      <api-prop name="onPrevMonth" type="Function([number, number]):void">
+        Emits when the <token>previous month</token> button is clicked. Called with an array containing the month ordinal and year for the previous month.
+      </api-prop>
+
+      <api-prop name="onDaySelect" type="Function(number):void">
+        Emits when a day is selected. Called with the date of the day selected.
+      </api-prop>
+    </app-cl-api>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Accessibility</h3>
+
+    This component does not inherently support accessibility.
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Browser Compatibility</h3>
+
+    <ul>
+      <li>Chrome 61 - OK</li>
+      <li>Firefox 52 - OK</li>
+      <li>Safari 11 - OK</li>
+      <li>Edge 40 - OK</li>
+      <li>IE 11 - OK</li>
+    </ul>
+  </app-cl-section>
+
+</app-component-library-screen>

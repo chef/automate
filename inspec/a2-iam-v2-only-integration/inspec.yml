@@ -1,0 +1,13 @@
+name: a2-iam-v2-only-integration
+title: InSpec Automate Integration Profile for IAM v2 (removing all legacy policies)
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: engineering@chef.io
+license: All Rights Reserved
+summary: An InSpec profile for integration testing the IAM v2 authz behaviour without legacy policies
+version: 0.1.0
+depends:
+  - name: a2-api-smoke
+    path: ../a2-api-smoke
+  - name: a2-resource-pack
+    path: ../a2-resource-pack

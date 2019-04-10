@@ -1,0 +1,15 @@
+results/
+node_modules
+docs/api.html
+docs/api_docs.go
+debug
+src
+vendor
+.secrets
+bin
+.bash_history
+
+# Avoid adding the binary
+config-mgmt-service
+# But make sure to add the cmd/config-mgmt-service/ dir
+!config-mgmt-service/

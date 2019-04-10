@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "root_api_url": {
+            "type": "string",
+            "required": true
+        },
+        "user_id": {
+            "type": "string",
+            "required": true
+        },
+        "password": {
+            "type": "string",
+            "required": false
+        }
+    }
+}

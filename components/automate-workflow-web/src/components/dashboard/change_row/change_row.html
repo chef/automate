@@ -1,0 +1,86 @@
+<div class="item change-item" ng-class="change.stage_status">
+  <div class="metadata">
+    <div class="name">
+      <a ui-sref="main.enterprise.organizations.organization.project.change({ org: change.org, project: change.project, change: change.id })">
+        {{ change.title }}
+      </a>
+    </div>
+    <div>
+      <time datetime="{{ change.submitted_at }}">
+        {{ change.submitted_at | moment:'ll h:mm A' }}
+      </time> by
+      <span class="submitter">{{ change.submitter }}</span>
+      &bull;
+      <a ui-sref="main.enterprise.organizations.organization.project.change.review({ org: change.org, project: change.project, change: change.id })">
+        Review
+      </a>
+    </div>
+    <div class="org-project">
+      <span>{{ change.org }}</span> /
+      <span>{{ change.project }}</span>
+    </div>
+  </div>
+  <div class="stage-status">
+    <div class="stage">
+      <div bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ titleForStage('verify') }}">
+        <div class="status-icon" ng-class="classNamePrior('verify', approvable())"></div>
+      </div>
+    </div>
+    <div class="stage">
+      <div bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ approved() ? 'Approved by ' + change.approved_by : 'Ready to approve' }}">
+        <div
+          class="progress status-icon"
+          ng-if="approved()"></div>
+        <div
+          class="status-icon"
+          ng-class="className('verify')"
+          ng-if="approvable()"></div>
+        <div class="participant" ng-if="approved()">
+          <div>{{ change.approved_by }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="stage">
+      <div bs-tooltip data-delay="800" data-placement="left" data-title="{{ titleForStage('build') }}">
+        <div class="status-icon" ng-class="classNamePrior('build')"></div>
+      </div>
+    </div>
+    <div class="stage">
+      <div bs-tooltip data-delay="800" data-placement="left" data-title="{{ titleForStage('acceptance') }}">
+          <div class="status-icon" ng-class="classNamePrior('acceptance', deliverable())"></div>
+      </div>
+    </div>
+    <div class="stage">
+      <div bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ delivered() ? 'Delivered by ' + change.delivered_by : 'Ready to deliver' }}">
+        <div
+          class="progress status-icon"
+          ng-if="delivered()"></div>
+        <div
+          class="status-icon"
+          ng-class="className('acceptance')"
+          ng-if="deliverable()"></div>
+        <div class="participant" ng-if="delivered()">
+          <div>{{ change.delivered_by }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="stage">
+      <div bs-tooltip data-delay="800" data-placement="left" data-title="{{ titleForStage('union') }}">
+          <div class="status-icon" ng-class="classNamePrior('union')"></div>
+      </div>
+    </div>
+    <div class="stage">
+      <div bs-tooltip data-delay="800" data-placement="left" data-title="{{ titleForStage('rehearsal') }}">
+          <div class="status-icon" ng-class="classNamePrior('rehearsal')"></div>
+      </div>
+    </div>
+    <div class="stage">
+      <div bs-tooltip data-delay="800" data-placement="left" data-title="{{ titleForStage('delivered') }}">
+        <div class="status-icon" ng-class="deliveredClass()"></div>
+      </div>
+    </div>
+  </div>
+</div>

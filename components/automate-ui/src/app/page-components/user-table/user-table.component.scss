@@ -1,0 +1,13 @@
+chef-table {
+  .name-column {
+    flex-basis: 30%;
+  }
+
+  .username-column {
+    flex-basis: 70%;
+  }
+
+  .garbage-column {
+    justify-content: flex-end;
+  }
+}

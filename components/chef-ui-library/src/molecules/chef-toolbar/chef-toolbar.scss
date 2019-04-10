@@ -1,0 +1,10 @@
+chef-toolbar {
+  chef-button {
+    margin-top: 0;
+
+    &:first-child {
+      margin-top: 0;
+      margin-left: 0;
+    }
+  }
+}

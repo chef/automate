@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request";
+
+message GetTeamsReq {}
+
+message GetTeamReq {
+    string id = 1;
+}
+
+message CreateTeamReq {
+    string id = 1;
+    string name = 2;
+    repeated string projects = 3;
+}
+
+message UpdateTeamReq {
+    string id = 1;
+    string name = 2;
+    repeated string projects = 3;
+}
+
+message DeleteTeamReq {
+    string id = 1;
+}
+
+message AddTeamMembersReq {
+    string id = 1;
+    repeated string user_ids = 2;
+}
+
+message GetTeamMembershipReq {
+    string id = 1;
+}
+
+message RemoveTeamMembersReq {
+    string id = 1;
+    repeated string user_ids = 2;
+}
+
+message GetTeamsForMemberReq {
+    string id = 1;
+}
+
+message ApplyV2DataMigrationsReq { }

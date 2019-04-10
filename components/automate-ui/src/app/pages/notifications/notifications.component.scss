@@ -1,0 +1,180 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+// This is temporary until we can hide the whole page
+.permission-denied-banner {
+  position: fixed;
+  top: $navigation-height;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($chef-white, 0.85);
+  z-index: 190;
+  padding-top: 38vh;
+  text-align: center;
+  font-weight: bold;
+
+  & > p {
+    margin: 0;
+    line-height: 1.6;
+    color: $chef-dark-grey;
+  }
+}
+
+.notifications-container {
+  margin-left: 200px;
+  margin-top: 80px;
+}
+
+.filter-button chef-button {
+  margin-left: 0;
+}
+
+#notifications-list {
+  font-size: 0.9em;
+
+  chef-icon.sort-icon.material-icons {
+    cursor: pointer;
+
+    &::after {
+      @extend .material-icons;
+      display: flex;
+      margin-top: -11px;
+      content: 'arrow_drop_down';
+      flex-wrap: wrap;
+    }
+  }
+
+  img {
+    width: 20px;
+    height: 20px;
+    margin-right: 1em;
+  }
+
+  chef-td:last-child {
+    justify-content: flex-end;
+  }
+}
+
+chef-icon#sort-desc {
+  color: $chef-primary-dark;
+
+  &::after {
+    color: $chef-dark-grey;
+  }
+}
+
+chef-icon#sort-asc {
+  color: $chef-dark-grey;
+
+  &::after {
+    color: $chef-primary-dark;
+  }
+}
+
+.actions {
+  padding: 8px 1em;
+
+  chef-button[icon] {
+    min-height: 32px;
+    font-size: 18px;
+    line-height: 32px;
+
+    chef-icon {
+      vertical-align: -3px;
+    }
+  }
+}
+
+#notifications-cards {
+  display: flex;
+  flex-wrap: wrap;
+
+  .card {
+    width: 375px;
+    height: 155px;
+    border-radius: $global-radius;
+    background-color: $chef-white;
+    margin-right: 16px;
+    margin-bottom: 16px;
+
+    &.new-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px dotted $chef-dark-grey;
+      background-color: $chef-lightest-grey;
+
+      span {
+        margin-bottom: 1em;
+        color: $chef-primary-bright;
+      }
+    }
+
+    .card-body {
+      padding-left: 16px;
+
+      dt, dd {
+        display: inline-block;
+        margin: 0;
+      }
+
+      dt {
+        width: 30%;
+        font-weight: bold;
+        font-size: 12pt;
+        color: $chef-dark-grey;
+      }
+
+      dd {
+        width: 65%;
+        padding-left: 16px;
+        font-size: 12pt;
+      }
+    }
+
+    .card-header {
+      display: flex;
+      border-bottom: 1px solid $chef-light-grey;
+      height: 60px;
+
+      .card-header-left {
+        display: flex;
+        align-items: center;
+        width: 60px;
+        border-right: 1px solid $chef-light-grey;
+
+        img {
+          display: block;
+          margin: auto;
+        }
+      }
+
+      .card-header-right {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin-right: 8px;
+
+        .card-name {
+          margin-left: 16px;
+          margin-right: 16px;
+          width: 100%;
+          font-weight: bold;
+          font-size: 12pt;
+        }
+
+        button {
+          margin: 0;
+
+          &[label="delete"] {
+            chef-icon {
+              color: $chef-critical;
+            }
+          }
+        }
+      }
+    }
+  }
+}

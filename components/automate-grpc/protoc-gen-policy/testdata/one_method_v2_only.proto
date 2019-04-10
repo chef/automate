@@ -1,0 +1,17 @@
+syntax = "proto3";
+package chef.automate.domain.one_method;
+option go_package = "github.com/chef/automate/components/mock-service/mock";
+
+import "google/api/annotations.proto";
+import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+
+message Foo {
+  string bar = 1;
+}
+message Bar {}
+service Mock {
+  rpc MockMethod (Foo) returns (Bar) {
+    option (chef.automate.api.iam.policy).resource = "mockvtwo:foo:{bar}";
+    option (chef.automate.api.iam.policy).action = "action:vtwo:verb";
+  };
+}

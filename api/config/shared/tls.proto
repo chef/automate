@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package chef.automate.infra.config;
+option go_package = "github.com/chef/automate/api/config/shared";
+
+message TLSCredentials {
+	string root_cert_contents = 1;
+	string key_contents = 2;
+	string cert_contents = 3;
+}
+
+message FrontendTLSCredential {
+	string server_name = 1;
+	string cert = 2; // contents
+	string cert_path = 3;
+	string key = 4; //contents
+	string key_path = 5;
+}
+

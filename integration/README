@@ -1,0 +1,122 @@
+# A2 Integration Test Framework
+
+The A2 integration test framework allows you to write tests against full A2 
+stack under different scenarios, such as A1 migration, upgrades from a 
+previous A2, backup/restore, etc.
+
+## Running
+To run a test, run the following from the A2 root folder outside the studio: 
+
+```bash
+HAB_ORIGIN=yourorigin ./integration/run_test ./integration/tests/testname.sh
+```
+
+## Test specifications
+Tests are written in bash. All tests will inherit integration/base.sh by default.
+The test framework allows certain callbacks to be defined in a test, and certain 
+variables may be set to change default behaviors. Below, some of the common ones
+are listed. Read base.sh for more details.
+
+Constants:
+- test_build_slug: Randomizes your container name
+- test_container_name: The name the test framework gave your container
+
+Variables:
+- test_name: [required] Set this to the name of your test
+- test_upgrades: [optional, default=false] Set this to true if your test requires
+                 upgrading from a previous version of A2.
+- test_backup_restore: [optional, default=false] Set this to true if your test requires backup/restore.
+                       Only one of test_upgrades and test_backup_restore is supported at a time. If you 
+                       need more, make it work.
+- test_loadbalancer_url: [optional, default="https://localhost"] The A2 https loadbalancer url
+- test_deploy_inspec_profiles: [optional, default=()] A list of inspec profiles to run after deploy
+- test_upgrade_inspec_profiles: [optional, default=()] A list of inspec profiles to run after upgrade
+- test_skip_diagnostics: [optional, default=false] Set to true if you do not wish for the diagnostics
+                         tests to be run
+- test_config_path: The location of the config
+- test_external_services: External services required to run this test. See the External Services section.
+
+Callbacks:
+- do_setup(): Do any setup you need prior to having A2 installed
+- do_build(): Build the harts for your change. In CI, this step only downloads because the changes are
+              built in another build step in the pipeline.
+- do_create_config(): Initialize the config. At the end of this step, the config should be written to
+                      $test_config_path
+- do_prepare_deploy(): This step runs right before deploying A2. For upgrades, the default implementation
+                       will lay down the dev deployment manifest and move out the changes, to be put back
+                       in place in the upgrade step.
+- do_deploy(): Deploys A2
+- do_test_deploy(): Runs tests after deploy. Uses the test_deploy_inspec_profiles and test_skip_diagnostics
+                    variables. to figure out what to run in the default implementation.
+- do_upgrade(): Moves the changes back into place and waits for A2 to finish upgrading.
+- do_test_upgrade(): Runs tests after upgrade. Uses the test_upgrade_inspec_profiles and test_skip_diagnostics
+                     variables. to figure out what to run in the default implementation.
+- do_backup(): Create a backup of A2
+- do_prepare_restore(): Prepare A2 for restore. The default implementation brings down A2 and deletes stuff
+- do_restore(): Restore A2. The id for the backup is stored in test_backup_id
+- do_test_restore(): Runs tests post restore. Default implementation only deals with diagnostics
+
+## External Services
+The ability to run external services was introduced in https://github.com/chef/automate/pull/5103.
+
+To add an external service, add a folder with the service name (no spaces) to `integration/services`.
+For example, `integration/services/elasticsearch`. In the folder for the service, create a shell 
+script called `init` with 2 functions: `service_name_setup` and `service_name_teardown`, where 
+`service_name` should be replaced with the service name. For example, in the elasticsearch case,
+they would be `elasticsearch_setup` and `elasticsearch_teardown`. This init file will be sourced 
+into the `run_test` script and the functions called if a test defines it as a dependency through 
+the `test_external_services` array. For example, a test might look like this:
+
+```bash
+test_name="product"
+test_deploy_inspec_profiles=(a2-deploy-integration)
+test_external_services=(
+  elasticsearch
+)
+
+do_prepare_config() {
+...
+}
+```
+
+The `_setup` function is responsible for setting up containers. There are a few helper functions provided
+for that. `service_container_name container_name` appends the `test_build_slug` variable to the container
+name, ensuring that multiple tests can run without interfering with each other. The `docker_run` function
+wraps `docker run` to setup the correct volumes, environment variables, etc.
+
+The `_setup` function can share config with the test container by writing a file in the service config
+path. For convention, services should use the `service_config_path service_name` function which will namespace
+the directory. `service_config_path` will create a folder `$SERVICES_CONFIG_PATH/service_name`.
+`$SERVICES_CONFIG_PATH` gets mounted at `/services` in the test container. As en example,
+the elasticsearch config could write out the toml required to start an external elasticsearch in A2. 
+The test container would append this file to its generated toml.
+
+An example init file:
+
+```bash
+
+SERVICE_A_DIR=$(dirname ${BASH_SOURCE[0]})
+
+service_a_container1=$(service_container_name "service_a_1")
+service_a_container2=$(service_container_name "service_a_2")
+service_a_config=$(service_config_path "service_a")
+
+service_a_setup() {
+    mkdir -p $(dirname $service_a_config)
+    docker_run $service_a_container1
+    docker cp "$SERVICE_A_DIR/setup.sh" "${service_a_container1}:/setup.sh"
+    docker exec $service_a_container1 /setup.sh
+    log_info "Launched $service_a_container1 with ip $(container_ip $service_a_container1)"
+    docker_run $service_a_container2
+    log_info "Launched $service_a_container2 with ip $(container_ip $service_a_container2)"
+    cat <<DOC > $service_a_config
+hello
+DOC
+
+}
+
+service_a_teardown() {
+    docker stop "$service_a_container1"
+    docker stop "$service_a_container2"
+}
+```

@@ -1,0 +1,9 @@
+<div class="approve-confirmation-modal">
+  <p>Are you sure you want to approve this change? After approval this change will be merged to {{ change.target }}.</p>
+  <cd-modal-buttons>
+    <button class="button cta" ng-click="doApprove(change)">
+      Confirm
+    </button>
+    <button class="button secondary" ng-click="closeModal()">Cancel</button>
+  </cd-modal-buttons>
+</div>

@@ -1,0 +1,14 @@
+.no-cards {
+  background-color: $white;
+  padding: 20px 70px;
+  margin-bottom: 10px;
+  @include clearfix();
+
+  .cta {
+    .add-card {
+      display: inline-block;
+      float: left;
+      margin-right: 20px;
+    }
+  }
+}

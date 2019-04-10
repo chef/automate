@@ -1,0 +1,23 @@
+<dl class="severity">
+  <dt class="severity-item-total">{{ data.critical | number }}</dt>
+  <dd class="severity-item-label">
+    <span class="severity-item-status critical">
+      <span class="severity-item-status-bar" [ngStyle]="styleForStatus(data.critical)"></span>
+    </span>
+    <span class="severity-item-label-text">Critical Failures</span>
+  </dd>
+  <dt class="severity-item-total">{{ data.major | number }}</dt>
+  <dd class="severity-item-label">
+    <span class="severity-item-status major">
+      <span class="severity-item-status-bar" [ngStyle]="styleForStatus(data.major)"></span>
+    </span>
+    <span class="severity-item-label-text">Major Failures</span>
+  </dd>
+  <dt class="severity-item-total">{{ data.minor | number }}</dt>
+  <dd class="severity-item-label">
+    <span class="severity-item-status minor">
+      <span class="severity-item-status-bar" [ngStyle]="styleForStatus(data.minor)"></span>
+    </span>
+    <span class="severity-item-label-text">Minor Failures</span>
+  </dd>
+</dl>

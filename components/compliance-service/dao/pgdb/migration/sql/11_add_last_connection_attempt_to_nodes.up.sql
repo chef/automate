@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS nodes
+  ADD COLUMN IF NOT EXISTS last_connection_attempt timestamp DEFAULT '0001-01-01T00:00:00Z00:00';

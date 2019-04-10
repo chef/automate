@@ -1,0 +1,54 @@
+chef-combobox {
+  display: inline-block;
+}
+
+chef-combobox > div {
+  display: grid;
+  grid-template-columns: auto 5fr;
+  grid-auto-flow: column;
+  justify-content: start;
+
+  chef-select {
+    grid-column-start: 1;
+    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
+    border-right-color: transparent;
+    background-color: chef-hsl(var(--chef-lightest-grey));
+  }
+
+  chef-input {
+    grid-column-start: 2;
+  }
+
+  & > * {
+    grid-column-start: 3;
+  }
+
+  chef-input {
+    border-radius: 0;
+  }
+
+  chef-input:first-of-type {
+    border-radius: var(--chef-border-radius);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  chef-input:first-of-type:last-of-type {
+    border-radius: var(--chef-border-radius);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  chef-input ~ chef-input {
+    border-top-color: transparent;
+  }
+
+  chef-input:last-of-type {
+    border-radius: var(--chef-border-radius);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+}

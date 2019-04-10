@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "Validate the filter JSON sent by clients to filter Viz data.",
+
+  "properties": {
+    "filter": { "$ref": "base#/definitions/must_should_filter" },
+    "group_by": {
+			"enum": [ "status" ]
+    },
+    "range": { "$ref": "base#/definitions/range_without_interval" }
+  }
+}

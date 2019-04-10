@@ -1,0 +1,30 @@
+<div class="deliver-confirmation-modal">
+  <h4>
+    The following changelog for
+    <a ui-sref="main.enterprise.organizations.organization.project">{{ project.name }}</a>
+    will be shipped to Union:
+  </h4>
+  <ol class="changelog-list">
+    <li class="changelog-item" ng-repeat="item in changelog">
+      <div class="item">
+        <div class="item-title">
+          <a ui-sref="main.enterprise.organizations.organization.project.change({ change: item.id })">
+            {{ item.title }}</a>
+          <span>{{ item.feature_branch }}</span>
+        </div>
+        <div
+          ng-if="item.description"
+          class="item-description"
+          cd-markdown="item.description">
+        </div>
+        <div class="item-approved-by">Approved by: {{ item.approved_by }}</div>
+      </div>
+    </li>
+  </ol>
+  <cd-modal-buttons>
+    <button class="button cta" ng-click="doDeliver(change)">
+      Confirm
+    </button>
+    <button class="button secondary" ng-click="closeModal()">Cancel</button>
+  </cd-modal-buttons>
+</div>

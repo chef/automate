@@ -1,0 +1,94 @@
+<app-admin-sidebar>
+</app-admin-sidebar>
+
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/settings/teams']">Teams</chef-breadcrumb>
+      {{ team?.id }}
+    </chef-breadcrumbs>
+
+    <chef-page-header>
+      <div class="flex-container">
+        <ng-container *ngIf="!editMode">
+          <div class="heading-container">
+            <chef-heading>{{team?.id}}</chef-heading>
+            <chef-subheading>{{team?.name}}</chef-subheading>
+          </div>
+          <div class="edit-container">
+              <!-- TODO (ms) Once the chef-button bug that allows enter to fire click
+              event on disabled buttons is fixed, this can be written as one button
+              with `[disabled]="teamMembershipView"`. -->
+            <chef-button secondary (click)="setEditMode(true)" *ngIf="!teamMembershipView">
+              <span>Edit</span>
+            </chef-button>
+            <chef-button primary disabled *ngIf="teamMembershipView">
+              <span>Edit</span>
+            </chef-button>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="editMode">
+          <div class="form-container">
+            <form [formGroup]="editForm">
+              <chef-heading>{{team?.id}}</chef-heading>
+              <chef-form-field id="edit-name">
+                <label>
+                  <span class="label">Team {{ versionedDescOrName | titlecase }}</span>
+                  <chef-input ngDefaultControl formControlName="teamName" type="text"></chef-input>
+                </label>
+                <chef-error *ngIf="(editForm.get('teamName').hasError('required') || editForm.get('teamName').hasError('pattern')) && editForm.get('teamName').dirty">
+                  A non-blank team {{ versionedDescOrName }} is required
+                </chef-error>
+              </chef-form-field>
+            </form>
+          </div>
+          <div class="button-container">
+            <ng-container>
+              <!-- TODO (tc) Once the chef-button bug that allows enter to fire click
+              event on disabled buttons is fixed, this can be written as one button
+              with `[disabled]="!this.editForm.valid"`. -->
+              <chef-button class="save-button" primary (click)="updateTeam()" *ngIf="this.editForm.valid">
+                <span>Save</span>
+              </chef-button>
+              <chef-button class="save-button" primary disabled *ngIf="!this.editForm.valid">
+                <span>Save</span>
+              </chef-button>
+              <chef-button tertiary (click)="setEditMode(false)">Cancel</chef-button>
+            </ng-container>
+          </div>
+        </ng-container>
+      </div>
+      <chef-tab-selector> <!-- (change)="onSelectedTab($event)"> -->
+        <chef-option value='users'>Users</chef-option>
+        <!-- Uncomment when we implement policies
+        <chef-option value='policies'>Policies</chef-option>
+        -->
+      </chef-tab-selector>
+    </chef-page-header>
+    <section class="page-body" *ngIf="team?.id">
+      <div id="users-list">
+        <div *ngIf="!teamMembershipView">
+          <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
+          since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
+          <app-user-table
+            [addButtonText]="addButtonText"
+            [removeText]="removeText"
+            [users$]="sortedUsers$"
+            [addButtonEnabled]="!editMode"
+            [baseUrl]="'/auth/users/' + team.id"
+            [overridePermissionsCheck]=true
+            (addClicked)="toggleUserMembershipView()"
+            (removeClicked)="removeUser($event)">
+          </app-user-table>
+        </div>
+        <div *ngIf="teamMembershipView">
+          <app-user-team-membership-table
+            [usersToFilter]="sortedUsers$"
+            (addClicked)="addUsers($event)"
+            (cancelClicked)="toggleUserMembershipView()">
+          </app-user-team-membership-table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

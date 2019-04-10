@@ -1,0 +1,55 @@
+<div class="sidebar-view">
+  <nav class="sidebar">
+    <ul>
+      <li>
+        <a href="/client-runs">
+          <i class="fa fa-chevron-left"></i>
+          <span class="text">Back to Client Runs</span>
+        </a>
+      </li>
+      <li>
+        <a ui-sref="main.enterprise.dashboard"
+           ui-sref-active="active">
+          <i class="fa fa-tachometer"></i>
+          <span class="text">Dashboard</span>
+          <i class="fa fa-caret-right"></i>
+        </a>
+      </li>
+      <li>
+        <a ui-sref="main.enterprise.organizations"
+           ui-sref-active="active">
+          <i class="fa fa-folder"></i>
+          <span class="text">Workflow Orgs</span>
+          <i class="fa fa-caret-right"></i>
+        </a>
+      </li>
+      <li>
+        <a ui-sref="main.enterprise.searches"
+           ui-sref-active="active">
+           <i class="fa fa-binoculars"></i>
+           <span class="text">Default Search</span>
+           <i class="fa fa-caret-right"></i>
+        </a>
+      </li>
+      <li>
+        <a ui-sref="main.enterprise.runners"
+           ui-sref-active="active">
+           <i class="fa fa-cogs"></i>
+           <span class="text">Runners</span>
+           <i class="fa fa-caret-right"></i>
+        </a>
+      </li>
+      <li>
+        <a ui-sref="main.enterprise.audit"
+           ui-sref-active="active">
+           <i class="fa fa-book"></i>
+           <span class="text">Audit Log</span>
+           <i class="fa fa-caret-right"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <div class="content">
+    <div ui-view="tabbed"></div>
+  </div>
+</div>

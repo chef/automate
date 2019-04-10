@@ -1,0 +1,6 @@
+syntax = "proto3";
+package chef.automate.domain.no_services;
+option go_package = "github.com/chef/automate/components/mock-service/mock";
+message Foo {
+  string bar = 1;
+}

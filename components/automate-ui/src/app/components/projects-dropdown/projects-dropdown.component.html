@@ -1,0 +1,32 @@
+<label>
+  Projects <span *ngIf="required">*</span>
+</label>
+<div class="dropdown-wrap">
+  <button class="dropdown-button"
+    aria-label="Select projects"
+    (click)="toggleDropdown($event)"
+    [ngClass]="{'active': active}"
+    [disabled]="disabled"
+    (keydown.arrowup)="moveFocus($event)"
+    (keydown.arrowdown)="moveFocus($event)">
+    Select projects... <chef-icon aria-hidden>keyboard_arrow_down</chef-icon>
+  </button>
+  <chef-click-outside omit="column-dropdown-toggle" (clickOutside)="closeColumnDropdown()">
+    <chef-dropdown [attr.visible]="active">
+      <chef-checkbox
+        *ngFor="let project of projects; index as i"
+        [checked]="project.enabled"
+        (change)="updateProjects($event.detail, i)"
+        (keydown.enter)="closeColumnDropdown()"
+        (keydown.esc)="closeColumnDropdown()"
+        (keydown.arrowup)="moveFocus($event)"
+        (keydown.arrowdown)="moveFocus($event)">{{ project['name'] }}</chef-checkbox>
+      <div class="error" *ngIf="showError">
+        At least one item must be selected.
+      </div>
+    </chef-dropdown>
+  </chef-click-outside>
+</div>
+<p class="help-text light">
+  Projects group resources together for role-based access.
+</p>

@@ -1,0 +1,35 @@
+[service]
+host = "localhost"
+port = 14001
+feed_interval = "5m"
+
+[tls]
+cert_path = "../../dev/certs/data-feed-service.crt"
+key_path = "../../dev/certs/data-feed-service.key"
+root_ca_path = "../../dev/certs/Chef_Automate_Dev.crt"
+
+[log]
+format = "text"
+level = "debug"
+
+[notifications]
+{{~#eachAlive bind.notifications-service.members as |notifications-service|}}
+{{~#if @last}}
+target = "{{notifications-service.cfg.host}}:{{notifications-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+
+[secrets]
+{{~#eachAlive bind.secrets-service.members as |secrets-service|}}
+{{~#if @last}}
+target = "{{secrets-service.cfg.host}}:{{secrets-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+[cfgmgmt]
+{{~#eachAlive bind.config-mgmt-service.members as |config-mgmt-service|}}
+{{~#if @last}}
+target = "{{config-mgmt-service.cfg.host}}:{{config-mgmt-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}

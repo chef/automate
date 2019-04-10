@@ -1,0 +1,59 @@
+@import "~styles/variables";
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+.detail-row {
+  display: flex;
+  color: $chef-primary-dark;
+}
+
+thead {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: $chef-primary-dark;
+}
+
+th {
+  text-align: left;
+  padding: 0px;
+}
+
+tbody > .detail-row {
+  padding-top: 0px;
+  padding-bottom: 15px;
+}
+
+.header-column {
+  padding-top: 0px;
+  padding-left: 0px;
+  width: 33%;
+}
+
+chef-tab-selector {
+  chef-option {
+    margin-right: 16px;
+    color: $chef-primary-dark;
+  }
+}
+
+chef-form-field {
+  width: 240px;
+}
+
+section {
+  chef-button {
+    margin-left: 0;
+
+    chef-loading-spinner {
+      position: relative;
+      top: 2px;
+      margin-right: 5px;
+    }
+  }
+
+  form {
+    margin-bottom: 24px;
+  }
+}

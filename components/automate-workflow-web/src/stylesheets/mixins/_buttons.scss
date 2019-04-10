@@ -1,0 +1,477 @@
+$button-base: lighten($storm, 5%) !default;
+$button-color: $chef-blue-dark !default;
+$button-font-size: .875rem !default;
+$button-background-color: $button-base !default;
+$button-border-radius: $global-radius !default;
+$button-border-width: 1px !default;
+$button-padding: 1em 2.5em !default;
+
+$tab-border-color: lighten($button-base, 45%) !default;
+
+@mixin button($border-radius: $button-border-radius,
+              $disabled-background-color: $greydisabled,
+              $disabled-color: $gray-light) {
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  cursor: pointer;
+  border-radius: $border-radius;
+  transition-property: color, background-color, border-color;
+  transition-duration: .15s;
+
+  span {
+    vertical-align: middle;
+  }
+
+  .badge {
+    border-radius: $border-radius;
+  }
+
+  &.disabled, &[disabled] {
+    background-color: transparent;
+    border: 1px solid $disabled-color;
+    color: $disabled-color;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@mixin button-size($font-size: $button-font-size,
+    $padding: $button-padding) {
+
+  font-size: $font-size;
+  padding: $padding;
+}
+
+@mixin button-skin($color: $white,
+    $background-color: $button-background-color,
+    $border-color: $background-color,
+    $hover-color: $button-color,
+    $hover-background-color: lighten($background-color, 3%),
+    $hover-border-color: lighten($border-color, 2%),
+    $active-color: lighten($color, 2%),
+    $active-background-color: lighten($background-color, 2%),
+    $active-border-color: lighten($border-color, 2%),
+    $text-transform: uppercase,
+    $letter-spacing: normal,
+    $line-height: 1em,
+    $font-weight: 400,
+    $perspective: false,
+    $shadowed: false) {
+
+  color: $color;
+  font-weight: $font-weight;
+  text-decoration: none;
+  background-color: $background-color;
+  border: $button-border-width solid $border-color;
+  text-transform: $text-transform;
+  letter-spacing: $letter-spacing;
+  line-height: $line-height;
+
+  &:hover {
+    color: $hover-color;
+    background-color: $hover-background-color;
+    border-color: $hover-border-color;
+  }
+
+  &:active {
+    color: $active-color;
+    background-color: $active-background-color;
+    border-color: $active-border-color;
+  }
+
+  &.active {
+    background-color: $active-background-color;
+    border-color: $active-border-color;
+
+    &:hover {
+      cursor: default;
+    }
+  }
+
+  .badge {
+    background-color: lighten($color, 12%);
+    color: $background-color;
+    font-size: 0.8em;
+    font-weight: normal;
+    padding: 2px 6px;
+    margin-left: 4px;
+  }
+
+  @if $perspective {
+    $edge: darken($border-color, 10%);
+
+    border-bottom: 2px solid $edge;
+
+    &:hover {
+      border-bottom-color: lighten($edge, 10%);
+    }
+
+    &:active {
+      border-bottom-color: lighten($edge, 5%);
+    }
+
+    &.disabled, &[disabled] {
+      border: $button-border-width solid $border-color;
+    }
+  }
+
+  @if $shadowed {
+    text-shadow: 0 1px 1px darken($border-color, 25%);
+  }
+}
+
+.button, .tab {
+  @include button;
+  @include button-size;
+  @include button-skin;
+
+  &.tiny {
+    @include button-size($font-size: 10px, $padding: 6px);
+  }
+
+  &.small {
+    @include button-size($font-size: 12px, $padding: 8px);
+  }
+
+  &.large {
+    @include button-size($font-size: 16px, $padding: 14px);
+  }
+
+  &.primary {
+    @include button(
+      $disabled-background-color: $white,
+      $disabled-color: $grey3
+    );
+    @include button-skin(
+      $color: $chef-orange,
+      $background-color: transparent,
+      $border-color: $chef-orange,
+      $hover-color: $white,
+      $hover-background-color: $chef-orange,
+      $hover-border-color: $chef-orange);
+  }
+
+  &.secondary {
+    @include button(
+      $disabled-background-color: transparent,
+      $disabled-color: $gray-light
+    );
+    @include button-skin(
+      $color: $bluedarkest,
+      $background-color: $white,
+      $border-color: $bluedarkest,
+      $hover-color: $white,
+      $hover-background-color: $bluegrey,
+      $hover-border-color: $bluegrey);
+  }
+
+  &.tertiary {
+    @include button(
+      $disabled-background-color: $greydisabled,
+      $disabled-color: $grey3
+    );
+    @include button-skin(
+      $color: $bluegrey,
+      $background-color: $greydisabled,
+      $border-color: $greydisabled,
+      $hover-color: $bluegrey,
+      $hover-background-color: $bluelightest,
+      $hover-border-color: $bluelightest
+    );
+  }
+
+  &.destroy {
+    @include button-skin(
+      $color: $redlight,
+      $background-color: $white,
+      $border-color: $redlight,
+      $hover-color: $white,
+      $hover-background-color: $redlight,
+      $hover-border-color: $redlight,
+      $active-color: $white,
+      $active-background-color: lighten($alertred, 5%),
+      $active-border-color: lighten($alertred, 5%));
+  }
+
+  &.navigation {
+    @include button-skin(
+      $color: $gray-less-pale,
+      $background-color: lighten($midnight, 10%),
+      $hover-color: $white,
+      $hover-background-color: lighten($midnight, 15%),
+      $hover-border-color: lighten($midnight, 15%),
+      $active-background-color: lighten($midnight, 12%),
+      $active-border-color: lighten($midnight, 12%));
+
+    margin: 8px 12px;
+  }
+
+  &.approve {
+    @include button-skin(
+      $background-color: $happygreen,
+      $border-color: $happygreen,
+      $color: $white,
+      $hover-background-color: $happygreenlight,
+      $hover-border-color: $happygreenlight,
+      $hover-color: $white,
+      $perspective: false,
+      $shadowed: false);
+
+    padding-left: 40px;
+    background-image: url(../images/go-button.svg);
+    background-position: 16px 15px;
+    background-repeat: no-repeat;
+
+    svg {
+      opacity: 0.9;
+    }
+
+    &:hover {
+      svg {
+        opacity: 1;
+      }
+    }
+  }
+
+  &.deliver {
+    @include button-skin(
+      $background-color: $chef-blue,
+      $border-color: $chef-blue,
+      $color: $white,
+      $hover-background-color: $bluelight,
+      $hover-border-color: $bluelight,
+      $hover-color: $white,
+      $perspective: false,
+      $shadowed: false);
+
+    position: relative;
+    padding-left: 40px;
+    background-image: url(../images/deliver-button.svg);
+    background-position: 16px 15px;
+    background-repeat: no-repeat;
+  }
+
+  &.caution {
+    @include button-skin(
+      $background-color: $yellow,
+      $border-color: $yellow,
+      $color: $white,
+      $hover-background-color: $yellowlight,
+      $hover-border-color: $yellowlight,
+      $perspective: false,
+      $shadowed: false);
+
+    position: relative;
+    padding-left: 40px;
+    background-image: url(../images/caution-button.svg);
+    background-position: 16px 15px;
+    background-repeat: no-repeat;
+
+    &.deliver {
+      svg {
+        fill: #fff;
+      }
+    }
+  }
+
+  i {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    width: 1em;
+    height: 1em;
+    margin-right: .5rem;
+
+    svg {
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+  }
+
+  &.square {
+    width: 2.2em;
+    height: 2.2em;
+    padding: 0;
+    border-width: 0px;
+    background-color: $greydisabled;
+
+    &:hover {
+      color: $bluedarkest;
+      background-color: $greydisabled;
+      border-color: $greydisabled;
+    }
+
+    i {
+      margin-right: 0;
+      margin-bottom: 1px;
+      margin-left: 1px;
+    }
+
+    span {
+      display: block;
+      font-size: 10px;
+      text-align: center;
+      white-space: nowrap;
+      margin: 4px 0 0 0;
+    }
+
+    &.captioned {
+      width: 46px;
+      height: 46px;
+    }
+  }
+
+  &.square + span.label {
+      height: 2.2em;
+      line-height: 2.2em;
+      padding-right: 10px;
+  }
+}
+
+.button {
+  @include button(
+    $disabled-background-color: $grey3,
+    $disabled-color: $gray-light
+  );
+  @include button-skin(
+      $background-color: $bluedarkest,
+      $hover-color: $white,
+      $hover-background-color: $bluegrey,
+      $hover-border-color: $bluegrey
+  );
+}
+
+.button-bar {
+  overflow: auto;
+
+  .button {
+    float: left;
+    margin: 0;
+    padding: .75rem 2rem;
+    text-transform: none;
+    border: 0;
+    letter-spacing: normal;
+    color: $white;
+    font-size: .875rem;
+    border-radius: 0;
+
+    &:first-child {
+      border-radius: $global-radius 0 0 $global-radius;
+    }
+
+    &:last-child {
+      border-radius: 0 $global-radius $global-radius 0;
+    }
+
+    &.active {
+      background-color: $chef-orange;
+    }
+
+    &.secondary {
+      background-color: $gray-less-pale;
+      color: $chef-blue;
+
+      &.disabled, &[disabled]  {
+        color: $grey4;
+        background-color: $lightgray;
+        border-width: 1px;
+      }
+
+      &.active {
+        background-color: $chef-blue;
+        color: $white;
+
+        &:hover {
+          background-color: $chef-blue-light;
+        }
+      }
+
+      &:hover {
+        background-color: $bluelightest;
+      }
+    }
+  }
+}
+
+.tabs {
+  position: relative;
+
+  .tab {
+    color: $button-base;
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 0;
+    position: relative;
+    display: inline-block;
+    margin: 0 0 -1px 0;
+    z-index: 2;
+
+    &:hover:not(.active) {
+      color: lighten($button-base, 15%);
+    }
+
+    &.active {
+      background-color: $white;
+      border-color: $tab-border-color;
+      border-bottom-color: $white;
+    }
+
+    &.disabled, &[disabled] {
+      background-color: transparent;
+      border-color: transparent;
+      color: $button-base;
+    }
+
+    .badge {
+      background-color: darken($gray-less-pale, 8%);
+      color: $button-base;
+    }
+  }
+}
+
+.tab-content {
+  position: relative;
+  z-index: 1;
+  border: 1px solid $tab-border-color;
+  border-bottom-width: 2px;
+  padding: 1rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.automate-ui {
+
+  .tabs {
+    font-size: .875rem;
+
+    .tab {
+      margin: 0 2em 0 0;
+      border: none;
+      padding: 0 0 1em;
+      border-bottom: 2px solid $white;
+      text-transform: capitalize;
+
+      &.active {
+        border-bottom: 2px solid $chef-blue;
+
+        &:hover {
+          border-color: $chef-blue;
+        }
+      }
+
+      &:hover {
+        border-bottom: 2px solid $gray-pale;
+      }
+    }
+  }
+
+  .tab-content {
+    border: none;
+  }
+}

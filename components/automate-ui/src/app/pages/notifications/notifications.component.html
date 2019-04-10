@@ -1,0 +1,60 @@
+<div *ngIf="permissionDenied" class="permission-denied-banner">
+  <p>You do not have permission to view everything on this page.</p>
+  <p>Please contact an administrator for permission.</p>
+</div>
+
+<app-admin-sidebar></app-admin-sidebar>
+<div class="container">
+  <main>
+    <chef-page-header [contrasting-background]="false">
+      <chef-heading>Notifications</chef-heading>
+      <chef-subheading>Notifications for Inspec compliance scans and Chef client runs.</chef-subheading>
+    </chef-page-header>
+
+    <div class="page-body">
+      <chef-alert type="error" *ngIf="errorLoading">There was an error loading notifications.</chef-alert>
+
+      <chef-toolbar>
+        <app-authorized [anyOf]="['/notifications/rules', 'post']">
+          <chef-button primary [routerLink]="['/settings/notifications/form']">Create Notification</chef-button>
+        </app-authorized>
+      </chef-toolbar>
+      <chef-table id="notifications-list">
+        <chef-tr>
+          <chef-th class="sort" (click)="toggleSort('node_name')">
+            <div class="text-and-sort-icons">
+              <span>Notification Name</span>
+              <chef-icon aria-hidden="true" id="{{sortIcon('node_name')}}" class="sort-icon">arrow_drop_up</chef-icon>
+            </div>
+          </chef-th>
+          <chef-th>Alert Type</chef-th>
+          <chef-th aria-hidden="true"></chef-th>
+        </chef-tr>
+
+        <chef-tr tabindex="0" *ngFor="let rule of rules$ | async |
+          slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
+          <chef-td class="{{rule.targetType}}">
+            <img src="assets/img/logo-{{rule.targetType}}.svg" alt="{{rule.targetType}} logo" />
+            <a [routerLink]="['/settings/notifications/form', rule.id]">{{ rule.name }}</a>
+          </chef-td>
+          <chef-td>
+            {{rule.AlertTypeLabels[rule.ruleType]}}
+          </chef-td>
+          <chef-td class="actions">
+            <chef-control-menu>
+              <chef-option (click)="deleteRule(rule)">Delete Notification</chef-option>
+            </chef-control-menu>
+          </chef-td>
+        </chef-tr>
+      </chef-table>
+
+      <app-page-picker
+        [total]="(rules$ | async)?.length"
+        [perPage]="pageSize"
+        [page]="currentPage"
+        (pageChanged)="currentPage = $event">
+      </app-page-picker>
+
+    </div><!--page-body-->
+  </main>
+</div><!--notifications-container-->

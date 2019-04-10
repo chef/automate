@@ -1,0 +1,30 @@
+# If we have a config pointing to an specific host,
+# lets use it, otherwise use the ipaddress of the server
+{{~#if cfg.service.host}}
+host = "{{cfg.service.host}}"
+{{else~}}
+host = "{{sys.ip}}"
+{{~/if}}
+port = "{{cfg.service.port}}"
+log_level = "{{cfg.log.level}}"
+
+# Listen to what our gossip protocol whispers
+#
+# We have modified our plan to have a hard dependency to
+# elasticsearch, that will ensure that we will always start
+# our service with the required bindings
+#
+# Elasticsearch
+{{~#eachAlive bind.automate-es-gateway.members as |member|}}
+backend = "elasticsearch"
+{{~#if member.cfg.http-host}}
+elasticsearch-url = "http://{{member.sys.ip}}:{{member.cfg.http-port}}"
+{{else}}
+elasticsearch-url = "http://127.0.0.1:{{member.cfg.http-port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"

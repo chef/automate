@@ -1,0 +1,172 @@
+#{$all-text-inputs},
+select,
+textarea {
+  display: block;
+  margin: 0;
+  padding: .5rem;
+  width: 100%;
+  border: 1px solid $gray-pale;
+  background-color: $white;
+  color: $chef-blue-dark;
+  outline: none;
+  font-size: .875rem;
+
+  &:focus {
+    border: 1px solid $grayblue;
+  }
+
+  @include placeholder-text($grey3, inherit);
+}
+
+select,
+textarea {
+  min-height: 150px;
+}
+
+.select-menu {
+  border: 1px solid $gray-pale;
+  width: 100%;
+  max-width: 400px;
+  text-align: left;
+  color: $bluegrey;
+  background-color: $white;
+  font-size: .875rem;
+  padding: .5rem;
+  position: relative;
+
+  .fa {
+    position: absolute;
+    right: .5rem;
+    line-height: 1.25rem;
+  }
+}
+
+.dropdown-menu {
+  margin: -1px 0 0;
+  padding: 0;
+  border: 1px solid $gray-pale;
+  width: 100%;
+  max-width: 400px;
+  text-align: left;
+  color: $chef-blue-dark;
+  background-color: $white;
+  font-size: .875rem;
+  position: absolute;
+  z-index: 100;
+
+  .active {
+    background-color: $gray-pale;
+  }
+
+  a {
+    display: block;
+    padding: .5rem;
+    color: $chef-blue-dark;
+
+    &:hover {
+      background-color: $gray-less-pale;
+    }
+  }
+}
+
+fieldset {
+  margin: 1em 0;
+}
+
+legend {
+  background: $hoopblue;
+  color: $darkgrayblue;
+  border-top: 1px solid darken($hoopblue, 3%);
+  border-bottom: 1px solid darken($hoopblue, 3%);
+  padding: 10px;
+  margin: 0;
+  display: block;
+  width: 100%;
+  position: relative;
+  top: 20px;
+
+  small {
+    color: $grayblue;
+  }
+}
+
+.little-title {
+  color: $bluegrey;
+  font-size: 10px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.required-indicator {
+  color: $cheforange;
+  font-weight: bold;
+}
+
+.field {
+  margin: 0 0 .5rem;
+  position: relative;
+
+  label {
+    cursor: pointer;
+
+    &.small {
+      font-size: .75rem;
+      font-weight: normal;
+      color: $bluegrey;
+      float: right;
+    }
+  }
+
+  input[type='checkbox'] {
+    cursor: pointer;
+  }
+
+  input, textarea {
+    &.disabled,
+    &[disabled],
+    &.readonly,
+    &[readonly]  {
+     color: $darkgray;
+     background-color: $gray-less-pale;
+    }
+  }
+
+  .required-indicator {
+    display: block;
+    position: absolute;
+    left: -12px;
+    top: 20px;
+  }
+
+  .field-message {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+  }
+
+  &.invalid {
+
+    #{$all-text-inputs},
+    textarea {
+      border-color: $chef-red;
+    }
+
+    .field-message {
+      color: $chef-red;
+    }
+  }
+}
+
+.checkbox-list {
+  div {
+    font-size: 12px;
+    color: $bluegrey;
+    font-weight: normal;
+    margin-bottom: 10px;
+  }
+}
+
+button {
+  outline: none;
+}

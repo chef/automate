@@ -1,0 +1,18 @@
+{
+  "id": "a0cc02a0-0c86-4d9c-84bb-165643d1357a",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "testing",
+  "entity_type": "organization",
+  "task": "create",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-03-27T18:42:25Z",
+  "remote_request_id": "fe61ed3d-2b3a-4104-a368-340803085ffc",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAEqAEOwAAIAAAAA",
+  "requestor_name": "pivotal",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Manage/11.16.2 (ruby-2.3.5-p376; ohai-7.4.1; x86_64-linux; +http://opscode.com)",
+  "data": "{\"clientname\":\"testing-validator\",\"uri\":\"https://localhost/organizations/testing\"}"
+}

@@ -1,0 +1,7 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+source {{pkg.svc_path}}/hooks/reconfigure
+
+exec haproxy -f {{pkg.svc_config_path}}/haproxy.conf -db

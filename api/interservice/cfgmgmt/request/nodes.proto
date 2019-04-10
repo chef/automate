@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
+
+import "google/protobuf/timestamp.proto";
+import "api/interservice/cfgmgmt/request/parameters.proto";
+
+message NodeRun {
+  string node_id = 1;
+  string run_id = 2;
+  google.protobuf.Timestamp end_time = 3;
+}
+
+message Nodes {
+  repeated string filter = 1;
+  Pagination pagination = 2;
+  Sorting sorting = 3;
+}
+
+message Node {
+  string node_id = 1;
+}
+
+message Runs {
+  string node_id = 1;
+  repeated string filter = 2;
+  Pagination pagination = 3;
+  // TODO: (@afiune) Should we standardize these parameters as well?
+  string start = 4;
+  string end = 5;
+}

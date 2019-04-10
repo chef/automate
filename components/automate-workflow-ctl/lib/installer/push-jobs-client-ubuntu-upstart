@@ -1,0 +1,13 @@
+# push-jobs-client - the Chef Push Jobs client
+#
+# push-jobs-client is here!
+
+description	"Chef Push Jobs Client"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+
+exec env PATH=/opt/chefdk/bin:/opt/chefdk/embedded/bin:$PATH /opt/chefdk/bin/pushy-client -l info -c /etc/chef/push-jobs-client.rb > /var/log/push-jobs-client/current 2>&1
+

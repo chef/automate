@@ -1,0 +1,121 @@
+$white: #FFF;
+$black: #000;
+// Chef Automate primary brand colors
+$chef-blue-dark: #3F5364;
+$chef-orange: #F18B21;
+// Chef Automate secondary colors
+$chef-blue: #3897D3;
+$chef-blue-medium: #3883B3;
+$chef-blue-light: #57ABE0;
+$chef-yellow: #F5A623;
+$chef-purple: #9013FE;
+$chef-green: #1FB899;
+$chef-red: #E27C79;
+// Chef Automate grayscale colors
+$gray-pale: #E6EBEE;
+$gray-less-pale: #F3F6F8;
+$gray-light: #B4B8BB;
+$gray-shadow: $gray-pale;
+$gray-highlight: $gray-less-pale;
+$gray: #9DA3A7;
+$gray7: #878B8E;
+
+// Grays
+$lightlightgray: #e3e3e3;
+$lightgray: #dadde0;
+$darkgray: #4a4a4a;
+$textgray: #a2a2a2;
+$greydisabled: #f3f3f3;
+$grey3: #c4c4c4;
+$grey4: #acacac;
+$grey5: #d8d8d8;
+$grey6: #dddddd;
+$grey7: #888888;
+$grey8: #e1e1e1;
+$gray-light: #b4b8bb;
+
+// Oranges
+$tangerine: #f38b00;
+$cheforange: #f38b00;
+$shadoworange: #aa6218;
+$overorange: #d67b1c;
+$uporange: #e3821e;
+
+// Blues
+$storm: #4a5969;
+$dusk: #5F7287;
+$midnight: darken($dusk, 16%);
+$hoopblue: #e2ecf8;
+$lightblue: #83bae0;
+$iceblue: #4c97c6;
+$lightgrayblue: #c1d0de;
+$grayblue: #90a2b4;
+$darkgrayblue: #4a5969;
+$mediumgrayblue: #3f5364;
+$darkblue: #212c35;
+$regalblue: #456a8d;
+$linkblue: #4c97c6;
+$chefblue: #6bb2e2;
+$chefblueshadow: #509ACC;
+$bluegrey: #677c8b;
+$bluelink: #53759d;
+$bluechef: #3f5364;
+$bluedarkest: #163850;
+$bluehover: #4a90e2;
+$bluelightest: #e5e8ee;
+$bluelight: lighten($chef-blue, 2%);
+
+// Greens
+$tealgreen: #5cb7ab;
+$darkteal: #3d7b75;
+$successmint: #e0efd8;
+$successgreen: $chef-green;
+$forest: #58B957;
+$happygreen: $chef-green;
+$happygreenlight: lighten($chef-green, 2%);
+
+// Reds
+$alertpink: #f0ddde;
+$alertred: $chef-red;
+$redlight: #e27c79;
+
+// Misc
+$cautionyellow: #FDCC14;
+$tooltipbg: rgba(0, 0, 0, 0.8);
+$stage-background-color: $gray-less-pale !default;
+$external-link-color: #4a90e2;
+$external-link-hover-color: darken($external-link-color, 10%);
+$darktext: #3e4346;
+$yellow: #fdb714;
+$yellowlight: #fcd06a;
+
+$status-colors: (
+  running: $chef-blue-dark,
+  failed: $chef-red,
+  passed: $chef-green,
+  caution: $chef-yellow,
+  skipped: $gray,
+  idle: $gray,
+  running-urd: $chef-blue
+);
+
+@mixin status-props($status, $inverse: false) {
+  $color: map-get($status-colors, $status);
+
+  @if $inverse {
+    background-color: $color;
+    color: $white;
+  }
+  @else {
+    color: $color;
+  }
+}
+
+// gradients
+%primary-gradient {
+  background: $chef-orange;
+  background: -moz-linear-gradient(left, rgba(255, 125, 76, 1) 0%, rgba(241, 139, 33, 1) 100%);
+  background: -webkit-linear-gradient(left, rgba(255, 125, 76, 1) 0%, rgba(241, 139, 33, 1) 100%);
+  background: -o-linear-gradient(left, rgba(255, 125, 76, 1) 0%, rgba(241, 139, 33, 1) 100%);
+  background: linear-gradient(to right, rgba(255, 125, 76, 1) 0%, rgba(241, 139, 33, 1) 100%);
+}

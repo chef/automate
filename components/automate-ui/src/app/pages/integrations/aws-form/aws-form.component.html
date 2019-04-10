@@ -1,0 +1,28 @@
+<ng-container [formGroup]="formGroup">
+
+  <label class="form-field">
+    <span class="label">Service Type</span>
+    <chef-toggle ngDefaultControl formControlName="service_type">
+      <chef-option value="aws-api">API</chef-option>
+      <chef-option value="aws-ec2">EC2</chef-option>
+    </chef-toggle>
+  </label>
+
+  <label class="form-field credential-toggle">
+    <span class="label">Read my credentials from my EC2 environment.</span>
+    <input type="checkbox" formControlName="no_creds">
+  </label>
+
+  <ng-container *ngIf="showInstanceCreds()" [formGroup]="formGroup.controls.credentials">
+    <label class="form-field">
+      <span class="label">Enter your AWS access key ID</span>
+      <chef-input ngDefaultControl type="password" formControlName="aws_access_key_id"></chef-input>
+    </label>
+
+    <label class="form-field">
+      <span class="label">Enter your AWS secret access key</span>
+      <chef-input ngDefaultControl type="password" formControlName="aws_secret_access_key"></chef-input>
+    </label>
+  </ng-container>
+
+</ng-container>

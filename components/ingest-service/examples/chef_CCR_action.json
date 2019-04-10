@@ -1,0 +1,23 @@
+{
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "organization_name": "chef",
+  "service_hostname": "chef-server.chef.co",
+  "recorded_at": "2018-01-30T14:42:44Z",
+  "remote_hostname": "10.194.12.215",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAIksQbkAAIAAAAA",
+  "requestor_name": "chefdk-debian-7-tester-2d206b",
+  "requestor_type": "client",
+  "user_agent": "Chef Client/12.21.3 (ruby-2.3.1-p112; ohai-8.24.0; x86_64-linux; +https://chef.io)",
+  "id": "action-id",
+  "run_id": "run-id",
+  "task": "update",
+  "entity_type": "node",
+  "entity_name": "chefdk-debian-7-tester-2d206b",
+  "remote_request_id": "8a64e85c-7ffb-4db3-a02e-1074d8aab25b",
+  "data": {
+    "name": "chefdk-debian-7-tester-2d206b",
+    "chef_environment": "manhattan",
+    "json_class": "Chef::Node"
+  }
+}

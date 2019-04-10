@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Helper methods specific for the license-control-service
+
+document "test_license_control_service" <<DOC
+  Lint, vet and test the license control service
+DOC
+function test_license_control_service {
+  install_if_missing core/curl curl;
+  install_if_missing core/go go;
+  setup_go_workspace
+  pushd /hab/cache/src/go/src/github.com/chef/automate/components/license-control-service >/dev/null;
+  make setup review test;
+}
+
+document "telemetry_status" <<DOC
+  Reports on the state of telemetry (enabled/disabled) along with other assorted meta-data.
+DOC
+function telemetry_status() {
+  install_if_missing core/jq-static jq
+  gateway_get /telemetry/config | jq
+}
+
+document "remove_dev_license" <<DOC
+  This removes the dev-license that is usually applied when running
+  'chef-automate dev deployinate'.
+
+  It removes the license file on disk then kills the running license-control-service
+  so that it'll come back up and find its license gone.
+
+  This command is meant to be used for verifying changes related to the trial
+  license lockout and license apply modals.
+DOC
+function remove_dev_license {
+  install_if_missing core/procps-ng pkill
+  rm /hab/svc/license-control-service/data/license_token.jwt && pkill -f license-control-service
+}

@@ -1,0 +1,13 @@
+{
+  "version": "2",
+  "build_cookbook": {
+    "name": "build_cookbook",
+    "path": ".delivery/build_cookbook"
+  },
+  "skip_phases": ["publish", "provision", "functional", "deploy", "smoke"],
+  "job_dispatch": {
+    "version": "v2"
+  },
+  "build_nodes": {},
+  "dependencies": []
+}

@@ -1,0 +1,14 @@
+chef-layout {
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  grid-template-rows: 70px auto;
+  grid-template-areas:
+  "header header"
+  "aside  main";
+  height: 100vh;
+
+  // Styles for IE fallback of CSS Grids
+  display: -ms-grid;
+  -ms-grid-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  -ms-grid-rows: 70px auto auto;
+}

@@ -1,0 +1,14 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+# *** WARNING ***
+# Please put potentially long-running and/or complex operations in the init hook rather
+# than the run hook until the issue described in
+#
+# https://github.com/habitat-sh/habitat/issues/1973
+#
+# has been resolved.
+# Currently, the Habitat `init` and `health_check` hooks run directly from the main loop
+# of the Habitat supervisor. If these hooks hang or take too long to run, they can block
+# execution of the supervisor.
+#
+

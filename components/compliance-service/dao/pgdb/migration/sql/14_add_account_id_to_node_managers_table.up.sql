@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS node_managers
+  ADD COLUMN IF NOT EXISTS account_id TEXT;

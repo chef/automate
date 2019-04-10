@@ -1,0 +1,25 @@
+---
+issuer-url: https://{{cfg.service.external_fqdn}}/dex
+{{~#eachAlive bind.automate-dex.members as |automate-dex|}}
+  {{~#if @last}}
+dex-url: https://{{automate-dex.sys.ip}}:{{automate-dex.cfg.port}}
+  {{~/if}}
+{{~/eachAlive}}
+redirect-url: {{ cfg.oidc.redirect_url }}
+client-id: {{ cfg.oidc.client_id }}
+client-secret: {{ cfg.oidc.client_secret }}
+http-port: {{ cfg.service.port }}
+http-listen: {{ cfg.service.host }}
+signin-url: {{ cfg.service.signin_url }}
+bldr-signin-url: {{ cfg.service.bldr_signin_url }}
+bldr-client-id: {{ cfg.service.bldr_client_id }}
+bldr-client-secret: {{ cfg.service.bldr_client_secret }}
+log-level: {{ cfg.logger.level }}
+log-format: {{ cfg.logger.format }}
+database: {{ cfg.storage.database }}
+migrations-path: {{ pkg.svc_static_path }}/migrations
+
+tls:
+  cert_path: {{pkg.svc_config_path}}/service.crt
+  key_path: {{pkg.svc_config_path}}/service.key
+  root_ca_path: {{pkg.svc_config_path}}/root_ca.crt

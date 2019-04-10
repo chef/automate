@@ -1,0 +1,6680 @@
+{
+  "chef_server_fqdn": "chef-server.chef.co",
+  "entity_uuid": "82760210-4686-497e-b039-efca78dee64b",
+  "expanded_run_list": {
+    "id": "manhattan",
+    "run_list": [
+      {
+        "type": "recipe",
+        "name": "opscode-ci::slave",
+        "version": null,
+        "skipped": false
+      }
+    ]
+  },
+  "id": "639844f4-2ce6-42ba-8c9d-853db69adff3",
+  "message_version": "1.1.0",
+  "message_type": "run_converge",
+  "node": {
+    "name": "chefdk-debian-7-tester-2d206b",
+    "chef_environment": "manhattan",
+    "json_class": "Chef::Node",
+    "automatic": {
+      "policy_revision": "policy_revision1",
+      "languages": {
+        "perl": {
+          "version": "5.14.2",
+          "archname": "x86_64-linux-gnu-thread-multi"
+        },
+        "java": {
+          "version": "1.7.0_131",
+          "hotspot": {
+            "name": "OpenJDK 64-Bit Server VM",
+            "build": "24.131-b00, mixed mode"
+          }
+        },
+        "ruby": {
+          "platform": "x86_64-linux",
+          "version": "2.3.1",
+          "release_date": "2016-04-26",
+          "target": "x86_64-pc-linux-gnu",
+          "target_cpu": "x86_64",
+          "target_vendor": "pc",
+          "target_os": "linux",
+          "host": "x86_64-pc-linux-gnu",
+          "host_cpu": "x86_64",
+          "host_os": "linux-gnu",
+          "host_vendor": "pc",
+          "bin_dir": "/opt/chef/embedded/bin",
+          "ruby_bin": "/opt/chef/embedded/bin/ruby",
+          "gems_dir": "/opt/chef/embedded/lib/ruby/gems/2.3.0",
+          "gem_bin": "/opt/chef/embedded/bin/gem"
+        },
+        "python": {
+          "version": "2.7.3",
+          "builddate": "Mar 13 2014, 11:03:55"
+        },
+        "c": {
+          "gcc": {
+            "target": "x86_64-linux-gnu",
+            "configured_with": "../src/configure -v --with-pkgversion='Debian 4.7.2-5' --with-bugurl=file:///usr/share/doc/gcc-4.7/README.Bugs --enable-languages=c,c++,go,fortran,objc,obj-c++ --prefix=/usr --program-suffix=-4.7 --enable-shared --enable-linker-build-id --with-system-zlib --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --with-gxx-include-dir=/usr/include/c++/4.7 --libdir=/usr/lib --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --enable-gnu-unique-object --enable-plugin --enable-objc-gc --with-arch-32=i586 --with-tune=generic --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu",
+            "thread_model": "posix",
+            "description": "gcc version 4.7.2 (Debian 4.7.2-5) ",
+            "version": "4.7.2"
+          }
+        }
+      },
+      "kernel": {
+        "name": "Linux",
+        "release": "3.2.0-4-amd64",
+        "version": "#1 SMP Debian 3.2.65-1+deb7u1",
+        "machine": "x86_64",
+        "processor": "unknown",
+        "os": "GNU/Linux",
+        "modules": {
+          "crc32c_intel": {
+            "size": "12747",
+            "refcount": "0"
+          },
+          "ghash_clmulni_intel": {
+            "size": "13130",
+            "refcount": "0"
+          },
+          "psmouse": {
+            "size": "69265",
+            "refcount": "0"
+          },
+          "aesni_intel": {
+            "size": "50667",
+            "refcount": "0"
+          },
+          "i2c_piix4": {
+            "size": "12536",
+            "refcount": "0"
+          },
+          "processor": {
+            "size": "28149",
+            "refcount": "0"
+          },
+          "serio_raw": {
+            "size": "12931",
+            "refcount": "0"
+          },
+          "thermal_sys": {
+            "size": "18040",
+            "refcount": "1"
+          },
+          "i2c_core": {
+            "size": "23876",
+            "refcount": "1"
+          },
+          "evdev": {
+            "size": "17562",
+            "refcount": "0"
+          },
+          "button": {
+            "size": "12937",
+            "refcount": "0"
+          },
+          "aes_x86_64": {
+            "size": "16843",
+            "refcount": "1"
+          },
+          "snd_pcsp": {
+            "size": "13742",
+            "refcount": "0"
+          },
+          "snd_pcm": {
+            "size": "68083",
+            "refcount": "1"
+          },
+          "snd_page_alloc": {
+            "size": "13003",
+            "refcount": "1"
+          },
+          "aes_generic": {
+            "size": "33026",
+            "refcount": "2"
+          },
+          "snd_timer": {
+            "size": "22917",
+            "refcount": "1"
+          },
+          "cryptd": {
+            "size": "14517",
+            "refcount": "2"
+          },
+          "snd": {
+            "size": "52893",
+            "refcount": "3"
+          },
+          "soundcore": {
+            "size": "13065",
+            "refcount": "1"
+          },
+          "ext4": {
+            "size": "350804",
+            "refcount": "1"
+          },
+          "crc16": {
+            "size": "12343",
+            "refcount": "1"
+          },
+          "jbd2": {
+            "size": "62115",
+            "refcount": "1"
+          },
+          "mbcache": {
+            "size": "13114",
+            "refcount": "1"
+          },
+          "ata_generic": {
+            "size": "12479",
+            "refcount": "0",
+            "version": "0.2.15"
+          },
+          "ata_piix": {
+            "size": "29535",
+            "refcount": "0",
+            "version": "2.13"
+          },
+          "libata": {
+            "size": "140630",
+            "refcount": "2",
+            "version": "3.00"
+          },
+          "floppy": {
+            "size": "53134",
+            "refcount": "0"
+          },
+          "xen_netfront": {
+            "size": "21985",
+            "refcount": "0"
+          },
+          "xen_blkfront": {
+            "size": "17398",
+            "refcount": "1"
+          },
+          "scsi_mod": {
+            "size": "162321",
+            "refcount": "1"
+          }
+        }
+      },
+      "network": {
+        "interfaces": {
+          "lo": {
+            "mtu": "16436",
+            "flags": [
+              "LOOPBACK",
+              "UP",
+              "LOWER_UP"
+            ],
+            "encapsulation": "Loopback",
+            "addresses": {
+              "127.0.0.1": {
+                "family": "inet",
+                "prefixlen": "8",
+                "netmask": "255.0.0.0",
+                "scope": "Node"
+              },
+              "::1": {
+                "family": "inet6",
+                "prefixlen": "128",
+                "scope": "Node",
+                "tags": []
+              }
+            },
+            "state": "unknown"
+          },
+          "eth0": {
+            "type": "eth",
+            "number": "0",
+            "mtu": "9001",
+            "flags": [
+              "BROADCAST",
+              "MULTICAST",
+              "UP",
+              "LOWER_UP"
+            ],
+            "encapsulation": "Ethernet",
+            "addresses": {
+              "02:07:F5:70:9F:F0": {
+                "family": "lladdr"
+              },
+              "242.58.187.217": {
+                "family": "inet",
+                "prefixlen": "21",
+                "netmask": "255.255.248.0",
+                "broadcast": "242.58.15.255",
+                "scope": "Global"
+              },
+              "fe80::7:f5ff:fe70:9ff0": {
+                "family": "inet6",
+                "prefixlen": "64",
+                "scope": "Link",
+                "tags": []
+              }
+            },
+            "state": "up",
+            "arp": {
+              "169.254.169.254": "02:a9:5a:b4:15:5a",
+              "242.58.10.3": "02:6a:65:20:3b:99",
+              "242.58.8.1": "02:a9:5a:b4:15:5a"
+            },
+            "routes": [
+              {
+                "destination": "default",
+                "family": "inet",
+                "via": "242.58.8.1"
+              },
+              {
+                "destination": "242.58.8.0/21",
+                "family": "inet",
+                "scope": "link",
+                "proto": "kernel",
+                "src": "242.58.187.217"
+              },
+              {
+                "destination": "169.254.0.0/16",
+                "family": "inet",
+                "scope": "link"
+              },
+              {
+                "destination": "fe80::/64",
+                "family": "inet6",
+                "metric": "256",
+                "proto": "kernel"
+              }
+            ]
+          }
+        },
+        "default_interface": "eth0",
+        "default_gateway": "242.58.8.1"
+      },
+      "counters": {
+        "network": {
+          "interfaces": {
+            "lo": {
+              "rx": {
+                "bytes": "31429732",
+                "packets": "31319",
+                "errors": "0",
+                "drop": "0",
+                "overrun": "0"
+              },
+              "tx": {
+                "bytes": "31429732",
+                "packets": "31319",
+                "errors": "0",
+                "drop": "0",
+                "carrier": "0",
+                "collisions": "0"
+              }
+            },
+            "eth0": {
+              "tx": {
+                "queuelen": "1000",
+                "bytes": "61730478022",
+                "packets": "33127828",
+                "errors": "0",
+                "drop": "0",
+                "carrier": "0",
+                "collisions": "0"
+              },
+              "rx": {
+                "bytes": "57417087460",
+                "packets": "41416006",
+                "errors": "0",
+                "drop": "0",
+                "overrun": "0"
+              }
+            }
+          }
+        }
+      },
+      "ipaddress": "242.58.187.217",
+      "macaddress": "02:07:F5:70:9F:F0",
+      "ip6address": "fe80::7:f5ff:fe70:9ff0",
+      "os": "linux",
+      "os_version": "3.2.0-4-amd64",
+      "memory": {
+        "swap": {
+          "cached": "0kB",
+          "total": "0kB",
+          "free": "0kB"
+        },
+        "hugepages": {
+          "total": "0",
+          "free": "0",
+          "reserved": "0",
+          "surplus": "0"
+        },
+        "total": "3797988kB",
+        "free": "1213780kB",
+        "buffers": "372500kB",
+        "cached": "1701292kB",
+        "active": "1120468kB",
+        "inactive": "1128636kB",
+        "dirty": "20kB",
+        "writeback": "0kB",
+        "anon_pages": "175324kB",
+        "mapped": "21736kB",
+        "slab": "310828kB",
+        "slab_reclaimable": "293784kB",
+        "slab_unreclaim": "17044kB",
+        "page_tables": "2996kB",
+        "nfs_unstable": "0kB",
+        "bounce": "0kB",
+        "commit_limit": "1898992kB",
+        "committed_as": "348472kB",
+        "vmalloc_total": "34359738367kB",
+        "vmalloc_used": "16784kB",
+        "vmalloc_chunk": "34359721339kB",
+        "hugepage_size": "2048kB"
+      },
+      "lsb": {
+        "id": "Debian",
+        "description": "Debian GNU/Linux 7.8 (wheezy)",
+        "release": "7.8",
+        "codename": "wheezy"
+      },
+      "platform": "debian",
+      "platform_version": "7.8",
+      "platform_family": "debian",
+      "uptime_seconds": 12864819,
+      "uptime": "148 days 21 hours 33 minutes 39 seconds",
+      "idletime_seconds": 25689221,
+      "idletime": "297 days 07 hours 53 minutes 41 seconds",
+      "cpu": {
+        "0": {
+          "vendor_id": "GenuineIntel",
+          "family": "6",
+          "model": "63",
+          "model_name": "Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz",
+          "stepping": "2",
+          "mhz": "2400.094",
+          "cache_size": "30720 KB",
+          "physical_id": "0",
+          "core_id": "0",
+          "cores": "2",
+          "flags": [
+            "fpu",
+            "vme",
+            "de",
+            "pse",
+            "tsc",
+            "msr",
+            "pae",
+            "mce",
+            "cx8",
+            "apic",
+            "sep",
+            "mtrr",
+            "pge",
+            "mca",
+            "cmov",
+            "pat",
+            "pse36",
+            "clflush",
+            "mmx",
+            "fxsr",
+            "sse",
+            "sse2",
+            "ht",
+            "syscall",
+            "nx",
+            "rdtscp",
+            "lm",
+            "constant_tsc",
+            "rep_good",
+            "nopl",
+            "xtopology",
+            "pni",
+            "pclmulqdq",
+            "ssse3",
+            "fma",
+            "cx16",
+            "pcid",
+            "sse4_1",
+            "sse4_2",
+            "x2apic",
+            "movbe",
+            "popcnt",
+            "tsc_deadline_timer",
+            "aes",
+            "xsave",
+            "avx",
+            "f16c",
+            "rdrand",
+            "hypervisor",
+            "lahf_lm",
+            "abm",
+            "xsaveopt",
+            "fsgsbase",
+            "smep",
+            "erms"
+          ]
+        },
+        "1": {
+          "vendor_id": "GenuineIntel",
+          "family": "6",
+          "model": "63",
+          "model_name": "Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz",
+          "stepping": "2",
+          "mhz": "2400.094",
+          "cache_size": "30720 KB",
+          "physical_id": "0",
+          "core_id": "1",
+          "cores": "2",
+          "flags": [
+            "fpu",
+            "vme",
+            "de",
+            "pse",
+            "tsc",
+            "msr",
+            "pae",
+            "mce",
+            "cx8",
+            "apic",
+            "sep",
+            "mtrr",
+            "pge",
+            "mca",
+            "cmov",
+            "pat",
+            "pse36",
+            "clflush",
+            "mmx",
+            "fxsr",
+            "sse",
+            "sse2",
+            "ht",
+            "syscall",
+            "nx",
+            "rdtscp",
+            "lm",
+            "constant_tsc",
+            "rep_good",
+            "nopl",
+            "xtopology",
+            "pni",
+            "pclmulqdq",
+            "ssse3",
+            "fma",
+            "cx16",
+            "pcid",
+            "sse4_1",
+            "sse4_2",
+            "x2apic",
+            "movbe",
+            "popcnt",
+            "tsc_deadline_timer",
+            "aes",
+            "xsave",
+            "avx",
+            "f16c",
+            "rdrand",
+            "hypervisor",
+            "lahf_lm",
+            "abm",
+            "xsaveopt",
+            "fsgsbase",
+            "smep",
+            "erms"
+          ]
+        },
+        "total": 2,
+        "real": 1,
+        "cores": 2
+      },
+      "filesystem": {
+        "rootfs": {
+          "kb_size": "30963708",
+          "kb_used": "3927384",
+          "kb_available": "25463744",
+          "percent_used": "14%",
+          "mount": "/",
+          "total_inodes": "1966080",
+          "inodes_used": "264597",
+          "inodes_available": "1701483",
+          "inodes_percent_used": "14%"
+        },
+        "udev": {
+          "kb_size": "10240",
+          "kb_used": "0",
+          "kb_available": "10240",
+          "percent_used": "0%",
+          "mount": "/dev",
+          "total_inodes": "506100",
+          "inodes_used": "252",
+          "inodes_available": "505848",
+          "inodes_percent_used": "1%",
+          "fs_type": "devtmpfs",
+          "mount_options": [
+            "rw",
+            "relatime",
+            "size=10240k",
+            "nr_inodes=506100",
+            "mode=755"
+          ]
+        },
+        "tmpfs": {
+          "kb_size": "759580",
+          "kb_used": "0",
+          "kb_available": "759580",
+          "percent_used": "0%",
+          "mount": "/run/shm",
+          "total_inodes": "474748",
+          "inodes_used": "2",
+          "inodes_available": "474746",
+          "inodes_percent_used": "1%",
+          "fs_type": "tmpfs",
+          "mount_options": [
+            "rw",
+            "nosuid",
+            "nodev",
+            "noexec",
+            "relatime",
+            "size=759580k"
+          ]
+        },
+        "/dev/disk/by-uuid/6f816946-42f1-4dcb-90f9-1c8b9daeafe2": {
+          "kb_size": "30963708",
+          "kb_used": "3927384",
+          "kb_available": "25463744",
+          "percent_used": "14%",
+          "mount": "/",
+          "total_inodes": "1966080",
+          "inodes_used": "264597",
+          "inodes_available": "1701483",
+          "inodes_percent_used": "14%",
+          "fs_type": "ext4",
+          "mount_options": [
+            "rw",
+            "relatime",
+            "user_xattr",
+            "barrier=1",
+            "data=ordered"
+          ]
+        },
+        "sysfs": {
+          "mount": "/sys",
+          "fs_type": "sysfs",
+          "mount_options": [
+            "rw",
+            "nosuid",
+            "nodev",
+            "noexec",
+            "relatime"
+          ]
+        },
+        "proc": {
+          "mount": "/proc",
+          "fs_type": "proc",
+          "mount_options": [
+            "rw",
+            "nosuid",
+            "nodev",
+            "noexec",
+            "relatime"
+          ]
+        },
+        "devpts": {
+          "mount": "/dev/pts",
+          "fs_type": "devpts",
+          "mount_options": [
+            "rw",
+            "nosuid",
+            "noexec",
+            "relatime",
+            "gid=5",
+            "mode=620",
+            "ptmxmode=000"
+          ]
+        },
+        "/dev/xvda": {
+          "fs_type": "ext4",
+          "uuid": "6f816946-42f1-4dcb-90f9-1c8b9daeafe2"
+        }
+      },
+      "virtualization": {
+        "systems": {
+          "xen": "guest"
+        },
+        "system": "xen",
+        "role": "guest"
+      },
+      "dmi": {
+        "dmidecode_version": "2.11",
+        "smbios_version": "2.4",
+        "structures": {
+          "count": "12",
+          "size": "349"
+        },
+        "bios": {
+          "all_records": [
+            {
+              "record_id": "0x0000",
+              "size": "0",
+              "application_identifier": "BIOS Information",
+              "Vendor": "Xen",
+              "Version": "4.2.amazon",
+              "Release Date": "02/16/2017",
+              "Address": "0xE8000",
+              "Runtime Size": "96 kB",
+              "ROM Size": "64 kB",
+              "Characteristics": {
+                "PCI is supported": null,
+                "EDD is supported": null,
+                "Targeted content distribution is supported": null
+              },
+              "BIOS Revision": "4.2"
+            }
+          ],
+          "vendor": "Xen",
+          "version": "4.2.amazon",
+          "release_date": "02/16/2017",
+          "address": "0xE8000",
+          "runtime_size": "96 kB",
+          "rom_size": "64 kB",
+          "bios_revision": "4.2"
+        },
+        "system": {
+          "all_records": [
+            {
+              "record_id": "0x0100",
+              "size": "1",
+              "application_identifier": "System Information",
+              "Manufacturer": "Xen",
+              "Product Name": "HVM domU",
+              "Version": "4.2.amazon",
+              "Serial Number": "ec261a1a-2a60-5962-4e85-8d3286c7c354",
+              "UUID": "EC261A1A-2A60-5962-4E85-8D3286C7C354",
+              "Wake-up Type": "Power Switch",
+              "SKU Number": "Not Specified",
+              "Family": "Not Specified"
+            }
+          ],
+          "manufacturer": "Xen",
+          "product_name": "HVM domU",
+          "version": "4.2.amazon",
+          "serial_number": "ec261a1a-2a60-5962-4e85-8d3286c7c354",
+          "uuid": "EC261A1A-2A60-5962-4E85-8D3286C7C354",
+          "wake_up_type": "Power Switch",
+          "sku_number": "Not Specified",
+          "family": "Not Specified"
+        },
+        "chassis": {
+          "all_records": [
+            {
+              "record_id": "0x0300",
+              "size": "3",
+              "application_identifier": "Chassis Information",
+              "Manufacturer": "Xen",
+              "Type": "Other",
+              "Lock": "Not Present",
+              "Version": "Not Specified",
+              "Serial Number": "Not Specified",
+              "Asset Tag": "Not Specified",
+              "Boot-up State": "Safe",
+              "Power Supply State": "Safe",
+              "Thermal State": "Safe",
+              "Security Status": "Unknown"
+            }
+          ],
+          "manufacturer": "Xen",
+          "type": "Other",
+          "lock": "Not Present",
+          "version": "Not Specified",
+          "serial_number": "Not Specified",
+          "asset_tag": "Not Specified",
+          "boot_up_state": "Safe",
+          "power_supply_state": "Safe",
+          "thermal_state": "Safe",
+          "security_status": "Unknown"
+        },
+        "processor": {
+          "all_records": [
+            {
+              "record_id": "0x0401",
+              "size": "4",
+              "application_identifier": "Processor Information",
+              "Socket Designation": "CPU 1",
+              "Type": "Central Processor",
+              "Family": "Other",
+              "Manufacturer": "Intel",
+              "ID": "F2 06 03 00 FF FB 89 17",
+              "Version": "Not Specified",
+              "Voltage": "Unknown",
+              "External Clock": "Unknown",
+              "Max Speed": "2400 MHz",
+              "Current Speed": "2400 MHz",
+              "Status": "Populated, Enabled",
+              "Upgrade": "Other"
+            },
+            {
+              "record_id": "0x0402",
+              "size": "4",
+              "application_identifier": "Processor Information",
+              "Socket Designation": "CPU 2",
+              "Type": "Central Processor",
+              "Family": "Other",
+              "Manufacturer": "Intel",
+              "ID": "F2 06 03 00 FF FB 89 17",
+              "Version": "Not Specified",
+              "Voltage": "Unknown",
+              "External Clock": "Unknown",
+              "Max Speed": "2400 MHz",
+              "Current Speed": "2400 MHz",
+              "Status": "Populated, Enabled",
+              "Upgrade": "Other"
+            }
+          ],
+          "type": "Central Processor",
+          "family": "Other",
+          "manufacturer": "Intel",
+          "id": "F2 06 03 00 FF FB 89 17",
+          "version": "Not Specified",
+          "voltage": "Unknown",
+          "external_clock": "Unknown",
+          "max_speed": "2400 MHz",
+          "current_speed": "2400 MHz",
+          "status": "Populated, Enabled",
+          "upgrade": "Other"
+        },
+        "oem_strings": {
+          "all_records": [
+            {
+              "record_id": "0x0B00",
+              "size": "11",
+              "application_identifier": "OEM Strings",
+              "String 1": "Xen"
+            }
+          ],
+          "string_1": "Xen"
+        }
+      },
+      "etc": {
+      },
+      "current_user": "root",
+      "time": {
+        "timezone": "UTC"
+      },
+      "filesystem2": {
+        "by_device": {
+          "rootfs": {
+            "kb_size": "30963708",
+            "kb_used": "3927384",
+            "kb_available": "25463744",
+            "percent_used": "14%",
+            "total_inodes": "1966080",
+            "inodes_used": "264597",
+            "inodes_available": "1701483",
+            "inodes_percent_used": "14%",
+            "mounts": [
+              "/"
+            ]
+          },
+          "udev": {
+            "kb_size": "10240",
+            "kb_used": "0",
+            "kb_available": "10240",
+            "percent_used": "0%",
+            "total_inodes": "506100",
+            "inodes_used": "252",
+            "inodes_available": "505848",
+            "inodes_percent_used": "1%",
+            "fs_type": "devtmpfs",
+            "mount_options": [
+              "rw",
+              "relatime",
+              "size=10240k",
+              "nr_inodes=506100",
+              "mode=755"
+            ],
+            "mounts": [
+              "/dev"
+            ]
+          },
+          "tmpfs": {
+            "kb_size": "759580",
+            "kb_used": "0",
+            "kb_available": "759580",
+            "percent_used": "0%",
+            "total_inodes": "474748",
+            "inodes_used": "2",
+            "inodes_available": "474746",
+            "inodes_percent_used": "1%",
+            "fs_type": "tmpfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime",
+              "size=759580k"
+            ],
+            "mounts": [
+              "/run",
+              "/run/lock",
+              "/run/shm"
+            ]
+          },
+          "/dev/disk/by-uuid/6f816946-42f1-4dcb-90f9-1c8b9daeafe2": {
+            "kb_size": "30963708",
+            "kb_used": "3927384",
+            "kb_available": "25463744",
+            "percent_used": "14%",
+            "total_inodes": "1966080",
+            "inodes_used": "264597",
+            "inodes_available": "1701483",
+            "inodes_percent_used": "14%",
+            "fs_type": "ext4",
+            "mount_options": [
+              "rw",
+              "relatime",
+              "user_xattr",
+              "barrier=1",
+              "data=ordered"
+            ],
+            "mounts": [
+              "/"
+            ]
+          },
+          "sysfs": {
+            "fs_type": "sysfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime"
+            ],
+            "mounts": [
+              "/sys"
+            ]
+          },
+          "proc": {
+            "fs_type": "proc",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime"
+            ],
+            "mounts": [
+              "/proc"
+            ]
+          },
+          "devpts": {
+            "fs_type": "devpts",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "noexec",
+              "relatime",
+              "gid=5",
+              "mode=620",
+              "ptmxmode=000"
+            ],
+            "mounts": [
+              "/dev/pts"
+            ]
+          },
+          "/dev/xvda": {
+            "fs_type": "ext4",
+            "uuid": "6f816946-42f1-4dcb-90f9-1c8b9daeafe2",
+            "mounts": []
+          }
+        },
+        "by_mountpoint": {
+          "/": {
+            "kb_size": "30963708",
+            "kb_used": "3927384",
+            "kb_available": "25463744",
+            "percent_used": "14%",
+            "total_inodes": "1966080",
+            "inodes_used": "264597",
+            "inodes_available": "1701483",
+            "inodes_percent_used": "14%",
+            "devices": [
+              "rootfs",
+              "/dev/disk/by-uuid/6f816946-42f1-4dcb-90f9-1c8b9daeafe2"
+            ],
+            "fs_type": "ext4",
+            "mount_options": [
+              "rw",
+              "relatime",
+              "user_xattr",
+              "barrier=1",
+              "data=ordered"
+            ]
+          },
+          "/dev": {
+            "kb_size": "10240",
+            "kb_used": "0",
+            "kb_available": "10240",
+            "percent_used": "0%",
+            "total_inodes": "506100",
+            "inodes_used": "252",
+            "inodes_available": "505848",
+            "inodes_percent_used": "1%",
+            "fs_type": "devtmpfs",
+            "mount_options": [
+              "rw",
+              "relatime",
+              "size=10240k",
+              "nr_inodes=506100",
+              "mode=755"
+            ],
+            "devices": [
+              "udev"
+            ]
+          },
+          "/run": {
+            "kb_size": "379800",
+            "kb_used": "128",
+            "kb_available": "379672",
+            "percent_used": "1%",
+            "total_inodes": "481148",
+            "inodes_used": "172",
+            "inodes_available": "480976",
+            "inodes_percent_used": "1%",
+            "fs_type": "tmpfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "noexec",
+              "relatime",
+              "size=379800k",
+              "nr_inodes=481148",
+              "mode=755"
+            ],
+            "devices": [
+              "tmpfs"
+            ]
+          },
+          "/run/lock": {
+            "kb_size": "5120",
+            "kb_used": "0",
+            "kb_available": "5120",
+            "percent_used": "0%",
+            "total_inodes": "474748",
+            "inodes_used": "1",
+            "inodes_available": "474747",
+            "inodes_percent_used": "1%",
+            "fs_type": "tmpfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime",
+              "size=5120k"
+            ],
+            "devices": [
+              "tmpfs"
+            ]
+          },
+          "/run/shm": {
+            "kb_size": "759580",
+            "kb_used": "0",
+            "kb_available": "759580",
+            "percent_used": "0%",
+            "total_inodes": "474748",
+            "inodes_used": "2",
+            "inodes_available": "474746",
+            "inodes_percent_used": "1%",
+            "fs_type": "tmpfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime",
+              "size=759580k"
+            ],
+            "devices": [
+              "tmpfs"
+            ]
+          },
+          "/sys": {
+            "fs_type": "sysfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime"
+            ],
+            "devices": [
+              "sysfs"
+            ]
+          },
+          "/proc": {
+            "fs_type": "proc",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime"
+            ],
+            "devices": [
+              "proc"
+            ]
+          },
+          "/dev/pts": {
+            "fs_type": "devpts",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "noexec",
+              "relatime",
+              "gid=5",
+              "mode=620",
+              "ptmxmode=000"
+            ],
+            "devices": [
+              "devpts"
+            ]
+          }
+        },
+        "by_pair": {
+          "rootfs,/": {
+            "device": "rootfs",
+            "kb_size": "30963708",
+            "kb_used": "3927384",
+            "kb_available": "25463744",
+            "percent_used": "14%",
+            "mount": "/",
+            "total_inodes": "1966080",
+            "inodes_used": "264597",
+            "inodes_available": "1701483",
+            "inodes_percent_used": "14%"
+          },
+          "udev,/dev": {
+            "device": "udev",
+            "kb_size": "10240",
+            "kb_used": "0",
+            "kb_available": "10240",
+            "percent_used": "0%",
+            "mount": "/dev",
+            "total_inodes": "506100",
+            "inodes_used": "252",
+            "inodes_available": "505848",
+            "inodes_percent_used": "1%",
+            "fs_type": "devtmpfs",
+            "mount_options": [
+              "rw",
+              "relatime",
+              "size=10240k",
+              "nr_inodes=506100",
+              "mode=755"
+            ]
+          },
+          "tmpfs,/run": {
+            "device": "tmpfs",
+            "kb_size": "379800",
+            "kb_used": "128",
+            "kb_available": "379672",
+            "percent_used": "1%",
+            "mount": "/run",
+            "total_inodes": "481148",
+            "inodes_used": "172",
+            "inodes_available": "480976",
+            "inodes_percent_used": "1%",
+            "fs_type": "tmpfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "noexec",
+              "relatime",
+              "size=379800k",
+              "nr_inodes=481148",
+              "mode=755"
+            ]
+          },
+          "/dev/disk/by-uuid/6f816946-42f1-4dcb-90f9-1c8b9daeafe2,/": {
+            "device": "/dev/disk/by-uuid/6f816946-42f1-4dcb-90f9-1c8b9daeafe2",
+            "kb_size": "30963708",
+            "kb_used": "3927384",
+            "kb_available": "25463744",
+            "percent_used": "14%",
+            "mount": "/",
+            "total_inodes": "1966080",
+            "inodes_used": "264597",
+            "inodes_available": "1701483",
+            "inodes_percent_used": "14%",
+            "fs_type": "ext4",
+            "mount_options": [
+              "rw",
+              "relatime",
+              "user_xattr",
+              "barrier=1",
+              "data=ordered"
+            ]
+          },
+          "tmpfs,/run/lock": {
+            "device": "tmpfs",
+            "kb_size": "5120",
+            "kb_used": "0",
+            "kb_available": "5120",
+            "percent_used": "0%",
+            "mount": "/run/lock",
+            "total_inodes": "474748",
+            "inodes_used": "1",
+            "inodes_available": "474747",
+            "inodes_percent_used": "1%",
+            "fs_type": "tmpfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime",
+              "size=5120k"
+            ]
+          },
+          "tmpfs,/run/shm": {
+            "device": "tmpfs",
+            "kb_size": "759580",
+            "kb_used": "0",
+            "kb_available": "759580",
+            "percent_used": "0%",
+            "mount": "/run/shm",
+            "total_inodes": "474748",
+            "inodes_used": "2",
+            "inodes_available": "474746",
+            "inodes_percent_used": "1%",
+            "fs_type": "tmpfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime",
+              "size=759580k"
+            ]
+          },
+          "sysfs,/sys": {
+            "device": "sysfs",
+            "mount": "/sys",
+            "fs_type": "sysfs",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime"
+            ]
+          },
+          "proc,/proc": {
+            "device": "proc",
+            "mount": "/proc",
+            "fs_type": "proc",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime"
+            ]
+          },
+          "devpts,/dev/pts": {
+            "device": "devpts",
+            "mount": "/dev/pts",
+            "fs_type": "devpts",
+            "mount_options": [
+              "rw",
+              "nosuid",
+              "noexec",
+              "relatime",
+              "gid=5",
+              "mode=620",
+              "ptmxmode=000"
+            ]
+          },
+          "/dev/xvda,": {
+            "device": "/dev/xvda",
+            "fs_type": "ext4",
+            "uuid": "6f816946-42f1-4dcb-90f9-1c8b9daeafe2"
+          }
+        }
+      },
+      "packages": {
+        "adduser": {
+          "version": "3.113+nmu3",
+          "arch": "all"
+        },
+        "apt": {
+          "version": "0.9.7.9+deb7u7",
+          "arch": "amd64"
+        },
+        "apt-utils": {
+          "version": "0.9.7.9+deb7u7",
+          "arch": "amd64"
+        },
+        "aptitude": {
+          "version": "0.6.8.2-1",
+          "arch": "amd64"
+        },
+        "aptitude-common": {
+          "version": "0.6.8.2-1",
+          "arch": "all"
+        },
+        "at": {
+          "version": "3.1.13-2+deb7u1",
+          "arch": "amd64"
+        },
+        "autoconf": {
+          "version": "2.69-1",
+          "arch": "all"
+        },
+        "automake": {
+          "version": "1:1.11.6-1",
+          "arch": "all"
+        },
+        "autopoint": {
+          "version": "0.18.1.1-9",
+          "arch": "all"
+        },
+        "autotools-dev": {
+          "version": "20120608.1",
+          "arch": "all"
+        },
+        "base-files": {
+          "version": "7.1wheezy8",
+          "arch": "amd64"
+        },
+        "base-passwd": {
+          "version": "3.5.26",
+          "arch": "amd64"
+        },
+        "bash": {
+          "version": "4.2+dfsg-0.1+deb7u3",
+          "arch": "amd64"
+        },
+        "binutils": {
+          "version": "2.22-8+deb7u3",
+          "arch": "amd64"
+        },
+        "binutils-doc": {
+          "version": "2.22-8+deb7u3",
+          "arch": "all"
+        },
+        "bison": {
+          "version": "1:2.5.dfsg-2.1",
+          "arch": "amd64"
+        },
+        "bsdmainutils": {
+          "version": "9.0.3",
+          "arch": "amd64"
+        },
+        "bsdutils": {
+          "version": "1:2.20.1-5.3",
+          "arch": "amd64"
+        },
+        "build-essential": {
+          "version": "11.5",
+          "arch": "amd64"
+        },
+        "bzip2": {
+          "version": "1.0.6-4",
+          "arch": "amd64"
+        },
+        "ca-certificates": {
+          "version": "20130119+deb7u1",
+          "arch": "all"
+        },
+        "ca-certificates-java": {
+          "version": "20121112+nmu2",
+          "arch": "all"
+        },
+        "chef": {
+          "version": "12.21.3-1",
+          "arch": "amd64"
+        },
+        "chefdk": {
+          "version": "2.4.3-1",
+          "arch": "amd64"
+        },
+        "cloud-init": {
+          "version": "0.7.2-3~bpo70+1",
+          "arch": "all"
+        },
+        "coreutils": {
+          "version": "8.13-3.5",
+          "arch": "amd64"
+        },
+        "cpio": {
+          "version": "2.11+dfsg-0.1+deb7u1",
+          "arch": "amd64"
+        },
+        "cpp": {
+          "version": "4:4.7.2-1",
+          "arch": "amd64"
+        },
+        "cpp-4.7": {
+          "version": "4.7.2-5",
+          "arch": "amd64"
+        },
+        "cron": {
+          "version": "3.0pl1-124",
+          "arch": "amd64"
+        },
+        "curl": {
+          "version": "7.26.0-1+wheezy19",
+          "arch": "amd64"
+        },
+        "dash": {
+          "version": "0.5.7-3",
+          "arch": "amd64"
+        },
+        "dbus": {
+          "version": "1.6.8-1+deb7u6",
+          "arch": "amd64"
+        },
+        "dctrl-tools": {
+          "version": "2.22.2",
+          "arch": "amd64"
+        },
+        "debconf": {
+          "version": "1.5.49",
+          "arch": "all"
+        },
+        "debconf-i18n": {
+          "version": "1.5.49",
+          "arch": "all"
+        },
+        "debhelper": {
+          "version": "9.20120909",
+          "arch": "all"
+        },
+        "debian-archive-keyring": {
+          "version": "2014.3~deb7u1",
+          "arch": "all"
+        },
+        "debian-keyring": {
+          "version": "2013.04.21",
+          "arch": "all"
+        },
+        "debianutils": {
+          "version": "4.3.2",
+          "arch": "amd64"
+        },
+        "devscripts": {
+          "version": "2.12.6+deb7u2",
+          "arch": "amd64"
+        },
+        "dhcpcd": {
+          "version": "1:3.2.3-11",
+          "arch": "amd64"
+        },
+        "diffstat": {
+          "version": "1.55-3",
+          "arch": "amd64"
+        },
+        "diffutils": {
+          "version": "1:3.2-6",
+          "arch": "amd64"
+        },
+        "distro-info-data": {
+          "version": "0.17~deb7u1",
+          "arch": "all"
+        },
+        "dmidecode": {
+          "version": "2.11-9",
+          "arch": "amd64"
+        },
+        "dpkg": {
+          "version": "1.16.15",
+          "arch": "amd64"
+        },
+        "dpkg-dev": {
+          "version": "1.16.18",
+          "arch": "all"
+        },
+        "dput": {
+          "version": "0.9.6.3+nmu2",
+          "arch": "all"
+        },
+        "e2fslibs": {
+          "version": "1.42.5-1.1",
+          "arch": "amd64"
+        },
+        "e2fsprogs": {
+          "version": "1.42.5-1.1",
+          "arch": "amd64"
+        },
+        "equivs": {
+          "version": "2.0.9",
+          "arch": "all"
+        },
+        "exim4-base": {
+          "version": "4.80-7+deb7u4",
+          "arch": "amd64"
+        },
+        "exim4-config": {
+          "version": "4.80-7+deb7u4",
+          "arch": "all"
+        },
+        "exim4-daemon-light": {
+          "version": "4.80-7+deb7u4",
+          "arch": "amd64"
+        },
+        "extlinux": {
+          "version": "2:4.05+dfsg-6+deb7u1",
+          "arch": "amd64"
+        },
+        "fakeroot": {
+          "version": "1.18.4-2",
+          "arch": "amd64"
+        },
+        "file": {
+          "version": "5.11-2+deb7u9",
+          "arch": "amd64"
+        },
+        "findutils": {
+          "version": "4.4.2-4",
+          "arch": "amd64"
+        },
+        "flex": {
+          "version": "2.5.35-10.1",
+          "arch": "amd64"
+        },
+        "fontconfig": {
+          "version": "2.9.0-7.1+deb7u1",
+          "arch": "amd64"
+        },
+        "fontconfig-config": {
+          "version": "2.9.0-7.1+deb7u1",
+          "arch": "all"
+        },
+        "g++": {
+          "version": "4:4.7.2-1",
+          "arch": "amd64"
+        },
+        "g++-4.7": {
+          "version": "4.7.2-5",
+          "arch": "amd64"
+        },
+        "gcc": {
+          "version": "4:4.7.2-1",
+          "arch": "amd64"
+        },
+        "gcc-4.7": {
+          "version": "4.7.2-5",
+          "arch": "amd64"
+        },
+        "gcc-4.7-base": {
+          "version": "4.7.2-5",
+          "arch": "amd64"
+        },
+        "gettext": {
+          "version": "0.18.1.1-9",
+          "arch": "amd64"
+        },
+        "gettext-base": {
+          "version": "0.18.1.1-9",
+          "arch": "amd64"
+        },
+        "git": {
+          "version": "1:1.7.10.4-1+wheezy4",
+          "arch": "amd64"
+        },
+        "git-man": {
+          "version": "1:1.7.10.4-1+wheezy4",
+          "arch": "all"
+        },
+        "gnupg": {
+          "version": "1.4.12-7+deb7u6",
+          "arch": "amd64"
+        },
+        "gpgv": {
+          "version": "1.4.12-7+deb7u6",
+          "arch": "amd64"
+        },
+        "grep": {
+          "version": "2.12-2",
+          "arch": "amd64"
+        },
+        "groff-base": {
+          "version": "1.21-9",
+          "arch": "amd64"
+        },
+        "gzip": {
+          "version": "1.5-1.1",
+          "arch": "amd64"
+        },
+        "hardening-includes": {
+          "version": "2.2",
+          "arch": "all"
+        },
+        "heirloom-mailx": {
+          "version": "12.5-2+deb7u1",
+          "arch": "amd64"
+        },
+        "hicolor-icon-theme": {
+          "version": "0.12-1",
+          "arch": "all"
+        },
+        "hostname": {
+          "version": "3.11",
+          "arch": "amd64"
+        },
+        "html2text": {
+          "version": "1.3.2a-15",
+          "arch": "amd64"
+        },
+        "ifupdown": {
+          "version": "0.7.8",
+          "arch": "amd64"
+        },
+        "info": {
+          "version": "4.13a.dfsg.1-10",
+          "arch": "amd64"
+        },
+        "initramfs-tools": {
+          "version": "0.109.1",
+          "arch": "all"
+        },
+        "initscripts": {
+          "version": "2.88dsf-41+deb7u1",
+          "arch": "amd64"
+        },
+        "insserv": {
+          "version": "1.14.0-5",
+          "arch": "amd64"
+        },
+        "install-info": {
+          "version": "4.13a.dfsg.1-10",
+          "arch": "amd64"
+        },
+        "intltool-debian": {
+          "version": "0.35.0+20060710.1",
+          "arch": "all"
+        },
+        "iproute": {
+          "version": "20120521-3+b3",
+          "arch": "amd64"
+        },
+        "iptables": {
+          "version": "1.4.14-3.1",
+          "arch": "amd64"
+        },
+        "iputils-ping": {
+          "version": "3:20101006-1+b1",
+          "arch": "amd64"
+        },
+        "iso-codes": {
+          "version": "3.41-1",
+          "arch": "all"
+        },
+        "java-common": {
+          "version": "0.47+deb7u2",
+          "arch": "all"
+        },
+        "klibc-utils": {
+          "version": "2.0.1-3.1",
+          "arch": "amd64"
+        },
+        "kmod": {
+          "version": "9-3",
+          "arch": "amd64"
+        },
+        "less": {
+          "version": "444-4",
+          "arch": "amd64"
+        },
+        "libacl1": {
+          "version": "2.2.51-8",
+          "arch": "amd64"
+        },
+        "libalgorithm-diff-perl": {
+          "version": "1.19.02-2",
+          "arch": "all"
+        },
+        "libalgorithm-diff-xs-perl": {
+          "version": "0.04-2+b1",
+          "arch": "amd64"
+        },
+        "libalgorithm-merge-perl": {
+          "version": "0.08-2",
+          "arch": "all"
+        },
+        "libapt-inst1.5": {
+          "version": "0.9.7.9+deb7u7",
+          "arch": "amd64"
+        },
+        "libapt-pkg-perl": {
+          "version": "0.1.26+b1",
+          "arch": "amd64"
+        },
+        "libapt-pkg4.12": {
+          "version": "0.9.7.9+deb7u7",
+          "arch": "amd64"
+        },
+        "libarchive-zip-perl": {
+          "version": "1.30-6",
+          "arch": "all"
+        },
+        "libasound2": {
+          "version": "1.0.25-4",
+          "arch": "amd64"
+        },
+        "libasprintf0c2": {
+          "version": "0.18.1.1-9",
+          "arch": "amd64"
+        },
+        "libasyncns0": {
+          "version": "0.8-4",
+          "arch": "amd64"
+        },
+        "libatk-wrapper-java": {
+          "version": "0.30.4-3",
+          "arch": "all"
+        },
+        "libatk-wrapper-java-jni": {
+          "version": "0.30.4-3",
+          "arch": "amd64"
+        },
+        "libatk1.0-0": {
+          "version": "2.4.0-2",
+          "arch": "amd64"
+        },
+        "libatk1.0-data": {
+          "version": "2.4.0-2",
+          "arch": "all"
+        },
+        "libattr1": {
+          "version": "1:2.4.46-8",
+          "arch": "amd64"
+        },
+        "libavahi-client3": {
+          "version": "0.6.31-2",
+          "arch": "amd64"
+        },
+        "libavahi-common-data": {
+          "version": "0.6.31-2",
+          "arch": "amd64"
+        },
+        "libavahi-common3": {
+          "version": "0.6.31-2",
+          "arch": "amd64"
+        },
+        "libbison-dev": {
+          "version": "1:2.5.dfsg-2.1",
+          "arch": "amd64"
+        },
+        "libblkid1": {
+          "version": "2.20.1-5.3",
+          "arch": "amd64"
+        },
+        "libboost-iostreams1.49.0": {
+          "version": "1.49.0-3.2",
+          "arch": "amd64"
+        },
+        "libbsd0": {
+          "version": "0.4.2-1",
+          "arch": "amd64"
+        },
+        "libbz2-1.0": {
+          "version": "1.0.6-4",
+          "arch": "amd64"
+        },
+        "libc-bin": {
+          "version": "2.13-38+deb7u11",
+          "arch": "amd64"
+        },
+        "libc-dev-bin": {
+          "version": "2.13-38+deb7u11",
+          "arch": "amd64"
+        },
+        "libc6": {
+          "version": "2.13-38+deb7u11",
+          "arch": "amd64"
+        },
+        "libc6-dev": {
+          "version": "2.13-38+deb7u11",
+          "arch": "amd64"
+        },
+        "libcairo2": {
+          "version": "1.12.2-3+deb7u1",
+          "arch": "amd64"
+        },
+        "libcap2": {
+          "version": "1:2.22-1.2",
+          "arch": "amd64"
+        },
+        "libclass-accessor-perl": {
+          "version": "0.34-1",
+          "arch": "all"
+        },
+        "libclass-inspector-perl": {
+          "version": "1.27-1",
+          "arch": "all"
+        },
+        "libclass-isa-perl": {
+          "version": "0.36-3",
+          "arch": "all"
+        },
+        "libclone-perl": {
+          "version": "0.31-1+b2",
+          "arch": "amd64"
+        },
+        "libcomerr2": {
+          "version": "1.42.5-1.1",
+          "arch": "amd64"
+        },
+        "libcommon-sense-perl": {
+          "version": "3.6-1",
+          "arch": "all"
+        },
+        "libconvert-binhex-perl": {
+          "version": "1.119+pristine-3",
+          "arch": "all"
+        },
+        "libcroco3": {
+          "version": "0.6.6-2+deb7u1",
+          "arch": "amd64"
+        },
+        "libcrypt-ssleay-perl": {
+          "version": "0.58-1",
+          "arch": "amd64"
+        },
+        "libcups2": {
+          "version": "1.5.3-5+deb7u6",
+          "arch": "amd64"
+        },
+        "libcurl3": {
+          "version": "7.26.0-1+wheezy19",
+          "arch": "amd64"
+        },
+        "libcurl3-gnutls": {
+          "version": "7.26.0-1+wheezy12",
+          "arch": "amd64"
+        },
+        "libcwidget3": {
+          "version": "0.5.16-3.4",
+          "arch": "amd64"
+        },
+        "libdatrie1": {
+          "version": "0.2.5-3",
+          "arch": "amd64"
+        },
+        "libdb5.1": {
+          "version": "5.1.29-5",
+          "arch": "amd64"
+        },
+        "libdbus-1-3": {
+          "version": "1.6.8-1+deb7u6",
+          "arch": "amd64"
+        },
+        "libdigest-hmac-perl": {
+          "version": "1.03+dfsg-1",
+          "arch": "all"
+        },
+        "libdistro-info-perl": {
+          "version": "0.10",
+          "arch": "all"
+        },
+        "libdpkg-perl": {
+          "version": "1.16.18",
+          "arch": "all"
+        },
+        "libdrm-intel1": {
+          "version": "2.4.40-1~deb7u2",
+          "arch": "amd64"
+        },
+        "libdrm-nouveau1a": {
+          "version": "2.4.40-1~deb7u2",
+          "arch": "amd64"
+        },
+        "libdrm-radeon1": {
+          "version": "2.4.40-1~deb7u2",
+          "arch": "amd64"
+        },
+        "libdrm2": {
+          "version": "2.4.40-1~deb7u2",
+          "arch": "amd64"
+        },
+        "libedit2": {
+          "version": "2.11-20080614-5",
+          "arch": "amd64"
+        },
+        "libemail-valid-perl": {
+          "version": "0.190-1",
+          "arch": "all"
+        },
+        "libencode-locale-perl": {
+          "version": "1.03-1",
+          "arch": "all"
+        },
+        "libept1.4.12": {
+          "version": "1.0.9",
+          "arch": "amd64"
+        },
+        "liberror-perl": {
+          "version": "0.17-1",
+          "arch": "all"
+        },
+        "libexpat1": {
+          "version": "2.1.0-1+deb7u1",
+          "arch": "amd64"
+        },
+        "libexporter-lite-perl": {
+          "version": "0.02-2",
+          "arch": "all"
+        },
+        "libfcgi-perl": {
+          "version": "0.74-1+b1",
+          "arch": "amd64"
+        },
+        "libffi5": {
+          "version": "3.0.10-3",
+          "arch": "amd64"
+        },
+        "libfile-fcntllock-perl": {
+          "version": "0.14-2",
+          "arch": "amd64"
+        },
+        "libfile-listing-perl": {
+          "version": "6.04-1",
+          "arch": "all"
+        },
+        "libflac8": {
+          "version": "1.2.1-6+deb7u1",
+          "arch": "amd64"
+        },
+        "libfont-afm-perl": {
+          "version": "1.20-1",
+          "arch": "all"
+        },
+        "libfontconfig1": {
+          "version": "2.9.0-7.1+deb7u1",
+          "arch": "amd64"
+        },
+        "libfreetype6": {
+          "version": "2.4.9-1.1+deb7u7",
+          "arch": "amd64"
+        },
+        "libgcc1": {
+          "version": "1:4.7.2-5",
+          "arch": "amd64"
+        },
+        "libgcrypt11": {
+          "version": "1.5.0-5+deb7u2",
+          "arch": "amd64"
+        },
+        "libgdbm3": {
+          "version": "1.8.3-11",
+          "arch": "amd64"
+        },
+        "libgdk-pixbuf2.0-0": {
+          "version": "2.26.1-1+deb7u5",
+          "arch": "amd64"
+        },
+        "libgdk-pixbuf2.0-common": {
+          "version": "2.26.1-1+deb7u5",
+          "arch": "all"
+        },
+        "libgettextpo0": {
+          "version": "0.18.1.1-9",
+          "arch": "amd64"
+        },
+        "libgif4": {
+          "version": "4.1.6-10+deb7u1",
+          "arch": "amd64"
+        },
+        "libgl1-mesa-dri": {
+          "version": "8.0.5-4+deb7u2",
+          "arch": "amd64"
+        },
+        "libgl1-mesa-glx": {
+          "version": "8.0.5-4+deb7u2",
+          "arch": "amd64"
+        },
+        "libglapi-mesa": {
+          "version": "8.0.5-4+deb7u2",
+          "arch": "amd64"
+        },
+        "libglib2.0-0": {
+          "version": "2.33.12+really2.32.4-5",
+          "arch": "amd64"
+        },
+        "libglib2.0-data": {
+          "version": "2.33.12+really2.32.4-5",
+          "arch": "all"
+        },
+        "libgmp10": {
+          "version": "2:5.0.5+dfsg-2",
+          "arch": "amd64"
+        },
+        "libgnutls26": {
+          "version": "2.12.20-8+deb7u2",
+          "arch": "amd64"
+        },
+        "libgomp1": {
+          "version": "4.7.2-5",
+          "arch": "amd64"
+        },
+        "libgpg-error0": {
+          "version": "1.10-3.1",
+          "arch": "amd64"
+        },
+        "libgssapi-krb5-2": {
+          "version": "1.10.1+dfsg-5+deb7u2",
+          "arch": "amd64"
+        },
+        "libgtk2.0-0": {
+          "version": "2.24.10-2",
+          "arch": "amd64"
+        },
+        "libgtk2.0-bin": {
+          "version": "2.24.10-2",
+          "arch": "amd64"
+        },
+        "libgtk2.0-common": {
+          "version": "2.24.10-2",
+          "arch": "all"
+        },
+        "libhtml-form-perl": {
+          "version": "6.03-1",
+          "arch": "all"
+        },
+        "libhtml-format-perl": {
+          "version": "2.10-1",
+          "arch": "all"
+        },
+        "libhtml-parser-perl": {
+          "version": "3.69-2",
+          "arch": "amd64"
+        },
+        "libhtml-tagset-perl": {
+          "version": "3.20-2",
+          "arch": "all"
+        },
+        "libhtml-template-perl": {
+          "version": "2.91-1",
+          "arch": "all"
+        },
+        "libhtml-tree-perl": {
+          "version": "5.02-1",
+          "arch": "all"
+        },
+        "libhttp-cookies-perl": {
+          "version": "6.00-2",
+          "arch": "all"
+        },
+        "libhttp-daemon-perl": {
+          "version": "6.01-1",
+          "arch": "all"
+        },
+        "libhttp-date-perl": {
+          "version": "6.02-1",
+          "arch": "all"
+        },
+        "libhttp-message-perl": {
+          "version": "6.03-1",
+          "arch": "all"
+        },
+        "libhttp-negotiate-perl": {
+          "version": "6.00-2",
+          "arch": "all"
+        },
+        "libice-dev": {
+          "version": "2:1.0.8-2",
+          "arch": "amd64"
+        },
+        "libice6": {
+          "version": "2:1.0.8-2",
+          "arch": "amd64"
+        },
+        "libidn11": {
+          "version": "1.25-2",
+          "arch": "amd64"
+        },
+        "libio-pty-perl": {
+          "version": "1:1.08-1+b2",
+          "arch": "amd64"
+        },
+        "libio-socket-ip-perl": {
+          "version": "0.16-2",
+          "arch": "all"
+        },
+        "libio-socket-ssl-perl": {
+          "version": "1.76-2",
+          "arch": "all"
+        },
+        "libio-string-perl": {
+          "version": "1.08-2",
+          "arch": "all"
+        },
+        "libio-stringy-perl": {
+          "version": "2.110-5",
+          "arch": "all"
+        },
+        "libipc-run-perl": {
+          "version": "0.92-1",
+          "arch": "all"
+        },
+        "libitm1": {
+          "version": "4.7.2-5",
+          "arch": "amd64"
+        },
+        "libjasper1": {
+          "version": "1.900.1-13+deb7u6",
+          "arch": "amd64"
+        },
+        "libjbig0": {
+          "version": "2.0-2+deb7u1",
+          "arch": "amd64"
+        },
+        "libjpeg8": {
+          "version": "8d-1+deb7u1",
+          "arch": "amd64"
+        },
+        "libjson-perl": {
+          "version": "2.53-1",
+          "arch": "all"
+        },
+        "libjson-xs-perl": {
+          "version": "2.320-1+b1",
+          "arch": "amd64"
+        },
+        "libjson0": {
+          "version": "0.10-1.2",
+          "arch": "amd64"
+        },
+        "libk5crypto3": {
+          "version": "1.10.1+dfsg-5+deb7u2",
+          "arch": "amd64"
+        },
+        "libkeyutils1": {
+          "version": "1.5.5-3+deb7u1",
+          "arch": "amd64"
+        },
+        "libklibc": {
+          "version": "2.0.1-3.1",
+          "arch": "amd64"
+        },
+        "libkmod2": {
+          "version": "9-3",
+          "arch": "amd64"
+        },
+        "libkrb5-3": {
+          "version": "1.10.1+dfsg-5+deb7u2",
+          "arch": "amd64"
+        },
+        "libkrb5support0": {
+          "version": "1.10.1+dfsg-5+deb7u2",
+          "arch": "amd64"
+        },
+        "liblcms2-2": {
+          "version": "2.2+git20110628-2.2+deb7u2",
+          "arch": "amd64"
+        },
+        "libldap-2.4-2": {
+          "version": "2.4.31-1+nmu2",
+          "arch": "amd64"
+        },
+        "liblocale-gettext-perl": {
+          "version": "1.05-7+b1",
+          "arch": "amd64"
+        },
+        "liblockfile-bin": {
+          "version": "1.09-5",
+          "arch": "amd64"
+        },
+        "liblockfile1": {
+          "version": "1.09-5",
+          "arch": "amd64"
+        },
+        "liblwp-mediatypes-perl": {
+          "version": "6.02-1",
+          "arch": "all"
+        },
+        "liblwp-protocol-https-perl": {
+          "version": "6.03-1",
+          "arch": "all"
+        },
+        "liblzma5": {
+          "version": "5.1.1alpha+20120614-2",
+          "arch": "amd64"
+        },
+        "libmagic1": {
+          "version": "5.11-2+deb7u9",
+          "arch": "amd64"
+        },
+        "libmail-sendmail-perl": {
+          "version": "0.79.16-1",
+          "arch": "all"
+        },
+        "libmailtools-perl": {
+          "version": "2.09-1",
+          "arch": "all"
+        },
+        "libmime-tools-perl": {
+          "version": "5.503-1",
+          "arch": "all"
+        },
+        "libmount1": {
+          "version": "2.20.1-5.3",
+          "arch": "amd64"
+        },
+        "libmpc2": {
+          "version": "0.9-4",
+          "arch": "amd64"
+        },
+        "libmpfr4": {
+          "version": "3.1.0-5",
+          "arch": "amd64"
+        },
+        "libncurses5": {
+          "version": "5.9-10",
+          "arch": "amd64"
+        },
+        "libncurses5-dev": {
+          "version": "5.9-10",
+          "arch": "amd64"
+        },
+        "libncursesw5": {
+          "version": "5.9-10",
+          "arch": "amd64"
+        },
+        "libnet-dns-perl": {
+          "version": "0.66-2+b2",
+          "arch": "amd64"
+        },
+        "libnet-domain-tld-perl": {
+          "version": "1.69-1",
+          "arch": "all"
+        },
+        "libnet-http-perl": {
+          "version": "6.03-2",
+          "arch": "all"
+        },
+        "libnet-ip-perl": {
+          "version": "1.25-3",
+          "arch": "all"
+        },
+        "libnet-ssleay-perl": {
+          "version": "1.48-1+b1",
+          "arch": "amd64"
+        },
+        "libnewt0.52": {
+          "version": "0.52.14-11.1",
+          "arch": "amd64"
+        },
+        "libnfnetlink0": {
+          "version": "1.0.0-1.1",
+          "arch": "amd64"
+        },
+        "libnspr4": {
+          "version": "2:4.12-1+deb7u1",
+          "arch": "amd64"
+        },
+        "libnss3": {
+          "version": "2:3.26-1+debu7u4",
+          "arch": "amd64"
+        },
+        "libogg0": {
+          "version": "1.3.0-4",
+          "arch": "amd64"
+        },
+        "libopts25": {
+          "version": "1:5.12-0.1",
+          "arch": "amd64"
+        },
+        "libossp-uuid-perl": {
+          "version": "1.6.2-1.3",
+          "arch": "amd64"
+        },
+        "libossp-uuid16": {
+          "version": "1.6.2-1.3",
+          "arch": "amd64"
+        },
+        "libp11-kit0": {
+          "version": "0.12-3",
+          "arch": "amd64"
+        },
+        "libpam-modules": {
+          "version": "1.1.3-7.1",
+          "arch": "amd64"
+        },
+        "libpam-modules-bin": {
+          "version": "1.1.3-7.1",
+          "arch": "amd64"
+        },
+        "libpam-runtime": {
+          "version": "1.1.3-7.1",
+          "arch": "all"
+        },
+        "libpam0g": {
+          "version": "1.1.3-7.1",
+          "arch": "amd64"
+        },
+        "libpango1.0-0": {
+          "version": "1.30.0-1",
+          "arch": "amd64"
+        },
+        "libparse-debcontrol-perl": {
+          "version": "2.005-3",
+          "arch": "all"
+        },
+        "libparse-debianchangelog-perl": {
+          "version": "1.2.0-1",
+          "arch": "all"
+        },
+        "libpciaccess0": {
+          "version": "0.13.1-2",
+          "arch": "amd64"
+        },
+        "libpcre3": {
+          "version": "1:8.30-5",
+          "arch": "amd64"
+        },
+        "libpcsclite1": {
+          "version": "1.8.4-1+deb7u2",
+          "arch": "amd64"
+        },
+        "libpipeline1": {
+          "version": "1.2.1-1",
+          "arch": "amd64"
+        },
+        "libpixman-1-0": {
+          "version": "0.26.0-4+deb7u2",
+          "arch": "amd64"
+        },
+        "libpng12-0": {
+          "version": "1.2.49-1+deb7u2",
+          "arch": "amd64"
+        },
+        "libpopt0": {
+          "version": "1.16-7",
+          "arch": "amd64"
+        },
+        "libprocps0": {
+          "version": "1:3.3.3-3",
+          "arch": "amd64"
+        },
+        "libpthread-stubs0": {
+          "version": "0.3-3",
+          "arch": "amd64"
+        },
+        "libpthread-stubs0-dev": {
+          "version": "0.3-3",
+          "arch": "amd64"
+        },
+        "libpulse0": {
+          "version": "2.0-6.1",
+          "arch": "amd64"
+        },
+        "libquadmath0": {
+          "version": "4.7.2-5",
+          "arch": "amd64"
+        },
+        "libreadline6": {
+          "version": "6.2+dfsg-0.1",
+          "arch": "amd64"
+        },
+        "librtmp0": {
+          "version": "2.4+20111222.git4e06e21-1",
+          "arch": "amd64"
+        },
+        "libsasl2-2": {
+          "version": "2.1.25.dfsg1-6+deb7u1",
+          "arch": "amd64"
+        },
+        "libsctp1": {
+          "version": "1.0.11+dfsg-2",
+          "arch": "amd64"
+        },
+        "libselinux1": {
+          "version": "2.1.9-5",
+          "arch": "amd64"
+        },
+        "libsemanage-common": {
+          "version": "2.1.6-6",
+          "arch": "all"
+        },
+        "libsemanage1": {
+          "version": "2.1.6-6",
+          "arch": "amd64"
+        },
+        "libsepol1": {
+          "version": "2.1.4-3",
+          "arch": "amd64"
+        },
+        "libsigc++-2.0-0c2a": {
+          "version": "2.2.10-0.2",
+          "arch": "amd64"
+        },
+        "libslang2": {
+          "version": "2.2.4-15",
+          "arch": "amd64"
+        },
+        "libsm-dev": {
+          "version": "2:1.2.1-2",
+          "arch": "amd64"
+        },
+        "libsm6": {
+          "version": "2:1.2.1-2",
+          "arch": "amd64"
+        },
+        "libsndfile1": {
+          "version": "1.0.25-9.1+deb7u2",
+          "arch": "amd64"
+        },
+        "libsoap-lite-perl": {
+          "version": "0.714-1+deb7u1",
+          "arch": "all"
+        },
+        "libsocket-perl": {
+          "version": "2.002-1",
+          "arch": "amd64"
+        },
+        "libsqlite3-0": {
+          "version": "3.7.13-1+deb7u1",
+          "arch": "amd64"
+        },
+        "libss2": {
+          "version": "1.42.5-1.1",
+          "arch": "amd64"
+        },
+        "libssh2-1": {
+          "version": "1.4.2-1.1",
+          "arch": "amd64"
+        },
+        "libssl1.0.0": {
+          "version": "1.0.1e-2+deb7u14",
+          "arch": "amd64"
+        },
+        "libstdc++6": {
+          "version": "4.7.2-5",
+          "arch": "amd64"
+        },
+        "libstdc++6-4.7-dev": {
+          "version": "4.7.2-5",
+          "arch": "amd64"
+        },
+        "libsub-name-perl": {
+          "version": "0.05-1+b2",
+          "arch": "amd64"
+        },
+        "libswitch-perl": {
+          "version": "2.16-2",
+          "arch": "all"
+        },
+        "libsys-hostname-long-perl": {
+          "version": "1.4-2",
+          "arch": "all"
+        },
+        "libsystemd-login0": {
+          "version": "44-11+deb7u5",
+          "arch": "amd64"
+        },
+        "libtask-weaken-perl": {
+          "version": "1.03-1",
+          "arch": "all"
+        },
+        "libtasn1-3": {
+          "version": "2.13-2+deb7u1",
+          "arch": "amd64"
+        },
+        "libtext-charwidth-perl": {
+          "version": "0.04-7+b1",
+          "arch": "amd64"
+        },
+        "libtext-iconv-perl": {
+          "version": "1.7-5",
+          "arch": "amd64"
+        },
+        "libtext-wrapi18n-perl": {
+          "version": "0.06-7",
+          "arch": "all"
+        },
+        "libthai-data": {
+          "version": "0.1.18-2",
+          "arch": "all"
+        },
+        "libthai0": {
+          "version": "0.1.18-2",
+          "arch": "amd64"
+        },
+        "libtie-ixhash-perl": {
+          "version": "1.21-2",
+          "arch": "all"
+        },
+        "libtiff4": {
+          "version": "3.9.6-11+deb7u5",
+          "arch": "amd64"
+        },
+        "libtimedate-perl": {
+          "version": "1.2000-1",
+          "arch": "all"
+        },
+        "libtinfo-dev": {
+          "version": "5.9-10",
+          "arch": "amd64"
+        },
+        "libtinfo5": {
+          "version": "5.9-10",
+          "arch": "amd64"
+        },
+        "libudev0": {
+          "version": "175-7.2",
+          "arch": "amd64"
+        },
+        "libunistring0": {
+          "version": "0.9.3-5",
+          "arch": "amd64"
+        },
+        "liburi-perl": {
+          "version": "1.60-1",
+          "arch": "all"
+        },
+        "libusb-0.1-4": {
+          "version": "2:0.1.12-20+nmu1",
+          "arch": "amd64"
+        },
+        "libustr-1.0-1": {
+          "version": "1.0.4-3",
+          "arch": "amd64"
+        },
+        "libuuid-perl": {
+          "version": "0.02-5",
+          "arch": "amd64"
+        },
+        "libuuid1": {
+          "version": "2.20.1-5.3",
+          "arch": "amd64"
+        },
+        "libvorbis0a": {
+          "version": "1.3.2-1.3",
+          "arch": "amd64"
+        },
+        "libvorbisenc2": {
+          "version": "1.3.2-1.3",
+          "arch": "amd64"
+        },
+        "libwrap0": {
+          "version": "7.6.q-24",
+          "arch": "amd64"
+        },
+        "libwww-perl": {
+          "version": "6.04-1",
+          "arch": "all"
+        },
+        "libwww-robotrules-perl": {
+          "version": "6.01-1",
+          "arch": "all"
+        },
+        "libx11-6": {
+          "version": "2:1.5.0-1+deb7u4",
+          "arch": "amd64"
+        },
+        "libx11-data": {
+          "version": "2:1.5.0-1+deb7u4",
+          "arch": "all"
+        },
+        "libx11-dev": {
+          "version": "2:1.5.0-1+deb7u4",
+          "arch": "amd64"
+        },
+        "libx11-doc": {
+          "version": "2:1.5.0-1+deb7u4",
+          "arch": "all"
+        },
+        "libx11-xcb1": {
+          "version": "2:1.5.0-1+deb7u4",
+          "arch": "amd64"
+        },
+        "libxapian22": {
+          "version": "1.2.12-2",
+          "arch": "amd64"
+        },
+        "libxau-dev": {
+          "version": "1:1.0.7-1",
+          "arch": "amd64"
+        },
+        "libxau6": {
+          "version": "1:1.0.7-1",
+          "arch": "amd64"
+        },
+        "libxcb-glx0": {
+          "version": "1.8.1-2+deb7u1",
+          "arch": "amd64"
+        },
+        "libxcb-render0": {
+          "version": "1.8.1-2+deb7u1",
+          "arch": "amd64"
+        },
+        "libxcb-shm0": {
+          "version": "1.8.1-2+deb7u1",
+          "arch": "amd64"
+        },
+        "libxcb1": {
+          "version": "1.8.1-2+deb7u1",
+          "arch": "amd64"
+        },
+        "libxcb1-dev": {
+          "version": "1.8.1-2+deb7u1",
+          "arch": "amd64"
+        },
+        "libxcomposite1": {
+          "version": "1:0.4.3-2",
+          "arch": "amd64"
+        },
+        "libxcursor1": {
+          "version": "1:1.1.13-1+deb7u1",
+          "arch": "amd64"
+        },
+        "libxdamage1": {
+          "version": "1:1.1.3-2",
+          "arch": "amd64"
+        },
+        "libxdmcp-dev": {
+          "version": "1:1.1.1-1",
+          "arch": "amd64"
+        },
+        "libxdmcp6": {
+          "version": "1:1.1.1-1",
+          "arch": "amd64"
+        },
+        "libxext6": {
+          "version": "2:1.3.1-2+deb7u1",
+          "arch": "amd64"
+        },
+        "libxfixes3": {
+          "version": "1:5.0-4+deb7u2",
+          "arch": "amd64"
+        },
+        "libxft2": {
+          "version": "2.3.1-1",
+          "arch": "amd64"
+        },
+        "libxi6": {
+          "version": "2:1.6.1-1+deb7u3",
+          "arch": "amd64"
+        },
+        "libxinerama1": {
+          "version": "2:1.1.2-1+deb7u1",
+          "arch": "amd64"
+        },
+        "libxml-namespacesupport-perl": {
+          "version": "1.09-3",
+          "arch": "all"
+        },
+        "libxml-parser-perl": {
+          "version": "2.41-1+b1",
+          "arch": "amd64"
+        },
+        "libxml-sax-base-perl": {
+          "version": "1.07-1",
+          "arch": "all"
+        },
+        "libxml-sax-expat-perl": {
+          "version": "0.40-2",
+          "arch": "all"
+        },
+        "libxml-sax-perl": {
+          "version": "0.99+dfsg-2",
+          "arch": "all"
+        },
+        "libxml-simple-perl": {
+          "version": "2.20-1",
+          "arch": "all"
+        },
+        "libxml2": {
+          "version": "2.8.0+dfsg1-7+wheezy7",
+          "arch": "amd64"
+        },
+        "libxrandr2": {
+          "version": "2:1.3.2-2+deb7u2",
+          "arch": "amd64"
+        },
+        "libxrender1": {
+          "version": "1:0.9.7-1+deb7u3",
+          "arch": "amd64"
+        },
+        "libxt-dev": {
+          "version": "1:1.1.3-1+deb7u1",
+          "arch": "amd64"
+        },
+        "libxt6": {
+          "version": "1:1.1.3-1+deb7u1",
+          "arch": "amd64"
+        },
+        "libxtst6": {
+          "version": "2:1.2.1-1+deb7u2",
+          "arch": "amd64"
+        },
+        "libxxf86vm1": {
+          "version": "1:1.1.2-1+deb7u1",
+          "arch": "amd64"
+        },
+        "libyaml-0-2": {
+          "version": "0.1.4-2+deb7u5",
+          "arch": "amd64"
+        },
+        "lintian": {
+          "version": "2.5.10.4",
+          "arch": "all"
+        },
+        "linux-base": {
+          "version": "3.5",
+          "arch": "all"
+        },
+        "linux-image-3.2.0-4-amd64": {
+          "version": "3.2.65-1+deb7u1",
+          "arch": "amd64"
+        },
+        "linux-image-amd64": {
+          "version": "3.2+46",
+          "arch": "amd64"
+        },
+        "linux-libc-dev": {
+          "version": "3.2.88-1",
+          "arch": "amd64"
+        },
+        "lksctp-tools": {
+          "version": "1.0.11+dfsg-2",
+          "arch": "amd64"
+        },
+        "locales": {
+          "version": "2.13-38+deb7u7",
+          "arch": "all"
+        },
+        "lockfile-progs": {
+          "version": "0.1.17",
+          "arch": "amd64"
+        },
+        "login": {
+          "version": "1:4.1.5.1-1",
+          "arch": "amd64"
+        },
+        "logrotate": {
+          "version": "3.8.1-4",
+          "arch": "amd64"
+        },
+        "lsb-base": {
+          "version": "4.1+Debian8+deb7u1",
+          "arch": "all"
+        },
+        "lsb-release": {
+          "version": "4.1+Debian8+deb7u1",
+          "arch": "all"
+        },
+        "m4": {
+          "version": "1.4.16-3",
+          "arch": "amd64"
+        },
+        "make": {
+          "version": "3.81-8.2",
+          "arch": "amd64"
+        },
+        "man-db": {
+          "version": "2.6.2-1",
+          "arch": "amd64"
+        },
+        "manpages": {
+          "version": "3.44-1",
+          "arch": "all"
+        },
+        "manpages-dev": {
+          "version": "3.44-1",
+          "arch": "all"
+        },
+        "mawk": {
+          "version": "1.3.3-17",
+          "arch": "amd64"
+        },
+        "mime-support": {
+          "version": "3.52-1+deb7u1",
+          "arch": "all"
+        },
+        "mount": {
+          "version": "2.20.1-5.3",
+          "arch": "amd64"
+        },
+        "multiarch-support": {
+          "version": "2.13-38+deb7u7",
+          "arch": "amd64"
+        },
+        "nano": {
+          "version": "2.2.6-1+b1",
+          "arch": "amd64"
+        },
+        "ncurses-base": {
+          "version": "5.9-10",
+          "arch": "all"
+        },
+        "ncurses-bin": {
+          "version": "5.9-10",
+          "arch": "amd64"
+        },
+        "net-tools": {
+          "version": "1.60-24.2",
+          "arch": "amd64"
+        },
+        "netbase": {
+          "version": "5.0",
+          "arch": "all"
+        },
+        "netcat-traditional": {
+          "version": "1.10-40",
+          "arch": "amd64"
+        },
+        "ntp": {
+          "version": "1:4.2.6.p5+dfsg-2+deb7u7",
+          "arch": "amd64"
+        },
+        "ntpdate": {
+          "version": "1:4.2.6.p5+dfsg-2+deb7u7",
+          "arch": "amd64"
+        },
+        "omnibus-toolchain": {
+          "version": "1.1.73-1",
+          "arch": "amd64"
+        },
+        "openjdk-7-jdk": {
+          "version": "7u131-2.6.9-2~deb7u1",
+          "arch": "amd64"
+        },
+        "openjdk-7-jre": {
+          "version": "7u131-2.6.9-2~deb7u1",
+          "arch": "amd64"
+        },
+        "openjdk-7-jre-headless": {
+          "version": "7u131-2.6.9-2~deb7u1",
+          "arch": "amd64"
+        },
+        "openssh-client": {
+          "version": "1:6.0p1-4+deb7u2",
+          "arch": "amd64"
+        },
+        "openssh-server": {
+          "version": "1:6.0p1-4+deb7u2",
+          "arch": "amd64"
+        },
+        "openssl": {
+          "version": "1.0.1e-2+deb7u14",
+          "arch": "amd64"
+        },
+        "passwd": {
+          "version": "1:4.1.5.1-1",
+          "arch": "amd64"
+        },
+        "patch": {
+          "version": "2.6.1-3",
+          "arch": "amd64"
+        },
+        "patchutils": {
+          "version": "0.3.2-1.1",
+          "arch": "amd64"
+        },
+        "perl": {
+          "version": "5.14.2-21+deb7u5",
+          "arch": "amd64"
+        },
+        "perl-base": {
+          "version": "5.14.2-21+deb7u5",
+          "arch": "amd64"
+        },
+        "perl-modules": {
+          "version": "5.14.2-21+deb7u5",
+          "arch": "all"
+        },
+        "po-debconf": {
+          "version": "1.0.16+nmu2",
+          "arch": "all"
+        },
+        "procps": {
+          "version": "1:3.3.3-3",
+          "arch": "amd64"
+        },
+        "psmisc": {
+          "version": "22.19-1+deb7u1",
+          "arch": "amd64"
+        },
+        "python": {
+          "version": "2.7.3-4+deb7u1",
+          "arch": "all"
+        },
+        "python-apt": {
+          "version": "0.8.8.2",
+          "arch": "amd64"
+        },
+        "python-apt-common": {
+          "version": "0.8.8.2",
+          "arch": "all"
+        },
+        "python-boto": {
+          "version": "2.3.0-1",
+          "arch": "all"
+        },
+        "python-chardet": {
+          "version": "2.0.1-2",
+          "arch": "all"
+        },
+        "python-cheetah": {
+          "version": "2.4.4-3",
+          "arch": "amd64"
+        },
+        "python-configobj": {
+          "version": "4.7.2+ds-4",
+          "arch": "all"
+        },
+        "python-debian": {
+          "version": "0.1.21",
+          "arch": "all"
+        },
+        "python-gnupginterface": {
+          "version": "0.3.2-9.1",
+          "arch": "all"
+        },
+        "python-magic": {
+          "version": "5.11-2+deb7u9",
+          "arch": "amd64"
+        },
+        "python-minimal": {
+          "version": "2.7.3-4+deb7u1",
+          "arch": "all"
+        },
+        "python-oauth": {
+          "version": "1.0.1-3",
+          "arch": "all"
+        },
+        "python-prettytable": {
+          "version": "0.6.1-1",
+          "arch": "all"
+        },
+        "python-pycurl": {
+          "version": "7.19.0-5",
+          "arch": "amd64"
+        },
+        "python-requests": {
+          "version": "0.12.1-1",
+          "arch": "all"
+        },
+        "python-six": {
+          "version": "1.1.0-2",
+          "arch": "all"
+        },
+        "python-software-properties": {
+          "version": "0.82.7.1debian1",
+          "arch": "all"
+        },
+        "python-support": {
+          "version": "1.0.15",
+          "arch": "all"
+        },
+        "python-yaml": {
+          "version": "3.10-4+deb7u1",
+          "arch": "amd64"
+        },
+        "python2.7": {
+          "version": "2.7.3-6+deb7u2",
+          "arch": "amd64"
+        },
+        "python2.7-minimal": {
+          "version": "2.7.3-6+deb7u2",
+          "arch": "amd64"
+        },
+        "readline-common": {
+          "version": "6.2+dfsg-0.1",
+          "arch": "all"
+        },
+        "rsync": {
+          "version": "3.0.9-4",
+          "arch": "amd64"
+        },
+        "rsyslog": {
+          "version": "5.8.11-3+deb7u2",
+          "arch": "amd64"
+        },
+        "sed": {
+          "version": "4.2.1-10",
+          "arch": "amd64"
+        },
+        "sensible-utils": {
+          "version": "0.0.7",
+          "arch": "all"
+        },
+        "sgml-base": {
+          "version": "1.26+nmu4",
+          "arch": "all"
+        },
+        "shared-mime-info": {
+          "version": "1.0-1+b1",
+          "arch": "amd64"
+        },
+        "strace": {
+          "version": "4.5.20-2.3",
+          "arch": "amd64"
+        },
+        "sudo": {
+          "version": "1.8.5p2-1+nmu1",
+          "arch": "amd64"
+        },
+        "sysv-rc": {
+          "version": "2.88dsf-41+deb7u1",
+          "arch": "all"
+        },
+        "sysvinit": {
+          "version": "2.88dsf-41+deb7u1",
+          "arch": "amd64"
+        },
+        "sysvinit-utils": {
+          "version": "2.88dsf-41+deb7u1",
+          "arch": "amd64"
+        },
+        "tar": {
+          "version": "1.26+dfsg-0.1",
+          "arch": "amd64"
+        },
+        "tasksel": {
+          "version": "3.14.1",
+          "arch": "all"
+        },
+        "tasksel-data": {
+          "version": "3.14.1",
+          "arch": "all"
+        },
+        "traceroute": {
+          "version": "1:2.0.18-3",
+          "arch": "amd64"
+        },
+        "ttf-dejavu-core": {
+          "version": "2.33-3",
+          "arch": "all"
+        },
+        "ttf-dejavu-extra": {
+          "version": "2.33-3",
+          "arch": "all"
+        },
+        "tzdata": {
+          "version": "2017b-0+deb7u1",
+          "arch": "all"
+        },
+        "tzdata-java": {
+          "version": "2017b-0+deb7u1",
+          "arch": "all"
+        },
+        "ucf": {
+          "version": "3.0025+nmu3",
+          "arch": "all"
+        },
+        "udev": {
+          "version": "175-7.2",
+          "arch": "amd64"
+        },
+        "unattended-upgrades": {
+          "version": "0.79.5+wheezy1",
+          "arch": "all"
+        },
+        "unzip": {
+          "version": "6.0-8+deb7u6",
+          "arch": "amd64"
+        },
+        "util-linux": {
+          "version": "2.20.1-5.3",
+          "arch": "amd64"
+        },
+        "vim-common": {
+          "version": "2:7.3.547-7",
+          "arch": "amd64"
+        },
+        "vim-tiny": {
+          "version": "2:7.3.547-7",
+          "arch": "amd64"
+        },
+        "wdiff": {
+          "version": "1.1.2-1",
+          "arch": "amd64"
+        },
+        "wget": {
+          "version": "1.13.4-3+deb7u2",
+          "arch": "amd64"
+        },
+        "whiptail": {
+          "version": "0.52.14-11.1",
+          "arch": "amd64"
+        },
+        "x11-common": {
+          "version": "1:7.7+3~deb7u1",
+          "arch": "all"
+        },
+        "x11proto-core-dev": {
+          "version": "7.0.23-1",
+          "arch": "all"
+        },
+        "x11proto-input-dev": {
+          "version": "2.2-1",
+          "arch": "all"
+        },
+        "x11proto-kb-dev": {
+          "version": "1.0.6-2",
+          "arch": "all"
+        },
+        "xml-core": {
+          "version": "0.13+nmu2",
+          "arch": "all"
+        },
+        "xorg-sgml-doctools": {
+          "version": "1:1.10-1",
+          "arch": "all"
+        },
+        "xtrans-dev": {
+          "version": "1.2.7-1",
+          "arch": "all"
+        },
+        "xz-utils": {
+          "version": "5.1.1alpha+20120614-2",
+          "arch": "amd64"
+        },
+        "zlib1g": {
+          "version": "1:1.2.7.dfsg-13",
+          "arch": "amd64"
+        },
+        "zlib1g-dev": {
+          "version": "1:1.2.7.dfsg-13",
+          "arch": "amd64"
+        }
+      },
+      "ec2": {
+        "ami_id": "ami-431a4273",
+        "ami_launch_index": "0",
+        "ami_manifest_path": "(unknown)",
+        "block_device_mapping_ami": "/dev/xvda",
+        "block_device_mapping_root": "/dev/xvda",
+        "hostname": "ip-242-58-187-217.us-west-2.compute.internal",
+        "instance_action": "none",
+        "instance_id": "i-090dc5353822119f7",
+        "instance_type": "t2.medium",
+        "local_hostname": "ip-242-58-187-217.us-west-2.compute.internal",
+        "local_ipv4": "242.58.187.217",
+        "mac": "02:07:f5:70:9f:f0",
+        "metrics_vhostmd": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+        "network_interfaces_macs": {
+          "02:07:f5:70:9f:f0": {
+            "device_number": "0",
+            "interface_id": "eni-6cd56b46",
+            "local_hostname": "ip-242-58-187-217.us-west-2.compute.internal",
+            "local_ipv4s": "242.58.187.217",
+            "mac": "02:07:f5:70:9f:f0",
+            "owner_id": "999999999999",
+            "security_group_ids": "sg-96274af3",
+            "security_groups": "default",
+            "subnet_id": "subnet-19ac017c",
+            "subnet_ipv4_cidr_block": "242.58.8.0/21",
+            "vpc_id": "vpc-2229ff47",
+            "vpc_ipv4_cidr_block": "242.58.0.0/16",
+            "vpc_ipv4_cidr_blocks": "242.58.0.0/16"
+          }
+        },
+        "placement_availability_zone": "us-west-2a",
+        "profile": "default-hvm",
+        "reservation_id": "r-020a5a0ce566ed4cd",
+        "security_groups": [
+          "default"
+        ],
+        "services_domain": "amazonaws.com",
+        "services_partition": "aws",
+        "userdata": "#!/bin/sh\n\n# Ensure CA bundle is up-to-date\nsudo apt-get update\nsudo apt-get install ca-certificates -y\nsudo apt-get install curl -y\n",
+        "account_id": "999999999999",
+        "availability_zone": "us-west-2a",
+        "region": "us-west-2"
+      },
+      "json?": "{\n  \"privateIp\" : \"242.58.187.217\",\n  \"devpayProductCodes\" : null,\n  \"availabilityZone\" : \"us-west-2a\",\n  \"version\" : \"2010-08-31\",\n  \"pendingTime\" : \"2017-06-05T23:19:43Z\",\n  \"instanceId\" : \"i-090dc5353822119f7\",\n  \"billingProducts\" : null,\n  \"instanceType\" : \"t2.medium\",\n  \"accountId\" : \"999999999999\",\n  \"architecture\" : \"x86_64\",\n  \"kernelId\" : null,\n  \"ramdiskId\" : null,\n  \"imageId\" : \"ami-431a4273\",\n  \"region\" : \"us-west-2\"\n}",
+      "cloud": {
+        "public_ips": [
+          null
+        ],
+        "private_ips": [
+          "242.58.187.217"
+        ],
+        "public_ipv4": null,
+        "public_hostname": null,
+        "local_ipv4": "242.58.187.217",
+        "local_hostname": "ip-242-58-187-217.us-west-2.compute.internal",
+        "provider": "ec2"
+      },
+      "init_package": "init",
+      "keys": {
+        "ssh": {
+          "host_rsa_public": "AAAAB3NzaC1yc2EAAAADAQABAAABAQDbxICh2E8+qP5vK70GH+YLCIFJxKZBJtz0+6Gr2hsLa/DtZPf2OuaaOyN9cCkhrh/91S5OtedzfV+L7HRZ8oQFPfSSQlyzkiP5PJif0lHjFb6QwAnDqCuYAN9laO0XzI+TgZDB4ehW4Ba7mq8cGlvVvHbaBPUJZDbrhpLQf5paca72cqBKabv8F5DEEtuBVU252uMAqq3bA1BkplGdX9NwLjlWk7rjuge6nwx919+9MZpjf0LunIrS8yHjA1AmkAV2oiEFu6blngrDaQwFVV9cwmkxFRoFCn8c7Y0QBGjrunTT2puxfutbh7QigJRCd6fS7vlwINMT/oy/TTkNxJ/b",
+          "host_dsa_public": "AAAAB3NzaC1kc3MAAACBAKfVmlUMK3AK2HGwhfgdSWBo9LYVjkKPpkbFRIUeq4xPa/40fY/1bSifgmKKUD0+s8t7CHUGwljGf+bmlHwhIbbRV7YywXchTngIkHa++Yv6jbcdjvSFyxavHPbElg6SWm2+Lc1mGfHuKyGuVv0KEmWVwSrIRFNFLp+M5HNimlsbAAAAFQDVbFm/aqqIzD+LEkehMq6QU9mf3wAAAIB1+wqs4QZGIy4GUn/27J7FxmBj9NY6VA19GJ8eVg7GChoUJYxYtQwXdevUkCFXJJBoxOmRsJomQs71Zzcm29pVVbhA6b1Yndehc2DmNUmItc1CsVnDxO4GSeQA8PITi+RN6SFa/XVnaa+8gBS7S4aGLsUyEct0W8JqcsOfq44k+gAAAIAt+YMmxa0kMTiRyXXoYFWahmf4FZKSKRrIhcY2N6+YcNxjZ/s+GohXNsvUwtrSWln/NYhClN/9QI/sa0Ei9jRVJcKWiBuv/FS3VyueorGADYoY6HQIfSBKoGSRz92ztk6dtHH7nnL7qg14cRMvk/Jx83+4pgAj0C/bFKFbBYBF7A==",
+          "host_ecdsa_public": "AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJcd62DZjaGarxcnhw9BinVX07hS6sj0bmY2r8rIKDrSsfuNJgtyqlubPgda4nnG54zIkacJ4Lfnx2oss0B1c7E=",
+          "host_ecdsa_type": "ecdsa-sha2-nistp256"
+        }
+      },
+      "hostname": "ip-242-58-187-217",
+      "machinename": "ip-242-58-187-217",
+      "fqdn": "ip-242-58-187-217.us-west-2.compute.internal",
+      "domain": "us-west-2.compute.internal",
+      "root_group": "root",
+      "fips": {
+        "kernel": {
+          "enabled": false
+        }
+      },
+      "command": {
+        "ps": "ps -ef"
+      },
+      "ohai_time": 1509569930.4779391,
+      "cloud_v2": {
+        "local_ipv4_addrs": [
+          "242.58.187.217"
+        ],
+        "provider": "ec2",
+        "local_hostname": "ip-242-58-187-217.us-west-2.compute.internal",
+        "local_ipv4": "242.58.187.217"
+      },
+      "machine_id": "b692aca8710cf323a5c03ad85935e81e",
+      "block_device": {
+        "xvda": {
+          "size": "62914560",
+          "removable": "0",
+          "rotational": "0",
+          "physical_block_size": "512",
+          "logical_block_size": "512"
+        }
+      },
+      "hostnamectl": {},
+      "shard_seed": 47797454,
+      "shells": [
+        "/bin/sh",
+        "/bin/dash",
+        "/bin/bash",
+        "/bin/rbash"
+      ],
+      "sysconf": {
+        "LINK_MAX": 32000,
+        "_POSIX_LINK_MAX": 32000,
+        "MAX_CANON": 255,
+        "_POSIX_MAX_CANON": 255,
+        "MAX_INPUT": 255,
+        "_POSIX_MAX_INPUT": 255,
+        "NAME_MAX": 255,
+        "_POSIX_NAME_MAX": 255,
+        "PATH_MAX": 4096,
+        "_POSIX_PATH_MAX": 4096,
+        "PIPE_BUF": 4096,
+        "_POSIX_PIPE_BUF": 4096,
+        "SOCK_MAXBUF": null,
+        "_POSIX_ASYNC_IO": null,
+        "_POSIX_CHOWN_RESTRICTED": 1,
+        "_POSIX_NO_TRUNC": 1,
+        "_POSIX_PRIO_IO": null,
+        "_POSIX_SYNC_IO": null,
+        "_POSIX_VDISABLE": 0,
+        "ARG_MAX": 2097152,
+        "ATEXIT_MAX": 2147483647,
+        "CHAR_BIT": 8,
+        "CHAR_MAX": 127,
+        "CHAR_MIN": -128,
+        "CHILD_MAX": 31631,
+        "CLK_TCK": 100,
+        "INT_MAX": 2147483647,
+        "INT_MIN": -2147483648,
+        "IOV_MAX": 1024,
+        "LOGNAME_MAX": 256,
+        "LONG_BIT": 64,
+        "MB_LEN_MAX": 16,
+        "NGROUPS_MAX": 65536,
+        "NL_ARGMAX": 4096,
+        "NL_LANGMAX": 2048,
+        "NL_MSGMAX": 2147483647,
+        "NL_NMAX": 2147483647,
+        "NL_SETMAX": 2147483647,
+        "NL_TEXTMAX": 2147483647,
+        "NSS_BUFLEN_GROUP": 1024,
+        "NSS_BUFLEN_PASSWD": 1024,
+        "NZERO": 20,
+        "OPEN_MAX": 1024,
+        "PAGESIZE": 4096,
+        "PAGE_SIZE": 4096,
+        "PASS_MAX": 8192,
+        "PTHREAD_DESTRUCTOR_ITERATIONS": 4,
+        "PTHREAD_KEYS_MAX": 1024,
+        "PTHREAD_STACK_MIN": 16384,
+        "PTHREAD_THREADS_MAX": null,
+        "SCHAR_MAX": 127,
+        "SCHAR_MIN": -128,
+        "SHRT_MAX": 32767,
+        "SHRT_MIN": -32768,
+        "SSIZE_MAX": 32767,
+        "TTY_NAME_MAX": 32,
+        "TZNAME_MAX": 6,
+        "UCHAR_MAX": 255,
+        "UINT_MAX": 4294967295,
+        "UIO_MAXIOV": 1024,
+        "ULONG_MAX": 18446744073709551615,
+        "USHRT_MAX": 65535,
+        "WORD_BIT": 32,
+        "_AVPHYS_PAGES": 301482,
+        "_NPROCESSORS_CONF": 2,
+        "_NPROCESSORS_ONLN": 2,
+        "_PHYS_PAGES": 949497,
+        "_POSIX_ARG_MAX": 2097152,
+        "_POSIX_ASYNCHRONOUS_IO": 200809,
+        "_POSIX_CHILD_MAX": 31631,
+        "_POSIX_FSYNC": 200809,
+        "_POSIX_JOB_CONTROL": 1,
+        "_POSIX_MAPPED_FILES": 200809,
+        "_POSIX_MEMLOCK": 200809,
+        "_POSIX_MEMLOCK_RANGE": 200809,
+        "_POSIX_MEMORY_PROTECTION": 200809,
+        "_POSIX_MESSAGE_PASSING": 200809,
+        "_POSIX_NGROUPS_MAX": 65536,
+        "_POSIX_OPEN_MAX": 1024,
+        "_POSIX_PII": null,
+        "_POSIX_PII_INTERNET": null,
+        "_POSIX_PII_INTERNET_DGRAM": null,
+        "_POSIX_PII_INTERNET_STREAM": null,
+        "_POSIX_PII_OSI": null,
+        "_POSIX_PII_OSI_CLTS": null,
+        "_POSIX_PII_OSI_COTS": null,
+        "_POSIX_PII_OSI_M": null,
+        "_POSIX_PII_SOCKET": null,
+        "_POSIX_PII_XTI": null,
+        "_POSIX_POLL": null,
+        "_POSIX_PRIORITIZED_IO": 200809,
+        "_POSIX_PRIORITY_SCHEDULING": 200809,
+        "_POSIX_REALTIME_SIGNALS": 200809,
+        "_POSIX_SAVED_IDS": 1,
+        "_POSIX_SELECT": null,
+        "_POSIX_SEMAPHORES": 200809,
+        "_POSIX_SHARED_MEMORY_OBJECTS": 200809,
+        "_POSIX_SSIZE_MAX": 32767,
+        "_POSIX_STREAM_MAX": 16,
+        "_POSIX_SYNCHRONIZED_IO": 200809,
+        "_POSIX_THREADS": 200809,
+        "_POSIX_THREAD_ATTR_STACKADDR": 200809,
+        "_POSIX_THREAD_ATTR_STACKSIZE": 200809,
+        "_POSIX_THREAD_PRIORITY_SCHEDULING": 200809,
+        "_POSIX_THREAD_PRIO_INHERIT": 200809,
+        "_POSIX_THREAD_PRIO_PROTECT": 200809,
+        "_POSIX_THREAD_ROBUST_PRIO_INHERIT": null,
+        "_POSIX_THREAD_ROBUST_PRIO_PROTECT": null,
+        "_POSIX_THREAD_PROCESS_SHARED": 200809,
+        "_POSIX_THREAD_SAFE_FUNCTIONS": 200809,
+        "_POSIX_TIMERS": 200809,
+        "TIMER_MAX": null,
+        "_POSIX_TZNAME_MAX": 6,
+        "_POSIX_VERSION": 200809,
+        "_T_IOV_MAX": null,
+        "_XOPEN_CRYPT": 1,
+        "_XOPEN_ENH_I18N": 1,
+        "_XOPEN_LEGACY": 1,
+        "_XOPEN_REALTIME": 1,
+        "_XOPEN_REALTIME_THREADS": 1,
+        "_XOPEN_SHM": 1,
+        "_XOPEN_UNIX": 1,
+        "_XOPEN_VERSION": 700,
+        "_XOPEN_XCU_VERSION": 4,
+        "_XOPEN_XPG2": 1,
+        "_XOPEN_XPG3": 1,
+        "_XOPEN_XPG4": 1,
+        "BC_BASE_MAX": 99,
+        "BC_DIM_MAX": 2048,
+        "BC_SCALE_MAX": 99,
+        "BC_STRING_MAX": 1000,
+        "CHARCLASS_NAME_MAX": 2048,
+        "COLL_WEIGHTS_MAX": 255,
+        "EQUIV_CLASS_MAX": null,
+        "EXPR_NEST_MAX": 32,
+        "LINE_MAX": 2048,
+        "POSIX2_BC_BASE_MAX": 99,
+        "POSIX2_BC_DIM_MAX": 2048,
+        "POSIX2_BC_SCALE_MAX": 99,
+        "POSIX2_BC_STRING_MAX": 1000,
+        "POSIX2_CHAR_TERM": 200809,
+        "POSIX2_COLL_WEIGHTS_MAX": 255,
+        "POSIX2_C_BIND": 200809,
+        "POSIX2_C_DEV": 200809,
+        "POSIX2_C_VERSION": null,
+        "POSIX2_EXPR_NEST_MAX": 32,
+        "POSIX2_FORT_DEV": null,
+        "POSIX2_FORT_RUN": null,
+        "_POSIX2_LINE_MAX": 2048,
+        "POSIX2_LINE_MAX": 2048,
+        "POSIX2_LOCALEDEF": 200809,
+        "POSIX2_RE_DUP_MAX": 32767,
+        "POSIX2_SW_DEV": 200809,
+        "POSIX2_UPE": null,
+        "POSIX2_VERSION": 200809,
+        "RE_DUP_MAX": 32767,
+        "PATH": "/bin:/usr/bin",
+        "CS_PATH": "/bin:/usr/bin",
+        "LFS_CFLAGS": null,
+        "LFS_LDFLAGS": null,
+        "LFS_LIBS": null,
+        "LFS_LINTFLAGS": null,
+        "LFS64_CFLAGS": "-D_LARGEFILE64_SOURCE",
+        "LFS64_LDFLAGS": null,
+        "LFS64_LIBS": null,
+        "LFS64_LINTFLAGS": "-D_LARGEFILE64_SOURCE",
+        "_XBS5_WIDTH_RESTRICTED_ENVS": "XBS5_LP64_OFF64",
+        "XBS5_WIDTH_RESTRICTED_ENVS": "XBS5_LP64_OFF64",
+        "_XBS5_ILP32_OFF32": null,
+        "XBS5_ILP32_OFF32_CFLAGS": null,
+        "XBS5_ILP32_OFF32_LDFLAGS": null,
+        "XBS5_ILP32_OFF32_LIBS": null,
+        "XBS5_ILP32_OFF32_LINTFLAGS": null,
+        "_XBS5_ILP32_OFFBIG": null,
+        "XBS5_ILP32_OFFBIG_CFLAGS": null,
+        "XBS5_ILP32_OFFBIG_LDFLAGS": null,
+        "XBS5_ILP32_OFFBIG_LIBS": null,
+        "XBS5_ILP32_OFFBIG_LINTFLAGS": null,
+        "_XBS5_LP64_OFF64": 1,
+        "XBS5_LP64_OFF64_CFLAGS": "-m64",
+        "XBS5_LP64_OFF64_LDFLAGS": "-m64",
+        "XBS5_LP64_OFF64_LIBS": null,
+        "XBS5_LP64_OFF64_LINTFLAGS": null,
+        "_XBS5_LPBIG_OFFBIG": null,
+        "XBS5_LPBIG_OFFBIG_CFLAGS": null,
+        "XBS5_LPBIG_OFFBIG_LDFLAGS": null,
+        "XBS5_LPBIG_OFFBIG_LIBS": null,
+        "XBS5_LPBIG_OFFBIG_LINTFLAGS": null,
+        "_POSIX_V6_ILP32_OFF32": null,
+        "POSIX_V6_ILP32_OFF32_CFLAGS": null,
+        "POSIX_V6_ILP32_OFF32_LDFLAGS": null,
+        "POSIX_V6_ILP32_OFF32_LIBS": null,
+        "POSIX_V6_ILP32_OFF32_LINTFLAGS": null,
+        "_POSIX_V6_WIDTH_RESTRICTED_ENVS": "POSIX_V6_LP64_OFF64",
+        "POSIX_V6_WIDTH_RESTRICTED_ENVS": "POSIX_V6_LP64_OFF64",
+        "_POSIX_V6_ILP32_OFFBIG": null,
+        "POSIX_V6_ILP32_OFFBIG_CFLAGS": null,
+        "POSIX_V6_ILP32_OFFBIG_LDFLAGS": null,
+        "POSIX_V6_ILP32_OFFBIG_LIBS": null,
+        "POSIX_V6_ILP32_OFFBIG_LINTFLAGS": null,
+        "_POSIX_V6_LP64_OFF64": 1,
+        "POSIX_V6_LP64_OFF64_CFLAGS": "-m64",
+        "POSIX_V6_LP64_OFF64_LDFLAGS": "-m64",
+        "POSIX_V6_LP64_OFF64_LIBS": null,
+        "POSIX_V6_LP64_OFF64_LINTFLAGS": null,
+        "_POSIX_V6_LPBIG_OFFBIG": null,
+        "POSIX_V6_LPBIG_OFFBIG_CFLAGS": null,
+        "POSIX_V6_LPBIG_OFFBIG_LDFLAGS": null,
+        "POSIX_V6_LPBIG_OFFBIG_LIBS": null,
+        "POSIX_V6_LPBIG_OFFBIG_LINTFLAGS": null,
+        "_POSIX_V7_ILP32_OFF32": null,
+        "POSIX_V7_ILP32_OFF32_CFLAGS": null,
+        "POSIX_V7_ILP32_OFF32_LDFLAGS": null,
+        "POSIX_V7_ILP32_OFF32_LIBS": null,
+        "POSIX_V7_ILP32_OFF32_LINTFLAGS": null,
+        "_POSIX_V7_WIDTH_RESTRICTED_ENVS": "POSIX_V7_LP64_OFF64",
+        "POSIX_V7_WIDTH_RESTRICTED_ENVS": "POSIX_V7_LP64_OFF64",
+        "_POSIX_V7_ILP32_OFFBIG": null,
+        "POSIX_V7_ILP32_OFFBIG_CFLAGS": null,
+        "POSIX_V7_ILP32_OFFBIG_LDFLAGS": null,
+        "POSIX_V7_ILP32_OFFBIG_LIBS": null,
+        "POSIX_V7_ILP32_OFFBIG_LINTFLAGS": null,
+        "_POSIX_V7_LP64_OFF64": 1,
+        "POSIX_V7_LP64_OFF64_CFLAGS": "-m64",
+        "POSIX_V7_LP64_OFF64_LDFLAGS": "-m64",
+        "POSIX_V7_LP64_OFF64_LIBS": null,
+        "POSIX_V7_LP64_OFF64_LINTFLAGS": null,
+        "_POSIX_V7_LPBIG_OFFBIG": null,
+        "POSIX_V7_LPBIG_OFFBIG_CFLAGS": null,
+        "POSIX_V7_LPBIG_OFFBIG_LDFLAGS": null,
+        "POSIX_V7_LPBIG_OFFBIG_LIBS": null,
+        "POSIX_V7_LPBIG_OFFBIG_LINTFLAGS": null,
+        "_POSIX_ADVISORY_INFO": 200809,
+        "_POSIX_BARRIERS": 200809,
+        "_POSIX_BASE": null,
+        "_POSIX_C_LANG_SUPPORT": null,
+        "_POSIX_C_LANG_SUPPORT_R": null,
+        "_POSIX_CLOCK_SELECTION": 200809,
+        "_POSIX_CPUTIME": 200809,
+        "_POSIX_THREAD_CPUTIME": 200809,
+        "_POSIX_DEVICE_SPECIFIC": null,
+        "_POSIX_DEVICE_SPECIFIC_R": null,
+        "_POSIX_FD_MGMT": null,
+        "_POSIX_FIFO": null,
+        "_POSIX_PIPE": null,
+        "_POSIX_FILE_ATTRIBUTES": null,
+        "_POSIX_FILE_LOCKING": null,
+        "_POSIX_FILE_SYSTEM": null,
+        "_POSIX_MONOTONIC_CLOCK": 200809,
+        "_POSIX_MULTI_PROCESS": null,
+        "_POSIX_SINGLE_PROCESS": null,
+        "_POSIX_NETWORKING": null,
+        "_POSIX_READER_WRITER_LOCKS": 200809,
+        "_POSIX_SPIN_LOCKS": 200809,
+        "_POSIX_REGEXP": 1,
+        "_REGEX_VERSION": null,
+        "_POSIX_SHELL": 1,
+        "_POSIX_SIGNALS": null,
+        "_POSIX_SPAWN": 200809,
+        "_POSIX_SPORADIC_SERVER": null,
+        "_POSIX_THREAD_SPORADIC_SERVER": null,
+        "_POSIX_SYSTEM_DATABASE": null,
+        "_POSIX_SYSTEM_DATABASE_R": null,
+        "_POSIX_TIMEOUTS": 200809,
+        "_POSIX_TYPED_MEMORY_OBJECTS": null,
+        "_POSIX_USER_GROUPS": null,
+        "_POSIX_USER_GROUPS_R": null,
+        "POSIX2_PBS": null,
+        "POSIX2_PBS_ACCOUNTING": null,
+        "POSIX2_PBS_LOCATE": null,
+        "POSIX2_PBS_TRACK": null,
+        "POSIX2_PBS_MESSAGE": null,
+        "SYMLOOP_MAX": null,
+        "STREAM_MAX": 16,
+        "AIO_LISTIO_MAX": null,
+        "AIO_MAX": null,
+        "AIO_PRIO_DELTA_MAX": 20,
+        "DELAYTIMER_MAX": 2147483647,
+        "HOST_NAME_MAX": 64,
+        "LOGIN_NAME_MAX": 256,
+        "MQ_OPEN_MAX": null,
+        "MQ_PRIO_MAX": 32768,
+        "_POSIX_DEVICE_IO": null,
+        "_POSIX_TRACE": null,
+        "_POSIX_TRACE_EVENT_FILTER": null,
+        "_POSIX_TRACE_INHERIT": null,
+        "_POSIX_TRACE_LOG": null,
+        "RTSIG_MAX": 32,
+        "SEM_NSEMS_MAX": null,
+        "SEM_VALUE_MAX": 2147483647,
+        "SIGQUEUE_MAX": 31631,
+        "FILESIZEBITS": 64,
+        "POSIX_ALLOC_SIZE_MIN": 4096,
+        "POSIX_REC_INCR_XFER_SIZE": null,
+        "POSIX_REC_MAX_XFER_SIZE": null,
+        "POSIX_REC_MIN_XFER_SIZE": 4096,
+        "POSIX_REC_XFER_ALIGN": 4096,
+        "SYMLINK_MAX": null,
+        "GNU_LIBC_VERSION": "glibc 2.13",
+        "GNU_LIBPTHREAD_VERSION": "NPTL 2.13",
+        "POSIX2_SYMLINKS": 1,
+        "LEVEL1_ICACHE_SIZE": 32768,
+        "LEVEL1_ICACHE_ASSOC": 8,
+        "LEVEL1_ICACHE_LINESIZE": 64,
+        "LEVEL1_DCACHE_SIZE": 32768,
+        "LEVEL1_DCACHE_ASSOC": 8,
+        "LEVEL1_DCACHE_LINESIZE": 64,
+        "LEVEL2_CACHE_SIZE": 262144,
+        "LEVEL2_CACHE_ASSOC": 8,
+        "LEVEL2_CACHE_LINESIZE": 64,
+        "LEVEL3_CACHE_SIZE": 31457280,
+        "LEVEL3_CACHE_ASSOC": 20,
+        "LEVEL3_CACHE_LINESIZE": 64,
+        "LEVEL4_CACHE_SIZE": 0,
+        "LEVEL4_CACHE_ASSOC": 0,
+        "LEVEL4_CACHE_LINESIZE": 0,
+        "IPV6": 200809,
+        "RAW_SOCKETS": 200809
+      },
+      "chef_packages": {
+        "chef": {
+          "version": "12.21.3",
+          "chef_root": "/opt/chef/embedded/lib/ruby/gems/2.3.0/gems/chef-12.21.3/lib"
+        },
+        "ohai": {
+          "version": "8.24.0",
+          "ohai_root": "/opt/chef/embedded/lib/ruby/gems/2.3.0/gems/ohai-8.24.0/lib/ohai"
+        }
+      },
+      "recipes": [
+        "opscode-ci::slave",
+        "opscode-ci::_build_support",
+        "chef-sugar::default",
+        "opscode-ci::_platform_tweaks",
+        "opscode-ci::_migration",
+        "omnibus::default",
+        "omnibus::_common",
+        "omnibus::_user",
+        "omnibus::_omnibus_toolchain",
+        "omnibus::_compile",
+        "build-essential::default",
+        "omnibus::_git",
+        "omnibus::_github",
+        "omnibus::_libffi",
+        "omnibus::_packaging",
+        "omnibus::_selinux",
+        "omnibus::_environment",
+        "opscode-ci::_github",
+        "opscode-ci::_ntp",
+        "ntp::default",
+        "opscode-ci::_package_signing",
+        "opscode-ci::_rubygems",
+        "opscode-ci::_aws",
+        "opscode-ci::_users",
+        "opscode-ci::_sudo",
+        "sudo::default",
+        "opscode-ci::_java",
+        "aws::default",
+        "opscode-ci::_omnibus"
+      ],
+      "expanded_run_list": [
+        "opscode-ci::slave"
+      ],
+      "roles": [
+        "test",
+        "test1"
+      ],
+      "cookbooks": {
+        "opscode-ci": {
+          "version": "5.15.127"
+        },
+        "apt": {
+          "version": "6.1.4"
+        },
+        "chef-sugar": {
+          "version": "3.4.0"
+        },
+        "freebsd": {
+          "version": "1.0.2"
+        },
+        "lvm": {
+          "version": "4.1.9"
+        },
+        "omnibus": {
+          "version": "5.2.2"
+        },
+        "build-essential": {
+          "version": "8.0.3"
+        },
+        "seven_zip": {
+          "version": "2.0.2"
+        },
+        "windows": {
+          "version": "2.0.2"
+        },
+        "mingw": {
+          "version": "2.0.1"
+        },
+        "chef-ingredient": {
+          "version": "2.1.10"
+        },
+        "git": {
+          "version": "6.1.0"
+        },
+        "dmg": {
+          "version": "4.0.0"
+        },
+        "yum-epel": {
+          "version": "2.1.2"
+        },
+        "compat_resource": {
+          "version": "12.19.0"
+        },
+        "homebrew": {
+          "version": "4.2.0"
+        },
+        "remote_install": {
+          "version": "1.0.2"
+        },
+        "wix": {
+          "version": "3.0.0"
+        },
+        "windows-sdk": {
+          "version": "1.0.2"
+        },
+        "ntp": {
+          "version": "3.5.2"
+        },
+        "route53": {
+          "version": "2.0.0"
+        },
+        "rsyslog": {
+          "version": "5.1.0"
+        },
+        "sudo": {
+          "version": "3.5.3"
+        },
+        "redhat_subscription_manager": {
+          "version": "0.6.0"
+        },
+        "aws": {
+          "version": "3.3.3"
+        },
+        "ohai": {
+          "version": "3.0.1"
+        },
+        "jenkins": {
+          "version": "2.6.0"
+        },
+        "runit": {
+          "version": "1.8.0"
+        },
+        "packagecloud": {
+          "version": "0.3.0"
+        },
+        "yum": {
+          "version": "3.13.0"
+        },
+        "chef_nginx": {
+          "version": "2.9.0"
+        },
+        "bluepill": {
+          "version": "3.0.0"
+        },
+        "zypper": {
+          "version": "0.4.0"
+        },
+        "rubygems": {
+          "version": "1.0.2"
+        }
+      }
+    },
+    "normal": {
+      "tags": [
+        "chefdk",
+        "slave",
+        "tester"
+      ],
+      "omnibus": {
+        "build_user": "jenkins",
+        "build_user_password": "$1$4PauyzMX$ew5qtMVnZG8SBGdwjxt/X1",
+        "build_user_group": "jenkins",
+        "build_user_home": "/home/jenkins",
+        "ruby_version": "2.1.8"
+      },
+      "authorization": {
+        "sudo": {
+          "sudoers_defaults": [
+            "exempt_group += jenkins",
+            "secure_path=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\""
+          ],
+          "agent_forwarding": true,
+          "include_sudoers_d": true
+        }
+      },
+      "jenkins": {
+        "master": {
+          "endpoint": "http://example.com"
+        }
+      }
+    },
+    "chef_type": "node",
+    "default": {
+      "apt": {
+        "cacher_dir": "/var/cache/apt-cacher-ng",
+        "cacher_interface": null,
+        "cacher_port": 3142,
+        "compiletime": false,
+        "compile_time_update": false,
+        "key_proxy": "",
+        "periodic_update_min_delay": 86400,
+        "launchpad_api_version": "1.0",
+        "unattended_upgrades": {
+          "enable": false,
+          "update_package_lists": true,
+          "allowed_origins": [
+            "Debian wheezy"
+          ],
+          "origins_patterns": [],
+          "package_blacklist": [],
+          "auto_fix_interrupted_dpkg": false,
+          "minimal_steps": false,
+          "install_on_shutdown": false,
+          "mail": null,
+          "mail_only_on_error": true,
+          "remove_unused_dependencies": false,
+          "automatic_reboot": false,
+          "automatic_reboot_time": "now",
+          "dl_limit": null,
+          "random_sleep": null
+        },
+        "cacher_client": {
+          "cacher_server": {}
+        },
+        "confd": {
+          "force_confask": false,
+          "force_confdef": false,
+          "force_confmiss": false,
+          "force_confnew": false,
+          "force_confold": false,
+          "install_recommends": true,
+          "install_suggests": false
+        }
+      },
+      "ohai": {
+        "plugin_path": "/etc/chef/ohai_plugins",
+        "plugins": {
+          "ohai": "plugins"
+        },
+        "hints_path": "/etc/chef/ohai/hints"
+      },
+      "aws": {
+        "aws_sdk_version": "~> 2.2",
+        "databag_name": null,
+        "databag_entry": null,
+        "mfa_code": null
+      },
+      "chef-ingredient": {
+        "mixlib-install": {
+          "git_ref": null
+        }
+      },
+      "rsyslog": {
+        "local_host_name": null,
+        "default_log_dir": "/var/log",
+        "log_dir": "/srv/rsyslog",
+        "working_dir": "/var/spool/rsyslog",
+        "server": false,
+        "use_relp": false,
+        "relp_port": 20514,
+        "protocol": "tcp",
+        "bind": "*",
+        "port": 514,
+        "server_ip": null,
+        "server_search": "role:loghost",
+        "remote_logs": true,
+        "per_host_dir": "%$YEAR%/%$MONTH%/%$DAY%/%HOSTNAME%",
+        "max_message_size": "2k",
+        "preserve_fqdn": "off",
+        "high_precision_timestamps": false,
+        "repeated_msg_reduction": "on",
+        "logs_to_forward": "*.*",
+        "enable_imklog": true,
+        "config_prefix": "/etc",
+        "default_file_template": null,
+        "default_remote_template": null,
+        "rate_limit_interval": null,
+        "rate_limit_burst": null,
+        "enable_tls": false,
+        "action_queue_max_disk_space": "1G",
+        "tls_ca_file": null,
+        "tls_certificate_file": null,
+        "tls_key_file": null,
+        "tls_auth_mode": "anon",
+        "tls_permitted_peer": null,
+        "use_local_ipv4": false,
+        "allow_non_local": false,
+        "custom_remote": [],
+        "additional_directives": {},
+        "templates": [],
+        "service_name": "rsyslog",
+        "user": "root",
+        "group": "adm",
+        "priv_seperation": false,
+        "priv_user": null,
+        "priv_group": null,
+        "modules": [
+          "imuxsock",
+          "imklog"
+        ],
+        "file_create_mode": "0640",
+        "dir_create_mode": "0755",
+        "umask": "0022",
+        "dir_owner": "root",
+        "dir_group": "adm",
+        "default_facility_logs": {
+          "auth,authpriv.*": "/var/log/auth.log",
+          "*.*;auth,authpriv.none": "-/var/log/syslog",
+          "daemon.*": "-/var/log/daemon.log",
+          "kern.*": "-/var/log/kern.log",
+          "mail.*": "-/var/log/mail.log",
+          "user.*": "-/var/log/user.log",
+          "mail.info": "-/var/log/mail.info",
+          "mail.warn": "-/var/log/mail.warn",
+          "mail.err": "/var/log/mail.err",
+          "news.crit": "/var/log/news/news.crit",
+          "news.err": "/var/log/news/news.err",
+          "news.notice": "-/var/log/news/news.notice",
+          "*.=debug;auth,authpriv.none;news.none;mail.none": "-/var/log/debug",
+          "*.=info;*.=notice;*.=warn;auth,authpriv.none;cron,daemon.none;mail,news.none": "-/var/log/messages",
+          "*.emerg": ":omusrmsg:*"
+        }
+      },
+      "bluepill": {
+        "bin": "/opt/chef/embedded/bin/bluepill",
+        "logfile": "/var/log/bluepill.log",
+        "pid_dir": "/var/run/bluepill",
+        "state_dir": "/var/lib/bluepill",
+        "group": 0,
+        "use_rsyslog": false,
+        "init_dir": "/etc/init.d",
+        "conf_dir": "/etc/bluepill",
+        "defaults_dir": "/etc/default"
+      },
+      "windows": {
+        "rubyzipversion": null
+      },
+      "seven_zip": {
+        "url": "http://www.7-zip.org/a/7z1514-x64.msi",
+        "checksum": "cefe1a9092d8a6be68468c33910d6206b40e934fb63cab686c5cccf369fbf712",
+        "package_name": "7-Zip 15.14 (x64 edition)",
+        "default_extract_timeout": 600
+      },
+      "build-essential": {
+        "compile_time": false,
+        "msys2": {
+          "path": "\\msys2"
+        }
+      },
+      "packagecloud": {
+        "base_repo_path": "/install/repositories/",
+        "gpg_key_path": "/gpgkey",
+        "hostname_override": null,
+        "proxy_host": null,
+        "proxy_port": null,
+        "default_type": "deb"
+      },
+      "yum-epel": {
+        "repos": [
+          "epel",
+          "epel-debuginfo",
+          "epel-source",
+          "epel-testing",
+          "epel-testing-debuginfo",
+          "epel-testing-source"
+        ]
+      },
+      "yum": {
+        "epel-debuginfo": {
+          "repositoryid": "epel-debuginfo",
+          "description": "Extra Packages for 7 - $basearch - Debug",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-debug-7&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-source": {
+          "repositoryid": "epel-source",
+          "description": "Extra Packages for 7 - $basearch - Source",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-source-7&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-testing-debuginfo": {
+          "repositoryid": "epel-testing-debuginfo",
+          "description": "Extra Packages for 7 - $basearch - Testing Debug",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=testing-debug-epel7&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-testing-source": {
+          "repositoryid": "epel-testing-source",
+          "description": "Extra Packages for 7 - $basearch - Testing Source",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=testing-source-epel7&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-testing": {
+          "repositoryid": "epel-testing",
+          "description": "Extra Packages for 7 - $basearch - Testing ",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=testing-epel7&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel": {
+          "repositoryid": "epel",
+          "description": "Extra Packages for 7 - $basearch",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": true,
+          "managed": true,
+          "make_cache": true
+        },
+        "main": {
+          "cachedir": "/var/cache/yum/$basearch/$releasever",
+          "distroverpkg": "debian-release",
+          "releasever": null,
+          "alwaysprompt": null,
+          "assumeyes": null,
+          "bandwidth": null,
+          "bugtracker_url": null,
+          "clean_requirements_on_remove": null,
+          "color": null,
+          "color_list_available_downgrade": null,
+          "color_list_available_install": null,
+          "color_list_available_reinstall": null,
+          "color_list_available_upgrade": null,
+          "color_list_installed_extra": null,
+          "color_list_installed_newer": null,
+          "color_list_installed_older": null,
+          "color_list_installed_reinstall": null,
+          "color_search_match": null,
+          "color_update_installed": null,
+          "color_update_local": null,
+          "color_update_remote": null,
+          "commands": null,
+          "deltarpm": null,
+          "debuglevel": null,
+          "diskspacecheck": null,
+          "enable_group_conditionals": null,
+          "errorlevel": null,
+          "exactarch": null,
+          "exclude": null,
+          "gpgcheck": true,
+          "group_package_types": null,
+          "groupremove_leaf_only": null,
+          "history_list_view": null,
+          "history_record": null,
+          "history_record_packages": null,
+          "http_caching": null,
+          "installonly_limit": null,
+          "installonlypkgs": null,
+          "installroot": null,
+          "keepalive": null,
+          "keepcache": false,
+          "kernelpkgnames": null,
+          "localpkg_gpgcheck": false,
+          "logfile": "/var/log/yum.log",
+          "max_retries": null,
+          "mdpolicy": null,
+          "metadata_expire": null,
+          "mirrorlist_expire": null,
+          "multilib_policy": null,
+          "obsoletes": null,
+          "overwrite_groups": null,
+          "password": null,
+          "path": "/etc/yum.conf",
+          "persistdir": null,
+          "pluginconfpath": null,
+          "pluginpath": null,
+          "plugins": null,
+          "protected_multilib": null,
+          "protected_packages": null,
+          "proxy": null,
+          "proxy_password": null,
+          "proxy_username": null,
+          "recent": null,
+          "repo_gpgcheck": null,
+          "reposdir": null,
+          "reset_nice": null,
+          "rpmverbosity": null,
+          "showdupesfromrepos": null,
+          "skip_broken": null,
+          "ssl_check_cert_permissions": null,
+          "sslcacert": null,
+          "sslclientcert": null,
+          "sslclientkey": null,
+          "sslverify": null,
+          "syslog_device": null,
+          "syslog_facility": null,
+          "syslog_ident": null,
+          "throttle": null,
+          "timeout": null,
+          "tolerant": false,
+          "tsflags": null,
+          "username": null
+        }
+      },
+      "runit": {
+        "sv_bin": "/usr/bin/sv",
+        "chpst_bin": "/usr/bin/chpst",
+        "service_dir": "/etc/service",
+        "sv_dir": "/etc/sv",
+        "lsb_init_dir": "/etc/init.d",
+        "executable": "/sbin/runit",
+        "start": "runsvdir-start",
+        "stop": "",
+        "reload": ""
+      },
+      "zypper": {
+        "smt_host": null
+      },
+      "nginx": {
+        "version": "1.10.1",
+        "package_name": "nginx",
+        "port": "80",
+        "dir": "/etc/nginx",
+        "script_dir": "/usr/sbin",
+        "log_dir": "/var/log/nginx",
+        "log_dir_perm": "0750",
+        "binary": "/usr/sbin/nginx",
+        "default_root": "/var/www/nginx-default",
+        "ulimit": "1024",
+        "pid": "/var/run/nginx.pid",
+        "user": "www-data",
+        "init_style": "runit",
+        "upstart": {
+          "runlevels": "2345",
+          "respawn_limit": null,
+          "foreground": true
+        },
+        "group": "www-data",
+        "gzip": "on",
+        "gzip_static": "off",
+        "gzip_http_version": "1.0",
+        "gzip_comp_level": "2",
+        "gzip_proxied": "any",
+        "gzip_vary": "off",
+        "gzip_buffers": null,
+        "gzip_types": [
+          "text/plain",
+          "text/css",
+          "application/x-javascript",
+          "text/xml",
+          "application/xml",
+          "application/rss+xml",
+          "application/atom+xml",
+          "text/javascript",
+          "application/javascript",
+          "application/json",
+          "text/mathml"
+        ],
+        "gzip_min_length": 1000,
+        "gzip_disable": "MSIE [1-6]\\.",
+        "keepalive": "on",
+        "keepalive_requests": 100,
+        "keepalive_timeout": 65,
+        "worker_processes": 2,
+        "worker_connections": 1024,
+        "worker_rlimit_nofile": null,
+        "multi_accept": false,
+        "event": null,
+        "accept_mutex_delay": null,
+        "server_tokens": null,
+        "server_names_hash_bucket_size": 64,
+        "variables_hash_max_size": 1024,
+        "variables_hash_bucket_size": 64,
+        "sendfile": "on",
+        "underscores_in_headers": null,
+        "tcp_nodelay": "on",
+        "tcp_nopush": "on",
+        "access_log_options": null,
+        "error_log_options": null,
+        "disable_access_log": false,
+        "log_formats": {},
+        "install_method": "package",
+        "default_site_enabled": true,
+        "types_hash_max_size": 2048,
+        "types_hash_bucket_size": 64,
+        "proxy_read_timeout": null,
+        "client_body_buffer_size": null,
+        "client_max_body_size": null,
+        "large_client_header_buffers": null,
+        "default": {
+          "modules": []
+        },
+        "extra_configs": {},
+        "auth_request": {
+          "url": "http://mdounin.ru/hg/ngx_http_auth_request_module/archive/662785733552.tar.gz",
+          "checksum": "2057bdefd2137a5000d9dbdbfca049d1ba7832ad2b9f8855a88ea5dfa70bd8c1"
+        },
+        "devel": {
+          "version": "0.3.0",
+          "url": "https://github.com/simpl/ngx_devel_kit/archive/v0.3.0.tar.gz",
+          "checksum": "88e05a99a8a7419066f5ae75966fb1efc409bad4522d14986da074554ae61619"
+        },
+        "echo": {
+          "version": "0.59",
+          "url": "https://github.com/openresty/echo-nginx-module/archive/v0.59.tar.gz",
+          "checksum": "9b319ad7836202883128d2b9c24ed818082541df57ef7f2065b7557085c603cd"
+        },
+        "geoip": {
+          "path": "/srv/geoip",
+          "enable_city": true,
+          "country_dat_url": "http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz",
+          "country_dat_checksum": null,
+          "city_dat_url": "http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz",
+          "city_dat_checksum": null,
+          "lib_version": "1.6.9",
+          "lib_url": "https://github.com/maxmind/geoip-api-c/releases/download/v1.6.9/GeoIP-1.6.9.tar.gz",
+          "lib_checksum": "4b446491843de67c1af9b887da17a3e5939e0aeed4826923a5f4bf09d845096f"
+        },
+        "headers_more": {
+          "version": "0.30",
+          "source_url": "https://github.com/openresty/headers-more-nginx-module/archive/v0.30.tar.gz",
+          "source_checksum": "2aad309a9313c21c7c06ee4e71a39c99d4d829e31c8b3e7d76f8c964ea8047f5"
+        },
+        "lua": {
+          "version": "0.10.3",
+          "url": "https://github.com/chaoslawful/lua-nginx-module/archive/v0.10.3.tar.gz",
+          "checksum": "a69504c25de67bce968242d331d2e433c021405a6dba7bca0306e6e0b040bb50"
+        },
+        "luajit": {
+          "version": "2.0.4",
+          "url": "http://luajit.org/download/LuaJIT-2.0.4.tar.gz",
+          "checksum": "620fa4eb12375021bef6e4f237cbd2dd5d49e56beb414bee052c746beef1807d"
+        },
+        "naxsi": {
+          "version": "0.54",
+          "url": "https://github.com/nbs-system/naxsi/archive/0.54.tar.gz",
+          "checksum": "9cc2c09405bc71f78ef26a8b6d70afcea3fccbe8125df70cb0cfc480133daba5"
+        },
+        "openssl_source": {
+          "version": "1.0.1t",
+          "url": "http://www.openssl.org/source/openssl-1.0.1t.tar.gz"
+        },
+        "pagespeed": {
+          "version": "1.11.33.2",
+          "url": "https://github.com/pagespeed/ngx_pagespeed/archive/release-1.11.33.2-beta.tar.gz",
+          "packages": {
+            "rhel": [
+              "pcre-dev",
+              "pcre-devel",
+              "zlib-devel"
+            ],
+            "debian": [
+              "zlib1g-dev",
+              "libpcre3",
+              "libpcre3-dev"
+            ]
+          }
+        },
+        "psol": {
+          "url": "https://dl.google.com/dl/page-speed/psol/1.11.33.2.tar.gz"
+        },
+        "passenger": {
+          "version": "4.0.57",
+          "root": "/opt/chef/embedded/lib/ruby/gems/2.3.0/gems/passenger-4.0.57",
+          "ruby": "/opt/chef/embedded/bin/ruby",
+          "packages": {
+            "rhel": [
+              "ruby-devel",
+              "curl-devel"
+            ],
+            "fedora": [
+              "ruby-devel",
+              "libcurl-devel"
+            ],
+            "debian": [
+              "ruby-dev",
+              "libcurl4-gnutls-dev"
+            ]
+          },
+          "install_rake": true,
+          "spawn_method": "smart-lv2",
+          "buffer_response": "on",
+          "max_pool_size": 6,
+          "min_instances": 1,
+          "max_instances_per_app": 0,
+          "pool_idle_time": 300,
+          "max_requests": 0,
+          "gem_binary": null,
+          "nodejs": null
+        },
+        "enable_rate_limiting": false,
+        "rate_limiting_zone_name": "default",
+        "rate_limiting_backoff": "10m",
+        "rate_limit": "1r/s",
+        "upstream_repository": "http://nginx.org/packages/debian",
+        "set_misc": {
+          "version": "0.30",
+          "url": "https://github.com/agentzh/set-misc-nginx-module/archive/v0.30.tar.gz",
+          "checksum": "59920dd3f92c2be32627121605751b52eae32b5884be09f2e4c53fb2fae8aabc"
+        },
+        "socketproxy": {
+          "root": "/usr/share/nginx/apps",
+          "app_owner": "root",
+          "logname": "socketproxy",
+          "log_level": "error"
+        },
+        "source": {
+          "version": "1.10.1",
+          "prefix": "/opt/nginx-1.10.1",
+          "conf_path": "/etc/nginx/nginx.conf",
+          "sbin_path": "/opt/nginx-1.10.1/sbin/nginx",
+          "default_configure_flags": [
+            "--prefix=/opt/nginx-1.10.1",
+            "--conf-path=/etc/nginx/nginx.conf",
+            "--sbin-path=/opt/nginx-1.10.1/sbin/nginx"
+          ],
+          "url": "http://nginx.org/download/nginx-1.10.1.tar.gz",
+          "checksum": "1fd35846566485e03c0e318989561c135c598323ff349c503a6c14826487a801",
+          "modules": [
+            "chef_nginx::http_ssl_module",
+            "chef_nginx::http_gzip_static_module"
+          ],
+          "use_existing_user": false
+        },
+        "configure_flags": [],
+        "status": {
+          "port": "8090"
+        },
+        "syslog": {
+          "git_repo": "https://github.com/yaoweibin/nginx_syslog_patch.git",
+          "git_revision": "master"
+        },
+        "upload_progress": {
+          "url": "https://github.com/masterzen/nginx-upload-progress-module/tarball/v0.9.0",
+          "checksum": "3fb903dab595cf6656fa0fc5743a48daffbba2f6b5c554836be630800eaad4e2",
+          "javascript_output": true,
+          "zone_name": "proxied",
+          "zone_size": "1m"
+        }
+      },
+      "freebsd": {
+        "compiletime_portsnap": false
+      },
+      "jenkins": {
+        "java": "java",
+        "executor": {
+          "timeout": 60,
+          "private_key": null,
+          "proxy": null,
+          "jvm_options": null
+        },
+        "master": {
+          "install_method": "package",
+          "version": null,
+          "mirror": "http://mirrors.jenkins-ci.org",
+          "source": "http://mirrors.jenkins-ci.org/war/latest/jenkins.war",
+          "checksum": null,
+          "jvm_options": null,
+          "jenkins_args": null,
+          "user": "jenkins",
+          "group": "jenkins",
+          "use_system_accounts": true,
+          "host": "localhost",
+          "listen_address": "0.0.0.0",
+          "port": 8080,
+          "endpoint": "http://localhost:8080",
+          "home": "/var/lib/jenkins",
+          "log_directory": "/var/log/jenkins",
+          "runit": {
+            "sv_timeout": 7
+          },
+          "repository": "http://pkg.jenkins-ci.org/debian",
+          "repository_key": "http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key",
+          "repository_keyserver": null
+        }
+      },
+      "lvm": {
+        "chef-ruby-lvm": {
+          "version": "0.3.0"
+        },
+        "chef-ruby-lvm-attrib": {
+          "version": "0.2.1"
+        },
+        "cleanup_old_gems": true,
+        "rubysource": "https://rubygems.org"
+      },
+      "ntp": {
+        "servers": [
+          "0.pool.ntp.org",
+          "1.pool.ntp.org",
+          "2.pool.ntp.org",
+          "3.pool.ntp.org"
+        ],
+        "peers": [],
+        "pools": [],
+        "restrictions": [],
+        "tinker": {
+          "panic": 0,
+          "allan": 1500,
+          "dispersion": 15,
+          "step": 0.128,
+          "stepout": 900
+        },
+        "restrict_default": "kod notrap nomodify nopeer noquery",
+        "packages": [
+          "ntp"
+        ],
+        "service": "ntp",
+        "varlibdir": "/var/lib/ntp",
+        "driftfile": "/var/lib/ntp/ntp.drift",
+        "logfile": null,
+        "conffile": "/etc/ntp.conf",
+        "statsdir": "/var/log/ntpstats/",
+        "conf_owner": "root",
+        "conf_group": "root",
+        "var_owner": "ntp",
+        "var_group": "ntp",
+        "leapfile": "/etc/ntp.leapseconds",
+        "sync_clock": false,
+        "sync_hw_clock": false,
+        "listen": null,
+        "listen_network": null,
+        "ignore": null,
+        "apparmor_enabled": false,
+        "monitor": false,
+        "statistics": true,
+        "conf_restart_immediate": false,
+        "keys": null,
+        "trustedkey": null,
+        "requestkey": null,
+        "disable_tinker_panic_on_virtualization_guest": true,
+        "peer": {
+          "key": null,
+          "use_iburst": true,
+          "use_burst": false,
+          "minpoll": 6,
+          "maxpoll": 10
+        },
+        "server": {
+          "prefer": "",
+          "use_iburst": true,
+          "use_burst": false,
+          "minpoll": 6,
+          "maxpoll": 10
+        },
+        "orphan": {
+          "enabled": false,
+          "stratum": 5
+        },
+        "localhost": {
+          "noquery": false
+        },
+        "use_cmos": false
+      },
+      "git": {
+        "prefix": "/usr/local",
+        "version": "2.8.1",
+        "url": "https://nodeload.github.com/git/git/tar.gz/v%{version}",
+        "checksum": "e08503ecaf5d3ac10c40f22871c996a392256c8d038d16f52ebf974cba29ae42",
+        "use_pcre": false,
+        "server": {
+          "base_path": "/srv/git",
+          "export_all": true
+        }
+      },
+      "homebrew": {
+        "owner": null,
+        "auto-update": true,
+        "casks": [],
+        "formulas": [],
+        "taps": [],
+        "installer": {
+          "url": "https://raw.githubusercontent.com/Homebrew/install/master/install",
+          "checksum": null
+        },
+        "enable-analytics": true
+      },
+      "windows-sdk": {
+        "install_path": null
+      },
+      "wix": {
+        "download_id": "1540241",
+        "checksum": "03b8f46cb3abf1465fe8f9975a94a4e0f75c77267ff4d1fcb6d5b6a97567f549",
+        "home": "\\wix"
+      },
+      "omnibus": {
+        "build_user": "omnibus",
+        "build_user_home": null,
+        "install_dir": null,
+        "toolchain_name": "omnibus-toolchain",
+        "toolchain_version": "1.1.73",
+        "toolchain_channel": "stable",
+        "git_version": "2.6.2",
+        "ruby_version": "2.1.8",
+        "build_user_group": "omnibus",
+        "base_dir": "/var/cache/omnibus",
+        "git_checksum": "34dfc06b44880df91940dc318a2d3c83b79e67b6f05319c7c71e94d30893636d",
+        "build_user_password": "$1$QTCj0tQy$C60hWNmo8wZo.ctvDSy9p/"
+      },
+      "rubygems": {
+        "gem_disable_default": false,
+        "gem_sources": [
+          "https://rubygems.org"
+        ],
+        "chef_gem_disable_default": false,
+        "chef_gem_sources": [
+          "https://rubygems.org"
+        ]
+      },
+      "authorization": {
+        "sudo": {
+          "groups": [
+            "sysadmin"
+          ],
+          "users": [],
+          "passwordless": false,
+          "setenv": false,
+          "include_sudoers_d": false,
+          "agent_forwarding": false,
+          "sudoers_defaults": [
+            "!lecture,tty_tickets,!fqdn"
+          ],
+          "command_aliases": [],
+          "env_keep_add": [],
+          "env_keep_subtract": [],
+          "custom_commands": {
+            "users": [],
+            "groups": []
+          },
+          "prefix": "/etc"
+        }
+      },
+      "opscode-ci": {
+        "user": "jenkins",
+        "user_home": null,
+        "group": "jenkins",
+        "master": {
+          "host_name": null,
+          "port": 8080,
+          "jnlp_port": 38529,
+          "pipeline_types": [],
+          "executors": 2,
+          "jvm_memory_size": "2278792K",
+          "use_lvm": false,
+          "ebs_vols": [
+            {
+              "device": "/dev/xvdj",
+              "size": 500
+            }
+          ],
+          "days_to_keep_builds": null,
+          "builds_to_keep": null,
+          "days_to_keep_artifacts": 15,
+          "artifacts_to_keep": null
+        },
+        "email": {
+          "system_address": "CHEF CI <ci-notifications@getchef.com>",
+          "list_id": "ci-notifications.getchef.com"
+        },
+        "monitoring": {
+          "jmx_hostname": "localhost",
+          "jmx_port": 9010
+        },
+        "artifactory": {
+          "endpoint": "http://example.com"
+        },
+        "omnibus-cache": {
+          "profile_name": "omnibus-cache"
+        }
+      },
+      "java": {
+        "jdk_version": "7"
+      }
+    },
+    "override": {
+      "opscode-ci": {
+        "artifactory": {
+          "endpoint": "http://example.com:8081"
+        },
+        "omnitruck": {
+          "packages_bucket": "opscode-omnibus-packages",
+          "metadata_bucket": "opscode-omnibus-package-metadata"
+        },
+        "master": {
+          "host_name": "example.com",
+          "pipeline_types": [
+            "client_build",
+            "releng"
+          ],
+          "artifacts_to_keep": null,
+          "days_to_keep_artifacts": 15
+        }
+      }
+    },
+    "run_list": [
+      "recipe[opscode-ci::slave]"
+    ]
+  },
+  "node_name": "chefdk-debian-7-tester-2d206b",
+  "organization_name": "chef",
+  "policy_name": "policy_name1",
+  "policy_group": "policy_group1",
+  "resources": [
+    {
+      "type": "chef_gem",
+      "name": "chef-sugar",
+      "id": "chef-sugar",
+      "after": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "before": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "duration": "132",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "chef-sugar",
+      "cookbook_version": "3.4.0",
+      "recipe_name": "default"
+    },
+    {
+      "type": "chef_gem",
+      "name": "chef-sugar",
+      "id": "chef-sugar",
+      "after": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "before": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "chef-sugar",
+      "cookbook_version": "3.4.0",
+      "recipe_name": "default"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local/bin",
+      "id": "/usr/local/bin",
+      "after": {
+        "group": "staff",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "before": {
+        "group": "staff",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "link",
+      "name": "/usr/local/bin/git",
+      "id": "/usr/local/bin/git",
+      "after": {
+        "to": "/opt/omnibus-toolchain/embedded/bin/git",
+        "owner": null,
+        "group": null
+      },
+      "before": {
+        "to": "/opt/omnibus-toolchain/embedded/bin/git",
+        "owner": "root",
+        "group": "root"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "apt_repository",
+      "name": "openjdk-r",
+      "id": "openjdk-r",
+      "after": {},
+      "before": {},
+      "duration": "2686",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "remove",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "apt_update",
+      "name": "update",
+      "id": "update",
+      "after": {},
+      "before": {},
+      "duration": "2563",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "update",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "apt_package",
+      "name": "wget",
+      "id": "wget",
+      "after": {
+        "package_name": "wget"
+      },
+      "before": {
+        "package_name": "wget",
+        "version": [
+          "1.13.4-3+deb7u2"
+        ]
+      },
+      "duration": "23",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "file",
+      "name": "/etc/profile.d/rbenv.sh",
+      "id": "/etc/profile.d/rbenv.sh",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/etc/profile.d/rbenv.sh"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/etc/profile.d/rbenv.sh"
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_migration"
+    },
+    {
+      "type": "directory",
+      "name": "/opt/rbenv",
+      "id": "/opt/rbenv",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_migration"
+    },
+    {
+      "type": "directory",
+      "name": "/opt/rubies",
+      "id": "/opt/rubies",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_migration"
+    },
+    {
+      "type": "file",
+      "name": "/home/jenkins/.bashrc.d/chruby-default.sh",
+      "id": "/home/jenkins/.bashrc.d/chruby-default.sh",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/home/jenkins/.bashrc.d/chruby-default.sh"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/home/jenkins/.bashrc.d/chruby-default.sh"
+      },
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_migration"
+    },
+    {
+      "type": "chef_ingredient",
+      "name": "omnibus-toolchain",
+      "id": "omnibus-toolchain",
+      "after": {
+        "product_name": "omnibus-toolchain",
+        "version": "1.1.73",
+        "channel": "stable",
+        "platform_version_compatibility_mode": true,
+        "platform": "debian",
+        "platform_version": "7",
+        "architecture": "x86_64"
+      },
+      "before": {},
+      "duration": "775",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "upgrade",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_omnibus_toolchain"
+    },
+    {
+      "type": "directory",
+      "name": "/export/home",
+      "id": "/export/home",
+      "after": {
+        "group": "root",
+        "mode": null,
+        "owner": "root"
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "group",
+      "name": "create jenkins group",
+      "id": "jenkins",
+      "after": {
+        "members": []
+      },
+      "before": {
+        "members": [
+          "jenkins"
+        ]
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "execute",
+      "name": "chsec_login_shell",
+      "id": "chsec -f /etc/security/login.cfg -s usw -a 'shells=/bin/sh,/bin/bsh,/bin/csh,/bin/ksh,/bin/tsh,/bin/ksh93,/usr/bin/sh,/usr/bin/bsh,/usr/bin/csh,/usr/bin/ksh,/usr/bin/tsh,/usr/bin/ksh93,/usr/bin/rksh,/usr/bin/rksh93,/usr/sbin/uucp/uucico,/usr/sbin/sliplogin,/usr/sbin/snappd,/usr/bin/bash,/opt/omnibus-toolchain/bin/bash'",
+      "after": {
+        "command": "chsec -f /etc/security/login.cfg -s usw -a 'shells=/bin/sh,/bin/bsh,/bin/csh,/bin/ksh,/bin/tsh,/bin/ksh93,/usr/bin/sh,/usr/bin/bsh,/usr/bin/csh,/usr/bin/ksh,/usr/bin/tsh,/usr/bin/ksh93,/usr/bin/rksh,/usr/bin/rksh93,/usr/sbin/uucp/uucico,/usr/sbin/sliplogin,/usr/sbin/snappd,/usr/bin/bash,/opt/omnibus-toolchain/bin/bash'",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "linux_user",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "uid": null,
+        "gid": 1001,
+        "home": "/home/jenkins"
+      },
+      "before": {
+        "uid": 1001,
+        "gid": 1001,
+        "home": "/home/jenkins"
+      },
+      "duration": "9",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "group",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "members": [
+          "jenkins"
+        ]
+      },
+      "before": {
+        "members": [
+          "jenkins"
+        ]
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "modify",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "directory",
+      "name": "/home/jenkins",
+      "id": "/home/jenkins",
+      "after": {
+        "group": "jenkins",
+        "mode": "0755",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0755",
+        "owner": "jenkins"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "directory",
+      "name": "/var/chef/cache",
+      "id": "/var/chef/cache",
+      "after": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "before": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_common"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local/bin",
+      "id": "/usr/local/bin",
+      "after": {
+        "group": null,
+        "mode": "0755",
+        "owner": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_common",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "/var/cache/omnibus",
+      "id": "/var/cache/omnibus",
+      "after": {
+        "group": "jenkins",
+        "mode": "0755",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0755",
+        "owner": "jenkins"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_common"
+    },
+    {
+      "type": "build_essential",
+      "name": "install_packages",
+      "id": "install_packages",
+      "after": {
+        "compile_time": false
+      },
+      "before": {},
+      "duration": "219",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "build-essential",
+      "cookbook_version": "8.0.3",
+      "recipe_name": "default"
+    },
+    {
+      "type": "file",
+      "name": "/home/jenkins/.gitconfig",
+      "id": "/home/jenkins/.gitconfig",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0644",
+        "path": "/home/jenkins/.gitconfig",
+        "verifications": [],
+        "checksum": "1d2b317206411daeb7adbfa5a0b1bf4c621e2ae62dedec4f1e5ffa6ede412028"
+      },
+      "before": {
+        "checksum": "cd94951406a630c64541144079d31d3581d9871cf2b4bbe4ac513ff19060c4fb",
+        "owner": "jenkins",
+        "group": "root",
+        "mode": "0644",
+        "path": "/home/jenkins/.gitconfig"
+      },
+      "duration": "11",
+      "delta": "--- /home/jenkins/.gitconfig\t2017-11-01 20:55:38.580713329 +0000\\n+++ /home/jenkins/.chef-.gitconfig20171101-6763-kzpg7e.gitconfig\t2017-11-01 20:59:12.492966103 +0000\\n@@ -20,6 +20,4 @@\\n   autosetuprebase = always\\n [pull]\\n   rebase = preserve\\n-[http]\\n-\tsslCAinfo = /opt/omnibus-toolchain/embedded/ssl/certs/cacert.pem",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_git"
+    },
+    {
+      "type": "execute",
+      "name": "/opt/omnibus-toolchain/bin/git config --global http.sslCAinfo /opt/omnibus-toolchain/embedded/ssl/certs/cacert.pem",
+      "id": "/opt/omnibus-toolchain/bin/git config --global http.sslCAinfo /opt/omnibus-toolchain/embedded/ssl/certs/cacert.pem",
+      "after": {
+        "command": "/opt/omnibus-toolchain/bin/git config --global http.sslCAinfo /opt/omnibus-toolchain/embedded/ssl/certs/cacert.pem",
+        "user": "jenkins"
+      },
+      "before": {},
+      "duration": "18",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_git"
+    },
+    {
+      "type": "ruby_block",
+      "name": "disable strict host key checking for github.com",
+      "id": "disable strict host key checking for github.com",
+      "after": {
+        "block_name": "disable strict host key checking for github.com"
+      },
+      "before": {},
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "ruby_block",
+      "name": "make sudo honor ssh_auth_sock",
+      "id": "make sudo honor ssh_auth_sock",
+      "after": {
+        "block_name": "make sudo honor ssh_auth_sock"
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "apt_package",
+      "name": "devscripts",
+      "id": "devscripts",
+      "after": {
+        "package_name": "devscripts"
+      },
+      "before": {
+        "package_name": "devscripts",
+        "version": [
+          "2.12.6+deb7u2"
+        ]
+      },
+      "duration": "25",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_packaging"
+    },
+    {
+      "type": "apt_package",
+      "name": "dpkg-dev",
+      "id": "dpkg-dev",
+      "after": {
+        "package_name": "dpkg-dev"
+      },
+      "before": {
+        "package_name": "dpkg-dev",
+        "version": [
+          "1.16.18"
+        ]
+      },
+      "duration": "24",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_packaging"
+    },
+    {
+      "type": "apt_package",
+      "name": "ncurses-dev",
+      "id": "ncurses-dev",
+      "after": {
+        "package_name": "ncurses-dev"
+      },
+      "before": {
+        "package_name": "ncurses-dev",
+        "version": [
+          "5.9-10"
+        ]
+      },
+      "duration": "67",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_packaging"
+    },
+    {
+      "type": "apt_package",
+      "name": "zlib1g-dev",
+      "id": "zlib1g-dev",
+      "after": {
+        "package_name": "zlib1g-dev"
+      },
+      "before": {
+        "package_name": "zlib1g-dev",
+        "version": [
+          "1:1.2.7.dfsg-13"
+        ]
+      },
+      "duration": "23",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_packaging"
+    },
+    {
+      "type": "apt_package",
+      "name": "fakeroot",
+      "id": "fakeroot",
+      "after": {
+        "package_name": "fakeroot"
+      },
+      "before": {
+        "package_name": "fakeroot",
+        "version": [
+          "1.18.4-2"
+        ]
+      },
+      "duration": "23",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_packaging"
+    },
+    {
+      "type": "file",
+      "name": "/home/jenkins/load-omnibus-toolchain.sh",
+      "id": "/home/jenkins/load-omnibus-toolchain.sh",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0755",
+        "path": "/home/jenkins/load-omnibus-toolchain.sh",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "1a590716d649641db92e4fe6ce790c04806589556e4ac2448b0be5ddaf3f2f9e",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0755",
+        "path": "/home/jenkins/load-omnibus-toolchain.sh"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_environment"
+    },
+    {
+      "type": "directory",
+      "name": "/home/jenkins/.ssh",
+      "id": "/home/jenkins/.ssh",
+      "after": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "cookbook_file",
+      "name": "/home/jenkins/.ssh/known_hosts",
+      "id": "/home/jenkins/.ssh/known_hosts",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0644",
+        "path": "/home/jenkins/.ssh/known_hosts",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "029aa31c902d2d49468a4584f65d69757696f68c92166dea1bacddee22d990ee",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0644",
+        "path": "/home/jenkins/.ssh/known_hosts"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "file",
+      "name": "/home/jenkins/.ssh/github",
+      "id": "/home/jenkins/.ssh/github",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/.ssh/github",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "c8fa3ddfe43f79cac2abfe110cc163ee45642571c17f03617fdcb548b777114a",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/.ssh/github"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "file",
+      "name": "/home/jenkins/.ssh/config",
+      "id": "/home/jenkins/.ssh/config",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/.ssh/config",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "fd3930562ec0c2c46049673f068cb2b2f38b045b339c4dd9efa3e46d0c781336",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/.ssh/config"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "apt_package",
+      "name": "ntp",
+      "id": "ntp",
+      "after": {
+        "package_name": "ntp"
+      },
+      "before": {
+        "package_name": "ntp",
+        "version": [
+          "1:4.2.6.p5+dfsg-2+deb7u7"
+        ]
+      },
+      "duration": "25",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "apt_package",
+      "name": "Remove ntpdate",
+      "id": "ntpdate",
+      "after": {
+        "package_name": "ntpdate"
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "remove",
+      "status": "skipped",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "/var/lib/ntp",
+      "id": "/var/lib/ntp",
+      "after": {
+        "group": "ntp",
+        "mode": "0755",
+        "owner": "ntp"
+      },
+      "before": {
+        "group": "ntp",
+        "mode": "0755",
+        "owner": "ntp"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "directory",
+      "name": "/var/log/ntpstats/",
+      "id": "/var/log/ntpstats/",
+      "after": {
+        "group": "ntp",
+        "mode": "0755",
+        "owner": "ntp"
+      },
+      "before": {
+        "group": "ntp",
+        "mode": "0755",
+        "owner": "ntp"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "cookbook_file",
+      "name": "/etc/ntp.leapseconds",
+      "id": "/etc/ntp.leapseconds",
+      "after": {
+        "owner": "root",
+        "group": "root",
+        "mode": "0644",
+        "path": "/etc/ntp.leapseconds",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "cd3e23bc9fd5119f37bb58bb7e0310b71a726424186a1c57343f3cfd1031d42e",
+        "owner": "root",
+        "group": "root",
+        "mode": "0644",
+        "path": "/etc/ntp.leapseconds"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "template",
+      "name": "/etc/ntp.conf",
+      "id": "/etc/ntp.conf",
+      "after": {
+        "owner": "root",
+        "group": "root",
+        "mode": "0644",
+        "path": "/etc/ntp.conf",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "5eba70b7b575a1e02fb498ef3d443b8a3cf55ab7190532b40934bf6ca77511fc",
+        "owner": "root",
+        "group": "root",
+        "mode": "0644",
+        "path": "/etc/ntp.conf"
+      },
+      "duration": "32",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "execute",
+      "name": "Force sync hardware clock with system clock",
+      "id": "hwclock --systohc",
+      "after": {
+        "command": "hwclock --systohc",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "service",
+      "name": "ntp",
+      "id": "ntp",
+      "after": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "before": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "duration": "14",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "enable",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "service",
+      "name": "ntp",
+      "id": "ntp",
+      "after": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "before": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "duration": "12",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "start",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "log",
+      "name": "Package signing not implemented for this platform_family",
+      "id": "Package signing not implemented for this platform_family",
+      "after": {
+        "message": "Package signing not implemented for this platform_family"
+      },
+      "before": {},
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "write",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing"
+    },
+    {
+      "type": "directory",
+      "name": "/home/jenkins/.gem",
+      "id": "/home/jenkins/.gem",
+      "after": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "file",
+      "name": "/home/jenkins/.gem/credentials",
+      "id": "/home/jenkins/.gem/credentials",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/.gem/credentials",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "08be5634d5030e591aab6c513c7a24abfb3e17afab3828741b077f396be5deda",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/.gem/credentials"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "gemrc",
+      "name": "global",
+      "id": "global",
+      "after": {
+        "user": "jenkins",
+        "group": "jenkins",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "before": {
+        "path": "/opt/chef/embedded/etc/gemrc",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "duration": "40",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "gemrc",
+      "name": "/home/jenkins/.gemrc",
+      "id": "/home/jenkins/.gemrc",
+      "after": {
+        "user": "jenkins",
+        "group": "jenkins",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "before": {
+        "path": "/home/jenkins/.gemrc",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "duration": "14",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "file",
+      "name": "/home/jenkins/.bundle/config",
+      "id": "/home/jenkins/.bundle/config",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/home/jenkins/.bundle/config"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/home/jenkins/.bundle/config"
+      },
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "directory",
+      "name": "/home/jenkins/.aws",
+      "id": "/home/jenkins/.aws",
+      "after": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_aws"
+    },
+    {
+      "type": "template",
+      "name": "/home/jenkins/.aws/credentials",
+      "id": "/home/jenkins/.aws/credentials",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/.aws/credentials",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "e03da2ff59a16921fa0cb84568c077502e2d832aa640efa0d2a4cd4d625cfbb0",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/.aws/credentials"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_aws"
+    },
+    {
+      "type": "linux_user",
+      "name": "root",
+      "id": "root",
+      "after": {
+        "uid": 0,
+        "gid": 0,
+        "home": "/root"
+      },
+      "before": {
+        "uid": 0,
+        "gid": 0,
+        "home": "/root"
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "apt_package",
+      "name": "sudo",
+      "id": "sudo",
+      "after": {
+        "package_name": "sudo"
+      },
+      "before": {},
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "skipped",
+      "cookbook_name": "sudo",
+      "cookbook_version": "3.5.3",
+      "recipe_name": "default",
+      "conditional": "not_if \"which sudo\""
+    },
+    {
+      "type": "directory",
+      "name": "/etc/sudoers.d",
+      "id": "/etc/sudoers.d",
+      "after": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "before": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "sudo",
+      "cookbook_version": "3.5.3",
+      "recipe_name": "default"
+    },
+    {
+      "type": "cookbook_file",
+      "name": "/etc/sudoers.d/README",
+      "id": "/etc/sudoers.d/README",
+      "after": {
+        "owner": "root",
+        "group": "root",
+        "mode": "0440",
+        "path": "/etc/sudoers.d/README",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "9ded172910845bd115fbe469d87cab80a215e756a973e5d09c0e58a19a1bfe81",
+        "owner": "root",
+        "group": "root",
+        "mode": "0440",
+        "path": "/etc/sudoers.d/README"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "sudo",
+      "cookbook_version": "3.5.3",
+      "recipe_name": "default"
+    },
+    {
+      "type": "template",
+      "name": "/etc/sudoers",
+      "id": "/etc/sudoers",
+      "after": {
+        "owner": "root",
+        "group": "root",
+        "mode": "0440",
+        "path": "/etc/sudoers",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "4520ba18debe05aaea860c0fef2d11aa0c6c1b8e7ee0eaa7c7e4360e659d1047",
+        "owner": "root",
+        "group": "root",
+        "mode": "0440",
+        "path": "/etc/sudoers"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "sudo",
+      "cookbook_version": "3.5.3",
+      "recipe_name": "default"
+    },
+    {
+      "type": "sudo",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "user": "jenkins",
+        "commands": [
+          "ALL"
+        ],
+        "host": "ALL",
+        "runas": "ALL",
+        "nopasswd": true,
+        "command_aliases": [],
+        "env_keep_add": [],
+        "env_keep_subtract": []
+      },
+      "before": {},
+      "duration": "21",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo"
+    },
+    {
+      "type": "sudo",
+      "name": "sysadmin",
+      "id": "sysadmin",
+      "after": {
+        "group": "sysadmin",
+        "commands": [
+          "ALL"
+        ],
+        "host": "ALL",
+        "runas": "ALL",
+        "nopasswd": true,
+        "command_aliases": [],
+        "env_keep_add": [],
+        "env_keep_subtract": []
+      },
+      "before": {},
+      "duration": "22",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo"
+    },
+    {
+      "type": "sudo",
+      "name": "build",
+      "id": "build",
+      "after": {
+        "user": "build",
+        "nopasswd": true
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "sudo",
+      "name": "vagrant",
+      "id": "vagrant",
+      "after": {
+        "user": "vagrant",
+        "nopasswd": true
+      },
+      "before": {},
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "sudo",
+      "name": "ubuntu",
+      "id": "ubuntu",
+      "after": {
+        "user": "ubuntu",
+        "nopasswd": true
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "sudo",
+      "name": "ec2-user",
+      "id": "ec2-user",
+      "after": {
+        "user": "ec2-user",
+        "nopasswd": true
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "apt_repository",
+      "name": "openjdk-r",
+      "id": "openjdk-r",
+      "after": {
+        "uri": "http://ppa.launchpad.net/openjdk-r/ppa/ubuntu",
+        "distribution": "wheezy",
+        "components": [
+          "main"
+        ],
+        "deb_src": true,
+        "keyserver": "keyserver.ubuntu.com",
+        "key": "DA1A4A13543B466853BAF164EB9B1D8886F44E2A"
+      },
+      "before": {},
+      "duration": "6654",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "add",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_java"
+    },
+    {
+      "type": "apt_package",
+      "name": "openjdk-7-jdk",
+      "id": "openjdk-7-jdk",
+      "after": {
+        "package_name": "openjdk-7-jdk"
+      },
+      "before": {
+        "package_name": "openjdk-7-jdk",
+        "version": [
+          "7u131-2.6.9-2~deb7u1"
+        ]
+      },
+      "duration": "1040",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_java"
+    },
+    {
+      "type": "git",
+      "name": "/var/chef/cache/artifactory",
+      "id": "/var/chef/cache/artifactory",
+      "after": {
+        "revision": "v2.8.2"
+      },
+      "before": {
+        "revision": "ee0af35496c0809c5b7445f951ee324f37e2679b"
+      },
+      "duration": "100",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "sync",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "execute",
+      "name": "build-artifactory-gem",
+      "id": "rm -rf artifactory-*.gem && gem build artifactory.gemspec",
+      "after": {
+        "command": "rm -rf artifactory-*.gem && gem build artifactory.gemspec",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "nothing",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus",
+      "conditional": "not_if { action == :nothing }"
+    },
+    {
+      "type": "execute",
+      "name": "install-artifactory-gem",
+      "id": "gem install artifactory-*.gem --no-ri --no-rdoc",
+      "after": {
+        "command": "gem install artifactory-*.gem --no-ri --no-rdoc",
+        "user": null
+      },
+      "before": {},
+      "duration": "625",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "git",
+      "name": "/var/chef/cache/omnibus",
+      "id": "/var/chef/cache/omnibus",
+      "after": {
+        "revision": "ced452379e27b85b9958421f258b5fbe22e3760a"
+      },
+      "before": {
+        "revision": "ced452379e27b85b9958421f258b5fbe22e3760a"
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "sync",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "execute",
+      "name": "build-omnibus-gem",
+      "id": "rm -rf omnibus-*.gem && gem build omnibus.gemspec",
+      "after": {
+        "command": "rm -rf omnibus-*.gem && gem build omnibus.gemspec",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "nothing",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus",
+      "conditional": "not_if { action == :nothing }"
+    },
+    {
+      "type": "execute",
+      "name": "install-omnibus-gem",
+      "id": "gem install omnibus-*.gem --no-ri --no-rdoc",
+      "after": {
+        "command": "gem install omnibus-*.gem --no-ri --no-rdoc",
+        "user": null
+      },
+      "before": {},
+      "duration": "3032",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "file",
+      "name": "/home/jenkins/omnibus-publish.rb",
+      "id": "/home/jenkins/omnibus-publish.rb",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/omnibus-publish.rb",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "246ba2cc9ba4fc07025deba38bd05895ddf7ad86878b2287a2cfc050e40366f8",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/home/jenkins/omnibus-publish.rb"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "directory",
+      "name": "/home/jenkins/.ssh",
+      "id": "/home/jenkins/.ssh",
+      "after": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "slave"
+    },
+    {
+      "type": "file",
+      "name": "/home/jenkins/.ssh/authorized_keys",
+      "id": "/home/jenkins/.ssh/authorized_keys",
+      "after": {
+        "owner": "jenkins",
+        "group": "root",
+        "mode": "0600",
+        "path": "/home/jenkins/.ssh/authorized_keys",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "0cbbb3b0e104f5c5deb49091126fbc35e352f4d4222c598eeff9170f9a2028e8",
+        "owner": "jenkins",
+        "group": "root",
+        "mode": "0600",
+        "path": "/home/jenkins/.ssh/authorized_keys"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "slave"
+    },
+    {
+      "type": "remote_file",
+      "name": "/var/chef/cache/jenkins-cli.jar",
+      "id": "/var/chef/cache/jenkins-cli.jar",
+      "after": {
+        "checksum": null,
+        "owner": "root",
+        "group": "root",
+        "mode": "0755",
+        "path": "/var/chef/cache/jenkins-cli.jar"
+      },
+      "before": {
+        "checksum": "f3c325f20fadb64a50c387cc3ad9429e34669de7ddf9e842bb65d4a1ddc982b4",
+        "owner": "root",
+        "group": "root",
+        "mode": "0755",
+        "path": "/var/chef/cache/jenkins-cli.jar"
+      },
+      "duration": "9",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "remote_file",
+      "name": "/var/chef/cache/update-center.json",
+      "id": "/var/chef/cache/update-center.json",
+      "after": {
+        "checksum": null,
+        "owner": "root",
+        "group": "root",
+        "mode": "0644",
+        "path": "/var/chef/cache/update-center.json"
+      },
+      "before": {
+        "checksum": "10bbc899f774f2d4524844848b245a9d8346b58d58dff034409f06325740ddc0",
+        "owner": "root",
+        "group": "root",
+        "mode": "0644",
+        "path": "/var/chef/cache/update-center.json"
+      },
+      "duration": "656",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "/var/chef/cache/extracted-update-center.json",
+      "id": "/var/chef/cache/extracted-update-center.json",
+      "after": {
+        "owner": "root",
+        "group": "root",
+        "mode": "0644",
+        "path": "/var/chef/cache/extracted-update-center.json",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "738ecb38401bedcf605a75e421013f7a16314f5c68152abefad85732dc327c1a",
+        "owner": "root",
+        "group": "root",
+        "mode": "0644",
+        "path": "/var/chef/cache/extracted-update-center.json"
+      },
+      "duration": "12",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "/var/chef/cache/jenkins-key",
+      "id": "/var/chef/cache/jenkins-key",
+      "after": {
+        "owner": "root",
+        "group": "root",
+        "mode": "0600",
+        "path": "/var/chef/cache/jenkins-key",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "ced9d2204cc71246b2a6b440829167aa024c2c7662d3c2451acf20ece4bc319d",
+        "owner": "root",
+        "group": "root",
+        "mode": "0600",
+        "path": "/var/chef/cache/jenkins-key"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "jenkins_private_key_credentials",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "description": "Credentials for jenkins - created by Chef",
+        "username": "jenkins",
+        "private_key": "EXAMPLEKEY"
+      },
+      "before": {
+        "id": "2e269a3f-71ba-4b22-8882-40790a8582e8",
+        "description": "Credentials for jenkins - created by Chef",
+        "username": "jenkins",
+        "private_key": "EXAMPLEKEY"
+      },
+      "duration": "2012",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "slave"
+    },
+    {
+      "type": "jenkins_ssh_slave",
+      "name": "chefdk-debian-7-tester-2d206b",
+      "id": "chefdk-debian-7-tester-2d206b",
+      "after": {
+        "slave_name": "chefdk-debian-7-tester-2d206b",
+        "description": "debian 7.8 [ GNU/Linux 3.2.0-4-amd64 x86_64 ]",
+        "remote_fs": "/home/jenkins",
+        "usage_mode": "normal",
+        "labels": [
+          "3.2.0-4-amd64",
+          "7",
+          "7.8",
+          "chefdk",
+          "debian",
+          "debian-7",
+          "debian-7.8",
+          "linux",
+          "slave",
+          "tester",
+          "x86_64"
+        ],
+        "environment": {
+          "LIBPATH": "",
+          "OMNIBUS_FIPS_MODE": "false"
+        },
+        "user": "jenkins",
+        "java_path": "java",
+        "host": "242.58.187.217",
+        "credentials": {
+          "json_class": "Chef::Resource::JenkinsPrivateKeyCredentials",
+          "instance_vars": {
+            "name": "jenkins",
+            "noop": null,
+            "before": null,
+            "params": {},
+            "provider": null,
+            "allowed_actions": [
+              "nothing",
+              "create",
+              "delete"
+            ],
+            "action": [
+              "create"
+            ],
+            "updated": false,
+            "updated_by_last_action": false,
+            "supports": {},
+            "ignore_failure": false,
+            "retries": 0,
+            "retry_delay": 2,
+            "source_line": "/var/chef/cache/cookbooks/opscode-ci/recipes/slave.rb:69:in `from_file'",
+            "guard_interpreter": null,
+            "default_guard_interpreter": "default",
+            "elapsed_time": 2.012877455,
+            "sensitive": true,
+            "declared_type": "jenkins_private_key_credentials",
+            "cookbook_name": "opscode-ci",
+            "recipe_name": "slave",
+            "private_key": "EXAMPLEKEY",
+            "username": "jenkins",
+            "description": "Credentials for jenkins - created by Chef"
+          }
+        },
+        "command_prefix": "env HOME=/home/jenkins PATH=/opt/omnibus-toolchain/embedded/bin::/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin JENKINS_HOME=/home/jenkins sh -c '",
+        "command_suffix": "'"
+      },
+      "before": {
+        "slave_name": "chefdk-debian-7-tester-2d206b",
+        "description": "debian 7.8 [ GNU/Linux 3.2.0-4-amd64 x86_64 ]",
+        "remote_fs": "/home/jenkins",
+        "executors": 1,
+        "labels": [
+          "3.2.0-4-amd64",
+          "7",
+          "7.8",
+          "chefdk",
+          "debian",
+          "debian-7",
+          "debian-7.8",
+          "linux",
+          "slave",
+          "tester",
+          "x86_64"
+        ],
+        "java_path": "java",
+        "host": "242.58.187.217",
+        "port": 22,
+        "credentials": "jenkins"
+      },
+      "duration": "2310",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "slave"
+    },
+    {
+      "type": "linux_user",
+      "name": "chefautomate",
+      "id": "chefautomate",
+      "after": {
+        "uid": null,
+        "gid": null,
+        "home": "/var/opt/chef"
+      },
+      "before": {
+        "uid": 7209,
+        "gid": 7209,
+        "home": "/var/opt/chef"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "directory",
+      "name": "/var/opt/chef/bin",
+      "id": "/var/opt/chef/bin",
+      "after": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "before": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "directory",
+      "name": "/var/opt/chef/etc",
+      "id": "/var/opt/chef/etc",
+      "after": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "before": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "directory",
+      "name": "/var/log/chef/automate-liveness-agent",
+      "id": "/var/log/chef/automate-liveness-agent",
+      "after": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "chefautomate"
+      },
+      "before": {
+        "group": "root",
+        "mode": "0755",
+        "owner": "chefautomate"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "/var/opt/chef/bin/automate-liveness-agent",
+      "id": "/var/opt/chef/bin/automate-liveness-agent",
+      "after": {
+        "owner": "root",
+        "group": "root",
+        "mode": "0755",
+        "path": "/var/opt/chef/bin/automate-liveness-agent",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "d7ad5dd68ab384e8e7f6c34ecb9c57b6c463a0d9625152c53c3deb7023a67e73",
+        "owner": "root",
+        "group": "root",
+        "mode": "0755",
+        "path": "/var/opt/chef/bin/automate-liveness-agent"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "/var/opt/chef/etc/config.json",
+      "id": "/var/opt/chef/etc/config.json",
+      "after": {
+        "owner": "root",
+        "group": "root",
+        "mode": "0755",
+        "path": "/var/opt/chef/etc/config.json",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "47922279c973502edbf2a1a9cb2d116639d96ae561a9b9c90dfb4ffed1efa119",
+        "owner": "root",
+        "group": "root",
+        "mode": "0755",
+        "path": "/var/opt/chef/etc/config.json"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "/etc/init.d/automate-liveness-agent",
+      "id": "/etc/init.d/automate-liveness-agent",
+      "after": {
+        "owner": "root",
+        "group": "root",
+        "mode": "0744",
+        "path": "/etc/init.d/automate-liveness-agent",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "8a39aa2bccd95ae7f4f47b6c6702af5a4c068c45b0bfa943f814fb49492fd75a",
+        "owner": "root",
+        "group": "root",
+        "mode": "0744",
+        "path": "/etc/init.d/automate-liveness-agent"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "service",
+      "name": "automate-liveness-agent",
+      "id": "automate-liveness-agent",
+      "after": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "before": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "duration": "8",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "enable",
+      "status": "up-to-date"
+    },
+    {
+      "type": "service",
+      "name": "automate-liveness-agent",
+      "id": "automate-liveness-agent",
+      "after": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "before": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "start",
+      "status": "up-to-date"
+    }
+  ],
+  "run_id": "639844f4-2ce6-42ba-8c9d-853db69adff3",
+  "run_list": [
+    "recipe[opscode-ci::slave]"
+  ],
+  "start_time": "2017-11-01T20:58:52Z",
+  "end_time": "2017-11-01T20:59:31Z",
+  "source": "chef_client",
+  "status": "success",
+  "total_resource_count": 352,
+  "updated_resource_count": 11,
+  "deprecations": [
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "/var/chef/cache/cookbooks/jenkins/libraries/plugin.rb:443:in `<top (required)>'"
+    },
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "/var/chef/cache/cookbooks/jenkins/libraries/slave.rb:410:in `<top (required)>'"
+    },
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "/var/chef/cache/cookbooks/jenkins/libraries/user.rb:183:in `<top (required)>'"
+    },
+    {
+      "message": "Property `sensitive` of resource `rhsm_register` overwrites an existing method. Please use a different property name. This will raise an exception in Chef 13.",
+      "url": "https://docs.chef.io/deprecations_property_name_collision.html",
+      "location": "/var/chef/cache/cookbooks/redhat_subscription_manager/libraries/rhsm_register.rb:34:in `<class:RhsmRegister>'"
+    },
+    {
+      "message": "method access to node attributes (node.foo.bar) is deprecated and will be removed in Chef 13, please use bracket syntax (node[\"foo\"][\"bar\"])",
+      "url": "https://docs.chef.io/deprecations_attributes.html",
+      "location": "/opt/chef/embedded/lib/ruby/gems/2.3.0/gems/chef-sugar-3.6.0/lib/chef/sugar/node.rb:162:in `method_missing'"
+    },
+    {
+      "message": "Property `sensitive` of resource `aws_s3_file` overwrites an existing method. Please use a different property name. This will raise an exception in Chef 13.",
+      "url": "https://docs.chef.io/deprecations_property_name_collision.html",
+      "location": "/var/chef/cache/cookbooks/aws/resources/s3_file.rb:36:in `class_from_file'"
+    },
+    {
+      "message": "Property `sensitive` of resource `yum_repository` overwrites an existing method. Please use a different property name. This will raise an exception in Chef 13.",
+      "url": "https://docs.chef.io/deprecations_property_name_collision.html",
+      "location": "/var/chef/cache/cookbooks/yum/resources/repository.rb:59:in `class_from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for directory[/usr/local/bin] from prior resource\nPrevious directory[/usr/local/bin]: /var/chef/cache/cookbooks/opscode-ci/recipes/_platform_tweaks.rb:23:in `from_file'\nCurrent  directory[/usr/local/bin]: /var/chef/cache/cookbooks/omnibus/recipes/_common.rb:49:in `from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "/var/chef/cache/cookbooks/omnibus/recipes/_common.rb:49:in `from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for apt_repository[openjdk-r] from prior resource\nPrevious apt_repository[openjdk-r]: /var/chef/cache/cookbooks/opscode-ci/recipes/_platform_tweaks.rb:37:in `from_file'\nCurrent  apt_repository[openjdk-r]: /var/chef/cache/cookbooks/opscode-ci/recipes/_java.rb:22:in `from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "/var/chef/cache/cookbooks/opscode-ci/recipes/_java.rb:22:in `from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for directory[/home/jenkins/.ssh] from prior resource\nPrevious directory[/home/jenkins/.ssh]: /var/chef/cache/cookbooks/opscode-ci/recipes/_github.rb:12:in `from_file'\nCurrent  directory[/home/jenkins/.ssh]: /var/chef/cache/cookbooks/opscode-ci/recipes/slave.rb:58:in `from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "/var/chef/cache/cookbooks/opscode-ci/recipes/slave.rb:58:in `from_file'"
+    }
+  ]
+}

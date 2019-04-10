@@ -1,0 +1,28 @@
+#!/bin/bash
+document "graph_deps" <<DOC
+  Outputs a dot file of the available component's dependencies
+
+  Usage: graph_deps [output-file]
+
+  Default output file is "binds.dot".
+DOC
+function graph_deps {
+  local output=${1:-"binds.dot"} # default output file
+  /src/scripts/graph-binds > "$output"
+}
+
+document "render_dot" <<DOC
+  Renders dot file to SVG (install graphviz first)
+
+  Usage: render_dot [input-file] [output-file]
+
+  Default input file is "binds.dot".
+  Default output file is "binds.svg".
+DOC
+function render_dot {
+  local input=${1:-"binds.dot"}
+  local output=${1:-"binds.svg"}
+  hab pkg install -b core/graphviz
+
+  $(hab pkg path core/graphviz)/bin/dot -Tsvg -o ${output} < ${input}
+}

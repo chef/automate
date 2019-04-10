@@ -1,0 +1,54 @@
+<div class="attributes">
+  <p>Displaying Most Recent Node Attributes</p>
+  <form #attrForm="ngForm" (ngSubmit)="search()">
+    <div class="input-container">
+      <input [(ngModel)]="searchTerm" name="searchTerm" placeholder="Search attributes...">
+      <div class="info">
+        <span class="results" [class.none]="resultCount === 0" *ngIf="resultSummary">
+        {{ resultSummary }}
+      </span>
+        <div class="reset" *ngIf="resultSummary" (click)="resetSearch()">
+          <span>Reset</span>
+          <chef-icon>search</chef-icon>
+        </div>
+      </div>
+    </div>
+    <button type="submit">
+      <chef-icon>search</chef-icon>
+    </button>
+  </form>
+  <div class="attributes-rollup">
+    <div class="rollup-item" (click)="filter(all)" [ngClass]="{active: selected_level === all}">
+      <h3 class="rollup-title">All</h3>
+      <span class="count all">{{attributes.allValueCount.toLocaleString()}}</span>
+    </div>
+    <div class="rollup-item" (click)="filter(default)" [ngClass]="{active: selected_level === default}">
+      <h3 class="rollup-title">Default</h3>
+      <span class="count default">{{attributes.defaultValueCount.toLocaleString()}}</span>
+    </div>
+    <div class="rollup-item" (click)="filter(normal)" [ngClass]="{active: selected_level === normal}">
+      <h3 class="rollup-title">Normal</h3>
+      <span class="count normal">{{attributes.normalValueCount.toLocaleString()}}</span>
+    </div>
+    <div class="rollup-item" (click)="filter(override)" [ngClass]="{active: selected_level === override}">
+      <h3 class="rollup-title">Override</h3>
+      <span class="count override">{{attributes.overrideValueCount.toLocaleString()}}</span>
+    </div>
+    <div class="rollup-item" (click)="filter(automatic)" [ngClass]="{active: selected_level === automatic}">
+      <h3 class="rollup-title">Automatic</h3>
+      <span class="count automatic">{{attributes.automaticValueCount.toLocaleString()}}</span>
+    </div>
+  </div>
+  <div class="expand-collapse">
+    <span class="action" (click)="tree.expand()">
+      <chef-icon>add_circle</chef-icon>
+      <span>Expand All</span>
+    </span>
+    <span class="separator">|</span>
+    <span class="action" (click)="tree.collapse()">
+      <chef-icon>remove_circle</chef-icon>
+      <span>Collapse All</span>
+    </span>
+  </div>
+  <app-json-tree class="json-tree-container" #tree [json]="selectedAttrs"></app-json-tree>
+</div>

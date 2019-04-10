@@ -1,0 +1,49 @@
+# WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+#
+# If you are modifying this file, you almost surely also want to
+# modify pkg/api/config_request.go. The DefaultConfigRequest() function
+# sets all of the real defaults.
+#
+# WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+#
+[service]
+  #
+  # Set the bind address to a specific IP (IPv4 or IPv6):
+  #
+  # host =  "_site_"
+
+  port = 10144
+[ngx.main]
+worker_processes = 4
+error_log = "stderr"
+
+[ngx.events]
+worker_connections = 1024
+worker_processor_method = "epoll"
+multi_accept = "on"
+
+[ngx.http]
+# access_log_buffer_size = "32k"
+# access_log_flush_time = "10s"
+default_type = "application/octet-stream"
+client_body_buffer_size = "128k"
+client_max_body_size = "250m"
+keepalive_timeout = 60
+keepalive_requests = 10000
+gzip = "on"
+gzip_comp_level = "2"
+gzip_disable = "MSIE [1-6]\\."
+gzip_http_version = "1.0"
+gzip_min_length = 10240
+gzip_proxied = "expired no-cache no-store private auth"
+gzip_types = "text/plain text/css text/xml text/javascript application/x-javascript application/xml"
+gzip_vary = "on"
+large_client_header_buffers_number = 4
+large_client_header_buffers_size = "8k"
+sendfile = "on"
+ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:AES256-GCM-SHA384:!aNULL:!eNULL:!EXPORT"
+ssl_protocols = "TLSv1.2"
+tcp_nopush = "on"
+tcp_nodelay = "on"
+ssl_verify_depth = 2
+proxy_connect_timeout = 5

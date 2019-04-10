@@ -1,0 +1,23 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+source "{{pkg.svc_config_path}}/env"
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template pg-env "{{pkg.svc_var_path}}/etc/pg-env"
+source "{{pkg.svc_var_path}}/etc/pg-env"
+
+pg-helper ensure-service-database "notifications_service"
+pg-helper create-extension "notifications_service" "pgcrypto"
+
+erl_cookie="$HOME/.erlang.cookie"
+if [[ ! -f "$erl_cookie" ]]; then
+    (umask 077 && head -c256 /dev/urandom | sha512sum | cut -d' ' -f1 > "$erl_cookie")
+    chmod 400 "$erl_cookie"
+fi
+
+exec "{{pkg.path}}/bin/notifications" foreground

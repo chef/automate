@@ -1,0 +1,333 @@
+{
+  "name": "mysql-baseline",
+  "title": "DevSec MySQL Baseline",
+  "maintainer": "DevSec Hardening Framework Team",
+  "copyright": "DevSec Hardening Framework Team",
+  "copyright_email": "hello@dev-sec.io",
+  "license": "Apache 2 license",
+  "summary": "Test-suite for best-practice mysql hardening",
+  "version": "2.1.0",
+  "supports": [
+    {
+      "os-family": "unix"
+    }
+  ],
+  "controls": [
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:47 275f3646a4a6834630ed1e4916491829)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:53 ae00b6b527c510094702501b6ded7ec6)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:57 113d73c0489962d03b3c1fc1b9401652)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:61 eafecb5c102de288f98f9a0c5d34bee7)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:65 84277adfa7cfa30eb0dccb2fba0e96eb)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:69 c7d7d6bbbd0bc0f1b6838706d0490982)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:73 3f45eb90e4605f881559513cb5b82164)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:77 be24db979b8b0f756040edc88580ab71)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:81 4e9d761a57f3657b6d2accb0a29791dc)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:86 32681fd57fb90390cabc7a2bf2b7fefc)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:91 980e2c27eb9b397dc763138c9a9bb07c)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:107 45283b721a209e3c34d8fcdbbb1f7a11)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:113 a7694fa60d4e7feec344137b2817827e)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:121 50c7411fdf1e6346c4c6c0414c0f020c)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:127 f7ad8b6efdc03d56a734aacc60151f4b)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:135 309d32ea6c4ed317ba74fecf6b43c66d)"
+    },
+    {
+      "title": null,
+      "desc": null,
+      "impact": 0.5,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "",
+      "source_location": {
+        "ref": "/usr/local/lib/ruby/gems/2.4.0/gems/inspec-2.2.20/lib/inspec/control_eval_context.rb",
+        "line": 89
+      },
+      "id": "(generated from mysql_spec.rb:152 5cfc72820b73c11a1415bfe91da0469b)"
+    }
+  ],
+  "groups": [
+    {
+      "title": null,
+      "controls": [
+        "(generated from mysql_spec.rb:47 275f3646a4a6834630ed1e4916491829)",
+        "(generated from mysql_spec.rb:53 ae00b6b527c510094702501b6ded7ec6)",
+        "(generated from mysql_spec.rb:57 113d73c0489962d03b3c1fc1b9401652)",
+        "(generated from mysql_spec.rb:61 eafecb5c102de288f98f9a0c5d34bee7)",
+        "(generated from mysql_spec.rb:65 84277adfa7cfa30eb0dccb2fba0e96eb)",
+        "(generated from mysql_spec.rb:69 c7d7d6bbbd0bc0f1b6838706d0490982)",
+        "(generated from mysql_spec.rb:73 3f45eb90e4605f881559513cb5b82164)",
+        "(generated from mysql_spec.rb:77 be24db979b8b0f756040edc88580ab71)",
+        "(generated from mysql_spec.rb:81 4e9d761a57f3657b6d2accb0a29791dc)",
+        "(generated from mysql_spec.rb:86 32681fd57fb90390cabc7a2bf2b7fefc)",
+        "(generated from mysql_spec.rb:91 980e2c27eb9b397dc763138c9a9bb07c)",
+        "(generated from mysql_spec.rb:107 45283b721a209e3c34d8fcdbbb1f7a11)",
+        "(generated from mysql_spec.rb:113 a7694fa60d4e7feec344137b2817827e)",
+        "(generated from mysql_spec.rb:121 50c7411fdf1e6346c4c6c0414c0f020c)",
+        "(generated from mysql_spec.rb:127 f7ad8b6efdc03d56a734aacc60151f4b)",
+        "(generated from mysql_spec.rb:135 309d32ea6c4ed317ba74fecf6b43c66d)",
+        "(generated from mysql_spec.rb:152 5cfc72820b73c11a1415bfe91da0469b)"
+      ],
+      "id": "controls/mysql_spec.rb"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "User",
+      "options": {
+        "description": "MySQL database user",
+        "default": "root",
+        "required": true
+      }
+    },
+    {
+      "name": "Password",
+      "options": {
+        "description": "MySQL database password",
+        "default": "iloverandompasswordsbutthiswilldo",
+        "required": true
+      }
+    }
+  ],
+  "sha256": "36c9bd5657ea1b1df5af6daa728eb5e2667f4ac56ea1187b5d0219a84cf4cb2b"
+}

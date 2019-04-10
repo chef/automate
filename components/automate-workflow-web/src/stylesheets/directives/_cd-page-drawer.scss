@@ -1,0 +1,8 @@
+[cd-page-drawer] {
+  display: block;
+  position: fixed;
+  right: 0;
+  z-index: 2;
+  box-shadow: 2px 0 2px rgba(0, 0, 0, 0.5);
+  @include transition(0.25s ease-in-out);
+}

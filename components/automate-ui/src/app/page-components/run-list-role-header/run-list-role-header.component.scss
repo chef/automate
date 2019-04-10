@@ -1,0 +1,26 @@
+@import "~styles/variables";
+
+.run-list-role-header {
+  .role-title-bar {
+    padding: 1em 0;
+    background-color: $gray-pale;
+    border-radius: $global-radius;
+    cursor: pointer;
+    color: $chef-primary-dark;
+
+    &:hover {
+      background-color: darken($gray-pale, 1%);
+    }
+
+    chef-icon {
+      margin: 0 10px;
+    }
+
+    .role-title {
+      chef-icon {
+        margin: 0 10px 0 0;
+      }
+
+    }
+  }
+}

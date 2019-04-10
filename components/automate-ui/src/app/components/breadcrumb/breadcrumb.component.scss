@@ -1,0 +1,12 @@
+@import "~styles/variables";
+
+.breadcrumb {
+  display: inline-block;
+  color: $chef-primary-bright;
+  text-decoration: underline;
+}
+
+chef-icon {
+  vertical-align: -2px;
+  margin-left: 4px;
+}

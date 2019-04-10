@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package chef.automate.api;
+
+option go_package = "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf";
+
+message Port {
+  string name = 1;
+  int32 default = 2;
+  string protocol = 3;
+}

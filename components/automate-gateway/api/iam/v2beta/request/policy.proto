@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request";
+
+// Statement, Policy definitions
+import "components/automate-gateway/api/iam/v2beta/common/policy.proto";
+
+// Does not contain type as the enduser can only create 'custom' policies.
+message CreatePolicyReq {
+    string id = 1;
+    string name = 2;
+    repeated string members = 3;
+    repeated Statement statements = 4;
+}
+
+message DeletePolicyReq {
+    string id = 1;
+}
+
+message ListPoliciesReq {}
+
+message AddPolicyMembersReq {
+    string id = 1;
+    repeated string members = 2;
+}
+
+message GetPolicyReq {
+    string id = 1;
+}
+
+// Does not contain type as the enduser can only create 'custom' policies.
+message UpdatePolicyReq {
+    string id = 1;
+    repeated string members = 2;
+    repeated Statement statements = 3;
+    string name = 8;
+}
+
+message UpgradeToV2Req {
+    Flag flag = 1;
+}
+
+message GetPolicyVersionReq {}
+
+message ResetToV1Req {}
+
+message ListPolicyMembersReq {
+    string id = 1;
+}
+
+message ReplacePolicyMembersReq {
+    string id = 1;
+    repeated string members = 2;
+}
+
+message RemovePolicyMembersReq {
+    string id = 1;
+    repeated string members = 2;
+}
+
+// Does not contain type as the enduser can only create 'custom' roles.
+message CreateRoleReq {
+    string id = 1;
+    string name = 2;
+    repeated string actions = 3;
+    repeated string projects = 4;
+}
+
+message GetRoleReq {
+    string id = 1;
+}
+
+message DeleteRoleReq {
+    string id = 1;
+}
+
+message UpdateRoleReq {
+    string id = 1;
+    string name = 2;
+    repeated string actions = 3;
+    repeated string projects = 4;
+}
+
+message ListRolesReq {}
+
+message GetProjectReq {
+    string id = 1;
+}
+
+message ListProjectsReq {}
+
+message CreateProjectReq {
+    string id = 1;
+    string name = 2;
+}
+
+message UpdateProjectReq {
+    string id = 1;
+    string name = 2;
+}
+
+message DeleteProjectReq {
+    string id = 1;
+}

@@ -1,0 +1,8 @@
+@import '../../../styles/variables.scss';
+
+@mixin section-content() {
+  background: $white;
+  border-radius: $global-radius;
+  padding: 1em;
+  margin-bottom: 2em;
+}

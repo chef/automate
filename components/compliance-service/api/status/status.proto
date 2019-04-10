@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package chef.automate.domain.compliance.api.status;
+option go_package = "github.com/chef/automate/components/compliance-service/api/status";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+
+// MigrationStatus message
+message MigrationStatus {
+	int64 total = 1;
+	int64 completed = 2;
+	repeated LogEntry logs = 3;
+	enum Status {
+		UNKNOWN = 0;
+		RUNNING = 1;
+		FINISHED = 2;
+		FAILED = 3;
+		SKIPPED = 4;
+	}
+	Status status = 4;
+}
+
+
+// label is used to differentiate between multiple migrations done by one service
+message LogEntry {
+	string label = 1;
+	google.protobuf.Timestamp timestamp = 2;
+	string text = 3;
+}
+
+service ComplianceStatus {
+	rpc GetMigrationStatus (google.protobuf.Empty) returns (MigrationStatus) {};
+}

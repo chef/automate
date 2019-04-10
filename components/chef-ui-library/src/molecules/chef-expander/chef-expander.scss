@@ -1,0 +1,11 @@
+chef-expander {
+  display: block;
+
+  > * {
+    display: none;
+  }
+
+  &[opened] > * {
+    display: inherit;
+  }
+}

@@ -1,0 +1,46 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+rc=0
+
+opts="-cert {{pkg.svc_config_path}}/service.crt"
+opts="${opts} -key {{pkg.svc_config_path}}/service.key"
+opts="${opts} {{sys.ip}}:{{cfg.service.port}}"
+
+# This is the right GRPC call but to make it we need a Bearer token.
+# It would be good to make simple endpoints like this one to not ask for auth
+#health=$(grpcurl -insecure ${opts} chef.automate.api.Gateway.GetHealth)
+#
+# For now we will just use curl and ensure that we have GRPC Error code 16
+# that means that Auth is blocking the requests
+url="https://{{sys.ip}}:{{cfg.service.port}}"
+health=$(curl --insecure --max-time 2 --noproxy {{sys.ip}} ${url}/gateway/health 2>/dev/null)
+status=$(echo $health | jq -r '.code // .status')
+
+# Inspect the health of the automate-gateway service
+#
+# Example message:
+# {
+#   "status": "ok"
+# }
+#status=$(echo $health | jq .status -r)
+case $status in
+  "16")
+    # Workaround until we find a way to hit GRPC calls or endpoints with NO auth
+    rc=0 ;;
+  "ok")
+    rc=0 ;;
+  "initialization")
+    rc=1 ;;
+  "warning")
+    rc=1 ;;
+  "critical")
+    rc=2 ;;
+  *)
+    # If we have an unknown health, lets print the entire blob
+    # @afiune: You can check this output at the service logs:
+    # => /hab/svc/automate-gateway/logs/health_check.stdout.log
+    echo "health: ${health}"
+    rc=3 ;; # Unknown
+esac
+
+exit $rc

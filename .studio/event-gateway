@@ -1,0 +1,18 @@
+#!/bin/bash
+
+document "start_event_gateway" <<DOC
+  Build and start the event-gateway
+DOC
+function start_event_gateway() {
+  build components/event-gateway
+  start_deployment_service
+  chef-automate dev deploy-some "$HAB_ORIGIN/event-gateway" --with-deps
+}
+
+document "event_gateway_integration" <<DOC
+  Run event gateway integration tests
+DOC
+function event_gateway_integration() {
+  go_test -v "github.com/chef/automate/components/event-gateway/integration_test"
+}
+

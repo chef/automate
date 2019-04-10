@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+{{ partial "automate/head" . }}
+<body>
+  <div class="off-canvas-wrapper has-sidebar">
+    <div class="off-canvas-content" data-off-canvas-content>
+      <div id="menu" class="cell small-12" data-sticky-container>
+        {{ partial "automate/header" . }}
+      </div>
+      <div class="cell small-12" style="z-index: 10;">
+        {{ partial "mini-hero" . }}
+      </div>
+      <div id="main-content" class="cell small-12" data-sticky-container>
+        <div class="grid-container">
+          <div class="grid-x">
+            <div class="cell medium-3 col-sidebar">
+              {{ partial "sidebar" . }}
+            </div>
+            <div id="main-content-col" class="cell medium-9 col-content">
+              {{ block "main" . }}
+              {{ end }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="footer" class="cell small-12">
+        <nav>
+          {{ partial "automate/footer" . }}
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script src="{{ "js/scripts-all.js" | relURL }}"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
+  <script type="text/javascript">
+    docsearch({
+      apiKey: '32f4c32fa5d7f5ff99ee4af5b783ca3a',
+      indexName: 'automate_chef_io',
+      inputSelector: '#doc-search',
+      debug: false // Set debug to true if you want to inspect the dropdown
+    });
+  </script>
+</body>
+</html>

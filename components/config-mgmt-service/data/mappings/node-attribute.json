@@ -1,0 +1,85 @@
+{
+	"template" : "node-attribute",
+	"settings":{
+		"index":{
+			"refresh_interval":"5s"
+		}
+	},
+	"mappings":{
+		"_default_" : {
+			"_all" : {"enabled" : false, "norms" : false},
+			"dynamic_templates" : [
+				{
+					"message_field" : {
+						"match" : "message",
+						"match_mapping_type" : "string",
+						"mapping" : {
+							"type" : "text", "onorms" : false,
+							"fielddata" : false
+						}
+					}
+				}, {
+					"string_fields" : {
+						"match" : "*",
+						"match_mapping_type" : "string",
+						"mapping" : {
+							"type" : "keyword", "norms" : false, "ignore_above" : 256
+						}
+					}
+				}, {
+					"double_fields" : {
+						"match" : "*",
+						"match_mapping_type" : "double",
+						"mapping" : { "type" : "double", "doc_values" : true }
+					}
+				}, {
+					"byte_fields" : {
+						"match" : "*",
+						"match_mapping_type" : "binary",
+						"mapping" : { "type" : "binary", "doc_values" : true }
+					}
+				}, {
+					"long_fields" : {
+						"match" : "*",
+						"match_mapping_type" : "long",
+						"mapping" : { "type" : "long", "doc_values" : true }
+					}
+				}, {
+					"date_fields" : {
+						"match" : "*",
+						"match_mapping_type" : "date",
+						"mapping" : { "type" : "date", "doc_values" : true }
+					}
+				}]
+		},
+		"node-attribute":{
+			"dynamic" : true,
+			"properties":{
+				"name":{
+					"type":"text"
+				},
+				"entity_uuid":{
+					"type":"keyword"
+				},
+				"chef_environment" : {
+					"type": "text"
+				},
+				"run_list": {
+					"type": "keyword"
+				},
+				"default":{
+					"type":"text"
+				},
+				"normal":{
+					"type":"text"
+				},
+				"override":{
+					"type":"text"
+				},
+				"last_update":{
+					"type":"date"
+				}
+			}
+		}
+	}
+}

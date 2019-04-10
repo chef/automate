@@ -1,0 +1,220 @@
+<chef-sidebar>
+  <div class="nav-items">
+    <chef-sidebar-entry route="/profiles" icon="library_books">Profiles</chef-sidebar-entry>
+  </div>
+</chef-sidebar>
+
+<div class="container">
+  <main>
+
+    <chef-notification
+      *ngIf="downloadErrorVisible"
+      type="error"
+      timeout="5"
+      (dismissed)="hideDownloadError()">
+      Failed to install profile. Please try again later.
+    </chef-notification>
+
+    <chef-page-header class="profiles-header">
+      <chef-heading>Asset Store</chef-heading>
+      <chef-subheading>Compliance profiles.</chef-subheading>
+
+      <div class="profiles-search">
+        <chef-input
+          type="text"
+          placeholder="Search profiles..."
+          (input)="onSearchInput($event)">
+        </chef-input>
+      </div>
+
+      <chef-tab-selector class="profiles-tabs" [value]="selectedTab" (change)="onTabChange($event)">
+        <chef-option value='installed'>{{ filteredProfiles.length }} Profiles</chef-option>
+        <chef-option value='available'>{{ filteredAvailableProfiles.length }} Available</chef-option>
+      </chef-tab-selector>
+    </chef-page-header>
+
+    <div class="empty-help setup-help" *ngIf="!profilesEnabled">
+      <img class="help-icon" src="/assets/img/services.svg" alt="">
+      <div class="help-msg">
+        <p>You will need to enable the compliance profile asset store to use this feature.</p>
+        <p>Enable the service by adding this line:</p>
+        <chef-snippet code="compliance_profiles['enable'] = true" lang="ruby"></chef-snippet>
+        <p>into <code>/etc/delivery/delivery.rb</code> and running <code>automate-ctl reconfigure</code>. The <code>automate-ctl status</code> command should now list the status of the compliance_profiles service.</p>
+      </div>
+    </div>
+
+    <!--only show content if profile store is enabled-->
+    <div *ngIf="profilesEnabled" class="profiles-content">
+
+      <!--profiles tab-->
+      <div *ngIf="selectedTab === 'installed'">
+
+        <chef-modal
+          id="upload-modal"
+          [visible]="uploadModalVisible"
+          (close)="hideUploadModal()">
+          <h2 id="upload-modal-title" slot="title">Upload an archived profile (.tar.gz or .zip)</h2>
+          <p id="upload-modal-subtitle">See the <a href="https://www.inspec.io/docs/reference/cli/#archive" target="_blank">Inspec CLI documentation</a> for more info on creating a profile archive.</p>
+          <chef-table class="file-upload-list">
+            <ng-container *ngFor="let file of fileUploads; trackBy: trackBy">
+              <chef-tr>
+                <chef-td>
+                  <chef-icon class="failed" *ngIf="file.failed">report_problem</chef-icon>
+                  <chef-icon class="passed" *ngIf="file.loaded">check_circle</chef-icon>
+                  <chef-loading-spinner size="14" *ngIf="file.loading"></chef-loading-spinner>
+                  <span>{{ file.name }}</span>
+                </chef-td>
+                <chef-td>
+                  <span *ngIf="file.loading && file.percent < 100" class="upload-percent">{{ file.percent }}%</span>
+                  <span *ngIf="file.loading && file.percent === 100" class="upload-percent">Verifying...</span>
+                  <chef-button *ngIf="file.failed" caution secondary (click)="toggleUploadResult(file)">
+                    <chef-icon>report_problem</chef-icon>
+                  </chef-button>
+                </chef-td>
+              </chef-tr>
+              <div class="result-detail" *ngIf="isOpenUploadResult(file)">
+                <pre>{{ file.response }}</pre>
+              </div>
+            </ng-container>
+          </chef-table>
+          <div class="actions">
+            <label class="custom-file-input">
+              <input (change)="onFilesSelected($event)" type="file" accept=".gz,.zip,.tar" multiple>
+            </label>
+            <chef-button tertiary (click)="hideUploadModal()">Cancel</chef-button>
+          </div>
+        </chef-modal>
+
+        <app-authorized [allOf]="['streaming::/compliance/profiles', 'post']">
+          <chef-toolbar>
+            <chef-button primary (click)="showUploadModal()" *ngIf="!profilesEmpty">
+              <chef-icon>cloud_upload</chef-icon>
+              <span>Upload Profile</span>
+            </chef-button>
+          </chef-toolbar>
+
+          <div class="empty-help" *ngIf="profilesEmpty">
+            <img class="help-icon" src="/assets/img/profiles.svg" alt="">
+            <div class="help-msg">
+              <p>Seems like you need to install some profiles!</p>
+              <p>Install pre-packaged compliance profiles from the "Available" tab or <a (click)="showUploadModal()">upload your own</a>.</p>
+            </div>
+          </div>
+        </app-authorized>
+
+        <!--profiles list-->
+        <chef-table
+          *ngIf="!profilesEmpty && !viewAvailableUpdatesList"
+          class="profiles-table installed">
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Profile</chef-th>
+              <chef-th>Version</chef-th>
+              <chef-th>Identifier</chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody *ngIf="!profilesListLoading">
+            <chef-tr *ngIf="profileUpdatesAvailable.length" class="empty new-row">
+              <span class="cta">{{ profileUpdatesAvailable.length }} Available Updates</span>
+              <span class="action">
+                <chef-button secondary (click)="showAvailableUpdates()">
+                  <chef-icon>inbox</chef-icon>
+                  <span>View</span>
+                </chef-button>
+              </span>
+            </chef-tr>
+            <chef-tr *ngFor="let profile of filteredProfiles">
+              <chef-td>
+                <a
+                  [routerLink]="['/profiles/profile-details']"
+                  [queryParams]="{name: profile.name, version: profile.version, owner: user}">
+                  {{ profile.title }}
+                </a>
+              </chef-td>
+              <chef-td>{{ profile.version }}</chef-td>
+              <chef-td>
+                <chef-clipboard value="{{ user }}/{{ profile.name }}"></chef-clipboard>
+                {{ user }}/{{ profile.name }}
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+          <chef-loading-spinner *ngIf="profilesListLoading" size="50"></chef-loading-spinner>
+        </chef-table>
+
+        <!--available updates list (sub-view of profiles tab)-->
+        <chef-table
+          *ngIf="viewAvailableUpdatesList"
+          class="profiles-table available">
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Profile</chef-th>
+              <chef-th>Version</chef-th>
+              <chef-th></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr class="empty new-row">
+              <span class="cta">Select a profile to preview the update and select "Update" to install it.</span>
+              <span class="action">
+                <chef-button secondary (click)="hideAvailableUpdates()">
+                  <chef-icon>chevron_left</chef-icon>
+                  <span>Go Back</span>
+                </chef-button>
+              </span>
+            </chef-tr>
+            <chef-tr *ngFor="let profile of profileUpdatesAvailable">
+              <chef-td>
+                <a
+                  [routerLink]="['/profiles/profile-details']"
+                  [queryParams]="{name: profile.name, version: profile.version}">
+                  {{ profile.title }}
+                </a>
+              </chef-td>
+              <chef-td>{{ profile.version }}</chef-td>
+              <chef-td>
+                <chef-button secondary (click)="getProfiles([profile])">
+                  Update
+                </chef-button>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </div>
+
+      <!-- available profiles tab-->
+      <div *ngIf="selectedTab === 'available'">
+        <chef-table class="profiles-table available">
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Profile</chef-th>
+              <chef-th>Version</chef-th>
+              <chef-th></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody *ngIf="!availableListLoading">
+            <chef-tr *ngFor="let profile of filteredAvailableProfiles">
+              <chef-td>
+                <a
+                  [routerLink]="['/profiles/profile-details']"
+                  [queryParams]="{name: profile.name, version: profile.version}">
+                  {{ profile.title }}
+                </a>
+              </chef-td>
+              <chef-td>{{ profile.version }}</chef-td>
+              <chef-td>
+                <chef-button secondary (click)="getProfiles([profile])">
+                  <chef-icon>get_app</chef-icon>
+                  <span>Get</span>
+                </chef-button>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+          <chef-loading-spinner *ngIf="availableListLoading" size="50"></chef-loading-spinner>
+        </chef-table>
+      </div>
+    </div>
+
+    <chef-scroll-top></chef-scroll-top>
+
+  </main>
+</div>

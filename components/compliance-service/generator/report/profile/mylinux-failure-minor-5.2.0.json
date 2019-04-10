@@ -1,0 +1,46 @@
+{
+  "name": "mylinux-failure-minor",
+  "title": "My Demo Linux minor failing profile",
+  "maintainer": "Chef Software, Inc.",
+  "copyright": "Chef Software, Inc.",
+  "copyright_email": "support@chef.io",
+  "license": "Apache 2 license",
+  "summary": "Demonstrates the use of InSpec Compliance Profile",
+  "version": "5.2.0",
+  "supports": [
+    {
+      "os-family": "unix"
+    }
+  ],
+  "controls": [
+    {
+      "title": "Check /etc/missing2.rb",
+      "desc": "File test in failure.rb desc",
+      "impact": 0.2,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "control 'Checking /etc/missing2.rb' do\n  impact 0.2\n  title \"Check /etc/missing2.rb\"\n  desc \"File test in failure.rb desc\"\n  describe file('/etc/missing2.rb') do\n    it { should be_file }\n  end\nend\n",
+      "source_location": {
+        "ref": "controls/failure.rb",
+        "line": 2
+      },
+      "id": "Checking /etc/missing2.rb"
+    }
+  ],
+  "groups": [
+    {
+      "title": null,
+      "controls": [
+        "Checking /etc/missing2.rb"
+      ],
+      "id": "controls/failure.rb"
+    }
+  ],
+  "attributes": [
+
+  ],
+  "sha256": "c1606e5277e9eb2d7f7c44cabec27621a8f183eb6310ac03ace2e5808c508d84"
+}

@@ -1,0 +1,228 @@
+%% -*- mode: erlang -*-
+
+%% We should try & keep this in alphabetical order
+
+{deliv_hand_change,
+ {pipeline, [{get, all},
+            {delete, [admin, committer]}]}}.
+
+{deliv_hand_changes,
+ %% TODO: what if you only have roles on a pipeline, and you need to see the changes?!
+ {project, [{get, all}]}}.
+
+{deliv_hand_enterprise,
+ {enterprise, [
+  {get, all}]}}.
+
+%% This handler works for multiple endpoints, but each one uses a
+%% different authorization scope. It is configured slightly
+%% differently from the other "single use" handler modules.
+%%
+%% See delivery_sup:set_authz/4.
+{deliv_hand_user_authz, [
+                         {enterprise, [{get, [admin]}, {post, [admin]}]},
+                         {organization, [{get, [admin]}, {post, [admin]}]},
+                         {project, [{get, [admin]}, {post, [admin]}]},
+                         {pipeline, [{get, [admin]}, {post, [admin]}]}
+                        ]}.
+
+{deliv_hand_external_users,
+ {enterprise, [
+               {post, [admin]}
+              ]}}.
+
+{auth_hand_saml_users,
+ {enterprise, [
+               {post, [admin]}
+              ]}}.
+
+{deliv_hand_change_merge,
+ {pipeline, [
+              {post, [admin, reviewer]}
+            ]}}.
+
+{deliv_hand_trigger,
+ {pipeline, [
+              {post, [admin, reviewer, committer]}
+            ]}}.
+
+{deliv_hand_change_accept,
+ {pipeline, [
+              {post, [admin, shipper]}
+            ]}}.
+
+{deliv_hand_change_description,
+ {pipeline, [
+             {get, all},
+             {put, [admin, committer]}
+            ]}}.
+
+{deliv_hand_intern_users,
+ {enterprise, [
+               {post, [admin]}
+              ]}}.
+
+%% The handler also allows for users to change their own password
+{deliv_hand_intern_users_change_password,
+ {enterprise, [
+               {post, [admin]}
+              ]}}.
+
+{deliv_hand_orgs,
+ {enterprise,[
+              {get, all},
+              {post, [admin]}
+             ]}}.
+
+{deliv_hand_orgs_named,
+ {enterprise, [
+               {get, all},
+               {put, [admin]},
+               {delete, [admin]}
+              ]}}.
+
+{deliv_hand_org_reviews,
+ {organization,[
+                {get, all}
+               ]}}.
+
+%% Note that builder users currently have admin permissions, so that's
+%% how they get to authorized
+%%
+%% Also, everyone needs to GET here, because that's how we get phase
+%% run logs
+{deliv_hand_phase_runs_named,
+ {pipeline, [
+             %% listing all 4 roles is different than `all': you still
+             %% need to have some role
+             {get, [admin, committer, reviewer, shipper]},
+             {post, [admin]}
+             ]}}.
+
+{deliv_hand_phase_runs_named_log,
+ {pipeline, [
+             %% listing all 4 roles is different than `all': you still
+             %% need to have some role
+             {get, [admin, committer, reviewer, shipper]},
+             {post, [admin]}
+             ]}}.
+
+{deliv_hand_phase_run_log_objects,
+ {enterprise, [
+             {get, [admin, committer, reviewer, shipper]},
+             {post, [admin]}
+             ]}}.
+
+{deliv_hand_pipeline_status,
+ {enterprise, [
+               {get, all}
+              ]}}.
+
+{deliv_hand_projects,
+ {organization,[
+              {get, all},
+              {post, [admin]}
+             ]}}.
+
+{deliv_hand_projects_named,
+ {project, [
+            {get, all},
+            {put, [admin]},
+            {delete, [admin]}
+           ]}}.
+
+{deliv_hand_ent_default_searches,
+ {enterprise, [
+            {get, all},
+            {put, [admin]},
+            {delete, [admin]}
+           ]}}.
+
+{deliv_hand_compare,
+ {project, [
+            {get, [admin, committer, reviewer]}
+           ]}}.
+
+{deliv_hand_comments,
+ %% TODO: the scope here should probably rather be `pipeline',
+ %% but we don't have the pipeline name in the URL, and so that would
+ %% require pretty large changes in the way we handle generic authz
+ %% So I leave that for later... (easiest fix would be to add the
+ %% pipe name in the URL)
+ {project, [
+            {get, all},
+            {post, [admin, committer, reviewer]},
+            {put, [admin, committer, reviewer]}
+           ]}}.
+
+{deliv_hand_comments_named,
+ {project, [
+            {delete, [admin, committer, reviewer]},
+            {put, [admin, committer, reviewer]}
+           ]}}.
+
+{deliv_hand_users,
+ {enterprise, [
+  {get, all}]}}.
+
+{deliv_hand_users_named,
+ {enterprise, [
+               {get, [admin]},
+               {put, [admin]},
+               {delete, [admin]}
+              ]}}.
+
+{deliv_hand_pipelines,
+ {project, [
+            {get, all},
+            {post, [admin]}
+           ]}}.
+
+
+{deliv_hand_pipelines_ent,
+ {enterprise, [
+               {get, all}
+              ]}}.
+
+{deliv_hand_pipeline_ent,
+ {enterprise, [
+               {get, all}
+              ]}}.
+
+{deliv_hand_pipes_named,
+ {pipeline, [
+            {get, all},
+            {put, [admin]},
+            {delete, [admin]}
+            ]}}.
+
+{deliv_hand_changelog,
+ {pipeline, [
+             {get, all}
+            ]}}.
+
+{deliv_hand_pipe_events,
+ {organization, [
+                 {get, all}
+                ]}}.
+
+{deliv_hand_queue_status,
+ {enterprise, [
+  {get, [admin]}]}}.
+
+{deliv_hand_user_oauth_alias,
+ {enterprise, [
+               {put, [admin]}
+              ]}}.
+
+{deliv_hand_blocked_projects,
+ {enterprise, [
+               {get, all}
+              ]}}.
+
+{auth_hand_saml_config,
+ {enterprise, [
+               {put, [admin]},
+               {delete, [admin]},
+               {get, [admin]}
+              ]}}.

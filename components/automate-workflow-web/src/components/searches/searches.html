@@ -1,0 +1,28 @@
+<div class="card-view">
+  <header class="page-header">
+    <div class="page-header-title">
+      <h2>Default Search</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="card-filter-wrapper">
+    <div class="quick-find-automate" cd-quick-find></div>
+  </div>
+  <div class="cards">
+    <form class="searches-form" name="searchesForm" ng-submit="submit(searches)">
+      <fieldset>
+        <h3>Search Query</h3>
+        <p>
+          Projects use this search query by default to locate build nodes.
+          You can specify a <code>build_nodes</code> section in your
+          project's Chef Automate configuration (config.json) to override it.
+        </p>
+        <input type="text" ng-model="searches.search" placeholder="e.g. platform_family:debian">
+      </fieldset>
+      <div class="form-controls">
+        <button class="button primary" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

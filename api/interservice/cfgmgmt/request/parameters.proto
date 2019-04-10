@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
+
+message Pagination {
+  int32 page = 1;
+  int32 size = 2;
+}
+
+message Sorting {
+  string field = 1;
+  Order order = 2;
+}
+
+message Suggestion {
+  string type = 1;
+  string text = 2;
+}
+
+enum Order {
+  asc = 0;   // By default we order ascending
+  desc = 1;
+}

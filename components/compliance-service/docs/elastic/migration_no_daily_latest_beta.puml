@@ -1,0 +1,53 @@
+@startuml
+start
+
+partition "Migration without daily latest approach" {
+:"Backup ES Data";
+note left
+    Important for obvious reasons.. do this!
+end note
+:Disable data collection;
+:**Disable reporting endpoints:**
+    return message from each, explaining that
+    we are currently reindexing etc...;
+note right
+  We will need to put an endpoint returning message,
+  explaining that we are currently reindexing etc..
+end note
+:Disable reaper;
+note right
+  Disable reaper to prevent anything from cutting our
+  legs out from under us while we do our thang!
+end note
+
+:**create index:** \ncomp-latest-rep-v<index_ver>\n\n**point alias:**\ncomp-latest-rep->comp-latest-rep-v<index_ver>;
+:**split compliance-latest migrate into:**\ncomp-lat-sum-v<index_ver>\nand\ncomp-lat-rep-v<index_ver>;
+:**delete index:**\ncompliance-latest;
+
+    :earliestScanDate=es.getEarliestScanDate;
+    if (earliestScanDate.Before(now - 7d) then (yes)
+        :backEndDate=now-7d;
+    else (no)
+        :backEndDate=earliestScanDate;
+    endif
+
+    :dateToMigrate=now.UTC;
+
+    while (dateToMigrate) is (onOrAfter earliestScanDate)
+        :migrate compliance-<dateToMigrate>;
+        :dateToMigrate = dateToMigrate - 1d;
+        if (dateToMigrate is backEndDate) then (yes)
+          :Enable reporting endpoints for past 7 days only;
+          note right
+            Open for business!
+          end note
+          :Enable data collector;
+        else (no)
+        endif
+    endwhile (Before earliestScanDate)
+
+:Enable reporting endpoints for all dates;
+:Enable reaper;
+}
+end
+@enduml

@@ -1,0 +1,22 @@
+name: chef-automate iam reset-to-v1
+synopsis: Reset to IAM v1
+usage: chef-automate iam reset-to-v1 [flags]
+description: |
+  Reset to IAM v1. This will revert to policies in place before upgrade to IAM v2 and will remove any v2 policies in place, even if upgrade is re-applied.
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for reset-to-v1
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate iam - Chef Automate iam commands

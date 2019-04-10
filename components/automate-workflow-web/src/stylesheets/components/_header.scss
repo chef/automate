@@ -1,0 +1,81 @@
+.main-header {
+  padding: 2px 0 0 0;
+  font-size: 14px;
+  color: $lightgray;
+  background-color: $midnight;
+  box-shadow: 0 1px 1px #444;
+  box-sizing: padding-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  height: 51px;
+
+  a.navigation {
+    margin-left: 26px;
+    display: block;
+    float: left;
+
+    @include media($small-down) {
+      display: none;
+    }
+  }
+
+  .logo-container {
+    float: left;
+    overflow: auto;
+    padding: 8px;
+
+    > a {
+      display: block;
+      position: relative;
+      overflow: auto;
+
+      svg {
+        display: block;
+      }
+    }
+
+    .chef-logo {
+      float: left;
+      width: 32px;
+      height: 32px;
+
+      .base {
+        fill: #fff;
+      }
+      .accent {
+        fill: #f18b21;
+      }
+    }
+
+    .chef-delivery-logo {
+      float: left;
+      margin-left: 6px;
+
+      .chef {
+        fill: #fff;
+        width: 64px;
+        height: 17px;
+        margin-top: 2px;
+      }
+
+      .delivery {
+        fill: #f18b21;
+        width: 64px;
+        height: 8px;
+        margin-top: 4px;
+        margin-left: 1px;
+      }
+    }
+  }
+
+  .left-nav, .mid-nav {
+    float: left;
+  }
+
+  .right-nav {
+    float: right;
+  }
+}

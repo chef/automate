@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common";
+
+message User {
+    string name = 1; // display name
+    string id = 2;   // same as login
+    // TODO (tc): Will remove post-GA
+    string membership_id = 3 [deprecated=true];
+}

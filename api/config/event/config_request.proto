@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package chef.automate.domain.event;
+option go_package = "github.com/chef/automate/api/config/event";
+
+import "api/config/shared/global.proto";
+import "api/config/shared/tls.proto";
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+message ConfigRequest {
+	option (chef.automate.api.service_config) = {name: "event-service"};
+
+	V1 v1 = 1;
+
+	message V1 {
+		System sys = 1;
+		Service svc = 2;
+
+		message System {
+			chef.automate.infra.config.Mlsa mlsa = 1;
+			chef.automate.infra.config.TLSCredentials tls = 2;
+			Service service = 3;
+			Log log = 4;
+			Handlers handlers = 5;
+			InternalMessaging internal_messaging = 6;
+			reserved 7;
+
+			message Service {
+				google.protobuf.StringValue host = 1;
+				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10132, protocol: "grpc" } ];
+				google.protobuf.Int32Value event_limit = 3;
+				google.protobuf.Int32Value listener_limit = 4;
+				google.protobuf.BoolValue enable_nats_feature = 5;
+			}
+
+			message InternalMessaging {
+				google.protobuf.StringValue host = 1;
+				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "internal_messaging", default: 10140, protocol: "nats" } ];
+				google.protobuf.Int32Value gateway_port = 3 [ (chef.automate.api.port) = { name: "internal_messaging_gw", default: 10147, protocol: "nats-gateway" } ];
+			}
+
+			message Log {
+				google.protobuf.StringValue format = 1;
+				google.protobuf.StringValue level = 2;
+			}
+
+			message Handlers {
+				google.protobuf.StringValue feed = 1;
+				google.protobuf.StringValue cfgingest = 2;
+			}
+		}
+		// V1.Service can currently only be used for deployment-service
+		message Service {
+			// these settings were initially added here but only things under System
+			// can get rendered in the config template
+			reserved 1; //google.protobuf.Int32Value event_limit = 1;
+			reserved 2; //google.protobuf.Int32Value listener_limit = 2;
+		}
+	}
+}

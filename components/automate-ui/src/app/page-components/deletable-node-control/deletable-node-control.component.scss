@@ -1,0 +1,14 @@
+@import "~styles/variables";
+
+chef-button {
+  margin: 15px 0 0;
+}
+
+.status-modal {
+  text-align: center;
+}
+
+.status-modal-heading {
+  margin-bottom: 24px;
+  color: $chef-critical;
+}

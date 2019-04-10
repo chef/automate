@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package chef.automate.infra.pg_sidecar;
+option go_package = "github.com/chef/automate/api/interservice/pg_sidecar";
+
+service PGSidecar {
+	rpc MigrateTables(MigrateTablesReq) returns (MigrateTablesRes) {};
+	rpc RenameDB(RenameDBReq) returns (RenameDBRes) {};
+	rpc CreateDB(CreateDBReq) returns (CreateDBRes) {};
+	rpc CreateExtension(CreateExtensionReq) returns (CreateExtensionRes) {};
+	rpc DeploySqitch(DeploySqitchReq) returns (DeploySqitchRes) {};
+	rpc SetPublicSchemaRole(SetPublicSchemaRoleReq) returns (SetPublicSchemaRoleRes) {};
+	rpc AlterRole(AlterRoleReq) returns (AlterRoleRes) {};
+	rpc DropTables(DropTablesReq) returns (DropTablesRes) {};
+}
+
+message ErrorDetails {
+	enum Codes {
+		SrcDbMissing = 0;
+	}
+
+	Codes code = 20;
+}
+
+message MigrateTablesReq {
+	string from_db = 20;
+	string to_db = 21;
+	repeated string table = 22;
+	string import_user = 23;
+	bool fail_if_src_db_missing = 24;
+	bool skip_db_create = 25;
+}
+
+message MigrateTablesRes {
+}
+
+message RenameDBReq {
+	string from_db = 20;
+	string to_db = 21;
+}
+
+message RenameDBRes {
+}
+
+message CreateDBReq {
+	string db = 20;
+	string user = 21;
+}
+
+message CreateDBRes {
+}
+
+message CreateExtensionReq {
+	string db = 20;
+	string ext = 21;
+}
+
+message CreateExtensionRes {
+}
+
+message DeploySqitchReq {
+	string db = 20;
+	string dir = 21;
+	string user = 22;
+}
+
+message DeploySqitchRes {
+}
+
+message SetPublicSchemaRoleReq {
+	string role = 20;
+	string db = 21;
+}
+
+message SetPublicSchemaRoleRes {
+}
+
+message AlterRoleReq {
+	string role = 20;
+	Options with = 21;
+
+	message Options {
+		bool superuser = 20;
+		bool nosuperuser = 21;
+		bool createdb = 22;
+		bool nocreatedb = 23;
+		bool createrole = 24;
+		bool nocreaterole = 25;
+		bool createuser = 26;
+		bool nocreateuser = 27;
+		bool inherit = 28;
+		bool noinherit = 29;
+		bool replication = 30;
+		bool noreplication = 31;
+		int64 connection_limit = 32;
+		Password password = 33;
+		// TODO: Add VALID UNTIL with a timestamp
+	}
+
+	message Password {
+		string value = 20;
+		bool unencrypted = 21; // default to encrypted
+	}
+}
+
+message AlterRoleRes {
+}
+
+message DropTablesReq {
+	string db = 20;
+	repeated string tables = 21;
+	bool cascade = 22;
+}
+
+message DropTablesRes {
+}

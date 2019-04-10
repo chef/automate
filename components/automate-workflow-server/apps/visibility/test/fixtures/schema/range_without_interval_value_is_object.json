@@ -1,0 +1,6 @@
+{
+  "range": {
+    "start_time": "a",
+    "end_time": {"bad": "value"}
+  }
+}

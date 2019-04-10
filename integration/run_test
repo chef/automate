@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+
+set -Eeo pipefail
+
+CI=${CI:-false}
+HAB_ORIGIN=${HAB_ORIGIN:-chef}
+TIMEOUT=$((${BUILDKITE_TIMEOUT:-32} - 2))
+source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
+source "${source_dir}/helpers/log.sh"
+source "${source_dir}/base.sh"
+source "$1"
+
+if [[ "$CI" = "true" ]]; then
+    echo "===== PRE-TEST HOST HEALTH REPORT ====="
+    echo "docker ps"
+    docker ps
+    echo "free -m"
+    free -m
+    echo "uptime"
+    uptime
+    echo "======================================="
+fi
+
+docker pull chefes/centos-systemd:latest
+workdir="/go/src/github.com/chef/automate"
+
+docker_run_args=(
+        "--detach"
+        "--env" "HAB_ORIGIN=$HAB_ORIGIN"
+        "--env" "HAB_STUDIO_SUP=false"
+        "--env" "HAB_NONINTERACTIVE=true"
+        "--env" "CONTAINER_HOSTNAME=${test_container_name}"
+        "--env" "test_notifications_endpoint=${test_notifications_endpoint}"
+        "--env" "A2_LICENSE"
+        "--hostname" "$test_container_name"
+        "--interactive"
+        "--name" "$test_container_name"
+        "--privileged"
+        "--rm"
+        "--tmpfs=/tmp:rw,noexec,nosuid"
+        "--tmpfs=/var/tmp:rw,noexec,nosuid"
+        "--tmpfs=/dev/shm:rw,noexec,nosuid"
+        "--tty"
+        "--volume" "$PWD:$workdir"
+        "--workdir" "$workdir"
+)
+
+if [ $CI = "true" ]
+then
+    buildkite_agent=$(command -v buildkite-agent)
+    docker_run_args+=(
+        "--env" "BUILDKITE_JOB_ID"
+        "--env" "BUILDKITE_BUILD_ID"
+        "--env" "BUILDKITE_AGENT_ACCESS_TOKEN"
+        "--env" "BUILDKITE"
+        "--volume" "$buildkite_agent:/usr/bin/buildkite-agent"
+        "--label" "buildkitejob=$BUILDKITE_JOB_ID"
+    )
+fi
+
+if [ ${#test_external_services[@]} -ne 0 ]; then
+    log_info "Start External Services"
+    source integration/services/common
+    create_services_config_path
+
+    docker_run_args+=(
+        "--volume" "$SERVICES_CONFIG_PATH:/services"
+    )
+
+    for external_service in "${test_external_services[@]}"
+    do
+        log_info "Starting $external_service"
+        source integration/services/$external_service/init
+        ${external_service}_setup
+    done
+fi
+
+echo "${docker_run_args[*]}"
+
+docker run "${docker_run_args[@]}" chefes/a2-integration:latest
+
+cleanup() {
+    echo "Attempting to clean up docker container $test_container_name"
+    docker stop "$test_container_name"
+
+    if [ ${#test_external_services[@]} -ne 0 ]; then
+        log_info "Cleaning Up External Services"
+
+        for external_service in "${test_external_services[@]}"
+        do
+            log_info "Dumping logs for $external_service"
+            ${external_service}_dump_logs
+            log_info "Stopping $external_service"
+            ${external_service}_teardown
+        done
+
+        destroy_services_config_path
+    fi
+}
+
+cleanup_ci() {
+    # We condition this on CI so that in CI we always cleanup, even on failure
+    if [[ "$CI" = "true" ]]; then
+        cleanup
+    else
+        echo "Not cleaning up because CI=$CI"
+    fi
+}
+
+trap cleanup_ci EXIT
+
+if [ $CI != "true" ]; then
+    secret_origin_key=$(hab origin key export --type secret $HAB_ORIGIN)
+    docker exec -e SEC_KEY="$secret_origin_key" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
+
+    public_origin_key=$(hab origin key export --type public $HAB_ORIGIN)
+    docker exec -e SEC_KEY="$public_origin_key" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
+fi
+
+echo "Running the docker. Will timeout after $TIMEOUT mins"
+docker exec -e TEST_PATH=$1 "$test_container_name" timeout "${TIMEOUT}m" bash -c 'source ./integration/base.sh; __run_test $TEST_PATH'

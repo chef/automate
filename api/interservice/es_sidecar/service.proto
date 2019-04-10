@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package chef.automate.infra.es_sidecar;
+option go_package = "github.com/chef/automate/api/interservice/es_sidecar";
+
+import "google/protobuf/empty.proto";
+
+message PurgeRequest{
+	// request identifier
+	string id = 1;
+	// index to purge from for Document delete; index base name for time series delete.
+	string index = 2;
+	// delete documents from index that were added longer than this many days ago.
+	int32 older_than_days = 3;
+	// reserved, not yet implemented.
+	bool purge_when_not_in_backup = 4;
+
+	// FOR NON-TIME SERIES INDICES ONLY!
+	// Optional field. Purge documents based on the time value in this field rather than
+	// the default field, end_time. Values for this field come from client purge policies.
+	// If this field is empty, purge defaults to end_time.
+	string customPurgeField = 5;
+}
+
+message PurgeResponse {
+	message Failure {
+		string id = 1; // doc id or index name
+		string type = 2; // document
+	}
+
+	bool Success = 1;
+	string message = 2;
+	repeated Failure failures = 3;
+}
+
+message VersionResponse {
+	string version = 1;
+}
+
+message CreateRepositoryRequest{
+	string service_name = 1;
+}
+
+message CreateRepositoryResponse{}
+
+message ConvergeRepositorySettingsRequest{
+	string service_name = 1;
+}
+
+message ConvergeRepositorySettingsResponse{}
+
+message RemoveRepositoryRequest{
+	string service_name = 1;
+}
+
+message RemoveRepositoryResponse{}
+
+message CreateSnapshotRequest{
+	string service_name = 1;
+	string multi_index_specification = 2;
+	string backup_id = 3;
+}
+
+message CreateSnapshotResponse{
+}
+
+message CreateSnapshotStatusRequest{
+	string service_name = 1;
+	string backup_id = 2;
+}
+
+enum SnapshotState {
+	UNKNOWN = 0;
+	SUCCESS = 1;
+	IN_PROGRESS = 2;
+	FAILED = 3;
+}
+
+message CreateSnapshotStatusResponse{
+	SnapshotState snapshot_state = 1;
+	double progress_percentage = 2;
+	string message = 3;
+}
+
+message RestoreSnapshotRequest{
+	string service_name = 1;
+	string backup_id = 2;
+}
+
+message RestoreSnapshotResponse{
+}
+
+message RestoreSnapshotStatusRequest{
+	string service_name = 1;
+	string backup_id = 2;
+}
+
+message RestoreSnapshotStatusResponse{
+	SnapshotState snapshot_state = 1;
+	double progress_percentage = 2;
+	string message = 3;
+}
+
+message DeleteSnapshotRequest{
+	string service_name = 1;
+	string backup_id = 2;
+}
+
+message DeleteSnapshotResponse{
+}
+
+service EsSidecar {
+	// Will begin a new purge if the identified purge is not already in progress.
+	// If it is in progress, the PurgeResponse status field will indicate this.
+	rpc PurgeTimeSeriesIndicesByAge(PurgeRequest) returns (PurgeResponse);
+	rpc PurgeDocumentsFromIndexByAge(PurgeRequest) returns (PurgeResponse) ;
+	rpc CreateRepository(CreateRepositoryRequest) returns (CreateRepositoryResponse);
+	rpc ConvergeRepositorySettings(ConvergeRepositorySettingsRequest) returns (ConvergeRepositorySettingsResponse);
+	rpc RemoveRepository(RemoveRepositoryRequest) returns (RemoveRepositoryResponse);
+	rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse);
+	rpc CreateSnapshotStatus(CreateSnapshotStatusRequest) returns (CreateSnapshotStatusResponse);
+	rpc RestoreSnapshot(RestoreSnapshotRequest) returns (RestoreSnapshotResponse);
+	rpc RestoreSnapshotStatus(RestoreSnapshotStatusRequest) returns (RestoreSnapshotStatusResponse);
+	rpc DeleteSnapshot(DeleteSnapshotRequest) returns (DeleteSnapshotResponse);
+	rpc Version (google.protobuf.Empty) returns (VersionResponse);
+}

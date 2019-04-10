@@ -1,0 +1,17 @@
+#
+# verify_setup: Initialize a buildkite host for running a `hab studio
+# run` style integration test.
+#
+# NOTE: This script is likely sourced in /bin/sh and not bash.
+#
+scripts/download_verify_harts
+
+upload_logs() {
+    echo "Attempting to upload logs to buildkite"
+    if ! buildkite-agent artifact upload "results/logs/*"; then
+        echo "Failed to upload logs. Print to stdout instead"
+        cat results/logs/*
+    fi
+}
+
+trap upload_logs EXIT

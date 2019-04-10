@@ -1,0 +1,194 @@
+<chef-loading-spinner *ngIf="loading" size='50' fixed></chef-loading-spinner>
+<app-deletable-node-control #deletable_control
+[deletableNodes]="deletableNodes"
+[isVisible]="canDeleteNodes"
+(deleteNodes)="onDeleteNodes($event)">
+</app-deletable-node-control>
+<chef-table class="node-list">
+  <caption class="visually-hidden">Node List Table with Node States</caption>
+  <chef-thead>
+    <chef-tr>
+      <chef-th *ngIf="canDeleteNodes" class="delete" scope="col">
+        <chef-checkbox class="delete-checkbox header"
+        [checked]="deletable_control.numberOfDeletableNodes() > 0 && deletable_control.areAllNodesSelected()"
+        (change)="deletable_control.selectAllNodesForDelete($event.detail)"
+        [disabled]="!deletable_control.deletableNodesNonEmpty()"
+        [indeterminate]="deletable_control.isAllSelectionOfNodesIndeterminate()"> </chef-checkbox>
+      </chef-th>
+      <chef-th scope="col" class="node-name sort" (click)="onToggleSort('name')">
+        Node Name <i class="sort-icon {{sortIcon('name')}}"></i>
+      </chef-th>
+      <chef-th scope="col" class="check-in sort" (click)="onToggleSort('checkin')" [hidden]="!columns.check_in">
+        Check-in<i class="sort-icon {{sortIcon('checkin')}}"></i>
+      </chef-th>
+      <chef-th scope="col" class="sort" (click)="onToggleSort('uptime_seconds')" [hidden]="!columns.uptime">
+        Uptime<i class="sort-icon {{sortIcon('uptime_seconds')}}"></i>
+      </chef-th>
+      <chef-th scope="col" class="sort" (click)="onToggleSort('platform')" [hidden]="!columns.platform">
+        Platform<i class="sort-icon {{sortIcon('platform')}}"></i>
+      </chef-th>
+      <chef-th scope="col" *ngIf="displayEnvironmentNodes" class="sort node-environment" (click)="onToggleSort('environment')" [hidden]="!columns.environment">
+        Environment<i class="sort-icon {{sortIcon('environment')}}"></i>
+      </chef-th>
+      <chef-th scope="col" *ngIf="displayPolicyNodes" class="sort" (click)="onToggleSort('policy_group')" [hidden]="!columns.policy_group">
+        Policy Group<i class="sort-icon {{sortIcon('policy_group')}}"></i>
+      </chef-th>
+      <chef-th scope="col"  class="sort" (click)="onToggleSort('chef_version')" [hidden]="!columns.chef_version">
+        Client Version<i class="sort-icon {{sortIcon('chef_version')}}"></i>
+      </chef-th>
+      <chef-th scope="col"  class="sort" (click)="onToggleSort('deprecations_count')" [hidden]="!columns.deprecations_count">
+        Deprecations<i class="sort-icon {{sortIcon('deprecations_count')}}"></i>
+      </chef-th>
+      <chef-th class="view-more column-dropdown">
+        <chef-button tertiary class="column-dropdown-toggle" (click)="toggleColumnDropdown()">
+          <chef-icon>settings</chef-icon>
+        </chef-button>
+        <chef-click-outside omit="column-dropdown-toggle" (clickOutside)="closeColumnDropdown()">
+          <chef-dropdown [attr.visible]="columnDropdownVisible">
+            <chef-checkbox [checked]="columns.check_in"
+              (change)="updateColumnVisibility('check_in')"> Check-In
+            </chef-checkbox>
+            <chef-checkbox [checked]="columns.uptime"
+              (change)="updateColumnVisibility('uptime')"> Uptime
+            </chef-checkbox>
+            <chef-checkbox [checked]="columns.platform"
+              (change)="updateColumnVisibility('platform')"> Platform
+            </chef-checkbox>
+            <chef-checkbox [checked]="columns.environment"
+              (change)="updateColumnVisibility('environment')"> Environment
+            </chef-checkbox>
+            <chef-checkbox [checked]="columns.policy_group"
+              (change)="updateColumnVisibility('policy_group')"> Policy Group
+            </chef-checkbox>
+            <chef-checkbox [checked]="columns.chef_version"
+              (change)="updateColumnVisibility('chef_version')"> Client Version
+            </chef-checkbox>
+            <chef-checkbox [checked]="columns.deprecations_count"
+              (change)="updateColumnVisibility('deprecations_count')"> Deprecations
+            </chef-checkbox>
+          </chef-dropdown>
+        </chef-click-outside>
+      </chef-th>
+    </chef-tr>
+  </chef-thead>
+  <chef-tbody>
+    <ng-container *ngFor="let node of nodes; index as i" >
+      <chef-tr *ngIf=node.hasRuns tabindex="0" class="row">
+        <chef-td  *ngIf="canDeleteNodes" class="{{node.status}} delete">
+          <chef-checkbox *ngIf="deletable_control.isNodeDeletable(node)" class="delete-checkbox row"
+            [checked]="deletable_control.isNodeSelected(node)"
+            (change)="deletable_control.selectNodeForDelete($event.detail, node)">
+          </chef-checkbox>
+          <div *ngIf="!deletable_control.isNodeDeletable(node)" class="empty-checkbox"></div>
+        </chef-td>
+        <chef-td class="{{node.status}} node-name has-runs">
+          <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
+            <span class="visually-hidden">Node Status {{node.status}}</span>
+            <chef-icon>{{ node.status | chefStatusIcon }}</chef-icon> {{node.name}}
+          </a>
+        </chef-td>
+        <chef-td class="check-in has-runs" [hidden]="!columns.check_in">
+          <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
+            {{node.checkin | timeFromNow}}
+          </a>
+        </chef-td>
+        <chef-td class="has-runs" [hidden]="!columns.uptime">
+          <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
+            {{node.uptime_seconds | timeDuration:'seconds'}}
+          </a>
+        </chef-td>
+        <chef-td class="has-runs" [hidden]="!columns.platform">
+          <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
+            {{node.platform}}
+          </a>
+        </chef-td>
+        <chef-td *ngIf="displayEnvironmentNodes" class="node-environment has-runs" [hidden]="!columns.environment">
+          <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
+            <ng-container *ngIf="!node.policy_group">
+              {{node.environment || "- -"}}
+            </ng-container>
+            <ng-container *ngIf="node.policy_group">
+              - -
+            </ng-container>
+          </a>
+        </chef-td>
+        <chef-td *ngIf="displayPolicyNodes" class="has-runs" [hidden]="!columns.policy_group">
+          <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
+            {{node.policy_group || "- -"}}
+          </a>
+        </chef-td>
+        <chef-td class="has-runs" [hidden]="!columns.chef_version">
+          <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
+            {{node.chefVersion}}
+          </a>
+        </chef-td>
+        <chef-td class="has-runs" [hidden]="!columns.deprecations_count">
+          <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
+            {{node.deprecationsCount || "0"}}
+          </a>
+        </chef-td>
+        <chef-td class="has-runs view-more">
+          <a [routerLink]="[node.id, 'runs', node.latestRunId, {end_time: node.lastCcrReceived}]">
+            <chef-button secondary aria-label="More Information">
+              <chef-icon>navigate_next</chef-icon>
+            </chef-button>
+          </a>
+        </chef-td>
+      </chef-tr>
+      <chef-tr *ngIf=!node.hasRuns >
+        <chef-td *ngIf="canDeleteNodes" class="delete" >
+          <chef-checkbox *ngIf="deletable_control.isNodeDeletable(node)" class="delete-checkbox row"
+            [checked]="deletable_control.isNodeSelected(node)"
+            (change)="deletable_control.selectNodeForDelete($event.detail, node)">
+          </chef-checkbox>
+          <div *ngIf="!deletable_control.isNodeDeletable(node)" class="empty-checkbox"></div>
+        </chef-td>
+        <chef-td class="{{node.status}} node-name">
+          <chef-icon>{{ node.status | chefStatusIcon }}</chef-icon> {{node.name}}
+        </chef-td>
+        <chef-td class="check-in" [hidden]="!columns.check_in">
+            <span class="no-data">
+              No data <chef-icon id='tooltip{{i}}'>info_outline</chef-icon>
+            </span>
+            <chef-tooltip follow position="bottom" [attr.for]='"tooltip"+ i'>
+              There is no client run data available for this node
+            </chef-tooltip>
+        </chef-td>
+        <chef-td [hidden]="!columns.uptime">
+            --
+        </chef-td>
+        <chef-td [hidden]="!columns.platform">
+            {{node.platform}}
+        </chef-td>
+        <chef-td *ngIf="displayEnvironmentNodes" class="node-environment" [hidden]="!columns.environment">
+            <ng-container *ngIf="!node.policy_group">
+              {{node.environment || "- -"}}
+            </ng-container>
+            <ng-container *ngIf="node.policy_group">
+              - -
+            </ng-container>
+        </chef-td>
+        <chef-td *ngIf="displayPolicyNodes" [hidden]="!columns.policy_group">
+            {{node.policy_group || "- -"}}
+        </chef-td>
+        <chef-td [hidden]="!columns.chef_version">
+          {{node.chefVersion}}
+        </chef-td>
+        <chef-td [hidden]="!columns.deprecations_count">
+          {{node.deprecationsCount || "0" }}
+        </chef-td>
+        <chef-td class="view-more">
+        </chef-td>
+      </chef-tr>
+    </ng-container>
+  </chef-tbody>
+</chef-table>
+
+<app-page-picker
+  [total]="totalNodes"
+  [perPage]="pageSize"
+  [page]="currentPage"
+  (pageChanged)="onPageChange($event)">
+</app-page-picker>
+
+<chef-scroll-top></chef-scroll-top>

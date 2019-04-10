@@ -1,0 +1,41 @@
+.file-comments {
+  overflow: hidden;
+  border-bottom: 1px solid $lightgray;
+
+  .file-comments-header {
+    margin: 10px 20px;
+    overflow: hidden;
+    
+    .file-name {
+      display: block;
+      margin-right: 10px;
+      text-decoration: none;
+      float: left;
+      line-height: 30px;
+    }
+
+    .comment-count {
+      line-height: 30px;
+    }
+
+    .comments-collapse {
+      float: right;
+      text-decoration: none;
+      line-height: 30px;
+
+      .icon {
+        @extend .icon-circle-plus;
+      }
+    }
+  }
+
+  &.open {
+
+    .file-comments-header {
+
+      .comments-collapse .icon {
+        @extend .icon-circle-dash;
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+ALTER TABLE IF EXISTS nodes
+  DROP COLUMN IF EXISTS manager_id,
+  DROP COLUMN IF EXISTS source_region,
+  DROP COLUMN IF EXISTS source_state;

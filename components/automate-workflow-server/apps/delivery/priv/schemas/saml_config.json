@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "metadata_url": {
+            "type": "string",
+            "required": false
+        },
+        "name_id": {
+            "type": "string",
+            "required": false
+        },
+        "sso_login_url": {
+            "type": "string",
+            "required": false
+        },
+        "sso_binding": {
+            "type": "string",
+            "required": false
+        },
+        "idp_url": {
+            "type": "string",
+            "required": false
+        },
+        "cert": {
+            "type": "string",
+            "required": false
+        },
+        "default_roles": {
+            "type": "array",
+            "required": true,
+            "items": {"type": "string"},
+            "minItems": 1
+        }
+    }
+}

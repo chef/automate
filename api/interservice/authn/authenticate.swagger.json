@@ -1,0 +1,54 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/interservice/authn/authenticate.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/authenticate": {
+      "get": {
+        "summary": "Authenticate inspects the request's metadata -- for this, an empty argument\nis just enough. Getting a response means it was authenticated successfully.\nIf the metadata does not contain what is needed to authenticate the\nrequest, or the tokens are wrong, the AuthenticationService will return the\ncorresponding error code, with details in the message.",
+        "operationId": "Authenticate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authnAuthenticateResponse"
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "authnAuthenticateResponse": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "This could be either \"user:{local,ldap,saml}:\u003csome-id\u003e\",\n\"tls:service:\u003csome-id\u003e or \"token:\u003csome-id\u003e\",\ndepending on the authentication method that was successful."
+        },
+        "teams": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Only human users have teams. The teams are provided either by the external\nIdP (in which case they're extracted from the id_token; TODO), or, for local\nusers, by teams-service (TODO)."
+        }
+      }
+    }
+  }
+}

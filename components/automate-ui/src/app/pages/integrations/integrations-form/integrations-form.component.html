@@ -1,0 +1,65 @@
+<form [formGroup]="integrationsForm">
+  <div class="integration-services form-field">
+    <span class="label">Select a node management service</span>
+    <chef-phat-radio ngDefaultControl formControlName="type">
+      <chef-option value="aws"><img src="assets/img/logo-aws.svg" alt="Amazon Web Services" class="logo aws" /></chef-option>
+      <chef-option *ngIf="showAzure" value="azure"><img src="assets/img/logo-azure.svg" alt="Microsoft Azure" class="logo azure" /></chef-option>
+      <chef-option *ngIf="showGcp" value="gcp"><img src="assets/img/logo-gcp.svg" alt="Google Cloud Platform" class="logo gcp" /></chef-option>
+    </chef-phat-radio>
+  </div>
+
+  <div class="integration-form">
+
+    <label class="form-field">
+      <span class="label">Name</span>
+      <chef-input ngDefaultControl formControlName="name"></chef-input>
+    </label>
+
+    <ng-container [ngSwitch]="integrationsForm.controls.type.value">
+      <app-aws-integration-form
+        *ngSwitchCase="'aws'"
+        [formGroup]="integrationsForm.controls.aws"></app-aws-integration-form>
+      <app-azure-integration-form
+        *ngSwitchCase="'azure'"
+        [formGroup]="integrationsForm.controls.azure"></app-azure-integration-form>
+      <app-gcp-integration-form
+        *ngSwitchCase="'gcp'"
+        [formGroup]="integrationsForm.controls.gcp"></app-gcp-integration-form>
+    </ng-container>
+
+  </div>
+
+  <div *ngIf="showInstanceCreds()" formArrayName="instance_credentials" class="credentials">
+
+    <header>
+      <h3 class="display5">Specify which credentials to be used with tag key value (optional)</h3>
+      <span class="help-text">Should you wish to run a scan job on these instances, you can associate ssh and winrm creds with instances by tags. Wild card match(*) allowed in value.</span>
+    </header>
+
+    <div *ngFor="let cred of instance_credentials.controls; let i=index" [formGroupName]="i" class="cred">
+      <span>Where</span>
+      <chef-input placeholder="Tag Key" ngDefaultControl formControlName="tag_key"></chef-input>
+      <chef-input placeholder="Value" ngDefaultControl formControlName="tag_value"></chef-input>
+      <span>use</span>
+
+      <select multiple formControlName="credential_ids" class="credential-ids">
+        <option
+          *ngFor="let credential of instanceCredentials$ | async"
+          [value]="credential.id">
+          {{ credential.name }}
+        </option>
+      </select>
+
+      <chef-button secondary caution (click)="handleRemoveCred(i)"><chef-icon>delete</chef-icon></chef-button>
+    </div>
+
+    <div class="empty new-cred">
+      <chef-button tertiary (click)="handleNewCred()">
+        <chef-icon>add</chef-icon>
+        <span>Add new credential association by tag</span>
+      </chef-button>
+    </div>
+
+  </div>
+
+</form>

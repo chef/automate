@@ -1,0 +1,45 @@
+<chef-radial-chart class="chart">
+  <span slot="innerText">
+    {{ data.failed + data.passed + data.skipped | number }} Total {{ type | titlecase }}
+  </span>
+
+  <chef-data-point [value]="data.failed" class="failed">
+    {{ data.failed | number }} Failed {{ type | titlecase }}
+  </chef-data-point>
+  <chef-data-point [value]="data.passed" class="passed">
+    {{ data.passed | number }} Passed {{ type | titlecase }}
+  </chef-data-point>
+  <chef-data-point [value]="data.skipped" class="skipped">
+    {{ data.skipped | number }} Skipped {{ type | titlecase }}
+  </chef-data-point>
+
+  <chef-data-point [value]="data.critical" secondary class="critical">
+    {{ data.critical | number }} Critical
+  </chef-data-point>
+  <chef-data-point [value]="data.major" secondary class="major">
+    {{ data.major | number }} Major
+  </chef-data-point>
+  <chef-data-point [value]="data.minor" secondary class="minor">
+    {{ data.minor | number }} Minor
+  </chef-data-point>
+  <chef-data-point [value]="data.passed + data.skipped" secondary class="remainder">
+  </chef-data-point>
+</chef-radial-chart>
+
+<dl class="legend">
+  <dt class="legend-item-total">{{ data.failed | number }}</dt>
+  <dd class="legend-item-label">
+    <span class="legend-item-status failed"></span>
+    <span>Failed {{ type | titlecase }}</span>
+  </dd>
+  <dt class="legend-item-total">{{ data.passed | number }}</dt>
+  <dd class="legend-item-label">
+    <span class="legend-item-status passed"></span>
+    <span>Passed {{ type | titlecase }}</span>
+  </dd>
+  <dt class="legend-item-total">{{ data.skipped | number }}</dt>
+  <dd class="legend-item-label">
+    <span class="legend-item-status skipped"></span>
+    <span>Skipped {{ type | titlecase }}</span>
+  </dd>
+</dl>

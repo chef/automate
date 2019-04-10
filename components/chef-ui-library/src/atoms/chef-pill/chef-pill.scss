@@ -1,0 +1,11 @@
+chef-pill {
+  #{--background-color}: var(--pill-background-color, chef-hsl(var(--chef-light-grey)));
+  #{--text-color}: var(--pill-text-color, chef-hsl(var(--chef-dark-grey)));
+
+  display: inline-block;
+  white-space: nowrap;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 0.5em;
+  border-radius: 1em;
+}

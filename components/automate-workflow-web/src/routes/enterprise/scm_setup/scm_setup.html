@@ -1,0 +1,119 @@
+<div class="organizations card-view">
+  <header class="page-header">
+    <div class="page-header-title">
+      <h2>SCM Setup</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="form-container">
+    <form class="scm-setup" name='scmSetupForm'>
+      <fieldset>
+        <legend>Source Code Provider</legend>
+        <div class="scm-setup-forbidden" ng-if="!authorized">
+          <p>You must be an admin in the '{{ session.enterprise }}' enterprise to setup Source Code Providers.</p>
+        </div>
+        <div ng-if="authorized">
+          <div class="field">
+            <div class="button-bar">
+              <button type="button" ng-repeat="provider in scmProviders" class="button secondary small"
+                ng-class="{ active: selectedProvider.type === provider.type }"
+                ng-click="selectProvider(provider)">
+                {{ provider.name }}
+              </button>
+            </div>
+          </div>
+          <div class="providers">
+            <div ng-switch on="selectedProvider.type" ng-class="selectedProvider.type">
+              <div ng-switch-when="github" class="field">
+                <fieldset>
+                  <div class="field">
+                    <div class="little-title">GitHub URL</div>
+                    <em class="required-indicator">*</em>
+                    <input type="text" ng-model="scmSetup.github.root_api_url" placeholder="https://10.xxx.xxx.xxx" required>
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <div class="field">
+                    <div class="little-title">GitHub Service Account</div>
+                    <em class="required-indicator">*</em>
+                    <input type="text" ng-model="scmSetup.github.user_id" placeholder="automate" required>
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <div class="field">
+                    <div class="little-title">Service Account Access Token</div>
+                    <em class="required-indicator">*</em>
+                    <input
+                      type="password"
+                      ng-change="editGithubPassword()"
+                      ng-model="scmSetup.github.password"
+                      placeholder="c776a47bdccfcef3ae35804e3c2572c2bc640286" required>
+                  </div>
+                </fieldset>
+              </div>
+              <div ng-switch-when="bitbucket" class="bitbucket-fields">
+                <fieldset>
+                  <div class="field">
+                    <div class="little-title">Bitbucket Instance URL</div>
+                    <em class="required-indicator">*</em>
+                    <input type="text" ng-model="scmSetup.bitbucket.root_api_url" placeholder="https://10.xxx.xxx.xxx" required>
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <div class="field">
+                    <div class="little-title">Bitbucket Username</div>
+                    <em class="required-indicator">*</em>
+                    <input type="text" ng-model="scmSetup.bitbucket.user_id" placeholder="my-team" required>
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <div class="field">
+                    <div class="little-title">Password</div>
+                    <em class="required-indicator">*</em>
+                    <input
+                      type="password"
+                      ng-change="editBitbucketPassword()"
+                      ng-model="scmSetup.bitbucket.password"
+                      placeholder="Password" required>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="form-controls" ng-if="selectedProvider.type === 'bitbucket'">
+                <button
+                  class="button primary"
+                  ng-if="!scmSetup.bitbucket._links.self.href"
+                  ng-click="save(scmSetup)">Save</button>
+                <button
+                  class="button primary"
+                  ng-if="scmSetup.bitbucket._links.self.href"
+                  ng-click="update(scmSetup)">Save</button>
+                  <button
+                    type="button"
+                    class="button destroy"
+                    ng-if="scmSetup.bitbucket._links.self.href"
+                    ng-click="delete()">Remove Configuration</button>
+               </div>
+               <div class="form-controls" ng-if="selectedProvider.type === 'github'">
+                 <button
+                   class="button primary"
+                   ng-if="!scmSetup.github._links.self.href"
+                   ng-click="save(scmSetup)">Save</button>
+                 <button
+                   class="button primary"
+                   ng-if="scmSetup.github._links.self.href"
+                   ng-click="update(scmSetup)">Save</button>
+                 <button
+                   type="button"
+                   class="button destroy"
+                   ng-if="scmSetup.github._links.self.href"
+                   ng-click="delete()">Remove Configuration</button>
+               </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>

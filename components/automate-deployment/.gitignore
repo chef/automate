@@ -1,0 +1,31 @@
+*.deb
+**/debug.test
+**/debug
+.vagrant
+tags
+results/
+bin/
+**/.kitchen
+.testenv
+/_plan.sh
+data/services/
+kitchen-tests/data/config.yml
+.vscode/
+bolt.db
+a1-migration/keys/
+a1-migration/hab_keys/
+cover/
+automate-upgrade.toml
+config.toml
+example/localhost.toml
+automate-credentials.toml
+cmd/chef-automate/chef-automate
+
+# artifacts that get copied into the a1-migration container
+a1-migration/automate-ctl
+a1-migration/chef-automate
+a1-migration/chef-automate_linux_amd64.zip
+a1-migration/pg_dumpall
+
+# Elasticsearch databases:
+es2-data-generator/datasets

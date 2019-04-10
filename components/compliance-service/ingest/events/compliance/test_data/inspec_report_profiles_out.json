@@ -1,0 +1,116 @@
+[
+  {
+    "name": "profile1",
+    "title": "Profile1 title",
+    "version": "1.1.1",
+    "summary": "",
+    "maintainer": "",
+    "license": "",
+    "copyright": "",
+    "copyright_email": "",
+    "controls": [
+      {
+        "id": "ctrl-01",
+        "code": "control 'ctrl-01' do ...",
+        "desc": "",
+        "impact": 0,
+        "title": "Checking for something1",
+        "source_location": {
+          "ref": "",
+          "line": 0
+        },
+        "refs": "[]",
+        "tags": "{}"
+      },
+      {
+        "id": "ctrl-02",
+        "code": "",
+        "desc": "",
+        "impact": 0.8,
+        "title": "",
+        "source_location": {
+          "ref": "",
+          "line": 0
+        },
+        "refs": "[]",
+        "tags": "{}"
+      },
+      {
+        "id": "ctrl-03",
+        "code": "",
+        "desc": "",
+        "impact": 1,
+        "title": "",
+        "source_location": {
+          "ref": "",
+          "line": 0
+        },
+        "refs": "[]",
+        "tags": "{}"
+      }
+    ],
+    "attributes": [],
+    "depends": [],
+    "sha256": "d2dcf9bf37feec01b31d743fbee6965f55218f730512e21308260c840f4f6654",
+    "groups": [],
+    "doc_version": "1",
+    "@timestamp": "2017-10-26T18:38:09Z"
+  },
+  {
+    "name": "profile2",
+    "title": "",
+    "version": "2.2.2",
+    "summary": "",
+    "maintainer": "",
+    "license": "",
+    "copyright": "",
+    "copyright_email": "",
+    "controls": [
+      {
+        "id": "sysctl-01",
+        "code": "",
+        "desc": "",
+        "impact": 0,
+        "title": "",
+        "source_location": {
+          "ref": "",
+          "line": 0
+        },
+        "refs": "[]",
+        "tags": "{}"
+      },
+      {
+        "id": "sysctl-02",
+        "code": "",
+        "desc": "",
+        "impact": 0,
+        "title": "",
+        "source_location": {
+          "ref": "",
+          "line": 0
+        },
+        "refs": "[]",
+        "tags": "{}"
+      },
+      {
+        "id": "sysctl-03",
+        "code": "",
+        "desc": "",
+        "impact": 0,
+        "title": "",
+        "source_location": {
+          "ref": "",
+          "line": 0
+        },
+        "refs": "[]",
+        "tags": "{}"
+      }
+    ],
+    "attributes": [],
+    "depends": [],
+    "sha256": "9490b16f32922b284a82a36d4f111e1474fcd9b53c4689f77de7ef68a1664487",
+    "groups": [],
+    "doc_version": "1",
+    "@timestamp": "2017-10-26T18:38:09Z"
+  }
+]

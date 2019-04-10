@@ -1,0 +1,124 @@
+<chef-phat-radio
+  class="nodes-list-status-filters"
+  (change)="onStatusFilterChanged($event)"
+  [value]="statusFilter$ | async">
+  <chef-option class="filter all" value='all'>
+    <span class="filter-label">All</span>
+    <span class="filter-total">
+      <chef-icon>storage</chef-icon> {{ (nodeTotals$ | async)?.all | number }}
+    </span>
+  </chef-option>
+  <chef-option class="filter unreachable" value='unreachable'>
+    <span class="filter-label">Unreachable</span>
+    <span class="filter-total">
+      <chef-icon>report_problem</chef-icon> {{ (nodeTotals$ | async)?.unreachable | number }}
+    </span>
+  </chef-option>
+  <chef-option class="filter reachable" value='reachable'>
+    <span class="filter-label">Reachable</span>
+    <span class="filter-total">
+      <chef-icon>check_circle</chef-icon> {{ (nodeTotals$ | async)?.reachable | number }}
+    </span>
+  </chef-option>
+  <chef-option class="filter unknown" value='unknown'>
+    <span class="filter-label">Unknown</span>
+    <span class="filter-total">
+      <chef-icon>help</chef-icon> {{ (nodeTotals$ | async)?.unknown | number }}
+    </span>
+  </chef-option>
+</chef-phat-radio>
+
+<chef-table class="nodes-list-table" (sort-toggled)="onSortToggled($event)">
+  <chef-thead>
+    <chef-tr>
+      <chef-th>
+        Node
+        <chef-sort-toggle sort="name" [order]="orderFor('name')"></chef-sort-toggle>
+      </chef-th>
+      <chef-th>
+        Platform
+        <chef-sort-toggle sort="platform" [order]="orderFor('platform')"></chef-sort-toggle>
+      </chef-th>
+      <chef-th>
+        Status
+        <chef-sort-toggle sort="status" [order]="orderFor('status')"></chef-sort-toggle>
+      </chef-th>
+      <chef-th>
+        Manager
+        <chef-sort-toggle sort="manager" [order]="orderFor('manager')"></chef-sort-toggle>
+      </chef-th>
+      <chef-th></chef-th>
+    </chef-tr>
+  </chef-thead>
+
+  <chef-loading-spinner *ngIf="nodesList.loading" size="100"></chef-loading-spinner>
+
+  <chef-tbody *ngIf="!nodesList.loading">
+    <chef-tr class="empty new-row">
+      <span class="cta">Add new nodes to scan</span>
+      <span class="action">
+        <chef-button primary
+          [routerLink]="['/compliance/scanner/nodes/add']">
+          Add Nodes
+        </chef-button>
+      </span>
+    </chef-tr>
+    <chef-tr *ngFor="let node of nodesList.items; index as i; trackBy: trackBy;">
+      <chef-td>{{ node.name }}</chef-td>
+      <chef-td>{{ node.platform }} {{ node.platform_version }}</chef-td>
+      <chef-td>
+        <chef-button [attr.id]="'rerun'+i" class="rerun-btn" tertiary (click)="rerunNode(node)">
+          <chef-icon>cached</chef-icon>
+        </chef-button>
+        <chef-tooltip [attr.for]="'rerun'+i">Check connection</chef-tooltip>
+        {{ node.status }}
+      </chef-td>
+      <chef-td>{{ node.manager }}</chef-td>
+      <chef-td>
+        <chef-button secondary caution
+          *ngIf="node.status === 'unreachable'"
+          (click)="onNodeResultsShow($event, node.id)">
+          Error
+        </chef-button>
+        <chef-button label="edit" secondary
+          [routerLink]="['/compliance', 'scanner', 'nodes', node.id, 'edit']">
+          <chef-icon>edit</chef-icon>
+        </chef-button>
+        <chef-button label="delete" secondary caution (click)="deleteNode(node)">
+          <chef-icon>delete</chef-icon>
+        </chef-button>
+      </chef-td>
+    </chef-tr>
+  </chef-tbody>
+</chef-table>
+
+<app-page-picker
+  class="nodes-list-paging"
+  [total]="nodesList.total"
+  [perPage]="nodesList.per_page"
+  [page]="nodesList.page"
+  (pageChanged)="onPageChanged($event)">
+</app-page-picker>
+
+<chef-scroll-top></chef-scroll-top>
+
+<chef-side-panel class="side-panel" [visible]="showNodeResults">
+  <div class="side-panel-header">
+    <chef-icon class="header-icon">equalizer</chef-icon>
+    <div class="header-text">
+      <h4><strong>Connectivity error for node:</strong></h4>
+      <p>{{ (nodeDetail$ | async)?.id }}</p>
+    </div>
+    <chef-button secondary (click)="onNodeResultsHide($event)">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <div class="side-panel-body">
+    <div class="side-panel-body-header">
+      <p>Status: {{ (nodeDetail$ | async)?.status }}</p>
+    </div>
+    <div class="side-panel-body-detail">
+      <pre>{{ (nodeDetail$ | async)?.last_job?.result }}</pre>
+    </div>
+  </div>
+</chef-side-panel>

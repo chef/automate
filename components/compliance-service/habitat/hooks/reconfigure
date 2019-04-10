@@ -1,0 +1,12 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+# create tmp folder for inspec
+mkdir -p {{pkg.svc_var_path}}/tmp
+chmod 0775 {{pkg.svc_var_path}}
+# nobody user needs access to this dir
+chmod 1777 {{pkg.svc_var_path}}/tmp
+
+# restrict permissions of keys for postgres usage
+chmod 0600 {{pkg.svc_config_path}}/service.crt
+chmod 0600 {{pkg.svc_config_path}}/service.key
+chmod 0600 {{pkg.svc_config_path}}/root_ca.crt

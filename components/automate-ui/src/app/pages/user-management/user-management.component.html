@@ -1,0 +1,47 @@
+<app-admin-sidebar></app-admin-sidebar>
+<chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+
+<div class="container">
+  <main>
+    <app-delete-object-modal
+      [visible]="deleteModalVisible"
+      objectNoun="user"
+      [objectName]="userToDelete?.name"
+      (close)="closeDeleteModal()"
+      (deleteClicked)="deleteUser()">
+    </app-delete-object-modal>
+    <chef-page-header>
+      <chef-heading>Users</chef-heading>
+      <chef-subheading>Chef Automate only displays local users.</chef-subheading>
+    </chef-page-header>
+
+    <chef-modal label="create-user-label" class="user-modal" [visible]="createModalVisible" (close)="closeCreateModal()">
+      <h2 id="create-user-label" class="title" slot="title">
+        Create User
+      </h2>
+      <div>
+        <app-user-form [createUserForm]="createUserForm"></app-user-form>
+        <div class="line"></div>
+        <div class="options">
+        <chef-button *ngIf="!(loading$ | async)" primary class="create" (click)="handleCreateUser()"
+        [disabled]="!createUserForm.valid" tabindex="2" data-cy="save-user">
+          <chef-icon>save</chef-icon>
+          <span>Save and Close</span>
+        </chef-button>
+        <chef-button type="reset" tertiary id="cancel" (click)="closeCreateModal()" tabindex="-1">Cancel</chef-button>
+        </div>
+      </div>
+    </chef-modal>
+
+    <section class="page-body">
+      <app-user-table
+        [addButtonText]="addButtonText"
+        [removeText]="removeText"
+        [users$]="sortedUsers$"
+        [baseUrl]="baseUrl"
+        (addClicked)="openCreateModal()"
+        (removeClicked)="startUserDelete($event)">
+    </app-user-table>
+    </section>
+  </main>
+</div>

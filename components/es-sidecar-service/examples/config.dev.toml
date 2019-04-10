@@ -1,0 +1,12 @@
+host = "localhost"
+port = "10390"
+
+elasticsearch_url = "http://localhost:9200"
+
+[watcher]
+interval = "2m"
+
+[tls]
+cert_path = "../../../dev/certs/es-sidecar-service.crt"
+key_path = "../../../dev/certs/es-sidecar-service.key"
+root_ca_path = "../../../dev/certs/es-sidecar-service.crt"

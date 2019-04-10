@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+
+# Health Check for oc_bifrost
+
+# default return code is 0
+rc=0
+
+#shellcheck disable=SC2140 # shellcheck gets confused by the quotes in the templating
+"{{pkgPathFor "core/curl"}}/bin/curl" \
+  -X GET -sS --fail --max-time 2 \
+  --cert "{{pkg.svc_config_path}}/service.crt" \
+  --key "{{pkg.svc_config_path}}/service.key" \
+  --cacert "{{pkg.svc_config_path}}/root_ca.crt" \
+  --resolve "automate-cs-oc-bifrost:{{cfg.network.port}}:127.0.0.1" \
+  --noproxy automate-cs-oc-bifrost \
+  "https://automate-cs-oc-bifrost:{{cfg.network.port}}/_status"
+
+case $? in
+    # Zero exit status means curl got back a 200 end everything is ok.
+    0)
+        rc=0 ;;
+    # Anything else is critical.
+    *)
+        rc=2 ;;
+esac
+
+exit $rc

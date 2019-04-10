@@ -1,0 +1,19 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.date-label {
+  font-size: 11px;
+  cursor: pointer;
+  fill: $chef-dark-grey;
+  font-weight: bold;
+}
+
+.guitar-string-section-even {
+  stroke: none;
+  fill: rgba($chef-light-grey, 0.4);
+}
+
+.guitar-string-section-odd {
+  stroke: none;
+  fill: none;
+}

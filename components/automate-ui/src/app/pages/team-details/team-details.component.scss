@@ -1,0 +1,71 @@
+chef-page-header {
+  // So chef-tab-selector renders right above body
+  padding-bottom: 0;
+
+  .flex-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    margin-bottom: 5em;
+  }
+
+  .heading-container {
+    justify-content: flex-start;
+  }
+
+  .edit-container {
+    justify-content: flex-end;
+  }
+
+  .flex-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+  }
+
+  .form-container {
+    flex-grow: 1;
+    justify-content: flex-start;
+  }
+
+  .button-container {
+    justify-content: flex-end;
+    flex-shrink: 0;
+    margin-left: 20px;
+
+  }
+
+  chef-tab-selector {
+    margin-top: 1em;
+  }
+
+  #edit-name {
+    width: 80%;
+    max-width: 600px;
+  }
+
+  $min-input-width: 270px;
+
+  chef-input {
+    width: 100%;
+    min-width: $min-input-width;
+  }
+
+  // You have to set the min-width on the actual .errors container in
+  // the chef-error. chef-error doesn't respect min-width.
+  ::ng-deep .errors {
+    min-width: $min-input-width;
+  }
+
+  chef-input {
+    font-size: 1.25em;
+  }
+
+}
+
+.page-body {
+  .body-description {
+    font-size: 14px;
+    margin-bottom: 1em;
+  }
+}

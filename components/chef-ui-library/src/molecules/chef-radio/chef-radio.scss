@@ -1,0 +1,41 @@
+chef-radio {
+  --active-color: var(--toggle-active-color, chef-hsl(var(--chef-primary-bright)));
+
+  chef-option {
+    display: block;
+    cursor: pointer;
+    padding: 0.5em 0.75em;
+    transition: color 0.5s ease;
+
+    .option-content {
+      padding-left: 0.5em;
+    }
+
+    &::before {
+      font-family: "Material Icons";
+      content: "\E836";
+      color: chef-hsl(var(--chef-grey));
+      vertical-align: -2px;
+    }
+
+    &:hover {
+      color: var(--active-color);
+      transition: color 1s ease;
+
+      &::before {
+        color: var(--active-color);
+        transition: color 1s ease;
+      }
+    }
+
+    &.selected {
+      color: var(--active-color);
+
+      &::before {
+        font-family: "Material Icons";
+        content: "\E837";
+        color: var(--active-color);
+      }
+    }
+  }
+}

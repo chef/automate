@@ -1,0 +1,13 @@
+name: a2-upgrade-from-v1-integration
+title: InSpec Profile
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: engineering@chef.io
+license: All Rights Reserved
+summary: Automate 2.0 Upgrade from Automate 1.x Integration Tests
+version: 0.1.0
+depends:
+  - name: a2-deploy-smoke
+    path: ../a2-deploy-smoke
+  - name: a2-resource-pack
+    path: ../a2-resource-pack

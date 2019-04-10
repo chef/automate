@@ -1,0 +1,43 @@
+@startuml
+class Deployment {
+    +string channel
+    +bool airgapped
+    +string depot_url
+}
+
+class Service {
+    map[string]Service Bindings
+}
+
+abstract class Topology {
+    +[Target] targets
+}
+
+class Target {
+    +(result, err) Deploy()
+    +(result, err) Upgrade()
+}
+
+abstract class Provisioner 
+
+class Kubernetes 
+class SSH
+class Local
+class Docker
+
+class Configuration
+
+Deployment --> "1..*" Topology
+Deployment --> "1..*" Service
+
+Provisioner --> Kubernetes
+Provisioner --> SSH
+Provisioner --> Local
+Provisioner --> Docker
+
+Topology --> "1..*" Target
+Target --> "1" Provisioner
+Target -> "1..*" Service
+
+Service -> "1" Configuration
+@enduml

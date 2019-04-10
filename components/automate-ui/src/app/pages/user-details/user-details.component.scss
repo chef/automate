@@ -1,0 +1,45 @@
+@import "~styles/variables";
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0 25px 0;
+
+  .user-column {
+    display: flex;
+    justify-content: space-evenly;
+    width: 70%;
+  }
+}
+
+.name-column {
+  line-height: 45px;
+  width: 246px;
+}
+
+.password {
+  width: 450px;
+
+  chef-input {
+    width: 100%;
+  }
+}
+
+chef-form-field:first-child.password label {
+  margin-top: 15px;
+}
+
+chef-form-field:not(:first-child).password label {
+  margin-top: 35px;
+}
+
+.update-password-button {
+  margin-left: 0px;
+  margin-top: 20px;
+}
+
+chef-page-header {
+  // This is because the Password selector is sitting
+  // right above the content below the header.
+  padding-bottom: 0;
+}

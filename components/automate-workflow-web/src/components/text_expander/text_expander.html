@@ -1,0 +1,19 @@
+<div class="msg-header">
+  <h5 class="button primary"><i class="fa"></i> Latest patchset: {{ patchset.sequenceNumber }}</h5>
+</div>
+<div class="msg-body">
+  <div class="submitted-at">
+    {{ patchset.commitMsgs.length }}
+    <ng-pluralize count="patchset.commitMsgs.length" when="{'1': 'commit', 'other': 'commits'}"></ng-pluralize>
+    &bull;
+    Submitted {{ patchset.submittedAt }}
+  </div>
+  <div class="commit-items">
+    <div ng-repeat="commitMsg in patchset.commitMsgs" class="commit-item">
+      <section>
+        <header>{{ commitMsg[0] }}</header>
+        <div ng-if="!!commitMsg[1]" cd-markdown="commitMsg[1]"></div>
+      </section>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,156 @@
+<div class="empty-help" *ngIf="reportData.profilesListEmpty">
+  <img class="help-icon" src="/assets/img/profiles.svg" alt="">
+  <div class="help-msg">
+    <p>A list of of the compliance profiles and the status of its controls for your scan report will appear here.</p>
+    <p>Learn how to start your first <a href="https://docs.chef.io/integrate_compliance_chef_automate.html" target="_blank">compliance scan</a>.</p>
+  </div>
+</div>
+
+<ng-container *ngIf="!reportData.profilesListEmpty">
+  <chef-table class="reporting-profiles-table" (sort-toggled)="onProfilesListSortToggled($event)">
+    <chef-thead>
+      <chef-tr>
+        <chef-th class="title-cell">
+          Profiles
+          <chef-sort-toggle sort="title" [order]="orderFor('title')"></chef-sort-toggle>
+        </chef-th>
+        <chef-th class="version-cell">Version</chef-th>
+        <chef-th class="identifier-cell">Identifier</chef-th>
+        <chef-th class="actions-cell"></chef-th>
+      </chef-tr>
+    </chef-thead>
+    <chef-tbody *ngIf="!reportData.profilesListLoading">
+      <chef-tr *ngFor="let profile of reportData.profilesList.items">
+        <chef-td class="title-cell">
+          <chef-icon class="status-icon" [ngClass]="profile.status">
+            {{ statusIcon(profile.status) }}
+          </chef-icon> 
+          <a [routerLink]="['/compliance/reporting/profiles', profile.id]">{{ profile.title }}</a>
+        </chef-td>
+        <chef-td class="version-cell">{{ profile.version }}</chef-td>
+        <chef-td class="identifier-cell">{{ user }}/{{ profile.name }}</chef-td>
+        <chef-td class="actions-cell">
+          <chef-button secondary *ngIf="!hasFilter(profile)" (click)="addFilter(profile)">
+            <chef-icon>playlist_add</chef-icon>
+          </chef-button>
+          <chef-button secondary *ngIf="hasFilter(profile)" (click)="removeFilter(profile)">
+            <chef-icon>playlist_add_check</chef-icon>
+          </chef-button>
+          <chef-button secondary (click)="displayScanResults(profile)">Scan Results</chef-button>
+        </chef-td>
+      </chef-tr>
+    </chef-tbody>
+    <chef-loading-spinner *ngIf="reportData.profilesListLoading" size="100"></chef-loading-spinner>
+  </chef-table>
+
+  <app-page-picker
+    class="reporting-profiles-paging"
+    [perPage]="reportData.profilesListParams.perPage"
+    [total]="reportData.profilesList.total"
+    [page]="reportData.profilesListParams.page"
+    (pageChanged)="onProfilesListPageChanged($event)">
+  </app-page-picker>
+
+  <chef-scroll-top></chef-scroll-top>
+</ng-container>
+
+<chef-side-panel class="reporting-profiles-side-panel" [visible]="displayScanResultsSidebar">
+  <div class="side-panel-header">
+    <chef-icon class="header-icon">equalizer</chef-icon>
+    <div class="header-text">
+      <h4><strong>Scan results for profile:</strong></h4>
+      <p>{{ layerOneData?.id }}</p>
+    </div>
+    <chef-button secondary (click)="hideScanResults()">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <div class="side-panel-body">
+    <ng-container [ngSwitch]="scanResultsPane">
+      <ng-container *ngSwitchCase="0">
+        <div class="side-panel-body-header">
+          <p>Tap on a node to view detailed scan results</p>
+        </div>
+        <ul class="results-profiles-list">
+          <ng-container *ngFor="let status of ['failed', 'passed', 'skipped']">
+            <li
+              *ngFor="let node of layerOneData[status]"
+              class="results-profiles-list-item">
+              <div class="list-item-summary">
+                <chef-icon class="list-item-icon" [ngClass]="node.status">{{ statusIcon(status) }}</chef-icon>
+                <div class="list-item-text">
+                  <p class="node-name">
+                    <strong>{{ node.name }}</strong>
+                  </p>
+                </div>
+                <chef-button secondary (click)="getControls(node)">
+                  <chef-icon>chevron_right</chef-icon>
+                </chef-button>
+              </div>
+            </li>
+          </ng-container>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchCase="1">
+        <div class="side-panel-body-header">
+          <chef-button secondary (click)="scanResultsPane = 0">
+            <chef-icon>chevron_left</chef-icon>
+          </chef-button>
+          <p>{{ layerTwoData?.id }}</p>
+        </div>
+        <ul class="results-profiles-list">
+          <ng-container *ngFor="let status of ['failed', 'passed', 'skipped']">
+            <li
+              *ngFor="let control of layerTwoData[status]"
+              class="results-profiles-list-item">
+              <div class="list-item-summary">
+                <chef-icon class="list-item-icon" [ngClass]="status">{{ statusIcon(status) }}</chef-icon>
+                <div class="list-item-text">
+                  <p class="node-name">
+                    <strong>{{ control.title }}</strong>
+                  </p>
+                </div>
+                <chef-button secondary (click)="toggleControl(control)">
+                  <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
+                  <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
+                </chef-button>
+              </div>
+              <div class="list-item-detail" [ngClass]="status" *ngIf="isOpenControl(control)">
+                <p [ngClass]="impactStatus(control)">
+                  <strong>{{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})</strong>
+                </p>
+                <chef-toggle
+                  [value]="openControls[control.id]?.pane"
+                  (change)="showControlPane(control, $event.target.value)">
+                  <chef-option value='results'>Results</chef-option>
+                  <chef-option value='source'>Source</chef-option>
+                </chef-toggle>
+                <ng-container [ngSwitch]="openControlPane(control)">
+                  <div *ngSwitchCase="'results'">
+                    <div class="result-item" *ngFor="let result of control.results">
+                      <div class="result-item-header">
+                        <chef-icon [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
+                        <p>{{ result.code_desc }}</p>
+                      </div>
+                      <div
+                        class="result-item-body"
+                        *ngIf="result.message.length || result.skip_message.length">
+                        <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
+                      </div>
+                    </div>
+                  </div>
+                  <chef-snippet
+                    class="source"
+                    *ngSwitchCase="'source'"
+                    [code]="control.code"
+                    lang="ruby">
+                  </chef-snippet>
+                </ng-container>
+              </div>
+            </li>
+          </ng-container>
+        </ul>
+      </ng-container>
+    </ng-container>
+  </div>
+</chef-side-panel>

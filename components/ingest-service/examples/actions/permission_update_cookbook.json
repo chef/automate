@@ -1,0 +1,21 @@
+{
+  "id": "ad98987f-f6ef-4dc6-af3d-c244b46cbecf",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "grant",
+  "entity_type": "permission",
+  "parent_name": "krasnow",
+  "parent_type": "cookbook",
+  "task": "update",
+  "organization_name": "testing",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-03-29T22:12:08Z",
+  "remote_request_id": "a8e236af-345d-45d1-afa5-cbe554e885dd",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAGcYka8AAEAAAAA",
+  "requestor_name": "mkrasnow",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Manage/11.16.2 (ruby-2.3.5-p376; ohai-7.4.1; x86_64-linux; +http://opscode.com)",
+  "data": "{\"grant\":{\"actors\":[\"mkrasnow\",\"pivotal\"],\"groups\":[\"admins\",\"users\"]}}"
+}

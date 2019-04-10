@@ -1,0 +1,28 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+source {{pkg.svc_path}}/hooks/reconfigure
+mkdir -p {{pkg.svc_var_path}}/logs
+
+export HOME={{pkg.svc_var_path}}
+export RUNNER_LOG_DIR="{{pkg.svc_var_path}}/logs"
+export RELX_CONFIG_PATH="{{pkg.svc_config_path}}/sys.config"
+export VMARGS_PATH="{{pkg.svc_config_path}}/vm.args"
+export DBNAME="{{cfg.sql.db_name}}"
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
+
+pg-helper rename-if-exists bookshelf "$DBNAME"
+pg-helper ensure-service-database "$DBNAME"
+pg-helper create-extension "$DBNAME" "uuid-ossp"
+pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/bookshelf"}}/schema"
+pg-helper fix-permissions "$DBNAME"
+
+secrets-helper generate bookshelf.access_key_id 16 --if-not-exists
+secrets-helper generate bookshelf.secret_access_key 16 --if-not-exists
+
+exec secrets-helper exec --secret bookshelf.access_key_id --secret bookshelf.secret_access_key -- bookshelf foreground

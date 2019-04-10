@@ -1,0 +1,64 @@
+#!/usr/bin/env ruby
+
+require "yaml"
+
+config = YAML.load(File.read(".expeditor/config.yml"))
+changed_files = `git diff --name-only origin/master...HEAD`.split("\n")
+
+puts "Travis has detected the following changed files:"
+puts changed_files.map { |file| "\t• #{file}" }.join("\n")
+
+#
+# Proceed with tests if any of the following scenarios are true
+#
+
+# Travis file has been modified -- we need to make sure we didn't accidentally break anything, so run all the tests
+if changed_files.include?(".travis.yml")
+  puts "The .travis.yml was modified -- running tests"
+  exit 0
+end
+
+# COMPONENT is set to "all" and any component needs to be rebuilt
+# This check is typically used in the product-integration stage, so we do not want to filter out mlsa like we do below
+if ENV["COMPONENT"] == "all"
+  config["habitat_packages"].each do |hab_pkg|
+    metadata = hab_pkg.values.first
+    if changed_files.any? { |file| Array(metadata["bldr_paths"]).any? { |glob| File.fnmatch(glob, file) } }
+      puts "A component was modified -- running tests"
+      exit 0
+    end
+  end
+# COMPONENT is set and dependent files of that component have changed
+# This check is typically used in the static, unit, and service-integration stages
+elsif !ENV["COMPONENT"].nil?
+  component = config["habitat_packages"].detect { |pkg| pkg.keys.first == ENV["COMPONENT"] }
+
+  if component
+    component_globs = component.values.first["bldr_paths"]
+
+    if changed_files.any? { |file| component_globs.any? { |glob| File.fnmatch(glob, file) } }
+      puts "The #{ENV["COMPONENT"]} component was modified -- running tests"
+      exit 0
+    end
+  end
+end
+
+# HABITAT is set and the studio files have changed
+if !ENV["HABITAT"].nil? && changed_files.any? { |file| %w{ .studio/* .studiorc }.any? { |glob| File.fnmatch(glob, file) } }
+  puts "Either the .studiorc or a file in the .studio/* directory was modified -- running tests"
+  exit 0
+end
+
+# GLOBS is set and a file matching the GLOBS has changed
+if !ENV["GLOBS"].nil? && changed_files.any? { |file| ENV["GLOBS"].split(",").any? { |glob| File.fnmatch(glob, file) } }
+  puts "A file matching the glob '#{ENV["GLOBS"]}' was modified -- running tests"
+  exit 0
+end
+
+if %w(COMPONENT HABITAT GLOBS).map { |key| ENV[key].nil? }.all?
+  puts "Neither of the relevant environment variables (COMPONENT, HABITAT, GLOBS) is set -- running tests"
+  exit 0
+end
+
+# Otherwise, short circuit the Travis tests and exit the worker early
+exit 1

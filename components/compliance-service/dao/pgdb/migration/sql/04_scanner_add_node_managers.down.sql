@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS node_managers;
+
+ALTER TABLE IF EXISTS jobs
+  DROP COLUMN IF EXISTS node_selectors;

@@ -1,0 +1,14 @@
+table {
+  tbody {
+
+    tr, td {
+      font-size: 8pt;
+      padding: 0;
+      padding-right: 1.5em;
+    }
+
+    td:first-child {
+      font-weight: bold;
+    }
+  }
+}

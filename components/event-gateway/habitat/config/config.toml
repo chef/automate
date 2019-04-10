@@ -1,0 +1,49 @@
+[service]
+{{~#if cfg.service.host}}
+host = "{{cfg.service.host}}"
+{{~else}}
+host = "{{sys.ip}}"
+{{~/if}}
+port = {{cfg.service.port}}
+gateway_port = {{cfg.service.gateway_port}}
+enabled = {{cfg.service.enable_nats_feature}}
+
+health_check_credentials_file = "{{pkg.svc_data_path}}/health_check_token"
+
+{{#each cfg.frontend_tls as |tls| ~}}
+[[frontend_tls]]
+cert_path = "{{../pkg.svc_data_path}}/{{tls.server_name}}.crt"
+key_path  = "{{../pkg.svc_data_path}}/{{tls.server_name}}.key"
+{{/each}}
+
+[log]
+log_format = "{{cfg.log.format}}"
+log_level = "{{cfg.log.level}}"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
+
+[internal_event_service]
+{{~#eachAlive bind.event-service.members as |event_svc|}}
+{{~#if @last}}
+host = "{{event_svc.sys.ip}}"
+gateway_port = {{event_svc.cfg.internal_messaging_gateway_port}}
+{{~/if}}
+{{~/eachAlive}}
+
+[auth]
+{{~#eachAlive bind.authn-service.members as |authn|}}
+{{~#if @last}}
+authn_endpoint = "{{authn.sys.ip}}:{{authn.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.authz-service.members as |authz|}}
+{{~#if @last}}
+authz_endpoint = "{{authz.sys.ip}}:{{authz.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+
+

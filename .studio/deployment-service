@@ -1,0 +1,228 @@
+#!/bin/bash
+# shellcheck disable=SC2164
+
+document "start_deployment_service" <<DOC
+  Start the deployment-service
+DOC
+function start_deployment_service {
+  start_deployment_service_unconfigured
+
+  local local_manifest=""
+  local_manifest=$(find_local_manifest)
+
+  chef-automate dev configure-deployment --config dev/config.toml --manifest-dir "$local_manifest"
+
+  restart_gateway_if_up
+}
+
+function start_deployment_service_external_es {
+  if ! check_external_es; then
+    return 1
+  fi
+
+  start_deployment_service
+
+  # This assumes you're running the elasticsearch docker image. You can do that
+  # by running `make start-es6` in components/compliance-service/
+  cat << EOH > /tmp/.use_external_elastic.toml
+[global.v1.external.elasticsearch]
+  enable = true
+  nodes = ["http://host.docker.internal:9200"]
+EOH
+
+  chef-automate config patch /tmp/.use_external_elastic.toml
+  rm /tmp/.use_external_elastic.toml
+}
+
+function find_local_manifest() {
+  local local_manifest=""
+
+  if [[ -f results/build.json ]]; then
+    log_line "local manifest file 'results/build.json' detected, configuring deployment to use it" >&2
+    local_manifest="results/build.json"
+  else
+    log_line "local manifest file 'results/build.json' not detected, default behavior will be used">&2
+  fi
+  echo "${local_manifest}"
+}
+
+function restart_gateway_if_up() {
+  # Verify upstream dependency, if the gateway is up, lets bounce
+  # it so that it loads the new available component
+  if hab_svc_up "$HAB_ORIGIN/automate-gateway" >/dev/null 2>&1; then
+      log_line "attempting restart of automate-gateway"
+      restart_gateway_service
+  else
+      log_line "automate-gateway not started. no restart needed"
+      return 0
+  fi
+}
+
+
+function start_deployment_service_unconfigured() {
+  local -r component=deployment-service
+  local origin
+  origin=$(hab_install_binlink $component deployment-service)
+
+  DS_DEV=true CHEF_AUTOMATE_SKIP_SYSTEMD=true start_sup
+  mkdir -p /hab/user/deployment-service/config
+  deployment_service_config > /hab/user/deployment-service/config/user.toml
+  log_line "Loading $origin/$component service"
+  hab svc load "$origin/$component" || return 1
+
+  wait_or_fail_for_port_to_listen 10160
+
+  hab_install_binlink automate-cli chef-automate
+}
+
+function check_external_es() {
+  if hab pkg exec core/curl curl -sS --fail http://host.docker.internal:9200 > /dev/null; then
+    return 0;
+  else
+    error "failed to connect to elasticsearch at host.docker.internal:9200"
+    log_line "setup of external elastic for dev is not yet automated"
+    log_line "run 'make start-es6' from components/compliance-service on your host machine to start es"
+    return 1;
+  fi
+}
+
+document "upgrade_from_v1_self_test" <<DOC
+  Run the A1 -> A2 migration in self test mode
+DOC
+function upgrade_from_v1_self_test {
+  # Ensure that self-test mode shims are compiled and in the path
+  [[ -f /src/bin/pg_dump ]] || go_build_pkg components/automate-deployment/cmd/pg_dump
+  [[ -f /src/bin/automate-ctl ]] || go_build_pkg components/automate-deployment/cmd/automate-ctl
+  [[ -f /src/bin/chef-server-ctl ]] || go_build_pkg components/automate-deployment/cmd/chef-server-ctl
+
+  local failure_code=$FAILURE
+  if [ -n "$1" ]; then
+    failure_code=$1
+  fi
+
+  hab sup term
+  rm /var/opt/delivery/delivery/etc/maint.flag || true
+  rm -rf /hab/svc/deployment-service/* || true
+  rm -rf /hab/sup/default/specs/*
+
+  install_chef_automate_cli
+
+  PATH=/src/bin:$PATH CHEF_AUTOMATE_SKIP_SYSTEMD=true FAILURE=$failure_code \
+    chef-automate upgrade-from-v1 /src/dev/config.toml \
+      --hartifacts /src/results \
+      --override-origin "$HAB_ORIGIN" \
+      --upgrade-strategy none \
+      --admin-password chefautomate \
+      --skip-preflight \
+      --self-test \
+      --enable-chef-server \
+      --enable-workflow \
+      --yes
+}
+
+function install_chef_automate_cli {
+  hab_install_binlink automate-cli chef-automate
+}
+
+function hab_install_binlink {
+  local component=$1
+  shift
+  local origin=$HAB_ORIGIN
+  local -r pkg_path=$(hab pkg path "$origin/$component" 2>/dev/null)
+  if [[ -z $pkg_path ]]; then
+      local -r latest_build=$(find /src/results -name "${origin}-${component}*.hart" | sort -r | head -1)
+      if [[ -z $latest_build ]]; then
+          log "Fetching $component from the depot (according to the manifest)"
+          origin=chef
+          pkg=$(pkg_from_manifest "$component")
+          log "version from manifest: $pkg"
+          hab pkg install "$pkg" >&2
+      else
+        log "Installing local hart: $latest_build"
+        log "SHASUM of hart: $(sha256sum "$latest_build")"
+        hab pkg install "$latest_build" >&2 || return 1
+      fi
+  else
+    log "hab package already installed: $pkg_path"
+  fi
+  log "Linking binaries to /hab/bin for $component"
+  while (( "$#" )); do
+    hab pkg binlink --force "$origin/$component" "$1" >&2 || return 1
+    shift
+  done
+
+  echo "$origin"
+}
+
+function pkg_from_manifest {
+  local component=$1
+  install_if_missing core/jq-static jq
+  install_if_missing core/curl curl
+  manifest=$(find_local_manifest)
+  if [[ "$manifest" = "" ]]; then
+      manifest_content=$(curl -sS "https://packages.chef.io/manifests/dev/automate/latest.json")
+  else
+      manifest_content=$(cat "$manifest")
+  fi
+  echo "$manifest_content" | jq -r --arg svc "$component" '.packages[] | select(contains($svc))'
+}
+
+function deployment_service_config {
+  cat <<EOF
+[mlsa]
+  accept = true
+
+[service]
+  listen_address = "0.0.0.0"
+  port = 10160
+
+[log]
+  level = "info"
+
+[gather_logs]
+
+[proxy]
+
+[backup]
+  [backup.filesystem]
+    path = "/var/opt/chef-automate/backups"
+EOF
+}
+
+document "debug_deployment_service" <<DOC
+  Attaches a remote debugger to deployment-service
+DOC
+function debug_deployment_service() {
+  check_if_deployinate_started || return 1
+  debug_go_service deployment-service
+}
+
+document "deployment_generate" <<DOC
+  After updating the services.json and binds.txt files this command needs to be run
+DOC
+function deployment_generate() {
+  install_if_missing core/git git
+  install_if_missing core/go go
+  install_if_missing core/go gofmt
+
+  setup_go_workspace
+
+  pushd /src/components/automate-deployment >/dev/null;
+    make generate;
+  popd >/dev/null;
+}
+
+document "deployment_update_bindings" <<DOC
+  After updating the binds.txt this command needs to be ran
+DOC
+function deployment_update_bindings() {
+  install_if_missing core/git git
+  install_if_missing core/go go
+  install_if_missing core/go gofmt
+
+  setup_go_workspace
+
+  pushd /src/components/automate-deployment >/dev/null;
+    make update-bindings;
+  popd >/dev/null;
+}

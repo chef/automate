@@ -1,0 +1,61 @@
+[
+  {
+    "name": "myrapper-child",
+    "title": "Linux Wrapper Child Profile",
+    "version": "0.6.1",
+    "summary": "Profile that wraps other profiles",
+    "maintainer": "Demo, Inc.",
+    "license": "Apache-2.0",
+    "copyright": "Demo, Inc.",
+    "copyright_email": "support@example.com",
+    "controls": [
+      {
+        "id": "pro1-con1",
+        "code": "control 'pro1-con1' do\n  impact 0.8\n  title 'Profile 1 - Control 1'\n  desc 'Profile 1 - Control 1 description'\n  tag 'hosts','file'\n  tag cce: 'CCE-27072-8'\n  describe file('/etc/hosts') do\n    its('mode') { should eq 0644 }\n  end\nend\n",
+        "desc": "Profile 1 - Control 1 description",
+        "impact": 0.8,
+        "title": "Profile 1 - Control 1",
+        "source_location": {
+          "ref": "controls/profile1.rb",
+          "line": 1
+        },
+        "refs": "[]",
+        "tags": "{\"cce\":\"CCE-27072-8\",\"file\":null,\"hosts\":null}"
+      },
+      {
+        "id": "pro1-con2",
+        "code": "  control 'pro1-con2' do\n    impact 0.999\n    title 'Profile 1 - Control 2-updated'\n    desc 'Profile 1 - Control 2 description-updated'\n    tag 'password-updated'\n    ref 'Section 3.5.2.1', url: 'https://example.com'\n    describe file('/etc/passwd') do\n      it { should exist }\n    end\n  end\n",
+        "desc": "Profile 1 - Control 2 description-updated",
+        "impact": 0.999,
+        "title": "Profile 1 - Control 2-updated",
+        "source_location": {
+          "ref": "/Users/apop/git/mycompliance-profile/myrapper-child/controls/defaut.rb",
+          "line": 6
+        },
+        "refs": "[{\"ref\":[{\"ref\":\"Section 3.5.2.1\",\"url\":\"https://example.com\"}]}]",
+        "tags": "{\"password\":null,\"password-updated\":null}"
+      }
+    ],
+    "supports": [],
+    "attributes": [],
+    "depends": [
+      {
+        "name": "myprofile1-v1.0.0test",
+        "url": "https://s3-eu-west-1.amazonaws.com/apop-bucket/profiles/myprofile1-1.0.0.tar.gz"
+      }
+    ],
+    "sha256": "81a2a15579c889552ed8c4369228ae0db40553b30bf78fe68142ec4c319d1935",
+    "groups": [
+      {
+        "id": "controls/profile1.rb",
+        "title": null,
+        "controls": [
+          "pro1-con1",
+          "pro1-con2"
+        ]
+      }
+    ],
+    "doc_version": "1",
+    "@timestamp": "2017-10-26T19:29:21Z"
+  }
+]

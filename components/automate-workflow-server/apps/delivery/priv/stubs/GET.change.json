@@ -1,0 +1,44 @@
+{
+  "id"             : "364D342D-26C6-4082-A8DD-AA39648AB086",
+  "topic"          : "sf/deliverything",
+  "target"         : "master",
+  "base"           : "a90d39fde48ef1a9928fdab0217d5abcd47bd3a4",
+  "state"          : "open",
+  "submit_at"     : "02/21/2014",
+  "submit_by"       : "jmorrow",
+
+  "patchsets": [
+    {
+      "sequence_number": 2,
+      "commit_msgs": [["C1 subject", "C1 body"], ["C2 subject", "C2 body"]],
+      "comment_count": 5,
+      "approval_count": 1,
+      "file_count": 8
+    },
+    {
+      "sequence_number": 1,
+      "commit_msgs": [["C1 subject", "C1 body"], ["C2 subject", "C2 body"]],
+      "comment_count": 5,
+      "approval_count": 1,
+      "file_count": 8
+    }
+  ],
+
+  "activity": [{
+    "type": "reply",
+    "from": "sfalcon",
+    "to": "jmorrow",
+    "file": "src/deliv_awesome.erl",
+    "when": "TIMESTAMP",
+    "_link": {
+      "full": {"href": "href to activity item detail"}
+    }
+  }],
+  "_links" : {
+    "self": "self link",
+    "patchsets": [ {"href": ".../changes/364D3.../p/2"},
+                   {"href": ".../changes/364D3.../p/1"}],
+    "activity": {"href": "activity feed href"},
+    "comments": {"href": "href comment!"}
+  }
+}

@@ -1,0 +1,191 @@
+<div class="empty-help" *ngIf="reportData.nodesListEmpty">
+  <img class="help-icon" src="/assets/img/nodes.svg" alt="">
+  <div class="help-msg">
+    <p>A list of nodes and their individual compliance status for your scan report will appear here.</p>
+    <p>Learn how to start your first <a href="https://docs.chef.io/integrate_compliance_chef_automate.html" target="_blank">compliance scan</a>.</p>
+  </div>
+</div>
+
+<ng-container *ngIf="!reportData.nodesListEmpty">
+  <chef-table class="reporting-nodes-table" (sort-toggled)="onNodesListSortToggled($event)">
+    <chef-thead>
+      <chef-tr>
+        <chef-th>
+          Nodes
+          <chef-sort-toggle
+            sort="name"
+            [order]="orderFor('name')">
+          </chef-sort-toggle>
+        </chef-th>
+        <chef-th>
+          Platform
+          <chef-sort-toggle
+            sort="platform"
+            [order]="orderFor('platform')">
+          </chef-sort-toggle>
+        </chef-th>
+        <chef-th>
+          Environment
+          <chef-sort-toggle
+            sort="environment"
+            [order]="orderFor('environment')">
+          </chef-sort-toggle>
+        </chef-th>
+        <chef-th>
+          Last Scan
+          <chef-sort-toggle
+            sort="latest_report.end_time"
+            [order]="orderFor('latest_report.end_time')">
+          </chef-sort-toggle>
+        </chef-th>
+        <chef-th>
+          Control Failures
+          <chef-sort-toggle
+            sort="latest_report.controls.failed.total"
+            [order]="orderFor('latest_report.controls.failed.total')">
+          </chef-sort-toggle>
+        </chef-th>
+        <chef-th></chef-th>
+      </chef-tr>
+    </chef-thead>
+    <chef-tbody *ngIf="!reportData.nodesListLoading">
+      <chef-tr *ngFor="let node of reportData.nodesList.items">
+        <chef-td>
+          <chef-icon class="status-icon" [ngClass]="node.latest_report.status">
+            {{ statusIcon(node.latest_report.status) }}
+          </chef-icon>
+          <a [routerLink]="['/compliance/reporting/nodes', node.id]">{{ node.name }}</a>
+        </chef-td>
+        <chef-td>{{ node.platform.name }} {{ node.platform.release }}</chef-td>
+        <chef-td>{{ node.environment }}</chef-td>
+        <chef-td>{{ formatTime(node.latest_report.end_time) }}</chef-td>
+        <chef-td>
+          <span class="controls-status" [ngClass]="statusControls(node.latest_report.controls)">
+            {{ statusControlsSeverity(node.latest_report.controls) | uppercase }}
+          </span>
+        </chef-td>
+        <chef-td>
+          <chef-button secondary *ngIf="!hasFilter(node)" (click)="addFilter(node)">
+            <chef-icon>playlist_add</chef-icon>
+          </chef-button>
+          <chef-button secondary *ngIf="hasFilter(node)" (click)="removeFilter(node)">
+            <chef-icon>playlist_add_check</chef-icon>
+          </chef-button>
+          <chef-button secondary (click)="displayScanResults(node)">Scan Results</chef-button>
+        </chef-td>
+      </chef-tr>
+    </chef-tbody>
+    <chef-loading-spinner *ngIf="reportData.nodesListLoading" size="100"></chef-loading-spinner>
+  </chef-table>
+
+  <app-page-picker
+    class="reporting-nodes-paging"
+    [perPage]="reportData.nodesListParams.perPage"
+    [total]="reportData.nodesList.total"
+    [page]="reportData.nodesListParams.page"
+    (pageChanged)="onNodesListPageChanged($event)">
+  </app-page-picker>
+
+  <chef-scroll-top></chef-scroll-top>
+</ng-container>
+
+<chef-side-panel class="reporting-nodes-side-panel" [visible]="displayScanResultsSidebar">
+  <div class="side-panel-header">
+    <chef-icon class="header-icon">equalizer</chef-icon>
+    <div class="header-text">
+      <h4><strong>Scan results for node:</strong></h4>
+      <p>{{ layerOneData?.id }}</p>
+    </div>
+    <chef-button secondary (click)="hideScanResults()">
+      <chef-icon>close</chef-icon>
+    </chef-button>
+  </div>
+  <div class="side-panel-body">
+    <ng-container [ngSwitch]="scanResultsPane">
+      <ng-container *ngSwitchCase="0">
+        <div class="side-panel-body-header">
+          <p>Tap on a profile to view detailed scan results</p>
+        </div>
+        <ul class="results-nodes-list">
+          <ng-container *ngFor="let status of ['failed', 'passed', 'skipped']">
+            <li
+              *ngFor="let profile of layerOneData[status]"
+              class="results-nodes-list-item">
+              <div class="list-item-summary">
+                <chef-icon class="list-item-icon" [ngClass]="profile.status">{{ statusIcon(status) }}</chef-icon>
+                <div class="list-item-text">
+                  <p class="node-name">
+                    <strong>{{ profile.name }}</strong>
+                  </p>
+                </div>
+                <chef-button secondary (click)="getControls(profile)">
+                  <chef-icon>chevron_right</chef-icon>
+                </chef-button>
+              </div>
+            </li>
+          </ng-container>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchCase="1">
+        <div class="side-panel-body-header">
+          <chef-button secondary (click)="scanResultsPane = 0">
+            <chef-icon>chevron_left</chef-icon>
+          </chef-button>
+          <p>{{ layerTwoData?.id }}</p>
+        </div>
+        <ul class="results-nodes-list">
+          <ng-container *ngFor="let status of ['failed', 'passed', 'skipped']">
+            <li
+              *ngFor="let control of layerTwoData[status]"
+              class="results-nodes-list-item">
+              <div class="list-item-summary">
+                <chef-icon class="list-item-icon" [ngClass]="status">{{ statusIcon(status) }}</chef-icon>
+                <div class="list-item-text">
+                  <p class="node-name">
+                    <strong>{{ displayControlTitleOrId(control.title, control.id) }}</strong>
+                  </p>
+                </div>
+                <chef-button secondary (click)="toggleControl(control)">
+                  <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
+                  <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
+                </chef-button>
+              </div>
+              <div class="list-item-detail" [ngClass]="status" *ngIf="isOpenControl(control)">
+                <p [ngClass]="impactStatus(control)">
+                  <strong>{{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})</strong>
+                </p>
+                <chef-toggle
+                  [value]="openControls[control.id]?.pane"
+                  (change)="showControlPane(control, $event.target.value)">
+                  <chef-option value='results'>Results</chef-option>
+                  <chef-option value='source'>Source</chef-option>
+                </chef-toggle>
+                <ng-container [ngSwitch]="openControlPane(control)">
+                  <div *ngSwitchCase="'results'">
+                    <div class="result-item" *ngFor="let result of control.results">
+                      <div class="result-item-header">
+                        <chef-icon [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
+                        <p>{{ result.code_desc }}</p>
+                      </div>
+                      <div
+                        class="result-item-body"
+                        *ngIf="result.message.length || result.skip_message.length">
+                        <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
+                      </div>
+                    </div>
+                  </div>
+                  <chef-snippet
+                    class="source"
+                    *ngSwitchCase="'source'"
+                    [code]="control.code"
+                    lang="ruby">
+                  </chef-snippet>
+                </ng-container>
+              </div>
+            </li>
+          </ng-container>
+        </ul>
+      </ng-container>
+    </ng-container>
+  </div>
+</chef-side-panel>

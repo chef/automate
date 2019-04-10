@@ -1,0 +1,41 @@
+:host {
+  display: block;
+  padding-bottom: 1em;
+}
+
+.pretext {
+  font-style: italic;
+  font-size: 0.7em;
+}
+
+.title {
+  font-weight: bold;
+  margin-left: 0.25em;
+}
+
+.property-list {
+  display: table;
+  width: 100%;
+  margin-top: 0.5em;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+
+  [role="columnheader"] {
+    display: table-cell;
+    font-size: 0.75em;
+    font-weight: bold;
+    font-style: italic;
+    padding: 0.5em 1.375em;
+    border-left: 1px dashed rgba(0, 0, 0, 0.1);
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+  }
+
+  ::ng-deep [role="gridcell"] {
+    display: table-cell;
+    padding: 0.25em 1em;
+    border-left: 1px dashed rgba(0, 0, 0, 0.1);
+  }
+
+  ::ng-deep [role="row"] {
+    display: table-row;
+  }
+}

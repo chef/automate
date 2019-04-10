@@ -1,0 +1,66 @@
+<div class="organizations card-view">
+  <header class="page-header">
+    <nav class="breadcrumb-nav" role="navigation">
+      <ol class="breadcrumbs">
+        <!-- just the plain Teams list -->
+        <li class="breadcrumb teams-page-not-linked" ng-show="!showNewTeamForm">
+          Teams
+          <i class="fa fa-angle-right"></i>
+        </li>
+        <!-- Team list + New Team form -->
+        <li class="breadcrumb teams-page-linked" ng-show="showNewTeamForm">
+          <a ng-click="toggleNewTeamForm()" ui-sref="main.admin.teams">Teams</a>
+          <i class="fa fa-angle-right"></i>
+        </li>
+        <li class="breadcrumb new-team" ng-show="showNewTeamForm">
+          New Team
+          <i class="fa fa-angle-right"></i>
+        </li>
+      </ol>
+    </nav>
+    <div class="page-header-title">
+      <h2>Teams</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="card-filter-wrapper">
+    <button ng-disabled="!isAdmin"
+      class="card-add-btn"
+      ng-click="toggleNewTeamForm()"
+      title="New Team"><i class="fa fa-plus"></i> New Team</button>
+  </div>
+  <div class="form-container" ng-if="showNewTeamForm">
+    <form
+      class="new-team-form card-add-form"
+      name="newTeamForm"
+      ng-if="showNewTeamForm"
+      ng-submit="submit(team)">
+      <fieldset>
+        <div class="field">
+          <div class="little-title">Team Name</div>
+          <em class="required-indicator">*</em>
+          <input type="text" placeholder="automate_shippers" ng-model="team.name" required>
+        </div>
+        <div class="field">
+          <div class="little-title">Team Description</div>
+          <em class="required-indicator">*</em>
+          <textarea placeholder="This team is for engineers and product managers who have approval to ship changes." ng-model="team.description" required></textarea>
+        </div>
+      </fieldset>
+      <div class="form-controls">
+        <button class="button primary" type="submit" ng-disabled="newTeamForm.$invalid">Save</button>
+        <button class="button secondary" ng-click="cancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+  <div class="cards">
+    <div class="card" ng-repeat="team in teams">
+      <div class="card-content">
+        <header>
+          <h2 class="card-title"><a ui-sref="main.admin.teams.team({ team: team })">{{ team }}</a></h2>
+        </header>
+      </div>
+    </div>
+  </div>
+</div>

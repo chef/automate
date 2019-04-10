@@ -1,0 +1,42 @@
+{{ $currentPage := . }}
+{{ $currentSection := $currentPage.Section }}
+<section id="hero">
+  <div class="grid-container">
+    <div class="grid-x align-middle">
+      <div class="cell medium-10 medium-offset-1">
+        <div class="grid-x">
+          <div class="cell large-6">
+            <div class="white-text valign-large">
+              <h1>Get Started with<br />Chef Automate</h1>
+              <p class="intro">Chef Automate delivers compelling software experiences by providing a unified view of everything you, and your team, automate. </p>
+            </div>
+          </div>
+          <div class="cell large-5 large-offset-1">
+            <div class="white-text text-center valign-large">
+              <p>
+                <a class="button-animated white-text" href="/docs/quickstart">
+                  <span class="text">Install Automate</span>
+                  <span class="line -right-top"></span>
+                  <span class="line -right-bottom"></span>
+                  <span class="line -top-left"></span>
+                  <span class="line -top-right"></span>
+                  <span class="line -left"></span>
+                  <span class="line -bottom"></span>
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="hero-nav" class="grid-x">
+    <div class="cell medium-12">
+      <ul class="vertical medium-horizontal menu align-center">
+        <li class="{{ if $currentPage.IsHome }}active{{ end }}"><a href="/">About Chef Automate</a></li>
+        <li class="{{ if eq $currentSection "docs" }}active{{end}}"><a href="/docs/quickstart/">Docs</a></li>
+        <li class="{{ if eq $currentSection "release-notes" }}active{{end}}"><a href="/release-notes/">Release Notes</a></li>
+      </ul>
+    </div>
+  </div>
+</section>

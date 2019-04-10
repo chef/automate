@@ -1,0 +1,30 @@
+<div class="change-card" ng-class="change.state">
+  <header>
+    <div class="overview-header">
+      <h2 class="card-title">
+        <a ui-sref="main.enterprise.organizations.organization.project.change({change: change.id, state: null})">{{ change.title }}</a>
+        <span class="badge">{{ change.state }}</span>
+      </h2>
+    </div>
+    <div class="overview-meta">
+      <div class="card-topic">
+        <span>{{ change.topic }}</span>
+        &rarr;
+        <span>{{ change.target }}</span>
+        <span class="overview-sha" ng-if="change.mergeSha">
+          ({{ change.mergeSha.slice(0, 7) }})
+        </span>
+      </div>
+      <span class="overview-created-time">
+        <time datetime="{{ change.submitAt }}" title="{{ change.submitAt }}">{{ change.submitDate }}</time>
+        by
+        <span class="overview-submitter">
+          {{ change.submitBy }}
+        </span>
+      </span>
+    </div>
+  </header>
+  <div class="commit-msgs">
+    <div class="commit-msg" cd-text-expander="patchset"></div>
+  </div>
+</div>

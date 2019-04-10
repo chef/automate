@@ -1,0 +1,61 @@
+{
+  "name": "mylinux-success",
+  "title": "My Demo Linux successful profile",
+  "maintainer": "Chef Software, Inc.",
+  "copyright": "Chef Software, Inc.",
+  "copyright_email": "support@chef.io",
+  "license": "Apache 2 license",
+  "summary": "Demonstrates the use of InSpec Compliance Profile",
+  "version": "1.8.9",
+  "supports": [
+
+  ],
+  "controls": [
+    {
+      "title": "Checking for /etc/passwd",
+      "desc": "Checking for /etc/passwd desc",
+      "impact": 0.6,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "control '/etc/passwd must exist' do\n  title 'Checking for /etc/passwd'\n  desc 'Checking for /etc/passwd desc'\n  impact 0.6\n  describe file('/etc/passwd') do\n    it { should be_file }\n  end\nend\n",
+      "source_location": {
+        "ref": "controls/success.rb",
+        "line": 2
+      },
+      "id": "/etc/passwd must exist"
+    },
+    {
+      "title": "Checking for /etc/group",
+      "desc": "Checking for /etc/group desc",
+      "impact": 0.3,
+      "refs": [
+
+      ],
+      "tags": {
+      },
+      "code": "control '/etc/group must exist' do\n  title 'Checking for /etc/group'\n  desc 'Checking for /etc/group desc'\n  impact 0.3\n  describe file('/etc/group') do\n    it { should be_file }\n  end\nend\n",
+      "source_location": {
+        "ref": "controls/success.rb",
+        "line": 11
+      },
+      "id": "/etc/group must exist"
+    }
+  ],
+  "groups": [
+    {
+      "title": null,
+      "controls": [
+        "/etc/passwd must exist",
+        "/etc/group must exist"
+      ],
+      "id": "controls/success.rb"
+    }
+  ],
+  "attributes": [
+
+  ],
+  "sha256": "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27"
+}

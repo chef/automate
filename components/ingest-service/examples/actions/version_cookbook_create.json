@@ -1,0 +1,21 @@
+{
+  "id": "a2a6bf1d-0384-487d-a560-319b10523380",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "0.1.0",
+  "entity_type": "version",
+  "parent_name": "krasnow",
+  "parent_type": "cookbook",
+  "task": "create",
+  "organization_name": "testing",
+  "remote_hostname": "172.21.8.51",
+  "recorded_at": "2018-03-29T22:10:43Z",
+  "remote_request_id": "569a2091-9b20-4981-933f-652f6cd0e112",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAALXgkTUAAIAAAAA",
+  "requestor_name": "mkrasnow",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Knife/12.19.36 (ruby-2.3.1-p112; ohai-8.23.0; x86_64-darwin14; +https://chef.io)",
+  "data": "{\"attributes\":[],\"chef_type\":\"cookbook_version\",\"cookbook_name\":\"krasnow\",\"definitions\":[],\"files\":[],\"frozen?\":false,\"json_class\":\"Chef::CookbookVersion\",\"libraries\":[],\"metadata\":{\"attributes\":{},\"chef_versions\":[],\"conflicting\":{},\"dependencies\":{},\"description\":\"Installs/Configures krasnow\",\"gems\":[],\"groupings\":{},\"issues_url\":\"\",\"license\":\"All rights reserved\",\"long_description\":\"# krasnow Cookbook\\n\\nTODO: Enter the cookbook description here.\\n\\ne.g.\\nThis cookbook makes your favorite breakfast sandwich.\\n\\n## Requirements\\n\\nTODO: List your cookbook requirements. Be sure to include any requirements this cookbook has on platforms, libraries, other cookbooks, packages, operating systems, etc.\\n\\ne.g.\\n### Platforms\\n\\n- SandwichOS\\n\\n### Chef\\n\\n- Chef 12.0 or later\\n\\n### Cookbooks\\n\\n- `toaster` - krasnow needs toaster to brown your bagel.\\n\\n## Attributes\\n\\nTODO: List your cookbook attributes here.\\n\\ne.g.\\n### krasnow::default\\n\\n\\u003ctable\\u003e\\n  \\u003ctr\\u003e\\n    \\u003cth\\u003eKey\\u003c/th\\u003e\\n    \\u003cth\\u003eType\\u003c/th\\u003e\\n    \\u003cth\\u003eDescription\\u003c/th\\u003e\\n    \\u003cth\\u003eDefault\\u003c/th\\u003e\\n  \\u003c/tr\\u003e\\n  \\u003ctr\\u003e\\n    \\u003ctd\\u003e\\u003ctt\\u003e['krasnow']['bacon']\\u003c/tt\\u003e\\u003c/td\\u003e\\n    \\u003ctd\\u003eBoolean\\u003c/td\\u003e\\n    \\u003ctd\\u003ewhether to include bacon\\u003c/td\\u003e\\n    \\u003ctd\\u003e\\u003ctt\\u003etrue\\u003c/tt\\u003e\\u003c/td\\u003e\\n  \\u003c/tr\\u003e\\n\\u003c/table\\u003e\\n\\n## Usage\\n\\n### krasnow::default\\n\\nTODO: Write usage instructions for each cookbook.\\n\\ne.g.\\nJust include `krasnow` in your node's `run_list`:\\n\\n```json\\n{\\n  \\\"name\\\":\\\"my_node\\\",\\n  \\\"run_list\\\": [\\n    \\\"recipe[krasnow]\\\"\\n  ]\\n}\\n```\\n\\n## Contributing\\n\\nTODO: (optional) If this is a public cookbook, detail the process for contributing. If this is a private cookbook, remove this section.\\n\\ne.g.\\n1. Fork the repository on Github\\n2. Create a named feature branch (like `add_component_x`)\\n3. Write your change\\n4. Write tests for your change (if applicable)\\n5. Run the tests, ensuring they all pass\\n6. Submit a Pull Request using Github\\n\\n## License and Authors\\n\\nAuthors: TODO: List authors\\n\\n\",\"maintainer\":\"YOUR_COMPANY_NAME\",\"maintainer_email\":\"YOUR_EMAIL\",\"name\":\"krasnow\",\"ohai_versions\":[],\"platforms\":{},\"privacy\":false,\"providing\":{\"krasnow\":\"\\u003e= 0.0.0\"},\"recipes\":{\"krasnow\":\"\"},\"recommendations\":{},\"replacing\":{},\"source_url\":\"\",\"suggestions\":{},\"version\":\"0.1.0\"},\"name\":\"krasnow-0.1.0\",\"providers\":[],\"recipes\":[{\"checksum\":\"ca3f0f5c2dc845cf074906e598b48fe1\",\"name\":\"default.rb\",\"path\":\"recipes/default.rb\",\"specificity\":\"default\"}],\"resources\":[],\"root_files\":[{\"checksum\":\"c7258878ae783228a2de0b5a607d5c48\",\"name\":\"CHANGELOG.md\",\"path\":\"CHANGELOG.md\",\"specificity\":\"default\"},{\"checksum\":\"8c3987675d9c38e1fa67eba9619d4fb0\",\"name\":\"metadata.rb\",\"path\":\"metadata.rb\",\"specificity\":\"default\"},{\"checksum\":\"8ab27962cbef86e94281db4615c2e43e\",\"name\":\"README.md\",\"path\":\"README.md\",\"specificity\":\"default\"}],\"templates\":[],\"version\":\"0.1.0\"}"
+}

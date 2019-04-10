@@ -1,0 +1,131 @@
+package apiclient
+
+import (
+	"context"
+
+	"google.golang.org/grpc"
+
+	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
+	"github.com/chef/automate/components/automate-cli/pkg/status"
+	"github.com/chef/automate/components/automate-deployment/pkg/constants"
+	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
+	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
+	"github.com/chef/automate/components/automate-gateway/api/auth/users"
+	"github.com/chef/automate/components/automate-gateway/api/authz"
+	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
+	"github.com/chef/automate/components/automate-gateway/api/iam/v2beta"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/tls/certs"
+)
+
+type client struct {
+	apiClientConn *grpc.ClientConn
+	// TODO (tc): Add other service clients here as needed.
+	authzClient     authz.AuthorizationClient
+	teamsClient     teams.TeamsClient
+	teamsV2Client   v2beta.TeamsClient
+	tokensClient    tokens.TokensMgmtClient
+	tokensV2Client  v2beta.TokensClient
+	usersClient     users.UsersMgmtClient
+	policiesClient  v2beta.PoliciesClient
+	reportingClient reporting.ReportingServiceClient
+}
+
+// OpenConnection returns a new API client ready to make requests against our public API,
+// These requests will auth via the deployment-service cert, which has a system level
+// policy granting it universal access to our API.
+func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
+	// TODO (tc): These values should come in via config and not be hard-coded.
+	// Fixing this will be required for multi-node deploys where the cert might live somewhere else.
+	deployCerts := certs.TLSConfig{
+		CertPath:       constants.CertPath,
+		KeyPath:        constants.KeyPath,
+		RootCACertPath: constants.RootCertPath,
+	}
+
+	// TODO (tc): These values should come in via config and not be hard-coded.
+	// Fixing this will be required for multi-node deploys. We can then go through the LB's
+	// FQDN instead of the gateway directly.
+	apiClientConn, err := newClientConn(ctx, deployCerts, "automate-gateway", "127.0.0.1:2001")
+	if err != nil {
+		return nil, err
+	}
+
+	return client{
+		apiClientConn: apiClientConn,
+		// TODO (tc): Add other service clients here as needed.
+		authzClient:     authz.NewAuthorizationClient(apiClientConn),
+		teamsClient:     teams.NewTeamsClient(apiClientConn),
+		teamsV2Client:   v2beta.NewTeamsClient(apiClientConn),
+		tokensClient:    tokens.NewTokensMgmtClient(apiClientConn),
+		tokensV2Client:  v2beta.NewTokensClient(apiClientConn),
+		usersClient:     users.NewUsersMgmtClient(apiClientConn),
+		policiesClient:  v2beta.NewPoliciesClient(apiClientConn),
+		reportingClient: reporting.NewReportingServiceClient(apiClientConn),
+	}, nil
+}
+
+func (c client) AuthzClient() authz.AuthorizationClient {
+	return c.authzClient
+}
+
+func (c client) TeamsClient() teams.TeamsClient {
+	return c.teamsClient
+}
+
+func (c client) TeamsV2Client() v2beta.TeamsClient {
+	return c.teamsV2Client
+}
+
+func (c client) TokensClient() tokens.TokensMgmtClient {
+	return c.tokensClient
+}
+
+func (c client) TokensV2Client() v2beta.TokensClient {
+	return c.tokensV2Client
+}
+
+func (c client) UsersClient() users.UsersMgmtClient {
+	return c.usersClient
+}
+
+func (c client) PoliciesClient() v2beta.PoliciesClient {
+	return c.policiesClient
+}
+
+func (c client) ReportingClient() reporting.ReportingServiceClient {
+	return c.reportingClient
+}
+
+// CloseConnection cleans up the temporary admin API token and closes all connections opened by client.
+func (c client) CloseConnection() error {
+	if err := c.apiClientConn.Close(); err != nil {
+		return status.Wrap(err, status.APIError, "failed to close the connection to the Chef Automate API")
+	}
+
+	return nil
+}
+
+func newClientConn(ctx context.Context,
+	connCerts certs.TLSConfig, serviceName, serviceAddress string) (*grpc.ClientConn, error) {
+
+	serviceCerts, err := connCerts.ReadCerts()
+	if err != nil {
+		return nil, status.Wrap(err, status.FileAccessError, "failed to read tls keys/certs")
+	}
+
+	factory := secureconn.NewFactory(*serviceCerts)
+
+	apiConn, err := factory.DialContext(
+		ctx,
+		serviceName,
+		serviceAddress,
+		grpc.WithBlock(),
+	)
+
+	if err != nil {
+		return nil, status.Annotate(err, status.APIUnreachableError)
+	}
+
+	return apiConn, nil
+}

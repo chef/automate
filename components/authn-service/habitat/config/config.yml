@@ -1,0 +1,59 @@
+---
+{{~#eachAlive bind.automate-dex.members as |member|}}
+  {{~#if @last}}
+upstream: https://{{member.sys.ip}}:{{member.cfg.port}}
+  {{~/if}}
+{{~/eachAlive}}
+grpc: {{cfg.service.host}}:{{cfg.service.port}}
+http1: {{cfg.http1.host}}:{{cfg.http1.port}}
+
+tls:
+  cert_path: {{pkg.svc_config_path}}/service.crt
+  key_path: {{pkg.svc_config_path}}/service.key
+  root_ca_path: {{pkg.svc_config_path}}/root_ca.crt
+
+authenticators:
+- id: oidc
+  type: oidc
+  config:
+    issuer: https://{{cfg.service.external_fqdn}}/dex
+    client_id: {{cfg.oidc.client_id}}
+    groups:
+    - users
+- id: token
+  type: header-token
+  config:
+    headers:
+      - x-data-collector-token
+      - api-token
+    storage:
+      type: postgresql
+      config:
+        database: {{cfg.storage.database}}
+        max_connections: {{cfg.storage.max_connections}}
+
+tokens:
+  type: postgresql
+  config:
+    database: {{cfg.storage.database}}
+
+{{~#eachAlive bind.teams-service.members as |teams-service|}}
+{{~#if @last}}
+teams_address: {{teams-service.sys.ip}}:{{teams-service.cfg.port}}
+{{~/if}}
+{{~/eachAlive}}
+
+{{~#eachAlive bind.authz-service.members as |authz-service|}}
+{{~#if @last}}
+authz_address: {{authz-service.sys.ip}}:{{authz-service.cfg.port}}
+{{~/if}}
+{{~/eachAlive}}
+
+{{~#if cfg.service.a1_data_collector_token}}
+legacy_data_collector_token: {{cfg.service.a1_data_collector_token}}
+{{~/if}}
+
+
+logger:
+  format: {{cfg.logger.format}}
+  level: {{cfg.logger.level}}

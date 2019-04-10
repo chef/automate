@@ -1,0 +1,30 @@
+# NOTE(ssd) 2018-07-25: These two are not exposed in public-facing
+# configuration as changing them would break everything.
+fips_enabled = false
+ip_mode = "ipv4"
+
+[network]
+port = 10201
+listen_ip="0.0.0.0"
+
+[log]
+level="info"
+rotation_max_bytes = 104857600
+rotation_max_files = 10
+max_error_logs_per_second = 1000
+
+[bookshelf]
+sql_retry_count=0
+sql_retry_delay=10
+abandoned_upload_cleanup_interval=1140000
+deleted_data_cleanup_interval=420000
+stream_download=true
+
+[sql]
+timeout=5000
+user="automate-cs-bookshelf"
+db_name="automate-cs-bookshelf"
+pool_queue_timeout=2000
+pool_max_size=20
+pool_init_size=20
+pool_queue_max=50

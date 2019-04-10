@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS store_profiles
+  DROP COLUMN IF EXISTS metadata;

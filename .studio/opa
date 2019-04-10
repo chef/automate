@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# Helper methods specific for testing OPA (Rego) code
+
+document "opa_test" <<DOC
+  Execute OPA's tests with authz-service's rego code
+DOC
+opa_test() {
+  install_if_missing core/opa opa
+  pushd /src/components/authz-service/engine/opa/policy >/dev/null
+    make unit || return 1
+  popd >/dev/null
+}
+
+document "opa_static" <<DOC
+  Verify the formatting of the Rego code in authz-service
+DOC
+opa_static() {
+  install_if_missing core/opa opa
+  pushd /src/components/authz-service/engine/opa/policy >/dev/null
+    make static || return 1
+  popd >/dev/null
+}

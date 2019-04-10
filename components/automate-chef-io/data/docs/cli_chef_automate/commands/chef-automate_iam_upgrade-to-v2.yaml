@@ -1,0 +1,22 @@
+name: chef-automate iam upgrade-to-v2
+synopsis: Upgrade to IAM v2
+usage: chef-automate iam upgrade-to-v2 [flags]
+description: |
+  Upgrade to IAM v2 and migrate existing v1 policies. On downgrade, any new v2 policies will be reverted.
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for upgrade-to-v2
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate iam - Chef Automate iam commands

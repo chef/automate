@@ -1,0 +1,12 @@
+---
+grpc: 127.0.0.1:9092
+dictionaryPath: password/dict/
+
+users:
+  type: dex
+  config:
+    grpcHost: 127.0.01:5557
+
+logger:
+  format: text
+  level: debug

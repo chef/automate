@@ -1,0 +1,99 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.rollup-item {
+  background-color: $gray-less-pale;
+  border: 1px solid $gray-pale;
+  border-radius: $global-radius;
+  box-shadow: inset 0 0 0 2px $gray-pale;
+  color: $gray;
+  padding: 1em;
+  text-transform: capitalize;
+  transition: background-color .2s;
+  width: 17%;
+
+  .rollup-title, .count {
+    display: inline-block;
+    width: 100%;
+  }
+
+  chef-icon {
+    vertical-align: top;
+    margin-top: 2px;
+
+    &.larger {
+      font-size: 1.4em;
+    }
+  }
+
+  .icon {
+    display: none;
+    margin-top: 15px;
+    width: 94%;
+  }
+
+  &:hover {
+    @include base-box-shadow(24px);
+    color: $chef-primary-dark;
+    cursor: pointer;
+    background-color: $white;
+    transition: all .2s;
+  }
+
+  &.active {
+    @extend %primary-gradient;
+    @include base-box-shadow(24px);
+    border: 0;
+    transition: all .2s;
+
+    h3, i, .count {
+      display: inline-block;
+      color: $white;
+    }
+
+  }
+
+  h3 {
+    margin: 0;
+    font-size: .875em;
+    font-weight: normal;
+    color: inherit;
+  }
+
+}
+
+.run-list {
+
+  .run-list-rollup {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+
+    .rollup-item {
+      box-shadow: inset 0 0 0 2px $gray-pale;
+      background-color: $gray-pale;
+      color: $chef-primary-dark;
+
+      &:hover {
+        color: $chef-primary-dark;
+      }
+    }
+  }
+
+  ul {
+    margin-top: 0px;
+    padding-left: 18px;
+
+    &.first-level {
+      padding: 0;
+    }
+
+    li {
+      width: 100%;
+      list-style: none;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  }
+}

@@ -1,0 +1,15 @@
+@import "~styles/variables";
+
+chef-table {
+  .id-column {
+    flex-basis: 30%;
+  }
+
+  .name-column {
+    flex-basis: 70%;
+  }
+
+  .button-column {
+    justify-content: flex-end;
+  }
+}

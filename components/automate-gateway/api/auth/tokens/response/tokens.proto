@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package chef.automate.api.tokens.response;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/auth/tokens/response";
+
+message Token {
+  string id = 1;
+  string description = 2;
+  string value = 3;
+  bool   active = 4;
+  string created = 5;
+  string updated = 6;
+};
+
+message Tokens {
+  repeated Token tokens = 1;
+}
+
+message DeleteTokenResp {}

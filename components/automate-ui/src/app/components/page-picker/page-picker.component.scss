@@ -1,0 +1,10 @@
+@import "~styles/variables";
+
+:host {
+  display: flex;
+  align-items: center;
+
+  chef-button {
+    margin: 0 0.5em 0 0;
+  }
+}

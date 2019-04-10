@@ -1,0 +1,110 @@
+<div class="organizations card-view">
+  <header class="page-header">
+    <div class="page-header-title">
+      <h2>Users</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="card-filter-wrapper">
+    <div class="quick-find-automate">
+      <input
+       class="card-filter"
+       type="text"
+       ng-model="userFilter"
+       placeholder="Filter users..."
+       ng-show="users.length">
+    </div>
+    <button
+      class="card-add-btn"
+      title="New User"
+      ng-click="toggleNewUserForm()"><i class="fa fa-plus"></i> New User</button>
+  </div>
+  <div class="form-container" ng-if="showNewUserForm">
+    <form
+      class="new-user-form card-add-form"
+      name="newUserForm"
+      ng-if="showNewUserForm"
+      ng-submit="submit(user)">
+      <fieldset>
+        <legend>User Authentication Type</legend>
+        <div class="field">
+          <div class="button-bar">
+            <a
+              class="button small secondary"
+              ng-class="{ active: userType === 'internal' }"
+              ng-click="selectUserType('internal')">
+              Chef Automate
+            </a>
+            <a
+              class="button small secondary"
+              ng-class="{ active: userType === 'external' }"
+              ng-click="selectUserType('external')">
+              LDAP
+            </a>
+            <a
+              class="button small secondary"
+              ng-class="{ active: userType === 'saml' }"
+              ng-click="selectUserType('saml')">
+              SAML
+            </a>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset ng-if="userType === 'internal'">
+        <legend>User Details</legend>
+        <div class="field">
+          <div class="little-title">First Name</div>
+          <em class="required-indicator">*</em>
+          <input type="text" placeholder="Jane" ng-model="user.first">
+        </div>
+        <div class="field">
+          <div class="little-title">Last Name</div>
+          <em class="required-indicator">*</em>
+          <input type="text" placeholder="Smith" ng-model="user.last">
+        </div>
+        <div class="field">
+          <div class="little-title">Email</div>
+          <em class="required-indicator">*</em>
+          <input type="text" placeholder="jsmith@example.com" ng-model="user.email">
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Security Information</legend>
+        <div class="field">
+          <div class="little-title">Username</div>
+          <em class="required-indicator">*</em>
+          <input type="text" placeholder="jsmith" ng-model="user.name">
+        </div>
+        <div class="field" ng-if="userType === 'internal'">
+          <div class="little-title">Password</div>
+          <em class="required-indicator">*</em>
+          <input type="password" placeholder="Password" ng-model="user.password">
+        </div>
+        <div class="field-tooltip icon-circle-question"
+          bs-tooltip data-title="Public SSH key is mandatory if you wish to clone or push to repos."
+          data-trigger="hover">
+        </div>
+        <div class="field">
+          <div class="little-title">SSH Key</div>
+          <textarea placeholder="(Optional)" ng-model="user.ssh_pub_key"></textarea>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Roles Within the Enterprise</legend>
+        <div class="field checkbox-list" cd-roles-field></div>
+      </fieldset>
+      <div class="form-controls">
+        <button class="button primary" type="submit">Save &amp; Close</button>
+        <button class="button secondary" ng-click="cancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+  <div class="cards" ng-show="users.length">
+    <cd-user-card
+      id="{{ user.name }}"
+      user="user"
+      ng-repeat="user in users | filter:userFilter">
+    </cd-user-card>
+  </div>
+</div>

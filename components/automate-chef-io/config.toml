@@ -1,0 +1,119 @@
+baseURL = "/"
+languageCode = "en-us"
+title = "Chef Automate"
+description = "One platform with a unified workflow, end-to-end visibility, and automated compliance over your entire Chef ecosystem."
+Paginate = 4
+theme = "chef"
+
+# To develop against a local copy of the chef hugo theme, uncomment this line
+# and set the value to the parent directory of where you have checked out the
+# chef-hugo-theme repository
+# themesDir = "../../../hugo-themes"
+
+pygmentsStyle = "emacs"
+pygmentsCodefences = true
+
+[params]
+  enable_search = true  # set to true to show search bar
+
+[[menu.main]]
+name = "Why Chef"
+url = "#"
+weight = 5
+
+[[menu.main]]
+name = "Product"
+url = "#"
+weight = 10
+
+[[menu.main]]
+name = "Solutions"
+url = "#"
+weight = 15
+
+[[menu.main]]
+name = "Pricing"
+url = "#"
+weight = 20
+
+[[menu.main]]
+name = "About"
+url = "#"
+weight = 25
+
+[[menu.main]]
+name = "Downloads"
+url = "https://www.chef.io/chef/get-chef/"
+weight = 30
+
+# Define the top level sidebar items so we can reference them explicitly
+[[menu.docs]]
+name = "Get Started with Automate"
+weight = 10
+identifier = "get_started"
+
+[[menu.docs]]
+name = "Configuring Automate"
+weight = 20
+identifier = "configuring_automate"
+
+[[menu.docs]]
+name = "Event Feed"
+weight = 40
+identifier = "event_feed"
+url = "/docs/event-feed"
+
+[[menu.docs]]
+name = "Client Runs"
+weight = 50
+identifier = "client_runs"
+url = "/docs/client-runs"
+
+[[menu.docs]]
+name = "Compliance"
+weight = 60
+identifier = "compliance"
+url = "/docs/compliance"
+
+[[menu.docs]]
+name = "Scan Jobs"
+weight = 70
+identifier = "scan_jobs"
+
+[[menu.docs]]
+name = "Asset Store"
+weight = 80
+identifier = "asset-store"
+url = "/docs/asset-store"
+
+[[menu.docs]]
+name = "Settings"
+weight = 90
+identifier = "settings"
+url = "/docs/settings"
+
+[[menu.docs]]
+name = "Authorization"
+weight = 100
+identifier = "authorization"
+
+[[menu.docs]]
+name = "Reference"
+weight = 110
+identifier = "reference"
+
+[[menu.docs]]
+name = "Troubleshooting"
+weight = 120
+identifier = "troubleshooting"
+url = "/docs/troubleshooting"
+
+[[menu.docs]]
+name = "Workflow (Legacy)"
+weight = 140
+identifier = "workflow"
+
+[[menu.docs]]
+name = "IAM v2 Beta"
+weight = 150
+identifier = "beta"

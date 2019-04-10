@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+# This script is meant to be included in every delivery-managed git repo as a
+# server-side git post-recieve hook
+# see https://www.kernel.org/pub/software/scm/git/docs/githooks.html
+
+require 'json'
+require 'uri'
+require 'net/http'
+
+DELIV_HTTP_HOST = 'localhost'
+DELIV_HTTP_POST_RECEIVE_ENDPOINT = 'internal/post_receive_hook'
+
+def run
+  # read STDIN (Format: "from_commit to_commit ref_name")
+  from_commit, to_commit, ref_name = ARGF.read.split " "
+
+  # the data to send
+  data = {
+    'enterprise' => ENV['DELIV_ENTERPRISE'],
+    'user' => ENV['DELIV_USER'],
+    'organization' => ENV['DELIV_ORGANIZATION'],
+    'project' => ENV['DELIV_PROJECT'],
+    'reference_name' => ref_name,
+    'to_commit' => to_commit
+  }
+
+  # let's send the data
+  uri = URI("http://#{DELIV_HTTP_HOST}:#{ENV['DELIV_HTTP_PORT']}/#{DELIV_HTTP_POST_RECEIVE_ENDPOINT}/")
+  http = Net::HTTP.new(uri.host, uri.port)
+  header = {'Content-Type' => 'application/json'}
+  response = http.post(uri.path, data.to_json, header)
+  # TODO: check the return code!
+  puts response.body
+end
+
+run

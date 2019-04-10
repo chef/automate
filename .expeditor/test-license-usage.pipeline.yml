@@ -1,0 +1,13 @@
+steps:
+  - command:
+      - .expeditor/buildkite/test-license-usage.sh
+    label: ":terraform:"
+    concurrency: 1
+    concurrency_group: chef-a2-master/test-license-usage/$CHANNEL
+    timeout_in_minutes: 5
+    expeditor:
+      accounts:
+        - aws/chef-cd
+        - github
+      executor:
+        docker:

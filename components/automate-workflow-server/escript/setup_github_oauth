@@ -1,0 +1,48 @@
+#!/usr/bin/env escript
+%%! -name github_oauth@127.0.0.1
+
+-define(SELF, 'github_oauth@127.0.0.1').
+-define(TARGET, 'delivery@127.0.0.1').
+
+main(Args) ->
+    init_network(),
+    [OauthAppName, GithubUrl, GithubApiUrl, ClientId, ClientSecret] = parse_args(Args),
+    case rpc_call(?TARGET, deliv_oauth_application, insert, [OauthAppName, <<"deliv_github_oauth">>, GithubUrl, GithubApiUrl, ClientId, ClientSecret]) of
+        [_] ->
+            io:format("Successfully added new Github OAuth configuration.~n");
+        {error, conflict} ->
+            perror(io:format("Error: Github OAuth configuration already exists!~n"));
+        {error, Why} ->
+            perror(io:format("Error: ~p~n", [Why]))
+    end.
+
+init_network() ->
+    {ok, _} = net_kernel:start([?SELF, longnames]),
+    true = erlang:set_cookie(node(), get_cookie()),
+    pong = net_adm:ping(?TARGET).
+
+parse_args([_OauthAppName, _GithubUrl, _GithubApiUrl, _ClientId, _ClientSecret] = Args) ->
+    Args;
+parse_args(Other) ->
+    perror(io:format("Invalid Arguments: ~p~n", [Other])).
+
+rpc_call(Node, Module, Function, Args) ->
+    case rpc:call(Node, Module, Function, Args) of
+        {badrpc, Reason} ->
+            perror(io_lib:format("RPC call ~p:~p:~p:~p failed with error ~p~n",
+                                 [Node, Module, Function, Args, Reason]));
+        Res ->
+            Res
+    end.
+
+perror(Msg) ->
+    io:format(Msg),
+    erlang:halt(1).
+
+get_cookie() ->
+    case os:getenv("ERL_COOKIE") of
+        false ->
+            'delivery';
+        Cookie ->
+            list_to_atom(Cookie)
+    end.

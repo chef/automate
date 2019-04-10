@@ -1,0 +1,30 @@
+.main {
+  @include outer-container($max-width);
+
+  .container {
+    min-height: 100%;
+    background-color: $gray-less-pale;
+  }
+
+  .main-view {
+    margin-top: $global-header-height;
+    @include transition(padding 0.25s ease-in-out);
+
+    &.collapsed {
+      @include transition(padding 0.25s ease-in-out);
+    }
+
+    .page {
+      position: relative;
+      @include clearfix;
+    }
+  }
+}
+
+.collapse {
+  display: none;
+
+  &.in {
+    display: block;
+  }
+}

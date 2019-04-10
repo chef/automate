@@ -1,0 +1,4 @@
+ALTER TABLE IF EXISTS nodes
+  ADD COLUMN IF NOT EXISTS manager_id TEXT REFERENCES node_managers(id),
+  ADD COLUMN IF NOT EXISTS source_region TEXT DEFAULT '',
+  ADD COLUMN IF NOT EXISTS source_state TEXT DEFAULT '';

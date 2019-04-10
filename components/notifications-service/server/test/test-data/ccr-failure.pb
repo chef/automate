@@ -1,0 +1,4 @@
+
+blashnode-11http://localhost/organizations/myorg/nodes/node-1""http://localhost/some/automate/url*cookbook2service:,
+2017-07-17T17:19:17Z2017-07-17T17:19:17ZBÅ
+	ExceptionFError executing action `run` on resource 'ruby_block[exploding block]'_ruby_block[exploding block] (test-cookbook::dir_recipe line 13) had an error: Exception: Sorry."–/home/marc/projects/chef/automate/data_generator/chef-client/cache/cookbooks/test-cookbook/recipes/dir_recipe.rb:15:in `block (2 levels) in from_file'"v/opt/chefdk/embedded/lib/ruby/gems/2.3.0/gems/chef-12.21.2/lib/chef/provider/ruby_block.rb:35:in `block in action_run'

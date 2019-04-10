@@ -1,0 +1,54 @@
+[cd-markdown] {
+  padding: 0;
+
+  pre code {
+    border: 1px solid #f1f1f1;
+    background: #f8f8f8;
+    padding: 8px;
+    display: block;
+    border-radius: 4px;
+  }
+
+  p code {
+    border: 1px solid #f1f1f1;
+    background: #f8f8f8;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  code {
+    font-family: $monospace;
+    font-size: .9em;
+  }
+
+  ul, ol {
+    padding-left: 1em;
+    margin: 1em;
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  table {
+    width: 100%;
+    background: $white;
+
+    th, td {
+      padding: 5px;
+      border: 1px solid $lightgray;
+    }
+
+    th {
+      background: darken($white, 3%);
+    }
+  }
+
+  img {
+    max-width: 100%;
+  }
+}

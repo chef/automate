@@ -1,0 +1,184 @@
+.pipeviz-container {
+  overflow: auto;
+  background: darken($white, 3%) url('../images/chevron-bg-mask.svg') left center repeat-x;
+  background-size: auto 80px;
+  margin: 10px 0;
+}
+
+.pipeviz-card-container {
+  width: 908px;
+  margin: 0 auto;
+  @include clearfix;
+}
+
+.pipeviz-card,
+.pipeviz-card-group {
+  float: left;
+}
+
+.pipeviz-card {
+  background: $white;
+  margin: 0 25px;
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 1px 2px $lightgray;
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: default;
+  @include flexbox;
+  @include flex-direction(column);
+
+  .pipeviz-card-icon {
+    display: block;
+    background-color: $lightgray;
+    background-size: 15px auto;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    text-indent: -999em;
+    @include flex-grow(1);
+  }
+
+  .pipeviz-card-details {
+    @include flexbox;
+    @include flex-grow(1);
+  }
+
+  .pipeviz-card-detail {
+    text-align: center;
+    background: #f7f7f7;
+    color: $white;
+    @include flex-grow(1);
+    @include flexbox;
+    @include flex-direction(column);
+    @include justify-content(center);
+
+    &.running {
+      background-color: #456a8d;
+    }
+
+    &.passed {
+      background-color: #417505;
+    }
+
+    &.failed {
+      background-color: #d0021b;
+    }
+
+    span {
+      font-weight: 300;
+    }
+  }
+
+  &.verify {
+    .pipeviz-card-icon {
+      background-image: url('../images/stage-verify-icon.svg');
+    }
+  }
+
+  &.approval {
+    .pipeviz-card-icon {
+      background-image: url('../images/stage-user-checkpoint-icon.svg');
+    }
+  }
+
+  &.build {
+    .pipeviz-card-icon {
+      background-image: url('../images/stage-build-icon.svg');
+    }
+  }
+
+  &.acceptance {
+    .pipeviz-card-icon {
+      background-image: url('../images/stage-acceptance-icon.svg');
+    }
+  }
+
+  &.delivery {
+    .pipeviz-card-icon {
+      background-image: url('../images/stage-user-checkpoint-icon.svg');
+    }
+  }
+}
+
+.pipeviz-card-group {
+  margin: 0 7px;
+  position: relative;
+
+  &.production-group {
+
+    .pipeviz-card {
+      border: 2px solid $lightgray;
+
+      &.running {
+        border-color: #456a8d;
+      }
+
+      &.passed {
+        border-color: #417505;
+      }
+
+      &.failed {
+        border-color: #d0021b;
+      }
+
+      .pipeviz-card-icon {
+        background-color: $white;
+        background-size: 30px auto;
+      }
+
+      &.union {
+        .pipeviz-card-icon {
+          background-image: url('../images/stage-union-icon.svg');
+        }
+
+        &.running .pipeviz-card-icon {
+          background-image: url('../images/stage-union-icon-running.svg');
+        }
+
+        &.passed .pipeviz-card-icon {
+          background-image: url('../images/stage-union-icon-passed.svg');
+        }
+
+        &.failed .pipeviz-card-icon {
+          background-image: url('../images/stage-union-icon-failed.svg');
+        }
+      }
+
+      &.rehearsal {
+        .pipeviz-card-icon {
+          background-image: url('../images/stage-rehearsal-icon.svg');
+        }
+
+        &.running .pipeviz-card-icon {
+          background-image: url('../images/stage-rehearsal-icon-running.svg');
+        }
+
+        &.passed .pipeviz-card-icon {
+          background-image: url('../images/stage-rehearsal-icon-passed.svg');
+        }
+
+        &.failed .pipeviz-card-icon {
+          background-image: url('../images/stage-rehearsal-icon-failed.svg');
+        }
+      }
+
+      &.delivered {
+        .pipeviz-card-icon {
+          background-image: url('../images/stage-delivered-icon.svg');
+        }
+
+        &.running .pipeviz-card-icon {
+          background-image: url('../images/stage-delivered-icon-running.svg');
+        }
+
+        &.passed .pipeviz-card-icon {
+          background-image: url('../images/stage-delivered-icon-passed.svg');
+        }
+
+        &.failed .pipeviz-card-icon {
+          background-image: url('../images/stage-delivered-icon-failed.svg');
+        }
+      }
+    }
+  }
+}

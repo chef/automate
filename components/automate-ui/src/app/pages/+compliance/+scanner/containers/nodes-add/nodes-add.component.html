@@ -1,0 +1,137 @@
+<chef-sidebar>
+  <div class="nav-items">
+    <chef-sidebar-entry route="/compliance/scanner" icon="wifi_tethering">Current jobs</chef-sidebar-entry>
+  </div>
+</chef-sidebar>
+
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/compliance/scanner/nodes']">Scan jobs</chef-breadcrumb>
+      Add nodes
+    </chef-breadcrumbs>
+
+    <chef-page-header>
+      <chef-heading>Add Nodes</chef-heading>
+      <chef-subheading>Enter node details to add nodes</chef-subheading>
+      <div slot="header-buttons">
+        <chef-button
+          primary class="submit-btn"
+          (click)="submit(form)"
+          [disabled]="!isFormValid() || isLoading">
+          <ng-container *ngIf="isLoading">
+            <chef-loading-spinner></chef-loading-spinner>
+            <span>Adding {{(nodesToAdd$ | async)?.length}} Node(s)</span>
+          </ng-container>
+          <span *ngIf="!isLoading">Add {{(nodesToAdd$ | async)?.length}} Node(s)</span>
+        </chef-button>
+        <chef-button tertiary [routerLink]="['/compliance/scanner/nodes']">Cancel</chef-button>
+      </div>
+    </chef-page-header>
+    <div class="page-body">
+      <form class="nodes-form" [formGroup]="form" novalidate>
+        <fieldset id="wizard-step-1" formGroupName="wizardStep1">
+          <chef-form-field class="field">
+            <label for="hosts">Import multiple nodes by IP or hostname <span class="required">*</span></label>
+            <input chefInput type="text" id="hosts" formControlName="hosts" placeholder="eg: 123.0.0.1, 128.0.0.2, my.host.name1" />
+            <chef-error *ngIf="form.get('wizardStep1.hosts').touched && form.get('wizardStep1.hosts').invalid">
+              Enter one or more nodes.
+            </chef-error>
+          </chef-form-field>
+
+          <chef-form-field class="field">
+            <label for="custom-prefix">Assign an optional name for your nodes with a custom prefix</label>
+            <input id="custom-prefix" type="text" chefInput formControlName="customPrefix" placeholder="eg: my-node-prefix-, my-node-name-" />
+          </chef-form-field>
+        </fieldset>
+        <fieldset id="wizard-step-2" formGroupName="wizardStep2">
+          <div class="fields">
+            <h3>Add credentials to connect to your nodes</h3>
+            <div class="field">
+              <label>Select SSH or WinRM <span class="required">*</span></label>
+              <div class="checkbox-field">
+                <input type="radio" id="backend-ssh" formControlName="backend" name="backend" value="ssh" />
+                <label for="backend-ssh">SSH</label>
+              </div>
+              <div class="checkbox-field">
+                <input type="radio" id="backend-winrm" formControlName="backend" name="backend" value="winrm" />
+                <label for="backend-winrm">WinRM</label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="secrets">Select your credentials <span class="required">*</span></label>
+              <select name="secrets" id="secrets" formControlName="secrets" multiple>
+                <option *ngFor="let secret of secrets$ | async" value="{{secret.id}}">{{secret.name}}</option>
+              </select>
+              <chef-alert
+                *ngIf="form.get('wizardStep2.secrets').touched && form.get('wizardStep2.secrets').invalid"
+                type='error'>
+                At least one credential selection is required.
+              </chef-alert>
+              <a [routerLink]="['/settings', 'node-credentials', 'add']">Add new credentials</a>
+            </div>
+
+            <chef-form-field class="field">
+              <label for="port">Enter optional port access</label>
+              <input id="port" type="number" chefInput formControlName="port" name="port" />
+              <div>
+                <ng-container *ngIf="backendControl.value === 'ssh'">
+                  <div class="radio-field">
+                    <input type="checkbox" id="sudo" formControlName="sudo" name="sudo" />
+                    <label for="sudo">Enable Sudo</label>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="backendControl.value === 'winrm'">
+                  <div class="radio-field">
+                    <input type="checkbox" id="ssl" formControlName="ssl" name="ssl" />
+                    <label for="ssl">SSL</label>
+                  </div>
+                  <div class="radio-field">
+                    <input type="checkbox" id="self_signed" formControlName="self_signed" name="self_signed">
+                    <label for="self_signed">Self Signed</label>
+                  </div>
+                </ng-container>
+              </div>
+            </chef-form-field>
+          </div>
+        </fieldset>
+        <fieldset id="tags" formArrayName="tags">
+          <h3>Specify tags (optional)</h3>
+          <div
+            class="kv-field"
+            *ngFor="let tag of form.get('tags')['controls']; let index = index;"
+            [formGroup]="tag">
+            <chef-form-field>
+              <input id="key-{{index}}" type="text" chefInput formControlName="key" placeholder="Key" />
+            </chef-form-field>
+            <chef-form-field>
+              <input id="value-{{index}}" type="text" chefInput formControlName="value" placeholder="Value" />
+            </chef-form-field>
+            <chef-button secondary (click)="addTag(form, index+1)">
+              <chef-icon>add</chef-icon>
+            </chef-button>
+            <chef-button
+              (click)="removeTag(form, index)"
+              secondary caution>
+              <chef-icon>delete</chef-icon>
+            </chef-button>
+          </div>
+          <div>
+            <chef-button
+              class="add-tag-btn"
+              secondary
+              (click)="addTag(form, form.get('tags').value.length)">
+              <chef-icon>add</chef-icon>
+              <span>Add new tag</span>
+            </chef-button>
+          </div>
+        </fieldset>
+      </form>
+      <div class="nodes-selection">
+        <h3>Preview your node selection here:</h3>
+        <chef-pill *ngFor="let node of nodesToAdd$ | async">{{node.name}}</chef-pill>
+      </div>
+    </div>
+  </main>
+</div>

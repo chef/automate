@@ -1,0 +1,80 @@
+<div class="change tabbed-view" ng-class="{'wide': diffView === 'split'}">
+  <header class="page-header">
+    <nav class="breadcrumb-nav" role="navigation">
+      <ol class="breadcrumbs">
+        <li class="breadcrumb">
+          <a ui-sref="main.enterprise.organizations">Workflow Orgs</a>
+          <i class="fa fa-angle-right"></i>
+        </li>
+        <li class="breadcrumb">
+          <a ui-sref="main.enterprise.organizations.organization({org: project.orgName})">{{ project.orgName }}</a>
+          <i class="fa fa-angle-right"></i>
+        </li>
+        <li class="breadcrumb">
+          <a ui-sref="main.enterprise.organizations.organization.project({org: project.orgName, project: project.name})">{{ project.name }}</a>
+          <i class="fa fa-angle-right"></i>
+        </li>
+        <li class="breadcrumb">
+          change details
+          <i class="fa fa-angle-right"></i>
+        </li>
+      </ol>
+    </nav>
+    <div class="page-header-title">
+      <h2 class="change-title">{{ change.title }}</h2>
+      <div class="overview-meta">
+        <div>
+          <span>{{ change.topic }}</span>
+          &rarr;
+          <span>{{ change.target }}</span>
+          <span class="overview-sha" ng-if="change.mergeSha">
+            ({{ change.mergeSha.slice(0, 7) }})
+          </span>
+          <span class="external-pr" ng-if="change.links.externalPr && !change.links.externalPr.href">
+             {{ no_pr_url_text() }}
+          </span>
+          <a
+            target="_blank"
+            class="external-pr"
+            ng-href="{{ change.links.externalPr.href }}"
+            ng-if="change.links.externalPr && change.links.externalPr.href">
+            {{ change.links.externalPr.title }}
+          </a>
+        </div>
+        <time datetime="{{ change.submitAt }}" title="{{ change.submitAt }}">{{ change.submitAt | moment:'MMMM D, YYYY h:mm A' }}</time>
+        by {{ change.submitBy }}
+        <div class="participants">
+          <span ng-if="change.approvedBy">
+            Approved by {{ change.approvedBy }}
+          </span>
+          <span class="delivered-by" ng-if="change.deliveredBy">
+            &bull; Delivered by {{ change.deliveredBy }}
+          </span>
+        </div>
+        <div class="patchset-status">
+          <span class="status-label">Patchset {{ change.patchsets[0].sequenceNumber }} -</span>
+          <span cd-patchset-status="change"></span>
+        </div>
+      </div>
+    </div>
+    <div class="page-header-meta">
+      <div cd-change-buttons></div>
+    </div>
+  </header>
+  <div class="tabs">
+    <ul>
+      <li class="tab" ui-sref-active="active" ui-sref="main.enterprise.organizations.organization.project.change.summary">
+        <span>Summary</span>
+      </li>
+      <li class="tab" ui-sref-active="active" ui-sref="main.enterprise.organizations.organization.project.change.status">
+        <span>Status</span>
+      </li>
+      <li class="tab" ui-sref-active="active" ui-sref="main.enterprise.organizations.organization.project.change.review">
+        <span>Review</span>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div ui-view>
+    </div>
+  </div>
+</div>

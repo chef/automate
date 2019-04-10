@@ -1,0 +1,76 @@
+{
+  "template": "actions-*",
+  "settings": {
+    "index": {
+      "refresh_interval": "5s"
+    }
+  },
+  "mappings": {
+    "_default_": {
+      "_all": {
+        "enabled": false
+      }
+    },
+    "action": {
+      "dynamic": false,
+      "properties": {
+        "entity_name": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "entity_type": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "entity_uuid": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "id": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "organization_name": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "remote_hostname": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "requestor_name": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "run_id": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "service_hostname": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "source": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "task": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "user_agent": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "revision_id": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "data": {
+          "type": "text",
+          "index": "false"
+        }
+      }
+    }
+  }
+}

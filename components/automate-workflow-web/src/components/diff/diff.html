@@ -1,0 +1,55 @@
+<div class="diff-header">
+  <div class="diff-header-container">
+    <div class="review-file-menu">
+      <button class="review-prev-file" ng-click="navToPrevFile()" type="button"><i class="icon-left"></i></button>
+      <button class="review-next-file" ng-click="navToNextFile()" type="button"><i class="icon-right"></i></button>
+      <button class="review-file-list" type="button" ng-click="toggleFiles()">File {{ files.indexOf(activeFile) + 1 }} of {{ files.length }}&nbsp;&nbsp;<i ng-class="{'icon-down': !scowFiles, 'icon-up': showFiles}"></i></button>
+      <span class="review-current-file">{{ activeFile[1] }}</span>
+    </div>
+    <div class="review-comments-menu">
+      <button type="button" class="review-comments-count" ng-click="onReviewCommentsClick()" ng-disabled="!getFileComments(activeFile).length"><i class="icon-bubble"></i> {{ getFileComments(activeFile).length }} comments&nbsp;&nbsp;<i ng-class="{'icon-down': !showComments, 'icon-up': showComments}"></i></a>
+    </div>
+  </div>
+</div>
+<div class="diff-container">
+  <div class="diff-files-container">
+    <table class="diff-files">
+      <tbody>
+        <tr ng-repeat="file in patchset.filesChanged track by $index">
+          <td>
+            <span class="file-status" ng-class="file[0] | lowercase">{{ file[0] }}</span>
+          </td>
+          <td>
+            <a class="file-name" ng-click="navToFile(file)" href="">{{ file[1] }}</a>
+          </td>
+          <td>
+            <div diff-stats insertions="file[2]" deletions="file[3]"></div>
+          </td>
+          <td>
+            <a ng-if="getFileComments(file).length" class="comments-count" ng-click="navToComment(getFileComments(file)[0])" href="">
+              {{ getFileComments(file).length }} <i class="icon-bubble"></i>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="diff-lines-container">
+    <table class="diff">
+      <tbody>
+        <tr ng-repeat="line in diff.files[0].lines" cd-diff-line></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="diff-comments-container">
+    <div class="diff-comments-header">
+      <div class="diff-comments-menu">
+        <button class="diff-comments-prev" ng-click="navToPrevComment()" type="button" ng-disabled="!getLineRangeComments(activeRange).length"><i class="icon-left"></i></button>
+        <button class="diff-comments-next" ng-click="navToNextComment()" type="button" ng-disabled="!getLineRangeComments(activeRange).length"><i class="icon-right"></i></button>
+      </div>
+      <span class="diff-comments-count">{{ getLineRangeComments(activeRange).length }} comments on line {{ activeRange[0] }}</span>
+      <button class="diff-comments-close" type="button" ng-click="toggleComments()"><i class="icon-close"></i></button>
+    </div>
+    <div class="diff-comments" ng-if="showComments" cd-line-comments></div>
+  </div>
+</div>

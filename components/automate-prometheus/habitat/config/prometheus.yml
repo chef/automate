@@ -1,0 +1,34 @@
+# habitat provided config file
+#
+# my global config
+global:
+  scrape_interval:     1m # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 1m # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+scrape_configs:
+{{#if bind.automate-gateway }}
+  - job_name:  "automate-gateway"
+    scheme: "https"
+    tls_config:
+      ca_file: "{{pkg.svc_config_path}}/root_ca.crt"
+      server_name: "automate-gateway"
+    static_configs:
+{{#each bind.automate-gateway.members as |target| }}
+      - targets: ['{{target.sys.ip}}:{{target.cfg.port}}']
+{{/each }}
+{{/if }}
+
+{{#if bind.applications-service }}
+  - job_name: "applications-service"
+    scheme: "https"
+    tls_config:
+      ca_file: "{{pkg.svc_config_path}}/root_ca.crt"
+      cert_file: "{{pkg.svc_config_path}}/service.crt"
+      key_file: "{{pkg.svc_config_path}}/service.key"
+      server_name: "applications-service"
+    static_configs:
+{{#each bind.applications-service.members as |target| }}
+      - targets: ['{{target.sys.ip}}:{{target.cfg.metrics-port}}']
+{{/each }}
+{{/if }}

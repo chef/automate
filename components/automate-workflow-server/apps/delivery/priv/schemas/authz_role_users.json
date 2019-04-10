@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema#",
+  "type": "object",
+  "description": "Describes which users have which effective roles a given scope. Roles are properties, while values are arrays of user names. An empty object should never be returned; arrays of user names may be empty, however. The 'admin' property, if present, should always have at least one user, namely 'admin'.",
+  "properties": {
+    "admin": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "committer": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "reviewer": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "shipper": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "observer": {
+      "type": "array",
+      "minItems": 0,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

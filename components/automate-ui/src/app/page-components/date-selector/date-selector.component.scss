@@ -1,0 +1,66 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.dropdown {
+  background: $white;
+
+  .dropdown-description {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    border: 1px solid $chef-grey;
+    color: $chef-primary-bright;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    height: 45px;
+    width: 140px;
+  }
+
+  .dropdown-menu {
+    @include modal-box();
+    font-size: .875em;
+    position: absolute;
+    right: 16px;
+    top: 90px;
+    width: 220px;
+    z-index: 99;
+
+    ul {
+      margin: 0;
+      padding: 0;
+
+      li {
+        cursor: pointer;
+        list-style: none;
+        padding: .25em .5em;
+        border: 1px solid $gray-pale;
+        border-radius: $global-radius;
+        margin-top: .5em;
+        transition: all .2s;
+
+        &.selected {
+          background-color: $chef-blue;
+          border-color: $chef-blue;
+          color: $white;
+        }
+
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+    }
+
+    .button-container {
+      margin: 1em 0 0;
+
+      chef-button:first-child {
+        margin-left: 0;
+      }
+
+      chef-button:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}

@@ -1,0 +1,119 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.overview-tabs {
+  margin: 35px 35px 0;
+
+  chef-option {
+    font-size: 12px;
+  }
+}
+
+.trend-row,
+.summary-row,
+.failures-row {
+  margin: 35px;
+
+  figure {
+    @include base-box-shadow();
+    display: flex;
+    margin: 0;
+    padding: 1em;
+    border: 1px solid $chef-light-grey;
+    background-color: $chef-white;
+    border-radius: $global-radius;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    .figure-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-basis: 100%;
+
+      chef-loading-spinner {
+        display: block;
+        margin: 4em 0;
+
+        &::after {
+          display: inline-block;
+          margin-top: 1em;
+          font-size: 14px;
+          color: $chef-dark-grey;
+          content: 'Loading...';
+        }
+      }
+
+      .figure-empty {
+        margin: 4em 0;
+        text-align: center;
+
+        img {
+          height: 60px;
+          margin-bottom: 1em;
+        }
+
+        p {
+          margin: 0;
+          color: $chef-dark-grey;
+        }
+      }
+    }
+
+    figcaption {
+      margin-top: 1em;
+      padding-top: 1em;
+      border-top: 1px solid $chef-light-grey;
+      text-align: center;
+      color: $chef-dark-grey;
+    }
+  }
+}
+
+.trend-row {
+  .interval {
+    display: flex;
+    align-items: center;
+
+    span {
+      margin-right: 0.5em;
+    }
+
+    chef-loading-spinner {
+      margin-left: 0.5em;
+    }
+  }
+}
+
+.summary-row,
+.failures-row {
+  display: flex;
+
+  figure {
+    flex-basis: 50%;
+
+    &:first-child {
+      margin-right: 1em;
+    }
+
+    &:last-child {
+      margin-left: 1em;
+    }
+  }
+
+  @media (max-width: 960px) {
+    flex-direction: column;
+
+    figure {
+      flex-basis: 100%;
+
+      &:first-child {
+        margin: 0 0 35px 0;
+      }
+
+      &:last-child {
+        margin: 0;
+      }
+    }
+  }
+}

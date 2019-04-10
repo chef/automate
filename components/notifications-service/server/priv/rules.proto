@@ -1,0 +1,131 @@
+syntax = "proto3";
+package notifications;
+
+option go_package = "api";
+////
+// Rules management messages and responses
+////
+message Empty { }
+message SlackAlert {
+  string url = 1;
+}
+
+message WebhookAlert {
+  string url = 1;
+}
+
+message ServiceNowAlert {
+  string url = 1;
+  string secret_id = 2;
+}
+
+message Rule {
+  enum Event {
+    CCRFailure = 0;
+    CCRSuccess = 1;
+    ComplianceFailure = 2;
+    ComplianceSuccess = 3;
+    Assets = 4;
+  }
+
+  string id = 1;
+  string name = 2;
+  Event event = 3;
+  oneof action {
+      SlackAlert SlackAlert = 4;
+      WebhookAlert WebhookAlert = 5;
+      ServiceNowAlert ServiceNowAlert = 6;
+  };
+}
+
+message UsernamePassword {
+  string username = 1;
+  string password = 2;
+}
+
+message SecretId {
+  string id = 1;
+}
+
+message URLValidationRequest {
+  string url = 1;
+  oneof credentials {
+    UsernamePassword username_password = 2;
+    SecretId secret_id = 3;
+    Empty none = 4;
+  }
+}
+
+message URLValidationResponse {
+  enum Code {
+    OK = 0;  // we made the request and it succeeded with a 20x response
+    ERROR = 1; // We made the request and it failed for any reason.
+    INVALID_URL = 4; // the url was not valid.
+    NOTIFICATIONS_UNAVAIALBLE = 98; // we could not make the request due to capacity
+    INTERNAL_ERROR = 99;
+  }
+  Code code = 1;
+  repeated string messages = 2; // unused but kept for consistency with other Rule api responses.
+}
+
+message RuleIdentifier {
+  string id = 1 ;
+}
+
+message RuleUpdateResponse {
+  enum Code {
+    OK = 0;
+    DUPLICATE_NAME = 1;
+    NOT_FOUND = 2;
+    VALIDATION_ERROR = 4;
+    INTERNAL_ERROR = 99;
+  }
+  Code code = 1;
+  repeated string messages = 2;
+}
+
+message RuleDeleteResponse {
+  enum Code {
+    DELETED = 0;
+    NOT_FOUND = 2;
+    INTERNAL_ERROR = 99;
+  }
+  Code code = 1;
+  repeated string messages = 2;
+}
+
+message RuleAddResponse {
+  enum Code {
+    ADDED = 0;
+    DUPLICATE_NAME = 1;
+    NOT_FOUND = 2;
+    INVALID_ACTION_CONFIG = 3;
+    VALIDATION_ERROR = 4;
+    INTERNAL_ERROR = 99;
+  }
+  Code code = 1;
+  repeated string messages = 2;
+  string id = 3;
+}
+
+message RuleGetResponse {
+  enum Code {
+    OK = 0;
+    NOT_FOUND = 2;
+    INTERNAL_ERROR = 99;
+  }
+  Code code = 1;
+  repeated string messages = 2;
+  Rule rule = 3;
+}
+
+message RuleListResponse {
+  enum Code {
+    OK = 0;
+    INTERNAL_ERROR = 99;
+  }
+  Code code = 1;
+  repeated string messages = 2;
+  repeated Rule rules = 3;
+}
+

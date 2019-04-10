@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package chef.automate.api.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
+
+message NodesCounts {
+  repeated string filter = 1;
+}
+
+message RunsCounts {
+  repeated string filter = 1;
+  string start = 2;
+  string end = 3;
+}

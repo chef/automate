@@ -1,0 +1,22 @@
+<div class="dashboard">
+  <div class="head-bar anchored">
+    <div class="filter">
+      <h3>Filter Changes</h3>
+      <input
+        type="text"
+        ng-model="filterText"
+        ng-keydown="onKeyDown($event)"
+        ng-keyup="onKeyUp($event)"
+        placeholder="e.g. stage:verify status:passed">
+      <div class="caption">
+        e.g. 
+          stage:verify
+          status:passed
+      </div>
+      <button icon-button="x" class="tiny square secondary" ng-click="clearFilter()" ng-if="filterText"></button>
+    </div>
+    <div class="ribbon" cd-pipeviz="pipeStats"></div>
+  </div>
+  <div class="quick-find-automate" cd-quick-find></div>
+  <div class="items" cd-pipe-status-list pipe-status="pipeStatus"></div>
+</div>

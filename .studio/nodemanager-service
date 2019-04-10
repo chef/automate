@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Helper methods specific for the nodemanager-service
+
+document "nodemanager_scans_integration" <<DOC
+  Runs the nodemanager scan jobs for aws and azure
+DOC
+function nodemanager_scans_integration() {
+  go_test -v "github.com/chef/automate/components/nodemanager-service/tests"
+  go test -v "github.com/chef/automate/components/nodemanager-service/tests/scanjobtests"
+}

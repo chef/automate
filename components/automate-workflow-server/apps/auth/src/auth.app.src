@@ -1,0 +1,17 @@
+{application, auth,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  oauth2,
+                  jose,
+                  delivery,
+                  chef_common,
+                  esaml
+                 ]},
+  {mod, { auth_app, []}},
+  {env, []}
+ ]}.

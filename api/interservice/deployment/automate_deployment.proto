@@ -1,0 +1,618 @@
+// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
+syntax = "proto3";
+
+package chef.automate.domain.deployment;
+option go_package = "github.com/chef/automate/api/interservice/deployment";
+
+import "google/protobuf/timestamp.proto";
+import "api/config/deployment/config_request.proto";
+import "api/config/deployment/automate_config.proto";
+
+service Deployment {
+	rpc Deploy (DeployRequest) returns (DeployResponse);
+	rpc DeployDataServices (DeployRequest) returns (DeployResponse);
+	rpc DeploySome (DeployRequest) returns (DeployResponse);
+	rpc DeployStatus (DeployStatusRequest) returns (stream DeployEvent);
+	rpc Preload (DeployRequest) returns (DeployResponse);
+	rpc RemoveSome (RemoveRequest) returns (RemoveResponse);
+	rpc StartNonDataServices (DeployRequest) returns (DeployResponse);
+	rpc NewDeployment (NewDeploymentRequest) returns (DeploymentID);
+	rpc ConfigureDeployment (ConfigureDeploymentRequest) returns (ConfigureDeploymentResponse);
+	rpc Ping (PingRequest) returns (PingResponse);
+	rpc Status (StatusRequest) returns (StatusResponse);
+	rpc ServiceVersions (ServiceVersionsRequest) returns (ServiceVersionsResponse);
+	rpc LicenseStatus (LicenseStatusRequest) returns (LicenseStatusResponse);
+	rpc LicenseApply (LicenseApplyRequest) returns (LicenseApplyResponse);
+	rpc Stop (StopRequest) returns (StopResponse);
+	rpc SystemLogs (SystemLogsRequest) returns (stream LogLine);
+	rpc GatherLogs (GatherLogsRequest) returns (GatherLogsResponse);
+	rpc GatherLogsDownload (GatherLogsDownloadRequest) returns (stream GatherLogsDownloadResponse);
+	rpc StopConverge (StopConvergeRequest) returns (StopConvergeResponse);
+	rpc StartConverge (StartConvergeRequest) returns (StartConvergeResponse);
+	rpc UpgradeStatus (UpgradeStatusRequest) returns (UpgradeStatusResponse);
+	rpc RestartServices (RestartServicesRequest) returns (RestartServicesResponse);
+	rpc GetAutomateConfig (GetAutomateConfigRequest) returns (GetAutomateConfigResponse);
+	rpc PatchAutomateConfig (PatchAutomateConfigRequest) returns (PatchAutomateConfigResponse);
+	rpc SetAutomateConfig (SetAutomateConfigRequest) returns (SetAutomateConfigResponse);
+	rpc DumpDB (DumpDBRequest) returns (stream DumpDBResponse);
+	rpc ManifestVersion (ManifestVersionRequest) returns (ManifestVersionResponse);
+	rpc CreateBackup(CreateBackupRequest) returns(CreateBackupResponse);
+	rpc ListBackups(ListBackupsRequest) returns(ListBackupsResponse);
+	rpc ShowBackup(ShowBackupRequest) returns(ShowBackupResponse);
+	rpc DeleteBackups(DeleteBackupsRequest) returns(DeleteBackupsResponse);
+	rpc RestoreBackup(RestoreBackupRequest) returns(RestoreBackupResponse);
+	rpc Upgrade(UpgradeRequest) returns (UpgradeResponse);
+	rpc SetLogLevel(SetLogLevelRequest) returns (SetLogLevelResponse);
+	rpc GenerateAdminToken(GenerateAdminTokenRequest) returns (GenerateAdminTokenResponse);
+	rpc DeployID (DeployIDRequest) returns (DeployIDResponse);
+	rpc CurrentReleaseManifest (CurrentReleaseManifestRequest) returns (ReleaseManifest);
+	rpc A1UpgradeStatus(A1UpgradeStatusRequest) returns (stream A1UpgradeStatusResponse);
+	rpc NodeInventory(NodeInventoryRequest) returns (NodeInventoryResponse);
+	rpc InfrastructureNodeDelete(InfrastructureNodeDeleteRequest) returns (InfrastructureNodeDeleteResponse);
+	rpc Usage(UsageRequest) returns (UsageResponse);
+	rpc GetCLIExecutable(GetCLIExecutableRequest) returns (stream GetCLIExecutableResponse);
+}
+
+message GetCLIExecutableRequest {
+	string platform = 1;
+}
+
+message GetCLIExecutableResponse {
+	string version = 1;
+	bytes data = 2;
+}
+
+message NodeInventoryRequest {
+
+}
+
+message NodeInventoryResponse {
+	repeated InventoryNode nodes = 1;
+}
+
+message InfrastructureNodeDeleteRequest {
+	string node_id = 1;
+}
+
+message InfrastructureNodeDeleteResponse {
+}
+
+message InventoryNode {
+	string name              = 1;
+	string organization      = 2;
+	string status            = 3;
+	string platform_family   = 4;
+	string platform          = 5;
+	string platform_version  = 6;
+	string checkin           = 7;
+	string client_version    = 8;
+	string ec2_instance_id   = 9;
+	string ec2_instance_type = 10;
+}
+
+message UsageRequest {
+	google.protobuf.Timestamp start_time =1;
+}
+
+message UsageResponse {
+	repeated NodeUsage nodes = 1;
+}
+
+message NodeUsage {
+	string id = 1;
+	string last_seen = 2;
+	string last_ccr_received = 3;
+	string checkin_type = 4;
+	map<string, string> metadata = 5;
+}
+
+message GenerateAdminTokenRequest {
+	string description = 1;
+}
+
+message GenerateAdminTokenResponse {
+	string api_token = 1;
+}
+
+message NewDeploymentRequest {
+	AutomateConfig config = 1;
+	PackageOptions package_options = 2;
+}
+
+message ConfigureDeploymentRequest {
+	AutomateConfig config = 1;
+}
+
+message ConfigureDeploymentResponse {
+	DeploymentID deployment_id = 1;
+	AutomateConfig config = 2;
+}
+
+message DeployRequest {
+	repeated string services = 1;
+}
+
+message DeployResponse {
+	string task_id = 1;
+}
+
+message DeployStatusRequest {
+	DeploymentID deployment_id = 1;
+	string task_id = 2;
+}
+
+message RemoveRequest {
+	repeated string services = 1;
+}
+
+message ManifestVersionRequest {}
+
+message PingRequest {}
+
+message PingResponse {}
+
+message DeployIDRequest {}
+
+message RemoveResponse {}
+
+message StopRequest {}
+
+message StopResponse {}
+
+message StopConvergeRequest {}
+
+message StopConvergeResponse {}
+
+message StartConvergeRequest {}
+
+message StartConvergeResponse {}
+
+message ServiceVersionsRequest {}
+
+message SystemLogsRequest {}
+
+message UpgradeStatusRequest {}
+
+message UpgradeStatusResponse {
+	UpgradeState state = 1;
+	repeated UpgradingService remaining_services = 4;
+	// latest_available_version is the version latest version
+	// available in the configured channel for this deployment.
+	string latest_available_version = 3;
+	// desired_version is the version that we think we should be
+	// upgrading to. This might be newer than the
+	// latest_available_version if a user has requested a manual
+	// upgrade to a newer version.
+	string desired_version = 5;
+	// current_version is the manifest in use by the deployment
+	// right now.
+	string current_version = 6;
+
+	enum UpgradeState {
+		// UNKNOWN indicates that we were not able to
+		// determine what the upgrade state was because of
+		// some error.
+		UNKNOWN = 0;
+		// Note(ssd) 2018-02-07: Not handling this for now:
+		//
+		// PROMOTING indicates that we believe a new
+		// version is currently being promoted into our channel.
+		//
+		// We assume that a promotion is happening if we detect a
+		// deployed service version newer than the version we find in
+		// the manifest. This can happen since we promote packages
+		// one-at-a-time and then promote the manifest.
+		//
+		// See
+		//
+		//    A2ROOT/.expeditor/promote-services.sh
+		//
+		// for the current upgrade process.
+		// PROMOTING = 3;
+		//
+		// UPGRADING indicates that an upgrade is likely
+		// in progress.
+		//
+		// We assume an upgrade is in progress anytime we have
+		// deployed versions that are older than what we see in the
+		// manifest.
+		UPGRADING = 1;
+		// IDLE indicates that an ongoing upgrade is unlikely.
+		//
+		// All currently deployed versions of services
+		// match the versions currently deployed.
+		IDLE = 2;
+	}
+}
+
+message SetLogLevelRequest {
+	reserved 1;
+}
+
+message SetLogLevelResponse {}
+
+message UpgradingService {
+	ServiceVersion target = 1;
+	ServiceVersion actual = 2;
+}
+
+message PackageOptions {
+	string override_origin = 1;
+	string hartifacts_path = 2;
+}
+
+message ConfigureRequest {
+	string service_name = 1;
+	string config_toml = 2;
+}
+
+message DeploymentID {
+	string id = 1;
+	google.protobuf.Timestamp created_at = 2;
+	string last_action = 3;
+}
+
+message DeploymentStatus {
+	string msg = 1;
+}
+
+message DeployEvent {
+	uint64 sequence = 1;
+	string deployment_id = 2;
+	google.protobuf.Timestamp time = 3;
+
+	oneof event {
+		Deploy deploy = 5;
+		Phase phase = 6;
+		PhaseStep phase_step = 7;
+		TaskComplete task_complete = 8;
+		Backup backup = 9;
+	}
+
+	enum Status {
+		WAITING	      = 0;
+		RUNNING	      = 1;
+		COMPLETE_OK   = 2;
+		COMPLETE_FAIL = 3;
+		SELF_UPGRADE_PENDING = 4;
+		SELF_RECONFIGURE_PENDING = 5;
+	}
+
+	message Deploy {
+		Status status = 1;
+		// repeated Phase phases = 2;
+		// string error = 3;
+	}
+
+	enum PhaseID {
+		INIT_SERVICE = 0;
+		INSTALL_SERVICE = 1;
+		START_SERVICE = 2;
+		CHECK_SERVICE_HEALTH = 3;
+		CREATE_ADMIN_USER = 4;
+		APPLY_LICENSE = 5;
+		UNLOAD_SERVICE = 6;
+	}
+
+	message Phase {
+		PhaseID phase_id = 1;
+		Status status = 2;
+		// repeated PhaseStep steps = 3;
+		// string error = 4;
+	}
+
+	message PhaseStep {
+		PhaseID phase_id = 1;
+		string step_name = 2;
+		Status status = 3;
+		// string description = 4;
+		string error = 5;
+	}
+
+	message Backup {
+		Status status = 1;
+		repeated Operation operations = 2;
+		BackupDescription description = 3;
+
+		message Operation {
+			reserved 3;
+
+			Status status = 1;
+			string name = 2;
+			string error = 4;
+			double sync_progress = 5;
+			double async_progress = 6;
+			Type type = 7;
+
+			enum Type {
+				BACKUP = 0;
+				RESTORE = 1;
+			}
+		}
+	}
+
+	// TaskComplete is used internally to manage event streams, it is not
+	// sent over the wire.
+	message TaskComplete {}
+}
+
+message LogLine {
+	string line = 1;
+}
+
+message SupportBundleConfig {
+	string staging_dir = 1;
+}
+
+message StatusRequest {}
+
+message StatusResponse {
+	ServiceStatus service_status  = 1;
+	ConfigRequest deployment_config = 2;
+}
+
+message ServiceVersionsResponse {
+	repeated ServiceVersion services = 1;
+}
+
+message ServiceVersion {
+	string name = 1;
+	string origin = 2;
+	string version = 3;
+	string release = 4;
+}
+
+message LicenseStatusRequest {}
+
+message LicenseStatusResponse {
+	bool   set	     = 1;
+	string license_id    = 2;
+	string customer_name = 3;
+	google.protobuf.Timestamp expiration_date = 4;
+}
+
+message LicenseApplyRequest {
+	string license = 1;
+	bool   force   = 2;
+}
+
+message LicenseApplyResponse {
+  bool   updated = 1;
+	string message = 2;
+	bool   duplicate = 3;
+}
+
+message ServiceStatus {
+	repeated ServiceState services = 1;
+}
+
+message ServiceState {
+	string name = 1;
+	enum State {
+		// CONNECTION_ERROR means we could not connect to the
+		// habitat supervisor.
+		CONNECTION_ERROR = 0;
+		// DOWN means the process is down and thus we have no
+		// health-check information from hab.
+		DOWN = 1;
+		// CRITICAL, OK, WARNING, UNKNOWN map directly to
+		// Habitat health check return codes:
+		//
+		// https://www.habitat.sh/docs/reference/#health_check
+		OK = 3;
+		WARNING = 4;
+		CRITICAL = 2;
+		UNKNOWN = 5;
+	}
+	State state = 2;
+        uint64 pid = 3;
+        uint64 uptime = 4;
+}
+
+message GatherLogsRequest {
+	// log_lines is the number of log lines we will collect from
+	// the system log (journald). A log_size of 0 means collect
+	// all logs.
+	uint64 log_lines = 1;
+}
+
+message GatherLogsResponse {
+	string bundle_name     = 1;
+	string bundle_checksum = 2;
+	int64  bundle_size     = 3;
+}
+
+message GatherLogsDownloadRequest {
+	string bundle_name = 1;
+}
+
+message GatherLogsDownloadResponse {
+	bytes data = 1;
+}
+
+message RestartServicesRequest {}
+
+message RestartServicesResponse {
+	string task_id = 1;
+}
+
+// AutomateConfig Messages
+message GetAutomateConfigRequest {
+}
+
+message GetAutomateConfigResponse {
+	AutomateConfig config = 1;
+	uint64 hash = 2;
+}
+
+message PatchAutomateConfigRequest {
+	AutomateConfig config = 1;
+	uint64 hash = 2;
+}
+
+message PatchAutomateConfigResponse {
+	string task_id = 1;
+}
+
+message SetAutomateConfigRequest {
+	AutomateConfig config = 1;
+}
+
+message SetAutomateConfigResponse {
+	string task_id = 1;
+}
+
+message DumpDBRequest {}
+
+message DumpDBResponse {
+	bytes data = 1;
+}
+
+message ManifestVersionResponse {
+	string build_timestamp = 1;
+	string build_sha = 2;
+	string cli_release = 3;
+}
+
+message DeployIDResponse {
+	string deployment_id = 1;
+}
+
+// Backup messages
+message BackupTask {
+	google.protobuf.Timestamp id = 1;
+	BackupState state = 2;
+
+	enum BackupState {
+		IN_PROGRESS = 0;
+		COMPLETED = 1;
+		FAILED = 3;
+		DELETING = 4;
+	}
+}
+
+message BackupDescription {
+	string id = 1;
+	string sha256 = 2;
+}
+
+message S3BackupLocation {
+	string bucket_name = 1;
+	string base_path = 2;
+	string endpoint = 3;
+	string access_key = 4;
+	string secret_key = 5;
+	string session_token = 6;
+}
+
+message BackupRestoreTask {
+	google.protobuf.Timestamp id = 1;
+	BackupTask backup = 2;
+	// When this gets called the backup directory should exist in the deployment
+	// config, however, it is whatever the backup directory was when the backup
+	// was created. We need to support passing in the current backup directory
+	// in case it's changed.
+	string backup_dir = 3;
+	string override_origin = 4;
+	string hartifacts_path = 5;
+	string channel = 7;
+	// When we install packages we need to know whether we should rely on the
+	// current manifest or upgrade to a new one.
+	bool upgrade = 6;
+	// If provided, the restore will install the manifest and packages from the
+	// airgap artifact. upgrade will be ignored.
+	bool airgap = 8;
+
+	// If S3BackupLocation is provided, the backup will be restored from S3
+	S3BackupLocation s3_backup_location = 9;
+
+	string sha256 = 10;
+}
+
+message BackupDeleteTask {
+	google.protobuf.Timestamp id = 1;
+	repeated BackupTask backups = 2;
+}
+
+message CreateBackupRequest {
+	// backup_timeout_seconds is the number of seconds to wait for
+	// a backup to be created
+	int64 backup_timeout_seconds = 9;
+};
+
+message CreateBackupResponse {
+	BackupTask backup = 1;
+};
+
+message ListBackupsRequest {};
+
+message ListBackupsResponse {
+	repeated BackupTask backups = 2;
+};
+
+message ShowBackupRequest {
+	BackupTask backup = 1;
+};
+
+message ShowBackupResponse {
+	string data = 1;
+	BackupTask backup = 2;
+	BackupDescription description = 3;
+};
+
+message DeleteBackupsRequest {
+	repeated BackupTask backups = 1;
+};
+
+message DeleteBackupsResponse {
+	BackupDeleteTask delete = 1;
+};
+
+message RestoreBackupRequest {
+	BackupRestoreTask restore = 1;
+};
+
+message RestoreBackupResponse {
+	BackupRestoreTask restore = 1;
+};
+
+message UpgradeRequest {
+	string version = 1;
+}
+
+message UpgradeResponse {
+	string previous_version = 1;
+	string next_version = 2;
+	string task_id = 3;
+}
+
+message CurrentReleaseManifestRequest {}
+
+message ReleaseManifest {
+	bytes json = 1;
+}
+
+message A1UpgradeStatusRequest {}
+
+message A1UpgradeStatusResponse {
+	MigrationStatus overall_status = 1;
+	repeated ServiceMigrationStatus service_statuses = 2;
+
+	enum MigrationStatus {
+		UNKNOWN = 0;
+		IN_PROGRESS = 1;
+		COMPLETE = 2;
+		FAILED = 3;
+	};
+
+	message  ServiceMigrationStatus {
+		string service_name = 1;
+		MigrationStatus status = 2;
+		int32 progress = 3;
+		// In the case of failed migration, contains an error
+		// message. In the case of an in-progress migration,
+		// may contain information about what the service is
+		// doing.
+		string info = 4;
+	}
+}

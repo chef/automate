@@ -1,0 +1,11 @@
+steps:
+  - label: ":terraform:"
+    command: .expeditor/buildkite/automate-chef-io-deploy.sh
+    concurrency: 1
+    concurrency_group: chef-a2-master/automate-chef-io-deploy/$EXPEDITOR_TARGET_CHANNEL
+    expeditor:
+      accounts:
+        - aws/chef-cd
+        - github
+      executor:
+        docker:

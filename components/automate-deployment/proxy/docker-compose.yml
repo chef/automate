@@ -1,0 +1,30 @@
+---
+version: '2'
+services:
+  proxyhost:
+    hostname: proxyhost
+    image: b4tman/squid
+    networks:
+      - network1
+      - default
+  a2-host:
+    hostname: a2-host
+    image: chef/a2-host
+    privileged: true  # so we can run hab
+    mem_limit: 4G
+    volumes:
+      - ./:/proxy
+      - ../../..:/a2
+    networks:
+      - network1
+    environment:
+      - HTTP_PROXY=http://proxyhost:3128
+      - http_proxy=http://proxyhost:3128
+      - HTTPS_PROXY=http://proxyhost:3128
+      - https_proxy=http://proxyhost:3128
+      - HAB_ORIGIN=${HAB_ORIGIN}
+networks:
+  network1:
+    driver: bridge
+    internal: true
+

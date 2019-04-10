@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Helper methods specific for the automate-postgresql
+
+document "postgresql_load_env" <<DOC
+  Load automate-postgresql environment variables
+DOC
+function postgresql_load_env() {
+  # TODO @afiune Read from toml file
+  export PGPORT="5432"
+  export PGHOST="0.0.0.0"
+  export PGUSER="automate"
+  
+  export PGDATABASE="postgres"
+  export PGSSLMODE="verify-ca"
+  export PGSSLCERT="/hab/svc/automate-postgresql/config/server.crt"
+  export PGSSLKEY="/hab/svc/automate-postgresql/config/server.key"
+  export PGSSLROOTCERT="/hab/svc/automate-postgresql/config/root.crt"
+}
+

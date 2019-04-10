@@ -1,0 +1,14 @@
+[service]
+host = "localhost"
+port = 10124
+
+[tls]
+key_contents =""
+cert_contents = ""
+root_cert_contents = ""
+
+[mlsa]
+accept = false
+
+[telemetry]
+url = "https://telemetry.chef.io"

@@ -1,0 +1,8 @@
+@import '../assets/fonts/material-icons/material-icons.css';
+
+body {
+  margin: 0;
+  background: hsl(var(--chef-lightest-grey));
+  font-family: var(--font-family);
+  font-weight: 300;
+}

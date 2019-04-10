@@ -1,0 +1,19 @@
+@import "~styles/variables";
+
+chef-page-header {
+  padding-bottom: 0;
+
+  chef-tab-selector {
+    display: block;
+    margin-top: 30px;
+  }
+
+  table {
+    color: $chef-primary-dark;
+
+    th, td {
+      padding: 0;
+      text-align: left;
+    }
+  }
+}

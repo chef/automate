@@ -1,0 +1,15 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+output=$(curl --fail --head --cacert {{pkg.svc_config_path}}/root_ca.crt \
+  --noproxy automate-ui \
+  --resolve automate-ui:{{cfg.service.port}}:{{sys.ip}} \
+  --max-time 2 \
+  https://automate-ui:{{cfg.service.port}} 2>&1)
+
+if [[ "$?" != "0" ]]; then
+  echo "health check curl command returned exit code ${res}:"
+  echo $output
+  exit 2
+fi
+
+exit 0

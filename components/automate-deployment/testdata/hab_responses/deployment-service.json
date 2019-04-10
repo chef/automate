@@ -1,0 +1,198 @@
+{
+    "service_group": "deployment-service.default",
+    "bldr_url": "https://bldr.habitat.sh",
+    "channel": "stable",
+    "spec_file": "/hab/sup/default/specs/deployment-service.spec",
+    "spec_ident": {
+        "origin": "ssd",
+        "name": "deployment-service",
+        "version": "0.1.0",
+        "release": "20180215154831"
+    },
+    "start_style": "Persistent",
+    "topology": "standalone",
+    "update_strategy": "at-once",
+    "cfg": {
+        "gather_logs": {
+            "staging_dir": ""
+        },
+        "log": {
+            "level": "info"
+        },
+        "mlsa": {
+            "accept": true
+        },
+        "service": {
+            "listen_address": "0.0.0.0",
+            "port": 10160
+        }
+    },
+    "pkg": {
+        "ident": "ssd/deployment-service/0.1.0/20180215154831",
+        "origin": "ssd",
+        "name": "deployment-service",
+        "version": "0.1.0",
+        "release": "20180215154831",
+        "deps": [
+            {
+                "origin": "chef",
+                "name": "mlsa",
+                "version": "1.0.1",
+                "release": "20170915011238"
+            },
+            {
+                "origin": "core",
+                "name": "acl",
+                "version": "2.2.52",
+                "release": "20170513213108"
+            },
+            {
+                "origin": "core",
+                "name": "attr",
+                "version": "2.4.47",
+                "release": "20170513213059"
+            },
+            {
+                "origin": "core",
+                "name": "bash",
+                "version": "4.3.42",
+                "release": "20170513213519"
+            },
+            {
+                "origin": "core",
+                "name": "certstrap",
+                "version": "v1.1.1",
+                "release": "20171031124354"
+            },
+            {
+                "origin": "core",
+                "name": "coreutils",
+                "version": "8.25",
+                "release": "20170513213226"
+            },
+            {
+                "origin": "core",
+                "name": "findutils",
+                "version": "4.4.2",
+                "release": "20170513214305"
+            },
+            {
+                "origin": "core",
+                "name": "gcc-libs",
+                "version": "5.2.0",
+                "release": "20170513212920"
+            },
+            {
+                "origin": "core",
+                "name": "glibc",
+                "version": "2.22",
+                "release": "20170513201042"
+            },
+            {
+                "origin": "core",
+                "name": "gmp",
+                "version": "6.1.0",
+                "release": "20170513202112"
+            },
+            {
+                "origin": "core",
+                "name": "libcap",
+                "version": "2.24",
+                "release": "20170513213120"
+            },
+            {
+                "origin": "core",
+                "name": "linux-headers",
+                "version": "4.3",
+                "release": "20170513200956"
+            },
+            {
+                "origin": "core",
+                "name": "ncurses",
+                "version": "6.0",
+                "release": "20170513213009"
+            },
+            {
+                "origin": "core",
+                "name": "readline",
+                "version": "6.3.8",
+                "release": "20170513213506"
+            },
+            {
+                "origin": "core",
+                "name": "tar",
+                "version": "1.29",
+                "release": "20170513213607"
+            }
+        ],
+        "env": {
+            "PATH": "/hab/pkgs/ssd/deployment-service/0.1.0/20180215154831/bin:/hab/pkgs/chef/mlsa/1.0.1/20170915011238/bin:/hab/pkgs/core/ncurses/6.0/20170513213009/bin:/hab/pkgs/core/glibc/2.22/20170513201042/bin:/hab/pkgs/core/bash/4.3.42/20170513213519/bin:/hab/pkgs/core/tar/1.29/20170513213607/bin:/hab/pkgs/core/attr/2.4.47/20170513213059/bin:/hab/pkgs/core/acl/2.2.52/20170513213108/bin:/hab/pkgs/core/findutils/4.4.2/20170513214305/bin:/hab/pkgs/core/coreutils/8.25/20170513213226/bin:/hab/pkgs/core/libcap/2.24/20170513213120/bin:/hab/pkgs/core/certstrap/v1.1.1/20171031124354/bin:/hab/pkgs/core/busybox-static/1.24.2/20170513215502/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        },
+        "exposes": [],
+        "exports": {},
+        "path": "/hab/pkgs/ssd/deployment-service/0.1.0/20180215154831",
+        "svc_path": "/hab/svc/deployment-service",
+        "svc_config_path": "/hab/svc/deployment-service/config",
+        "svc_data_path": "/hab/svc/deployment-service/data",
+        "svc_files_path": "/hab/svc/deployment-service/files",
+        "svc_static_path": "/hab/svc/deployment-service/static",
+        "svc_var_path": "/hab/svc/deployment-service/var",
+        "svc_pid_file": "/hab/svc/deployment-service/PID",
+        "svc_run": "/hab/svc/deployment-service/run",
+        "svc_user": "root",
+        "svc_group": "hab"
+    },
+    "sys": {
+        "version": "0.54.0/20180221023448",
+        "member_id": "83893c6114ea4b7cb3089b6b2b452400",
+        "ip": "10.0.2.15",
+        "hostname": "automate-deployment",
+        "gossip_ip": "0.0.0.0",
+        "gossip_port": 9638,
+        "http_gateway_ip": "0.0.0.0",
+        "http_gateway_port": 9631,
+        "permanent": false
+    },
+    "initialized": true,
+    "user_config_updated": false,
+    "health_check": "Unknown",
+    "last_election_status": "None",
+    "needs_reload": false,
+    "needs_reconfiguration": false,
+    "smoke_check": "Pending",
+    "binds": [],
+    "hooks": {
+        "health_check": null,
+        "init": null,
+        "file_updated": null,
+        "reload": null,
+        "reconfigure": null,
+        "suitability": null,
+        "run": {
+            "render_pair": "/hab/svc/deployment-service/hooks/run",
+            "stdout_log_path": "/hab/svc/deployment-service/logs/run.stdout.log",
+            "stderr_log_path": "/hab/svc/deployment-service/logs/run.stderr.log"
+        },
+        "post_run": null,
+        "smoke_test": null,
+        "post_stop": null
+    },
+    "config_from": null,
+    "manager_fs_cfg": {
+        "butterfly_data_path": "/hab/sup/default/data/butterfly.dat",
+        "census_data_path": "/hab/sup/default/data/census.dat",
+        "services_data_path": "/hab/sup/default/data/services.dat",
+        "data_path": "/hab/sup/default/data",
+        "specs_path": "/hab/sup/default/specs",
+        "composites_path": "/hab/sup/default/composites",
+        "member_id_file": "/hab/sup/default/MEMBER_ID",
+        "proc_lock_file": "/hab/sup/default/LOCK"
+    },
+    "process": {
+        "pid": 27446,
+        "state": "Up",
+        "state_entered": 1518709853
+    },
+    "svc_encrypted_password": null,
+    "composite": null
+}

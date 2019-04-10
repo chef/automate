@@ -1,0 +1,14 @@
+# If we have a config pointing to an specific host,
+# lets use it, otherwise use the ipaddress of the server
+{{~#if cfg.service.host}}
+host = "{{cfg.service.host}}"
+{{else~}}
+host = "{{sys.ip}}"
+{{~/if}}
+port = "{{cfg.service.port}}"
+log_level = "{{cfg.log.level}}"
+
+[tls]
+  cert_path = "{{pkg.svc_config_path}}/service.crt"
+  key_path = "{{pkg.svc_config_path}}/service.key"
+  root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"

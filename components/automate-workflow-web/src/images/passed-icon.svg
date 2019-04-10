@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="20px" height="19px" viewBox="0 0 20 19" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2.2 (9983) - http://www.bohemiancoding.com/sketch -->
+    <title>Small Success</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Acceptance-Wires" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Pipelines-List" sketch:type="MSArtboardGroup" transform="translate(-512.000000, -213.000000)" fill="#58B957">
+            <g id="delivery/delivery_api/master" sketch:type="MSLayerGroup" transform="translate(60.000000, 189.000000)">
+                <g id="Small-Success" transform="translate(452.000000, 24.000000)" sketch:type="MSShapeGroup">
+                    <path d="M4.983,1.27315833 C6.5185,0.424491667 8.19066667,0 10,0 C11.8091667,0 13.4811667,0.424491667 15.0168333,1.27315833 C16.5518333,2.121825 17.7666667,3.27544167 18.6598333,4.73416667 C19.553,6.19273333 20,7.78129167 20,9.5 C20,11.2187083 19.553,12.807425 18.6598333,14.2658333 C17.7666667,15.7247167 16.5518333,16.8783333 15.0168333,17.7266833 C13.4811667,18.5756667 11.8091667,19 10,19 C8.19066667,19 6.5185,18.5756667 4.983,17.7266833 C3.44766667,16.8783333 2.23333333,15.7247167 1.34016667,14.2658333 C0.446666667,12.807425 0,11.2187083 0,9.5 C0,7.78129167 0.446666667,6.19273333 1.34016667,4.73416667 C2.23333333,3.27544167 3.44766667,2.121825 4.983,1.27315833 C4.983,1.27315833 3.44766667,2.121825 4.983,1.27315833 L4.983,1.27315833 L4.983,1.27315833 Z M9.0955,9.13409167 L7.387,7.51101667 L4.47233333,10.2797917 L9.0955,14.687475 L15.9798333,8.14751667 L13.0488333,5.37858333 L9.0955,9.13409167 L9.0955,9.13409167 Z" id="Imported-Layers-4"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

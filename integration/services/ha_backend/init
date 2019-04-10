@@ -1,0 +1,132 @@
+#!/bin/bash
+
+HA_BACKEND_DIR=$(dirname ${BASH_SOURCE[0]})
+HA_BACKEND_USER="admin"
+HA_BACKEND_PASSWORD="chefautomate"
+
+ha_backend_container1=$(service_container_name "ha_backend_1")
+ha_backend_container2=$(service_container_name "ha_backend_2")
+
+ha_backend_private=$(service_config_path "ha_backend_private")
+ha_backend_config=$(service_config_path "ha_backend.toml")
+
+
+ha_backend_setup() {
+    mkdir -p $ha_backend_private
+    mkdir -p $(dirname $ha_backend_config)
+    local peer_ring_file=$(service_config_path "ha_backend_peers")
+    touch "$peer_ring_file"
+
+    docker_run $ha_backend_container1
+    local ha_backend_container1_ip=$(container_ip $ha_backend_container1)
+    log_info "Launched $ha_backend_container1 with ip ${ha_backend_container1_ip}"
+    echo "$ha_backend_container1_ip" >> "$peer_ring_file"
+
+    docker_run $ha_backend_container2
+    local ha_backend_container2_ip=$(container_ip $ha_backend_container2)
+    log_info "Launched $ha_backend_container2 with ip ${ha_backend_container2_ip}"
+
+    local openssl_cnf
+    openssl_cnf="$(hab pkg path core/openssl)/ssl/openssl.cnf"
+    if [ ! -f "$openssl_cnf" ]; then
+        echo "Could not find default openssl config at $openssl_cnf"
+        return 1
+    fi
+
+    hab pkg exec core/openssl openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+        -keyout $ha_backend_private/nginx-selfsigned.pem \
+        -out $ha_backend_private/nginx-selfsigned.crt \
+        -reqexts SAN -extensions SAN -subj '/CN=elasticsearch' \
+        -config \
+        <(cat "$openssl_cnf" \
+        <(printf "\n[SAN]\nsubjectAltName=IP.1:${ha_backend_container1_ip},IP.2:${ha_backend_container2_ip}"))
+
+    cp $HA_BACKEND_DIR/htpasswd $ha_backend_private
+
+    docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container1}:/setup.sh"
+    docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container2}:/setup.sh"
+
+    docker exec -t $ha_backend_container1 /setup.sh "$ha_backend_container1_ip"
+    docker exec -t $ha_backend_container2 /setup.sh "$ha_backend_container2_ip"
+
+    local errcode
+    local output
+    for try in {1..60}; do
+        echo "Trying to create dbuser"
+        errcode="0"
+        output="$(docker exec --env PGPASSWORD="admin" $ha_backend_container1 hab pkg exec core/postgresql11 psql \
+            -h 127.0.0.1 -p 7432 -U admin -d postgres -c \
+            "CREATE USER dbuser WITH PASSWORD 'dbuser'")" || errcode="$?"
+        if [ "$errcode" -eq "0" ]; then
+            break
+        else
+            echo "Retrying in 5 seconds"
+            sleep 5
+        fi
+    done
+
+    if [ ! "$errcode" -eq "0" ]; then
+        echo "Failed to create dbuser($errcode): $output"
+        return 1
+    fi
+
+    # This config is for ES SSL & Basic Auth.
+    # We can use it again once ha backend adds back support
+    # nodes = ["https://${ha_backend_container1_ip}:9200", "https://${ha_backend_container2_ip}:9200"]
+    # [global.v1.external.elasticsearch.auth]
+    # scheme = "basic_auth"
+    # [global.v1.external.elasticsearch.auth.basic_auth]
+    # username = "${HA_BACKEND_USER}"
+    # password = "${HA_BACKEND_PASSWORD}"
+    # [global.v1.external.elasticsearch.ssl]
+    # server_name = "elasticsearch"
+    # root_cert = """$(cat $ha_backend_private/nginx-selfsigned.crt)"""
+    cat <<DOC > $ha_backend_config
+[global.v1.external.elasticsearch]
+enable = true
+nodes = ["http://${ha_backend_container1_ip}:9200", "http://${ha_backend_container2_ip}:9200"]
+
+[global.v1.external.postgresql]
+enable = true
+nodes = ["${ha_backend_container1_ip}:7432", "${ha_backend_container2_ip}:7432"]
+
+[global.v1.external.postgresql.ssl]
+mode = "disable"
+
+[global.v1.external.postgresql.auth]
+scheme = "password"
+
+[global.v1.external.postgresql.auth.password.superuser]
+username = "admin"
+password = "admin"
+[global.v1.external.postgresql.auth.password.dbuser]
+username = "dbuser"
+password = "dbuser"
+
+[global.v1.external.postgresql.backup]
+enable = true
+DOC
+
+    sleep 45
+    curl -k "http://${ha_backend_container1_ip}:9200"
+    curl -k "http://${ha_backend_container2_ip}:9200"
+}
+
+ha_backend_dump_logs() {
+    tmpdir=$(mktemp -d)
+    docker exec -t $ha_backend_container1 journalctl --no-pager -u hab-sup > $tmpdir/ha_backend_container_1
+    docker exec -t $ha_backend_container2 journalctl --no-pager -u hab-sup > $tmpdir/ha_backend_container_2
+
+    if command -v buildkite-agent; then
+        if ! buildkite-agent artifact upload "$tmpdir/*"
+        then
+            echo "Failed to ha backend container logs"
+        fi
+    fi
+    rm -r $tmpdir
+}
+
+ha_backend_teardown() {
+    docker stop "$ha_backend_container1"
+    docker stop "$ha_backend_container2"
+}

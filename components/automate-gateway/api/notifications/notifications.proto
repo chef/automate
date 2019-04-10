@@ -1,0 +1,188 @@
+syntax = "proto3";
+
+// nolint: keeping this as-is for backwards-compat reasons (for now)
+
+package chef.automate.api.notifications;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/notifications";
+
+import "google/api/annotations.proto";
+
+// for option (chef.automate.api.policy)
+import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
+// for option (chef.automate.api.iam.policy)
+import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+
+message SlackAlert {
+  string url = 1;
+}
+
+message WebhookAlert {
+  string url = 1;
+}
+
+message ServiceNowAlert {
+  string url = 1;
+  string secret_id = 2;
+}
+
+message Rule {
+  enum Event {
+    CCRFailure = 0;
+    CCRSuccess = 1;
+    ComplianceFailure = 2;
+    ComplianceSuccess = 3;
+    Assets = 4;
+  }
+  string id = 1;
+  string name = 2;
+  Event event = 3;
+  oneof action {
+      SlackAlert SlackAlert = 4;
+      WebhookAlert WebhookAlert = 5;
+      ServiceNowAlert ServiceNowAlert = 6;
+  };
+}
+
+message RuleIdentifier {
+  string id = 1;
+}
+message RuleUpdateRequest {
+  Rule rule = 2;
+  string id = 3;
+}
+
+message RuleListRequest { }
+
+message RuleUpdateResponse {
+  repeated string messages = 1;
+}
+
+message RuleDeleteResponse {
+  repeated string messages = 1;
+}
+
+message RuleAddRequest {
+  Rule rule = 1;
+}
+
+message RuleAddResponse {
+  repeated string messages = 1;
+  string id = 2;
+}
+
+message RuleGetResponse {
+  repeated string messages = 1;
+  Rule rule = 2;
+}
+
+message RuleListResponse {
+  repeated string messages = 1;
+  repeated Rule rules = 2;
+}
+
+message VersionRequest {
+}
+
+message VersionResponse {
+  string version  = 1;
+}
+
+message UsernamePassword {
+  string username = 1;
+  string password = 2;
+}
+
+message SecretId {
+  string id = 1;
+}
+
+message Empty { }
+
+message URLValidationRequest {
+  string url = 1;
+  oneof credentials {
+    UsernamePassword username_password = 2;
+    SecretId secret_id = 3;
+    Empty none = 4;
+  }
+}
+
+message URLValidationResponse {
+}
+
+service Notifications {
+  rpc AddRule(RuleAddRequest) returns (RuleAddResponse) {
+    option (google.api.http) = {
+      post: "/notifications/rules"
+      body: "*"
+    };
+    option (chef.automate.api.policy).resource = "notifications:rules";
+    option (chef.automate.api.policy).action = "create";
+    option (chef.automate.api.iam.policy).resource = "notifications:rules";
+    option (chef.automate.api.iam.policy).action = "notifications:notifyRules:create";
+  };
+
+  rpc DeleteRule(RuleIdentifier) returns (RuleDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/notifications/rules/{id}"
+    };
+    option (chef.automate.api.policy).resource = "notifications:rules:{id}";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "notifications:rules:{id}";
+    option (chef.automate.api.iam.policy).action = "notifications:notifyRules:delete";
+  };
+
+  rpc UpdateRule(RuleUpdateRequest) returns (RuleUpdateResponse) {
+    option (google.api.http) = {
+      put: "/notifications/rules/{id}"
+      body: "*"
+    };
+    option (chef.automate.api.policy).resource = "notifications:rules:{id}";
+    option (chef.automate.api.policy).action = "update";
+    option (chef.automate.api.iam.policy).resource = "notifications:rules:{id}";
+    option (chef.automate.api.iam.policy).action = "notifications:notifyRules:update";
+  };
+
+  rpc GetRule(RuleIdentifier) returns (RuleGetResponse) {
+    option (google.api.http) = {
+      get: "/notifications/rules/{id}"
+    };
+    option (chef.automate.api.policy).resource = "notifications:rules:{id}";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "notifications:rules:{id}";
+    option (chef.automate.api.iam.policy).action = "notifications:notifyRules:get";
+  };
+
+  rpc ListRules(RuleListRequest) returns (RuleListResponse) {
+    option (google.api.http) = {
+      get: "/notifications/rules"
+    };
+    option (chef.automate.api.policy).resource = "notifications:rules";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "notifications:rules";
+    option (chef.automate.api.iam.policy).action = "notifications:notifyRules:list";
+  };
+
+  rpc ValidateWebhook(URLValidationRequest) returns (URLValidationResponse) {
+    option (google.api.http) = {
+      post: "/notifications/webhook"
+      body: "*"
+    };
+    // this call is used to test a notification rule being created
+    // so the resource mapping matches AddRule
+    option (chef.automate.api.policy).resource = "notifications:rules";
+    option (chef.automate.api.policy).action = "validate";
+    option (chef.automate.api.iam.policy).resource = "notifications:rules";
+    option (chef.automate.api.iam.policy).action = "notifications:notifyRules:validate";
+  }
+
+  rpc Version(VersionRequest) returns (VersionResponse) {
+    option (google.api.http) = {
+      get: "/notifications/version"
+    };
+    option (chef.automate.api.policy).resource = "service_info:version";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "system:service:version";
+    option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
+  };
+}

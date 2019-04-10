@@ -1,0 +1,36 @@
+@import "~styles/variables";
+
+.event-type-select {
+  margin: 10px;
+  line-height: 1;
+  box-shadow: 0 0 20px rgba($gray-light, .20);
+}
+
+.event-type-name {
+  font-size: 12px;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+.event-type-count {
+  display: none;
+  color: inherit;
+  font-size: 9px;
+}
+
+chef-option .event-type-count {
+  display: block;
+}
+
+chef-icon {
+  display: none;
+  color: $chef-primary-bright;
+  position: absolute;
+  right: 1em;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+chef-option chef-icon {
+  display: block;
+ }

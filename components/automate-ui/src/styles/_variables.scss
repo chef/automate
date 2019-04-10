@@ -1,0 +1,52 @@
+@import "colors";
+
+// GLOBAL COLOR CONFIGS
+// Ok to use around app
+//primary
+$chef-primary: $chef-orange;
+$chef-primary-dark: $ebony-clay;
+$chef-primary-bright: $royal-blue;
+$chef-primary-light: $malibu;
+//secondary
+$chef-critical: $pink;
+$chef-major: $violet;
+$chef-minor: $indigo;
+$chef-success: $science-blue;
+//greyscale
+$chef-dark-grey: $sirocco;
+$chef-grey: $iron;
+$chef-light-grey: $mystic;
+$chef-lightest-grey: $haze;
+$chef-white: $white;
+$chef-black: $black;
+$transparent-white: rgba(255, 255, 255, 0.85);
+
+// logos
+$default-logo: url('/assets/img/logos/AutomateLogo-default.svg');
+$preview-logo: url('/assets/img/logos/AutomateLogo-preview.svg');
+$beta-logo: url('/assets/img/logos/AutomateLogo-beta.svg');
+
+// ------------------------------------------------------------------------------------- //
+//Size Settings
+$size_4: 4px;
+$size_16: 16px;
+$size_40: 40px;
+$size_45: 45px;
+$size_shrink: 80%;
+$size_60: 1.6em;
+
+$monospace: "Bitstream Vera Sans Mono", "Consolas", "Courier", monospace;
+
+// ------------------------------------------------------------------------------------- //
+// SETTINGS
+// height of header
+$navigation-height: 70px;
+$modal-z-index: 99;
+$sidebar-width: 200px;
+$sidebar-top: 70px; // required space to accommodate header
+$sidebar-small-width: 80px;
+$global-radius: 4px;
+// width used for run-history sidebar
+$sidebar-right-width: 200px;
+// the padding on the content pane, besides the left sidebar
+$content-container-padding: 35px;

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+/Applications/Safari.app/Contents/MacOS/Safari $1 &
+pid=$!
+
+while :
+do
+   trap "$(dirname $0)/safari_killer $pid" EXIT
+done

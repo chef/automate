@@ -1,0 +1,65 @@
+@import '~styles/variables';
+
+$size: 0.9em;
+$day-size: $size * 2.75;
+
+:host {
+  display: block;
+  width: $day-size * 7;
+  font-size: $size;
+}
+
+.header {
+  display: flex;
+  border-bottom: 1px solid $chef-grey;
+  margin-bottom: 0.5em;
+  font-size: 1em;
+  color: $chef-primary-dark;
+  font-weight: bold;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+.days {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+  font-size: inherit;
+}
+
+.column-header, .day {
+  width: $day-size;
+  height: $day-size;
+  line-height: $day-size;
+  flex: 0 0 $day-size;
+  font-size: inherit;
+  font-weight: bold;
+}
+
+.column-header {
+  text-transform: uppercase;
+  color: $chef-dark-grey;
+}
+
+.day {
+  border-radius: $global-radius;
+  color: $chef-primary-dark;
+
+  &.a:hover, &.s {
+    background-color: $chef-primary-bright;
+    color: $chef-white;
+  }
+
+  &.a {
+    cursor: pointer;
+  }
+
+  &.t {
+    color: $chef-primary-light;
+  }
+
+  &.i {
+    color: $chef-grey;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "0a07dab8-29c2-4358-992f-5464fb5f330b",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "big_old_bag",
+  "entity_type": "bag",
+  "task": "create",
+  "organization_name": "testing",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-03-28T21:24:09Z",
+  "remote_request_id": "664af6d8-5cdd-40c7-aa22-7ec57ae2c368",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAD9PkRMAAIAAAAA",
+  "requestor_name": "mkrasnow",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Manage/11.16.2 (ruby-2.3.5-p376; ohai-7.4.1; x86_64-linux; +http://opscode.com)",
+  "data": "{\"name\":\"big_old_bag\"}"
+}

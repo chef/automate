@@ -1,0 +1,363 @@
+#!/bin/bash
+#
+# This file is the place we will put all the common functionality that
+# two or more components share/require (ex. install elasticsearch)
+
+# TODO (tc) Please take a pass @afiune and Infra Auto team to see if some of these other helpers
+# can be deleted in the new world.
+# Compile protobuf definitions
+document "compile_go_protobuf_component" <<DOC
+  A wrapper around the compile_go_protobuf to compile the protobuf definitions of a specific component.
+DOC
+function compile_go_protobuf_component() {
+  [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
+  verify_component "$1" || return $?
+
+  # prep policy generation (only automate-gateway needs that right now)
+  # Note: the actual generation is triggered by a call to protoc with the
+  # parameter '--policy_out=...'. Only if the service's methods has the proper
+  # annotations will the generated code not be a NO-OP.
+  setup_go_workspace
+  ( cd "${scaffolding_go_pkg_path}" || return 1
+    local proto_go_tools=(
+      github.com/chef/automate/components/automate-grpc/protoc-gen-policy
+      github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock # generate mock grpc server implementations
+      github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config
+    )
+    install_go_tool "${proto_go_tools[@]}"
+    GO_TOOL_VENDOR=true install_go_tool github.com/lyft/protoc-gen-validate
+  )
+
+  # Note: while we remove all pb-derived files before regenerating, we're
+  # actually cheating a bit: the protoc-gen-* executables built above do partly
+  # depend on them.
+  local path
+  if [ "$1" == "api" ]; then
+    path=api
+  elif [ "$1" == "config" ]; then
+    path=api/config
+  else
+    path="components/$1"
+  fi
+
+  # "api" doesn't compile the config directory so let's not delete the config directory in that case
+  if [ "$path" == "api" ]; then
+      find "$path" -not -path 'api/config/*' \( -name '*.pb.go' -o -name '*.pb.*.go' -o -name '*.swagger.json' \) -delete
+  else
+      find "$path" \( -name '*.pb.go' -o -name '*.pb.*.go' -o -name '*.swagger.json' \) -delete
+  fi
+
+  local proto_script="$path/scripts/grpc.sh"
+  if [ -x "$proto_script" ]; then
+      compile_go_protobuf "$proto_script"
+  else
+      error "$proto_script doesn't exist or is not executable!"
+      case $path in
+          # NOTE: Don't warn for services that haven't been moved or
+          # which still have some protos that they use internally
+          api|api/config|automate-deployment|automate-gateway|compliance-service|nodemanager-service|notifications-service)
+              return 1
+              ;;
+          *)
+              log_warning "Most internal protobufs have moved into the api folder."
+              log_warning "Did you mean: compile_go_protobuf_component api"
+              return 1
+      esac
+  fi
+}
+# Adding auto tab complete
+complete -F _component_auto_complete compile_go_protobuf_component
+
+document "compile_all_protobuf_components" <<DOC
+  Compile every protobuf file for every component in A2.
+DOC
+function compile_all_protobuf_components() {
+  local components
+
+  install_if_missing core/git git
+  # Note 2019/02/05 (sr): "api" doesn't fit in the folder structure, so it's
+  # added to the list manually, same goes for "api/config".
+  components=($(git ls-files '*/scripts/grpc.sh' | awk -F/ '!/api/{print $2}') "api" "config")
+  for component in "${components[@]}"; do
+    log_line "Compiling protobuf files for ${YELLOW}'$component'${NC}"
+    if ! compile_go_protobuf_component "$component"; then
+      log_line "${RED}ERROR:${NC} Unable to compile protobuf files for '$component'"
+      return 1
+    fi
+  done
+}
+
+document "link_component_bin" <<DOC
+  Link binaries from COMPONENT/cmd/* to /hab/bin
+DOC
+function link_component_bin() {
+  if [[ -z $1 ]]; then
+      error "Missing component name argument to ${FUNCNAME[0]}"
+      return 1
+  fi
+  local component=$1
+  local component_dir=$component
+  if [[ $component == "deployment-service" ]]; then
+      component_dir="automate-deployment"
+  fi
+  for d in $(ls -d components/$component_dir/cmd/* 2>/dev/null); do
+    local cmd_bin=$(basename $d)
+    hab pkg binlink --force $HAB_ORIGIN/$component $cmd_bin
+  done
+  return 0
+}
+
+function start_sup() {
+  hab svc status 2>/dev/null 1>&2
+  [[ $? == 0 ]] && return
+  mkdir -p /hab/sup/default
+
+  log_line "Launching the Habitat Supervisor in the background..."
+  # We can change sec to ns when everyone is using gnu date
+  (hab sup run $* | while read -r line; do echo "[$(date -u -Isec)]" "$line"; done > /hab/sup/default/sup.log) &
+  while ! hab svc status >/dev/null 2>&1; do
+    sleep 1
+  done
+}
+
+# Verify if a service is up. (no need to add to 'describe')
+#
+# @(arg:1) PKG_IDENT A Habitat package identifier (ex: core/redis)
+#
+# Example: hab_svc_up afiune/config-mgmt-service
+function hab_svc_up() {
+  hab sup status $1 2>/dev/null | tail -1 | awk '{print $3}' | grep -q up
+}
+
+document "wait_for_svc_to_stop" <<DOC
+  Helper function to wait for a Habitat service (hab svc) to be stopped by the Habitat Supervisor.
+
+  @(arg:1) PKG_IDENT A Habitat package identifier (ex: core/redis)
+  @(arg:2) Number of seconds to wait before returning 1. (default: 30 seconds)
+
+  Example: Stop the automate-gateway service and wait for it to be down
+  ---------------------------------------------------------------------
+  hab stop afiune/automate-gateway
+  wait_for_svc_to_stop afiune/automate-gateway
+DOC
+function wait_for_svc_to_stop() {
+  local SECONDS_WAITING=${2:-30}
+  local COUNTER=0
+  hab stop $1
+  while hab_svc_up $1; do
+    echo -n ".";
+    [ $COUNTER -ge $SECONDS_WAITING ] && return 1
+    let COUNTER=COUNTER+1;
+    sleep 1;
+  done;
+}
+
+document "build" <<EOF
+  Simple wrapper around /hab/bin/build
+EOF
+function build() {
+  local hab_build
+
+  # Support for hab v.0.63.0
+  if [ -f /bin/build ]; then
+    hab_build=/bin/build
+  fi
+
+  # Support prior hab versions
+  if [ -f /hab/bin/build ]; then
+    hab_build=/hab/bin/build
+  fi
+
+  if [ -z "$hab_build" ]; then
+    exit_with "Hab build binary not found. Verify the 'build' wrapper inside the studio." 22
+  else
+    HAB_FEAT_IGNORE_LOCAL=true HAB_BLDR_CHANNEL=dev $hab_build "$@"
+  fi
+}
+
+document "rebuild" <<EOF
+  Simple wrapper around build that will attempt
+  to build with NO_INSTALL_DEPS speeding up the
+  build time
+EOF
+function rebuild() {
+  output=$(set -o pipefail; NO_INSTALL_DEPS=1 build $@ | tee /dev/stderr)
+  err=$?
+  if [[ $err != 0 ]]
+  then
+    echo $output | grep "Resolving '.*' failed" > /dev/null
+    if [[ $? == 0 ]]
+    then
+      build $@
+      err=$?
+    fi
+  fi
+
+  if [[ $err == 0 ]]
+  then
+      chef-automate upgrade run
+      err=$?
+  fi
+
+  return $err
+}
+
+document "build_all" <<DOC
+  Build every hab package in components/
+DOC
+function build_all() {
+  log_line "Building all components..."
+  for d in /src/components/*/; do
+    [[ -f "$d/habitat/plan.sh" ]] || continue # skip what can't be built
+    if [[ "$d" = "/src/components/automate-chef-io" ]] && [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
+        log_line "Skipping build of $d since AUTOMATE_OSS_BUILD is set."
+    fi
+    log_line "Building $d"
+    build "$d" || return 1
+  done;
+}
+
+function verify_component() {
+  if [[ "$1" == "deployment-service" || "$1" == "api" || "$1" == "config" ]]; then
+    return 0
+  fi
+  if [[ ! -d /src/components/$1 ]]; then
+    error "Component '$1' not found.\\n"
+    display_available_components
+    return 1
+  fi;
+  return 0
+}
+
+function display_available_components() {
+  log_line "Available components:"
+  ls -1 /src/components | awk '{print "* "$1}'
+}
+
+document "install_gomock" <<DOC
+  Install gomock tool. Used for creating mocks for client-side unit tests.
+DOC
+function install_gomock() {
+  local go_mock_tools=(
+    github.com/golang/mock/gomock
+    github.com/golang/mock/mockgen
+  )
+  GO_TOOL_VENDOR=true install_go_tool "${go_mock_tools[@]}"
+}
+
+document "generate_dev_root_ca" <<DOC
+Create the key, certificate, and revocation list for the Automate root CA used in dev. These
+files live in dev/certs.
+
+Note
+----
+The files generated by this function are not to be used for any purpose other than testing in
+the dev environment. Private keys are checked into git.
+
+DOC
+function generate_dev_root_ca() {
+    install_if_missing core/certstrap certstrap
+    (
+        enter_go_workspace
+        go run ./tools/dev-cert-gen --regen-ca
+    )
+}
+
+document "generate_dev_service_cert" <<DOC
+Create a certificate and key pair for a service. Use this function when creating a new
+service that will use mutual tls for grpc. These files live in dev/certs.
+
+Note
+----
+The files generated by this function are not to be used for any purpose other than testing in
+the dev environment. Private keys are checked into git.
+
+Example:
+----------------
+generate_dev_service_cert foo-service
+DOC
+function generate_dev_service_cert() {
+    install_if_missing core/certstrap certstrap
+    (
+        enter_go_workspace
+        go run ./tools/dev-cert-gen "$@"
+    )
+}
+
+_component_auto_complete()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts=$(ls /src/components | tr "\\n" " ")
+
+    if [[ ${cur} == * ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+}
+
+# Quick helper around service_running to print a message if the service is NOT running
+function check_service_running_or_exit() {
+  if ! service_running "$1"; then
+    error "The component '$1' must be already running."
+    return 1
+  fi;
+}
+
+document "service_running" <<DOC
+  Check if either HAB_ORIGIN/\$1 or chef/\$1 service is up
+DOC
+service_running() {
+  local service=${1:?"service_running SERVICENAME"}
+  # Check for our own origin
+  hab_svc_up "$HAB_ORIGIN/$service"
+  local local_pkg=$?
+  # Check if we have packages installed from the Depot (HAB_ORIGIN:chef)
+  hab_svc_up "chef/$service"
+  local depot_pkg=$?
+
+  [ $local_pkg -eq 0 ] || [ $depot_pkg -eq 0 ] && return 0
+  return 1
+}
+
+document "build_all_changed_components" <<DOC
+  build all the changed components
+
+  arguments: if none will build all modified components else a list of components to build only if they were modified.
+
+  Example:
+  ----------------
+  build_all_changed_components automate-gateway automate-deployment
+DOC
+function build_all_changed_components() {
+  local whitelist=$@
+
+  install_if_missing core/git git
+  install_if_missing core/ruby ruby
+  hab pkg install core/coreutils >/dev/null
+  mkdir -p /usr/bin
+  ln -sv "$(hab pkg path core/coreutils)/bin/env" /usr/bin/env 2>/dev/null
+
+  build_commands=""
+  pushd /src >/dev/null;
+    for component in $(./scripts/changed_components)
+    do
+      if [[ -n "$AUTOMATE_OSS_BUILD" ]] && [[ "$component" = "components/automate-chef-io" ]]; then
+        log_line "$component has changed but AUTOMATE_OSS_BUILD is set."
+        continue
+      fi
+
+      if [[ ! -z "$whitelist" ]]; then
+        if [[ "$whitelist" == *"$(basename $component)"* ]]; then
+          log_line "Building $component"
+          build $component
+        fi
+      else
+        log_line "Building $component"
+        build $component
+      fi
+    done
+  popd >/dev/null;
+}

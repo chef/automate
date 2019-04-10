@@ -1,0 +1,103 @@
+# Chef-MLSA
+[mlsa]
+accept = false
+
+[log]
+level = "debug"
+
+[storage]
+database = "dex"
+user = "dex"
+
+[service]
+host = "localhost"
+port = 5556
+
+key_contents = ""
+cert_contents = ""
+root_cert_contents = ""
+
+[grpc]
+host = "localhost"
+port = 5557
+
+[expiry]
+signing_keys = "6h"
+id_tokens = "3m"
+
+# TODO long-term we need to take another look
+# at how we bootstrap the initial admin.
+[bootstrap]
+insecure_admin = false
+
+# Default connects to nil so the template
+# only renders them if connectors are configured.
+# [connectors.google]
+# client_id = "setme"
+# client_secret = "setme"
+
+# [connectors.ldap]
+# # Host Values
+
+# # (optional) string containing the cert for your LDAP server. default: non-ssl-mode
+# ca_contents = ""
+# host = "setme"
+# bind_dn = "setme"
+# bind_password = "setme"
+
+# # User Query
+
+# # base DN to search for users to auth under: e.g. dc=ldapadmin,dc=yourdomain,dc=com
+# base_user_search_dn = "setme"
+
+# # (optional) additional LDAP query to add to logical AND filter e.g. (objectClass=person)
+# # default: no additional filtering
+# user_query_filter = "setme"
+
+# # attribute by which to search for user that user inserts via login UI i.e. sAMAccountName
+# username_attr = "setme"
+
+# # User Mapping Attributes
+
+# # value for the string representation of the user,
+# # usually the same as username_attr: e.g.sAMAccountName
+# user_id_attr = "setme"
+
+# # (optional) default via config template: "mail"
+# email_attr = "setme"
+
+# # (optional) attribute for the user's display name: default name
+# user_display_name_attr = "setme"
+
+# # Group Query
+
+# # base DN to search for group membership for an auth'ed user:
+# # e.g. dc=ldapadmin,dc=yourdomain,dc=com
+# base_group_search_dn = "setme"
+
+# # (optional) additional LDAP query to add to logical AND filter e.g. (objectClass=group)
+# # default: no additional filtering
+# group_query_filter = "setme"
+
+# # (optional) together with filter_groups_by_user_value, the logical AND by
+# # which to filter group set down by group membership i.e.
+# # (<filter_groups_by_user_attr>=<filter_groups_by_user_value>).
+# # defaults to member
+# filter_groups_by_user_attr = "setme"
+
+# # (optional) together with filter_groups_by_user_attr, the logical AND by
+# # which to filter group set down by group membership i.e.
+# # (<filter_groups_by_user_attr>=<filter_groups_by_user_value>).
+# # defaults to DN
+# filter_groups_by_user_value = "setme"
+
+# # (optional) attribute for the user's display name: default name
+# group_display_name_attr = "setme"
+
+# [connectors.saml]
+# # this values should contain the actual contents of ca pem
+# ca_contents = ""
+# sso_url = "setme"
+# email_attr = "email"
+# username_attr = "emal"
+# groups_attr = "groups"

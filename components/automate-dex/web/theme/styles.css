@@ -1,0 +1,160 @@
+@font-face {
+  font-family: 'Muli';
+  src: url('../static/fonts/Muli-Regular.ttf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Muli';
+  src: url('../static/fonts/Muli-Bold.ttf');
+  font-weight: 700;
+  font-style: normal;
+}
+
+html, body {
+    height: 100%;
+    background-color: rgba(255,255,255,0);
+    font-family: 'Muli';
+    color: rgb(87,105,120);
+    font-size: 12px;
+    font-weight: 100;
+    background-color: rgb(243, 246, 248);
+}
+
+button {
+    border: 1px solid #2A9FD8;
+    background-color: rgb(56,131,179);
+    color: white;
+    width: 279px;
+    height: 53px;
+}
+
+label {
+    color: rgb(64,136,182);
+}
+
+.back {
+    margin: 15px 30px;
+    font-size: 12px;
+    font-weight: 100;
+    color: rgb(64,136,182);
+    cursor: pointer;
+}
+
+.dex-error-box {
+    background-color: rgb(248,140,35);
+    width: 250px;
+    border-radius: 3px;
+    margin: 10px auto;
+}
+
+.dex-error-text {
+    font-size: 10px;
+    top: -2px;
+    position: relative;
+}
+
+.dex-btn-text {
+    font-family: 'Muli';
+    font-size: 12px;
+    font-weight: 100;
+    float: left;
+    padding: 0px 6px;
+}
+
+.dex-btn-icon {
+    background-color: rgb(56,131,179);
+}
+
+.dex-btn-icon--local {
+    background-color: rgb(56,131,179);
+    background-image: url(../static/img/email-icon.png)
+}
+
+.dex-btn-icon--msad {
+    background-color: rgb(56,131,179);
+    background-image: url(../static/img/microsoft-icon.png)
+}
+
+.theme-btn--primary {
+    width: 150px;
+    font-weight: 100;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.theme-panel {
+    text-align: center;
+    position: relative;
+    top: 40%;
+    transform: translateY(-50%);
+}
+
+.theme-body {
+    font-family: 'Source Sans Pro', Helvetica, sans-serif;
+}
+
+.theme-navbar {
+    background-color: #fff;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    color: #333;
+    font-size: 13px;
+    font-weight: 100;
+    height: 46px;
+    overflow: hidden;
+    padding: 0 10px;
+}
+
+.theme-navbar__logo-wrap {
+    display: inline-block;
+    height: 100%;
+    overflow: hidden;
+    padding: 10px 15px;
+    width: 300px;
+}
+
+.theme-navbar__logo {
+    height: 60px;
+}
+
+.theme-heading {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
+
+.theme-form-row {
+    display: block;
+    margin: 10px auto;
+}
+
+.theme-form-input {
+    border-radius: 4px;
+    border: 1px solid #CCC;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    color: #666;
+    display: block;
+    font-size: 14px;
+    height: 36px;
+    line-height: 1.42857143;
+    margin: auto;
+    padding: 6px 12px;
+    width: 250px;
+}
+
+.theme-form-input:focus,
+.theme-form-input:active {
+    border-color: #66AFE9;
+    outline: none;
+}
+
+.theme-form-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 4px auto;
+    position: relative;
+    text-align: left;
+    width: 250px;
+}

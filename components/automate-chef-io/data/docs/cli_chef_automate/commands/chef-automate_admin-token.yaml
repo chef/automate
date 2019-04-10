@@ -1,0 +1,31 @@
+name: chef-automate admin-token
+synopsis: generate an admin token for use against the Automate API
+usage: chef-automate admin-token [flags]
+description: |2-
+
+  Generate an admin token for use against the Automate API.
+
+  You can pass token with the "api-token" header. For example, you could query
+  for all existing auth policies with curl:
+
+    curl -H "api-token: <YOUR_TOKEN>" <AUTOMATE_FQDN>/api/v0/auth/policies
+
+  The admin API token has access to the entire Automate API. With great power
+  comes great responsibility. Keep it secret, keep it safe.
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for admin-token
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI

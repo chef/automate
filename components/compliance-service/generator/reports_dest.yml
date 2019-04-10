@@ -1,0 +1,24 @@
+# target: filesystem
+
+# Send data to the data collector endpoint, same as the audit cookbook
+ target: automate
+ target_opts:
+   url: https://ec2-54-201-50-23.us-west-2.compute.amazonaws.com/data-collector/v0/
+   header:
+     x-data-collector-token: v93Hr87p6ZFeG6DskC_5WJAHcOY=
+
+#target: automate
+#target_opts:
+#  url: https://ap-ca66.opschef.tv/data-collector/v0/
+#  header:
+#    x-data-collector-token: 93a49a4f2482c64126f7b6015e6b0f30284287ee4054ff8807fb63d9cbd1c506
+#    chef-delivery-enterprise: Chef
+
+# target: postgresql
+# target_opts:
+#   host: localhost
+#   port: 15432
+#   user: delivery
+#   password: pokemon
+#   dbname: delivery
+#   table_prefix: 'cmp_'

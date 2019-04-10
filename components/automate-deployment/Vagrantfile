@@ -1,0 +1,20 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    v.cpus = 2
+  end
+
+  config.vm.box = "bento/ubuntu-16.04"
+
+  config.vm.synced_folder "../../", "/a2", create: true
+
+  config.vm.hostname = 'automate-deployment.test'
+  config.vm.network 'private_network', ip: '192.168.33.199'
+
+  config.vm.provision "shell", inline: "apt-get update && apt-get install -y unzip tree"
+  config.vm.provision "shell", inline: "sysctl -w vm.max_map_count=262144"
+  config.vm.provision "shell", inline: "sysctl -w vm.dirty_expire_centisecs=20000"
+end

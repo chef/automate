@@ -1,0 +1,16 @@
+{application, notification,
+ [
+  {description, "Respond to Chef Automate events with a notification based on user configuration"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  gen_smtp,
+                  github,
+                  delivery,
+                  chef_common
+                 ]},
+  {mod, { notification_app, []}},
+  {env, []}
+ ]}.

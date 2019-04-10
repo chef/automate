@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package chef.automate.domain.compliance.ingest.events.compliance;
+option go_package = "github.com/chef/automate/components/compliance-service/ingest/events/compliance";
+
+import "components/compliance-service/ingest/events/inspec/inspec.proto";
+
+message Report {
+	// inspec full json report fields
+	string version = 1;
+	chef.automate.domain.compliance.ingest.events.inspec.Platform platform = 16;
+	chef.automate.domain.compliance.ingest.events.inspec.Statistics statistics = 17;
+	repeated inspec.Profile profiles = 18;
+	repeated string other_checks = 19;
+
+	// extra report fields added by the audit cookbook
+	string report_uuid = 20;
+	string node_uuid = 21;
+	string job_uuid = 22;
+	string node_name = 23;
+	string environment = 24;
+	repeated string roles = 25;
+	repeated string recipes = 26;
+	string end_time = 27;
+	string type = 28;
+	string source_id = 29;
+	string source_region = 30;
+	string source_account_id = 31;
+	string policy_name = 32;
+	string policy_group = 33;
+	string organization_name = 34;
+	string source_fqdn = 35;
+	repeated string chef_tags = 36;
+	string ipaddress = 37;
+	string fqdn = 38;
+}

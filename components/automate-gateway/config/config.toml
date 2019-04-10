@@ -1,0 +1,41 @@
+host = "0.0.0.0"
+port = 2000
+grpc_port = 2001
+external_fqdn = "https://localhost"
+
+[log]
+level = "debug"
+
+[tls]
+  cert_path = "../../../dev/certs/automate-gateway.crt"
+  key_path = "../../../dev/certs/automate-gateway.key"
+  root_ca_path = "../../../dev/certs/Chef_Automate_FAKE_Dev.crt"
+
+[grpc_clients.endpoints]
+  [grpc_clients.endpoints.authn-service]
+    target = "0.0.0.0:9091"
+    secure = true
+  [grpc_clients.endpoints.authz-service]
+    target = "0.0.0.0:10130"
+    secure = true
+  [grpc_clients.endpoints.config-mgmt-service]
+    target = "0.0.0.0:10119"
+    secure = true
+  [grpc_clients.endpoints.compliance-service]
+    target = "0.0.0.0:10121"
+    secure = true
+  [grpc_clients.endpoints.ingest-service]
+    target = "0.0.0.0:10122"
+    secure = true
+  [grpc_clients.endpoints.license-control-service]
+    target = "0.0.0.0:10124"
+    secure = true
+  [grpc_clients.endpoints.local-user-service]
+    target = "0.0.0.0:9092"
+    secure = true
+  [grpc_clients.endpoints.notifications-service]
+    target = "0.0.0.0:4001"
+    secure = true
+  [grpc_clients.endpoints.teams-service]
+    target = "0.0.0.0:9093"
+    secure = true

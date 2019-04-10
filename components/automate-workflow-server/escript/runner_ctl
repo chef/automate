@@ -1,0 +1,141 @@
+#!/usr/bin/env escript
+%%! -name runner_ctl@127.0.0.1
+
+-define(SELF, 'runner_ctl@127.0.0.1').
+-define(TARGET, 'delivery@127.0.0.1').
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Some examples for install and delete runner
+%% automate-ctl install-runner first.runner.box myusername --password mypass -y
+%% automate-ctl install-runner first.runner.box myusername --password -y
+%% automate-ctl delete-runner first.runner.box -y
+%% automate-ctl delete-runner first.runner.box --enterprise myenterprise
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+main(Args) ->
+    init_network(),
+    {Action, RestArgs} = get_action(Args),
+    Params = case Action of
+                 create   -> parse_args_create(RestArgs);
+                 delete   -> parse_args_delete(RestArgs);
+                 validate -> parse_args_validate(RestArgs)
+             end,
+    BinaryParams = [erlang:list_to_binary(P) || P <- Params],
+    perform_action(Action, BinaryParams).
+
+init_network() ->
+    net_kernel:start([?SELF, longnames]),
+    erlang:set_cookie(node(), get_cookie()),
+    pong = net_adm:ping(?TARGET).
+
+get_action(["create" | RestArgs] = _Args) ->
+    {create, RestArgs};
+get_action(["delete" | RestArgs] = _Args) ->
+    {delete, RestArgs};
+get_action(["validate_runner" | RestArgs] = _Args) ->
+    {validate, RestArgs};
+get_action([_Other | _RestArgs] = Args) ->
+    {create, Args}.
+
+parse_args_create([_Hostname, _Os, _PlatformFamily, _Platform, _PlatformVersion] = Args) ->
+    case rpc_call(?TARGET, deliv_enterprise, list_all, []) of
+        [Enterprise] ->
+            EntName = get_enterprise_name(Enterprise),
+            parse_args_create([erlang:binary_to_list(EntName) | Args]);
+        [_|_] = Enterprises ->
+            EntNames = [get_enterprise_name(EntName) || EntName <- Enterprises],
+
+            perror([io_lib:format("There are multiple Enterprises in your installation. Pick one of:~n~n", []),
+                    [io_lib:format("~s~n", [EntName]) || EntName <- EntNames],
+                    io_lib:format("~nUse --enterprise to specify an enterprise and try again.~n", [])]);
+        [] ->
+            perror("No Enterprise has been defined. Use: automate-ctl create-enterprise to create an Enterprise and try again.");
+        _ ->
+            perror("An unknown error occurred. Please ensure your Automate instance is running and try again")
+    end;
+parse_args_create([_EntName, _Hostname, _Os, _PlatformFamily, _Platform, _PlatformVersion] = Args) ->
+    Args;
+parse_args_create(Other) ->
+    perror(io_lib:format("Invalid Arguments: ~p~nExpected Enterprise, Hostname, Os, Platform Family, Platform and Platform Version", [Other])).
+
+parse_args_validate([_Hostname] = Args) ->
+    case rpc_call(?TARGET, deliv_enterprise, list_all, []) of
+        [Enterprise] ->
+            EntName = get_enterprise_name(Enterprise),
+            parse_args_validate([erlang:binary_to_list(EntName) | Args]);
+        [_|_] = Enterprises ->
+            EntNames = [get_enterprise_name(EntName) || EntName <- Enterprises],
+
+            perror([io_lib:format("There are multiple Enterprises in your installation. Pick one of:~n~n", []),
+                    [io_lib:format("~s~n", [EntName]) || EntName <- EntNames],
+                    io_lib:format("~nUse --enterprise to specify an enterprise and try again.~n", [])]);
+        [] ->
+            perror("Enterprise does not exist.");
+        _ ->
+            perror("An unknown error occurred. Please ensure your Automate instance is running and try again")
+    end;
+parse_args_validate([EntNameArgs, _Hostname] = Args) ->
+    case rpc_call(?TARGET, deliv_enterprise, fetch, [list_to_binary(EntNameArgs)]) of
+        {ok, _Enterprise} -> ok;
+        _ ->
+            perror(io_lib:format("Enterprise ~p does not exist.", [EntNameArgs]))
+    end,
+    Args;
+parse_args_validate(Other) ->
+    perror(io_lib:format("Invalid Arguments: ~p~nExpected Hostname", [Other])).
+
+%% This function has only 2 cases since we know that validate_runner was successful.
+parse_args_delete([_Hostname] = Args) ->
+    case rpc_call(?TARGET, deliv_enterprise, list_all, []) of
+        [Enterprise] ->
+            EntName = get_enterprise_name(Enterprise),
+            parse_args_delete([erlang:binary_to_list(EntName) | Args])
+    end;
+parse_args_delete([_EntNameArgs, _Hostname] = Args) ->
+    Args.
+
+perform_action(create, BinaryParams) ->
+    case rpc_call(?TARGET, jobs_runner_registry, register_get_public_key, BinaryParams) of
+        {ok, Key} ->
+            io:format("~s", [Key]);
+        {error, Why} ->
+            perror(io_lib:format("Error: ~p~n", [Why]))
+    end;
+perform_action(validate, [Entname, Hostname] = BinaryParams) ->
+    %% fetch the runner record
+    case rpc_call(?TARGET, jobs_runners_state, fetch, BinaryParams) of
+        [Runner] -> Runner;
+        [] -> perror(io_lib:format("No runner found for enterprise ~p with hostname ~p", [binary_to_list(Entname), binary_to_list(Hostname)]))
+    end;
+perform_action(delete, [_Entname, Hostname] = BinaryParams) ->
+    %% fetch the runner record
+    [RunnerRecord] = rpc_call(?TARGET, jobs_runners_state, fetch, BinaryParams),
+    %% delete the runner
+    case rpc_call(?TARGET, jobs_runner_registry, delete, [RunnerRecord]) of
+        ok -> io:format("Successfully deleted runner : ~p",[Hostname]);
+        Error -> perror(io_lib:format("Could not delete runner due to : ~p", [Error]))
+    end.
+
+get_enterprise_name(Enterprise) ->
+    rpc_call(?TARGET, deliv_enterprise, getval, [name, Enterprise]).
+
+rpc_call(Node, Module, Function, Args) ->
+    case rpc:call(Node, Module, Function, Args) of
+        {badrpc, Reason} ->
+            perror(io_lib:format("RPC call ~p:~p:~p:~p failed with error ~p~n",
+                                 [Node, Module, Function, Args, Reason]));
+        Res ->
+            Res
+    end.
+
+perror(Msg) ->
+    io:format(Msg),
+    erlang:halt(1).
+
+get_cookie() ->
+    case os:getenv("ERL_COOKIE") of
+        false ->
+            'delivery';
+        Cookie ->
+            list_to_atom(Cookie)
+    end.

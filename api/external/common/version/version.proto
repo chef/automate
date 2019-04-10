@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package chef.automate.api.common.version;
+option go_package = "github.com/chef/automate/api/external/common/version";
+
+message VersionInfo {
+  string name = 1;
+  string version = 2;
+  string sha = 3;
+  string built = 4;
+}
+
+message VersionInfoRequest {
+
+}

@@ -1,0 +1,13 @@
+{application, chef_common,
+ [
+  {description, "Common Chef libraries"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  jiffy,
+                  jesse
+                 ]},
+  {env, []}
+ ]}.

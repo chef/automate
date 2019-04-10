@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.response;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response";
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+message NodeAttribute{
+  string          node_id          = 1;
+  string          name             = 2;
+  repeated string run_list         = 3;
+  string          chef_environment = 4;
+  string          normal           = 5;
+  string          default          = 6;
+  string          override         = 7;
+  int32           normal_value_count = 8;
+  int32           default_value_count = 9;
+  int32           override_value_count = 10;
+  int32           all_value_count = 11;
+  string          automatic = 12;
+  int32           automatic_value_count = 13;
+}
+
+message AbridgedConverge {
+  string id         = 1;
+  string start_time = 2;
+  string end_time   = 3;
+  string status     = 4;
+}
+
+message Run {
+  string                    id                     = 1;
+  string                    node_id                = 2;
+  string                    node_name              = 3;
+  string                    organization           = 4;
+  google.protobuf.Timestamp start_time             = 5;
+  google.protobuf.Timestamp end_time               = 6;
+  // (@afiune) What is this source? Maybe a dup of source_fqdn?
+  string                    source                 = 7;
+  string                    status                 = 8;
+  int32                     total_resource_count   = 9;
+  int32                     updated_resource_count = 10;
+  string                    chef_version           = 11;
+  int32                     uptime_seconds         = 12;
+  string                    environment            = 13;
+  string                    fqdn                   = 14;
+  string                    source_fqdn            = 15;
+  string                    ipaddress              = 16;
+  repeated Resource         resources              = 17;
+  repeated string           run_list               = 18;
+  repeated Deprecation      deprecations           = 19;
+  ChefError                 error                  = 20;
+  repeated string           tags                   = 21;
+  repeated string           resource_names         = 22;
+  repeated string           recipes                = 23;
+  repeated string           chef_tags              = 24;
+  repeated string           cookbooks              = 25;
+  string                    platform               = 26;
+  string                    platform_family        = 27;
+  string                    platform_version       = 28;
+  repeated string           roles                  = 29;
+  string                    policy_name            = 30;
+  string                    policy_group           = 31;
+  string                    policy_revision        = 32;
+  ExpandedRunList           expanded_run_list      = 33;
+}
+
+message ExpandedRunList {
+  string id = 1;
+  repeated RunList run_list = 2;
+}
+
+message Resource {
+  string type = 1;
+  string name = 2;
+  string id = 3;
+  string duration = 4;
+  string delta = 5;
+  string cookbook_name = 6;
+  string cookbook_version = 7;
+  string status = 9;
+  string recipe_name = 10;
+  string result = 11;
+  // Fields that might be empty
+  string conditional = 16;
+  bool ignore_failure = 17;
+}
+
+message ChefError {
+  string class = 1;
+  string message = 2;
+  repeated string backtrace = 16;
+  Description description = 17;
+}
+
+message RunList {
+  string type = 1;
+  string name = 2;
+  string version = 3;
+  bool skipped = 4;
+  repeated RunList children = 5;
+}
+
+message Description {
+  string title = 1;
+  repeated google.protobuf.Struct sections = 2;
+}
+
+message Deprecation {
+  string message  = 1;
+  string url      = 2;
+  string location = 3;
+}

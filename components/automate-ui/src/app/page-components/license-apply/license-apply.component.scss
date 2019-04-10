@@ -1,0 +1,107 @@
+@import "~styles/variables";
+
+.license-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+    color: $chef-primary-bright;
+    margin-bottom: 1em;
+    margin-top: 20px;
+
+    chef-icon {
+      vertical-align: -4px;
+    }
+  }
+
+  .alert {
+    color: $chef-critical;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .info {
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+
+  .button {
+    margin-top: 1em;
+    text-align: center;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+
+    li {
+      display: flex;
+      height: 48px;
+      align-items: center;
+      background-color: transparent;
+      border: 1px solid $gray-pale;
+      border-radius: $global-radius;
+      margin-bottom: 1em;
+      padding: .5em 1em;
+      position: relative;
+      font-size: .875em;
+      transition: background-color .2s;
+
+      &:hover {
+        background-color: $chef-grey;
+        cursor: pointer;
+        transition: background-color .2s;
+      }
+    }
+  }
+
+
+  .footer {
+    margin-top: 80px;
+  }
+
+  textarea {
+    font-size: 12px;
+    min-width: 500px;
+    max-width: 600px;
+    min-height: 175px;
+  }
+
+  .spinner-container, .error-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 10px;
+    height: 50px;
+  }
+
+  ::ng-deep chef-alert {
+    width: 500px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    min-height: 50px;
+
+    a.error-msg {
+      color: $chef-white;
+      text-decoration: underline;
+    }
+  }
+
+  chef-button#dismiss-help {
+    width: 210px;
+  }
+
+  .note {
+    font-style: italic;
+    font-size: 12px;
+  }
+
+  app-telemetry-checkbox {
+    margin: 20px 50px 0;
+  }
+}

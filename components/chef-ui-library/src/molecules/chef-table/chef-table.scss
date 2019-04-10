@@ -1,0 +1,60 @@
+chef-table {
+  display: flex;
+  flex-flow: column nowrap;
+
+  chef-tr {
+    display: flex;
+    width: 100%;
+    margin-bottom: 0.5em;
+    flex-flow: row nowrap;
+  }
+
+  chef-th,
+  chef-td {
+    display: flex;
+    padding: 1em;
+    min-width: 0;
+    border-top: 1px solid chef-hsl(var(--chef-grey));
+    border-bottom: 1px solid chef-hsl(var(--chef-grey));
+    flex-flow: row nowrap;
+    flex-basis: 0;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 14px;
+
+    &:first-child {
+      border-left: 1px solid chef-hsl(var(--chef-grey));
+      border-top-left-radius: var(--chef-border-radius);
+      border-bottom-left-radius: var(--chef-border-radius);
+    }
+
+    &:last-child {
+      border-right: 1px solid chef-hsl(var(--chef-grey));
+      border-top-right-radius: var(--chef-border-radius);
+      border-bottom-right-radius: var(--chef-border-radius);
+    }
+
+    chef-button {
+      margin: -0.5em 0;
+    }
+
+    chef-button + chef-button {
+      margin-left: 0.5em;
+    }
+  }
+
+  chef-th,
+  chef-thead chef-th
+  chef-thead chef-td,
+  chef-tfoot chef-th,
+  chef-tfoot chef-td {
+    background-color: chef-hsl(var(--chef-lightest-grey));
+    font-weight: 700;
+  }
+
+  chef-td,
+  chef-body chef-td {
+    background-color: chef-hsl(var(--chef-white));
+  }
+}

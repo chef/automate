@@ -1,0 +1,36 @@
+@import "~styles/variables";
+
+:host {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+}
+
+::ng-deep {
+  svg {
+    display: block;
+    width: 100%;
+
+    .bubble {
+      circle {
+        fill: $chef-critical;
+      }
+
+      text {
+        fill: $chef-white;
+        pointer-events: none;
+      }
+    }
+  }
+
+  .bubble-tip-name {
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid $chef-grey;
+    font-weight: bold;
+  }
+
+  .bubble-tip-text {
+    margin: 0;
+  }
+}

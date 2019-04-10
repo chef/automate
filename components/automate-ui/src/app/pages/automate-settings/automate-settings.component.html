@@ -1,0 +1,71 @@
+<app-admin-sidebar></app-admin-sidebar>
+
+<div class="container">
+  <main>
+   <chef-notification
+     *ngIf="notificationVisible"
+     [type]="notificationType"
+     [timeout]="notificationTimeout()"
+     (dismissed)="hideNotification()">
+     {{ notificationMessage }}
+   </chef-notification>
+
+    <chef-page-header>
+      <chef-heading>Node Lifecycle</chef-heading>
+      <chef-subheading>Control the lifecycle of nodes.</chef-subheading>
+    </chef-page-header>
+
+    <div class="page-body">
+      <chef-table>
+        <chef-tbody>
+          <chef-tr [formGroup]="missingNodesForm">
+            <chef-td><b>Missing Nodes</b></chef-td>
+            <chef-td class="description">If no Chef Client runs have completed in the specified window, nodes will be marked as "Missing".</chef-td>
+            <chef-td class="input">
+              <chef-checkbox
+                [checked]="missingNodesForm.value.disable"
+                (change)="patchDisableValue(missingNodesForm, $event.detail)">
+                Never mark
+              </chef-checkbox>
+            </chef-td>
+            <chef-td class="input">
+              <chef-input ngDefaultControl formControlName="threshold"></chef-input>
+            </chef-td>
+            <chef-td class="input">
+              <chef-select ngDefaultControl formControlName="unit" (change)="patchUnitValue(missingNodesForm, $event)">
+                <chef-option value='m'>Minutes</chef-option>
+                <chef-option value='h'>Hours</chef-option>
+                <chef-option value='d' selected>Days</chef-option>
+              </chef-select>
+            </chef-td>
+          </chef-tr>
+          <chef-tr [formGroup]="deleteMissingNodesForm">
+            <chef-td><b>Delete Missing Nodes</b></chef-td>
+            <chef-td class="description">Nodes set to missing will be removed at this interval.</chef-td>
+            <chef-td class="input">
+              <chef-checkbox
+                [checked]="deleteMissingNodesForm.value.disable"
+                (change)="patchDisableValue(deleteMissingNodesForm, $event.detail)">
+                Never delete
+              </chef-checkbox>
+            </chef-td>
+            <chef-td class="input">
+              <chef-input ngDefaultControl formControlName="threshold"></chef-input>
+            </chef-td>
+            <chef-td class="input">
+              <chef-select ngDefaultControl formControlName="unit" (change)="patchUnitValue(deleteMissingNodesForm, $event)">
+                <chef-option value='m'>Minutes</chef-option>
+                <chef-option value='h'>Hours</chef-option>
+                <chef-option value='d' selected>Days</chef-option>
+              </chef-select>
+            </chef-td>
+          </chef-tr>
+        </chef-tbody>
+      </chef-table>
+
+      <div class="center">
+        <chef-button primary [disabled]="noChanges()" (click)="applyChanges()">Apply Changes</chef-button>
+      </div>
+    </div>
+  </main>
+</div>

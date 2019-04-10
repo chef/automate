@@ -1,0 +1,161 @@
+/* You can add global styles to this file, and also import other style files */
+@import "assets/chef-ui-library/chef.css";
+@import "assets/chef-ui-library/collection/assets/fonts/material-icons/material-icons.css";
+@import "assets/chef-ui-library/collection/styles/variables.example.css";
+@import "styles/chef-theme";
+
+.container {
+  margin-left: $sidebar-width;
+  position: relative;
+
+  main {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media screen and (max-width: 769px) {
+  .container {
+    margin-left: $sidebar-small-width;
+  }
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: $gray-highlight;
+  color: $chef-primary-dark;
+  line-height: 1.33em;
+}
+
+.page-body {
+  padding: $content-container-padding;
+
+  .is-empty {
+    border: 1px dashed lighten($chef-dark-grey, 10%);
+    padding: 100px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: darken($chef-dark-grey, 6%);
+    letter-spacing: 1px;
+  }
+}
+
+button.create {
+  color: $white;
+  font-family: Muli;
+  font-size: 13px;
+  font-weight: 100;
+  background-color: $chef-blue-medium;
+  border: 1px solid $chef-blue-medium;
+  border-radius: 4px;
+  height: 33px;
+  width: 171px;
+}
+
+
+// a11y helpers
+.visually-hidden { /* https://snook.ca/archives/html_and_css/hiding-content-for-accessibility */
+  position: absolute;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px 1px 1px 1px);/* IE6, IE7 */
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+.visually-hidden a:focus,
+.visually-hidden input:focus,
+.visually-hidden button:focus {
+  position: static;
+  width: auto;
+  height: auto;
+}
+
+// status styles from pipes and other
+.success, .passed, .compliant, .compliant-node-count {
+  span.count, i, chef-icon {
+    color: $chef-success;
+  }
+}
+
+.failure, .failed, .critical, .critical-node-count {
+  span.count, i, chef-icon {
+    color: $chef-critical;
+  }
+}
+
+.total {
+  span.count, i, chef-icon {
+    color: $chef-primary-bright;
+  }
+}
+
+.minor, .minor-node-count {
+  span.count, i, chef-icon {
+    color: $chef-minor;
+  }
+}
+
+.major, .major-node-count {
+  span.count, i, chef-icon {
+    color: $chef-major;
+  }
+}
+
+.workflow-changes {
+  span.count, i, chef-icon {
+    color: $chef-purple;
+  }
+}
+
+.missing, .skipped, .skipped_tests, .skipped-node-count, .unchanged {
+  span.count, i, chef-icon {
+    color: $chef-dark-grey;
+  }
+}
+
+// TODO new component?
+.empty-help {
+  display: flex;
+  margin: 2em;
+  padding: 2em;
+  border: 1px dashed $chef-light-grey;
+  background: $chef-white;
+  align-items: center;
+
+  .help-icon {
+    height: 60px;
+    margin-right: 2em;
+  }
+
+  .help-msg {
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Modernizr classes
+// This is for SVG SMIL animation, where you animate the SVG element within the XML
+html.smil {
+  .m--no-smil {
+    display: none;
+  }
+}
+
+html.no-smil {
+  .m--smil {
+    display: none;
+  }
+
+  .m--no-smil {
+    display: block;
+  }
+}
+
+// Global loading modifier class to accomodate for our navigation
+chef-loading-spinner[fixed] {
+  top: $navigation-height;
+}

@@ -1,0 +1,16 @@
+[service]
+host = "localhost"
+port = 10143
+access_key = ""
+secret_key = ""
+
+[tls]
+key_contents = ""
+cert_contents = ""
+root_cert_contents = ""
+
+[gateway.backup.filesystem]
+path = "/var/opt/chef-automate/backups"
+
+[gateway.backup.s3]
+

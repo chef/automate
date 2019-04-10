@@ -1,0 +1,36 @@
+---
+grpc: {{cfg.service.host}}:{{cfg.service.port}}
+a1_user_data: {{pkg.svc_data_path}}/{{cfg.service.a1_user_data}}
+a1_user_roles_data: {{pkg.svc_data_path}}/{{cfg.service.a1_user_roles_data}}
+
+tls:
+  cert_path: {{pkg.svc_config_path}}/service.crt
+  key_path: {{pkg.svc_config_path}}/service.key
+  root_ca_path: {{pkg.svc_config_path}}/root_ca.crt
+
+users:
+  type: dex
+  config:
+    issuerURL: https://{{cfg.service.external_fqdn}}/dex
+    {{~#eachAlive bind.automate-dex.members as |automate-dex|}}
+      {{~#if @last}}
+    grpcHost: {{automate-dex.sys.ip}}:{{automate-dex.cfg.grpc-port}}
+    dexURL: https://{{automate-dex.sys.ip}}:{{automate-dex.cfg.port}}/dex
+      {{~/if}}
+    {{~/eachAlive}}
+
+{{~#eachAlive bind.teams-service.members as |teams-service|}}
+{{~#if @last}}
+teams_address: {{teams-service.sys.ip}}:{{teams-service.cfg.port}}
+{{~/if}}
+{{~/eachAlive}}
+
+{{~#eachAlive bind.authz-service.members as |authz-service|}}
+{{~#if @last}}
+authz_address: {{authz-service.sys.ip}}:{{authz-service.cfg.port}}
+{{~/if}}
+{{~/eachAlive}}
+
+logger:
+  format: {{cfg.logger.format}}
+  level: {{cfg.logger.level}}

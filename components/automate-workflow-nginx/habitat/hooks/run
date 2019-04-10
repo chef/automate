@@ -1,0 +1,41 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+set -e
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+for dir in logs client_body_temp proxy fastcgi scgi uwsgi; do
+  mkdir -pv "{{pkg.svc_var_path}}/$dir"
+done
+
+# Generate install ID and apply to JSON
+if [[ ! -e "{{pkg.svc_data_path}}/install_id" ]]; then
+  uuid -o "{{pkg.svc_data_path}}/install_id"
+fi
+sed -e "s^INSTALL_ID^$(cat "{{pkg.svc_data_path}}/install_id")^" \
+  "{{pkg.svc_config_path}}/telemetry.default.json" \
+  > "{{pkg.svc_config_path}}/telemetry.json"
+
+# Create SSL certs
+
+# This file is for openssl to put random bits into when doing key generation.
+export RANDFILE="{{pkg.svc_data_path}}/.rnd"
+touch $RANDFILE
+
+# Generate a private key if one does not exist.
+cert_file="{{cfg.ssl_certificate}}"
+key_file="{{cfg.ssl_certificate_key}}"
+if [[ ! -f "$cert_file" ]]; then
+  openssl req \
+    -newkey rsa:2040 -nodes -keyout "$key_file" \
+    -x509 -days 3650 -out "$cert_file" \
+    -subj "/C=US/O=Chef Software/OU=Chef Delivery/CN={{cfg.server_name}}"
+  chmod 600 "$cert_file" "$key_file"
+fi
+
+exec hab pkg exec chef/openresty-noroot openresty \
+  -c "{{pkg.svc_config_path}}/nginx.conf" \
+  -p "{{pkg.svc_var_path}}"

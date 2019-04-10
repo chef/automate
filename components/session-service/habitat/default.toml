@@ -1,0 +1,22 @@
+[mlsa]
+accept = false
+
+[service]
+host = "localhost"
+port = 7777
+signin_url = "/signin"
+external_fqdn = "localhost"
+
+[oidc]
+# issuer is constructed from external-fqdn config + "/dex"
+client_id = "automate-session"
+client_secret = "secretchangeme"
+redirect_url = "/session/callback"
+
+[storage]
+database = "chef_session_service"
+user = "session"
+
+[logger]
+format = "json"
+level = "debug"

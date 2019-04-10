@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package chef.automate.infra.config;
+option go_package = "github.com/chef/automate/api/config/shared";
+
+import "google/protobuf/wrappers.proto";
+import "api/config/shared/tls.proto";
+
+message GlobalConfig {
+	V1 v1 = 1;
+}
+
+message V1 {
+	google.protobuf.StringValue fqdn = 1;
+	Mlsa mlsa = 2;
+	Proxy proxy = 3;
+	Backups backups = 4;
+	Log log = 5;
+	External external = 6;
+	repeated chef.automate.infra.config.FrontendTLSCredential frontend_tls = 7;
+}
+
+message External {
+	message Elasticsearch {
+		message Backup {
+			message FsSettings {
+				message OptionalSettings {
+					google.protobuf.StringValue max_snapshot_bytes_per_sec = 1;
+					google.protobuf.StringValue max_restore_bytes_per_sec = 2;
+				}
+				google.protobuf.StringValue path = 1;
+				OptionalSettings settings = 2;
+			}
+
+			message S3Settings {
+				google.protobuf.StringValue bucket = 1;
+				google.protobuf.StringValue client = 2;
+				google.protobuf.StringValue base_path = 3;
+				chef.automate.infra.config.Backups.S3.Elasticsearch settings = 4; // optional settings
+			}
+
+			google.protobuf.BoolValue enable = 1;
+			google.protobuf.StringValue location = 2;
+			FsSettings fs = 3;
+			S3Settings s3 = 4;
+		}
+
+		message Authentication {
+			message BasicAuth {
+				google.protobuf.StringValue username = 1;
+				google.protobuf.StringValue password = 2;
+			}
+			google.protobuf.StringValue scheme = 1;
+			BasicAuth basic_auth = 2;
+		}
+
+		message SSL {
+			google.protobuf.StringValue root_cert = 1;
+			google.protobuf.StringValue server_name = 2;
+			google.protobuf.StringValue root_cert_file = 3;
+		}
+
+		google.protobuf.BoolValue enable = 1;
+		repeated google.protobuf.StringValue nodes = 2;
+		Backup backup = 3;
+		Authentication auth = 4;
+		SSL ssl = 5;
+	}
+
+	message Postgresql {
+		message Backup {
+			google.protobuf.BoolValue enable = 1;
+		}
+
+		message Authentication {
+			message PasswordAuthentication {
+				message User {
+					google.protobuf.StringValue username = 1;
+					google.protobuf.StringValue password = 2;
+				}
+				User superuser = 1;
+				User dbuser = 2;
+			}
+			google.protobuf.StringValue scheme = 1;
+			PasswordAuthentication password = 2;
+		}
+
+		message SSL {
+			google.protobuf.StringValue mode = 1; // disabled by default
+			google.protobuf.StringValue cert = 2;
+			google.protobuf.StringValue key = 3;
+			google.protobuf.StringValue root_cert = 4;
+		}
+
+		google.protobuf.BoolValue enable = 1;
+		repeated google.protobuf.StringValue nodes = 2;
+		Backup backup = 3;
+		Authentication auth = 4;
+		SSL ssl = 5;
+	}
+
+	Elasticsearch elasticsearch = 1;
+	Postgresql postgresql = 2;
+}
+
+message Mlsa {
+	google.protobuf.BoolValue accept = 1;
+}
+
+message Proxy {
+	google.protobuf.StringValue host = 1;
+	google.protobuf.Int32Value port = 2;
+	google.protobuf.StringValue user = 3;
+	google.protobuf.StringValue password = 4;
+	repeated string no_proxy = 5;
+}
+
+message Backups {
+	// 1 is a field that got committed in generated code but not in the
+	// proto file
+	reserved 1;
+	// location should be one of ["filesystem", "s3"]
+	google.protobuf.StringValue location = 3;
+	Filesystem filesystem = 2;
+	S3 s3 = 4;
+
+	message Filesystem {
+		google.protobuf.StringValue path = 1;
+		google.protobuf.StringValue es_max_snapshot_bytes_per_sec = 2;
+		google.protobuf.StringValue es_max_restore_bytes_per_sec = 3;
+	}
+
+	message S3 {
+		AWSCredentials credentials = 1;
+		Elasticsearch es = 2;
+		Bucket bucket = 3;
+
+		message AWSCredentials {
+			google.protobuf.StringValue access_key = 1;
+			google.protobuf.StringValue secret_key = 2;
+			google.protobuf.StringValue session_token = 3;
+		}
+
+		message Elasticsearch {
+			// Backup repo settings
+			google.protobuf.BoolValue compress = 2;
+			google.protobuf.BoolValue server_side_encryption = 3;
+			google.protobuf.StringValue buffer_size = 4;
+			google.protobuf.StringValue canned_acl = 5;
+			google.protobuf.StringValue storage_class = 6;
+			// Snapshot settings
+			google.protobuf.StringValue max_snapshot_bytes_per_sec = 7;
+			google.protobuf.StringValue max_restore_bytes_per_sec = 8;
+			google.protobuf.StringValue chunk_size = 9;
+			// S3 client settings
+			google.protobuf.StringValue read_timeout = 10;
+			google.protobuf.Int32Value max_retries = 11;
+			google.protobuf.BoolValue use_throttle_retries = 12;
+			google.protobuf.StringValue protocol = 13;
+		}
+
+		message Bucket {
+			google.protobuf.StringValue endpoint = 1;
+			google.protobuf.StringValue base_path = 2;
+			google.protobuf.StringValue name = 3;
+		}
+	}
+}
+
+message Log {
+	google.protobuf.StringValue level = 1;
+	google.protobuf.StringValue format = 2;
+}

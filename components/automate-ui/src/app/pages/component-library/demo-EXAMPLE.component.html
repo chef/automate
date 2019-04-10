@@ -1,0 +1,186 @@
+<!--
+Use this template as a starting point for adding a component to the library.
+Review all the HTML comments (and delete from your file before committing!).
+Outside of comments, look for any items bracketed with %%% and replace appropriately.
+-->
+<!-- The title attribute is optional, and needed only in the rare case that you want
+to use a name (perhaps a more general name) than your actual component. -->
+<app-component-library-screen title="%%% COMPONENT-NAME %%%">
+
+  <app-cl-section>
+    <!--
+    Purpose and description of component.
+    Note that any symbol names, function names, HTML element names, etc.
+    throughout the page should be wrapped in a <token></token> element,
+    e.g. <token>my_func</token> rather than 'my_func', <my_func>, or <b>my_func</b>, etc.
+    -->
+  </app-cl-section>
+
+  <!--
+  Should you need more specifics (see e.g. DemoButton)
+  add additional <app-cl-section> elements like this next:
+  -->
+  <app-cl-section>
+    <!-- Use <h3> and <h4> elements as needed. -->
+    <h3>%%% SUB-HEADING %%%</h3>
+    <!-- Arbitrary content here (using p, div, code, etc.) -->
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Working Example</h3>
+
+    <!--
+    Use your real component here.
+    Optionally, include meta-controls to demo your component.
+    Examples with meta-controls: DemoRadialChart, DemoBubbleChart
+    -->
+    <!-- BEGIN example content -->
+    <chef-form-field>
+      <label>Test Field</label>
+      <input chefInput required #testfield type="text" placeholder="Type 'error' to see an example error." >
+      <chef-error *ngIf="testfield.value == 'error'">This is an example error</chef-error>
+    </chef-form-field>
+    <!-- END example content -->
+  </app-cl-section>
+
+  <app-cl-code-section>
+    <h3>Angular Template Code Example</h3>
+
+    <!--
+    Repeat your example (less any meta-controls) as string literals here.
+    1. Typically bracket the example with <pre> elements.
+    2. Encode HTML entities for '<' and '>' to '&lt;' and '&gt;' respectively.
+    3. Encode opening curly braces with {{ ‘{‘ }} or &#x0007B; to disambiguate for Angular.
+    4. Note that inside a <pre> all spaces count, hence the particular
+       positioning of line breaks and indents here should be observed.
+    5. If you want to highlight a fragment inside a <code> block (see examples
+       for DemoButton, DemoRadio, or DemoRadialChart) simply wrap it with
+       the standard HTML <strong> element. In your text, that renders as just emboldened
+       but in <code> blocks it appears highlighted.
+    -->
+    <!-- BEGIN example content -->
+    <pre>&lt;chef-form-field&gt;
+  &lt;label&gt;Test Field&lt;label&gt;
+  &lt;input chefInput #testfield id="test" required type="<strong>text</strong>" placeholder="Type 'error' to see an example error."&gt;
+  &lt;chef-error *ngIf="testfield.value == 'error'"&gt;This is an example error&lt;/chef-error&gt;
+&lt;/chef-form-field&gt;</pre>
+    <!-- END example content -->
+
+  </app-cl-code-section>
+
+  <app-cl-code-section>
+    <h3>Typescript Code Example</h3>
+
+    <!--
+    If your above example requires backing typescript code, include that here instead of N/A.
+    (and of course, it belongs in your component.ts file to actually work!).
+    Examples: DemoBubbleChart, DemoCheckbox, DemoSelect
+    -->
+    N/A
+  </app-cl-code-section>
+
+  <app-cl-code-section>
+    <h3>CSS Code Example</h3>
+
+    <!--
+    If your above example requires backing CSS code, include that here instead of N/A.
+    Examples: DemoCheckbox
+    -->
+    N/A
+  </app-cl-code-section>
+
+  <app-cl-section>
+    <h3>API</h3>
+
+    <!-- If your element allows no child components, include this as your first line here: -->
+    The <token>&lt;your-element-name&gt;</token> element has no child content.
+
+    <!--
+    Each parameter should be defined in an <api-prop> and should always
+    have "name" and "type" attributes.
+    Type names should begin with a capital letter.
+    If your parameter operates by merely being present or absent, i.e. it takes no value,
+    then assign it a type of "Attribute".
+
+    Include a "default" attribute if appropriate.
+    If your default value is an empty string, specify it literally,
+    e.g. <api-prop name="foo" type="string" default="empty string">.
+    Such meta-terms will be recognized and styled to differentiate them.
+
+    Include a "required" attribute if appropriate.
+    The required attribute takes no value; simply include it for a required parameter
+    and omit it for an optional parameter.
+
+    Note the presence of the "for" attribute in the <app-cl-api> below.
+    Include the "for" if you have multiple APIs to document,
+    then add additional <app-cl-api> sections for each one.
+    Just omit the "for" for the typical, single API case.
+    -->
+
+    <app-cl-api for="chef-icon-button">
+
+      <api-prop name="big" type="Attribute" required>
+        <!-- Write this as a complete sentence. -->
+        Make a big icon button.
+      </api-prop>
+
+      <api-prop name="borderless" type="Attribute"> <!-- optional due to lack of 'required' -->
+        Make a borderless button.
+      </api-prop>
+
+      <!-- If your element accepts child components, include this as your LAST parameter: -->
+      <api-prop name="Content Model" type="DOM nodes" required>
+        <!-- Describe your content here. -->
+      </api-prop>
+    </app-cl-api>
+
+    <app-cl-api for="chef-button">
+      <!-- Itemize parameters for this additional element's API... -->
+    </app-cl-api>
+
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Accessibility</h3>
+
+    <!--
+    Ideally your component should be designed for accessibility.
+    Please use one of the following statements.
+    -->
+    This component supports accessibility.
+    This component does not currently support accessibility.
+    This component has not been evaluated for accessibility support.
+    This component partially supports accessibility because...
+
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Browser Compatibility</h3>
+
+    <!--
+    All 5 browsers should be listed here; adjust the major version number
+    to indicate what you have actually tested.
+    Ideally the state of all browsers should be "OK" as shown.
+    However, if there is a known issue (that should be addressed in the near term) note it here.
+    -->
+    <ul>
+      <li>Chrome 61 - OK</li>
+      <li>Firefox 52 - OK</li>
+      <li>Safari 11 - OK</li>
+      <li>Edge 40 - OK</li>
+      <li>IE 11 - OK</li>
+    </ul>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Example Running In Chef Automate</h3>
+
+    <!-- Description (including hyperlink) of how to navigate to and use a live example -->
+    <!-- BEGIN example content -->
+    Go to the <a href="/client-runs" target="_blank">Client Runs page</a>.
+    <br/>
+    The chart at the top of the page shows the number of succeeding, failing, and missing nodes.
+    <!-- END example content -->
+  </app-cl-section>
+
+</app-component-library-screen>

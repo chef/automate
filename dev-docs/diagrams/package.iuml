@@ -1,0 +1,86 @@
+@startuml
+!include "style/style.iuml"
+agent "api-client" as apiclient
+agent "automate-ui" as aui
+agent "Upstream Identity Provider" as idp
+agent "load balancer" as elb
+agent "automate-gateway" as gateway
+agent "chef-automate cli" as depcli
+agent "deployment-service" as deploymentsrv
+agent "license-control-service" as licensectrlsrv
+agent "config-mgmt-service" as cfgmgmtsrv
+agent "ingest-service" as ingestsrv
+agent "compliance-service" as compsrv
+database "postgres" as pgscannersrv
+agent "notifications-service" as notificationsrv
+agent "Slack" as slack
+agent "Webhook" as webhook
+agent "authz-service" as authzsrv
+agent "authn-service" as authnsrv
+agent "local-user-service" as localuserserv
+agent "automate-dex" as automatedex
+agent "dex" as dex
+database "postgres" as pgdex
+agent "license" as licensesrv
+agent Salesforce
+agent S3
+database "elasticsearch" as escfgmgmt
+agent "es-sidecar-service" as essidecar
+agent "data-lifecycle-service" as datalifecycle
+database "elasticsearch" as escompliance
+agent "secrets-service" as secserv
+database "postgres" as pgnotifications
+agent "session-service" as sessionsrv
+agent "teams-service" as teamsrv
+
+apiclient <<--> elb: grpc
+aui <<--> elb : https/rest
+elb <<--> gateway : https/rest; grpc
+gateway <-->> deploymentsrv : grpc
+gateway <-->> licensectrlsrv : grpc
+gateway <-->> cfgmgmtsrv : grpc
+gateway <-->> ingestsrv : grpc
+gateway <-->> compsrv : grpc
+gateway <-->> notificationsrv : grpc
+gateway <-->> authzsrv : grpc
+gateway <-->> sessionsrv : https
+gateway <-->> localuserserv : grpc
+gateway <-->> teamsrv : grpc
+
+depcli <-->> deploymentsrv : grpc
+
+gateway <-->> automatedex : https
+gateway <-->> authnsrv : grpc
+dex <-->> idp : https
+dex <-->> sessionsrv : https
+dex <-->> authzsrv : grpc
+dex <-->> authnsrv : grpc
+dex <-->> localuserserv : grpc
+authnsrv <-->> teamsrv : grpc
+
+licensectrlsrv <-->> licensesrv : manual
+licensesrv -->> Salesforce : https
+licensesrv -->> S3 : https
+
+cfgmgmtsrv <-- escfgmgmt : https
+ingestsrv <<-- datalifecycle : grpc
+ingestsrv -->> escfgmgmt : https
+
+compsrv <-- escompliance : https
+compsrv <<-- datalifecycle : grpc
+compsrv <-->> secserv : grpc
+
+escompliance <<-- essidecar : local
+escfgmgmt <<-- essidecar : local
+
+compsrv <-->> pgscannersrv : tcp
+
+notificationsrv -->> slack : http
+notificationsrv -->> webhook : http
+notificationsrv <-->> pgnotifications : tcp
+notificationsrv <-->> secserv: grpc
+
+automatedex -- dex : fronts
+dex <-->> pgdex : tcp
+
+@enduml

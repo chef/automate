@@ -1,0 +1,16 @@
+<div class="info-modal">
+  <fieldset>
+    <div class="field">
+      <input type="text" readonly ng-model="token">
+    </div>
+  </fieldset>
+  <div class="copy">
+    <cd-modal-buttons>
+      <button class="button primary" ng-click="copy()">Copy</button>
+      <div class="result" ng-if="copied">
+          <span class="success" icon="checkmark"></span>
+          <span class="success">Copied!</span>
+      </div>
+    </cd-modal-buttons>
+  </div>
+</div>

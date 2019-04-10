@@ -1,0 +1,16 @@
+<!doctype html>
+<html class="automate-ui">
+  <head>
+    <title><%= webpackConfig.metadata.title %></title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/workflow/images/favicon.ico?v=2" rel="shortcut icon">
+    <link href="/workflow/images/favicon.png?v=2" rel="icon" type="image/png">
+    <base href="/workflow/e/{{ session.enterprise }}/">
+  </head>
+  <body ng-class="app_state" cd-flash cd-modal>
+    <div class="ng-hide" ng-include="'/workflow/images/icons.svg'"></div>
+    <div class="fade-in container" ui-view></div>
+  </body>
+</html>

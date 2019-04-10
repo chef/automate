@@ -1,0 +1,16 @@
+[service]
+host = "localhost"
+port = 14001
+feed_interval = "30m"
+
+[tls]
+key_contents =""
+cert_contents = ""
+root_cert_contents = ""
+
+[mlsa]
+accept = false
+
+[log]
+format = "text"
+level = "info"

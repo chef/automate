@@ -1,0 +1,11 @@
+name: a2-api-smoke
+title: InSpec Automate REST API Smoke Profile
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: engineering@chef.io
+license: All Rights Reserved
+summary: An InSpec profile for smoke testing Automate's REST API
+version: 0.1.0
+depends:
+  - name: a2-resource-pack
+    path: ../a2-resource-pack

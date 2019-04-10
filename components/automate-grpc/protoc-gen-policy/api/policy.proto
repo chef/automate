@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package chef.automate.api;
+
+option go_package = "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/api";
+
+message PolicyInfo {
+  string resource = 1;
+  string action = 2;
+};

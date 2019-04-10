@@ -1,0 +1,46 @@
+chef-ui-docs,
+chef-design-docs {
+
+  #sidebar-nav {
+    order: 1;
+    margin-left: -1em;
+    display: flex;
+    flex-direction: column;
+    padding: 1em 1em;
+    flex: 1 0 150px;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+
+    ul {
+      padding-left: 0px;
+
+      li {
+        margin: 0;
+        list-style: none;
+      }
+    }
+
+    a {
+      padding: 0.5em;
+      display: block;
+      text-decoration: none;
+      color: inherit;
+
+      &.link-active {
+        background: chef-hsl(var(--chef-grey));
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+      }
+
+      &:hover,
+      &:focus {
+        color: chef-hsl(var(--chef-primary-bright));
+        border-right: 2px solid chef-hsl(var(--chef-primary-bright));
+      }
+    }
+  }
+
+
+}

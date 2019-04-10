@@ -1,0 +1,73 @@
+.cd-select {
+  display: inline-block;
+  font-size: 24px;
+  position: relative;
+
+  .selection {
+    display: inline-block;
+    background-color: $hoopblue;
+    padding: 0 9px;
+    cursor: pointer;
+
+    &:after {
+      @extend .icon;
+      content: "\e632";
+      margin-left: 5px;
+      display: inline-block;
+      font-size: 16px;
+    }
+  }
+
+  .options {
+    display: none;
+    position: absolute;
+    z-index: 100;
+    left: 0;
+    top: 105%;
+    border: 1px solid gray;
+    background-color: $white;
+  }
+
+  .cd-option {
+    display: block;
+    white-space: nowrap;
+    padding: 0 5px;
+    color: black;
+
+    &:hover {
+      background-color: gray;
+      cursor: pointer;
+      color: $white;
+    }
+  }
+}
+
+// open state
+.open {
+  .selection {
+    &:after {
+      @include transform(rotate(90deg) translateY(-4px));
+    }
+  }
+
+  .options {
+    display: block;
+  }
+}
+
+// Color variations
+.green {
+  .options {
+    border-color: $tealgreen;
+  }
+
+  .cd-option {
+    color: $tealgreen;
+
+    &:hover {
+      background-color: $tealgreen;
+      color: $white;
+    }
+  }
+
+}

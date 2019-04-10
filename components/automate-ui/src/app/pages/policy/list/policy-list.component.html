@@ -1,0 +1,55 @@
+<app-admin-sidebar></app-admin-sidebar>
+<chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+
+<div class="container">
+  <main>
+    <chef-page-header>
+      <chef-heading>Policies</chef-heading>
+      <chef-subheading>
+        Policies manage the resources and actions used by identities.
+      </chef-subheading>
+    </chef-page-header>
+    <section *ngIf="(iamMajorVersion$ | async) === 'v1'" class="page-body">
+      Currently, you are using IAM v1 policies. Automate only shows IAM v2 policies.
+    </section>
+    <section *ngIf="(iamMajorVersion$ | async) !== 'v1'" class="page-body">
+      <app-authorized [allOf]="['/iam/v2beta/policies', 'get']">
+        <chef-table>
+          <chef-thead>
+            <chef-tr>
+              <chef-th class="name-column">Name</chef-th>
+              <chef-th class="type-column">Type</chef-th>
+              <chef-th class="status-column">Status</chef-th>
+              <chef-th class="button-column"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let policy of sortedPolicies$ | async">
+                <chef-td class="name-column">
+                  <a [routerLink]="['/settings/policies', policy.id]">{{ policy.name }}</a>
+                </chef-td>
+                <chef-td class="type-column">{{ policy.type | iamType }}</chef-td>
+                <chef-td class="status-column">{{ status(policy) | capitalize }}</chef-td>
+                <chef-td class="button-column">
+                <!-- <app-authorized [allOf]="['/policies/{policy}', 'delete', policy]"> -->
+                  <chef-control-menu *ngIf="policy.type !== 'CHEF_MANAGED'">
+                    <chef-option (click)="startPolicyDelete(policy)">Delete Policy</chef-option>
+                  </chef-control-menu>
+                <!-- </app-authorized> -->
+                </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </app-authorized>
+    </section>
+
+    <app-delete-object-modal
+      [visible]="deleteModalVisible"
+      objectNoun="policy"
+      [objectName]="policyToDelete?.id"
+      [moreDetails]="inUseMessage()"
+      (close)="closeDeleteModal()"
+      (deleteClicked)="deletePolicy()">
+    </app-delete-object-modal>
+  </main>
+</div>

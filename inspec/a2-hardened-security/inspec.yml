@@ -1,0 +1,11 @@
+name: a2-hardened-security
+title: InSpec Profile
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: engineering@chef.io
+license: All Rights Reserved
+summary: Automate 2.0 Hardened Security Tests
+version: 0.1.0
+depends:
+- name: cis-rhel7-level1-server
+  path: vendor/cis-rhel7-level1-server-v2.1.1

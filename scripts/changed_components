@@ -1,0 +1,75 @@
+#!/usr/bin/env ruby
+
+require "json"
+require "yaml"
+require "tsort"
+
+class Hash
+  include TSort
+  alias tsort_each_node each_key
+  def tsort_each_child(node, &block)
+    fetch(node).each(&block)
+  end
+end
+
+def get_hab_deps(source_dir)
+  plan_path = "#{source_dir}/habitat/plan.sh"
+  depString = `bash -c '. #{plan_path}; echo ${pkg_deps[*]}'`
+  depString.lines.last.split
+end
+
+config = YAML.load(File.read(".expeditor/config.yml"))
+
+changed_files = `git diff --name-only $(scripts/git_difference_expression)`.split("\n")
+
+build_all = (ENV["BUILDKITE_BRANCH"] || "").include?("verify-rebuild-all")
+
+#
+# The goal here is to produce the same builds that Expeditor would produce
+# should the PR be merged. That way we can know whether or not this PR would
+# break the pipeline.
+#
+# We are a bit wasteful here as we could do this in one pass and
+# without the O(N^2) searching, but if any of that ends up mattering
+# something has gone very very very wrong.
+#
+# Also only care about the portion of the dep tree we can actually
+# build, which means we throw out anything not in this repository. I
+# suppose techincally if something outside this repository depended
+# on us, we could end up missing a required dependency.
+#
+changed_packages = Hash.new
+hab_deps = Hash.new
+our_packages = Hash.new
+
+config["habitat_packages"].each do |hab_pkg|
+  our_packages[hab_pkg.keys.first] = hab_pkg.values.first["source"]
+end
+
+config["habitat_packages"].each do |hab_pkg|
+  pkg_name = hab_pkg.keys.first
+  metadata = hab_pkg.values.first
+
+  # Gather hab dependency information, filtering packages not in this repo
+  hab_deps[pkg_name] = get_hab_deps(metadata["source"]).map do |p|
+    name = p.split("/")[1]
+    name if our_packages[name]
+  end.compact
+
+  # Look for changed packages based on file diff
+  if build_all || changed_files.any? do |file|
+       Array(metadata["bldr_paths"]).any? { |glob| File.fnmatch(glob, file) }
+     end
+    changed_packages[pkg_name] = metadata["source"]
+  end
+end
+
+hab_deps.each do |pkg, deps|
+  deps.each do |d|
+    changed_packages[pkg] = our_packages[pkg] if changed_packages[d]
+  end
+end
+
+hab_deps.tsort.each do |p|
+  puts changed_packages[p] if changed_packages[p]
+end

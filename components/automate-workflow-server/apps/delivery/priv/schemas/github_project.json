@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string",
+            "required": true
+        },
+        "scm": {
+            "type": "object",
+            "organization":  {
+              "type": "string",
+              "required": true
+            },
+            "project":  {
+              "type": "string",
+              "required": true
+            },
+            "branch":  {
+              "type": "string",
+              "required": true
+            },
+            "verify_ssl": {
+              "type": "boolean",
+              "required": true
+            }
+        }
+    }
+}

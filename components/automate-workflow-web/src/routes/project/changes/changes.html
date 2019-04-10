@@ -1,0 +1,21 @@
+<div class="change-container">
+  <div class="change-filters">
+    <label class="little-title">Filter Changes</label>
+    <button
+      type="button"
+      class="select-menu"
+      bs-select
+      bs-options="filter as filter.text for filter in stateFilters"
+      ng-model="currentFilter"
+      ng-change="filterByState(currentFilter)"
+      data-caret-html="<i class='fa fa-chevron-down'></i>">
+    </button>
+  </div>
+  <div ng-repeat="change in changes" class="change-item">
+    <cd-change-card change="change"></cd-change-card>
+  </div>
+  <div class="no-items" ng-hide="changes.length">
+    This project doesn't have any {{ currentFilter.value === 'all' ? '' : currentFilter.value }}
+    changes right now.
+  </div>
+</div>

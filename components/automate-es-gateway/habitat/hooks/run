@@ -1,0 +1,9 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# We shipped a version of A2 where es-gateway would write logs into the /hab/pkgs
+# path. Attempt to clean up those log files if they exist:
+rm -f /hab/pkgs/core/nginx/1.15.6/20181212185120/chef /hab/pkgs/core/nginx/1.15.6/20190115154053/chef
+
+exec {{pkgPathFor "core/nginx"}}/bin/nginx -c {{pkg.svc_config_path}}/nginx.conf

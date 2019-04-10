@@ -1,0 +1,108 @@
+.tmp
+/nodes/
+
+# Habitat
+.secrets
+results/
+!results/.gitkeep
+.studio/personal
+# just a particular file called 'src', *not* src directories that exist in some projects!
+src
+!src/
+package-lock.json
+
+# InSpec
+inspec.lock
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*_override.tf
+
+# Workflow
+.delivery/cli.toml
+
+# ctags
+/tags
+
+# mac
+.DS_Store
+
+# node
+node_modules
+dist
+
+# Go dep - Some dep versions create this while fetching
+vendor.orig/
+
+# GO debugging
+debug
+debug.test
+
+# Ingest uses nodeJS for integration tests
+.ingest-service.toml
+
+.bash_history
+
+# intellij
+.idea
+
+# VSCode
+.vscode
+
+# gometalinter in cache
+cache/gometalinter-*
+
+# golangci-lint in cache
+cache/golangci-lint*
+
+# for built component binary files
+bin/
+# bin stubs/wrappers/etc. in the hab dir
+!/components/*/habitat/bin/
+!/components/*/habitat/bin/*
+
+components/automate-cs-nginx/chef-server-ctl
+
+# automate-chef-io
+components/automate-chef-io/public
+components/automate-chef-io/themes/chef
+
+# vim
+*.swp
+*.swo
+
+# CI/CD Pipeline
+manifest.json
+.vagrant/
+a2-dependency-licenses.json
+existing-versions.json
+existing-releases.json
+updated-versions.json
+updated-releases.json
+
+dev/auth.toml
+
+# Licenses and other secrets
+dev/secrets-env.sh
+dev/license.jwt
+components/automate-deployment/a1-migration/delivery.license
+components/automate-deployment/basic-a1/delivery.license
+
+backups
+
+# never ignore anything below vendor/
+!/vendor/**
+
+# Do not add automate credentials files.
+components/automate-deployment/automate-credentials-*.toml
+/ec2/out.json
+
+# cypress screenshots/videos and other folders cypress creates
+e2e/cypress/screenshots
+e2e/cypress/videos
+e2e/cypress/fixtures
+components/automate-grpc/protoc-gen-a2-config/protoc-gen-a2-config
+components/event-gateway/cmd/event-gateway/event-gateway
+tools/expeditor-config-gen/expeditor-config-gen

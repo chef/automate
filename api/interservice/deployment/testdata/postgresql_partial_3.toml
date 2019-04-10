@@ -1,0 +1,12 @@
+port = 6543
+log_level = "INFO"
+
+[superuser]
+password = "sesame"
+
+[replication]
+enable = true
+lag_health_threshold = 3
+
+[wale.aws]
+prefix = 'adam'

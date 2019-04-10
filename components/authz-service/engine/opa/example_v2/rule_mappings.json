@@ -1,0 +1,24 @@
+{
+  "project1" : [
+    {
+      "type":   "ChefServers",
+      "values": ["chef-server-1", "chef-server-2", "chef-server-3"]
+    }
+  ],
+  "project2" : [
+    {
+      "type":   "ChefOrgs",
+      "values": ["Org1", "Org2"]
+    },
+    {
+      "type":   "ChefServers",
+      "values": ["chef-server-3", "chef-server-4", "chef-server-5"]
+    }
+  ],
+  "project3" : [
+    {
+      "type":   "ChefEnvironment",
+      "values": ["env-1", "env-2", "env3-3"]
+    }
+  ]
+}

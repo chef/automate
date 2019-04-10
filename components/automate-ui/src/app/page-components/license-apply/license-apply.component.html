@@ -1,0 +1,105 @@
+<chef-modal label="license-lockout-label" [locked]="modalLocked" [visible]="modalVisible" (close)="closeModal()">
+  <div class="license-wrapper">
+    <ng-container *ngIf="!licenseApplied">
+
+      <!-- See enum LicenseApplyReason for what magic numbers correspond to:
+        INITIAL_INSTALL = 1
+        LICENSE_EXPIRED = 2
+        LICENSE_ABOUT_TO_EXPIRE = 3
+      -->
+      <ng-container *ngIf="licenseApplyReason === 1">
+        <div class="title">Welcome to Chef Automate!</div>
+        <div class="subtitle">Please enter your license key.</div>
+      </ng-container>
+
+      <ng-container *ngIf="licenseApplyReason === 2">
+        <div class="title alert">
+          <chef-icon>warning</chef-icon> Your Chef Automate license has expired. </div>
+        <div class="subtitle">Please
+          <a href="https://www.chef.io/contact-us/" target="_blank">contact us</a> to get a license. If you already have one, enter it now.
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="licenseApplyReason === 3">
+        <h2 id="apply-license-label" class="title">Apply new Chef Automate license</h2>
+        <div class="subtitle">
+          Please <a href="https://www.chef.io/contact-us/" target="_blank">contact us</a> to get a license.
+          If you already have one, enter it now.
+        </div>
+      </ng-container>
+
+      <div class="error-container">
+        <chef-alert type="error" *ngIf="applyLicenseInternalError">
+          <span>
+          Sorry, we're unable to apply this license. Please check your logs or
+          contact <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a>.
+          </span>
+        </chef-alert>
+        <chef-alert type="error" *ngIf="permissionDenied">
+          We're sorry, but you currently do not have permission to apply a license. Please contact an administrator for permission.
+        </chef-alert>
+        <chef-alert type="error" *ngIf="badRequestReason">
+          Sorry but this license {{ badRequestReason }}. Please enter a valid license.
+        </chef-alert>
+      </div>
+
+      <div class="note">Required fields are marked with an asterisk (*).</div>
+      <form class="apply" [formGroup]="applyForm" (ngSubmit)="onApplyLicenseFormSubmit()" novalidate>
+        <chef-form-field>
+          <label for="licenseKey">License Key *</label>
+          <textarea name="licenseKey" id="licenseKey" formControlName="licenseKey" cols="65" rows="10" autofocus placeholder="Enter license key here..."></textarea>
+          <chef-error *ngIf="applyForm.get('licenseKey').hasError('required') && applyForm.get('licenseKey').dirty">License key required</chef-error>
+        </chef-form-field>
+        <div class="button">
+          <chef-button type="submit" primary [disabled]="!applyForm.valid || applyingLicense">Apply License</chef-button>
+        </div>
+      </form>
+      <div class="spinner-container">
+        <chef-loading-spinner *ngIf="applyingLicense" size="30"></chef-loading-spinner>
+      </div>
+
+      <!-- Only show footer to get trial if this is the initial apply -->
+      <ng-container *ngIf="licenseApplyReason === 1 && !licenseExpired">
+        <div class="footer">
+          <a href="" (click)="backToLicenseLockout(); false" class="active bright-link">Sign up for the trial</a>.
+          Or
+          <a href="https://www.chef.io/contact-us/" target="_blank">contact us</a> to get a license.
+        </div>
+      </ng-container>
+    </ng-container>
+
+    <!-- display confirmation once license applied -->
+    <ng-container *ngIf="licenseApplied">
+      <div class="title">
+        <chef-icon>check_circle</chef-icon> Your Chef Automate license has been applied!
+      </div>
+      <div class="info">
+        <div class="subtitle">Your new Chef Automate license will expire on
+          <strong class="date">{{ expirationDate }}.</strong>
+          We will keep you informed about your license's status, and will alert you
+          <strong>90 days prior</strong> to your license expiration date.
+        </div>
+        <div class="subtitle">
+          <strong>How can we help you be successful with Chef?</strong>
+        </div>
+      </div>
+
+      <ul>
+        <li>
+          <a href="https://automate.chef.io/docs" target="_blank">
+            I'm familiar with Chef, but I need help getting started with Chef Automate.
+            <chef-icon>launch</chef-icon>
+          </a>
+        </li>
+        <li>
+          <a href="https://learn.chef.io/" target="_blank">
+            Teach me everything!
+            <chef-icon>launch</chef-icon>
+          </a>
+        </li>
+      </ul>
+      <chef-button primary (click)="closeModal()" class="confirmation" id="dismiss-help"> It's ok, I know what I am doing </chef-button>
+      <app-telemetry-checkbox></app-telemetry-checkbox>
+    </ng-container>
+  </div>
+</chef-modal>

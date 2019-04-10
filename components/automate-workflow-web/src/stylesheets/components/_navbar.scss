@@ -1,0 +1,118 @@
+.navbar {
+  padding: 2px 0 0 0;
+  font-size: 1em;
+  background-color: $white;
+  box-shadow: 0 0 6px $gray-pale;
+  box-sizing: padding-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  height: $global-header-height;
+
+  .logo {
+    float: left;
+
+    a {
+      display: block;
+      padding: 13px 40px;
+
+      img {
+        width: 116px;
+        height: 50px;
+        display: block;
+      }
+    }
+
+    .chef-logo {
+      float: left;
+      width: 32px;
+      height: 32px;
+
+      .base {
+        fill: #526375;
+      }
+      .accent {
+        fill: #f18b21;
+      }
+    }
+
+    .chef-delivery-logo {
+      float: left;
+      margin-left: 6px;
+
+      .chef {
+        fill: #526375;
+        width: 64px;
+        height: 17px;
+        margin-top: 2px;
+      }
+
+      .delivery {
+        fill: #f18b21;
+        width: 64px;
+        height: 8px;
+        margin-top: 4px;
+        margin-left: 1px;
+      }
+    }
+  }
+
+  .navigation {
+    margin-left: 30px;
+    float: left;
+    font-size: 1em;
+
+    ul.navigation-menu {
+      clear: both;
+      display: inline;
+      margin: 0;
+      overflow: visible;
+      padding: 0;
+      width: 100%;
+      z-index: 9999;
+
+      li.nav-link {
+        display: inline;
+        margin: 0 10px;
+        background: transparent;
+        line-height: $global-header-height - 4;
+        overflow: hidden;
+        text-decoration: none;
+        width: 100%;
+        z-index: 99;
+        width: auto;
+        padding: 5px;
+
+        a {
+          display: inline-block;
+          color: $chef-blue-dark;
+          border-bottom: 2px solid $white;
+          text-decoration: none;
+          transition: border-bottom .2s;
+
+          &:hover {
+            border-bottom: 2px solid $gray-pale;
+            transition: border-bottom .2s;
+          }
+        }
+
+        &.active a {
+          border-bottom: 2px solid $chef-blue-dark;
+        }
+      }
+    }
+  }
+
+  .navigation-tools {
+    float: right;
+
+    .user-nav {
+      margin: 1em 0 0;
+      padding: .5em 1em;
+      font-size: .875em;
+      @include clearfix;
+    }
+  }
+}

@@ -1,0 +1,81 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+ENV['VAGRANT_DEFAULT_PROVIDE'] = 'libvirt'
+
+"installation of boxes:
+  vagrant box add trusty https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box
+  vagrant box mutate trusty libvirt
+  vagrant box add precise https://vagrantcloud.com/ubuntu/boxes/precise64/versions/12.02.4/providers/virtualbox.box
+  vagrant box mutate trusty libvirt
+  vagrant box add centos65 https://vagrantcloud.com/nrel/boxes/CentOS-6.5-x86_64/versions/1.2.0/providers/virtualbox.box
+  vagrant box mutate centos65 libvirt
+"
+
+def add_ssh config
+  config.vm.provision "shell", inline: "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key' >> /home/vagrant/.ssh/authorized_keys"
+  # get private vulcano key
+  pkey = File::read '/home/vulcano/.ssh/id_rsa.pub'
+  unless pkey.nil?
+    config.vm.provision "shell", inline: "echo '#{pkey}' >> /home/vagrant/.ssh/authorized_keys"
+  end
+end
+
+Vagrant.configure(2) do |config|
+  config.vm.define "100" do |c|
+    c.vm.box = "trusty"
+    c.vm.network "private_network", ip: "123.123.123.100"
+
+    c.vm.provision "shell", inline: "apt-get update"
+    c.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = ["cookbooks"]
+      chef.add_recipe "ssh-hardening"
+    end
+    add_ssh c
+  end
+
+  config.vm.define "101" do |c|
+    c.vm.box = "trusty"
+    c.vm.network "private_network", ip: "123.123.123.101"
+    c.vm.provision "shell", inline: "apt-get update"
+    add_ssh c
+  end
+
+  config.vm.define "102" do |c|
+    c.vm.box = "centos65"
+    c.vm.network "private_network", ip: "123.123.123.102"
+    add_ssh c
+  end
+
+  config.vm.define "103" do |c|
+    c.vm.box = "centos65"
+    c.vm.network "private_network", ip: "123.123.123.103"
+
+    c.vm.provision "shell", inline: "yum -y install curl wget && curl -L https://www.chef.io/chef/install.sh | sudo bash"
+    c.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = ["cookbooks"]
+      chef.add_recipe "ssh-hardening"
+    end
+    add_ssh c
+  end
+
+  config.vm.define "104" do |c|
+    c.vm.box = "precise"
+    c.vm.network "private_network", ip: "123.123.123.104"
+
+    c.vm.provision "shell", inline: "apt-get update && apt-get -y install curl wget && curl -L https://www.chef.io/chef/install.sh | sudo bash"
+    c.vm.provision :chef_solo do |chef|
+      chef.cookbooks_path = ["cookbooks"]
+      chef.add_recipe "ssh-hardening"
+    end
+    add_ssh c
+  end
+
+  config.vm.define "105" do |c|
+    c.vm.box = "precise"
+    c.vm.network "private_network", ip: "123.123.123.105"
+    c.vm.provision "shell", inline: "apt-get update"
+    add_ssh c
+  end
+
+end

@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package chef.automate.api.users.request;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/auth/users/request";
+
+message GetUsersReq {
+
+}
+
+message CreateUser {
+  string id = 1;
+  string name = 2;
+  string email = 3 [deprecated=true];
+  string username = 5;
+  string password = 4;
+}
+
+message UpdateUser {
+  string id = 1;
+  string email = 2 [deprecated=true];
+  string name = 3;
+  string password = 4;
+  string username = 5;
+}
+
+message UpdateSelf {
+  string id = 1;
+  string name = 2;
+  string password = 3;
+  string username = 4;
+  string previous_password = 5;
+}
+
+message Email {
+	string email = 1;
+}
+
+message Username  {
+  string username = 1;
+}

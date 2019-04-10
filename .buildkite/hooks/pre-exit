@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eu
+
+echo "Attempting to clean up docker containers for buildkitejob=$BUILDKITE_JOB_ID"
+
+matching_containers=$(docker ps --filter "label=buildkitejob=$BUILDKITE_JOB_ID" --format "{{.ID}}")
+if [ -n "$matching_containers" ]; then
+    echo "Killing docker containers $matching_containers"
+    docker kill $matching_containers
+fi

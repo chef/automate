@@ -1,0 +1,193 @@
+.cd-modal-overlay {
+  background-color: rgba($chef-blue-dark, 0.4);
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: 300;
+  overflow: scroll;
+
+  &.ng-enter {
+    @include transition(all 0.25s ease-in);
+    opacity: 0;
+
+    &.ng-enter-active {
+      opacity: 1;
+    }
+  }
+
+  &.ng-leave {
+    @include transition(all 0.25s ease-in);
+    opacity: 1;
+
+    &.ng-leave-active {
+      opacity: 0;
+    }
+  }
+}
+
+.cd-modal {
+  @include modal-box;
+  box-shadow: 0 1px 14px rgba($chef-blue-dark, 0.6);
+  $width: 421px;
+
+  position: absolute;
+  z-index: 320;
+  @include calc(left, '50% - #{$width/2}');
+  top: 10%;
+  margin-bottom: 5%;
+
+  &.ng-enter {
+    @include transition(all 0.25s ease-in);
+    @include transform(translateY(-500px) scale(0.5));
+    opacity: 0;
+
+    &.ng-enter-active {
+      @include transform(translateY(0) scale(1));
+      opacity: 1;
+    }
+  }
+
+  &.ng-leave {
+    @include transition(all 0.25s ease-in);
+    @include transform(translateY(0) scale(1));
+    opacity: 1;
+
+    &.ng-leave-active {
+      @include transform(translateY(-500px) scale(0.5));
+      opacity: 0;
+    }
+  }
+
+  &.red-modal {
+    header {
+      background-color: $alertred;
+
+      .icon {
+        @extend .icon-caution;
+      }
+    }
+  }
+
+  &.info-modal {
+    header {
+      background-color: $iceblue;
+
+      .icon {
+        @extend .icon-circle-info;
+      }
+    }
+  }
+
+  header {
+    background-color: $darkblue;
+    color: $white;
+    padding: 1rem;
+    font-size: 1.6em;
+    vertical-align: text-bottom;
+    position: relative;
+
+    .icon {
+      @extend .icon-download;
+      font-size: 1.4em;
+      vertical-align: text-bottom;
+      padding-right: 5px;
+    }
+
+    .close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.3em;
+      cursor: pointer;
+    }
+  }
+
+  .content {
+    font-size: 1.2em;
+  }
+
+  fieldset {
+    border: none;
+    padding: 20px;
+    margin: 0px;
+    background-color: $white;
+
+    input {
+      background-color: $lightgray;
+      font-family: $monospace;
+    }
+  }
+}
+
+.cd-modal-buttons {
+  @include clearfix;
+  border-top: 1px solid $lightgray;
+  padding: 10px 15px;
+  text-align: right;
+
+  button {
+    display: inline-block;
+  }
+
+  button + button {
+    margin-left: 1rem;
+  }
+
+  button.cta {
+    @include cta-button($padding1: 1rem, $padding2: 2rem, $hasShadow: true);
+  }
+}
+
+.copy {
+  .cd-modal-buttons {
+    border-top: none;
+    text-align: center;
+    button {
+      display: inline-block;
+    }
+    .result {
+      display: inline-block;
+      position: absolute;
+      margin: 12px;
+      font-size: 13px;
+
+      .success {
+        color: $successgreen;
+      }
+    }
+  }
+}
+
+.automate-ui {
+
+  .cd-modal {
+    $width: 650px;
+
+    width: $width;
+    @include calc(left, '50% - #{$width/2}');
+
+    header {
+      background-color: transparent;
+      color: $storm;
+      font-size: 1.5rem;
+      padding: 1rem;
+
+      .close {
+        top: 1rem;
+        right: 1rem;
+        font-size: 1rem;
+      }
+    }
+
+    .content {
+      font-size: 14px;
+      padding: 0 1rem;
+    }
+  }
+
+  .cd-modal-buttons {
+    border-top: none;
+    padding: 1.5rem;
+    text-align: center;
+  }
+}

@@ -1,0 +1,131 @@
+
+@import "~styles/variables";
+@import "~styles/mixins";
+// main classes in component:
+// input-suggester, input-dropdown
+// suggester-input-wrapper, suggester-input
+// category-marker
+// list-item
+// suggester-button-wrapper, suggester-buttons
+
+.flex-wrapper {
+  display: flex;
+  flex-flow: row;
+}
+
+.suggester-wrapper {
+  width: 100%;
+  font-size: 1em;
+  color: $chef-primary-dark;
+}
+
+.suggester-input-wrapper {
+  @include base-box-shadow();
+  display: flex;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid $chef-light-grey;
+  flex-flow: row;
+  flex: 1 1 auto;
+  order: 1;
+  height: 48px;
+  align-items: center;
+
+  input {
+    border: 0px;
+    background: transparent;
+    font-family: 'Muli', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    flex: 1 1 auto;
+    padding-left: 15px;
+    height: 100%;
+
+    &::placeholder {
+      font-size: 13px;
+      opacity: 0.45;
+    }
+  }
+
+  .category-marker {
+    margin-left: 15px;
+    line-height: 1.15;
+    font-size: 14px;
+    flex: 0 0 auto;
+    font-weight: bold;
+    color: $chef-black;
+  }
+}
+
+.input-dropdown {
+  @include base-box-shadow();
+  border: 1px solid lightgrey;
+  border-radius: 3px;
+  background-color: $white;
+  position: absolute;
+  z-index: 99;
+  width: 232px;
+
+  &.categories {
+    width: 232px;
+  }
+
+  &.suggestions {
+    width: 400px;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    list-style: none;
+    padding: 8px 10px;
+    border-bottom: 1px solid lightGrey;
+
+    &.list-item {
+      &.selected {
+        color: $white;
+        cursor: pointer;
+        background-color: $chef-primary-bright;
+
+        &:last-child {
+          border-top-left-radius: 3px;
+          border-top-right-radius: 3px;
+        }
+
+        &:last-child {
+          border-bottom-left-radius: 3px;
+          border-bottom-right-radius: 3px;
+        }
+
+        &.category::after {
+          color: $white;
+        }
+      }
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.suggestion-status {
+      color: $chef-dark-grey;
+    }
+
+    &.no-category-items {
+      font-size: 13px;
+      color: $chef-critical;
+    }
+
+    chef-icon {
+      color: $chef-primary-bright;
+      float: right;
+    }
+  }
+}
+
+
+.hidden-label {
+  padding: 0;
+}

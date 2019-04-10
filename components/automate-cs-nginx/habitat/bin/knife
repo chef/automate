@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+chef_server_ctl_pkg_path="__BUILDTIME_HAB_PKG_PATH_CHEF_SERVER_CTL__"
+bundler_pkg_path="__BUILDTIME_HAB_PKG_PATH_BUNDLER__"
+BUNDLE_GEMFILE="${chef_server_ctl_pkg_path}/chef/Gemfile"
+export BUNDLE_GEMFILE
+"${bundler_pkg_path}/bin/bundle" exec \
+	"${chef_server_ctl_pkg_path}/chef/bin/knife" \
+	"$@" \
+	-c /hab/svc/automate-cs-nginx/config/knife_superuser.rb
+

@@ -1,0 +1,14 @@
+<div class="change-description" ng-if="change.description">
+  <div cd-markdown="change.description"></div>
+</div>
+<div class="commit-items">
+  <div ng-repeat="commitMsg in change.patchsets[0].commitMsgs" class="commit-item">
+    <section>
+      <header>
+        {{ commitMsg[0] }}
+        <span class="sha">{{ commitMsg[2].slice(0, 7) }}</span>
+      </header>
+      <div ng-if="!!commitMsg[1]" cd-markdown="commitMsg[1]"></div>
+    </section>
+  </div>
+</div>

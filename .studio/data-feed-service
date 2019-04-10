@@ -1,0 +1,32 @@
+#!/bin/bash
+
+document "data_feed_start_service" <<DOC
+  Build and start the local data-feed-service
+DOC
+function data_feed_start_service() {
+  build components/data-feed-service
+  start_deployment_service
+  chef-automate dev deploy-some $HAB_ORIGIN/data-feed-service
+}
+
+document "data_feed_build_demo" <<DOC
+  Build components required for data-feed-service demo
+DOC
+function data_feed_build_demo() {
+  rm results/*
+  if ! notifications_compile_protobuf; then
+    log_line "${RED}ERROR:${NC} Unable to compile protobuf files for notifications"
+    return 1
+  fi
+  if ! compile_go_protobuf_component api; then
+    log_line "${RED}ERROR:${NC} Unable to compile protobuf files for api"
+    return 1
+  fi
+  components=("automate-gateway" "notifications-service" "automate-ui" "automate-deployment" "data-feed-service")
+  for component in "${components[@]}"; do
+    if ! build components/"$component"; then
+      log_line "${RED}ERROR:${NC} Unable to compile component '$component'"
+      return 1
+    fi
+  done
+}

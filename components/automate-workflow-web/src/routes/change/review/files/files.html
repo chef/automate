@@ -1,0 +1,40 @@
+<div class="review">
+  <div class="tab-controls">
+    <section class="right">
+      <div class="button-bar">
+        <a class="button small" ng-click="setDiffView('unified')" ng-class="{ active: diffView === 'unified'}">Unified</a>
+        <a class="button small" ng-click="setDiffView('split')" ng-class="{ active: diffView === 'split'}">Split</a>
+      </div>
+    </section>
+    <div class="review-header">
+      <div class="review-actions">
+        <a
+          class="back-btn"
+          ui-sref="main.enterprise.organizations.organization.project.change.review.overview({
+          file: null, start: null, end: null
+          })">
+          <i class="icon-left"></i>
+          Back
+        </a>
+      </div>
+      <div class="file-header">
+        <span>Patchsets: </span>
+        <ol>
+          <li ng-repeat="patchset in change.patchsets | orderBy:'sequenceNumber'">
+            <a
+              ui-sref="main.enterprise.organizations.organization.project.change.review({
+                end: 'p' + patchset.sequenceNumber
+              })"
+              ng-class="{ active: isActivePatchset(patchset) }"
+              ng-click="selectPatchset(patchset)">
+              {{ patchset.sequenceNumber }}
+            </a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <div class="review-diff">
+    <cd-diff></cd-diff>
+  </div>
+</div>

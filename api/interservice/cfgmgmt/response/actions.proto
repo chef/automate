@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.response;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response";
+
+message PolicyCookbooks {
+  string policy_name = 1;
+  repeated CookbookLock cookbook_locks = 2;
+}
+
+message CookbookLock {
+  string cookbook = 1;
+  string policy_identifier = 2;
+}

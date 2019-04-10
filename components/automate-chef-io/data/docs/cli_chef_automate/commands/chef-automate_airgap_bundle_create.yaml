@@ -1,0 +1,30 @@
+name: chef-automate airgap bundle create
+usage: |
+  chef-automate airgap bundle create [/path/to/bundle.aib] [flags]
+options:
+- name: channel
+  shorthand: c
+  usage: Release channel to pull packages from
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for create
+- name: manifest
+  shorthand: m
+  usage: Path to a release manifest.json
+- name: workspace
+  shorthand: w
+  usage: |
+    Path to workspace storage location where temporary data will be stored
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- 'chef-automate airgap bundle - '

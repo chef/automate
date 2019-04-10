@@ -1,0 +1,88 @@
+cluster.name: {{cfg.cluster.name}}
+
+cluster.routing.allocation.node_concurrent_recoveries: {{cfg.cluster.routing.allocation.node_concurrent_recoveries}}
+cluster.routing.allocation.node_initial_primaries_recoveries: {{cfg.cluster.routing.allocation.node_initial_primaries_recoveries}}
+cluster.routing.allocation.same_shard.host: {{cfg.cluster.routing.allocation.same_shard_host}}
+
+cluster.routing.allocation.disk.watermark.low: 1GB
+cluster.routing.allocation.disk.watermark.high: 500MB
+cluster.routing.allocation.disk.watermark.flood_stage: 250MB
+cluster.info.update.interval: 1m
+
+
+{{#if cfg.cluster.routing.allocation.awareness_attributes ~}}
+cluster.routing.allocation.awareness.attributes: {{cfg.cluster.routing.allocation.awareness_attributes}}
+{{/if ~}}
+
+{{#if cfg.node.name ~}}
+node.name: {{cfg.node.name}}
+{{/if ~}}
+node.max_local_storage_nodes: {{cfg.node.max_local_storage_nodes}}
+
+{{#if cfg.node.rack_id ~}}
+node.rack_id: {{cfg.node.rack_id}}
+{{/if ~}}
+{{#if cfg.node.zone ~}}
+node.zone: {{cfg.node.zone}}
+{{/if ~}}
+node.master: {{cfg.node.master}}
+node.data: {{cfg.node.data}}
+
+path.logs: {{pkg.svc_var_path}}/{{cfg.path.logs}}
+path.data: {{pkg.svc_data_path}}/{{cfg.path.data}}
+{{#if cfg.path.repo ~}}
+path.repo: {{cfg.path.repo}}
+{{/if ~}}
+
+indices.recovery.max_bytes_per_sec: {{cfg.indices.recovery.max_bytes_per_sec}}
+
+{{#if cfg.indices.fielddata.cache_size ~}}
+indices.fielddata.cache.size: {{cfg.indices.fielddata.cache_size}}
+{{/if ~}}
+
+indices.breaker.total.limit: {{cfg.indices.breaker.total_limit}}
+indices.breaker.fielddata.limit: {{cfg.indices.breaker.fielddata_limit}}
+indices.breaker.fielddata.overhead: {{cfg.indices.breaker.fielddata_overhead}}
+indices.breaker.request.limit: {{cfg.indices.breaker.request_limit}}
+indices.breaker.request.overhead: {{cfg.indices.breaker.request_overhead}}
+
+bootstrap.memory_lock: {{cfg.bootstrap.memory_lock}}
+
+{{#if cfg.network.host ~}}
+network.host: {{cfg.network.host}}
+{{/if ~}}
+http.port: {{cfg.network.port}}
+transport.tcp.port: {{cfg.transport.port}}
+discovery.zen.fd.ping_timeout: {{cfg.discovery.zen_fd_ping_timeout}}
+{{#if bind.automate-elasticsearch ~}}
+discovery.zen.ping.unicast.hosts: [{{#each bind.automate-elasticsearch.members ~}} "{{sys.ip}}", {{/each ~}}]
+{{else ~}}
+discovery.zen.ping.unicast.hosts: {{cfg.discovery.ping_unicast_hosts}}
+{{/if ~}}
+discovery.zen.minimum_master_nodes: {{cfg.discovery.minimum_master_nodes}}
+
+{{#if cfg.gateway.recover_after_nodes ~}}
+gateway.recover_after_nodes: {{cfg.gateway.recover_after_nodes}}
+{{/if ~}}
+gateway.expected_nodes: {{cfg.gateway.expected_nodes}}
+gateway.expected_master_nodes: {{cfg.gateway.expected_master_nodes}}
+gateway.expected_data_nodes: {{cfg.gateway.expected_data_nodes}}
+{{#if cfg.gateway.recover_after_time ~}}
+gateway.recover_after_time: {{cfg.gateway.recover_after_time}}
+{{/if ~}}
+
+action.destructive_requires_name: {{cfg.action.destructive_requires_name}}
+
+{{#if cfg.plugins.cloud_aws_signer ~}}
+cloud.aws.signer: {{cfg.plugins.cloud_aws_signer}}
+{{/if ~}}
+
+s3.client.{{ cfg.s3.client.name }}.protocol: https
+s3.client.{{ cfg.s3.client.name }}.read_timeout: {{cfg.s3.client.read_timeout}}
+s3.client.{{ cfg.s3.client.name }}.max_retries: {{cfg.s3.client.max_retries}}
+s3.client.{{ cfg.s3.client.name }}.use_throttle_retries: {{cfg.s3.client.use_throttle_retries}}
+{{~#eachAlive bind.backup-gateway.members as |bgw|}}
+{{~#if @last}}
+s3.client.{{ cfg.s3.client.name }}.endpoint: {{bgw.sys.ip}}:{{bgw.cfg.port}}
+{{~/if}}
+{{~/eachAlive}}

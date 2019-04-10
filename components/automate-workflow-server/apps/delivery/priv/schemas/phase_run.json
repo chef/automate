@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "run_success": {
+            "type": "boolean",
+            "required": true
+        },
+        "run_log": {
+            "type": "string",
+            "required": true
+        },
+        "run_status": {
+            "type": "string",
+            "required": true
+        },
+        "run_complete": {
+            "type": "boolean",
+            "required": false
+        }
+    }
+}

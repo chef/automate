@@ -1,0 +1,232 @@
+#!/bin/bash
+#shellcheck disable=SC2034
+
+# Setting up the minimum settings to be able to configure
+# the Go Workspace inside the studio
+pkg_scaffolding=chef/scaffolding-go
+scaffolding_go_base_path=github.com/chef
+scaffolding_go_repo_name=automate
+scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}"
+
+export HAB_ORIGIN=${HAB_ORIGIN:-chef}
+# Bring ci-studio-common to life
+RECOMMENDED_HAB_VERSION="0.77.0"
+# shellcheck disable=1090
+if [ -d "${CI_STUDIO_COMMON:-}" ]; then
+  echo "CI_STUDIO_COMMON override in effect; using $CI_STUDIO_COMMON, not chef/ci-studio-common habitat package"
+  source "$CI_STUDIO_COMMON/bin/studio-common"
+else
+  hab pkg install chef/ci-studio-common --channel dev
+  source "$(hab pkg path chef/ci-studio-common)/bin/studio-common"
+fi
+
+# Install busybox-static so script evaluations (e.g. #!/bin/bash) will work
+# This ensures normal linxu studios work like Docker studios
+hab pkg install core/busybox-static
+hab pkg binlink -d /bin core/busybox-static
+hab pkg install core/bash
+hab pkg binlink -d /bin/ -f core/bash
+
+# TODO (tc) Let's get rid of this hard-coded config long-term.
+# Elasticsearch
+# TODO (tc) This should be https once certs are added, at which point
+# the HTTP calls in the mocha tests that talk to ES in ingest-service
+# will need to be updated to pass certs along.
+export ES_VERSION=5.6.4
+export ELASTICSEARCH_URL="http://localhost:10141"
+export POSTGRESQL_URL="localhost:5432"
+# Ingest
+export INGEST_URL="https://localhost:10122"
+export INGEST_PORT=$(echo $INGEST_URL | awk -F: '{ print $NF }')
+export INGEST_HOST=$(echo $INGEST_URL | awk -F: '{ print $2 }' | tr -d '/')
+# Automate Gateway service
+export GATEWAY_URL="https://localhost:2000"
+export GATEWAY_PORT=$(echo $GATEWAY_URL | awk -F: '{ print $NF }')
+export GATEWAY_HOST=$(echo $GATEWAY_URL | awk -F: '{ print $2 }' | tr -d '/')
+
+# Compiling with cgo require gcc to be in our path. We don't typically
+# use cgo so we set CGO_ENABLED=0 by default in the studio.
+export CGO_ENABLED=0
+
+
+# The version of the Go dependency management tool
+export GO_DEP_VERSION=0.5.0
+
+# Delve Server port for remote debugging
+export GO_DEBUG_PORT=2345
+
+# Depot channel for Chef micro-services
+export CHEF_CHANNEL=dev
+
+# Flag that will allow us detect when are we in dev mode inside any a2 component
+export CHEF_DEV_ENVIRONMENT=true
+
+# minimal(fast) hart compression level for dev
+export HAB_HART_COMPRESSION_LEVEL=0
+
+getting_started << GETTING_STARTED
+
+Welcome to the Habitat-based development environment for the A2 mono-repo!
+
+===== Deploy A2 =====
+
+    To get started, use this to start the deployment service, download the latest 'dev' images for
+    each service, and spin up A2. (when you don't need local UI development)
+
+        # start_all_services
+
+    If you need to develop against the UI.
+
+        # build components/automate-ui-devproxy/
+        # start_automate_ui_background
+        # start_all_services
+
+    See ./dev-docs/ui-development.md for additional information.
+
+===== Rebuild Components and Hot-load the Results =====
+
+    After A2 is running, you can rebuild an entire component's hab package from source,
+    then HOT LOAD IT INTO YOUR DEPLOY, replacing the dev image that was there previously.
+    (Use 'build' instead of 'rebuild' if you want to check dependencies also.)
+
+        # rebuild components/<COMPONENT>
+
+===== Rebuild just the Go Binary =====
+
+    If you have Go changes but no hab package changes, you can rebuild just the Go binary for your component.
+    This works for both hab packages you've already built AND packages initially downloaded from the chef depot.
+    This is slightly faster than 'rebuild' described above, but 'hab sup status' will not show a local origin
+    like 'rebuild' does (so you won't be able to tell at a glance which components you have built locally).
+
+        # go_update_component COMPONENT_NAME
+
+===== Helpful Commands =====
+
+    Get a fully-permissioned token with 'get_admin_token'. It's also idempotent,
+    so you'll get the same token every time after the first run and can do things like:
+
+        # curl --insecure -H "api-token \$(get_admin_token)" https://localhost/api/v0/version
+
+    Load various data sets with 'chef_load_actions' or 'chef_load_nodes'.
+
+For a complete walkthrough of the dev environment, see ./README.md and ./dev-docs/DEV_ENVIRONMENT.md.
+Also try 'describe' at the hab studio prompt for a summary of available commands.
+
+GETTING_STARTED
+
+# Memory check. Because we all always forget to change the docker preferences
+# when we re-install it
+total_memory_kb=$(cat /proc/meminfo | grep MemTotal | grep -o -E '[[:digit:]]+')
+# 8 gigs == 8164340kb, subtract a few kb so we can just do a less than comp
+if (( $total_memory_kb < 8164000 )); then
+  warn "!!!"
+  warn "This system has less than 8Gb of RAM. You will not be able to run a full A2 deployment."
+  warn "!!!"
+fi
+
+
+document "start_all_services" <<DOC
+  Simple wrapper for 'start_deployment_service' and 'chef-automate dev deployinate'.
+DOC
+function start_all_services() {
+  start_deployment_service
+  chef-automate dev deployinate
+  if [[ -f "/src/dev/license.jwt" ]]; then
+     chef-automate license apply "/src/dev/license.jwt"
+  fi
+}
+
+document "get_admin_token" <<DOC
+  This will idempotently generate an API token that has universal access for all your dev / curl needs.
+DOC
+function get_admin_token() {
+  check_if_deployinate_started || return 1
+  if [ -f /tmp/admin_token ]; then
+    cat /tmp/admin_token
+  else
+    # note: we don't have to suppress stderr, $(get_api_token) won't capture it.
+    chef-automate admin-token >/tmp/admin_token
+    if [ $? -ne 0 ]; then
+      # attempt iam v2 cmd
+      chef-automate iam token create "api-token-$$" --admin >/tmp/admin_token || return 1
+    fi
+    cat /tmp/admin_token
+  fi
+}
+
+document "check_if_deployinate_started" <<DOC
+  Returns 0 if deployinate is up or 1 if not and a relevant error.
+DOC
+function check_if_deployinate_started() {
+  if ! type chef-automate > /dev/null 2>&1; then
+    error "The deploy service has not been installed."
+    log_line "Run '${GREEN}start_deployment_service${NC}' to consume the dev channel hart or '${GREEN}build components/automate-deployment${NC}' to build from source."
+    return 1
+  fi
+
+  if ! chef-automate status > /dev/null 2>&1; then
+    error "The current status of your deploy is unhealthy."
+    log_line "If you have yet to do so, run '${GREEN}chef-automate dev deployinate${NC}' to deploy A2."
+    log_line "If you have already deployed, there is an issue with your deploy."
+    log_line "You can check the logs with '${YELLOW}sl${NC}' and the status with '${YELLOW}chef-automate status${NC}'."
+    return 1
+  fi
+
+  return 0
+}
+
+# Setup ~/.netrc configuration in the studio
+#
+# We have a dependency with the automate-ui that is a private github repository.
+# At this time, NodeJS requires that you either use git+ssh or https w/ a .netrc.
+# We are using a .netrc.
+#
+# Requirements:
+# => Habitat 0.54.0 or greater installed
+# => Specify `HAB_STUDIO_SECRET_GITHUB_TOKEN` in your shell environment
+# ```
+# export HAB_STUDIO_SECRET_GITHUB_TOKEN=secret
+# ```
+generate_netrc_config
+
+# Prepare the environment to run our services
+function prepare_system() {
+  # These are needed for elasticsearch
+  mount --bind / / > /dev/null
+  install_if_missing core/busybox-static sysctl > /dev/null
+  sysctl -w net.ipv6.conf.all.disable_ipv6=1 > /dev/null
+  sysctl -w vm.max_map_count=262144 > /dev/null
+
+  # Workaround to start ES in CI systems
+  ulimit -n 65536 > /dev/null
+
+  # Set DEVPROXY_URL for automate-ui-devproxy to either localhost or host.docker.internal depending
+  # on if we are in a Vagrant-based dev env or a Docker-based dev env, respectively.
+  if grep docker /proc/1/cgroup > /dev/null 2>&1; then
+    export DEVPROXY_URL="host.docker.internal"
+  else
+    export DEVPROXY_URL="localhost"
+  fi
+}
+
+prepare_system
+
+# Saves the in memory bash history to a file
+function save_history() {
+  history -a /src/.bash_history
+}
+
+# if .studiorc is being sourced from an already running studio, don't reset bash
+# history -- this is achieved by saving the current history before it is re-read
+save_history
+
+# Load the bash history from a file
+history -r /src/.bash_history
+
+function cleanup() {
+    save_history
+    umount /
+}
+
+# When exiting the studio save the bash history to a file
+trap cleanup EXIT

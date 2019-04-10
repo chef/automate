@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package chef.automate.domain.compliance.api.jobs;
+option go_package = "github.com/chef/automate/components/compliance-service/api/jobs";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+import "components/compliance-service/api/common/common.proto";
+
+service JobsService {
+	rpc Create(Job) returns (Id) {};
+	rpc Read(Id) returns (Job) {};
+	rpc Update(Job) returns (google.protobuf.Empty) {};
+	rpc Delete(Id) returns (google.protobuf.Empty) {};
+	rpc List(Query) returns (Jobs) {};
+	rpc Rerun(Id) returns (RerunResponse) {};
+	rpc ListInitiatedScans(TimeQuery) returns (Ids) {};
+	rpc GetJobResultByNodeId(GetJobResultByNodeIdRequest) returns (ResultsRow) {};
+}
+
+message GetJobResultByNodeIdRequest{
+	string job_id = 1;
+	string node_id = 2;
+}
+message RerunResponse {}
+message Id {
+	string id = 1;
+}
+message Ids {
+	repeated string ids = 1;
+}
+message TimeQuery {
+	google.protobuf.Timestamp start_time = 1;
+}
+
+message ManagerFilter {
+	string manager_id = 1;
+	repeated chef.automate.domain.compliance.api.common.Filter filters = 2;
+}
+
+message Query {
+	repeated chef.automate.domain.compliance.api.common.Filter filters = 20;
+	enum OrderType {
+		ASC = 0;
+		DESC = 1;
+	}
+	OrderType order = 21;
+	string sort = 22;
+	int32 page = 23;
+	int32 per_page = 24;
+}
+
+message Job {
+	string id = 1;
+	string name = 2;
+	string type = 3;
+	int32 timeout = 4;
+	repeated chef.automate.domain.compliance.api.common.Kv tags = 20;
+	google.protobuf.Timestamp start_time = 21;
+	google.protobuf.Timestamp end_time = 22;
+	string status = 23;
+	int32 retries = 26;
+	int32 retries_left = 27;
+	repeated ResultsRow results = 28;
+
+	repeated string nodes = 100;
+	repeated string profiles = 101;
+	int32 node_count = 102;
+	int32 profile_count = 103;
+
+	repeated ManagerFilter node_selectors = 104;
+	google.protobuf.Timestamp scheduled_time = 105;
+	string recurrence = 106;
+	string parent_id = 107;
+	int32 job_count = 108;
+	bool deleted = 109;
+}
+
+message Jobs {
+	repeated Job jobs = 1;
+	int32 total = 20;
+}
+
+message ResultsRow {
+	string node_id = 1;
+	string report_id = 2;
+	string status = 3;
+	string result = 4;
+	string job_id = 5;
+	google.protobuf.Timestamp start_time = 20;
+	google.protobuf.Timestamp end_time = 21;
+}

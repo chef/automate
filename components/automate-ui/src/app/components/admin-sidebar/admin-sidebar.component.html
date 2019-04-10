@@ -1,0 +1,42 @@
+<chef-sidebar>
+  <div class="nav-items">
+   <div class="group" *ngIf="notifications.visible || integrations.visible || credentials.visible || lifecycle.visible">Node Management</div>
+    <app-authorized #notifications [anyOf]="['/notifications/rules', 'get']">
+      <chef-sidebar-entry route="/settings/notifications" icon="notifications">Notifications</chef-sidebar-entry>
+    </app-authorized>
+    <app-authorized #integrations [anyOf]="['/nodemanagers/search', 'post']">
+      <chef-sidebar-entry route="/settings/node-integrations" icon="settings_input_component">Node Integrations</chef-sidebar-entry>
+    </app-authorized>
+    <app-authorized #credentials [anyOf]="['/secrets/search', 'post']">
+      <chef-sidebar-entry route="/settings/node-credentials"
+        icon="vpn_key" iconRotation="90">Node Credentials</chef-sidebar-entry>
+    </app-authorized>
+    <app-authorized #lifecycle [anyOf]="['/retention/nodes/status', 'get']">
+      <chef-sidebar-entry route="/settings/node-lifecycle" icon="storage">Node Lifecycle</chef-sidebar-entry>
+    </app-authorized>
+
+    <div class="group" *ngIf="users.visible || teams.visible || tokens.visible">Identity</div>
+    <app-authorized #users [allOf]="['/auth/users', 'get']">
+      <chef-sidebar-entry route="/settings/users" icon="person">Users</chef-sidebar-entry>
+    </app-authorized>
+    <app-authorized  #teams [allOf]="['/auth/teams', 'get']">
+      <chef-sidebar-entry route="/settings/teams" icon="people">Teams</chef-sidebar-entry>
+    </app-authorized>
+    <app-authorized  #tokens [anyOf]="[['/auth/tokens', 'get'], ['/iam/v2beta/tokens', 'get']]">
+      <chef-sidebar-entry route="/settings/tokens" icon="vpn_key">API Tokens</chef-sidebar-entry>
+    </app-authorized>
+
+    <div *ngIf="(iamMajorVersion$ | async) !== 'v1'">
+      <div class="group" *ngIf="policies.visible || roles.visible || projects.visible">Access Management</div>
+      <app-authorized #policies [allOf]="['/iam/v2beta/policies', 'get']">
+        <chef-sidebar-entry route="/settings/policies" icon="security">Policies</chef-sidebar-entry>
+      </app-authorized>
+      <app-authorized #roles [allOf]="['/iam/v2beta/roles', 'get']">
+        <chef-sidebar-entry route="/settings/roles" icon="assignment_ind">Roles</chef-sidebar-entry>
+      </app-authorized>
+      <app-authorized #projects [allOf]="['/iam/v2beta/projects', 'get']">
+        <chef-sidebar-entry *ngIf="(iamMinorVersion$ | async) === 'v1'" route="/settings/projects" icon="work">Projects</chef-sidebar-entry>
+      </app-authorized>
+    </div>
+  </div>
+</chef-sidebar>

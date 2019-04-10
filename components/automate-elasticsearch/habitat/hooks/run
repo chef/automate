@@ -1,0 +1,27 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+{{#if cfg.disable ~}}
+while true
+do
+  sleep 60
+done
+
+exit 0
+{{~else}}
+
+{{#if cfg.runtime.es_startup_sleep_time ~}}
+export ES_STARTUP_SLEEP_TIME={{cfg.runtime.es_startup_sleep_time}}
+{{/if ~}}
+
+export TMPDIR="{{pkg.svc_var_path}}/tmp"
+export ES_TMPDIR="{{pkg.svc_var_path}}/tmp"
+export ES_PATH_CONF="{{pkg.svc_config_path}}"
+
+# Initialize the secrets keystore and trusted certs ca keystore
+source {{pkg.svc_config_path}}/init_keystore
+source {{pkg.svc_config_path}}/init_ca
+
+exec elasticsearch
+{{~/if}}

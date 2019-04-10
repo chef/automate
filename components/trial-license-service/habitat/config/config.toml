@@ -1,0 +1,7 @@
+listen_host = "{{ cfg.service.host }}"
+listen_port = {{ cfg.service.port }}
+lic_gen_url = "{{ cfg.license_gen.url }}"
+lic_gen_auth_token = "{{ cfg.license_gen.auth_token }}"
+segmentio_write_key = "{{ cfg.tracking.segmentio_write_key }}"
+log_level = "{{ cfg.logger.level }}"
+log_format = "{{ cfg.logger.format }}"

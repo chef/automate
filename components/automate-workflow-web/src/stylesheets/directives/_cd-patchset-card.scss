@@ -1,0 +1,63 @@
+cd-patchset-card {
+  display: block;
+}
+
+.patchset {
+  @include modal-box;
+
+  .patchset-header {
+    @include clearfix();
+    border-bottom: 1px solid $lightlightgray;
+    position: relative;
+    font-size: .875rem;
+
+    &:hover {
+      background: $gray-less-pale;
+    }
+
+    .patchset-title {
+      display: block;
+      margin: 0 160px 0 0;
+      font-size: inherit;
+      font-weight: normal;
+      line-height: 38px;
+      z-index: 1;
+      padding: .5rem;
+      cursor: pointer;
+    }
+
+    .button {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      z-index: 2;
+    }
+  }
+
+  .patchset-files {
+    display: block;
+  }
+
+  .patchset-footer {
+    overflow: hidden;
+    background: darken($white, 3%);
+    border-top: 1px solid $lightgray;
+    padding: 20px;
+
+    .comment-count {
+      color: $regalblue;
+      text-decoration: none;
+    }
+  }
+}
+
+.patchset-title::after {
+  @extend .icon;
+  @extend .icon-right:before;
+  padding-left: 5px;
+  font-size: 80%;
+}
+
+.open .patchset-title::after {
+  @extend .icon-down:before;
+}

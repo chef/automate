@@ -1,0 +1,235 @@
+#!/opt/chefdk/embedded/bin/ruby
+
+require 'chef'
+require 'chef/config'
+require 'chef/server_api'
+require 'chef/client'
+require 'base64'
+require 'uri'
+require 'date'
+
+module Delivery
+  # Helper methods for our build node job runner workflow.
+  module JobHelpers
+
+    # All build nodes currently leverage a built-in internal user that
+    # all enterprises have; its name is "builder".
+    #
+    # This is my builder. There are many like it, but this is mine.
+    BUILDER_USER = "builder"
+
+    # Create appropriate authentication headers for a builder, given a
+    # job data hash. If no token is present in `job_data` (because the
+    # build nodes were updated before the server began handing tokens
+    # out), an empty set of headers is returned.
+    #
+    # @param job_data [Hash] Describes the job being run; we're
+    #   looking for a `token` key.
+    #
+    # @return [Hash] authentication headers, suitable for passing into
+    #   a `Chef::ServerAPI` call.
+    def self.builder_auth_headers(job_data)
+      if job_token = job_data["token"]
+        {"chef-delivery-token" => job_token,
+         "chef-delivery-user"  => BUILDER_USER}
+      else
+        {}
+      end
+    end
+
+  end # JobHelpers
+end # Delivery
+
+class Streamy
+  attr_accessor :output, :rest, :path, :builder_auth_headers
+
+  def initialize(rest, path, headers)
+    @rest = rest
+    @path = path
+    @builder_auth_headers = headers
+    @output = ""
+  end
+
+  def <<(arg)
+    begin
+      # Force the chef-client output into UTF-8 to prevent issues
+      # sending it to our REST API.
+      @output << arg.encode("UTF-8", invalid: :replace, undef: :replace)
+      rest.post(path,
+                {
+                  "run_success" => false,
+                  "run_log" => @output,
+                  "run_status" => "running",
+                  "run_complete" => false
+                },
+                builder_auth_headers
+               )
+    rescue
+      # If we hit this block it means 1 of 2 things went wrong:
+      #    1) There was an error encoding the String
+      #    2) There was an error talking to the Delivery Server
+      #
+      # The first case, while unlikely, shouldn't cause the entire phase
+      # run to fail. We would rather have a successful phase runs without
+      # logs than a failed phase runs due to logging errors.
+      #
+      # The second case, if it happens with the request, the logs will continue
+      # to aggregate and be sent on the next attempt. If we continue to get
+      # request errors than eventually the job will time out and we will know
+      # there is something wrong with the build node or the delivery server.
+    end
+  end
+
+  def to_str
+    @output
+  end
+end
+
+def write_profile(workspace_root)
+  cli_env = {
+    'LC_ALL' => 'en_US.UTF-8',
+    'HOME' => workspace_root
+  }
+  cmd = Mixlib::ShellOut.new("/opt/chefdk/bin/chef shell-init sh > #{workspace_root}/.chef-profile", environment: cli_env)
+  cmd.run_command
+end
+
+workspace_root = "/var/opt/delivery/workspace"
+workspace_bin =  "/var/opt/delivery/workspace/bin"
+
+Chef::Config.from_file(Chef::Config.platform_specific_path("/etc/chef/client.rb"))
+client = Chef::Client.new
+client.run_ohai
+client.node_name
+
+write_profile(workspace_root)
+
+change_file = File.join(workspace_root, 'change.json')
+raw_json = Base64.decode64(ARGV[0])
+File.open(change_file, 'w') do |file|
+  file.puts(raw_json)
+end
+
+job_data = Chef::JSONCompat.from_json(raw_json)
+
+builder_auth_headers = Delivery::JobHelpers.builder_auth_headers(job_data)
+
+rest = Chef::ServerAPI.new(job_data["delivery_api_url"])
+path = File.join(job_data['enterprise'],
+                 'orgs', job_data['organization'],
+                 'projects', job_data['project'],
+                 'pipelines', job_data['pipeline'],
+                 'phase_runs', job_data['phase_run_id'].to_s)
+
+streamy = Streamy.new(rest, path, builder_auth_headers)
+server = URI(job_data['delivery_api_url'])
+
+command_line = if job_data['stage'] == "verify"
+  "delivery job #{job_data['stage']} #{job_data['phase']} --server #{server.host} --user builder --ent #{job_data['enterprise']} --org #{job_data['organization']} --project #{job_data['project']} --for #{job_data['pipeline']} --change-id #{job_data['change_id']} --branch #{job_data['patchset_branch']} --git-url #{job_data['git_url']}"
+else
+  "delivery job #{job_data['stage']} #{job_data['phase']} --server #{server.host} --user builder --ent #{job_data['enterprise']} --org #{job_data['organization']} --project #{job_data['project']} --for #{job_data['pipeline']} --change-id #{job_data['change_id']} --shasum #{job_data['sha']} --git-url #{job_data['git_url']}"
+end
+
+command_line += " --a2-mode" if job_data['a2_mode'] == "true"
+command_line += " --fips --fips-git-port #{job_data['fips_git_port']}" if job_data['fips'] == "true"
+
+# placed on disk by install-runner if the user needs a custom cert chain
+custom_cert_filepath = "/var/opt/delivery/workspace/etc/custom_certificate_chain.crt"
+command_line += " --fips-custom-cert-filename #{custom_cert_filepath}" if File.exist?(custom_cert_filepath)
+
+https_proxy = Chef::Config[:https_proxy] || ENV['HTTPS_PROXY'] || ENV['https_proxy']
+http_proxy = Chef::Config[:http_proxy] || ENV['HTTP_PROXY'] || ENV['http_proxy']
+no_proxy = Chef::Config[:no_proxy] || ENV['NO_PROXY'] || ENV['no_proxy']
+
+cli_env = {
+  'PATH' => ['/opt/chefdk/bin:/opt/chefdk/embedded/bin', ENV['PATH']].join(File::PATH_SEPARATOR),
+  'LC_ALL' => 'en_US.UTF-8',
+  'GIT_SSH' => File.join(workspace_bin, 'git_ssh'),
+  'HOME' => workspace_root,
+  'TERM' => 'screen-256color'
+}
+cli_env['https_proxy'] = https_proxy if https_proxy && !https_proxy.strip.empty?
+cli_env['http_proxy'] = http_proxy if http_proxy && !http_proxy.strip.empty?
+cli_env['no_proxy'] = no_proxy if no_proxy && !no_proxy.strip.empty?
+
+cmd = Mixlib::ShellOut.new(". #{workspace_root}/.chef-profile && #{command_line} --no-spinner", environment: cli_env)
+
+start_datetime = DateTime.now
+
+streamy << "Starting job on builder #{client.node_name} at #{start_datetime.iso8601}.\nCommand: #{command_line}\n"
+
+cmd.timeout = job_data['timeout'] || 13300
+if job_data['dispatch_version'] == 'v2'
+  cmd.timeout = job_data['timeout'] || Float::INFINITY
+end
+
+cmd.log_level = :error
+cmd.live_stream = streamy
+cmd.cwd = workspace_root
+cmd.run_command
+
+end_datetime = DateTime.now
+# difference between 2 DateTimes is expressed in days
+elapsed_time = ((end_datetime - start_datetime) * 24 * 60 * 60).to_i
+streamy << "\nJob ended at #{end_datetime.iso8601} (ran in #{elapsed_time} seconds)"
+
+# Borrowed from chef-cookbooks/jenkins; used to create a cleanly normalized URL
+def uri_join(*parts)
+  parts = parts.compact.map(&URI.method(:escape))
+  URI.parse(parts.join('/')).normalize.to_s
+end
+
+# Borrowed from chef-cookbooks/omnibus; used to create a windows-safe file.join
+def windows_safe_path_join(*args)
+  ::File.join(args).gsub(::File::SEPARATOR, ::File::ALT_SEPARATOR || File::SEPARATOR)
+end
+
+compliance_json = windows_safe_path_join(
+                            workspace_root, server.host, job_data['enterprise'],
+                            job_data['organization'], job_data['project'], job_data['pipeline'],
+                            job_data['stage'], job_data['phase'], "repo", ".delivery-compliance.json"
+                  )
+
+path_compliance = uri_join(job_data['enterprise'],
+                 'orgs', job_data['organization'],
+                 'projects', job_data['project'],
+                 'pipelines', job_data['pipeline'],
+                 'phase_runs', job_data['phase_run_id'].to_s, 'log_objects')
+
+if File.exist?(compliance_json)
+ rest.post(path_compliance,File.read(compliance_json),builder_auth_headers)
+ streamy << "\nCompliance data has posted.\n"
+end
+
+if cmd.error?
+  # Chef Stacktrace File Path
+  chef_stacktrace_file = File.join(
+                              workspace_root, server.host, job_data['enterprise'],
+                              job_data['organization'], job_data['project'], job_data['pipeline'],
+                              job_data['stage'], job_data['phase'], "cache", "chef-stacktrace.out"
+                        )
+  if File.exist?(chef_stacktrace_file)
+    streamy << "\nChef Stacktrace\n"
+    streamy << File.read(chef_stacktrace_file)
+  end
+
+  rest.post(path,
+    {
+      "run_success" => false,
+      "run_log" => streamy.output,
+      "run_status" => "failed",
+      "run_complete" => true
+    },
+    builder_auth_headers
+  )
+else
+  rest.post(path,
+    {
+      "run_success" => true,
+      "run_log" => streamy.output,
+      "run_status" => "finished",
+      "run_complete" => true
+    },
+    builder_auth_headers
+  )
+end

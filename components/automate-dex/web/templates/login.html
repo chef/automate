@@ -1,0 +1,33 @@
+<!-- rework of coreos login.html-->
+<!-- rendered using https://golang.org/pkg/html/template/-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{{ issuer }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url "static/main.css" }}" rel="stylesheet">
+    <link href="{{ url "theme/styles.css" }}" rel="stylesheet">
+  </head>
+  <div class="theme-panel">
+    <img class="theme-navbar__logo" src="{{url "static/img/automate-blue-d9789f4b.svg" }}">
+    <h2 class="theme-heading">Choose a method to log in</h2>
+    <div>
+      {{ range $c := .Connectors }}
+      <div class="theme-form-row">
+        <a href="{{ $c.URL }}" target="_self">
+          <button class="dex-btn theme-btn-provider">
+            <span class="dex-btn-icon dex-btn-icon--{{ $c.ID }}"></span>
+            {{ if eq $c.ID "local" }}
+            <span class="dex-btn-text">Log in with Username</span>
+            {{ else }}
+            <span class="dex-btn-text">Log in with {{ $c.Name }}</span>
+            {{ end }}
+          </button>
+        </a>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</html>

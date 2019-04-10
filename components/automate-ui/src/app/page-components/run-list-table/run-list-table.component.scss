@@ -1,0 +1,40 @@
+@import "~styles/variables";
+
+.recipe-list {
+  padding: 20px 0;
+  border-bottom: 1px solid $gray-light;
+
+  > div {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .status-icon {
+    chef-icon {
+      margin: 0 5px;
+
+      &.success {
+        color: $success-green;
+      }
+
+      &.failed {
+        color: $alert-pink;
+      }
+    }
+  }
+
+  .recipe-icon {
+    margin: 0 5px;
+    color: $chef-primary-dark;
+  }
+
+  .recipe {
+    margin-left: 2px;
+    line-height: 18px;
+    font-weight: 300;
+
+    .version {
+      font-size: 12px;
+    }
+  }
+}

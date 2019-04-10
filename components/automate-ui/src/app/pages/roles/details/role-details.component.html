@@ -1,0 +1,38 @@
+<app-admin-sidebar></app-admin-sidebar>
+
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/settings/roles']">Roles</chef-breadcrumb>
+      {{ role?.name }}
+    </chef-breadcrumbs>
+    <chef-page-header>
+      <chef-heading>{{ role?.name }}</chef-heading>
+      <table>
+        <thead>
+          <tr class="detail-row">
+            <th class="id-column">ID</th>
+            <th class="type-column">Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="detail-row">
+            <td class="id-column">{{ role?.id }}</td>
+            <td class="type-column">{{ role?.type | iamType }}</td>
+          </tr>
+        </tbody>
+      </table>
+        <chef-tab-selector>
+          <chef-option value='definition'>Definition</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+    <section class="page-body">
+      <chef-toolbar>
+        <chef-clipboard value={{roleToString(role)}} label="Copy Definition" icon=""></chef-clipboard>
+      </chef-toolbar>
+      <section id="json-bg">
+        <chef-snippet [code]="role | json" lang="json"></chef-snippet>
+      </section>
+    </section>
+  </main>
+</div>

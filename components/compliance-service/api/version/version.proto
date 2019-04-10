@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package chef.automate.domain.compliance.api.version;
+option go_package = "github.com/chef/automate/components/compliance-service/api/version";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service VersionService {
+	rpc Version(google.protobuf.Empty) returns (VersionInfo) {};
+}
+
+message VersionInfo {
+	string name = 1;
+	string version = 2;
+	string sha = 3;
+	string built = 4;
+	string api = 5;
+}

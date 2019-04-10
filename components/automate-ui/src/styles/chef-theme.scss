@@ -1,0 +1,25 @@
+@import '~@angular/material/theming';
+@import './_chef_material_palettes.scss';
+
+@include mat-core();
+
+// This is a theme for our components wrapping Angular Material.
+
+// Currently we are passing accent colors in for both primary
+// and accent colors because we are actually not using the
+// chef primary colors much in the micro actions. If that changes,
+// we should revist
+
+$chef-primary: mat-palette($chef-mat-primary);
+$chef-accent:  mat-palette($chef-mat-primary);
+
+// The warn palette is pink and yellow
+$chef-warn:    mat-palette($chef-mat-warn);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$chef-theme: mat-light-theme($chef-primary, $chef-accent, $chef-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($chef-theme);

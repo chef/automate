@@ -1,0 +1,60 @@
+.slack-webhook-form {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid $gray-less-pale;
+
+  .heading {
+    position: relative;
+
+    legend {
+      width: 50%;
+      color: $bluechef;
+    }
+
+    label {
+      font-size: .75rem;
+
+      &[disabled] {
+        color: $textgray;
+      }
+    }
+    .checkbox-list {
+      position: absolute;
+      right: 10px;
+    }
+  }
+
+  .webhook-url {
+    position: relative;
+
+    .webhook-test {
+      position: absolute;
+      right: 0;
+      top: 68px;
+      z-index: 9999;
+
+      .result {
+        margin-left: 4px;
+        font-size: .75rem;
+
+        .success {
+          color: $successgreen;
+        }
+        .error {
+          color: $alertred;
+        }
+      }
+    }
+  }
+
+  .webhook-link {
+    font-size: 12px;
+    display: inline-block;
+    margin-bottom: .5rem;
+    color: $chef-blue;
+  }
+
+  [icon-button="trash"] {
+    margin-bottom: 4px;
+  }
+}

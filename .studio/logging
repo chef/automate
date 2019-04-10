@@ -1,0 +1,17 @@
+#!/bin/bash
+
+function log {
+  log_line "$@" >&2
+}
+
+function log_info {
+  log_line "$@" >&2
+}
+
+function log_warning {
+ warn "$@"
+}
+
+function log_error {
+ error "$@"
+}

@@ -1,0 +1,14 @@
+[mlsa]
+accept = false
+
+[service]
+host = "localhost"
+port = 9093
+
+[logger]
+format = "json"
+level = "info"
+
+[storage]
+database = "chef_teams_service"
+user = "teams"

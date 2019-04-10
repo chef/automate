@@ -1,0 +1,171 @@
+<app-component-library-screen>
+
+  <app-cl-section>
+    Use this to generate a standard sidebar on any page in the application in one of two formats:
+    navigation elements only, or selection plus navigation elements together.
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Working Example</h3>
+    <ul>
+      <li>Hovering over any of the elements displays standard Chef mouse-over styling.</li>
+      <li>Clicking on any <strong>navigation</strong> items take you to the real
+        Chef Automate page it connects to.</li>
+      <li>Clicking on any <strong>selection</strong> items performs a custom action on
+        the current page that you must define.</li>
+    </ul>
+    <div class="sidebar-container">
+      <div class="sidebar-example">
+        This sidebar contains just navigation elements
+        (from the <token>Admin</token> page).
+        <chef-sidebar>
+          <div class="nav-items">
+            <chef-sidebar-entry route="/settings" exact icon="build">Overview</chef-sidebar-entry>
+            <chef-sidebar-entry route="/settings/users" icon="person">Users</chef-sidebar-entry>
+            <chef-sidebar-entry route="/settings/tokens" icon="vpn_key">API Tokens</chef-sidebar-entry>
+          </div>
+        </chef-sidebar>
+      </div>
+      <div class="sidebar-example">
+        This sidebar contains both selection filters (top) as well as
+        navigation elements (from the <token>Client Runs</token> page).
+        <chef-sidebar>
+          <div class="select-items">
+            <div role="button" tabindex="0" (click)="doSomethingClever('servers')">
+              <chef-sidebar-entry>All Chef servers</chef-sidebar-entry>
+            </div>
+            <div role="button" tabindex="0" (click)="doSomethingClever('orgs')">
+              <chef-sidebar-entry>All Chef server orgs</chef-sidebar-entry>
+            </div>
+          </div>
+          <div class="nav-items">
+            <chef-sidebar-entry route="/client-runs" icon="storage">Node State</chef-sidebar-entry>
+          </div>
+        </chef-sidebar>
+        <chef-alert type="success" *ngIf="selectActionClicked">
+          Some custom action for &nbsp; <strong>{{ selectActionClicked }}</strong> &nbsp; here...
+        </chef-alert>
+      </div>
+    </div>
+  </app-cl-section>
+
+  <app-cl-code-section>
+    <h3>Angular Template Code Example: Navigation Elements Only</h3>
+    <pre>&lt;chef-sidebar&gt;
+  &lt;div <strong>class="nav-items"</strong>&gt;
+    &lt;chef-sidebar-entry route="/settings" <strong>exact</strong> icon="build"&gt;Overview&lt;/chef-sidebar-entry&gt;
+    &lt;chef-sidebar-entry route="/settings/users" icon="person"&gt;Users&lt;/chef-sidebar-entry&gt;
+    &lt;chef-sidebar-entry route="/settings/tokens" icon="vpn_key"&gt;API Tokens&lt;/chef-sidebar-entry&gt;
+  &lt;/div&gt;
+&lt;/chef-sidebar&gt;</pre>
+  </app-cl-code-section>
+
+  <app-cl-code-section>
+    <h3>Angular Template Code Example: Selection and Navigation Elements</h3>
+    <pre>&lt;chef-sidebar&gt;
+  &lt;div <strong>class="select-items"</strong>&gt;
+    &lt;div role="button" tabindex="0" (click)="doSomethingClever('servers')"&gt;
+      &lt;chef-sidebar-entry&gt;All Chef servers&lt;/chef-sidebar-entry&gt;
+    &lt;/div&gt;
+    &lt;div role="button" tabindex="0" (click)="doSomethingClever('orgs')"&gt;
+      &lt;chef-sidebar-entry&gt;All Chef server orgs&lt;/chef-sidebar-entry&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div <strong>class="nav-items"</strong>&gt;
+    &lt;chef-sidebar-entry route="/client-runs" icon="storage"&gt;Node State&lt;/chef-sidebar-entry&gt;
+  &lt;/div&gt;
+&lt;/chef-sidebar&gt;</pre>
+  </app-cl-code-section>
+
+  <app-cl-code-section>
+    <h3>Typescript Code Example</h3>
+
+    <pre>doSomethingClever(item: string) {{'{'}}
+  // . . .
+}</pre>
+  </app-cl-code-section>
+
+  <app-cl-section>
+    <h3>API</h3>
+
+    <app-cl-api for="chef-sidebar">
+      <api-prop name="Content Model" type="DOM nodes" required>
+        <p>The <token>chef-sidebar</token> element takes one or two children.</p>
+        <p>For a sidebar with navigation-only elements, include a <token>div</token> with
+        a <token>nav-items</token> class.
+        That child <token>div</token> must contain one or more <token>chef-sidebar-entry</token> elements.</p>
+        <p>For a sidebar with selection and navigation elements, include one <token>div</token> with
+        a <token>select-items</token> class and a second with a <token>nav-items</token> class.
+        The <token>nav-items</token> <token>div</token> is the same as just described.
+        The <token>select-items</token> <token>div</token> must contain one or more
+        <token>chef-sidebar-entry</token> elements, each wrapped in its own <token>div</token>,
+        customized for your particular needs. See the example above.</p>
+      </api-prop>
+    </app-cl-api>
+
+    <app-cl-api for="chef-sidebar-entry">
+      <api-prop name="route" type="String" required>
+        This specifies the path to navigate to when the entry is selected.
+        For more technical details, it is passed to the
+        <a href="https://angular.io/api/router/RouterLink">RouterLink</a>
+        value on an embedded navigation link. In the static case, it is a simple path
+        to another page in the application. See the referenced Angular documentation
+        for more complex cases.
+        [Required only when used in the <token>nav-items</token> section;
+        ignored in the <token>select-items</token> section.]
+      </api-prop>
+      <api-prop name="exact" type="Attribute">
+        This determines whether an exact path or a prefix of the path is required to
+        make a navigation element active, for styling purposes. Looking at the example
+        for the Admin page, you will see it is used for the first entry
+        (with route <token>/settings</token>) because the paths on the other two entries
+        start with the same string (<token>/settings/users</token>, <token>/settings/tokens</token>).
+        If <token>exact</token> was removed from the first entry, then it would also be highlighted
+        when the second or third entry was selected.
+        For more technical details, this parameter is passed as the <token>exact</token> property
+        to the <token>RouterLinkActiveOptions</token>, which determines how the embedded
+        <a href="https://angular.io/api/router/RouterLink">RouterLink</a> is activated.
+        See also <a href="https://angular.io/api/router/RouterLinkActive">RouterLinkActive</a>.
+        [Used only in the <token>nav-items</token> section;
+        ignored in the <token>select-items</token> section.]
+      </api-prop>
+      <api-prop name="icon" type="String" required>
+        The name of the <a href="/component_library/icon">chef-icon</a> element.
+        [Required only when used in the <token>nav-items</token> section;
+        ignored in the <token>select-items</token> section.]
+      </api-prop>
+      <api-prop name="Content Model" type="DOM nodes" required>
+        Specify text that comprises the rendered label of the
+        <token>&lt;chef-sidebar-entry&gt;</token>.
+      </api-prop>
+
+    </app-cl-api>
+
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Accessibility</h3>
+
+    This component supports accessibility.
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Browser Compatibility</h3>
+
+    <ul>
+      <li>Chrome 61 - OK</li>
+      <li>Firefox 52 - OK</li>
+      <li>Safari 11 - OK</li>
+      <li>Edge 40 - OK</li>
+      <li>IE 11 - OK</li>
+    </ul>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Example Running In Chef Automate</h3>
+
+    Go to the <a href="/client-runs" target="_blank">Client Runs page</a> or
+    <a href="/settings" target="_blank">Admin page</a> to see the above examples in the wild.
+  </app-cl-section>
+
+</app-component-library-screen>

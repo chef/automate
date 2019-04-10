@@ -1,0 +1,69 @@
+<app-admin-sidebar></app-admin-sidebar>
+<chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+
+<div class="container">
+  <main>
+    <chef-page-header>
+      <chef-heading>Projects</chef-heading>
+      <chef-subheading>
+        Projects are named groups of resources used to define policies.
+      </chef-subheading>
+    </chef-page-header>
+    <section *ngIf="(iamMajorVersion$ | async) === 'v1' || (iamMinorVersion$ | async) === 'v0'" class="page-body">
+      Currently, you are using IAM {{ iamMajorVersion$ | async }}. Projects are only available when using IAM v2.1.
+    </section>
+
+    <section *ngIf="(iamMinorVersion$ | async) === 'v1'" class="page-body">
+      <chef-toolbar>
+        <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+          <chef-button id="create-button" primary (click)="openCreateModal()">Create Project</chef-button>
+        </app-authorized>
+      </chef-toolbar>
+      <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
+        <chef-table>
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Name</chef-th>
+              <chef-th>Type</chef-th>
+              <chef-th class="controls"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let project of sortedProjects$ | async">
+              <chef-td>
+                <a [routerLink]="['/settings/projects', project.id]">{{ project.name }}</a>
+              </chef-td>
+              <chef-td>{{ project.type | iamType }}</chef-td>
+              <chef-td class="controls">
+                <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
+                  <chef-control-menu>
+                    <chef-option (click)="startProjectDelete(project)">Delete Project</chef-option>
+                  </chef-control-menu>
+                </app-authorized>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </app-authorized>
+    </section>
+
+    <app-create-object-modal
+      [visible]="createModalVisible"
+      [creating]="creatingProject"
+      [conflictErrorEvent]="conflictErrorEvent"
+      objectNoun="project"
+      [createForm]="createProjectForm"
+      (close)="closeCreateModal()"
+      (createClicked)="createProject()">
+    </app-create-object-modal>
+
+    <app-delete-object-modal
+      [visible]="deleteModalVisible"
+      objectNoun="project"
+      [objectName]="projectToDelete?.id"
+      [moreDetails]="inUseMessage()"
+      (close)="closeDeleteModal()"
+      (deleteClicked)="deleteProject()">
+    </app-delete-object-modal>
+  </main>
+</div>

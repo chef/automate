@@ -1,0 +1,97 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -eu
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+export HOME="{{pkg.svc_var_path}}"
+export CONFIG_PATH="{{pkg.svc_config_path}}/sys.config"
+export VMARGS_PATH="{{pkg.svc_config_path}}/vm.args"
+export RUNNER_LOG_DIR="{{pkg.svc_var_path}}/logs"
+# A2 Workflow Database
+DBNAME="{{cfg.postgresql.db_name}}"
+DBUSER="workflow"
+export A2_SVC_DB_USER="workflow"
+
+mkdir -p {{pkg.svc_var_path}}/log
+mkdir -p {{pkg.svc_var_path}}/etc
+mkdir -p {{pkg.svc_data_path}}/git/repos
+mkdir -p {{pkg.svc_data_path}}/git/workspace
+mkdir -p {{pkg.svc_data_path}}/ssh_git_server_keys
+
+# Only copy the default template if none exists in the template path and a
+# custom template name is not configured.
+if [[ ! -d "{{pkg.svc_files_path}}/{{cfg.ssh_git.git_repo_template}}" ]] && [[ "{{cfg.ssh_git.git_repo_template}}" == "git_repo_template" ]]; then
+  cp -a {{pkg.path}}/{{cfg.ssh_git.git_repo_template}} {{pkg.svc_files_path}}/
+fi
+# Attempt to chown the directory and fail if it is missing.
+chown hab:hab -R \
+  {{pkg.svc_files_path}}/{{cfg.ssh_git.git_repo_template}} \
+  {{pkg.svc_data_path}}/git
+
+# Verify if the cookie was already migrated
+ERL_COOKIE_PATH="{{pkg.svc_var_path}}/.erlang.cookie"
+if [ -s "$ERL_COOKIE_PATH" ]; then
+  echo "Using existing erl_cookie $ERL_COOKIE_PATH"
+else
+{{~#if cfg.erl_cookie }}
+  erl_cookie="{{cfg.erl_cookie}}"
+{{~else}}
+  erl_cookie=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 20)
+{{~/if}}
+
+  # Create .erlang.cookie
+  echo $erl_cookie > "$ERL_COOKIE_PATH"
+fi
+
+# Only we can eat the cookie
+chmod 600 "$ERL_COOKIE_PATH"
+
+# Create Git SSH host keys
+#
+# The key file must be named 'ssh_host_rsa_key for erlang to find it
+key_file="{{pkg.svc_data_path}}/ssh_git_server_keys/ssh_host_rsa_key"
+mkdir -pv "$(dirname "$key_file")"
+if [[ ! -f "$key_file" ]]; then
+  ssh-keygen -t rsa -N '' -f "$key_file"
+fi
+
+#
+# Create Git SSH Client Keys
+#
+ent_key_filename="{{pkg.svc_var_path}}/{{cfg.ssh_git.builder_key}}"
+# Generate an SSH keypair if the private key is mssing.
+if [[ ! -f "$ent_key_filename" ]]; then
+  ssh-keygen -f "$ent_key_filename" -t rsa -b 4096 -C "chef@chef.ent" -q -N ""
+fi
+
+# Re-generate the SSH public key if missing and the private key is present.
+# This is safer than recreating both keys and potentially bricking logins.
+if [[ (-f "$ent_key_filename") && ! (-f "$ent_key_filename.pub") ]]; then
+  ssh-keygen -y -f "$ent_key_filename" > "$ent_key_filename.pub"
+fi
+
+# Ensure that the application has access to our root CA
+CACERTS="{{pkg.svc_path}}/var/root_ca.crt"
+if [[ ! -f "${CACERTS}" ]] ; then
+  ln -s "{{pkgPathFor "core/cacerts"}}/ssl/certs/cacert.pem" "${CACERTS}"
+fi
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
+
+pg-helper migrate-tables delivery "$DBNAME" "$DBUSER"
+pg-helper ensure-service-database "$DBNAME" "$DBUSER"
+
+# Remove tables that are not needed for workflow in A2
+pg-helper drop-tables "$DBNAME" agents jobs jobs_nodes jobs_profiles jobs_tags \
+  node_managers nodes nodes_agents nodes_secrets nodes_tags profiles results s_secrets \
+  s_secrets_tags s_tags tags \
+    --cascade
+
+pg-helper create-extension "$DBNAME" "uuid-ossp"
+pg-helper sqitch-deploy "$DBNAME" "{{pkg.path}}/schema"
+pg-helper fix-permissions "$DBNAME" "$DBUSER"
+
+exec "{{pkg.path}}/delivery/bin/delivery" foreground

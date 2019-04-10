@@ -1,0 +1,84 @@
+##
+# Documented settings for the "delivery" service
+#
+# See https://docs.chef.io/config_rb_delivery.html
+# and https://docs.chef.io/config_rb_delivery_optional_settings.html#delivery
+# for definitions and defaults.
+#
+api_port = 9611
+audit_max_events = 100
+ca_cert_chain_depth = 2
+db_pool_init_count = 20
+db_pool_max_count = 100
+default_search="""(recipes:delivery_builder OR recipes:delivery_builder\\\\:\\\\:default
+                  OR recipes:delivery_build OR recipes:delivery_build\\\\:\\\\:default
+                  OR tags:delivery-build-node)"""
+elasticsearch_url = "http://127.0.0.1:9200"
+
+# Automate listens  on the default route ip address unless this value is set
+#
+# When we finish, this should end up being commented out by default. The
+# default behavior should be to bind to the default interface, which Habitat
+# exposes as `sys.ip`.
+#
+# As of now, however, we need to listen on 0.0.0.0 (all interfaces) because the
+# update git hook (in
+# /server/apps/delivery/priv/git_repo_template/hooks/update) has "localhost"
+# hard-coded for the host to connect to, so if we're not listening on
+# 127.0.0.1, that hook will fail.
+#
+# https://chefio.atlassian.net/browse/ET-495 is open to fix this.
+listen = "0.0.0.0"
+
+phase_job_confirmation_timeout = 300000 # "5m"
+push_jobs_max_retries = 3
+push_jobs_overall_timeout =  7200 # "2h"
+push_jobs_run_timeout = 4500 # "75m"
+read_ttl = 604800 # "7d"
+write_ttl = 604800 # "7d"
+
+# Used for linking to the Opsworks Console
+# console_name = nil
+# console_url = nil
+
+#[postgresql]
+# => Look at pkg/api/config_request.go for these configs
+
+[telemetry]
+telemetry_api = "https://telemetry.chef.io"
+telemetry_enabled = false
+
+[delivery]
+omnibus_version = "0.0.1"
+deliv_git_ssh_base_command = "git"
+deliv_chef_config = "erlang.cfg"
+disaster_recovery_mode = "standalone"
+lsyncd_stat_path = "/lsyncd/supervise/stat"
+fips_mode = false
+is_dev_box = false
+no_ssl_verification = []
+marketplace_licensing = false
+
+[chef_server]
+chef_user_private_key = "/var/etc/delivery.pem"
+
+# SSH Git port must be defined both here and proto config to ensure the hab package build works due to the bindings.
+[ssh_git]
+port = 8989
+builder_key = "etc/builder_key"
+
+[log_rotation]
+file_maxbytes = 10240000
+num_to_keep = 10
+
+[deliv_notify]
+config = []
+
+[lsyncd]
+log_directory = "/var/log/lsyncd/lsync-status.log"
+
+[mlsa]
+accept = false
+
+[log]
+level = "info"

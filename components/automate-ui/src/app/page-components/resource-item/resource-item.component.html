@@ -1,0 +1,37 @@
+<div class="resource">
+  <div class="meta">
+    <div class="status {{resource.status}}">
+      <span>
+        <chef-icon>{{ resource.status | chefStatusIcon }}</chef-icon>
+      </span>
+    </div>
+    <div class="step">
+      <span>{{resource.step}}</span>
+    </div>
+    <div class="type">
+      <span>{{resource.type}}</span>
+    </div>
+    <div class="name">
+      <span>{{resource.name}}</span>
+    </div>
+    <div class="action">
+      <span>{{resource.result}}</span>
+    </div>
+    <div class="cookbook">
+      <span>{{resource.cookbook_name}}</span>
+    </div>
+    <div class="view-action">
+      <span *ngIf="resource.delta && resource.delta.length" class="link" (click)="toggleDelta()">
+        <span>diff</span><chef-icon>expand_{{ showDelta === true ? 'more' : 'less' }}</chef-icon>
+      </span>
+      <span *ngIf="resource.status === 'failed'" class="link" (click)="showModal()">
+        <span>error log</span>
+      </span>
+      <span *ngIf="(!resource.delta || resource.delta.length === 0) && resource.status !== 'failed'"
+        class="none">- -</span>
+    </div>
+  </div>
+  <div class="delta" *ngIf="resource.delta && showDelta">
+    <app-delta-viewer [delta]="resource.delta"></app-delta-viewer>
+  </div>
+</div>

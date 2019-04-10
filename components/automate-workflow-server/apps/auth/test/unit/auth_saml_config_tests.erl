@@ -1,0 +1,647 @@
+-module(auth_saml_config_tests).
+
+-include_lib("hoax/include/hoax.hrl").
+-include_lib("esaml/include/esaml.hrl").
+-include_lib("auth_types.hrl").
+
+-compile([export_all]).
+
+auth_saml_config_test_() ->
+    [
+     hoax:fixture(?MODULE, "service_provider_"),
+     hoax:fixture(?MODULE, "identity_provider_"),
+     hoax:fixture(?MODULE, "periodic_metadata_refresh_"),
+     hoax:fixture(?MODULE, "refresh_metadata_"),
+     hoax:fixture(?MODULE, "from_json_"),
+     hoax:fixture(?MODULE, "to_json_")
+    ].
+
+service_provider_when_no_entity_id_is_configured_returns_esaml_sp_record() ->
+    EntName = <<"enterprise">>,
+    ConsumeUri = <<"enterprise/saml/consume">>,
+    MetadataUri= <<"enterprise/saml/metadata">>,
+    Cert = <<"cert">>,
+    FingerPrint = "SHA256:fingerprint",
+    ServiceProvider = #esaml_sp{consume_uri = "enterprise/saml/consume",
+                                metadata_uri = "enterprise/saml/metadata",
+                                idp_signs_envelopes = false,
+                                idp_signs_assertions = true,
+                                trusted_fingerprints = [FingerPrint]},
+    hoax:mock(application,
+              ?expect(get_env,
+                      ?withArgs([auth, saml_entity_id]),
+                      ?andReturn(undefined))),
+    hoax:mock(deliv_web_utils,
+              [?expect(api_url_for,
+                       ?withArgs([saml_consume, [EntName]]),
+                       ?andReturn(ConsumeUri)),
+               ?expect(api_url_for,
+                       ?withArgs([saml_metadata, [EntName]]),
+                       ?andReturn(MetadataUri))]),
+    hoax:mock(auth_saml_utils,
+              ?expect(calculate_fingerprint,
+                      ?withArgs([Cert]),
+                      ?andReturn(FingerPrint))),
+    hoax:mock(esaml_sp,
+              ?expect(setup,
+                      ?withArgs([ServiceProvider]),
+                      ?andReturn(service_provider_config))),
+
+    Actual = auth_saml_config:service_provider(EntName, Cert),
+    ?assertEqual({ok, service_provider_config}, Actual),
+    ?verifyAll.
+
+service_provider_when_given_an_enterprise_name_returns_esaml_sp_record() ->
+    EntName = <<"enterprise">>,
+    EntityId = "https://saml-for-test.chef.io",
+    ConsumeUri = <<"enterprise/saml/consume">>,
+    Cert = <<"cert">>,
+    FingerPrint = "SHA256:fingerprint",
+    ServiceProvider = #esaml_sp{consume_uri = "enterprise/saml/consume",
+                                metadata_uri = EntityId,
+                                idp_signs_envelopes = false,
+                                idp_signs_assertions = true,
+                                trusted_fingerprints = [FingerPrint]},
+    hoax:mock(application,
+              ?expect(get_env,
+                      ?withArgs([auth, saml_entity_id]),
+                      ?andReturn({ok, EntityId}))),
+    hoax:mock(deliv_web_utils,
+              ?expect(api_url_for,
+                      ?withArgs([saml_consume, [EntName]]),
+                      ?andReturn(ConsumeUri))),
+    hoax:mock(auth_saml_utils,
+              ?expect(calculate_fingerprint,
+                      ?withArgs([Cert]),
+                      ?andReturn(FingerPrint))),
+    hoax:mock(esaml_sp,
+              ?expect(setup,
+                      ?withArgs([ServiceProvider]),
+                      ?andReturn(service_provider_config))),
+
+    Actual = auth_saml_config:service_provider(EntName, Cert),
+    ?assertEqual({ok, service_provider_config}, Actual),
+    ?verifyAll.
+
+service_provider_when_multiple_certificates_returns_esaml_sp_record_with_multiple_fingerprints() ->
+    EntName = <<"enterprise">>,
+    ConsumeUri = <<"enterprise/saml/consume">>,
+    EntityId = "https://saml-for-test.chef.io",
+    Cert = <<"cert">>,
+    Cert2 = <<"cert2">>,
+    FingerPrint = "SHA256:fingerprint",
+    FingerPrint2 = "SHA256:fingerprint2",
+    ServiceProvider = #esaml_sp{consume_uri = "enterprise/saml/consume",
+                                metadata_uri = EntityId,
+                                idp_signs_envelopes = false,
+                                idp_signs_assertions = true,
+                                trusted_fingerprints = [FingerPrint, FingerPrint2]},
+    hoax:mock(deliv_web_utils, [
+              ?expect(api_url_for,
+                      ?withArgs([saml_consume, [EntName]]),
+                      ?andReturn(ConsumeUri))]),
+    hoax:mock(auth_saml_utils, [
+              ?expect(calculate_fingerprint,
+                      ?withArgs([Cert]),
+                      ?andReturn(FingerPrint)),
+              ?expect(calculate_fingerprint,
+                      ?withArgs([Cert2]),
+                      ?andReturn(FingerPrint2))]),
+    hoax:mock(esaml_sp,
+              ?expect(setup,
+                      ?withArgs([ServiceProvider]),
+                      ?andReturn(service_provider_config))),
+    hoax:mock(application,
+              ?expect(get_env,
+                      ?withArgs([auth, saml_entity_id]),
+                      ?andReturn({ok, EntityId}))),
+
+    Actual = auth_saml_config:service_provider(EntName, [Cert, Cert2]),
+    ?assertEqual({ok, service_provider_config}, Actual),
+    ?verifyAll.
+
+service_provider_when_esaml_sp_setup_errors_returns_error() ->
+    EntName = <<"testEnt">>,
+    ConsumeUri = <<"https://delivery.com/api/v0/e/enterprise/saml/consume">>,
+    EntityId = "https://saml-for-test.chef.io",
+    Cert = <<"cert">>,
+    FingerPrint = "SHA256:fingerprint",
+    hoax:mock(application,
+              ?expect(get_env,
+                      ?withArgs([auth, saml_entity_id]),
+                      ?andReturn({ok, EntityId}))),
+    hoax:mock(deliv_web_utils,
+              ?expect(api_url_for,
+                      ?withArgs([saml_consume, [EntName]]),
+                      ?andReturn(ConsumeUri))),
+    hoax:mock(auth_saml_utils,
+              ?expect(calculate_fingerprint,
+                      ?withArgs([Cert]),
+                      ?andReturn(FingerPrint))),
+    hoax:mock(esaml_sp,
+              ?expect(setup,
+                      ?withArgs([#esaml_sp{consume_uri = erlang:binary_to_list(ConsumeUri),
+                                           metadata_uri = EntityId,
+                                           idp_signs_envelopes = false,
+                                           idp_signs_assertions = true,
+                                           trusted_fingerprints = [FingerPrint]
+                                           }]),
+                      ?andError(an_error))),
+
+    Actual = auth_saml_config:service_provider(EntName, Cert),
+    ?assertEqual({error, an_error}, Actual),
+    ?verifyAll.
+
+service_provider_metadata_when_given_an_enterprise_name_returns_esaml_sp_metadata_record() ->
+    EntName = <<"enterprise">>,
+    ConsumeUri = <<"https://delivery.com/api/v0/e/enterprise/saml/consume">>,
+    EntityId = "https://saml-for-test.chef.io",
+    Expected = #esaml_sp_metadata{
+                  consumer_location = "https://delivery.com/api/v0/e/enterprise/saml/consume",
+                  entity_id = EntityId,
+                  signed_requests = false,
+                  signed_assertions = true,
+                  org = #esaml_org{
+                           name = "Chef Automate",
+                           displayname = "Chef Automate",
+                           url = "https://www.chef.io/automate/"
+                          }
+                 },
+    hoax:mock(application,
+              ?expect(get_env,
+                      ?withArgs([auth, saml_entity_id]),
+                      ?andReturn({ok, EntityId}))),
+    hoax:mock(deliv_web_utils,
+              ?expect(api_url_for,
+                      ?withArgs([saml_consume, [EntName]]),
+                      ?andReturn(ConsumeUri))),
+
+    Actual = auth_saml_config:service_provider_metadata(EntName),
+    ?assertEqual(Expected, Actual),
+    ?verifyAll.
+
+identity_provider_when_enterprise_saml_config_exists_returns_esaml_idp_record() ->
+    EntName = <<"testEnt">>,
+    SSOLoginUrl = <<"https://bomb.com/login">>,
+    SSOBinding = <<"HTTP-Redirect">>,
+    NameIdFormat = <<"default">>,
+    IdPUrl = <<"https://bomb.com">>,
+    Cert =  <<"x509abcabcabc">>,
+    Config = auth_saml_config:fromlist([{sso_login_url, SSOLoginUrl},
+                                        {sso_binding, SSOBinding},
+                                        {idp_url, IdPUrl},
+                                        {cert, Cert},
+                                        {name_id, NameIdFormat}]),
+    IdPMeta = #esaml_idp_metadata{
+        certificates = [Cert],
+        entity_id = erlang:binary_to_list(IdPUrl),
+        login_location_redirect = erlang:binary_to_list(SSOLoginUrl)},
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([Config]))),
+
+    Actual = auth_saml_config:identity_provider(EntName),
+    ?assertEqual({ok, IdPMeta, SSOBinding, NameIdFormat}, Actual),
+    ?verifyAll.
+
+identity_provider_when_enterprise_saml_config_db_query_fails_returns_error() ->
+    EntName = <<"testEnt">>,
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn({error, why}))),
+
+    Actual = auth_saml_config:identity_provider(EntName),
+    ?assertEqual({error, why}, Actual),
+    ?verifyAll.
+
+identity_provider_returns_idp_metadata_and_configured_sso_binding_and_nameid_format_when_parsing_metadata_successfully() ->
+    MetadataXML = <<"xml">>,
+    EntName = <<"testEnt">>,
+    MetadataUrl = <<"www.metadata.com">>,
+    SSOLoginUrl = <<"https://bomb.com/login">>,
+    IdPUrl = <<"example:urn:foo">>,
+    SSOBinding = <<"HTTP-Redirect">>,
+    NameIdFormat = <<"default">>,
+    Config = auth_saml_config:fromlist([ {metadata_url, MetadataUrl},
+                                         {metadata_xml, MetadataXML},
+                                         {sso_binding, SSOBinding},
+                                         {name_id, NameIdFormat}]),
+    IdPMeta = #esaml_idp_metadata{
+        certificates = [<<48,130,3,60,48,130,2,36,2,9>>],
+        entity_id = erlang:binary_to_list(IdPUrl),
+        login_location_redirect = erlang:binary_to_list(SSOLoginUrl)},
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([Config]))),
+    hoax:mock(xmerl_scan,
+              ?expect(string,
+                      ?withArgs(["xml", [{namespace_conformant,true}]]),
+                      ?andReturn({metadata_xmerl, rest}))),
+    hoax:mock(esaml,
+              ?expect(decode_idp_metadata,
+                      ?withArgs([metadata_xmerl]),
+                      ?andReturn({ok, IdPMeta}))),
+
+    Actual = auth_saml_config:identity_provider(EntName),
+    ?assertEqual({ok, IdPMeta, SSOBinding, NameIdFormat}, Actual),
+    ?verifyAll.
+
+identity_provider_returns_error_when_xml_metadata_error_occurs() ->
+    MetadataXML = <<"xml">>,
+    EntName = <<"testEnt">>,
+    MetadataUrl = <<"www.metadata.com">>,
+    SSOBinding = <<"HTTP-Redirect">>,
+    NameIdFormat = <<"default">>,
+    Config = auth_saml_config:fromlist([ {metadata_url, MetadataUrl},
+                                         {metadata_xml, MetadataXML},
+                                         {sso_binding, SSOBinding},
+                                         {name_id, NameIdFormat}]),
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([Config]))),
+    hoax:mock(xmerl_scan,
+              ?expect(string,
+                      ?withArgs(["xml", [{namespace_conformant,true}]]),
+                      ?andReturn({metadata_xmerl, rest}))),
+    hoax:mock(esaml,
+              ?expect(decode_idp_metadata,
+                      ?withArgs([metadata_xmerl]),
+                      ?andReturn({error, because}))),
+
+    Actual = auth_saml_config:identity_provider(EntName),
+    ?assertEqual({error, because}, Actual),
+    ?verifyAll.
+
+identity_provider_returns_error_when_missing_config() ->
+    EntName = <<"testEnt">>,
+    Config = auth_saml_config:fromlist([ {metadata_url, <<"www.metadata.com">>},
+                                         {metadata_xml, undefined},
+                                         {sso_binding, undefined},
+                                         {idp_url, undefined},
+                                         {name_id, <<"default">>}]),
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([Config]))),
+    Actual = auth_saml_config:identity_provider(EntName),
+    ?assertEqual({error, malformed_config}, Actual),
+    ?verifyAll.
+
+refresh_metadata_when_saml_not_configured_returns_ok_noop() ->
+    EntName = <<"testEnt">>,
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn({error, why}))),
+
+    Actual = auth_saml_config:refresh_metadata(EntName),
+    ?assertEqual({ok, noop}, Actual),
+    ?verifyAll.
+
+refresh_metadata_when_metadata_url_is_undefined_returns_config() ->
+    EntName = <<"testEnt">>,
+    SSOLoginUrl = <<"https://bomb.com/login">>,
+    SSOBinding = <<"HTTP-Redirect">>,
+    NameIdFormat = <<"default">>,
+    IdPUrl = <<"https://bomb.com">>,
+    Cert =  <<"x509abcabcabc">>,
+    DefaultRoles = [<<"admin">>],
+    ConfigSerialized = auth_saml_config:fromlist([{sso_login_url, SSOLoginUrl},
+                                                  {sso_binding, SSOBinding},
+                                                  {idp_url, IdPUrl},
+                                                  {cert, Cert},
+                                                  {name_id, NameIdFormat},
+                                                  {default_roles, DefaultRoles}]),
+    Config = #saml_config{ent_name = EntName,
+                          sso_login_url = SSOLoginUrl,
+                          sso_binding = SSOBinding,
+                          idp_url = IdPUrl,
+                          cert = Cert,
+                          name_id = NameIdFormat,
+                          default_roles = DefaultRoles},
+
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([ConfigSerialized]))),
+
+    Actual = auth_saml_config:refresh_metadata(EntName),
+    ?assertEqual({ok, Config}, Actual),
+    ?verifyAll.
+
+refresh_metadata_when_metadata_url_present_and_reachable_returns_updated_config() ->
+    MetadataXml = <<"xml">>,
+    UpdatedXml = <<"new xml">>,
+    EntName = <<"testEnt">>,
+    MetadataUrl = <<"http://www.metadata.com">>,
+    SSOBinding = <<"HTTP-Redirect">>,
+    NameIdFormat = <<"default">>,
+    DefaultRoles = [<<"admin">>],
+    Config = auth_saml_config:fromlist([{metadata_url, MetadataUrl},
+                                        {metadata_xml, MetadataXml},
+                                        {sso_binding, SSOBinding},
+                                        {name_id, NameIdFormat},
+                                        {default_roles, DefaultRoles}]),
+    NewConfig = #saml_config{ent_name = EntName,
+                             name_id = NameIdFormat,
+                             sso_binding = SSOBinding,
+                             metadata_url = MetadataUrl,
+                             metadata_xml = UpdatedXml,
+                             default_roles = DefaultRoles},
+
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([Config]))),
+    hoax:mock(deliv_http,
+              ?expect(req,
+                      ?withArgs([MetadataUrl]),
+                      ?andReturn({ok, 200, headers, UpdatedXml}))),
+
+    Actual = auth_saml_config:refresh_metadata(EntName),
+    ?assertEqual({ok, NewConfig}, Actual),
+    ?verifyAll.
+
+to_json_when_given_saml_config_record_of_type_metadata_returns_ejson_representation() ->
+    MetadataUrl = <<"www.metadata.com">>,
+    MetadataXml = <<"worstformatever">>,
+    NameId = <<"urn:oasis:names:tc:SAML:2.0:nameid-format:entity">>,
+    DefaultRoles = [<<"admin">>, <<"observer">>],
+    Config = #saml_config{metadata_url = MetadataUrl,
+                          metadata_xml = MetadataXml,
+                          name_id = NameId,
+                          default_roles = DefaultRoles},
+    ResponseEjson = {[
+                      {<<"sso_login_url">>, undefined},
+                      {<<"sso_binding">>, undefined},
+                      {<<"idp_url">>, undefined},
+                      {<<"cert">>, undefined},
+                      {<<"name_id">>, NameId},
+                      {<<"metadata_url">>, MetadataUrl},
+                      {<<"default_roles">>, DefaultRoles}
+                     ]},
+
+    ?assertEqual(ResponseEjson, auth_saml_config:to_json(Config)).
+
+to_json_when_given_saml_config_record_of_type_manual_returns_ejson_representation() ->
+    NameId = <<"urn:oasis:names:tc:SAML:2.0:nameid-format:entity">>,
+    SSOLoginUrl = <<"https://bomb.com/login">>,
+    SSOBinding = <<"HTTP-Redirect">>,
+    IdPUrl = <<"https://bomb.com">>,
+    Cert =  <<"x509abcabcabc">>,
+    Config = #saml_config{sso_login_url = SSOLoginUrl,
+                          sso_binding = SSOBinding,
+                          idp_url = IdPUrl,
+                          cert = Cert,
+                          name_id = NameId},
+    ResponseEjson = {[
+                      {<<"sso_login_url">>, SSOLoginUrl},
+                      {<<"sso_binding">>, SSOBinding},
+                      {<<"idp_url">>, IdPUrl},
+                      {<<"cert">>, Cert},
+                      {<<"name_id">>, NameId},
+                      {<<"metadata_url">>, undefined},
+                      {<<"default_roles">>, undefined}
+                     ]},
+
+    ?assertEqual(ResponseEjson, auth_saml_config:to_json(Config)).
+
+from_json_when_given_ejson_that_is_a_manual_config_returns_saml_config() ->
+    SSOLoginUrl = <<"https://bomb.com/login">>,
+    SSOBinding = <<"HTTP-Redirect">>,
+    IdPUrl = <<"https://bomb.com">>,
+    Cert =  <<"x509abcabcabc">>,
+    NameId = <<"urn:oasis:names:tc:SAML:2.0:nameid-format:entity">>,
+    EntName = <<"NCC-1701">>,
+    DefaultRoles = [<<"committer">>, <<"observer">>],
+    ReqEjson = {[
+                 {<<"sso_login_url">>, SSOLoginUrl},
+                 {<<"sso_binding">>, SSOBinding},
+                 {<<"idp_url">>, IdPUrl},
+                 {<<"cert">>, Cert},
+                 {<<"name_id">>, NameId},
+                 {<<"default_roles">>, DefaultRoles}
+                ]},
+    ConfigRecord = #saml_config{sso_login_url = SSOLoginUrl,
+                                sso_binding = SSOBinding,
+                                idp_url = IdPUrl,
+                                cert = Cert,
+                                ent_name = EntName,
+                                metadata_url = undefined,
+                                name_id = NameId,
+                                default_roles = DefaultRoles},
+    ?assertEqual(ConfigRecord, auth_saml_config:from_json(ReqEjson, EntName)).
+
+from_json_when_given_ejson_that_is_a_metadata_config_returns_saml_config() ->
+    SSOBinding = <<"HTTP-Redirect">>,
+    MetadataUrl = <<"https://bouncer.com/saml/metadata.xml">>,
+    NameId = <<"urn:oasis:names:tc:SAML:2.0:nameid-format:entity">>,
+    EntName = <<"NCC-1701">>,
+    ReqEjson = {[
+                 {<<"metadata_url">>, MetadataUrl},
+                 {<<"sso_binding">>, SSOBinding},
+                 {<<"name_id">>, NameId}
+                ]},
+    ConfigRecord = #saml_config{metadata_url = MetadataUrl,
+                                sso_binding = SSOBinding,
+                                ent_name = EntName,
+                                name_id = NameId},
+    ?assertEqual(ConfigRecord, auth_saml_config:from_json(ReqEjson, EntName)).
+
+periodic_metadata_refresh_when_no_refresh_interval_configured_does_not_start_refresh_timer() ->
+    EntName = <<"EntE">>,
+    hoax:mock(application,
+              ?expect(get_env,
+                      ?withArgs([auth, saml_metadata_refresh_interval]),
+                      ?andReturn(undefined))),
+    hoax:mock(application,
+              ?expect(get_env,
+                      ?withArgs([auth, saml_metadata_retry_interval]),
+                      ?andReturn({ok, 60}))),
+    hoax:mock(deliv_enterprise,
+              ?expect(get_canonical_enterprise,
+                      ?withArgs([]),
+                      ?andReturn({ok, EntName}))),
+    hoax:mock(timer, [
+              ?expect(seconds,
+                      ?withArgs([0]),
+                      ?andReturn(0)),
+              ?expect(seconds,
+                      ?withArgs([60]),
+                      ?andReturn(60000)),
+              ?expect(apply_interval,
+                      ?withArgs([?any, ?any, ?any, ?any]),
+                      ?times(0))]),
+
+    ?assertEqual({error, not_configured}, auth_saml_config:periodic_metadata_refresh()),
+    ?verifyAll.
+
+periodic_metadata_refresh_when_refresh_interval_is_configured_starts_timer_based_process_with_this_interval() ->
+    EntName = <<"EntE">>,
+    Seconds = 60,
+    RetryCount = 0,
+    Interval = 60000,
+    RetryInterval = 0,
+
+    hoax:mock(application,
+              ?expect(get_env,
+                      ?withArgs([auth, saml_metadata_refresh_interval]),
+                      ?andReturn({ok, Seconds}))),
+    hoax:mock(application,
+              ?expect(get_env,
+                      ?withArgs([auth, saml_metadata_retry_interval]),
+                      ?andReturn(undefined))),
+    hoax:mock(deliv_enterprise,
+              ?expect(get_canonical_enterprise,
+                      ?withArgs([]),
+                      ?andReturn({ok, EntName}))),
+    hoax:mock(timer, [
+              ?expect(seconds,
+                      ?withArgs([Seconds]),
+                      ?andReturn(Interval)),
+              ?expect(seconds,
+                      ?withArgs([0]),
+                      ?andReturn(0)),
+              ?expect(apply_interval,
+                      ?withArgs([Interval, auth_saml_config, refresh_metadata_with_retry, [EntName, RetryInterval, RetryCount]]),
+                      ?andReturn({ok, pid}))]),
+
+    ?assertEqual({ok, pid}, auth_saml_config:periodic_metadata_refresh()),
+    ?verifyAll.
+
+refresh_metadata_with_retry_saves_updated_xml_and_does_not_start_retry_timer_when_refresh_succeeds() ->
+    EntName = <<"EntE">>,
+    MetadataXml = <<"xml">>,
+    UpdatedXml = <<"new xml">>,
+    IdPUrl = <<"example:urn:foo">>,
+    Cert =  <<"x509abcabcabc">>,
+    SSOLoginUrl = <<"https://bomb.com/login">>,
+    MetadataUrl = <<"http://www.metadata.com">>,
+    SSOBinding = <<"HTTP-Redirect">>,
+    NameIdFormat = <<"default">>,
+    DefaultRoles = [<<"admin">>],
+    RetryInterval = 60000,
+    RetryCount = 0,
+    Config = auth_saml_config:fromlist([{enterprise_id, EntName},
+                                        {sso_login_url, SSOLoginUrl},
+                                        {sso_binding, SSOBinding},
+                                        {idp_url, IdPUrl},
+                                        {cert, Cert},
+                                        {name_id, NameIdFormat},
+                                        {metadata_url, MetadataUrl},
+                                        {metadata_xml, MetadataXml},
+                                        {default_roles, DefaultRoles}]),
+    NewConfig = auth_saml_config:fromlist([{enterprise_id, EntName},
+                                        {sso_login_url, SSOLoginUrl},
+                                        {sso_binding, SSOBinding},
+                                        {idp_url, IdPUrl},
+                                        {cert, Cert},
+                                        {name_id, NameIdFormat},
+                                        {metadata_url, MetadataUrl},
+                                        {metadata_xml, UpdatedXml},
+                                        {default_roles, DefaultRoles}]),
+
+    hoax:mock(deliv_db, [
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([Config])),
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, upsert, [EntName, SSOLoginUrl,
+                                 SSOBinding, IdPUrl, Cert, NameIdFormat,
+                                 %% TODO: fromlist should probably make the last argument an empty list (OR observer)
+                                 MetadataUrl, UpdatedXml, DefaultRoles]]),
+                      ?andReturn([NewConfig]))]),
+    hoax:mock(deliv_http,
+              ?expect(req,
+                      ?withArgs([MetadataUrl]),
+                      ?andReturn({ok, 200, headers, UpdatedXml}))),
+    hoax:mock(timer,
+              ?expect(apply_interval,
+                      ?withArgs([?any, ?any, ?any, ?any]),
+                      ?times(0))),
+
+    ?assertEqual(ok, auth_saml_config:refresh_metadata_with_retry(EntName, RetryInterval, RetryCount)),
+    ?verifyAll.
+
+refresh_metadata_with_retry_when_no_retry_interval_is_configured_does_not_start_retry_timer_on_failure() ->
+    EntName = <<"EntE">>,
+    RetryInterval = 0,
+    RetryCount = 0,
+    MetadataUrl = <<"http://www.metadata.com">>,
+    Config = auth_saml_config:fromlist([ {metadata_url, MetadataUrl},
+                                         {metadata_xml, undefined},
+                                         {sso_binding, undefined},
+                                         {idp_url, undefined},
+                                         {name_id, <<"default">>}]),
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([Config]))),
+    hoax:mock(deliv_http,
+              ?expect(req,
+                      ?withArgs([MetadataUrl]),
+                      ?andReturn({error, 500}))),
+    hoax:mock(timer,
+              ?expect(apply_interval,
+                      ?withArgs([?any, ?any, ?any, ?any]),
+                      ?times(0))),
+
+    ?assertEqual(ok, auth_saml_config:refresh_metadata_with_retry(EntName, RetryInterval, RetryCount)),
+    ?verifyAll.
+
+refresh_metadata_with_retry_does_not_start_retry_timer_when_retry_limit_reached() ->
+    EntName = <<"EntE">>,
+    RetryInterval = 60000,
+    MetadataUrl = <<"http://www.metadata.com">>,
+    Config = auth_saml_config:fromlist([ {metadata_url, MetadataUrl},
+                                         {metadata_xml, undefined},
+                                         {sso_binding, undefined},
+                                         {idp_url, undefined},
+                                         {name_id, <<"default">>}]),
+
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([Config]))),
+    hoax:mock(deliv_http,
+              ?expect(req,
+                      ?withArgs([MetadataUrl]),
+                      ?andReturn({error, 500}))),
+    hoax:mock(timer,
+              ?expect(apply_after,
+                      ?withArgs([?any, ?any, ?any, ?any]),
+                      ?times(0))),
+
+    ?assertEqual(ok, auth_saml_config:refresh_metadata_with_retry(EntName, RetryInterval, ?SAML_METADATA_MAX_RETRIES)),
+    ?verifyAll.
+
+refresh_metadata_with_retry_starts_retry_timer_on_failure_with_incremented_retry_count() ->
+    EntName = <<"EntE">>,
+    RetryCount = 0,
+    RetryInterval = 60000,
+    MetadataUrl = <<"http://www.metadata.com">>,
+    Config = auth_saml_config:fromlist([ {metadata_url, MetadataUrl},
+                                         {metadata_xml, undefined},
+                                         {sso_binding, undefined},
+                                         {idp_url, undefined},
+                                         {name_id, <<"default">>}]),
+
+    hoax:mock(deliv_db,
+              ?expect(qfetch,
+                      ?withArgs([auth_saml_config, fetch_by_enterprise_name, [EntName]]),
+                      ?andReturn([Config]))),
+    hoax:mock(deliv_http,
+              ?expect(req,
+                      ?withArgs([MetadataUrl]),
+                      ?andReturn({error, 500}))),
+    hoax:mock(timer,
+              ?expect(apply_after,
+              ?withArgs([RetryInterval, auth_saml_config, refresh_metadata_with_retry, [EntName, RetryInterval, RetryCount+1]]),
+              ?andReturn({ok, pid}))),
+
+    ?assertEqual(ok, auth_saml_config:refresh_metadata_with_retry(EntName, RetryInterval, RetryCount)),
+    ?verifyAll.

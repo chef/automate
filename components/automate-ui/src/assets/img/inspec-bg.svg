@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="642px" height="242px" viewBox="0 0 642 242" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 3.8.3 (29802) - http://www.bohemiancoding.com/sketch -->
+    <title>61F8CE14-14C9-42BA-B06A-DAE5E1F25D4D</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <linearGradient x1="43.4743924%" y1="4.40321181%" x2="50%" y2="4.40321192%" id="linearGradient-1">
+            <stop stop-color="#EBEBEB" offset="0%"></stop>
+            <stop stop-color="#D7D7D7" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="76.2521701%" y1="13.5494231%" x2="36.9097222%" y2="7.92046763%" id="linearGradient-2">
+            <stop stop-color="#ADDBAD" offset="0%"></stop>
+            <stop stop-color="#7DC67D" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="0%" x2="76.8388254%" y2="16.1168667%" id="linearGradient-3">
+            <stop stop-color="#ECA9A7" offset="0%"></stop>
+            <stop stop-color="#E17572" offset="100%"></stop>
+        </linearGradient>
+        <rect id="path-4" x="0" y="0" width="22.7555192" height="22.7555192" rx="4"></rect>
+        <mask id="mask-5" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="22.7555192" height="22.7555192" fill="white">
+            <use xlink:href="#path-4"></use>
+        </mask>
+    </defs>
+    <g id="Exploration" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="WELCOME_StaticWidgets" transform="translate(-47.000000, -43.000000)">
+            <g id="inspec-bg-copy" transform="translate(47.000000, 43.000000)">
+                <rect id="Rectangle-1028" fill="#FFFFFF" x="0" y="0" width="642" height="242"></rect>
+                <g id="Charts" transform="translate(25.000000, 26.000000)">
+                    <g id="Compliance-Pie" transform="translate(0.455437, 0.327065)">
+                        <path d="M93.0907604,186.181521 C144.503368,186.181521 186.181521,144.503368 186.181521,93.0907604 C186.181521,41.6781531 144.503368,0 93.0907604,0 C41.6781531,0 0,41.6781531 0,93.0907604 C0,144.503368 41.6781531,186.181521 93.0907604,186.181521 Z" id="Oval-80-Copy-12" fill="url(#linearGradient-1)"></path>
+                        <path d="M137.348162,11.1730866 C166.429941,26.9181622 186.181521,57.697847 186.181521,93.0907604 C186.181521,144.503368 144.503368,186.181521 93.0907604,186.181521 C41.6781531,186.181521 0,144.503368 0,93.0907604 C0,44.6729695 36.9640159,4.88858715 84.2117158,0.417945078 L93.0723578,93.6251725 L137.348162,11.1730866 Z" id="Combined-Shape" fill="url(#linearGradient-2)"></path>
+                        <path d="M137.155333,11.0689814 C124.085561,4.03274549 109.141297,0.029157699 93.2644812,0.000158639669 L93.2644812,93.1820374 L137.155333,11.0689814 Z" id="Combined-Shape" fill="url(#linearGradient-3)"></path>
+                        <ellipse id="Center" fill="#FFFFFF" cx="93.0907604" cy="93.0907604" rx="77.5756337" ry="77.5756337"></ellipse>
+                    </g>
+                    <text id="Compliance-Status" font-family="FontAwesome" font-size="24" font-weight="normal" line-spacing="25" fill="#677C8B">
+                        <tspan x="82.0633688" y="85.4562551"></tspan>
+                        <tspan x="106.063369" y="85.4562551" font-family="HelveticaNeue, Helvetica Neue" font-size="22"></tspan>
+                        <tspan x="51.8253688" y="111.456255" font-family="Montserrat-Regular, Montserrat" font-size="14">Compliance</tspan>
+                        <tspan x="71.7543688" y="129.456255" font-family="Montserrat-Regular, Montserrat" font-size="14">Status</tspan>
+                    </text>
+                    <g id="Group-2" transform="translate(467.844644, 4.464432)" fill="#7DC67D">
+                        <rect id="Rectangle-4" x="70.564544" y="11.8165713" width="5.34579879" height="18.1793404"></rect>
+                        <rect id="Rectangle-4-Copy-6" x="32.0747927" y="11.8165713" width="5.34579879" height="18.1793404"></rect>
+                        <rect id="Rectangle-4-Copy-3" x="51.3196684" y="11.8165713" width="5.34579879" height="18.1793404"></rect>
+                        <rect id="Rectangle-4-Copy-7" x="12.8299171" y="11.8165713" width="5.34579879" height="18.1793404"></rect>
+                        <rect id="Rectangle-4-Copy" x="64.1495855" y="3.63586808" width="5.34579879" height="26.3600436"></rect>
+                        <rect id="Rectangle-4-Copy-8" x="25.6598342" y="6.36276915" width="5.34579879" height="23.6331425"></rect>
+                        <rect id="Rectangle-4-Copy-4" x="44.9047098" y="0" width="5.34579879" height="29.9959117"></rect>
+                        <rect id="Rectangle-4-Copy-9" x="6.41495855" y="20.9062415" width="5.34579879" height="9.08967021"></rect>
+                        <rect id="Rectangle-4-Copy-2" x="57.7346269" y="6.36276915" width="5.34579879" height="23.6331425"></rect>
+                        <rect id="Rectangle-4-Copy-10" x="19.2448756" y="6.36276915" width="5.34579879" height="23.6331425"></rect>
+                        <rect id="Rectangle-4-Copy-5" x="38.4897513" y="3.63586808" width="5.34579879" height="26.3600436"></rect>
+                        <rect id="Rectangle-4-Copy-11" x="0" y="20.9062415" width="5.34579879" height="9.08967021"></rect>
+                    </g>
+                    <g id="Group-Copy-3" transform="translate(248.525756, 24.116926)" fill="#E27C79">
+                        <rect id="Rectangle-4" x="70.2184031" y="3.88724447" width="5.31957599" height="5.9803761"></rect>
+                        <rect id="Rectangle-4-Copy-6" x="31.917456" y="3.88724447" width="5.31957599" height="5.9803761"></rect>
+                        <rect id="Rectangle-4-Copy-3" x="51.0679295" y="3.88724447" width="5.31957599" height="5.9803761"></rect>
+                        <rect id="Rectangle-4-Copy-7" x="12.7669824" y="3.88724447" width="5.31957599" height="5.9803761"></rect>
+                        <rect id="Rectangle-4-Copy" x="63.8349119" y="1.19607522" width="5.31957599" height="8.67154535"></rect>
+                        <rect id="Rectangle-4-Copy-8" x="25.5339648" y="2.09313164" width="5.31957599" height="7.77448893"></rect>
+                        <rect id="Rectangle-4-Copy-4" x="44.6844383" y="0" width="5.31957599" height="9.86762057"></rect>
+                        <rect id="Rectangle-4-Copy-9" x="6.38349119" y="6.87743252" width="5.31957599" height="2.99018805"></rect>
+                        <rect id="Rectangle-4-Copy-2" x="57.4514207" y="2.09313164" width="5.31957599" height="7.77448893"></rect>
+                        <rect id="Rectangle-4-Copy-10" x="19.1504736" y="2.09313164" width="5.31957599" height="7.77448893"></rect>
+                        <rect id="Rectangle-4-Copy-5" x="38.3009472" y="1.19607522" width="5.31957599" height="8.67154535"></rect>
+                        <rect id="Rectangle-4-Copy-11" x="0" y="6.87743252" width="5.31957599" height="2.99018805"></rect>
+                    </g>
+                    <text id="Compliance-Status-Copy-7" font-family="HelveticaNeue-Light, Helvetica Neue" font-size="11" font-weight="300" line-spacing="25">
+                        <tspan x="249" y="54.9118652" fill="#677C8B">UNCOMPLIANT NODES</tspan>
+                        <tspan x="359.625" y="49" font-size="24" fill="#677C8B"> </tspan>
+                        <tspan x="253.717723" y="79.9118652" font-family="FontAwesome" font-size="22" font-weight="normal" fill="#E27C79"> </tspan>
+                        <tspan x="268.558" y="76.3917847" font-family="HelveticaNeue-Medium, Helvetica Neue" font-size="22" font-weight="400" fill="#E27C79">90</tspan>
+                        <tspan x="303.274" y="79.9118652" font-family="Montserrat-Regular, Montserrat" font-size="22" font-weight="normal" fill="#677C8B"> </tspan>
+                        <tspan x="300.31" y="79.9118652" font-family="HelveticaNeue, Helvetica Neue" font-size="12" font-weight="normal" fill="#4A90E2">view</tspan>
+                    </text>
+                    <text id="Compliance-Status-Copy-8" font-family="HelveticaNeue-Light, Helvetica Neue" font-size="11" font-weight="300" line-spacing="25">
+                        <tspan x="468.012277" y="52" fill="#677C8B">COMPLIANT NODES </tspan>
+                        <tspan x="468" y="77" font-family="FontAwesome" font-size="22" font-weight="normal" fill="#7DC67D"> </tspan>
+                        <tspan x="479.69742" y="71.4799194" font-family="HelveticaNeue-Medium, Helvetica Neue" font-size="22" font-weight="400" fill="#7DC67D">1150</tspan>
+                        <tspan x="538.87742" y="76.4958496" font-family="Montserrat-Regular, Montserrat" font-size="22" font-weight="normal" fill="#677C8B"> </tspan>
+                        <tspan x="535.91342" y="77" font-family="HelveticaNeue, Helvetica Neue" font-size="12" font-weight="normal" fill="#4A90E2">view</tspan>
+                        <tspan x="569.10942" y="76.4958496" font-family="Montserrat-Regular, Montserrat" font-size="22" font-weight="normal" fill="#677C8B"> </tspan>
+                    </text>
+                    <text id="WORKFLOW-CHANGES-*" font-family="HelveticaNeue, Helvetica Neue" font-size="11" font-weight="normal" line-spacing="31">
+                        <tspan x="276.188098" y="136.516762" fill="#6E8492">WORKFLOW CHANGES </tspan>
+                        <tspan x="399.850098" y="136.516762" font-size="16" fill="#6E8492">*</tspan>
+                        <tspan x="405.482098" y="136.516762" font-size="12" fill="#6E8492"></tspan>
+                        <tspan x="249.560098" y="164.360878" font-size="28" fill="#9012FE">    </tspan>
+                        <tspan x="280.696098" y="164.360878" font-size="28" fill="#EB7DD6">7</tspan>
+                        <tspan x="313.382098" y="167.516762" font-size="10" fill="#6E8492">   </tspan>
+                        <tspan x="319.820098" y="167.516762" font-size="12" fill="#4A90E2">view trend </tspan>
+                        <tspan x="390.109402" y="167.516762" font-family="FontAwesome" font-size="12" fill="#4A90E2"> </tspan>
+                    </text>
+                    <g id="Line-1-Copy-2" transform="translate(249.560098, 164.787408)">
+                        <use id="Rectangle-296" stroke="#EB7DD6" mask="url(#mask-5)" stroke-width="2" fill="#EB7DD6" xlink:href="#path-4"></use>
+                        <text id="P" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="14" font-weight="bold" fill="#FFFFFF">
+                            <tspan x="7.12546561" y="15.3170434">P</tspan>
+                        </text>
+                    </g>
+                </g>
+                <rect id="Rectangle-1028" fill="#4196B5" opacity="0.930000007" x="0" y="0" width="642" height="242"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

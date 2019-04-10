@@ -1,0 +1,1 @@
+ALTER TABLE policies ADD COLUMN updated_at TIMESTAMPTZ;

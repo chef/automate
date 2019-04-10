@@ -1,0 +1,18 @@
+<div class="embed">
+  <table class="embed-text">
+    <tbody>
+      <tr>
+        <td class="embed-image">
+          <img ng-if="thumbnail_url" src="{{thumbnail_url}}" class="thumb" style="{{style}}"/>
+        </td>
+        <td class="embed-header">
+          <h2 ng-if="original_url"><a href="{{original_url}}">{{title}}</a></h2>
+          <div class="description">
+            <hr/>
+            {{description}}
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

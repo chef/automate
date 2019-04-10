@@ -1,0 +1,73 @@
+$small: new-breakpoint(max-width 740px);
+
+.user-nav {
+  padding: 10px;
+  font-size: 13px;
+  margin: 25px 0;
+  position: relative;
+  float: right;
+
+  .user {
+    position: relative;
+    opacity: 1;
+    cursor: pointer;
+    overflow: auto;
+    float: left;
+    color: $chef-blue-dark;
+
+    .user-image {
+      float: left;
+      border-radius: 2px;
+      height: 30px;
+      margin-right: 10px;
+    }
+
+    .user-info {
+      @include media($small) {
+        display: none;
+      }
+
+      float: left;
+      margin-right: 10px;
+    }
+  }
+
+  .logout-dropdown {
+    @include modal-box();
+    margin-top: 5px;
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    min-width: 200px;
+    list-style: none;
+
+    li {
+
+      a {
+        display: block;
+        padding: 0 5px;
+        border-radius: $global-radius;
+        color: $chef-blue-dark;
+        text-decoration: none;
+        line-height: 30px;
+
+        &:hover {
+          cursor: pointer;
+          background-color: $gray-highlight;
+        }
+
+        &.version-link,
+        &.license-link {
+          font-size: .75rem;
+          color: $gray;
+
+          &:hover {
+            background: none;
+            color: $chef-blue;
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2.2 (9983) - http://www.bohemiancoding.com/sketch -->
+    <title>Error</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Pipeline-Visualization-Wires" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Pipeline-Visualization-Enterprise-Level-(verify-hover)" sketch:type="MSArtboardGroup" transform="translate(-772.000000, -348.000000)" fill="#DB524B">
+            <g id="Production" sketch:type="MSLayerGroup" transform="translate(579.000000, 294.000000)">
+                <g id="Rehearsal" transform="translate(153.000000, 24.000000)" sketch:type="MSShapeGroup">
+                    <g id="Rectangle-213-+-Rectangle-212-+-Blocked-by-delivery_" transform="translate(0.000000, 20.000000)">
+                        <path d="M49.967,12.6806667 C53.037,10.8936667 56.3813333,10 60,10 C63.6183333,10 66.9616667,10.8936667 70.0326667,12.6806667 C73.1033333,14.467 75.533,16.896 77.3196667,19.9666667 C79.1056667,23.0373333 80,26.3816667 80,30 C80,33.6183333 79.1056667,36.963 77.3196667,40.0333333 C75.533,43.1046667 73.1033333,45.5333333 70.0326667,47.3193333 C66.9616667,49.1066667 63.6183333,50 60,50 C56.3813333,50 53.037,49.1066667 49.967,47.3193333 C46.895,45.5333333 44.4666667,43.1046667 42.6803333,40.0333333 C40.8926667,36.963 40,33.6183333 40,30 C40,26.3816667 40.8926667,23.0373333 42.6803333,19.9666667 C44.4666667,16.896 46.895,14.467 49.967,12.6806667 C49.967,12.6806667 46.895,14.467 49.967,12.6806667 L49.967,12.6806667 L49.967,12.6806667 Z M52.8983333,30 L48.1406667,34.7233333 L55.2756667,41.8593333 L60,37.102 L64.7243333,41.8593333 L71.8593333,34.7233333 L67.1016667,30 L71.8593333,25.2763333 L64.7243333,18.1743333 L60,22.898 L55.2756667,18.1406667 L48.1743333,25.2763333 L52.8983333,30 Z" id="Error"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,106 @@
+.card-view,
+.tabbed-view {
+
+  .page-header {
+    @include row();
+    padding: 1.5em 2em;
+    background-color: $white;
+  }
+
+  .page-header-title {
+    @include span-columns(4);
+
+    h2 {
+      margin: .5em 0 1em;
+    }
+
+    p {
+      color: $gray-light;
+      font-size: .75rem;
+    }
+  }
+
+  .page-header-meta {
+    @include span-columns(8);
+  }
+
+  .card-add-btn {
+    @include cta-button;
+
+    @include media($medium-down) {
+      margin-top: 1rem;
+    }
+
+    &:disabled {
+      background-color: $greydisabled;
+    }
+  }
+
+  .card-filter-wrapper {
+    @include row();
+    padding: 2rem 2rem .5rem;
+
+    .quick-find-automate {
+      margin: 0 0 1rem;
+    }
+
+    > button {
+      display: block;
+      clear: left;
+    }
+  }
+
+  .card-filter {
+    @include span-columns(3);
+  }
+
+  .cards {
+    @include row();
+    padding: 1.5em 2em;
+  }
+
+  .card {
+    @include span-columns(6);
+    @include modal-box;
+    margin-bottom: .5rem;
+    padding: 1rem 1.5rem;
+    clear: left;
+
+    @include media($laptop-down) {
+      @include span-columns(12);
+    }
+
+    header {
+
+      .card-title {
+        margin: 0;
+        vertical-align: middle;
+        font-weight: 700;
+        display: inline-block;
+        font-size: .875rem;
+        color: $chef-blue-dark;
+        font-family: $heading-font;
+
+        a {
+          text-decoration: none;
+          color: $chef-blue;
+          font-size: .875rem;
+
+          &:hover {
+            color: $bluehover;
+          }
+        }
+      }
+
+      .button.square, .scm-type {
+        float: right;
+      }
+
+      .scm-type {
+        margin-right: 1rem;
+        line-height: 2rem;
+      }
+    }
+
+  }
+}

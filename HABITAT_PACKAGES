@@ -1,0 +1,70 @@
+#
+# SORTING
+#
+# Habitat packages are built in (at least) TWO locations:
+#
+# EXPEDITOR: Post-merge, Expeditor will trigger a build of all
+# packages and push them to the depot. Expeditor topologically sorts
+# the Habitat packages according to the dependency list in the
+# plan.sh files. The order of this list should not matter for
+# Expeditor builds.
+#
+# BUILDKITE: Pre-merge, our verification jobs build the packages to
+# run end-to-end integration tests. Packages are built in the order
+# they listed in this file. For builds to be correct during
+# verification tests, this list should be in /build time/ dependency
+# order.
+#
+# Tier 1
+#
+automate-platform-tools components/automate-platform-tools
+backup-gateway components/backup-gateway
+automate-elasticsearch components/automate-elasticsearch
+automate-postgresql components/automate-postgresql
+automate-debug components/automate-debug
+#
+# Tier 2
+#
+authn-service components/authn-service
+authz-service components/authz-service
+automate-dex components/automate-dex
+event-gateway components/event-gateway
+automate-gateway components/automate-gateway
+automate-load-balancer components/automate-load-balancer
+automate-prometheus components/automate-prometheus
+# Not managed by our generator yet
+# automate-ui components/automate-ui
+compliance-service components/compliance-service
+config-mgmt-service components/config-mgmt-service
+data-lifecycle-service components/data-lifecycle-service
+automate-cli components/automate-cli
+deployment-service components/automate-deployment
+es-sidecar-service components/es-sidecar-service
+automate-es-gateway components/automate-es-gateway
+pg-sidecar-service components/pg-sidecar-service
+automate-pg-gateway components/automate-pg-gateway
+event-service components/event-service
+applications-service components/applications-service
+nodemanager-service components/nodemanager-service
+ingest-service components/ingest-service
+license-control-service components/license-control-service
+local-user-service components/local-user-service
+# Not managed by our generator yet
+# notifications-service components/notifications-service
+secrets-service components/secrets-service
+session-service components/session-service
+teams-service components/teams-service
+trial-license-service components/trial-license-service
+automate-cs-bookshelf components/automate-cs-bookshelf
+automate-cs-oc-bifrost components/automate-cs-oc-bifrost
+automate-cs-oc-erchef components/automate-cs-oc-erchef
+automate-cs-nginx components/automate-cs-nginx
+automate-workflow-nginx components/automate-workflow-nginx
+automate-workflow-web components/automate-workflow-web
+# Not managed by generator until we solve cross-dependency issue more
+# smoothly
+# automate-workflow-server components/automate-workflow-server
+# automate-workflow-ctl components/automate-workflow-ctl
+# Not managed by our generator yet
+# automate-chef-io components/automate-chef-io
+data-feed-service components/data-feed-service

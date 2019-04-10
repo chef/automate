@@ -1,0 +1,2 @@
+ALTER TABLE teams DROP CONSTRAINT IF EXISTS teams_projects_check;
+ALTER TABLE teams ALTER COLUMN projects SET DEFAULT '{}';

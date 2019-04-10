@@ -1,0 +1,125 @@
+<div class="stage-run-details" ng-show="change.stages.length" ng-click="disableAutoProgress()">
+  <ol class="status-nav">
+    <li
+      class="status-stage verify"
+      ng-class="{disabled: !change.stages[0].status}">
+      <a
+        ui-sref="{{ stateParent }}.verify"
+        ui-sref-active="active">
+        <span class="stage-icon verify"></span>
+        <span
+          class="status-stage-item"
+          ng-class="change.stages[0].status">Verify
+        </span>
+        <span
+          class="status-stage-item"
+          ng-class="{
+            passed: change.state === 'merged',
+            running: change.stages[0].status === 'open' && !change.stage[1],
+            caution: change.state === 'open' && change.stages[0].status === 'failed',
+            waiting: change.stages[0].status === 'passed' && !change.stages[1]
+            }">
+            Approval
+        </span>
+      </a>
+    </li>
+    <li
+      class="status-stage build"
+      ng-class="{disabled: !change.stages[1].status}">
+      <a
+        ui-sref="{{ stateParent }}.build"
+        ui-sref-active="active">
+        <span class="stage-icon build"></span>
+        <span
+          class="status-stage-item"
+          ng-class="change.stages[1].status">Build
+        </span>
+      </a>
+    </li>
+    <li
+      class="status-stage acceptance"
+      ng-class="{
+        disabled: !change.stages[2].status,
+        unreachable: change.supersedingChange && !change.stages[2].status
+      }">
+      <a
+        ui-sref="{{ stateParent }}.acceptance"
+        ui-sref-active="active">
+        <span class="stage-icon acceptance"></span>
+        <span
+          class="status-stage-item"
+          ng-class="change.stages[2].status">Acceptance
+        </span>
+        <span
+          class="status-stage-item"
+          ng-class="{
+            running:
+              change.stages[2].status === 'running',
+            passed:
+              change.stages[3].status === 'running' ||
+              change.stages[3].status === 'passed',
+            caution:
+              change.stages[2].status === 'failed' ||
+              change.stages[3].status === 'failed' ||
+              change.stages[2].status === 'running',
+            waiting:
+              change.stages[2].status === 'passed' && !change.stages[3]
+          }">
+            Deliver
+        </span>
+      </a>
+    </li>
+    <li
+      class="status-stage union"
+      ng-class="{
+        disabled: !change.stages[3].status,
+        unreachable: change.supersedingChange && !change.stages[3].status
+      }">
+      <a
+        ui-sref="{{ stateParent }}.union"
+        ui-sref-active="active">
+        <span class="stage-icon union"></span>
+        <span
+          class="status-stage-item"
+          ng-class="change.stages[3].status">Union
+        </span>
+      </a>
+    </li>
+    <li
+      class="status-stage rehearsal"
+      ng-class="{
+        disabled: !change.stages[4].status,
+        unreachable: change.supersedingChange && !change.stages[4].status
+      }">
+      <a
+        ui-sref="{{ stateParent }}.rehearsal"
+        ui-sref-active="active">
+        <span class="stage-icon rehearsal"></span>
+        <span
+          class="status-stage-item"
+          ng-class="change.stages[4].status">Rehearsal
+        </span>
+      </a>
+    </li>
+    <li
+      class="status-stage delivered"
+      ng-class="{
+        disabled: !change.stages[5].status,
+        unreachable: change.supersedingChange && !change.stages[5].status
+      }">
+      <a
+        ui-sref="{{ stateParent }}.delivered"
+        ui-sref-active="active">
+        <span class="stage-icon delivered"></span>
+        <span
+          class="status-stage-item"
+          ng-class="change.stages[5].status">Delivered
+        </span>
+      </a>
+    </li>
+  </ol>
+  <div ui-view></div>
+</div>
+<div ng-if="change.stages.length === 0">
+  This change will begin processing in a moment.
+</div>

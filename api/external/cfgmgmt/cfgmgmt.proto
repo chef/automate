@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package chef.automate.api.cfgmgmt;
+option go_package = "github.com/chef/automate/api/external/cfgmgmt";
+
+// Local request & response messages
+import "api/external/cfgmgmt/request/actions.proto";
+import "api/external/cfgmgmt/request/nodes.proto";
+import "api/external/cfgmgmt/request/stats.proto";
+import "api/external/cfgmgmt/request/root.proto";
+
+import "api/external/cfgmgmt/response/actions.proto";
+import "api/external/cfgmgmt/response/nodes.proto";
+import "api/external/cfgmgmt/response/stats.proto";
+
+import "api/external/common/query/parameters.proto";
+import "api/external/common/version/version.proto";
+
+import "google/protobuf/struct.proto";
+import "google/api/annotations.proto";
+
+// for option (chef.automate.api.policy)
+import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
+// for option (chef.automate.api.iam.policy)
+import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+
+service ConfigMgmt {
+  rpc GetNodes(cfgmgmt.request.Nodes) returns (google.protobuf.ListValue) {
+    option (google.api.http).get = "/cfgmgmt/nodes";
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+  rpc GetRuns(cfgmgmt.request.Runs) returns (google.protobuf.ListValue) {
+    option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/runs";
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes:{node_id}:runs";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes:{node_id}";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+  rpc GetNodesCounts (cfgmgmt.request.NodesCounts) returns (cfgmgmt.response.NodesCounts) {
+    option (google.api.http).get = "/cfgmgmt/stats/node_counts";
+    option (chef.automate.api.policy).resource = "cfgmgmt:stats:node_counts";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+  rpc GetRunsCounts (cfgmgmt.request.RunsCounts) returns (cfgmgmt.response.RunsCounts) {
+    option (google.api.http).get = "/cfgmgmt/stats/run_counts";
+    option (chef.automate.api.policy).resource = "cfgmgmt:stats:run_counts";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+  rpc GetNodeRun (cfgmgmt.request.NodeRun) returns (cfgmgmt.response.Run) {
+    option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/runs/{run_id}";
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes:{node_id}:runs:{run_id}";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes:{node_id}";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:get";
+  };
+  rpc GetSuggestions (common.query.Suggestion) returns (google.protobuf.ListValue) {
+    option (google.api.http).get = "/cfgmgmt/suggestions";
+    // if you can get nodes, you are allowed to get suggested fields on nodes
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+  rpc GetOrganizations(cfgmgmt.request.Organizations) returns (google.protobuf.ListValue) {
+    option (google.api.http).get = "/cfgmgmt/organizations";
+    // if you can get nodes, you are allowed to get the organization field on nodes
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+  rpc GetSourceFqdns(cfgmgmt.request.SourceFqdns) returns (google.protobuf.ListValue) {
+    option (google.api.http).get = "/cfgmgmt/source_fqdns";
+    // if you can get nodes, you are allowed to get the source fqdn field on nodes
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+  rpc GetAttributes (cfgmgmt.request.Node) returns (cfgmgmt.response.NodeAttribute) {
+    option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/attribute";
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes:{node_id}:attribute";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes:{node_id}";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:get";
+  };
+  rpc GetVersion(common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
+    option (google.api.http).get =  "/cfgmgmt/version";
+    option (chef.automate.api.policy).resource = "service_info:version";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "system:service:version";
+    option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
+  };
+  rpc GetPolicyCookbooks(cfgmgmt.request.PolicyRevision) returns (cfgmgmt.response.PolicyCookbooks) {
+    option (google.api.http).get =  "/cfgmgmt/policy_revision/{revision_id}";
+    // special call for getting nodes with policy information
+    // the revision_id identifies a node that has policy data
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes:{revision_id}";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes:{revision_id}";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+}

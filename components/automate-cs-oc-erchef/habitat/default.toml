@@ -1,0 +1,67 @@
+# NOTE(ssd) 2018-07-25: These two are not exposed in public-facing
+# configuration as changing them would break everything.
+fips_enabled = false
+ip_mode = "ipv4"
+
+[network]
+port=10203
+listen_ip="0.0.0.0"
+
+[log]
+level = "info"
+rotation_max_bytes = 104857600
+rotation_max_files = 10
+rotation_max_megabytes = 100
+max_error_logs_per_second = 1000
+
+[api]
+auth_skew=900
+max_request_size=1000000
+bulk_fetch_batch_size=5
+base_resource_url="host_header"
+strict_search_result_acls=false
+
+[keygen]
+cache_workers = 2
+cache_size = 10
+start_size = 2
+timeout = 20000
+
+[index]
+timeout = 30000
+pool_init_size = 25
+pool_max_size = 100
+batch_size = 1000
+batch_max_wait = 10
+reindex_batch_size=10
+reindex_sleep_min_ms=50
+reindex_sleep_max_ms=2000
+reindex_item_retries=3
+
+[authz]
+fanout = 20
+timeout = 2000
+pool_init_size = 25
+pool_max_size = 100
+pool_queue_max = 50
+pool_queue_timeout = 2000
+
+[sql]
+timeout = 5000
+pool_init_size = 20
+pool_max_size = 50
+pool_queue_max = 20
+pool_queue_timeout = 2000
+user="automate-cs-oc-erchef"
+db_name="automate-cs-oc-erchef"
+
+[data_collector]
+timeout = 5000
+pool_init_size = 25
+pool_max_size = 100
+enabled=true
+
+[depsolver]
+pool_max_size=5
+pool_init_size=5
+pool_queue_max=50

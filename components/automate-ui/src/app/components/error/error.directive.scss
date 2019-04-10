@@ -1,0 +1,13 @@
+@import '../../../styles/variables.scss';
+
+:host .errors {
+  background-color: $chef-critical;
+  color: $white;
+  border-radius: 0 0 $global-radius $global-radius;
+}
+
+::ng-deep .chef-error {
+  display: block;
+  padding: 0.5em 1em;
+  font-size: 0.65em;
+}

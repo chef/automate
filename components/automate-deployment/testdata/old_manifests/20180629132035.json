@@ -1,0 +1,35 @@
+{
+  "schema_version": "1",
+  "build": "20180629132035",
+  "hab": [
+    "core/hab/0.57.0/20180614230004",
+    "core/hab-sup/0.57.0/20180614232222",
+    "core/hab-launcher/7611/20180521214042"
+  ],
+  "hab_build": "core/hab/0.54.0/20180221022026",
+  "git_sha": "15f732db3098596fd7a8c7c0f4c9f90b39af4082",
+  "packages": [
+    "chef/authn-service/0.1.0/20180621233337",
+    "chef/authz-service/0.1.0/20180620132402",
+    "chef/automate-cli/0.1.0/20180628165417",
+    "chef/automate-debug/0.1.0/20180619235057",
+    "chef/automate-dex/0.1.0/20180628110621",
+    "chef/automate-elasticsearch/6.2.2/20180621223817",
+    "chef/automate-gateway/0.1.0/20180628141127",
+    "chef/automate-load-balancer/0.1.0/20180619233210",
+    "chef/automate-postgresql/9.6.8/20180619233409",
+    "chef/automate-ui/2.0.0/20180629131431",
+    "chef/compliance-service/1.11.1/20180628140618",
+    "chef/config-mgmt-service/0.1.0/20180620133538",
+    "chef/data-lifecycle-service/0.0.1/20180620133705",
+    "chef/deployment-service/0.1.0/20180628165651",
+    "chef/es-sidecar-service/1.0.0/20180625212844",
+    "chef/ingest-service/0.1.0/20180625213004",
+    "chef/license-control-service/1.0.0/20180628092904",
+    "chef/local-user-service/0.1.0/20180625145256",
+    "chef/notifications-service/1.0.0/20180619233802",
+    "chef/session-service/0.1.0/20180620133048",
+    "chef/teams-service/0.1.0/20180620133222",
+    "core/rsync/3.1.2/20180608145950"
+  ]
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
+
+import "google/protobuf/timestamp.proto";
+import "api/interservice/cfgmgmt/request/parameters.proto";
+
+message InventoryNodes {
+  google.protobuf.Timestamp start       = 1;
+  google.protobuf.Timestamp end         = 2;
+  repeated string filter                = 3;
+  google.protobuf.Timestamp cursor_date = 4;
+  string cursor_id                      = 5;
+  int32 page_size                       = 6;
+  Sorting sorting                       = 7;
+}

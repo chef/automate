@@ -1,0 +1,50 @@
+.pipelines-modal {
+
+  form {
+    padding: 0 15px 15px 15px;
+
+    label {
+      font-weight: normal;
+    }
+
+    input {
+      width: auto;
+    }
+  }
+
+  .example-config {
+    border-top: 1px solid $lightgray;
+    padding: 0 15px 15px 15px;
+  }
+
+  .pipelines {
+    border-top: 1px solid $lightgray;
+    padding: 0 15px 15px 15px;
+    box-shadow: inset 0 0 1px $lightgray;
+    background: #fafafa;
+
+    li {
+      font-size: 1.25em;
+      padding: 3px;
+      margin-bottom: 2px;
+
+      &:nth-child(even) {
+        background-color: lightgray;
+      }
+
+      &:hover {
+        color: $cheforange;
+        border-bottom: 1px solid $cheforange;
+        padding-bottom: 2px;
+      }
+
+      .actions {
+        float: right;
+
+        .icon {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.credential-toggle {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+
+  .label {
+    padding-bottom: 0;
+    padding-left: 0.5em;
+  }
+}

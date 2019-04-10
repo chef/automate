@@ -1,0 +1,35 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+rc=0
+
+opts="-cert {{pkg.svc_config_path}}/service.crt"
+opts="${opts} -key {{pkg.svc_config_path}}/service.key"
+opts="${opts} {{sys.ip}}:{{cfg.service.port}}"
+
+health=$(grpcurl -max-time 2 -insecure ${opts} chef.automate.domain.ingest.IngestStatus.GetHealth)
+
+# Inspect the health of the ingest service
+#
+# Example message:
+# {
+#   "status": "ok"
+# }
+status=$(echo $health | jq .status -r)
+case $status in
+  "ok")
+    rc=0 ;;
+  "initialization")
+    rc=1 ;;
+  "warning")
+    rc=1 ;;
+  "critical")
+    rc=2 ;;
+  *)
+    # If we have an unknown health, lets print the entire blob
+    # @afiune: You can check this output at the service logs:
+    # => /hab/svc/ingest-service/logs/health_check.stdout.log
+    echo "health: ${health}"
+    rc=3 ;; # Unknown
+esac
+
+exit $rc

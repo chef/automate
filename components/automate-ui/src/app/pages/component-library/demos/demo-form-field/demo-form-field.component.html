@@ -1,0 +1,62 @@
+<app-component-library-screen title="Form Field">
+
+  <app-cl-section>
+     <p>
+       <token>chef-form-field</token> is a component used to wrap several chef form components
+       to apply some common styles and behaviors. <token>chef-form-field</token> is
+       heavily inspired by Angular material's <token>mat-form-field</token>.
+       The <token>chef-form-field</token> is designed to wrap
+       <a [routerLink]="['/component_library/input']">&lt;input matInput&gt; &amp; &lt;textarea matInput&gt;</a> components.
+     </p>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Working Example</h3>
+
+    <chef-form-field>
+      <label>Test Field</label>
+      <input chefInput required #testfield type="text" placeholder="Type 'error' to see an example error." >
+      <chef-error *ngIf="testfield.value == 'error'">This is an example error</chef-error>
+    </chef-form-field>
+  </app-cl-section>
+
+  <app-cl-code-section>
+    <h3>Angular Template Code Example</h3>
+
+    <pre>&lt;chef-form-field&gt;
+  &lt;label&gt;Test Field&lt;label&gt;
+  &lt;input chefInput #testfield id="test" required type="text" placeholder="Type 'error' to see an example error."&gt;
+  &lt;chef-error *ngIf="testfield.value == 'error'"&gt;This is an example error&lt;/chef-error&gt;
+&lt;/chef-form-field&gt;</pre>
+  </app-cl-code-section>
+
+  <app-cl-section>
+    <h3>API</h3>
+
+    <app-cl-api>
+      <api-prop name="Content Model" type="DOM nodes" required>
+        <a href="https://www.w3.org/TR/html51/dom.html#flow-content">Flow content</a>;
+        typically <token>&lt;input&gt;</token> and <token>&lt;textarea&gt;</token> elements.
+      </api-prop>
+    </app-cl-api>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Accessibility</h3>
+
+    This component has not been evaluated for accessibility support.
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Browser Compatibility</h3>
+
+    <ul>
+      <li>Chrome 61 - OK</li>
+      <li>Firefox 52 - OK</li>
+      <li>Safari 11 - OK</li>
+      <li>Edge 40 - OK</li>
+      <li>IE 11 - OK</li>
+    </ul>
+  </app-cl-section>
+
+</app-component-library-screen>

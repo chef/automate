@@ -1,0 +1,10 @@
+/_build
+/cover
+erl_crash.dump
+*.ez
+*.beam
+results/
+log/
+rule_store
+test_rule_store
+clients/golang/vendor

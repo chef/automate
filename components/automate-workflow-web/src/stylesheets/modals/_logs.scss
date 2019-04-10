@@ -1,0 +1,27 @@
+.cd-modal.logs {
+  $width: 90%;
+
+  width: $width;
+  @include calc(left, '50% - #{$width/2}');
+
+  .logs-modal {
+    padding: 20px;
+
+    .name {
+      font-weight: bold;
+    }
+
+    .logs {
+
+      .log {
+        color: $white;
+        max-height: 600px;
+        overflow: scroll;
+
+        .log-display {
+          padding: 20px;
+        }
+      }
+    }
+  }
+}

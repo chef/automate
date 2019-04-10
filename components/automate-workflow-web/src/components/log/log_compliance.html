@@ -1,0 +1,38 @@
+<div class="compliance">
+  <div class="profile">
+    <div class="title">
+      <div class="name">{{profiles.title}}</div>
+      <div class="version">{{profiles.version}}</div>
+      <div class="summary">{{profiles.summary}}</div>
+    </div>
+  </div>
+
+  <div class="summary row">
+    <div class="column title">Summary: </div>
+    <div class="column status">
+      <div class="critical" ng-if="summary.critical > 0">{{summary.critical}} <i class="icon-cancel"></i></div>
+      <div class="major"    ng-if="summary.major > 0"   >{{summary.major}} <i class="icon-attention-alt"></i></div>
+      <div class="minor"    ng-if="summary.minor > 0"   >{{summary.minor}} <i class="icon-attention-alt"></i></div>
+      <div class="passed"   ng-if="summary.passed > 0"  >{{summary.passed}} <i class="icon-ok"></i></div>
+      <div class="skipped"  ng-if="summary.skipped > 0" >{{summary.skipped}} <i class="icon-info"></i></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="row" ng-repeat="control in sortedControls">
+      <div class="column title" ng-click="showDetails(control)">{{control.title}}
+        <div class="details" ng-show="showDescription===control">
+          <div class="desc">{{control.desc}}</div>
+          <div class="results" ng-repeat="result in control.results">
+            <div class="result-status">{{result.status}}: {{result.code_desc}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="column impact">
+        <div class="impact-indicator impact-{{control.indicator}}">
+          {{control.indicator}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

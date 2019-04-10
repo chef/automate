@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package chef.automate.api.tokens.request;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/auth/tokens/request";
+
+// This is for API compatibility -- this field is no longer required to be a
+// valid UUIDv4. However, we cannot rename the message, so we keep the name.
+message Uuid {
+  string id = 1;
+};
+
+message Value {
+  string value = 1;
+};
+
+message CreateToken {
+  string description = 1;
+  bool active = 2;
+  string value = 3;
+  string id = 4;
+};
+
+message UpdateToken {
+  string id = 1;
+  bool active = 2;
+  string description = 3;
+};
+
+message GetTokensReq {}

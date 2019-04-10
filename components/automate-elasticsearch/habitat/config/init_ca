@@ -1,0 +1,15 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+if ! [[ -f {{pkg.svc_var_path}}/ca.jks ]]; then
+{{pkgPathFor "core/jre8"}}/bin/keytool -importcert \
+	-trustcacerts \
+	-file {{pkg.svc_config_path}}/root_ca.crt \
+	-alias chefautomaterootca \
+	-keystore {{pkg.svc_var_path}}/ca.jks \
+	-storepass "changeit" \
+	-noprompt
+fi
+
+chown hab:hab {{pkg.svc_var_path}}/ca.jks

@@ -1,0 +1,9 @@
+PATH=/usr/local/bin:/usr/bin:/bin
+
+*/5 * * * * root /aws-scripts-mon/mon-put-instance-data.pl --mem-util --disk-space-util --disk-path=/ --from-cron
+*/5 * * * * root /opt/collect_metrics/cluster_health.sh
+* * * * *   root /opt/collect_metrics/disk_queue_size.sh
+* * * * *   root /opt/collect_metrics/es_heap.sh
+* * * * * root /opt/collect_metrics/es_post_times.sh
+* * * * *   root /opt/collect_metrics/es_threadpool.sh
+*/5 * * * * root /opt/collect_metrics/index_records.sh

@@ -1,0 +1,43 @@
+<div class="run-list">
+  <div class="run-list-rollup"
+       [ngClass]="{'policy-rollup': nodeRun.policyRevision, 'role-rollup': !nodeRun.policyRevision}">
+    <div class="rollup-item" *ngIf="!nodeRun.policyRevision">
+      <div class="rollup-title">
+        <h3 class="title">Roles</h3>
+      </div>
+      <span class="count roles"><chef-icon class="larger">view_module</chef-icon> {{rolesCount}}</span>
+    </div>
+    <div class="rollup-item">
+      <div class="rollup-title">
+        <h3 class="title">Cookbooks</h3>
+      </div>
+      <span class="count cookbooks"><chef-icon>chrome_reader_mode</chef-icon> {{cookbooksCount}}</span>
+    </div>
+    <div class="rollup-item">
+      <div class="rollup-title">
+        <h3 class="title">Recipes</h3>
+      </div>
+      <span class="count recipes"><chef-icon>description</chef-icon> {{recipesCount}}</span>
+    </div>
+    <div class="rollup-item">
+      <div class="rollup-title">
+        <h3 class="title">Failed</h3>
+      </div>
+      <span class="count failure"><chef-icon>warning</chef-icon> {{failedCount}}</span>
+    </div>
+    <div class="rollup-item">
+      <div class="rollup-title">
+        <h3 class="title">Succeeded</h3>
+      </div>
+      <span class="count success"><chef-icon>check_circle</chef-icon> {{successCount}}</span>
+    </div>
+  </div>
+  <ul *ngFor="let item of runList" class="first-level">
+     <app-run-list-role-header *ngIf="item.isRole()"
+                          [roles]="item">
+    </app-run-list-role-header>
+    <app-run-list-table *ngIf="!item.isRole()"
+                    [item]="item">
+    </app-run-list-table>
+  </ul>
+</div>

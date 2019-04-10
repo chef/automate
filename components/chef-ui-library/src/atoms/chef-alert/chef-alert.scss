@@ -1,0 +1,29 @@
+chef-alert {
+  #{--alert-color}: var(--chef-success);
+  background-color: chef-hsl(var(--alert-color));
+  display: -webkit-flex;
+  display: flex;
+  margin: 0;
+  padding: 8px;
+  width: 100%;
+  color: chef-hsl(var(--chef-white));
+  border-radius: 4px;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+
+  & > chef-icon {
+    margin-right: 8px;
+  }
+
+  &[type='success'] {
+    #{--alert-color}: var(--chef-success);
+  }
+
+  &[type='error'] {
+    #{--alert-color}: var(--chef-critical);
+  }
+}

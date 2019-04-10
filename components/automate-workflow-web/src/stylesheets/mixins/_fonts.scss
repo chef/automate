@@ -1,0 +1,50 @@
+// Font styles
+
+@mixin font-smoothing($value: on) {
+  @if $value == on {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  else {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+  }
+}
+
+@font-face {
+  font-family: "Muli";
+  src: url("../fonts/muli/Muli-Bold.ttf");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Muli";
+  src: url("../fonts/muli/Muli-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Muli";
+  src: url("../fonts/muli/Muli-Italic.ttf");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Muli";
+  src: url("../fonts/muli/Muli-Light.ttf");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Muli";
+  src: url("../fonts/muli/Muli-LightItalic.ttf");
+  font-weight: 300;
+  font-style: italic;
+}
+
+$heading-font: 'Muli', $helvetica;
+$body-font: $helvetica;

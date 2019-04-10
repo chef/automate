@@ -1,0 +1,65 @@
+#!/usr/bin/env escript
+%%! -name oauth_alias@127.0.0.1
+
+-define(SELF, 'oauth_alias@127.0.0.1').
+-define(TARGET, 'delivery@127.0.0.1').
+
+main(Args) ->
+    init_network(),
+    [AppName, AppId, UserName, UserId, Alias] = parse_args(Args),
+    case rpc_call(?TARGET, deliv_oauth_user_alias, insert, [AppId, UserId, Alias]) of
+        {ok, _} ->
+            io:format("Successfully associated Github user ~s with Delivery user ~s for OAuth application ~s~n", [Alias, UserName, AppName]);
+        {error, Why} ->
+            perror(io:format("Error: Could not associate Github user ~s with Delivery user ~s for OAuth application ~s - ~p~n", [Alias, UserName, AppName, Why]))
+    end.
+
+get_user(EntName, UserName) ->
+    rpc_call(?TARGET, deliv_user, fetch, [EntName, UserName]).
+
+get_app(AppName) ->
+    rpc_call(?TARGET, deliv_oauth_application, fetch, [AppName]).
+
+init_network() ->
+    {ok, _} = net_kernel:start([?SELF, longnames]),
+    true = erlang:set_cookie(node(), get_cookie()),
+    pong = net_adm:ping(?TARGET).
+
+parse_args([AppName, EntName, UserName, Alias]) ->
+    case {get_app(AppName), get_user(EntName, UserName)} of
+        {{ok, App}, {ok, User}} ->
+            AppId = rpc_call(?TARGET, deliv_oauth_application, getval, [id, App]),
+            UserId = rpc_call(?TARGET, deliv_user, getval, [id, User]),
+            [AppName, AppId, UserName, UserId, Alias];
+        {{error, WhyApp}, {error, WhyUser}} ->
+            perror(io:format("Error: Failed to retrieve OAuth application ~s - ~p~n"
+                             "Error: Failed to retrieve user ~s from enterprise ~p - ~p~n",
+                             [AppName, WhyApp, UserName, EntName, WhyUser]));
+        {{error, Why}, _} ->
+            perror(io:format("Error: Failed to retrieve OAuth application ~s - ~p~n", [AppName, Why]));
+        {_, {error, Why}} ->
+            perror(io:format("Error: Failed to retrieve user ~s from enterprise ~p - ~p~n", [UserName, EntName, Why]))
+    end;
+parse_args(Other) ->
+    perror(io:format("Invalid Arguments: ~p~n", [Other])).
+
+rpc_call(Node, Module, Function, Args) ->
+    case rpc:call(Node, Module, Function, Args) of
+        {badrpc, Reason} ->
+            perror(io_lib:format("RPC call ~p:~p:~p:~p failed with error ~p~n",
+                                 [Node, Module, Function, Args, Reason]));
+        Res ->
+            Res
+    end.
+
+perror(Msg) ->
+    io:format(Msg),
+    erlang:halt(1).
+
+get_cookie() ->
+    case os:getenv("ERL_COOKIE") of
+        false ->
+            'delivery';
+        Cookie ->
+            list_to_atom(Cookie)
+    end.

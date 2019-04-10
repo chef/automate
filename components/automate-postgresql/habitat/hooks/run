@@ -1,0 +1,51 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+#
+
+set -e
+exec 2>&1
+
+{{#if cfg.disable ~}}
+echo "Internal Postgres Disabled"
+while true
+do
+  sleep 60
+done
+
+exit 0
+{{~else}}
+
+echo 'Executing run hook'
+
+source {{pkg.svc_config_path}}/functions.sh
+
+write_local_conf
+ensure_dir_ownership
+
+echo "Starting PostgreSQL"
+export PGDATA={{pkg.svc_data_path}}/pgdata
+
+pidfile="$PGDATA/postmaster.pid"
+if [ -f  "$pidfile" ]; then
+  pgpid=$(head -n 1 "$pidfile")
+  echo "Found leftover postmaster.pid with PID=$pgpid... Checking if it's safe to remove"
+  commfile="/proc/$pgpid/comm"
+  if [ -r "$commfile" ]; then
+    if grep "postgres" "$commfile"; then
+      echo "postmaster.pid is not safe to remove"
+      echo "pgsql seems to still be running"
+      echo "Try systemctl restart chef-automate if postgres does not start"
+    else
+      echo "Running pid from postmaster.pid is not postgres. Removing postmaster.pid"
+      rm "$pidfile"
+    fi
+  else
+    # This is safe because if the user that runs postgres cant access the pid,
+    # it means that process isn't the user's postgres or the process no longer exists
+    echo "Could not access comm for PID=$pgpid... Removing postmaster.pid"
+    rm "$pidfile"
+  fi
+fi
+
+exec postgres \
+  -c config_file={{pkg.svc_config_path}}/postgresql.conf
+{{~/if}}

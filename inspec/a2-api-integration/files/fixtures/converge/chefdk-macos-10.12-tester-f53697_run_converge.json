@@ -1,0 +1,5545 @@
+{
+  "chef_server_fqdn": "chef-server.chef.co",
+  "entity_uuid": "867cbcdd-f1d0-4878-8ce7-adcf565eb2d8",
+  "expanded_run_list": {
+    "id": "manhattan",
+    "run_list": [
+      {
+        "type": "recipe",
+        "name": "opscode-ci::slave",
+        "version": null,
+        "skipped": false
+      }
+    ]
+  },
+  "id": "81e9d8b2-2d5f-4fa5-9c61-8e39d776f998",
+  "message_version": "1.1.0",
+  "message_type": "run_converge",
+  "node": {
+    "name": "chefdk-macos-10.12-tester-f53697",
+    "chef_environment": "manhattan",
+    "json_class": "Chef::Node",
+    "automatic": {
+      "cpu": {
+        "real": 2,
+        "cores": 2,
+        "total": 2,
+        "mhz": 2861,
+        "vendor_id": "GenuineIntel",
+        "model_name": "Intel(R) Xeon(R) CPU E5-1680 v2 @ 3.00GHz",
+        "model": 58,
+        "family": 6,
+        "stepping": 9,
+        "flags": [
+          "fpu",
+          "vme",
+          "de",
+          "pse",
+          "tsc",
+          "msr",
+          "pae",
+          "mce",
+          "cx8",
+          "apic",
+          "sep",
+          "mtrr",
+          "pge",
+          "mca",
+          "cmov",
+          "pat",
+          "pse36",
+          "clfsh",
+          "ds",
+          "mmx",
+          "fxsr",
+          "sse",
+          "sse2",
+          "ss",
+          "sse3",
+          "pclmulqdq",
+          "mon",
+          "ssse3",
+          "cx16",
+          "sse4.1",
+          "sse4.2",
+          "x2apic",
+          "popcnt",
+          "aes",
+          "vmm",
+          "pcid",
+          "xsave",
+          "osxsave",
+          "tsctmr",
+          "avx1.0",
+          "rdrand",
+          "f16c"
+        ]
+      },
+      "filesystem": {
+        "/dev/disk0s2": {
+          "block_size": 512,
+          "kb_size": 41103432,
+          "kb_used": 14351448,
+          "kb_available": 26495984,
+          "percent_used": "36%",
+          "inodes_used": "747178",
+          "inodes_available": "4294220101",
+          "total_inodes": "4294967279",
+          "mount": "/",
+          "fs_type": "hfs",
+          "mount_options": [
+            "local",
+            "journaled"
+          ]
+        },
+        "devfs": {
+          "block_size": 512,
+          "kb_size": 175,
+          "kb_used": 175,
+          "kb_available": 0,
+          "percent_used": "100%",
+          "inodes_used": "608",
+          "inodes_available": "0",
+          "total_inodes": "608",
+          "mount": "/dev",
+          "fs_type": "devfs",
+          "mount_options": [
+            "local",
+            "nobrowse"
+          ]
+        },
+        "map -hosts": {
+          "block_size": 512,
+          "kb_size": 0,
+          "kb_used": 0,
+          "kb_available": 0,
+          "percent_used": "100%",
+          "inodes_used": "0",
+          "inodes_available": "0",
+          "total_inodes": "0",
+          "mount": "/net",
+          "fs_type": "autofs",
+          "mount_options": [
+            "nosuid",
+            "automounted",
+            "nobrowse"
+          ]
+        },
+        "map auto_home": {
+          "block_size": 512,
+          "kb_size": 0,
+          "kb_used": 0,
+          "kb_available": 0,
+          "percent_used": "100%",
+          "inodes_used": "0",
+          "inodes_available": "0",
+          "total_inodes": "0",
+          "mount": "/home",
+          "fs_type": "autofs",
+          "mount_options": [
+            "automounted",
+            "nobrowse"
+          ]
+        }
+      },
+      "kernel": {
+        "name": "Darwin",
+        "release": "16.7.0",
+        "version": "Darwin Kernel Version 16.7.0: Thu Jun 15 17:36:27 PDT 2017; root:xnu-3789.70.16~2/RELEASE_X86_64",
+        "machine": "x86_64",
+        "processor": "i386",
+        "os": "Darwin",
+        "modules": {
+          "com.apple.kec.corecrypto": {
+            "version": "1.0",
+            "size": 692224,
+            "index": "8",
+            "refcount": "5"
+          },
+          "com.apple.kec.pthread": {
+            "version": "1",
+            "size": 61440,
+            "index": "9",
+            "refcount": "0"
+          },
+          "com.apple.kec.Libm": {
+            "version": "1",
+            "size": 45056,
+            "index": "10",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOACPIFamily": {
+            "version": "1.4",
+            "size": 36864,
+            "index": "11",
+            "refcount": "16"
+          },
+          "com.apple.iokit.IOPCIFamily": {
+            "version": "2.9",
+            "size": 217088,
+            "index": "12",
+            "refcount": "13"
+          },
+          "com.apple.driver.AppleACPIPlatform": {
+            "version": "5.0",
+            "size": 393216,
+            "index": "13",
+            "refcount": "1"
+          },
+          "com.apple.driver.AppleFDEKeyStore": {
+            "version": "28.30",
+            "size": 45056,
+            "index": "14",
+            "refcount": "1"
+          },
+          "com.apple.iokit.IOReportFamily": {
+            "version": "31",
+            "size": 28672,
+            "index": "15",
+            "refcount": "2"
+          },
+          "com.apple.iokit.IOStorageFamily": {
+            "version": "2.1",
+            "size": 159744,
+            "index": "16",
+            "refcount": "8"
+          },
+          "com.apple.driver.DiskImages": {
+            "version": "444.50.16",
+            "size": 102400,
+            "index": "17",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleBusPowerController": {
+            "version": "1.0",
+            "size": 53248,
+            "index": "18",
+            "refcount": "1"
+          },
+          "com.apple.iokit.IOUSBHostFamily": {
+            "version": "1.1",
+            "size": 430080,
+            "index": "19",
+            "refcount": "9"
+          },
+          "com.apple.driver.KernelRelayHost": {
+            "version": "1",
+            "size": 122880,
+            "index": "20",
+            "refcount": "3"
+          },
+          "com.apple.driver.AppleCredentialManager": {
+            "version": "1.0",
+            "size": 151552,
+            "index": "21",
+            "refcount": "1"
+          },
+          "com.apple.driver.AppleMobileFileIntegrity": {
+            "version": "1.0.5",
+            "size": 94208,
+            "index": "22",
+            "refcount": "2"
+          },
+          "com.apple.driver.AppleKeyStore": {
+            "version": "2",
+            "size": 348160,
+            "index": "23",
+            "refcount": "0"
+          },
+          "com.apple.security.TMSafetyNet": {
+            "version": "8",
+            "size": 8192,
+            "index": "24",
+            "refcount": "0"
+          },
+          "com.apple.security.sandbox": {
+            "version": "300.0",
+            "size": 131072,
+            "index": "26",
+            "refcount": "1"
+          },
+          "com.apple.security.quarantine": {
+            "version": "3",
+            "size": 36864,
+            "index": "27",
+            "refcount": "0"
+          },
+          "com.apple.nke.applicationfirewall": {
+            "version": "172",
+            "size": 32768,
+            "index": "28",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleAPIC": {
+            "version": "1.7",
+            "size": 12288,
+            "index": "29",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleSMBIOS": {
+            "version": "2.1",
+            "size": 16384,
+            "index": "30",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleRTC": {
+            "version": "2.0",
+            "size": 32768,
+            "index": "31",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleHPET": {
+            "version": "1.8",
+            "size": 12288,
+            "index": "32",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOHIDFamily": {
+            "version": "2.0.0",
+            "size": 499712,
+            "index": "33",
+            "refcount": "2"
+          },
+          "com.apple.driver.AppleACPIButtons": {
+            "version": "5.0",
+            "size": 16384,
+            "index": "34",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleEFIRuntime": {
+            "version": "2.1",
+            "size": 20480,
+            "index": "35",
+            "refcount": "1"
+          },
+          "com.apple.driver.AppleEFINVRAM": {
+            "version": "2.1",
+            "size": 45056,
+            "index": "36",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOAHCIFamily": {
+            "version": "288",
+            "size": 106496,
+            "index": "37",
+            "refcount": "3"
+          },
+          "com.apple.driver.AppleAHCIPort": {
+            "version": "326.60.1",
+            "size": 122880,
+            "index": "38",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IONetworkingFamily": {
+            "version": "3.2",
+            "size": 184320,
+            "index": "39",
+            "refcount": "2"
+          },
+          "com.apple.driver.Intel82574LEthernet": {
+            "version": "2.7.2",
+            "size": 69632,
+            "index": "40",
+            "refcount": "0"
+          },
+          "com.apple.driver.usb.AppleUSBXHCI": {
+            "version": "1.1",
+            "size": 266240,
+            "index": "41",
+            "refcount": "1"
+          },
+          "com.apple.driver.usb.AppleUSBXHCIPCI": {
+            "version": "1.1",
+            "size": 184320,
+            "index": "42",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOAHCIBlockStorage": {
+            "version": "295.20.1",
+            "size": 114688,
+            "index": "43",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOSCSIArchitectureModelFamily": {
+            "version": "394.50.1",
+            "size": 176128,
+            "index": "44",
+            "refcount": "3"
+          },
+          "com.apple.iokit.IOAHCISerialATAPI": {
+            "version": "266.50.1",
+            "size": 53248,
+            "index": "45",
+            "refcount": "0"
+          },
+          "com.apple.iokit.SCSITaskUserClient": {
+            "version": "394.50.1",
+            "size": 28672,
+            "index": "47",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOCDStorageFamily": {
+            "version": "1.8",
+            "size": 57344,
+            "index": "48",
+            "refcount": "3"
+          },
+          "com.apple.iokit.IODVDStorageFamily": {
+            "version": "1.8",
+            "size": 45056,
+            "index": "49",
+            "refcount": "2"
+          },
+          "com.apple.iokit.IOBDStorageFamily": {
+            "version": "1.8",
+            "size": 36864,
+            "index": "50",
+            "refcount": "1"
+          },
+          "com.apple.iokit.IOSCSIMultimediaCommandsDevice": {
+            "version": "394.50.1",
+            "size": 106496,
+            "index": "51",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOUSBFamily": {
+            "version": "900.4.1",
+            "size": 630784,
+            "index": "52",
+            "refcount": "0"
+          },
+          "com.apple.driver.usb.AppleUSBHostPacketFilter": {
+            "version": "1.0",
+            "size": 20480,
+            "index": "53",
+            "refcount": "0"
+          },
+          "com.apple.filesystems.hfs.encodings.kext": {
+            "version": "1",
+            "size": 28672,
+            "index": "54",
+            "refcount": "1"
+          },
+          "com.apple.filesystems.hfs.kext": {
+            "version": "366.70.1",
+            "size": 430080,
+            "index": "55",
+            "refcount": "0"
+          },
+          "com.apple.BootCache": {
+            "version": "40",
+            "size": 40960,
+            "index": "56",
+            "refcount": "0"
+          },
+          "com.apple.AppleFSCompression.AppleFSCompressionTypeZlib": {
+            "version": "1.0.0",
+            "size": 24576,
+            "index": "57",
+            "refcount": "0"
+          },
+          "com.apple.driver.usb.AppleUSBHostCompositeDevice": {
+            "version": "1.1",
+            "size": 32768,
+            "index": "60",
+            "refcount": "0"
+          },
+          "com.apple.driver.usb.networking": {
+            "version": "5.0.0",
+            "size": 32768,
+            "index": "61",
+            "refcount": "0"
+          },
+          "com.apple.driver.usb.AppleUSBHub": {
+            "version": "1.1",
+            "size": 188416,
+            "index": "63",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleUSBHostMergeProperties": {
+            "version": "1.1",
+            "size": 16384,
+            "index": "64",
+            "refcount": "0"
+          },
+          "com.apple.driver.usb.IOUSBHostHIDDevice": {
+            "version": "1.1",
+            "size": 45056,
+            "index": "65",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOGraphicsFamily": {
+            "version": "515.3",
+            "size": 245760,
+            "index": "66",
+            "refcount": "3"
+          },
+          "com.vmware.kext.VMwareGfx": {
+            "version": "0554.16.82",
+            "size": 53248,
+            "index": "67",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOSlowAdaptiveClockingFamily": {
+            "version": "1.0.0",
+            "size": 20480,
+            "index": "70",
+            "refcount": "1"
+          },
+          "com.apple.driver.AppleIntelSlowAdaptiveClocking": {
+            "version": "4.0.0",
+            "size": 8192,
+            "index": "71",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleHV": {
+            "version": "1",
+            "size": 40960,
+            "index": "72",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleSSE": {
+            "version": "1.0",
+            "size": 40960,
+            "index": "73",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleSMC": {
+            "version": "3.1.9",
+            "size": 106496,
+            "index": "74",
+            "refcount": "3"
+          },
+          "com.apple.iokit.IOSerialFamily": {
+            "version": "11",
+            "size": 57344,
+            "index": "77",
+            "refcount": "1"
+          },
+          "com.apple.iokit.IOSurface": {
+            "version": "159.9",
+            "size": 98304,
+            "index": "79",
+            "refcount": "0"
+          },
+          "com.apple.iokit.IOUserEthernet": {
+            "version": "1.0.1",
+            "size": 24576,
+            "index": "80",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleOSXWatchdog": {
+            "version": "1",
+            "size": 16384,
+            "index": "81",
+            "refcount": "0"
+          },
+          "com.apple.driver.pmtelemetry": {
+            "version": "1",
+            "size": 61440,
+            "index": "82",
+            "refcount": "0"
+          },
+          "com.apple.driver.IOPlatformPluginLegacy": {
+            "version": "1.0.0",
+            "size": 73728,
+            "index": "84",
+            "refcount": "1"
+          },
+          "com.apple.iokit.IOSMBusFamily": {
+            "version": "1.1",
+            "size": 16384,
+            "index": "86",
+            "refcount": "1"
+          },
+          "com.apple.driver.AppleMCCSControl": {
+            "version": "1.3.4",
+            "size": 57344,
+            "index": "88",
+            "refcount": "0"
+          },
+          "com.apple.driver.AppleUpstreamUserClient": {
+            "version": "3.6.4",
+            "size": 20480,
+            "index": "89",
+            "refcount": "0"
+          },
+          "com.apple.kext.triggers": {
+            "version": "1.0",
+            "size": 20480,
+            "index": "91",
+            "refcount": "1"
+          },
+          "com.apple.filesystems.autofs": {
+            "version": "3.0",
+            "size": 36864,
+            "index": "92",
+            "refcount": "0"
+          },
+          "com.vmware.kext.vmhgfs": {
+            "version": "0554.16.82",
+            "size": 40960,
+            "index": "93",
+            "refcount": "0"
+          }
+        }
+      },
+      "memory": {
+        "total": "4096MB",
+        "active": "2545MB",
+        "inactive": "245MB",
+        "free": "1305MB"
+      },
+      "network": {
+        "interfaces": {
+          "lo0": {
+            "addresses": {
+              "127.0.0.1": {
+                "family": "inet",
+                "netmask": "255.0.0.0"
+              },
+              "::1": {
+                "family": "inet6",
+                "prefixlen": "128",
+                "scope": "Node"
+              },
+              "fe80::1": {
+                "family": "inet6",
+                "prefixlen": "64",
+                "scope": "Link"
+              }
+            },
+            "mtu": "16384",
+            "flags": [
+              "UP",
+              "LOOPBACK",
+              "RUNNING",
+              "MULTICAST"
+            ],
+            "type": "lo",
+            "number": "0",
+            "encapsulation": "Loopback"
+          },
+          "gif0": {
+            "addresses": {},
+            "mtu": "1280",
+            "flags": [
+              "POINTOPOINT",
+              "MULTICAST"
+            ],
+            "type": "gif",
+            "number": "0",
+            "encapsulation": "IPIP"
+          },
+          "stf0": {
+            "addresses": {},
+            "mtu": "1280",
+            "flags": [],
+            "type": "stf",
+            "number": "0",
+            "encapsulation": "6to4"
+          },
+          "en0": {
+            "addresses": {
+              "00:50:56:9a:e9:7e": {
+                "family": "lladdr"
+              },
+              "fe80::1ce1:fc46:5fc6:500e": {
+                "family": "inet6",
+                "prefixlen": "64",
+                "scope": "Link"
+              },
+              "172.31.11.220": {
+                "family": "inet",
+                "netmask": "255.255.240.0",
+                "broadcast": "172.31.15.255"
+              }
+            },
+            "mtu": "1500",
+            "flags": [
+              "UP",
+              "BROADCAST",
+              "SMART",
+              "RUNNING",
+              "SIMPLEX",
+              "MULTICAST"
+            ],
+            "type": "en",
+            "number": "0",
+            "encapsulation": "Ethernet",
+            "arp": {
+              "169.254.139.71": "80:49:71:11:16:45",
+              "169.254.175.40": "98:5a:eb:c6:9b:cb",
+              "169.254.193.187": "80:49:71:11:16:45",
+              "172.31.0.1": "0:9:f:9:0:5",
+              "172.31.1.1": "d4:ae:52:b1:c:86",
+              "172.31.8.4": "b8:ac:6f:12:46:6c",
+              "172.31.8.7": "0:10:e0:99:f0:d0",
+              "172.31.8.10": "ac:1f:6b:18:37:8",
+              "172.31.8.11": "ac:1f:6b:18:37:8",
+              "172.31.8.12": "ac:1f:6b:18:37:8",
+              "172.31.8.13": "ac:1f:6b:18:37:8",
+              "172.31.8.20": "ac:1f:6b:18:37:8",
+              "172.31.8.21": "ac:1f:6b:18:37:8",
+              "172.31.8.22": "b8:ac:6f:12:46:6c",
+              "172.31.8.23": "b8:ac:6f:12:17:be",
+              "172.31.8.24": "ac:1f:6b:18:37:8",
+              "172.31.8.25": "ac:1f:6b:18:37:8",
+              "172.31.9.3": "0:10:e0:99:f0:d0",
+              "172.31.9.5": "0:10:e0:99:f0:d0",
+              "172.31.9.6": "0:10:e0:99:f0:d0",
+              "172.31.9.7": "0:10:e0:99:f0:d0",
+              "172.31.9.10": "0:10:e0:99:f0:d0",
+              "172.31.9.52": "0:10:e0:99:f0:d0",
+              "172.31.9.56": "0:10:e0:99:f0:d0",
+              "172.31.9.57": "0:10:e0:99:f0:d0",
+              "172.31.9.58": "0:10:e0:99:f0:d0",
+              "172.31.11.215": "0:50:56:9a:35:ca",
+              "224.0.0.251": "1:0:5e:0:0:fb"
+            }
+          },
+          "utun0": {
+            "addresses": {
+              "fe80::99b1:f600:4158:a281": {
+                "family": "inet6",
+                "prefixlen": "64",
+                "scope": "Link"
+              }
+            },
+            "mtu": "2000",
+            "flags": [
+              "UP",
+              "POINTOPOINT",
+              "RUNNING",
+              "MULTICAST"
+            ],
+            "type": "utun",
+            "number": "0",
+            "encapsulation": "Unknown"
+          }
+        },
+        "default_gateway": "172.31.0.1",
+        "default_interface": "en0",
+        "settings": {
+          "net.local.stream.tracemdns": "0",
+          "net.local.stream.recvspace": "8192",
+          "net.local.stream.sendspace": "8192",
+          "net.local.dgram.recvspace": "4096",
+          "net.local.dgram.maxdgram": "2048",
+          "net.local.inflight": "0",
+          "net.inet.ip.portrange.hilast": "65535",
+          "net.inet.ip.portrange.hifirst": "49152",
+          "net.inet.ip.portrange.last": "65535",
+          "net.inet.ip.portrange.first": "49152",
+          "net.inet.ip.portrange.lowlast": "600",
+          "net.inet.ip.portrange.lowfirst": "1023",
+          "net.inet.ip.forwarding": "0",
+          "net.inet.ip.redirect": "1",
+          "net.inet.ip.ttl": "64",
+          "net.inet.ip.rtexpire": "710",
+          "net.inet.ip.rtminexpire": "10",
+          "net.inet.ip.rtmaxcache": "128",
+          "net.inet.ip.sourceroute": "0",
+          "net.inet.ip.accept_sourceroute": "0",
+          "net.inet.ip.gifttl": "30",
+          "net.inet.ip.subnets_are_local": "0",
+          "net.inet.ip.mcast.maxgrpsrc": "512",
+          "net.inet.ip.mcast.maxsocksrc": "128",
+          "net.inet.ip.mcast.loop": "1",
+          "net.inet.ip.dummynet.hash_size": "64",
+          "net.inet.ip.dummynet.curr_time": "0",
+          "net.inet.ip.dummynet.ready_heap": "0",
+          "net.inet.ip.dummynet.extract_heap": "0",
+          "net.inet.ip.dummynet.searches": "0",
+          "net.inet.ip.dummynet.search_steps": "0",
+          "net.inet.ip.dummynet.expire": "1",
+          "net.inet.ip.dummynet.max_chain_len": "16",
+          "net.inet.ip.dummynet.red_lookup_depth": "256",
+          "net.inet.ip.dummynet.red_avg_pkt_size": "512",
+          "net.inet.ip.dummynet.red_max_pkt_size": "1500",
+          "net.inet.ip.dummynet.debug": "0",
+          "net.inet.ip.random_id_statistics": "0",
+          "net.inet.ip.random_id_collisions": "0",
+          "net.inet.ip.random_id_total": "0",
+          "net.inet.ip.random_id": "1",
+          "net.inet.ip.linklocal.in.allowbadttl": "1",
+          "net.inet.ip.rx_chainsz": "6",
+          "net.inet.ip.rx_chaining": "1",
+          "net.inet.ip.check_interface": "0",
+          "net.inet.ip.adj_clear_hwcksum": "0",
+          "net.inet.ip.maxfragsperpacket": "128",
+          "net.inet.ip.fragpackets": "0",
+          "net.inet.ip.maxfragpackets": "1024",
+          "net.inet.ip.sendsourcequench": "0",
+          "net.inet.ip.maxchainsent": "32",
+          "net.inet.ip.select_srcif_debug": "0",
+          "net.inet.ip.output_perf_bins": "0",
+          "net.inet.ip.output_perf": "0",
+          "net.inet.icmp.maskrepl": "0",
+          "net.inet.icmp.icmplim": "250",
+          "net.inet.icmp.timestamp": "0",
+          "net.inet.icmp.drop_redirect": "1",
+          "net.inet.icmp.log_redirect": "0",
+          "net.inet.icmp.bmcastecho": "1",
+          "net.inet.igmp.recvifkludge": "1",
+          "net.inet.igmp.sendra": "1",
+          "net.inet.igmp.sendlocal": "1",
+          "net.inet.igmp.v1enable": "1",
+          "net.inet.igmp.v2enable": "1",
+          "net.inet.igmp.legacysupp": "0",
+          "net.inet.igmp.debug": "0",
+          "net.inet.igmp.gsrdelay": "10",
+          "net.inet.igmp.default_version": "3",
+          "net.inet.tcp.rfc1644": "0",
+          "net.inet.tcp.mssdflt": "512",
+          "net.inet.tcp.keepidle": "7200000",
+          "net.inet.tcp.keepintvl": "75000",
+          "net.inet.tcp.sendspace": "131072",
+          "net.inet.tcp.recvspace": "131072",
+          "net.inet.tcp.keepinit": "75000",
+          "net.inet.tcp.v6mssdflt": "1024",
+          "net.inet.tcp.ecn_timeout": "60",
+          "net.inet.tcp.disable_tcp_heuristics": "0",
+          "net.inet.tcp.clear_tfocache": "0",
+          "net.inet.tcp.log_in_vain": "0",
+          "net.inet.tcp.blackhole": "0",
+          "net.inet.tcp.delayed_ack": "3",
+          "net.inet.tcp.tcp_lq_overflow": "1",
+          "net.inet.tcp.recvbg": "0",
+          "net.inet.tcp.drop_synfin": "1",
+          "net.inet.tcp.reass.overflows": "0",
+          "net.inet.tcp.slowlink_wsize": "8192",
+          "net.inet.tcp.maxseg_unacked": "8",
+          "net.inet.tcp.rfc3465": "1",
+          "net.inet.tcp.rfc3465_lim2": "1",
+          "net.inet.tcp.recv_allowed_iaj": "5",
+          "net.inet.tcp.doautorcvbuf": "1",
+          "net.inet.tcp.autorcvbufmax": "1048576",
+          "net.inet.tcp.lro": "0",
+          "net.inet.tcp.lrodbg": "0",
+          "net.inet.tcp.lro_startcnt": "4",
+          "net.inet.tcp.rcvsspktcnt": "512",
+          "net.inet.tcp.rexmt_thresh": "3",
+          "net.inet.tcp.path_mtu_discovery": "1",
+          "net.inet.tcp.slowstart_flightsize": "1",
+          "net.inet.tcp.local_slowstart_flightsize": "8",
+          "net.inet.tcp.tso": "1",
+          "net.inet.tcp.ecn_setup_percentage": "50",
+          "net.inet.tcp.enable_tlp": "1",
+          "net.inet.tcp.recv_throttle_minwin": "16384",
+          "net.inet.tcp.rtt_recvbg": "1",
+          "net.inet.tcp.ack_prioritize": "1",
+          "net.inet.tcp.autosndbufmax": "1048576",
+          "net.inet.tcp.autosndbufinc": "8192",
+          "net.inet.tcp.doautosndbuf": "1",
+          "net.inet.tcp.acc_iaj_react_limit": "200",
+          "net.inet.tcp.min_iaj_win": "16",
+          "net.inet.tcp.rfc3390": "1",
+          "net.inet.tcp.socket_unlocked_on_output": "1",
+          "net.inet.tcp.packetchain": "50",
+          "net.inet.tcp.ecn_negotiate_in": "2",
+          "net.inet.tcp.ecn_initiate_out": "2",
+          "net.inet.tcp.sack": "1",
+          "net.inet.tcp.sack_maxholes": "128",
+          "net.inet.tcp.sack_globalmaxholes": "65536",
+          "net.inet.tcp.sack_globalholes": "0",
+          "net.inet.tcp.tcbhashsize": "4096",
+          "net.inet.tcp.win_scale_factor": "3",
+          "net.inet.tcp.randomize_ports": "0",
+          "net.inet.tcp.rexmt_slop": "200",
+          "net.inet.tcp.rtt_min": "100",
+          "net.inet.tcp.icmp_may_rst": "1",
+          "net.inet.tcp.tw_pcbcount": "3",
+          "net.inet.tcp.pcbcount": "13",
+          "net.inet.tcp.do_tcpdrain": "0",
+          "net.inet.tcp.minmss": "216",
+          "net.inet.tcp.fastopen_fallback_min": "10",
+          "net.inet.tcp.fastopen": "3",
+          "net.inet.tcp.fastopen_backlog": "10",
+          "net.inet.tcp.pmtud_blackhole_mss": "1200",
+          "net.inet.tcp.pmtud_blackhole_detection": "1",
+          "net.inet.tcp.tcp_resched_timerlist": "10227025",
+          "net.inet.tcp.tcp_timer_advanced": "498",
+          "net.inet.tcp.broken_peer_syn_rexmit_thres": "10",
+          "net.inet.tcp.timer_fastmode_idlemax": "10",
+          "net.inet.tcp.always_keepalive": "0",
+          "net.inet.tcp.max_persist_timeout": "0",
+          "net.inet.tcp.msl": "15000",
+          "net.inet.tcp.keepcnt": "8",
+          "net.inet.tcp.cc_debug": "0",
+          "net.inet.tcp.newreno_sockets": "0",
+          "net.inet.tcp.background_sockets": "0",
+          "net.inet.tcp.cubic_sockets": "13",
+          "net.inet.tcp.use_newreno": "0",
+          "net.inet.tcp.cubic_use_minrtt": "0",
+          "net.inet.tcp.cubic_fast_convergence": "0",
+          "net.inet.tcp.cubic_tcp_friendliness": "0",
+          "net.inet.tcp.lro_sz": "8",
+          "net.inet.tcp.lro_time": "10",
+          "net.inet.tcp.bg_ss_fltsz": "2",
+          "net.inet.tcp.bg_tether_shift": "1",
+          "net.inet.tcp.bg_allowed_increase": "8",
+          "net.inet.tcp.bg_target_qdelay": "100",
+          "net.inet.udp.checksum": "1",
+          "net.inet.udp.maxdgram": "9216",
+          "net.inet.udp.recvspace": "196724",
+          "net.inet.udp.log_in_vain": "0",
+          "net.inet.udp.blackhole": "0",
+          "net.inet.udp.randomize_ports": "1",
+          "net.inet.udp.pcbcount": "38",
+          "net.inet.ipsec.def_policy": "1",
+          "net.inet.ipsec.esp_trans_deflev": "1",
+          "net.inet.ipsec.esp_net_deflev": "1",
+          "net.inet.ipsec.ah_trans_deflev": "1",
+          "net.inet.ipsec.ah_net_deflev": "1",
+          "net.inet.ipsec.ah_cleartos": "1",
+          "net.inet.ipsec.ah_offsetmask": "0",
+          "net.inet.ipsec.dfbit": "0",
+          "net.inet.ipsec.ecn": "0",
+          "net.inet.ipsec.debug": "0",
+          "net.inet.ipsec.esp_randpad": "-1",
+          "net.inet.ipsec.esp_port": "0",
+          "net.inet.ipsec.bypass": "1",
+          "net.inet.log_restricted": "0",
+          "net.inet.raw.maxdgram": "8192",
+          "net.inet.raw.recvspace": "8192",
+          "net.inet.raw.pcbcount": "1",
+          "net.inet.mptcp.enable": "1",
+          "net.inet.mptcp.mptcp_cap_retr": "2",
+          "net.inet.mptcp.dss_csum": "0",
+          "net.inet.mptcp.fail": "1",
+          "net.inet.mptcp.keepalive": "840",
+          "net.inet.mptcp.mpprio": "1",
+          "net.inet.mptcp.remaddr": "1",
+          "net.inet.mptcp.fastjoin": "1",
+          "net.inet.mptcp.zerortt_fastjoin": "0",
+          "net.inet.mptcp.rwnotify": "0",
+          "net.inet.mptcp.rtthist": "1",
+          "net.inet.mptcp.rtthist_thresh": "600",
+          "net.inet.mptcp.userto": "1",
+          "net.inet.mptcp.rto_thresh": "1500",
+          "net.inet.mptcp.use_peer": "1",
+          "net.inet.mptcp.peerswitchno": "3",
+          "net.inet.mptcp.probeto": "1000",
+          "net.inet.mptcp.probecnt": "5",
+          "net.inet.mptcp.dbg_area": "0",
+          "net.inet.mptcp.dbg_level": "0",
+          "net.inet.mptcp.pcbcount": "0",
+          "net.inet.mptcp.sk_lim": "32",
+          "net.inet.mptcp.delayed": "0",
+          "net.inet.mptcp.usesymptoms": "1",
+          "net.inet.mptcp.force_64bit_dsn": "0",
+          "net.inet.mptcp.rto": "3",
+          "net.inet.mptcp.nrto": "3",
+          "net.inet.mptcp.tw": "60",
+          "net.link.generic.system.ifcount": "5",
+          "net.link.generic.system.if_verbose": "0",
+          "net.link.generic.system.dlil_lladdr_ckreq": "0",
+          "net.link.generic.system.dlil_verbose": "0",
+          "net.link.generic.system.tx_chain_len_count": "0",
+          "net.link.generic.system.hwcksum_rx": "1",
+          "net.link.generic.system.hwcksum_tx": "1",
+          "net.link.generic.system.hwcksum_dbg_finalized_data": "0",
+          "net.link.generic.system.hwcksum_dbg_finalized_hdr": "0",
+          "net.link.generic.system.hwcksum_dbg_adjusted": "0",
+          "net.link.generic.system.hwcksum_dbg_bad_rxoff": "0",
+          "net.link.generic.system.hwcksum_dbg_bad_cksum": "0",
+          "net.link.generic.system.hwcksum_dbg_verified": "0",
+          "net.link.generic.system.hwcksum_dbg_partial_rxoff_adj": "0",
+          "net.link.generic.system.hwcksum_dbg_partial_rxoff_forced": "0",
+          "net.link.generic.system.hwcksum_dbg_partial_forced_bytes": "0",
+          "net.link.generic.system.hwcksum_dbg_partial_forced": "0",
+          "net.link.generic.system.hwcksum_dbg_mode": "0",
+          "net.link.generic.system.start_delay_disabled": "0",
+          "net.link.generic.system.start_delayed": "0",
+          "net.link.generic.system.hwcksum_dbg": "0",
+          "net.link.generic.system.hwcksum_in_invalidated": "0",
+          "net.link.generic.system.delaybased_queue": "1",
+          "net.link.generic.system.flow_advisory": "1",
+          "net.link.generic.system.dlil_input_sanity_check": "0",
+          "net.link.generic.system.dlil_input_threads": "2",
+          "net.link.generic.system.if_bw_measure_size": "10",
+          "net.link.generic.system.if_bw_smoothing_val": "3",
+          "net.link.generic.system.rxpoll": "1",
+          "net.link.generic.system.rxpoll_max": "0",
+          "net.link.generic.system.rxpoll_wakeups_hiwat": "100",
+          "net.link.generic.system.rxpoll_wakeups_lowat": "10",
+          "net.link.generic.system.rxpoll_interval_pkts": "0",
+          "net.link.generic.system.rxpoll_interval_time": "1000000",
+          "net.link.generic.system.rxpoll_sample_time": "10000000",
+          "net.link.generic.system.rxpoll_freeze_time": "1000000000",
+          "net.link.generic.system.rxpoll_decay": "2",
+          "net.link.generic.system.rcvq_maxlen": "256",
+          "net.link.generic.system.sndq_maxlen": "128",
+          "net.link.ether.inet.prune_intvl": "300",
+          "net.link.ether.inet.probe_intvl": "7",
+          "net.link.ether.inet.max_age": "1200",
+          "net.link.ether.inet.host_down_time": "20",
+          "net.link.ether.inet.arp_llreach_base": "120",
+          "net.link.ether.inet.arp_unicast_lim": "3",
+          "net.link.ether.inet.maxtries": "5",
+          "net.link.ether.inet.maxhold": "16",
+          "net.link.ether.inet.useloopback": "1",
+          "net.link.ether.inet.proxyall": "0",
+          "net.link.ether.inet.sendllconflict": "0",
+          "net.link.ether.inet.log_arp_warnings": "0",
+          "net.link.ether.inet.keep_announcements": "1",
+          "net.link.ether.inet.send_conflicting_probes": "1",
+          "net.link.ether.inet.verbose": "0",
+          "net.link.bridge.inherit_mac": "0",
+          "net.link.bridge.rtable_prune_period": "300",
+          "net.link.bridge.rtable_hash_size_max": "2048",
+          "net.link.bridge.txstart": "0",
+          "net.link.bridge.debug": "0",
+          "net.link.loopback.bw_sleep_usec": "10",
+          "net.link.loopback.bw_measure": "0",
+          "net.link.loopback.dequeue_sc": "0",
+          "net.link.loopback.sched_model": "0",
+          "net.link.loopback.max_dequeue": "256",
+          "net.link.iptap.total_tap_count": "0",
+          "net.link.iptap.log": "0",
+          "net.link.pktap.total_tap_count": "0",
+          "net.link.pktap.count_unknown_if_type": "0",
+          "net.link.pktap.log": "0",
+          "net.key.debug": "0",
+          "net.key.spi_trycnt": "1000",
+          "net.key.spi_minval": "256",
+          "net.key.spi_maxval": "268435455",
+          "net.key.int_random": "60",
+          "net.key.larval_lifetime": "30",
+          "net.key.blockacq_count": "10",
+          "net.key.blockacq_lifetime": "20",
+          "net.key.esp_keymin": "256",
+          "net.key.esp_auth": "0",
+          "net.key.ah_keymin": "128",
+          "net.key.prefered_oldsa": "0",
+          "net.key.natt_keepalive_interval": "20",
+          "net.inet6.ip6.forwarding": "0",
+          "net.inet6.ip6.redirect": "1",
+          "net.inet6.ip6.hlim": "64",
+          "net.inet6.ip6.maxfragpackets": "1024",
+          "net.inet6.ip6.accept_rtadv": "1",
+          "net.inet6.ip6.keepfaith": "0",
+          "net.inet6.ip6.log_interval": "5",
+          "net.inet6.ip6.hdrnestlimit": "15",
+          "net.inet6.ip6.dad_count": "1",
+          "net.inet6.ip6.auto_flowlabel": "1",
+          "net.inet6.ip6.defmcasthlim": "1",
+          "net.inet6.ip6.gifhlim": "0",
+          "net.inet6.ip6.kame_version": "2009/apple-darwin",
+          "net.inet6.ip6.use_deprecated": "1",
+          "net.inet6.ip6.rr_prune": "5",
+          "net.inet6.ip6.v6only": "0",
+          "net.inet6.ip6.rtexpire": "3600",
+          "net.inet6.ip6.rtminexpire": "10",
+          "net.inet6.ip6.rtmaxcache": "128",
+          "net.inet6.ip6.use_tempaddr": "1",
+          "net.inet6.ip6.temppltime": "86400",
+          "net.inet6.ip6.tempvltime": "604800",
+          "net.inet6.ip6.auto_linklocal": "1",
+          "net.inet6.ip6.prefer_tempaddr": "1",
+          "net.inet6.ip6.use_defaultzone": "0",
+          "net.inet6.ip6.maxfrags": "2048",
+          "net.inet6.ip6.mcast_pmtu": "0",
+          "net.inet6.ip6.neighborgcthresh": "1024",
+          "net.inet6.ip6.maxifprefixes": "16",
+          "net.inet6.ip6.maxifdefrouters": "16",
+          "net.inet6.ip6.maxdynroutes": "1024",
+          "net.inet6.ip6.fragpackets": "0",
+          "net.inet6.ip6.adj_clear_hwcksum": "0",
+          "net.inet6.ip6.input_perf_bins": "0",
+          "net.inet6.ip6.input_perf": "0",
+          "net.inet6.ip6.output_perf_bins": "0",
+          "net.inet6.ip6.output_perf": "0",
+          "net.inet6.ip6.select_srcif_debug": "0",
+          "net.inet6.ip6.select_srcaddr_debug": "0",
+          "net.inet6.ip6.select_src_expensive_secondary_if": "0",
+          "net.inet6.ip6.mcast.maxgrpsrc": "512",
+          "net.inet6.ip6.mcast.maxsocksrc": "128",
+          "net.inet6.ip6.mcast.loop": "1",
+          "net.inet6.ip6.only_allow_rfc4193_prefixes": "0",
+          "net.inet6.ip6.maxchainsent": "1",
+          "net.inet6.ip6.dad_enhanced": "1",
+          "net.inet6.ipsec6.def_policy": "1",
+          "net.inet6.ipsec6.esp_trans_deflev": "1",
+          "net.inet6.ipsec6.esp_net_deflev": "1",
+          "net.inet6.ipsec6.ah_trans_deflev": "1",
+          "net.inet6.ipsec6.ah_net_deflev": "1",
+          "net.inet6.ipsec6.ecn": "0",
+          "net.inet6.ipsec6.debug": "0",
+          "net.inet6.ipsec6.esp_randpad": "-1",
+          "net.inet6.icmp6.rediraccept": "0",
+          "net.inet6.icmp6.redirtimeout": "600",
+          "net.inet6.icmp6.nd6_prune": "1",
+          "net.inet6.icmp6.nd6_delay": "5",
+          "net.inet6.icmp6.nd6_umaxtries": "3",
+          "net.inet6.icmp6.nd6_mmaxtries": "3",
+          "net.inet6.icmp6.nd6_useloopback": "1",
+          "net.inet6.icmp6.nodeinfo": "3",
+          "net.inet6.icmp6.errppslimit": "500",
+          "net.inet6.icmp6.nd6_debug": "0",
+          "net.inet6.icmp6.nd6_accept_6to4": "1",
+          "net.inet6.icmp6.nd6_optimistic_dad": "63",
+          "net.inet6.icmp6.nd6_onlink_ns_rfc4861": "0",
+          "net.inet6.icmp6.rappslimit": "10",
+          "net.inet6.icmp6.nd6_prune_lazy": "5",
+          "net.inet6.icmp6.nd6_llreach_base": "30",
+          "net.inet6.icmp6.nd6_maxsolstgt": "8",
+          "net.inet6.icmp6.nd6_maxproxiedsol": "4",
+          "net.inet6.icmp6.prproxy_cnt": "0",
+          "net.inet6.mld.debug": "0",
+          "net.inet6.mld.use_allow": "1",
+          "net.inet6.mld.v2enable": "1",
+          "net.inet6.mld.v1enable": "1",
+          "net.inet6.mld.gsrdelay": "10",
+          "net.inet6.send.opstate": "1",
+          "net.inet6.send.opmode": "1",
+          "net.systm.kctl.debug": "0",
+          "net.systm.kctl.autorcvbufhigh": "0",
+          "net.systm.kctl.autorcvbufmax": "262144",
+          "net.ndrv_multi_max_count": "1024",
+          "net.statistics_privcheck": "0",
+          "net.stats.debug": "0",
+          "net.stats.sendspace": "2048",
+          "net.stats.recvspace": "8192",
+          "net.necp.drop_all_level": "0",
+          "net.necp.debug": "0",
+          "net.necp.pass_loopback": "1",
+          "net.necp.pass_keepalives": "1",
+          "net.necp.socket_policy_count": "20",
+          "net.necp.socket_non_app_policy_count": "20",
+          "net.necp.ip_policy_count": "8",
+          "net.necp.session_count": "5",
+          "net.netagent.debug": "5",
+          "net.netagent.registered_count": "12",
+          "net.netagent.active_count": "11",
+          "net.cfil.log": "3",
+          "net.cfil.debug": "1",
+          "net.cfil.sock_attached_count": "0",
+          "net.cfil.active_count": "0",
+          "net.cfil.close_wait_timeout": "1000",
+          "net.cfil.sbtrim": "1",
+          "net.pktmnglr.log": "3",
+          "net.classq.verbose": "0",
+          "net.classq.sfb.holdtime": "0",
+          "net.classq.sfb.pboxtime": "0",
+          "net.classq.sfb.hinterval": "0",
+          "net.classq.sfb.increment": "82",
+          "net.classq.sfb.decrement": "16",
+          "net.classq.sfb.allocation": "0",
+          "net.classq.sfb.ratelimit": "0",
+          "net.classq.target_qdelay": "0",
+          "net.classq.update_interval": "0",
+          "net.pktsched.verbose": "0",
+          "net.qos.policy.capable_enabled": "0",
+          "net.qos.policy.wifi_enabled": "0",
+          "net.qos.policy.restrict_avapps": "0",
+          "net.qos.policy.restricted": "0",
+          "net.qos.verbose": "0",
+          "net.qos.reset_dscp_to_wifi_ac_map": "0",
+          "net.alf.loglevel": "55",
+          "net.alf.perm": "0",
+          "net.alf.defaultaction": "1",
+          "net.alf.mqcount": "0"
+        }
+      },
+      "counters": {
+        "network": {
+          "interfaces": {
+            "lo0": {
+              "rx": {
+                "bytes": "132187",
+                "packets": "0",
+                "errors": "25876760",
+                "drop": 0,
+                "overrun": 0,
+                "frame": 0,
+                "compressed": 0,
+                "multicast": 0
+              },
+              "tx": {
+                "bytes": "0",
+                "packets": "0",
+                "errors": "25876760",
+                "drop": 0,
+                "overrun": 0,
+                "collisions": "0",
+                "carrier": 0,
+                "compressed": 0
+              }
+            },
+            "gif0": {
+              "rx": {
+                "bytes": "0",
+                "packets": "0",
+                "errors": "0",
+                "drop": 0,
+                "overrun": 0,
+                "frame": 0,
+                "compressed": 0,
+                "multicast": 0
+              },
+              "tx": {
+                "bytes": "0",
+                "packets": "0",
+                "errors": "0",
+                "drop": 0,
+                "overrun": 0,
+                "collisions": "0",
+                "carrier": 0,
+                "compressed": 0
+              }
+            },
+            "stf0": {
+              "rx": {
+                "bytes": "0",
+                "packets": "0",
+                "errors": "0",
+                "drop": 0,
+                "overrun": 0,
+                "frame": 0,
+                "compressed": 0,
+                "multicast": 0
+              },
+              "tx": {
+                "bytes": "0",
+                "packets": "0",
+                "errors": "0",
+                "drop": 0,
+                "overrun": 0,
+                "collisions": "0",
+                "carrier": 0,
+                "compressed": 0
+              }
+            },
+            "en0": {
+              "rx": {
+                "bytes": "56081089471",
+                "packets": "192667287",
+                "errors": "7",
+                "drop": 0,
+                "overrun": 0,
+                "frame": 0,
+                "compressed": 0,
+                "multicast": 0
+              },
+              "tx": {
+                "bytes": "35521625809",
+                "packets": "212281022",
+                "errors": "0",
+                "drop": 0,
+                "overrun": 0,
+                "collisions": "0",
+                "carrier": 0,
+                "compressed": 0
+              }
+            },
+            "utun0": {
+              "rx": {
+                "bytes": "3",
+                "packets": "0",
+                "errors": "0",
+                "drop": 0,
+                "overrun": 0,
+                "frame": 0,
+                "compressed": 0,
+                "multicast": 0
+              },
+              "tx": {
+                "bytes": "0",
+                "packets": "0",
+                "errors": "268",
+                "drop": 0,
+                "overrun": 0,
+                "collisions": "0",
+                "carrier": 0,
+                "compressed": 0
+              }
+            }
+          }
+        }
+      },
+      "ipaddress": "172.31.11.220",
+      "macaddress": "00:50:56:9a:e9:7e",
+      "ip6address": "fe80::1",
+      "os": "darwin",
+      "os_version": "16.7.0",
+      "platform": "mac_os_x",
+      "platform_version": "10.12.6",
+      "platform_build": "16G29",
+      "platform_family": "mac_os_x",
+      "uptime_seconds": 4064562,
+      "uptime": "47 days 01 hours 02 minutes 42 seconds",
+      "virtualization": {
+        "systems": {}
+      },
+      "languages": {
+        "c": {
+          "gcc": {
+            "configured_with": "--prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/usr/include/c++/4.2.1",
+            "description": "Apple LLVM version 8.1.0 (clang-802.0.42)",
+            "version": "8.1.0",
+            "target": "x86_64-apple-darwin16.7.0",
+            "thread_model": "posix"
+          }
+        },
+        "java": {
+          "version": "1.7.0_71",
+          "runtime": {
+            "name": "Java(TM) SE Runtime Environment",
+            "build": "1.7.0_71-b14"
+          },
+          "hotspot": {
+            "name": "Java HotSpot(TM) 64-Bit Server VM",
+            "build": "24.71-b01, mixed mode"
+          }
+        },
+        "perl": {
+          "version": "5.18.2",
+          "archname": "darwin-thread-multi-2level"
+        },
+        "php": {
+          "version": "5.6.30",
+          "builddate": "Feb  7 2017 16:18:37",
+          "zend_engine_version": "2.6.0"
+        },
+        "python": {
+          "version": "2.7.10",
+          "builddate": "Feb 7 2017, 00:08:15"
+        },
+        "ruby": {
+          "platform": "universal.x86_64-darwin16",
+          "version": "2.0.0",
+          "release_date": "2015-12-16",
+          "target": "universal-apple-darwin16",
+          "target_cpu": "universal",
+          "target_vendor": "apple",
+          "target_os": "darwin16",
+          "host": "x86_64-apple-darwin16",
+          "host_cpu": "x86_64",
+          "host_os": "darwin16",
+          "host_vendor": "apple",
+          "bin_dir": "/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin",
+          "ruby_bin": "/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin/ruby",
+          "gems_dir": "/Library/Ruby/Gems/2.0.0",
+          "gem_bin": "/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin/gem"
+        }
+      },
+      "chef_packages": {
+        "chef": {
+          "version": "12.21.3",
+          "chef_root": "/opt/chef/embedded/lib/ruby/gems/2.3.0/gems/chef-12.21.3/lib"
+        },
+        "ohai": {
+          "version": "8.24.0",
+          "ohai_root": "/opt/chef/embedded/lib/ruby/gems/2.3.0/gems/ohai-8.24.0/lib/ohai"
+        }
+      },
+      "dmi": {},
+      "etc": {
+      },
+      "current_user": "root",
+      "cloud_v2": null,
+      "command": {
+        "ps": "ps -ef"
+      },
+      "filesystem2": {
+        "by_device": {
+          "/dev/disk0s2": {
+            "block_size": 512,
+            "kb_size": "41103432",
+            "kb_used": "14351452",
+            "kb_available": "26495980",
+            "percent_used": "36%",
+            "inodes_used": "747178",
+            "inodes_available": "4294220101",
+            "total_inodes": "4294967279",
+            "inodes_percent_used": "0%",
+            "fs_type": "hfs",
+            "mount_options": [
+              "local",
+              "journaled"
+            ],
+            "mounts": [
+              "/"
+            ]
+          },
+          "devfs": {
+            "block_size": 512,
+            "kb_size": "175",
+            "kb_used": "175",
+            "kb_available": "0",
+            "percent_used": "100%",
+            "inodes_used": "608",
+            "inodes_available": "0",
+            "total_inodes": "608",
+            "inodes_percent_used": "100%",
+            "fs_type": "devfs",
+            "mount_options": [
+              "local",
+              "nobrowse"
+            ],
+            "mounts": [
+              "/dev"
+            ]
+          },
+          "map -hosts": {
+            "block_size": 512,
+            "kb_size": "0",
+            "kb_used": "0",
+            "kb_available": "0",
+            "percent_used": "100%",
+            "inodes_used": "0",
+            "inodes_available": "0",
+            "total_inodes": "0",
+            "inodes_percent_used": "100%",
+            "fs_type": "autofs",
+            "mount_options": [
+              "nosuid",
+              "automounted",
+              "nobrowse"
+            ],
+            "mounts": [
+              "/net"
+            ]
+          },
+          "map auto_home": {
+            "block_size": 512,
+            "kb_size": "0",
+            "kb_used": "0",
+            "kb_available": "0",
+            "percent_used": "100%",
+            "inodes_used": "0",
+            "inodes_available": "0",
+            "total_inodes": "0",
+            "inodes_percent_used": "100%",
+            "fs_type": "autofs",
+            "mount_options": [
+              "automounted",
+              "nobrowse"
+            ],
+            "mounts": [
+              "/home"
+            ]
+          }
+        },
+        "by_mountpoint": {
+          "/": {
+            "block_size": 512,
+            "kb_size": "41103432",
+            "kb_used": "14351452",
+            "kb_available": "26495980",
+            "percent_used": "36%",
+            "inodes_used": "747178",
+            "inodes_available": "4294220101",
+            "total_inodes": "4294967279",
+            "inodes_percent_used": "0%",
+            "fs_type": "hfs",
+            "mount_options": [
+              "local",
+              "journaled"
+            ],
+            "devices": [
+              "/dev/disk0s2"
+            ]
+          },
+          "/dev": {
+            "block_size": 512,
+            "kb_size": "175",
+            "kb_used": "175",
+            "kb_available": "0",
+            "percent_used": "100%",
+            "inodes_used": "608",
+            "inodes_available": "0",
+            "total_inodes": "608",
+            "inodes_percent_used": "100%",
+            "fs_type": "devfs",
+            "mount_options": [
+              "local",
+              "nobrowse"
+            ],
+            "devices": [
+              "devfs"
+            ]
+          },
+          "/net": {
+            "block_size": 512,
+            "kb_size": "0",
+            "kb_used": "0",
+            "kb_available": "0",
+            "percent_used": "100%",
+            "inodes_used": "0",
+            "inodes_available": "0",
+            "total_inodes": "0",
+            "inodes_percent_used": "100%",
+            "fs_type": "autofs",
+            "mount_options": [
+              "nosuid",
+              "automounted",
+              "nobrowse"
+            ],
+            "devices": [
+              "map -hosts"
+            ]
+          },
+          "/home": {
+            "block_size": 512,
+            "kb_size": "0",
+            "kb_used": "0",
+            "kb_available": "0",
+            "percent_used": "100%",
+            "inodes_used": "0",
+            "inodes_available": "0",
+            "total_inodes": "0",
+            "inodes_percent_used": "100%",
+            "fs_type": "autofs",
+            "mount_options": [
+              "automounted",
+              "nobrowse"
+            ],
+            "devices": [
+              "map auto_home"
+            ]
+          }
+        },
+        "by_pair": {
+          "/dev/disk0s2,/": {
+            "block_size": 512,
+            "device": "/dev/disk0s2",
+            "kb_size": "41103432",
+            "kb_used": "14351452",
+            "kb_available": "26495980",
+            "percent_used": "36%",
+            "inodes_used": "747178",
+            "inodes_available": "4294220101",
+            "total_inodes": "4294967279",
+            "inodes_percent_used": "0%",
+            "mount": "/",
+            "fs_type": "hfs",
+            "mount_options": [
+              "local",
+              "journaled"
+            ]
+          },
+          "devfs,/dev": {
+            "block_size": 512,
+            "device": "devfs",
+            "kb_size": "175",
+            "kb_used": "175",
+            "kb_available": "0",
+            "percent_used": "100%",
+            "inodes_used": "608",
+            "inodes_available": "0",
+            "total_inodes": "608",
+            "inodes_percent_used": "100%",
+            "mount": "/dev",
+            "fs_type": "devfs",
+            "mount_options": [
+              "local",
+              "nobrowse"
+            ]
+          },
+          "map -hosts,/net": {
+            "block_size": 512,
+            "device": "map -hosts",
+            "kb_size": "0",
+            "kb_used": "0",
+            "kb_available": "0",
+            "percent_used": "100%",
+            "inodes_used": "0",
+            "inodes_available": "0",
+            "total_inodes": "0",
+            "inodes_percent_used": "100%",
+            "mount": "/net",
+            "fs_type": "autofs",
+            "mount_options": [
+              "nosuid",
+              "automounted",
+              "nobrowse"
+            ]
+          },
+          "map auto_home,/home": {
+            "block_size": 512,
+            "device": "map auto_home",
+            "kb_size": "0",
+            "kb_used": "0",
+            "kb_available": "0",
+            "percent_used": "100%",
+            "inodes_used": "0",
+            "inodes_available": "0",
+            "total_inodes": "0",
+            "inodes_percent_used": "100%",
+            "mount": "/home",
+            "fs_type": "autofs",
+            "mount_options": [
+              "automounted",
+              "nobrowse"
+            ]
+          }
+        }
+      },
+      "hardware": {
+        "SMC_version_system": "2.8f0",
+        "boot_rom_version": "VMW71.00V.0.B64.1704101057",
+        "current_processor_speed": "2.86 GHz",
+        "l2_cache_share": "256 KB",
+        "l3_cache_processor": "25 MB",
+        "machine_model": "VMware7,1",
+        "machine_name": "Apple device",
+        "number_processors": 2,
+        "packages": 2,
+        "physical_memory": "4 GB",
+        "platform_UUID": "00000000-0000-1000-8000-005056883945",
+        "serial_number": "VM+nvmZr0HA7",
+        "operating_system": "Mac OS X",
+        "operating_system_version": "10.12.6",
+        "build_version": "16G29",
+        "architecture": "x86_64",
+        "storage": [
+          {
+            "name": "OSX",
+            "bsd_name": "disk0s2",
+            "capacity": 42089914368
+          }
+        ],
+        "battery": {}
+      },
+      "system_profile": [
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPAirPortData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.03912496566772461,
+          "_SPResponseTime": 0.13068300485610962,
+          "_dataType": "SPAirPortData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPAudioData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.03925597667694092,
+          "_SPResponseTime": 0.1342419981956482,
+          "_dataType": "SPAudioData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPBluetoothData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.040044963359832764,
+          "_SPResponseTime": 0.133495032787323,
+          "_dataType": "SPBluetoothData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPCardReaderData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04007399082183838,
+          "_SPResponseTime": 0.13348901271820068,
+          "_dataType": "SPCardReaderData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPDiagnosticsData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04037904739379883,
+          "_SPResponseTime": 0.13348400592803955,
+          "_dataType": "SPDiagnosticsData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPDiscBurningData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04048401117324829,
+          "_SPResponseTime": 0.13347899913787842,
+          "_dataType": "SPDiscBurningData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPDisplaysData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.040048956871032715,
+          "_SPResponseTime": 0.13092702627182007,
+          "_dataType": "SPDisplaysData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPEthernetData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.0401650071144104,
+          "_SPResponseTime": 0.1300470232963562,
+          "_dataType": "SPEthernetData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPFibreChannelData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04010695219039917,
+          "_SPResponseTime": 0.13004297018051147,
+          "_dataType": "SPFibreChannelData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPFireWireData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.0455629825592041,
+          "_SPResponseTime": 0.13364499807357788,
+          "_dataType": "SPFireWireData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPHardwareDataType",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.048483967781066895,
+          "_SPResponseTime": 0.14165103435516357,
+          "_dataType": "SPHardwareDataType",
+          "_detailLevel": "-2",
+          "_items": [
+            {
+              "SMC_version_system": "2.8f0",
+              "_name": "hardware_overview",
+              "boot_rom_version": "VMW71.00V.0.B64.1704101057",
+              "current_processor_speed": "2.86 GHz",
+              "l2_cache_share": "256 KB",
+              "l3_cache_processor": "25 MB",
+              "machine_model": "VMware7,1",
+              "machine_name": "Apple device",
+              "number_processors": 2,
+              "packages": 2,
+              "physical_memory": "4 GB",
+              "platform_UUID": "00000000-0000-1000-8000-005056883945",
+              "serial_number": "VM+nvmZr0HA7"
+            }
+          ],
+          "_parentDataType": "SPRootDataType",
+          "_properties": {
+            "LOM_revision": {
+              "_order": "85"
+            },
+            "Lightshow_version": {
+              "_order": "83",
+              "_suppressLocalization": "YES"
+            },
+            "MMM_state": {
+              "_order": "70"
+            },
+            "SMC_version_other": {
+              "_order": "82"
+            },
+            "SMC_version_riser": {
+              "_order": "81"
+            },
+            "SMC_version_system": {
+              "_order": "80",
+              "_suppressLocalization": "YES"
+            },
+            "apple_rom_info": {
+              "_order": "53"
+            },
+            "boot_rom_release_date": {
+              "_order": "52"
+            },
+            "boot_rom_vendor": {
+              "_order": "50"
+            },
+            "boot_rom_version": {
+              "_order": "51"
+            },
+            "bus_speed": {
+              "_order": "45"
+            },
+            "cores_per_package": {
+              "_order": "24"
+            },
+            "cpu_interconnect_speed": {
+              "_order": "46"
+            },
+            "cpu_type": {
+              "_order": "15"
+            },
+            "current_processor_speed": {
+              "_order": "17"
+            },
+            "l2_cache": {
+              "_order": "26"
+            },
+            "l2_cache_core": {
+              "_order": "26"
+            },
+            "l2_cache_share": {
+              "_order": "26"
+            },
+            "l2_cache_size": {
+              "_order": "26"
+            },
+            "l3_cache": {
+              "_order": "27"
+            },
+            "l3_cache_processor": {
+              "_order": "27"
+            },
+            "l3_cache_size": {
+              "_order": "27"
+            },
+            "machine_model": {
+              "_order": "11"
+            },
+            "machine_name": {
+              "_order": "10"
+            },
+            "maximum_processor_speed": {
+              "_order": "19"
+            },
+            "minimum_processor_speed": {
+              "_order": "18"
+            },
+            "number_cpus": {
+              "_order": "20"
+            },
+            "number_processors": {
+              "_order": "22"
+            },
+            "packages": {
+              "_order": "20"
+            },
+            "physical_memory": {
+              "_order": "40"
+            },
+            "platform_UUID": {
+              "_detailLevel": "0",
+              "_order": "98"
+            },
+            "platform_cpu_features": {
+              "_order": "30"
+            },
+            "platform_cpu_htt": {
+              "_order": "28"
+            },
+            "platform_cpu_vendor": {
+              "_order": "12"
+            },
+            "platform_manufacturer": {
+              "_order": "4"
+            },
+            "platform_product_name": {
+              "_order": "2"
+            },
+            "platform_version": {
+              "_order": "6"
+            },
+            "riser_serial_number": {
+              "_detailLevel": "0",
+              "_order": "92"
+            },
+            "sales_order_number": {
+              "_detailLevel": "0",
+              "_order": "95"
+            },
+            "serial_number": {
+              "_detailLevel": "0",
+              "_order": "90"
+            },
+            "volumes": {
+              "_detailLevel": "0"
+            }
+          },
+          "_timeStamp": "2017-11-01T21:03:09+00:00",
+          "_versionInfo": {
+            "com.apple.SystemProfiler.SPPlatformReporter": "1445"
+          }
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPHardwareRAIDData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04424399137496948,
+          "_SPResponseTime": 0.136896014213562,
+          "_dataType": "SPHardwareRAIDData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPMemoryData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.041976988315582275,
+          "_SPResponseTime": 0.13432300090789795,
+          "_dataType": "SPMemoryData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPModemData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.040564000606536865,
+          "_SPResponseTime": 0.13301700353622437,
+          "_dataType": "SPModemData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPNetworkData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04057103395462036,
+          "_SPResponseTime": 0.1330299973487854,
+          "_dataType": "SPNetworkData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPPCIData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04416501522064209,
+          "_SPResponseTime": 0.13894999027252197,
+          "_dataType": "SPPCIData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPParallelATAData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.045993030071258545,
+          "_SPResponseTime": 0.13519901037216187,
+          "_dataType": "SPParallelATAData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPParallelSCSIData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.044422030448913574,
+          "_SPResponseTime": 0.13895100355148315,
+          "_dataType": "SPParallelSCSIData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPPrintersData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04045301675796509,
+          "_SPResponseTime": 0.13373500108718872,
+          "_dataType": "SPPrintersData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPPrintersSoftwareData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04034501314163208,
+          "_SPResponseTime": 0.13374102115631104,
+          "_dataType": "SPPrintersSoftwareData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPSASData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04062998294830322,
+          "_SPResponseTime": 0.13444596529006958,
+          "_dataType": "SPSASData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPSerialATAData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.04078704118728638,
+          "_SPResponseTime": 0.13441097736358643,
+          "_dataType": "SPSerialATAData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPSoftwareData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.03978002071380615,
+          "_SPResponseTime": 0.13340097665786743,
+          "_dataType": "SPSoftwareData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPThunderboltData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.03978896141052246,
+          "_SPResponseTime": 0.13339096307754517,
+          "_dataType": "SPThunderboltData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPUSBData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.040130019187927246,
+          "_SPResponseTime": 0.13061296939849854,
+          "_dataType": "SPUSBData",
+          "_items": []
+        },
+        {
+          "_SPCommandLineArguments": [
+            "/usr/sbin/system_profiler",
+            "-nospawn",
+            "-xml",
+            "SPWWANData",
+            "-detailLevel",
+            "full"
+          ],
+          "_SPCompletionInterval": 0.039950013160705566,
+          "_SPResponseTime": 0.13060694932937622,
+          "_dataType": "SPWWANData",
+          "_items": []
+        }
+      ],
+      "hostname": "builds-Mac-60",
+      "machinename": "builds-Mac-60.local",
+      "domain": null,
+      "keys": {
+      },
+      "ohai_time": 1509570190.0031831,
+      "root_group": "wheel",
+      "shard_seed": 61692707,
+      "shells": [
+        "/bin/bash",
+        "/bin/csh",
+        "/bin/ksh",
+        "/bin/sh",
+        "/bin/tcsh",
+        "/bin/zsh"
+      ],
+      "time": {
+        "timezone": "PDT"
+      },
+      "recipes": [
+        "opscode-ci::slave",
+        "opscode-ci::_build_support",
+        "chef-sugar::default",
+        "opscode-ci::_platform_tweaks",
+        "opscode-ci::_migration",
+        "omnibus::default",
+        "omnibus::_common",
+        "omnibus::_user",
+        "omnibus::_omnibus_toolchain",
+        "omnibus::_compile",
+        "build-essential::default",
+        "homebrew::default",
+        "omnibus::_git",
+        "omnibus::_github",
+        "omnibus::_libffi",
+        "omnibus::_packaging",
+        "omnibus::_selinux",
+        "omnibus::_environment",
+        "opscode-ci::_github",
+        "opscode-ci::_ntp",
+        "ntp::default",
+        "ntp::mac_os_x_client",
+        "opscode-ci::_package_signing",
+        "opscode-ci::_rubygems",
+        "opscode-ci::_aws",
+        "opscode-ci::_users",
+        "opscode-ci::_sudo",
+        "sudo::default",
+        "opscode-ci::_java",
+        "aws::default",
+        "opscode-ci::_omnibus",
+        "opscode-ci::_slave_mac_os_x"
+      ],
+      "expanded_run_list": [
+        "opscode-ci::slave"
+      ],
+      "roles": [],
+      "cookbooks": {
+        "opscode-ci": {
+          "version": "5.15.127"
+        },
+        "apt": {
+          "version": "6.1.4"
+        },
+        "chef-sugar": {
+          "version": "3.4.0"
+        },
+        "freebsd": {
+          "version": "1.0.2"
+        },
+        "lvm": {
+          "version": "4.1.9"
+        },
+        "omnibus": {
+          "version": "5.2.2"
+        },
+        "build-essential": {
+          "version": "8.0.3"
+        },
+        "seven_zip": {
+          "version": "2.0.2"
+        },
+        "windows": {
+          "version": "2.0.2"
+        },
+        "mingw": {
+          "version": "2.0.1"
+        },
+        "chef-ingredient": {
+          "version": "2.1.10"
+        },
+        "git": {
+          "version": "6.1.0"
+        },
+        "dmg": {
+          "version": "4.0.0"
+        },
+        "yum-epel": {
+          "version": "2.1.2"
+        },
+        "compat_resource": {
+          "version": "12.19.0"
+        },
+        "homebrew": {
+          "version": "4.2.0"
+        },
+        "remote_install": {
+          "version": "1.0.2"
+        },
+        "wix": {
+          "version": "3.0.0"
+        },
+        "windows-sdk": {
+          "version": "1.0.2"
+        },
+        "ntp": {
+          "version": "3.5.2"
+        },
+        "route53": {
+          "version": "2.0.0"
+        },
+        "rsyslog": {
+          "version": "5.1.0"
+        },
+        "sudo": {
+          "version": "3.5.3"
+        },
+        "redhat_subscription_manager": {
+          "version": "0.6.0"
+        },
+        "aws": {
+          "version": "3.3.3"
+        },
+        "ohai": {
+          "version": "3.0.1"
+        },
+        "jenkins": {
+          "version": "2.6.0"
+        },
+        "runit": {
+          "version": "1.8.0"
+        },
+        "packagecloud": {
+          "version": "0.3.0"
+        },
+        "yum": {
+          "version": "3.13.0"
+        },
+        "chef_nginx": {
+          "version": "2.9.0"
+        },
+        "bluepill": {
+          "version": "3.0.0"
+        },
+        "zypper": {
+          "version": "0.4.0"
+        },
+        "rubygems": {
+          "version": "1.0.2"
+        }
+      }
+    },
+    "normal": {
+      "tags": [
+        "chefdk",
+        "slave",
+        "tester"
+      ],
+      "omnibus": {
+        "build_user": "jenkins",
+        "build_user_password": "fabjaboac!1",
+        "build_user_group": "jenkins",
+        "build_user_home": "/Users/jenkins",
+        "ruby_version": "2.1.8"
+      },
+      "homebrew": {
+        "auto-update": false
+      },
+      "authorization": {
+        "sudo": {
+          "sudoers_defaults": [
+            "exempt_group += jenkins",
+            "secure_path=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"",
+            "env_keep += \"BLOCKSIZE\"",
+            "env_keep += \"COLORFGBG COLORTERM\"",
+            "env_keep += \"CHARSET LANG LANGUAGE LC_ALL LC_COLLATE LC_CTYPE\"",
+            "env_keep += \"LC_MESSAGES LC_MONETARY LC_NUMERIC LC_TIME\"",
+            "env_keep += \"LINES COLUMNS\"",
+            "env_keep += \"LSCOLORS\"",
+            "env_keep += \"TZ\"",
+            "env_keep += \"DISPLAY XAUTHORIZATION XAUTHORITY\""
+          ],
+          "agent_forwarding": true,
+          "include_sudoers_d": true
+        }
+      },
+      "jenkins": {
+        "master": {
+          "endpoint": "http://example.com"
+        }
+      }
+    },
+    "chef_type": "node",
+    "default": {
+      "apt": {
+        "cacher_dir": "/var/cache/apt-cacher-ng",
+        "cacher_interface": null,
+        "cacher_port": 3142,
+        "compiletime": false,
+        "compile_time_update": false,
+        "key_proxy": "",
+        "periodic_update_min_delay": 86400,
+        "launchpad_api_version": "1.0",
+        "unattended_upgrades": {
+          "enable": false,
+          "update_package_lists": true,
+          "allowed_origins": [
+            "Mac_os_x notlinux"
+          ],
+          "origins_patterns": [],
+          "package_blacklist": [],
+          "auto_fix_interrupted_dpkg": false,
+          "minimal_steps": false,
+          "install_on_shutdown": false,
+          "mail": null,
+          "mail_only_on_error": true,
+          "remove_unused_dependencies": false,
+          "automatic_reboot": false,
+          "automatic_reboot_time": "now",
+          "dl_limit": null,
+          "random_sleep": null
+        },
+        "cacher_client": {
+          "cacher_server": {}
+        },
+        "confd": {
+          "force_confask": false,
+          "force_confdef": false,
+          "force_confmiss": false,
+          "force_confnew": false,
+          "force_confold": false,
+          "install_recommends": true,
+          "install_suggests": false
+        }
+      },
+      "ohai": {
+        "plugin_path": "/etc/chef/ohai_plugins",
+        "plugins": {
+          "ohai": "plugins"
+        },
+        "hints_path": "/etc/chef/ohai/hints"
+      },
+      "aws": {
+        "aws_sdk_version": "~> 2.2",
+        "databag_name": null,
+        "databag_entry": null,
+        "mfa_code": null
+      },
+      "chef-ingredient": {
+        "mixlib-install": {
+          "git_ref": null
+        }
+      },
+      "rsyslog": {
+        "local_host_name": null,
+        "default_log_dir": "/var/log",
+        "log_dir": "/srv/rsyslog",
+        "working_dir": "/var/spool/rsyslog",
+        "server": false,
+        "use_relp": false,
+        "relp_port": 20514,
+        "protocol": "tcp",
+        "bind": "*",
+        "port": 514,
+        "server_ip": null,
+        "server_search": "role:loghost",
+        "remote_logs": true,
+        "per_host_dir": "%$YEAR%/%$MONTH%/%$DAY%/%HOSTNAME%",
+        "max_message_size": "2k",
+        "preserve_fqdn": "off",
+        "high_precision_timestamps": false,
+        "repeated_msg_reduction": "on",
+        "logs_to_forward": "*.*",
+        "enable_imklog": true,
+        "config_prefix": "/etc",
+        "default_file_template": null,
+        "default_remote_template": null,
+        "rate_limit_interval": null,
+        "rate_limit_burst": null,
+        "enable_tls": false,
+        "action_queue_max_disk_space": "1G",
+        "tls_ca_file": null,
+        "tls_certificate_file": null,
+        "tls_key_file": null,
+        "tls_auth_mode": "anon",
+        "tls_permitted_peer": null,
+        "use_local_ipv4": false,
+        "allow_non_local": false,
+        "custom_remote": [],
+        "additional_directives": {},
+        "templates": [],
+        "service_name": "rsyslog",
+        "user": "root",
+        "group": "adm",
+        "priv_seperation": false,
+        "priv_user": null,
+        "priv_group": null,
+        "modules": [
+          "imuxsock",
+          "imklog"
+        ],
+        "file_create_mode": "0640",
+        "dir_create_mode": "0755",
+        "umask": "0022",
+        "dir_owner": "root",
+        "dir_group": "adm",
+        "default_facility_logs": {
+          "auth,authpriv.*": "/var/log/auth.log",
+          "*.*;auth,authpriv.none": "-/var/log/syslog",
+          "daemon.*": "-/var/log/daemon.log",
+          "kern.*": "-/var/log/kern.log",
+          "mail.*": "-/var/log/mail.log",
+          "user.*": "-/var/log/user.log",
+          "mail.info": "-/var/log/mail.info",
+          "mail.warn": "-/var/log/mail.warn",
+          "mail.err": "/var/log/mail.err",
+          "news.crit": "/var/log/news/news.crit",
+          "news.err": "/var/log/news/news.err",
+          "news.notice": "-/var/log/news/news.notice",
+          "*.=debug;auth,authpriv.none;news.none;mail.none": "-/var/log/debug",
+          "*.=info;*.=notice;*.=warn;auth,authpriv.none;cron,daemon.none;mail,news.none": "-/var/log/messages",
+          "*.emerg": ":omusrmsg:*"
+        }
+      },
+      "bluepill": {
+        "bin": "/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin/bluepill",
+        "logfile": "/var/log/bluepill.log",
+        "pid_dir": "/var/run/bluepill",
+        "state_dir": "/var/lib/bluepill",
+        "group": 0,
+        "use_rsyslog": false,
+        "init_dir": "/etc/init.d",
+        "conf_dir": "/etc/bluepill"
+      },
+      "windows": {
+        "rubyzipversion": null
+      },
+      "seven_zip": {
+        "url": "http://www.7-zip.org/a/7z1514-x64.msi",
+        "checksum": "cefe1a9092d8a6be68468c33910d6206b40e934fb63cab686c5cccf369fbf712",
+        "package_name": "7-Zip 15.14 (x64 edition)",
+        "default_extract_timeout": 600
+      },
+      "build-essential": {
+        "compile_time": false,
+        "msys2": {
+          "path": "\\msys2"
+        }
+      },
+      "packagecloud": {
+        "base_repo_path": "/install/repositories/",
+        "gpg_key_path": "/gpgkey",
+        "hostname_override": null,
+        "proxy_host": null,
+        "proxy_port": null,
+        "default_type": null
+      },
+      "yum-epel": {
+        "repos": [
+          "epel",
+          "epel-debuginfo",
+          "epel-source",
+          "epel-testing",
+          "epel-testing-debuginfo",
+          "epel-testing-source"
+        ]
+      },
+      "yum": {
+        "epel-debuginfo": {
+          "repositoryid": "epel-debuginfo",
+          "description": "Extra Packages for 10 - $basearch - Debug",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-debug-10&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-10",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-source": {
+          "repositoryid": "epel-source",
+          "description": "Extra Packages for 10 - $basearch - Source",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-source-10&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-10",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-testing-debuginfo": {
+          "repositoryid": "epel-testing-debuginfo",
+          "description": "Extra Packages for 10 - $basearch - Testing Debug",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=testing-debug-epel10&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-10",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-testing-source": {
+          "repositoryid": "epel-testing-source",
+          "description": "Extra Packages for 10 - $basearch - Testing Source",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=testing-source-epel10&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-10",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-testing": {
+          "repositoryid": "epel-testing",
+          "description": "Extra Packages for 10 - $basearch - Testing ",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=testing-epel10&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-10",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel": {
+          "repositoryid": "epel",
+          "description": "Extra Packages for 10 - $basearch",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-10&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-10",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": true,
+          "managed": true,
+          "make_cache": true
+        },
+        "main": {
+          "cachedir": "/var/cache/yum/$basearch/$releasever",
+          "distroverpkg": "mac_os_x-release",
+          "releasever": null,
+          "alwaysprompt": null,
+          "assumeyes": null,
+          "bandwidth": null,
+          "bugtracker_url": null,
+          "clean_requirements_on_remove": null,
+          "color": null,
+          "color_list_available_downgrade": null,
+          "color_list_available_install": null,
+          "color_list_available_reinstall": null,
+          "color_list_available_upgrade": null,
+          "color_list_installed_extra": null,
+          "color_list_installed_newer": null,
+          "color_list_installed_older": null,
+          "color_list_installed_reinstall": null,
+          "color_search_match": null,
+          "color_update_installed": null,
+          "color_update_local": null,
+          "color_update_remote": null,
+          "commands": null,
+          "deltarpm": null,
+          "debuglevel": null,
+          "diskspacecheck": null,
+          "enable_group_conditionals": null,
+          "errorlevel": null,
+          "exactarch": null,
+          "exclude": null,
+          "gpgcheck": true,
+          "group_package_types": null,
+          "groupremove_leaf_only": null,
+          "history_list_view": null,
+          "history_record": null,
+          "history_record_packages": null,
+          "http_caching": null,
+          "installonly_limit": null,
+          "installonlypkgs": null,
+          "installroot": null,
+          "keepalive": null,
+          "keepcache": false,
+          "kernelpkgnames": null,
+          "localpkg_gpgcheck": false,
+          "logfile": "/var/log/yum.log",
+          "max_retries": null,
+          "mdpolicy": null,
+          "metadata_expire": null,
+          "mirrorlist_expire": null,
+          "multilib_policy": null,
+          "obsoletes": null,
+          "overwrite_groups": null,
+          "password": null,
+          "path": "/etc/yum.conf",
+          "persistdir": null,
+          "pluginconfpath": null,
+          "pluginpath": null,
+          "plugins": null,
+          "protected_multilib": null,
+          "protected_packages": null,
+          "proxy": null,
+          "proxy_password": null,
+          "proxy_username": null,
+          "recent": null,
+          "repo_gpgcheck": null,
+          "reposdir": null,
+          "reset_nice": null,
+          "rpmverbosity": null,
+          "showdupesfromrepos": null,
+          "skip_broken": null,
+          "ssl_check_cert_permissions": null,
+          "sslcacert": null,
+          "sslclientcert": null,
+          "sslclientkey": null,
+          "sslverify": null,
+          "syslog_device": null,
+          "syslog_facility": null,
+          "syslog_ident": null,
+          "throttle": null,
+          "timeout": null,
+          "tolerant": false,
+          "tsflags": null,
+          "username": null
+        }
+      },
+      "zypper": {
+        "smt_host": null
+      },
+      "nginx": {
+        "version": "1.10.1",
+        "package_name": "nginx",
+        "port": "80",
+        "dir": "/etc/nginx",
+        "script_dir": "/usr/sbin",
+        "log_dir": "/var/log/nginx",
+        "log_dir_perm": "0750",
+        "binary": "/usr/sbin/nginx",
+        "default_root": "/var/www/nginx-default",
+        "ulimit": "1024",
+        "pid": "/var/run/nginx.pid",
+        "user": "www-data",
+        "init_style": "init",
+        "upstart": {
+          "runlevels": "2345",
+          "respawn_limit": null,
+          "foreground": true
+        },
+        "group": "www-data",
+        "gzip": "on",
+        "gzip_static": "off",
+        "gzip_http_version": "1.0",
+        "gzip_comp_level": "2",
+        "gzip_proxied": "any",
+        "gzip_vary": "off",
+        "gzip_buffers": null,
+        "gzip_types": [
+          "text/plain",
+          "text/css",
+          "application/x-javascript",
+          "text/xml",
+          "application/xml",
+          "application/rss+xml",
+          "application/atom+xml",
+          "text/javascript",
+          "application/javascript",
+          "application/json",
+          "text/mathml"
+        ],
+        "gzip_min_length": 1000,
+        "gzip_disable": "MSIE [1-6]\\.",
+        "keepalive": "on",
+        "keepalive_requests": 100,
+        "keepalive_timeout": 65,
+        "worker_processes": 2,
+        "worker_connections": 1024,
+        "worker_rlimit_nofile": null,
+        "multi_accept": false,
+        "event": null,
+        "accept_mutex_delay": null,
+        "server_tokens": null,
+        "server_names_hash_bucket_size": 64,
+        "variables_hash_max_size": 1024,
+        "variables_hash_bucket_size": 64,
+        "sendfile": "on",
+        "underscores_in_headers": null,
+        "tcp_nodelay": "on",
+        "tcp_nopush": "on",
+        "access_log_options": null,
+        "error_log_options": null,
+        "disable_access_log": false,
+        "log_formats": {},
+        "install_method": "package",
+        "default_site_enabled": true,
+        "types_hash_max_size": 2048,
+        "types_hash_bucket_size": 64,
+        "proxy_read_timeout": null,
+        "client_body_buffer_size": null,
+        "client_max_body_size": null,
+        "large_client_header_buffers": null,
+        "default": {
+          "modules": []
+        },
+        "extra_configs": {},
+        "auth_request": {
+          "url": "http://mdounin.ru/hg/ngx_http_auth_request_module/archive/662785733552.tar.gz",
+          "checksum": "2057bdefd2137a5000d9dbdbfca049d1ba7832ad2b9f8855a88ea5dfa70bd8c1"
+        },
+        "devel": {
+          "version": "0.3.0",
+          "url": "https://github.com/simpl/ngx_devel_kit/archive/v0.3.0.tar.gz",
+          "checksum": "88e05a99a8a7419066f5ae75966fb1efc409bad4522d14986da074554ae61619"
+        },
+        "echo": {
+          "version": "0.59",
+          "url": "https://github.com/openresty/echo-nginx-module/archive/v0.59.tar.gz",
+          "checksum": "9b319ad7836202883128d2b9c24ed818082541df57ef7f2065b7557085c603cd"
+        },
+        "geoip": {
+          "path": "/srv/geoip",
+          "enable_city": true,
+          "country_dat_url": "http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz",
+          "country_dat_checksum": null,
+          "city_dat_url": "http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz",
+          "city_dat_checksum": null,
+          "lib_version": "1.6.9",
+          "lib_url": "https://github.com/maxmind/geoip-api-c/releases/download/v1.6.9/GeoIP-1.6.9.tar.gz",
+          "lib_checksum": "4b446491843de67c1af9b887da17a3e5939e0aeed4826923a5f4bf09d845096f"
+        },
+        "headers_more": {
+          "version": "0.30",
+          "source_url": "https://github.com/openresty/headers-more-nginx-module/archive/v0.30.tar.gz",
+          "source_checksum": "2aad309a9313c21c7c06ee4e71a39c99d4d829e31c8b3e7d76f8c964ea8047f5"
+        },
+        "lua": {
+          "version": "0.10.3",
+          "url": "https://github.com/chaoslawful/lua-nginx-module/archive/v0.10.3.tar.gz",
+          "checksum": "a69504c25de67bce968242d331d2e433c021405a6dba7bca0306e6e0b040bb50"
+        },
+        "luajit": {
+          "version": "2.0.4",
+          "url": "http://luajit.org/download/LuaJIT-2.0.4.tar.gz",
+          "checksum": "620fa4eb12375021bef6e4f237cbd2dd5d49e56beb414bee052c746beef1807d"
+        },
+        "naxsi": {
+          "version": "0.54",
+          "url": "https://github.com/nbs-system/naxsi/archive/0.54.tar.gz",
+          "checksum": "9cc2c09405bc71f78ef26a8b6d70afcea3fccbe8125df70cb0cfc480133daba5"
+        },
+        "openssl_source": {
+          "version": "1.0.1t",
+          "url": "http://www.openssl.org/source/openssl-1.0.1t.tar.gz"
+        },
+        "pagespeed": {
+          "version": "1.11.33.2",
+          "url": "https://github.com/pagespeed/ngx_pagespeed/archive/release-1.11.33.2-beta.tar.gz",
+          "packages": {
+            "rhel": [
+              "pcre-dev",
+              "pcre-devel",
+              "zlib-devel"
+            ],
+            "debian": [
+              "zlib1g-dev",
+              "libpcre3",
+              "libpcre3-dev"
+            ]
+          }
+        },
+        "psol": {
+          "url": "https://dl.google.com/dl/page-speed/psol/1.11.33.2.tar.gz"
+        },
+        "passenger": {
+          "version": "4.0.57",
+          "root": "/Library/Ruby/Gems/2.0.0/gems/passenger-4.0.57",
+          "ruby": "/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr/bin/ruby",
+          "packages": {
+            "rhel": [
+              "ruby-devel",
+              "curl-devel"
+            ],
+            "fedora": [
+              "ruby-devel",
+              "libcurl-devel"
+            ],
+            "debian": [
+              "ruby-dev",
+              "libcurl4-gnutls-dev"
+            ]
+          },
+          "install_rake": true,
+          "spawn_method": "smart-lv2",
+          "buffer_response": "on",
+          "max_pool_size": 6,
+          "min_instances": 1,
+          "max_instances_per_app": 0,
+          "pool_idle_time": 300,
+          "max_requests": 0,
+          "gem_binary": null,
+          "nodejs": null
+        },
+        "enable_rate_limiting": false,
+        "rate_limiting_zone_name": "default",
+        "rate_limiting_backoff": "10m",
+        "rate_limit": "1r/s",
+        "set_misc": {
+          "version": "0.30",
+          "url": "https://github.com/agentzh/set-misc-nginx-module/archive/v0.30.tar.gz",
+          "checksum": "59920dd3f92c2be32627121605751b52eae32b5884be09f2e4c53fb2fae8aabc"
+        },
+        "socketproxy": {
+          "root": "/usr/share/nginx/apps",
+          "app_owner": "root",
+          "logname": "socketproxy",
+          "log_level": "error"
+        },
+        "source": {
+          "version": "1.10.1",
+          "prefix": "/opt/nginx-1.10.1",
+          "conf_path": "/etc/nginx/nginx.conf",
+          "sbin_path": "/opt/nginx-1.10.1/sbin/nginx",
+          "default_configure_flags": [
+            "--prefix=/opt/nginx-1.10.1",
+            "--conf-path=/etc/nginx/nginx.conf",
+            "--sbin-path=/opt/nginx-1.10.1/sbin/nginx"
+          ],
+          "url": "http://nginx.org/download/nginx-1.10.1.tar.gz",
+          "checksum": "1fd35846566485e03c0e318989561c135c598323ff349c503a6c14826487a801",
+          "modules": [
+            "chef_nginx::http_ssl_module",
+            "chef_nginx::http_gzip_static_module"
+          ],
+          "use_existing_user": false
+        },
+        "configure_flags": [],
+        "status": {
+          "port": "8090"
+        },
+        "syslog": {
+          "git_repo": "https://github.com/yaoweibin/nginx_syslog_patch.git",
+          "git_revision": "master"
+        },
+        "upload_progress": {
+          "url": "https://github.com/masterzen/nginx-upload-progress-module/tarball/v0.9.0",
+          "checksum": "3fb903dab595cf6656fa0fc5743a48daffbba2f6b5c554836be630800eaad4e2",
+          "javascript_output": true,
+          "zone_name": "proxied",
+          "zone_size": "1m"
+        }
+      },
+      "freebsd": {
+        "compiletime_portsnap": false
+      },
+      "jenkins": {
+        "java": "java",
+        "executor": {
+          "timeout": 60,
+          "private_key": null,
+          "proxy": null,
+          "jvm_options": null
+        },
+        "master": {
+          "install_method": "war",
+          "version": null,
+          "mirror": "http://mirrors.jenkins-ci.org",
+          "source": "http://mirrors.jenkins-ci.org/war/latest/jenkins.war",
+          "checksum": null,
+          "jvm_options": null,
+          "jenkins_args": null,
+          "user": "jenkins",
+          "group": "jenkins",
+          "use_system_accounts": true,
+          "host": "localhost",
+          "listen_address": "0.0.0.0",
+          "port": 8080,
+          "endpoint": "http://localhost:8080",
+          "home": "/var/lib/jenkins",
+          "log_directory": "/var/log/jenkins",
+          "runit": {
+            "sv_timeout": 7
+          },
+          "repository": null,
+          "repository_key": null,
+          "repository_keyserver": null
+        }
+      },
+      "lvm": {
+        "chef-ruby-lvm": {
+          "version": "0.3.0"
+        },
+        "chef-ruby-lvm-attrib": {
+          "version": "0.2.1"
+        },
+        "cleanup_old_gems": true,
+        "rubysource": "https://rubygems.org"
+      },
+      "ntp": {
+        "servers": [
+          "0.pool.ntp.org",
+          "1.pool.ntp.org",
+          "2.pool.ntp.org",
+          "3.pool.ntp.org"
+        ],
+        "peers": [],
+        "pools": [],
+        "restrictions": [],
+        "tinker": {
+          "panic": 1000,
+          "allan": 1500,
+          "dispersion": 15,
+          "step": 0.128,
+          "stepout": 900
+        },
+        "restrict_default": "kod notrap nomodify nopeer noquery",
+        "packages": [
+          "ntp"
+        ],
+        "service": "ntpd",
+        "varlibdir": "/var/lib/ntp",
+        "driftfile": "/var/lib/ntp/ntp.drift",
+        "logfile": null,
+        "conffile": "/etc/ntp.conf",
+        "statsdir": "/var/log/ntpstats/",
+        "conf_owner": "root",
+        "conf_group": "root",
+        "var_owner": "ntp",
+        "var_group": "ntp",
+        "leapfile": "/etc/ntp.leapseconds",
+        "sync_clock": false,
+        "sync_hw_clock": false,
+        "listen": null,
+        "listen_network": null,
+        "ignore": null,
+        "apparmor_enabled": false,
+        "monitor": false,
+        "statistics": true,
+        "conf_restart_immediate": false,
+        "keys": null,
+        "trustedkey": null,
+        "requestkey": null,
+        "disable_tinker_panic_on_virtualization_guest": true,
+        "peer": {
+          "key": null,
+          "use_iburst": true,
+          "use_burst": false,
+          "minpoll": 6,
+          "maxpoll": 10
+        },
+        "server": {
+          "prefer": "",
+          "use_iburst": true,
+          "use_burst": false,
+          "minpoll": 6,
+          "maxpoll": 10
+        },
+        "orphan": {
+          "enabled": false,
+          "stratum": 5
+        },
+        "localhost": {
+          "noquery": false
+        },
+        "use_cmos": true
+      },
+      "git": {
+        "osx_dmg": {
+          "app_name": "git-2.8.1-intel-universal-mavericks",
+          "volumes_dir": "Git 2.8.1 Mavericks Intel Universal",
+          "package_id": "GitOSX.Installer.git281Universal.git.pkg",
+          "url": "http://sourceforge.net/projects/git-osx-installer/files/git-2.8.1-intel-universal-mavericks.dmg/download",
+          "checksum": "c2912895a1e2018d9be4c646765d511f7c82e0114275505dbd13d1ac70c62023"
+        },
+        "server": {
+          "base_path": "/srv/git",
+          "export_all": true
+        }
+      },
+      "homebrew": {
+        "owner": null,
+        "auto-update": true,
+        "casks": [],
+        "formulas": [],
+        "taps": [],
+        "installer": {
+          "url": "https://raw.githubusercontent.com/Homebrew/install/master/install",
+          "checksum": null
+        },
+        "enable-analytics": true
+      },
+      "windows-sdk": {
+        "install_path": null
+      },
+      "wix": {
+        "download_id": "1540241",
+        "checksum": "03b8f46cb3abf1465fe8f9975a94a4e0f75c77267ff4d1fcb6d5b6a97567f549",
+        "home": "\\wix"
+      },
+      "omnibus": {
+        "build_user": "omnibus",
+        "build_user_home": null,
+        "install_dir": null,
+        "toolchain_name": "omnibus-toolchain",
+        "toolchain_version": "1.1.73",
+        "toolchain_channel": "stable",
+        "git_version": "2.6.2",
+        "ruby_version": "2.1.8",
+        "build_user_group": "omnibus",
+        "base_dir": "/var/cache/omnibus",
+        "git_checksum": "34dfc06b44880df91940dc318a2d3c83b79e67b6f05319c7c71e94d30893636d",
+        "build_user_password": "get0ntheBus"
+      },
+      "rubygems": {
+        "gem_disable_default": false,
+        "gem_sources": [
+          "https://rubygems.org"
+        ],
+        "chef_gem_disable_default": false,
+        "chef_gem_sources": [
+          "https://rubygems.org"
+        ]
+      },
+      "authorization": {
+        "sudo": {
+          "groups": [
+            "sysadmin"
+          ],
+          "users": [],
+          "passwordless": false,
+          "setenv": false,
+          "include_sudoers_d": false,
+          "agent_forwarding": false,
+          "sudoers_defaults": [
+            "!lecture,tty_tickets,!fqdn"
+          ],
+          "command_aliases": [],
+          "env_keep_add": [],
+          "env_keep_subtract": [],
+          "custom_commands": {
+            "users": [],
+            "groups": []
+          },
+          "prefix": "/etc"
+        }
+      },
+      "opscode-ci": {
+        "user": "jenkins",
+        "user_home": null,
+        "group": "jenkins",
+        "master": {
+          "host_name": null,
+          "port": 8080,
+          "jnlp_port": 38529,
+          "pipeline_types": [],
+          "executors": 2,
+          "jvm_memory_size": "2457K",
+          "use_lvm": false,
+          "ebs_vols": [
+            {
+              "device": "/dev/xvdj",
+              "size": 50
+            }
+          ],
+          "days_to_keep_builds": null,
+          "builds_to_keep": null,
+          "days_to_keep_artifacts": 15,
+          "artifacts_to_keep": null
+        },
+        "email": {
+          "system_address": "CHEF CI <ci-notifications@getchef.com>",
+          "list_id": "ci-notifications.getchef.com"
+        },
+        "monitoring": {
+          "jmx_hostname": "localhost",
+          "jmx_port": 9010
+        },
+        "artifactory": {
+          "endpoint": "http://example.com"
+        },
+        "omnibus-cache": {
+          "profile_name": "omnibus-cache"
+        }
+      },
+      "java": {
+        "jdk_version": "7"
+      }
+    },
+    "override": {
+      "opscode-ci": {
+        "artifactory": {
+          "endpoint": "http://example.com:8081"
+        },
+        "omnitruck": {
+          "packages_bucket": "opscode-omnibus-packages",
+          "metadata_bucket": "opscode-omnibus-package-metadata"
+        },
+        "master": {
+          "host_name": "example.com",
+          "pipeline_types": [
+            "client_build",
+            "releng"
+          ],
+          "artifacts_to_keep": null,
+          "days_to_keep_artifacts": 15
+        }
+      }
+    },
+    "run_list": [
+      "recipe[opscode-ci::slave]"
+    ]
+  },
+  "node_name": "chefdk-macos-10.12-tester-f53697",
+  "organization_name": "chef",
+  "resources": [
+    {
+      "type": "chef_gem",
+      "name": "chef-sugar",
+      "id": "chef-sugar",
+      "after": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "before": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "duration": "169",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "chef-sugar",
+      "cookbook_version": "3.4.0",
+      "recipe_name": "default"
+    },
+    {
+      "type": "chef_gem",
+      "name": "chef-sugar",
+      "id": "chef-sugar",
+      "after": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "before": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "chef-sugar",
+      "cookbook_version": "3.4.0",
+      "recipe_name": "default"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local/bin",
+      "id": "/usr/local/bin",
+      "after": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "build"
+      },
+      "before": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "build"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "link",
+      "name": "/usr/local/bin/git",
+      "id": "/usr/local/bin/git",
+      "after": {
+        "to": "/opt/omnibus-toolchain/embedded/bin/git",
+        "owner": null,
+        "group": null
+      },
+      "before": {
+        "to": "/opt/omnibus-toolchain/embedded/bin/git",
+        "owner": "root",
+        "group": "wheel"
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "file",
+      "name": "/etc/profile.d/rbenv.sh",
+      "id": "/etc/profile.d/rbenv.sh",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/etc/profile.d/rbenv.sh"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/etc/profile.d/rbenv.sh"
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_migration"
+    },
+    {
+      "type": "directory",
+      "name": "/opt/rbenv",
+      "id": "/opt/rbenv",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_migration"
+    },
+    {
+      "type": "directory",
+      "name": "/opt/rubies",
+      "id": "/opt/rubies",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_migration"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/.bashrc.d/chruby-default.sh",
+      "id": "/Users/jenkins/.bashrc.d/chruby-default.sh",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Users/jenkins/.bashrc.d/chruby-default.sh"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Users/jenkins/.bashrc.d/chruby-default.sh"
+      },
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_migration"
+    },
+    {
+      "type": "chef_ingredient",
+      "name": "omnibus-toolchain",
+      "id": "omnibus-toolchain",
+      "after": {
+        "product_name": "omnibus-toolchain",
+        "version": "1.1.73",
+        "channel": "stable",
+        "platform_version_compatibility_mode": true,
+        "platform": "mac_os_x",
+        "platform_version": "10.12",
+        "architecture": "x86_64"
+      },
+      "before": {},
+      "duration": "159",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "upgrade",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_omnibus_toolchain"
+    },
+    {
+      "type": "directory",
+      "name": "/export/home",
+      "id": "/export/home",
+      "after": {
+        "group": "root",
+        "mode": null,
+        "owner": "root"
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "group",
+      "name": "create jenkins group",
+      "id": "jenkins",
+      "after": {
+        "members": []
+      },
+      "before": {
+        "members": [
+          "jenkins"
+        ]
+      },
+      "duration": "22",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "execute",
+      "name": "chsec_login_shell",
+      "id": "chsec -f /etc/security/login.cfg -s usw -a 'shells=/bin/sh,/bin/bsh,/bin/csh,/bin/ksh,/bin/tsh,/bin/ksh93,/usr/bin/sh,/usr/bin/bsh,/usr/bin/csh,/usr/bin/ksh,/usr/bin/tsh,/usr/bin/ksh93,/usr/bin/rksh,/usr/bin/rksh93,/usr/sbin/uucp/uucico,/usr/sbin/sliplogin,/usr/sbin/snappd,/usr/bin/bash,/opt/omnibus-toolchain/bin/bash'",
+      "after": {
+        "command": "chsec -f /etc/security/login.cfg -s usw -a 'shells=/bin/sh,/bin/bsh,/bin/csh,/bin/ksh,/bin/tsh,/bin/ksh93,/usr/bin/sh,/usr/bin/bsh,/usr/bin/csh,/usr/bin/ksh,/usr/bin/tsh,/usr/bin/ksh93,/usr/bin/rksh,/usr/bin/rksh93,/usr/sbin/uucp/uucico,/usr/sbin/sliplogin,/usr/sbin/snappd,/usr/bin/bash,/opt/omnibus-toolchain/bin/bash'",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "dscl_user",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "uid": null,
+        "gid": 206,
+        "home": "/Users/jenkins"
+      },
+      "before": {
+        "uid": "262",
+        "gid": "206",
+        "home": "/Users/jenkins"
+      },
+      "duration": "264",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "group",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "members": [
+          "jenkins"
+        ]
+      },
+      "before": {
+        "members": [
+          "jenkins"
+        ]
+      },
+      "duration": "16",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "modify",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "directory",
+      "name": "/Users/jenkins",
+      "id": "/Users/jenkins",
+      "after": {
+        "group": "jenkins",
+        "mode": "0755",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0755",
+        "owner": "jenkins"
+      },
+      "duration": "10",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "directory",
+      "name": "/var/chef/cache",
+      "id": "/var/chef/cache",
+      "after": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "before": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_common"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local/bin",
+      "id": "/usr/local/bin",
+      "after": {
+        "group": null,
+        "mode": "0755",
+        "owner": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_common",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "/var/cache/omnibus",
+      "id": "/var/cache/omnibus",
+      "after": {
+        "group": "jenkins",
+        "mode": "0755",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0755",
+        "owner": "jenkins"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_common"
+    },
+    {
+      "type": "build_essential",
+      "name": "install_packages",
+      "id": "install_packages",
+      "after": {
+        "compile_time": false
+      },
+      "before": {},
+      "duration": "72",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "build-essential",
+      "cookbook_version": "8.0.3",
+      "recipe_name": "default"
+    },
+    {
+      "type": "execute",
+      "name": "set analytics",
+      "id": "/usr/local/bin/brew analytics on",
+      "after": {
+        "command": "/usr/local/bin/brew analytics on",
+        "user": "build"
+      },
+      "before": {},
+      "duration": "740",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "homebrew",
+      "cookbook_version": "4.2.0",
+      "recipe_name": "default",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local",
+      "id": "/usr/local",
+      "after": {
+        "group": "staff",
+        "mode": "0775",
+        "owner": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_compile",
+      "conditional": "not_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local/bin",
+      "id": "/usr/local/bin",
+      "after": {
+        "group": "staff",
+        "mode": "0775",
+        "owner": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_compile",
+      "conditional": "not_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local/etc",
+      "id": "/usr/local/etc",
+      "after": {
+        "group": "staff",
+        "mode": "0775",
+        "owner": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_compile",
+      "conditional": "not_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local/lib",
+      "id": "/usr/local/lib",
+      "after": {
+        "group": "staff",
+        "mode": "0775",
+        "owner": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_compile",
+      "conditional": "not_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local/share",
+      "id": "/usr/local/share",
+      "after": {
+        "group": "staff",
+        "mode": "0775",
+        "owner": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_compile",
+      "conditional": "not_if { #code block }"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/.gitconfig",
+      "id": "/Users/jenkins/.gitconfig",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0644",
+        "path": "/Users/jenkins/.gitconfig",
+        "verifications": [],
+        "checksum": "90647b81910137479785caa4cdee15251da53bbc12471eda12e04767e38c8dbf"
+      },
+      "before": {
+        "checksum": "008e63236ccff47b9d96492007302b3250e58a65f9c7c024522584130d439191",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0644",
+        "path": "/Users/jenkins/.gitconfig"
+      },
+      "duration": "10",
+      "delta": "--- /Users/jenkins/.gitconfig\t2017-11-01 07:47:13.000000000 -0700\\n+++ /Users/jenkins/.chef-.gitconfig20171101-96755-1advq0a.gitconfig\t2017-11-01 14:03:30.000000000 -0700\\n@@ -20,6 +20,4 @@\\n   autosetuprebase = always\\n [pull]\\n   rebase = preserve\\n-[http]\\n-\tsslCAinfo = /opt/omnibus-toolchain/embedded/ssl/certs/cacert.pem",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_git"
+    },
+    {
+      "type": "execute",
+      "name": "/opt/omnibus-toolchain/bin/git config --global http.sslCAinfo /opt/omnibus-toolchain/embedded/ssl/certs/cacert.pem",
+      "id": "/opt/omnibus-toolchain/bin/git config --global http.sslCAinfo /opt/omnibus-toolchain/embedded/ssl/certs/cacert.pem",
+      "after": {
+        "command": "/opt/omnibus-toolchain/bin/git config --global http.sslCAinfo /opt/omnibus-toolchain/embedded/ssl/certs/cacert.pem",
+        "user": "jenkins"
+      },
+      "before": {},
+      "duration": "20",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_git"
+    },
+    {
+      "type": "ruby_block",
+      "name": "disable strict host key checking for github.com",
+      "id": "disable strict host key checking for github.com",
+      "after": {
+        "block_name": "disable strict host key checking for github.com"
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_github",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "ruby_block",
+      "name": "make sudo honor ssh_auth_sock",
+      "id": "make sudo honor ssh_auth_sock",
+      "after": {
+        "block_name": "make sudo honor ssh_auth_sock"
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/load-omnibus-toolchain.sh",
+      "id": "/Users/jenkins/load-omnibus-toolchain.sh",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0755",
+        "path": "/Users/jenkins/load-omnibus-toolchain.sh",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "1a590716d649641db92e4fe6ce790c04806589556e4ac2448b0be5ddaf3f2f9e",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0755",
+        "path": "/Users/jenkins/load-omnibus-toolchain.sh"
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_environment"
+    },
+    {
+      "type": "directory",
+      "name": "/Users/jenkins/.ssh",
+      "id": "/Users/jenkins/.ssh",
+      "after": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "cookbook_file",
+      "name": "/Users/jenkins/.ssh/known_hosts",
+      "id": "/Users/jenkins/.ssh/known_hosts",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0644",
+        "path": "/Users/jenkins/.ssh/known_hosts",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "029aa31c902d2d49468a4584f65d69757696f68c92166dea1bacddee22d990ee",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0644",
+        "path": "/Users/jenkins/.ssh/known_hosts"
+      },
+      "duration": "12",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/.ssh/github",
+      "id": "/Users/jenkins/.ssh/github",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.ssh/github",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "c8fa3ddfe43f79cac2abfe110cc163ee45642571c17f03617fdcb548b777114a",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.ssh/github"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/.ssh/config",
+      "id": "/Users/jenkins/.ssh/config",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.ssh/config",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "2cf850f8b635e77d74ef6e6340c928a2b1d19dc629265dee6e8b8bbd3ba61c95",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.ssh/config"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "execute",
+      "name": "set_ntp_server",
+      "id": "systemsetup -setnetworktimeserver 0.pool.ntp.org",
+      "after": {
+        "command": "systemsetup -setnetworktimeserver 0.pool.ntp.org",
+        "user": null
+      },
+      "before": {},
+      "duration": "39",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "mac_os_x_client",
+      "conditional": "not_if \"systemsetup -getnetworktimeserver | grep -F 0.pool.ntp.org\""
+    },
+    {
+      "type": "execute",
+      "name": "enable_ntp",
+      "id": "systemsetup -setusingnetworktime on",
+      "after": {
+        "command": "systemsetup -setusingnetworktime on",
+        "user": null
+      },
+      "before": {},
+      "duration": "39",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "mac_os_x_client",
+      "conditional": "not_if \"systemsetup -getusingnetworktime | grep On\""
+    },
+    {
+      "type": "remote_file",
+      "name": "/var/chef/cache/AppleWWDRCA.cer",
+      "id": "/var/chef/cache/AppleWWDRCA.cer",
+      "after": {
+        "checksum": null,
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/AppleWWDRCA.cer"
+      },
+      "before": {
+        "checksum": "ce057691d730f89ca25e916f7335f4c8a15713dcd273a658c024023f8eb809c2",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/AppleWWDRCA.cer"
+      },
+      "duration": "159",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing"
+    },
+    {
+      "type": "execute",
+      "name": "Install AppleWWDRCA.cer",
+      "id": "security add-certificates         -k /Library/Keychains/System.keychain         /var/chef/cache/AppleWWDRCA.cer",
+      "after": {
+        "command": "security add-certificates         -k /Library/Keychains/System.keychain         /var/chef/cache/AppleWWDRCA.cer",
+        "user": null
+      },
+      "before": {},
+      "duration": "30",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing",
+      "conditional": "not_if \"security find-certificate -Z /Library/Keychains/System.keychain -a -c 'Apple Worldwide Developer Relations Certification Authority'\""
+    },
+    {
+      "type": "remote_file",
+      "name": "/var/chef/cache/DeveloperIDCA.cer",
+      "id": "/var/chef/cache/DeveloperIDCA.cer",
+      "after": {
+        "checksum": null,
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/DeveloperIDCA.cer"
+      },
+      "before": {
+        "checksum": "7afc9d01a62f03a2de9637936d4afe68090d2de18d03f29c88cfb0b1ba63587f",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/DeveloperIDCA.cer"
+      },
+      "duration": "142",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing"
+    },
+    {
+      "type": "execute",
+      "name": "Install DeveloperIDCA.cer",
+      "id": "security add-certificates         -k /Library/Keychains/System.keychain         /var/chef/cache/DeveloperIDCA.cer",
+      "after": {
+        "command": "security add-certificates         -k /Library/Keychains/System.keychain         /var/chef/cache/DeveloperIDCA.cer",
+        "user": null
+      },
+      "before": {},
+      "duration": "27",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing",
+      "conditional": "not_if \"security find-certificate -Z /Library/Keychains/System.keychain -a -c 'Developer ID Certification Authority'\""
+    },
+    {
+      "type": "remote_file",
+      "name": "/var/chef/cache/AppleIncRootCertificate.cer",
+      "id": "/var/chef/cache/AppleIncRootCertificate.cer",
+      "after": {
+        "checksum": null,
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/AppleIncRootCertificate.cer"
+      },
+      "before": {
+        "checksum": "b0b1730ecbc7ff4505142c49f1295e6eda6bcaed7e2c68c5be91b5a11001f024",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/AppleIncRootCertificate.cer"
+      },
+      "duration": "21",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing"
+    },
+    {
+      "type": "execute",
+      "name": "Install AppleIncRootCertificate.cer",
+      "id": "security add-certificates         -k /Library/Keychains/System.keychain         /var/chef/cache/AppleIncRootCertificate.cer",
+      "after": {
+        "command": "security add-certificates         -k /Library/Keychains/System.keychain         /var/chef/cache/AppleIncRootCertificate.cer",
+        "user": null
+      },
+      "before": {},
+      "duration": "38",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing",
+      "conditional": "not_if \"security find-certificate -Z /Library/Keychains/System.keychain -a -c 'Apple Root CA'\""
+    },
+    {
+      "type": "remote_file",
+      "name": "/var/chef/cache/AppleComputerRootCertificate.cer",
+      "id": "/var/chef/cache/AppleComputerRootCertificate.cer",
+      "after": {
+        "checksum": null,
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/AppleComputerRootCertificate.cer"
+      },
+      "before": {
+        "checksum": "0d83b611b648a1a75eb8558400795375cad92e264ed8e9d7a757c1f5ee2bb22d",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/AppleComputerRootCertificate.cer"
+      },
+      "duration": "17",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing"
+    },
+    {
+      "type": "execute",
+      "name": "Install AppleComputerRootCertificate.cer",
+      "id": "security add-certificates         -k /Library/Keychains/System.keychain         /var/chef/cache/AppleComputerRootCertificate.cer",
+      "after": {
+        "command": "security add-certificates         -k /Library/Keychains/System.keychain         /var/chef/cache/AppleComputerRootCertificate.cer",
+        "user": null
+      },
+      "before": {},
+      "duration": "28",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing",
+      "conditional": "not_if \"security find-certificate -Z /Library/Keychains/System.keychain -a -c 'Apple Root Certificate Authority'\""
+    },
+    {
+      "type": "file",
+      "name": "/var/chef/cache/9NBR9JL2R2.p12",
+      "id": "/var/chef/cache/9NBR9JL2R2.p12",
+      "after": {
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0600",
+        "path": "/var/chef/cache/9NBR9JL2R2.p12",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "47235db52c52dc6db3204b3eed0b8a56b5a2417d0735097307268bf4a24544d5",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0600",
+        "path": "/var/chef/cache/9NBR9JL2R2.p12"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing"
+    },
+    {
+      "type": "execute",
+      "name": "Install 9NBR9JL2R2",
+      "id": "security import /var/chef/cache/9NBR9JL2R2.p12         -k /Library/Keychains/System.keychain         -A         -P Chef2UncleNed!",
+      "after": {
+        "command": "security import /var/chef/cache/9NBR9JL2R2.p12         -k /Library/Keychains/System.keychain         -A         -P Chef2UncleNed!",
+        "user": null
+      },
+      "before": {},
+      "duration": "80",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing",
+      "conditional": "not_if \"security find-identity -v | grep '9NBR9JL2R2'\""
+    },
+    {
+      "type": "file",
+      "name": "/var/chef/cache/EU3VF8YLX2.p12",
+      "id": "/var/chef/cache/EU3VF8YLX2.p12",
+      "after": {
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0600",
+        "path": "/var/chef/cache/EU3VF8YLX2.p12",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "2b59647c9c4a27a05c7d5334a96b7d7719f57a805e2814aab86b3fc261fd25b2",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0600",
+        "path": "/var/chef/cache/EU3VF8YLX2.p12"
+      },
+      "duration": "8",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing"
+    },
+    {
+      "type": "execute",
+      "name": "Install EU3VF8YLX2",
+      "id": "security import /var/chef/cache/EU3VF8YLX2.p12         -k /Library/Keychains/System.keychain         -A         -P Chef2UncleNed!",
+      "after": {
+        "command": "security import /var/chef/cache/EU3VF8YLX2.p12         -k /Library/Keychains/System.keychain         -A         -P Chef2UncleNed!",
+        "user": null
+      },
+      "before": {},
+      "duration": "62",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing",
+      "conditional": "not_if \"security find-identity -v | grep 'EU3VF8YLX2'\""
+    },
+    {
+      "type": "directory",
+      "name": "/Users/jenkins/.gem",
+      "id": "/Users/jenkins/.gem",
+      "after": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/.gem/credentials",
+      "id": "/Users/jenkins/.gem/credentials",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.gem/credentials",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "08be5634d5030e591aab6c513c7a24abfb3e17afab3828741b077f396be5deda",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.gem/credentials"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "gemrc",
+      "name": "global",
+      "id": "global",
+      "after": {
+        "user": "jenkins",
+        "group": "jenkins",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "before": {
+        "path": "/opt/chef/embedded/etc/gemrc",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "duration": "32",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "gemrc",
+      "name": "/Users/jenkins/.gemrc",
+      "id": "/Users/jenkins/.gemrc",
+      "after": {
+        "user": "jenkins",
+        "group": "jenkins",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "before": {
+        "path": "/Users/jenkins/.gemrc",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "duration": "12",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/.bundle/config",
+      "id": "/Users/jenkins/.bundle/config",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Users/jenkins/.bundle/config"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Users/jenkins/.bundle/config"
+      },
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "directory",
+      "name": "/Users/jenkins/.aws",
+      "id": "/Users/jenkins/.aws",
+      "after": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_aws"
+    },
+    {
+      "type": "template",
+      "name": "/Users/jenkins/.aws/credentials",
+      "id": "/Users/jenkins/.aws/credentials",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.aws/credentials",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "e03da2ff59a16921fa0cb84568c077502e2d832aa640efa0d2a4cd4d625cfbb0",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.aws/credentials"
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_aws"
+    },
+    {
+      "type": "group",
+      "name": "com.apple.access_screensharing",
+      "id": "com.apple.access_screensharing",
+      "after": {
+        "members": [
+          "jenkins"
+        ]
+      },
+      "before": {
+        "members": [
+          "jenkins"
+        ]
+      },
+      "duration": "15",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "dscl_user",
+      "name": "root",
+      "id": "root",
+      "after": {
+        "uid": 0,
+        "gid": 0,
+        "home": "/var/root"
+      },
+      "before": {
+        "uid": "0",
+        "gid": "0",
+        "home": "/var/root"
+      },
+      "duration": "341",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "homebrew_package",
+      "name": "sudo",
+      "id": "sudo",
+      "after": {
+        "package_name": "sudo"
+      },
+      "before": {},
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "skipped",
+      "cookbook_name": "sudo",
+      "cookbook_version": "3.5.3",
+      "recipe_name": "default",
+      "conditional": "not_if \"which sudo\""
+    },
+    {
+      "type": "directory",
+      "name": "/etc/sudoers.d",
+      "id": "/etc/sudoers.d",
+      "after": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "before": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "duration": "8",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "sudo",
+      "cookbook_version": "3.5.3",
+      "recipe_name": "default"
+    },
+    {
+      "type": "cookbook_file",
+      "name": "/etc/sudoers.d/README",
+      "id": "/etc/sudoers.d/README",
+      "after": {
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0440",
+        "path": "/etc/sudoers.d/README",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "9ded172910845bd115fbe469d87cab80a215e756a973e5d09c0e58a19a1bfe81",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0440",
+        "path": "/etc/sudoers.d/README"
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "sudo",
+      "cookbook_version": "3.5.3",
+      "recipe_name": "default"
+    },
+    {
+      "type": "template",
+      "name": "/etc/sudoers",
+      "id": "/etc/sudoers",
+      "after": {
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0440",
+        "path": "/etc/sudoers",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "daba34b8e67c9c5ce873a5ea930363ad9ecfc420eb0dbeac10c779e17d583a6e",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0440",
+        "path": "/etc/sudoers"
+      },
+      "duration": "10",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "sudo",
+      "cookbook_version": "3.5.3",
+      "recipe_name": "default"
+    },
+    {
+      "type": "sudo",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "user": "jenkins",
+        "commands": [
+          "ALL"
+        ],
+        "host": "ALL",
+        "runas": "ALL",
+        "nopasswd": true,
+        "command_aliases": [],
+        "env_keep_add": [],
+        "env_keep_subtract": []
+      },
+      "before": {},
+      "duration": "30",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo"
+    },
+    {
+      "type": "sudo",
+      "name": "sysadmin",
+      "id": "sysadmin",
+      "after": {
+        "group": "sysadmin",
+        "commands": [
+          "ALL"
+        ],
+        "host": "ALL",
+        "runas": "ALL",
+        "nopasswd": true,
+        "command_aliases": [],
+        "env_keep_add": [],
+        "env_keep_subtract": []
+      },
+      "before": {},
+      "duration": "25",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo"
+    },
+    {
+      "type": "sudo",
+      "name": "build",
+      "id": "build",
+      "after": {
+        "user": "build",
+        "commands": [
+          "ALL"
+        ],
+        "host": "ALL",
+        "runas": "ALL",
+        "nopasswd": true,
+        "command_aliases": [],
+        "env_keep_add": [],
+        "env_keep_subtract": []
+      },
+      "before": {},
+      "duration": "35",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo"
+    },
+    {
+      "type": "sudo",
+      "name": "vagrant",
+      "id": "vagrant",
+      "after": {
+        "user": "vagrant",
+        "nopasswd": true
+      },
+      "before": {},
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "sudo",
+      "name": "ubuntu",
+      "id": "ubuntu",
+      "after": {
+        "user": "ubuntu",
+        "nopasswd": true
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "sudo",
+      "name": "ec2-user",
+      "id": "ec2-user",
+      "after": {
+        "user": "ec2-user",
+        "nopasswd": true
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_sudo",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "execute",
+      "name": "install_java_from_dmg",
+      "id": "hdiutil attach jdk-7u71-macosx-x64.dmg\ninstaller -pkg \"/Volumes/JDK 7 Update 71\"/*.pkg -target /\nhdiutil detach \"/Volumes/JDK 7 Update 71\"",
+      "after": {
+        "command": "hdiutil attach jdk-7u71-macosx-x64.dmg\ninstaller -pkg \"/Volumes/JDK 7 Update 71\"/*.pkg -target /\nhdiutil detach \"/Volumes/JDK 7 Update 71\"",
+        "user": "root"
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "nothing",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_java",
+      "conditional": "not_if { action == :nothing }"
+    },
+    {
+      "type": "execute",
+      "name": "disable_java_updates",
+      "id": "defaults write /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled -bool false",
+      "after": {
+        "command": "defaults write /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled -bool false",
+        "user": "root"
+      },
+      "before": {},
+      "duration": "29",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_java"
+    },
+    {
+      "type": "git",
+      "name": "/var/chef/cache/artifactory",
+      "id": "/var/chef/cache/artifactory",
+      "after": {
+        "revision": "v2.8.2"
+      },
+      "before": {
+        "revision": "ee0af35496c0809c5b7445f951ee324f37e2679b"
+      },
+      "duration": "391",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "sync",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "execute",
+      "name": "build-artifactory-gem",
+      "id": "rm -rf artifactory-*.gem && gem build artifactory.gemspec",
+      "after": {
+        "command": "rm -rf artifactory-*.gem && gem build artifactory.gemspec",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "nothing",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus",
+      "conditional": "not_if { action == :nothing }"
+    },
+    {
+      "type": "execute",
+      "name": "install-artifactory-gem",
+      "id": "gem install artifactory-*.gem --no-ri --no-rdoc",
+      "after": {
+        "command": "gem install artifactory-*.gem --no-ri --no-rdoc",
+        "user": null
+      },
+      "before": {},
+      "duration": "654",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "git",
+      "name": "/var/chef/cache/omnibus",
+      "id": "/var/chef/cache/omnibus",
+      "after": {
+        "revision": "ced452379e27b85b9958421f258b5fbe22e3760a"
+      },
+      "before": {
+        "revision": "ced452379e27b85b9958421f258b5fbe22e3760a"
+      },
+      "duration": "23",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "sync",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "execute",
+      "name": "build-omnibus-gem",
+      "id": "rm -rf omnibus-*.gem && gem build omnibus.gemspec",
+      "after": {
+        "command": "rm -rf omnibus-*.gem && gem build omnibus.gemspec",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "nothing",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus",
+      "conditional": "not_if { action == :nothing }"
+    },
+    {
+      "type": "execute",
+      "name": "install-omnibus-gem",
+      "id": "gem install omnibus-*.gem --no-ri --no-rdoc",
+      "after": {
+        "command": "gem install omnibus-*.gem --no-ri --no-rdoc",
+        "user": null
+      },
+      "before": {},
+      "duration": "3377",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/omnibus-publish.rb",
+      "id": "/Users/jenkins/omnibus-publish.rb",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/omnibus-publish.rb",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "2936845f6498f013d35f7d8f539de2008d4bda8ab94c0fcfb3c300173b68b777",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/omnibus-publish.rb"
+      },
+      "duration": "8",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "macosx_service",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "enabled": null,
+        "running": null,
+        "masked": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "stop",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_mac_os_x",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "macosx_service",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "enabled": null,
+        "running": null,
+        "masked": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "disable",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_mac_os_x",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/jenkins.jnlp.sh",
+      "id": "/Users/jenkins/jenkins.jnlp.sh",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Users/jenkins/jenkins.jnlp.sh"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Users/jenkins/jenkins.jnlp.sh"
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_mac_os_x"
+    },
+    {
+      "type": "file",
+      "name": "/Library/LaunchDaemons/org.jenkins-ci.slave.jnlp.plist",
+      "id": "/Library/LaunchDaemons/org.jenkins-ci.slave.jnlp.plist",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Library/LaunchDaemons/org.jenkins-ci.slave.jnlp.plist"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Library/LaunchDaemons/org.jenkins-ci.slave.jnlp.plist"
+      },
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_mac_os_x"
+    },
+    {
+      "type": "macosx_service",
+      "name": "jenkins-slave",
+      "id": "jenkins-slave",
+      "after": {
+        "enabled": null,
+        "running": null,
+        "masked": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "stop",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_mac_os_x",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "macosx_service",
+      "name": "jenkins-slave",
+      "id": "jenkins-slave",
+      "after": {
+        "enabled": null,
+        "running": null,
+        "masked": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "disable",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_mac_os_x",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/jenkins-slave.jnlp.sh",
+      "id": "/Users/jenkins/jenkins-slave.jnlp.sh",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Users/jenkins/jenkins-slave.jnlp.sh"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Users/jenkins/jenkins-slave.jnlp.sh"
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_mac_os_x"
+    },
+    {
+      "type": "file",
+      "name": "/Library/LaunchDaemons/org.jenkins-ci.jenkins-slave.jnlp.plist",
+      "id": "/Library/LaunchDaemons/org.jenkins-ci.jenkins-slave.jnlp.plist",
+      "after": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Library/LaunchDaemons/org.jenkins-ci.jenkins-slave.jnlp.plist"
+      },
+      "before": {
+        "owner": null,
+        "group": null,
+        "mode": null,
+        "path": "/Library/LaunchDaemons/org.jenkins-ci.jenkins-slave.jnlp.plist"
+      },
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_mac_os_x"
+    },
+    {
+      "type": "directory",
+      "name": "/Users/jenkins/.ssh",
+      "id": "/Users/jenkins/.ssh",
+      "after": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": "jenkins",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "slave"
+    },
+    {
+      "type": "file",
+      "name": "/Users/jenkins/.ssh/authorized_keys",
+      "id": "/Users/jenkins/.ssh/authorized_keys",
+      "after": {
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.ssh/authorized_keys",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "0cbbb3b0e104f5c5deb49091126fbc35e352f4d4222c598eeff9170f9a2028e8",
+        "owner": "jenkins",
+        "group": "jenkins",
+        "mode": "0600",
+        "path": "/Users/jenkins/.ssh/authorized_keys"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "slave"
+    },
+    {
+      "type": "remote_file",
+      "name": "/var/chef/cache/jenkins-cli.jar",
+      "id": "/var/chef/cache/jenkins-cli.jar",
+      "after": {
+        "checksum": null,
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0755",
+        "path": "/var/chef/cache/jenkins-cli.jar"
+      },
+      "before": {
+        "checksum": "f3c325f20fadb64a50c387cc3ad9429e34669de7ddf9e842bb65d4a1ddc982b4",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0755",
+        "path": "/var/chef/cache/jenkins-cli.jar"
+      },
+      "duration": "352",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "remote_file",
+      "name": "/var/chef/cache/update-center.json",
+      "id": "/var/chef/cache/update-center.json",
+      "after": {
+        "checksum": "64a0fd3fd4f00350bbe1c05b5588b4fd0224b61f7277952e1da943af1619e480",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/update-center.json",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "a1654b369edbd1847ceb1e132cd4bec32b8f0d3fd06d9236e0c4c6582915b87d",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/update-center.json"
+      },
+      "duration": "810",
+      "delta": "suppressed sensitive resource",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated"
+    },
+    {
+      "type": "file",
+      "name": "/var/chef/cache/extracted-update-center.json",
+      "id": "/var/chef/cache/extracted-update-center.json",
+      "after": {
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/extracted-update-center.json",
+        "verifications": [],
+        "checksum": "3c0c442fde018f24a83863409de92032d1db1da65ccf576e761f376243c62c35"
+      },
+      "before": {
+        "checksum": "b12da39a17fd4c874c6634d7c26484bd785bbfa90a5d29a7c1ade138e6318a2b",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0644",
+        "path": "/var/chef/cache/extracted-update-center.json"
+      },
+      "duration": "24",
+      "delta": "suppressed sensitive resource",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated"
+    },
+    {
+      "type": "file",
+      "name": "/var/chef/cache/jenkins-key",
+      "id": "/var/chef/cache/jenkins-key",
+      "after": {
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0600",
+        "path": "/var/chef/cache/jenkins-key",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "ced9d2204cc71246b2a6b440829167aa024c2c7662d3c2451acf20ece4bc319d",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0600",
+        "path": "/var/chef/cache/jenkins-key"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "jenkins_private_key_credentials",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "description": "Credentials for jenkins - created by Chef",
+        "username": "jenkins",
+        "private_key": "EXAMPLEKEY"
+      },
+      "before": {
+        "id": "2e269a3f-71ba-4b22-8882-40790a8582e8",
+        "description": "Credentials for jenkins - created by Chef",
+        "username": "jenkins",
+        "private_key": "EXAMPLEKEY"
+      },
+      "duration": "10269",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "slave"
+    },
+    {
+      "type": "jenkins_ssh_slave",
+      "name": "chefdk-macos-10.12-tester-f53697",
+      "id": "chefdk-macos-10.12-tester-f53697",
+      "after": {
+        "slave_name": "chefdk-macos-10.12-tester-f53697",
+        "description": "mac_os_x 10.12.6 [ Darwin 16.7.0 x86_64 ]",
+        "remote_fs": "/Users/jenkins",
+        "usage_mode": "normal",
+        "labels": [
+          "10.12",
+          "10.12.6",
+          "16.7.0",
+          "chefdk",
+          "darwin",
+          "mac_os_x",
+          "mac_os_x-10.12",
+          "mac_os_x-10.12.6",
+          "macos",
+          "macos-10.12",
+          "sierra",
+          "slave",
+          "tester",
+          "x86_64"
+        ],
+        "environment": {
+          "LIBPATH": "",
+          "OMNIBUS_FIPS_MODE": "false"
+        },
+        "user": "jenkins",
+        "java_path": "java",
+        "host": "172.31.11.220",
+        "credentials": {
+          "json_class": "Chef::Resource::JenkinsPrivateKeyCredentials",
+          "instance_vars": {
+            "name": "jenkins",
+            "noop": null,
+            "before": null,
+            "params": {},
+            "provider": null,
+            "allowed_actions": [
+              "nothing",
+              "create",
+              "delete"
+            ],
+            "action": [
+              "create"
+            ],
+            "updated": false,
+            "updated_by_last_action": false,
+            "supports": {},
+            "ignore_failure": false,
+            "retries": 0,
+            "retry_delay": 2,
+            "source_line": "/var/chef/cache/cookbooks/opscode-ci/recipes/slave.rb:69:in `from_file'",
+            "guard_interpreter": null,
+            "default_guard_interpreter": "default",
+            "elapsed_time": 10.269874,
+            "sensitive": true,
+            "declared_type": "jenkins_private_key_credentials",
+            "cookbook_name": "opscode-ci",
+            "recipe_name": "slave",
+            "private_key": "EXAMPLEKEY",
+            "username": "jenkins",
+            "description": "Credentials for jenkins - created by Chef"
+          }
+        },
+        "command_prefix": "env HOME=/Users/jenkins PATH=/opt/omnibus-toolchain/embedded/bin::/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin JENKINS_HOME=/Users/jenkins sh -c '",
+        "command_suffix": "'"
+      },
+      "before": {
+        "slave_name": "chefdk-macos-10.12-tester-f53697",
+        "description": "mac_os_x 10.12.6 [ Darwin 16.7.0 x86_64 ]",
+        "remote_fs": "/Users/jenkins",
+        "executors": 1,
+        "labels": [
+          "10.12",
+          "10.12.6",
+          "16.7.0",
+          "chefdk",
+          "darwin",
+          "mac_os_x",
+          "mac_os_x-10.12",
+          "mac_os_x-10.12.6",
+          "macos",
+          "macos-10.12",
+          "sierra",
+          "slave",
+          "tester",
+          "x86_64"
+        ],
+        "java_path": "java",
+        "host": "172.31.11.220",
+        "port": 22,
+        "credentials": "jenkins"
+      },
+      "duration": "13399",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "slave"
+    },
+    {
+      "type": "dscl_user",
+      "name": "chefautomate",
+      "id": "chefautomate",
+      "after": {
+        "uid": null,
+        "gid": null,
+        "home": "/var/opt/chef"
+      },
+      "before": {
+        "uid": "500",
+        "gid": "20",
+        "home": "/var/opt/chef/"
+      },
+      "duration": "42",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "directory",
+      "name": "/var/opt/chef/bin",
+      "id": "/var/opt/chef/bin",
+      "after": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "before": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "directory",
+      "name": "/var/opt/chef/etc",
+      "id": "/var/opt/chef/etc",
+      "after": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "before": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "root"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "directory",
+      "name": "/var/log/chef/automate-liveness-agent",
+      "id": "/var/log/chef/automate-liveness-agent",
+      "after": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "chefautomate"
+      },
+      "before": {
+        "group": "wheel",
+        "mode": "0755",
+        "owner": "chefautomate"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "/var/opt/chef/bin/automate-liveness-agent",
+      "id": "/var/opt/chef/bin/automate-liveness-agent",
+      "after": {
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0755",
+        "path": "/var/opt/chef/bin/automate-liveness-agent",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "d7ad5dd68ab384e8e7f6c34ecb9c57b6c463a0d9625152c53c3deb7023a67e73",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0755",
+        "path": "/var/opt/chef/bin/automate-liveness-agent"
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "/var/opt/chef/etc/config.json",
+      "id": "/var/opt/chef/etc/config.json",
+      "after": {
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0755",
+        "path": "/var/opt/chef/etc/config.json",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "49e0de0f435328a45ebcb9a79d1bfa1fa2bd752615b51dc3623dfa90c336354e",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0755",
+        "path": "/var/opt/chef/etc/config.json"
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "/Library/LaunchDaemons/io.chef.automate.liveness.agent.plist",
+      "id": "/Library/LaunchDaemons/io.chef.automate.liveness.agent.plist",
+      "after": {
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0744",
+        "path": "/Library/LaunchDaemons/io.chef.automate.liveness.agent.plist",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "f4fbf3eb0d7a63ac1e28a69b0cf18cea938f2b89cb3e25bd0e5d9d01ae0ac3a8",
+        "owner": "root",
+        "group": "wheel",
+        "mode": "0744",
+        "path": "/Library/LaunchDaemons/io.chef.automate.liveness.agent.plist"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "macosx_service",
+      "name": "io.chef.automate.liveness.agent",
+      "id": "io.chef.automate.liveness.agent",
+      "after": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "before": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "duration": "44",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "enable",
+      "status": "up-to-date"
+    }
+  ],
+  "run_id": "81e9d8b2-2d5f-4fa5-9c61-8e39d776f998",
+  "run_list": [
+    "recipe[opscode-ci::slave]"
+  ],
+  "start_time": "2017-11-01T21:03:11Z",
+  "end_time": "2017-11-01T21:04:09Z",
+  "source": "chef_client",
+  "status": "success",
+  "total_resource_count": 364,
+  "updated_resource_count": 11,
+  "deprecations": [
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "/var/chef/cache/cookbooks/jenkins/libraries/plugin.rb:443:in `<top (required)>'"
+    },
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "/var/chef/cache/cookbooks/jenkins/libraries/slave.rb:410:in `<top (required)>'"
+    },
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "/private/var/chef/cache/cookbooks/jenkins/libraries/slave.rb:410:in `<top (required)>'"
+    },
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "/var/chef/cache/cookbooks/jenkins/libraries/user.rb:183:in `<top (required)>'"
+    },
+    {
+      "message": "Property `sensitive` of resource `rhsm_register` overwrites an existing method. Please use a different property name. This will raise an exception in Chef 13.",
+      "url": "https://docs.chef.io/deprecations_property_name_collision.html",
+      "location": "/var/chef/cache/cookbooks/redhat_subscription_manager/libraries/rhsm_register.rb:34:in `<class:RhsmRegister>'"
+    },
+    {
+      "message": "method access to node attributes (node.foo.bar) is deprecated and will be removed in Chef 13, please use bracket syntax (node[\"foo\"][\"bar\"])",
+      "url": "https://docs.chef.io/deprecations_attributes.html",
+      "location": "/opt/chef/embedded/lib/ruby/gems/2.3.0/gems/chef-sugar-3.6.0/lib/chef/sugar/node.rb:162:in `method_missing'"
+    },
+    {
+      "message": "Property `sensitive` of resource `aws_s3_file` overwrites an existing method. Please use a different property name. This will raise an exception in Chef 13.",
+      "url": "https://docs.chef.io/deprecations_property_name_collision.html",
+      "location": "/var/chef/cache/cookbooks/aws/resources/s3_file.rb:36:in `class_from_file'"
+    },
+    {
+      "message": "Property `sensitive` of resource `yum_repository` overwrites an existing method. Please use a different property name. This will raise an exception in Chef 13.",
+      "url": "https://docs.chef.io/deprecations_property_name_collision.html",
+      "location": "/var/chef/cache/cookbooks/yum/resources/repository.rb:59:in `class_from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for directory[/usr/local/bin] from prior resource\nPrevious directory[/usr/local/bin]: /var/chef/cache/cookbooks/opscode-ci/recipes/_platform_tweaks.rb:23:in `from_file'\nCurrent  directory[/usr/local/bin]: /var/chef/cache/cookbooks/omnibus/recipes/_common.rb:49:in `from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "/var/chef/cache/cookbooks/omnibus/recipes/_common.rb:49:in `from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for directory[/usr/local/bin] from prior resource\nPrevious directory[/usr/local/bin]: /var/chef/cache/cookbooks/omnibus/recipes/_common.rb:49:in `from_file'\nCurrent  directory[/usr/local/bin]: /var/chef/cache/cookbooks/omnibus/recipes/_compile.rb:61:in `block in from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "/var/chef/cache/cookbooks/omnibus/recipes/_compile.rb:61:in `block in from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for group[com.apple.access_ssh] from prior resource\nPrevious group[com.apple.access_ssh]: /var/chef/cache/cookbooks/opscode-ci/recipes/_users.rb:78:in `from_file'\nCurrent  group[com.apple.access_ssh]: /var/chef/cache/cookbooks/opscode-ci/recipes/_users.rb:137:in `from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "/var/chef/cache/cookbooks/opscode-ci/recipes/_users.rb:137:in `from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for directory[/Users/jenkins/.ssh] from prior resource\nPrevious directory[/Users/jenkins/.ssh]: /var/chef/cache/cookbooks/opscode-ci/recipes/_github.rb:12:in `from_file'\nCurrent  directory[/Users/jenkins/.ssh]: /var/chef/cache/cookbooks/opscode-ci/recipes/slave.rb:58:in `from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "/var/chef/cache/cookbooks/opscode-ci/recipes/slave.rb:58:in `from_file'"
+    }
+  ]
+}

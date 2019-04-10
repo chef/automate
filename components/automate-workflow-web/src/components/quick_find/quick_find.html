@@ -1,0 +1,12 @@
+<div class="quick-find-inner">
+  <input
+    class="quick-find-input"
+    type="search"
+    ng-model="quickFindCtrl.term"
+    placeholder="Find a project..."
+    bs-typeahead
+    bs-options="quickFindCtrl.getFormattedItem(result) for result in quickFindCtrl.getResults($viewValue)"
+    data-html="true"
+  />
+  <button><span class="fa fa-search"></span></button>
+</div>

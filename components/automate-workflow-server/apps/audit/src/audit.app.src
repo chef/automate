@@ -1,0 +1,15 @@
+{application, audit,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  gproc,
+                  delivery,
+                  chef_common
+                 ]},
+  {mod, { audit_app, []}},
+  {env, []}
+ ]}.

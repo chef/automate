@@ -1,0 +1,19 @@
+<li class="run-list-role-header">
+  <div class="role-title-bar" (click)="toggleExpand()">
+    <span>
+      <chef-icon>{{ expanded ? 'keyboard_arrow_down' : 'keyboard_arrow_right' }}</chef-icon>
+      <span class="role-title">
+        <chef-icon>view_module</chef-icon>
+        <span class="name">
+          {{roles.name}}
+        </span>
+      </span>
+    </span>
+  </div>
+  <div *ngIf="expanded">
+    <ul *ngFor="let r of roles.children">
+      <app-run-list-role-header *ngIf="r.isRole()" [roles]="r"></app-run-list-role-header>
+      <app-run-list-table *ngIf="!r.isRole()" [item]="r"></app-run-list-table>
+    </ul>
+  </div>
+</li>

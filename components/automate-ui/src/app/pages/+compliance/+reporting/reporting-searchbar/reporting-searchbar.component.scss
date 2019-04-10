@@ -1,0 +1,62 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.reporting-search {
+  @include base-box-shadow();
+  display: flex;
+  height: 50px;
+  align-items: center;
+  justify-content: space-between;
+  flex-grow: 1;
+  border: 1px solid $chef-grey;
+  border-radius: $global-radius;
+
+  .reporting-search-input {
+    padding: 1em;
+    width: 100%;
+    border: none;
+    border-radius: $global-radius;
+    background-color: $chef-white;
+    font-family: inherit;
+    font-size: 14px;
+  }
+
+  .reporting-search-prefix {
+    display: flex;
+    position: relative;
+    padding: 0.5em 0 0.5em 1em;
+    white-space: nowrap;
+
+    strong {
+      font-size: 14px;
+    }
+  }
+
+  .reporting-search-suffix {
+    display: flex;
+    position: relative;
+    padding: 0.5em 1em 0.5em 0;
+
+    chef-button {
+      margin: 0 0 0 0.5em;
+
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+
+    chef-dropdown {
+      top: 100%;
+      right: 0;
+      padding: 0.5em;
+    }
+  }
+}
+
+.filters-list {
+  @include base-box-shadow();
+  background: $chef-white;
+  border: 1px solid $chef-grey;
+  border-radius: $global-radius;
+  padding: 0.5em;
+}

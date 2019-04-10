@@ -1,0 +1,132 @@
+<chef-sidebar>
+  <div class="nav-items">
+    <chef-sidebar-entry route="/compliance/scanner/jobs" icon="wifi_tethering">Current jobs</chef-sidebar-entry>
+  </div>
+</chef-sidebar>
+
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/compliance/scanner/jobs']">Scan jobs</chef-breadcrumb>
+      Scan reports
+    </chef-breadcrumbs>
+
+
+    <chef-page-header>
+      <chef-heading>Scan reports</chef-heading>
+      <chef-subheading>Job: {{ route.snapshot.params.id }}</chef-subheading>
+    </chef-page-header>
+
+    <div class="jobs-list-body">
+      <chef-table class="jobs-list-table" (sort-toggled)="onSortToggled($event)">
+        <chef-thead>
+          <chef-tr>
+            <chef-th>
+              Job
+              <chef-sort-toggle sort="name" [order]="orderFor('name')"></chef-sort-toggle>
+            </chef-th>
+            <chef-th>
+              Nodes
+            </chef-th>
+            <chef-th>
+              Last Scan
+              <chef-sort-toggle sort="end_time" [order]="orderFor('end_time')"></chef-sort-toggle>
+            </chef-th>
+            <chef-th>
+              Status
+              <chef-sort-toggle sort="status" [order]="orderFor('status')"></chef-sort-toggle>
+            </chef-th>
+            <chef-th></chef-th>
+          </chef-tr>
+        </chef-thead>
+
+        <chef-tbody>
+          <chef-tr *ngFor="let job of jobScansList.items; trackBy: trackBy;">
+            <chef-td>{{ job.name }}</chef-td>
+            <chef-td>{{ displayNodeCount(job.node_count | number, job.recurrence) }}</chef-td>
+            <chef-td>{{ timeFromNow(job.end_time) }}</chef-td>
+            <chef-td>{{ job.status }}</chef-td>
+            <chef-td>
+              <chef-button secondary
+                *ngIf="job.status === 'completed'"
+                (click)="viewReport(job.id)">
+                Report
+              </chef-button>
+              <chef-button secondary caution
+                *ngIf="job.status === 'failed'"
+                (click)="onJobResultsShow($event, job.id)">
+                Error
+              </chef-button>
+              <chef-button secondary caution label="delete" (click)="promptDeleteJob(job)">
+                <chef-icon>delete</chef-icon>
+              </chef-button>
+            </chef-td>
+          </chef-tr>
+        </chef-tbody>
+      </chef-table>
+
+      <app-page-picker
+        class="jobs-list-paging"
+        [total]="jobScansList.total"
+        [perPage]="jobScansList.per_page"
+        [page]="jobScansList.page"
+        (pageChanged)="onPageChanged($event)">
+      </app-page-picker>
+
+      <chef-scroll-top></chef-scroll-top>
+
+      <chef-side-panel class="side-panel" [visible]="showJobResults">
+        <div class="side-panel-header">
+          <chef-icon class="header-icon">equalizer</chef-icon>
+          <div class="header-text">
+            <h4><strong>{{ (jobDetail$ | async)?.results?.length }} errors for job:</strong></h4>
+            <p>{{ (jobDetail$ | async)?.name }}</p>
+          </div>
+          <chef-button secondary (click)="onJobResultsHide($event)">
+            <chef-icon>close</chef-icon>
+          </chef-button>
+        </div>
+        <div class="side-panel-body">
+          <div class="side-panel-body-header">
+            <p>Tap on a node to view the full backtrace for the error.</p>
+          </div>
+          <ul class="results-list">
+            <li
+              *ngFor="let result of (jobDetail$ | async)?.results"
+              class="results-list-item">
+              <div class="list-item-summary">
+                <chef-icon class="list-item-icon">report_problem</chef-icon>
+                <div class="list-item-text">
+                  <p class="node-name">
+                    <strong>Node:</strong> {{ result.node_id }}
+                  </p>
+                </div>
+                <chef-button secondary (click)="toggleResult(result)">
+                  <chef-icon>add</chef-icon>
+                </chef-button>
+              </div>
+              <div class="list-item-detail" *ngIf="isOpenResult(result)">
+                <pre>{{ result.result }}</pre>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </chef-side-panel>
+
+      <chef-modal
+        *ngIf="jobDeletePrompt$ | async as prompt"
+        id="delete-prompt"
+        [visible]="prompt.visible"
+        (close)="cancelDeleteJob(prompt.job)">
+        <h2 id="delete-prompt-title" slot="title">Are you sure you want to delete this job?</h2>
+        <div>
+          <p>{{ prompt.job?.name }}</p>
+          <div class="options">
+            <chef-button label="confirm" primary caution (click)="confirmDeleteJob(prompt.job)">Delete it</chef-button>
+            <chef-button label="cancel" tertiary (click)="cancelDeleteJob(prompt.job)">Cancel</chef-button>
+          </div>
+        </div>
+      </chef-modal>
+    </div>
+  </main>
+</div>

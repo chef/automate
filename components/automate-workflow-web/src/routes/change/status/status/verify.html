@@ -1,0 +1,59 @@
+<div>
+  <div class="stage-step verify" ng-class="change.stages[0].status">
+    <div class="stage-step-header">
+      <span class="stage-title">
+        <span class="status-icon" ng-class="change.stages[0].status"></span> Verify
+      </span>
+      <a
+        class="tiny"
+        icon-button="reload"
+        ng-click="handleRerun(rerunLink(change.stages[0]))"
+        ng-if="rerunLink(change.stages[0]) && showRerunLink">
+        Re-Run
+      </a>
+    </div>
+    <div
+      ng-repeat="phase in change.stages[0].phases track by phase.name"
+      cd-grouped-phase-list="phase">
+    </div>
+  </div>
+  <div class="stage-step approval">
+    <div class="stage-step-header">
+      <span class="stage-title">
+        <span
+          class="status-icon"
+          ng-hide="change.state === 'open' && change.stages[0].status === 'passed'"
+          ng-class="{
+            passed: change.state === 'merged',
+            running: change.state === 'open' && change.stages[0].status !== 'passed',
+            caution:
+              change.state === 'open' && change.stages[0].status === 'failed'
+          }"></span>
+        <span
+          class="waiting"
+          ng-if="change.state === 'open' && change.stages[0].status === 'passed'">
+          <i class="fa fa-user" aria-hidden="true"></i>
+        </span>
+          Approval
+      </span>
+      <span class="stage-step-approval-status">
+        <a
+          ui-sref="main.enterprise.organizations.organization.project.change.review"
+          class="stage-step-comment-count">
+          {{ getPatchsetComments(change.patchsets[0]).length }}
+          <span class="icon icon-bubble"></span>
+        </a>
+        <span
+          class="user-gate-status passed"
+          ng-if="change.state === 'merged'">
+          Approved
+        </span>
+        <span
+          class="user-gate-status running"
+          ng-if="change.state === 'open'">
+          Awaiting Approval
+        </span>
+      </span>
+    </div>
+  </div>
+</div>

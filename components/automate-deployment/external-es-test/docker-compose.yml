@@ -1,0 +1,14 @@
+---
+version: '2.1'
+services:
+  a2:
+    extends:
+      file: docker-compose-services.yml
+      service: a2
+  external-es:
+    extends:
+      file: docker-compose-services.yml
+      service: external-es
+networks:
+  esnet:
+    driver: bridge

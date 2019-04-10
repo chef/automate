@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+
+# Health Check for Automate Es Gateway
+
+# default return code is 0
+rc=0
+
+# BUG: `-s` (`--silent`) is not working for me with `core/curl/7.62.0/20181212184320`
+{{pkgPathFor "core/curl"}}/bin/curl -k -X GET -sS --fail --max-time 2 http://localhost:{{cfg.service.port}}/automate_es_gateway_status
+
+case $? in
+    # Zero exit status means curl got back a 200 end everything is ok.
+    0)
+        rc=0 ;;
+    # Anything else is critical.
+    *)
+        rc=2 ;;
+esac
+
+exit $rc

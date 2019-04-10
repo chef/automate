@@ -1,0 +1,62 @@
+<div class="resources-rollup">
+  <div class="rollup-item total" (click)="filter('total')" [ngClass]="{active: active === 'total'}">
+    <div class="rollup-title">
+      <h3 class="title">Total Resources</h3>
+    </div>
+    <span class="count"><chef-icon>list</chef-icon> {{resourcesTotal}}</span>
+  </div>
+  <div class="rollup-item failure" (click)="filter('failed')" [ngClass]="{active: active === 'failed'}">
+    <div class="rollup-title">
+      <h3 class="title">Failed</h3>
+    </div>
+    <span class="count"><chef-icon>warning</chef-icon> {{failedTotal}}</span>
+  </div>
+  <div class="rollup-item success" (click)="filter('success')" [ngClass]="{active: active ===  'success'}">
+    <div class="rollup-title">
+      <h3 class="title">Successful</h3>
+    </div>
+    <span class="count"><chef-icon>check_circle</chef-icon> {{successTotal}}</span>
+  </div>
+  <div class="rollup-item unchanged" (click)="filter('unchanged')" [ngClass]="{active: active === 'unchanged'}">
+    <div class="rollup-title">
+      <h3 class="title">Unchanged</h3>
+    </div>
+    <span class="count"><chef-icon>remove_circle</chef-icon> {{unchangedTotal}}</span>
+  </div>
+  <div class="rollup-item missing" (click)="filter('unprocessed')" [ngClass]="{active: active ===  'unprocessed'}">
+    <div class="rollup-title">
+      <h3 class="title">Unprocessed</h3>
+    </div>
+    <span class="count"><chef-icon>help</chef-icon> {{unprocessedTotal}}</span>
+  </div>
+</div>
+<!--
+  TODO: when the chef-table component includes pagination and sorting,
+  this element below should be replaced with a table.
+-->
+<div class="resources-list">
+  <div class="head">
+    <div class="status">Status</div>
+    <div class="step">Step</div>
+    <div class="type">Type</div>
+    <div class="name">Name</div>
+    <div class="action">Action</div>
+    <div class="cookbook">Cookbook</div>
+    <div class="view-action">View</div>
+  </div>
+  <app-resource-item
+    [resource]="resourcesData"
+    *ngFor="let resourcesData of (resourcesDataCollection | selectedStatus:active) |
+      slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
+  </app-resource-item>
+</div>
+<div class="no-resources" *ngIf="resourcesTotal === 0">
+  <span>No resources ran.</span>
+</div>
+
+<app-page-picker
+  [total]="(resourcesDataCollection | selectedStatus:active).length"
+  [perPage]="pageSize"
+  [page]="currentPage"
+  (pageChanged)="currentPage = $event">
+</app-page-picker>

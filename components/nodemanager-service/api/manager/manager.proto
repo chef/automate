@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package chef.automate.domain.nodemanager.api.manager;
+option go_package = "github.com/chef/automate/components/nodemanager-service/api/manager";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+import "components/compliance-service/api/common/common.proto";
+import "components/nodemanager-service/api/nodes/nodes.proto";
+
+
+service NodeManagerService {
+	rpc Create(NodeManager) returns (Ids) {};
+	rpc Read(Id) returns (NodeManager) {};
+	rpc Update(NodeManager) returns (google.protobuf.Empty) {};
+	rpc Delete(Id) returns (google.protobuf.Empty) {};
+	rpc DeleteWithNodes(Id) returns (Ids) {};
+	rpc DeleteWithNodeStateStopped(Id) returns (google.protobuf.Empty) {};
+	rpc DeleteWithNodeStateTerminated(Id) returns (google.protobuf.Empty) {};
+	rpc List(Query) returns (NodeManagers) {};
+	rpc Connect(NodeManager) returns (google.protobuf.Empty) {};
+	rpc ConnectManager(Id) returns (google.protobuf.Empty) {};
+	rpc SearchNodeFields(FieldQuery) returns (Fields) {};
+	rpc SearchNodes(NodeQuery) returns (Nodes) {};
+	rpc ProcessNode(NodeMetadata) returns (ProcessNodeResponse) {};
+	rpc ChangeNodeState(NodeState) returns (ChangeNodeStateResponse) {};
+	rpc GetNodeWithSecrets(Id) returns (chef.automate.domain.nodemanager.api.nodes.Node) {};
+	rpc SearchManagerNodes(NodeQuery) returns (ManagerNodes) {};
+}
+
+message Id {
+	string id = 1;
+}
+
+message Ids {
+	repeated Id ids = 1;
+}
+message ChangeNodeStateResponse {}
+
+message ProcessNodeResponse {}
+
+message NodeState {
+	string id = 1;
+	enum State {
+		RUNNING = 0;
+		STOPPED = 1;
+		TERMINATED = 2;
+	}
+	State state = 2;
+}
+
+message Query {
+	repeated chef.automate.domain.compliance.api.common.Filter filter_map = 25;
+
+	enum OrderType {
+		ASC = 0;
+		DESC = 1;
+	}
+	OrderType order = 21;
+	string sort = 22;
+	int32 page = 23;
+	int32 per_page = 24;
+}
+message NodeMetadata {
+	string uuid = 1;
+	string name = 2;
+	string platform_name = 3;
+	string platform_release = 4;
+	string job_uuid = 5;
+	google.protobuf.Timestamp last_contact = 6;
+	string source_id = 7;
+	string source_region = 8;
+	string source_account_id = 9;
+}
+
+message Fields {
+	repeated string fields = 1;
+}
+message FieldQuery {
+		Query query = 20;
+		string field = 21;
+		string node_manager_id = 22;
+}
+
+message Nodes {
+		repeated string nodes = 1;
+		int32 total = 20;
+}
+message NodeQuery {
+		Query query = 20;
+		string node_manager_id = 21;
+}
+
+message Credentials {
+		string credentials = 20;
+}
+message NodeManager {
+		string id = 1;
+		string name = 2;
+		string type = 3;
+		string credential_id = 20; // aws or azure cred id
+		repeated CredentialsByTags instance_credentials = 21; // ssh, winrm creds
+		string status = 22;
+		string account_id = 24;
+		google.protobuf.Timestamp date_added = 25;
+		repeated chef.automate.domain.compliance.api.common.Kv credential_data = 26;
+		string account_alias = 27;
+}
+message CredentialsByTags {
+	string tag_key = 20;
+	string tag_value = 21;
+	repeated string credential_ids = 22;
+}
+message NodeManagers {
+		repeated NodeManager managers = 1;
+		int32 total = 20;
+}
+message ManagerNodes {
+	repeated ManagerNode nodes = 1;
+}
+message ManagerNode {
+	string id = 1; 
+	string host = 2;
+	string public_ip = 3;
+	repeated chef.automate.domain.compliance.api.common.Kv tags = 4;
+	string platform = 5;  
+	// should all these be tags??    
+	string region = 6;    
+	string name = 7;
+	string ssm = 8; 
+	string uuid = 9;
+	string machine_identifier = 10;
+	string group = 11;
+}

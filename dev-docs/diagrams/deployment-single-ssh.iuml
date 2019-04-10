@@ -1,0 +1,38 @@
+@startuml
+object "Automate Host (customer)" as automate_host <<Linux, Habitat>>{
+	+automate-ui
+	+edge load balancer
+	automate-gateway
+	deployment-cli
+	deployment-service
+	license-control-service
+	config-mgmt-service
+	ingest-service
+	compliance-policy-service
+	compliance-reporting-service
+	compliance-scanner-service
+	postgres
+	notifications-service
+	authz-service
+	user-token-service
+}
+
+object "Workstation (customer)" as workstation <<Linux, Habitat>> {
+    +deployment-cli
+    deployment-service
+}
+
+object "License Host (chef)" as license <<Linux, Habitat>> {
+    +license
+}
+
+object "Chef" as chef <<External>> 
+object "Inspec" as inspec <<External>> 
+object "Web Browser" as browser <<External>> 
+
+workstation -> automate_host : ssh
+license -> workstation : manual copy
+chef --> automate_host : https/rest
+inspec --> automate_host : https/rest
+browser <--> automate_host : https/rest
+@enduml

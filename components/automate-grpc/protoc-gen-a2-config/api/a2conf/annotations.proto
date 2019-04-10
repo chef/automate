@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package chef.automate.api;
+
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/port.proto";
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf";
+
+extend google.protobuf.FieldOptions {
+  Port port = 51000;
+}
+
+message ServiceConfig {
+  string name = 1;
+}
+
+extend google.protobuf.MessageOptions {
+  ServiceConfig service_config = 51000;
+}

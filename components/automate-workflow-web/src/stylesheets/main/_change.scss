@@ -1,0 +1,503 @@
+.change {
+  @include columns(10);
+
+  &.wide {
+    @include columns(11.6);
+  }
+
+  .change-navbar {
+    border-bottom: 1px solid $lightgray;
+    overflow: hidden;
+  }
+
+  &.tabbed-view {
+
+    .page-header-title {
+        @include span-columns(6);
+    }
+
+    .page-header-meta {
+        @include span-columns(6);
+    }
+
+    h1 {
+      font-size: 24px;
+      padding: 4px 0;
+      font-family: $heading-font;
+      color: $bluechef;
+    }
+
+    .tab-content {
+      font-size: 14px;
+      padding-top: 22px;
+      padding-bottom: 22px;
+
+      form {
+        width: auto;
+      }
+    }
+
+    .review {
+      font-size: .875rem;
+    }
+  }
+
+  .change-nav {
+    float: right;
+    padding-top: 20px;
+
+    ul {
+      float: left;
+    }
+
+    li {
+      float: left;
+      padding: 5px 20px 0 20px;
+
+      a {
+        display: block;
+        text-decoration: none;
+        color: $darkgray;
+        padding-bottom: 5px;
+        position: relative;
+
+        &.active {
+          border-bottom: 3px solid #E6772F;
+        }
+      }
+    }
+  }
+
+  .change-header {
+    padding: 20px;
+    overflow: hidden;
+    border-bottom: 1px solid $lightgray;
+    margin-bottom: -1px;
+
+    .change-submitted-by,
+    .change-approved-by,
+    .change-delivered-by {
+      font-size: 12px;
+      float: left;
+      margin-top: 4px;
+    }
+
+    .change-approved-by,
+    .change-delivered-by {
+      border-left: 1px solid $lightgray;
+      padding-left: 10px;
+      margin-left: 10px;
+    }
+  }
+
+  .patchset-status {
+    font-weight: bold;
+    margin: 8px 0;
+  }
+
+  .external-pr {
+    margin-left: 4px;
+    padding-left: 7px;
+    border-left: 1px solid $darkgray;
+  }
+
+  .change-description {
+    border-bottom: 1px solid lighten($storm, 50%);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    color: $darkgray;
+  }
+
+  .commit-items {
+
+    .commit-item {
+
+      header {
+        font-weight: 500;
+        color: lighten($darkgrayblue, 6%);
+        margin-bottom: 8px;
+      }
+
+      section {
+        padding: 5px 0px;
+      }
+
+      .sha {
+        font-weight: normal;
+        font-family: $monospace;
+        font-size: 0.8em;
+        color: $textgray;
+        margin-left: 2px;
+      }
+
+      .commit-msg {
+        padding: 10px 0px 0px 0px;
+        font-size: 15px;
+        background-color: $white;
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid lighten($storm, 50%);
+        margin-bottom: 18px;
+        padding-bottom: 8px;
+      }
+    }
+  }
+
+  .change-toolbar {
+    float: right;
+    overflow: hidden;
+
+    .change-btns {
+      float: right;
+
+      button {
+        margin-left: .5rem;
+      }
+    }
+  }
+
+  .promotion-status {
+    padding: 8px 0;
+    float: right;
+    clear: right;
+    font-size: .75rem;
+    color: lighten($darkgray, 5%);
+
+    a {
+      color: lighten($storm, 8%);
+      text-decoration: none;
+    }
+  }
+
+  .status-nav {
+    margin: 0 0 .5rem 0;
+    padding: 0;
+    list-style: none;
+    position: relative;
+    z-index: 2;
+    @include flexbox;
+
+    li {
+      margin-right: .5rem;
+      background-color: $white;
+      border-radius: $global-radius;
+      @include flex-grow(1);
+      @include flex-direction(column);
+      @include justify-content(center);
+      @include flexbox;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      a {
+        display: block;
+        padding: .5rem .5rem .5rem 4rem;
+        @include flex-grow(1);
+        @include flexbox;
+        @include flex-direction(column);
+        @include justify-content(center);
+        text-decoration: none;
+        position: relative;
+        outline: none;
+        box-shadow: inset 0 0 0 2px $gray-pale;
+        color: $darkgray;
+
+        &.active {
+          border-radius: $global-radius;
+          box-shadow: inset 0 0 0 2px $chef-green, 0 0 14px $gray-pale;
+        }
+      }
+
+      &.disabled {
+
+        .status-stage-item {
+          padding-left: 0;
+        }
+      }
+
+      &.unreachable {
+        background: repeating-linear-gradient(
+          45deg,
+          $lightgray,
+          $lightgray 1px,
+          transparent 1px,
+          transparent 5px
+        )
+      }
+    }
+
+    .status-stage-item {
+      @include flex-grow(1);
+      @include flexbox;
+      @include flex-direction(column);
+      @include justify-content(center);
+      font-size: .75rem;
+      line-height: 1.75rem;
+      padding-left: 2rem;
+      background: center left no-repeat;
+      background-size: .875rem;
+
+      &.running {
+        background-image: url(../images/running-large.svg);
+      }
+
+      &.passed {
+        background-image: url(../images/good-large.svg);
+      }
+
+      &.failed {
+        background-image: url(../images/failed-large.svg);
+      }
+
+      &.caution {
+        background-image: url(../images/caution-large.svg);
+      }
+
+      &.waiting {
+        background-image: url(../images/person.svg);
+        color: $chef-blue-dark;
+      }
+    }
+
+    .stage-icon {
+      background: center left no-repeat;
+      display: block;
+      width: 30px;
+      height: 30px;
+      position: absolute;
+      left: 15px;
+      background-size: contain;
+      top: 50%;
+      margin-top: -15px;
+
+      &.verify {
+        background-image: url(../images/verify.svg);
+      }
+
+      &.build {
+        background-image: url(../images/build.svg);
+      }
+
+      &.acceptance {
+        background-image: url(../images/acceptance.svg);
+      }
+
+      &.union {
+        background-image: url(../images/union.svg);
+      }
+
+      &.rehearsal {
+        background-image: url(../images/rehearsal.svg);
+      }
+
+      &.delivered {
+        background-image: url(../images/delivered.svg);
+      }
+    }
+  }
+
+  .stage-step {
+
+    > div:not(.stage-step-header) {
+      @include modal-box;
+      margin-bottom: .5rem;
+      padding: 0;
+    }
+
+    &.approval {
+      .stage-step-header {
+        border-bottom: none;
+      }
+    }
+  }
+
+  .stage-step-header {
+    overflow: hidden;
+    padding: 1rem 0;
+    overflow: hidden;
+    margin-top: -1px;
+
+    .tiny, button {
+      margin-left: 1rem;
+      color: $white;
+    }
+
+    .stage-rerun {
+      min-width: inherit;
+      font-size: .75rem;
+      padding: 5px 10px;
+      display: inline-block;
+      position: relative;
+      top: -2px;
+      margin: -5px 5px;
+    }
+  }
+
+  .stage-title {
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .stage-timestamps {
+    float: right;
+
+    > span {
+      float: left;
+      margin-left: 40px;
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
+
+  .stage-step-approval-status {
+    float: right;
+    font-size: 14px;
+
+    .stage-step-comment-count {
+      margin-right: 10px;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.status-icon {
+  display: inline-block;
+  width: .75rem;
+  height: .75rem;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin: 9px 4px -4px 0;
+
+  .ribbon & {
+    margin-top: 0;
+  }
+
+  &.running {
+    background-image: url('../images/running-large.svg');
+  }
+
+  &.running-idle {
+    background-image: url('../images/running-small-zero.svg');
+  }
+
+  &.failed {
+    background-image: url('../images/failed-large.svg');
+  }
+
+  &.failed-idle {
+    background-image: url('../images/failed-small-zero.svg');
+  }
+
+  &.passed {
+    background-image: url('../images/good-large.svg');
+  }
+
+  &.waiting-idle {
+    background-image: url('../images/human-small-zero.svg');
+  }
+
+  &.waiting {
+    background-image: url('../images/person.svg');
+  }
+
+  &.caution {
+    background-image: url('../images/caution-large.svg');
+  }
+
+  &.skipped {
+    background-image: url('../images/skipped-large.svg');
+  }
+
+  &.plus {
+    background-image: url('../images/plus.svg');
+  }
+
+  &.minus {
+    background-image: url('../images/minus.svg');
+  }
+
+  &.progress {
+    height: 4px;
+    width: 100%;
+    border-top: 3px solid $chef-green;
+  }
+
+  &.complete {
+    height: 1rem;
+    width: 1rem;
+    background-image: url('../images/check-complete.svg');
+  }
+}
+
+.user-gate-status {
+  display: inline-block;
+  font-size: .75rem;
+  background-color: $lightgray;
+  border-radius: $global-radius;
+  padding: .25rem .5rem;
+  color: $white;
+
+  &.running {
+    background-color: $chef-blue;
+  }
+
+  &.failed {
+    background-color: $chef-red;
+  }
+
+  &.passed {
+    background-color: $chef-green;
+  }
+
+  &.caution {
+    background-color: $chef-yellow;
+  }
+
+  &.skipped {
+    background-color: $gray;
+  }
+}
+
+.change-history {
+  padding: 10px 20px;
+}
+
+.waiting {
+  color: $chef-green;
+
+  i {
+    width: 16.4px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 0.7;
+    margin-right: 5px;
+  }
+}
+
+.not-so-tall {
+  height: 24px;
+}
+
+.top-waiting {
+  margin-left: -26px;
+  color: $chef-green;
+
+  i {
+    width: 16.4px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 0.7;
+  }
+}
+
+.automate-ui .change {
+  width: 100%;
+  margin: 0;
+  float: none;
+}

@@ -1,0 +1,6 @@
+@import "~styles/variables";
+
+.chef-guitar-string {
+  stroke: darken($chef-light-grey, 10%);
+  stroke-width: 0.4px;
+}

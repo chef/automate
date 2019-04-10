@@ -1,0 +1,107 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.profile,
+button {
+  -webkit-appearance: none;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+.user {
+  display: flex;
+  padding: 0 16px;
+  opacity: 1;
+  pointer-events: none;
+  color: $chef-primary-dark;
+}
+
+.account-icon-container {
+  margin-right: 16px;
+  pointer-events: none;
+  overflow: hidden;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  padding: 0.18em 0;
+  border: 1px solid $chef-dark-grey;
+  background-color: $chef-dark-grey;
+
+  #account-icon {
+    color: $chef-white;
+    font-size: 24px;
+  }
+}
+
+.user ::ng-deep .user-image {
+  pointer-events: none;
+}
+
+.user-name {
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 112px;
+  font-size: 12px;
+
+  @media (max-width: 740px) {
+    display: none;
+  }
+}
+
+.logout-dropdown {
+  @include modal-box();
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  min-width: 200px;
+  margin-top: 5px;
+  list-style: none;
+  z-index: 1;
+
+  a, button {
+    display: block;
+    width: 100%;
+    padding: 0 5px;
+    border-radius: $global-radius;
+    color: $chef-primary-dark;
+    text-decoration: none;
+    line-height: 30px;
+    text-align: left;
+
+    &:hover {
+      cursor: pointer;
+      background-color: $gray-highlight;
+    }
+
+    &.version-link,
+    &.license-link {
+      font-size: 11px;
+      color: #AAA;
+
+      &:hover {
+        background: none;
+        color: #222;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+chef-modal {
+  text-align: center;
+
+  h2 {
+    margin: 12px 0 20px 0;
+  }
+
+  .button {
+    display: flex;
+    justify-content: center;
+    height: 32px;
+  }
+}

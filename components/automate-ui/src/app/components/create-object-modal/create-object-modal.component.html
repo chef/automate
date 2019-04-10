@@ -1,0 +1,58 @@
+<chef-modal [visible]="visible" (close)="closeEvent()">
+  <h2 slot="title">Create {{ objectNoun | titlecase }}</h2>
+    <div class="flex-container">
+      <form [formGroup]="createForm">
+        <div class="margin">
+          <chef-form-field>
+            <label>
+              <span class="label">Name
+                <span aria-hidden="true">*</span>
+              </span>
+              <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" id="name-input">
+            </label>
+          </chef-form-field>
+          <span class="detail">Don't worry, {{ objectNoun }} names can be changed later.</span>
+        </div>
+        <div *ngIf="modifyID" class="margin">
+          <chef-form-field>
+            <label>
+              <span class="label">ID
+                <span aria-hidden="true">*</span>
+              </span>
+              <input chefInput formControlName="id" type="text" (keyup)="handleIDInput($event)" id="id-input">
+            </label>
+            <chef-error
+              *ngIf="createForm?.controls['id'].hasError('maxlength')">
+              IDs must be 64 characters or less.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm?.controls['id'].hasError('pattern')">
+              Only lowercase letters, numbers, and hyphens(-) are allowed.
+            </chef-error>
+            <chef-error *ngIf="conflictError">
+              IDs must be unique, there is already a {{objectNoun}} with ID: {{createForm?.controls['id'].value}}.
+            </chef-error>
+          </chef-form-field>
+          <span class="detail">{{ objectNoun | titlecase }} IDs are unique, permanent, and cannot be changed later.</span>
+        </div>
+        <div *ngIf="!modifyID" class="margin">
+          <div id="id-fields">
+            <span class="key-label">ID:&nbsp;</span>
+            <span>{{ this.createForm?.value.id }}</span>
+          </div>
+          <chef-toolbar>
+            <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal">Edit ID</chef-button>
+          </chef-toolbar>
+        </div>
+        <div id="button-bar">
+          <chef-button primary id="create-button-object-modal"
+            [disabled]="!createForm?.valid || creating || conflictError" (click)="createObject()">
+            <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+            <span *ngIf="!creating">Create {{ objectNoun | titlecase }}</span>
+            <span *ngIf="creating">Creating {{ objectNoun | titlecase }}...</span>
+          </chef-button>
+          <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
+        </div>
+      </form>
+    </div>
+</chef-modal>

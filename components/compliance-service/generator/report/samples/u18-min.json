@@ -1,0 +1,1607 @@
+{
+  "controls": [
+    {
+      "id": "os-01",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/hosts.equiv should not exist"
+    },
+    {
+      "id": "os-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/shadow should exist"
+    },
+    {
+      "id": "os-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/shadow should be file"
+    },
+    {
+      "id": "os-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/shadow should be owned by \"root\""
+    },
+    {
+      "id": "os-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/shadow should not be executable"
+    },
+    {
+      "id": "os-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/shadow should not be readable by other"
+    },
+    {
+      "id": "os-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/shadow group should eq \"shadow\""
+    },
+    {
+      "id": "os-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/shadow should be writable by owner"
+    },
+    {
+      "id": "os-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/shadow should be readable by owner"
+    },
+    {
+      "id": "os-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/shadow should be readable by group"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should exist"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should be file"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should be owned by \"root\""
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should not be executable"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should be writable by owner"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should not be writable by group"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should not be writable by other"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should be readable by owner"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should be readable by group"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should be readable by other"
+    },
+    {
+      "id": "os-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/passwd group should eq \"root\""
+    },
+    {
+      "id": "os-04",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Environment variable PATH split should not include \"\""
+    },
+    {
+      "id": "os-04",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Environment variable PATH split should not include \".\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/login.defs should exist"
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/login.defs should be file"
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/login.defs should be owned by \"root\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/login.defs should not be executable"
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/login.defs should be readable by owner"
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/login.defs should be readable by group"
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/login.defs should be readable by other"
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /etc/login.defs group should eq \"root\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "login.defs ENV_SUPATH should include \"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "login.defs ENV_PATH should include \"/usr/local/bin:/usr/bin:/bin\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "login.defs UMASK should include \"027\"",
+      "message": "expected \"022\" to include \"027\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "login.defs PASS_MAX_DAYS should eq \"60\"",
+      "message": "\nexpected: \"60\"\n     got: \"99999\"\n\n(compared using ==)\n"
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "login.defs PASS_MIN_DAYS should eq \"7\"",
+      "message": "\nexpected: \"7\"\n     got: \"0\"\n\n(compared using ==)\n"
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "login.defs PASS_WARN_AGE should eq \"7\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "login.defs LOGIN_RETRIES should eq \"5\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "login.defs LOGIN_TIMEOUT should eq \"60\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "login.defs UID_MIN should eq \"1000\""
+    },
+    {
+      "id": "os-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "login.defs GID_MIN should eq \"1000\""
+    },
+    {
+      "id": "os-05b",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "os-06",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "suid_check diff should be empty"
+    },
+    {
+      "id": "os-07",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "/etc/passwd uids should not contain duplicates"
+    },
+    {
+      "id": "os-07",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "/etc/group gids should not contain duplicates"
+    },
+    {
+      "id": "os-08",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "3215 should >= 1000"
+    },
+    {
+      "id": "os-09",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "[] should be empty"
+    },
+    {
+      "id": "os-10",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "File /etc/modprobe.d/dev-sec.conf content should match \"install cramfs /bin/true\"",
+      "message": "expected nil to match \"install cramfs /bin/true\""
+    },
+    {
+      "id": "os-10",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "File /etc/modprobe.d/dev-sec.conf content should match \"install freevxfs /bin/true\"",
+      "message": "expected nil to match \"install freevxfs /bin/true\""
+    },
+    {
+      "id": "os-10",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "File /etc/modprobe.d/dev-sec.conf content should match \"install jffs2 /bin/true\"",
+      "message": "expected nil to match \"install jffs2 /bin/true\""
+    },
+    {
+      "id": "os-10",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "File /etc/modprobe.d/dev-sec.conf content should match \"install hfs /bin/true\"",
+      "message": "expected nil to match \"install hfs /bin/true\""
+    },
+    {
+      "id": "os-10",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "File /etc/modprobe.d/dev-sec.conf content should match \"install hfsplus /bin/true\"",
+      "message": "expected nil to match \"install hfsplus /bin/true\""
+    },
+    {
+      "id": "os-10",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "File /etc/modprobe.d/dev-sec.conf content should match \"install squashfs /bin/true\"",
+      "message": "expected nil to match \"install squashfs /bin/true\""
+    },
+    {
+      "id": "os-10",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "File /etc/modprobe.d/dev-sec.conf content should match \"install udf /bin/true\"",
+      "message": "expected nil to match \"install udf /bin/true\""
+    },
+    {
+      "id": "os-10",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "File /etc/modprobe.d/dev-sec.conf content should match \"install vfat /bin/true\"",
+      "message": "expected nil to match \"install vfat /bin/true\""
+    },
+    {
+      "id": "os-11",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /var/log should be directory"
+    },
+    {
+      "id": "os-11",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "File /var/log should be owned by \"root\""
+    },
+    {
+      "id": "os-11",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "File /var/log should be grouped into \"syslog\"",
+      "message": "expected `File /var/log.grouped_into?(\"syslog\")` to return true, got false"
+    },
+    {
+      "id": "package-01",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "System Package inetd should not be installed"
+    },
+    {
+      "id": "package-01",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "System Package xinetd should not be installed"
+    },
+    {
+      "id": "package-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "System Package telnetd should not be installed"
+    },
+    {
+      "id": "package-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "System Package telnetd should not be installed"
+    },
+    {
+      "id": "package-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "System Package ypserv should not be installed"
+    },
+    {
+      "id": "package-06",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "System Package tftp-server should not be installed"
+    },
+    {
+      "id": "package-07",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "System Package rsyslog should be installed",
+      "message": "expected that `System Package rsyslog` is installed"
+    },
+    {
+      "id": "package-08",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "System Package auditd should be installed",
+      "message": "expected that `System Package auditd` is installed"
+    },
+    {
+      "id": "package-08",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "skipped",
+      "code_desc": "Audit Daemon Config",
+      "skip_message": "Can't find file: /etc/audit/auditd.conf",
+      "resource": "Audit Daemon Config"
+    },
+    {
+      "id": "package-09",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "System Package prelink should not be installed"
+    },
+    {
+      "id": "sysctl-01",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.ip_forward value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-01",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.forwarding value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.rp_filter value should eq 1"
+    },
+    {
+      "id": "sysctl-02",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.default.rp_filter value should eq 1"
+    },
+    {
+      "id": "sysctl-03",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.icmp_ignore_bogus_error_responses value should eq 1"
+    },
+    {
+      "id": "sysctl-04",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.icmp_echo_ignore_broadcasts value should eq 1"
+    },
+    {
+      "id": "sysctl-05",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.icmp_ratelimit value should eq 100",
+      "message": "\nexpected: 100\n     got: 1000\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-06",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.icmp_ratemask value should eq 88089",
+      "message": "\nexpected: 88089\n     got: 6168\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-07",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.tcp_timestamps value should eq 0",
+      "message": "\nexpected: 0\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-08",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.arp_ignore value should eq 1",
+      "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-09",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.arp_announce value should eq 2",
+      "message": "\nexpected: 2\n     got: 0\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-10",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.tcp_rfc1337 value should eq 1",
+      "message": "\nexpected: 1\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-11",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.tcp_syncookies value should eq 1"
+    },
+    {
+      "id": "sysctl-12",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.shared_media value should eq 1"
+    },
+    {
+      "id": "sysctl-12",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.default.shared_media value should eq 1"
+    },
+    {
+      "id": "sysctl-13",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.accept_source_route value should eq 0"
+    },
+    {
+      "id": "sysctl-13",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.default.accept_source_route value should eq 0"
+    },
+    {
+      "id": "sysctl-14",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.default.accept_redirects value should eq 0"
+    },
+    {
+      "id": "sysctl-14",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.accept_redirects value should eq 0"
+    },
+    {
+      "id": "sysctl-15",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.secure_redirects value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-15",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.default.secure_redirects value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-16",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.default.send_redirects value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-16",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.send_redirects value should eq 0"
+    },
+    {
+      "id": "sysctl-17",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.all.log_martians value should eq 1",
+      "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-17",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv4.conf.default.log_martians value should eq 1",
+      "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-18",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.all.disable_ipv6 value should eq 1"
+    },
+    {
+      "id": "sysctl-19",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.all.forwarding value should eq 0"
+    },
+    {
+      "id": "sysctl-20",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_redirects value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-20",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.all.accept_redirects value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-21",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.default.router_solicitations value should eq 0",
+      "message": "\nexpected: 0\n     got: \"-1\"\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-22",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_ra_rtr_pref value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-23",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_ra_pinfo value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-24",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_ra_defrtr value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-25",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.all.accept_ra value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-25",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_ra value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-26",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.default.autoconf value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-27",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.default.dad_transmits value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-28",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter net.ipv6.conf.default.max_addresses value should eq 1",
+      "message": "\nexpected: 1\n     got: 16\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-29",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter kernel.modules_disabled value should eq 0"
+    },
+    {
+      "id": "sysctl-30",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "failed",
+      "code_desc": "Kernel Parameter kernel.sysrq value should eq 0",
+      "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sysctl-31a",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter fs.suid_dumpable value should cmp == /(0|2)/"
+    },
+    {
+      "id": "sysctl-31b",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "sysctl-32",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "Kernel Parameter kernel.randomize_va_space value should eq 2"
+    },
+    {
+      "id": "sysctl-33",
+      "profile_id": "linux-baseline",
+      "profile_sha256": "bf5ffac4d08aadd4120cf2316dc1633d90f0f2965b69c2974f925d8bed79c07f",
+      "status": "passed",
+      "code_desc": "/proc/cpuinfo Flags should include NX"
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should exist"
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should be file"
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should be owned by \"root\""
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should be grouped into \"root\""
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should not be executable"
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should be readable by owner"
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should be readable by group"
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should be readable by other"
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should be writable by owner"
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should not be writable by group"
+    },
+    {
+      "id": "ssh-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/ssh_config should not be writable by other"
+    },
+    {
+      "id": "ssh-02",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration AddressFamily should match /inet|inet6|any/",
+      "message": "expected nil to match /inet|inet6|any/"
+    },
+    {
+      "id": "ssh-03",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration Port should eq \"22\"",
+      "message": "\nexpected: \"22\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration Protocol should eq \"2\"",
+      "message": "\nexpected: \"2\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration BatchMode should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-06",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration CheckHostIP should eq \"yes\"",
+      "message": "\nexpected: \"yes\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-07",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration StrictHostKeyChecking should match /ask|yes/",
+      "message": "expected nil to match /ask|yes/"
+    },
+    {
+      "id": "ssh-08",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration Ciphers should eq \"aes256-ctr,aes192-ctr,aes128-ctr\"",
+      "message": "\nexpected: \"aes256-ctr,aes192-ctr,aes128-ctr\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-09",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration KexAlgorithms should eq \"diffie-hellman-group-exchange-sha256\"",
+      "message": "\nexpected: \"diffie-hellman-group-exchange-sha256\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-10",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration MACs should eq \"hmac-sha2-512,hmac-sha2-256,hmac-ripemd160\"",
+      "message": "\nexpected: \"hmac-sha2-512,hmac-sha2-256,hmac-ripemd160\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-11",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration ForwardAgent should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-12",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration ForwardX11 should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-13",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration HostbasedAuthentication should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-14",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration RhostsRSAAuthentication should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-15",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration RSAAuthentication should eq \"yes\"",
+      "message": "\nexpected: \"yes\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-16",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration PasswordAuthentication should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-17",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration GSSAPIAuthentication should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: \"yes\"\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-18",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration GSSAPIDelegateCredentials should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-19",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration Tunnel should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-20",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration PermitLocalCommand should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "ssh-21",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSH Configuration UseRoaming should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-01",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration Ciphers should eq \"aes256-ctr,aes192-ctr,aes128-ctr\"",
+      "message": "\nexpected: \"aes256-ctr,aes192-ctr,aes128-ctr\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-02",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration KexAlgorithms should eq \"diffie-hellman-group-exchange-sha256\"",
+      "message": "\nexpected: \"diffie-hellman-group-exchange-sha256\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-03",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration MACs should eq \"hmac-sha2-512,hmac-sha2-256,hmac-ripemd160\"",
+      "message": "\nexpected: \"hmac-sha2-512,hmac-sha2-256,hmac-ripemd160\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should exist"
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should be directory"
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should be owned by \"root\""
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should be grouped into \"root\""
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should be executable"
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should be readable by owner"
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should be readable by group"
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should be readable by other"
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should be writable by owner"
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should not be writable by group"
+    },
+    {
+      "id": "sshd-04",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh should not be writable by other"
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/sshd_config should exist"
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/sshd_config should be file"
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/sshd_config should be owned by \"root\""
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/sshd_config should be grouped into \"root\""
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/sshd_config should not be executable"
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/sshd_config should be readable by owner"
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "File /etc/ssh/sshd_config should not be readable by group",
+      "message": "expected File /etc/ssh/sshd_config not to be readable by group"
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "File /etc/ssh/sshd_config should not be readable by other",
+      "message": "expected File /etc/ssh/sshd_config not to be readable by other"
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/sshd_config should be writable by owner"
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/sshd_config should not be writable by group"
+    },
+    {
+      "id": "sshd-05",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "File /etc/ssh/sshd_config should not be writable by other"
+    },
+    {
+      "id": "sshd-06",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration PermitRootLogin should match /no|without-password/",
+      "message": "expected nil to match /no|without-password/"
+    },
+    {
+      "id": "sshd-07",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration Port should eq \"22\"",
+      "message": "\nexpected: \"22\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-08",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration AddressFamily should match /inet|inet6|any/",
+      "message": "expected nil to match /inet|inet6|any/"
+    },
+    {
+      "id": "sshd-09",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration ListenAddress should match /.*/",
+      "message": "expected nil to match /.*/"
+    },
+    {
+      "id": "sshd-10",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration Protocol should eq \"2\"",
+      "message": "\nexpected: \"2\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-11",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration StrictModes should eq \"yes\"",
+      "message": "\nexpected: \"yes\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-12",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration SyslogFacility should eq \"AUTH\"",
+      "message": "\nexpected: \"AUTH\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-13",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration LogLevel should eq \"VERBOSE\"",
+      "message": "\nexpected: \"VERBOSE\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-14",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration HostKey should cmp == [\"/etc/ssh/ssh_host_rsa_key\", \"/etc/ssh/ssh_host_ecdsa_key\", \"/etc/ssh/ssh_host_ed25519_key\"]",
+      "message": "\nexpected: [\"/etc/ssh/ssh_host_rsa_key\", \"/etc/ssh/ssh_host_ecdsa_key\", \"/etc/ssh/ssh_host_ed25519_key\"]\n     got: \n\n(compared using `cmp` matcher)\n"
+    },
+    {
+      "id": "sshd-15",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration UseLogin should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-16",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration UsePrivilegeSeparation should eq \"sandbox\"",
+      "message": "\nexpected: \"sandbox\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-17",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration PermitUserEnvironment should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-18",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration LoginGraceTime should eq \"30s\"",
+      "message": "\nexpected: \"30s\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-19",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration MaxAuthTries should eq \"2\"",
+      "message": "\nexpected: \"2\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-20",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration MaxSessions should eq \"10\"",
+      "message": "\nexpected: \"10\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-21",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration MaxStartups should eq \"10:30:100\"",
+      "message": "\nexpected: \"10:30:100\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-22",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration PubkeyAuthentication should eq \"yes\"",
+      "message": "\nexpected: \"yes\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-23",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration IgnoreRhosts should eq \"yes\"",
+      "message": "\nexpected: \"yes\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-24",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration IgnoreUserKnownHosts should eq \"yes\"",
+      "message": "\nexpected: \"yes\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-25",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration HostbasedAuthentication should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-27",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration PasswordAuthentication should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-28",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration PermitEmptyPasswords should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-29",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "SSHD Configuration ChallengeResponseAuthentication should eq \"no\""
+    },
+    {
+      "id": "sshd-30",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration KerberosAuthentication should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-31",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration KerberosOrLocalPasswd should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-32",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration KerberosTicketCleanup should eq \"yes\"",
+      "message": "\nexpected: \"yes\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-33",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration GSSAPIAuthentication should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-34",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration GSSAPICleanupCredentials should eq \"yes\"",
+      "message": "\nexpected: \"yes\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-35",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration TCPKeepAlive should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-36",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration ClientAliveInterval should eq \"600\"",
+      "message": "\nexpected: \"600\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-37",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration ClientAliveCountMax should eq \"3\"",
+      "message": "\nexpected: \"3\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-38",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration PermitTunnel should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-39",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration AllowTcpForwarding should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-40",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration AllowAgentForwarding should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-41",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration GatewayPorts should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-42",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration X11Forwarding should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: \"yes\"\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-43",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration X11UseLocalhost should eq \"yes\"",
+      "message": "\nexpected: \"yes\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-44",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "SSHD Configuration PrintMotd should eq \"no\""
+    },
+    {
+      "id": "sshd-45",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration PrintLastLog should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-46",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration Banner should eq \"none\"",
+      "message": "\nexpected: \"none\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-47",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "failed",
+      "code_desc": "SSHD Configuration DebianBanner should eq \"no\"",
+      "message": "\nexpected: \"no\"\n     got: nil\n\n(compared using ==)\n"
+    },
+    {
+      "id": "sshd-48",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "Command test $(awk '$5 < 2047 && $5 ~ /^[0-9]+$/ { print $5 }' /etc/ssh/moduli | uniq | wc -c) -eq 0 exit_status should eq 0"
+    },
+    {
+      "id": "sshd-48",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "Command test $(awk '$5 < 2047 && $5 ~ /^[0-9]+$/ { print $5 }' /etc/ssh/moduli | uniq | wc -c) -eq 0 stdout should eq \"\""
+    },
+    {
+      "id": "sshd-48",
+      "profile_id": "ssh-baseline",
+      "profile_sha256": "f42d2f48c9acd48f52324d52ec575ca9028e405eb303f69cb34d79eb0e588b5c",
+      "status": "passed",
+      "code_desc": "Command test $(awk '$5 < 2047 && $5 ~ /^[0-9]+$/ { print $5 }' /etc/ssh/moduli | uniq | wc -c) -eq 0 stderr should eq \"\""
+    }
+  ],
+  "statistics": {
+    "duration": 0.54335
+  },
+  "version": "2.2.20",
+  "node_name": "to_be_generated",
+  "node_uuid": "to_be_generated",
+  "report_uuid": "to_be_generated",
+  "end_time": "to_be_generated",
+  "environment": "to_be_generated",
+  "type": "inspec_report"
+}

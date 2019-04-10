@@ -1,0 +1,10 @@
+[connectors.ldap]
+ca_contents = """this
+is
+multiline"""
+
+host = "localhost:123"
+bind_dn = "bind"
+bind_password = "p@ssw0rd1"
+base_user_search_dn = "searching"
+user_query_filter = "filter"

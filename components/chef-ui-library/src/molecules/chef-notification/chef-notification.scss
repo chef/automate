@@ -1,0 +1,43 @@
+chef-notification {
+  color: chef-hsl(var(--chef-white));
+  background-color: chef-hsl(var(--chef-dark-grey));
+  padding: 0.5em;
+  padding-right: 1.5em;
+  display: none;
+  position: relative;
+
+  &.visible {
+    display: block;
+  }
+
+  &.info {
+    background-color: chef-hsl(var(--chef-success));
+
+    &::before {
+      font-family: "Material Icons";
+      content: "\E86C";
+      color: currentColor;
+      padding-right: 0.5em;
+    }
+  }
+
+  &.error {
+    background-color: chef-hsl(var(--chef-critical));
+
+    &::before {
+      font-family: "Material Icons";
+      content: "\E002";
+      color: currentColor;
+      padding-right: 0.5em;
+    }
+  }
+
+  &>chef-icon {
+    position: absolute;
+    right: 0.5em;
+    top: 0.5em;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+}

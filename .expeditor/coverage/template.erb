@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script type="text/javascript">
+    //<![CDATA[
+    window.addEventListener("load", function(event) {
+      var trace1 = {
+        x: ["<%= @top_level_coverage.keys.join("\", \"") %>"],
+        y: [<%= @top_level_coverage.values.join(", ") %>],
+        type: 'scatter'
+      };
+      var data = [trace1];
+
+      var layout1 = {
+        yaxis: {rangemode: 'tozero',
+                showline: true,
+                zeroline: true}
+      };
+
+      Plotly.newPlot('div1', data, layout1);
+    });
+    //]]>
+  </script>
+</HEAD>
+<BODY>
+
+<div id="div1"></div>
+
+<H1>Automate UI Code Coverage</H1>
+<ul>
+  <% @dates.each do |date| %>
+    <li><a href="https://a2-code-coverage.cd.chef.co/automate-ui/<%= date %>/"><%= date %></a></li>
+  <% end %>
+</ul>
+<H3>
+Last Updated: <%= @now %>
+</H3>
+</BODY>
+</HTML>

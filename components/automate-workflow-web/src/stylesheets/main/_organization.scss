@@ -1,0 +1,44 @@
+.organization {
+  @include columns(10);
+
+  .button-bar {
+    a {
+      width: auto;
+    }
+  }
+
+  .project-scm-instructions {
+    font-size: 13px;
+    line-height: 1.3rem;
+    color: #666;
+  }
+}
+
+.automate-ui .organization {
+  width: 100%;
+  margin: 0;
+  float: none;
+}
+
+.icon-line {
+  display: flex;
+  justify-content: space-between;
+
+  .scm-icon {
+    color: $grey3;
+    font-size: 26px;
+  }
+
+  a .scm-icon {
+    color: $bluelink;
+
+    &:hover {
+      color: $bluehover;
+    }
+  }
+
+  .tooltip-inner {
+    font-family: Helvetica;
+  }
+
+}

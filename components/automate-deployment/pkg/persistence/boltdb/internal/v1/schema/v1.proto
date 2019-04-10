@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option go_package = "github.com/chef/automate/components/automate-deployment/pkg/persistence/boltdb/internal/v1/schema";
+import "google/protobuf/timestamp.proto";
+
+message Deployment {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string last_action = 3;
+  bool deployed = 4;
+  repeated Service services = 5;
+  ReleaseManifest current_release_manifest = 6;
+}
+
+message ReleaseManifest {
+  string build = 1;
+  string buildSHA = 2;
+  repeated string packages = 3;
+  repeated Hart harts = 4;
+}
+
+message Hart {
+  string origin = 1;
+  string name = 2;
+  string path = 3;
+}
+
+message Service {
+  enum DeploymentState {
+    SKIP = 0;
+    INSTALLED = 1;
+    RUNNING = 2;
+    REMOVED = 3;
+  }
+
+  enum InstallType {
+    DEPOT = 0;
+    HART = 1;
+  }
+
+  string origin = 1;
+  string original_origin = 2;
+  string name = 3;
+  InstallType install_type = 4;
+  string hart_path = 5;
+  reserved 6;
+  reserved 7;
+  DeploymentState deployment_state = 8;
+  string ssl_key = 9;
+  string ssl_cert = 10;
+  reserved 11;
+}

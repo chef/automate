@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package chef.automate.api.ingest.request;
+option go_package = "github.com/chef/automate/api/external/ingest/request";
+
+// SchedulerConfig
+// The job message to configure the Delete Node Job
+// every - It accepts '1h30m', '1m', '2h30m', ...
+message SchedulerConfig {
+  string every = 1;
+  string threshold = 2;
+  bool running = 3;
+}
+message GetStatusJobScheduler { }
+message StartJobScheduler { }
+message StopJobScheduler { }
+
+// DeleteNodesScheduler
+message DeleteMarkedNodes { }
+message StartDeleteNodesScheduler { }
+message StopDeleteNodesScheduler { }
+
+// MissingNodesForDeletionScheduler
+message MarkMissingNodesForDeletion { }
+message StartMissingNodesForDeletionScheduler { }
+message StopMissingNodesForDeletionScheduler { }
+
+// NodesMissingScheduler
+message MarkNodesMissing { }
+message StartNodesMissingScheduler { }
+message StopNodesMissingScheduler { }

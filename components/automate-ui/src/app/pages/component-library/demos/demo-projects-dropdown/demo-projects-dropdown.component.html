@@ -1,0 +1,116 @@
+<app-component-library-screen>
+  <app-cl-section>
+    <h3>Working Example</h3>
+
+    <app-projects-dropdown
+      [projects]="dropdownProjects"
+      (onSelection)="projectsDropdownAction($event.detail)">
+    </app-projects-dropdown>
+    <app-projects-dropdown
+      [disabled]="true"
+      [projects]="dropdownProjects"
+      (onSelection)="projectsDropdownAction($event.detail)">
+    </app-projects-dropdown>
+  </app-cl-section>
+
+  <app-cl-code-section>
+    <h3>Angular Template Code Example</h3>
+
+    <pre>&lt;app-projects-dropdown
+  [projects]="arrayOfProjects"
+  (onSelection)="someFunction($event.detail)"&gt;
+&lt;/app-projects-dropdown&gt;
+</pre>
+  </app-cl-code-section>
+
+  <app-cl-code-section>
+    <h3>Typescript Code Example</h3>
+
+    <code>
+      <pre>
+import {{'{'}} Component {{'}'}} from '@angular/core';
+
+@Component({{'{'}}
+  selector: 'app-demo-projects-dropdown',
+  templateUrl: './demo-projects-dropdown.component.html',
+  styleUrls: []
+{{'}'}})
+export class DemoProjectsDropdownComponent {{'{'}}
+  dropdownProjects = [{{'{'}}
+    'name': 'Project 1',
+    'id': 'project-1',
+    'enabled': false
+  {{'}'}}, {{'{'}}
+    'name': 'Project 2',
+    'id': 'project-2',
+    'enabled': false
+  {{'}'}}, {{'{'}}
+    'name': 'Project 3',
+    'id': 'project-3',
+    'enabled': false
+  {{'}'}}, {{'{'}}
+    'name': 'Project 4',
+    'id': 'project-4',
+    'enabled': false
+  {{'}'}}, {{'{'}}
+    'name': 'Project 5',
+    'id': 'project-5',
+    'enabled': false
+  {{'}'}}, {{'{'}}
+    'name':
+    `Project 6 Has A Really Ridiculously Long Name and It should Stay on the same line
+    Stay on the same line`,
+    'id': 'project-6',
+    'enabled': false
+{{'}'}}];
+
+
+  projectsDropdownAction(projects) {{'{'}}
+    console.log('projects:');
+    console.log(projects);
+  {{'}'}}
+{{'}'}}
+      </pre>
+    </code>
+  </app-cl-code-section>
+
+  <app-cl-section>
+    <h3>API</h3>
+
+    <app-cl-api>
+      <api-prop name="projects" type="Array" required>
+        Array of projects to be passed to the dropdown
+      </api-prop>
+
+      <api-prop name="onSelection" type="Function(Array): void" required>
+        Emits the array of projects that has been selected
+      </api-prop>
+
+      <api-prop name="disabled" type="Boolean" default="false">
+        Specify whether the dropdown should be disabled.
+      </api-prop>
+
+      <api-prop name="required" type="Boolean" default="false">
+        Specify whether the dropdown is a required element to fill out.
+      </api-prop>
+    </app-cl-api>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Accessibility</h3>
+
+    <p>
+      This component is keyboard accessible. You can use the tab key to navigate to the
+      component and press enter/spacebar to open the dropdown. Then you can use the tab key
+      (or shift+tab to move backwards) to navigate to the checkboxes in the dropdown.
+      Use the space bar to check/uncheck the checkboxes. Use the enter key to close the
+      dropdown.
+    </p>
+    <p>
+      You can also navigate between the checkboxes using the up/down arrow keys. You cannot
+      use the arrow keys to navigate between the button (the element that says 'select projects')
+      and the checkboxes. The whole component will be navigabie with arrow keys in future
+      iterations.
+    </p>
+  </app-cl-section>
+</app-component-library-screen>

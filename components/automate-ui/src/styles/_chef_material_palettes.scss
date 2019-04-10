@@ -1,0 +1,17 @@
+@import './_variables';
+
+$chef-mat-primary: (
+  100: $chef-primary-bright,
+  500: $chef-primary-bright,
+  contrast: (
+    500: $chef-primary-light
+  )
+);
+
+$chef-mat-warn: (
+  100: $chef-critical,
+  500: $chef-critical,
+  contrast: (
+    500: $chef-yellow
+  )
+);

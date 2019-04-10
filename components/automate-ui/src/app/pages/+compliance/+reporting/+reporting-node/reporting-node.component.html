@@ -1,0 +1,215 @@
+<app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
+
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/compliance/reporting/nodes']">Reporting</chef-breadcrumb>
+      {{ activeReport.node_name }}
+    </chef-breadcrumbs>
+
+    <ng-container *ngIf="activeReport && !reportLoading">
+      <chef-page-header>
+        <chef-heading>{{ activeReport.node_name }}</chef-heading>
+        <div slot="header-buttons">
+          <chef-button primary (click)="onHistoryOpenClick($event)">
+            Scan History
+          </chef-button>
+        </div>
+      </chef-page-header>
+
+      <div class="metadata">
+        <chef-card>
+          <chef-table>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>schedule</chef-icon> Last Scan
+              </chef-th>
+              <chef-td>{{ formatDate(activeReport.end_time) }}</chef-td>
+            </chef-tr>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>description</chef-icon> Profiles
+              </chef-th>
+              <chef-td>
+                {{ activeReport.profiles.length | number }} Profiles
+                <ng-container *ngIf="profilesByStatus(activeReport.profiles, 'skipped'); let skipped">
+                  <span id="skipped-count" *ngIf="skipped.length > 0">
+                    ({{ skipped.length }} Skipped <chef-icon>info</chef-icon>)
+                    <chef-tooltip for="skipped-count" position="right">
+                      <p>Skipping profile(s):</p>
+                      <ul>
+                        <li *ngFor="let profile of skipped">{{ profile.skip_message }}</li>
+                      </ul>
+                    </chef-tooltip>
+                  </span>
+                </ng-container>
+              </chef-td>
+            </chef-tr>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>storage</chef-icon> Platform
+              </chef-th>
+              <chef-td>{{ activeReport.platform.name }} {{ activeReport.platform.release }}</chef-td>
+            </chef-tr>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>public</chef-icon> Environment
+              </chef-th>
+              <chef-td>{{ activeReport.environment }}</chef-td>
+            </chef-tr>
+          </chef-table>
+        </chef-card>
+      </div>
+
+      <chef-phat-radio
+        class="nodes-list-status-filters"
+        [value]="activeStatusFilter"
+        (change)="onFilterControlStatusClick($event, $event.target.value)">
+        <chef-option class="filter all" value='all'>
+          <span class="filter-label">Total Controls</span>
+          <span class="filter-total">
+            <chef-icon>storage</chef-icon> {{activeReport.controls.total | number}}
+          </span>
+        </chef-option>
+        <chef-option class="filter critical" value='critical'>
+          <span class="filter-label">Critical Controls</span>
+          <span class="filter-total">
+            <chef-icon>report_problem</chef-icon> {{activeReport.controls.failed.critical | number}}
+          </span>
+        </chef-option>
+        <chef-option class="filter major" value='major'>
+          <span class="filter-label">Major Controls</span>
+          <span class="filter-total">
+            <chef-icon>check_circle</chef-icon> {{activeReport.controls.failed.major | number}}
+          </span>
+        </chef-option>
+        <chef-option class="filter minor" value='minor'>
+          <span class="filter-label">Minor Controls</span>
+          <span class="filter-total">
+            <chef-icon>help</chef-icon> {{activeReport.controls.failed.minor | number}}
+          </span>
+        </chef-option>
+        <chef-option class="filter skipped" value='skipped'>
+          <span class="filter-label">Skipped Controls</span>
+          <span class="filter-total">
+            <chef-icon>help</chef-icon> {{activeReport.controls.skipped.total | number}}
+          </span>
+        </chef-option>
+        <chef-option class="filter passed" value='passed'>
+          <span class="filter-label">Passed Controls</span>
+          <span class="filter-total">
+            <chef-icon>help</chef-icon> {{activeReport.controls.passed.total | number}}
+          </span>
+        </chef-option>
+      </chef-phat-radio>
+
+      <chef-table class="controls-table">
+        <chef-thead>
+          <chef-tr>
+            <chef-th>Control</chef-th>
+            <chef-th>Severity</chef-th>
+            <chef-th>Root Profile</chef-th>
+            <chef-th>Test Results</chef-th>
+            <chef-th></chef-th>
+          </chef-tr>
+        </chef-thead>
+        <chef-tbody>
+          <ng-container *ngFor="let profile of filteredProfiles(activeReport.profiles, activeStatusFilter)">
+            <ng-container *ngFor="let control of filteredControls(profile.controls, activeStatusFilter)">
+              <chef-tr>
+                <chef-td>
+                  <chef-icon class="status-icon" [ngClass]="control.status">
+                    {{ statusIcon(control.status) }}
+                  </chef-icon>
+                  <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
+                </chef-td>
+                <chef-td class="impact-status" [ngClass]="impactStatus(control)">
+                  {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
+                </chef-td>
+                <chef-td>{{profile.name}}</chef-td>
+                <chef-td>{{control.results.length | number}}</chef-td>
+                <chef-td>
+                  <chef-button secondary (click)="toggleControl(control)">
+                    <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
+                    <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
+                  </chef-button>
+                </chef-td>
+              </chef-tr>
+              <div class="control-detail" *ngIf="isOpenControl(control)">
+                <p *ngIf="control.desc.length">{{ control.desc }}</p>
+                <chef-toggle
+                  [value]="openControls[control.id]?.pane"
+                  (change)="showControlPane(control, $event.target.value)">
+                  <chef-option value='results'>Results</chef-option>
+                  <chef-option value='source'>Source</chef-option>
+                </chef-toggle>
+                <ng-container [ngSwitch]="openControlPane(control)">
+                  <div *ngSwitchCase="'results'">
+                    <div class="result-item" *ngFor="let result of control.results">
+                      <div class="result-item-header">
+                        <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
+                        <p>{{ result.code_desc }}</p>
+                      </div>
+                      <div
+                        class="result-item-body"
+                        *ngIf="result.message.length || result.skip_message.length">
+                        <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
+                      </div>
+                    </div>
+                  </div>
+                  <chef-snippet
+                    class="source"
+                    *ngSwitchCase="'source'"
+                    [code]="control.code"
+                    lang="ruby">
+                  </chef-snippet>
+                </ng-container>
+              </div>
+            </ng-container>
+          </ng-container>
+        </chef-tbody>
+      </chef-table>
+
+      <chef-scroll-top></chef-scroll-top>
+    </ng-container>
+
+    <chef-side-panel class="reporting-profile-side-panel" [visible]="showScanHistory">
+      <div class="side-panel-header">
+        <chef-icon class="header-icon">restore</chef-icon>
+        <div class="header-text">
+          <h4><strong>Scan history for node:</strong></h4>
+          <p>{{ activeReport?.node_name }}</p>
+        </div>
+        <chef-button secondary (click)="onHistoryCloseClick($event)">
+          <chef-icon>close</chef-icon>
+        </chef-button>
+      </div>
+      <div class="side-panel-body">
+        <div class="side-panel-body-header">
+          <p>Tap on a scan to view results on that date</p>
+        </div>
+        <ul class="results-profile-list">
+          <li
+            *ngFor="let report of filteredReports(reports, activeReportStatus)"
+            class="results-profile-list-item"
+            [class.selected]="isReportSelected(report)">
+            <div class="list-item-summary">
+              <chef-icon class="status-icon list-item-icon" [ngClass]="report.status">{{ statusIcon(report.status) }}</chef-icon>
+              <div class="list-item-text">
+                <p class="node-name">
+                  <strong>{{formatDate(report.end_time)}}</strong>
+                </p>
+                <p>{{formatDaysAgo(report.end_time)}}</p>
+              </div>
+              <chef-button secondary (click)="onReportItemClick($event, report)">
+                <chef-icon>chevron_right</chef-icon>
+              </chef-button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </chef-side-panel>
+
+    <chef-loading-spinner *ngIf="reportLoading" size="100"></chef-loading-spinner>
+  </main>
+</div>

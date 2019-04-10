@@ -1,0 +1,72 @@
+<div *ngIf="permissionDenied" class="permission-denied-banner">
+  <p>You do not have permission to view everything on this page.</p>
+  <p>Please contact an administrator for permission.</p>
+</div>
+
+<app-server-org-filter-sidebar>
+</app-server-org-filter-sidebar>
+
+<div class="container">
+  <main>
+    <div class="event-feed-container">
+      <div class="event-feed-upper">
+        <chef-page-header>
+          <chef-heading>Event Feed</chef-heading>
+          <chef-subheading>Displays events for the past week. Use <em>SHIFT+R</em>  to reset the time scale.</chef-subheading>
+        </chef-page-header>
+      </div>
+      <div class="page-body">
+          <div class="event-summary-bar">
+            <app-event-feed-select
+              [selectedValue]="selectedEntityType"
+              [eventTypeCount]="eventTypeCount"
+              (change)="selectEventType($event)"
+              [disabled]="permissionDenied">
+            </app-event-feed-select>
+            <div class="summary-totals small strong">
+              <div class="summary">
+                <div class="title">Total events</div>
+                <div class="total">{{totalTaskCounts | number}}</div>
+              </div>
+              <div class="summary circle">
+                <div class="title">Creations</div>
+                <div class="total">{{createCounts | number}}</div>
+              </div>
+              <div class="summary outline">
+                <div class="title">Deletions</div>
+                <div class="total">{{deleteCounts | number}}</div>
+              </div>
+              <div class="summary rhombus">
+                <div class="title">Updates</div>
+                <div class="total">{{updateCounts | number}} </div>
+              </div>
+            </div>
+            <chef-button secondary class="reset-button"
+              (click)="guitarStrings.resetSliders()"
+              [disabled]="resetTimescaleDisabled">
+              Reset Timescale
+            </chef-button>
+          </div>
+          <div class="app-event-feed-guitar-strings">
+            <app-event-feed-guitar-strings #guitarStrings
+              (newDateRange)="selectDateRange($event)"
+              [guitarStringCollection]="guitarStringCollection">
+            </app-event-feed-guitar-strings>
+          </div>
+        <p class="is-empty" *ngIf="loadedEmptySetOfEvents">There were no events in the selected timeframe.</p>
+        <p class="is-empty" *ngIf="errorLoadingEvents">There was an error loading events.</p>
+        <chef-loading-spinner *ngIf="eventsLoading" size="50"></chef-loading-spinner>
+        <ng-container>
+            <app-event-feed-table [events]="events"></app-event-feed-table>
+        </ng-container>
+        <chef-separator class="load-more" *ngIf="completeNumberOfEvents > totalNumberOfEventsLoaded">
+          <chef-button primary (click)="loadMore()" >
+            <div class="load-more-text">Load more events</div>
+            <div class="load-more-index"> ({{totalNumberOfEventsLoaded | number}} of {{completeNumberOfEvents | number}})</div>
+          </chef-button>
+        </chef-separator>
+      </div>
+    </div>
+  </main>
+</div>
+<chef-scroll-top></chef-scroll-top>

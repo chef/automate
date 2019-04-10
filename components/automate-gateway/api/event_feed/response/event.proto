@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package chef.automate.api.event_feed.response;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/event_feed/response";
+
+import "google/protobuf/timestamp.proto";
+
+message Events {
+  repeated Event events = 1;
+  int64 total_events = 2;
+}
+
+message Event {
+  string event_type = 1;
+  string task = 2;
+  google.protobuf.Timestamp start_time = 3;
+  string entity_name = 4;
+  string requestor_type = 5;
+  string requestor_name = 6;
+  string service_hostname = 7;
+  string start_id = 8;
+  int32 event_count = 9;        // To group events of the same type, task and requestor
+  string parent_name = 16;
+  string parent_type = 17;
+  google.protobuf.Timestamp end_time = 18; // Equal to start_time if not grouped
+  string end_id = 19; // Equal to start_id if not grouped
+}
+
+message EventCounts {
+  int64 total = 1;
+  repeated EventCount counts = 2;
+}
+
+message EventCount {
+  string name = 1;
+  int64 count = 2;
+}

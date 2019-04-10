@@ -1,0 +1,74 @@
+<div class="comment-container" id="comment-{{ comment.id }}" ng-class="{ active: isActive() }" ng-if='!editingComment'>
+  <a class="comment-author" href="">{{ comment.author.first[0] }}{{ comment.author.last[0] }}</a>
+  <div class="comment-body">
+    <div class="comment-header">
+      <div class="comment-meta">
+        {{ render_author_name() }} commented
+        <a ng-href="{{ comment.url }}" ng-click="onCommentLinkClick($event, comment)">
+          <time datetime="{{ comment.datetime }}" title="{{ comment.datetime }}" cd-relative-time>{{ comment.datetime }}</time>
+        </a>
+      </div>
+      <div ng-if="isAuthor" class="comment-actions">
+        <button
+          ng-if="isAuthor"
+          class="button square secondary"
+          icon-button="pencil"
+          ng-click="editComment()"
+          title="Edit Organization">
+        </button>
+        <button
+          ng-if="isAuthor"
+          class="button square destroy"
+          ng-click="deleteComment()"
+          icon-button="trash"
+          title="Delete Comment">
+        </button>
+      </div>
+    </div>
+    <div cd-embedly>
+      <div ng-embedly key="key" method="method" add-image-styles="addImageStyles" display="display">
+        <div class="comment-text" cd-markdown="comment.content"></div>
+      </div>
+    </div>
+    <div class="comment-footer">
+      <a class="comment-reply" href="" ng-click="toggleReply()">Reply</a>
+    </div>
+    <form class="comment-reply-form" ng-if="draftingReply" ng-submit="submitReply(reply)">
+      <cd-ace
+        ng-model="reply.content"
+        placeholder="Make a reply"
+        on-submit="submitReply(reply)">
+      </cd-ace>
+      <div class="reply-form-footer">
+        <button type="submit" class="button primary">Submit Reply</button>
+        <button type="button" class="button secondary" ng-click="cancelReply()">Cancel</button>
+      </div>
+    </form>
+    <div class="comment-container" ng-if="reply.content">
+      <div cd-embedly>
+        <div ng-embedly key="key" method="method" add-image-styles="addImageStyles" display="display">
+          <div class="comment-text" cd-markdown="reply.content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div ng-if="editingComment">
+  <form class="comment-reply-form" ng-submit="submitEditedComment(editedComment)">
+    <cd-ace
+      ng-model="editedComment.content"
+      on-submit="submitEditedComment(editedComment)">
+    </cd-ace>
+    <div class="reply-form-footer">
+      <button type="submit" class="button primary">Submit Edited Comment</button>
+      <button type="button" class="button secondary" ng-click="cancelEdit()">Cancel</button>
+    </div>
+  </form>
+  <div class="comment-container" ng-if="editedComment.content">
+    <div cd-embedly>
+      <div ng-embedly key="key" method="method" add-image-styles="addImageStyles" display="display">
+        <div class="comment-text" cd-markdown="editedComment.content"></div>
+      </div>
+    </div>
+  </div>
+</div>

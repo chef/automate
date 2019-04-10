@@ -1,0 +1,85 @@
+/*
+This is the context map for Chef Automate 2. 
+
+As you add items, you will likely need to tweak "K" to find a layout that fits.
+
+Additionally, don't be afraid to add direction for edges to tweak the lines. A little passthrough
+is fine, as long as the labels are clear.
+
+*/
+
+digraph "context_map" {
+	fontsize = "60"
+	layout = fdp
+	overlap = scale 
+	splines = true
+	compound = true
+	K = 7
+
+	node [shape=circle, height=6, fontsize=60]
+	
+	edge [arrowhead = none, labeldistance=5, labelangle=30, minlen=5, fontsize=40]
+
+		subgraph cluster_supporting {
+			style=invis
+			label=""
+			node [style="filled"]
+			deployment [label="Deployment"]
+			notifications [label="Notifications"]
+			licensing [label="Licensing"]
+			auth [label="Authentication\n & Authorization"]
+		}
+
+		subgraph cluster_generic {
+			legal [label="Legal"]
+			style=invis
+			label=""
+			salesandmarketing [label="Sales & Marketing"]
+		}
+
+		subgraph cluster_cm {
+			label="Configuration Management"
+			fontsize="50"
+			style=filled
+			fillcolor="#F3F6F8"
+			node [style="filled" color="#3897D3" fillcolor="#3897D3"]
+			cmingestion [label="Ingestion"]
+			cmreporting [label="Reporting"]
+			color=blue
+		}
+
+		subgraph cluster_co {
+			label="Compliance"
+			fontsize="40"
+			style=filled
+			fillcolor="#F3F6F8"
+			//fillcolor="#fdb714"
+			node [style="filled" color="#fdb714" fillcolor="#fdb714"]
+			coingestion [label="Ingestion"]
+			coreporting [label="Reporting"]
+			coprofiles [label="Profiles"]
+			coscanner [label="Scanner"]
+		}
+
+	cmingestion -> cmreporting [taillabel="SK" headlabel="SK" ]
+	cmingestion:nw -> coingestion [taillabel="SK" headlabel="SK"]
+
+	coingestion -> coreporting [taillabel="SK" headlabel="SK" minlen=2]
+	coprofiles -> {coreporting, coingestion, coscanner} [style="invis"]
+	coscanner -> {coreporting, coingestion, coprofiles} [style="invis"]
+
+	deployment -> {notifications, licensing, auth}  [taillabel="S" headlabel="C"]
+	deployment -> cluster_cm [taillabel="S" headlabel="C"]
+	deployment -> cluster_co [taillabel="S" headlabel="C"]
+
+	notifications -> cluster_co [taillabel="OHL", headlabel="ACL"]
+	notifications -> cluster_cm [taillable="OHL", headlabel="ACL"]
+
+	auth:nw -> cluster_co [taillabel="OHL", headlabel="ACL"]
+	auth -> cluster_cm [taillabel="OHL", headlabel="ACL"]
+
+	licensing -> salesandmarketing [headlabel="C" taillabel="S"]
+	licensing -> legal [headlabel="C" taillabel="S"]
+	licensing:sw -> cluster_co [taillabel="OHL" headlabel="ACL" lhead=cluster_cm]
+	licensing:s -> cluster_cm [taillabel="OHL" headlabel="ACL" lhead=cluster_co]
+}

@@ -1,0 +1,21 @@
+.change-btns {
+  @include clearfix;
+
+  .review-btns {
+    float: left;
+  }
+
+  .action-btns {
+    float: right;
+
+    .btn-delete {
+      background-color: $alertred;
+      border-color: $alertred;
+    }
+
+    .btn-approve {
+      background-color: $darkteal;
+      border-color: $darkteal;
+    }
+  }
+}

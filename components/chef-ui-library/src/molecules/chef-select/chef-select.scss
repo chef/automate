@@ -1,0 +1,84 @@
+chef-select {
+  outline: none;
+  border-radius: var(--chef-border-radius);
+  border-color: chef-hsl(var(--chef-grey));
+  display: inline-block;
+  background-color: chef-hsl(var(--chef-white));
+
+  .selected-value {
+    display: block;
+    padding: 1em 3.5em 1em 1em;
+    position: relative;
+    border-radius: inherit;
+    border: 1px solid;
+    border-color: inherit;
+    position: relative;
+    transition: border-color 0.5s ease;
+
+    chef-icon {
+      position: absolute;
+      right: 0.75em;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.25em;
+    }
+
+    &:not(.disabled) .selected-value {
+      cursor: pointer;
+    }
+  }
+
+  &.focused .selected-value {
+    border-color: chef-hsl(var(--chef-primary-bright));
+  }
+
+  &.active .selected-value {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    z-index: 102;
+  }
+
+  .options {
+    width: 100%;
+    position: relative;
+  }
+
+  chef-dropdown {
+    width: 100%;
+    border: 1px solid;
+    border-color: chef-hsl(var(--chef-primary-bright));
+    border-top: none;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    outline: none;
+    z-index: 101;
+  }
+
+  chef-option {
+    display: block;
+    padding: 1em 3em 1em 1.5em;
+    border-bottom: 1px solid chef-hsl(var(--chef-grey));
+    cursor: pointer;
+    color: inherit;
+    position: relative;
+    white-space: nowrap;
+
+    &:last-child {
+      border-bottom: 0px;
+    }
+
+    &:hover {
+      background-color: chef-hsl(var(--chef-lightest-grey));
+      color: chef-hsl(var(--chef-primary-bright));
+      outline: none;
+    }
+
+    .option-content {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-block;
+      width: 100%;
+    }
+
+  }
+}

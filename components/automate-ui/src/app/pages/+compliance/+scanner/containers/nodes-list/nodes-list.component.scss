@@ -1,0 +1,149 @@
+@import "~styles/variables";
+
+.nodes-list-status-filters {
+  display: block;
+  margin-bottom: 1em;
+
+  ::ng-deep .filter {
+    font-size: 14px;
+    height: auto;
+
+    &::before {
+      display: none;
+    }
+
+    .option-content {
+      display: flex;
+      padding: 0;
+      flex-direction: column;
+    }
+
+    .filter-total {
+      display: flex;
+      align-items: center;
+
+      chef-icon {
+        margin: -2px 0.5em 0 0;
+      }
+    }
+
+    &.selected {
+      background: blue;
+
+      .filter-label,
+      .filter-total {
+        color: $chef-white;
+      }
+
+      &.all  {
+        background: $chef-primary-bright;
+      }
+
+      &.unreachable  {
+        background: $chef-critical;
+      }
+
+      &.reachable  {
+        background: $chef-success;
+      }
+
+      &.unknown  {
+        background: $chef-dark-grey;
+      }
+    }
+
+    &:not(.selected) {
+      &.all .filter-total  {
+        color: $chef-primary-bright;
+      }
+
+      &.unreachable .filter-total  {
+        color: $chef-critical;
+      }
+
+      &.reachable .filter-total  {
+        color: $chef-success;
+      }
+
+      &.unknown .filter-total  {
+        color: $chef-dark-grey;
+      }
+    }
+  }
+}
+
+.nodes-list-table {
+  .new-row {
+    font-size: 14px;
+  }
+
+  chef-loading-spinner {
+    display: block;
+    margin: 100px auto;
+    width: 100px;
+  }
+
+  .rerun-btn {
+    margin-left: -0.5em;
+  }
+}
+
+.nodes-list-paging {
+  margin: 0 0 35px;
+}
+
+.side-panel {
+  chef-button {
+    margin: 0;
+  }
+
+  .side-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background: $chef-white;
+    border-bottom: 1px solid $chef-grey;
+
+    .header-icon {
+      font-size: 2em;
+      color: $chef-dark-grey;
+    }
+
+    .header-text {
+      margin: 0 1em;
+      flex-grow: 1;
+
+      p {
+        margin: 0;
+        color: $chef-dark-grey;
+      }
+    }
+  }
+
+  .side-panel-body-header {
+    display: flex;
+    padding: 1em;
+    border-bottom: 1px solid $chef-grey;
+    align-items: center;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .side-panel-body-detail {
+    padding: 1em;
+    border-left: 4px solid $chef-critical;
+    background: $chef-white;
+
+    pre {
+      margin: 0;
+      padding: 1em;
+      border: 1px solid $chef-grey;
+      border-radius: $global-radius;
+      background: $chef-lightest-grey;
+      font-size: 14px;
+    }
+  }
+}

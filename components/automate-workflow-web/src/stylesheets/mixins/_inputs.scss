@@ -1,0 +1,23 @@
+@mixin placeholder-text($placeholder-color: $grey3, $placeholder-size: 12px) {
+  &::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: $placeholder-color;
+    font-size: $placeholder-size;
+  }
+
+  &:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color: $placeholder-color;
+    font-size: $placeholder-size;
+    opacity: 1;
+  }
+
+  &::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: $placeholder-color;
+    font-size: $placeholder-size;
+    opacity: 1;
+  }
+
+  &:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: $placeholder-color;
+    font-size: $placeholder-size;
+  }
+}

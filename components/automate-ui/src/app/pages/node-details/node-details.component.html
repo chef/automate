@@ -1,0 +1,52 @@
+<app-server-org-filter-sidebar>
+  <chef-sidebar-entry route="/client-runs" icon="storage">Node State</chef-sidebar-entry>
+</app-server-org-filter-sidebar>
+<div class="container">
+  <main>
+    <div class="node-details-container">
+      <div class="run-container">
+        <chef-breadcrumbs>
+          <chef-breadcrumb [link]="['/client-runs']">Client runs</chef-breadcrumb>
+          Node {{nodeRun.nodeName}}
+        </chef-breadcrumbs>
+
+        <chef-page-header>
+          <chef-heading>Node {{nodeRun.nodeName}}</chef-heading>
+          <chef-subheading>Use the run history list to examine recent Chef client runs for this node.</chef-subheading>
+          <div slot="header-buttons">
+            <chef-button class="run-history-button" id="run-history-button" primary (click)="openRunHistory()">Run history</chef-button>
+          </div>
+          <app-run-summary [nodeRun]="nodeRun"> </app-run-summary>
+        </chef-page-header>
+
+        <div class="main page-body">
+          <app-tabs class="tabs-row" (tabChange)="tabChange($event)">
+            <app-tab tabTitle="Resources" #res_tab [active]="true">
+              <app-resources *ngIf="res_tab.active" [nodeRun]="nodeRun">
+              </app-resources>
+            </app-tab>
+            <app-tab tabTitle="Run List" #run_tab  [active]="false">
+              <app-run-list *ngIf="run_tab.active" [nodeRun]="nodeRun">
+              </app-run-list>
+            </app-tab>
+            <app-tab tabTitle="Attributes" #attr_tab [active]="false">
+              <app-attributes *ngIf="attr_tab.active" [nodeId]="nodeId"></app-attributes>
+            </app-tab>
+          </app-tabs>
+
+          <chef-scroll-top></chef-scroll-top>
+        </div>
+      </div>
+    </div>
+    <app-logs-modal [isVisible]="modalIsVisible" [nodeRun]="nodeRun"></app-logs-modal>
+      <app-run-history
+        [visible]="runHistoryVisible"
+        class="run-history-container"
+        [nodeId]="nodeId"
+        (on_run_change)="updateRunId($event)"
+        (closeRunHistoryEvent)="closeRunHistory()"
+        [initialRunId]="runId"
+        [initialDate]="nodeRun.startTime">
+      </app-run-history>
+  </main>
+</div>

@@ -1,0 +1,4 @@
+#!{{pkgPathFor "core/bash"}}/bin/sh
+
+chown -R hab:hab "{{ pkg.svc_static_path }}"
+exec nginx -c "{{ pkg.svc_config_path }}/nginx.conf" 2>&1

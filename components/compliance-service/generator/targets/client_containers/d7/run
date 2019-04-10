@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run -p 11029:22 -d d7:latest

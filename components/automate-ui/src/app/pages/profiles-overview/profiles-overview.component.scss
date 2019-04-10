@@ -1,0 +1,145 @@
+@import "~styles/variables";
+
+.profiles-header {
+  padding-bottom: 0;
+}
+
+.profiles-search {
+  padding: 32px 0 14px;
+
+  chef-input {
+    width: 100%;
+    font-size: 14px;
+  }
+}
+
+.profiles-content {
+  margin: 35px;
+
+  .empty-help {
+    margin: 0;
+  }
+}
+
+.profiles-table {
+  chef-loading-spinner {
+    display: block;
+    margin: 100px auto;
+    width: 100px;
+  }
+
+  chef-clipboard {
+    margin-left: -0.5em;
+  }
+
+  &.installed {
+    chef-th:first-child,
+    chef-td:first-child,
+    chef-th:last-child,
+    chef-td:last-child {
+      flex-grow: 2;
+    }
+  }
+
+  &.available {
+    chef-th:first-child,
+    chef-td:first-child {
+      flex-grow: 5;
+    }
+
+    chef-td:last-child {
+      justify-content: flex-end;
+    }
+  }
+}
+
+#upload-modal {
+  .file-upload-list {
+    margin: 1em 0 -0.5em 0;
+
+    chef-td {
+      flex-basis: auto;
+
+      &:first-child {
+        chef-icon,
+        chef-loading-spinner {
+          margin-right: 1em;
+        }
+      }
+
+      &:last-child {
+        flex-grow: 0;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    margin: 1em 0;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .upload-percent {
+    color: $chef-dark-grey;
+  }
+
+  .failed {
+    color: $chef-critical;
+  }
+
+  .passed {
+    color: $chef-success;
+  }
+}
+
+#upload-modal-title,
+#upload-modal-subtitle {
+  text-align: center;
+}
+
+.result-detail {
+  background: $chef-lightest-grey;
+  border: 1px solid $chef-grey;
+  border-top: none;
+  transform: translateY(-0.5em);
+
+  pre {
+    margin: 0;
+    padding: 1em;
+    font-size: 14px;
+  }
+}
+
+// TODO need a reusable input[file] chef-button
+.custom-file-input {
+  display: inline-block;
+  margin: 8px;
+  padding: 0 8px;
+  background-color: $chef-primary-bright;
+  border: 1px solid $chef-primary-bright;
+  border-radius: $global-radius;
+  color: $chef-white;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 32px;
+  text-align: center;
+  font-weight: 400;
+
+  &:hover {
+    background-color: darken($chef-primary-bright, 7%);
+  }
+
+  &:active {
+    background-color: darken($chef-primary-bright, 14%);
+  }
+
+  &::before {
+    content: 'Select Files';
+  }
+
+  input[type='file'] {
+    position: absolute;
+    left: -999em;
+  }
+}

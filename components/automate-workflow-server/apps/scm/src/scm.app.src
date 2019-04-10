@@ -1,0 +1,14 @@
+{application, scm,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  delivery,
+                  chef_common
+                 ]},
+  {mod, {scm_app, []}},
+  {env, []}
+ ]}.

@@ -1,0 +1,30 @@
+## This file is intended for use in the Docker container only
+## Name of the node
+-name delivery@127.0.0.1
+
+## Cookie for distributed erlang
+-setcookie
+
+## When Erlang runs on a single CPU system it defaults to disabled SMP
+## which breaks some NIF code. In general Delivery should be run on a
+## multicore box and this option will not be needed as the Erlang VM
+## will enable SMP on multicore boxes by default. However, enabling it
+## here will allow the NIF code in question to function on a single
+## core box which could be useful for testing.
+-smp enable
+
+## Enable kernel poll and a few async threads
++K true
++A 10
+
+## Increase number of concurrent ports/sockets
+-env ERL_MAX_PORTS 4096
+
+## Tweak GC to run more often
+-env ERL_FULLSWEEP_AFTER 10
+
+## Increase logfile size to 10M
+-env RUN_ERL_LOG_MAXSIZE 10000000
+
+## Add directory for hot patches to the front of the code path
+-pa lib/patches

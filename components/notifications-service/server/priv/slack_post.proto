@@ -1,0 +1,31 @@
+/*
+   Slack does not support protobuf- we manage this file directly. We're maintaining this
+   here as a bit of an experiment to see how much it simplifies the construction and validation
+   of payloads.
+*/
+syntax = "proto3";
+package slack;
+
+message Message {
+  message Attachment {
+    message Field {
+      bool short = 1;
+      string title = 2;
+      string value = 3;
+    }
+    string color = 1;
+    string fallback = 2;
+    string pretext = 3;
+    string text = 4;
+    /* valid values for mrkdn_in, which indicates
+       which fields contain markdwon formatting:
+       text, pretext, fields */
+    string mrkdwn_in = 5;
+    repeated Field fields = 6;
+  }
+  string icon_url = 1;
+  string text = 2;
+  string username = 3;
+  repeated Attachment attachments = 4;
+}
+

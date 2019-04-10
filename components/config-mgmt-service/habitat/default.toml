@@ -1,0 +1,15 @@
+[mlsa]
+accept = false
+
+[service]
+host = "localhost"
+port = 1234
+
+[tls]
+key_contents = ""
+cert_contents = ""
+root_cert_contents = ""
+
+# If needed be, we can add more backends
+# [mock]
+# data = "awesome"

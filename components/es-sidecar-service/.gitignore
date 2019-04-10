@@ -1,0 +1,14 @@
+vendor*
+dist
+bin
+results
+.secrets
+
+# Avoid adding the binary
+es-sidecar-service
+# But make sure to add the cmd/es-sidecar-service/ dir
+!es-sidecar-service/
+
+
+.tmp
+.idea

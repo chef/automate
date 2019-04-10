@@ -1,0 +1,29 @@
+chef-page-header {
+  display: block;
+  padding: 25px 35px 16px;
+  position: relative;
+  font-style: normal;
+  font-size: 13px;
+  color: chef-hsl(var(--chef-dark-grey));
+
+  chef-heading {
+    font-weight: 700;
+  }
+
+  chef-subheading {
+    color: chef-hsl(var(--chef-primary-dark));
+  }
+
+  &.contrasting {
+    background-color: chef-hsl(var(--chef-white));
+  }
+
+  .header-buttons {
+    @media (min-width: 1024px) {
+      margin: 0;
+      position: absolute;
+      top: 35px;
+      right: 35px;
+    }
+  }
+}

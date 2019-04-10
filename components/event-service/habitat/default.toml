@@ -1,0 +1,29 @@
+[service]
+host = "localhost"
+port = 10132
+event_limit = 100000
+listener_limit = 10000
+enable_nats_feature = false
+
+[internal_messaging]
+port = 10140
+gateway_port = 10147
+
+[stream_service]
+cluster_id = "event-service"
+
+[tls]
+key_contents =""
+cert_contents = ""
+root_cert_contents = ""
+
+[mlsa]
+accept = false
+
+[log]
+format = "text"
+level = "info"
+
+[handlers]
+feed = "0.0.0.0:10121"
+cfgingest = "0.0.0.0:10122"

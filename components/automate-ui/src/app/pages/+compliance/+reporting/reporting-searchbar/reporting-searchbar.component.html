@@ -1,0 +1,64 @@
+<div class="reporting-search">
+  <div *ngIf="selectedType" class="reporting-search-prefix">
+    <strong>{{ selectedType.title }}:</strong>
+  </div>
+
+  <input
+    #keyInput
+    class="reporting-search-input"
+    type="text"
+    list="key-list"
+    [hidden]="!keyInputVisible"
+    placeholder="Filter reports by..."
+    (change)="onKeyChange($event)" />
+  <datalist id="key-list">
+    <option *ngFor="let type of filterTypes" [value]="type.title">{{ type.title }}</option>
+  </datalist>
+
+  <input
+    #valInput
+    class="reporting-search-input"
+    type="text"
+    list="val-list"
+    [hidden]="!valInputVisible"
+    [placeholder]="selectedType?.placeholder"
+    (change)="onValChange($event)"
+    (input)="onValInput($event)"
+    (keydown)="onValKeydown($event)" />
+  <datalist id="val-list">
+    <option *ngFor="let value of filterValues" [value]="value.title">{{ value.title }}</option>
+  </datalist>
+
+  <div class="reporting-search-suffix">
+    <chef-button class="filter-btn" *ngIf="filters.length > 0" secondary (click)="toggleFilters()">
+      <chef-icon>filter_list</chef-icon>
+      <span>{{ filters.length }}</span>
+    </chef-button>
+    <chef-button class="calendar-btn" secondary (click)="toggleCalendar()">
+      <chef-icon>date_range</chef-icon>
+      <span>{{ date | date:'shortDate' }}</span>
+    </chef-button>
+    <chef-dropdown [attr.visible]="calendarVisible">
+      <chef-click-outside omit="calendar-btn" (clickOutside)="hideCalendar()">
+        <chef-calendar
+          [selected]="date.toISOString()"
+          [date]="visibleDate.toISOString()"
+          (onNextMonth)="onMonthSelect($event)"
+          (onPrevMonth)="onMonthSelect($event)"
+          (onDaySelect)="onDaySelect($event)">
+        </chef-calendar>
+      </chef-click-outside>
+    </chef-dropdown>
+  </div>
+</div>
+
+<div class="filters-list" *ngIf="filtersVisible && filters.length > 0">
+  <chef-button secondary (click)="onClearClick()">Clear All</chef-button>
+  <chef-button
+    primary
+    *ngFor="let filter of filters"
+    (click)="onRemoveFilterClick(filter)">
+    <span>{{ filter.type.name }}: {{ filter.value.text }}</span>
+    <chef-icon>close</chef-icon>
+  </chef-button>
+</div>

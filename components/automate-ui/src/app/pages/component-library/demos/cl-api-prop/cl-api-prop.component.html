@@ -1,0 +1,14 @@
+<span class="prop-name" role="gridcell">
+  <span *ngIf="!isEmpty(name)">{{ name }}</span>
+  <span *ngIf="isEmpty(name)" class="error">MISSING VALUE</span>
+</span>
+<span class="type" role="gridcell">
+  <span *ngIf="!isEmpty(type)">{{ type }}</span>
+  <span *ngIf="isEmpty(type)" class="error">MISSING VALUE</span>
+</span>
+<span class="required" role="gridcell">{{ isRequired() ? "required" : "optional" }}</span>
+<span class="default" role="gridcell" [ngClass]="{'meta': isMeta(default)}">{{ default }}</span>
+<span class="content" role="gridcell">
+  <span #contentRef><ng-content></ng-content></span>
+  <span *ngIf="isContentEmpty(contentRef)" class="error">MISSING VALUE</span>
+</span>

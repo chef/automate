@@ -1,0 +1,7 @@
+<div class="chef-form-field"
+     [class.error]="errorChildren.length > 0">
+  <ng-content></ng-content>
+  <div class="errors">
+    <ng-content select="chef-error"></ng-content>
+  </div>
+</div>

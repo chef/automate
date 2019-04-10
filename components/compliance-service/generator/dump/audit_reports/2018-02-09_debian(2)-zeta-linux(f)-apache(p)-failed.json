@@ -1,0 +1,1622 @@
+{
+  "type": "inspec_report",
+  "node_uuid": "34cbbb4c-c502-4971-b193-00e987b4678c",
+  "report_uuid": "44024b50-2e0d-42fa-a57c-dddddddddddd",
+  "job_uuid": "12345678-1234-123e-b12e-222222222222",
+  "node_name": "debian(2)-zeta-linux(f)-apache(p)-failed",
+  "environment": "DevSec Prod Zeta",
+  "roles": ["base_deb", "apache_deb", "debian-hardening-prod", "dot.role"],
+  "recipes": [],
+  "end_time": "2018-02-09T09:18:41Z",
+  "version": "2.1.10",
+  "platform": {
+    "name": "debian",
+    "release": "8.7"
+  },
+  "statistics": {
+    "duration": 0.636833
+  },
+  "other_checks": [],
+  "policy_name": "",
+  "policy_group": "",
+  "organization_name": "",
+  "source_fqdn": "localhost",
+  "chef_tags": [],
+  "ipaddress": "192.168.56.33",
+  "fqdn": "lb-deb.example.com",
+  "profiles": [
+    {
+      "name": "linux-baseline",
+      "title": "DevSec Linux Security Baseline",
+      "version": "2.0.1",
+      "sha256": "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
+      "summary": "Test-suite for best-preactice os hardening",
+      "maintainer": "",
+      "license": "",
+      "copyright": "Hardening Framework Team",
+      "copyright_email": "hello@hardening.io",
+      "status": "loaded",
+      "attributes": [
+        {
+          "name": "role_name",
+          "options": {
+            "default": "base",
+            "description": "Chef Role"
+          }
+        },
+        {
+          "name": "profile_id",
+          "options": {
+            "default": 1,
+            "description": "An int id"
+          }
+        },
+        {
+          "name": "do.this?",
+          "options": {
+            "default": true,
+            "description": "A bool flag"
+          }
+        },
+        {
+          "name": "take_this",
+          "options": {
+            "default": [
+              "oh",
+              "hear"
+            ],
+            "description": "A bloody array"
+          }
+        },
+        {
+          "name": "bloody_hash",
+          "options": {
+            "default": {
+              "oh": "god"
+            }
+          }
+        },
+        {
+          "name": "no_default",
+          "options": {
+            "description": "Default is for lazies!"
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "os-01",
+          "code": "control 'os-01' do\n  impact 1.0\n  title 'Trusted hosts login'\n  desc \"Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.\"\n  describe command('find / -name \\'.rhosts\\'') do\n    its('stdout') { should be_empty }\n  end\n  describe command('find / -name \\'hosts.equiv\\' ') do\n    its('stdout') { should be_empty }\n  end\nend\n",
+          "desc": "Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.",
+          "descriptions": [
+            {
+              "label": "default",
+              "data": "Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system."
+            },
+            {
+              "label": "en",
+              "data": "Some english"
+            },
+            {
+              "label": "de",
+              "data": "Some german"
+            }
+          ],
+          "impact": 1,
+          "title": "Trusted hosts login",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/os_spec.rb",
+            "line": 21
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Command find / -name '.rhosts' stdout should be empty",
+              "run_time": 0.062734
+            },
+            {
+              "status": "passed",
+              "code_desc": "Command find / -name 'hosts.equiv'  stdout should be empty",
+              "run_time": 0.06203
+            }
+          ]
+        },
+        {
+          "id": "os-02",
+          "code": "control 'os-02' do\n  impact 1.0\n  title 'Check owner and permissions for /etc/shadow'\n  desc 'Check periodically the owner and permissions for /etc/shadow'\n  describe file('/etc/shadow') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    its('group') { should eq 'root' }\n    it { should_not be_executable }\n    it { should be_writable.by('owner') }\n    it { should be_readable.by('owner') }\n    it { should_not be_readable.by('group') }\n    it { should_not be_readable.by('other') }\n  end\nend\n",
+          "desc": "Check periodically the owner and permissions for /etc/shadow",
+          "impact": 1,
+          "title": "Check owner and permissions for /etc/shadow",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/os_spec.rb",
+            "line": 33
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should exist",
+              "run_time": 0.004684
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should be file",
+              "run_time": 0.004503
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should be owned by \"root\"",
+              "run_time": 0.000176
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should not be executable",
+              "run_time": 0.000138
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should be writable by owner",
+              "run_time": 7.6e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should be readable by owner",
+              "run_time": 7.2e-05
+            },
+            {
+              "status": "failed",
+              "code_desc": "File /etc/shadow should not be readable by group",
+              "run_time": 0.000171,
+              "message": "expected File /etc/shadow not to be readable by group"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/shadow should not be readable by other",
+              "run_time": 9.4e-05
+            },
+            {
+              "status": "failed",
+              "code_desc": "File /etc/shadow group should eq \"root\"",
+              "run_time": 0.000138,
+              "message": "\nexpected: \"root\"\n     got: \"shadow\"\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "os-03",
+          "code": "control 'os-03' do\n  impact 1.0\n  title 'Check owner and permissions for /etc/passwd'\n  desc 'Check periodically the owner and permissions for /etc/passwd'\n  describe file('/etc/passwd') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    its('group') { should eq 'root' }\n    it { should_not be_executable }\n    it { should be_writable.by('owner') }\n    it { should_not be_writable.by('group') }\n    it { should_not be_writable.by('other') }\n    it { should be_readable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should be_readable.by('other') }\n  end\nend\n",
+          "desc": "Check periodically the owner and permissions for /etc/passwd",
+          "impact": 1,
+          "title": "Check owner and permissions for /etc/passwd",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/os_spec.rb",
+            "line": 50
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should exist",
+              "run_time": 0.003601
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should be file",
+              "run_time": 0.005196
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should be owned by \"root\"",
+              "run_time": 0.000162
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should not be executable",
+              "run_time": 0.000142
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should be writable by owner",
+              "run_time": 9.1e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should not be writable by group",
+              "run_time": 0.000111
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should not be writable by other",
+              "run_time": 9e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should be readable by owner",
+              "run_time": 9.1e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should be readable by group",
+              "run_time": 8.8e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should be readable by other",
+              "run_time": 8.8e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd group should eq \"root\"",
+              "run_time": 9.4e-05
+            }
+          ]
+        },
+        {
+          "id": "os-04",
+          "code": "control 'os-04' do\n  impact 1.0\n  title 'Dot in PATH variable'\n  desc 'Do not include the current working directory in PATH variable. This makes it easier for an attacker to gain extensive rigths by executing a Trojan program'\n  describe os_env('PATH') do\n    its('split') { should_not include('') }\n    its('split') { should_not include('.') }\n  end\nend\n",
+          "desc": "Do not include the current working directory in PATH variable. This makes it easier for an attacker to gain extensive rigths by executing a Trojan program",
+          "impact": 1,
+          "title": "Dot in PATH variable",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/os_spec.rb",
+            "line": 69
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Environment variable PATH split should not include \"\"",
+              "run_time": 0.000134
+            },
+            {
+              "status": "passed",
+              "code_desc": "Environment variable PATH split should not include \".\"",
+              "run_time": 9.8e-05
+            }
+          ]
+        },
+        {
+          "id": "os-05",
+          "code": "control 'os-05' do\n  impact 1.0\n  title 'Check login.defs'\n  desc 'Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs'\n  describe file('/etc/login.defs') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    its('group') { should eq 'root' }\n    it { should_not be_executable }\n    it { should_not be_writable }\n    it { should be_readable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should be_readable.by('other') }\n  end\n  describe login_defs do\n    its('ENV_SUPATH') { should include('/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin') }\n    its('ENV_PATH') { should include('/usr/local/bin:/usr/bin:/bin') }\n    its('UMASK') { should include('027') }\n    its('PASS_MAX_DAYS') { should eq '60' }\n    its('PASS_MIN_DAYS') { should eq '7' }\n    its('PASS_WARN_AGE') { should eq '7' }\n    its('LOGIN_RETRIES') { should eq '5' }\n    its('LOGIN_TIMEOUT') { should eq '60' }\n    its('UID_MIN') { should eq '1000' }\n    its('GID_MIN') { should eq '1000' }\n    its('SYS_UID_MIN') { should eq '100' }\n    its('SYS_UID_MAX') { should eq '999' }\n    its('SYS_GID_MIN') { should eq '100' }\n    its('SYS_GID_MAX') { should eq '999' }\n    its('ENCRYPT_METHOD') { should eq 'SHA512' }\n  end\nend\n",
+          "desc": "Check owner and permissions for login.defs. Also check the configured PATH variable and umask in login.defs",
+          "impact": 1,
+          "title": "Check login.defs",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/os_spec.rb",
+            "line": 79
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/login.defs should exist",
+              "run_time": 0.003574
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/login.defs should be file",
+              "run_time": 0.004564
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/login.defs should be owned by \"root\"",
+              "run_time": 0.000154
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/login.defs should not be executable",
+              "run_time": 0.000138
+            },
+            {
+              "status": "failed",
+              "code_desc": "File /etc/login.defs should not be writable",
+              "run_time": 0.000166,
+              "message": "expected File /etc/login.defs not to be writable"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/login.defs should be readable by owner",
+              "run_time": 9.3e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/login.defs should be readable by group",
+              "run_time": 8.2e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/login.defs should be readable by other",
+              "run_time": 8.2e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/login.defs group should eq \"root\"",
+              "run_time": 9.7e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "login.defs ENV_SUPATH should include \"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"",
+              "run_time": 0.01768
+            },
+            {
+              "status": "passed",
+              "code_desc": "login.defs ENV_PATH should include \"/usr/local/bin:/usr/bin:/bin\"",
+              "run_time": 0.000103
+            },
+            {
+              "status": "failed",
+              "code_desc": "login.defs UMASK should include \"027\"",
+              "run_time": 0.000189,
+              "message": "expected \"022\" to include \"027\""
+            },
+            {
+              "status": "failed",
+              "code_desc": "login.defs PASS_MAX_DAYS should eq \"60\"",
+              "run_time": 0.0001,
+              "message": "\nexpected: \"60\"\n     got: \"99999\"\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "login.defs PASS_MIN_DAYS should eq \"7\"",
+              "run_time": 9.5e-05,
+              "message": "\nexpected: \"7\"\n     got: \"0\"\n\n(compared using ==)\n"
+            },
+            {
+              "status": "passed",
+              "code_desc": "login.defs PASS_WARN_AGE should eq \"7\"",
+              "run_time": 6.2e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "login.defs LOGIN_RETRIES should eq \"5\"",
+              "run_time": 6.1e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "login.defs LOGIN_TIMEOUT should eq \"60\"",
+              "run_time": 6.3e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "login.defs UID_MIN should eq \"1000\"",
+              "run_time": 5.6e-05
+            },
+            {
+              "status": "passed",
+              "code_desc": "login.defs GID_MIN should eq \"1000\"",
+              "run_time": 0.000103
+            },
+            {
+              "status": "failed",
+              "code_desc": "login.defs SYS_UID_MIN should eq \"100\"",
+              "run_time": 8.3e-05,
+              "message": "\nexpected: \"100\"\n     got: nil\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "login.defs SYS_UID_MAX should eq \"999\"",
+              "run_time": 8.3e-05,
+              "message": "\nexpected: \"999\"\n     got: nil\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "login.defs SYS_GID_MIN should eq \"100\"",
+              "run_time": 0.000441,
+              "message": "\nexpected: \"100\"\n     got: nil\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "login.defs SYS_GID_MAX should eq \"999\"",
+              "run_time": 0.000118,
+              "message": "\nexpected: \"999\"\n     got: nil\n\n(compared using ==)\n"
+            },
+            {
+              "status": "passed",
+              "code_desc": "login.defs ENCRYPT_METHOD should eq \"SHA512\"",
+              "run_time": 6.6e-05
+            }
+          ]
+        },
+        {
+          "id": "os-06",
+          "code": "control 'os-06' do\n  impact 1.0\n  title 'Check for SUID/ SGID blacklist'\n  desc 'Find blacklisted SUID and SGID files to ensure that no rogue SUID and SGID files have been introduced into the system'\n\n  blacklist = [\n    # blacklist as provided by NSA\n    '/usr/bin/rcp', '/usr/bin/rlogin', '/usr/bin/rsh',\n    # sshd must not use host-based authentication (see ssh cookbook)\n    '/usr/libexec/openssh/ssh-keysign',\n    '/usr/lib/openssh/ssh-keysign',\n    # misc others\n    '/sbin/netreport',                                            # not normally required for user\n    '/usr/sbin/usernetctl',                                       # modify interfaces via functional accounts\n    # connecting to ...\n    '/usr/sbin/userisdnctl',                                      # no isdn...\n    '/usr/sbin/pppd',                                             # no ppp / dsl ...\n    # lockfile\n    '/usr/bin/lockfile',\n    '/usr/bin/mail-lock',\n    '/usr/bin/mail-unlock',\n    '/usr/bin/mail-touchlock',\n    '/usr/bin/dotlockfile',\n    # need more investigation, blacklist for now\n    '/usr/bin/arping',\n    '/usr/sbin/arping',\n    '/usr/sbin/uuidd',\n    '/usr/bin/mtr',                                               # investigate current state...\n    '/usr/lib/evolution/camel-lock-helper-1.2',                   # investigate current state...\n    '/usr/lib/pt_chown',                                          # pseudo-tty, needed?\n    '/usr/lib/eject/dmcrypt-get-device',\n    '/usr/lib/mc/cons.saver' # midnight commander screensaver\n  ]\n\n  output = command('find / -perm -4000 -o -perm -2000 -type f ! -path \\'/proc/*\\' -print 2>/dev/null | grep -v \\'^find:\\'')\n  diff = output.stdout.split(/\\r?\\n/) & blacklist\n  describe diff do\n    it { should be_empty }\n  end\nend\n",
+          "desc": "Find blacklisted SUID and SGID files to ensure that no rogue SUID and SGID files have been introduced into the system",
+          "impact": 1,
+          "title": "Check for SUID/ SGID blacklist",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/os_spec.rb",
+            "line": 113
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "[] should be empty",
+              "run_time": 7.5e-05
+            }
+          ]
+        },
+        {
+          "id": "os-07",
+          "code": "control 'os-07' do\n  impact 1.0\n  title 'Unique uid and gid'\n  desc 'Check for unique uids gids'\n  describe passwd do\n    its('uids') { should_not contain_duplicates }\n  end\n  describe etc_group do\n    its('gids') { should_not contain_duplicates }\n  end\nend\n",
+          "desc": "Check for unique uids gids",
+          "impact": 1,
+          "title": "Unique uid and gid",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/os_spec.rb",
+            "line": 154
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "/etc/passwd uids should not contain duplicates",
+              "run_time": 0.000168
+            },
+            {
+              "status": "passed",
+              "code_desc": "/etc/group gids should not contain duplicates",
+              "run_time": 0.000187
+            }
+          ]
+        },
+        {
+          "id": "package-01",
+          "code": "control 'package-01' do\n  impact 1.0\n  title 'Do not run deprecated inetd or xinetd'\n  desc 'http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.1'\n  describe package('inetd') do\n    it { should_not be_installed }\n  end\n  describe package('xinetd') do\n    it { should_not be_installed }\n  end\nend\n",
+          "desc": "http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.1",
+          "impact": 1,
+          "title": "Do not run deprecated inetd or xinetd",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/package_spec.rb",
+            "line": 21
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "System Package inetd should not be installed",
+              "run_time": 0.008312
+            },
+            {
+              "status": "passed",
+              "code_desc": "System Package xinetd should not be installed",
+              "run_time": 0.007024
+            }
+          ]
+        },
+        {
+          "id": "package-02",
+          "code": "control 'package-02' do\n  impact 1.0\n  title 'Do not install Telnet server'\n  desc 'Telnet protocol uses unencrypted communication, that means the passowrd and other sensitive data are unencrypted. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.2'\n  describe package('telnetd') do\n    it { should_not be_installed }\n  end\nend\n",
+          "desc": "Telnet protocol uses unencrypted communication, that means the passowrd and other sensitive data are unencrypted. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.2",
+          "impact": 1,
+          "title": "Do not install Telnet server",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/package_spec.rb",
+            "line": 33
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "System Package telnetd should not be installed",
+              "run_time": 0.2623
+            }
+          ]
+        },
+        {
+          "id": "package-03",
+          "code": "control 'package-03' do\n  impact 1.0\n  title 'Do not install rsh server'\n  desc 'The r-commands suffers same problem as telnet. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.3'\n  describe package('telnetd') do\n    it { should_not be_installed }\n  end\nend\n",
+          "desc": "The r-commands suffers same problem as telnet. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.3",
+          "impact": 1,
+          "title": "Do not install rsh server",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/package_spec.rb",
+            "line": 42
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "System Package telnetd should not be installed",
+              "run_time": 0.006853
+            }
+          ]
+        },
+        {
+          "id": "package-05",
+          "code": "control 'package-05' do\n  impact 1.0\n  title 'Do not install ypserv server (NIS)'\n  desc 'Network Information Service (NIS) has some security design weaknesses like inadequate protection of important authentication information. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.4'\n  describe package('ypserv') do\n    it { should_not be_installed }\n  end\nend\n",
+          "desc": "Network Information Service (NIS) has some security design weaknesses like inadequate protection of important authentication information. http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.4",
+          "impact": 1,
+          "title": "Do not install ypserv server (NIS)",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/package_spec.rb",
+            "line": 51
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "System Package ypserv should not be installed",
+              "run_time": 0.006921
+            }
+          ]
+        },
+        {
+          "id": "package-06",
+          "code": "control 'package-06' do\n  impact 1.0\n  title 'Do not install tftp server'\n  desc 'tftp-server provides little security http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.5'\n  describe package('tftp-server') do\n    it { should_not be_installed }\n  end\nend\n",
+          "desc": "tftp-server provides little security http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf, Chapter 3.2.5",
+          "impact": 1,
+          "title": "Do not install tftp server",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/package_spec.rb",
+            "line": 60
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "System Package tftp-server should not be installed",
+              "run_time": 0.006591
+            }
+          ]
+        },
+        {
+          "id": "sysctl-01",
+          "code": "control 'sysctl-01' do\n  impact 1.0\n  title 'IPv4 Forwarding'\n  desc \"If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.\"\n  describe kernel_parameter('net.ipv4.ip_forward') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.all.forwarding') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.",
+          "impact": 1,
+          "title": "IPv4 Forwarding",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 21
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.ip_forward value should eq 0",
+              "run_time": 0.004171,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.forwarding value should eq 0",
+              "run_time": 0.004013,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-02",
+          "code": "control 'sysctl-02' do\n  impact 1.0\n  title 'Reverse path filtering'\n  desc \"The rp_filter can reject incoming packets if their source address doesn't match the network interface that they're arriving on, which helps to prevent IP spoofing.\"\n  describe kernel_parameter('net.ipv4.conf.all.rp_filter') do\n    its(:value) { should eq 1 }\n  end\n  describe kernel_parameter('net.ipv4.conf.default.rp_filter') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "The rp_filter can reject incoming packets if their source address doesn't match the network interface that they're arriving on, which helps to prevent IP spoofing.",
+          "impact": 1,
+          "title": "Reverse path filtering",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 33
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.rp_filter value should eq 1",
+              "run_time": 0.003864
+            },
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.default.rp_filter value should eq 1",
+              "run_time": 0.003689
+            }
+          ]
+        },
+        {
+          "id": "sysctl-03",
+          "code": "control 'sysctl-03' do\n  impact 1.0\n  title 'ICMP ignore bogus error responses'\n  desc 'Sometimes routers send out invalid responses to broadcast frames. This is a violation of RFC 1122 and the kernel will logged this. To avoid filling up your logfile with unnecessary stuff, you can tell the kernel not to issue these warnings'\n  describe kernel_parameter('net.ipv4.icmp_ignore_bogus_error_responses') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "Sometimes routers send out invalid responses to broadcast frames. This is a violation of RFC 1122 and the kernel will logged this. To avoid filling up your logfile with unnecessary stuff, you can tell the kernel not to issue these warnings",
+          "impact": 1,
+          "title": "ICMP ignore bogus error responses",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 45
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.icmp_ignore_bogus_error_responses value should eq 1",
+              "run_time": 0.003764
+            }
+          ]
+        },
+        {
+          "id": "sysctl-04",
+          "code": "control 'sysctl-04' do\n  impact 1.0\n  title 'ICMP echo ignore broadcasts'\n  desc 'Blocking ICMP ECHO requests to broadcast addresses'\n  describe kernel_parameter('net.ipv4.icmp_echo_ignore_broadcasts') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "Blocking ICMP ECHO requests to broadcast addresses",
+          "impact": 1,
+          "title": "ICMP echo ignore broadcasts",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 54
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.icmp_echo_ignore_broadcasts value should eq 1",
+              "run_time": 0.003746
+            }
+          ]
+        },
+        {
+          "id": "sysctl-05",
+          "code": "control 'sysctl-05' do\n  impact 1.0\n  title 'ICMP ratelimit'\n  desc 'icmp_ratelimit defines how many packets that match the icmp_ratemask per second'\n  describe kernel_parameter('net.ipv4.icmp_ratelimit') do\n    its(:value) { should eq 100 }\n  end\nend\n",
+          "desc": "icmp_ratelimit defines how many packets that match the icmp_ratemask per second",
+          "impact": 1,
+          "title": "ICMP ratelimit",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 63
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.icmp_ratelimit value should eq 100",
+              "run_time": 0.004023,
+              "message": "\nexpected: 100\n     got: 1000\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-06",
+          "code": "control 'sysctl-06' do\n  impact 1.0\n  title 'ICMP ratemask'\n  desc 'Ratemask is a logical OR of all ICMP codes to rate limit'\n  describe kernel_parameter('net.ipv4.icmp_ratemask') do\n    its(:value) { should eq 88089 }\n  end\nend\n",
+          "desc": "Ratemask is a logical OR of all ICMP codes to rate limit",
+          "impact": 1,
+          "title": "ICMP ratemask",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 72
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.icmp_ratemask value should eq 88089",
+              "run_time": 0.003728,
+              "message": "\nexpected: 88089\n     got: 6168\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-07",
+          "code": "control 'sysctl-07' do\n  impact 1.0\n  title 'TCP timestamps'\n  desc \"It is possible to estimate the current uptime of a Linux system. It's preferable to disable TCP timestamps on your systems.\"\n  describe kernel_parameter('net.ipv4.tcp_timestamps') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "It is possible to estimate the current uptime of a Linux system. It's preferable to disable TCP timestamps on your systems.",
+          "impact": 1,
+          "title": "TCP timestamps",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 81
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.tcp_timestamps value should eq 0",
+              "run_time": 0.003771,
+              "message": "\nexpected: 0\n     got: nil\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-08",
+          "code": "control 'sysctl-08' do\n  impact 1.0\n  title 'ARP ignore'\n  desc 'Reply only if the target IP address is local address configured on the incoming interface.'\n  describe kernel_parameter('net.ipv4.conf.all.arp_ignore') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "Reply only if the target IP address is local address configured on the incoming interface.",
+          "impact": 1,
+          "title": "ARP ignore",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 90
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.arp_ignore value should eq 1",
+              "run_time": 0.003666,
+              "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-09",
+          "code": "control 'sysctl-09' do\n  impact 1.0\n  title 'ARP announce'\n  desc 'Always use the best local address for this target. In this mode we ignore the source address in the IP packet and try to select local address that we prefer for talks with\tthe target host.'\n  describe kernel_parameter('net.ipv4.conf.all.arp_announce') do\n    its(:value) { should eq 2 }\n  end\nend\n",
+          "desc": "Always use the best local address for this target. In this mode we ignore the source address in the IP packet and try to select local address that we prefer for talks with\tthe target host.",
+          "impact": 1,
+          "title": "ARP announce",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 99
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.arp_announce value should eq 2",
+              "run_time": 0.003711,
+              "message": "\nexpected: 2\n     got: 0\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-10",
+          "code": "control 'sysctl-10' do\n  impact 1.0\n  title 'TCP RFC1337 Protect Against TCP Time-Wait'\n  desc 'This enables a fix for time-wait assassination hazards in tcp, described in RFC 1337. If enabled, this causes the kernel to drop RST packets for sockets in the time-wait state.'\n  describe kernel_parameter('net.ipv4.tcp_rfc1337') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "This enables a fix for time-wait assassination hazards in tcp, described in RFC 1337. If enabled, this causes the kernel to drop RST packets for sockets in the time-wait state.",
+          "impact": 1,
+          "title": "TCP RFC1337 Protect Against TCP Time-Wait",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 108
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.tcp_rfc1337 value should eq 1",
+              "run_time": 0.003682,
+              "message": "\nexpected: 1\n     got: nil\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-11",
+          "code": "control 'sysctl-11' do\n  impact 1.0\n  title 'Protection against SYN flood attacks'\n  desc 'A SYN-Attack is a denial of service (DoS) attack that consumes resources on your system forcing you to reboot.'\n  describe kernel_parameter('net.ipv4.tcp_syncookies') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "A SYN-Attack is a denial of service (DoS) attack that consumes resources on your system forcing you to reboot.",
+          "impact": 1,
+          "title": "Protection against SYN flood attacks",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 117
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.tcp_syncookies value should eq 1",
+              "run_time": 0.003911
+            }
+          ]
+        },
+        {
+          "id": "sysctl-12",
+          "code": "control 'sysctl-12' do\n  impact 1.0\n  title 'Shared Media IP Architecture'\n  desc 'Send(router) or accept(host) RFC1620 shared media redirects. If it is not set the kernel does not assume that different subnets on this device can communicate directly.'\n  describe kernel_parameter('net.ipv4.conf.all.shared_media') do\n    its(:value) { should eq 1 }\n  end\n  describe kernel_parameter('net.ipv4.conf.default.shared_media') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "Send(router) or accept(host) RFC1620 shared media redirects. If it is not set the kernel does not assume that different subnets on this device can communicate directly.",
+          "impact": 1,
+          "title": "Shared Media IP Architecture",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 126
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.shared_media value should eq 1",
+              "run_time": 0.003485
+            },
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.default.shared_media value should eq 1",
+              "run_time": 0.003418
+            }
+          ]
+        },
+        {
+          "id": "sysctl-13",
+          "code": "control 'sysctl-13' do\n  impact 1.0\n  title 'Disable Source Routing'\n  desc 'The accept_source_route option causes network interfaces to accept packets with the Strict Source Route (SSR) or Loose Source Routing (LSR) option set. An attacker is able to send a source routed packet into the network, then he could intercept the replies and your server might not know that it is not communicating with a trusted server'\n  describe kernel_parameter('net.ipv4.conf.all.accept_source_route') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.default.accept_source_route') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "The accept_source_route option causes network interfaces to accept packets with the Strict Source Route (SSR) or Loose Source Routing (LSR) option set. An attacker is able to send a source routed packet into the network, then he could intercept the replies and your server might not know that it is not communicating with a trusted server",
+          "impact": 1,
+          "title": "Disable Source Routing",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 138
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.accept_source_route value should eq 0",
+              "run_time": 0.003562
+            },
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.default.accept_source_route value should eq 0",
+              "run_time": 0.003687
+            }
+          ]
+        },
+        {
+          "id": "sysctl-14",
+          "code": "control 'sysctl-14' do\n  impact 1.0\n  title 'Disable acceptance of all IPv4 redirected packets'\n  desc 'Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.'\n  describe kernel_parameter('net.ipv4.conf.default.accept_redirects') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.all.accept_redirects') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.",
+          "impact": 1,
+          "title": "Disable acceptance of all IPv4 redirected packets",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 150
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.default.accept_redirects value should eq 0",
+              "run_time": 0.003682
+            },
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.accept_redirects value should eq 0",
+              "run_time": 0.003555
+            }
+          ]
+        },
+        {
+          "id": "sysctl-15",
+          "code": "control 'sysctl-15' do\n  impact 1.0\n  title 'Disable acceptance of all secure redirected packets'\n  desc 'Disable acceptance of all secure redirected packets these prevents Man-in-the-Middle attacks.'\n  describe kernel_parameter('net.ipv4.conf.all.secure_redirects') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.default.secure_redirects') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "Disable acceptance of all secure redirected packets these prevents Man-in-the-Middle attacks.",
+          "impact": 1,
+          "title": "Disable acceptance of all secure redirected packets",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 162
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.secure_redirects value should eq 0",
+              "run_time": 0.003499,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.default.secure_redirects value should eq 0",
+              "run_time": 0.003595,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-16",
+          "code": "control 'sysctl-16' do\n  impact 1.0\n  title 'Disable sending of redirects packets'\n  desc 'Disable sending of redirects packets'\n  describe kernel_parameter('net.ipv4.conf.all.send_redirects') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv4.conf.all.send_redirects') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "Disable sending of redirects packets",
+          "impact": 1,
+          "title": "Disable sending of redirects packets",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 174
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.send_redirects value should eq 0",
+              "run_time": 0.00397
+            },
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.send_redirects value should eq 0",
+              "run_time": 0.003905
+            }
+          ]
+        },
+        {
+          "id": "sysctl-17",
+          "code": "control 'sysctl-17' do\n  impact 1.0\n  title 'Disable log martians'\n  desc 'log_martians can cause a denial of service attack to the host'\n  describe kernel_parameter('net.ipv4.conf.all.log_martians') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "log_martians can cause a denial of service attack to the host",
+          "impact": 1,
+          "title": "Disable log martians",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 186
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv4.conf.all.log_martians value should eq 1",
+              "run_time": 0.003698,
+              "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-18",
+          "code": "control 'sysctl-18' do\n  impact 1.0\n  title 'Disable IPv6 if it is not needed'\n  desc 'Disable IPv6 if it is not needed'\n  describe kernel_parameter('net.ipv6.conf.all.disable_ipv6') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "Disable IPv6 if it is not needed",
+          "impact": 1,
+          "title": "Disable IPv6 if it is not needed",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 195
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.all.disable_ipv6 value should eq 1",
+              "run_time": 0.003765,
+              "message": "\nexpected: 1\n     got: 0\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-19",
+          "code": "control 'sysctl-19' do\n  impact 1.0\n  title 'IPv6 Forwarding'\n  desc \"If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.\"\n  describe kernel_parameter('net.ipv6.conf.all.forwarding') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "If you're not intending for your system to forward traffic between interfaces, or if you only have a single interface, the forwarding function must be disable.",
+          "impact": 1,
+          "title": "IPv6 Forwarding",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 204
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.all.forwarding value should eq 0",
+              "run_time": 0.00366
+            }
+          ]
+        },
+        {
+          "id": "sysctl-20",
+          "code": "control 'sysctl-20' do\n  impact 1.0\n  title 'Disable acceptance of all IPv6 redirected packets'\n  desc 'Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.'\n  describe kernel_parameter('net.ipv6.conf.default.accept_redirects') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv6.conf.all.accept_redirects') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "Disable acceptance of all redirected packets these prevents Man-in-the-Middle attacks.",
+          "impact": 1,
+          "title": "Disable acceptance of all IPv6 redirected packets",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 213
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_redirects value should eq 0",
+              "run_time": 0.003587,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.all.accept_redirects value should eq 0",
+              "run_time": 0.003961,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-21",
+          "code": "control 'sysctl-21' do\n  impact 1.0\n  title 'Disable acceptance of IPv6 router solicitations messages'\n  desc 'The router solicitations setting determines how many router solicitations are sent when bringing up the interface. If addresses are statically assigned, there is no need to send any solicitations.'\n  describe kernel_parameter('net.ipv6.conf.default.router_solicitations') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "The router solicitations setting determines how many router solicitations are sent when bringing up the interface. If addresses are statically assigned, there is no need to send any solicitations.",
+          "impact": 1,
+          "title": "Disable acceptance of IPv6 router solicitations messages",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 225
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.default.router_solicitations value should eq 0",
+              "run_time": 0.003601,
+              "message": "\nexpected: 0\n     got: \"-1\"\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-22",
+          "code": "control 'sysctl-22' do\n  impact 1.0\n  title 'Disable Accept Router Preference from router advertisement'\n  desc 'Disable Accept Router Preference from router advertisement'\n  describe kernel_parameter('net.ipv6.conf.default.accept_ra_rtr_pref') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "Disable Accept Router Preference from router advertisement",
+          "impact": 1,
+          "title": "Disable Accept Router Preference from router advertisement",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 234
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_ra_rtr_pref value should eq 0",
+              "run_time": 0.003782,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-23",
+          "code": "control 'sysctl-23' do\n  impact 1.0\n  title 'Disable learning Prefix Information from router advertisement'\n  desc 'The accept_ra_pinfo setting controls whether the system will accept prefix info from the router.'\n  describe kernel_parameter('net.ipv6.conf.default.accept_ra_pinfo') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "The accept_ra_pinfo setting controls whether the system will accept prefix info from the router.",
+          "impact": 1,
+          "title": "Disable learning Prefix Information from router advertisement",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 243
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_ra_pinfo value should eq 0",
+              "run_time": 0.003568,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-24",
+          "code": "control 'sysctl-24' do\n  impact 1.0\n  title 'Disable learning Hop limit from router advertisement'\n  desc 'The accept_ra_defrtr setting controls whether the system will accept Hop Limit settings from a router advertisement. Setting it to 0 prevents a router from changing your default IPv6 Hop Limit for outgoing packets.'\n  describe kernel_parameter('net.ipv6.conf.default.accept_ra_defrtr') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "The accept_ra_defrtr setting controls whether the system will accept Hop Limit settings from a router advertisement. Setting it to 0 prevents a router from changing your default IPv6 Hop Limit for outgoing packets.",
+          "impact": 1,
+          "title": "Disable learning Hop limit from router advertisement",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 252
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_ra_defrtr value should eq 0",
+              "run_time": 0.003662,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-25",
+          "code": "control 'sysctl-25' do\n  impact 1.0\n  title 'Disable the system`s acceptance of router advertisement'\n  desc 'Setting controls whether the system will accept router advertisement'\n  describe kernel_parameter('net.ipv6.conf.all.accept_ra') do\n    its(:value) { should eq 0 }\n  end\n  describe kernel_parameter('net.ipv6.conf.default.accept_ra') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "Setting controls whether the system will accept router advertisement",
+          "impact": 1,
+          "title": "Disable the system`s acceptance of router advertisement",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 261
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.all.accept_ra value should eq 0",
+              "run_time": 0.00385,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            },
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.default.accept_ra value should eq 0",
+              "run_time": 0.003774,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-26",
+          "code": "control 'sysctl-26' do\n  impact 1.0\n  title 'Disable IPv6 autoconfiguration'\n  desc 'The autoconf setting controls whether router advertisements can cause the system to assign a global unicast address to an interface.'\n  describe kernel_parameter('net.ipv6.conf.default.autoconf') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "The autoconf setting controls whether router advertisements can cause the system to assign a global unicast address to an interface.",
+          "impact": 1,
+          "title": "Disable IPv6 autoconfiguration",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 273
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.default.autoconf value should eq 0",
+              "run_time": 0.003631,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-27",
+          "code": "control 'sysctl-27' do\n  impact 1.0\n  title 'Disable neighbor solicitations to send out per address'\n  desc 'The dad_transmits setting determines how many neighbor solicitations to send out per address (global and link-local) when bringing up an interface to ensure the desired address is unique on the network.'\n  describe kernel_parameter('net.ipv6.conf.default.dad_transmits') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "The dad_transmits setting determines how many neighbor solicitations to send out per address (global and link-local) when bringing up an interface to ensure the desired address is unique on the network.",
+          "impact": 1,
+          "title": "Disable neighbor solicitations to send out per address",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 282
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.default.dad_transmits value should eq 0",
+              "run_time": 0.003698,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-28",
+          "code": "control 'sysctl-28' do\n  impact 1.0\n  title 'Assign one global unicast IPv6 addresses to each interface'\n  desc 'The max_addresses setting determines how many global unicast IPv6 addresses can be assigned to each interface. The default is 16, but it should be set to exactly the number of statically configured global addresses required.'\n  describe kernel_parameter('net.ipv6.conf.default.max_addresses') do\n    its(:value) { should eq 1 }\n  end\nend\n",
+          "desc": "The max_addresses setting determines how many global unicast IPv6 addresses can be assigned to each interface. The default is 16, but it should be set to exactly the number of statically configured global addresses required.",
+          "impact": 1,
+          "title": "Assign one global unicast IPv6 addresses to each interface",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 291
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter net.ipv6.conf.default.max_addresses value should eq 1",
+              "run_time": 0.003665,
+              "message": "\nexpected: 1\n     got: 16\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-29",
+          "code": "control 'sysctl-29' do\n  impact 1.0\n  title 'Disable loading kernel modules'\n  desc 'The sysctl key kernel.modules_disabled is very straightforward. If it contains a \"1\" it will disable loading new modules, where a \"0\" will still allow loading them. Using this option will be a great protection against loading malicious kernel modules.'\n  describe kernel_parameter('kernel.modules_disabled') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "The sysctl key kernel.modules_disabled is very straightforward. If it contains a \"1\" it will disable loading new modules, where a \"0\" will still allow loading them. Using this option will be a great protection against loading malicious kernel modules.",
+          "impact": 1,
+          "title": "Disable loading kernel modules",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 300
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter kernel.modules_disabled value should eq 0",
+              "run_time": 0.004364
+            }
+          ]
+        },
+        {
+          "id": "sysctl-30",
+          "code": "control 'sysctl-30' do\n  impact 1.0\n  title 'Magic SysRq'\n  desc \"Kernel.sysreg is a 'magical' key combo you can hit which the kernel will respond to regardless of whatever else it is doing, unless it is completely locked up.\"\n  describe kernel_parameter('kernel.sysrq') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "Kernel.sysreg is a 'magical' key combo you can hit which the kernel will respond to regardless of whatever else it is doing, unless it is completely locked up.",
+          "impact": 1,
+          "title": "Magic SysRq",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 309
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Kernel Parameter kernel.sysrq value should eq 0",
+              "run_time": 0.004179,
+              "message": "\nexpected: 0\n     got: 1\n\n(compared using ==)\n"
+            }
+          ]
+        },
+        {
+          "id": "sysctl-31",
+          "code": "control 'sysctl-31' do\n  impact 1.0\n  title 'Disable Core Dumps'\n  desc 'Ensure that core dumps can never be made by setuid programs'\n  describe kernel_parameter('fs.suid_dumpable') do\n    its(:value) { should eq 0 }\n  end\nend\n",
+          "desc": "Ensure that core dumps can never be made by setuid programs",
+          "impact": 1,
+          "title": "Disable Core Dumps",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 318
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter fs.suid_dumpable value should eq 0",
+              "run_time": 0.003693
+            }
+          ]
+        },
+        {
+          "id": "sysctl-32",
+          "code": "control 'sysctl-32' do\n  impact 1.0\n  title 'kernel.randomize_va_space'\n  desc 'kernel.randomize_va_space'\n  describe kernel_parameter('kernel.randomize_va_space') do\n    its(:value) { should eq 2 }\n  end\nend\n",
+          "desc": "kernel.randomize_va_space",
+          "impact": 1,
+          "title": "kernel.randomize_va_space",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 327
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Kernel Parameter kernel.randomize_va_space value should eq 2",
+              "run_time": 0.003624
+            }
+          ]
+        },
+        {
+          "id": "sysctl-33",
+          "code": "control 'sysctl-33' do\n  impact 1.0\n  title 'CPU No execution Flag or Kernel ExecShield'\n  desc 'Kernel features and CPU flags provide a protection against buffer overflows. The CPU NX Flag and the kernel parameter exec-shield prevents code execution on a per memory page basis. If the CPU supports the NX-Flag then this should be used instead of the kernel parameter exec-shield.'\n\n  # parse for cpu flags\n  flags = parse_config_file('/proc/cpuinfo', assignment_re: /^([^:]*?)\\s+:\\s+(.*?)$/).flags\n  flags ||= ''\n  flags = flags.split(' ')\n\n  describe '/proc/cpuinfo' do\n    it 'Flags should include NX' do\n      expect(flags).to include('nx')\n    end\n  end\n\n  unless flags.include?('nx')\n    # if no nx flag is present, we require exec-shield\n    describe kernel_parameter('kernel.exec-shield') do\n      its(:value) { should eq 1 }\n    end\n  end\nend\n",
+          "desc": "Kernel features and CPU flags provide a protection against buffer overflows. The CPU NX Flag and the kernel parameter exec-shield prevents code execution on a per memory page basis. If the CPU supports the NX-Flag then this should be used instead of the kernel parameter exec-shield.",
+          "impact": 1,
+          "title": "CPU No execution Flag or Kernel ExecShield",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/linux-baseline-2.0.1.tar.gz/linux-baseline-2.0.1/controls/sysctl_spec.rb",
+            "line": 336
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "/proc/cpuinfo Flags should include NX",
+              "run_time": 7.1e-05
+            }
+          ]
+        }
+      ],
+      "status": "loaded",
+      "supports": null,
+      "groups": null
+    },
+    {
+      "name": "apache-baseline",
+      "title": "DevSec Apache Baseline",
+      "version": "2.0.0",
+      "sha256": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+      "summary": "Test-suite for best-practice apache hardening",
+      "maintainer": "",
+      "license": "",
+      "copyright": "Hardening Framework Team",
+      "copyright_email": "hello@dev-sec.io",
+      "status": "loaded",
+      "controls": [
+        {
+          "id": "apache-03",
+          "code": "control 'apache-03' do\n  title 'Apache should start max. 1 root-task different'\n  desc 'The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.'\n  total_tasks = command(\"ps aux | grep #{apache.service} | grep -v grep | grep root | wc -l | tr -d [:space:]\").stdout.to_i\n  describe total_tasks do\n    it { should eq 1 }\n  end\nend\n",
+          "desc": "The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.",
+          "impact": 0.5,
+          "title": "Apache should start max. 1 root-task different",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 49
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06
+            }
+          ]
+        },
+        {
+          "id": "apache-01",
+          "code": "control 'apache-01' do\n  impact 1.0\n  title 'Apache should be running'\n  desc 'Apache should be running.'\n  describe service(apache.service) do\n    it { should be_installed }\n    it { should be_running }\n  end\nend\n",
+          "desc": "Apache should be running.",
+          "impact": 1,
+          "title": "Apache should be running",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 29
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 6e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-02",
+          "code": "control 'apache-02' do\n  impact 1.0\n  title 'Apache should be enabled'\n  desc 'Configure apache service to be automatically started at boot time'\n  only_if { os[:family] != 'ubuntu' && os[:release] != '16.04' } || only_if { os[:family] != 'debian' && os[:release] != '8' }\n  describe service(apache.service) do\n    it { should be_enabled }\n  end\nend\n",
+          "desc": "Configure apache service to be automatically started at boot time",
+          "impact": 1,
+          "title": "Apache should be enabled",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 39
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-04",
+          "code": "control 'apache-04' do\n  impact 1.0\n  title 'Check Apache config folder owner, group and permissions.'\n  desc 'The Apache config folder should owned and grouped by root, be writable, readable and executable by owner. It should be readable, executable by group and not readable, not writeable by others.'\n  describe file(apache.conf_dir) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should be_readable.by('owner') }\n    it { should be_writable.by('owner') }\n    it { should be_executable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should_not be_writable.by('group') }\n    it { should be_executable.by('group') }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should be_executable.by('others') }\n  end\nend\n",
+          "desc": "The Apache config folder should owned and grouped by root, be writable, readable and executable by owner. It should be readable, executable by group and not readable, not writeable by others.",
+          "impact": 1,
+          "title": "Check Apache config folder owner, group and permissions.",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 58
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-05",
+          "code": "control 'apache-05' do\n  impact 1.0\n  title 'Check Apache config file owner, group and permissions.'\n  desc 'The Apache config file should owned and grouped by root, only be writable and readable by owner and not write- and readable by others.'\n  describe file(apache.conf_path) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should be_readable.by('owner') }\n    it { should be_writable.by('owner') }\n    it { should_not be_executable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should_not be_writable.by('group') }\n    it { should_not be_executable.by('group') }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_executable.by('others') }\n  end\n  describe file(File.join(apache.conf_dir, '/conf-enabled/hardening.conf')) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should be_readable.by('owner') }\n    it { should be_writable.by('owner') }\n    it { should_not be_executable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should_not be_writable.by('group') }\n    it { should_not be_executable.by('group') }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_executable.by('others') }\n  end\nend\n",
+          "desc": "The Apache config file should owned and grouped by root, only be writable and readable by owner and not write- and readable by others.",
+          "impact": 1,
+          "title": "Check Apache config file owner, group and permissions.",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 77
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-06",
+          "code": "control 'apache-06' do\n  impact 1.0\n  title 'User and group should be set properly'\n  desc 'For security reasons it is recommended to run Apache in its own non-privileged account.'\n  describe apache_conf do\n    its('User') { should eq [apache.user] }\n    its('Group') { should eq [apache.user] }\n  end\nend\n",
+          "desc": "For security reasons it is recommended to run Apache in its own non-privileged account.",
+          "impact": 1,
+          "title": "User and group should be set properly",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 109
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-07",
+          "code": "control 'apache-07' do\n  impact 1.0\n  title 'Set the apache server token'\n  desc '\\'ServerTokens Prod\\' tells Apache to return only Apache as product in the server response header on the every page request'\n\n  describe file(File.join(apache.conf_dir, '/conf-enabled/security.conf')) do\n    its('content') { should match(/^ServerTokens Prod/) }\n  end\n\n  # open bug https://github.com/chef/inspec/issues/786, if the bug solved use this test\n  # describe apache_conf do\n  #   its('ServerTokens') { should eq 'Prod' }\n  # end\nend\n",
+          "desc": "'ServerTokens Prod' tells Apache to return only Apache as product in the server response header on the every page request",
+          "impact": 1,
+          "title": "Set the apache server token",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 119
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-08",
+          "code": "control 'apache-08' do\n  impact 1.0\n  title 'Should not load certain modules'\n  desc 'Apache HTTP should not load legacy modules'\n\n  module_path = File.join(apache.conf_dir, '/mods-enabled/')\n  loaded_modules = command('ls ' << module_path).stdout.split.keep_if { |file_name| /.load/.match(file_name) }\n\n  loaded_modules.each do |id|\n    describe file(File.join(module_path, id)) do\n      its('content') { should_not match(/^\\s*?LoadModule\\s+?dav_module/) }\n      its('content') { should_not match(/^\\s*?LoadModule\\s+?cgid_module/) }\n      its('content') { should_not match(/^\\s*?LoadModule\\s+?cgi_module/) }\n      its('content') { should_not match(/^\\s*?LoadModule\\s+?include_module/) }\n    end\n  end\n\n  # open bug https://github.com/chef/inspec/issues/786, if the bug solved use this test\n  # describe apache_conf do\n  #   its('LoadModule') { should_not eq 'dav_module' }\n  #   its('LoadModule') { should_not eq 'cgid_module' }\n  #   its('LoadModule') { should_not eq 'cgi_module' }\n  #   its('LoadModule') { should_not eq 'include_module' }\n  #   its('content') { should_not match(/^\\s*?LoadModule\\s+?dav_module/) }\n  #   its('content') { should_not match(/^\\s*?LoadModule\\s+?cgid_module/) }\n  #   its('content') { should_not match(/^\\s*?LoadModule\\s+?cgi_module/) }\n  #   its('content') { should_not match(/^\\s*?LoadModule\\s+?include_module/) }\n  # end\nend\n",
+          "desc": "Apache HTTP should not load legacy modules",
+          "impact": 1,
+          "title": "Should not load certain modules",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 134
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-09",
+          "code": "control 'apache-09' do\n  impact 1.0\n  title 'Disable TRACE-methods'\n  desc 'The web server doesn’t allow TRACE request and help in blocking Cross Site Tracing attack.'\n\n  describe file(File.join(apache.conf_dir, '/conf-enabled/security.conf')) do\n    its('content') { should match(/^\\s*?TraceEnable\\s+?Off/) }\n  end\n\n  # open bug https://github.com/chef/inspec/issues/786, if the bug solved use this test\n  # describe apache_conf do\n  #   its('TraceEnable') { should eq 'Off' }\n  # end\nend\n",
+          "desc": "The web server doesn’t allow TRACE request and help in blocking Cross Site Tracing attack.",
+          "impact": 1,
+          "title": "Disable TRACE-methods",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 164
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-10",
+          "code": "control 'apache-10' do\n  impact 1.0\n  title 'Disable insecure HTTP-methods'\n  desc 'Disable insecure HTTP-methods and allow only necessary methods.'\n\n  describe file(File.join(apache.conf_dir, '/conf-enabled/hardening.conf')) do\n    its('content') { should match(/^\\s*?<LimitExcept\\s+?GET\\s+?POST>/) }\n  end\n\n  # open bug https://github.com/chef/inspec/issues/786, if the bug solved use this test\n  # describe apache_conf do\n  #   its('LimitExcept') { should eq ['GET','POST'] }\n  # end\nend\n",
+          "desc": "Disable insecure HTTP-methods and allow only necessary methods.",
+          "impact": 1,
+          "title": "Disable insecure HTTP-methods",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 179
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-11",
+          "code": "control 'apache-11' do\n  impact 1.0\n  title 'Disable Apache’s follows Symbolic Links for directories in alias.conf'\n  desc 'Should include -FollowSymLinks or +SymLinksIfOwnerMatch for directories in alias.conf'\n\n  describe file(File.join(apache.conf_dir, '/mods-enabled/alias.conf')) do\n    its('content') { should match(/-FollowSymLinks/).or match(/\\+SymLinksIfOwnerMatch/) }\n  end\nend\n",
+          "desc": "Should include -FollowSymLinks or +SymLinksIfOwnerMatch for directories in alias.conf",
+          "impact": 1,
+          "title": "Disable Apache’s follows Symbolic Links for directories in alias.conf",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 194
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-12",
+          "code": "control 'apache-12' do\n  impact 1.0\n  title 'Disable Directory Listing for directories in alias.conf'\n  desc 'Should include -Indexes for directories in alias.conf'\n\n  describe file(File.join(apache.conf_dir, '/mods-enabled/alias.conf')) do\n    its('content') { should match(/-Indexes/) }\n  end\nend\n",
+          "desc": "Should include -Indexes for directories in alias.conf",
+          "impact": 1,
+          "title": "Disable Directory Listing for directories in alias.conf",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 204
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-13",
+          "code": "control 'apache-13' do\n  impact 1.0\n  title 'SSL honor cipher order'\n  desc 'When choosing a cipher during an SSLv3 or TLSv1 handshake, normally the client\\'s preference is used. If this directive is enabled, the server\\'s preference will be used instead.'\n\n  describe file(File.join(apache.conf_dir, '/mods-enabled/ssl.conf')) do\n    its('content') { should match(/^\\s*?SSLHonorCipherOrder\\s+?On/i) }\n  end\n\n  sites_enabled_path = File.join(apache.conf_dir, '/sites-enabled/')\n  loaded_sites = command('ls ' << sites_enabled_path).stdout.split.keep_if { |file_name| /.conf/.match(file_name) }\n\n  loaded_sites.each do |id|\n    virtual_host = file(File.join(sites_enabled_path, id)).content.gsub(/#.*$/, '').scan(%r{<virtualhost.*443(.*?)<\\/virtualhost>}im).flatten\n    next if virtual_host.empty?\n    describe virtual_host do\n      it { should include(/^\\s*?SSLHonorCipherOrder\\s+?On/i) }\n    end\n  end\nend\n",
+          "desc": "When choosing a cipher during an SSLv3 or TLSv1 handshake, normally the client's preference is used. If this directive is enabled, the server's preference will be used instead.",
+          "impact": 1,
+          "title": "SSL honor cipher order",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 214
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 2e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        },
+        {
+          "id": "apache-14",
+          "code": "control 'apache-14' do\n  impact 1.0\n  title 'Enable Apache Logging'\n  desc 'Apache allows you to logging independently of your OS logging. It is wise to enable Apache logging, because it provides more information, such as the commands entered by users that have interacted with your Web server.'\n\n  sites_enabled_path = File.join(apache.conf_dir, '/sites-enabled/')\n  loaded_sites = command('ls ' << sites_enabled_path).stdout.split.keep_if { |file_name| /.conf/.match(file_name) }\n\n  loaded_sites.each do |id|\n    describe file(File.join(sites_enabled_path, id)).content.gsub(/#.*$/, '').scan(%r{<virtualhost(.*?)<\\/virtualhost>}im).flatten do\n      it { should include(/CustomLog.*$/i) }\n    end\n  end\nend\n",
+          "desc": "Apache allows you to logging independently of your OS logging. It is wise to enable Apache logging, because it provides more information, such as the commands entered by users that have interacted with your Web server.",
+          "impact": 1,
+          "title": "Enable Apache Logging",
+          "source_location": {
+            "ref": "./.tmp/profiles/dist/unpacked/apache-baseline-2.0.1.tar.gz/apache-baseline-2.0.1/controls/apache_spec.rb",
+            "line": 235
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "skipped",
+              "code_desc": "Operating System Detection",
+              "run_time": 3e-06,
+              "skip_message": "Skipped control due to only_if condition."
+            }
+          ]
+        }
+      ],
+      "status": "loaded",
+      "supports": null,
+      "attributes": null,
+      "groups": null
+    }
+  ]
+}

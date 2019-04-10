@@ -1,0 +1,286 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/interservice/ingest/job_scheduler.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/job/delete-nodes/config": {
+      "post": {
+        "operationId": "ConfigureDeleteNodesScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestConfigureDeleteNodesSchedulerResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/delete-nodes/delete-marked-nodes": {
+      "post": {
+        "summary": "DeleteNodesScheduler",
+        "operationId": "DeleteMarkedNodes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestDeleteMarkedNodesResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/delete-nodes/start": {
+      "post": {
+        "operationId": "StartDeleteNodesScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestStartDeleteNodesSchedulerResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/delete-nodes/stop": {
+      "post": {
+        "operationId": "StopDeleteNodesScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestStopDeleteNodesSchedulerResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/job-scheduler/start": {
+      "post": {
+        "operationId": "StartJobScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestStartJobSchedulerResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/job-scheduler/status": {
+      "get": {
+        "operationId": "GetStatusJobScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestJobSchedulerStatus"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/job-scheduler/stop": {
+      "post": {
+        "operationId": "StopJobScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestStopJobSchedulerResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/missing-nodes/config": {
+      "post": {
+        "operationId": "ConfigureNodesMissingScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestConfigureNodesMissingSchedulerResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/missing-nodes/mark-nodes-missing": {
+      "post": {
+        "operationId": "MarkNodesMissing",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestMarkNodesMissingResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/missing-nodes/start": {
+      "post": {
+        "operationId": "StartNodesMissingScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestStartNodesMissingSchedulerResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    },
+    "/job/missing-nodes/stop": {
+      "post": {
+        "operationId": "StopNodesMissingScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ingestStopNodesMissingSchedulerResponse"
+            }
+          }
+        },
+        "tags": [
+          "JobScheduler"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "ingestConfigureDeleteNodesSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestConfigureMissingNodesForDeletionSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestConfigureNodesMissingSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestDeleteMarkedNodesResponse": {
+      "type": "object"
+    },
+    "ingestJob": {
+      "type": "object",
+      "properties": {
+        "running": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "every": {
+          "type": "string"
+        },
+        "last_run": {
+          "type": "string"
+        },
+        "next_run": {
+          "type": "string"
+        },
+        "last_elapsed": {
+          "type": "string"
+        },
+        "started_on": {
+          "type": "string"
+        },
+        "threshold": {
+          "type": "string"
+        }
+      }
+    },
+    "ingestJobSchedulerStatus": {
+      "type": "object",
+      "properties": {
+        "running": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "jobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ingestJob"
+          }
+        }
+      }
+    },
+    "ingestMarkMissingNodesForDeletionResponse": {
+      "type": "object",
+      "title": "MissingNodesForDeletionScheduler"
+    },
+    "ingestMarkNodesMissingResponse": {
+      "type": "object"
+    },
+    "ingestStartDeleteNodesSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestStartJobSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestStartMissingNodesForDeletionSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestStartNodesMissingSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestStopDeleteNodesSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestStopJobSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestStopMissingNodesForDeletionSchedulerResponse": {
+      "type": "object"
+    },
+    "ingestStopNodesMissingSchedulerResponse": {
+      "type": "object"
+    }
+  }
+}

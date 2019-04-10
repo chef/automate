@@ -1,0 +1,19 @@
+{
+  "id": "e88bbc1a-8b33-45c5-8f7b-eebf6278a7c3",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "testing",
+  "entity_type": "group",
+  "task": "create",
+  "organization_name": "testing",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-04-02T22:38:22Z",
+  "remote_request_id": "837b2b01-0fef-49e7-8b1e-7069db97ab3a",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAEQgkj8AAEAAAAA",
+  "requestor_name": "mkrasnow",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Manage/11.16.2 (ruby-2.3.5-p376; ohai-7.4.1; x86_64-linux; +http://opscode.com)",
+  "data": "{\"actors\":{\"clients\":[],\"groups\":[],\"users\":[]},\"groupname\":\"testing\"}"
+}

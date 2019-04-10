@@ -1,0 +1,83 @@
+@startuml
+start
+
+partition "Migration with daily latest approach - ripping fast!" {
+:"Backup ES Data";
+note left
+    Important for obvious reasons.. do this!
+end note
+:Disable data collection;
+:**Disable reporting endpoints:**
+    return message from each, explaining that
+    we are currently reindexing etc...;
+note right
+  We will need to put an endpoint returning message,
+  explaining that we are currently reindexing etc..
+end note
+:Disable reaper;
+note right
+  Disable reaper to prevent anything from cutting our
+  legs out from under us while we do our thang!
+end note
+
+partition "Migrate compliance-latest to new format"
+
+:**create index:** \ncomp-latest-rep-v<index_ver>\n\n**point alias:**\ncomp-latest-rep->comp-latest-rep-v<index_ver>;
+:**split compliance-latest**\nmigrate into:comp-lat-rep-v<index_ver>;
+note right
+  Notice - no comp-lat-sum-v needed anymore!
+end note
+}
+
+partition "Make past 7 days available for reporting" {
+    :earliestScanDate=es.getEarliestScanDate;
+    if (earliestScanDate.Before(now - 7d) then (yes)
+        :backEndDate=now-7d;
+    else (no)
+        :backEndDate=earliestScanDate;
+    endif
+
+    :generateDailyLatestFromBackEndDateUpThruToday;
+    :dateToMigrate=now.UTC;
+
+    while (dateToMigrate) is (onOrAfter earliestScanDate)
+        :migrate compliance-<dateToMigrate>;
+        :dateToMigrate = dateToMigrate - 1d;
+        if (dateToMigrate is backEndDate) then (yes)
+          :Enable reporting endpoints;
+          note right
+            Open for business!
+          end note
+          :Enable data collector;
+        else (no)
+        endif
+    endwhile (Before earliestScanDate)
+}
+
+ if (earliestScanDate.Before(now - 7d) then (yes)
+    partition "Migrate everything prior to the past 7 days.. and make available for reporting!" {
+        :earliestScanDate=es.getEarliestScanDate;
+
+        :generateDailyLatestFromEarliestScanDateUpThruTodayMinus8Days;
+
+        :dateToMigrate=now.UTC-8d;
+
+        while (dateToMigrate) is (onOrAfter earliestScanDate)
+            :migrate compliance-<dateToMigrate>;
+            :dateToMigrate = dateToMigrate - 1d;
+            if (dateToMigrate is earliestScanDate) then (yes)
+              :Enable reporting endpoints for all dates;
+              note right
+                All dates open for business!
+              end note
+            else (no)
+            endif
+        endwhile (Before earliestScanDate)
+    }
+else (no)
+        :backEndDate=earliestScanDate;
+endif
+:Enable reaper;
+}
+end
+@enduml

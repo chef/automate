@@ -1,0 +1,15 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+{{~#eachAlive bind.automate-dex.members as |automate-dex|}}
+  {{~#if @last}}
+# Add dex to no-proxy
+addNoProxy {{automate-dex.sys.ip}}
+  {{~/if}}
+{{~/eachAlive}}
+
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+exec users serve {{pkg.svc_config_path}}/config.yml

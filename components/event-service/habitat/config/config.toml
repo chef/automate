@@ -1,0 +1,31 @@
+[service]
+{{~#if cfg.service.host}}
+host = "{{cfg.service.host}}"
+{{~else}}
+host = "{{sys.ip}}"
+{{~/if}}
+port = "{{cfg.service.port}}"
+event_limit = "{{cfg.service.event_limit}}"
+listener_limit = "{{cfg.service.listener_limit}}"
+
+[stream_service]
+enabled = {{cfg.service.enable_nats_feature}}
+cluster_id = "{{cfg.stream_service.cluster_id}}"
+store = "{{pkg.svc_data_path}}/datastore"
+
+[internal_messaging]
+port = {{cfg.internal_messaging.port}}
+gateway_port = {{cfg.internal_messaging.gateway_port}}
+
+[log]
+log_format = "{{cfg.log.format}}"
+log_level = "{{cfg.log.level}}"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
+
+[handlers]
+feed = "{{cfg.handlers.feed}}"
+cfgingest = "{{cfg.handlers.cfgingest}}"

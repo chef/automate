@@ -1,0 +1,5 @@
+listen_host = "localhost"
+listen_port = 10165
+lic_gen_url = "https://lic-gen-server.com"
+lic_gen_auth_token = "abc-sesame"
+segmentio_write_key = "def-sesame"

@@ -1,0 +1,18 @@
+<li>
+  <div class="recipe-list">
+    <div class="status-icon">
+      <chef-icon class="{{item.status}}">{{item.status | chefStatusIcon }}</chef-icon>
+    </div>
+    <div class="recipe-icon">
+      <chef-icon>book</chef-icon>
+    </div>
+    <div class="recipe">
+      <div class="name">
+        {{item.name.replace('::', ' :: ')}}
+      </div>
+      <div class="version">
+        v{{item.version}}<span class="policy-identifier" *ngIf="item.policy_identifier"> / {{item.policy_identifier}}</span>
+      </div>
+    </div>
+  </div>
+</li>

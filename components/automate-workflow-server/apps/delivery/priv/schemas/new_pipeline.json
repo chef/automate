@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "description": "The name of the pipeline to create. If using an existing target branch, it must be *exactly the same* as the name of that branch.",
+      "type": "string",
+      "required": true
+    },
+    "base": {
+      "description": "A base SHA, branch, or tag (i.e., a valid Git reference) at which to create a new target branch for this pipeline. Only use if you intend to create a new branch for the pipeline; not including this implies the branch already exists, and it is an error if it does not. A null value is the same as if no base was included at all.",
+      "type": ["string", null],
+      "required": false
+    }
+  }
+}

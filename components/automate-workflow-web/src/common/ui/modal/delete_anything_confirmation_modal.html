@@ -1,0 +1,7 @@
+<div class="delete-confirmation-modal">
+  <p>Are you sure you want to delete this {{ nameOfItem }}? This <strong>cannot</strong> be undone.</p>
+  <cd-modal-buttons>
+    <button class="button secondary" ng-click="closeModal()">Cancel</button>
+    <button class="button destroy" ng-click="doDelete(itemToBeDeleted)">Confirm</button>
+  </cd-modal-buttons>
+</div>

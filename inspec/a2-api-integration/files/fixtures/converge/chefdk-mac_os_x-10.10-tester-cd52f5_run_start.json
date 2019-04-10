@@ -1,0 +1,12 @@
+{
+  "chef_server_fqdn": "chef-server.chef.co",
+  "entity_uuid": "479c5129-61f5-4fb7-81db-686faf2ebdd9",
+  "id": "692407e5-f249-4098-a6f0-95794ab0a83a",
+  "message_version": "1.0.0",
+  "message_type": "run_start",
+  "node_name": "chefdk-mac_os_x-10.10-tester-cd52f5",
+  "organization_name": "chef",
+  "run_id": "692407e5-f249-4098-a6f0-95794ab0a83a",
+  "source": "chef_client",
+  "start_time": "2017-11-01T21:00:39Z"
+}

@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+
+# Health Check for Chef Server Load Balancer
+
+# default return code is 0
+rc=0
+
+curlOpts="-k -X GET -sS --fail --max-time 2"
+curlOpts="$curlOpts --cert {{pkg.svc_config_path}}/service.crt"
+curlOpts="$curlOpts --key {{pkg.svc_config_path}}/service.key"
+# This gets routed to erchef which does a "deep" health check
+{{pkgPathFor "core/curl"}}/bin/curl $curlOpts https://localhost:{{cfg.service.port}}/_status
+
+case $? in
+    # Zero exit status means curl got back a 200 end everything is ok.
+    0)
+        rc=0 ;;
+    # Anything else is critical.
+    *)
+        rc=2 ;;
+esac
+
+exit $rc

@@ -1,0 +1,44 @@
+chef-modal {
+  display: none;
+
+  &.visible {
+    display: block;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    height: 100%;
+    background-color: chef-hsla(var(--chef-primary-dark), 0.4);
+  }
+
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    z-index: 1001;
+    background-color: chef-hsl(var(--chef-white));
+    color: chef-hsl(var(--chef-primary-dark));
+    border-radius: var(--chef-border-radius);
+    padding: 30px;
+
+    #{--default-modal-width}: 700px;
+    width: var(--modal-width, var(--default-modal-width));
+
+    .close {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: auto;
+    }
+
+    [slot=title] {
+      #{--default-title-size}: 24px;
+      font-size: var(--title-size, var(--default-title-size));
+    }
+  }
+}

@@ -1,0 +1,75 @@
+<app-admin-sidebar></app-admin-sidebar>
+
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/settings/policies']">Policies</chef-breadcrumb>
+      {{ policy?.name }}
+    </chef-breadcrumbs>
+    <chef-page-header>
+      <chef-heading>{{ policy?.name }}</chef-heading>
+      <table>
+        <thead>
+          <tr class="detail-row">
+            <th class="id-column">ID</th>
+            <th class="type-column">Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="detail-row">
+            <td class="id-column">{{ policy?.id }}</td>
+            <td class="type-column">{{ policy?.type | iamType }}</td>
+          </tr>
+        </tbody>
+      </table>
+        <chef-tab-selector (change)="onSelectedTab($event)" [value]="tabValue">
+          <chef-option value='definition'>Definition</chef-option>
+          <chef-option value='members' routerLink="./" fragment="members">Members</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+    <section class="page-body">
+      <ng-container *ngIf="tabValue === 'definition'">
+        <chef-toolbar>
+          <chef-clipboard value={{policyJSON}} label="Copy Definition" icon=""></chef-clipboard>
+        </chef-toolbar>
+        <section id="json-bg">
+          <chef-snippet [code]="policy | json" lang="json"></chef-snippet>
+        </section>
+      </ng-container>
+      <ng-container *ngIf="tabValue === 'members'">
+        <div *ngIf="(members$ | async)?.length === 0" id="getting-started">Add the first members to get started!</div>
+        <chef-toolbar>
+          <chef-button primary
+            [routerLink]="['/settings', 'policies', policy.id, 'add-members']">Add Members</chef-button>
+        </chef-toolbar>
+        <chef-table *ngIf="(members$ | async)?.length > 0">
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Name</chef-th>
+              <chef-th>Type</chef-th>
+              <chef-th></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let member of members$ | async">
+              <!-- TODO (tc) we should link to local users and teams once we switch those APIs to named IDs.
+              can't now since we don't have the GUIDs for them unless we queried them by name for each
+              row somehow. -->
+              <chef-td>
+                {{ member.displayName }}
+              </chef-td>
+              <chef-td>
+                {{ member.displayType }}
+              </chef-td>
+              <chef-td class="three-dot-entry">
+                <chef-control-menu>
+                  <chef-option (click)="removeMember(member)">Remove Member</chef-option>
+                </chef-control-menu>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </ng-container>
+    </section>
+  </main>
+</div>

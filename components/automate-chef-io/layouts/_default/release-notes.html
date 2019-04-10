@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+{{ partial "automate/head" . }}
+<body>
+  <div class="off-canvas-wrapper has-sidebar">
+    <div class="off-canvas-content" data-off-canvas-content>
+      <div id="menu" class="cell small-12" data-sticky-container>
+        {{ partial "automate/header" . }}
+      </div>
+      <div class="cell small-12" style="z-index: 10;">
+        {{ partial "mini-hero" . }}
+      </div>
+      <div id="main-content" class="cell small-12" data-sticky-container>
+        <div class="grid-container">
+          <div class="grid-x">
+            <div id="navigation-bar" class="cell medium-3 col-sidebar">
+              {{ partial "empty-sidebar" . }}
+            </div>
+            <div id="main-content-col" class="cell medium-9 col-content">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="footer" class="cell small-12">
+        <nav>
+          {{ partial "automate/footer" . }}
+        </nav>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="{{ "js/scripts-all.js" | relURL }}"></script>
+  <script type="text/javascript">
+    loadReleaseNotesPage('automate');
+  </script>
+</body>
+</html>

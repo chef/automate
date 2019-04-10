@@ -1,0 +1,27 @@
+[service]
+{{~#if cfg.service.host}}
+host = "{{cfg.service.host}}"
+{{~else}}
+host = "{{sys.ip}}"
+{{~/if}}
+port = {{cfg.service.port}}
+metrics_port = {{cfg.service.metrics_port}}
+log_level = "{{cfg.log.level}}"
+
+[events]
+{{~#eachAlive bind.event-service.members as |events|}}
+{{~#if @last}}
+host = "{{events.sys.ip}}"
+port = {{events.cfg.internal_messaging_port}}
+cluster_id = "{{events.cfg.cluster_id}}"
+{{~/if}}
+{{~/eachAlive}}
+
+[postgres]
+database = "{{cfg.storage.database}}"
+schema_path = "{{pkg.svc_static_path}}/schema"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"

@@ -1,0 +1,9 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+# Start our service
+exec config-mgmt-service serve --config {{pkg.svc_config_path}}/config.toml

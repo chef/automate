@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package chef.automate.domain.notifications;
+option go_package = "github.com/chef/automate/api/config/notifications";
+
+import "api/config/shared/global.proto";
+import "api/config/shared/tls.proto";
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+
+import "google/protobuf/wrappers.proto";
+
+message ConfigRequest {
+	option (chef.automate.api.service_config) = {name: "notifications-service"};
+
+	reserved 1 to 2;
+
+	V1 v1 = 3;
+
+	message V1 {
+		System sys = 1;
+		Service svc = 2;
+
+		message System {
+			chef.automate.infra.config.Mlsa mlsa = 1;
+			Service service = 2;
+			Storage storage = 3;
+			Cache cache = 4;
+			chef.automate.infra.config.TLSCredentials tls = 5;
+			chef.automate.infra.config.Proxy proxy = 6;
+			Migration migration = 7;
+			Log log = 8;
+
+			message Service {
+				google.protobuf.StringValue external_fqdn = 1;
+				google.protobuf.StringValue host = 2;
+				google.protobuf.Int32Value port = 3 [ (chef.automate.api.port) = { name: "service", default: 10125, protocol: "grpc" } ];
+				google.protobuf.Int32Value dedupe_window_seconds = 4;
+			}
+
+			message Storage {
+				reserved 2 to 3;
+				google.protobuf.StringValue user = 1;
+			}
+
+			message Cache {
+				google.protobuf.Int64Value event_rule_timeout_ms = 1;
+			}
+
+			message Migration {
+				google.protobuf.StringValue rule_store_file = 1 [deprecated=true];
+			}
+
+			message Log {
+				google.protobuf.StringValue level = 1;
+			}
+		}
+
+		message Service {
+
+		}
+	}
+}

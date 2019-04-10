@@ -1,0 +1,6 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec service-health {{sys.ip}} {{cfg.service.port}} "pg-sidecar-service" \
+  {{pkg.svc_config_path}}/service.crt \
+  {{pkg.svc_config_path}}/service.key \
+  {{pkg.svc_config_path}}/root_ca.crt

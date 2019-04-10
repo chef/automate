@@ -1,0 +1,13 @@
+#!/usr/bin/osascript
+
+on run(argv)
+  tell application "System Events"
+    tell (first application process whose unix id is argv)
+        set appPath to the path of its application file
+    end tell
+  end tell
+
+  tell application appPath
+    quit
+  end tell
+end

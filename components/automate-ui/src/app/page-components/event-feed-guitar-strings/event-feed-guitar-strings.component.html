@@ -1,0 +1,104 @@
+<div class="event-feed-guitar-strings">
+  <div class="guitar-string-zoom">
+    <svg id="guitar-string-zoom-slider" width="100%" height="30">
+      <ng-container *ngFor="let date of buttonDates; let i = index">
+        <rect class="guitar-string-zoom-button"
+          [attr.width]="zoomButtonWidth(buttonDates)"
+          height="100%"
+          [attr.x]="zoomButtonPosition(i)"
+          y="0"
+          tabindex="0"
+          [attr.aria-label]="date | date: 'EEE, MMM d'"
+          (click)="dateSelected(date, i)"
+          (keydown.enter)="dateSelected(date, i)"/>
+        <text class="guitar-string-zoom-date"
+          [attr.x]="zoomTextPosition(i)" y="18">
+            {{date | date: 'EEE, MMM d'}}
+        </text>
+      </ng-container>
+      <rect class="slider-overlay start" x="0" y="0" width="0" height="100%"/>
+      <rect class="slider-overlay end" x="100%" y="0" width="0" height="100%"/>
+      <circle class="zoom-slider-button start"
+        cx="0" cy="50%" r="15" tabindex="0"
+        role="slider"
+        aria-label="Start Time"
+        aria-valuemin="1"
+        aria-valuemax="7"
+        aria-valuenow="1"
+        value="1"
+        aria-valuetext="Monday, June 1"
+        (keydown)="moveSlider($event, 'start')"
+        #startSlider/>
+      <text class="zoom-slider-icon start material-icons" x="0" y="22" aria-hidden="true">&#xe1b8;</text>
+      <circle class="zoom-slider-button end"
+        cx="100%" cy="50%" r="15" tabindex="0"
+        role="slider"
+        aria-label="End Time"
+        aria-valuemin="1"
+        aria-valuemax="7"
+        aria-valuenow="7"
+        value="7"
+        aria-valuetext="Friday, June 15"
+        (keydown)="moveSlider($event, 'end')"
+        #endSlider/>
+      <text class="zoom-slider-icon end material-icons" x="100%" y="22">&#xe1b8;</text>
+    </svg>
+  </div>
+
+  <chef-guitar-string-collection [height]="140">
+    <svg:g chef-guitar-string
+      [y]="i * graphicProportions.spaceBetweenStrings + graphicProportions.firstStringY"
+      *ngFor="let guitarString of guitarStringDataContainer.dynamicallyBucketedGuitarStrings; let i = index">
+
+      <ng-container ngProjectAs="[chef-guitar-string-item]"
+        *ngFor="let item of guitarString.items; let j = index">
+
+        <svg:g *ngIf="!item.isEmpty()" chef-guitar-string-item
+          (click)="itemSelected(item)"
+          [ngClass]="guitarString.eventAction"
+          [y]="i * graphicProportions.spaceBetweenStrings + graphicProportions.firstStringY"
+          [index]="j"
+          [space]="graphicProportions.spaceWidthBetweenItems"
+          [eventType]="item.getEventType()"
+          [iconRadius]="graphicProportions.iconRadius"
+          [multiple]="item.isMultiple()"
+          [task]="guitarString.eventAction"
+          [id]="'guitar-string-item-' + i  + '-' + j">
+        </svg:g>
+
+      </ng-container>
+    </svg:g>
+
+    <svg:g chef-guitar-string-section
+      [width]="graphicProportions.sectionWidth"
+      [index]="i"
+      *ngFor="let date of guitarStringDataContainer.sectionDates; let i = index">
+      {{date | date: 'EEE, MMM d'}}
+    </svg:g>
+
+  </chef-guitar-string-collection>
+
+
+  <ng-container *ngFor="let guitarString of guitarStringDataContainer.dynamicallyBucketedGuitarStrings; let i = index">
+    <ng-container *ngFor="let item of guitarString.items; let j = index">
+      <chef-tooltip follow
+        *ngIf="!item.isEmpty()"
+        class="guitar-tooltip {{j > 36 ? 'offset' : ''}}"
+        [offset]="tooltipOffset(j)"
+        [attr.for]="'guitar-string-item-' + i  + '-' + j">
+        <app-event-icon
+            [group]="item.isMultiple()"
+            [type]="item.getEventType()"
+            [task]="guitarString.eventAction">
+          </app-event-icon>
+          <span class="guitar-tooltip-text">
+            <span class="guitar-tooltip-date">
+                {{item.start | date:'EE' }}, {{item.start | date:'MMM d yyyy' }}
+                from {{item.start | date:'h:mm a' }} - {{item.end | date:'h:mm a' }}
+            </span>
+            <span [innerHTML]="getTooltipText(item, item.isMultiple(), guitarString)"></span>
+          </span>
+      </chef-tooltip>
+    </ng-container>
+  </ng-container>
+</div>

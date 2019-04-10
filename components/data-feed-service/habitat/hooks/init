@@ -1,0 +1,2 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+set -e

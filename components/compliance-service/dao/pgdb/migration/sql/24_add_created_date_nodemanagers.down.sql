@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS node_managers
+  DROP COLUMN IF EXISTS date_added;

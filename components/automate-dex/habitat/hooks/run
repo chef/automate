@@ -1,0 +1,20 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+export A2_SVC_DB_USER="dex"
+
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+source {{pkg.svc_config_path}}/run_environment.sh
+mkdir -p {{pkg.svc_var_path}}/etc
+
+render-template config.yml {{pkg.svc_var_path}}/etc/config.yml --conf {{pkg.svc_config_path}}/config.json
+
+pg-helper ensure-service-database "{{cfg.storage.database}}"
+
+pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
+
+cp -r {{pkg.path}}/web {{pkg.svc_static_path}}
+
+exec dex serve {{pkg.svc_var_path}}/etc/config.yml

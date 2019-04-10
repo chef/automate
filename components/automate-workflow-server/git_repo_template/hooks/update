@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# This script is meant to be included in every delivery-managed git repo as a
+# server-side git update hook
+# see https://www.kernel.org/pub/software/scm/git/docs/githooks.html
+
+# TODO: check that the refname is actually properly formatted.
+# TODO: when we move that script to ruby, we'll need to set time outs on how
+# long the HTTP call can take
+
+DELIV_HTTP_HOST='localhost'
+DELIV_HTTP_ROUTE='internal/ssh_authz'
+CURL='{{CURL_PATH}}/bin/curl'
+
+unknown_error()
+{
+    # Whatever we output here is forwarded to the git client, so we don't
+    # want to be too explicit here
+    echo "Unknown error" >&2
+    exit 2
+}
+
+main()
+{
+    local REFNAME OLDREV NEWREV OUTPUT AUTHZ_REQ_URL
+    REFNAME="$1"
+    OLDREV="$2"
+    NEWREV="$3"
+
+    # the other vars must come from the environment
+    if [ -z "$REFNAME" \
+         -o -z "$OLDREV" \
+         -o -z "$NEWREV" \
+         -o -z "$DELIV_USER" \
+         -o -z "$DELIV_ENTERPRISE" \
+         -o -z "$DELIV_ORGANIZATION" \
+         -o -z "$DELIV_PROJECT" \
+         -o -z "$DELIV_HTTP_PORT" ]; then
+        # TODO: log that somewhere
+        unknown_error
+    fi
+
+    # TODO: for now, the ent/user/project are URL-encoded, so we're fine here;
+    # however, if/when we change the encoding used for those, we'll need to
+    # properly URL-encode here (at which point we'll probably want to re-write
+    # this script with something a little more powerful (Ruby?)
+    AUTHZ_REQ_URL="http://$DELIV_HTTP_HOST:$DELIV_HTTP_PORT/$DELIV_HTTP_ROUTE/\
+?user=$DELIV_USER&ent=$DELIV_ENTERPRISE&org=$DELIV_ORGANIZATION&proj=$DELIV_PROJECT&action=write"
+    OUTPUT=$($CURL --silent -XGET "$AUTHZ_REQ_URL")
+    if [ $? -ne 0 ]; then
+        # TODO log that somewhere
+        unknown_error
+    fi
+
+    case $OUTPUT in
+        'allow')
+            # TODO: (next) ref authz checking!
+            # i.e. check that if we push to a protected branch, we're allowed to do that
+            return 0
+            ;;
+        'forbid')
+            return 1
+            ;;
+        *)
+            unknown_error
+            ;;
+    esac
+}
+
+# if DELIV_MERGE_NO_HOOK env var is set, that means we're pushing locally
+# from the same box, and in that case we disable the hook
+# TODO: this is hacky, and a potential security concern!!
+# all the more so as we allow SSH sessions to set env vars. Two potential
+# quick fixes:
+#  - is it even relevant to pass env vars through SSH sessions?
+#  - if it is, then we could say we silently drop any env var that begins
+#    with DELIV_ ? or else any that does not begin with GIT_ ?
+[ "$DELIV_MERGE_NO_HOOK" ] || main "$@"

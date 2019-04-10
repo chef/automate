@@ -1,0 +1,32 @@
+@import "~styles/variables";
+
+[disabled] {
+  cursor: pointer;
+}
+
+chef-modal {
+  .errors {
+    margin: 8px 85px 8px 85px;
+  }
+
+  .title {
+    font-size: 18px;
+    font-weight: bold;
+    color: $chef-primary-dark;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .line {
+    margin: 1.5em 2em 1.5em 1em;
+    box-sizing: border-box;
+    height: 3px;
+    width: 95%;
+    border: 1px solid $chef-light-grey;
+  }
+
+  .options {
+    text-align: center;
+  }
+}

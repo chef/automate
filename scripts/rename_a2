@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# rename_a2: A one-shot script to change 'chef/a2' to 'chef/automate' where required.
+#
+# To use on OSX, install gsed and replace sed with gsed
+SED=gsed
+echo "Constructing null-terminated files list: files_list"
+readarray -t non_vendor_files <<<"$(git ls-files | grep -v '^vendor' | grep -v '^docs$' | grep -v 'rename_a2')"
+rm -f files_list
+for i in "${non_vendor_files[@]}"; do
+    printf '%s%b' "$i" '\0' >> files_list
+done
+
+echo "Changing chef/a2 -> chef/automate"
+for pattern in "s#github.com/chef/a2#github.com/chef/automate#" "s#scaffolding_go_repo_name=a2#scaffolding_go_repo_name=automate#" "s#github.com:chef/a2#github.com:chef/automate#" "s#chef/a2:master#chef/automate:master#"; do
+    echo " - $SED -i $pattern"
+    <files_list xargs -0 $SED -i "$pattern"
+done

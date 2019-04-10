@@ -1,0 +1,42 @@
+#!/bin/bash
+
+document "debug_go_service" <<DOC
+  Attaches the remote delve debugger to a running service
+DOC
+function debug_go_service() {
+  if [[ "$1" == "" ]]; then
+    log_error "Missing the service name; try 'describe ${FUNCNAME[0]}'"
+    return 1
+  fi;
+
+  status_output=$(hab svc status | grep $1)
+  if [[ $status_output == "" ]]; then
+      log_error "Could not query hab-sup status"
+      return 1
+  fi
+
+  col_count=$(echo "$status_output" | awk '{print NF}')
+  local needed_col
+  case $col_count in
+      "6")
+          needed_col=5
+          ;;
+      "7")
+          needed_col=6
+          ;;
+      *)
+          log_error "Unrecognzied number of columns in hab output."
+          return 1
+          ;;
+  esac
+
+  local pid=$(echo "$status_output" | awk "{print \$$needed_col}")
+  if [[ $pid == "" ]]; then
+    log_error "Couldn't find running service ($1)"
+    return 1
+  fi;
+
+  GO_TOOL_METHOD="get" install_go_tool github.com/derekparker/delve/cmd/dlv;
+
+  dlv attach --headless -l ":${GO_DEBUG_PORT:-2345}" "$pid" --log=true --api-version=2
+}

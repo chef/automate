@@ -1,0 +1,3 @@
+{{~#if cfg.external.enable }}
+{{ cfg.external.root_cert }}
+{{/if}}

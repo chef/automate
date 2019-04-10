@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -eu
+
+# We've now seen cases where origin/master on the build hosts can get
+# out of date. This causes us to build components unnecessarily.
+# Fetching it here hopefully will prevent this situation.
+echo "Fetching origin/master"
+git fetch origin master
+
+
+# By default, Buildkite pulls down HEAD. If we're on a pull-request, pull down
+# the merged head: https://github.com/buildkite/agent/blob/master/bootstrap/bootstrap.go#L698
+if [[ "$BUILDKITE_PULL_REQUEST" != "false" ]]; then
+  echo "Switching to refspec 'refs/pull/$BUILDKITE_PULL_REQUEST/merge'"
+  git fetch origin +refs/pull/$BUILDKITE_PULL_REQUEST/merge
+  git checkout -qf FETCH_HEAD
+fi
+
+# Count retries as BK annotations; don't make all jobs explode if the script
+# is removed.
+[[ -x "scripts/count_retries" ]] && scripts/count_retries

@@ -1,0 +1,21 @@
+secrets_key = ""
+
+[mlsa]
+accept = false
+
+[service]
+host = "localhost"
+port = 10131
+
+[tls]
+key_contents = ""
+cert_contents = ""
+root_cert_contents = ""
+
+[storage]
+a1_database = "delivery"
+# The DBNAME is coming from compliance at:
+# => https://github.com/chef/automate/blob/master/components/compliance-service/habitat/default.toml#L17
+compliance_database = "chef_compliance_service"
+database = "secrets_service"
+user = "secrets"

@@ -1,0 +1,71 @@
+@import "~styles/variables";
+
+:host {
+  fieldset {
+    border: none;
+  }
+}
+
+.integration-services {
+  .logo {
+    width: 100px;
+  }
+
+  .aws,
+  .gcp {
+    height: 45px;
+    padding-top: 5px;
+  }
+
+  .gcp {
+    width: 120px;
+  }
+}
+
+.integration-form {
+  width: 60%;
+}
+
+.credentials {
+  display: flex;
+  padding-top: 2em;
+  flex-direction: column;
+
+  header {
+    padding-bottom: 1em;
+  }
+
+  h3 {
+    font-weight: bold;
+  }
+
+  .help-text {
+    font-size: 13px;
+  }
+
+  .cred {
+    display: flex;
+    margin-bottom: 1em;
+    font-size: 13px;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 700px;
+  }
+
+  .credential-ids {
+    align-self: flex-start;
+    flex: 0 1 200px;
+    border-radius: $global-radius;
+    padding: 0.5em;
+    border: 1px solid $chef-grey;
+
+    &:focus {
+      border-color: $chef-primary-bright;
+      outline: none;
+    }
+  }
+
+  .new-cred {
+    max-width: 700px;
+  }
+}

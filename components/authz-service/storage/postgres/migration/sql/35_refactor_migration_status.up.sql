@@ -1,0 +1,1 @@
+ALTER TYPE migration_state ADD VALUE 'successful-beta1';

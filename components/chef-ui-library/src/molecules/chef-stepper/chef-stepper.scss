@@ -1,0 +1,13 @@
+chef-stepper {
+  display: flex;
+  counter-reset: step;
+
+  chef-step {
+    flex: 1;
+
+    &::before {
+      counter-increment: step;
+      content: counter(step);
+    }
+  }
+}

@@ -1,0 +1,91 @@
+.cd-menu {
+  background: $white;
+  position: absolute;
+  z-index: 150;
+  font-size: 12px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  @include transform(translateX(10px));
+
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    z-index: 1;
+    left: 10px;
+    top: -5px;
+    width: 10px;
+    height: 10px;
+    background-color: $white;
+    box-shadow: -2px -2px 2px rgba(0,0,0,0.25);
+    @include transform(rotate(45deg));
+  }
+
+  .cd-menu-section {
+    padding-top: 5px;
+    position: relative;
+    z-index: 5;
+
+    &:after {
+      content: "";
+      display: block;
+      height: 1px;
+      background-color: $lightgrayblue;
+      margin: 0 10px;
+      margin-top: 10px;
+    }
+
+    &:last-child {
+      padding-bottom: 5px;
+      &:after {
+        display: none;
+      }
+    }
+
+    .cd-menu-item {
+      display: block;
+      cursor: pointer;
+
+      &.action {
+        padding: 4px 10px;
+
+        &:hover {
+          background-color: $lightblue;
+        }
+      }
+
+      &.toggle {
+
+        &:hover {
+          background-color: $lightblue;
+        }
+
+        label {
+          padding: 4px 10px;
+          display: block;
+          cursor: pointer;
+        }
+
+        input {
+          background-color: $white;
+          border: 1px solid $darkblue;
+          border-radius: none;
+        }
+
+        .title {
+          padding-left: 3px;
+        }
+
+        .display_data {
+          float: right;
+        }
+      }
+
+      &.button {
+        font-size: 1em;
+        margin: 4px 10px;
+        padding: 4px 10px;
+      }
+
+    }
+  }
+}

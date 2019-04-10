@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response";
+
+// Statement, Policy definitions
+import "components/automate-gateway/api/iam/v2beta/common/policy.proto";
+
+message CreatePolicyResp {
+  Policy policy = 1;
+}
+
+message GetPolicyResp {
+  Policy policy = 1;
+}
+
+message UpdatePolicyResp {
+  Policy policy = 1;
+}
+
+message ListPoliciesResp {
+  repeated Policy policies = 1;
+}
+
+message AddPolicyMembersResp {
+  repeated string members = 1;
+}
+
+message DeletePolicyResp {}
+
+message UpgradeToV2Resp {
+  repeated string reports = 1;
+}
+
+message GetPolicyVersionResp {
+  Version version = 1;
+}
+
+message ResetToV1Resp {}
+
+message ListPolicyMembersResp {
+  repeated string members = 1;
+}
+
+message ReplacePolicyMembersResp {
+  repeated string members = 1;
+}
+
+message RemovePolicyMembersResp {
+  repeated string members = 1;
+}
+
+message CreateRoleResp {
+  Role role = 1;
+}
+
+message GetRoleResp {
+  Role role = 1;
+}
+
+message DeleteRoleResp {}
+
+message UpdateRoleResp {
+  Role role = 1;
+}
+
+message ListRolesResp {
+  repeated Role roles = 1;
+}
+
+message GetProjectResp {
+  Project project = 1;
+}
+
+message ListProjectsResp {
+  repeated Project projects = 1;
+}
+
+message CreateProjectResp {
+  Project project = 1;
+}
+
+message UpdateProjectResp {
+  Project project = 1;
+}
+
+message DeleteProjectResp {}

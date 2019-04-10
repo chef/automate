@@ -1,0 +1,173 @@
+@import "~styles/variables";
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+::ng-deep {
+  svg {
+    display: block;
+    width: 100%;
+
+    .status-line {
+      fill: none;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      stroke-width: 2;
+
+      &.passed {
+        stroke: $chef-success;
+      }
+
+      &.failed {
+        stroke: $chef-critical;
+      }
+
+      &.skipped {
+        stroke: $chef-grey;
+      }
+    }
+
+    .dot-group {
+
+      .dot-group-tick {
+        stroke: $chef-light-grey;
+        stroke-dasharray: 4;
+        transition: stroke 0.5s;
+
+        &.hidden {
+          opacity: 0;
+        }
+      }
+
+      .dot-group-bg {
+        fill: transparent;
+      }
+
+      .status-dot {
+        fill: $chef-white;
+        stroke-width: 2;
+        transition: fill 0.5s;
+
+        &.hidden {
+          opacity: 0;
+        }
+
+        &.passed {
+          stroke: $chef-success;
+        }
+
+        &.failed {
+          stroke: $chef-critical;
+        }
+
+        &.skipped {
+          stroke: $chef-grey;
+        }
+      }
+
+      &:hover {
+        .dot-group-tick {
+          stroke: $chef-dark-grey;
+          stroke-dasharray: 0;
+
+          &.hidden {
+            opacity: 1;
+          }
+        }
+
+        .status-dot {
+          &.hidden {
+            opacity: 1;
+          }
+
+          &.passed {
+            fill: $chef-success;
+          }
+
+          &.failed {
+            fill: $chef-critical;
+          }
+
+          &.skipped {
+            fill: $chef-grey;
+          }
+        }
+      }
+    }
+
+    .y-axis {
+      transform: translateX(40px);
+
+      .domain {
+        opacity: 0;
+      }
+
+      .tick {
+        line {
+          stroke: $chef-grey;
+          transform: translateX(10px);
+        }
+
+        text {
+          fill: $chef-dark-grey;
+          font-size: 11px;
+        }
+      }
+    }
+
+    .x-axis {
+      text {
+        fill: $chef-dark-grey;
+        font-size: 11px;
+        text-anchor: middle;
+      }
+
+      .domain {
+        stroke: $chef-grey;
+      }
+    }
+  }
+
+  .tip-name {
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid $chef-grey;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .tip-legend {
+    .tip-legend-item {
+      margin: 0;
+      margin-bottom: 0.5em;
+      white-space: nowrap;
+
+      &::before {
+        display: inline-block;
+        margin: 1px 0.5em 1px 0;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        content: '';
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &.failed::before {
+        background: $chef-critical;
+      }
+
+      &.passed::before {
+        background: $chef-success;
+      }
+
+      &.skipped::before {
+        background: $chef-grey;
+      }
+    }
+  }
+}

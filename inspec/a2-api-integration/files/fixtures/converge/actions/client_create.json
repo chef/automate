@@ -1,0 +1,19 @@
+{
+  "id": "1e96e1c2-a424-4197-a84a-fdac971149e1",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "a2-local-fresh-install-dev.cd.chef.co",
+  "entity_type": "client",
+  "task": "create",
+  "organization_name": "chef",
+  "remote_hostname": "172.21.108.230",
+  "recorded_at": "2018-03-27T00:03:09Z",
+  "remote_request_id": "193d005e-0b06-4e9d-99bb-38e9ab4e5ad0",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAADyYkA8AAEAAAAA",
+  "requestor_name": "cd-infrastructure",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Knife/13.8.5 (ruby-2.4.3-p205; ohai-13.8.0; x86_64-linux; +https://chef.io)",
+  "data": "{\"admin\":false,\"chef_type\":\"client\",\"clientname\":\"a2-local-fresh-install-dev.cd.chef.co\",\"create_key\":true,\"json_class\":\"Chef::ApiClient\",\"name\":\"a2-local-fresh-install-dev.cd.chef.co\",\"validator\":false}"
+}

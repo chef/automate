@@ -1,0 +1,18 @@
+[mlsa]
+accept = false
+
+[log]
+format = "text"
+level = "info"
+
+[service]
+host = "localhost"
+port = 10120
+
+[storage]
+a1_database = "delivery"
+# The DBNAME is coming from compliance at:
+# => https://github.com/chef/automate/blob/master/components/compliance-service/habitat/default.toml#L17
+compliance_database = "chef_compliance_service"
+database = "nodemanager_service"
+user = "nodemanager"

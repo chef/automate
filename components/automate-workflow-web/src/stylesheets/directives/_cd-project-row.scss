@@ -1,0 +1,27 @@
+.project-item {
+  .status-icon {
+    margin: 0;
+    padding: 0;
+    height: .75rem;
+    width: .75rem;
+  }
+
+  .count {
+    font-size: .75rem;
+  }
+
+  .project-name {
+    font-family: $heading-font;
+  }
+
+  .toggle-icon {
+    float: left;
+    margin: .25em 1em 1.5em 0;
+    height: 12px;
+    width: 12px;
+  }
+
+  .toggle-icon.minus {
+    margin-top: .75em;
+  }
+}

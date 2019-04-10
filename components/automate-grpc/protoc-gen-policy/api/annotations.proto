@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package chef.automate.api;
+
+import "components/automate-grpc/protoc-gen-policy/api/policy.proto";
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/api";
+
+extend google.protobuf.MethodOptions {
+  // ... 50000-9999.
+  // This range is reserved for internal use within individual organizations, so
+  // you can use numbers in this range freely for in-house applications. If you
+  // intend to use custom options in public applications, however, then it is
+  // important that you make sure that your field numbers are globally unique.
+  // To obtain globally unique field numbers, please send a request to
+  // protobuf-global-extension-registry@google.com. Simply provide your project
+  // name (e.g. Object-C plugin) and your project website (if available).
+  // Usually you only need one extension number.
+  // See https://developers.google.com/protocol-buffers/docs/proto#customoptions
+  PolicyInfo policy = 50000;
+}

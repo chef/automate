@@ -1,0 +1,68 @@
+<app-admin-sidebar></app-admin-sidebar>
+<div class="container">
+  <main>
+    <chef-page-header>
+      <chef-heading>Node Integrations</chef-heading>
+      <chef-subheading>Connect Chef Automate to cloud services.</chef-subheading>
+    </chef-page-header>
+
+    <div class="page-body">
+      <h2 class="display4 strong">Nodes by IP Address</h2>
+      <chef-card *ngIf="automateManager$ | async as manager" class="regular">
+        <a class="link" [routerLink]="['/settings/node-integrations', manager.id]">{{ manager.name }}</a>
+      </chef-card>
+
+
+      <h2 class="display4 strong">Cloud Platform Providers</h2>
+      <chef-toolbar>
+        <app-authorized [anyOf]="['/nodemanagers', 'post']">
+          <chef-button primary [routerLink]="['/settings/node-integrations/add']">Create Integration</chef-button>
+        </app-authorized>
+      </chef-toolbar>
+
+      <chef-table (sort-toggled)="onSortToggled($event)">
+        <chef-thead>
+          <chef-tr>
+            <chef-th>
+              Node Manager
+              <chef-sort-toggle sort="name" [order]="orderFor('name')"></chef-sort-toggle>
+            </chef-th>
+            <chef-th>
+              Provider
+              <chef-sort-toggle sort="type" [order]="orderFor('type')"></chef-sort-toggle>
+            </chef-th>
+            <chef-th class="column-date">
+              Date Created
+              <chef-sort-toggle sort="date_added" [order]="orderFor('date_added')"></chef-sort-toggle>
+            </chef-th>
+            <chef-th>
+              Status
+              <chef-sort-toggle sort="status" [order]="orderFor('status')"></chef-sort-toggle>
+            </chef-th>
+            <chef-th></chef-th>
+          </chef-tr>
+        </chef-thead>
+
+        <chef-loading-spinner *ngIf="loading(managerStatus$ | async)" size='50'></chef-loading-spinner>
+
+        <chef-tbody>
+          <chef-tr *ngFor="let manager of managers$ | async">
+            <chef-td>
+              <a class="link" [routerLink]="['/settings/node-integrations', manager.id]">{{ manager.name }}</a>
+            </chef-td>
+            <chef-td>{{ manager.type }}</chef-td>
+            <chef-td class="column-date">{{ manager.date_added | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</chef-td>
+            <chef-td>{{ manager.status }}</chef-td>
+            <chef-td class="controls">
+              <chef-control-menu>
+                <chef-option (click)="handleEdit(manager.id)">Edit Integration</chef-option>
+                <chef-option (click)="handleDelete(manager.id)">Delete Integration</chef-option>
+              </chef-control-menu>
+            </chef-td>
+          </chef-tr>
+        </chef-tbody>
+      </chef-table>
+
+    </div>
+  </main>
+</div>

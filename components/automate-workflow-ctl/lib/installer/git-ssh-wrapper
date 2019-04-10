@@ -1,0 +1,14 @@
+#!/bin/bash
+# Martin Emde
+# https://github.com/martinemde/git-ssh-wrapper
+
+unset SSH_AUTH_SOCK
+ssh -o CheckHostIP=no \
+    -o IdentitiesOnly=yes \
+    -o LogLevel=INFO \
+    -o StrictHostKeyChecking=no \
+    -o PasswordAuthentication=no \
+    -o UserKnownHostsFile=/var/opt/delivery/workspace/etc/delivery-git-ssh-known-hosts \
+    -o IdentityFile=/var/opt/delivery/workspace/etc/builder_key \
+    -l builder \
+    $*

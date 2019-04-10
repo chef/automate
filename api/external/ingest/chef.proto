@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package chef.automate.api.ingest;
+option go_package = "github.com/chef/automate/api/external/ingest";
+
+import "google/api/annotations.proto";
+
+// for option (chef.automate.api.policy)
+import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
+// for option (chef.automate.api.iam.policy)
+import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
+
+import "api/external/common/version/version.proto";
+
+import "api/external/ingest/request/chef.proto";
+import "api/external/ingest/request/action.proto";
+import "api/external/ingest/request/liveness.proto";
+
+import "api/external/ingest/response/chef.proto";
+import "api/external/ingest/response/action.proto";
+import "api/external/ingest/response/liveness.proto";
+
+service ChefIngester {
+  rpc ProcessChefRun (ingest.request.Run) returns (ingest.response.ProcessChefRunResponse) {
+    option (google.api.http) = {
+      post: "/ingest/events/chef/run"
+      body: "*"
+    };
+    option (chef.automate.api.policy).resource = "ingest:nodes:{entity_uuid}:runs";
+    option (chef.automate.api.policy).action = "create";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes:{entity_uuid}:runs";
+    option (chef.automate.api.iam.policy).action = "infra:ingest:create";
+  };
+  rpc ProcessChefAction (ingest.request.Action) returns (ingest.response.ProcessChefActionResponse) {
+    option (google.api.http) = {
+      post: "/ingest/events/chef/action"
+      body: "*"
+    };
+    // actions can be anything a user does on chef server
+    // not necessarily related to nodes
+    option (chef.automate.api.policy).resource = "ingest:actions";
+    option (chef.automate.api.policy).action = "create";
+    option (chef.automate.api.iam.policy).resource = "infra:actions";
+    option (chef.automate.api.iam.policy).action = "infra:ingest:create";
+  };
+  rpc ProcessNodeDelete (ingest.request.Delete) returns (ingest.response.ProcessNodeDeleteResponse) {
+    option (google.api.http) = {
+      post: "/ingest/events/chef/nodedelete"
+      body: "*"
+    };
+    // special action that marks a node for deletion
+    // but scheduler actually deletes it
+    // NOTE: if this is called by chef server, node_id will not be provided
+    // for now we cannot enforce deleting a specific node, just any node or none
+    option (chef.automate.api.policy).resource = "ingest:nodes";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:ingest:delete";
+  };
+  rpc ProcessMultipleNodeDeletes (ingest.request.MultipleNodeDeleteRequest) returns (ingest.response.ProcessMultipleNodeDeleteResponse) {
+    option (google.api.http) = {
+      post: "/ingest/events/chef/node-multiple-deletes"
+      body: "*"
+    };
+    option (chef.automate.api.policy).resource = "ingest:nodes";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:ingestNodes:delete";
+  };
+  rpc ProcessLivenessPing(ingest.request.Liveness) returns (ingest.response.ProcessLivenessResponse) {
+    option (google.api.http) = {
+      post: "/ingest/events/chef/liveness"
+      body: "*"
+    };
+    option (chef.automate.api.policy).resource = "ingest:nodes:{entity_uuid}:liveness";
+    option (chef.automate.api.policy).action = "create";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes:{entity_uuid}:liveness";
+    option (chef.automate.api.iam.policy).action = "infra:ingest:create";
+  }
+  rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
+    option (google.api.http).get = "/ingest/version";
+    option (chef.automate.api.policy).resource = "service_info:version";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "system:service:version";
+    option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
+  };
+}

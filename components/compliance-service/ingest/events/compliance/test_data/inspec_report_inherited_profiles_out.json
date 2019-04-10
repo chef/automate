@@ -1,0 +1,129 @@
+[
+  {
+    "name": "myprofile2",
+    "title": "My Profile 2 title",
+    "version": "2.0.0",
+    "summary": "My Profile 2 summary",
+    "maintainer": "Demo, Inc.",
+    "license": "Apache-2.0",
+    "copyright": "Demo, Inc.",
+    "copyright_email": "support@example.com",
+    "controls": [
+      {
+        "id": "pro2-con1",
+        "code": "control 'pro2-con1' do\n  impact 0.3\n  title 'Profile 2 - Control 1'\n  desc 'Profile 2 - Control 1 description'\n  describe file('c:\\Windows') do\n    it { should exist }\n  end\n  only_if { os.windows? }\nend\n",
+        "desc": "Profile 2 - Control 1 description",
+        "impact": 0.3,
+        "title": "Profile 2 - Control 1",
+        "source_location": {
+          "ref": "controls/profile2.rb",
+          "line": 1
+        },
+        "refs": "[{\"ref\":\"NSA-RH6-STIG - Section 3.5.2.1\",\"url\":\"https://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf\"},{\"ref\":\"http://people.redhat.com/swells/scap-security-guide/RHEL/6/output/ssg-centos6-guide-C2S.html\"}]",
+        "tags": "{\"cce\":[\"CCE-27072-8\",\"CCE-27072-9\"],\"our_criticality\":98,\"reviewed\":true}"
+      }
+    ],
+    "supports": [ { "inspec": "~> 1.0" } ],
+    "attributes": [
+      {
+        "name": "role_name",
+        "options": {
+            "description": "Chef Role",
+            "default": "\"base\""
+        }
+      }
+    ],
+    "sha256": "e4930e2d434407fdd5fb6d42bf73aa4a822a2b081b42feb901842cd6c1e5f406",
+    "groups": [
+      {
+        "id": "controls/profile2.rb",
+        "title": null,
+        "controls": [
+          "pro2-con1"
+        ]
+      }
+    ],
+    "depends": [],
+    "doc_version": "1",
+    "@timestamp": "2017-10-26T19:29:21Z"
+  },
+  {
+    "name": "myrapper-father",
+    "title": "Linux Wrapper Father Profile",
+    "version": "0.6.6",
+    "summary": "Base profile that wraps other profiles",
+    "maintainer": "Demo, Inc.",
+    "license": "Apache-2.0",
+    "copyright": "Demo, Inc.",
+    "copyright_email": "support@example.com",
+    "controls": [
+      {
+        "id": "myrap-father-control1",
+        "code": "control 'myrap-father-control1' do\n  impact 0.5\n  title 'The father of all controls'\n  desc 'The father of all controls description'\n  describe file('/etc/group') do\n    it { should exist }\n  end\nend\n",
+        "desc": "The father of all controls description",
+        "impact": 0.5,
+        "title": "The father of all controls",
+        "source_location": {
+          "ref": "controls/defaut.rb",
+          "line": 3
+        },
+        "refs": "[]",
+        "tags": "{}"
+      },
+      {
+        "id": "pro1-con1",
+        "code": "control 'pro1-con1' do\n  impact 0.8\n  title 'Profile 1 - Control 1'\n  desc 'Profile 1 - Control 1 description'\n  tag 'hosts','file'\n  tag cce: 'CCE-27072-8'\n  describe file('/etc/hosts') do\n    its('mode') { should eq 0644 }\n  end\nend\n",
+        "desc": "Profile 1 - Control 1 description",
+        "impact": 0.8,
+        "title": "Profile 1 - Control 1",
+        "source_location": {
+          "ref": "controls/profile1.rb",
+          "line": 1
+        },
+        "refs": "[]",
+        "tags": "{\"cce\":\"CCE-27072-8\",\"file\":null,\"hosts\":null}"
+      },
+      {
+        "id": "pro1-con2",
+        "code": "control 'pro1-con2' do\n  impact 0.9\n  title 'Profile 1 - Control 2'\n  desc 'Profile 1 - Control 2 description'\n  tag 'password'\n  describe file('/etc/passwdddddddddd') do\n    it { should exist }\n  end\nend\n",
+        "desc": "Profile 1 - Control 2 description",
+        "impact": 0.9,
+        "title": "Profile 1 - Control 2",
+        "source_location": {
+          "ref": "controls/profile1.rb",
+          "line": 12
+        },
+        "refs": "[]",
+        "tags": "{\"password\":null}"
+      }
+    ],
+    "supports": [],
+    "attributes": [],
+    "depends": [
+      {
+        "name": "myrapper-child",
+        "url": "https://s3-eu-west-1.amazonaws.com/apop-bucket/profiles/myrapper-child-0.5.5.tar.gz"
+      }
+    ],
+    "sha256": "bebfe8ae7742e6ea9e09765eb0110f77b602d1c35442d3f59516f3957d40ac13",
+    "groups": [
+      {
+        "id": "controls/defaut.rb",
+        "title": null,
+        "controls": [
+          "myrap-father-control1"
+        ]
+      },
+      {
+        "id": "controls/profile1.rb",
+        "title": null,
+        "controls": [
+          "pro1-con1",
+          "pro1-con2"
+        ]
+      }
+    ],
+    "doc_version": "1",
+    "@timestamp": "2017-10-26T19:29:21Z"
+  }
+]

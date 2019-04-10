@@ -1,0 +1,64 @@
+syntax="proto3";
+
+package chef.automate.domain.event.api;
+option go_package = "github.com/chef/automate/api/interservice/event";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+service EventService {
+    rpc Publish(PublishRequest) returns (PublishResponse);
+    rpc Subscribe(SubscribeRequest) returns (SubscribeResponse);
+    rpc Start(StartRequest) returns (StartResponse);
+    rpc Stop(StopRequest) returns (StopResponse);
+}
+
+message EventType { string Name = 1; }
+
+message Producer {
+    string  ID              = 1;
+    string ProducerName     = 2;
+    string ProducerType     = 3;
+    repeated string Tags    = 4;
+}
+
+message Actor {
+    string ID           = 1;
+    string ObjectType   = 2;
+    string DisplayName  = 3;
+}
+
+message Object {
+    string ID           = 1;
+    string ObjectType   = 2;
+    string DisplayName  = 3;
+}
+
+message Target {
+    string ID           = 1;
+    string ObjectType   = 2;
+    string DisplayName  = 3;
+}
+
+message EventMsg {
+    string EventID                         = 1;
+    EventType Type                         = 2;
+    Producer Producer                      = 3;
+    repeated string Tags                   = 4;
+    google.protobuf.Timestamp Published    = 5;
+    Actor Actor                            = 6;
+    string Verb                            = 7;
+    Object Object                          = 8;
+    Target Target                          = 9;
+    google.protobuf.Struct data            = 10;
+}
+
+message EventResponse { bool Success = 1; }
+message PublishRequest { EventMsg Msg = 1; }
+message PublishResponse { bool Success = 1; }
+message SubscribeRequest {}
+message SubscribeResponse {}
+message StartRequest {}
+message StartResponse {}
+message StopRequest {}
+message StopResponse {}

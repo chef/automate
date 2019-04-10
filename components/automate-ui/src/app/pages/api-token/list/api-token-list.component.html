@@ -1,0 +1,70 @@
+<app-admin-sidebar></app-admin-sidebar>
+<chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+
+<div class="container token-container">
+  <main>
+    <chef-page-header contrastingBackground>
+      <chef-heading>API Tokens</chef-heading>
+      <chef-subheading>API tokens grant authorized access to the Chef Automate API.</chef-subheading>
+    </chef-page-header>
+
+    <app-create-object-modal
+      [visible]="createModalVisible"
+      [creating]="creatingToken"
+      [conflictErrorEvent]="conflictErrorEvent"
+      objectNoun="token"
+      [createForm]="createTokenForm"
+      (close)="closeCreateModal()"
+      (createClicked)="createToken()">
+    </app-create-object-modal>
+
+    <app-delete-object-modal
+      [visible]="deleteModalVisible"
+      objectNoun="token"
+      [objectName]="tokenToDelete?.name"
+      (close)="closeDeleteModal()"
+      (deleteClicked)="deleteToken()">
+    </app-delete-object-modal>
+
+    <div class="page-body">
+      <chef-toolbar>
+        <app-authorized [anyOf]="[['/iam/v2beta/tokens', 'post'], ['/auth/tokens', 'post']]">
+          <chef-button id="create-button" primary (click)="openCreateModal()">Create Token</chef-button>
+        </app-authorized>
+      </chef-toolbar>
+      <app-authorized [anyOf]="[['/iam/v2beta/tokens', 'get'], ['/auth/tokens', 'get']]">
+        <chef-table>
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Name</chef-th>
+              <chef-th>Created date</chef-th>
+              <chef-th>Status</chef-th>
+              <chef-th class="controls"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let token of sortedApiTokens$ | async">
+              <chef-td>
+                <a [routerLink]="['/settings/tokens', token.id]">{{ token.name }}</a>
+              </chef-td>
+              <chef-td>{{ token.created_at | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</chef-td>
+              <chef-td>
+                <ng-container *ngIf="token.active">Active</ng-container>
+                <ng-container *ngIf="!token.active">Inactive</ng-container>
+              </chef-td>
+              <chef-td class="controls">
+                <chef-control-menu id="menu-{{token.id}}">
+                  <chef-option (click)="notifyCopy()">
+                    <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
+                  </chef-option>
+                  <chef-option (click)="toggleActive(token)">Toggle Status</chef-option>
+                  <chef-option (click)="startTokenDelete(token)">Delete Token</chef-option>
+                </chef-control-menu>
+              </chef-td>
+           </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </app-authorized>
+    </div>
+  </main>
+</div>

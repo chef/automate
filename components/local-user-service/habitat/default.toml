@@ -1,0 +1,13 @@
+[mlsa]
+accept = false
+
+[service]
+host = "localhost"
+port = 9092
+external_fqdn = "localhost"
+a1_user_data = "a1_user_data.json"
+a1_user_roles_data = "a1_user_roles_data.json"
+
+[logger]
+format = "text"
+level = "info"

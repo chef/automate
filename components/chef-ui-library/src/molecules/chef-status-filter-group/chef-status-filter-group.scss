@@ -1,0 +1,140 @@
+chef-status-filter-group {
+  --active-color: var(--toggle-active-color, chef-hsl(var(--chef-primary-bright)));
+  display: block;
+  display: flex;
+  align-items: center;
+
+  chef-option {
+    display: inline-flex;
+    // align-items: center;
+    background-color: chef-hsl(var(--chef-white));
+    box-shadow: 0 0 0 1px #DAE1E6 inset;
+    cursor: pointer;
+    padding: 1em;
+    border-radius: 4px;
+    height: 60px;
+    width: 175px;
+    margin-right: 8px;
+
+    &:nth-child(n+2) {
+      margin-left: 8px;
+    }
+
+    &.filter {
+      font-size: 14px;
+      height: auto;
+      display: flex;
+
+      .option-content {
+        padding: 0;
+        flex-direction: column;
+      }
+
+
+      &::before {
+        display: none;
+      }
+
+      &.general {
+        chef-icon {
+          color: #212334;
+        }
+      }
+
+      &.critical {
+        chef-icon {
+          color: chef-hsl(var(--chef-critical));
+        }
+      }
+
+      &.warning {
+        chef-icon {
+          color: chef-hsl(var(--chef-primary));
+        }
+      }
+
+      &.success {
+        chef-icon {
+          color: chef-hsl(var(--chef-success));
+        }
+      }
+
+      &.unknown {
+        chef-icon {
+          color: chef-hsl(var(--chef-dark-grey));
+        }
+      }
+    }
+
+    .filter-total {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: center;
+    }
+
+    chef-icon {
+      display: inline-flex;
+      vertical-align: center;
+      height: 16px;
+      width: 16px;
+      margin-right: 4px;
+    }
+
+    &.selected {
+      background: chef-hsl(var(--chef-white));
+
+      .filter-label,
+      .filter-total {
+        color: #212334;
+      }
+
+      &.general {
+        background: #F3F6F8;
+        box-shadow: 0px 0px 0px 1px #829BA8 inset;
+      }
+
+      &.critical {
+        background: #F9DBEA;
+        box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-critical)) inset;
+      }
+
+      &.warning {
+        background: #FFE5D4;
+        box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-primary)) inset;
+      }
+
+      &.success {
+        background: #CFE8FF;
+        box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-success)) inset;
+      }
+
+      &.unknown {
+        background: #E7E9E9;
+        box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-dark-grey)) inset;
+      }
+    }
+
+    &:hover {
+
+      &.general {
+        background: #F3F6F8;
+      }
+
+      &.critical {
+        background: #F9DBEA;
+      }
+
+      &.warning {
+        background: #FFE5D4;
+      }
+
+      &.success {
+        background: #CFE8FF;
+      }
+
+      &.unknown {
+        background: #E7E9E9;
+      }
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "platform": {
+    "name": "mac_os_x",
+    "release": "17.7.0"
+  },
+  "profiles": [
+    {
+      "name": "myrapper-child",
+      "version": "0.6.2",
+      "sha256": "7c23eca1ca68dd0bb34a04f6c24a2a77642d260c713c167dbf1a9cdb5c0d00b0",
+      "title": "Linux Wrapper Child Profile",
+      "maintainer": "Demo, Inc.",
+      "summary": "Profile that wraps other profiles",
+      "license": "Apache-2.0",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "supports": [],
+      "attributes": [],
+      "depends": [
+        {
+          "name": "myprofile1-new-name",
+          "path": "../myprofile1",
+          "status": "skipped",
+          "skip_message": "Skipping profile: 'myprofile1' on unsupported platform: 'mac_os_x/17.7.0'."
+        },
+        {
+          "name": "myprofile2-new-name",
+          "path": "../myprofile2",
+          "status": "loaded"
+        }
+      ],
+      "groups": [
+        {
+          "id": "controls/defaut.rb",
+          "controls": [
+            "one"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "one",
+          "title": "control number one",
+          "desc": "description of control #1",
+          "descriptions": [
+            {
+              "label": "default",
+              "data": "description of control #1"
+            }
+          ],
+          "impact": 0.5,
+          "refs": [],
+          "tags": {},
+          "code": "control 'one' do\n  title 'control number one'\n  desc 'description of control #1'\n  describe 1 do\n    it { should eq 1 }\n  end\nend\n",
+          "source_location": {
+            "line": 3,
+            "ref": "/Users/apop/git/mycompliance-profile/myrapper-child/controls/defaut.rb"
+          },
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "2 should eq 2",
+              "run_time": 0.001552,
+              "start_time": "2018-10-11T11:42:47+01:00"
+            }
+          ]
+        }
+      ],
+      "status": "loaded"
+    }
+  ],
+  "statistics": {
+    "duration": 0.004743
+  },
+  "version": "3.0.12",
+  "type": "inspec_report",
+  "end_time": "2018-10-26T09:39:25+00:00",
+  "environment": "_default",
+  "node_name":   "centos6-node1",
+  "node_uuid":   "6dd7c19c-c1bc-4cf5-b431-524e3e42f553",
+  "report_uuid": "491285be-b513-4f8a-ad05-295829243b54"
+}

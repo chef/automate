@@ -1,0 +1,38 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+:host {
+  cursor: pointer;
+}
+
+.create.icon, .update.icon {
+  fill: $chef-white;
+}
+
+.delete.circle {
+  fill: $chef-white;
+
+  stroke: $chef-critical;
+  stroke-width: 0.8871;
+}
+
+.delete.multiple {
+  fill: $chef-white;
+
+  stroke: $chef-critical;
+  stroke-width: 0.8871;
+}
+
+.create.multiple {
+  fill: $chef-white;
+
+  stroke: $chef-success;
+  stroke-width: 0.8871;
+}
+
+.update.multiple {
+  fill: $chef-white;
+
+  stroke: $chef-major;
+  stroke-width: 0.8871;
+}

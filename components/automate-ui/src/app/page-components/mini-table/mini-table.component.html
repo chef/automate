@@ -1,0 +1,7 @@
+<table class="mini-table">
+  <tr *ngFor="let rowArray of tableData">
+    <td *ngFor="let entry of rowArray" class="mini-td"> 
+      {{ entry | definedOrDefault }}
+    </td>
+  </tr>
+</table>

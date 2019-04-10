@@ -1,0 +1,43 @@
+# Order is important. The last matching pattern has the most precedence.
+
+.delivery/**            @chef/jex-team
+.expeditor/**           @chef/jex-team
+.github/**              @chef/a2-maintainers @chef/jex-team
+.travis.yml             @chef/a2-maintainers @chef/jex-team
+dev/**                  @chef/a2-maintainers
+docs/**                 @chef/a2-maintainers @chef/jex-team @chef/docs-team
+inspec/**               @chef/a2-maintainers @chef/jex-team
+scripts/**              @chef/jex-team
+terraform/**            @chef/jex-team
+www/**                  @chef/release-engineering
+
+components/authn-service/**                @chef/auth-team
+components/authz-service/**                @chef/auth-team
+components/automate-debug/**               @chef/automate-deployment-team
+components/automate-chef-io/**             @chef/docs-team
+components/automate-deployment/**          @chef/automate-deployment-team
+components/automate-dex/**                 @chef/auth-team
+components/automate-gateway/**             @chef/a2-maintainers
+components/automate-grpc/**                @chef/automate-deployment-team
+components/automate-load-balancer/**       @chef/automate-deployment-team
+components/automate-ui/**                  @chef/automate-ui-team
+components/automate-ui-devproxy/**         @chef/automate-ui-team
+components/chef-ui-library/**              @chef/automate-ui-team
+components/compliance-service/**           @chef/compliance-team
+components/config-mgmt-service/**          @chef/a2-infra-automation-team
+components/data-lifecycle-service/**       @chef/automate-deployment-team
+components/es-sidecar-service/**           @chef/automate-deployment-team
+components/ingest-service/**               @chef/a2-infra-automation-team @chef/compliance-team
+components/license-control-service/**      @chef/operability-team
+components/local-user-service/**           @chef/auth-team
+components/notifications-client/**         @chef/operability-team
+components/notifications-service/**        @chef/operability-team
+components/release-mgmt-dashboard/**       @chef/jex-team
+components/session-service/**              @chef/auth-team
+components/teams-service/**                @chef/auth-team
+lib/logger/**                              @chef/operability-team
+lib/tls/**                                 @chef/automate-deployment-team
+
+**/.studiorc  @chef/a2-maintainers
+**/.studio/**  @chef/a2-maintainers
+**/habitat/** @chef/a2-habitat-maintainers

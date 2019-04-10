@@ -1,0 +1,161 @@
+package pg
+
+import (
+	"context"
+
+	"github.com/lib/pq"
+	"go.uber.org/zap"
+
+	tokens "github.com/chef/automate/components/authn-service/tokens/types"
+	tutil "github.com/chef/automate/components/authn-service/tokens/util"
+	uuid "github.com/chef/automate/lib/uuid4"
+)
+
+func (a *adapter) CreateToken(ctx context.Context,
+	id, description string, active bool, projects []string) (*tokens.Token, error) {
+	value, err := tutil.GenerateNewToken()
+	if err != nil {
+		return nil, err
+	}
+	return a.CreateTokenWithValue(ctx, id, value, description, active, projects)
+}
+
+func (a *adapter) CreateTokenWithValue(ctx context.Context,
+	id, value, description string, active bool, projects []string) (*tokens.Token, error) {
+	if err := tutil.IsValidToken(value); err != nil {
+		return nil, err
+	}
+	if id == "" {
+		uid, err := uuid.NewV4()
+		if err != nil {
+			return nil, err
+		}
+		id = uid.String()
+	}
+
+	return a.insertToken(ctx, id, description, value, active, projects)
+}
+
+func (a *adapter) CreateLegacyTokenWithValue(ctx context.Context, value string) (*tokens.Token, error) {
+	if err := tutil.IsValidLegacyToken(value); err != nil {
+		return nil, err
+	}
+
+	id, err := uuid.NewV4() // TODO: hard-code legacy token ID?
+	if err != nil {
+		return nil, err
+	}
+
+	return a.insertToken(ctx, id.String(), tokens.LegacyTokenDescription, value, true, []string{})
+}
+
+func (a *adapter) insertToken(ctx context.Context,
+	id string, description string, value string, active bool, projects []string) (*tokens.Token, error) {
+
+	t := tokens.Token{}
+	// ensure we do not pass null projects to db and break the not null constraint
+	if projects == nil {
+		projects = []string{}
+	}
+	err := a.db.QueryRowContext(ctx,
+		`INSERT INTO chef_authn_tokens(id, description, value, active, project_ids, created, updated)
+		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+		RETURNING id, description, value, active, project_ids, created, updated`,
+		id, description, value, active, pq.Array(projects)).
+		Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated)
+
+	if err != nil {
+		return nil, processSQLError(err, "insert token")
+	}
+	return &t, nil
+}
+
+func (a *adapter) UpdateToken(ctx context.Context,
+	id, description string, active bool, projects []string) (*tokens.Token, error) {
+	t := tokens.Token{}
+
+	// ensure we do not pass null projects to db
+	if projects == nil {
+		projects = []string{}
+	}
+	if description != "" {
+		if err := a.db.QueryRowContext(ctx,
+			`UPDATE chef_authn_tokens SET active=$2, description=$3, project_ids=$4, updated=NOW() WHERE id=$1
+			RETURNING id, description, value, active, project_ids, created, updated`,
+			id, active, description, pq.Array(projects)).
+			Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
+			return nil, processSQLError(err, "update token")
+		}
+	} else {
+		if err := a.db.QueryRowContext(ctx,
+			`UPDATE chef_authn_tokens SET active=$2, project_ids=$3, updated=NOW() WHERE id=$1
+			RETURNING id, description, value, active, project_ids, created, updated`,
+			id, active, pq.Array(projects)).
+			Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
+			return nil, processSQLError(err, "update token")
+		}
+	}
+	return &t, nil
+}
+
+func (a *adapter) DeleteToken(ctx context.Context, id string) error {
+	if _, err := a.db.ExecContext(ctx,
+		`DELETE FROM chef_authn_tokens WHERE id=$1`,
+		id); err != nil {
+		return processSQLError(err, "delete token by id")
+	} // TODO: check rows affected?
+	return nil
+}
+
+func (a *adapter) GetToken(ctx context.Context, id string) (*tokens.Token, error) {
+	t := tokens.Token{}
+	if err := a.db.QueryRowContext(ctx,
+		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens WHERE id=$1`,
+		id).
+		Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
+		return nil, processSQLError(err, "select token by id")
+	}
+	return &t, nil
+}
+
+func (a *adapter) GetTokenIDWithValue(ctx context.Context, value string) (string, error) {
+	var id string
+	if err := a.db.QueryRowContext(ctx,
+		`SELECT id FROM chef_authn_tokens WHERE value=$1 AND active`,
+		value).
+		Scan(&id); err != nil {
+		return "", processSQLError(err, "select token ID by value")
+	}
+
+	return id, nil
+}
+
+func (a *adapter) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
+	ts := []*tokens.Token{}
+	rows, err := a.db.QueryContext(ctx,
+		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens`)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			a.logger.Warn("failed to close DB rows", zap.Error(err))
+		}
+	}()
+
+	for rows.Next() {
+		t := tokens.Token{}
+		if err := rows.Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects),
+			&t.Created, &t.Updated); err != nil {
+			return nil, err
+		}
+		ts = append(ts, &t)
+	}
+	return ts, nil
+}
+
+// Reset deletes all tokens from the database /!\
+func (a *adapter) Reset(ctx context.Context) error {
+	_, err := a.db.ExecContext(ctx, `TRUNCATE chef_authn_tokens`)
+	return err
+}

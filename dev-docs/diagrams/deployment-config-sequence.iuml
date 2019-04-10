@@ -1,0 +1,42 @@
+@startuml
+title Call sequence for runtime service configuration
+
+collections "automate-gateway" as api
+collections "chef-automate CLI" as cli
+collections "deployment-service" as ds
+collections "auth-service" as auth
+collections "automate-dex" as dex
+
+group Fetching config "DESIRED 2: auth stores config"
+cli -> ds: ds.FetchAuthConfig
+ds -> auth: auth.FetchConfig (grpc)
+auth -> auth: read from db
+else "DESIRED 1: deployment stores config"
+cli -> ds: ds.FetchAuthConfig
+ds -> auth: auth.FetchConfig (grpc)
+auth -> ds: ds.FetchDexConfig
+ds -> ds: read from db
+end
+
+group Setting config "DESIRED 2: auth and deployment store config"
+cli -> ds: ds.SetAuthConfig
+ds -> auth: auth.SetConfig (grpc)
+auth -> auth: persist to db
+auth -> ds: ds.SetDexConfig
+ds -> ds: persist to db
+ds -> dex: hab apply config
+else "DESIRED 1: deployment stores config"
+cli -> ds: ds.SetAuthConfig
+ds -> auth: auth.SetConfig (grpc)
+auth -> ds: ds.SetDexConfig
+ds -> ds: persist to db
+ds -> dex: hab apply config
+end
+
+group "Via API Gateway"
+api -> auth: auth.FetchConfig (grpc)
+api -> auth: auth.SetConfig (grpc)
+end
+
+
+@enduml

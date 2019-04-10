@@ -1,0 +1,13 @@
+cluster:
+  name: ${es.cluster.name:chef-insights}
+  routing:
+    allocation:
+      disk:
+        threshold_enabled: false
+
+network:
+  host: ${es.network.host:0.0.0.0}
+
+path:
+  data: ${es.path.data:/usr/share/elasticsearch/data}
+  logs: ${es.path.logs:/usr/share/elasticsearch/logs}

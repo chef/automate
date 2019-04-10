@@ -1,0 +1,69 @@
+.review {
+
+  .review-header {
+    overflow: hidden;
+    font-size: .875rem;
+
+    .file-header {
+
+      span {
+        display: block;
+        float: left;
+        padding: 8px 6px 8px 12px;
+        color: lighten($darkblue, 10%);
+      }
+
+      ol {
+        float: left;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+          float: left;
+          padding: 3px 0;
+          margin-right: 4px;
+
+          a {
+            display: block;
+            text-decoration: none;
+            padding: 4px 8px;
+            color: lighten($darkblue, 10%);
+            border: 1px solid transparent;
+            border-radius: 3px;
+
+            &.active {
+              background: lighten($darkblue, 10%);
+              color: $white;
+            }
+
+            &:hover {
+              border: 1px solid lighten($darkblue, 10%);
+            }
+          }
+        }
+      }
+    }
+
+    .review-actions {
+      float: left;
+
+      a {
+        display: block;
+        border-right: 1px solid $lightgray;
+        padding: 8px 12px 8px 8px;
+        text-decoration: none;
+        color: lighten($darkblue, 10%);
+        float: left;
+      }
+    }
+  }
+
+  .review-files {
+    display: block;
+    margin-top: -1px;
+    border: 1px solid $lightgray;
+    border-bottom: none;
+    border-top: none;
+  }
+}

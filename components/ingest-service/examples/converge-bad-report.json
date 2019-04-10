@@ -1,0 +1,191 @@
+{
+  "end_time": "2017-10-04T21:13:00Z",
+  "entity_uuid": "068880f1-5abe-4295-8362-733abaac8f0f",
+  "error": {
+      "backtrace": [
+          "/opt/chef/embedded/lib/ruby/gems/2.3.0/gems/chef-12.21.3/bin/chef-client:26:in '<top (required)>'",
+          "/usr/bin/chef-client:57:in 'load'",
+          "/usr/bin/chef-client:57:in '<main>'"
+      ],
+      "class": "Error class",
+      "description": {
+          "sections": [
+              {
+                  "Mixlib::ShellOut::ShellCommandFailed": "Expected process to exit with [0], but received ''\n---- Begin output of /bin/systemctl --system stop chef-client ----\nSTDOUT: \nSTDERR: \n---- End output of /bin/systemctl --system stop chef-client ----\nRan /bin/systemctl --system stop chef-client returned "
+              },
+              {
+                  "Resource Declaration:": "# In /var/chef/cache/cookbooks/chef-client/recipes/systemd_service.rb\n\n 62: service 'chef-client' do\n 63:   supports status: true, restart: true\n 64:   action(timer ? [:disable, :stop] : [:enable, :start])\n 65: end\n 66: \n"
+              },
+              {
+                  "Compiled Resource:": "# Declared in /var/chef/cache/cookbooks/chef-client/recipes/systemd_service.rb:62:in `from_file'\n\nservice(\"chef-client\") do\n  action [:disable, :stop]\n  default_guard_interpreter :default\n  service_name \"chef-client\"\n  enabled false\n  running true\n  masked false\n  pattern \"chef-client\"\n  declared_type :service\n  cookbook_name \"chef-client\"\n  recipe_name \"systemd_service\"\n  supports {:status=>true, :restart=>true}\nend\n"
+              }
+          ],
+          "title": "Error title"
+      },
+      "message": "Error message"
+  },
+  "event_action": "finished",
+  "expanded_run_list": {
+      "id": "acceptance-chef-products-automate-master",
+      "run_list": [
+          {
+              "name": "apache::default",
+              "skipped": false,
+              "type": "recipe"
+          },
+          {
+              "name": "postgres::default",
+              "skipped": false,
+              "type": "recipe"
+          }
+      ]
+  },
+  "fqdn": "Numquam-nam-quasi.kerluke.info",
+  "id": "91a3a46e-2095-42f4-813f-0d2069925c20",
+  "ipaddress": "234.188.26.140",
+  "message_type": "run_converge",
+  "node_name": "Numquam-nam-quasi",
+  "organization_name": "org2",
+  "platform": "ubuntu",
+  "policy_group": "dev",
+  "policy_name": "policy2",
+  "policy_revision": "4f8f2de8ae6feaa7280fbc03779448358de2a87b16d9c6c36c0d31950179d8b9",
+  "resources": [
+      {
+          "cookbook_name": "apt",
+          "cookbook_version": "6.1.3",
+          "delta": "",
+          "duration": "2",
+          "id": "/var/cache/local/preseeding",
+          "ignore_failure": false,
+          "name": "/var/cache/local/preseeding",
+          "recipe_name": "default",
+          "result": "create",
+          "status": "up-to-date",
+          "type": "directory"
+      },
+      {
+          "cookbook_name": "ntp",
+          "cookbook_version": "3.5.1",
+          "delta": "",
+          "duration": "66",
+          "id": "ntp",
+          "ignore_failure": false,
+          "name": "ntp",
+          "recipe_name": "default",
+          "result": "enable",
+          "status": "up-to-date",
+          "type": "service"
+      },
+      {
+          "conditional": "not_if \"which sudo\"",
+          "cookbook_name": "sudo",
+          "cookbook_version": "3.5.3",
+          "delta": "",
+          "duration": "14",
+          "id": "sudo",
+          "ignore_failure": false,
+          "name": "sudo",
+          "recipe_name": "default",
+          "result": "install",
+          "status": "skipped",
+          "type": "apt_package"
+      },
+      {
+          "cookbook_name": "sudo",
+          "cookbook_version": "3.5.3",
+          "delta": "",
+          "duration": "7",
+          "id": "/etc/sudoers",
+          "ignore_failure": false,
+          "name": "/etc/sudoers",
+          "recipe_name": "default",
+          "result": "create",
+          "status": "up-to-date",
+          "type": "template"
+      },
+      {
+          "cookbook_name": "oc-users",
+          "cookbook_version": "1.0.2",
+          "delta": "",
+          "duration": "34",
+          "id": "bash",
+          "ignore_failure": false,
+          "name": "bash",
+          "recipe_name": "default",
+          "result": "install",
+          "status": "up-to-date",
+          "type": "apt_package"
+      },
+      {
+          "cookbook_name": "ntp",
+          "cookbook_version": "3.5.1",
+          "delta": "",
+          "duration": "34",
+          "id": "ntp",
+          "ignore_failure": false,
+          "name": "ntp",
+          "recipe_name": "default",
+          "result": "install",
+          "status": "up-to-date",
+          "type": "apt_package"
+      },
+      {
+          "cookbook_name": "apt",
+          "cookbook_version": "6.1.3",
+          "delta": "",
+          "duration": "3",
+          "id": "/etc/apt/apt.conf.d/10recommends",
+          "ignore_failure": false,
+          "name": "/etc/apt/apt.conf.d/10recommends",
+          "recipe_name": "default",
+          "result": "create",
+          "status": "up-to-date",
+          "type": "template"
+      },
+      {
+          "cookbook_name": "apt",
+          "cookbook_version": "6.1.3",
+          "delta": "",
+          "duration": "35",
+          "id": "apt-transport-https",
+          "ignore_failure": false,
+          "name": "apt-transport-https",
+          "recipe_name": "default",
+          "result": "install",
+          "status": "up-to-date",
+          "type": "apt_package"
+      },
+      {
+          "cookbook_name": "sudo",
+          "cookbook_version": "3.5.3",
+          "delta": "",
+          "duration": "6",
+          "id": "/etc/sudoers.d/README",
+          "ignore_failure": false,
+          "name": "/etc/sudoers.d/README",
+          "recipe_name": "default",
+          "result": "create",
+          "status": "up-to-date",
+          "type": "cookbook_file"
+      },
+      {
+          "conditional": "only_if { #code block }",
+          "cookbook_name": "oc-users",
+          "cookbook_version": "1.0.2",
+          "delta": "",
+          "duration": "4",
+          "id": "vagrant",
+          "ignore_failure": false,
+          "name": "vagrant",
+          "recipe_name": "default",
+          "result": "install",
+          "status": "skipped",
+          "type": "sudo"
+      }
+  ],
+  "run_id": "91a3a46e-2095-42f4-813f-0d2069925c20",
+  "start_time": "2017-10-04T20:56:53Z",
+  "status": "failure",
+  "uptime_seconds": 30794898
+}

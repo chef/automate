@@ -1,0 +1,25 @@
+<header class="navbar" role="banner">
+  <div class="navigation-wrapper">
+    <div class="logo">
+      <a href="/">
+        <img src="/workflow/images/automate-blue.svg">
+      </a>
+    </div>
+    <nav role="navigation" class="navigation">
+      <ul class="navigation-menu">
+        <li class="nav-link" ng-class="{'active': isParentActive('main.enterprise')}">
+          <a ui-sref="main.enterprise.dashboard">Workflow</a>
+        </li>
+        <li class="nav-link" ng-class="{'active': isParentActive('main.admin')}">
+          <a ui-sref="main.admin.users">Admin</a>
+        </li>
+        <li class="nav-link" ng-if="console">
+          <a target="_blank" ng-href="{{ console.url }}">{{ console.name }}</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="navigation-tools">
+      <div cd-user-dropdown></div>
+    </div>
+  </div>
+</header>

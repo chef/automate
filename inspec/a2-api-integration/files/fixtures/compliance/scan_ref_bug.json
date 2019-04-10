@@ -1,0 +1,595 @@
+{
+  "version": "3.0.52",
+  "platform": {
+    "name": "ubuntu",
+    "release": "16.04"
+  },
+  "statistics": {
+    "duration": 0.23413536
+  },
+  "profiles": [
+    {
+      "name": "nginx-baseline",
+      "title": "DevSec Nginx Baseline",
+      "version": "2.2.0",
+      "summary": "Test-suite for best-practice nginx hardening",
+      "maintainer": "DevSec Hardening Framework Team",
+      "license": "Apache-2.0",
+      "copyright": "DevSec Hardening Framework Team",
+      "copyright_email": "hello@dev-sec.io",
+      "sha256": "010ec5ba7e784be27eb25844c9c6de679748c76ce1e282e90d027df95855c3c4",
+      "controls": [
+        {
+          "id": "nginx-01",
+          "impact": 1,
+          "title": "Running worker process as non-privileged user",
+          "code": "control 'nginx-01' do\n  impact 1.0\n  title 'Running worker process as non-privileged user'\n  desc 'The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.'\n  describe user(nginx_lib.valid_users) do\n    it { should exist }\n  end\n  describe parse_config_file(nginx_conf, options) do\n    its('user') { should eq nginx_lib.valid_users }\n  end\n\n  describe parse_config_file(nginx_conf, options) do\n    its('group') { should_not eq 'root' }\n  end\nend\n",
+          "desc": "The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 99
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "User www-data should exist",
+              "run_time": 0.010670299,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/nginx.conf user should eq \"www-data\"",
+              "run_time": 0.0013724,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/nginx.conf group should not eq \"root\"",
+              "run_time": 0.000103799,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-02",
+          "impact": 1,
+          "title": "Check NGINX config file owner, group and permissions.",
+          "code": "control 'nginx-02' do\n  impact 1.0\n  title 'Check NGINX config file owner, group and permissions.'\n  desc 'The NGINX config file should owned by root, only be writable by owner and not write- and readable by others.'\n  describe file(nginx_conf) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_executable.by('others') }\n  end\nend\n",
+          "desc": "The NGINX config file should owned by root, only be writable by owner and not write- and readable by others.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 115
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/nginx.conf should be owned by \"root\"",
+              "run_time": 0.001954405,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/nginx.conf should be grouped into \"root\"",
+              "run_time": 0.000103097,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/nginx.conf should not be readable by others",
+              "run_time": 0.042294484,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/nginx.conf should not be writable by others",
+              "run_time": 0.000162673,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/nginx.conf should not be executable by others",
+              "run_time": 0.000111303,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-03",
+          "impact": 1,
+          "title": "Nginx default files",
+          "code": "control 'nginx-03' do\n  impact 1.0\n  title 'Nginx default files'\n  desc 'Remove the default nginx config files.'\n  describe file(File.join(nginx_confd, 'default.conf')) do\n    it { should_not be_file }\n  end\n\n  describe file(File.join(nginx_enabled, 'default')) do\n    it { should_not be_file }\n  end\n\n  conf_paths.each do |conf_path|\n    describe file(conf_path) do\n      it { should be_file }\n    end\n  end\nend\n",
+          "desc": "Remove the default nginx config files.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 128
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/conf.d/default.conf should not be file",
+              "run_time": 0.048846535,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/sites-enabled/default should not be file",
+              "run_time": 0.04783225,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/nginx.conf should be file",
+              "run_time": 0.000138037,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/conf.d/90.hardening.conf should be file",
+              "run_time": 9.1593e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-04",
+          "impact": 1,
+          "title": "Check for multiple instances",
+          "code": "control 'nginx-04' do\n  impact 1.0\n  title 'Check for multiple instances'\n  desc 'Different instances of the nginx webserver should run in separate environments'\n  describe command('ps aux | egrep \"nginx: master\" | egrep -v \"grep\" | wc -l') do\n    its(:stdout) { should match(/^1$/) }\n  end\nend\n",
+          "desc": "Different instances of the nginx webserver should run in separate environments",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 147
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Command: `ps aux | egrep \"nginx: master\" | egrep -v \"grep\" | wc -l` stdout should match /^1$/",
+              "run_time": 0.055699985,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-05",
+          "impact": 1,
+          "title": "Disable server_tokens directive",
+          "code": "control 'nginx-05' do\n  impact 1.0\n  title 'Disable server_tokens directive'\n  desc 'Disables emitting nginx version in error messages and in the “Server” response header field.'\n  describe parse_config_file(nginx_conf, options) do\n    its('server_tokens') { should eq 'off' }\n  end\nend\n",
+          "desc": "Disables emitting nginx version in error messages and in the “Server” response header field.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 156
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/nginx.conf server_tokens should eq \"off\"",
+              "run_time": 0.000150618,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-06",
+          "impact": 1,
+          "title": "Prevent buffer overflow attacks",
+          "code": "control 'nginx-06' do\n  impact 1.0\n  title 'Prevent buffer overflow attacks'\n  desc 'Buffer overflow attacks are made possible by writing data to a buffer and exceeding that buffer boundary and overwriting memory fragments of a process. To prevent this in nginx we can set buffer size limitations for all clients.'\n  describe parse_config_file(nginx_conf, options) do\n    its('client_body_buffer_size') { should eq CLIENT_BODY_BUFFER_SIZE }\n  end\n  describe parse_config_file(nginx_conf, options) do\n    its('client_max_body_size') { should eq CLIENT_MAX_BODY_SIZE }\n  end\n  describe parse_config_file(nginx_hardening, options) do\n    its('client_header_buffer_size') { should eq CLIENT_HEADER_BUFFER_SIZE }\n  end\n  describe parse_config_file(nginx_hardening, options) do\n    its('large_client_header_buffers') { should eq LARGE_CLIENT_HEADER_BUFFER }\n  end\nend\n",
+          "desc": "Buffer overflow attacks are made possible by writing data to a buffer and exceeding that buffer boundary and overwriting memory fragments of a process. To prevent this in nginx we can set buffer size limitations for all clients.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 165
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/nginx.conf client_body_buffer_size should eq \"1k\"",
+              "run_time": 9.5377e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/nginx.conf client_max_body_size should eq \"1k\"",
+              "run_time": 9.0094e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf client_header_buffer_size should eq \"1k\"",
+              "run_time": 8.9857e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf large_client_header_buffers should eq \"2 1k\"",
+              "run_time": 0.000106725,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-07",
+          "impact": 1,
+          "title": "Control simultaneous connections",
+          "code": "control 'nginx-07' do\n  impact 1.0\n  title 'Control simultaneous connections'\n  desc 'NginxHttpLimitZone module to limit the number of simultaneous connections for the assigned session or as a special case, from one IP address.'\n  describe parse_config_file(nginx_hardening, options) do\n    its('limit_conn_zone') { should eq '$binary_remote_addr zone=default:10m' }\n  end\n  describe parse_config_file(nginx_hardening, options) do\n    its('limit_conn') { should eq 'default 5' }\n  end\nend\n",
+          "desc": "NginxHttpLimitZone module to limit the number of simultaneous connections for the assigned session or as a special case, from one IP address.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 183
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf limit_conn_zone should eq \"$binary_remote_addr zone=default:10m\"",
+              "run_time": 9.263e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf limit_conn should eq \"default 5\"",
+              "run_time": 8.6322e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-08",
+          "impact": 1,
+          "title": "Prevent clickjacking",
+          "code": "control 'nginx-08' do\n  impact 1.0\n  title 'Prevent clickjacking'\n  desc 'Do not allow the browser to render the page inside an frame or iframe.'\n  describe parse_config_file(nginx_hardening, options_add_header) do\n    its('add_header') { should include 'X-Frame-Options SAMEORIGIN' }\n  end\nend\n",
+          "desc": "Do not allow the browser to render the page inside an frame or iframe.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 195
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf add_header should include \"X-Frame-Options SAMEORIGIN\"",
+              "run_time": 0.001823202,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-09",
+          "impact": 1,
+          "title": "Enable Cross-site scripting filter",
+          "code": "control 'nginx-09' do\n  impact 1.0\n  title 'Enable Cross-site scripting filter'\n  desc 'This header is used to configure the built in reflective XSS protection. This tells the browser to block the response if it detects an attack rather than sanitising the script.'\n  describe parse_config_file(nginx_hardening, options_add_header) do\n    its('add_header') { should include 'X-XSS-Protection \"1; mode=block\"' }\n  end\nend\n",
+          "desc": "This header is used to configure the built in reflective XSS protection. This tells the browser to block the response if it detects an attack rather than sanitising the script.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 204
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf add_header should include \"X-XSS-Protection \\\"1; mode=block\\\"\"",
+              "run_time": 0.00011331,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-10",
+          "impact": 1,
+          "title": "Disable content-type sniffing",
+          "code": "control 'nginx-10' do\n  impact 1.0\n  title 'Disable content-type sniffing'\n  desc 'It prevents browser from trying to mime-sniff the content-type of a response away from the one being declared by the server. It reduces exposure to drive-by downloads and the risks of user uploaded content that, with clever naming, could be treated as a different content-type, like an executable.'\n  describe parse_config_file(nginx_hardening, options_add_header) do\n    its('add_header') { should include 'X-Content-Type-Options nosniff' }\n  end\nend\n",
+          "desc": "It prevents browser from trying to mime-sniff the content-type of a response away from the one being declared by the server. It reduces exposure to drive-by downloads and the risks of user uploaded content that, with clever naming, could be treated as a different content-type, like an executable.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 213
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf add_header should include \"X-Content-Type-Options nosniff\"",
+              "run_time": 0.00010336,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-12",
+          "impact": 1,
+          "title": "TLS Protocols",
+          "code": "control 'nginx-12' do\n  impact 1.0\n  title 'TLS Protocols'\n  desc 'When choosing a cipher during an SSLv3 or TLSv1 handshake, normally the client\\'s preference is used. If this directive is enabled, the server\\'s preference will be used instead.'\n  ref 'SSL Hardening config', url: 'https://mozilla.github.io/server-side-tls/ssl-config-generator/'\n  describe file(nginx_hardening) do\n    its('content') { should match(/^\\s*ssl_protocols TLSv1.2;$/) }\n    its('content') { should match(/^\\s*ssl_session_tickets off;$/) }\n    its('content') { should match(/^\\s*ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';$/) }\n    its('content') { should match(/^\\s*ssl_prefer_server_ciphers on;$/) }\n    its('content') { should match(%r{^\\s*ssl_dhparam /etc/nginx/dh2048.pem;$}) }\n    # its('content') { should match(/^\\s*ssl on;$/) }\n  end\nend\n",
+          "desc": "When choosing a cipher during an SSLv3 or TLSv1 handshake, normally the client's preference is used. If this directive is enabled, the server's preference will be used instead.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 222
+          },
+          "refs": [
+            {
+              "ref": "SSL Hardening config",
+              "url": "https://mozilla.github.io/server-side-tls/ssl-config-generator/"
+            }
+          ],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/conf.d/90.hardening.conf content should match /^\\s*ssl_protocols TLSv1.2;$/",
+              "run_time": 0.000110776,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/conf.d/90.hardening.conf content should match /^\\s*ssl_session_tickets off;$/",
+              "run_time": 0.000103447,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/conf.d/90.hardening.conf content should match /^\\s*ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';$/",
+              "run_time": 9.2887e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/conf.d/90.hardening.conf content should match /^\\s*ssl_prefer_server_ciphers on;$/",
+              "run_time": 0.000116648,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/conf.d/90.hardening.conf content should match /^\\s*ssl_dhparam \\/etc\\/nginx\\/dh2048.pem;$/",
+              "run_time": 9.5325e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-13",
+          "impact": 1,
+          "title": "Add HSTS Header",
+          "code": "control 'nginx-13' do\n  impact 1.0\n  title 'Add HSTS Header'\n  desc 'HTTP Strict Transport Security (HSTS) is a web security policy mechanism which helps to protect websites against protocol downgrade attacks and cookie hijacking. It allows web servers to declare that web browsers (or other complying user agents) should only interact with it using secure HTTPS connections, and never via the insecure HTTP protocol. HSTS is an IETF standards track protocol and is specified in RFC 6797.'\n  describe file(nginx_hardening) do\n    its('content') { should match(/^\\s*add_header Strict-Transport-Security max-age=15768000;$/) }\n  end\nend\n",
+          "desc": "HTTP Strict Transport Security (HSTS) is a web security policy mechanism which helps to protect websites against protocol downgrade attacks and cookie hijacking. It allows web servers to declare that web browsers (or other complying user agents) should only interact with it using secure HTTPS connections, and never via the insecure HTTP protocol. HSTS is an IETF standards track protocol and is specified in RFC 6797.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 237
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/nginx/conf.d/90.hardening.conf content should match /^\\s*add_header Strict-Transport-Security max-age=15768000;$/",
+              "run_time": 8.6479e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-14",
+          "impact": 1,
+          "title": "Disable insecure HTTP-methods",
+          "code": "control 'nginx-14' do\n  impact 1.0\n  title 'Disable insecure HTTP-methods'\n  desc 'Disable insecure HTTP-methods and allow only necessary methods.'\n  ref 'OWASP HTTP Methods', url: 'https://www.owasp.org/index.php/Test_HTTP_Methods_(OTG-CONFIG-006)'\n\n  describe file(nginx_conf) do\n    its('content') { should match(/^\\s*if\\s+\\(\\$request_method\\s+\\!\\~\\s+\\^\\(#{HTTP_METHODS}\\)\\$\\)\\{?$/) }\n  end\nend\n",
+          "desc": "Disable insecure HTTP-methods and allow only necessary methods.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 246
+          },
+          "refs": [
+            {
+              "ref": "OWASP HTTP Methods",
+              "url": "https://www.owasp.org/index.php/Test_HTTP_Methods_(OTG-CONFIG-006)"
+            }
+          ],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "File /etc/nginx/nginx.conf content should match /^\\s*if\\s+\\(\\$request_method\\s+\\!\\~\\s+\\^\\(GET\\|HEAD\\|POST\\)\\$\\)\\{?$/",
+              "run_time": 0.013586473,
+              "start_time": "2018-11-21T22:35:37+00:00",
+              "message": "expected \"user www-data;\\nworker_processes 1;\\n\\nerror_log  /var/log/nginx/error.log;\\npid        /var/run/ngi...ody_size 1k;\\n\\n\\n\\n  include /etc/nginx/conf.d/*.conf;\\n  include /etc/nginx/sites-enabled/*;\\n}\\n\" to match /^\\s*if\\s+\\(\\$request_method\\s+\\!\\~\\s+\\^\\(GET\\|HEAD\\|POST\\)\\$\\)\\{?$/\nDiff:\n@@ -1,2 +1,51 @@\n-/^\\s*if\\s+\\(\\$request_method\\s+\\!\\~\\s+\\^\\(GET\\|HEAD\\|POST\\)\\$\\)\\{?$/\n+user www-data;\n+worker_processes 1;\n+\n+error_log  /var/log/nginx/error.log;\n+pid        /var/run/nginx.pid;\n+events {\n+  worker_connections  1024;\n+}\n+\n+http {\n+\n+  include       /etc/nginx/mime.types;\n+  default_type  application/octet-stream;\n+  charset_types text/css text/plain text/vnd.wap.wml application/javascript application/json application/rss+xml application/xml;\n+\n+\n+  access_log    /var/log/nginx/access.log;\n+  server_tokens off;\n+\n+  sendfile on;\n+  tcp_nopush on;\n+  tcp_nodelay on;\n+\n+  keepalive_requests 100;\n+  keepalive_timeout  5 5;\n+\n+\n+  gzip  on;\n+  gzip_http_version 1.0;\n+  gzip_comp_level 2;\n+  gzip_proxied any;\n+  gzip_vary off;\n+  gzip_types text/plain text/css application/x-javascript text/xml application/xml application/rss+xml application/atom+xml image/svg+xml text/javascript application/javascript application/json text/mathml;\n+  gzip_min_length  1000;\n+  gzip_disable     \"MSIE [1-6]\\.\";\n+\n+\n+  variables_hash_max_size 1024;\n+  variables_hash_bucket_size 64;\n+  server_names_hash_bucket_size 64;\n+  types_hash_max_size 2048;\n+  types_hash_bucket_size 64;\n+  client_body_buffer_size 1k;\n+  client_max_body_size 1k;\n+\n+\n+\n+  include /etc/nginx/conf.d/*.conf;\n+  include /etc/nginx/sites-enabled/*;\n+}\n"
+            }
+          ]
+        },
+        {
+          "id": "nginx-15",
+          "impact": 1,
+          "title": "Content-Security-Policy",
+          "code": "control 'nginx-15' do\n  impact 1.0\n  title 'Content-Security-Policy'\n  desc 'The Content-Security-Policy HTTP response header helps you reduce XSS risks on modern browsers by declaring what dynamic resources are allowed to load via a HTTP Header'\n  describe parse_config_file(nginx_hardening, options_add_header) do\n    its('content') { should match(/^\\s*add_header Content-Security-Policy \"script-src 'self'; object-src 'self'\";$/) }\n  end\nend\n",
+          "desc": "The Content-Security-Policy HTTP response header helps you reduce XSS risks on modern browsers by declaring what dynamic resources are allowed to load via a HTTP Header",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 257
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf content should match /^\\s*add_header Content-Security-Policy \"script-src 'self'; object-src 'self'\";$/",
+              "run_time": 0.000177842,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        },
+        {
+          "id": "nginx-16",
+          "impact": 1,
+          "title": "Set cookie with HttpOnly and Secure flag",
+          "code": "control 'nginx-16' do\n  impact 1.0\n  title 'Set cookie with HttpOnly and Secure flag'\n  desc 'You can mitigate most of the common Cross Site Scripting attack using HttpOnly and Secure flag in a cookie. Without having HttpOnly and Secure, it is possible to steal or manipulate web application session and cookies and it’s dangerous.'\n  describe parse_config_file(nginx_hardening, options_add_header) do\n    its('content') { should match(/^\\s*set_cookie_flag * HttpOnly secure;$/) }\n  end\nend\n",
+          "desc": "You can mitigate most of the common Cross Site Scripting attack using HttpOnly and Secure flag in a cookie. Without having HttpOnly and Secure, it is possible to steal or manipulate web application session and cookies and it’s dangerous.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 266
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf content should match /^\\s*set_cookie_flag * HttpOnly secure;$/",
+              "run_time": 0.000411796,
+              "start_time": "2018-11-21T22:35:37+00:00",
+              "message": "expected \"# Additional configuration for Nginx.\\n# \\n# Generated by Chef for ip-172-18-2-120.eu-west-1.compute...';\\nssl_prefer_server_ciphers on;\\nssl_session_tickets off;\\nssl_dhparam /etc/nginx/dh2048.pem;\\n\\n\" to match /^\\s*set_cookie_flag * HttpOnly secure;$/\nDiff:\n@@ -1,2 +1,24 @@\n-/^\\s*set_cookie_flag * HttpOnly secure;$/\n+# Additional configuration for Nginx.\n+# \n+# Generated by Chef for ip-172-18-2-120.eu-west-1.compute.internal\n+# Generated by nginx-hardening cookbook\n+# \n+\n+client_header_buffer_size 1k;\n+large_client_header_buffers 2 1k;\n+client_body_timeout 10;\n+client_header_timeout 10;\n+send_timeout 10;\n+limit_conn_zone $binary_remote_addr zone=default:10m;\n+limit_conn default 5;\n+add_header X-Frame-Options SAMEORIGIN;\n+add_header X-Content-Type-Options nosniff;\n+add_header X-XSS-Protection \"1; mode=block\";\n+add_header Strict-Transport-Security max-age=15768000;\n+add_header Content-Security-Policy \"script-src 'self'; object-src 'self'\";\n+ssl_protocols TLSv1.2;\n+ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';\n+ssl_prefer_server_ciphers on;\n+ssl_session_tickets off;\n+ssl_dhparam /etc/nginx/dh2048.pem;\n"
+            }
+          ]
+        },
+        {
+          "id": "nginx-17",
+          "impact": 1,
+          "title": "Control timeouts to improve performance",
+          "code": "control 'nginx-17' do\n  impact 1.0\n  title 'Control timeouts to improve performance'\n  desc 'Control timeouts to improve server performance and cut clients.'\n  describe parse_config_file(nginx_conf, options) do\n    its('keepalive_timeout') { should eq KEEPALIVE_TIMEOUT }\n  end\n  describe parse_config_file(nginx_hardening, options) do\n    its('client_body_timeout') { should eq CLIENT_BODY_TIMEOUT }\n  end\n  describe parse_config_file(nginx_hardening, options) do\n    its('client_header_timeout') { should eq CLIENT_HEADER_TIMEOUT }\n  end\n  describe parse_config_file(nginx_hardening, options) do\n    its('send_timeout') { should eq SEND_TIMEOUT }\n  end\nend\n",
+          "desc": "Control timeouts to improve server performance and cut clients.",
+          "source_location": {
+            "ref": "nginx-baseline-2.2.0/controls/nginx_spec.rb",
+            "line": 275
+          },
+          "refs": [],
+          "tags": {},
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/nginx.conf keepalive_timeout should eq \"5 5\"",
+              "run_time": 0.000144415,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf client_body_timeout should eq \"10\"",
+              "run_time": 8.998e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf client_header_timeout should eq \"10\"",
+              "run_time": 8.8297e-05,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            },
+            {
+              "status": "passed",
+              "code_desc": "Parse Config File /etc/nginx/conf.d/90.hardening.conf send_timeout should eq \"10\"",
+              "run_time": 0.000114807,
+              "start_time": "2018-11-21T22:35:37+00:00"
+            }
+          ]
+        }
+      ],
+      "supports": [
+        {
+          "platform_family": "unix"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "client_max_body_size",
+          "options": {
+            "default": "1k",
+            "description": "Sets the maximum allowed size of the client request body, specified in the “Content-Length” request header field. If the size in a request exceeds the configured value, the 413 (Request Entity Too Large) error is returned to the client. Please be aware that browsers cannot correctly display this error. Setting size to 0 disables checking of client request body size."
+          }
+        },
+        {
+          "name": "client_body_buffer_size",
+          "options": {
+            "default": "1k",
+            "description": "Sets buffer size for reading client request body. In case the request body is larger than the buffer, the whole body or only its part is written to a temporary file. By default, buffer size is equal to two memory pages. This is 8K on x86, other 32-bit platforms, and x86-64. It is usually 16K on other 64-bit platforms."
+          }
+        },
+        {
+          "name": "client_header_buffer_size",
+          "options": {
+            "default": "1k",
+            "description": "Sets buffer size for reading client request header. For most requests, a buffer of 1K bytes is enough. However, if a request includes long cookies, or comes from a WAP client, it may not fit into 1K. If a request line or a request header field does not fit into this buffer then larger buffers, configured by the large_client_header_buffers directive, are allocated."
+          }
+        },
+        {
+          "name": "large_client_header_buffers",
+          "options": {
+            "default": "2 1k",
+            "description": "Sets the maximum number and size of buffers used for reading large client request header. A request line cannot exceed the size of one buffer, or the 414 (Request-URI Too Large) error is returned to the client. A request header field cannot exceed the size of one buffer as well, or the 400 (Bad Request) error is returned to the client. Buffers are allocated only on demand. By default, the buffer size is equal to 8K bytes. If after the end of request processing a connection is transitioned into the keep-alive state, these buffers are released."
+          }
+        },
+        {
+          "name": "keepalive_timeout",
+          "options": {
+            "default": "5 5",
+            "description": "The first parameter sets a timeout during which a keep-alive client connection will stay open on the server side. The zero value disables keep-alive client connections. The optional second parameter sets a value in the “Keep-Alive: timeout=time” response header field. Two parameters may differ."
+          }
+        },
+        {
+          "name": "client_body_timeout",
+          "options": {
+            "default": "10",
+            "description": "Defines a timeout for reading client request body. The timeout is set only for a period between two successive read operations, not for the transmission of the whole request body. If a client does not transmit anything within this time, the 408 (Request Time-out) error is returned to the client."
+          }
+        },
+        {
+          "name": "client_header_timeout",
+          "options": {
+            "default": "10",
+            "description": "Defines a timeout for reading client request header. If a client does not transmit the entire header within this time, the 408 (Request Time-out) error is returned to the client."
+          }
+        },
+        {
+          "name": "send_timeout",
+          "options": {
+            "default": "10",
+            "description": "Sets a timeout for transmitting a response to the client. The timeout is set only between two successive write operations, not for the transmission of the whole response. If the client does not receive anything within this time, the connection is closed."
+          }
+        },
+        {
+          "name": "http_methods",
+          "options": {
+            "default": "GET\\|HEAD\\|POST",
+            "description": "Specify the used HTTP methods"
+          }
+        }
+      ],
+      "groups": [
+        {
+          "id": "controls/nginx_spec.rb",
+          "title": "NGINX server config",
+          "controls": [
+            "nginx-01",
+            "nginx-02",
+            "nginx-03",
+            "nginx-04",
+            "nginx-05",
+            "nginx-06",
+            "nginx-07",
+            "nginx-08",
+            "nginx-09",
+            "nginx-10",
+            "nginx-12",
+            "nginx-13",
+            "nginx-14",
+            "nginx-15",
+            "nginx-16",
+            "nginx-17"
+          ]
+        }
+      ],
+      "status": "loaded"
+    }
+  ],
+  "report_uuid": "bbbbbbba-babb-4b8a-aab7-b4e83b620ca2",
+  "node_uuid": "088e5b01-2a1d-4c3e-8026-900c2e154908",
+  "job_uuid": "5619f34c-15ff-42b6-9f17-b968e6c867a0",
+  "node_name": "ubuntu-node1-172.18.2.120",
+  "environment": "unknown",
+  "end_time": "2018-11-21T22:35:37Z",
+  "type": "_doc"
+}

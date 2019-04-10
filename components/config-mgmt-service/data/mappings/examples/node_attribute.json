@@ -1,0 +1,10 @@
+{
+	"entity_uuid": "0271e125-97dd-498a-b026-8448ee60aafe",
+	"name": "supermarket-rhel-7-builder-45f356",
+	"run_list": null,
+	"chef_environment": "wilson",
+	"normal": "{\"authorization\":{\"sudo\":{\"agent_forwarding\":true,\"include_sudoers_d\":true,\"sudoers_defaults\":[\"exempt_group += jenkins\",\"secure_path=\\\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\\\"\"]}},\"git\":{\"checksum\":\"34dfc06b44880df91940dc318a2d3c83b79e67b6f05319c7c71e94d30893636d\",\"version\":\"2.6.2\"},\"jenkins\":{\"master\":{\"endpoint\":\"http://wilson.ci.chef.co\"}},\"omnibus\":{\"build_user\":\"jenkins\",\"build_user_group\":\"jenkins\",\"build_user_home\":\"/home/jenkins\",\"ruby_version\":\"2.1.8\"},\"tags\":[\"slave\",\"supermarket\",\"builder\"]}",
+	"default": "{ \"apt\":{\"cache_bypass\":{},\"cacher-client\":{ \"restrict_environment\":false},\"cacher_dir\":\"\/var\/cache\/apt-cacher-ng\",\"cacher_interface\":null,\"cacher_port\":3142,\"cacher_ssl_support\":false,\"caching_server\":false,\"compile_time_update\":false,\"compiletime\":false,\"confd\":{ \"install_recommends\":true, \"install_suggests\":false},\"key_proxy\":\"\",\"launchpad_api_version\":\"1.0\",\"periodic_update_min_delay\":86400 }, \"aws\":{\"databag_entry\":null,\"databag_name\":null,\"right_aws_version\":\"3.0.5\" }, \"bluepill\":{\"bin\":\"\/opt\/chef\/embedded\/bin\/bluepill\",\"conf_dir\":\"\/etc\/bluepill\",\"group\":0,\"init_dir\":\"\/etc\/init.d\",\"logfile\":\"\/var\/log\/bluepill.log\",\"pid_dir\":\"\/var\/run\/bluepill\",\"state_dir\":\"\/var\/lib\/bluepill\",\"use_rsyslog\":false }, \"build-essential\":{\"compile_time\":false,\"msys2\":{ \"path\":\"\\\\msys2\"} }, \"chef-ingredient\":{\"mixlib-install\":{ \"git_ref\":null} }}",
+  "override": "{\"opscode-ci\":{\"artifactory\":{\"endpoint\":\"http://artifactory.chef.co:8081\"},\"master\":{\"artifacts_to_keep\":null,\"days_to_keep_artifacts\":15,\"host_name\":\"wilson.ci.chef.co\",\"pipeline_types\":[\"server_build\"]},\"omnitruck\":{\"metadata_bucket\":\"opscode-omnibus-package-metadata\",\"packages_bucket\":\"opscode-omnibus-packages\"}}}",
+	"last_update": "2017-08-29T22:12:15.000Z"
+}

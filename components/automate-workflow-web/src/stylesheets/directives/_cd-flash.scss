@@ -1,0 +1,92 @@
+.cd-flash {
+  $width: 320px;
+  $padding: 1rem;
+
+  @include calc(left, '50% - #{$width/2}');
+  @include base-box-shadow;
+  border-radius: $global-radius;
+  position: fixed;
+  top: 100px;
+  z-index: 150;
+  width: $width;
+  padding: $padding;
+  font-size: .75rem;
+  border-width: 2px;
+  border-style: solid;
+
+  &.ng-enter {
+    @include transition(all 0.25s ease-in);
+    @include transform(translateY(-500px) scale(0.5));
+    opacity: 0;
+
+    &.ng-enter-active {
+      @include transform(translateY(0) scale(1));
+      opacity: 1;
+    }
+  }
+
+  &.ng-leave {
+    @include transition(all 0.5s ease-in);
+    @include transform(translateY(0) scale(1));
+    opacity: 1;
+
+    &.ng-leave-active {
+      @include transform(translateY(-500px) scale(0.5));
+      opacity: 0;
+    }
+  }
+
+  &.error {
+    background-color: $white;
+    border-color: $alertred;
+    color: $alertred;
+
+    header .icon {
+      @extend .icon-caution;
+    }
+  }
+
+  &.notify {
+    background-color: $white;
+    border-color: $successgreen;
+    color: $successgreen;
+
+    header .icon {
+      @extend .icon-circle-check;
+    }
+  }
+
+  header {
+    padding: 0;
+    text-align: middle;
+    margin-bottom: 1rem;
+
+    h1 {
+      font-size: 1rem;
+      font-weight: normal;
+      display: inline;
+      vertical-align: text-bottom;
+    }
+
+    .icon {
+      font-size: 1rem;
+      padding-right: .5rem;
+      vertical-align: bottom;
+    }
+  }
+
+  p {
+    font-size: .875rem;
+    padding: 0;
+    margin: 0;
+  }
+
+  .close {
+    position: absolute;
+    top: $padding;
+    right: $padding;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+}

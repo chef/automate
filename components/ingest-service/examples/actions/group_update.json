@@ -1,0 +1,19 @@
+{
+  "id": "22777887-f20b-4b9a-bc4a-44cae0ff0e58",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "billing-admins",
+  "entity_type": "group",
+  "task": "update",
+  "organization_name": "testing",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-03-27T18:42:26Z",
+  "remote_request_id": "fe61ed3d-2b3a-4104-a368-340803085ffc",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAEwXUOwAAIAAAAA",
+  "requestor_name": "pivotal",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Manage/11.16.2 (ruby-2.3.5-p376; ohai-7.4.1; x86_64-linux; +http://opscode.com)",
+  "data": "{\"actors\":{\"groups\":[],\"users\":[\"mkrasnow\"]},\"groupname\":\"billing-admins\"}"
+}

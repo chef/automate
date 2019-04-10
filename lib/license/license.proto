@@ -1,0 +1,39 @@
+// WARNING WARNING WARNING WARNING WARNING
+//
+// The code in this package is a copy of code in the chef/license
+// library. chef/license is still proprietary and thus cannot be
+// included in full as a dependency. Please take care that any changes
+// to this file are compatible with the chef/license library.
+//
+// WARNING WARNING WARNING WARNING WARNING
+//
+syntax = "proto3";
+
+package license;
+
+import "google/protobuf/timestamp.proto";
+
+message License {
+	string id         = 1;  // Unique ID for this license; defaults to auto-generated
+	string version    = 2;  // License version
+	string type       = 3;  // commercial, eval, developer, partner
+	string generator  = 20; // chef/license, chef/license-generation-service
+	string key_sha256 = 6;  // public key checksum
+
+	google.protobuf.Timestamp generation_date = 21;
+
+	string customer            = 24;
+	string customer_id         = 4;
+	string customer_id_version = 25;
+
+	repeated Entitlement entitlements = 5;
+}
+
+message Entitlement {
+	string name    = 1; // ReticulateSplines
+	string measure = 2; // nodes
+	sint64 limit   = 3; // 10
+
+	google.protobuf.Timestamp start = 22; // date the entitlement becomes active
+	google.protobuf.Timestamp end   = 23; // last date the entitlement is active
+}

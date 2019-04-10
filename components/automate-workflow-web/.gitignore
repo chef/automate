@@ -1,0 +1,8 @@
+.DS_Store
+/dist/*
+!/dist/.gitkeep
+npm-debug.log
+.sass-cache
+/node_modules/*
+/test/test_config.js
+.e2ebuild

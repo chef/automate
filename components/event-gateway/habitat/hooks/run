@@ -1,0 +1,24 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+set -e
+
+exec 2>&1
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+################################################################################
+# Handle frontend TLS certificates
+# Note: this is duplicated from automate-load-balancer
+################################################################################
+
+# Hab does not support dynamic templates so we're iterating over our frontend_tls
+# and generating certificate and key files for each server listener
+{{#each cfg.frontend_tls as |tls| ~}}
+cert_path="{{../pkg.svc_data_path}}/{{tls.server_name}}.crt"
+key_path="{{../pkg.svc_data_path}}/{{tls.server_name}}.key"
+echo "{{~ tls.cert ~}}" > $cert_path
+echo "{{~ tls.key ~}}" > $key_path
+
+chmod 0600 $cert_path $key_path
+{{/each ~}}
+
+exec event-gateway serve --config {{pkg.svc_config_path}}/config.toml

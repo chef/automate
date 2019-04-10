@@ -1,0 +1,104 @@
+%% -*- mode: erlang -*-
+
+%% We should try to keep this in alphabetical order
+
+{deliv_hand_enterprise, [
+  {get, [
+    {self, get, deliv_hand_enterprise},
+    {users, get, deliv_hand_users},
+    {create_internal_user, post, deliv_hand_intern_users},
+    {create_external_user, post, deliv_hand_external_users},
+    {orgs, get, deliv_hand_orgs},
+    {create_org, post, deliv_hand_orgs}
+%%    {get_user_token, post, deliv_hand_user_authn},
+%%    {revoke_user_token, post, deliv_hand_revoke_token}
+  ]}
+]}.
+
+{deliv_hand_external_users, [
+  {post, [
+    {full, get, deliv_hand_users_named}
+  ]}
+]}.
+
+{deliv_hand_intern_users, [
+  {post, [
+    {full, get, deliv_hand_users_named},
+    {change_password, post, deliv_hand_intern_users_change_password}
+  ]}
+]}.
+
+{deliv_hand_orgs, [
+  {get, [
+    {create_org, post, deliv_hand_orgs},
+    {show_org, get, deliv_hand_orgs_named}
+  ]},
+  {post, [
+    {full, get, deliv_hand_orgs_named}
+%%    {create_project, post, deliv_hand_projects}
+  ]}
+]}.
+
+{deliv_hand_orgs_named, [
+  {get, [
+    {self, get, deliv_hand_orgs_named}
+%%    {projects, get, deliv_hand_project}
+  ]},
+  {put, []},
+  {delete, []}
+]}.
+
+{deliv_hand_pipelines, [
+                        {get, [
+                               {full, get, deliv_hand_pipelines},
+                               {list_pipelines, get, deliv_hand_pipelines},
+                               {create_pipeline, post, deliv_hand_pipelines}
+                               %% {pipeline, get, deliv_hand_pipelines_named},
+                              ]},
+                        {post, [
+                                %% {full, get, deliv_hand_pipelines_named},
+                                {list_pipelines, get, deliv_hand_pipelines}
+                               ]}
+                       ]}.
+
+{deliv_hand_projects, [
+  {get, [
+    {self, get, deliv_hand_projects},
+    {create_project, post, deliv_hand_projects}
+  ]},
+  {post, [
+    {full, get, deliv_hand_projects_named}
+  ]}
+]}.
+
+{deliv_hand_projects_named, [
+  {get, [
+    {self, get, deliv_hand_projects_named}
+  ]},
+  {put, []},
+  {delete, []}
+]}.
+
+{deliv_hand_users, [
+  {get, [
+    {self, get, deliv_hand_users},
+    {user, get, deliv_hand_users_named}
+  ]}
+]}.
+
+{deliv_hand_users_named, [
+  {get, [
+    {self, get, deliv_hand_users_named},
+    {change_password, post, deliv_hand_intern_users_change_password}
+  ]},
+  {put, []},
+  {delete, []}
+]}.
+
+{deliv_hand_compare,
+ [
+  {get,
+   [
+    {self, get, deliv_hand_compare}
+   ]}
+]}.

@@ -1,0 +1,28 @@
+@import '~styles/variables';
+
+:host {
+  display: block;
+  padding: 20px;
+
+  header {
+    padding-bottom: 1em;
+    padding-top: 1em;
+  }
+
+  h3 {
+    margin: 0;
+    color: $chef-primary-bright;
+    font-weight: bold;
+    padding-bottom: 0.15em;
+  }
+
+  span.subtitle {
+    font-size: 0.85em;
+    font-weight: bold;
+  }
+
+  chef-table {
+    font-size: 14px;
+  }
+
+}

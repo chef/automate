@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+import "api/external/common/version/version.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+package chef.automate.domain.authz;
+option go_package = "github.com/chef/automate/api/interservice/authz";
+
+// Notes re: regular expressions
+//
+// - the language is re2, see https://github.com/google/re2/wiki/Syntax
+// - only the ...Req messages have been given these annotations
+// - the only way I've found to match the literal "*" character is this: [*]
+//   - it would be valid re2 to use \* to match a literal "*" character, but
+//     that breaks in the protoc-gen-validate processing, leading to an
+//     "Invalid escape sequence in string literal" error
+// - for IsAuthorizedReq, the patterns for subjects, action, and resource are
+//   simpler, as for those, wildcards aren't permitted.
+// - the (?:) business is a non-matching group, since we don't want to capture
+//   any matches, but only need a boolean answer
+//   - it looks worse when the first char of the (not-captured) group is a ":",
+//     leading to (?::...)
+//
+// => Note: for visual representations of those regular expressions, go to
+//          https://regexper.com/ -- for example,
+//          https://regexper.com/#^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$
+
+message GetVersionReq {}
+
+message IsAuthorizedReq {
+    repeated string subjects = 1
+      [(validate.rules).repeated = {
+        min_items: 1,
+        items: { string: { pattern: "^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$|^tls:service:[^:*]+:[^:*]+$" } }
+       }];
+    string resource = 2
+      [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*$"];
+    string action = 3
+      [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*$"];
+}
+
+message IsAuthorizedResp {
+    bool authorized = 1;
+}
+
+message Policy {
+    string action = 1;
+    repeated string subjects = 2;
+    string id = 3;
+    string resource = 4;
+    string effect = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+message CreatePolicyReq {
+    string action = 1
+      [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*(?::[*])?$|^[*]$" ];
+    repeated string subjects = 2
+      [(validate.rules).repeated = {
+        min_items: 1,
+        items: { string: { pattern: "^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|service):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$" } }
+       }];
+    string resource = 3
+      [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*(?::[*])?$|^[*]$" ];
+}
+
+message CreatePolicyResp {
+    Policy policy = 1;
+}
+
+message ListPoliciesReq {
+}
+
+message ListPoliciesResp {
+    repeated Policy policies = 1;
+}
+
+message DeletePolicyReq {
+    string id = 1
+      [(validate.rules).string.pattern = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$"];
+}
+// Note: This regular expression describes a valid UUIDv4. It would be nice
+// to make UUIDv4 a "well-known format" of protoc-gen-validate, like email
+// or URI or IPv4.
+// See https://github.com/lyft/protoc-gen-validate/blob/930a67cf7ba4/README.md#strings
+// for "well-known formats".
+
+message DeletePolicyResp {
+    Policy policy = 1;
+}
+
+message PurgeSubjectFromPoliciesReq {
+    // Q: Right now, this allows purging subject wildcards (like "user:*").
+    // -- Do we want to restrict this to only complete subjects?
+    string subject = 1
+      [(validate.rules).string.pattern = "^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|service):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$"];
+}
+
+message PurgeSubjectFromPoliciesResp {
+    repeated string ids = 1; // ids is IDs of modified policies
+}
+
+message FilterAuthorizedPairsReq {
+    repeated string subjects = 1
+      [(validate.rules).repeated = {
+        min_items: 1,
+        items: { string: { pattern: "^(?:(?:team|user):(?:local|ldap|saml)|token|tls:service:[^:*]+):[^:*]+$" } }
+       }];
+    repeated Pair pairs = 2;
+}
+
+message FilterAuthorizedPairsResp {
+    repeated Pair pairs = 1;
+}
+
+message FilterAuthorizedProjectsResp {
+    repeated string projects = 1;
+}
+
+message Pair {
+    string resource = 2
+      [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*$"];
+    string action = 3
+      [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*$"];
+}
+
+service Authorization {
+    rpc GetVersion (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
+    rpc IsAuthorized (IsAuthorizedReq) returns (IsAuthorizedResp) {};
+    rpc FilterAuthorizedPairs (FilterAuthorizedPairsReq) returns (FilterAuthorizedPairsResp) {};
+    rpc FilterAuthorizedProjects (FilterAuthorizedPairsReq) returns (FilterAuthorizedProjectsResp) {};
+    rpc CreatePolicy (CreatePolicyReq) returns (CreatePolicyResp) {};
+    rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {};
+    rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {};
+    rpc PurgeSubjectFromPolicies (PurgeSubjectFromPoliciesReq) returns (PurgeSubjectFromPoliciesResp) {};
+}

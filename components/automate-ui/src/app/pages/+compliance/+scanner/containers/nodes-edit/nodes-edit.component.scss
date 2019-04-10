@@ -1,0 +1,115 @@
+@import '~styles/variables';
+
+.page-body {
+  display: flex;
+  padding: 35px;
+}
+
+.nodes-form {
+  flex-basis: 50%;
+  margin-right: 0.5em;
+
+  fieldset {
+    margin: 0;
+    padding: 1em 0;
+    border: none;
+    border-bottom: 1px solid $chef-grey;
+  }
+
+  h3 {
+    margin-bottom: 1em;
+  }
+
+  select[multiple] {
+    width: 100%;
+    padding: 1em;
+    font-size: 14px;
+    cursor: pointer;
+    min-height: 150px;
+    border: 1px solid $chef-light-grey;
+    border-radius: $global-radius;
+  }
+
+  select[disabled],
+  select[disabled] option {
+    color: $chef-grey;
+    background: rgba($chef-white, 0.5);
+  }
+
+  .required {
+    color: $chef-critical;
+  }
+
+  .field {
+    margin-bottom: 1em;
+
+    &.host {
+      margin: 0;
+      padding-bottom: 2em;
+      border-bottom: 1px solid $chef-grey;
+    }
+  }
+
+  .radio-field,
+  .checkbox-field {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5em 0;
+    margin-right: 0.5em;
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      margin-right: 0.5em;
+    }
+
+    label {
+      padding: 0;
+    }
+  }
+
+  .kv-field {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1em;
+
+    chef-form-field {
+      flex: 2;
+    }
+
+    chef-form-field,
+    chef-button:not(:last-child) {
+      margin-right: 0.5em;
+    }
+
+    chef-button {
+      padding: 2px;
+    }
+  }
+
+  a {
+    font-size: 14px;
+  }
+
+  chef-button {
+    margin: 0;
+  }
+}
+
+.nodes-selection {
+  margin-left: 0.5em;
+  padding: 1em;
+  border: 1px dashed $chef-grey;
+  border-radius: $global-radius;
+  flex-basis: 50%;
+
+  chef-pill {
+    #{--pill-background-color}: $chef-primary-light;
+    #{--pill-text-color}: $chef-white;
+    margin: 0 0.5em 0.5em 0;
+    font-size: 14px;
+  }
+}
+
+.add-tag-btn {
+  margin-bottom: 1em;
+}

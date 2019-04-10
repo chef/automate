@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="33px" height="42px" viewBox="0 0 33 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2.2 (9983) - http://www.bohemiancoding.com/sketch -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Change" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Change-in-Verify(status)" sketch:type="MSArtboardGroup" transform="translate(-321.000000, -431.000000)">
+            <g id="Group-2" sketch:type="MSLayerGroup" transform="translate(60.000000, 423.000000)">
+                <g id="Group" transform="translate(253.000000, 0.000000)" sketch:type="MSShapeGroup">
+                    <g transform="translate(8.000000, 8.000000)">
+                        <rect id="Rectangle-330" stroke="#4A4A4A" stroke-width="2" fill="#FFFFFF" x="0" y="0" width="33" height="42"></rect>
+                        <rect id="Rectangle-331" fill="#4A4A4A" x="4.125" y="5.6" width="5.5" height="5.6"></rect>
+                        <rect id="Rectangle-331" fill="#4A4A4A" x="4.125" y="18.2" width="5.5" height="5.6"></rect>
+                        <rect id="Rectangle-331" fill="#4A4A4A" x="4.125" y="30.1" width="5.5" height="5.6"></rect>
+                        <path d="M5.70625636,6.51044467 L3.90692016,8.34239131 L6.76097933,11.2587138 L11.0109439,6.93158183 L9.20152454,5.09953042 L6.76097933,7.58434442 L5.70625636,6.51044467 Z" id="Path-3" stroke="#4A4A4A" fill="#FFFFFF"></path>
+                        <path d="M5.70625636,19.1104447 L3.90692016,20.9423913 L6.76097933,23.8587138 L11.0109439,19.5315818 L9.20152454,17.6995304 L6.76097933,20.1843444 L5.70625636,19.1104447 Z" id="Path-3" stroke="#4A4A4A" fill="#FFFFFF"></path>
+                        <path d="M5.70625636,31.0104447 L3.90692016,32.8423913 L6.76097933,35.7587138 L11.0109439,31.4315818 L9.20152454,29.5995304 L6.76097933,32.0843444 L5.70625636,31.0104447 Z" id="Path-3" stroke="#4A4A4A" fill="#FFFFFF"></path>
+                        <rect id="Rectangle-332" fill="#4A4A4A" x="14.4375" y="7" width="12.375" height="2.1"></rect>
+                        <rect id="Rectangle-332" fill="#4A4A4A" x="14.4375" y="19.6" width="6.875" height="2.1"></rect>
+                        <rect id="Rectangle-332" fill="#4A4A4A" x="14.4375" y="31.5" width="9.625" height="2.1"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

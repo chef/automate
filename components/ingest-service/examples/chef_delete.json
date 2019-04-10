@@ -1,0 +1,7 @@
+{
+    "organization_name": "chef",
+    "id": "action-id",
+    "remote_hostname": "10.194.12.215",
+    "service_hostname": "10.194.12.215",
+    "node_name": "chefdk-debian-7-tester-2d206b"
+}

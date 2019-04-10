@@ -1,0 +1,3 @@
+ALTER TABLE IF EXISTS nodes
+  ADD COLUMN IF NOT EXISTS report_id text DEFAULT '';
+  

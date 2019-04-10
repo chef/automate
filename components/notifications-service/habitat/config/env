@@ -1,0 +1,38 @@
+export HOME="{{pkg.svc_var_path}}"
+export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+
+export EXTERNAL_FQDN="{{cfg.service.external_fqdn}}"
+export PORT="{{cfg.service.port}}"
+export REPLACE_OS_VARS="true"
+export RELEASE_MUTABLE_DIR="{{pkg.svc_var_path}}"
+
+export CACHE_TIMEOUT_MS_EVENT_RULE="{{cfg.cache.event_rule_timeout_ms}}"
+export EVENT_DEDUP_WINDOW_SECONDS="{{cfg.service.dedup_window_seconds}}"
+
+{{~#eachAlive bind.secrets-service.members as |secrets|}}
+  {{~#if @last}}
+#export SECRETS_URL="{{secrets.sys.ip}}:{{secrets.cfg.port}}"
+export SECRETS_URL="localhost:{{secrets.cfg.port}}"
+  {{~/if}}
+{{~/eachAlive}}
+export SECRETS_SERVICE_CERT="/hab/svc/secrets-service/config/service.crt"
+export SECRETS_SERVICE_KEY="/hab/svc/secrets-service/config/service.key"
+export SECRETS_ROOT_CA_CERT="/hab/svc/secrets-service/config/root_ca.crt"
+
+# TLS Config
+export SERVICE_CERT="{{pkg.svc_config_path}}/service.crt"
+export SERVICE_KEY="{{pkg.svc_config_path}}/service.key"
+export ROOT_CA_CERT="{{pkg.svc_config_path}}/root_ca.crt"
+
+{{ #if cfg.proxy.host ~}}
+export PROXY_HOST="{{cfg.proxy.host}}"
+export PROXY_PORT="{{cfg.proxy.port}}"
+{{ #if cfg.proxy.no_proxy ~}}
+export NO_PROXY="{{strJoin cfg.proxy.no_proxy ","}}"
+{{ /if ~ }}
+export PROXY_USER="{{cfg.proxy.user}}"
+export PROXY_PASSWORD="{{cfg.proxy.password}}"
+{{ /if ~ }}
+
+export MIGRATION_RULE_STORE_FILE="{{ pkg.svc_data_path }}/rule_store"
+export MIGRATION_STATUS_FILE="{{ pkg.svc_data_path }}/a1-migration-status"

@@ -1,0 +1,48 @@
+chef-toggle {
+  #{--default-active-color}: chef-hsl(var(--chef-white));
+  #{--default-active-background-color}: chef-hsl(var(--chef-primary-bright));
+
+  #{--active-color}: var(--toggle-active-color, var(--default-active-color));
+  #{--active-background-color}: var(--toggle-active-background-color, var(--default-active-background-color));
+
+  display: inline-flex;
+  background-color: chef-hsl(var(--chef-white));
+  box-shadow: var(--chef-box-shadow);
+  border-radius: 3em;
+
+  chef-option {
+    display: block;
+    cursor: pointer;
+    padding: 0.5em 0.75em;
+    border-radius: 3em;
+    overflow: hidden;
+    position: relative;
+    transition: color 0.5s ease;
+
+    .option-content {
+      position: relative;
+    }
+
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      height: calc(100% + 0.5em);
+      width: calc(100% + 0.75em);
+      background-color: var(--active-background-color);
+      left: -0.75em;
+      top: -0.5em;
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+
+    &:hover, &.selected {
+      color: var(--active-color);
+
+      &::before {
+        transform: translateX(0);
+      }
+    }
+
+  }
+}

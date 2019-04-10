@@ -1,0 +1,211 @@
+<!doctype html>
+<html class="automate-ui">
+  <head>
+    <title>Chef Automate</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link href="/images/favicon.ico?v=2" rel="shortcut icon">
+    <link href="/images/favicon.png?v=2" rel="icon" type="image/png">
+    <style>
+      body {
+        background-color: #212c35;
+        font-family: Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;
+      }
+
+      p {
+        margin 0;
+        white-space: nowrap;
+        color: #3f5364;
+        font-size: 75%;
+        text-align: center;
+      }
+
+      ul {
+        list-style-type: none;
+        font-size: 0.875rem;
+        margin-left: 30px;
+        white-space: nowrap;
+        color: #3f5364;
+      }
+
+      li {
+        padding: 5px 0;
+      }
+
+      li span {
+        font-weight: bold;
+      }
+
+      .login {
+        background: #f3f6f8;
+        width: 312px;
+        margin: 120px auto;
+        padding: 45px 24px;
+        height: 405px;
+      }
+
+      h1 {
+        height: 88px;
+        width: 205px;
+        margin: 0 51px;
+        background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjIuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAzMzUuNSAxNDUuMSIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMzM1LjUgMTQ1LjE7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDojRjM4QjAwO30KCS5zdDF7ZmlsbDojNDM1MzYzO30KPC9zdHlsZT4KPGc+Cgk8Zz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTYuNiwxMDcuOWgzLjhMMzcsMTQ0LjVoLTQuNGwtNC4zLTkuNkg4LjVsLTQuMyw5LjZIMEwxNi42LDEwNy45eiBNMjYuNywxMzEuMWwtOC4zLTE4LjVsLTguMywxOC41SDI2Ljd6IgoJCQkvPgoJCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik00Ny41LDEyOS4zdi0yMS4xaDQuMVYxMjljMCw3LjgsNC4yLDEyLjMsMTEuMSwxMi4zYzYuNywwLDExLTQuMSwxMS0xMnYtMjEuMWg0LjFWMTI5CgkJCWMwLDEwLjYtNi4xLDE2LjEtMTUuMiwxNi4xQzUzLjYsMTQ1LjEsNDcuNSwxMzkuNSw0Ny41LDEyOS4zeiIvPgoJCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMDIuMiwxMTEuOUg5MHYtMy44aDI4LjZ2My44aC0xMi4ydjMyLjZoLTQuMlYxMTEuOXoiLz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTI3LjQsMTI2LjR2LTAuMWMwLTEwLDcuNS0xOC44LDE4LjYtMTguOGMxMS4xLDAsMTguNSw4LjcsMTguNSwxOC43djAuMWMwLDEwLTcuNSwxOC44LTE4LjYsMTguOAoJCQlDMTM0LjgsMTQ1LjEsMTI3LjQsMTM2LjQsMTI3LjQsMTI2LjR6IE0xNjAuMiwxMjYuNHYtMC4xYzAtOC4zLTYtMTUtMTQuMy0xNWMtOC4zLDAtMTQuMiw2LjYtMTQuMiwxNC45djAuMWMwLDguMyw2LDE1LDE0LjMsMTUKCQkJQzE1NC4zLDE0MS4zLDE2MC4yLDEzNC43LDE2MC4yLDEyNi40eiIvPgoJCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNzguMywxMDguMWg0LjJsMTMuMiwxOS44bDEzLjItMTkuOGg0LjJ2MzYuNEgyMDlWMTE1bC0xMy4yLDE5LjVoLTAuMmwtMTMuMi0xOS40djI5LjRoLTRWMTA4LjF6Ii8+CgkJPHBhdGggY2xhc3M9InN0MCIgZD0iTTI0MiwxMDcuOWgzLjhsMTYuNiwzNi42SDI1OGwtNC4zLTkuNkgyMzRsLTQuMyw5LjZoLTQuMkwyNDIsMTA3Ljl6IE0yNTIuMiwxMzEuMWwtOC4zLTE4LjVsLTguMywxOC41SDI1Mi4yCgkJCXoiLz4KCQk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjc5LjcsMTExLjloLTEyLjJ2LTMuOGgyOC42djMuOGgtMTIuMnYzMi42aC00LjJWMTExLjl6Ii8+CgkJPHBhdGggY2xhc3M9InN0MCIgZD0iTTMwOSwxMDguMWgyNi4zdjMuN2gtMjIuMnYxMi40aDE5Ljh2My43aC0xOS44djEyLjdoMjIuNHYzLjdIMzA5VjEwOC4xeiIvPgoJPC9nPgoJPGc+CgkJPGc+CgkJCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0wLDQyLjV2LTAuMkMwLDE5LDE3LjUsMCw0Mi42LDBjMTUuNCwwLDI0LjcsNS4xLDMyLjIsMTIuNkw2My40LDI1LjhjLTYuMy01LjctMTIuNy05LjItMjAuOS05LjIKCQkJCWMtMTMuOCwwLTIzLjcsMTEuNS0yMy43LDI1LjV2MC4yYzAsMTQsOS43LDI1LjcsMjMuNywyNS43YzkuMywwLDE1LjEtMy43LDIxLjUtOS42TDc1LjUsNzBjLTguNCw5LTE3LjgsMTQuNi0zMy41LDE0LjYKCQkJCUMxNy45LDg0LjYsMCw2NiwwLDQyLjUiLz4KCQkJPHBvbHlnb24gY2xhc3M9InN0MSIgcG9pbnRzPSI5Ni4zLDEuNCAxMTQuMywxLjQgMTE0LjMsMzMuOCAxNDcuNSwzMy44IDE0Ny41LDEuNCAxNjUuNSwxLjQgMTY1LjUsODMuMiAxNDcuNSw4My4yIDE0Ny41LDUwLjQgCgkJCQkxMTQuMyw1MC40IDExNC4zLDgzLjIgOTYuMyw4My4yIDk2LjMsMS40IAkJCSIvPgoJCQk8cG9seWdvbiBjbGFzcz0ic3QxIiBwb2ludHM9IjE4Ny40LDEuNCAyNDkuMSwxLjQgMjQ5LjEsMTcuNCAyMDUuMywxNy40IDIwNS4zLDM0IDI0My45LDM0IDI0My45LDUwIDIwNS4zLDUwIDIwNS4zLDY3LjIgCgkJCQkyNDkuNyw2Ny4yIDI0OS43LDgzLjIgMTg3LjQsODMuMiAxODcuNCwxLjQgCQkJIi8+CgkJCTxwb2x5Z29uIGNsYXNzPSJzdDEiIHBvaW50cz0iMjczLjIsMS40IDMzNS41LDEuNCAzMzUuNSwxNy44IDI5MS4yLDE3LjggMjkxLjIsMzUuMiAzMzAuMywzNS4yIDMzMC4zLDUxLjUgMjkxLjIsNTEuNSAKCQkJCTI5MS4yLDgzLjIgMjczLjIsODMuMiAyNzMuMiwxLjQgCQkJIi8+CgkJPC9nPgoJPC9nPgo8L2c+Cjwvc3ZnPgo=);
+      background-repeat: no-repeat;
+      text-indent: -999999px;
+      background-size: 100%,100%;
+    }
+
+    .loading {
+      position: relative;
+      text-align: center;
+      margin-top: 61px;
+      margin-bottom: 45px;
+    }
+
+    .logo path {
+      fill: #3f5364;
+    }
+
+    .logo path.dark {
+      fill: #f38b00;
+    }
+
+    .logo {
+      font-size: 0;
+      line-height: 0;
+      width: 100px;
+      height: 100px;
+      white-space: nowrap;
+      margin: auto;
+      transform: translate3d(0, 0, 0);
+      overflow: hidden;
+    }
+
+    @keyframes x {
+      0% {
+        transform: rotateX(0deg)
+      }
+      100% {
+        transform: rotateX(360deg)
+      }
+    }
+
+    @keyframes y {
+      0% {
+        transform: rotateY(0deg)
+      }
+      100% {
+        transform: rotateY(360deg)
+      }
+    }
+
+    @keyframes z {
+      0% {
+        transform: rotateZ(0deg)
+      }
+      100% {
+        transform: rotateZ(360deg)
+      }
+    }
+
+    .logo-animate .ring-0 {
+      animation-name: z;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      transform-origin: center;
+      animation-duration: 1s;
+    }
+
+    .logo-animate .ring-1 {
+      animation-name: x;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      transform-origin: center;
+      animation-duration: 2.5s;
+    }
+
+    .logo-animate .ring-2 {
+      animation-name: y;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      transform-origin: center;
+      animation-duration: 2.5s;
+    }
+
+    .logo-animate .ring-3 {
+      animation-name: x;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      transform-origin: center;
+      animation-duration: 2.5s;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="login">
+      <h1>Chef Automate</h1>
+      <div class="loading">
+        <svg viewBox="-200 -200 400 400" width="300" height="300" xmlns="http://www.w3.org/2000/svg" class="logo logo-animate">
+          <g display="inline" class="ring ring-odd ring-3">
+          <title>ring-3</title>
+          <path id="svg_6" d="m-159.0006,47.62601c-0.5723,-1.87601 -1.1114,-3.76001 -1.61731,-5.67001c-0.0265,-0.11899 -0.05989,-0.23299 -0.0865,-0.35199c-0.46581,-1.76401 -0.89828,-3.528 -1.3042,-5.311c-0.08,-0.366 -0.1532,-0.726 -0.2397,-1.08501c-0.3394,-1.53099 -0.6588,-3.06799 -0.95169,-4.612c-0.1331,-0.67899 -0.24611,-1.37099 -0.3727,-2.04999c-0.2128,-1.244 -0.4259,-2.46901 -0.6255,-3.70601c-0.1597,-1.052 -0.2995,-2.11699 -0.43932,-3.181c-0.97159,-7.228 -1.49728,-14.56799 -1.49069,-22.022l-33.8606,0c-0.01318,8.11301 0.49918,16.132 1.45073,24.03801l0,0c0.0201,0.166 0.04665,0.339 0.07326,0.51199c0.26628,2.15001 0.55896,4.3 0.89851,6.436c0.09302,0.592 0.19963,1.17799 0.29268,1.763c0.28615,1.757 0.59242,3.50099 0.93176,5.245c0.17303,0.931 0.37941,1.85001 0.56561,2.76801c0.28616,1.39099 0.57906,2.77499 0.8985,4.153c0.27951,1.211 0.57904,2.416 0.88512,3.62c0.27292,1.07201 0.53897,2.15601 0.82515,3.228c0.38612,1.42401 0.79208,2.83501 1.20456,4.246c0.17303,0.599 0.32616,1.198 0.50591,1.77701l0.01991,0c2.3425,7.73898 5.1111,15.28601 8.3253,22.60001l31.0392,-13.64902c-2.6821,-6.06299 -4.9848,-12.32599 -6.92799,-18.74799l0,0z" class="dark" fill="#F38B00"></path>
+          <path class="dark" id="svg_7" d="m-0.332,165.44699c-45.70599,0 -87.141,-18.61398 -117.1613,-48.642l-23.9912,23.992c36.13,36.13 86.02249,58.504 141.1525,58.504c101.815,0 185.815,-76.21298 198.10001,-174.70099l-34.18701,0c-12.07199,79.62698 -80.978,140.84698 -163.91299,140.84698z" fill="#F38B00"></path>
+          <path class="dark" id="svg_8" d="m-0.332,-166.146c37.13499,0 71.44199,12.27849 99.11301,32.9823l20.29199,-27.1924c-33.302,-24.89641 -74.623,-39.64391 -119.39799,-39.64391c-84.718,0 -157.1051,52.77429 -186.09419,127.237l31.5981,12.29201c24.10429,-61.7785 84.25909,-105.675 154.48909,-105.675z" fill="#F38B00"></path>
+          <path id="svg_9" d="m163.57501,-25.299l34.18597,0c-3.66699,-29.382 -13.71597,-56.78101 -28.70898,-80.7655l-28.78299,17.9615c11.746,18.761 19.858,40.024 23.306,62.804z" fill="#FFFFFF"></path>
+          </g>
+          <g display="inline" class="ring ring-even ring-2">
+          <title>ring-2</title>
+          <path class="dark" id="svg_10" d="m125.06866,-25.29926l34.29993,0c-8.95764,-57.50595 -48.33536,-105.05605 -101.10297,-125.65996l-12.25186,31.49818c40.14304,15.66591 70.4899,51.02397 79.0549,94.16177z" fill="#F38B00"></path>
+          <path id="svg_13" d="m-0.33176,127.50653l0,33.77417c80.63214,0 147.66809,-59.35608 159.707,-136.67401l-34.29993,0c-11.64627,58.60403 -63.44888,102.89984 -125.40707,102.89984z" fill="#FFFFFF"></path>
+          <path id="svg_12" d="m-128.19452,-0.34961l0,0l-33.77434,0l0,0c0,67.92108 42.12637,126.15909 101.60889,150.03726l12.53804,-31.34509c-47.05094,-18.89362 -80.37259,-64.95958 -80.37259,-118.69217z" fill="#FFFFFF"></path>
+          <path id="svg_11" d="m-0.33176,-128.20572l0,0l0,-33.7742c0,0 0,0 0,0c-68.46011,0 -127.10408,42.79174 -150.62285,103.02628l31.4715,12.24522c18.60076,-47.65655 64.99286,-81.4973 119.15135,-81.4973z" fill="#FFFFFF"></path>
+          </g>
+          <g display="inline" class="ring ring-odd ring-1">
+          <title>ring-1</title>
+          <path id="svg_1" d="m-0.33176,89.57959c-49.5865,0 -89.92253,-40.3427 -89.92253,-89.9292c0,-49.5865 40.34268,-89.92253 89.92253,-89.92253c40.92169,0 75.52774,27.4852 86.37543,64.96623l34.79904,0c-11.56641,-56.2881 -61.50562,-98.74708 -121.1678,-98.74708c-68.20724,0 -123.69674,55.48949 -123.69674,123.69672s55.48949,123.7034 123.69674,123.7034c59.66219,0 109.60139,-42.45898 121.1678,-98.7471l-34.79904,0c-10.85434,37.4877 -45.45374,64.97955 -86.37543,64.97955z" fill="#FFFFFF"></path>
+          </g>
+          <g display="inline" class="ring ring-even ring-0">
+          <title>ring-0</title>
+          <path id="svg_2" d="m-60.952,60.26401c15.526,15.53299 36.968,25.14999 60.614,25.14999l0,-35.858c-13.783,0 -26.261,-5.59 -35.299,-14.614l-25.315,25.32201z" fill="#FFFFFF"></path>
+          <path id="svg_3" d="m-86.102,-0.35001c0,12.27901 2.616,23.95201 7.27399,34.52l32.80301,-14.42799c-2.709,-6.14301 -4.21901,-12.931 -4.21901,-20.09201c0,-27.56499 22.341,-49.91199 49.912,-49.91199l0,-35.85101c-47.28999,0 -85.77,38.473 -85.77,85.76299z" class="dark" fill="#F38B00"></path>
+          <path id="svg_4" d="m30.75999,-80.27l-13.00299,33.42199c10.621,4.13901 19.47899,11.78601 25.12199,21.54201l38.832,0c-7.66599,-25.16901 -26.62599,-45.467 -50.951,-54.964z" fill="#FFFFFF"></path>
+          <path id="svg_5" d="m17.763,46.149l13.004,33.42101c24.311,-9.496 43.27802,-29.79401 50.944,-54.97l-38.832,0c-5.64301,9.763 -14.50099,17.40999 -25.116,21.549z" class="dark" fill="#F38B00"></path>
+          </g>
+        </svg>
+      </div>
+      <p>Bringing up Chef Automate Pilot environment&hellip;</p>
+      <p>When your instance is available please sign in with:</p>
+      <ul>
+        <li>Username: <span>admin</span></li>
+        <li>Password: <span>password</span></li>
+      </ul>
+    </div>
+    <script>
+      var delete_cookie = function(name) {
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      };
+      function check() {
+        var enterprise, username = "admin";
+
+        fetch("/api/v0/canonical_enterprise").then(function (response) {
+          if (response.status === 200) { return response.json(); }
+        }).then(function (json) {
+          if (json) {
+            enterprise = json.ent_name;
+            localStorage.clear();
+            delete_cookie("chef-delivery-user");
+            delete_cookie("chef-delivery-token");
+            delete_cookie("chef-delivery-enterprise");
+            localStorage.setItem("admin-show-welcome-modal-on-startup", "0");
+            window.location.assign("/e/" + enterprise + "/#/login?returnUrl=%2Fviz%2Fwelcome");
+          }
+        });
+      }
+      check();
+      setInterval(check, 1000);
+    </script>
+  </body>
+</html>

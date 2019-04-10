@@ -1,0 +1,17 @@
+{
+    "version": "1",
+    "build_cookbook": "cookbooks/test",
+    "build_nodes": {
+        "default"    : ["name:*"],
+        "deploy"     : ["name:*"],
+        "functional" : ["name:*"],
+        "lint"       : ["name:*"],
+        "provision"  : ["name:*"],
+        "quality"    : ["name:*"],
+        "publish"    : ["name:*"],
+        "security"   : ["name:*"],
+        "smoke"      : ["name:*"],
+        "syntax"     : ["name:*"],
+        "unit"       : ["name:*"]
+    }
+}

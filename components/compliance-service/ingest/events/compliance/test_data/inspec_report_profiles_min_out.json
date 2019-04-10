@@ -1,0 +1,142 @@
+[
+  {
+    "name": "profile1",
+    "title": "Profile1 title",
+    "profile": "profile1|d2dcf9bf37feec01b31d743fbee6965f55218f730512e21308260c840f4f6654",
+    "version": "1.1.1",
+    "sha256": "d2dcf9bf37feec01b31d743fbee6965f55218f730512e21308260c840f4f6654",
+    "controls": [
+      {
+        "id": "ctrl-01",
+        "impact": 0,
+        "title": "Checking for something1",
+        "status": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "code_desc": "File /etc/passwd should be file",
+            "run_time": 0.002524643
+          },
+          {
+            "status": "passed",
+            "code_desc": "",
+            "run_time": 0
+          }
+        ]
+      },
+      {
+        "id": "ctrl-02",
+        "impact": 0.8,
+        "title": "",
+        "status": "failed",
+        "results": [
+          {
+            "status": "failed",
+            "code_desc": "",
+            "run_time": 0
+          },
+          {
+            "status": "passed",
+            "code_desc": "",
+            "run_time": 0
+          }
+        ]
+      },
+      {
+        "id": "ctrl-03",
+        "impact": 1,
+        "title": "",
+        "status": "skipped",
+        "results": [
+          {
+            "status": "skipped",
+            "code_desc": "",
+            "run_time": 0
+          }
+        ]
+      }
+    ],
+    "controls_sums": {
+      "total": 3,
+      "passed": {
+        "total": 1
+      },
+      "skipped": {
+        "total": 1
+      },
+      "failed": {
+        "total": 1,
+        "minor": 0,
+        "major": 0,
+        "critical": 1
+      }
+    }
+  },
+  {
+    "name": "profile2",
+    "title": "",
+    "profile": "profile2|9490b16f32922b284a82a36d4f111e1474fcd9b53c4689f77de7ef68a1664487",
+    "version": "2.2.2",
+    "sha256": "9490b16f32922b284a82a36d4f111e1474fcd9b53c4689f77de7ef68a1664487",
+    "controls": [
+      {
+        "id": "sysctl-01",
+        "status": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "code_desc": "",
+            "run_time": 0
+          },
+          {
+            "status": "passed",
+            "code_desc": "",
+            "run_time": 0
+          }
+        ]
+      },
+      {
+        "id": "sysctl-02",
+        "status": "skipped",
+        "results": [
+          {
+            "status": "passed",
+            "code_desc": "",
+            "run_time": 0
+          },
+          {
+            "status": "skipped",
+            "code_desc": "",
+            "run_time": 0
+          }
+        ]
+      },
+      {
+        "id": "sysctl-03",
+        "status": "passed",
+        "results": [
+          {
+            "status": "passed",
+            "code_desc": "",
+            "run_time": 0
+          }
+        ]
+      }
+    ],
+    "controls_sums": {
+      "total": 3,
+      "passed": {
+        "total": 2
+      },
+      "skipped": {
+        "total": 1
+      },
+      "failed": {
+        "total": 0,
+        "minor": 0,
+        "major": 0,
+        "critical": 0
+      }
+    }
+  }
+]

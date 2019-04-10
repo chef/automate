@@ -1,0 +1,101 @@
+<app-component-library-screen>
+  <app-cl-code-section>
+    <h3>Working Example</h3>
+
+    <chef-checkbox
+      (checkValue)="updateCheckedValue($event)"
+      [checked]="checkedValue">
+      A checkbox!
+    </chef-checkbox>
+    <p> The checkbox is checked: {{ checkedValue }} </p>
+
+    <chef-checkbox
+      (checkValue)="updateCheckedValue($event)"
+      disabled="true">
+      A disabled checkbox
+    </chef-checkbox>
+  </app-cl-code-section>
+
+  <app-cl-code-section>
+    <h3>Angular Template Code Example</h3>
+
+    <pre>&lt;chef-checkbox
+  (checkValue)="updateCheckedValue($event)"
+  [checked]="checkedValue"&gt;
+  Checkbox text goes here!
+&lt;/chef-checkbox&gt;</pre>
+  </app-cl-code-section>
+
+  <app-cl-code-section>
+    <h3>Typescript Code Example</h3>
+
+  <pre>checked = false;
+updateCheckedValue(event) {{ '{' }}
+  &nbsp;this.checkedValue = event;
+{{ '}' }}</pre>
+  </app-cl-code-section>
+
+  <app-cl-code-section>
+    <h3>CSS Code Example</h3>
+    N/A
+  </app-cl-code-section>
+
+  <app-cl-section>
+    <h3>API</h3>
+
+    <app-cl-api>
+      <api-prop name="checked" type="Boolean">
+        Specify whether the checkbox is initialized checked.
+      </api-prop>
+
+      <api-prop name="disabled" type="Boolean">
+        Specify whether the checkbox is initialized disabled.
+      </api-prop>
+
+      <api-prop name="checkValue" type="Function(Boolean): void" required>
+        Catch the checkValue event emitted when the checkbox changes.
+      </api-prop>
+
+      <api-prop name="Content Model" type="DOM nodes" required>
+        Specify text that comprises the rendered label of the
+        <token>&lt;chef-checkbox&gt;</token>.
+      </api-prop>
+    </app-cl-api>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Accessibility</h3>
+
+    <p>
+    The <token>chef-checkbox</token> wraps the <token>mat-checkbox</token> component.
+    <token>mat-checkbox</token> uses an internal <token>input type="checkbox"</token> to provide
+    an accessible experience. This internal checkbox receives focus and is automatically
+    labelled by the text content of the <token>mat-checkbox</token> element.
+    </p>
+    <p>
+    Checkboxes without text or labels should be given a meaningful label
+    via <token>aria-label</token> or <token>aria-labelledby</token>.
+    </p>
+    <p>
+    See <a href="https://material.angular.io/components/checkbox/overview">Angular Material docs</a>.
+    </p>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Browser Compatibility</h3>
+
+    <ul>
+      <li>Chrome 61 OSX Sierra 1920x1200 - OK</li>
+      <li>Firefox 56 OSX Sierra 1920x1200 - OK</li>
+      <li>Safari 11 OSX Sierra 1920x1200 - OK</li>
+      <li>Edge 16 Windows 10 1919x999 - OK</li>
+      <li>IE 11 - OK</li>
+    </ul>
+  </app-cl-section>
+
+  <app-cl-section>
+    <h3>Example Running In Chef Automate</h3>
+
+    See <code>app/pages/signin/signin.component.html</code>
+  </app-cl-section>
+</app-component-library-screen>

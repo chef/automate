@@ -1,0 +1,691 @@
+{
+  "delivery": {
+    "install_path": "/opt/delivery",
+    "cookbook_path": "/opt/delivery/embedded/cookbooks",
+    "dir": "/opt/delivery",
+    "bootstrap": {
+      "enable": false
+    },
+    "chef_base_path": "/opt/opscode",
+    "user": {
+      "username": "delivery",
+      "shell": "/bin/bash",
+      "home": "/opt/delivery/embedded",
+      "comment": "CHEF Delivery"
+    },
+    "delivery": {
+      "enable": true,
+      "dir": "/var/opt/delivery/delivery",
+      "etc_dir": "/var/opt/delivery/delivery/etc",
+      "chef_config": "/var/opt/delivery/delivery/etc/erlang.cfg",
+      "log_directory": "/var/log/delivery/delivery",
+      "log_rotation": {
+        "file_maxbytes": 10240000,
+        "num_to_keep": 10
+      },
+      "vip": "a1-migration.test",
+      "listen": "127.0.0.1",
+      "port": 9611,
+      "erl_cookie": "b610c5c617170727af00",
+      "marketplace_licensing": false,
+      "ssl_certificates": {
+
+      },
+      "ca_cert_chain_depth": 20,
+      "no_ssl_verification": [
+
+      ],
+      "keepalive": {
+        "enable": false,
+        "count": 10
+      },
+      "chef_server_proxy": true,
+      "chef_server_proxy_keepalive": {
+        "enable": false,
+        "count": 10
+      },
+      "api_port": 9611,
+      "db_pool_max_count": 100,
+      "db_pool_init_count": 20,
+      "chef_username": "delivery",
+      "chef_private_key": "/a1-migration/keys/test.pem",
+      "chef_server": "https://a1-migration.test:8443/organizations/test/",
+      "default_search": "(recipes:delivery_builder OR recipes:delivery_builder\\\\:\\\\:default OR recipes:delivery_build OR recipes:delivery_build\\\\:\\\\:default OR tags:delivery-build-node)",
+      "chef_server_webui": "https://127.0.0.1",
+      "db_name": "delivery",
+      "sql_user": "delivery",
+      "sql_password": "fe32e7e2fa1019ad2aa06fa1e1c8793327a582c22952c69e50981b973d6d843bc4a0f652ee18f7af094f07c5642c41053aae",
+      "sql_repl_user": "delivery_repl",
+      "sql_repl_password": "be341cc6a065a5fc10a66c06e9e3235b61a2ded5fe983a19f3210be47ed1304f2b77f580d1d26cdca291d52a5d93b2650514",
+      "git_repo_template": "/opt/delivery/embedded/etc/deliv_git_repo_template",
+      "git_repos": "/var/opt/delivery/delivery/git_repos",
+      "git_working_tree_dir": "/var/opt/delivery/delivery/git_workspace",
+      "push_jobs_max_retries": 3,
+      "push_jobs_overall_timeout": "2h",
+      "push_jobs_run_timeout": "75m",
+      "phase_job_confirmation_timeout": "5m",
+      "is_dev_box": false,
+      "audit_max_events": 100,
+      "read_ttl": "7d",
+      "write_ttl": "7d",
+      "ldap_hosts": [
+      ],
+      "ldap_port": 3269,
+      "ldap_timeout": 5000,
+      "ldap_base_dn": "OU=Employees,OU=Domain users,DC=examplecorp,DC=com",
+      "ldap_bind_dn": "ldapbind",
+      "ldap_bind_dn_password": "secret123",
+      "ldap_encryption": "start_tls",
+      "ldap_attr_login": "sAMAccountName",
+      "ldap_attr_mail": "mail",
+      "ldap_attr_full_name": "fullName",
+      "primary": true,
+      "primary_ip": null,
+      "standby_ip": null,
+      "console_name": null,
+      "console_url": null,
+      "proxy": {
+        "host": null,
+        "port": 0,
+        "user": null,
+        "password": null,
+        "no_proxy": [
+          "localhost",
+          "127.0.0.1"
+        ]
+      },
+      "telemetry_api": "https://telemetry.chef.io",
+      "telemetry": {
+        "open_timeout": 5,
+        "read_timeout": 5,
+        "ssl_timeout": 5
+      },
+      "use_ssl_termination": false,
+      "delivery": {
+
+      },
+      "sql_ro_password": "fba3f2420346d267f2f0656b440e07a46f8b1b2f9ca3a54fe4ae57d1c45d7de8bae101774ae4383f430ffa89994d4960cf44",
+      "secrets_key": "fdd297213e8d51371c7d7d1564201a97"
+    },
+    "delivery_web": {
+      "root": "/opt/delivery/embedded/service/delivery_web"
+    },
+    "auth": {
+      "enable": true,
+      "oidc_signing_private_key": "/etc/delivery/oidc_signing_key.pem",
+      "oidc_clients": [
+
+      ],
+      "saml_metadata_refresh_interval": "1d",
+      "saml_metadata_retry_interval": "1m"
+    },
+    "lsyncd": {
+      "enable": true,
+      "dir": "/var/opt/delivery/lsyncd",
+      "log_directory": "/var/log/delivery/lsyncd",
+      "status_log_file": "lsyncd-status.log",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "user": "delivery",
+      "ssh_key": "/opt/delivery/embedded/.ssh/id_rsa"
+    },
+    "postgresql": {
+      "version": "9.2",
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/delivery/postgresql/9.2",
+      "data_dir": "/var/opt/delivery/postgresql/9.2/data",
+      "log_directory": "/var/log/delivery/postgresql/9.2",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "username": "chef-pgsql",
+      "superuser_enable": true,
+      "superuser_username": "chef-pgsql",
+      "superuser_password": "6591266f724f79da0ef8a984dee897b51eba969df9345ce0ddffdd9af627d39a83b3deb804ac4f2c000473c703a970d5f692",
+      "shell": "/bin/bash",
+      "home": "/var/opt/delivery/postgresql",
+      "user_path": "/opt/delivery/embedded/bin:/opt/delivery/bin:$PATH",
+      "vip": "127.0.0.1",
+      "port": 5432,
+      "listen_address": "0.0.0.0",
+      "max_connections": 350,
+      "md5_auth_cidr_addresses": [
+        "127.0.0.1/32",
+        "::1/128"
+      ],
+      "trust_auth_cidr_addresses": [
+
+      ],
+      "shmmax": 17179869184,
+      "shmall": 4194304,
+      "shared_buffers": "1048MB",
+      "work_mem": "8MB",
+      "effective_cache_size": "128MB",
+      "checkpoint_segments": 3,
+      "checkpoint_timeout": "5min",
+      "checkpoint_completion_target": 0.5,
+      "checkpoint_warning": "30s",
+      "debug": false
+    },
+    "ssh_git": {
+      "hostname": "a1-migration.test",
+      "host_address": "0.0.0.0",
+      "port": 8989,
+      "keys_dir": "/var/opt/delivery/delivery/etc/ssh_git_server_keys"
+    },
+    "insights": {
+      "enable": true,
+      "data_directory": "/var/opt/delivery/elasticsearch/data",
+      "node_missing_threshold_mins": 720,
+      "enable_auth": true
+    },
+    "data_collector": {
+      "token": "SI3JNdW4XIN3iNaNL2gWkSOjxowNQHW7r8NG9yV7fsI"
+    },
+    "insights_web": {
+      "root": "/opt/delivery/embedded/service/insights_web"
+    },
+    "elasticsearch": {
+      "home": "/opt/delivery/embedded/elasticsearch",
+      "log_directory": "/var/log/delivery/elasticsearch",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "urls": [
+        "http://127.0.0.1:9200"
+      ],
+      "host_header": null,
+      "schema_version": 2,
+      "enable_auth": true,
+      "dir": "/var/opt/delivery/elasticsearch",
+      "config_directory": "/var/opt/delivery/elasticsearch/config",
+      "config_file": "/var/opt/delivery/elasticsearch/config/elasticsearch.yml",
+      "java_home": "/opt/delivery/embedded/jre",
+      "max_open_files": 65536,
+      "max_map_count": 262144,
+      "max_locked_memory": "unlimited",
+      "proxy_connect_timeout": 60,
+      "proxy_send_timeout": 300,
+      "proxy_read_timeout": 300,
+      "keepalive": {
+        "enable": false,
+        "count": 10
+      },
+      "retry_limit": 3,
+      "request_timeout": 15,
+      "memory": "1048m",
+      "new_memory_size": "65m",
+      "jvm_opts": [
+
+      ],
+      "enable_gc_log": false,
+      "migration_client_timeout": 600,
+      "config": {
+        "bootstrap": {
+          "memory_lock": false
+        },
+        "cluster": {
+          "name": "chef-insights"
+        },
+        "indices": {
+          "breaker": {
+            "fielddata": {
+              "limit": "60%"
+            },
+            "request": {
+              "limit": "40%"
+            },
+            "total": {
+              "limit": "70%"
+            }
+          },
+          "store": {
+            "throttle": {
+              "max_bytes_per_sec": "100mb"
+            }
+          }
+        },
+        "logger": {
+          "com.amazonaws": "WARN"
+        },
+        "network": {
+          "host": "127.0.0.1"
+        },
+        "node": {
+          "name": "a1-migration"
+        },
+        "path": {
+          "data": "/var/opt/delivery/elasticsearch/data",
+          "logs": "/var/log/delivery/elasticsearch",
+          "repo": "/var/opt/delivery/elasticsearch_backups,"
+        }
+      },
+      "auth_user": null,
+      "auth_password": null,
+      "nginx_proxy": "http://localhost:8080/",
+      "nginx_proxy_url": "http://localhost:8080/elasticsearch/"
+    },
+    "logstash": {
+      "pipeline_config_dir": "/opt/delivery/embedded/etc/logstash/conf.d",
+      "home": "/opt/delivery/embedded/logstash",
+      "dir": "/var/opt/delivery/logstash",
+      "config_dir": "/var/opt/delivery/logstash/config",
+      "data_dir": "/var/opt/delivery/logstash/data",
+      "config_file": "/var/opt/delivery/logstash/config/logstash.yml",
+      "log_directory": "/var/log/delivery/logstash",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "port": 8080,
+      "heap_size": "419m",
+      "java_home": "/opt/delivery/embedded/jre",
+      "config": {
+        "config": {
+          "reload": {
+            "automatic": false,
+            "interval": 3
+          }
+        },
+        "node": {
+          "name": "a1-migration"
+        },
+        "path": {
+          "config": "/opt/delivery/embedded/etc/logstash/conf.d",
+          "data": "/var/opt/delivery/logstash/data",
+          "logs": "/var/log/delivery/logstash",
+          "queue": "/var/opt/delivery/logstash/data/queue"
+        },
+        "pipeline": {
+          "workers": 4,
+          "output": {
+            "workers": 1
+          },
+          "batch": {
+            "size": 125,
+            "delay": 5
+          },
+          "unsafe_shutdown": false
+        },
+        "queue": {
+          "type": "memory",
+          "page_capacity": "250mb",
+          "max_events": 0,
+          "checkpoint": {
+            "acks": 1024,
+            "writes": 1024,
+            "interval": 1000
+          }
+        },
+        "http": {
+          "host": "127.0.0.1",
+          "port": 9600
+        },
+        "log": {
+          "level": "info",
+          "format": "plain"
+        }
+      }
+    },
+    "kibana": {
+      "log_directory": "/var/log/delivery/kibana",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "conf_dir": "/var/opt/delivery/kibana/",
+      "port": 5601,
+      "max_old_space_size": 2048,
+      "version": "5.4.1",
+      "enable": false,
+      "enable_auth": true,
+      "keepalive": {
+        "enable": false,
+        "count": 10
+      }
+    },
+    "rabbitmq": {
+      "dir": "/var/opt/delivery/rabbitmq",
+      "data_dir": "/var/opt/delivery/rabbitmq/db",
+      "log_directory": "/var/log/delivery/rabbitmq",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "vhost": "/insights",
+      "user": "insights",
+      "password": "36e8eb7a0f396dc1bb0307c0ed68cc09b573b4679c163b3b9b69ebf5dc3b9797d6d77e1870afa3dd2f8b31cae6f171bd0631",
+      "node_ip_address": "127.0.0.1",
+      "management_listen_address": "127.0.0.1",
+      "port": "5672",
+      "use_ssl": true,
+      "ssl_certificate": "/var/opt/delivery/rabbitmq/db/rabbitmq.localhost.crt",
+      "ssl_certificate_key": "/var/opt/delivery/rabbitmq/db/rabbitmq.localhost.key",
+      "ssl_versions": [
+        "tlsv1.2",
+        "tlsv1.1"
+      ],
+      "nodename": "rabbit@localhost",
+      "vip": "127.0.0.1",
+      "env_path": "/opt/delivery/bin:/opt/delivery/embedded/bin:/usr/bin:/bin",
+      "management_user": "rabbitmgmt",
+      "management_password": "b151974aebbacc980ca5760ce410e54a5beaa71f1d368bca4a0cc4a37b9c0e256e9e831ae36dd42b02f439be5bc3829b18ea",
+      "management_port": 15672,
+      "management_enabled": true
+    },
+    "lb": {
+      "debug": false
+    },
+    "nginx": {
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/delivery/nginx",
+      "fqdns": [
+        "a1-migration.test"
+      ],
+      "strict_host_header": false,
+      "use_implicit_hosts": false,
+      "x_frame_options_header": "SAMEORIGIN",
+      "log_directory": "/var/log/delivery/nginx",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "access_log": {
+        "buffer_size": "32k",
+        "flush_time": "10s"
+      },
+      "ssl_port": 443,
+      "enable_non_ssl": false,
+      "non_ssl_port": 80,
+      "ssl_protocols": "TLSv1.2",
+      "ssl_ciphers": "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:AES256-GCM-SHA384:!aNULL:!eNULL:!EXPORT",
+      "ssl_certificate": null,
+      "ssl_certificate_key": null,
+      "ssl_country_name": "US",
+      "ssl_state_name": "WA",
+      "ssl_locality_name": "Seattle",
+      "ssl_company_name": "Chef",
+      "ssl_organizational_unit_name": "Engineering",
+      "ssl_email_address": "support@chef.io",
+      "worker_processes": 4,
+      "worker_connections": 10240,
+      "worker_processor_method": "epoll",
+      "multi_accept": "on",
+      "sendfile": "on",
+      "tcp_nopush": "on",
+      "tcp_nodelay": "on",
+      "gzip": "on",
+      "gzip_http_version": "1.0",
+      "gzip_comp_level": "2",
+      "gzip_proxied": "any",
+      "gzip_types": [
+        "text/plain",
+        "text/css",
+        "text/xml",
+        "text/javascript",
+        "application/javascript",
+        "application/json",
+        "application/x-javascript",
+        "application/xml",
+        "application/xml+rss"
+      ],
+      "keepalive_timeout": 60,
+      "keepalive_requests": 10000,
+      "client_max_body_size": "250m",
+      "client_body_buffer_size": "128k",
+      "client_header_buffer_size": "1k",
+      "large_client_header_buffers": {
+        "number": 4,
+        "size": "8k"
+      },
+      "output_buffers": {
+        "number": 2,
+        "size": "32k"
+      },
+      "postpone_output": 1460,
+      "client_body_timeout": "60s",
+      "client_header_timeout": "60s",
+      "send_timeout": "60s",
+      "open_file_cache_enable": false,
+      "open_file_cache_max": 1000,
+      "open_file_cache_inactive": "1m",
+      "open_file_cache_valid": "30s",
+      "open_file_cache_min_uses": 3,
+      "open_file_cache_errors": "off",
+      "server_names_hash_bucket_size": 128,
+      "cache_max_size": "5000m",
+      "expired_trial_contact": "awesome@chef.io",
+      "server_name": "a1-migration.test",
+      "static_content": "/opt/delivery/embedded/nginx/html",
+      "elasticsearch_auth_header": null,
+      "elasticsearch_host_header": "127.0.0.1:9200",
+      "token_protect_file": "/var/opt/delivery/nginx/etc/addon.d/token_protect.lua",
+      "compliance_auth_file": "/var/opt/delivery/nginx/etc/addon.d/compliance_auth.lua",
+      "listen_ipv6": false,
+      "proxy_read_timeout": 300,
+      "proxy_send_timeout": 300,
+      "proxy_connect_timeout": 60
+    },
+    "admin": {
+      "account_name": "admin",
+      "full_name": "Chef Delivery Administrator",
+      "email": "admin@example.com",
+      "password": "snakes"
+    },
+    "git": {
+      "username": "git",
+      "home": "/var/opt/delivery/home/git",
+      "ssh_dir": "/var/opt/delivery/home/git/.ssh",
+      "authkeys": "/var/opt/delivery/home/git/.ssh/authorized_keys",
+      "shell": "/opt/delivery/embedded/bin/git-shell"
+    },
+    "deliv_notify": {
+      "config": [
+
+      ]
+    },
+    "backup": {
+      "access_key_id": null,
+      "create_bucket": true,
+      "bucket": null,
+      "base_path": null,
+      "chef_server_config": false,
+      "config": {
+        "enabled": true
+      },
+      "cron": {
+        "enabled": false,
+        "max_archives": 7,
+        "max_snapshots": 7,
+        "notation": "0 0 * * *"
+      },
+      "db": {
+        "enabled": true
+      },
+      "delete": {
+        "pattern": null,
+        "max_archives": null,
+        "max_snapshots": null
+      },
+      "digest": {
+        "enabled": true,
+        "length": 256,
+        "value": null
+      },
+      "elasticsearch": {
+        "access_key_id": null,
+        "bucket": null,
+        "base_path": null,
+        "enabled": true,
+        "location": "/var/opt/delivery/elasticsearch_backups",
+        "lock_timeout": "600",
+        "max_restore_bytes_per_sec": "40mb",
+        "max_snapshot_bytes_per_sec": "40mb",
+        "poll_interval": "5",
+        "region": "us-east-1",
+        "request_timeout": "300",
+        "retry_limit": 3,
+        "secret_access_key": null,
+        "server_side_encryption": null,
+        "snapshot_timeout": "600",
+        "type": "fs",
+        "wait_for_lock": true
+      },
+      "notifications": {
+        "enabled": true
+      },
+      "force": false,
+      "git": {
+        "enabled": true
+      },
+      "license": {
+        "enabled": true
+      },
+      "list": {
+        "types": "all",
+        "format": "text"
+      },
+      "location": "/var/opt/delivery/backups",
+      "name": null,
+      "quiet": false,
+      "rabbit": {
+        "enabled": false
+      },
+      "compliance_profiles": {
+        "enabled": true
+      },
+      "region": null,
+      "secret_access_key": null,
+      "server_side_encryption": "AES256",
+      "sse_customer_algorithm": null,
+      "sse_customer_key": null,
+      "sse_customer_key_md5": null,
+      "ssekms_key_id": null,
+      "staging_dir": null,
+      "type": "fs",
+      "retry_limit": 5,
+      "wait": true
+    },
+    "reaper": {
+      "conf_file": "/var/opt/delivery/reaper/reaper_config.json",
+      "service_dir": "/opt/delivery/embedded/service/reaper",
+      "log_file": "/var/log/delivery/reaper/reaper.log",
+      "enable": true,
+      "mode": "delete",
+      "retention_period_in_days": 14,
+      "compliance_retention_period_in_days": null,
+      "insights_retention_period_in_days": null,
+      "archive_region": null,
+      "archive_destination": "fs",
+      "aws_access_key_id": null,
+      "aws_secret_key": null,
+      "s3_bucket_name": null,
+      "server_side_encryption": null,
+      "archive_filesystem_path": null,
+      "evasive_maneuvers_enabled": true,
+      "free_space_threshold_percent": 10,
+      "repository": "fs-chef-automate-reaper"
+    },
+    "compliance_profiles": {
+      "enable": true,
+      "vip": "127.0.0.1",
+      "port": 2134,
+      "service_directory": "/opt/delivery/embedded/service/compliance-profiles",
+      "log_directory": "/var/log/delivery/compliance_profiles",
+      "inspec_cache": true,
+      "storage_directory": "/var/opt/delivery/compliance",
+      "market_path": "/var/opt/delivery/compliance/market",
+      "profiles_path": "/var/opt/delivery/compliance/profiles",
+      "log_rotation": {
+        "file_maxbytes": 10240000,
+        "num_to_keep": 10
+      },
+      "log_level": "info",
+      "keepalive": {
+        "enable": false,
+        "count": 10
+      },
+      "legacy_insights_data": false
+    },
+    "fips": {
+      "enable": false
+    },
+    "stunnel": {
+      "log_directory": "/var/log/delivery/stunnel",
+      "log_rotation": {
+        "file_maxbytes": 10240000,
+        "num_to_keep": 10
+      },
+      "ssh_git": {
+        "port": 25689
+      }
+    },
+    "notifications": {
+      "enable": true,
+      "port": 9603,
+      "conf_dir": "/var/opt/delivery/notifications",
+      "rule_store_file": "/var/opt/delivery/notifications/rule_store",
+      "log_directory": "/var/log/delivery/notifications",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "keepalive": {
+        "enable": false,
+        "count": 10
+      }
+    },
+    "statistics": {
+      "enable": true,
+      "port": 7676,
+      "bind_address": "127.0.0.1",
+      "log_directory": "/var/log/delivery/statistics",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      }
+    },
+    "notifier": {
+      "enable": false,
+      "conf_file": "/var/opt/delivery/notifier/notifier_config.json",
+      "log_directory": "/var/log/delivery/notifier",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      }
+    },
+    "spice": {
+      "conf_dir": "/var/opt/delivery/spice",
+      "log_directory": "/var/log/delivery/spice",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      }
+    },
+    "fqdn": "a1-migration.test",
+    "ip_version": "ipv4",
+    "adoption": false
+  },
+  "run_list": [
+  "recipe[delivery::default]"
+]
+,
+  "runit": {
+    "sv_bin": "/opt/delivery/embedded/bin/sv",
+    "chpst_bin": "/opt/delivery/embedded/bin/chpst",
+    "service_dir": "/opt/delivery/service",
+    "sv_dir": "/opt/delivery/sv",
+    "lsb_init_dir": "/opt/delivery/init",
+    "executable": "/sbin/runit",
+    "start": "start runsvdir",
+    "stop": "stop runsvdir",
+    "reload": "reload runsvdir",
+    "svlogd_bin": "/opt/delivery/embedded/bin/svlogd"
+  }
+}

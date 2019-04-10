@@ -1,0 +1,26 @@
+<div class="job-queue-container">
+  <table class="job-queue">
+    <thead>
+      <tr>
+        <th>Project</th>
+        <th>Change Title</th>
+        <th>Stage</th>
+        <th>Phase</th>
+        <th>Status</th>
+        <th>Time In State</th>
+        <th>Submitted At</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="job-queue-item" ng-class="{ active: job.status === 'running' }" ng-repeat="job in jobs track by job.id">
+        <td class="job-queue-link"><a ui-sref="main.enterprise.organizations.organization.project({ org: job.org, project: job.project })">{{ job.project }}</a></td>
+        <td class="job-queue-link"><a ui-sref="main.enterprise.organizations.organization.project.change({ org: job.org, project: job.project, change: job.change.id })">{{ job.change.title }}</a></td>
+        <td class="stage">{{ job.stage }}</td>
+        <td class="phase">{{ job.phase }}</td>
+        <td class="status">{{ job.status }}</td>
+        <td>{{ job.timeInState }}</td>
+        <td>{{ job.submittedAt }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

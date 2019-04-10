@@ -1,0 +1,12 @@
+{
+  "chef_server_fqdn": "chef-server.insights.co",
+  "entity_uuid": "0271e125-97dd-498a-b026-8448ll60aafe",
+  "id": "aa6acaaa-aeaa-aaaa-aaaa-aaaaaaaaeaaa",
+  "message_version": "1.0.0",
+  "message_type": "run_start",
+  "node_name": "insights.chef.co",
+  "organization_name": "chef_delivery",
+  "run_id": "ba6acb91-1eaa-4c84-8d68-f19ee641e606",
+  "source": "chef_delivery",
+  "start_time": "2016-06-28T20:05:29Z"
+}

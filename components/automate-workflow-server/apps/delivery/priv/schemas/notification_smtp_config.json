@@ -1,0 +1,34 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "host": {
+            "type": "string",
+            "required": true
+        },
+        "port": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "exclusiveMaximum": false,
+            "required" : true
+        },
+        "smtp_login" : {
+            "type": "string",
+            "required": false
+        },
+        "password" : {
+            "type": "string",
+            "required": false
+        },
+        "sender_email" : {
+            "type": "string",
+            "required": true
+        },
+        "sender_name": {
+            "type": ["string", null],
+            "required": false
+        }
+    }
+}

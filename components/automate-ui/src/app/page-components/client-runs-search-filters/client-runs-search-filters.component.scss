@@ -1,0 +1,6 @@
+@import "~styles/variables";
+
+:host ::ng-deep .content {
+  padding: 0.5em;
+  border: 1px solid $chef-light-grey;
+}

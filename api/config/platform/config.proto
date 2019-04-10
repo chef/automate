@@ -1,0 +1,53 @@
+// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
+syntax = "proto3";
+
+package chef.automate.platform;
+option go_package = "github.com/chef/automate/api/config/platform";
+import "api/config/shared/global.proto";
+
+message Config {
+	message TLS {
+		string cert_path = 1;
+		string key_path = 2;
+		string root_ca_path = 3;
+	}
+
+	message Service {
+		string name = 1;
+		string path = 2;
+		TLS tls = 3;
+	}
+
+	message Package {
+		string ident = 1;
+		string path = 2;
+	}
+
+	message Platform {
+		chef.automate.infra.config.External.Postgresql external_postgresql = 1;
+	}
+
+	message Postgresql {
+		message Cfg {
+			int64 port = 1;
+		}
+		string ip = 1;
+		Cfg cfg = 2;
+	}
+
+	message PGS {
+		message Cfg {
+			int64 port = 1;
+		}
+		string ip = 1;
+		Cfg cfg = 2;
+	}
+
+
+	Service service = 1;
+	Package package = 2;
+	Platform platform = 3;
+	Postgresql postgresql = 4;
+	PGS pg_sidecar = 5;
+}
+

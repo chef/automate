@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response";
+
+import "components/automate-gateway/api/iam/v2beta/common/users.proto";
+
+message CreateUserResp {
+  User user = 1;
+}
+
+message GetUsersResp {
+  repeated User users = 1;
+}
+
+message DeleteUserResp {}
+
+message GetUserResp {
+  User user = 1;
+}
+
+message UpdateUserResp {
+  User user = 1;
+}

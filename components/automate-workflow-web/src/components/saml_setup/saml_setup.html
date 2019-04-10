@@ -1,0 +1,89 @@
+<div class="organizations card-view">
+  <header class="page-header">
+    <div class="page-header-title">
+      <h2>SAML Setup</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="form-container">
+    <form class="saml-setup" name="samlSetupForm">
+      <fieldset>
+        <h3>SAML Configuration Options</h3>
+        <div class="saml-setup-forbidden" ng-show="!authorized">
+          <p>You must be an admin in the '{{ enterprise }}' enterprise to setup SAML integration.</p>
+        </div>
+        <hr>
+        <div class="saml-setup-fields" ng-show="authorized">
+          <fieldset>
+            <div class="field">
+              <input type="checkbox" id="metadata-checkbox" ng-checked="!isManual" ng-click="toggleManual()">
+              Import Metadata
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <div class="little-title">Metadata XML URL</div>
+              <em ng-if="!isManual" class="required-indicator">*</em>
+              <input ng-disabled="isManual" type="url" name="metadata_url" ng-model="config.metadata_url" placeholder="http://example.com/metadata.xml" required>
+            </div>
+          </fieldset>
+          <hr>
+          <fieldset>
+            <div class="field">
+              <input type="checkbox" id="manual-checkbox" ng-checked="isManual" ng-click="toggleManual()">
+              Configure Manually
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <div class="little-title">Single Sign-On Login URL</div>
+              <em ng-if="isManual" class="required-indicator">*</em>
+              <input ng-disabled="!isManual" name="sso_login_url" type="url" ng-model="config.sso_login_url" placeholder="https://myname.idp.com/app/abcd/sso/saml" required>
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <div class="little-title">Identity Provider URI</div>
+              <em ng-if="isManual" class="required-indicator">*</em>
+              <input ng-disabled="!isManual" name="idp_uri" type="text" ng-model="config.idp_url" placeholder="urn:example:idp" required>
+            </div>
+          </fieldset>
+          <fieldset>
+            <div class="field">
+              <div class="little-title">Identity Provider Signing Certificate</div>
+              <em ng-if="isManual" class="required-indicator">*</em>
+              <textarea ng-disabled="!isManual" placeholder="If your signing certificate is provided to you in an XML metadata file, please copy the certificate from the KeyInfo block of XML and paste it here. Omit all XML tags." ng-model="config.cert"></textarea>
+            </div>
+          </fieldset>
+          <hr>
+          <fieldset>
+            <h3>User Defaults</h3>
+            <div class="field">
+              <div class="little-title">Name ID Policy</div>
+              <button type="button" class="select-menu" data-caret-html="<span class='fa fa-chevron-down'></span>" ng-model="config.name_id" data-toggle="true" bs-options="policy.value as policy.name for policy in policies" bs-select></button>
+             </div>
+           </fieldset>
+           <fieldset class="roles">
+             <legend>Default Role(s) For New Users</legend>
+             <div class="field checkbox-list" ng-repeat="(role, enabled) in roles">
+               <input
+                    type="checkbox"
+                    ng-checked="enabled"
+                    ng-click="toggleRole(role)"
+                    value="{{ role }}" /> {{ role }}
+               </div>
+           </fieldset>
+          <div class="form-controls">
+            <button class="button primary" name="save" ng-click="save()" ng-disabled="(isManual && samlSetupForm.sso_login_url.$invalid) || (!isManual && samlSetupForm.metadata_url.$invalid)">
+              Save
+            </button>
+            <button type="button" class="button destroy" ng-click="confirmDelete()">
+              Remove Configuration
+            </button>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>

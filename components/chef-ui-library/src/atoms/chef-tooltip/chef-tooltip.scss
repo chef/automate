@@ -1,0 +1,74 @@
+chef-tooltip {
+  #{--background-color}: var(--tooltip-color, chef-hsl(var(--chef-white)));
+  display: block;
+  position: fixed;
+  opacity: 0;
+  z-index: 300;
+  background-color: var(--background-color);
+  border-radius: var(--chef-border-radius);
+  box-shadow: var(--chef-box-shadow);
+  pointer-events: none;
+  padding: 1em;
+  transition-property: opacity;
+  transition-duration: 0.5s;
+  transition-timing-function: ease;
+  font-family: var(--chef-font-family);
+  font-size: var(--chef-base-font-size);
+  font-weight: normal;
+  color: chef-hsl(var(--chef-primary-dark));
+
+  &:after {
+    content: '';
+    display: block;
+    width: 0.75em;
+    height: 0.75em;
+    position: absolute;
+    background-color: var(--background-color);
+    transform: translateX(-50%) translateY(-50%) rotate(45deg);
+  }
+
+  &.top {
+    transform: translate(-50%, calc(-100% - 0.75em));
+
+    &::after {
+      left: 50%;
+      top: 100%;
+    }
+  }
+
+  &.left {
+    transform: translate(calc(-100% - 0.75em), -50%);
+
+    &::after {
+      left: 100%;
+      top: 50%;
+    }
+  }
+
+  &.right {
+    transform: translate(0.75em , -50%);
+
+    &::after {
+      left: 0;
+      top: 50%;
+    }
+  }
+
+  &.bottom {
+    transform: translate(-50%, 0.75em);
+
+    &::after {
+      left: 50%;
+      top: 0;
+    }
+  }
+
+  &.visible {
+    opacity: 1;
+    transition-property: opacity;
+  }
+
+  &.follow {
+    transition-property: opacity, top, left;
+  }
+}

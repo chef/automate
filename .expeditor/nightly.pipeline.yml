@@ -1,0 +1,79 @@
+expeditor:
+  defaults:
+    executor:
+      docker:
+        image_sha256: 60245e6090ff677e5f3263c73855ef4dc29082ecff6ab6981cef109391fc253b
+        workdir: /go/src/github.com/chef/automate
+
+steps:
+  - label: build
+    command:
+      - scripts/verify_build
+    timeout_in_minutes: 45
+    env:
+      ALLOW_LOCAL_PACKAGES: true
+      HAB_STUDIO_SUP: false
+      HAB_NONINTERACTIVE: true
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - wait
+
+  - label: "[integration] chef server upgrade"
+    command:
+      - integration/run_test integration/tests/chef_server_upgrade.sh
+    timeout_in_minutes: 30 # longer timeout for chef-server
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] chef server backup"
+    command:
+      - integration/run_test integration/tests/chef_server_backup.sh
+    timeout_in_minutes: 30 # longer timeout for chef-server
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] backups-no-sha256"
+    command:
+      - integration/run_test integration/tests/backup-no-sha.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] deprecated backup w external es"
+    command: integration/run_test integration/tests/deprecated_backup_external_es.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] backups repo permissions"
+    command:
+      - integration/run_test integration/tests/backup_repo_permissions.sh
+    timeout_in_minutes: 30 # it restores twice so we'll give it a while
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] product mitm"
+    command:
+      - integration/run_test integration/tests/product_mitm.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true

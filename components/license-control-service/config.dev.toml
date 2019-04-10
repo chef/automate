@@ -1,0 +1,6 @@
+host = "0.0.0.0"
+port = "10124"
+cert_path = "../../dev/certs/license-control-service.crt"
+key_path = "../../dev/certs/license-control-service.key"
+root_ca_path = "../../dev/certs/Chef_Automate_FAKE_Dev.crt"
+license_token_path = "/tmp/license_token.jwt"

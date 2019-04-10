@@ -1,0 +1,90 @@
+.team .page-header {
+  .page-header-title {
+      @include span-columns(6);
+  }
+  .page-header-meta {
+      @include span-columns(6);
+  }
+
+  .team-description {
+    margin-bottom: 1rem;
+  }
+
+  > div {
+    font-size: .875rem;
+  }
+}
+
+.team-members {
+
+  .new-member-form {
+    padding-bottom: 2.5rem;
+    $search-bar-width: 515px;
+    $submit-button-width: 173px;
+    button {
+      position: absolute;
+      width: $submit-button-width;
+      left: $search-bar-width + $submit-button-width + 70px;
+    }
+
+    input {
+      position: absolute;
+      width: $search-bar-width;
+      font-size: .875rem;
+      height: 35px;
+    }
+
+    .button {
+      padding: .65rem 1rem;
+      font-size: .75rem;
+    }
+
+    li, a {
+      font-size: .875rem;
+      color: $chef-blue-dark;
+    }
+
+    ul {
+      &.typeahead.dropdown-menu {
+        max-width: $search-bar-width;
+      }
+    }
+  }
+
+
+  a {
+    cursor: pointer;
+  }
+
+  .add-team-members-text {
+    margin-bottom: 1.5rem;
+  }
+
+
+  .disabled-for-non-admin {
+    .add-team-members-text, .little-title {
+      color: $grey3;
+    }
+    input {
+      background-color: $grey8;
+    }
+  }
+
+
+  .member-container {
+    padding: 1.5rem 0;
+
+    @extend %table-base;
+
+    thead th:first-child {
+      width: 5rem;
+    }
+    tbody td:first-child {
+      padding-left: 0;
+    }
+  }
+
+  .no-members {
+    @include empty-item;
+  }
+}

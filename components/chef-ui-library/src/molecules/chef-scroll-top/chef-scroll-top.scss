@@ -1,0 +1,19 @@
+chef-scroll-top {
+  .sentinel {
+    position: absolute;
+    top: 100vh;
+  }
+
+  .chef-scroll-button {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+
+    chef-icon:first-child {
+      margin: 0;
+    }
+  }
+}

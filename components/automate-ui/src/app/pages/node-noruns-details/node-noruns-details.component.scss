@@ -1,0 +1,27 @@
+@import "~styles/variables";
+
+chef-page-header {
+  padding-bottom: 50px;
+}
+
+.metadata {
+  margin-top: 10px;
+  padding: 30px 10px 30px;
+  box-shadow: 0 0 20px rgba($gray-light, .20);
+  border-radius: $global-radius;
+  width: 100%;
+}
+
+.heading {
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 200px;
+  font-weight: bold;
+  color: $chef-dark-grey;
+}
+
+.content {
+  display: inline-block;
+  margin: 0 0 10px;
+  width: calc(100% - 210px);
+}

@@ -1,0 +1,8 @@
+name: a2-resource-pack
+title: InSpec Automate Resource Pack
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: engineering@chef.io
+license: All Rights Reserved
+summary: Common resources and libraries for testing Automate 2.0
+version: 0.1.0

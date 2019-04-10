@@ -1,0 +1,153 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.event-feed-table {
+  margin: 0;
+  padding: 0;
+}
+
+.event-row {
+  display: flex;
+  position: relative;
+}
+
+.event-date-time {
+  flex-basis: 100px;
+
+  & > .event-time {
+    padding-bottom: 5pt;
+    padding-top: 5pt;
+  }
+
+  & > .event-day,
+  & > .event-date {
+    font-size: .625em;
+    line-height: 10pt;
+  }
+}
+
+.event-info {
+  flex-grow: 1;
+  border-left: 1px rgba(221, 221, 221, 0.685) dashed;
+  padding: 5px 0 5px 9px;
+  max-width: calc(100% - 100px);
+}
+
+.event-chat-bubble {
+  margin: 0;
+  padding: 12px 1.5em;
+  align-items: center;
+  position: relative;
+  border: 1px solid $gray-pale;
+  border-radius: $global-radius;
+  background: $chef-white;
+  box-shadow: 0 0 20px rgba($gray-light, .20);
+
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    border-right-color: $chef-white;
+    border-left: 0;
+    margin-top: -8px;
+    margin-left: -8px;
+  }
+}
+
+.event-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 50px;
+}
+
+.event-type {
+  display: inline-block;
+  vertical-align: middle;
+  width: 125px;
+  font-size: .675em;
+  font-weight: bold;
+}
+
+.event-description {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: .675em;
+  line-height: 12pt;
+  max-width: calc(100% - 185px);
+
+  b {
+    font-size: .975em;
+  }
+}
+
+.event-group-button {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  border: none;
+  color: $chef-primary-bright;
+  text-decoration: underline;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+// Side Panel
+$event-group-border: 1px solid $chef-light-grey;
+
+chef-side-panel {
+  z-index: 100;
+}
+
+.event-group-list {
+  margin: 0;
+  padding: 0;
+  border: $event-group-border;
+  list-style: none;
+}
+
+.event-group-item {
+  position: relative;
+  border-top: $event-group-border;
+  padding: 22px 40px 20px 90px;
+
+  &:nth-child(odd) {
+    background: $chef-white;
+  }
+
+  & > .event-icon {
+    position: absolute;
+    top: 23px;
+    left: 40px;
+  }
+
+  &:not(:first-child) > .event-icon {
+    transform: scale(0.7);
+    left: 38px;
+  }
+}
+
+.event-group-text {
+  margin: 0;
+  font-size: 10px;
+
+
+  & > strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+
+  & > em {
+    font-style: normal;
+    font-weight: bold;
+    font-size: inherit;
+    font-family: inherit;
+  }
+}

@@ -1,0 +1,20 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+# Postgres Database Management
+# We do this here because init hooks block the hab supervisor
+DBNAME="{{cfg.storage.database}}"
+
+pg-helper ensure-service-database "$DBNAME"
+pg-helper create-extension "$DBNAME" "pgcrypto"
+pg-helper fix-permissions "$DBNAME"
+
+# Copy schema sql files
+cp -r "{{pkg.path}}/schema" "{{pkg.svc_static_path}}/."
+
+# Start our service
+exec applications-service serve --config {{pkg.svc_config_path}}/config.toml

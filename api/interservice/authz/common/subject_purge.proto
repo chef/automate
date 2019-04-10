@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+
+package chef.automate.domain.authz.common;
+option go_package = "github.com/chef/automate/api/interservice/authz/common";
+
+message ErrorShouldUseV1 {};
+message ErrorShouldUseV2 {};
+
+message PurgeSubjectFromPoliciesReq {
+    // Q: Right now, this allows purging subject wildcards (like "user:*").
+    // -- Do we want to restrict this to only complete subjects?
+    string subject = 1
+      [(validate.rules).string.pattern = "^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|service):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$"];
+}
+
+// PurgeSubjectFromPolicies() removes the passed subject from every policy,
+// IAM v1 _and_ IAM v2. We thus differentiate the returned "affected" arrays.
+message PurgeSubjectFromPoliciesResp {
+    repeated string policies_v1 = 1;
+    repeated string policies_v2 = 2;
+}
+
+service SubjectPurge {
+    rpc PurgeSubjectFromPolicies (PurgeSubjectFromPoliciesReq) returns (PurgeSubjectFromPoliciesResp) {};
+}

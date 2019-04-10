@@ -1,0 +1,36 @@
+<div [formGroup]="form">
+  <h3>Select one or multiple profiles to scan your nodes</h3>
+  <chef-table>
+    <chef-tr>
+      <chef-th>
+        <input
+          type="checkbox"
+          formControlName="allSelected"
+          [indeterminate]="form.controls['someSelected'].value" />
+        Profile Name
+      </chef-th>
+      <chef-th>
+        Profile ID
+      </chef-th>
+      <chef-th>
+        Version
+      </chef-th>
+    </chef-tr>
+    <chef-tbody formArrayName="profiles">
+      <chef-tr
+      *ngFor="let profileGroup of form.controls['profiles']['controls']; let pIndex = index;"
+      [formGroup]="profileGroup">
+        <chef-td>
+          <input type="checkbox" formControlName="include" />
+          {{profileGroup.value.title}}
+        </chef-td>
+        <chef-td>
+          {{profileGroup.value.owner}}/{{profileGroup.value.name}}
+        </chef-td>
+        <chef-td>
+          {{profileGroup.value.version}}
+        </chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
+</div>

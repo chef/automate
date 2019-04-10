@@ -1,0 +1,10 @@
+syntax = "proto3";
+package chef.automate.domain.imported_method_arguments.messages;
+option go_package = "github.com/chef/automate/components/mock-service/mock/messages";
+
+message Foo {
+  string bar = 1;
+}
+message Bar {
+  string baz = 1;
+}

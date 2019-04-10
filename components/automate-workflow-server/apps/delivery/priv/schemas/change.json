@@ -1,0 +1,317 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "description": "The UUID of a change",
+      "type": "string",
+      "required": true,
+      "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+    },
+    "topic": {
+      "description": "The name of the branch for this change",
+      "type": "string",
+      "required": true
+    },
+    "target": {
+      "description": "The name of the pipeline to which this change is targeted for merging",
+      "type": "string",
+      "required": true
+    },
+    "state": {
+      "description": "The current status of this change",
+      "type": "string",
+      "required": true,
+      "enum": ["open", "merged"]
+    },
+    "submit_at": {
+      "description": "The time at which this change was initially submitted (i.e., timestamp of first patchset for this change)",
+      "type": "string",
+      "required": true,
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
+    },
+    "submit_by": {
+      "description": "The username of the User that initially submitted the change (i.e., submitter of first patchset for this change)",
+      "type": "string",
+      "required": true
+    },
+    "merge_sha": {
+      "description": "The SHA1 of the git merge.",
+      "type": ["string","null"],
+      "required": true
+    },
+    "approved_by": {
+      "description": "The approver of the change.",
+      "type": ["string","null"],
+      "required": true
+    },
+    "approved_at": {
+      "description": "The time the change was approved.",
+      "type": ["string", "null"],
+      "required": true
+    },
+    "delivered_by": {
+      "description": "The person who delivered the change.",
+      "type": ["string", "null"],
+      "required": true
+    },
+    "delivered_at": {
+      "description": "The time the change was delivered.",
+      "type": ["string", "null"],
+      "required": true
+    },
+    "title": {
+      "description": "Title of change.",
+      "type": ["string","null"],
+      "required": true
+    },
+    "description": {
+      "description": "Description of change.",
+      "type": ["string","null"],
+      "required": true
+    },
+    "stages": {
+      "type": "array",
+      "uniqueItems": true,
+      "required": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "stage": {
+            "type":"string",
+            "required": true,
+            "enum": ["verify", "build", "acceptance", "union", "rehearsal", "delivered"]
+          },
+          "status": {
+            "description": "TODO: what's the enum here?",
+            "type": "string",
+            "required": true
+          },
+          "phases": {
+            "type": "array",
+            "uniqueItems": true,
+            "required": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "phase": {
+                  "type": "string",
+                  "required":true
+                },
+                "status": {
+                  "description": "TODO: what's the enum here?",
+                  "type": "string",
+                  "required": true
+                },
+                "href": {
+                  "description": "API URL to details of this particular phase run",
+                  "type": "string",
+                  "required": true
+                },
+                "search_query": {
+                  "description": "The search query provided",
+                  "type": ["string","null"],
+                  "required": true
+		            },
+                "search_description": {
+                  "description": "The search description provided",
+                  "type": ["string","null"],
+                  "required": true
+	             	}
+              }
+            }
+          }
+        }
+      }
+    },
+    "_links" :{
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "trigger-verify": {
+                "description": "POST to this URL to trigger the verify stage to re-run",
+                "required": false,
+                "additionalProperties": true,
+                "type": "object",
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            },
+            "delete": {
+                "description": "DELETE to this URL to delete the change",
+                "required": false,
+                "additionalProperties": true,
+                "type": "object",
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            },
+            "approve": {
+                "description": "POST to this URL to approve the change",
+                "required": false,
+                "additionalProperties": true,
+                "type": "object",
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            },
+            "trigger-build": {
+                "description": "POST to this URL to trigger the build stage to re-run",
+                "required": false,
+                "additionalProperties": true,
+                "type": "object",
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            },
+            "trigger-acceptance": {
+                "description": "POST to this URL to trigger the acceptance stage to re-run",
+                "required": false,
+                "additionalProperties": true,
+                "type": "object",
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            },
+            "trigger-union": {
+                "description": "POST to this URL to trigger the union stage to re-run",
+                "required": false,
+                "additionalProperties": true,
+                "type": "object",
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            },
+            "trigger-rehearsal": {
+                "description": "POST to this URL to trigger the rehearsal stage to re-run",
+                "required": false,
+                "additionalProperties": true,
+                "type": "object",
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            },
+            "trigger-delivered": {
+                "description": "POST to this URL to trigger the delivered stage to re-run",
+                "required": false,
+                "additionalProperties": true,
+                "type": "object",
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            }
+        }
+    },
+    "patchsets": {
+      "type": "array",
+      "uniqueItems": true,
+      "required": true,
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sequence_number": {
+            "description": "Identifier of a patchset for a change",
+            "type": "integer",
+            "required": true,
+            "minimum": 1
+          },
+          "submitted_at": {
+            "description": "The time at which this patchset was submitted",
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$"
+          },
+          "sha": {
+            "description": "The SHA1 for this patchset",
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "stats": {
+            "description": "Diffstats for the entire change represented by this patchset. Cumulative over all individual commits in the patchset",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "insertions": {
+                "description": "Number of lines inserted",
+                "type": "integer",
+                "required": true,
+                "minimum": 0
+              },
+              "deletions": {
+                "description": "Number of lines deleted",
+                "type": "integer",
+                "required": true,
+                "minimum": 0
+              }
+            }
+          },
+          "commit_msgs": {
+            "type": "array",
+            "required": true,
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "additionalProperties": false,
+              "items": [
+                {"description": "Commit subject",
+                 "type": "string"},
+                {"description": "Commit body (may be empty)",
+                 "type": "string"},
+                {"description": "Commit sha",
+                 "type": "string"}
+              ]
+            }
+          },
+          "files_changed": {
+            "type": "array",
+            "required": true,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "additionalProperties": false,
+              "items": [
+                {"description": "Modification flag: 'A'dded, 'M'odified or 'D'eleted",
+                 "type": "string",
+                 "enum": ["A", "M", "D"]},
+                {"description": "File path within repository",
+                 "type": "string"}
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

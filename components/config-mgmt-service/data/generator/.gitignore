@@ -1,0 +1,9 @@
+chef-client/backup/*
+chef-client/cache/*
+chef-client/cookbooks/*
+chef-client/nodes/*
+Berksfile.lock
+Gemfile.lock
+
+# Predefined node_uuid needed until IPO-216 is fixed:
+!chef-client/cache/data_collector_metadata.json

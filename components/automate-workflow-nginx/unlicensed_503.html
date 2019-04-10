@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Delivery - No Tires on the Truck</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+     @import url("//fonts.googleapis.com/css?family=Montserrat:400,700");
+
+     body {
+       color: #4a4a4a;
+       font-family: 'Helvetica Neue', Helvetica, sans-serif;
+       font-size: 14px;
+     }
+     h1 {
+       margin: 0;
+       padding: 0;
+       text-align: center;
+       font-family: 'Montserrat';
+     }
+     a {
+       color: #4a90e2;
+       text-decoration: underline;
+     }
+     img {
+       max-width: 550px;
+     }
+     p {
+       line-height: 1.6em;
+     }
+     .container {
+       max-width: 550px;
+       margin: 120px auto 0;
+     }
+     .text {
+       margin: 60px auto;
+       text-align: center;
+     }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Time flies when you're having fun!</h1>
+      <div class="text">
+        <p>Your evaluation period for Chef Automate has expired.</p>
+        <p>To continue working with Automate, email us at <a href="mailto:<%= @expired_trial_contact %>"><%= @expired_trial_contact %></a>.</p>
+        <p>We'll get you back on the road.</p>
+      </div>
+      <img src="/maint_image.svg">
+    </div>
+  </body>
+</html>

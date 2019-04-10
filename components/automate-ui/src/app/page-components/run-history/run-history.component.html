@@ -1,0 +1,54 @@
+<chef-click-outside omit="run-history-button" (clickOutside)="closeRunHistory()">
+  <chef-side-panel id="run-history-panel" tabindex="0" [visible]="visible">
+    <div class="history-header">
+      <h2 class="history-heading"> Run History</h2>
+      <chef-button (click)="closeRunHistory()" secondary class="close-button" label="close">
+        <chef-icon>close</chef-icon>
+      </chef-button>
+    </div>
+    <div class="filter-selectors">
+      <div class="selector all" (click)="onStatusChange(selectedStatus.All)" [ngClass]="{active: selected == selectedStatus.All}">
+          <chef-icon>check_circle</chef-icon>
+          <div>{{stats(selectedStatus.All)}}</div>
+      </div>
+      <div class="selector failed" (click)="onStatusChange(selectedStatus.Failure)" [ngClass]="{active: selected == selectedStatus.Failure}">
+        <chef-icon>warning</chef-icon>
+        <div>{{stats(selectedStatus.Failure)}}</div>
+      </div>
+      <div class="selector successful" (click)="onStatusChange(selectedStatus.Success)" [ngClass]="{active: selected == selectedStatus.Success}">
+        <chef-icon>check_circle</chef-icon><div>{{stats(selectedStatus.Success)}}</div>
+      </div>
+      <div>
+        <app-date-selector (select)="dateSelected($event)" [initialDateTerm]="defaultSelectionTerm"> </app-date-selector>
+      </div>
+    </div>
+    <ul>
+      <li class="history-item" *ngFor="let history of nodeHistory" (click)="onSelect(history)">
+        <div class="arrow">
+          <chef-icon *ngIf="activeRunId === history.runId">chevron_left</chef-icon>
+        </div>
+        <div class="status" [ngClass]="history.status">
+          <chef-icon>{{ history.status | chefStatusIcon }}</chef-icon>
+        </div>
+        <div class="duration">
+          {{renderDate(history.startTime)}} <span>{{renderTime(history.startTime)}}</span>
+        </div>
+        <div class="date-time">
+          {{getDuration(history.startTime, history.endTime)}} <span>{{renderTime(history.endTime)}}</span>
+        </div>
+      </li>
+      <li class="no-runs-small" *ngIf="stats(selected) == 0">
+        <span>There are no runs for this node that match the criteria selected.</span>
+      </li>
+    </ul>
+
+    <app-page-picker
+      class="history-pagination"
+      [total]="stats(selected)"
+      [perPage]="pageSize"
+      [page]="currentPage"
+      [maxPageItems]="3"
+      (pageChanged)="updatePageNumber($event)">
+    </app-page-picker>
+  </chef-side-panel>
+</chef-click-outside>

@@ -1,0 +1,38 @@
+<div class="login-form-container normal" ng-if="loginState == 'saml'">
+  <form class="login-form" ng-submit="saml()">
+    <button type="submit" class="button"><span class="icon-key-small"></span>Sign In</button>
+  </form>
+
+  <div class="login-form-toggle">
+    <a href="" id="link-toggle-local" ng-click="setLoginState('local')">Sign in with username and password</a>
+  </div>
+</div>
+
+<div class="login-form-container normal" ng-if="loginState == 'local'">
+  <form class="login-form" ng-submit="login(user)">
+    <div class="inputs">
+      <div ng-class="usernamestate" class="form-group">
+        <span class="icon icon-user"></span>
+        <input class="form-control" type="text" name="username" id="username" placeholder="Username" ng-model="user.username">
+      </div>
+      <div ng-class="passwordstate" class="form-group">
+        <span class="icon icon-lock"></span>
+        <input class="form-control" type="password" name="password" id="password" placeholder="Password" ng-model="user.password">
+      </div>
+    </div>
+    <div class="form-group additionals">
+      <div class="remember">
+        <label>
+          <input type="checkbox" ng-model="user.remember"> Remember Me
+        </label>
+      </div>
+    </div>
+    <button type="submit" class="button"><span class="icon-key-small"></span>Sign In</button>
+  </form>
+
+  <div class="login-form-toggle">
+    <a href="" id="link-toggle-saml" ng-click="setLoginState('saml')" ng-if="samlEnabled">Authenticate via single-sign-on</a>
+  </div>
+</div>
+
+<div feature-flag-overrides ng-show="showFeatureFlags"></div>

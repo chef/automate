@@ -1,0 +1,9 @@
+{
+  "filter": {
+    "must": [
+      {
+        "key_1": { "nested_key": "nested_value" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "api/interservice/authz/v2/type.proto";
+
+package chef.automate.domain.authz.v2;
+option go_package = "github.com/chef/automate/api/interservice/authz/v2";
+
+message Project {
+    string name = 1;
+    string id = 2;
+    Type type = 3;
+    repeated string projects = 4;
+}
+
+message CreateProjectReq {
+    string name = 1;
+    string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+
+message CreateProjectResp {
+    Project project = 1;
+}
+
+message GetProjectReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+
+message GetProjectResp {
+    Project project = 1;
+}
+
+message ListProjectsReq {
+}
+
+message ListProjectsResp {
+    repeated Project projects = 1;
+}
+
+message UpdateProjectReq {
+    string name = 1;
+    string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+
+message UpdateProjectResp {
+    Project project = 1;
+}
+
+message DeleteProjectReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+
+message DeleteProjectResp {}
+
+service Projects {
+    rpc UpdateProject(UpdateProjectReq) returns (UpdateProjectResp) {};
+    rpc CreateProject(CreateProjectReq) returns (CreateProjectResp) {};
+    rpc GetProject(GetProjectReq) returns (GetProjectResp) {};
+    rpc DeleteProject(DeleteProjectReq) returns (DeleteProjectResp) {};
+    rpc ListProjects(ListProjectsReq) returns (ListProjectsResp) {};
+
+    // Note: POC functions that are not ready to expose outside of our
+    // spike (aka keep them out of the gateway for now).
+    rpc ListProjectRules(ListProjectRulesReq) returns (ProjectCollectionRulesResp) {};
+    rpc GetProjectRules(GetProjectRulesReq) returns (GetProjectRulesResp) {};
+}
+
+message ListProjectRulesReq {}
+message ProjectCollectionRulesResp {
+    map<string, ProjectRules> project_rules = 2;
+}
+
+message GetProjectRulesReq {
+    string project_id = 1;
+}
+
+message GetProjectRulesResp {
+    ProjectRules rules_for_project = 2;
+}
+
+message ProjectRules {
+    repeated ProjectRule rules = 2;
+}
+message ProjectRule {
+    repeated Condition conditions = 2;
+}
+
+// type = "ChefServers"
+// values = ['chef_server_1.org', 'chef_server_2.org', 'chef_*']
+message Condition {
+    string type = 1;
+    repeated string values = 2;
+}

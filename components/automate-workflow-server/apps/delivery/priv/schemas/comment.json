@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema#",
+  "description": "Encapsulates the variety of comment types in a Delivery system. It is currently defined using an array of types only because the Erlang library we use for validating against schemas (jesse) cannot deal with 'ref' properties; otherwise, we'd just define a core type and extend it.",
+  "type": [
+    {
+      "title": "Comment comment",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": ["comment"],
+          "default": "comment"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "published"],
+          "default": "draft"
+        },
+        "content": {
+          "type": "string",
+          "required": true
+        },
+        "parent_id": {
+          "type": "integer",
+          "required": true,
+          "minimum": 1
+        },
+        "datetime": {
+          "description": "This will be ignored when/if fed to the creating/updating endpoint",
+          "type": "string",
+          "format": "date-time"
+        },
+        "author": {
+          "description": "This will be ignored when/if fed to the creating/updating endpoint",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+
+
+    {
+      "title": "Line comment",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": ["line"],
+          "default": "line"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "published"],
+          "default": "draft"
+        },
+        "content": {
+          "type": "string",
+          "required": true
+        },
+        "patchset": {
+          "type": "integer",
+          "required": true,
+          "minimum": 1
+        },
+        "line_range": {
+          "type": "array",
+          "description": "Both are inclusive",
+          "minItems": 2,
+          "maxItems": 2,
+          "required": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "file": {
+          "type": ["string", null],
+          "default": null
+        },
+        "datetime": {
+          "description": "This will be ignored when/if fed to the creating/updating endpoint",
+          "type": "string",
+          "format": "date-time"
+        },
+        "author": {
+          "description": "This will be ignored when/if fed to the creating/updating endpoint",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+
+
+    {
+      "title": "Patchset comment",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": ["patchset"],
+          "default": "patchset"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "published"],
+          "default": "draft"
+        },
+        "content": {
+          "type": "string",
+          "required": true
+        },
+        "patchset": {
+          "type": "integer",
+          "required": true,
+          "minimum": 1
+        },
+        "datetime": {
+          "description": "This will be ignored when/if fed to the creating/updating endpoint",
+          "type": "string",
+          "format": "date-time"
+        },
+        "author": {
+          "description": "This will be ignored when/if fed to the creating/updating endpoint",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    }
+
+
+
+
+
+
+
+
+
+  ]
+}

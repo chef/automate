@@ -1,0 +1,41 @@
+chef-tab-selector {
+
+  chef-option {
+    position: relative;
+    display: inline-block;
+    color: chef-hsl(var(--chef-primary-dark));
+    font-size: 16px;
+    line-height: 32px;
+    min-width: 72px;
+    padding: 8px 16px;
+    cursor: pointer;
+    background: transparent;
+
+    // Underline
+    &:before {
+      display: block;
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      height: 2px;
+      left: 0;
+      width: 100%;
+      background: transparent;
+    }
+
+    &.selected:before {
+      background: chef-hsl(var(--chef-primary-bright));
+    }
+
+    &:hover,
+    &:focus {
+      background: blue;
+      background: chef-hsl(var(--chef-lightest-grey));
+
+    }
+
+    &:active {
+      background: chef-hsl(var(--chef-light-grey));
+    }
+  }
+}

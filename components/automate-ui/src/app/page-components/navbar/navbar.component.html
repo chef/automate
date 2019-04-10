@@ -1,0 +1,41 @@
+<header role="banner">
+  <nav role="navigation" class="navigation-wrapper">
+    <div class="left-nav"  role="menubar">
+      <div role="menuitem" class="logo-wrapper">
+        <a tabindex="0" routerLink="/" class="logo" title="logo link to homepage"></a>
+      </div>
+      <div class="navigation-menu">
+        <div role="menuitem" class="nav-link"><a routerLink="/event-feed" routerLinkActive="active" tabindex="0">Event Feed</a></div>
+
+        <div *ngIf="applicationsFeatureFlagOn" role="menuitem" class="nav-link"><a routerLink="/applications" routerLinkActive="active" tabindex="0">Applications</a></div>
+
+        <app-authorized [allOf]="[['/cfgmgmt/nodes', 'get'], ['/cfgmgmt/stats/node_counts', 'get']]">
+          <div role="menuitem" class="nav-link"><a routerLink="/client-runs" routerLinkActive="active" tabindex="0">Client Runs</a></div>
+        </app-authorized>
+
+        <app-authorized
+          [allOf]="[['/compliance/reporting/stats/summary', 'post'], ['/compliance/reporting/stats/failures', 'post'], ['/compliance/reporting/stats/trend', 'post']]">
+          <div role="menuitem" class="nav-link"><a routerLink="/compliance/reporting" routerLinkActive="active" tabindex="0">Compliance</a></div>
+        </app-authorized>
+
+        <app-authorized [allOf]="[['/compliance/scanner/jobs', 'post'], ['/compliance/scanner/jobs/search', 'post']]">
+          <div role="menuitem" class="nav-link"><a routerLink="/compliance/scanner" routerLinkActive="active" tabindex="0">Scan Jobs</a></div>
+        </app-authorized>
+
+        <app-authorized [allOf]="[['/compliance/profiles/search', 'post']]">
+          <div role="menuitem" class="nav-link"><a routerLink="/profiles" routerLinkActive="active" tabindex="0">Asset Store</a></div>
+        </app-authorized>
+
+        <app-authorized
+          [anyOf]="[['/notifications/rules', 'get'], ['/secrets/search', 'post'], ['/nodemanagers/search', 'post'], ['/retention/nodes/status', 'get'],
+            ['/auth/users', 'get'], ['/auth/teams', 'get'], ['/auth/tokens', 'get'], ['/iam/v2beta/tokens', 'get'],
+            ['/iam/v2beta/policies', 'get'], ['/iam/v2beta/roles', 'get'], ['/iam/v2beta/projects', 'get']] ">
+          <div role="menuitem" class="nav-link"><a routerLink="/settings" routerLinkActive="active" tabindex="0">Settings</a></div>
+        </app-authorized>
+      </div>
+    </div>
+    <div class="right-nav" role="menubar">
+      <app-profile></app-profile>
+    </div>
+  </nav>
+</header>

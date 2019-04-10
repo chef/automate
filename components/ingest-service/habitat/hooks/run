@@ -1,0 +1,81 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+# Setting coming from our default.toml
+CONFIG="--port {{cfg.service.port}}"
+{{~#if cfg.service.purge_converge_history_after_days }}
+CONFIG="$CONFIG --converge-history-days {{cfg.service.purge_converge_history_after_days}}"
+{{~/if}}
+
+{{~#if cfg.service.purge_actions_after_days }}
+CONFIG="$CONFIG --actions-days {{cfg.service.purge_actions_after_days}}"
+{{~/if}}
+
+# If we have a config pointing to an specific host,
+# lets use it, otherwise use the ipaddress of the server
+#
+# Service Host
+{{~#if cfg.service.host}}
+CONFIG="$CONFIG --host {{cfg.service.host}}"
+{{else}}
+CONFIG="$CONFIG --host {{sys.ip}}"
+{{~/if}}
+
+{{~#if cfg.log.level}}
+CONFIG="$CONFIG --log-level {{cfg.log.level}}"
+{{~/if}}
+
+CONFIG="$CONFIG --cert {{pkg.svc_config_path}}/service.crt"
+CONFIG="$CONFIG --key {{pkg.svc_config_path}}/service.key"
+CONFIG="$CONFIG --root-cert {{pkg.svc_config_path}}/root_ca.crt"
+
+# Create the ingest config file
+CONFIG="$CONFIG --config {{pkg.svc_data_path}}/.ingest-service.toml"
+
+# Listen to what our gossip protocol whispers
+#
+# We have modified our plan to have a hard dependency to
+# elasticsearch, that will ensure that we will always start
+# our service with the required bindings
+#
+# Elasticsearch
+{{~#eachAlive bind.automate-es-gateway.members as |member|}}
+{{~#if member.cfg.http-host}}
+addNoProxy {{member.sys.ip}}
+ELASTICSEARCH_URL="http://{{member.sys.ip}}:{{member.cfg.http-port}}"
+{{else}}
+ELASTICSEARCH_URL="http://127.0.0.1:{{member.cfg.http-port}}"
+{{~/if}}
+BACKEND="--elasticsearch-url $ELASTICSEARCH_URL"
+{{~/eachAlive}}
+
+# Bind to ES Sidecar if it's available
+{{~#eachAlive bind.es-sidecar-service.members as |sidecar|}}
+  {{~#if @last}}
+addNoProxy {{sidecar.sys.ip}}
+CONFIG="$CONFIG --es-sidecar-address {{sidecar.sys.ip}}:{{sidecar.cfg.port}}"
+  {{~/if}}
+{{~/eachAlive}}
+
+# Bind to Authz if it's available
+{{~#eachAlive bind.authz-service.members as |authz-service|}}
+  {{~#if @last}}
+addNoProxy {{authz-service.sys.ip}}
+CONFIG="$CONFIG --authz-address {{authz-service.sys.ip}}:{{authz-service.cfg.port}}"
+  {{~/if}}
+{{~/eachAlive}}
+
+# Bind to event if it's available
+{{~#eachAlive bind.event-service.members as |event-service|}}
+  {{~#if @last}}
+addNoProxy {{event-service.sys.ip}}
+CONFIG="$CONFIG --event-address {{event-service.sys.ip}}:{{event-service.cfg.port}}"
+  {{~/if}}
+{{~/eachAlive}}
+
+# Start Ingest Service
+exec ingest-service serve $CONFIG $BACKEND

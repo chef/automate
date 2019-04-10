@@ -1,0 +1,51 @@
+<div class="enterprise tabbed-view">
+  <header class="page-header">
+    <div class="page-header-title">
+      <h2>Audit Log</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="card-filter-wrapper">
+    <div class="audit-filter">
+      <input class="filter" type="text" ng-model="filterText" ng-change="parseFilterText()" ng-keydown="onKeyDown($event)" ng-keyup="onKeyUp($event)" placeholder="Find an item (e.g. status:passed)">
+      <button icon-button="x" class="tiny square secondary" ng-click="clearFilter()" ng-if="filterText"></button>
+    </div>
+  </div>
+  <div class="audit-container">
+    <table class="audit-log">
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Change Title</th>
+          <th>Stage</th>
+          <th>Action</th>
+          <th class="status">Status</th>
+          <th>Event Time</th>
+          <th>Submitted At</th>
+          <th>Submitted By</th>
+          <th>Approved By</th>
+          <th>Delivered By</th>
+        </tr>
+      </thead>
+      <tbody ng-click="onFieldClick($event)">
+        <tr class="audit-log-item" ng-repeat="audit in auditLog | filter:comparisonObj">
+          <td>
+            <a ui-sref="main.enterprise.organizations.organization.project({ org: audit.org, project: audit.proj })">{{ audit.proj }}</a>
+          </td>
+          <td>
+            <a ui-sref="main.enterprise.organizations.organization.project.change({ org: audit.org, project: audit.proj, change: audit.change_id })">{{ audit.change_title }}</a>
+          </td>
+          <td data-field="stage" data-value="{{ audit.stage_name }}"><span>{{ audit.stage_name }}</span></td>
+          <td data-field="action" data-value="{{ audit.action }}"><span>{{ audit.action }}</span></td>
+          <td data-field="status" data-value="{{ audit.status }}"><span status-icon="{{ audit.status }}" title="{{ audit.status }}"></span></td>
+          <td><span>{{ audit.create_time }}</span></td>
+          <td><span>{{ audit.submitted_at }}</span></td>
+          <td data-field="submitted" data-value="{{ audit.submitted_by }}"><span>{{ audit.submitted_by }}</span></td>
+          <td data-field="approved" data-value="{{ audit.approved_by }}"><span>{{ audit.approved_by }}</span></td>
+          <td data-field="delivered" data-value="{{ audit.delivered_by }}"><span>{{ audit.delivered_by }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

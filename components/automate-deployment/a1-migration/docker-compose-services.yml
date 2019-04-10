@@ -1,0 +1,29 @@
+---
+version: '2'
+services:
+  a1-migration:
+    hostname: a1-migration
+    image: chef/a1-migration
+    privileged: true  # so we can run hab
+    mem_limit: 4G
+    expose:
+      - "443"
+    ports:
+      - "443:443"
+    volumes:
+      - ./:/a1-migration
+      - ../../..:/a2
+    # This is needed for building hab packages of a1 data dumps for migration
+    # testing (we forget why exactly, though). But for now it's problematic as
+    # it's persisting some state across runs of the upgrade test environment
+    # which causes weird failure modes.
+    #  - "${HOME}/.hab:/hab"
+    environment:
+      - SERVER_CHANNEL=${SERVER_CHANNEL}
+      - SERVER_VERSION=${SERVER_VERSION}
+      - AUTOMATE_CHANNEL=${AUTOMATE_CHANNEL}
+      - AUTOMATE_VERSION=${AUTOMATE_VERSION}
+      - HAB_ORIGIN=${HAB_ORIGIN}
+    # This is the default CMD in the Dockerfile. If you need to change it, it's
+    # faster to do that here (where you don't need a full image rebuild)
+    # command: ["bash", "-c", "echo 'login and run /a1-migration/run.sh to continue'; exec /sbin/init --show-status=on --log-target=journal 3>&1"]

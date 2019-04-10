@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package chef.automate.api.ingest.response;
+option go_package = "github.com/chef/automate/api/external/ingest/response";
+
+message JobSchedulerStatus {
+  bool running = 1;
+  repeated Job jobs = 2;
+}
+
+message Job {
+  bool running = 1;
+  string name = 2;
+  string every = 3;
+  string last_run = 4;
+  string next_run = 5;
+  string last_elapsed = 6;
+  string started_on = 7;
+  string threshold = 8;
+}
+message StartJobScheduler { }
+message StopJobScheduler { }
+
+// DeleteNodesScheduler
+message DeleteMarkedNodes { }
+message StartDeleteNodesScheduler { }
+message StopDeleteNodesScheduler { }
+message ConfigureDeleteNodesScheduler { }
+
+// MissingNodesForDeletionScheduler
+message MarkMissingNodesForDeletion { }
+message StartMissingNodesForDeletionScheduler { }
+message StopMissingNodesForDeletionScheduler { }
+message ConfigureMissingNodesForDeletionScheduler { }
+
+// NodesMissingScheduler
+message MarkNodesMissing { }
+message StartNodesMissingScheduler { }
+message StopNodesMissingScheduler { }
+message ConfigureNodesMissingScheduler { }

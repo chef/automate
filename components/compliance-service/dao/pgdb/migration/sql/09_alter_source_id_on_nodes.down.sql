@@ -1,0 +1,3 @@
+ALTER TABLE IF EXISTS nodes
+  DROP COLUMN IF EXISTS source_id,
+  DROP COLUMN IF EXISTS date_added;

@@ -1,0 +1,653 @@
+# NOTE(ssd) 2019-02-06: Please explicitly document why a given job is
+# here and not in the public verify pipeline. The more jobs we have in
+# this pipeline, the harder it is for external contributors.
+
+expeditor:
+  defaults:
+    executor:
+      docker:
+        image_sha256: 60245e6090ff677e5f3263c73855ef4dc29082ecff6ab6981cef109391fc253b
+        workdir: /go/src/github.com/chef/automate
+
+steps:
+  # Building hugo currently depends on a github token
+  #     https://github.com/chef/chef-hugo-theme
+  # which is currently private.
+  - label: lint hugo site
+    command:
+      - .expeditor/buildkite/hugo_lint.sh
+      - cd components/automate-chef-io && make lint
+    timeout_in_minutes: 10
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      secrets:
+        GITHUB_TOKEN:
+          account: github/chef-ci
+          field: token
+      executor:
+        docker:
+
+  # license scout requires github account access because we currently
+  # rely on at least 2 private repositories.
+  - label: license scout
+    command:
+      # here we reuse the license_scout.sh script used by expeditor to publish the manifest
+      - .expeditor/license_scout.sh
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      secrets:
+        GITHUB_TOKEN:
+          account: github/chef-ci
+          field: token
+      executor:
+        docker:
+
+  # The build technically depends on AWS access to build
+  # automate-compliance-profiles even though we don't currently have
+  # it piped in here. Further we need to build in order to run the
+  # integration tests.
+  - label: build
+    command:
+      - scripts/verify_build
+    timeout_in_minutes: 45
+    env:
+      ALLOW_LOCAL_PACKAGES: true
+      HAB_STUDIO_SUP: false
+      HAB_NONINTERACTIVE: true
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+
+  - label: "[unit] license-control-service"
+    command:
+      - scripts/install_golang
+      - echo "\$A2_LICENSE" > dev/license.jwt
+      - cd components/license-control-service
+      - make setup review test
+    timeout_in_minutes: 10
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        docker:
+
+  - label: "[unit] trial-license-service"
+    command:
+      - scripts/install_golang
+      - echo "\$A2_LICENSE" > dev/license.jwt
+      - cd components/trial-license-service
+      - make static unit
+    timeout_in_minutes: 10
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        docker:
+
+  # Wait for the build to complete before starting anything below this
+  # directive. All tests below this wait either require build assets
+  # or take a long time.
+  - wait
+
+  - label: "[integration] applications-service"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/applications-service --with-deps && applications_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  # The nodemanager tests require access to AWS and Azure accounts as
+  # they test against the actual API endpoints of those services.
+  - label: "[integration] nodemanager-integration-tests"
+    command:
+      - . scripts/verify_setup
+      - |
+        hab studio run "source scripts/verify_studio_init &&
+          start_deployment_service &&
+          chef-automate dev deploy-some chef/compliance-service --with-deps &&
+          nodemanager_scans_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      secrets:
+        HAB_STUDIO_SECRET_AZURE_CLIENT_ID:
+          account: azure/inspec
+          field: client_id
+        HAB_STUDIO_SECRET_AZURE_CLIENT_SECRET:
+          account: azure/inspec
+          field: client_secret
+        HAB_STUDIO_SECRET_AZURE_TENANT_ID:
+          account: azure/inspec
+          field: tenant_id
+        HAB_STUDIO_SECRET_AWS_ACCESS_KEY_ID:
+          account: aws/chef-cd
+          field: access_key_id
+        HAB_STUDIO_SECRET_AWS_SECRET_ACCESS_KEY:
+          account: aws/chef-cd
+          field: secret_access_key
+        HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
+          account: aws/chef-cd
+          field: session_token
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  # The license_usage_nodes_test appears to require AWS access. We
+  # might consider splitting this into two different tests.
+  - label: "[integration] gateway-integration-tests"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_all_services && go_test components/automate-gateway/integration/license_usage_nodes_test.go && go_test components/automate-gateway/integration/nodes_test.go"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      accounts:
+        - aws/chef-cd
+      secrets:
+        HAB_STUDIO_SECRET_AWS_ACCESS_KEY_ID:
+          account: aws/chef-cd
+          field: access_key_id
+        HAB_STUDIO_SECRET_AWS_SECRET_ACCESS_KEY:
+          account: aws/chef-cd
+          field: secret_access_key
+        HAB_STUDIO_SECRET_AWS_SESSION_TOKEN:
+          account: aws/chef-cd
+          field: session_token
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_HOST:
+          path: secret/a2/testing/target_host
+          field: data
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_HOST2:
+          path: secret/a2/testing/target_host2
+          field: data
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_USERNAME:
+          path: secret/a2/testing/target_username
+          field: data
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_PASSWORD:
+          path: secret/a2/testing/target_password
+          field: data
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] automate-gateway-iam-v1"
+    command:
+      - . scripts/verify_setup
+      - |
+        hab studio run "source scripts/verify_studio_init &&
+          start_deployment_service &&
+          chef-automate dev deployinate &&
+          gateway_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] automate-gateway-iam-v2"
+    command:
+      - . scripts/verify_setup
+      - |
+        hab studio run "source scripts/verify_studio_init &&
+          start_deployment_service &&
+          chef-automate dev deployinate &&
+          chef-automate iam upgrade-to-v2 &&
+          remove_legacy_v1_policies &&
+          gateway_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] secrets-service"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/secrets-service --with-deps && secrets_integration"
+    timeout_in_minutes: 10
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] es-sidecar-service"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/es-sidecar-service --with-deps && es_sidecar_service_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] ingest-service"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/ingest-service --with-deps && ingest_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+            - REST_SERVICE=https://localhost:10122
+
+  - label: "[integration] compliance-service"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/compliance-service --with-deps && compliance_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] config-mgmt-service"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/automate-elasticsearch --with-deps && config_mgmt_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] event-service"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deployinate && event_integration"
+    timeout_in_minutes: 10
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] event-gateway"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deployinate && event_gateway_integration"
+    timeout_in_minutes: 10
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] compliance-feed-service"
+    command:
+      - . scripts/verify_setup
+      - |
+        hab studio run "source scripts/verify_studio_init &&
+          start_deployment_service &&
+          chef-automate dev deploy-some chef/data-lifecycle-service --with-deps &&
+          feed_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  - label: "[integration] pg-sidecar-service"
+    command:
+      - . scripts/verify_setup
+      - |
+        hab studio run "source scripts/verify_studio_init &&
+        start_deployment_service &&
+        chef-automate dev deploy-some chef/pg-sidecar-service --with-deps &&
+        pg_sidecar_integration"
+    timeout_in_minutes: 10
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
+  #
+  # The following tests all use the integration test framework for
+  # end-to-end testing. These tests all test full deployments of
+  # Automate in different configurations.
+  #
+  - label: "[integration] iam v2 (migrated)"
+    command:
+      - integration/run_test integration/tests/iam_v2.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] iam v2 (v2 only)"
+    command:
+      - integration/run_test integration/tests/iam_v2_only.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] data-lifecycle-service"
+    command:
+      - integration/run_test integration/tests/data_lifecycle.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] a1migration"
+    command:
+      - integration/run_test integration/tests/a1migration.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] airgap a1migration"
+    command:
+      - integration/run_test integration/tests/airgap_a1migration.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] product"
+    command:
+      - integration/run_test integration/tests/product.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] product deployment stress mode"
+    command:
+      - integration/run_test integration/tests/product_deployment_stress.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] product airgap"
+    command:
+      - integration/run_test integration/tests/airgap_product.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] airgap upgrade"
+    command:
+      - integration/run_test integration/tests/airgap_upgrade.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] airgap backup"
+    command:
+      - integration/run_test integration/tests/airgap_backup.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] chef server"
+    command:
+      - integration/run_test integration/tests/chef_server.sh
+    timeout_in_minutes: 30 # longer timeout for chef-server
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] workflow"
+    command:
+      - integration/run_test integration/tests/workflow.sh
+    timeout_in_minutes: 30 # longer timeout for workflow
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] backup to s3"
+    command:
+      - integration/run_test integration/tests/backup_s3.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] ontop backup "
+    command:
+      - integration/run_test integration/tests/backup_ontop.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] backup w external es"
+    command:
+      - integration/run_test integration/tests/backup_external_es.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] upgrade dev -> master"
+    command:
+      - integration/run_test integration/tests/upgrade.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] upgrade acceptance -> master"
+    command:
+      - integration/run_test integration/tests/upgrade_acceptance_master.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] upgrade current -> master"
+    command:
+      - integration/run_test integration/tests/upgrade_current_master.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] manual upgrade current -> master"
+    command:
+      - integration/run_test integration/tests/manual_upgrade.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] deep upgrades"
+    command:
+      - integration/run_test integration/tests/deep_upgrade.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] deep migrate upgrade"
+    command:
+      - integration/run_test integration/tests/migrate_upgrade.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: "[integration] backups"
+    command:
+      - integration/run_test integration/tests/backup.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] reset admin access v1"
+    command:
+      - integration/run_test integration/tests/reset_admin_access_v1.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] reset admin access v2"
+    command:
+      - integration/run_test integration/tests/reset_admin_access_v2.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] upgrade / reset IAM v2"
+    command:
+      - integration/run_test integration/tests/upgrade_reset_iam_v2.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] security"
+    command:
+      - integration/run_test integration/tests/security.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "[integration] ha data services"
+    command:
+      - integration/run_test integration/tests/ha_data_services.sh
+    timeout_in_minutes: 35
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true

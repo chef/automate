@@ -1,0 +1,146 @@
+#!/bin/bash
+#
+# This file is the place we will put all the chef-load functionality
+#
+
+# Load data to config-mgmt-service continuously
+document "chef_load_start" <<DOC
+  Start the ingestion of nodes, actions and/or reports. (depends on automate-gateway & ingest-service)
+
+  This method will start the ingestion of data through the data-collector endpoint. (/events/data-collector)
+
+  Example: Start ingesting 10 nodes and 10 actions every 5 minutes
+  -------------------------
+  chef_load_start
+DOC
+function chef_load_start() {
+  local nodes=${1:-10}
+  local actions=${2:-10}
+  local interval=${3:-5}
+  prepare_chef_load
+
+  chef-load start --config /tmp/chef-load.toml -a $actions -n $nodes -i $interval
+}
+
+# Generate config-mgmt chef actions
+document "chef_load_actions" <<DOC
+  Load a number of Chef Actions to Chef Automate. (depends on automate-gateway & ingest-service)
+
+  This method will ensure that the automate-gateway and the ingest-service are up and
+  running (with its dependencies) and then it will load the specified number of Chef Actions
+  through the data-collector endpoint. (/events/data-collector)
+
+  Example: Load 100 actions
+  -------------------------
+  chef_load_actions 100
+DOC
+function chef_load_actions() {
+  local actions=${1:-10}
+  prepare_chef_load
+  pushd /src >/dev/null;
+    chef-load generate --config /tmp/chef-load.toml -a $actions
+    local EXIT_CODE=$?;
+  popd >/dev/null;
+  return $EXIT_CODE;
+}
+
+# Generate compliance-service reports (CCRs)
+document "chef_load_compliance_scans" <<DOC
+  Load the provided number of inspec reports to Chef Automate. (depends on automate-gateway & compliance-service)
+
+  This method will ensure that the automate-gateway is up and running (with its
+  dependencies) and then it will load a number of inspec scans through the data-collector
+  endpoint. (/events/data-collector)
+
+  Example: Load compliance reports from 100 nodes going back 3 days
+  -----------------------
+  chef_load_compliance_scans -N100 -D3
+    or (the following will work equally well)
+  chef_load_compliance_scans -N 100 -D 3
+DOC
+function chef_load_compliance_scans() {
+  local OPTIND opt 
+  local reporting_nodes=1
+  local days_back=1
+  local max_scans=1
+  local total_max_scans=10
+  local format="full"
+
+  while getopts ":N:D:M:T:F:" opt; do
+    case $opt in
+      N) reporting_nodes="$OPTARG"
+      ;;
+      D) days_back="$OPTARG"
+      ;;
+      M) max_scans="$OPTARG"
+      ;;
+      T) total_max_scans="$OPTARG"
+      ;;
+      F) format="$OPTARG"
+      ;;
+      \?) echo "Invalid option -$OPTARG" >&2
+      ;;
+      : )
+      echo "Invalid option: $OPTARG requires an argument" 1>&2
+      ;;
+    esac
+  done
+  shift $((OPTIND -1))
+
+  prepare_chef_load
+  pushd /src >/dev/null;
+    chef-load generate --config /tmp/chef-load.toml -N $reporting_nodes -D $days_back -M $max_scans -T $total_max_scans -F $format
+    local EXIT_CODE=$?;
+  popd >/dev/null;
+  return $EXIT_CODE;
+}
+
+# Generate config-mgmt chef nodes (CCRs)
+document "chef_load_nodes" <<DOC
+  Load the provided number of nodes to Chef Automate. (depends on automate-gateway & ingest-service)
+
+  This method will ensure that the automate-gateway is up and running (with its
+  dependencies) and then it will load a number of nodes through the data-collector
+  endpoint. (/events/data-collector)
+
+  Example: Load 100 nodes
+  -----------------------
+  chef_load_nodes 100
+DOC
+function chef_load_nodes() {
+  local nodes=${1:-50}
+  prepare_chef_load
+  pushd /src >/dev/null;
+    chef-load generate --config /tmp/chef-load.toml -n $nodes
+    local EXIT_CODE=$?;
+  popd >/dev/null;
+  return $EXIT_CODE;
+}
+
+document "chef_load_liveness_ping" <<DOC
+  Load the provided number of nodes triggering a liveness ping to Chef Automate. (depends on automate-gateway & ingest-service)
+
+  Example: Load 100 nodes with its liveness agent ping
+  -----------------------
+  chef_load_liveness_ping 100
+DOC
+function chef_load_liveness_ping() {
+  local nodes=${1:-50}
+  prepare_chef_load
+  pushd /src >/dev/null;
+    chef-load generate --config /tmp/chef-load.toml -n $nodes --liveness_agent
+    local EXIT_CODE=$?;
+  popd >/dev/null;
+  return $EXIT_CODE;
+}
+
+# prepare_chef_load verifies that the gateway and ingest services are up and running for
+# ingestion into the data-collector endpoint. it also installs chef-load for execution
+function prepare_chef_load() {
+  check_if_deployinate_started || return 1
+  cp components/ingest-service/chef-load-data/chef-load.toml /tmp/chef-load.toml
+  sed -i "s/REPLACE_ME_VIA_HAB/$(get_admin_token)/g" /tmp/chef-load.toml
+  install_if_missing core/busybox-static netstat;
+  install_if_missing chef/chef-load chef-load;
+}
+

@@ -1,0 +1,12 @@
+{
+    "filter": {
+        "must": [
+            {
+                "cookbooks": "cookbook_name"
+            },
+            {
+                "roles": "role_name"
+            }
+        ]
+    }
+}

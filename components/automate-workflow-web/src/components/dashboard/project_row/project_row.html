@@ -1,0 +1,121 @@
+<div class="item project-item" ng-click="toggle()" ng-class="{ open: project.open }">
+  <div class="metadata">
+    <span class="status-icon toggle-icon" ng-class="{ plus: !project.open, minus: project.open }"></span>
+    <div class="name project-name">
+      <a ui-sref="main.enterprise.organizations.organization.project({ org: project.changes[0].org, project: project.changes[0].project })"
+         ng-click="$event.stopPropagation()">
+        {{ project.name }}
+      </a>
+    </div>
+    <div>
+      {{ project.org }} &bull;
+      {{ project.changes.length }}
+      <ng-pluralize count="project.changes.length"
+        when="{'1': 'change', 'other': 'changes'}"></ng-pluralize>
+    </div>
+  </div>
+  <div class="stage-status">
+    <div class="stage">
+      <div class="status running"
+        ng-if="project.stats.verify.running" bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ project.stats.verify.running }} running in Verify"
+        ng-click="applyFilter($event, 'stage:verify status:running')">
+        <span class="status-icon running"></span>
+        <span class="count">{{ project.stats.verify.running }}</span>
+      </div>
+      <div class="status failed"
+        ng-if="project.stats.verify.failed" bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ project.stats.verify.failed }} failed in Verify"
+        ng-click="applyFilter($event, 'stage:verify status:failed')">
+          <span class="status-icon failed"></span>
+          <span class="count">{{ project.stats.verify.failed }}</span>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="status passed"
+        ng-if="project.stats.verify.passed" bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ project.stats.verify.passed }} ready to approve"
+        ng-click="applyFilter($event, 'stage:verify status:passed')">
+        <span class="status-icon waiting"></span>
+        <span class="count">{{ project.stats.verify.passed }}</span>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="status running"
+        ng-if="project.stats.build.running" bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ project.stats.build.running }} running in Build"
+        ng-click="applyFilter($event, 'stage:build status:running')">
+        <span class="status-icon running"></span>
+        <span class="count">{{ project.stats.build.running }}</span>
+      </div>
+      <div class="status failed"
+        ng-if="project.stats.build.failed" bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ project.stats.build.failed }} failed in Build"
+        ng-click="applyFilter($event, 'stage:build status:failed')">
+        <span class="status-icon failed"></span>
+        <span class="count">{{ project.stats.build.failed }}</span>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="status running"
+        ng-if="project.stats.acceptance.running" bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ project.stats.acceptance.running }} running in Acceptance"
+        ng-click="applyFilter($event, 'stage:acceptance status:running')">
+        <span class="status-icon running"></span>
+        <span class="count">{{ project.stats.acceptance.running }}</span>
+      </div>
+      <div class="status failed"
+        ng-if="project.stats.acceptance.failed" bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ project.stats.acceptance.failed }} failed in Acceptance"
+        ng-click="applyFilter($event, 'stage:acceptance status:failed')">
+        <span class="status-icon failed"></span>
+        <span class="count">{{ project.stats.acceptance.failed }}</span>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="status passed"
+        ng-if="project.stats.acceptance.passed" bs-tooltip data-delay="800" data-placement="left"
+        data-title="{{ project.stats.acceptance.passed }} ready to deliver"
+        ng-click="applyFilter($event, 'stage:acceptance status:passed')">
+        <span class="status-icon waiting"></span>
+        <span class="count">{{ project.stats.acceptance.passed }}</span>
+      </div>
+    </div>
+    <div class="stage"></div>
+    <div class="stage"></div>
+    <div class="stage"></div>
+  </div>
+</div>
+<div ng-repeat="change in project.changes track by change.id" ng-if="project.open">
+  <div cd-change-row change="change"></div>
+  <div class="included" ng-if="change.includes.length > 0">
+    <h3>
+      &mdash; Includes the following
+      <span ng-if="change.includes.length > 1">{{ change.includes.length }}</span>
+      <ng-pluralize count="change.includes.length"
+        when="{'1': 'change', 'other': 'changes'}"></ng-pluralize>,
+      previously merged:
+    </h3>
+    <div ng-repeat="included in change.includes track by included.id">
+      <div class="item change-item">
+        <div class="metadata">
+          <div class="name">
+            <a ui-sref="main.enterprise.organizations.organization.project.change({ org: included.org, project: included.project, change: included.id })">
+              {{ included.title }}
+            </a>
+          </div>
+          <div>
+            <time datetime="{{ included.submitted_at }}">
+              {{ included.submitted_at | moment:'MMMM D, YYYY h:mm A' }}
+            </time> by
+            <span class="submitter">{{ included.submitter }}</span>
+          </div>
+          <div class="org-project">
+            <span>{{ included.org }}</span> /
+            <span>{{ included.project }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

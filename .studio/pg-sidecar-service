@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Helper methods specific for the pg-sidecar-service
+
+# Run Integration tests for the pg-sidecar-service
+document "pg_sidecar_integration" <<DOC
+  Runs the integration tests for the automate-platform-tools
+DOC
+function pg_sidecar_integration() {
+  check_if_deployinate_started || start_deployment_service
+  chef-automate dev deploy-some chef/pg-sidecar-service --with-deps
+  go_test -v ./components/pg-sidecar-service/integration/...
+}

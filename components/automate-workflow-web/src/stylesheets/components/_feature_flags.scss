@@ -1,0 +1,45 @@
+.feature-flags {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: #fff;
+  border-radius: 5px;
+  border: 1px solid lighten($midnight, 18%);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  color: #444;
+
+  h1 {
+    font-size: 18px;
+    font-family: $helvetica;
+    font-weight: 400;
+    border-bottom: 1px solid $lightgray;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .feature-flags-flag {
+    border-bottom: 1px solid $lightgray;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+
+    &:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .feature-flags-name {
+      font-family: $helvetica;
+      font-weight: 600;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .feature-flags-desc {
+      font-size: 14px;
+      margin: 10px 0;
+    }
+  }
+}

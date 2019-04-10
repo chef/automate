@@ -1,0 +1,104 @@
+@import "~styles/variables";
+
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.chart,
+.legend {
+  flex-grow: 1;
+}
+
+.chart {
+  flex-basis: 60%;
+  max-width: 300px;
+
+  ::ng-deep {
+    .failed {
+      color: $chef-critical;
+    }
+
+    .passed {
+      color: $chef-success;
+    }
+
+    .skipped {
+      color: $chef-grey;
+    }
+
+    .critical {
+      color: $chef-critical;
+    }
+
+    .major {
+      color: $chef-major;
+    }
+
+    .minor {
+      color: $chef-minor;
+    }
+
+    .remainder {
+      color: transparent;
+    }
+  }
+}
+
+.legend {
+  margin: 0;
+  padding: 0 1em;
+  flex-basis: 40%;
+  list-style: none;
+
+  .legend-item-total,
+  .legend-item-label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .legend-item-total {
+    font-size: 26px;
+  }
+
+  .legend-item-label {
+    margin: 0 0 1em 0;
+    min-width: 100px;
+    flex-basis: 100px;
+    font-size: 12px;
+    white-space: nowrap;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    span {
+      display: block;
+      width: 100px;
+    }
+
+    .legend-item-status {
+      width: 8px;
+      height: 8px;
+      flex-basis: 8px;
+      border-radius: 50%;
+      background: $chef-grey;
+
+      &.failed {
+        background: $chef-critical;
+      }
+
+      &.passed {
+        background: $chef-success;
+      }
+
+      &.skipped {
+        background: $chef-grey;
+      }
+    }
+  }
+}

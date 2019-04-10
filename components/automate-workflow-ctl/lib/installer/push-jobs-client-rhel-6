@@ -1,0 +1,102 @@
+#!/bin/bash
+#
+# push-jobs-client
+#
+# chkconfig: 345 70 30
+# description: The Chef Push Jobs client
+# processname: push-jobs-client
+
+
+# source common function library
+. /etc/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "$NETWORKING" = "no" ] && exit 0
+
+PATH=/opt/chefdk/bin:/opt/chefdk/embedded/bin:$PATH
+lockfile=/var/lock/subsys/push-jobs-client
+pushclient=/opt/chefdk/bin/pushy-client
+prog=$(basename $pushclient)
+
+start() {
+	echo -n "Starting Push Jobs Client"
+        # daemon lives in 'functions'
+        daemon $pushclient -l info  -c /etc/chef/push-jobs-client.rb > /var/log/push-jobs-client/current 2>&1 &
+	retval=$?
+	echo
+	[ $retval -eq 0 ] && touch $lockfile
+	return $retval
+}
+
+stop() {
+       	echo -n "Terminating Push Jobs Client"
+        # killproc lives in 'functions'
+        killproc $prog -QUIT
+        retval=$?
+	echo
+	[ $retval -eq 0 ] && rm -f $lockfile
+	return $retval
+}
+
+restart() {
+	stop
+	start
+}
+
+reload() {
+        echo "Reloading Push Jobs Client Configuration"
+	echo -n "Reload not supported, use restart"
+	killproc $prog -USR1
+}
+
+force_reload() {
+	restart
+}
+
+rh_status() {
+	status $prog
+}
+
+rh_status_q() {
+	rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+    start)
+	# only start if not running
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+	# only stop if running
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart|configtest)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+	    ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restartcondrestart|try-restart|reload|force-reload}"
+        exit 2
+esac
+
+
+
+
+

@@ -1,0 +1,180 @@
+<!--Tabs (Node Status, Profile Status)-->
+<chef-toggle class="overview-tabs" (change)="onSelectedTab($event)">
+  <chef-option value='Node Status'>Node Status</chef-option>
+  <chef-option value='Profile Status'>Profile Status</chef-option>
+</chef-toggle>
+
+<!--Overview - Node Status Tab-->
+<div *ngIf="selectedButtonTab === 'Node Status'">
+  <div class="summary-row">
+    <figure>
+      <div class="figure-content">
+        <chef-loading-spinner *ngIf="nodeRadialLoading" size="60"></chef-loading-spinner>
+        <div class="figure-empty" *ngIf="!nodeRadialLoading && nodeRadialEmpty">
+          <img src="/assets/img/radial.svg" alt="">
+          <p>Global compliance status for your nodes will be displayed here.</p>
+        </div>
+        <app-overview-status
+          *ngIf="!nodeRadialLoading && !nodeRadialEmpty"
+          [data]="nodeRadialData"
+          type="nodes">
+        </app-overview-status>
+      </div>
+      <figcaption>Node Status</figcaption>
+    </figure>
+
+    <figure>
+      <div class="figure-content">
+        <chef-loading-spinner *ngIf="nodeRadialLoading" size="60"></chef-loading-spinner>
+        <div class="figure-empty" *ngIf="!nodeRadialLoading && nodeRadialEmpty">
+          <img src="/assets/img/radial.svg" alt="">
+          <p>Severity levels for your nodes will be displayed here.</p>
+        </div>
+        <app-overview-severity
+          *ngIf="!nodeRadialLoading && !nodeRadialEmpty"
+          [data]="nodeRadialData"
+          type="nodes">
+        </app-overview-severity>
+      </div>
+      <figcaption>Severity of Node Failures</figcaption>
+    </figure>
+  </div>
+
+  <div class="trend-row">
+    <figure>
+      <label class="interval">
+        <span>Showing:</span>
+        <chef-select (change)="onTrendIntervalChange($event)" [value]="reportQuery.interval">
+          <chef-option
+            *ngFor="let interval of reportQuery.intervals; index as i"
+            [value]="i">
+            {{interval[0]}}
+          </chef-option>
+        </chef-select>
+        <chef-loading-spinner *ngIf="nodeTrendLoading" size="16"></chef-loading-spinner>
+      </label>
+      <app-overview-trend [data]="nodeTrendData" type="nodes"></app-overview-trend>
+      <figcaption>Node Status Over Time</figcaption>
+    </figure>
+  </div>
+
+  <div class="failures-row">
+    <figure>
+      <div class="figure-content">
+        <chef-loading-spinner *ngIf="nodeBubbleLoading" size="60"></chef-loading-spinner>
+        <div class="figure-empty" *ngIf="!nodeBubbleLoading && platformBubbleEmpty">
+          <img src="/assets/img/bubble.svg" alt="">
+          <p>Important compliance scan failures by platform will be displayed here.</p>
+        </div>
+        <app-overview-failures
+          *ngIf="!nodeBubbleLoading && !platformBubbleEmpty"
+          [data]="bubblePlatformFailures">
+        </app-overview-failures>
+      </div>
+      <figcaption>Top Platform Failures</figcaption>
+    </figure>
+
+    <figure>
+      <div class="figure-content">
+        <chef-loading-spinner *ngIf="nodeBubbleLoading" size="60"></chef-loading-spinner>
+        <div class="figure-empty" *ngIf="!nodeBubbleLoading && envBubbleEmpty">
+          <img src="/assets/img/bubble.svg" alt="">
+          <p>Important compliance scan failures by environment will be displayed here.</p>
+        </div>
+        <app-overview-failures
+          *ngIf="!nodeBubbleLoading && !envBubbleEmpty"
+          [data]="bubbleEnvFailures">
+        </app-overview-failures>
+      </div>
+      <figcaption>Top Environment Failures</figcaption>
+    </figure>
+  </div>
+</div>
+
+<!--Overview - Profile Status Tab-->
+<div *ngIf="selectedButtonTab === 'Profile Status'">
+
+  <div class="summary-row">
+    <figure>
+      <div class="figure-content">
+        <chef-loading-spinner *ngIf="profileRadialLoading" size="60"></chef-loading-spinner>
+        <div class="figure-empty" *ngIf="!profileRadialLoading && profileRadialEmpty">
+          <img src="/assets/img/radial.svg" alt="">
+          <p>Global compliance status for your controls will be displayed here.</p>
+        </div>
+        <app-overview-status
+          *ngIf="!profileRadialLoading && !profileRadialEmpty"
+          [data]="profileRadialData"
+          type="controls">
+        </app-overview-status>
+      </div>
+      <figcaption>Control Status</figcaption>
+    </figure>
+
+    <figure>
+      <div class="figure-content">
+        <chef-loading-spinner *ngIf="profileRadialLoading" size="60"></chef-loading-spinner>
+        <div class="figure-empty" *ngIf="!profileRadialLoading && profileRadialEmpty">
+          <img src="/assets/img/radial.svg" alt="">
+          <p>Severity levels for your controls will be displayed here.</p>
+        </div>
+        <app-overview-severity
+          *ngIf="!profileRadialLoading && !profileRadialEmpty"
+          [data]="profileRadialData"
+          type="controls">
+        </app-overview-severity>
+      </div>
+      <figcaption>Severity of Control Failures</figcaption>
+    </figure>
+  </div>
+
+  <div class="trend-row">
+    <figure>
+      <label class="interval">
+        <span>Showing:</span>
+        <chef-select (change)="onTrendIntervalChange($event)" [value]="reportQuery.interval">
+          <chef-option
+            *ngFor="let interval of reportQuery.intervals; index as i"
+            [value]="i">
+            {{interval[0]}}
+          </chef-option>
+        </chef-select>
+        <chef-loading-spinner *ngIf="profileTrendLoading" size="16"></chef-loading-spinner>
+      </label>
+      <app-overview-trend [data]="profileTrendData" type="controls"></app-overview-trend>
+      <figcaption>Control Status Over Time</figcaption>
+    </figure>
+  </div>
+
+  <div class="failures-row">
+    <figure>
+      <div class="figure-content">
+        <chef-loading-spinner *ngIf="profileBubbleLoading" size="60"></chef-loading-spinner>
+        <div class="figure-empty" *ngIf="!profileBubbleLoading && profileBubbleEmpty">
+          <img src="/assets/img/bubble.svg" alt="">
+          <p>Important compliance scan failures by profile will be displayed here.</p>
+        </div>
+        <app-overview-failures
+          *ngIf="!profileBubbleLoading && !profileBubbleEmpty"
+          [data]="bubbleProfileFailures">
+        </app-overview-failures>
+      </div>
+      <figcaption>Top Profile Failures</figcaption>
+    </figure>
+
+    <figure>
+      <div class="figure-content">
+        <chef-loading-spinner *ngIf="profileBubbleLoading" size="60"></chef-loading-spinner>
+        <div class="figure-empty" *ngIf="!profileBubbleLoading && controlBubbleEmpty">
+          <img src="/assets/img/bubble.svg" alt="">
+          <p>Important compliance scan failures by control will be displayed here.</p>
+        </div>
+        <app-overview-failures
+          *ngIf="!profileBubbleLoading && !controlBubbleEmpty"
+          [data]="bubbleControlFailures">
+        </app-overview-failures>
+      </div>
+      <figcaption>Top Control Failures</figcaption>
+    </figure>
+  </div>
+</div>

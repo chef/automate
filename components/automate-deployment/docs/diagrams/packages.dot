@@ -1,0 +1,24 @@
+digraph "package_map" {
+	fontsize = "60"
+
+	node [shape=box, fontsize=30]
+
+	edge [labeldistance=5, labelangle=30, minlen=5, fontsize=40]
+
+	actions -> deployment
+	actions -> services
+	actions -> target        
+	cli -> client
+	client -> deployment
+	client -> target        
+	deployment
+	main -> cli
+	main -> deployment
+	main -> server        
+	server -> actions
+	server -> deployment
+	server -> services
+	server -> target        
+	services
+	target
+}

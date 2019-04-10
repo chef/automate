@@ -1,0 +1,210 @@
+.sidebar-view {
+  @include clearfix;
+
+  .sidebar {
+    display: block;
+    width: $global-sidebar-width;
+    position: fixed;
+    top: 80px;
+    bottom: 0;
+    left: 0;
+    z-index: 190;
+    padding: 0 0 2rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: $chef-blue-dark;
+
+    li:first-child a {
+      padding: 26px 1.25em 22px;
+      border-bottom: 1px solid white;
+    }
+
+    a {
+      display: block;
+      position: relative;
+      padding: .75em 1.25em;
+      color: darken($gray-pale, 5%);
+      text-decoration: none;
+      font-size: .875em;
+      font-weight: 300;
+      transition: color .2s;
+
+      .text {
+        display: inline-block;
+        margin-left: .25em;
+      }
+
+      .fa-caret-right {
+        display: none;
+        position: absolute;
+        right: 1em;
+        top: 50%;
+        margin-top: -7px;
+        color: $chef-orange;
+      }
+
+      &:hover, &.active {
+        color: $white;
+        background-color: rgba($white, 0.05);
+        transition: color .2s;
+      }
+
+      &.active {
+
+        .fa-caret-right {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .content {
+    margin-left: $global-sidebar-width;
+
+    .tab-controls {
+      @include clearfix;
+
+      .label {
+        font-size: 14px;
+        color: lighten($darkgrayblue, 5%);
+        vertical-align: middle;
+        display: inline-block;
+        margin-left: 8px;
+      }
+
+      section.left {
+        float: left;
+      }
+
+      section.right {
+        float: right;
+        margin-left: 8px;
+      }
+
+      .add-a-thing {
+        background-color: $greydisabled;
+
+        div {
+          cursor: pointer;
+        }
+      }
+
+      form {
+        clear: both;
+      }
+    }
+
+    .sidebar-content-title {
+      font-family: $heading-font;
+      font-weight: 400;
+      color: $storm;
+    }
+
+    .form-container {
+      @include row();
+      @include pad(1rem 2rem);
+
+      hr {
+        display: block;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid $gray-pale;
+        margin: 1.5em 0;
+      }
+    }
+
+    form {
+      @include modal-box();
+      @include span-columns(6);
+
+      @include media($laptop-down) {
+        @include span-columns(9);
+      }
+
+      @include media($medium-down) {
+        @include span-columns(12);
+      }
+
+      h3 {
+        margin: 0 0 1rem;
+      }
+
+      p {
+        font-size: .875rem;
+      }
+
+      fieldset {
+        margin: 0 0 .5rem;
+        padding: 0;
+        border: 0;
+
+        legend {
+          margin-bottom: .5rem;
+          border: none;
+          background: none;
+          padding: 0;
+          top: auto;
+          font-size: .875rem;
+        }
+
+        legend.smallLegend {
+          color: $grayblue;
+          font-weight: 400;
+          font-size: .75rem;
+          padding: 0px;
+          text-transform: uppercase;
+        }
+
+        .field {
+          padding-left: 0;
+          overflow: visible;
+
+          .required-indicator {
+            left: -12px;
+            top: 8px;
+          }
+
+          .little-title + .required-indicator {
+            left: -10px;
+            top: 22px;
+          }
+
+          .button-container {
+            text-align: right;
+
+            button {
+              padding: .5rem 1rem;
+              font-size: .75rem;
+            }
+          }
+        }
+
+        .field-tooltip {
+          color: lighten($darkgrayblue, 5%);
+          float: right;
+          margin-right: -20px;
+          margin-top: 15px;
+        }
+      }
+
+      .form-controls {
+        margin-top: 1.5rem;
+        clear: both;
+
+        .button + .button {
+          margin-left: .5rem;
+        }
+      }
+
+      &.edit-project-form,
+      &.edit-org-form,
+      &.edit-user-form {
+        @include span-columns(9);
+        margin: 2rem 0 1rem;
+        padding: 0;
+        box-shadow: none;
+        border: 0;
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+[service]
+host = "0.0.0.0"
+port = 4222
+gateway_port = 10147
+enabled = true
+
+[log]
+log_format = "text"
+log_level = "debug"
+
+[tls]
+# This service can't really work unless AuthN, AuthZ and event-service are up.
+# So hard-code to the studio:
+cert_path     = "/hab/svc/deployment-service/data/deployment-service.crt"
+key_path      = "/hab/svc/deployment-service/data/deployment-service.key"
+root_ca_path  = "/hab/svc/deployment-service/data/root.crt"
+
+[internal_event_service]
+host = "localhost"
+gateway_port = 10148
+
+[auth]
+authn_endpoint = "localhost:10113"
+authz_endpoint = "localhost:10130"
+
+
+

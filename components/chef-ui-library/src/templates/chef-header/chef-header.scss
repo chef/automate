@@ -1,0 +1,9 @@
+chef-header {
+  grid-area: header;
+
+  // Styles for IE fallback of CSS Grids
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 6;
+  display: block;
+}

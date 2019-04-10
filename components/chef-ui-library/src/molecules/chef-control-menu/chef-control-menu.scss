@@ -1,0 +1,100 @@
+chef-control-menu {
+  outline: none;
+  border-radius: var(--chef-border-radius);
+  border-color: chef-hsl(var(--chef-primary-dark));
+  box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-primary-dark)) inset;
+  display: inline-block;
+  background-color: chef-hsl(var(--chef-white));
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+
+  .control-menu {
+    display: block;
+    border-radius: inherit;
+    margin-bottom: 2px;
+
+    chef-icon {
+      height: 16px;
+      width: 16px;
+      margin: 8px;
+    }
+
+    &:not(.disabled) .control-menu {
+      cursor: pointer;
+    }
+
+    &:hover {
+      background-color: chef-hsl(var(--chef-primary-bright));
+      color: chef-hsl(var(--chef-white));
+      box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-primary-bright)) inset;
+    }
+  }
+
+  &.disabled .control-menu {
+    background-color: chef-hsl(var(--chef-white));
+    color: chef-hsl(var(--chef-dark-grey));
+
+    &:hover {
+      box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-white)) inset;
+    }
+  }
+
+  &.active .control-menu {
+    z-index: 102;
+  }
+
+  .options {
+    width: 100%;
+    position: relative;
+  }
+
+  chef-dropdown {
+    box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-light-grey)) inset;
+    z-index: 101;
+    right: 0;
+    text-align: left;
+  }
+
+  chef-option {
+    display: block;
+    padding: 8px 23px;
+    border-bottom: 1px solid chef-hsl(var(--chef-grey));
+    cursor: pointer;
+    color: inherit;
+    position: relative;
+    white-space: nowrap;
+
+    &:last-child {
+      border-bottom: 0px;
+    }
+
+    &:hover {
+      background-color: chef-hsl(var(--chef-primary-bright));
+      color: chef-hsl(var(--chef-white));
+      outline: none;
+
+      &:first-child {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+      }
+
+      &:last-child {
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+      }
+    }
+
+    .option-content {
+      display: inline-block;
+      width: 100%;
+      line-height: 21px;
+      font-size: 14px;
+    }
+  }
+
+  chef-table chef-th:last-child,
+  chef-table chef-td:last-child {
+    max-width: 50px;
+  }
+}

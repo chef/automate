@@ -1,0 +1,79 @@
+<div class="pipes-container">
+  <div class="tab-controls" ng-if="project.pipelines.length">
+    <div class="card-filter-wrapper">
+      <button ng-click="toggleNewPipelineForm()" title="Add a New Pipeline" class="button card-add-btn"><i class="fa fa-plus"></i> Add a New Pipeline</button>
+    </div>
+    <form ng-if="showNewPipelineForm" >
+      <fieldset>
+        <legend>Pipeline Name</legend>
+        <div class="field">
+          <input id="pipeline-name" ng-model="newPipeline.name" type="text" placeholder="New Pipeline Name" />
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Pipeline Base</legend>
+        <div class="field">
+          <input ng-model="newPipeline.base" type="text" placeholder="New Pipeline Base" />
+        </div>
+      </fieldset>
+      <div class="form-controls">
+        <button class="button primary" ng-click="savePipeline(newPipeline)">Save</button>
+        <button class="button secondary" ng-click="closeNewPipelineForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+  <div class="cards" ng-if="project.pipelines.length">
+    <div ng-repeat="pipeline in project.pipelines">
+      <div class="pipe-card">
+        <header>
+          <button class="button square destroy" ng-click="deletePipeline(pipeline)" icon-button="trash" title="Delete Pipeline"></button>
+          <h2 class="card-title">{{ pipeline.name }}</h2>
+        </header>
+      </div>
+    </div>
+  </div>
+  <div class="no-items" ng-if="!project.pipelines.length" ng-switch on="project.scm.type">
+    <div ng-switch-when="local">
+      <div class="empty-item">
+        This project needs a pipeline! Here's how to create one.
+      </div>
+      <div class="empty-instructions">
+        <h3>Create a Pipeline</h3>
+
+        <ol>
+          <li>
+            If you haven't already, install the <code>delivery</code> command-line tool.
+            <a href="https://docs.chef.io/delivery_cli.html">See the Chef Docs</a>
+            for details on how to do that.
+          </li>
+          <li>
+            With the command-line tool installed, clone this project:
+            <pre><code>
+{{ project.cloneCmd() }}
+cd {{ project.name }}
+            </code></pre>
+          </li>
+          <li>
+            Create a project configuration file:
+            <pre><code>{{ project.setupCmd() }}</code></pre>
+          </li>
+          <li>
+            Make an initial commit. Note we're excluding the project configuration file:
+            <pre><code>
+echo "# {{ project.name }}" >> README.md
+echo ".delivery/cli.toml" >> .gitignore
+git add README.md .gitignore
+git commit -m "Initial commit"
+           </code></pre>
+          </li>
+          <li>
+            Run <code>delivery init</code>, which will create an empty build cookbook
+            for you (with an empty set of phase recipes), add the cookbook to your project,
+            create the new pipeline and submit the project to Delivery for review:
+            <pre><code>delivery init</code></pre>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>

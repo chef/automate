@@ -1,0 +1,94 @@
+<div class="organizations card-view">
+  <header class="page-header">
+    <nav class="breadcrumb-nav" role="navigation">
+      <ol class="breadcrumbs">
+        <li class="breadcrumb">Workflow Orgs <i class="fa fa-angle-right"></i></li>
+      </ol>
+    </nav>
+    <div class="page-header-title">
+      <h2>Workflow Orgs</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="card-filter-wrapper">
+    <input
+     class="card-filter"
+     type="text"
+     ng-model="orgFilter"
+     placeholder="Filter orgs..."
+     ng-show="orgs.length">
+     <div class="quick-find-automate" cd-quick-find></div>
+     <button
+       class="button card-add-btn"
+       title="New Workflow Org"
+       ng-click="toggleNewOrgForm()"><i class="fa fa-plus"></i> New Workflow Org</button>
+  </div>
+  <div class="form-container" ng-show="showNewOrgForm || !orgs.length">
+    <form class="new-org card-add-form" ng-show="showNewOrgForm || !orgs.length" name="newOrgForm">
+      <fieldset>
+        <h3>Workflow Org</h3>
+        <div class="field" ng-class="{'invalid':newOrgForm.orgName.$invalid}">
+          <div class="little-title">Organization Name</div>
+          <em class="required-indicator">*</em>
+          <input name="orgName" type="text" placeholder="my-org" ng-model="newOrg.name" pattern="[a-zA-Z0-9\-\_]*">
+          <span ng-if="newOrgForm.orgName.$error.pattern" class="field-message">
+            Organization names can only include alphanumeric characters, underscores, and dashes.
+          </span>
+        </div>
+        <div class="slack-webhook-form">
+          <div class="heading">
+            <legend>Slack notifications</legend>
+          </div>
+          <div class="webhook-name field" ng-class="{'invalid':newOrgForm.webhookName.$invalid}">
+            <span class="checkbox-list">
+              <label ng-disabled="!webhook.url" class="small">
+                <input type="checkbox" ng-model="webhook.enabled" ng-init="webhook.enabled=true" ng-disabled="!webhook.url">
+                Enabled
+              </label>
+            </span>
+            <span class="little-title">Slack Integration Name</span>
+            <input name="webhookName" type="text" placeholder="My Slack Team" ng-model="webhook.name" ng-required="webhook.url">
+            <span ng-if="newOrgForm.webhookName.$error.required" class="field-message">
+              Please provide a name for the webhook.
+            </span>
+          </div>
+          <div class="webhook-url">
+            <div class="field">
+              <div class="little-title">Slack Webhook URL</div>
+              <input name="webhookUrl" type="text" placeholder="https://hooks.slack.com/services/T00000000" ng-model="webhook.url">
+            </div>
+            <div class="webhook-test">
+              <span class="result" ng-switch="testResult">
+                <span class="success" ng-switch-when="success">
+                  <span icon="checkmark"></span>
+                  <span class="message">It worked!</span>
+                </span>
+                <span class="error" ng-switch-when="error-any">
+                  <span icon="x"></span>
+                  <span class="message">Slack didn't respond with this URL. Please doublecheck it and try again.</span>
+                </span>
+                <span class="error" ng-switch-when="error-504">
+                  <span icon="x"></span>
+                  <span class="message">Slack doesn't appear to be reachable from the Delivery server.</span>
+                </span>
+              </span>
+              <button class="button small tertiary" ng-click="testWebhook(webhook)" ng-disabled="!webhook.url">Send Test</button>
+            </div>
+          </div>
+          <div class="field">
+            <a class="webhook-link" href="https://my.slack.com/services/new/incoming-webhook" target="_blank">Get a Slack Webhook</a>
+          </div>
+        </div>
+        <div class="form-controls">
+          <button class="button primary" ng-click="saveAndClose(newOrg, webhook)" ng-disabled="newOrgForm.$invalid">Save &amp; Close</button>
+          <button class="button secondary" ng-click="closeForm()" >Cancel</button>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+  <div class="cards" ng-show="orgs.length">
+    <h3>All Workflow Orgs</h3>
+    <cd-org-card org="org" ng-repeat="org in orgs | filter:orgFilter | orderBy:'name':reverse"></cd-org-card>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+{
+  "chef_server_fqdn": "chef-server-dev.test",
+  "entity_uuid": "f6a5c33f-bef5-433b-815e-a8f6e69e6b1b",
+  "id": "7188b88b-2236-4e27-a875-d3a10a70c497",
+  "message_version": "1.1.0",
+  "message_type": "run_start",
+  "node_name": "chef-client-dev.test",
+  "organization_name": "finfrock",
+  "run_id": "7188b88b-2236-4e27-a875-d3a10a70c497",
+  "start_time": "2018-09-13T20:43:01Z",
+  "source": "chef_client",
+}

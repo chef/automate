@@ -1,0 +1,68 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  color: $chef-blue-dark;
+  line-height: 1.33em;
+  font-family: $heading-font;
+  font-size: 16px;
+
+  h1 {
+    margin: 0;
+  }
+
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+
+    li {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  p, pre, code {
+    line-height: 1.5;
+  }
+}
+
+body {
+  background-color: $stage-background-color;
+}
+
+a {
+  color: $bluelink;
+
+  &:hover,
+  &:active {
+    color: $bluehover;
+  }
+
+  &[target='_blank'] {
+    color: $external-link-color;
+
+    &:hover {
+      color: $external-link-hover-color;
+    }
+  }
+}
+
+h1, h2, h3, h4 {
+  font-family: $heading-font;
+  font-weight: 400;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 16px;
+}

@@ -1,0 +1,4 @@
+{
+    "line-length": { "line_length": 300, "code_blocks": false },
+    "commands-show-output": false
+}

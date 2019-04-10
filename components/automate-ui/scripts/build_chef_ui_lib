@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd ../chef-ui-library
+
+npm install && npm run build

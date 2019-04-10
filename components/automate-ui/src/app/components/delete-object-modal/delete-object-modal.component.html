@@ -1,0 +1,19 @@
+<chef-modal [visible]="visible" (close)="closeEvent()">
+  <h2 slot="title">Delete {{objectNoun | titlecase}}?</h2>
+  <div>
+    <span *ngIf="moreDetails">
+      Deleting {{objectNoun}} {{objectName}} cannot be undone<br>
+      {{moreDetails}}.
+    </span>
+    <span *ngIf="!moreDetails">
+      Deleting {{objectNoun}} {{objectName}} cannot be undone.
+    </span>
+  </div>
+
+  <div class="options">
+    <chef-button primary caution (click)="deleteObject()">
+      Delete {{objectNoun | titlecase}}
+    </chef-button>
+    <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
+  </div>
+</chef-modal>

@@ -1,0 +1,6 @@
+<div bs-collapse data-allow-multiple="true" ng-model="patchsetsCollapse">
+  <cd-patchset-card
+    ng-repeat="patchset in change.patchsets track by patchset.sequenceNumber"
+    ng-class="{open: patchsetsCollapse.indexOf($index) > -1}">
+  </cd-patchset-card>
+</div>

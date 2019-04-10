@@ -1,0 +1,11 @@
+<div class="login-wrapper" ng-class="(loginState == 'saml') ? 'saml' : 'local'">
+  <div class="login-container" ng-class="(loginState == 'saml') ? 'saml' : 'local'">
+    <header>
+      <h1>Chef Automate</h1>
+      <div class="flash">
+        <p class="message" ng-class="state">{{ message }}</p>
+      </div>
+    </header>
+    <div ui-view></div>
+  </div>
+</div>

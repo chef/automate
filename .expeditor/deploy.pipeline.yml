@@ -1,0 +1,49 @@
+steps:
+  - label: ":terraform:"
+    command: .expeditor/buildkite/terraform.sh
+    concurrency: 1
+    concurrency_group: chef-a2-master/deploy/$CHANNEL
+    timeout_in_minutes: 60
+    expeditor:
+      accounts:
+        - aws/chef-cd
+        - github
+      executor:
+        docker:
+
+  - wait
+
+  - label: ":inspec:"
+    command: .expeditor/buildkite/inspec.sh
+    concurrency: 1
+    concurrency_group: chef-a2-master/deploy/$CHANNEL
+    timeout_in_minutes: 30
+    expeditor:
+      secrets:
+        CHEF_CI_SSH_PRIVATE_KEY:
+          path: account/static/ad/chef-ci
+          field: ssh_private_key
+      executor:
+        docker:
+
+  - label: ":cypress:"
+    command: .expeditor/buildkite/cypress.sh
+    concurrency: 1
+    concurrency_group: chef-a2-master/deploy/$CHANNEL
+    timeout_in_minutes: 30
+    expeditor:
+      secrets:
+        CYPRESS_RECORD_KEY:
+          path: secret/a2/cypress
+          field: record_key
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST:
+          path: secret/a2/testing/target_host
+          field: data
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USERNAME:
+          path: secret/a2/testing/target_username
+          field: data
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_PASSWORD:
+          path: secret/a2/testing/target_password
+          field: data
+      executor:
+          docker:

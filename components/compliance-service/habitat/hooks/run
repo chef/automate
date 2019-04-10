@@ -1,0 +1,157 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+export DBNAME="{{cfg.storage.database}}"
+export DBUSER="{{cfg.storage.user}}"
+source {{pkg.svc_path}}/hooks/reconfigure
+
+# Migrate from A1's delivery database if it's present
+pg-helper migrate-tables-v2 delivery "$DBNAME" \
+  agents node_managers results profiles tags jobs jobs_nodes jobs_profiles \
+  jobs_tags nodes nodes_agents nodes_secrets nodes_tags
+
+pg-helper ensure-service-database "$DBNAME"
+
+pg-helper create-extension "$DBNAME" pgcrypto
+
+pg-helper fix-permissions "$DBNAME"
+
+mkdir -p "{{pkg.svc_data_path}}/profiles"
+
+# remove the stale dir that was created by a lack of trailing slash on the next command!
+rm -rf "{{pkg.svc_static_path}}/migrations"
+
+# trailing slash is important here!!! (to make cp not create extra subdirs and mess up the pg migrations)
+cp -r {{pkg.path}}/migrations/* {{pkg.svc_static_path}}/
+
+{{!--
+# we use bash to test for the existence of the automate-compliance-profiles path
+# because the handlebars combo of `#if pkgPathFor "chef/automate-compliance-profiles"`
+# doesn't work as desired. `pkgPathFor` returns "" when a package isn't a dep of the
+# package it is executed from
+--}}
+profiles_package_path="{{pkgPathFor "chef/automate-compliance-profiles"}}"
+profiles_market_path="{{pkgPathFor "chef/automate-compliance-profiles"}}/market"
+if [ "$profiles_package_path" != "" ] &&
+   [ -d $profiles_package_path ]; then
+  CONFIG="--market-path $profiles_market_path"
+fi
+
+CONFIG="$CONFIG --profiles-path {{pkg.svc_data_path}}/profiles"
+CONFIG="$CONFIG --log-level {{cfg.logger.level}}"
+CONFIG="$CONFIG --port {{cfg.service.port}}"
+
+# Interval in minutes to poll for node status.
+CONFIG="$CONFIG --manager-awsec2-poll {{cfg.nodemanager.awsec2_polling_interval}}"
+CONFIG="$CONFIG --manager-azurevm-poll {{cfg.nodemanager.azurevm_polling_interval}}"
+CONFIG="$CONFIG --manager-manual-poll {{cfg.nodemanager.manual_polling_interval}}"
+
+# Inspec agent configuration.
+CONFIG="$CONFIG --job-workers {{cfg.agent.workers}}"
+CONFIG="$CONFIG --job-buffer-size {{cfg.agent.buffer_size}}"
+
+# Mutual TLS Configuration
+CONFIG="$CONFIG --cert {{pkg.svc_config_path}}/service.crt"
+CONFIG="$CONFIG --key {{pkg.svc_config_path}}/service.key"
+CONFIG="$CONFIG --root-cert {{pkg.svc_config_path}}/root_ca.crt"
+
+PG_BACKEND="--postgres-db {{cfg.storage.database}}"
+
+CONFIG="$CONFIG --automate-fqdn https://{{cfg.service.external_fqdn}}"
+
+# If we have a config pointing to an specific host,
+# lets use it, otherwise use the ipaddress of the server
+{{~#if cfg.service.host}}
+CONFIG="$CONFIG --host {{cfg.service.host}}"
+{{else}}
+CONFIG="$CONFIG --host {{sys.ip}}"
+{{~/if}}
+
+# A data retention policy was configured
+{{~#if cfg.retention.compliance_report_days}}
+CONFIG="$CONFIG --reports-retention-days {{cfg.retention.compliance_report_days}}"
+{{~/if}}
+
+# get auth binding, used for retrieving token for inspec reporting directly to automate
+{{~#eachAlive bind.authn-service.members as |authn|}}
+{{~#if @last}}
+addNoProxy {{authn.sys.ip}}
+CONFIG="$CONFIG --authn-target {{authn.sys.ip}}:{{authn.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+# get notifications binding, used for sending notifications on compliance report ingestion
+{{~#eachAlive bind.notifications-service.members as |notifications|}}
+{{~#if @last}}
+addNoProxy {{notifications.sys.ip}}
+CONFIG="$CONFIG --notifications-target {{notifications.sys.ip}}:{{notifications.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+# get secrets service binding, used for storing secrets
+{{~#eachAlive bind.secrets-service.members as |secrets|}}
+{{~#if @last}}
+addNoProxy {{secrets.sys.ip}}
+CONFIG="$CONFIG --secrets-host {{secrets.sys.ip}} --secrets-port {{secrets.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+# get authz service binding, used for getting project rules
+{{~#eachAlive bind.authz-service.members as |authz|}}
+{{~#if @last}}
+addNoProxy {{authz.sys.ip}}
+CONFIG="$CONFIG --authz-host {{authz.sys.ip}} --authz-port {{authz.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+# get event service binding, used for publishing event
+{{~#eachAlive bind.event-service.members as |event|}}
+{{~#if @last}}
+addNoProxy {{event.sys.ip}}
+CONFIG="$CONFIG --event-endpoint {{event.sys.ip}}:{{event.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+# get nodemanager binding, used for getting nodes and nodemanager info
+ {{~#eachAlive bind.nodemanager-service.members as |manager|}}
+ {{~#if @last}}
+ addNoProxy {{manager.sys.ip}}
+ CONFIG="$CONFIG --manager-host {{manager.sys.ip}} --manager-port {{manager.cfg.port}}"
+ {{~/if}}
+ {{~/eachAlive}}
+
+# Listen to what our gossip protocol whispers
+#
+# We have modified our plan to have a hard dependency to
+# elasticsearch and postgres, that will ensure that we
+# will always start our service with the required bindings
+#
+#
+{{~#eachAlive bind.es-sidecar-service.members as |member|}}
+addNoProxy {{member.sys.ip}}
+CONFIG="$CONFIG --es-sidecar-address {{member.sys.ip}}:{{member.cfg.port}}"
+{{~/eachAlive}}
+
+# Elasticsearch
+{{~#eachAlive bind.automate-es-gateway.members as |member|}}
+{{~#if member.cfg.http-host }}
+addNoProxy {{member.sys.ip}}
+ES_BACKEND="--es-url http://{{member.sys.ip}}:{{member.cfg.http-port}}"
+{{else}}
+ES_BACKEND="--es-url http://127.0.0.1:{{member.cfg.http-port}}"
+{{/if ~}}
+{{~/eachAlive}}
+
+# Postgres
+PG_BACKEND="--postgres-database {{cfg.storage.database}} --migrations-path {{pkg.svc_static_path}}"
+
+export HOME="{{pkg.svc_data_path}}"
+
+CONFIG="$CONFIG --inspec-tmp-dir {{pkg.svc_var_path}}/tmp"
+
+# Start our service
+exec compliance-service run ${CONFIG} ${ES_BACKEND} ${PG_BACKEND}

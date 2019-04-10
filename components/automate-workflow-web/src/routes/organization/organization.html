@@ -1,0 +1,98 @@
+<div class="organization card-view">
+  <header class="page-header">
+    <nav class="breadcrumb-nav" role="navigation">
+      <ol class="breadcrumbs">
+        <li class="breadcrumb">
+          <a ui-sref="main.enterprise.organizations">Workflow Orgs</a>
+          <i class="fa fa-angle-right"></i>
+        </li>
+        <li class="breadcrumb">{{ org.name }} <i class="fa fa-angle-right"></i></li>
+      </ol>
+    </nav>
+    <div class="page-header-title">
+      <h2>{{ org.name }}</h2>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="card-filter-wrapper">
+    <input
+     class="card-filter"
+     type="text"
+     ng-model="projectFilter"
+     placeholder="Filter projects..."
+     ng-show="projects.length">
+    <div class="quick-find-automate" cd-quick-find></div>
+    <button
+      class="card-add-btn"
+      title="New Project"
+      ng-click="toggleNewProjectForm()"><i class="fa fa-plus"></i> New Project</button>
+  </div>
+  <div class="form-container" ng-if="showNewProjectForm || !projects.length">
+    <form class="new-project card-add-form" ng-if="showNewProjectForm || !projects.length" name="newProjectForm">
+      <fieldset>
+        <h3>Project</h3>
+        <div class="field">
+          <div class="little-title">Project Name</div>
+          <em class="required-indicator">*</em>
+          <input id="project-name" type="text" placeholder="My Project" ng-model="newProject.name" required>
+        </div>
+      </fieldset>
+      <fieldset cd-project-repo org="org" project="newProject" providers="scmProviders" ng-show="scmProviders.length"></fieldset>
+      <fieldset>
+        <div class="slack-webhook-form">
+          <div class="heading">
+            <legend>Slack Notifications</legend>
+          </div>
+          <div class="webhook-name field" ng-class="{'invalid':newProjectForm.webhookName.$invalid}">
+            <span class="little-title">Slack Integration Name</span>
+            <span class="checkbox-list">
+              <label ng-disabled="!webhook.url" class="small">
+                <input type="checkbox" ng-model="webhook.enabled" ng-init="webhook.enabled=true" ng-disabled="!webhook.url">
+                Enabled
+              </label>
+            </span>
+            <input name="webhookName" type="text" placeholder="My Slack Team" ng-model="webhook.name" ng-required="webhook.url">
+            <span ng-if="newProjectForm.webhookName.$error.required" class="field-message">
+              Please provide a name for the webhook.
+            </span>
+          </div>
+          <div class="webhook-url">
+            <div class="field">
+              <div class="little-title">Slack Webhook URL</div>
+              <input name="webhookUrl" type="text" placeholder="https://hooks.slack.com/services/T00000000" ng-model="webhook.url">
+            </div>
+            <div class="webhook-test">
+              <button type="button" class="button small tertiary" ng-click="testWebhook(webhook)" ng-disabled="!webhook.url">Send Test</button>
+              <span class="result" ng-switch="testResult">
+                <span class="success" ng-switch-when="success">
+                  <span icon="checkmark"></span>
+                  <span class="message">It worked!</span>
+                </span>
+                <span class="error" ng-switch-when="error-any">
+                  <span icon="x"></span>
+                  <span class="message">Slack didn't respond with this URL. Please doublecheck it and try again.</span>
+                </span>
+                <span class="error" ng-switch-when="error-504">
+                  <span icon="x"></span>
+                  <span class="message">Slack doesn't appear to be reachable from the Delivery server.</span>
+                </span>
+              </span>
+            </div>
+          </div>
+          <div class="field">
+            <a class="webhook-link" href="https://my.slack.com/services/new/incoming-webhook" target="_blank">Get a Slack Webhook</a>
+          </div>
+        </div>
+      </fieldset>
+      <div class="form-controls">
+        <button type="submit" ng-disabled="newProject.scm.scmSetupConfigs.length === 0 || newProjectForm.$invalid" class="button primary" ng-click="saveAndClose(newProject, webhook)">Save &amp; Close</button>
+        <button type="button" class="button secondary" ng-click="cancel()" ng-show="projects.length">Cancel</button>
+      </div>
+    </form>
+  </div>
+  <div class="cards" ng-show="projects.length">
+    <h3>Projects</h3>
+    <cd-project-card project="project" org="org" scm-providers="scmProviders" ng-repeat="project in projects | filter:projectFilter | orderBy:'name':reverse"></cd-project-card>
+  </div>
+</div>

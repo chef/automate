@@ -1,0 +1,62 @@
+@import "~styles/variables";
+
+chef-snippet ::ng-deep pre {
+  background-color: $chef-grey;
+  border-radius: 4px;
+  font-size: 9pt;
+  margin-top: 3px;
+}
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+chef-tab-selector {
+  chef-option {
+    margin-right: 16px;
+    color: $chef-primary-dark;
+  }
+}
+
+thead {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: $chef-primary-dark;
+}
+
+th {
+  text-align: left;
+  padding: 0px;
+}
+
+tbody > .detail-row {
+  padding-top: 0px;
+  padding-bottom: 15px;
+}
+
+.detail-row {
+  display: flex;
+  color: $chef-primary-dark;
+}
+
+.id-column {
+  width: 33%;
+  padding-top: 0px;
+  padding-left: 0px;
+}
+
+.type-column {
+  width: 66%;
+  padding-top: 0px;
+  padding-left: 0px;
+}
+
+.three-dot-entry {
+  justify-content: flex-end;
+}
+
+#getting-started {
+  margin: 8px 0;
+  font-size: 14px;
+  color: $chef-dark-grey;
+}

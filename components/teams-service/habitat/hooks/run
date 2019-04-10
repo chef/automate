@@ -1,0 +1,25 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+{{~#eachAlive bind.authz-service.members as |authz-service|}}
+{{~#if @last}}
+addNoProxy {{authz-service.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+
+echo "Creating database"
+pg-helper ensure-service-database "{{cfg.storage.database}}"
+
+echo "Creating extension"
+pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
+
+pg-helper create-extension "{{cfg.storage.database}}" "uuid-ossp"
+
+cp -r {{pkg.path}}/migrations {{pkg.svc_static_path}}
+cp -r {{pkg.path}}/data-migrations {{pkg.svc_static_path}}
+
+exec teams-service {{pkg.svc_config_path}}/config.yml

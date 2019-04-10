@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
+
+message PolicyRevision {
+  string revision_id = 1;
+}

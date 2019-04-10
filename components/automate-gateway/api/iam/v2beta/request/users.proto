@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request";
+
+message CreateUserReq {
+  string id = 1;
+  string name = 2;
+  string password = 3;
+}
+
+message GetUsersReq {
+}
+
+message DeleteUserReq {
+  string id = 1;
+}
+
+message GetUserReq {
+  string id = 1;
+}
+
+message UpdateUserReq {
+  // The id cannot be changed, it's for determining which user this is supposed
+  // to update
+  string id = 1;
+  string name = 2;
+  string password = 3;
+}

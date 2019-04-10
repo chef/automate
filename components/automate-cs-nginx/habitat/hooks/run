@@ -1,0 +1,18 @@
+#!{{pkgPathFor "core/bash"}}/bin/sh
+
+exec 2>&1
+
+set -e
+
+{{#if cfg.required_recipe.enabled ~}}
+# Copy the required_recipe into the service's data directory and
+# ensure it has permissions that the service user can read.
+touch {{pkg.svc_var_path}}/required_recipe
+chown hab:hab {{pkg.svc_var_path}}/required_recipe
+chmod 0400 {{pkg.svc_var_path}}/required_recipe
+
+# Copy the required_recipe into the service's data directory
+cp {{cfg.required_recipe.path}} {{pkg.svc_var_path}}/required_recipe
+{{/if}}
+
+exec openresty -c {{pkg.svc_config_path}}/nginx.conf -p {{pkg.svc_var_path}}

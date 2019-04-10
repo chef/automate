@@ -1,0 +1,55 @@
+@import "~styles/variables";
+
+:host {
+  display: block;
+}
+
+.nav-tabs-list {
+  margin: 0 -35px 16px;
+  padding: 16px 35px 0;
+  background: $chef-white;
+}
+
+.nav-tabs-item {
+  display: inline-block;
+  position: relative;
+  list-style: none;
+  margin-right: 8px;
+}
+
+.nav-tab {
+  font-size: 16px;
+  line-height: 32px;
+  min-width: 72px;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  // Underline
+  &:before {
+    display: block;
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    height: 2px;
+    left: 0;
+    width: 100%;
+    background: transparent;
+  }
+
+  &.active {
+    &:before {
+      background: $chef-primary-bright;
+    }
+  }
+
+  &:hover,
+  &:focus {
+    background: $chef-lightest-grey;
+  }
+
+  &:active {
+    background: $chef-light-grey;
+  }
+}

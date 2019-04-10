@@ -1,0 +1,14 @@
+{application, github,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  delivery,
+                  chef_common
+                 ]},
+  {mod, { github_app, []}},
+  {env, []}
+ ]}.

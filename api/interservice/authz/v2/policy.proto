@@ -1,0 +1,271 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "api/interservice/authz/v2/type.proto";
+
+package chef.automate.domain.authz.v2;
+option go_package = "github.com/chef/automate/api/interservice/authz/v2";
+
+message Policy {
+    string name = 1;
+    string id = 2;
+    Type type = 3;
+    repeated string members = 4;
+    repeated Statement statements = 5;
+}
+
+message Role {
+    string name = 1;
+    string id = 2;
+    Type type = 3;
+    repeated string actions = 4;
+    repeated string projects = 5;
+}
+
+message CreatePolicyReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string name = 2 [(validate.rules).string.min_len = 1];
+    repeated string members = 3 [(validate.rules).repeated = {
+        unique: true,
+        items: {
+            string: {
+                pattern: "^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$"
+            }
+        }
+       }];
+    repeated Statement statements = 4;
+}
+
+message DeletePolicyReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+
+message DeletePolicyResp {}
+
+message Statement {
+    enum Effect {
+        ALLOW = 0;
+        DENY = 1;
+    }
+    Effect effect = 1;
+
+    // inline definitions
+    repeated string resources = 2 [(validate.rules).repeated = {
+        unique: true,
+        items: { string: { pattern: "^[a-z][^:*]*(?::[^:*]+)*(?::[*])?$|^[*]$" } } }];
+
+    // this RE means:  * OR *:verb OR svc:type:verb OR svc:* OR svc:*:verb OR svc:type:*
+    repeated string actions = 3 [(validate.rules).repeated = {
+        unique: true,
+        items: { string: { pattern: "^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$" } } }];
+
+    // references
+    string role = 4; // TODO: validations -- if we want a pattern, have it be `role:...`, otherwise, do other validations ;)
+    repeated string projects = 5; // same here
+}
+
+message ListPoliciesReq {}
+
+message ListPoliciesResp {
+  repeated Policy policies = 1;
+}
+
+message GetPolicyReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+
+// Note that update does not accept a type since
+// users can only create custom type policies.
+message UpdatePolicyReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    repeated string members = 2 [(validate.rules).repeated = {
+        unique: true,
+        items: {
+            string: {
+                pattern: "^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$"
+            }
+        }
+       }];
+    repeated Statement statements = 3;
+    string name = 8;
+}
+
+message ReplacePolicyMembersReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    repeated string members = 2 [(validate.rules).repeated = {
+        unique: true,
+        items: {
+            string: {
+                pattern: "^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$"
+            }
+        }
+       }];
+}
+
+message ReplacePolicyMembersResp {
+    repeated string members = 1;
+}
+
+message AddPolicyMembersReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    repeated string members = 2 [(validate.rules).repeated = {
+        unique: true,
+        items: {
+            string: {
+                pattern: "^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$"
+            }
+        }
+    }];
+}
+
+message AddPolicyMembersResp {
+    repeated string members = 2;
+}
+
+// the only values that may be returned by GetPolicyVersion
+message Version {
+    enum VersionNumber {
+        V0 = 0;
+        V1 = 1;
+        V2 = 2;
+    }
+    VersionNumber major = 1;
+    VersionNumber minor = 2;
+}
+
+message GetPolicyVersionReq {}
+message GetPolicyVersionResp {
+    Version version = 1;
+}
+
+message ListRolesReq {}
+message ListRolesResp {
+    repeated Role roles = 1;
+}
+
+message DeleteRoleReq {
+    string id = 1
+    [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+message DeleteRoleResp {}
+
+message UpdateRoleReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string name = 2 [(validate.rules).string.pattern = "\\S"];
+    repeated string actions = 3
+    [(validate.rules).repeated = {
+      unique: true,
+      // this RE means:  * OR *:verb OR svc:type:verb OR svc:* OR svc:*:verb OR svc:type:*
+      items: {
+          string: {
+              pattern: "^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$"
+          }
+      }
+     }];
+     repeated string projects = 4 [(validate.rules).repeated = {
+        unique: true,
+        items: {
+            string: {
+                pattern: "^[a-z0-9-]{1,64}$"
+            }
+        }
+       }];
+}
+
+message ListPolicyMembersReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+message ListPolicyMembersResp {
+    repeated string members = 1;
+}
+
+message RemovePolicyMembersReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    repeated string members = 2 [(validate.rules).repeated = {
+        unique: true,
+        items: {
+            string: {
+                pattern: "^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|tls):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$"
+            }
+        }
+       }];
+}
+message RemovePolicyMembersResp {
+    repeated string members = 2;
+}
+
+enum Flag {
+    VERSION_2_0 = 0;
+    VERSION_2_1 = 1;
+}
+
+message MigrateToV2Req {
+    Flag flag = 1;
+}
+message MigrateToV2Resp {
+    repeated string reports = 1;
+}
+
+message ResetToV1Req {}
+message ResetToV1Resp {}
+
+message GetRoleReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+
+message CreateRoleReq {
+    string id = 1
+      [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string name = 2
+      [(validate.rules).string.pattern = "\\S"];;
+    repeated string actions = 3
+      [(validate.rules).repeated = {
+        unique: true,
+        // this RE means:  * OR *:verb OR svc:type:verb OR svc:* OR svc:*:verb OR svc:type:*
+        items: {
+            string: {
+                pattern: "^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$"
+            }
+        }
+       }];
+    repeated string projects = 4 [(validate.rules).repeated = {
+        unique: true,
+        items: {
+            string: {
+                pattern: "^[a-z0-9-]{1,64}$"
+            }
+        }
+       }];
+}
+
+message PurgeSubjectFromPoliciesReq {
+    // Q: Right now, this allows purging subject wildcards (like "user:*").
+    // -- Do we want to restrict this to only complete subjects?
+    string subject = 1
+      [(validate.rules).string.pattern = "^(?:team|user):(?:local|ldap|saml):(?:[^:*]+|[*])$|^(?:(?:team|user|token|service):)?[*]$|^token:[^:*]+$|^tls:service:(?:[^:*]+:)?(?:[^:*]+|[*])$"];
+}
+
+message PurgeSubjectFromPoliciesResp {
+    repeated string ids = 1; // ids is IDs of modified policies
+}
+
+service Policies {
+    rpc ReplacePolicyMembers (ReplacePolicyMembersReq) returns (ReplacePolicyMembersResp) {};
+    rpc CreatePolicy (CreatePolicyReq) returns (Policy) {};
+    rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {};
+    rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {};
+    rpc GetPolicy (GetPolicyReq) returns (Policy) {};
+    rpc UpdatePolicy (UpdatePolicyReq) returns (Policy) {};
+    rpc MigrateToV2 (MigrateToV2Req) returns (MigrateToV2Resp) {};
+    rpc GetPolicyVersion (GetPolicyVersionReq) returns (GetPolicyVersionResp) {};
+    rpc ResetToV1 (ResetToV1Req) returns (ResetToV1Resp) {};
+    rpc CreateRole (CreateRoleReq) returns (Role) {};
+    rpc ListRoles (ListRolesReq) returns (ListRolesResp) {};
+    rpc GetRole (GetRoleReq) returns (Role) {};
+    rpc DeleteRole (DeleteRoleReq) returns (DeleteRoleResp) {};
+    rpc UpdateRole (UpdateRoleReq) returns (Role) {};
+    rpc ListPolicyMembers (ListPolicyMembersReq) returns (ListPolicyMembersResp) {};
+    rpc RemovePolicyMembers (RemovePolicyMembersReq) returns (RemovePolicyMembersResp) {};
+    rpc AddPolicyMembers (AddPolicyMembersReq) returns (AddPolicyMembersResp) {};
+    rpc PurgeSubjectFromPolicies(PurgeSubjectFromPoliciesReq) returns (PurgeSubjectFromPoliciesResp) {};
+}

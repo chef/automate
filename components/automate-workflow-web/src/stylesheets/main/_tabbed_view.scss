@@ -1,0 +1,145 @@
+$column-count:                  8 !default;
+$column-shift:                  ($grid-columns - $column-count) / 2 !default;
+$border-radius:                 2px !default;
+$border-width:                  1px !default;
+$border-color:                  #ddd !default;
+$box-shadow:                    0px 1px 2px 0px rgba(0, 0, 0, 0.25) !default;
+$content-background-color:      $white !default;
+
+@mixin columns($count: $column-count) {
+  @include span-columns($count);
+  @include shift(($grid-columns - $count) / 2);
+}
+
+.tabbed-view {
+
+  .page-header {
+    position: relative;
+
+    .parent {
+      font-family: $helvetica;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: $darkgray;
+
+      a {
+        text-decoration: none;
+        color: $dusk;
+
+        &:hover {
+          color: $linkblue;
+        }
+      }
+    }
+
+    h1 {
+      float: left;
+      font-weight: normal;
+      font-family: $helvetica;
+      color: #444;
+      font-size: 34px;
+      font-weight: 400;
+    }
+
+    .overview-meta {
+      clear: left;
+      font-size: 14px;
+      line-height: 1.3rem;
+      color: $darktext;
+    }
+  }
+
+  .tabs {
+    position: relative;
+
+    > ul {
+      margin-bottom: 1rem;
+      padding: 0 2rem;
+      background-color: $white;
+    }
+
+    .tab-content {
+
+      .tab-controls {
+        overflow: auto;
+        font-size: .875rem;
+        min-height: 32px;
+        @include clearfix;
+
+        .label {
+          font-size: 14px;
+          vertical-align: middle;
+          display: inline-block;
+          margin-left: 8px;
+          color: $bluegrey;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+        }
+
+        section.left {
+          float: left;
+        }
+
+        section.right {
+          float: right;
+          margin-left: 8px;
+        }
+
+        .add-a-thing {
+          background-color: $greydisabled;
+
+          div {
+            cursor: pointer;
+          }
+        }
+
+        form {
+          clear: both;
+        }
+
+        .button.cta {
+          @include cta-button;
+        }
+      }
+
+      form {
+        @include span-columns(6);
+        @include modal-box;
+        margin: 1.5rem 0;
+
+        fieldset {
+          border: none;
+          background: none;
+          padding-top: 0;
+          margin: 0 0 8px 0;
+
+          legend {
+            border: none;
+            background: none;
+            padding: 0;
+            top: auto;
+          }
+
+          legend.smallLegend {
+            color: $grayblue;
+            font-weight: normal;
+            font-size:12px;
+            padding: 0px;
+            text-transform: uppercase;
+          }
+
+          .field-tooltip {
+            color: lighten($darkgrayblue, 5%);
+            float: right;
+            margin-right: -20px;
+            margin-top: 15px;
+          }
+        }
+
+        .form-controls {
+          margin-top: 20px;
+        }
+      }
+    }
+  }
+}

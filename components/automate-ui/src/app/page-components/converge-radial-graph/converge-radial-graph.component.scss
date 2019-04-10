@@ -1,0 +1,65 @@
+@import "~styles/variables";
+
+.chart-container {
+  display: flex;
+  justify-content: space-between;
+  background-color: $chef-white;
+  padding: 20px 0 20px 20px;
+  width: 50%;
+  border-radius: $global-radius;
+  box-shadow: 0 0 16px 0 $chef-light-grey;
+
+  .label {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: inherit;
+  }
+
+  .chart-legend {
+    .display5 {
+      font-weight: bold;
+      line-height: 16px;
+      margin-top: 10px;
+
+      .success {
+        font-size: inherit;
+        color: $chef-primary-bright;
+      }
+
+      .failure {
+        font-size: inherit;
+        color: $chef-critical;
+      }
+
+      .missing {
+        font-size: inherit;
+        color: $chef-dark-grey;
+      }
+    }
+  }
+
+}
+
+chef-radial-chart {
+  width: 250px;
+  height: 250px;
+
+  ::ng-deep .failed {
+    color: $chef-critical;
+    fill: $chef-critical;
+    stroke: $chef-critical;
+  }
+
+  ::ng-deep .success {
+    color: $chef-success;
+    fill: $chef-success;
+    stroke: $chef-success;
+  }
+
+  ::ng-deep .missing {
+    color: $chef-grey;
+    fill: $chef-grey;
+    stroke: $chef-grey;
+  }
+}

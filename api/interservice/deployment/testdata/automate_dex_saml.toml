@@ -1,0 +1,9 @@
+[connectors.saml]
+ca_contents = """this
+is
+multiline"""
+
+sso_url = "https://okta.com/account/app"
+email_attr = "email"
+username_attr = "user"
+groups_attr = "groups"

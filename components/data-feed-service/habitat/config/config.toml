@@ -1,0 +1,40 @@
+[service]
+{{~#if cfg.service.host}}
+host = "{{cfg.service.host}}"
+{{~else}}
+host = "{{sys.ip}}"
+{{~/if}}
+port = "{{cfg.service.port}}"
+feed_interval = "{{cfg.service.feed_interval}}"
+
+[log]
+log_format = "{{cfg.log.format}}"
+log_level = "{{cfg.log.level}}"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
+
+[notifications]
+{{~#eachAlive bind.notifications-service.members as |notifications-service|}}
+{{~#if @last}}
+target = "{{notifications-service.cfg.host}}:{{notifications-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+
+[secrets]
+{{~#eachAlive bind.secrets-service.members as |secrets-service|}}
+{{~#if @last}}
+target = "{{secrets-service.cfg.host}}:{{secrets-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+[cfgmgmt]
+{{~#eachAlive bind.config-mgmt-service.members as |config-mgmt-service|}}
+{{~#if @last}}
+target = "{{config-mgmt-service.cfg.host}}:{{config-mgmt-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+

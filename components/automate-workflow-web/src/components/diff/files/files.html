@@ -1,0 +1,20 @@
+<table class="diff-files">
+  <tbody>
+    <tr ng-repeat="file in patchset.filesChanged track by $index">
+      <td>
+        <span class="file-status" ng-class="file[0] | lowercase">{{ file[0] }}</span>
+      </td>
+      <td>
+        <a class="file-name" ui-sref="main.enterprise.organizations.organization.project.change.review({ start: 'base', end: 'p' + patchset.sequenceNumber, file: file[1] })">{{ file[1] }}</a>
+      </td>
+      <td>
+        <div diff-stats insertions="file[2]" deletions="file[3]"></div>
+      </td>
+      <td>
+        <a ng-if="getFileComments(file).length" class="comments-count" ui-sref="main.enterprise.organizations.organization.project.change.review({ start: 'base', end: 'p' + patchset.sequenceNumber, file: file[1] })">
+          {{ getFileComments(file).length }} <i class="icon-bubble"></i>
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>

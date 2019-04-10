@@ -1,0 +1,15 @@
+<div class="cl-api-section">
+  <header *ngIf="for">
+    <span class="pretext">Properties for </span><span class="title">'{{ for }}'</span>
+  </header>
+  <div class="property-list" role="grid">
+    <span class="header" role="row">
+      <span role="columnheader">Name</span>
+      <span role="columnheader">Type</span>
+      <span role="columnheader">Required?</span>
+      <span role="columnheader">Default Value</span>
+      <span role="columnheader">Description</span>
+    </span>
+    <ng-content select="api-prop, app-cl-api-prop"></ng-content>
+  </div>
+</div>

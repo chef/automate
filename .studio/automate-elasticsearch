@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# Helper methods specific for the automate-elasticsearch
+
+document "es_clean_all_indices" <<DOC
+  Clean elasticsearch indices. (Removes every single document)
+DOC
+function es_clean_all_indices() {
+  check_if_deployinate_started || return 1
+
+  local es_indices
+  es_indices=($(es_list_indices 2>/dev/null | awk '{print $3}'))
+  if [ "$es_indices" != "" ];then
+    install_if_missing core/curl curl;
+    for index in "${es_indices[@]}"; do
+      log_line "Cleaning index '${YELLOW}${index}${NC}'"
+      curl -XPOST -H "Content-Type: application/json" \
+	      "${ELASTICSEARCH_URL}/${index}/_delete_by_query?conflicts=proceed" \
+	      -d '{"query":{"match_all":{}}}'
+      echo ""
+    done
+  else
+    warn "No index found."
+  fi
+}
+
+document "es_delete_all_indices" <<DOC
+  Delete elasticsearch indices. (Deletes every single index)
+DOC
+function es_delete_all_indices() {
+  check_if_deployinate_started || return 1
+
+  local es_indices
+  es_indices=($(es_list_indices 2>/dev/null | awk '{print $3}'))
+  if [ "$es_indices" != "" ];then
+    install_if_missing core/curl curl;
+    for index in "${es_indices[@]}"; do
+      log_line "Deleting index '${YELLOW}${index}${NC}'"
+      curl -XDELETE "$ELASTICSEARCH_URL/$index"
+      echo ""
+    done
+  else
+    warn "No index found."
+  fi
+}
+
+document "es_list_indices" <<DOC
+  List elasticsearch indices
+DOC
+function es_list_indices() {
+  check_if_deployinate_started || return 1
+  install_if_missing core/curl curl;
+  curl "$ELASTICSEARCH_URL/_cat/indices?pretty"
+}

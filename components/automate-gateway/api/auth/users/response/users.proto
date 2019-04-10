@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package chef.automate.api.users.response;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/auth/users/response";
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3 [deprecated=true];
+  string username = 4;
+}
+
+message Users {
+  repeated User users = 1;
+}
+
+message DeleteUserResp {
+
+};

@@ -1,0 +1,7 @@
+ALTER TABLE IF EXISTS jobs ADD COLUMN IF NOT EXISTS deleted boolean;
+
+UPDATE jobs SET deleted='f' WHERE deleted IS NULL;
+
+ALTER TABLE IF EXISTS jobs ALTER COLUMN deleted SET NOT NULL;
+
+CREATE INDEX IF NOT EXISTS deleted ON jobs (deleted);

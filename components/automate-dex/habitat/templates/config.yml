@@ -1,0 +1,210 @@
+{{- if cfg.service.external_fqdn}}
+issuer: https://{{cfg.service.external_fqdn}}/dex
+{{- else}}
+issuer: http://{{cfg.service.host}}:{{cfg.service.port}}/dex
+{{- end}}
+enablePasswordDB: true
+storage:
+  type: postgres
+  config:
+    host: {{ pg_gateway_host }}
+    port: {{ pg_gateway_port }}
+    database: {{cfg.storage.database}}
+{{- if is_external_pg }}
+    {{- if eq "password" .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetScheme.GetValue }}
+    user: {{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetUsername.GetValue }}
+    password: {{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetPassword.GetValue }}
+    {{- else }}
+    {{ fail "unsupported auth scheme" }}
+    {{- end }}
+    {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl }}
+    ssl:
+      {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetMode.GetValue }}
+      mode: {{ .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetMode.GetValue }}
+      {{- end }}
+    {{- end }}
+{{- else }}
+    user: {{cfg.storage.user}}
+    ssl:
+      mode: verify-ca
+      certFile: {{svc_cert_path}}
+      keyFile: {{svc_key_path}}
+      caFile: {{svc_root_ca_path}}
+
+{{- end }}
+web:
+  https: {{cfg.service.host}}:{{cfg.service.port}}
+  tlsCert: {{svc_cert_path}}
+  tlsKey: {{svc_key_path}}
+grpc:
+  addr: {{cfg.grpc.host}}:{{cfg.grpc.port}}
+  tlsCert: {{svc_cert_path}}
+  tlsKey: {{svc_key_path}}
+  tlsClientCA: {{svc_root_ca_path}}
+frontend:
+  dir: {{svc_static_path}}/web
+  issuer: Chef Automate
+  theme: chef
+logger:
+  level: {{cfg.log.level}}
+  format: text
+oauth2:
+  responseTypes:
+    - code
+    - token
+    - id_token
+  skipApprovalScreen: true
+staticClients:
+  - id: automate-api # public, no secret, used by a2-api tests and l-u-s
+    name: Automate API
+    public: true
+  - id: automate-session
+    secret: secretchangeme # TODO
+    redirectURIs:
+      - /session/callback
+    name: Automate Session Service
+{{- if cfg.connectors}}
+connectors:
+  {{- if cfg.connectors.google}}
+  - type: oidc
+    id: google
+    name: Google
+    config:
+      issuer: https://accounts.google.com
+      clientID: {{cfg.connectors.google.client_id}}
+      clientSecret: {{cfg.connectors.google.client_secret}}
+      {{- if cfg.service.external_fqdn}}
+      redirectURI: https://{{cfg.service.external_fqdn}}/dex/callback
+      {{- else}}
+      redirectURI: http://{{cfg.service.host}}:{{cfg.service.port}}/dex/callback
+      {{- end}}
+  {{- end}}
+  {{- if cfg.connectors.ldap}}
+  - type: ldap
+    id: ldap
+    name: LDAP
+    config:
+      host: {{cfg.connectors.ldap.host}}
+      bindDN: $LDAP_BINDDN
+      bindPW: $LDAP_BINDPW
+      {{- if cfg.connectors.ldap.ca_contents}}
+      insecureSkipVerify: false
+      rootCA: {{svc_config_path}}/ldap-ca.pem
+      {{- else}}
+      insecureSkipVerify: true
+      {{- end}}
+      {{- if cfg.connectors.ldap.insecure_no_ssl}}
+      insecureNoSSL: {{cfg.connectors.ldap.insecure_no_ssl}}
+      {{- end}}
+      userSearch:
+        baseDN: {{cfg.connectors.ldap.base_user_search_dn}}
+        {{- if cfg.connectors.ldap.user_query_filter}}
+        filter: {{cfg.connectors.ldap.user_query_filter}}
+        {{- end}}
+        username: {{cfg.connectors.ldap.username_attr}}
+        idAttr: {{cfg.connectors.ldap.user_id_attr}}
+        {{- if cfg.connectors.ldap.email_attr}}
+        emailAttr: {{cfg.connectors.ldap.email_attr}}
+        {{- else}}
+        # No email_attr provided, using user_id_attr as workaround
+        emailAttr: {{cfg.connectors.ldap.user_id_attr}}
+        {{- end}}
+        {{- if cfg.connectors.ldap.user_display_name_attr}}
+        nameAttr: {{cfg.connectors.ldap.user_display_name_attr}}
+        {{- else}}
+        nameAttr: name
+        {{- end}}
+      groupSearch:
+        baseDN: {{cfg.connectors.ldap.base_group_search_dn}}
+        {{- if cfg.connectors.ldap.group_query_filter}}
+        filter: {{cfg.connectors.ldap.group_query_filter}}
+        {{- end}}
+        {{if cfg.connectors.ldap.filter_groups_by_user_value}}
+        userAttr: {{cfg.connectors.ldap.filter_groups_by_user_value}}
+        {{- else}}
+        userAttr: DN
+        {{- end}}
+        {{- if cfg.connectors.ldap.filter_groups_by_user_attr}}
+        groupAttr: {{cfg.connectors.ldap.filter_groups_by_user_attr}}
+        {{- else}}
+        groupAttr: member
+        {{- end}}
+        {{- if cfg.connectors.ldap.group_display_name_attr}}
+        nameAttr: {{cfg.connectors.ldap.group_display_name_attr}}
+        {{- else}}
+        nameAttr: name
+        {{- end}}
+  {{- end}}
+  {{- if cfg.connectors.msad_ldap}}
+  - type: ldap
+    id: ldap
+    name: LDAP Microsoft AD
+    config:
+      host: {{cfg.connectors.msad_ldap.host}}
+      bindDN: $LDAP_BINDDN
+      bindPW: $LDAP_BINDPW
+      {{- if cfg.connectors.msad_ldap.ca_contents}}
+      insecureSkipVerify: false
+      rootCA: {{svc_config_path}}/ldap-ca.pem
+      {{- else}}
+      insecureSkipVerify: true
+      {{- end}}
+      userSearch:
+        baseDN: {{cfg.connectors.msad_ldap.base_user_search_dn}}
+        {{- if cfg.connectors.msad_ldap.user_query_filter}}
+        filter: {{cfg.connectors.msad_ldap.user_query_filter}}
+        {{- else}}
+        filter: (objectClass=person)
+        {{- end}}
+        username: sAMAccountName
+        idAttr: sAMAccountName
+        emailAttr: mail
+        nameAttr: displayName
+      groupSearch:
+        baseDN: {{cfg.connectors.msad_ldap.base_group_search_dn}}
+        {{- if cfg.connectors.msad_ldap.group_query_filter}}
+        filter: {{cfg.connectors.msad_ldap.group_query_filter}}
+        {{- else}}
+        filter: (objectClass=group)
+        {{- end}}
+        userAttr: DN
+        groupAttr: member
+        nameAttr: displayName
+  {{- end}}
+  {{- if cfg.connectors.saml}}
+  - type: saml
+    id: saml
+    name: SAML
+    config:
+      ssoURL: {{cfg.connectors.saml.sso_url}}
+      ca: {{svc_config_path}}/saml-ca.pem
+      {{- if cfg.service.external_fqdn}}
+      redirectURI: https://{{cfg.service.external_fqdn}}/dex/callback
+      {{- else}}
+      redirectURI: http://{{cfg.service.host}}:{{cfg.service.port}}/dex/callback
+      {{- end}}
+      {{- if cfg.connectors.saml.entity_issuer}}
+      entityIssuer: {{cfg.connectors.saml.entity_issuer}}
+      {{- end}}
+      usernameAttr: {{cfg.connectors.saml.username_attr}}
+      emailAttr: {{cfg.connectors.saml.email_attr}}
+      groupsAttr: {{cfg.connectors.saml.groups_attr}}
+  {{- end}}
+{{- end}}
+
+{{- if cfg.bootstrap.insecure_admin}}
+staticPasswords:
+  - email: admin
+    hash: $2a$10$b0bF1A/AoAPAJUe.hqBarO3I5wFZ0QgzOBl9Cc8ZlhpXlEiZ7S/l6 # "chefautomate"
+    username: Local Admin
+    userID: 08a8684b-db88-4b73-90a9-3cd1661f5466
+{{- end}}
+
+expiry:
+  signingKeys: {{cfg.expiry.signing_keys}}
+  {{- if cfg.connectors.saml}}
+  # SAML is being used, so we cannot tweak ID token expiry
+  idTokens: 24h
+  {{- else}}
+  idTokens: {{cfg.expiry.id_tokens}}
+  {{- end}}

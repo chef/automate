@@ -1,0 +1,35 @@
+<ng-container *ngIf="selectablePages.length > 1">
+  <chef-button secondary
+    class="page-picker-item page-picker-first"
+    (click)="onItemTap(first)"
+    [disabled]="isNull(prev)">
+    <chef-icon>first_page</chef-icon>
+  </chef-button>
+  <chef-button secondary
+    class="page-picker-item page-picker-prev"
+    (click)="onItemTap(prev)"
+    [disabled]="isNull(prev)">
+    <chef-icon>chevron_left</chef-icon>
+  </chef-button>
+  <chef-button
+    *ngFor="let item of selectablePages; trackBy: trackBy"
+    class="page-picker-item"
+    [attr.primary]="item === page"
+    [attr.secondary]="item !== page"
+    [attr.disabled]="selectablePages.length <= 1"
+    (click)="onItemTap(item)">
+    {{ item }}
+  </chef-button>
+  <chef-button secondary
+    class="page-picker-item page-picker-next"
+    (click)="onItemTap(next)"
+    [disabled]="isNull(next)">
+    <chef-icon>chevron_right</chef-icon>
+  </chef-button>
+  <chef-button secondary
+    class="page-picker-item page-picker-last"
+    (click)="onItemTap(last)"
+    [disabled]="isNull(next)">
+    <chef-icon>last_page</chef-icon>
+  </chef-button>
+</ng-container>

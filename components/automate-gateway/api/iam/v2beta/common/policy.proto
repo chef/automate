@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common";
+
+enum Type {
+    CHEF_MANAGED = 0;
+    CUSTOM = 1;
+}
+
+message Policy {
+    string name = 1;
+    string id = 2;
+    Type type = 3;
+    repeated string members = 4;
+    repeated Statement statements = 5;
+}
+
+message Statement {
+    enum Effect {
+        ALLOW = 0;
+        DENY = 1;
+    }
+    Effect effect = 1;
+
+    // inline definitions
+    repeated string actions = 3;
+
+    // references
+    string role = 4;
+
+    // Note: these are for display only, not to be set in CreatePolicy/UpdatePolicy
+    repeated string resources = 5;
+}
+
+message Role {
+    string name = 1;
+    string id = 2;
+    Type type = 3;
+    repeated string actions = 4;
+    repeated string projects = 5;
+}
+
+message Project {
+    string name = 1;
+    string id = 2;
+    Type type = 3;
+    repeated string projects = 4;
+}
+
+// passed to UpgradeToV2 to set version
+enum Flag {
+    VERSION_2_0 = 0;
+    VERSION_2_1 = 1;
+}
+
+// the only values that may be returned by GetPolicyVersion
+message Version {
+    enum VersionNumber {
+        V0 = 0;
+        V1 = 1;
+        V2 = 2;
+    }
+    VersionNumber major = 1;
+    VersionNumber minor = 2;
+}

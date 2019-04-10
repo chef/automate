@@ -1,0 +1,52 @@
+chef-phat-radio {
+  --active-color: var(--toggle-active-color, chef-hsl(var(--chef-primary-bright)));
+  display: block;
+
+  chef-option {
+    display: inline-flex;
+    align-items: center;
+    background-color: chef-hsl(var(--chef-white));
+    box-shadow: 0 0 16px 0 #E6EBEE;
+    cursor: pointer;
+    padding: 1em;
+    border-radius: 5px;
+    height: 60px;
+    width: 175px;
+    margin-right: 8px;
+
+    &:nth-child(n+2) {
+      margin-left: 8px;
+    }
+
+    .option-content {
+      padding-left: 0.5em;
+    }
+
+    &::before {
+      font-family: "Material Icons";
+      content: "\E836";
+      color: chef-hsl(var(--chef-grey));
+      font-size: 20px;
+    }
+
+    &:hover {
+      color: var(--active-color);
+      transition: color 1s ease;
+
+      &::before {
+        color: var(--active-color);
+        transition: color 1s ease;
+      }
+    }
+
+    &.selected {
+      color: var(--active-color);
+
+      &::before {
+        font-family: "Material Icons";
+        content: "\E837";
+        color: var(--active-color);
+      }
+    }
+  }
+}

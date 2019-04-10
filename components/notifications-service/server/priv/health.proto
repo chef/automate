@@ -1,0 +1,15 @@
+syntax = "proto3";
+package notifications;
+
+option go_package = "api";
+
+///
+// Health check and server metadata messages and responses
+///
+
+message VersionRequest {
+}
+
+message VersionResponse {
+  string version  = 1;
+}

@@ -1,0 +1,37 @@
+<svg:g [attr.transform]="'translate(' + x + ',' + y + ')'">
+
+  <svg:circle *ngIf="multiple && !isUpdate()" 
+    [ngClass]="[task, 'multiple']" 
+    [attr.r]="iconRadius" 
+    x="0" 
+    y="0"/>
+
+  <svg:circle *ngIf="!isUpdate()" 
+    [ngClass]="[task, 'circle']" 
+    [attr.r]="iconRadius-2" />
+
+  <svg:rect *ngIf="multiple && isUpdate()" 
+    [ngClass]="[task, 'multiple']" 
+    [attr.x]="(iconRadius+6)/-2" 
+    [attr.y]="(iconRadius+6)/-2" 
+    [attr.width]="iconRadius+6" 
+    [attr.height]="iconRadius+6" 
+    transform="rotate(-45 0 0)"/>
+
+  <svg:rect *ngIf="isUpdate()" 
+    [attr.x]="(iconRadius+2)/-2" 
+    [attr.y]="(iconRadius+2)/-2" 
+    [attr.width]="iconRadius+2" 
+    [attr.height]="iconRadius+2" 
+    transform="rotate(-45 0 0)"/>
+
+  <svg:text 
+    [ngClass]="[task, 'icon']" 
+    [attr.x]="iconRadius/-2" 
+    [attr.y]="iconRadius/2"
+    [attr.font-family]="'Material Icons'"
+    [attr.font-size]="iconRadius">
+    {{getEventIcon()}}
+  </svg:text>
+
+</svg:g>

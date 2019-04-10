@@ -1,0 +1,76 @@
+<div class="project tabbed-view" cd-infinite-scroll="loadMoreChanges()">
+  <header class="page-header">
+    <nav class="breadcrumb-nav" role="navigation">
+      <ol class="breadcrumbs">
+        <li class="breadcrumb">
+          <a ui-sref="main.enterprise.organizations">Workflow Orgs</a>
+          <i class="fa fa-angle-right"></i>
+        </li>
+        <li class="breadcrumb">
+          <a ui-sref="main.enterprise.organizations.organization({org: project.orgName})">{{ project.orgName }}</a>
+          <i class="fa fa-angle-right"></i>
+        </li>
+        <li class="breadcrumb project-name">{{ project.name }} <i class="fa fa-angle-right"></i></li>
+      </ol>
+    </nav>
+    <div class="page-header-title">
+      <h2>{{ project.name }}</h2>
+    </div>
+    <div class="page-header-meta">
+      <div class="watch">
+        <div class="watch-button" ng-attr-title="{{ watchButton.title }}">
+          <button class="button small secondary"
+            type="button"
+            icon-button="{{ watchButton.icon }}"
+            ng-click="toggleWatchMenu()"
+            ng-disabled="watchButton.disabled">
+              {{ watchButton.label }}</button>
+        </div>
+        <div class="watch-menu" ng-if="showWatchMenu">
+          <div class="heading">
+            Select the categories you'd like to receive email notifications about for this project.
+          </div>
+          <ul class="categories">
+            <li ng-repeat="category in watchableCategories">
+              <label>
+                <input
+                  type="checkbox"
+                  name="categories[]"
+                  value="{{ category.name }}"
+                  ng-checked="watchSettings.categories.indexOf(category.name) !== -1"
+                  ng-click="toggleCategory(category.name)"> {{category.name | capitalize}}
+              </label>
+              <div class="description">
+                {{ category.description }}
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="tabs">
+    <ul>
+      <li class="tab changes" ui-sref-active="active" ui-sref="main.enterprise.organizations.organization.project.changes">
+        <span>Changes</span>
+      </li>
+      <li class="tab pipelines" ui-sref-active="active" ui-sref="main.enterprise.organizations.organization.project.pipelines">
+        <span>Pipelines</span>
+      </li>
+      <li class="tab clone" ui-sref-active="active" ui-sref="main.enterprise.organizations.organization.project.clone" ng-if="clonesFromDelivery(project.scm.type)">
+        <span>Clone Project</span>
+      </li>
+      <li class="tab dependencies" ui-sref-active="active" ui-sref="main.enterprise.organizations.organization.project.dependencies" ng-if="depCount(interdeps.dependencies) > 0">
+        <span class="label">Dependencies</span>
+        <span class="badge">{{ depCount(interdeps.dependencies) }}</span>
+      </li>
+      <li class="tab consumers" ui-sref-active="active" ui-sref="main.enterprise.organizations.organization.project.consumers" ng-if="depCount(interdeps.required_by) > 0">
+        <span class="label">Required By</span>
+        <span class="badge">{{ depCount(interdeps.required_by) }}</span>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div ui-view>
+    </div>
+  </div>
+</div>

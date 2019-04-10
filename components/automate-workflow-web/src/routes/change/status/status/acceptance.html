@@ -1,0 +1,57 @@
+<div>
+  <div class="stage-step acceptance" ng-class="change.stages[2].status">
+    <div class="stage-step-header">
+      <span class="stage-title">
+        <span class="status-icon" ng-class="change.stages[2].status"></span> Acceptance
+      </span>
+      <button
+        type="button"
+        class="stage-rerun button"
+        ng-click="change.rerun(rerunLink(change.stages[2]))"
+        ng-if="rerunLink(change.stages[2]) && showRerunLink">
+        <span class="icon icon-reload"></span> Re-Run
+      </button>
+    </div>
+    <div
+      ng-repeat="phase in change.stages[2].phases track by phase.name"
+      cd-grouped-phase-list="phase">
+    </div>
+  </div>
+  <div class="stage-step approval">
+    <div class="stage-step-header">
+      <span class="stage-title">
+        <span
+          class="status-icon"
+          ng-hide="change.stages[2].status === 'passed' && !change.stages[3]"
+          ng-class="{
+            running:
+              change.stages[2].status === 'running',
+            passed:
+              change.stages[3].status === 'running' ||
+              change.stages[3].status === 'passed',
+            caution:
+              change.stages[2].status === 'failed' ||
+              change.stages[3].status === 'failed' ||
+              change.stages[2].status === 'running'
+          }"></span>
+          <div
+            class="waiting"
+            ng-if="change.stages[2].status === 'passed' && !change.stages[3]"
+            status-icon="waiting"></div>
+            Deliver
+      </span>
+      <span class="stage-step-approval-status">
+        <span
+          class="user-gate-status passed"
+          ng-if="delivered()">
+          Delivered
+        </span>
+        <span
+          class="user-gate-status running"
+          ng-if="!delivered()">
+          Awaiting Delivery
+        </span>
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+@startuml
+autonumber "[<b>#</b>]"
+title Authorization of an API method
+participant "actor" as actor
+participant "automate-gateway" as api
+participant "authz-service" as authz
+entity "OPA engine" as opa
+participant "//other chef service//" as target
+
+  actor -> api: <Endpoint URL>
+
+  alt endpoint IS instrumented
+
+	  api -> authz: IsAuthorizedReq
+    note left
+	    send user and teams as subjects,
+	    plus action & expanded resource
+      from endpoint
+    end note
+    authz -> opa: engine.IsAuthorized
+    alt policy does not exist
+      opa -[#red]> authz: deny
+    else policy exists
+      opa -[#green]> authz: allow
+    end
+    authz -> api: IsAuthorizedResp[allow/deny]
+
+    alt user IS authorized
+      api -> target: pass through original URL and params
+      target -> actor: <result>
+    else user IS NOT authorized
+     api -[#red]> actor: deny
+    end
+	
+  else endpoint IS NOT instrumented
+
+     api -[#red]> actor: deny
+   
+  end ' alt
+
+@enduml

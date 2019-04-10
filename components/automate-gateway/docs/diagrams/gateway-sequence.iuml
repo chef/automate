@@ -1,0 +1,19 @@
+@startuml
+title A2 High Level Sequence Diagram: browser through domain
+
+actor       "browser" as browser
+participant "automate-load-balancer" as lb
+participant "automate-webui" as webui
+participant "dex" as dex
+participant "session-service" as session
+participant "automate-gateway" as api
+collections "domain services" as domain
+
+browser -> lb
+lb -> webui
+browser -> lb
+lb -> session
+lb -> dex
+lb -> api
+api -> domain
+@enduml

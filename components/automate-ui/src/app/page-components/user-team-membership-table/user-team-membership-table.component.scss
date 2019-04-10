@@ -1,0 +1,33 @@
+@import "~styles/variables";
+
+chef-table {
+  font-size: 14px;
+
+  .profile-image {
+    width: 20px;
+    height: 20px;
+    margin-right: 1em;
+  }
+
+  .no-users {
+    display: flex;
+    align-items: center;
+    height: 55px;
+    justify-content: center;
+  }
+
+  .checkbox-row {
+    max-width: 50px;
+  }
+}
+
+chef-loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.body-description {
+  font-size: 14px;
+  margin-bottom: 1em;
+}

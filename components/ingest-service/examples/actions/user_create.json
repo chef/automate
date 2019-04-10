@@ -1,0 +1,18 @@
+{
+  "id": "5718006e-eef4-49c8-84e0-44f9c29dd12d",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "mkrasnow",
+  "entity_type": "user",
+  "task": "create",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-03-27T18:40:50Z",
+  "remote_request_id": "fc6b3a5c-ea41-462c-9f33-1897d34c7584",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAEE/0OwAAIAAAAA",
+  "requestor_name": "pivotal",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Manage/11.16.2 (ruby-2.3.5-p376; ohai-7.4.1; x86_64-linux; +http://opscode.com)",
+  "data": "{\"display_name\":\"mkrasnow\",\"email\":\"mkrasnow@chef.io\",\"external_authentication_uid\":\"mkrasnow\",\"first_name\":\"Mike\",\"last_name\":\"Krasnow\",\"recovery_authentication_enabled\":false,\"username\":\"mkrasnow\"}"
+}

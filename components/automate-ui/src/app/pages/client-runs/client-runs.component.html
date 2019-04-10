@@ -1,0 +1,136 @@
+<div *ngIf="permissionDenied$ | async" class="permission-denied-banner">
+  <p>You do not currently have permission to view this page.</p>
+  <p>Please contact your administrator for permission.</p>
+</div>
+
+<app-server-org-filter-sidebar>
+  <chef-sidebar-entry route="/client-runs" icon="storage">Node State</chef-sidebar-entry>
+  <a *ngIf="isWorkflowEnabled$ | async" href="/workflow">
+    <chef-icon class="sidebar-icon" aria-hidden="true">local_shipping</chef-icon>
+    Workflow
+    <chef-icon class="arrow" aria-hidden="true">play_arrow</chef-icon>
+  </a>
+</app-server-org-filter-sidebar>
+
+<div class="container">
+  <chef-notification
+    *ngIf="notificationVisible"
+    [type]="'error'"
+    [timeout]="8"
+    (dismissed)="hideNotification()">
+    Failed to retrieve data.
+  </chef-notification>
+  <main>
+    <h1 class="visually-hidden">Node Converge State Page</h1>
+    <div class="node-list-container">
+      <chef-page-header>
+
+        <app-client-runs-search-bar
+          [numberOfFilters]="numberOfSearchBarFilters$ | async"
+          [filterTypes]="categoryTypes"
+          [filterValues]="nodeSuggestions$ | async"
+          (suggestValues)="onSuggestValues($event)"
+          (itemSelected)="onFilterAdded($event)"
+          (filtersButtonClick)="toggleFilters()">
+        </app-client-runs-search-bar>
+        <div class="copy-dropdown">
+          <chef-button class="dropdown-toggle" secondary (click)="toggleShareDropdown()">
+            <chef-icon>share</chef-icon>
+          </chef-button>
+          <chef-dropdown class="dropdown" [visible]="shareDropdownVisible">
+            <chef-click-outside (clickOutside)="hideShareDropdown()" omit="dropdown-toggle">
+              <p>Copy this private URL to share:</p>
+              <div class="copy-input">
+                <input type="text" [value]="shareUrl" readonly />
+                <chef-clipboard [value]="shareUrl"></chef-clipboard>
+              </div>
+            </chef-click-outside>
+          </chef-dropdown>
+        </div>
+        <div class="download-nodes">
+          <chef-button class="dropdown-toggle" secondary (click)="toggleDownloadDropdown()">
+            <chef-icon>cloud_download</chef-icon>
+          </chef-button>
+          <chef-dropdown class="dropdown" [visible]="downloadOptsVisible">
+            <chef-click-outside (clickOutside)="hideDownloadDropdown()" omit="dropdown-toggle">
+              <chef-button tertiary (click)="onDownloadOptPressed('json')">Download JSON</chef-button>
+              <chef-button tertiary (click)="onDownloadOptPressed('csv')">Download CSV</chef-button>
+            </chef-click-outside>
+          </chef-dropdown>
+        </div>
+
+        <app-client-runs-search-filters *ngIf="filtersVisible"
+          [filters]="searchBarFilters$ | async"
+          (filtersCleared)="onFiltersClear($event)"
+          (filterRemoved)="onFilterRemoved($event)">
+        </app-client-runs-search-filters>
+      </chef-page-header>
+      <div class="page-body">
+        <ng-container>
+          <div class="stats-box">
+            <app-converge-radial-graph [count]="nodeCounts$ | async"></app-converge-radial-graph>
+          </div>
+        </ng-container>
+        <!-- Converge Status elements -->
+        <div class="node-rollups">
+          <app-node-rollup
+            class="total"
+            [name]="'total'"
+            [count]="totalNodeCount$ | async"
+            [active]="isTotalStatusSelected$ | async"
+            (activated)="statusFilter('total')">
+          </app-node-rollup>
+          <app-node-rollup
+            class="failure"
+            [name]="'failure'"
+            [count]="failNodeCount$ | async"
+            [active]="isFailureStatusSelected$ | async"
+            (activated)="statusFilter('failure')">
+          </app-node-rollup>
+          <app-node-rollup
+            class="success"
+            [name]="'success'"
+            [count]="successNodeCount$ | async"
+            [active]="isSuccessStatusSelected$ | async"
+            (activated)="statusFilter('success')">
+          </app-node-rollup>
+          <app-node-rollup
+            class="missing"
+            [name]="'missing'"
+            [count]="missingNodeCount$ | async"
+            [active]="isMissingStatusSelected$ | async"
+            (activated)="statusFilter('missing')">
+          </app-node-rollup>
+        </div>
+        <app-client-runs-table
+          [totalNodes]= "totalNumberOfNodesWithStatusFilter$ | async"
+          [nodes]="nodes$ | async"
+          [selectedFieldDirection]="fieldDirection$ | async"
+          [selectedSortField]="sortField$ | async"
+          [currentPage]="currentPage$ | async"
+          [pageSize]="pageSize"
+          [columns]="columns$ | async"
+          [defaultFieldDirection]="defaultFieldDirection"
+          [loading]="loading(loadedStatus$ | async)"
+          [canDeleteNodes]="authorizedChecker.isAuthorized$ | async"
+          (deleteNodes)="onDeleteNodes($event)"
+          (updateSort)="onUpdateSort($event)"
+          (pageChange)="onPageChange($event)"
+          (updateColumns)="onUpdateColumns($event)">
+        </app-client-runs-table>
+      </div>
+    </div>
+
+    <chef-modal
+      id="download-modal"
+      title="download-title"
+      [visible]="downloadStatusVisible"
+      (close)="hideDownloadStatus()">
+      <h4 id="download-title" slot="title">
+        <ng-container *ngIf="downloadInProgress">Downloading report...</ng-container>
+        <ng-container *ngIf="downloadFailed">Download failed.</ng-container>
+      </h4>
+      <chef-loading-spinner *ngIf="downloadInProgress" size="50"></chef-loading-spinner>
+    </chef-modal>
+  </main>
+</div>

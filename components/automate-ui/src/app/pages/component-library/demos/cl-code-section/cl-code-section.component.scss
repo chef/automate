@@ -1,0 +1,10 @@
+@import '../../component-library-mixins.scss';
+
+:host .cl-content {
+  @include section-content();
+  overflow: auto;
+
+  ::ng-deep pre {
+    margin: 0;
+  }
+}

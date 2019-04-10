@@ -1,0 +1,75 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+# shellcheck disable=SC1083 # false positives from handlebars
+
+exec 2>&1
+
+"{{pkgPathFor "chef/mlsa"}}/bin/accept" {{cfg.mlsa.accept}}
+
+mkdir -p {{pkg.svc_var_path}}/logs
+source {{pkg.svc_path}}/hooks/reconfigure
+source "{{pkg.svc_config_path}}/elasticsearch-init.sh"
+
+export HOME={{pkg.svc_var_path}}
+export RUNNER_LOG_DIR="{{pkg.svc_var_path}}/logs"
+export RELX_CONFIG_PATH="{{pkg.svc_config_path}}/sys.config"
+export VMARGS_PATH="{{pkg.svc_config_path}}/vm.args"
+export DBNAME="{{cfg.sql.db_name}}"
+{{#if cfg.fips_enabled ~}}
+export OPENSSL_FIPS=1
+{{/if ~}}
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template sqerl.config "{{pkg.svc_var_path}}/etc/sqerl.config"
+render-template pg.env "{{pkg.svc_var_path}}/etc/pg.env"
+
+pg-helper rename-if-exists opscode_chef "$DBNAME"
+pg-helper ensure-service-database "$DBNAME"
+pg-helper create-extension "$DBNAME" "uuid-ossp"
+pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/baseline"
+pg-helper sqitch-deploy "$DBNAME" "{{pkgPathFor "chef/oc_erchef"}}/schema/"
+pg-helper fix-permissions "$DBNAME"
+
+# chef_server_data_bootstrap relies on the webui keys so create that first
+ruby "{{pkg.svc_config_path}}/ensure_webui_key.rb" "{{pkg.svc_data_path}}"
+
+cd {{pkg.path}} || exit
+
+# TODO(ssd) 2018-09-21: This is lame. We close FD 0 so that that gets
+# used as the FD that secrets-helper passes. The issue is that some
+# FDs (3,4,5) are reserved by the Ruby VM so you can't use them. This
+# wasn't a problem for the ruby implementation because it was also in
+# ruby so those FD's were taken.
+exec 0<&-
+
+source "{{pkg.svc_var_path}}/etc/pg.env"
+HOME="{{pkg.svc_data_path}}" BUNDLE_GEMFILE="{{pkgPathFor "chef/oc_erchef"}}/Gemfile" \
+  secrets-helper exec --secret oc_bifrost.superuser_id -- \
+    bundle exec ruby "{{pkg.svc_config_path}}/chef_server_data_bootstrap.rb"
+
+# ruby vars are needed in order to make depselector start up
+export PATH={{pkgPathFor "core/ruby"}}/bin:{{pkgPathFor "core/bundler"}}/bin:${PATH}
+export LD_LIBRARY_PATH={{pkgPathFor "core/libffi"}}/lib:${LD_LIBRARY_PATH}
+export GEM_HOME={{pkgPathFor "core/bundler"}}
+export GEM_PATH={{pkgPathFor "core/bundler"}}
+
+# non root svc user and we need write access to the file
+cp {{pkg.svc_config_path}}/dark_launch_features.json {{pkg.svc_data_path}}
+
+secrets-helper insert chef-server.webui_pub_key <{{pkg.svc_data_path}}/webui_pub.pem
+
+# The erlang VM is also fussy about file descriptors.
+# TODO(yzl): `exec 0</dev/null` can be removed once
+# https://github.com/habitat-sh/habitat/issues/1973
+# has been addressed.
+#
+exec 0</dev/null
+exec secrets-helper exec \
+     --secret oc_bifrost.superuser_id \
+     --secret bookshelf.access_key_id \
+     --secret bookshelf.secret_access_key \
+     --secret chef-server.webui_pub_key \
+     -- \
+     {{~#if cfg.memory.max_bytes}}
+     chpst -d {{cfg.memory.max_bytes}} \
+     {{~/if}}
+     oc_erchef foreground

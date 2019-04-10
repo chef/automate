@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# Helper methods specific for the automate-workflow-server
+
+document "start_workflow_server" <<DOC
+  Build and start the local automate-workflow-server
+DOC
+function start_workflow_server {
+  check_if_deployinate_started || return 1
+  log_line "Patching the deployment-service to enable workflow"
+  cat << EOF > "/tmp/.enable_workflow_server.toml"
+[deployment.v1.svc]
+enable_workflow = true
+EOF
+  chef-automate config patch /tmp/.enable_workflow_server.toml
+  rm /tmp/.enable_workflow_server.toml
+}
+
+document "create_workflow_enterprise" <<DOC
+  Creates a Workflow enterprise. (default: automate)
+DOC
+function create_workflow_enterprise {
+  local enterprise=${1-automate}
+  log_line "Creating $(green "$enterprise") Workflow enterprise"
+  install_workflow_ctl
+  workflow-ctl create-enterprise "$enterprise" --ssh-pub-key-file=/hab/svc/automate-workflow-server/var/etc/builder_key.pub
+}
+
+document "install_workflow_ctl" <<DOC
+  Installs the workflow-ctl command line
+DOC
+function install_workflow_ctl {
+  install_if_missing "${HAB_ORIGIN}/automate-workflow-server" workflow-ctl
+}
+
+############## ############## ############## ##############
+# Migration helper methods
+#
+# The following function requires postgresql to be running:
+#    => chef-automate dev deploy-some chef/automate-postgresql
+#
+document "workflow_download_and_load_A1_data" <<DOC
+  Download and load a Workflow A1 backup.
+
+  The function accepts a different backup name that has to be stored
+  in the following S3 location:
+
+  https://s3.console.aws.amazon.com/s3/buckets/a2-bucket/
+
+  (@arg:1) database backup name
+  (@arg:2) git repos backup name
+
+  Example 1: Download a CUSTOMER's backup
+  ------------------------------------
+  workflow_download_and_load_A1_data a1_CUSTOMER_Fc_delivery_backup a1_CUSTOMER_git_repos
+DOC
+function workflow_download_and_load_A1_data {
+  local db_backup=${1-a1_SMALL_Fc_delivery_backup}
+  local git_repos_backup=${2-a1_SMALL_git_repos}
+  local DBNAME=delivery
+
+  # Verify that postgresql is already running
+  check_service_running_or_exit automate-postgresql || return 1
+
+  # Remove any git_repos dir if exists
+  if [ -d /var/opt/delivery/delivery/git_repos/ ]; then
+    warn "Git repos found. Removing '$(yellow /var/opt/delivery/delivery/git_repos/)' directory."
+    rm -rf /var/opt/delivery/delivery/git_repos/
+  fi
+
+  log_line "Downloading backup from S3 bucket"
+  install_if_missing core/wget wget
+  wget "https://s3-us-west-2.amazonaws.com/a2-bucket/$db_backup.sql"
+  wget "https://s3-us-west-2.amazonaws.com/a2-bucket/$git_repos_backup.tar"
+
+  log_line "Uncompressing Git repos backup $(green "$git_repos_backup.tar")"
+  install_if_missing core/tar tar
+  tar xf "$git_repos_backup.tar" -C /
+  rm -f "$git_repos_backup.tar"
+
+  log_line "Restoring data base from backup $(green "$db_backup.sql")"
+  postgresql_load_env
+  install_if_missing core/postgresql psql;
+  psql -c "DROP DATABASE IF EXISTS $DBNAME"
+  psql -c "CREATE DATABASE $DBNAME"
+  install_if_missing core/postgresql pg_restore;
+  pg_restore -d $DBNAME --no-owner "$db_backup.sql"
+  psql $DBNAME -c '\dt'
+  rm -f "$db_backup.sql"
+}

@@ -1,0 +1,70 @@
+
+// ------------------------------------------------------------------------------------- //
+// DO NOT DIRECTLY IMPORT COLORS FROM THIS FILE : CREATE A VARIABLE in _variables.scss //
+// ------------------------------------------------------------------------------------- //
+
+// LOCAL COLOR VARIABLES
+// ONLY to be used to set color configs in _variables.scss
+// primary
+$chef-orange: #FE6100;
+$ebony-clay: #222435;
+$royal-blue: #3864F2;
+$malibu: #648FFF;
+// secondary
+$pink: #DC267F;
+$violet: #C22DD5;
+$indigo: #785EF0;
+$science-blue: #0075DB;
+// greyscale
+$sirocco: #6F7878;
+$iron: #DFE3E5;
+$mystic: #E6EBEE;
+$haze: #F3F6F8;
+$white: #FFFFFF;
+$black: #000000;
+
+
+// ------------------------------------------------------------------------------------- //
+// gradients
+%primary-gradient {
+  background: $chef-orange;
+  background: -moz-linear-gradient(left, rgba(255, 125, 76, 1) 0%, rgba(241, 139, 33, 1) 100%);
+  background: -webkit-linear-gradient(left, rgba(255, 125, 76, 1) 0%, rgba(241, 139, 33, 1) 100%);
+  background: -o-linear-gradient(left, rgba(255, 125, 76, 1) 0%, rgba(241, 139, 33, 1) 100%);
+  background: linear-gradient(to right, rgba(255, 125, 76, 1) 0%, rgba(241, 139, 33, 1) 100%);
+}
+
+// ------------------------------------------------------------------------------------- //
+// DEPRECATED COLORS //
+
+// OLD Chef Automate primary brand colors
+$chef-blue-dark: #3F5364;
+// OLD Chef Automate secondary colors
+$chef-dark-blue: $royal-blue;
+$chef-blue: $malibu;
+$link-blue: $malibu;
+$chef-turquoise: #009BEF;
+$chef-yellow: #FFB000;
+// Chef colors that have been historically used
+$chef-blue-medium: #3883B3;
+$chef-blue-light: #57ABE0;
+$chef-blue-lighter: #E8F3FA;
+$chef-purple: #9013FE;
+$chef-green: #1FB899;
+$chef-light-green: #3DC5AA;
+$chef-red: #E27C79;
+$blue-light: #E1E5EC;
+$bluedarkest: #163850;
+$alert-pink: $chef-red;
+$success-green: $chef-green;
+// OLD Chef Automate grayscale colors
+$gray-pale: $mystic;
+$gray-shadow: $mystic;
+$gray-less-pale: $haze;
+$gray-highlight: $haze;
+$gray-light: #B4B8BB;
+$gray: #9DA3A7;
+$gray7: #878B8E;
+$gray-icon: #D8D8D8;
+// pre background
+$pre-background: #424242;

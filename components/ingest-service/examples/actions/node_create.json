@@ -1,0 +1,19 @@
+{
+  "id": "0e622271-1e0c-4de9-a9ad-3d642005c2f9",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "a2-local-fresh-install-unstable.cd.chef.co",
+  "entity_type": "node",
+  "task": "create",
+  "organization_name": "chef",
+  "remote_hostname": "172.21.104.205",
+  "recorded_at": "2018-02-27T14:56:39Z",
+  "remote_request_id": "4bcac361-43d9-4ad6-9fef-5a321c88f9e0",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAOe3TZQAAEAAAAA",
+  "requestor_name": "a2-local-fresh-install-unstable.cd.chef.co",
+  "requestor_type": "client",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Client/13.8.0 (ruby-2.4.3-p205; ohai-13.7.1; x86_64-linux; +https://chef.io)",
+  "data": "{\"automatic\":{},\"chef_environment\":\"acceptance-chef-products-a2-master\",\"chef_type\":\"node\",\"default\":{},\"json_class\":\"Chef::Node\",\"name\":\"a2-local-fresh-install-unstable.cd.chef.co\",\"normal\":{},\"override\":{},\"run_list\":[]}"
+}

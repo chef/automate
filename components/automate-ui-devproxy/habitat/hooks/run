@@ -1,0 +1,8 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+echo "Setting UI proxy to $DEVPROXY_URL based on \$DEVPROXY_URL which is set differently by .studiorc for either the Docker-based or Vagrant-based studio dev env."
+sed -i -e "s/WILL_GET_REPLACED_BY_INIT_HOOK/$DEVPROXY_URL/g" /hab/svc/automate-ui/config/nginx.conf || true
+
+exec {{ pkgPathFor "core/nginx" }}/bin/nginx -c "{{ pkg.svc_config_path }}/nginx.conf"

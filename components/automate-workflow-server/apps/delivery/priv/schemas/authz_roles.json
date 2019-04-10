@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema#",
+  "type": "object",
+  "description": "Describes the effective roles a user has at a given scope, as well as the scopes at which those roles have been granted. If the given user has no roles set whatsoever, an empty object is returned.",
+  "properties": {
+    "admin": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string",
+        "enum": ["enterprise",
+                 "organization",
+                 "project",
+                 "pipeline"]
+      }
+    },
+    "committer": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string",
+        "enum": ["enterprise",
+                 "organization",
+                 "project",
+                 "pipeline"]
+      }
+    },
+    "reviewer": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string",
+        "enum": ["enterprise",
+                 "organization",
+                 "project",
+                 "pipeline"]
+      }
+    },
+    "shipper": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string",
+        "enum": ["enterprise",
+                 "organization",
+                 "project",
+                 "pipeline"]
+      }
+    },
+    "observer": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "required": false,
+      "items": {
+        "type": "string",
+        "enum": ["enterprise",
+                 "organization",
+                 "project",
+                 "pipeline"]
+      }
+    }
+  },
+  "additionalProperties": false
+}

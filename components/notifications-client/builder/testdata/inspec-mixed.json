@@ -1,0 +1,172 @@
+{
+  "report_uuid": "b4df00d02",
+  "node_uuid": "deadbeef02",
+  "node_name": "bleh-node",
+  "environment": "optional",
+
+  "version": "1.30.0",
+  "profiles": [{
+    "name": "ssh",
+    "title": "Basic SSH",
+    "maintainer": "Chef Software, Inc.",
+    "copyright": "Chef Software, Inc.",
+    "copyright_email": "support@chef.io",
+    "license": "Proprietary, All rights reserved",
+    "summary": "Verify that SSH Server and SSH Client are configured securely",
+    "version": "1.1.0",
+    "supports": [{
+      "os-family": "unix"
+    }],
+    "controls": [{
+      "title": "/etc/ssh should be a directory",
+      "desc": "In order for OpenSSH to function correctly, its\nconfiguration path must be a folder.",
+      "impact": 1.0,
+      "refs": [],
+      "tags": {},
+      "code": "control 'basic-1' do\n  impact 1.0\n  title '/etc/ssh should be a directory'\n  desc '\n    In order for OpenSSH to function correctly, its\n    configuration path must be a folder.\n  '\n  describe file('/etc/ssh') do\n    it { should be_directory }\n  end\nend\n",
+      "source_location": {
+        "ref": "base/ssh/controls/ssh_folder_spec.rb",
+        "line": 11
+      },
+      "id": "basic-1",
+      "results": [{
+        "status": "skipped",
+        "skip_message": "Because",
+        "code_desc": "File /etc/ssh should be directory",
+        "run_time": 0.002151,
+        "start_time": "2017-07-05 14:08:05 +0200"
+      }]
+    }],
+    "attributes": [],
+    "sha256": "f56ef31e9e8be7c9064e84f1db699d3f0175924a0ee4517e3a626c38727ebf93"
+  }, {
+    "name": "ssh 2",
+    "title": "Basic SSH 2",
+    "maintainer": "Chef Software, Inc.",
+    "copyright": "Chef Software, Inc.",
+    "copyright_email": "support@chef.io",
+    "license": "Proprietary, All rights reserved",
+    "summary": "Verify that SSH Server and SSH Client are configured securely",
+    "version": "1.1.0",
+    "supports": [{
+      "os-family": "unix"
+    }],
+    "controls": [{
+      "title": "/etc/ssh should have limited access to 0755",
+      "desc": "The OpenSSH configuration folder should have restricted\naccess permissions. It is an important step towards making\nsure, that configuration files are only changed by\npriviledged users, while leaving them readable for the\nSSH client.",
+      "impact": 0.9,
+      "refs": [],
+      "tags": {},
+      "code": "control 'basic-3' do\n  impact 0.5\n  title '/etc/ssh should have limited access to 0755'\n  desc '\n    The OpenSSH configuration folder should have restricted\n    access permissions. It is an important step towards making\n    sure, that configuration files are only changed by\n    priviledged users, while leaving them readable for the\n    SSH client.\n  '\n  describe file('/etc/ssh') do\n    it { should_not be_writable.by('group') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_readable.by('others') }\n  end\nend\n",
+      "source_location": {
+        "ref": "base/ssh/controls/ssh_folder_spec.rb",
+        "line": 37
+      },
+      "id": "basic-3",
+      "results": [{
+        "status": "passed",
+        "code_desc": "File /etc/ssh should not be writable by group",
+        "run_time": 0.000469,
+        "start_time": "2017-07-05 14:08:05 +0200"
+      }, {
+        "status": "passed",
+        "code_desc": "File /etc/ssh should not be writable by others",
+        "run_time": 0.000217,
+        "start_time": "2017-07-05 14:08:05 +0200"
+      }, {
+        "status": "failed",
+        "code_desc": "File /etc/ssh should not be readable by others",
+        "run_time": 0.003424,
+        "start_time": "2017-07-05 14:08:05 +0200",
+        "message": "expected File /etc/ssh not to be readable by others"
+      }]
+    }],
+    "attributes": [],
+    "sha256": "f56ef31e9e8be7c9064e84f1db699d3f0175924a0ee4517e3a626c38727ebf93"
+  },{
+    "name": "ssh 3",
+    "title": "Basic SSH 3",
+    "maintainer": "Chef Software, Inc.",
+    "copyright": "Chef Software, Inc.",
+    "copyright_email": "support@chef.io",
+    "license": "Proprietary, All rights reserved",
+    "summary": "Verify that SSH Server and SSH Client are configured securely",
+    "version": "1.1.0",
+    "supports": [{
+      "os-family": "unix"
+    }],
+    "controls": [{
+      "title": "/etc/ssh should have limited access to 0755",
+      "desc": "The OpenSSH configuration folder should have restricted\naccess permissions. It is an important step towards making\nsure, that configuration files are only changed by\npriviledged users, while leaving them readable for the\nSSH client.",
+      "impact": 0.3,
+      "refs": [],
+      "tags": {},
+      "code": "control 'basic-3' do\n  impact 0.5\n  title '/etc/ssh should have limited access to 0755'\n  desc '\n    The OpenSSH configuration folder should have restricted\n    access permissions. It is an important step towards making\n    sure, that configuration files are only changed by\n    priviledged users, while leaving them readable for the\n    SSH client.\n  '\n  describe file('/etc/ssh') do\n    it { should_not be_writable.by('group') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_readable.by('others') }\n  end\nend\n",
+      "source_location": {
+        "ref": "base/ssh/controls/ssh_folder_spec.rb",
+        "line": 37
+      },
+      "id": "basic-3",
+      "results": [{
+        "status": "passed",
+        "code_desc": "File /etc/ssh should not be writable by group",
+        "run_time": 0.000469,
+        "start_time": "2017-07-05 14:08:05 +0200"
+      }, {
+        "status": "failed",
+        "code_desc": "File /etc/ssh should not be writable by others",
+        "run_time": 0.000217,
+        "start_time": "2017-07-05 14:08:05 +0200",
+        "message": "expected File /etc/ssh not to be writable by others"
+      }, {
+        "status": "failed",
+        "code_desc": "File /etc/ssh should not be readable by others",
+        "run_time": 0.003424,
+        "start_time": "2017-07-05 14:08:05 +0200",
+        "message": "expected File /etc/ssh not to be readable by others"
+      }]
+    }],
+    "attributes": [],
+    "sha256": "f56ef31e9e8be7c9064e84f1db699d3f0175924a0ee4517e3a626c38727ebf93"
+  },{
+    "name": "ssh 3",
+    "title": "Basic SSH 3",
+    "maintainer": "Chef Software, Inc.",
+    "copyright": "Chef Software, Inc.",
+    "copyright_email": "support@chef.io",
+    "license": "Proprietary, All rights reserved",
+    "summary": "Verify that SSH Server and SSH Client are configured securely",
+    "version": "1.1.0",
+    "supports": [{
+      "os-family": "unix"
+    }],
+    "controls": [{
+      "title": "/etc/ssh should be a directory",
+      "desc": "In order for OpenSSH to function correctly, its\nconfiguration path must be a folder.",
+      "impact": 1.0,
+      "refs": [],
+      "tags": {},
+      "code": "control 'basic-1' do\n  impact 1.0\n  title '/etc/ssh should be a directory'\n  desc '\n    In order for OpenSSH to function correctly, its\n    configuration path must be a folder.\n  '\n  describe file('/etc/ssh') do\n    it { should be_directory }\n  end\nend\n",
+      "source_location": {
+        "ref": "base/ssh/controls/ssh_folder_spec.rb",
+        "line": 11
+      },
+      "id": "basic-1",
+      "results": [{
+        "status": "passed",
+        "code_desc": "File /etc/ssh should be directory",
+        "run_time": 0.002151,
+        "start_time": "2017-07-05 14:08:05 +0200"
+      }]
+    }],
+    "attributes": [],
+    "sha256": "f56ef31e9e8be7c9064e84f1db699d3f0175924a0ee4517e3a626c38727ebf93"
+  }],
+  "platform": {
+    "name": "mac_os_x",
+    "release": "10.12.5"
+  },
+  "statistics": {
+    "duration": 0.348947
+  }
+}

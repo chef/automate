@@ -1,0 +1,18 @@
+<ol class="comments">
+  <li class="comment" ng-repeat="comment in getLineRangeComments(activeRange)" cd-comment="comment"></li>
+</ol>
+<div class="comment-form">
+  <form ng-submit="addComment(newComment)">
+    <cd-ace
+      ng-model="newComment.content"
+      placeholder="Make a comment on line {{ activeRange[0] }}"
+      on-submit="addComment(newComment)">
+    </cd-ace>
+    <div class="controls">
+      <button class="button primary" type="submit">Add Comment</button>
+    </div>
+  </form>
+  <div class="comment-container">
+    <div class="comment-text" cd-markdown="newComment.content"></div>
+  </div>
+</div>

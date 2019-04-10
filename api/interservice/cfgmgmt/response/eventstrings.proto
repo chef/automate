@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.response;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response";
+import "api/interservice/cfgmgmt/response/event.proto";
+
+message EventStrings {
+    repeated EventString strings = 1;
+    string start = 2;
+    string end = 3;
+    int32 hours_between = 4;
+}
+
+message EventString {
+    repeated EventCollection collection = 1;
+    string event_action = 2;
+}
+
+message EventCollection {
+    repeated EventCount events_count = 1;
+}

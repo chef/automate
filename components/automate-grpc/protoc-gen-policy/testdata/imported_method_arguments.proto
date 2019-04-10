@@ -1,0 +1,15 @@
+syntax = "proto3";
+package chef.automate.domain.imported_method_arguments;
+option go_package = "github.com/chef/automate/components/mock-service/mock";
+
+import "google/api/annotations.proto";
+import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
+import "components/automate-grpc/protoc-gen-policy/testdata/messages.proto";
+
+service Mock {
+  rpc MockMethod (messages.Foo) returns (messages.Bar) {
+    option (google.api.http).get = "/auth/foo/baz";
+    option (chef.automate.api.policy).resource = "mock:foo:{bar}";
+    option (chef.automate.api.policy).action = "action";
+  };
+}

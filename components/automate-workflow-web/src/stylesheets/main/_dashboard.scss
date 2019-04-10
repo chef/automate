@@ -1,0 +1,505 @@
+$dashboard-statuses: running passed failed idle running-urd;
+$standard-padding: .5em;
+$standard-radius: 3px;
+
+.dashboard {
+
+  .head-bar {
+    @include row();
+    @include omega();
+    background-color: $white;
+
+    &.anchored {
+      @include base-box-shadow();
+      padding: 1em 2em;
+      position: fixed;
+      top: $global-header-height;
+      width: calc(100% - 200px);
+      z-index: 1;
+    }
+  }
+
+  .teeny {
+    height: 11px;
+    width: 11px;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  @each $status in $dashboard-statuses {
+    .#{$status} {
+      @include status-props($status);
+    }
+  }
+
+  .filter {
+    @include span-columns(3);
+    padding: .5em 1em 0 0;
+    position: relative;
+
+    input {
+      margin: 0;
+      border: 1px solid $gray-pale;
+      @include placeholder-text($gray, inherit);
+      font-size: 11.7px;
+      transition: border-color .15s;
+
+      &:focus {
+        border: 1px solid lighten($darkgrayblue, 30%);
+
+        +.caption {
+          opacity: 1;
+        }
+      }
+    }
+
+    h3 {
+      margin: -.25em 0 .25em;
+      color: $gray;
+      font-size: .75em;
+      font-weight: normal;
+
+      @include media($medium-down) {
+        margin: 2px 0 3px 0;
+      }
+    }
+
+    .caption {
+      position: absolute;
+      top: 6px;
+      right: 1rem;
+      font-size: .625rem;
+      color: lighten($darkgray, 22%);
+      opacity: 0;
+      transition: opacity .15s;
+
+      @include media($medium-down) {
+        display: none;
+      }
+    }
+
+    .button.tiny.square {
+      position: absolute;
+      width: auto;
+      height: auto;
+      padding: .25em;
+      right: 24px;
+      top: 37px;
+      background-color: transparent;
+    }
+  }
+
+  .ribbon {
+    @include span-columns(9);
+
+    .stage {
+      @include span-columns(1.125 of 9);
+      position: relative;
+      height: 60px;
+      border-radius: $global-radius;
+      background-color: $white;
+
+      .status-icon {
+        width: .75rem;
+        height: .75rem;
+      }
+
+      .status {
+        &:hover {
+          cursor: pointer;
+          opacity: 0.8;
+        }
+      }
+
+      .ribbon-caret {
+        position: absolute;
+        right: -1.5rem;
+        top: 20px;
+
+        @include media($laptop-down) {
+          right: -1.25rem;
+        }
+      }
+    }
+
+    .stage {
+      border: 1px solid $chef-blue-dark;
+
+      .heading {
+        text-align: center;
+        background-color: $chef-blue-dark;
+        color: $white;
+        font-size: .75em;
+
+        [icon] {
+          display: none;
+        }
+      }
+
+      .detail.big {
+        font-size: 1.25rem;
+        margin: .5rem 0;
+      }
+
+      .detail {
+        @include clearfix;
+        margin: .4em 0;
+        text-align: center;
+
+        .status {
+          display: inline-block;
+          float: left;
+          width: 50%;
+          text-align: center;
+          cursor: default;
+          font-size: .75em;
+          cursor: pointer;
+
+          .count {
+            margin: 0 0 0 -3px;
+            vertical-align: text-top;
+          }
+
+          &.active {
+            .count {
+              font-weight: bold;
+            }
+          }
+        }
+
+        &.one .status {
+          width: 100%;
+        }
+
+        @include media($medium-down) {
+          padding: 0;
+        }
+      }
+
+      @each $status in $dashboard-statuses {
+        &.#{$status} {
+          $status-color: map-get($status-colors, $status);
+          border-color: $status-color;
+
+          .heading {
+            background-color: $status-color;
+          }
+
+          .detail {
+            color: $status-color;
+          }
+        }
+      }
+    }
+
+    .urd {
+      @include span-columns(3 of 8);
+      border: none;
+      border-radius: $standard-radius;
+      padding-top: 15px;
+      background-color: #f8f8f8;
+      text-transform: uppercase;
+
+      .stage {
+        @include span-columns(1 of 3);
+        font-size: 2em;
+        height: 67.7px;
+        background-color: $white;
+
+        @include media($medium-down) {
+          font-size: 1em;
+
+          .detail {
+            [status-icon] {
+              display: inline-block;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .items {
+    @include row();
+    @include omega();
+
+    .item {
+      @include span-columns(12);
+
+      .metadata {
+        @include span-columns(2.85 of 12);
+        font-size: .75rem;
+        color: $gray;
+
+        .name {
+          font-size: 13px;
+          margin-bottom: 4px;
+        }
+      }
+
+      .stage-status {
+        @include span-columns(9.15 of 12);
+
+        .stage {
+          width: 12.8957%;
+          float: left;
+          padding: 1em 0 0 0;
+          text-align: center;
+
+          &:last-child {
+            width: 9.72762%;
+          }
+
+          .status {
+            display: inline-block;
+
+            .count {
+              font-weight: bold;
+            }
+          }
+
+          .participant {
+            font-size: 10px;
+            color: $textgray;
+            cursor: default;
+          }
+        }
+      }
+
+      .urd-status {
+        @include span-columns(3);
+
+        .stage {
+          @include span-columns(1 of 3);
+          padding: 20px 0 0 0;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .urd-items {
+    overflow: auto;
+
+    .change-item {
+      @include modal-box();
+      padding: 1em 0 1em 1em;
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #f1f1f1;
+    }
+  }
+
+  .delivered-changes, .active-projects {
+    @include span-columns(12);
+    padding: 0 2em .5em;
+  }
+
+  .active-projects {
+
+    .no-items {
+      @include empty-item();
+    }
+  }
+
+  .project-items {
+    @include modal-box();
+    margin-bottom: .5em;
+    overflow: auto;
+    padding: 0;
+
+    $hover-color: $gray-less-pale;
+    $active-color: darken($gray-less-pale, 2%);
+
+    .project-item {
+      padding: 1em;
+
+      .stage-status {
+
+        .stage {
+          padding-top: 6px;
+
+          .status {
+            white-space: nowrap;
+
+            &:hover {
+              cursor: pointer;
+              opacity: 0.8;
+            }
+          }
+        }
+      }
+
+      .metadata {
+        .name {
+          font-weight: 600;
+        }
+      }
+
+      [icon] {
+        font-size: 10px;
+      }
+
+      &.open {
+        background-color: $gray-less-pale;
+      }
+    }
+
+    &:hover {
+      @include base-box-shadow(24px);
+      cursor: pointer;
+    }
+
+    .change-item {
+      padding: 1em 0;
+      border-top: 1px solid #f5f5f5;
+
+      .status-icon {
+
+        &.progress {
+          height: 4px;
+          width: 100%;
+          border-top: 3px solid $chef-green;
+        }
+
+        &.complete {
+          margin-top: 5px;
+        }
+      }
+
+      .stage-status {
+
+        .stage {
+          padding-top: 7px;
+        }
+      }
+
+      .metadata {
+        padding-left: 30px;
+      }
+
+      .org-project {
+        display: none;
+      }
+
+      &:hover {
+        cursor: default;
+      }
+    }
+
+    .included {
+      padding-left: 1.5rem;
+    }
+
+    &.open {
+      border: 1px solid $gray-pale;
+      box-shadow: 0px 0px 14px darken($gray-pale, 4%);
+      border-radius: $global-radius;
+      margin-bottom: .5em;
+
+      &:not(:first-child) {
+        margin-top: -1px;
+      }
+    }
+  }
+
+  [status-icon] {
+    display: inline-block;
+
+    &.prior {
+      width: 4px;
+      height: 4px;
+      opacity: 0.8;
+      border-radius: 50%;
+      display: inline-block;
+      padding-top: 0;
+
+      @each $status in $dashboard-statuses {
+        &.#{$status} {
+          background-color: map-get($status-colors, $status);
+        }
+      }
+
+      i {
+        display: none;
+      }
+    }
+  }
+
+  .project-item, .ribbon .stage {
+    [status-icon] {
+      font-size: 0.8em;
+    }
+  }
+
+  .change-item {
+    [bs-tooltip] {
+      display: inline-block;
+      width: 100%;
+    }
+  }
+
+  .included {
+    @include span-columns(12);
+    margin-bottom: 12px;
+
+    h3 {
+      font-size: .75rem;
+      color: $chef-blue-dark;
+      padding-left: .5rem;
+      margin: 1rem 0;
+    }
+
+    [cd-change-row] {
+      overflow: auto;
+
+      &:not(:last-child) {
+        margin-bottom: 4px;
+      }
+    }
+
+    .change-item {
+      margin-bottom: 1rem;
+      padding: 0;
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+
+      .metadata {
+        @include span-columns(12);
+        padding: 0 0 0 1.5rem;
+
+        .org-project {
+          display: none;
+        }
+      }
+
+      .stage-status, .urd-status {
+        display: none;
+      }
+
+      &:hover {
+        border: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  .tooltip {
+    font-size: .75rem;
+  }
+
+  h2 {
+    font-weight: bold;
+    font-size: .875rem;
+  }
+
+  .delivered-changes {
+    h2 {
+      margin-top: 1rem;
+    }
+  }
+}

@@ -1,0 +1,140 @@
+<app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
+
+<div class="container">
+  <main>
+    <div class="reporting-header">
+      <app-reporting-searchbar
+        [date]="reportQuery.endDate"
+        [filters]="getSelectedFilters()"
+        [filterTypes]="availableFilterTypes"
+        [filterValues]="availableFilterValues"
+        (suggestValues)="onSuggestValues($event)"
+        (filtersCleared)="onFiltersClear($event)"
+        (filterRemoved)="onFilterRemoved($event)"
+        (filterAdded)="onFilterAdded($event)"
+        (dateChanged)="onEndDateChanged($event)">
+      </app-reporting-searchbar>
+      <div class="download-report">
+        <chef-button class="dropdown-toggle" secondary (click)="toggleDownloadDropdown()">
+          <chef-icon>cloud_download</chef-icon>
+        </chef-button>
+        <chef-dropdown class="dropdown" [visible]="downloadOptsVisible">
+          <chef-click-outside (clickOutside)="hideDownloadDropdown()" omit="dropdown-toggle">
+            <chef-button tertiary (click)="onDownloadOptPressed('json')">Download JSON</chef-button>
+            <chef-button tertiary (click)="onDownloadOptPressed('csv')">Download CSV</chef-button>
+          </chef-click-outside>
+        </chef-dropdown>
+      </div>
+    </div>
+
+    <!--Reporting Summary-->
+    <div class="reporting-summary">
+      <div
+        *ngIf="reportData.reportingSummaryEmpty"
+        class="empty-summary">
+        <p>
+          There are no compliance scans to display report metadata. Learn how to start your first <a href="https://docs.chef.io/integrate_compliance_chef_automate.html" target="_blank">compliance scan</a>.
+        </p>
+      </div>
+      <div
+        *ngIf="!reportData.reportingSummaryEmpty && !!reportData.reportingSummary"
+        class="summary"
+        [ngClass]="reportData.reportingSummary.status">
+        <div class="summary-toggle" (click)="toggleSummary()">
+          <p>
+            <chef-icon>{{ getIcon(reportData.reportingSummary.status) }}</chef-icon>
+            <span>Your System is {{ formatSummaryPhrase(reportData.reportingSummary.status) }}</span>
+          </p>
+          <p>
+            <span>Report Metadata</span>
+            <chef-icon *ngIf="!showSummary">add</chef-icon>
+            <chef-icon *ngIf="showSummary">remove</chef-icon>
+          </p>
+        </div>
+        <div class="summary-body" *ngIf="showSummary">
+          <chef-table>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>computer</chef-icon> Nodes
+              </chef-th>
+              <chef-td>{{ reportData.reportingSummary.stats.nodes | number }}</chef-td>
+            </chef-tr>
+            <chef-tr>
+              <chef-th id="report-date-label">
+                <chef-icon>date_range</chef-icon> Report Date
+                <chef-tooltip for="report-date-label">Latest information available for everything at this date.</chef-tooltip>
+              </chef-th>
+              <chef-td>{{ reportQuery.endDate | date: 'longDate' }}</chef-td>
+            </chef-tr>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>equalizer</chef-icon> Status
+              </chef-th>
+              <chef-td>{{ reportData.reportingSummary.status | titlecase }}</chef-td>
+            </chef-tr>
+          </chef-table>
+          <chef-table>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>storage</chef-icon> Platform
+              </chef-th>
+              <chef-td>
+                {{ reportData.reportingSummary.stats.platforms | number }}
+                {{ reportData.reportingSummary.stats.platforms | i18nPlural: {'=1': 'Platform', 'other': 'Platforms'} }}
+              </chef-td>
+            </chef-tr>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>public</chef-icon> Environment
+              </chef-th>
+              <chef-td>
+                {{ reportData.reportingSummary.stats.environments | number }}
+                {{ reportData.reportingSummary.stats.environments | i18nPlural: {'=1': 'Environment', 'other': 'Environments'} }}
+              </chef-td>
+            </chef-tr>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>description</chef-icon> Profiles
+              </chef-th>
+              <chef-td>
+                {{ reportData.reportingSummary.stats.profiles | number }}
+                {{ reportData.reportingSummary.stats.profiles | i18nPlural: {'=1': 'Profile', 'other': 'Profiles'} }}
+              </chef-td>
+            </chef-tr>
+          </chef-table>
+        </div>
+      </div>
+    </div>
+
+    <!--Tabs (Overview, Nodes, Profiles)-->
+    <ul class="nav-tabs-list">
+      <li class="nav-tabs-item">
+        <a class="nav-tab" routerLink="/compliance/reporting/overview" routerLinkActive="active" queryParamsHandling="preserve">Overview</a>
+      </li>
+      <li class="nav-tabs-item">
+        <a class="nav-tab" routerLink="/compliance/reporting/nodes" routerLinkActive="active" queryParamsHandling="preserve">
+          {{reportData.reportingSummary?.stats.nodes | number }} Nodes
+        </a>
+      </li>
+      <li class="nav-tabs-item">
+        <a class="nav-tab" routerLink="/compliance/reporting/profiles" routerLinkActive="active" queryParamsHandling="preserve">
+          {{reportData.reportingSummary?.stats.profiles | number }} Profiles
+        </a>
+      </li>
+    </ul>
+
+    <router-outlet></router-outlet>
+
+    <chef-modal
+      id="download-modal"
+      title="download-title"
+      [visible]="downloadStatusVisible"
+      (close)="hideDownloadStatus()">
+      <h4 id="download-title" slot="title">
+        <ng-container *ngIf="downloadInProgress">Downloading report...</ng-container>
+        <ng-container *ngIf="downloadFailed">Download failed.</ng-container>
+      </h4>
+      <chef-loading-spinner *ngIf="downloadInProgress" size="50"></chef-loading-spinner>
+    </chef-modal>
+  </main>
+</div>

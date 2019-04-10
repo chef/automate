@@ -1,0 +1,21 @@
+{
+  "id": "4c8b0065-2aaa-41a0-a5df-0f98c82e28be",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "create",
+  "entity_type": "permission",
+  "parent_name": "groups",
+  "parent_type": "container",
+  "task": "update",
+  "organization_name": "testing",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-03-30T16:29:30Z",
+  "remote_request_id": "e86c8ac6-cfef-42ff-9aaa-2521c11b3514",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAL43kckAAEAAAAA",
+  "requestor_name": "mkrasnow",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Manage/11.16.2 (ruby-2.3.5-p376; ohai-7.4.1; x86_64-linux; +http://opscode.com)",
+  "data": "{\"create\":{\"actors\":[\"pivotal\"],\"groups\":[\"admins\"]}}"
+}

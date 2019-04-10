@@ -1,0 +1,209 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+// Table list styles
+.node-list {
+  margin-top: 16px;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+a, a:visited {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+chef-th,
+chef-td {
+  line-height: 1.2;
+
+  &.sort:hover {
+    cursor: pointer;
+  }
+
+  &.center {
+    text-align: center;
+  }
+
+  &.delete {
+    max-width: 40px;
+    padding-right: 0;
+  }
+
+  &.node-name {
+    flex-basis: 24%;
+  }
+
+  &.check-in {
+    min-width: 140px;
+  }
+
+  &.node-environment {
+    white-space: normal;
+    width: 15%;
+  }
+
+  &.has-runs {
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &.view-more {
+    max-width: 60px;
+  }
+}
+
+chef-td {
+  padding: 1em;
+
+  &.has-runs {
+    & > a {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+    }
+  }
+
+  &:first-child {
+    position: relative;
+  }
+
+  &.node-name chef-icon {
+    margin-right: 1em;
+  }
+}
+
+chef-tr.row {
+  & > chef-td:first-child:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    transition: width 0.2s;
+    background: $chef-success;
+    border-top-left-radius: $global-radius;
+    border-bottom-left-radius: $global-radius;
+  }
+
+  &:hover > chef-td:first-child:before {
+    width: 7px;
+  }
+
+  & > chef-td.failure:first-child:before {
+    background: $chef-critical;
+  }
+
+  & > chef-td.missing:first-child:before {
+    background: $chef-dark-grey;
+  }
+}
+
+.column-dropdown {
+  position: relative;
+
+  chef-checkbox {
+    margin-bottom: 7px;
+  }
+}
+
+chef-dropdown {
+  top: 47px;
+  right: 11px;
+  padding: 11px 15px 6px;
+}
+
+.sort-icon {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  position: relative;
+  margin-left: 16px;
+
+  &:before, &:after {
+    border: 4px solid transparent;
+    content: "";
+    height: 0;
+    right: 5px;
+    top: 50%;
+    position: absolute;
+    width: 0;
+    opacity: 0.8;
+  }
+
+  &:before {
+    border-bottom-color: $chef-dark-grey;
+    margin-top: -11px;
+  }
+
+  &:after {
+    border-top-color: $chef-dark-grey;
+    margin-top: 3px;
+  }
+
+  &.sort-asc {
+    &:before {
+      border-bottom-color: $chef-dark-grey;
+    }
+
+    &:after {
+      border-top-color: $chef-primary-dark;
+      opacity: 1;
+    }
+  }
+
+  &.sort-desc {
+    &:before {
+      border-bottom-color: $chef-primary-dark;
+      opacity: 1;
+    }
+
+    &:after {
+      border-top-color: $chef-dark-grey;
+    }
+  }
+}
+
+.no-data {
+  border: 1px dashed $chef-dark-grey;
+  background: $chef-lightest-grey;
+  border-radius: 16px;
+  padding: 6px 12px 6px 14px;
+  font-size: 12px;
+  cursor: default;
+
+  & > chef-icon {
+    color: $chef-primary-bright;
+    vertical-align: -2px;
+    margin-left: 18px;
+  }
+}
+
+chef-tooltip {
+  width: 300px;
+  font-size: 12px;
+  padding: 22px;
+  line-height: 1.2;
+}
+
+.empty-checkbox {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid $chef-grey;
+  border-radius: 5px;
+}
+
+.delete-checkbox {
+  ::ng-deep {
+    .mat-checkbox-layout {
+      padding-bottom: 0;
+    }
+  }
+}

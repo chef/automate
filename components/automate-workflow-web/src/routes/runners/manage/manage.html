@@ -1,0 +1,42 @@
+<div class="no-runners-info" ng-if="!runners.length">
+  You don't have any runners yet. <a href="https://docs.chef.io/job_dispatch.html" target="_blank">Let's get started.</a>
+</div>
+<table class="runners-list" ng-if="runners.length">
+  <thead>
+    <tr>
+      <th class="hostname">Host Name</th>
+      <th class="current-job">Current Job</th>
+      <th class="test-button">Test Runner</th>
+      <th/>
+      <th class="health-output"/>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="runners-list-item" ng-repeat="runner in runners track by runner.id">
+      <td class="hostname">{{ runner.hostname }}</td>
+      <td ng-if="runner.job.id"
+        class="runner-job"><a ui-sref="main.enterprise.organizations.organization.project.change({ org: runner.job.org, project: runner.job.project, change: runner.job.id })">{{ runner.job.title }}</a>
+      </td>
+      <td ng-if="!runner.job.id"
+        class="runner-idle">Idle
+      </td>
+      <td class="test-button">
+        <button
+          class="button primary runner-check"
+          ng-disabled="canTest(runner)"
+          ng-click="checkStatus(runner)">Test
+        </button>
+      </td>
+      <td>
+        <i class="runner-status-icon fa fa-2x fa-fw" ng-class="healthIcon(runner.health)"></i>
+      </td>
+      <td class="health-output">
+        <div class="field-tooltip"
+          ng-if="runner.health.command_output"
+          bs-tooltip data-title="{{ runner.health.command_output }}""
+          data-trigger="hover"><a>{{ healthOutput(runner.health) }}</a>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

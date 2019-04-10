@@ -1,0 +1,48 @@
+<div class="sidebar-view">
+  <nav class="sidebar">
+    <ul>
+      <li>
+        <a href="/client-runs">
+          <i class="fa fa-chevron-left"></i>
+          <span class="text">Back to Client Runs</span>
+        </a>
+      </li>
+      <li>
+        <a ui-sref="main.admin.users"
+           ui-sref-active="active">
+          <i class="fa fa-fw fa-user"></i>
+          <span class="text">Users</span>
+          <i class="fa fa-caret-right"></i>
+        </a>
+      </li>
+      <li feature-flag="governance">
+        <a ui-sref="main.admin.teams"
+           ui-sref-active="active"
+           ui-sref-opts="{ reload: true }">
+          <i class="fa fa-fw fa-users"></i>
+          <span class="text">Teams</span>
+          <i class="fa fa-caret-right"></i>
+        </a>
+      </li>
+      <li>
+        <a ui-sref="main.admin.scm_setup"
+           ui-sref-active="active">
+          <i class="fa fa-fw fa-code"></i>
+          <span class="text">SCM Setup</span>
+          <i class="fa fa-caret-right"></i>
+        </a>
+      </li>
+      <li>
+        <a ui-sref="main.admin.smtp_setup"
+           ui-sref-active="active">
+           <i class="fa fa-fw fa-envelope"></i>
+           <span class="text">Email Setup</span>
+           <i class="fa fa-caret-right"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <div class="content">
+    <div ui-view="tabbed"></div>
+  </div>
+</div>

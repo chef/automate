@@ -1,0 +1,18 @@
+{
+  "query": {
+    "bool": {
+      "filter" : [
+        {
+          "term": {
+            "exists": "true"
+          }
+        },
+        {
+          "term": {
+            "status": "missing"
+          }
+        }
+      ]
+    }
+  }
+}

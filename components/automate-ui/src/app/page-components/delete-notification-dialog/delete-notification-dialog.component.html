@@ -1,0 +1,11 @@
+<div id="delete-dialog">
+  <div mat-dialog-content>
+    <img src="assets/img/trash.svg" id="delete-dialog-trash" alt="trash can icon" />
+    <div>Are you sure that you want to</div>
+    <div>permanently delete this notification?</div>
+  </div>
+  <div mat-dialog-actions>
+    <button class="delete" mat-button (click)="dialogRef.close('delete')">YES, DELETE</button>
+    <button class="cancel" mat-button (click)="dialogRef.close('cancel')">NO, KEEP IT</button>
+  </div>
+</div>

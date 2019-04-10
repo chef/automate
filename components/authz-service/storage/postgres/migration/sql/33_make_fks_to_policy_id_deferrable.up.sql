@@ -1,0 +1,2 @@
+ALTER TABLE iam_policy_members ALTER CONSTRAINT iam_policy_members_policy_id_fkey DEFERRABLE;
+ALTER TABLE iam_policy_statements ALTER CONSTRAINT iam_policy_statements_policy_id_fkey DEFERRABLE;

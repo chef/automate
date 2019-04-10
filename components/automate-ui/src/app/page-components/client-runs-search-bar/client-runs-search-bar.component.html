@@ -1,0 +1,65 @@
+<div class="suggester-wrapper" (focusout)="handleFocusOut()" tabindex="0">
+  <label class="hidden-label" for="search_box">
+    <span class="visually-hidden">Filter Node View Search Box</span>
+  </label>
+  <div class="suggester-input-wrapper">
+    <span (click)="handleCategoryClick()"
+      class="category-marker"
+      *ngIf="selectedCategoryType">
+      {{ selectedCategoryType.text }}:
+    </span>
+    <input #search_box
+          id="search_box"
+          (click)="handleFocus($event)"
+          (focus)="handleFocus($event)"
+          (keyup)="handleInput($event.key, search_box.value)"
+          [value]="inputText"
+          type="text"
+          class="suggester-input"
+          placeholder="{{ get_filter_text() }}">
+    <ng-content select=".suggester-input-buttons"></ng-content>
+    <div *ngIf="numberOfFilters > 0" class="search-suffix">
+      <chef-button class="filter-btn" secondary (click)="handleFiltersClick()">
+        <chef-icon>filter_list</chef-icon> {{ numberOfFilters }}
+      </chef-button>
+    </div>
+  </div>
+  <div *ngIf="suggestionsVisible && selectedCategoryType && search_box.value.length > 0"
+    class="input-dropdown suggestions">
+    <ul>
+      <li *ngIf="isLoadingSuggestions" class="suggestion-status">
+          Loading...
+      </li>
+      <li *ngIf="!isLoadingSuggestions && suggestions.isEmpty()"
+        class="suggestion-status">
+        No matching results found
+      </li>
+      <li *ngFor="let hint of suggestions; let i = index"
+        (click)="handleSuggestionClick(hint, $event)"
+        (mouseenter)="handleSuggestionItemOnMouseOver(i)"
+        (keyup)="handleInput($event.key, hint)"
+        class="list-item category
+              {{ highlightedIndex === i ? 'selected' : '' }}">
+        {{ hint }}
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="suggestionsVisible && !selectedCategoryType" class="input-dropdown categories">
+    <ul>
+      <li *ngIf="visibleCategories.isEmpty()"
+            class="no-category-items">
+          Not a Valid Filter Category
+      </li>
+      <li *ngFor="let suggestion of visibleCategories.toJS(); let i = index"
+          (click)="handleCategoryItemClick(suggestion, $event)"
+          (mouseenter)="handleCategoryItemOnMouseOver(i)"
+          class="list-item category
+                  {{ suggestion.type }}
+                  {{ highlightedIndex == i ? 'selected' : '' }}">
+        {{ suggestion.text }}
+        <chef-icon>add</chef-icon>
+      </li>
+    </ul>
+  </div>
+  <ng-content></ng-content>
+</div>

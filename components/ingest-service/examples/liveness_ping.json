@@ -1,0 +1,10 @@
+{
+  "chef_server_fqdn": "chef-server.opsworks.com",
+  "source": "liveness_agent",
+  "message_version": "0.0.1",
+  "event_type": "node_ping",
+  "organization_name": "happytrees",
+  "node_name": "leaf",
+  "entity_uuid": "0271e125-97dd-498a-b026-8448ee60aafe",
+  "@timestamp": "2017-04-21T22:59:00Z"
+}

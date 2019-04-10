@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="33px" height="44px" viewBox="0 0 33 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2.2 (9983) - http://www.bohemiancoding.com/sketch -->
+    <title>Verify</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Change" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Change-in-Verify(status)" sketch:type="MSArtboardGroup" transform="translate(-71.000000, -430.000000)">
+            <g id="Group-2" sketch:type="MSLayerGroup" transform="translate(60.000000, 423.000000)">
+                <g id="Group" sketch:type="MSShapeGroup">
+                    <g id="Verify" transform="translate(11.000000, 7.000000)">
+                        <rect id="Rectangle-296" fill="#4A4A4A" x="0.931364288" y="6.42684928" width="31.1372714" height="37.3621622" rx="1"></rect>
+                        <rect id="Rectangle-834" fill="#FFFFFF" x="5" y="11" width="23" height="26"></rect>
+                        <path d="M21.9389404,5.6484709 L21.9389404,1.97868025 C21.9389404,1.42603305 21.4954112,0.978200627 20.9482902,0.978200627 L11.3103462,0.978200627 C10.7609958,0.978200627 10.319696,1.42613061 10.319696,1.97868025 L10.319696,5.6484709 L7.11354661,5.6484709 C6.57659795,5.6484709 6.12090953,6.09225098 6.12090953,6.63968145 L6.12090953,14.2572603 C6.12090953,14.7983191 6.56532829,15.2484709 7.11354661,15.2484709 L25.1450898,15.2484709 C25.6820384,15.2484709 26.1377269,14.8046908 26.1377269,14.2572603 L26.1377269,6.63968145 C26.1377269,6.09862267 25.6933081,5.6484709 25.1450898,5.6484709 L21.9389404,5.6484709 Z" id="Rectangle-297" stroke="#4A4A4A" stroke-width="1.5" fill="#FFFFFF"></path>
+                        <rect id="Rectangle-299" fill="#4A4A4A" x="14.80473" y="3.48078817" width="2.64917637" height="2.33078241" rx="1"></rect>
+                        <rect id="Rectangle-847" fill="#4A4A4A" x="8" y="19" width="16" height="1"></rect>
+                        <rect id="Rectangle-848" fill="#4A4A4A" x="8" y="22" width="9" height="1"></rect>
+                        <rect id="Rectangle-849" fill="#4A4A4A" x="8" y="25" width="13" height="1"></rect>
+                        <rect id="Rectangle-850" fill="#4A4A4A" x="8" y="28" width="11" height="1"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

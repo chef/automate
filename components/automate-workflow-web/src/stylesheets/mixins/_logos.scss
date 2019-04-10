@@ -1,0 +1,9 @@
+.logo {
+  background-repeat: no-repeat;
+  text-indent:-999999px;
+  background-size: 100%, 100%;
+}
+
+.automate-logo {
+  @include background-image(url("../images/automate-blue.svg"));
+}

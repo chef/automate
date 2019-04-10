@@ -1,0 +1,7 @@
+<chef-checkbox
+  *ngIf="isTelemetryServiceEnabled"
+  (change)="togglePersonalTelemetryCollection()"
+  [checked]="telemetryPersonalPref">
+    Allow Chef Automate to collect anonymized usage and diagnostic data to help improve your experience.
+    Review our <a href="https://www.chef.io/privacy-policy/" target="_blank">Privacy Policy</a>.
+</chef-checkbox>

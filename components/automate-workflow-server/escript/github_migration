@@ -1,0 +1,39 @@
+#!/usr/bin/env escript
+%%! -name github_migration@127.0.0.1
+
+-define(SELF, 'github_migration@127.0.0.1').
+-define(TARGET, 'delivery@127.0.0.1').
+
+main(Args) ->
+    init_network(),
+    Result = rpc_call(?TARGET, scm_github_migration, migrate, [Args]),
+    print_and_exit(Result).
+
+print_and_exit({ok, Msg}) ->
+    io:fwrite(Msg);
+print_and_exit({error, Msg}) ->
+    io:fwrite(<<"Please fix the errors listed below and rerun the migration command.\n">>),
+    io:fwrite(Msg),
+    erlang:halt(1).
+
+init_network() ->
+    {ok, _} = net_kernel:start([?SELF, longnames]),
+    true = erlang:set_cookie(node(), get_cookie()),
+    pong = net_adm:ping(?TARGET).
+
+rpc_call(Node, Module, Function, Args) ->
+    case rpc:call(Node, Module, Function, Args) of
+        {badrpc, Reason} ->
+            io:fwrite(io_lib:format("RPC call ~p:~p:~p:~p failed with error ~p~n",
+                                 [Node, Module, Function, Args, Reason]));
+        Res ->
+            Res
+    end.
+
+get_cookie() ->
+    case os:getenv("ERL_COOKIE") of
+        false ->
+            'delivery';
+        Cookie ->
+            list_to_atom(Cookie)
+    end.

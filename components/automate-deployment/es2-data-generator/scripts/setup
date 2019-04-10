@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -ex
+
+mkdir -p /var/cache/es2-data-generator
+mkdir -p /var/opt/delivery/license
+mkdir -p /var/opt/es2-data-generator
+mkdir -p /etc/delivery
+
+pushd /var/cache/es2-data-generator
+
+curl -LO  https://packages.chef.io/files/stable/automate/0.8.5/ubuntu/16.04/automate_0.8.5-1_amd64.deb
+dpkg -i automate_0.8.5-1_amd64.deb
+
+curl -L 'https://api.bintray.com/content/habitat/stable/linux/x86_64/hab-%24latest-x86_64-linux.tar.gz?bt_package=hab-x86_64-linux' > hab.tgz
+tar zxvf hab.tgz
+mv hab-*-x86_64-linux/hab /bin/hab
+
+popd
+
+cp ../a1-migration/delivery.license /var/opt/delivery/license
+cp ../a1-migration/keys/test.pem /var/opt/es2-data-generator
+cp delivery.rb /etc/delivery/
+
+
+automate-ctl reconfigure
+
+hab pkg install chef/chef-load
+hab pkg binlink chef/chef-load chef-load
+

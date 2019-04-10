@@ -1,0 +1,166 @@
+#!/bin/bash
+
+document "notifications_unit_test" <<DOC
+  run the notifications service's unit tests
+DOC
+function notifications_unit_test() {
+  elixir_install;
+  pushd /src/components/notifications-service/server >/dev/null;
+	  mix local.hex --force
+	  mix local.rebar --force
+	  mix escript.install github tony612/protobuf-elixir --force
+
+    mix deps.get
+    mix test --no-start
+    local EXIT_CODE=$?;
+  popd >/dev/null;
+
+  return $EXIT_CODE;
+}
+
+document "notifications_lint" <<DOC
+  run the notifications service's lint tests
+DOC
+function notifications_lint() {
+  elixir_install;
+  pushd /src/components/notifications-service/server >/dev/null;
+	  mix local.hex --force
+	  mix local.rebar --force
+	  mix escript.install github tony612/protobuf-elixir --force
+
+    mix deps.get
+    mix compile
+    mix credo
+
+    local EXIT_CODE=$?;
+  popd >/dev/null;
+
+  return $EXIT_CODE;
+}
+
+document "notifications_compile_protobuf" <<DOC
+  create the protobuf files for the notifications-service and notifications-client.
+  This was copied from both of the components Make files.
+DOC
+function notifications_compile_protobuf() {
+  local error_code
+  install_if_missing core/protobuf-cpp protoc
+  GO_TOOL_VENDOR=true install_go_tool github.com/golang/protobuf/protoc-gen-go;
+  GO_TOOL_METHOD="install" install_go_tool github.com/golang/protobuf/protoc-gen-go
+
+  setup_go_workspace
+  # notifications-client
+  pushd /hab/cache/src/scaffolding-go-gopath/src/github.com/chef/automate/components/notifications-client/ >/dev/null;
+    log_line "compiling for notifications-client..."
+    protoc -I../../components/notifications-service/server/priv \
+      --go_out=plugins=grpc:./api notifications.proto rules.proto server.proto health.proto
+    error_code=$?
+  popd >/dev/null;
+
+  if [[ $error_code -ne 0 ]]
+  then
+    error "Failed compiling protobuf files"
+    return $error_code
+  fi
+
+  elixir_install;
+
+  # compile to notifications-service elixir
+  pushd /src/components/notifications-service/server >/dev/null;
+
+    log_line "installing elixir tools to compile protobuf files"
+    mix local.hex --force
+    mix escript.install github tony612/protobuf-elixir --force
+    mix deps.get --force
+    mix escript.install hex protobuf --force
+
+    log_line "compiling for notifications-service..."
+    PATH=$PATH:/root/.mix/escripts protoc --elixir_out=plugins=grpc:lib/pb \
+      -I/src/components/notifications-service/server/priv/ \
+      -I/src/api/external/secrets/ \
+      -I/src/ \
+      -I/src/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/ \
+      notifications.proto \
+      rules.proto \
+      server.proto \
+      health.proto \
+      slack_post.proto \
+      secrets.proto \
+      google/protobuf/struct.proto
+    error_code=$?
+  popd >/dev/null;
+
+  if [[ $error_code -eq 0 ]]
+  then
+    log_line "Finished compiling protobufs for notifications-service successfully"
+  else
+    error "Failed compiling protobuf files"
+    return $error_code
+  fi
+}
+
+document "notifications_update_component" <<DOC
+  compile and update the running notifications-service
+
+  Warning: this does not work for new files. If you create a new file run rebuild components/notifications-service
+DOC
+function notifications_update_component() {
+  component_path=$(hab pkg path $HAB_ORIGIN/notifications-service 2> /dev/null)
+  if [[ $? -ne 0 ]]; then
+    component_path=$(hab pkg path chef/notifications-service 2> /dev/null)
+    if [[ $? -ne 0 ]]; then
+      error "Could not find notifications-service deployed under either your origin ($HAB_ORIGIN) or chef origin."
+      error "Deploy A2 and try again."
+      return 1
+    fi
+  fi
+
+  elixir_install;
+
+  pushd /src/components/notifications-service/server >/dev/null;
+    mix local.hex --force
+    mix local.rebar --force
+    MIX_ENV=habitat mix do deps.get, compile
+    returnStatus=$?
+  popd >/dev/null;
+
+  if [[ $returnStatus == 0 ]]; then
+    log_line "reload the notifications-service binary."
+
+    kill_running_service notifications-service
+    rm -rf "${component_path}/lib/notifications-1.0.0/"*
+    cp -r "/src/components/notifications-service/server/_habitat_build/habitat/lib/notifications/"* "${component_path}/lib/notifications-1.0.0/."
+
+    return 0
+  else
+    error "There was a problem trying to reload the notifications-service binary."
+    error "Rebuild components/notifications-service and try again."
+    return 1
+  fi
+}
+
+function elixir_install() {
+  log_line "installing elixir if needed"
+  install_if_missing core/git git
+  install_if_missing core/elixir mix
+  install_if_missing core/elixir elixir
+  install_if_missing core/erlang escript
+  install_if_missing core/erlang erl
+  install_if_missing core/coreutils env
+  local HAB_BINLINK_DIR
+  mkdir -p /usr/bin
+  if [ -f /hab/bin/env ]; then
+    HAB_BINLINK_DIR=/hab/bin
+  else
+    HAB_BINLINK_DIR=/bin
+  fi
+  ln -s ${HAB_BINLINK_DIR}/env /usr/bin/env 2>/dev/null;
+  export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+}
+
+document "notifications_psql" <<DOC
+   Enter psql with the notifications_service database
+DOC
+function notifications_psql() {
+  chef-automate dev psql notifications_service;
+}

@@ -1,0 +1,76 @@
+#%RAML 1.0
+title: Notifications API
+version: 1
+mediaType: application/json
+types:
+  Notification:
+    type: object
+    properties:
+      id: number
+      name: string
+      event: Event
+      target: Target
+    example:
+      id: 2
+      name: notification1
+      event: ccr_failure
+      target:
+        type: slack
+        slack:
+          url: "https://webhook.slack.com/TIS/9000"
+
+  Target: SlackTarget | WebhookTarget
+
+  SlackTarget:
+    type: object
+    properties:
+      type:
+        pattern: slack
+      slack:
+        type: object
+        properties:
+          url: string
+    example:
+      type: slack
+      slack:
+        url: "https://webhook.slack.com/TIS/9000"
+
+  WebhookTarget:
+    type: object
+    properties:
+      type:
+        pattern: webhook
+      webhook:
+        properties:
+          url: object
+
+  Event:
+    enum: [ccr_failure]
+
+
+/notifications:
+  get:
+    description: Returns a list of notifications.
+    responses:
+      200:
+        body: Notification[]
+  /{notification_id}:
+    get:
+      description: Returns a notification.
+      responses:
+        200:
+          body: Notification
+    delete:
+      description: Deletes a notification.
+      responses:
+        204:
+  post:
+    description: Create a new notification.
+    body:
+      properties:
+        name: string
+        event: Event
+        target: Target
+    responses:
+      201:
+        body: Notification

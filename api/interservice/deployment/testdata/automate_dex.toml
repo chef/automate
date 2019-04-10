@@ -1,0 +1,26 @@
+[mlsa]
+accept = false
+
+[log]
+level = "debug"
+
+[storage]
+database = "dex"
+user = "dex"
+password = "todochangeme"
+ssl_mode = "disable"
+
+[service]
+host = "localhost"
+port = 5556
+
+[grpc]
+host = "localhost"
+port = 5557
+
+[expiry]
+signing_keys = "6h"
+id_tokens = "24h"
+
+[bootstrap]
+insecure_admin = false

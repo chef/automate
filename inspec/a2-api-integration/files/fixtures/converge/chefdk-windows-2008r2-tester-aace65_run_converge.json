@@ -1,0 +1,3705 @@
+{
+  "chef_server_fqdn": "chef-server.chef.co",
+  "entity_uuid": "cc6b66ae-a047-4818-b234-65ef3a873649",
+  "expanded_run_list": {
+    "id": "manhattan",
+    "run_list": [
+      {
+        "type": "recipe",
+        "name": "opscode-ci::slave",
+        "version": null,
+        "skipped": false
+      }
+    ]
+  },
+  "id": "6d1d17e0-0d8f-4782-ac30-072fae505c80",
+  "message_version": "1.1.0",
+  "message_type": "run_converge",
+  "node": {
+    "name": "chefdk-windows-2008r2-tester-aace65",
+    "chef_environment": "manhattan",
+    "json_class": "Chef::Node",
+    "automatic": {
+      "cpu": {
+        "0": {
+          "cores": 2,
+          "vendor_id": "GenuineIntel",
+          "family": "1",
+          "model": "16130",
+          "stepping": "2",
+          "physical_id": "CPU0",
+          "model_name": "Intel64 Family 6 Model 63 Stepping 2",
+          "mhz": "2400",
+          "cache_size": " KB"
+        },
+        "total": 2,
+        "cores": 2,
+        "real": 1
+      },
+      "filesystem": {
+        "C:": {
+          "kb_size": 64422408,
+          "kb_available": 35273261,
+          "kb_used": 29149147,
+          "percent_used": 45,
+          "mount": "C:",
+          "fs_type": "ntfs",
+          "volume_name": ""
+        }
+      },
+      "kernel": {
+        "os_info": {
+          "boot_device": "\\Device\\HarddiskVolume1",
+          "build_number": "7601",
+          "build_type": "Multiprocessor Free",
+          "caption": "Microsoft Windows Server 2008 R2 Datacenter ",
+          "code_set": "1252",
+          "country_code": "1",
+          "creation_class_name": "Win32_OperatingSystem",
+          "cs_creation_class_name": "Win32_ComputerSystem",
+          "csd_version": "Service Pack 1",
+          "cs_name": "WIN-S74L0HSRE8I",
+          "current_time_zone": 0,
+          "data_execution_prevention_32_bit_applications": true,
+          "data_execution_prevention_available": true,
+          "data_execution_prevention_drivers": true,
+          "data_execution_prevention_support_policy": 3,
+          "debug": false,
+          "description": "",
+          "distributed": false,
+          "encryption_level": 256,
+          "foreground_application_boost": 0,
+          "free_physical_memory": "2657908",
+          "free_space_in_paging_files": "513704",
+          "free_virtual_memory": "3123740",
+          "install_date": "20170530204701.000000+000",
+          "large_system_cache": null,
+          "last_boot_up_time": "20170530204538.375000+000",
+          "local_date_time": "20171101211035.365000+000",
+          "locale": "0409",
+          "manufacturer": "Microsoft Corporation",
+          "max_number_of_processes": -1,
+          "max_process_memory_size": "8589934464",
+          "mui_languages": [
+            "en-US"
+          ],
+          "name": "Microsoft Windows Server 2008 R2 Datacenter |C:\\Windows|\\Device\\Harddisk0\\Partition1",
+          "number_of_licensed_users": 0,
+          "number_of_processes": 42,
+          "number_of_users": 3,
+          "operating_system_sku": 8,
+          "organization": "Amazon.com",
+          "os_architecture": "64-bit",
+          "os_language": 1033,
+          "os_product_suite": 400,
+          "os_type": 18,
+          "other_type_description": null,
+          "pae_enabled": null,
+          "plus_product_id": null,
+          "plus_version_number": null,
+          "primary": true,
+          "product_type": 3,
+          "registered_user": "EC2",
+          "serial_number": "00496-001-0001283-84650",
+          "service_pack_major_version": 1,
+          "service_pack_minor_version": 0,
+          "size_stored_in_paging_files": "524288",
+          "status": "OK",
+          "suite_mask": 400,
+          "system_device": "\\Device\\HarddiskVolume1",
+          "system_directory": "C:\\Windows\\system32",
+          "system_drive": "C:",
+          "total_swap_space_size": null,
+          "total_virtual_memory_size": "4716336",
+          "total_visible_memory_size": "4193908",
+          "version": "6.1.7601",
+          "windows_directory": "C:\\Windows"
+        },
+        "name": "Microsoft Windows Server 2008 R2 Datacenter ",
+        "release": "6.1.7601",
+        "version": "6.1.7601 Service Pack 1 Build 7601",
+        "os": "WINNT",
+        "cs_info": {
+          "admin_password_status": 3,
+          "automatic_managed_pagefile": false,
+          "automatic_reset_boot_option": true,
+          "automatic_reset_capability": true,
+          "boot_option_on_limit": null,
+          "boot_option_on_watch_dog": null,
+          "boot_rom_supported": true,
+          "bootup_state": "Normal boot",
+          "caption": "WIN-S74L0HSRE8I",
+          "chassis_bootup_state": 3,
+          "creation_class_name": "Win32_ComputerSystem",
+          "current_time_zone": 0,
+          "daylight_in_effect": null,
+          "description": "AT/AT COMPATIBLE",
+          "dns_host_name": "WIN-S74L0HSRE8I",
+          "domain": "WORKGROUP",
+          "domain_role": 2,
+          "enable_daylight_savings_time": true,
+          "front_panel_reset_status": 3,
+          "infrared_supported": false,
+          "initial_load_info": null,
+          "install_date": null,
+          "keyboard_password_status": 3,
+          "last_load_info": null,
+          "manufacturer": "Xen",
+          "model": "HVM domU",
+          "name": "WIN-S74L0HSRE8I",
+          "name_format": null,
+          "network_server_mode_enabled": true,
+          "number_of_logical_processors": 2,
+          "number_of_processors": 1,
+          "oem_string_array": [
+            "Xen"
+          ],
+          "part_of_domain": false,
+          "pause_after_reset": "-1",
+          "pc_system_type": 0,
+          "power_management_capabilities": null,
+          "power_management_supported": null,
+          "power_on_password_status": 3,
+          "power_state": 0,
+          "power_supply_state": 3,
+          "primary_owner_contact": null,
+          "primary_owner_name": "EC2",
+          "reset_capability": 1,
+          "reset_count": -1,
+          "reset_limit": -1,
+          "roles": [
+            "LM_Workstation",
+            "LM_Server",
+            "NT",
+            "Server_NT"
+          ],
+          "status": "OK",
+          "support_contact_description": null,
+          "system_startup_delay": null,
+          "system_startup_options": null,
+          "system_startup_setting": null,
+          "system_type": "x64-based PC",
+          "thermal_state": 3,
+          "total_physical_memory": "4294561792",
+          "user_name": null,
+          "wake_up_type": 6,
+          "workgroup": "WORKGROUP"
+        },
+        "machine": "x86_64"
+      },
+      "memory": {
+        "swap": {
+          "total": "524288kB",
+          "free": "513704kB"
+        },
+        "total": "4193908kB",
+        "free": "2657548kB"
+      },
+      "network": {
+        "interfaces": {
+          "0xc": {
+            "configuration": {
+              "ip_address": [
+                "145.84.166.177",
+                "fe80::5852:20f5:7cd7:777e"
+              ],
+              "arp_always_source_route": null,
+              "arp_use_ether_snap": null,
+              "caption": "[00000007] AWS PV Network Device",
+              "database_path": "%SystemRoot%\\System32\\drivers\\etc",
+              "dead_gw_detect_enabled": null,
+              "default_ip_gateway": [
+                "145.84.8.1"
+              ],
+              "default_tos": null,
+              "default_ttl": null,
+              "description": "AWS PV Network Device",
+              "dhcp_enabled": true,
+              "dhcp_lease_expires": "20171101214740.000000+000",
+              "dhcp_lease_obtained": "20171101204740.000000+000",
+              "dhcp_server": "145.84.8.1",
+              "dns_domain": "us-west-2.compute.internal",
+              "dns_domain_suffix_search_order": [
+                "us-west-2.ec2-utilities.amazonaws.com",
+                "ec2.internal",
+                "us-east-1.ec2-utilities.amazonaws.com",
+                "compute-1.internal",
+                "us-west-2.compute.internal"
+              ],
+              "dns_enabled_for_wins_resolution": false,
+              "dns_host_name": "WIN-S74L0HSRE8I",
+              "dns_server_search_order": [
+                "145.84.0.2"
+              ],
+              "domain_dns_registration_enabled": false,
+              "forward_buffer_memory": null,
+              "full_dns_registration_enabled": true,
+              "gateway_cost_metric": [
+                0
+              ],
+              "igmp_level": null,
+              "index": 7,
+              "interface_index": 12,
+              "ip_connection_metric": 10,
+              "ip_enabled": true,
+              "ip_filter_security_enabled": false,
+              "ip_port_security_enabled": null,
+              "ip_sec_permit_ip_protocols": [],
+              "ip_sec_permit_tcp_ports": [],
+              "ip_sec_permit_udp_ports": [],
+              "ip_subnet": [
+                "255.255.248.0",
+                "64"
+              ],
+              "ip_use_zero_broadcast": null,
+              "ipx_address": null,
+              "ipx_enabled": null,
+              "ipx_frame_type": null,
+              "ipx_media_type": null,
+              "ipx_network_number": null,
+              "ipx_virtual_net_number": null,
+              "keep_alive_interval": null,
+              "keep_alive_time": null,
+              "mac_address": "02:89:E8:23:BE:EE",
+              "mtu": null,
+              "num_forward_packets": null,
+              "pmtubh_detect_enabled": null,
+              "pmtu_discovery_enabled": null,
+              "service_name": "xennet",
+              "setting_id": "{4488897B-6EA0-4FA4-A6C0-E94ADD5B6A67}",
+              "tcpip_netbios_options": 0,
+              "tcp_max_connect_retransmissions": null,
+              "tcp_max_data_retransmissions": null,
+              "tcp_num_connections": null,
+              "tcp_use_rfc1122_urgent_pointer": null,
+              "tcp_window_size": null,
+              "wins_enable_lm_hosts_lookup": true,
+              "wins_host_lookup_file": null,
+              "wins_primary_server": null,
+              "wins_scope_id": "",
+              "wins_secondary_server": null
+            },
+            "instance": {
+              "adapter_type": "Ethernet 802.3",
+              "adapter_type_id": 0,
+              "auto_sense": null,
+              "availability": 3,
+              "caption": "[00000007] AWS PV Network Device",
+              "config_manager_error_code": 0,
+              "config_manager_user_config": false,
+              "creation_class_name": "Win32_NetworkAdapter",
+              "description": "AWS PV Network Device",
+              "device_id": "7",
+              "error_cleared": null,
+              "error_description": null,
+              "guid": "{4488897B-6EA0-4FA4-A6C0-E94ADD5B6A67}",
+              "index": 7,
+              "install_date": null,
+              "installed": true,
+              "interface_index": 12,
+              "last_error_code": null,
+              "mac_address": "02:89:E8:23:BE:EE",
+              "manufacturer": "Amazon Inc.",
+              "max_number_controlled": 0,
+              "max_speed": null,
+              "name": "AWS PV Network Device",
+              "net_connection_id": "Local Area Connection",
+              "net_connection_status": 2,
+              "net_enabled": true,
+              "network_addresses": null,
+              "permanent_address": null,
+              "physical_adapter": true,
+              "pnp_device_id": "XENVIF\\VEN_XS0001&DEV_NET&REV_00000000\\0",
+              "power_management_capabilities": null,
+              "power_management_supported": false,
+              "product_name": "AWS PV Network Device",
+              "service_name": "xennet",
+              "speed": "1000000000",
+              "status": null,
+              "status_info": null,
+              "system_creation_class_name": "Win32_ComputerSystem",
+              "system_name": "WIN-S74L0HSRE8I",
+              "time_of_last_reset": "20170530204538.375000+000"
+            },
+            "counters": {},
+            "addresses": {
+              "145.84.166.177": {
+                "prefixlen": "21",
+                "netmask": "255.255.248.0",
+                "broadcast": "145.84.15.255",
+                "family": "inet"
+              },
+              "fe80::5852:20f5:7cd7:777e": {
+                "prefixlen": "64",
+                "family": "inet6",
+                "scope": "Link"
+              },
+              "02:89:E8:23:BE:EE": {
+                "family": "lladdr"
+              }
+            },
+            "mtu": null,
+            "type": "Ethernet 802.3",
+            "arp": {
+              "145.84.8.1": "02:a9:5a:b4:15:5a",
+              "145.84.166.3": "02:6a:65:20:3b:99",
+              "145.84.15.255": "ff:ff:ff:ff:ff:ff",
+              "224.0.0.22": "01:00:5e:00:00:16",
+              "224.0.0.252": "01:00:5e:00:00:fc",
+              "255.255.255.255": "ff:ff:ff:ff:ff:ff"
+            },
+            "encapsulation": "Ethernet"
+          }
+        },
+        "default_gateway": "145.84.8.1",
+        "default_interface": "0xc"
+      },
+      "counters": {
+        "network": {}
+      },
+      "ipaddress": "145.84.166.177",
+      "macaddress": "02:89:E8:23:BE:EE",
+      "ip6address": "fe80::5852:20f5:7cd7:777e",
+      "os": "windows",
+      "os_version": "6.1.7601",
+      "platform": "windows",
+      "platform_version": "6.1.7601",
+      "platform_family": "windows",
+      "uptime_seconds": 13393497,
+      "uptime": "155 days 00 hours 24 minutes 57 seconds",
+      "virtualization": {
+        "systems": {
+          "xen": "guest"
+        },
+        "system": "xen",
+        "role": "guest"
+      },
+      "languages": {
+        "java": {
+          "version": "1.8.0_45",
+          "runtime": {
+            "name": "Java(TM) SE Runtime Environment",
+            "build": "1.8.0_45-b15"
+          },
+          "hotspot": {
+            "name": "Java HotSpot(TM) 64-Bit Server VM",
+            "build": "25.45-b02, mixed mode"
+          }
+        },
+        "perl": {
+          "version": "5.8.8",
+          "archname": "msys-64int"
+        },
+        "powershell": {
+          "version": "3.0",
+          "ws_man_stack_version": "3.0",
+          "serialization_version": "1.1.0.1",
+          "clr_version": "4.0.30319.36392",
+          "build_version": "6.2.9200.16481",
+          "compatible_versions": [
+            "1.0",
+            "2.0",
+            "3.0"
+          ],
+          "remoting_protocol_version": "2.2"
+        },
+        "ruby": {
+          "platform": "x64-mingw32",
+          "version": "2.3.1",
+          "release_date": "2016-04-26",
+          "target": "x86_64-w64-mingw32",
+          "target_cpu": "x64",
+          "target_vendor": "w64",
+          "target_os": "mingw32",
+          "host": "x86_64-w64-mingw32",
+          "host_cpu": "x86_64",
+          "host_os": "mingw32",
+          "host_vendor": "w64",
+          "bin_dir": "C:/opscode/chef/embedded/bin",
+          "ruby_bin": "C:/opscode/chef/embedded/bin/ruby",
+          "gems_dir": "C:/opscode/chef/embedded/lib/ruby/gems/2.3.0",
+          "gem_bin": "C:/opscode/chef/embedded/bin/gem"
+        }
+      },
+      "chef_packages": {
+        "chef": {
+          "version": "12.21.3",
+          "chef_root": "C:/opscode/chef/embedded/lib/ruby/gems/2.3.0/gems/chef-12.21.3-universal-mingw32/lib"
+        },
+        "ohai": {
+          "version": "8.24.0",
+          "ohai_root": "C:/opscode/chef/embedded/lib/ruby/gems/2.3.0/gems/ohai-8.24.0/lib/ohai"
+        }
+      },
+      "dmi": {},
+      "ec2": {
+        "ami_id": "ami-90aecdf0",
+        "ami_launch_index": "0",
+        "ami_manifest_path": "(unknown)",
+        "block_device_mapping_ami": "/dev/sda1",
+        "block_device_mapping_root": "/dev/sda1",
+        "hostname": "ip-145-84-166-177.us-west-2.compute.internal",
+        "instance_action": "none",
+        "instance_id": "i-0473bb51c91a991f2",
+        "instance_type": "t2.medium",
+        "local_hostname": "ip-145-84-166-177.us-west-2.compute.internal",
+        "local_ipv4": "145.84.166.177",
+        "mac": "02:89:e8:23:be:ee",
+        "metrics_vhostmd": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+        "network_interfaces_macs": {
+          "02:89:e8:23:be:ee": {
+            "device_number": "0",
+            "interface_id": "eni-a70dc88d",
+            "local_hostname": "ip-145-84-166-177.us-west-2.compute.internal",
+            "local_ipv4s": "145.84.166.177",
+            "mac": "02:89:e8:23:be:ee",
+            "owner_id": "999999999999",
+            "security_group_ids": "sg-96274af3\nsg-e401eb83",
+            "security_groups": "default\nwindows-default",
+            "subnet_id": "subnet-19ac017c",
+            "subnet_ipv4_cidr_block": "145.84.8.0/21",
+            "vpc_id": "vpc-2229ff47",
+            "vpc_ipv4_cidr_block": "145.84.0.0/16",
+            "vpc_ipv4_cidr_blocks": "145.84.0.0/16"
+          }
+        },
+        "placement_availability_zone": "us-west-2a",
+        "profile": "windows-hvm",
+        "reservation_id": "r-035763534f403bc69",
+        "security_groups": [
+          "default",
+          "windows-default"
+        ],
+        "services_domain": "amazonaws.com",
+        "services_partition": "aws",
+        "userdata": "<powershell>\n$logfile=\"C:/Program Files/Amazon/Ec2ConfigService/Logs/knife-ec2.log\"\n# Allow script execution\nSet-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force -Scope process\n# On windows 2008r2 it will force a reload, which will sever the session\nNew-ItemProperty hklm:/SOFTWARE/Policies/Microsoft/Windows/System -Name DisableForceUnload -Value 1 -propertytype DWORD\n#PS Remoting and & winrm.cmd basic config\n$enableArgs=@{Force=$true}\n$command=Get-Command Enable-PSRemoting\nif($command.Parameters.Keys -contains \"skipnetworkprofilecheck\"){\n    $enableArgs.skipnetworkprofilecheck=$true\n}\n& winrm.cmd set winrm/config '@{MaxTimeoutms=\"1800000\"}' >> $logfile\n& winrm.cmd set winrm/config/winrs '@{MaxShellsPerUser=\"50\"}' >> $logfile\nEnable-PSRemoting @enableArgs\n#Firewall Config\n& netsh advfirewall firewall set rule name=\"Windows Remote Management (HTTP-In)\" profile=public protocol=tcp localport=5985 remoteip=localsubnet new remoteip=any  >> $logfile\n# new stuff\n& net.exe user /y /add bootstrap \"P2ssw0rd!\" >> $logfile\n& net.exe localgroup Administrators /add bootstrap >> $logfile\n</powershell>\n",
+        "account_id": "999999999999",
+        "availability_zone": "us-west-2a",
+        "region": "us-west-2"
+      },
+      "json?": "{\n  \"privateIp\" : \"145.84.166.177\",\n  \"devpayProductCodes\" : null,\n  \"availabilityZone\" : \"us-west-2a\",\n  \"version\" : \"2010-08-31\",\n  \"pendingTime\" : \"2017-05-30T20:40:00Z\",\n  \"instanceId\" : \"i-0473bb51c91a991f2\",\n  \"billingProducts\" : [ \"bp-6ba54002\" ],\n  \"instanceType\" : \"t2.medium\",\n  \"accountId\" : \"999999999999\",\n  \"architecture\" : \"x86_64\",\n  \"kernelId\" : null,\n  \"ramdiskId\" : null,\n  \"imageId\" : \"ami-90aecdf0\",\n  \"region\" : \"us-west-2\"\n}",
+      "cloud": {
+        "public_ips": [
+          null
+        ],
+        "private_ips": [
+          "145.84.166.177"
+        ],
+        "public_ipv4": null,
+        "public_hostname": null,
+        "local_ipv4": "145.84.166.177",
+        "local_hostname": "ip-145-84-166-177.us-west-2.compute.internal",
+        "provider": "ec2"
+      },
+      "cloud_v2": {
+        "local_ipv4_addrs": [
+          "145.84.166.177"
+        ],
+        "provider": "ec2",
+        "local_hostname": "ip-145-84-166-177.us-west-2.compute.internal",
+        "local_ipv4": "145.84.166.177"
+      },
+      "command": {},
+      "hostname": "WIN-S74L0HSRE8I",
+      "machinename": "WIN-S74L0HSRE8I",
+      "fqdn": "WIN-S74L0HSRE8I",
+      "domain": null,
+      "keys": {
+        "ssh": {}
+      },
+      "fips": {
+        "kernel": {
+          "enabled": false
+        }
+      },
+      "ohai_time": 1509570661.8595982,
+      "packages": {
+        "7-Zip 15.14 (x64 edition)": {
+          "version": "15.14.00.0",
+          "publisher": "Igor Pavlov",
+          "installdate": "20170530"
+        },
+        "Microsoft .NET Framework 4.5.2": {
+          "version": "4.5.51209",
+          "publisher": "Microsoft Corporation"
+        },
+        "Java 8 Update 45 (64-bit)": {
+          "version": "8.0.450",
+          "publisher": "Oracle Corporation",
+          "installdate": "20170530"
+        },
+        "Microsoft Visual C++ 2008 Redistributable - x64 9.0.30729": {
+          "version": "9.0.30729",
+          "publisher": "Microsoft Corporation",
+          "installdate": "20110305"
+        },
+        "Amazon SSM Agent": {
+          "version": "2.0.761.0",
+          "publisher": "Amazon Web Services"
+        },
+        "Windows Software Development Kit DirectX x64 Remote": {
+          "version": "8.100.25984",
+          "publisher": "Microsoft Corporation",
+          "installdate": "20170526"
+        },
+        "Omnibus Toolchain v1.1.73": {
+          "version": "1.1.73.1",
+          "publisher": "Chef Software, Inc.",
+          "installdate": "20170720"
+        },
+        "aws-cfn-bootstrap": {
+          "version": "1.3.6",
+          "publisher": "Amazon Web Services",
+          "installdate": "20121207"
+        },
+        "Windows Software Development Kit for Windows Store Apps DirectX x64 Remote": {
+          "version": "8.100.26936",
+          "publisher": "Microsoft Corporation",
+          "installdate": "20170526"
+        },
+        "Chef Client v12.21.3": {
+          "version": "12.21.3.1",
+          "publisher": "Chef Software, Inc.",
+          "installdate": "20170816"
+        },
+        "EC2ConfigService": {
+          "version": "4.9.1775.0",
+          "publisher": "Amazon Web Services"
+        },
+        "AWS PV Drivers": {
+          "version": "7.4.6",
+          "publisher": "Amazon Web Services",
+          "installdate": "20170510"
+        },
+        "Network Time Protocol": {
+          "version": "4.2.8p5"
+        },
+        "Windows Software Development Kit EULA": {
+          "version": "8.100.25984",
+          "publisher": "Microsoft Corporations",
+          "installdate": "20170526"
+        },
+        "AWS Tools for Windows": {
+          "version": "3.15.34",
+          "publisher": "Amazon Web Services Developer Relations",
+          "installdate": "20170510"
+        },
+        "Windows Software Development Kit Redistributables": {
+          "version": "8.100.26936",
+          "publisher": "Microsoft Corporation",
+          "installdate": "20170526"
+        },
+        "Windows Software Development Kit for Windows Store Apps": {
+          "version": "8.100.26936",
+          "publisher": "Microsoft Corporation",
+          "installdate": "20170526"
+        },
+        "Java Auto Updater": {
+          "version": "2.8.45.15",
+          "publisher": "Oracle Corporation",
+          "installdate": "20170530"
+        },
+        "Windows Installer PowerShell Module": {
+          "version": "2.3.0.0",
+          "publisher": "Microsoft Corporation",
+          "installdate": "20170530"
+        },
+        "Windows Software Development Kit for Windows Store Apps DirectX x86 Remote": {
+          "version": "8.100.26936",
+          "publisher": "Microsoft Corporation",
+          "installdate": "20170526"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3023224)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3035490)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3037581)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3074230)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3074550)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3097996)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3098781)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3122656)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3127229)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3135996)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3135996v2)": {
+          "version": "2",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3142033)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Security Update for Microsoft .NET Framework 4.5.2 (KB3163251)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Reliability Update for Microsoft .NET Framework 4.5.2 (KB3179930)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Update for Microsoft .NET Framework 4.5.2 (KB3195363)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Update for Microsoft .NET Framework 4.5.2 (KB3210139)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Update for Microsoft .NET Framework 4.5.2 (KB4014514)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Update for Microsoft .NET Framework 4.5.2 (KB4014559)": {
+          "version": "1",
+          "publisher": "Microsoft Corporation"
+        },
+        "Windows Software Development Kit": {
+          "version": "8.100.26936",
+          "publisher": "Microsoft Corporation",
+          "installdate": "20170526"
+        },
+        "Windows Software Development Kit DirectX x86 Remote": {
+          "version": "8.100.25984",
+          "publisher": "Microsoft Corporation",
+          "installdate": "20170526"
+        },
+        "Kits Configuration Installer": {
+          "version": "8.100.25984",
+          "publisher": "Microsoft",
+          "installdate": "20170526"
+        },
+        "Windows Software Development Kit for Windows 8.1": {
+          "version": "8.100.26936",
+          "publisher": "Microsoft Corporation"
+        }
+      },
+      "root_group": "Administrators",
+      "time": {
+        "timezone": "Coordinated Universal Time"
+      },
+      "recipes": [
+        "opscode-ci::slave",
+        "opscode-ci::_build_support",
+        "chef-sugar::default",
+        "opscode-ci::_platform_tweaks",
+        "opscode-ci::_migration",
+        "omnibus::default",
+        "omnibus::_common",
+        "omnibus::_user",
+        "omnibus::_omnibus_toolchain",
+        "omnibus::_compile",
+        "seven_zip::default",
+        "omnibus::_git",
+        "omnibus::_github",
+        "omnibus::_libffi",
+        "omnibus::_packaging",
+        "wix::default",
+        "windows-sdk::windows_sdk",
+        "omnibus::_selinux",
+        "omnibus::_environment",
+        "opscode-ci::_github",
+        "opscode-ci::_ntp",
+        "ntp::default",
+        "ntp::windows_client",
+        "opscode-ci::_package_signing",
+        "opscode-ci::_rubygems",
+        "opscode-ci::_aws",
+        "opscode-ci::_users",
+        "opscode-ci::_sudo",
+        "opscode-ci::_java",
+        "aws::default",
+        "opscode-ci::_omnibus",
+        "opscode-ci::_slave_windows"
+      ],
+      "expanded_run_list": [
+        "opscode-ci::slave"
+      ],
+      "roles": [],
+      "cookbooks": {
+        "opscode-ci": {
+          "version": "5.15.127"
+        },
+        "apt": {
+          "version": "6.1.4"
+        },
+        "chef-sugar": {
+          "version": "3.4.0"
+        },
+        "freebsd": {
+          "version": "1.0.2"
+        },
+        "lvm": {
+          "version": "4.1.9"
+        },
+        "omnibus": {
+          "version": "5.2.2"
+        },
+        "build-essential": {
+          "version": "8.0.3"
+        },
+        "seven_zip": {
+          "version": "2.0.2"
+        },
+        "windows": {
+          "version": "2.0.2"
+        },
+        "mingw": {
+          "version": "2.0.1"
+        },
+        "chef-ingredient": {
+          "version": "2.1.10"
+        },
+        "git": {
+          "version": "6.1.0"
+        },
+        "dmg": {
+          "version": "4.0.0"
+        },
+        "yum-epel": {
+          "version": "2.1.2"
+        },
+        "compat_resource": {
+          "version": "12.19.0"
+        },
+        "homebrew": {
+          "version": "4.2.0"
+        },
+        "remote_install": {
+          "version": "1.0.2"
+        },
+        "wix": {
+          "version": "3.0.0"
+        },
+        "windows-sdk": {
+          "version": "1.0.2"
+        },
+        "ntp": {
+          "version": "3.5.2"
+        },
+        "route53": {
+          "version": "2.0.0"
+        },
+        "rsyslog": {
+          "version": "5.1.0"
+        },
+        "sudo": {
+          "version": "3.5.3"
+        },
+        "redhat_subscription_manager": {
+          "version": "0.6.0"
+        },
+        "aws": {
+          "version": "3.3.3"
+        },
+        "ohai": {
+          "version": "3.0.1"
+        },
+        "jenkins": {
+          "version": "2.6.0"
+        },
+        "runit": {
+          "version": "1.8.0"
+        },
+        "packagecloud": {
+          "version": "0.3.0"
+        },
+        "yum": {
+          "version": "3.13.0"
+        },
+        "chef_nginx": {
+          "version": "2.9.0"
+        },
+        "bluepill": {
+          "version": "3.0.0"
+        },
+        "zypper": {
+          "version": "0.4.0"
+        },
+        "rubygems": {
+          "version": "1.0.2"
+        }
+      }
+    },
+    "normal": {
+      "tags": [
+        "chefdk",
+        "slave",
+        "tester"
+      ],
+      "omnibus": {
+        "build_user": "jenkins",
+        "build_user_password": "fabjaboac!1",
+        "build_user_group": "Administrators",
+        "build_user_home": "C:\\jenkins",
+        "ruby_version": "2.1.8"
+      },
+      "jenkins": {
+        "java": "C:\\Program Files\\Java\\jre1.8.0_45/bin/java",
+        "master": {
+          "endpoint": "http://example.com"
+        }
+      }
+    },
+    "chef_type": "node",
+    "default": {
+      "apt": {
+        "cacher_dir": "/var/cache/apt-cacher-ng",
+        "cacher_interface": null,
+        "cacher_port": 3142,
+        "compiletime": false,
+        "compile_time_update": false,
+        "key_proxy": "",
+        "periodic_update_min_delay": 86400,
+        "launchpad_api_version": "1.0",
+        "unattended_upgrades": {
+          "enable": false,
+          "update_package_lists": true,
+          "allowed_origins": [
+            "Windows notlinux"
+          ],
+          "origins_patterns": [],
+          "package_blacklist": [],
+          "auto_fix_interrupted_dpkg": false,
+          "minimal_steps": false,
+          "install_on_shutdown": false,
+          "mail": null,
+          "mail_only_on_error": true,
+          "remove_unused_dependencies": false,
+          "automatic_reboot": false,
+          "automatic_reboot_time": "now",
+          "dl_limit": null,
+          "random_sleep": null
+        },
+        "cacher_client": {
+          "cacher_server": {}
+        },
+        "confd": {
+          "force_confask": false,
+          "force_confdef": false,
+          "force_confmiss": false,
+          "force_confnew": false,
+          "force_confold": false,
+          "install_recommends": true,
+          "install_suggests": false
+        }
+      },
+      "ohai": {
+        "plugin_path": "C:/chef/ohai_plugins",
+        "plugins": {
+          "ohai": "plugins"
+        },
+        "hints_path": "C:\\chef\\ohai\\hints"
+      },
+      "aws": {
+        "aws_sdk_version": "~> 2.2",
+        "databag_name": null,
+        "databag_entry": null,
+        "mfa_code": null
+      },
+      "chef-ingredient": {
+        "mixlib-install": {
+          "git_ref": null
+        }
+      },
+      "rsyslog": {
+        "local_host_name": null,
+        "default_log_dir": "/var/log",
+        "log_dir": "/srv/rsyslog",
+        "working_dir": "/var/spool/rsyslog",
+        "server": false,
+        "use_relp": false,
+        "relp_port": 20514,
+        "protocol": "tcp",
+        "bind": "*",
+        "port": 514,
+        "server_ip": null,
+        "server_search": "role:loghost",
+        "remote_logs": true,
+        "per_host_dir": "%$YEAR%/%$MONTH%/%$DAY%/%HOSTNAME%",
+        "max_message_size": "2k",
+        "preserve_fqdn": "off",
+        "high_precision_timestamps": false,
+        "repeated_msg_reduction": "on",
+        "logs_to_forward": "*.*",
+        "enable_imklog": true,
+        "config_prefix": "/etc",
+        "default_file_template": null,
+        "default_remote_template": null,
+        "rate_limit_interval": null,
+        "rate_limit_burst": null,
+        "enable_tls": false,
+        "action_queue_max_disk_space": "1G",
+        "tls_ca_file": null,
+        "tls_certificate_file": null,
+        "tls_key_file": null,
+        "tls_auth_mode": "anon",
+        "tls_permitted_peer": null,
+        "use_local_ipv4": false,
+        "allow_non_local": false,
+        "custom_remote": [],
+        "additional_directives": {},
+        "templates": [],
+        "service_name": "rsyslog",
+        "user": "root",
+        "group": "adm",
+        "priv_seperation": false,
+        "priv_user": null,
+        "priv_group": null,
+        "modules": [
+          "imuxsock",
+          "imklog"
+        ],
+        "file_create_mode": "0640",
+        "dir_create_mode": "0755",
+        "umask": "0022",
+        "dir_owner": "root",
+        "dir_group": "adm",
+        "default_facility_logs": {
+          "auth,authpriv.*": "/var/log/auth.log",
+          "*.*;auth,authpriv.none": "-/var/log/syslog",
+          "daemon.*": "-/var/log/daemon.log",
+          "kern.*": "-/var/log/kern.log",
+          "mail.*": "-/var/log/mail.log",
+          "user.*": "-/var/log/user.log",
+          "mail.info": "-/var/log/mail.info",
+          "mail.warn": "-/var/log/mail.warn",
+          "mail.err": "/var/log/mail.err",
+          "news.crit": "/var/log/news/news.crit",
+          "news.err": "/var/log/news/news.err",
+          "news.notice": "-/var/log/news/news.notice",
+          "*.=debug;auth,authpriv.none;news.none;mail.none": "-/var/log/debug",
+          "*.=info;*.=notice;*.=warn;auth,authpriv.none;cron,daemon.none;mail,news.none": "-/var/log/messages",
+          "*.emerg": ":omusrmsg:*"
+        }
+      },
+      "bluepill": {
+        "bin": "C:/opscode/chef/embedded/bin/bluepill",
+        "logfile": "/var/log/bluepill.log",
+        "pid_dir": "/var/run/bluepill",
+        "state_dir": "/var/lib/bluepill",
+        "group": 0,
+        "use_rsyslog": false,
+        "init_dir": "/etc/init.d",
+        "conf_dir": "/etc/bluepill"
+      },
+      "windows": {
+        "rubyzipversion": null
+      },
+      "seven_zip": {
+        "url": "http://www.7-zip.org/a/7z1514-x64.msi",
+        "checksum": "cefe1a9092d8a6be68468c33910d6206b40e934fb63cab686c5cccf369fbf712",
+        "package_name": "7-Zip 15.14 (x64 edition)",
+        "default_extract_timeout": 600,
+        "home": "C:\\Program Files\\7-zip",
+        "syspath": true
+      },
+      "build-essential": {
+        "compile_time": false,
+        "msys2": {
+          "path": "C:\\msys2"
+        }
+      },
+      "packagecloud": {
+        "base_repo_path": "/install/repositories/",
+        "gpg_key_path": "/gpgkey",
+        "hostname_override": null,
+        "proxy_host": null,
+        "proxy_port": null,
+        "default_type": null
+      },
+      "yum-epel": {
+        "repos": [
+          "epel",
+          "epel-debuginfo",
+          "epel-source",
+          "epel-testing",
+          "epel-testing-debuginfo",
+          "epel-testing-source"
+        ]
+      },
+      "yum": {
+        "epel-debuginfo": {
+          "repositoryid": "epel-debuginfo",
+          "description": "Extra Packages for 6 - $basearch - Debug",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-debug-6&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-source": {
+          "repositoryid": "epel-source",
+          "description": "Extra Packages for 6 - $basearch - Source",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-source-6&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-testing-debuginfo": {
+          "repositoryid": "epel-testing-debuginfo",
+          "description": "Extra Packages for 6 - $basearch - Testing Debug",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=testing-debug-epel6&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-testing-source": {
+          "repositoryid": "epel-testing-source",
+          "description": "Extra Packages for 6 - $basearch - Testing Source",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=testing-source-epel6&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel-testing": {
+          "repositoryid": "epel-testing",
+          "description": "Extra Packages for 6 - $basearch - Testing ",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=testing-epel6&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": false,
+          "managed": false,
+          "make_cache": true
+        },
+        "epel": {
+          "repositoryid": "epel",
+          "description": "Extra Packages for 6 - $basearch",
+          "mirrorlist": "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-6&arch=$basearch",
+          "gpgkey": "https://download.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6",
+          "failovermethod": "priority",
+          "gpgcheck": true,
+          "enabled": true,
+          "managed": true,
+          "make_cache": true
+        },
+        "main": {
+          "cachedir": "/var/cache/yum/$basearch/$releasever",
+          "distroverpkg": "windows-release",
+          "releasever": null,
+          "alwaysprompt": null,
+          "assumeyes": null,
+          "bandwidth": null,
+          "bugtracker_url": null,
+          "clean_requirements_on_remove": null,
+          "color": null,
+          "color_list_available_downgrade": null,
+          "color_list_available_install": null,
+          "color_list_available_reinstall": null,
+          "color_list_available_upgrade": null,
+          "color_list_installed_extra": null,
+          "color_list_installed_newer": null,
+          "color_list_installed_older": null,
+          "color_list_installed_reinstall": null,
+          "color_search_match": null,
+          "color_update_installed": null,
+          "color_update_local": null,
+          "color_update_remote": null,
+          "commands": null,
+          "deltarpm": null,
+          "debuglevel": null,
+          "diskspacecheck": null,
+          "enable_group_conditionals": null,
+          "errorlevel": null,
+          "exactarch": null,
+          "exclude": null,
+          "gpgcheck": true,
+          "group_package_types": null,
+          "groupremove_leaf_only": null,
+          "history_list_view": null,
+          "history_record": null,
+          "history_record_packages": null,
+          "http_caching": null,
+          "installonly_limit": null,
+          "installonlypkgs": null,
+          "installroot": null,
+          "keepalive": null,
+          "keepcache": false,
+          "kernelpkgnames": null,
+          "localpkg_gpgcheck": false,
+          "logfile": "/var/log/yum.log",
+          "max_retries": null,
+          "mdpolicy": null,
+          "metadata_expire": null,
+          "mirrorlist_expire": null,
+          "multilib_policy": null,
+          "obsoletes": null,
+          "overwrite_groups": null,
+          "password": null,
+          "path": "/etc/yum.conf",
+          "persistdir": null,
+          "pluginconfpath": null,
+          "pluginpath": null,
+          "plugins": null,
+          "protected_multilib": null,
+          "protected_packages": null,
+          "proxy": null,
+          "proxy_password": null,
+          "proxy_username": null,
+          "recent": null,
+          "repo_gpgcheck": null,
+          "reposdir": null,
+          "reset_nice": null,
+          "rpmverbosity": null,
+          "showdupesfromrepos": null,
+          "skip_broken": null,
+          "ssl_check_cert_permissions": null,
+          "sslcacert": null,
+          "sslclientcert": null,
+          "sslclientkey": null,
+          "sslverify": null,
+          "syslog_device": null,
+          "syslog_facility": null,
+          "syslog_ident": null,
+          "throttle": null,
+          "timeout": null,
+          "tolerant": false,
+          "tsflags": null,
+          "username": null
+        }
+      },
+      "zypper": {
+        "smt_host": null
+      },
+      "nginx": {
+        "version": "1.10.1",
+        "package_name": "nginx",
+        "port": "80",
+        "dir": "/etc/nginx",
+        "script_dir": "/usr/sbin",
+        "log_dir": "/var/log/nginx",
+        "log_dir_perm": "0750",
+        "binary": "/usr/sbin/nginx",
+        "default_root": "/var/www/nginx-default",
+        "ulimit": "1024",
+        "pid": "/var/run/nginx.pid",
+        "user": "www-data",
+        "init_style": "init",
+        "upstart": {
+          "runlevels": "2345",
+          "respawn_limit": null,
+          "foreground": true
+        },
+        "group": "www-data",
+        "gzip": "on",
+        "gzip_static": "off",
+        "gzip_http_version": "1.0",
+        "gzip_comp_level": "2",
+        "gzip_proxied": "any",
+        "gzip_vary": "off",
+        "gzip_buffers": null,
+        "gzip_types": [
+          "text/plain",
+          "text/css",
+          "application/x-javascript",
+          "text/xml",
+          "application/xml",
+          "application/rss+xml",
+          "application/atom+xml",
+          "text/javascript",
+          "application/javascript",
+          "application/json",
+          "text/mathml"
+        ],
+        "gzip_min_length": 1000,
+        "gzip_disable": "MSIE [1-6]\\.",
+        "keepalive": "on",
+        "keepalive_requests": 100,
+        "keepalive_timeout": 65,
+        "worker_processes": 2,
+        "worker_connections": 1024,
+        "worker_rlimit_nofile": null,
+        "multi_accept": false,
+        "event": null,
+        "accept_mutex_delay": null,
+        "server_tokens": null,
+        "server_names_hash_bucket_size": 64,
+        "variables_hash_max_size": 1024,
+        "variables_hash_bucket_size": 64,
+        "sendfile": "on",
+        "underscores_in_headers": null,
+        "tcp_nodelay": "on",
+        "tcp_nopush": "on",
+        "access_log_options": null,
+        "error_log_options": null,
+        "disable_access_log": false,
+        "log_formats": {},
+        "install_method": "package",
+        "default_site_enabled": true,
+        "types_hash_max_size": 2048,
+        "types_hash_bucket_size": 64,
+        "proxy_read_timeout": null,
+        "client_body_buffer_size": null,
+        "client_max_body_size": null,
+        "large_client_header_buffers": null,
+        "default": {
+          "modules": []
+        },
+        "extra_configs": {},
+        "auth_request": {
+          "url": "http://mdounin.ru/hg/ngx_http_auth_request_module/archive/662785733552.tar.gz",
+          "checksum": "2057bdefd2137a5000d9dbdbfca049d1ba7832ad2b9f8855a88ea5dfa70bd8c1"
+        },
+        "devel": {
+          "version": "0.3.0",
+          "url": "https://github.com/simpl/ngx_devel_kit/archive/v0.3.0.tar.gz",
+          "checksum": "88e05a99a8a7419066f5ae75966fb1efc409bad4522d14986da074554ae61619"
+        },
+        "echo": {
+          "version": "0.59",
+          "url": "https://github.com/openresty/echo-nginx-module/archive/v0.59.tar.gz",
+          "checksum": "9b319ad7836202883128d2b9c24ed818082541df57ef7f2065b7557085c603cd"
+        },
+        "geoip": {
+          "path": "/srv/geoip",
+          "enable_city": true,
+          "country_dat_url": "http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz",
+          "country_dat_checksum": null,
+          "city_dat_url": "http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz",
+          "city_dat_checksum": null,
+          "lib_version": "1.6.9",
+          "lib_url": "https://github.com/maxmind/geoip-api-c/releases/download/v1.6.9/GeoIP-1.6.9.tar.gz",
+          "lib_checksum": "4b446491843de67c1af9b887da17a3e5939e0aeed4826923a5f4bf09d845096f"
+        },
+        "headers_more": {
+          "version": "0.30",
+          "source_url": "https://github.com/openresty/headers-more-nginx-module/archive/v0.30.tar.gz",
+          "source_checksum": "2aad309a9313c21c7c06ee4e71a39c99d4d829e31c8b3e7d76f8c964ea8047f5"
+        },
+        "lua": {
+          "version": "0.10.3",
+          "url": "https://github.com/chaoslawful/lua-nginx-module/archive/v0.10.3.tar.gz",
+          "checksum": "a69504c25de67bce968242d331d2e433c021405a6dba7bca0306e6e0b040bb50"
+        },
+        "luajit": {
+          "version": "2.0.4",
+          "url": "http://luajit.org/download/LuaJIT-2.0.4.tar.gz",
+          "checksum": "620fa4eb12375021bef6e4f237cbd2dd5d49e56beb414bee052c746beef1807d"
+        },
+        "naxsi": {
+          "version": "0.54",
+          "url": "https://github.com/nbs-system/naxsi/archive/0.54.tar.gz",
+          "checksum": "9cc2c09405bc71f78ef26a8b6d70afcea3fccbe8125df70cb0cfc480133daba5"
+        },
+        "openssl_source": {
+          "version": "1.0.1t",
+          "url": "http://www.openssl.org/source/openssl-1.0.1t.tar.gz"
+        },
+        "pagespeed": {
+          "version": "1.11.33.2",
+          "url": "https://github.com/pagespeed/ngx_pagespeed/archive/release-1.11.33.2-beta.tar.gz",
+          "packages": {
+            "rhel": [
+              "pcre-dev",
+              "pcre-devel",
+              "zlib-devel"
+            ],
+            "debian": [
+              "zlib1g-dev",
+              "libpcre3",
+              "libpcre3-dev"
+            ]
+          }
+        },
+        "psol": {
+          "url": "https://dl.google.com/dl/page-speed/psol/1.11.33.2.tar.gz"
+        },
+        "passenger": {
+          "version": "4.0.57",
+          "root": "C:/opscode/chef/embedded/lib/ruby/gems/2.3.0/gems/passenger-4.0.57",
+          "ruby": "C:/opscode/chef/embedded/bin/ruby",
+          "packages": {
+            "rhel": [
+              "ruby-devel",
+              "curl-devel"
+            ],
+            "fedora": [
+              "ruby-devel",
+              "libcurl-devel"
+            ],
+            "debian": [
+              "ruby-dev",
+              "libcurl4-gnutls-dev"
+            ]
+          },
+          "install_rake": true,
+          "spawn_method": "smart-lv2",
+          "buffer_response": "on",
+          "max_pool_size": 6,
+          "min_instances": 1,
+          "max_instances_per_app": 0,
+          "pool_idle_time": 300,
+          "max_requests": 0,
+          "gem_binary": null,
+          "nodejs": null
+        },
+        "enable_rate_limiting": false,
+        "rate_limiting_zone_name": "default",
+        "rate_limiting_backoff": "10m",
+        "rate_limit": "1r/s",
+        "set_misc": {
+          "version": "0.30",
+          "url": "https://github.com/agentzh/set-misc-nginx-module/archive/v0.30.tar.gz",
+          "checksum": "59920dd3f92c2be32627121605751b52eae32b5884be09f2e4c53fb2fae8aabc"
+        },
+        "socketproxy": {
+          "root": "/usr/share/nginx/apps",
+          "app_owner": "root",
+          "logname": "socketproxy",
+          "log_level": "error"
+        },
+        "source": {
+          "version": "1.10.1",
+          "prefix": "/opt/nginx-1.10.1",
+          "conf_path": "/etc/nginx/nginx.conf",
+          "sbin_path": "/opt/nginx-1.10.1/sbin/nginx",
+          "default_configure_flags": [
+            "--prefix=/opt/nginx-1.10.1",
+            "--conf-path=/etc/nginx/nginx.conf",
+            "--sbin-path=/opt/nginx-1.10.1/sbin/nginx"
+          ],
+          "url": "http://nginx.org/download/nginx-1.10.1.tar.gz",
+          "checksum": "1fd35846566485e03c0e318989561c135c598323ff349c503a6c14826487a801",
+          "modules": [
+            "chef_nginx::http_ssl_module",
+            "chef_nginx::http_gzip_static_module"
+          ],
+          "use_existing_user": false
+        },
+        "configure_flags": [],
+        "status": {
+          "port": "8090"
+        },
+        "syslog": {
+          "git_repo": "https://github.com/yaoweibin/nginx_syslog_patch.git",
+          "git_revision": "master"
+        },
+        "upload_progress": {
+          "url": "https://github.com/masterzen/nginx-upload-progress-module/tarball/v0.9.0",
+          "checksum": "3fb903dab595cf6656fa0fc5743a48daffbba2f6b5c554836be630800eaad4e2",
+          "javascript_output": true,
+          "zone_name": "proxied",
+          "zone_size": "1m"
+        }
+      },
+      "freebsd": {
+        "compiletime_portsnap": false
+      },
+      "jenkins": {
+        "java": "C:\\Program Files\\Java\\jre1.8.0_45/bin/java",
+        "executor": {
+          "timeout": 60,
+          "private_key": null,
+          "proxy": null,
+          "jvm_options": null
+        },
+        "master": {
+          "install_method": "war",
+          "version": null,
+          "mirror": "http://mirrors.jenkins-ci.org",
+          "source": "http://mirrors.jenkins-ci.org/war/latest/jenkins.war",
+          "checksum": null,
+          "jvm_options": null,
+          "jenkins_args": null,
+          "user": "jenkins",
+          "group": "jenkins",
+          "use_system_accounts": true,
+          "host": "localhost",
+          "listen_address": "0.0.0.0",
+          "port": 8080,
+          "endpoint": "http://localhost:8080",
+          "home": "/var/lib/jenkins",
+          "log_directory": "/var/log/jenkins",
+          "runit": {
+            "sv_timeout": 7
+          },
+          "repository": null,
+          "repository_key": null,
+          "repository_keyserver": null
+        }
+      },
+      "lvm": {
+        "chef-ruby-lvm": {
+          "version": "0.3.0"
+        },
+        "chef-ruby-lvm-attrib": {
+          "version": "0.2.1"
+        },
+        "cleanup_old_gems": true,
+        "rubysource": "https://rubygems.org"
+      },
+      "ntp": {
+        "servers": [
+          "0.pool.ntp.org",
+          "1.pool.ntp.org",
+          "2.pool.ntp.org",
+          "3.pool.ntp.org"
+        ],
+        "peers": [],
+        "pools": [],
+        "restrictions": [],
+        "tinker": {
+          "panic": 0,
+          "allan": 1500,
+          "dispersion": 15,
+          "step": 0.128,
+          "stepout": 900
+        },
+        "restrict_default": "kod notrap nomodify nopeer noquery",
+        "packages": [
+          "ntp"
+        ],
+        "service": "NTP",
+        "varlibdir": "/var/lib/ntp",
+        "driftfile": "C:\\NTP\\ntp.drift",
+        "logfile": null,
+        "conffile": "C:\\NTP\\etc\\ntp.conf",
+        "statsdir": "/var/log/ntpstats/",
+        "conf_owner": "Administrators",
+        "conf_group": "Administrators",
+        "var_owner": "ntp",
+        "var_group": "ntp",
+        "leapfile": "/etc/ntp.leapseconds",
+        "sync_clock": false,
+        "sync_hw_clock": false,
+        "listen": null,
+        "listen_network": null,
+        "ignore": null,
+        "apparmor_enabled": false,
+        "monitor": false,
+        "statistics": false,
+        "conf_restart_immediate": false,
+        "keys": null,
+        "trustedkey": null,
+        "requestkey": null,
+        "disable_tinker_panic_on_virtualization_guest": true,
+        "peer": {
+          "key": null,
+          "use_iburst": true,
+          "use_burst": false,
+          "minpoll": 6,
+          "maxpoll": 10
+        },
+        "server": {
+          "prefer": "",
+          "use_iburst": true,
+          "use_burst": false,
+          "minpoll": 6,
+          "maxpoll": 10
+        },
+        "orphan": {
+          "enabled": false,
+          "stratum": 5
+        },
+        "localhost": {
+          "noquery": false
+        },
+        "package_url": "https://www.meinbergglobal.com/download/ntp/windows/ntp-4.2.8p10-win32-setup.exe",
+        "use_cmos": false
+      },
+      "git": {
+        "version": "2.8.1",
+        "architecture": "64",
+        "checksum": "5e5283990cc91d1e9bd0858f8411e7d0afb70ce26e23680252fb4869288c7cfb",
+        "url": "https://github.com/git-for-windows/git/releases/download/v%{version}.windows.1/Git-%{version}-%{architecture}-bit.exe",
+        "display_name": "Git version 2.8.1",
+        "server": {
+          "base_path": "/srv/git",
+          "export_all": true
+        }
+      },
+      "homebrew": {
+        "owner": null,
+        "auto-update": true,
+        "casks": [],
+        "formulas": [],
+        "taps": [],
+        "installer": {
+          "url": "https://raw.githubusercontent.com/Homebrew/install/master/install",
+          "checksum": null
+        },
+        "enable-analytics": true
+      },
+      "windows-sdk": {
+        "install_path": null
+      },
+      "wix": {
+        "download_id": "1540241",
+        "checksum": "03b8f46cb3abf1465fe8f9975a94a4e0f75c77267ff4d1fcb6d5b6a97567f549",
+        "home": "C:\\wix"
+      },
+      "omnibus": {
+        "build_user": "omnibus",
+        "build_user_home": null,
+        "install_dir": null,
+        "toolchain_name": "omnibus-toolchain",
+        "toolchain_version": "1.1.73",
+        "toolchain_channel": "stable",
+        "git_version": "2.6.2",
+        "ruby_version": "2.1.8",
+        "build_user_group": "Administrators",
+        "base_dir": "C:\\omnibus-ruby",
+        "git_checksum": "ade9f885220964ec190b5de6c6aa42857e00afc7b21827223807c857cce38a78",
+        "build_user_password": "get0ntheBus"
+      },
+      "rubygems": {
+        "gem_disable_default": false,
+        "gem_sources": [
+          "https://rubygems.org"
+        ],
+        "chef_gem_disable_default": false,
+        "chef_gem_sources": [
+          "https://rubygems.org"
+        ]
+      },
+      "authorization": {
+        "sudo": {
+          "groups": [
+            "sysadmin"
+          ],
+          "users": [],
+          "passwordless": false,
+          "setenv": false,
+          "include_sudoers_d": false,
+          "agent_forwarding": false,
+          "sudoers_defaults": [
+            "!lecture,tty_tickets,!fqdn"
+          ],
+          "command_aliases": [],
+          "env_keep_add": [],
+          "env_keep_subtract": [],
+          "custom_commands": {
+            "users": [],
+            "groups": []
+          },
+          "prefix": "/etc"
+        }
+      },
+      "opscode-ci": {
+        "user": "jenkins",
+        "user_home": null,
+        "group": "Administrators",
+        "master": {
+          "host_name": null,
+          "port": 8080,
+          "jnlp_port": 38529,
+          "pipeline_types": [],
+          "executors": 2,
+          "jvm_memory_size": "2516344K",
+          "use_lvm": false,
+          "ebs_vols": [
+            {
+              "device": "/dev/xvdj",
+              "size": 500
+            }
+          ],
+          "days_to_keep_builds": null,
+          "builds_to_keep": null,
+          "days_to_keep_artifacts": 15,
+          "artifacts_to_keep": null
+        },
+        "email": {
+          "system_address": "CHEF CI <ci-notifications@getchef.com>",
+          "list_id": "ci-notifications.getchef.com"
+        },
+        "monitoring": {
+          "jmx_hostname": "localhost",
+          "jmx_port": 9010
+        },
+        "artifactory": {
+          "endpoint": "http://example.com"
+        },
+        "omnibus-cache": {
+          "profile_name": "omnibus-cache"
+        }
+      },
+      "java": {
+        "jdk_version": "7"
+      }
+    },
+    "override": {
+      "opscode-ci": {
+        "artifactory": {
+          "endpoint": "http://example.com:8081"
+        },
+        "omnitruck": {
+          "packages_bucket": "opscode-omnibus-packages",
+          "metadata_bucket": "opscode-omnibus-package-metadata"
+        },
+        "master": {
+          "host_name": "example.com",
+          "pipeline_types": [
+            "client_build",
+            "releng"
+          ],
+          "artifacts_to_keep": null,
+          "days_to_keep_artifacts": 15
+        }
+      }
+    },
+    "run_list": [
+      "recipe[opscode-ci::slave]"
+    ]
+  },
+  "node_name": "chefdk-windows-2008r2-tester-aace65",
+  "organization_name": "chef",
+  "resources": [
+    {
+      "type": "chef_gem",
+      "name": "chef-sugar",
+      "id": "chef-sugar",
+      "after": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "before": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "duration": "313",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "chef-sugar",
+      "cookbook_version": "3.4.0",
+      "recipe_name": "default"
+    },
+    {
+      "type": "chef_gem",
+      "name": "rubyzip",
+      "id": "rubyzip",
+      "after": {
+        "package_name": "rubyzip"
+      },
+      "before": {
+        "package_name": "rubyzip",
+        "version": "1.2.1"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "chef_gem",
+      "name": "chef-sugar",
+      "id": "chef-sugar",
+      "after": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "before": {
+        "package_name": "chef-sugar",
+        "version": "3.4.0"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "chef-sugar",
+      "cookbook_version": "3.4.0",
+      "recipe_name": "default"
+    },
+    {
+      "type": "chef_gem",
+      "name": "rubyzip",
+      "id": "rubyzip",
+      "after": {
+        "package_name": "rubyzip"
+      },
+      "before": {
+        "package_name": "rubyzip",
+        "version": "1.2.1"
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "registry_key",
+      "name": "HKLM\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components\\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}",
+      "id": "HKLM\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components\\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}",
+      "after": {
+        "values": [
+          {
+            "name": "IsInstalled",
+            "type": "dword",
+            "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+          }
+        ]
+      },
+      "before": {
+        "values": [
+          {
+            "name": "",
+            "type": "string",
+            "data": "Applying Enhanced Security Configuration"
+          },
+          {
+            "name": "Version",
+            "type": "string",
+            "data": "8,0,7100,0"
+          },
+          {
+            "name": "IsInstalled",
+            "type": "dword",
+            "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+          },
+          {
+            "name": "ComponentID",
+            "type": "string",
+            "data": "IEHardenAdmin"
+          },
+          {
+            "name": "LocalizedName",
+            "type": "string",
+            "data": "@C:\\Windows\\System32\\iesetup.dll,-3010"
+          },
+          {
+            "name": "StubPath",
+            "type": "string",
+            "data": "\"C:\\Windows\\System32\\rundll32.exe\" \"C:\\Windows\\System32\\iesetup.dll\",IEHardenAdmin"
+          },
+          {
+            "name": "Dontask",
+            "type": "dword",
+            "data": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+          },
+          {
+            "name": "Locale",
+            "type": "string",
+            "data": "en"
+          }
+        ]
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "registry_key",
+      "name": "HKLM\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components\\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}",
+      "id": "HKLM\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components\\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}",
+      "after": {
+        "values": [
+          {
+            "name": "IsInstalled",
+            "type": "dword",
+            "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+          }
+        ]
+      },
+      "before": {
+        "values": [
+          {
+            "name": "",
+            "type": "string",
+            "data": "Applying Enhanced Security Configuration"
+          },
+          {
+            "name": "Version",
+            "type": "string",
+            "data": "8,0,7100,0"
+          },
+          {
+            "name": "IsInstalled",
+            "type": "dword",
+            "data": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+          },
+          {
+            "name": "ComponentID",
+            "type": "string",
+            "data": "IEHardenUser"
+          },
+          {
+            "name": "LocalizedName",
+            "type": "string",
+            "data": "@C:\\Windows\\System32\\iesetup.dll,-3011"
+          },
+          {
+            "name": "StubPath",
+            "type": "string",
+            "data": "\"C:\\Windows\\System32\\rundll32.exe\" \"C:\\Windows\\System32\\iesetup.dll\",IEHardenUser"
+          },
+          {
+            "name": "Dontask",
+            "type": "dword",
+            "data": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+          },
+          {
+            "name": "Locale",
+            "type": "string",
+            "data": "en"
+          }
+        ]
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "remote_file",
+      "name": "c:/chef/cache/psmsi.msi",
+      "id": "c:/chef/cache/psmsi.msi",
+      "after": {
+        "checksum": "e4a2488e4bd0ec95ffcfa874e99c5b3104e0eca6b7a8bf40cc3f2c5c1d29ac0c",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/psmsi.msi"
+      },
+      "before": {
+        "checksum": "e4a2488e4bd0ec95ffcfa874e99c5b3104e0eca6b7a8bf40cc3f2c5c1d29ac0c",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/psmsi.msi"
+      },
+      "duration": "10",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "windows_package",
+      "name": "Windows Installer PowerShell Module",
+      "id": "Windows Installer PowerShell Module",
+      "after": {
+        "package_name": "Windows Installer PowerShell Module",
+        "source": "c:/chef/cache/psmsi.msi",
+        "version": "2.3.0.0",
+        "options": "ALLUSERS=1",
+        "success_codes": [
+          0,
+          42,
+          127
+        ]
+      },
+      "before": {
+        "package_name": "Windows Installer PowerShell Module",
+        "version": "2.3.0.0"
+      },
+      "duration": "58",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_platform_tweaks"
+    },
+    {
+      "type": "directory",
+      "name": "C:/rubies",
+      "id": "C:/rubies",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_migration"
+    },
+    {
+      "type": "chef_ingredient",
+      "name": "omnibus-toolchain",
+      "id": "omnibus-toolchain",
+      "after": {
+        "product_name": "omnibus-toolchain",
+        "version": "1.1.73",
+        "channel": "stable",
+        "platform_version_compatibility_mode": true,
+        "platform": "windows",
+        "platform_version": "2008r2",
+        "architecture": "x86_64"
+      },
+      "before": {},
+      "duration": "6526",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_omnibus_toolchain"
+    },
+    {
+      "type": "directory",
+      "name": "/export/home",
+      "id": "/export/home",
+      "after": {
+        "group": "root",
+        "mode": null,
+        "owner": "root"
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "group",
+      "name": "create Administrators group",
+      "id": "Administrators",
+      "after": {
+        "members": []
+      },
+      "before": {
+        "members": [
+          "S-1-5-21-999892205-709409153-2190002045-500",
+          "S-1-5-21-999892205-709409153-2190002045-1001",
+          "S-1-5-21-999892205-709409153-2190002045-1002",
+          "S-1-5-21-999892205-709409153-2190002045-1003"
+        ]
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": true,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "execute",
+      "name": "chsec_login_shell",
+      "id": "chsec -f /etc/security/login.cfg -s usw -a 'shells=/bin/sh,/bin/bsh,/bin/csh,/bin/ksh,/bin/tsh,/bin/ksh93,/usr/bin/sh,/usr/bin/bsh,/usr/bin/csh,/usr/bin/ksh,/usr/bin/tsh,/usr/bin/ksh93,/usr/bin/rksh,/usr/bin/rksh93,/usr/sbin/uucp/uucico,/usr/sbin/sliplogin,/usr/sbin/snappd,/usr/bin/bash,C:\\opscode\\omnibus-toolchain\\embedded\\bin\\usr\\bin\\bash'",
+      "after": {
+        "command": "chsec -f /etc/security/login.cfg -s usw -a 'shells=/bin/sh,/bin/bsh,/bin/csh,/bin/ksh,/bin/tsh,/bin/ksh93,/usr/bin/sh,/usr/bin/bsh,/usr/bin/csh,/usr/bin/ksh,/usr/bin/tsh,/usr/bin/ksh93,/usr/bin/rksh,/usr/bin/rksh93,/usr/sbin/uucp/uucico,/usr/sbin/sliplogin,/usr/sbin/snappd,/usr/bin/bash,C:\\opscode\\omnibus-toolchain\\embedded\\bin\\usr\\bin\\bash'",
+        "user": null
+      },
+      "before": {},
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "windows_user",
+      "name": "jenkins",
+      "id": "jenkins",
+      "after": {
+        "uid": null,
+        "gid": null,
+        "home": "C:\\jenkins"
+      },
+      "before": {
+        "uid": 1002,
+        "gid": null,
+        "home": "C:\\jenkins"
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "group",
+      "name": "Administrators",
+      "id": "Administrators",
+      "after": {
+        "members": [
+          "jenkins"
+        ]
+      },
+      "before": {
+        "members": [
+          "S-1-5-21-999892205-709409153-2190002045-500",
+          "S-1-5-21-999892205-709409153-2190002045-1001",
+          "S-1-5-21-999892205-709409153-2190002045-1002",
+          "S-1-5-21-999892205-709409153-2190002045-1003"
+        ]
+      },
+      "duration": "12",
+      "delta": "",
+      "ignore_failure": true,
+      "result": "modify",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "directory",
+      "name": "C:\\jenkins",
+      "id": "C:\\jenkins",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_user"
+    },
+    {
+      "type": "directory",
+      "name": "c:/chef/cache",
+      "id": "c:/chef/cache",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_common"
+    },
+    {
+      "type": "directory",
+      "name": "/usr/local/bin",
+      "id": "/usr/local/bin",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_common",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "C:\\omnibus-ruby",
+      "id": "C:\\omnibus-ruby",
+      "after": {
+        "group": "Administrators",
+        "mode": "0755",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_common"
+    },
+    {
+      "type": "windows_package",
+      "name": "7-Zip 15.14 (x64 edition)",
+      "id": "7-Zip 15.14 (x64 edition)",
+      "after": {
+        "package_name": "7-Zip 15.14 (x64 edition)",
+        "source": "http://www.7-zip.org/a/7z1514-x64.msi",
+        "version": "15.14.00.0",
+        "options": "INSTALLDIR=\"C:\\Program Files\\7-zip\"",
+        "checksum": "cefe1a9092d8a6be68468c33910d6206b40e934fb63cab686c5cccf369fbf712",
+        "success_codes": [
+          0,
+          42,
+          127
+        ]
+      },
+      "before": {
+        "package_name": "7-Zip 15.14 (x64 edition)",
+        "version": "15.14.00.0"
+      },
+      "duration": "77",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "seven_zip",
+      "cookbook_version": "2.0.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "windows_path",
+      "name": "seven_zip",
+      "id": "seven_zip",
+      "after": {
+        "path": "C:\\Program Files\\7-zip"
+      },
+      "before": {},
+      "duration": "38",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "add",
+      "status": "up-to-date",
+      "cookbook_name": "seven_zip",
+      "cookbook_version": "2.0.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "file",
+      "name": "C:\\jenkins/.gitconfig",
+      "id": "C:\\jenkins/.gitconfig",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.gitconfig",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "3dead071e10c6a19cc220d8f5f35224ec78f345b20aba5ebb9cd7873233fcd4d",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.gitconfig"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_git"
+    },
+    {
+      "type": "remote_file",
+      "name": "c:/chef/cache/wix-1540241.zip",
+      "id": "c:/chef/cache/wix-1540241.zip",
+      "after": {
+        "checksum": "03b8f46cb3abf1465fe8f9975a94a4e0f75c77267ff4d1fcb6d5b6a97567f549",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/wix-1540241.zip"
+      },
+      "before": {
+        "checksum": "03b8f46cb3abf1465fe8f9975a94a4e0f75c77267ff4d1fcb6d5b6a97567f549",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/wix-1540241.zip"
+      },
+      "duration": "296",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "wix",
+      "cookbook_version": "3.0.0",
+      "recipe_name": "default"
+    },
+    {
+      "type": "windows_zipfile",
+      "name": "C:\\wix",
+      "id": "C:\\wix",
+      "after": {
+        "source": "c:/chef/cache/wix-1540241.zip",
+        "overwrite": true
+      },
+      "before": {},
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "nothing",
+      "status": "skipped",
+      "cookbook_name": "wix",
+      "cookbook_version": "3.0.0",
+      "recipe_name": "default",
+      "conditional": "not_if { action == :nothing }"
+    },
+    {
+      "type": "windows_path",
+      "name": "C:\\wix",
+      "id": "C:\\wix",
+      "after": {
+        "path": "C:\\wix"
+      },
+      "before": {},
+      "duration": "38",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "add",
+      "status": "up-to-date",
+      "cookbook_name": "wix",
+      "cookbook_version": "3.0.0",
+      "recipe_name": "default"
+    },
+    {
+      "type": "windows_sdk_feature",
+      "name": "windows_software_development_kit",
+      "id": "windows_software_development_kit",
+      "after": {},
+      "before": {},
+      "duration": "7460",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "updated",
+      "cookbook_name": "windows-sdk",
+      "cookbook_version": "1.0.2",
+      "recipe_name": "windows_sdk"
+    },
+    {
+      "type": "file",
+      "name": "C:\\jenkins\\load-omnibus-toolchain.bat",
+      "id": "C:\\jenkins\\load-omnibus-toolchain.bat",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins\\load-omnibus-toolchain.bat",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "0e7f33943d66608b05718a43e5f5327d7b4243c48c135ed2f68889ed23ed445d",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins\\load-omnibus-toolchain.bat"
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_environment"
+    },
+    {
+      "type": "file",
+      "name": "C:\\jenkins\\load-omnibus-toolchain.ps1",
+      "id": "C:\\jenkins\\load-omnibus-toolchain.ps1",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins\\load-omnibus-toolchain.ps1",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "40be104dcf83bb93ddfbe2b46f644c468685245d8b6627e07c737dfd2c21fe35",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins\\load-omnibus-toolchain.ps1"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "omnibus",
+      "cookbook_version": "5.2.2",
+      "recipe_name": "_environment"
+    },
+    {
+      "type": "directory",
+      "name": "C:\\jenkins/.ssh",
+      "id": "C:\\jenkins/.ssh",
+      "after": {
+        "group": "Administrators",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "cookbook_file",
+      "name": "C:\\jenkins/.ssh/known_hosts",
+      "id": "C:\\jenkins/.ssh/known_hosts",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.ssh/known_hosts",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "029aa31c902d2d49468a4584f65d69757696f68c92166dea1bacddee22d990ee",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.ssh/known_hosts"
+      },
+      "duration": "9",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "file",
+      "name": "C:\\jenkins/.ssh/github",
+      "id": "C:\\jenkins/.ssh/github",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.ssh/github",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "c8fa3ddfe43f79cac2abfe110cc163ee45642571c17f03617fdcb548b777114a",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.ssh/github"
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "file",
+      "name": "C:\\jenkins/.ssh/config",
+      "id": "C:\\jenkins/.ssh/config",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.ssh/config",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "18a93200307a88528899836e7ed82e30595d7a499eec57c9cfb219dcadf5d494",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.ssh/config"
+      },
+      "duration": "8",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_github"
+    },
+    {
+      "type": "directory",
+      "name": "C:/NTP/etc",
+      "id": "C:/NTP/etc",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "windows_client"
+    },
+    {
+      "type": "cookbook_file",
+      "name": "C:/NTP/ntp.ini",
+      "id": "C:/NTP/ntp.ini",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:/NTP/ntp.ini",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "31f77c763632d556ece76a958ac37a6159d8540ce481ee15a56a31d604ad66b3",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:/NTP/ntp.ini"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "windows_client"
+    },
+    {
+      "type": "template",
+      "name": "C:\\NTP\\etc\\ntp.conf",
+      "id": "C:\\NTP\\etc\\ntp.conf",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\NTP\\etc\\ntp.conf",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "2ae2338857fb364c6a5e2cb758cab27bb2031ecdcacd58522dd06532f6c710ef",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\NTP\\etc\\ntp.conf"
+      },
+      "duration": "22",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "execute",
+      "name": "Force sync hardware clock with system clock",
+      "id": "hwclock --systohc",
+      "after": {
+        "command": "hwclock --systohc",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default",
+      "conditional": "only_if { #code block }"
+    },
+    {
+      "type": "windows_service",
+      "name": "NTP",
+      "id": "NTP",
+      "after": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "before": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "enable",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "windows_service",
+      "name": "NTP",
+      "id": "NTP",
+      "after": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "before": {
+        "enabled": true,
+        "running": true,
+        "masked": null
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "start",
+      "status": "up-to-date",
+      "cookbook_name": "ntp",
+      "cookbook_version": "3.5.2",
+      "recipe_name": "default"
+    },
+    {
+      "type": "file",
+      "name": "c:/chef/cache/E05FF095D07F233B78EB322132BFF0F035E11B5B.pfx",
+      "id": "c:/chef/cache/E05FF095D07F233B78EB322132BFF0F035E11B5B.pfx",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/E05FF095D07F233B78EB322132BFF0F035E11B5B.pfx",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "1ed81d21ff55d76d617fd79f1716bf56a272a84390d7c2be898556c877b19c21",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/E05FF095D07F233B78EB322132BFF0F035E11B5B.pfx"
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing"
+    },
+    {
+      "type": "windows_certificate",
+      "name": "c:/chef/cache/E05FF095D07F233B78EB322132BFF0F035E11B5B.pfx",
+      "id": "c:/chef/cache/E05FF095D07F233B78EB322132BFF0F035E11B5B.pfx",
+      "after": {
+        "source": "c:/chef/cache/E05FF095D07F233B78EB322132BFF0F035E11B5B.pfx",
+        "pfx_password": "jd:^2FaA2zUzA7wFG3",
+        "private_key_acl": [
+          "\\jenkins"
+        ],
+        "store_name": "MY"
+      },
+      "before": {
+        "source": "c:/chef/cache/E05FF095D07F233B78EB322132BFF0F035E11B5B.pfx",
+        "pfx_password": "jd:^2FaA2zUzA7wFG3",
+        "private_key_acl": [
+          "\\jenkins"
+        ],
+        "store_name": "MY",
+        "user_store": false
+      },
+      "duration": "669",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_package_signing"
+    },
+    {
+      "type": "directory",
+      "name": "C:\\jenkins/.gem",
+      "id": "C:\\jenkins/.gem",
+      "after": {
+        "group": "Administrators",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "file",
+      "name": "C:\\jenkins/.gem/credentials",
+      "id": "C:\\jenkins/.gem/credentials",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.gem/credentials",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "08be5634d5030e591aab6c513c7a24abfb3e17afab3828741b077f396be5deda",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.gem/credentials"
+      },
+      "duration": "6",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "gemrc",
+      "name": "global",
+      "id": "global",
+      "after": {
+        "user": "jenkins",
+        "group": "Administrators",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "before": {
+        "path": "C:/ProgramData/gemrc",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "duration": "21",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "gemrc",
+      "name": "C:\\jenkins/.gemrc",
+      "id": "C:\\jenkins/.gemrc",
+      "after": {
+        "user": "jenkins",
+        "group": "Administrators",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "before": {
+        "path": "C:\\jenkins/.gemrc",
+        "values": {
+          "sources": [
+            "https://rubygems.org/"
+          ]
+        }
+      },
+      "duration": "10",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "file",
+      "name": "C:\\jenkins/.bundle/config",
+      "id": "C:\\jenkins/.bundle/config",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.bundle/config"
+      },
+      "before": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.bundle/config"
+      },
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "delete",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_rubygems"
+    },
+    {
+      "type": "directory",
+      "name": "C:\\jenkins/.aws",
+      "id": "C:\\jenkins/.aws",
+      "after": {
+        "group": "Administrators",
+        "mode": "0700",
+        "owner": "jenkins"
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_aws"
+    },
+    {
+      "type": "template",
+      "name": "C:\\jenkins/.aws/credentials",
+      "id": "C:\\jenkins/.aws/credentials",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.aws/credentials",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "01c720435e9475a64328993faa4039842068d1d3db99e06ba8f082e127f9bdac",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/.aws/credentials"
+      },
+      "duration": "8",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_aws"
+    },
+    {
+      "type": "file",
+      "name": "c:\\chef\\cache\\secpol.inf",
+      "id": "c:\\chef\\cache\\secpol.inf",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:\\chef\\cache\\secpol.inf",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "07a3708445e4ca47d4acc9cfe096dbcdec7b636ec5991261fef4677cc0604934",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:\\chef\\cache\\secpol.inf"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "execute",
+      "name": "secedit /import /db secedit.sdb /cfg \"c:\\chef\\cache\\secpol.inf\"",
+      "id": "secedit /import /db secedit.sdb /cfg \"c:\\chef\\cache\\secpol.inf\"",
+      "after": {
+        "command": "secedit /import /db secedit.sdb /cfg \"c:\\chef\\cache\\secpol.inf\"",
+        "user": null
+      },
+      "before": {},
+      "duration": "86",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "execute",
+      "name": "secedit /configure /db secedit.sdb",
+      "id": "secedit /configure /db secedit.sdb",
+      "after": {
+        "command": "secedit /configure /db secedit.sdb",
+        "user": null
+      },
+      "before": {},
+      "duration": "65",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "execute",
+      "name": "gpupdate /force",
+      "id": "gpupdate /force",
+      "after": {
+        "command": "gpupdate /force",
+        "user": null
+      },
+      "before": {},
+      "duration": "10797",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "windows_user",
+      "name": "build",
+      "id": "build",
+      "after": {
+        "uid": null,
+        "gid": null,
+        "home": null
+      },
+      "before": {
+        "uid": 1003,
+        "gid": null,
+        "home": ""
+      },
+      "duration": "3",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "windows_user",
+      "name": "build",
+      "id": "build",
+      "after": {
+        "uid": null,
+        "gid": null,
+        "home": null
+      },
+      "before": {
+        "uid": 1003,
+        "gid": null,
+        "home": ""
+      },
+      "duration": "14",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "modify",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "group",
+      "name": "Administrators",
+      "id": "Administrators",
+      "after": {
+        "members": [
+          "build"
+        ]
+      },
+      "before": {
+        "members": [
+          "S-1-5-21-999892205-709409153-2190002045-500",
+          "S-1-5-21-999892205-709409153-2190002045-1001",
+          "S-1-5-21-999892205-709409153-2190002045-1002",
+          "S-1-5-21-999892205-709409153-2190002045-1003"
+        ]
+      },
+      "duration": "10",
+      "delta": "",
+      "ignore_failure": true,
+      "result": "modify",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_users"
+    },
+    {
+      "type": "windows_package",
+      "name": "win-java",
+      "id": "win-java",
+      "after": {
+        "package_name": "Java 8 Update 45 (64-bit)",
+        "source": "c:\\chef\\cache\\jre-8u45-windows-x64.exe",
+        "options": "INSTALLDIR=\"C:\\Program Files\\Java\\jre1.8.0_45\" AUTO_UPDATE=Disable SPONSORS=Disable WEB_ANALYTICS=Disable REBOOT=Disable /s",
+        "installer_type": "custom",
+        "checksum": "98c6fd5407b9af839b826d07f9c2275f4cf4319e3db9a407e0c757fe8398c3bf",
+        "success_codes": [
+          0,
+          42,
+          127
+        ]
+      },
+      "before": {
+        "package_name": "win-java",
+        "version": [
+          "8.0.450"
+        ]
+      },
+      "duration": "202",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "install",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_java"
+    },
+    {
+      "type": "env",
+      "name": "JAVA_HOME",
+      "id": "JAVA_HOME",
+      "after": {
+        "value": "C:\\Program Files\\Java\\jre1.8.0_45"
+      },
+      "before": {
+        "value": "C:\\Program Files\\Java\\jre1.8.0_45"
+      },
+      "duration": "33",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_java"
+    },
+    {
+      "type": "windows_path",
+      "name": "C:\\Program Files\\Java\\jre1.8.0_45\\bin",
+      "id": "C:\\Program Files\\Java\\jre1.8.0_45\\bin",
+      "after": {
+        "path": "C:\\Program Files\\Java\\jre1.8.0_45\\bin"
+      },
+      "before": {},
+      "duration": "35",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "add",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_java"
+    },
+    {
+      "type": "windows_path",
+      "name": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd",
+      "id": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd",
+      "after": {
+        "path": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd"
+      },
+      "before": {},
+      "duration": "36",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "add",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "windows_path",
+      "name": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\mingw64\\libexec\\git-core",
+      "id": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\mingw64\\libexec\\git-core",
+      "after": {
+        "path": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\mingw64\\libexec\\git-core"
+      },
+      "before": {},
+      "duration": "35",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "add",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "git",
+      "name": "c:/chef/cache/artifactory",
+      "id": "c:/chef/cache/artifactory",
+      "after": {
+        "revision": "v2.8.2"
+      },
+      "before": {
+        "revision": "ee0af35496c0809c5b7445f951ee324f37e2679b"
+      },
+      "duration": "307",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "sync",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "execute",
+      "name": "build-artifactory-gem",
+      "id": "DEL /Q artifactory-*.gem & gem build artifactory.gemspec",
+      "after": {
+        "command": "DEL /Q artifactory-*.gem & gem build artifactory.gemspec",
+        "user": null
+      },
+      "before": {},
+      "duration": "1",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "nothing",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus",
+      "conditional": "not_if { action == :nothing }"
+    },
+    {
+      "type": "execute",
+      "name": "install-artifactory-gem",
+      "id": "gem install artifactory-*.gem --no-ri --no-rdoc",
+      "after": {
+        "command": "gem install artifactory-*.gem --no-ri --no-rdoc",
+        "user": null
+      },
+      "before": {},
+      "duration": "3172",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "windows_path",
+      "name": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd",
+      "id": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd",
+      "after": {
+        "path": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd"
+      },
+      "before": {},
+      "duration": "38",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "add",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "windows_path",
+      "name": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\mingw64\\libexec\\git-core",
+      "id": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\mingw64\\libexec\\git-core",
+      "after": {
+        "path": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\mingw64\\libexec\\git-core"
+      },
+      "before": {},
+      "duration": "35",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "add",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "git",
+      "name": "c:/chef/cache/omnibus",
+      "id": "c:/chef/cache/omnibus",
+      "after": {
+        "revision": "ced452379e27b85b9958421f258b5fbe22e3760a"
+      },
+      "before": {
+        "revision": "ced452379e27b85b9958421f258b5fbe22e3760a"
+      },
+      "duration": "34",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "sync",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "execute",
+      "name": "build-omnibus-gem",
+      "id": "DEL /Q omnibus-*.gem & gem build omnibus.gemspec",
+      "after": {
+        "command": "DEL /Q omnibus-*.gem & gem build omnibus.gemspec",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "nothing",
+      "status": "skipped",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus",
+      "conditional": "not_if { action == :nothing }"
+    },
+    {
+      "type": "execute",
+      "name": "install-omnibus-gem",
+      "id": "gem install omnibus-*.gem --no-ri --no-rdoc",
+      "after": {
+        "command": "gem install omnibus-*.gem --no-ri --no-rdoc",
+        "user": null
+      },
+      "before": {},
+      "duration": "6635",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "file",
+      "name": "C:\\jenkins/omnibus-publish.rb",
+      "id": "C:\\jenkins/omnibus-publish.rb",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/omnibus-publish.rb",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "e335fcaa0dbd3ff08e15c0f05b7386569350746ac95796c0f60eb273dbc3fb56",
+        "rights": null,
+        "deny_rights": null,
+        "path": "C:\\jenkins/omnibus-publish.rb"
+      },
+      "duration": "7",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_omnibus"
+    },
+    {
+      "type": "env",
+      "name": "JENKINS_HOME",
+      "id": "JENKINS_HOME",
+      "after": {
+        "value": "C:\\jenkins"
+      },
+      "before": {
+        "value": "C:\\jenkins"
+      },
+      "duration": "32",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_windows"
+    },
+    {
+      "type": "env",
+      "name": "JENKINS_URL",
+      "id": "JENKINS_URL",
+      "after": {
+        "value": "http://example.com"
+      },
+      "before": {
+        "value": "http://example.com"
+      },
+      "duration": "33",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_windows"
+    },
+    {
+      "type": "remote_file",
+      "name": "c:/chef/cache/jenkins-cli.jar",
+      "id": "c:/chef/cache/jenkins-cli.jar",
+      "after": {
+        "checksum": null,
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/jenkins-cli.jar"
+      },
+      "before": {
+        "checksum": "f3c325f20fadb64a50c387cc3ad9429e34669de7ddf9e842bb65d4a1ddc982b4",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/jenkins-cli.jar"
+      },
+      "duration": "19",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "remote_file",
+      "name": "c:/chef/cache/update-center.json",
+      "id": "c:/chef/cache/update-center.json",
+      "after": {
+        "checksum": "64a0fd3fd4f00350bbe1c05b5588b4fd0224b61f7277952e1da943af1619e480",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/update-center.json",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "a1654b369edbd1847ceb1e132cd4bec32b8f0d3fd06d9236e0c4c6582915b87d",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/update-center.json"
+      },
+      "duration": "1202",
+      "delta": "suppressed sensitive resource",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated"
+    },
+    {
+      "type": "file",
+      "name": "c:/chef/cache/extracted-update-center.json",
+      "id": "c:/chef/cache/extracted-update-center.json",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/extracted-update-center.json",
+        "verifications": [],
+        "checksum": "3c0c442fde018f24a83863409de92032d1db1da65ccf576e761f376243c62c35"
+      },
+      "before": {
+        "checksum": "b12da39a17fd4c874c6634d7c26484bd785bbfa90a5d29a7c1ade138e6318a2b",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/extracted-update-center.json"
+      },
+      "duration": "30",
+      "delta": "suppressed sensitive resource",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated"
+    },
+    {
+      "type": "file",
+      "name": "c:/chef/cache/jenkins-key",
+      "id": "c:/chef/cache/jenkins-key",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/jenkins-key",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "ced9d2204cc71246b2a6b440829167aa024c2c7662d3c2451acf20ece4bc319d",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:/chef/cache/jenkins-key"
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "jenkins_windows_slave",
+      "name": "chefdk-windows-2008r2-tester-aace65",
+      "id": "chefdk-windows-2008r2-tester-aace65",
+      "after": {
+        "slave_name": "chefdk-windows-2008r2-tester-aace65",
+        "description": "windows 6.1.7601 [ WINNT 6.1.7601 x86_64 ]",
+        "remote_fs": "C:\\jenkins",
+        "executors": 1,
+        "usage_mode": "normal",
+        "labels": [
+          "6.1.7601",
+          "chefdk",
+          "slave",
+          "tester",
+          "windows",
+          "windows-2008r2",
+          "windows-6.1.7601",
+          "windows-server-2008-r2",
+          "x86_64"
+        ],
+        "availability": "always",
+        "environment": {
+          "OMNIBUS_WINDOWS_ARCH": "x64",
+          "OMNIBUS_FIPS_MODE": "true"
+        },
+        "user": "jenkins",
+        "service_name": "jenkins",
+        "password": "fabjaboac!1",
+        "winsw_url": "http://repo.jenkins-ci.org/releases/com/sun/winsw/winsw/1.17/winsw-1.17-bin.exe",
+        "winsw_checksum": "5859b114d96800a2b98ef9d19eaa573a786a422dad324547ef25be181389df01",
+        "path": "C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd;%PATH%",
+        "pre_run_cmds": []
+      },
+      "before": {
+        "slave_name": "chefdk-windows-2008r2-tester-aace65",
+        "description": "windows 6.1.7601 [ WINNT 6.1.7601 x86_64 ]",
+        "remote_fs": "C:\\jenkins",
+        "executors": 1,
+        "labels": [
+          "6.1.7601",
+          "chefdk",
+          "slave",
+          "tester",
+          "windows",
+          "windows-2008r2",
+          "windows-6.1.7601",
+          "windows-server-2008-r2",
+          "x86_64"
+        ]
+      },
+      "duration": "4918",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "updated",
+      "cookbook_name": "opscode-ci",
+      "cookbook_version": "5.15.127",
+      "recipe_name": "_slave_windows"
+    },
+    {
+      "type": "windows_user",
+      "name": "chefautomate",
+      "id": "chefautomate",
+      "after": {
+        "uid": null,
+        "gid": null,
+        "home": "c:\\chef"
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "skipped",
+      "conditional": "not_if { #code block }"
+    },
+    {
+      "type": "directory",
+      "name": "c:\\chef\\bin",
+      "id": "c:\\chef\\bin",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "2",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "directory",
+      "name": "c:\\chef\\etc",
+      "id": "c:\\chef\\etc",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "5",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "directory",
+      "name": "c:\\chef\\log\\automate-liveness-agent",
+      "id": "c:\\chef\\log\\automate-liveness-agent",
+      "after": {
+        "group": null,
+        "mode": null,
+        "owner": "administrator"
+      },
+      "before": {
+        "group": null,
+        "mode": null,
+        "owner": null
+      },
+      "duration": "4",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "c:\\chef\\bin\\automate-liveness-agent",
+      "id": "c:\\chef\\bin\\automate-liveness-agent",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:\\chef\\bin\\automate-liveness-agent",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "41abfb1f4f19b2b80ccb6302845dd18b9ec6501a61e140c845e8e635837fb4fb",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:\\chef\\bin\\automate-liveness-agent"
+      },
+      "duration": "23",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "c:\\chef\\etc\\config.json",
+      "id": "c:\\chef\\etc\\config.json",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:\\chef\\etc\\config.json",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "d14ac752b5a4fbfafd77a145a53560ee43fb9adb0265c7d5b3877988893aef01",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:\\chef\\etc\\config.json"
+      },
+      "duration": "22",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "file",
+      "name": "c:\\chef\\bin\\automate_liveness_agent_task.ps1",
+      "id": "c:\\chef\\bin\\automate_liveness_agent_task.ps1",
+      "after": {
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:\\chef\\bin\\automate_liveness_agent_task.ps1",
+        "verifications": []
+      },
+      "before": {
+        "checksum": "c2606368eab14f6db1209bafc6c2cd122e0a101d4b0d7efc82b5d72c7ed49da9",
+        "rights": null,
+        "deny_rights": null,
+        "path": "c:\\chef\\bin\\automate_liveness_agent_task.ps1"
+      },
+      "duration": "8",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "create",
+      "status": "up-to-date"
+    },
+    {
+      "type": "powershell_script",
+      "name": "Setup scheduled task at 30 minutes",
+      "id": "Setup scheduled task at 30 minutes",
+      "after": {
+        "command": "Setup scheduled task at 30 minutes",
+        "user": null
+      },
+      "before": {},
+      "duration": "0",
+      "delta": "",
+      "ignore_failure": false,
+      "result": "run",
+      "status": "skipped",
+      "conditional": "not_if { #code block }"
+    }
+  ],
+  "run_id": "6d1d17e0-0d8f-4782-ac30-072fae505c80",
+  "run_list": [
+    "recipe[opscode-ci::slave]"
+  ],
+  "start_time": "2017-11-01T21:11:03Z",
+  "end_time": "2017-11-01T21:12:09Z",
+  "source": "chef_client",
+  "status": "success",
+  "total_resource_count": 84,
+  "updated_resource_count": 9,
+  "deprecations": [
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "c:/chef/cache/cookbooks/jenkins/libraries/plugin.rb:443:in `<top (required)>'"
+    },
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "c:/chef/cache/cookbooks/jenkins/libraries/slave.rb:410:in `<top (required)>'"
+    },
+    {
+      "message": "Chef::Platform.set is deprecated",
+      "url": "https://docs.chef.io/deprecations_chef_platform_methods.html",
+      "location": "c:/chef/cache/cookbooks/jenkins/libraries/user.rb:183:in `<top (required)>'"
+    },
+    {
+      "message": "Property `sensitive` of resource `rhsm_register` overwrites an existing method. Please use a different property name. This will raise an exception in Chef 13.",
+      "url": "https://docs.chef.io/deprecations_property_name_collision.html",
+      "location": "c:/chef/cache/cookbooks/redhat_subscription_manager/libraries/rhsm_register.rb:34:in `<class:RhsmRegister>'"
+    },
+    {
+      "message": "method access to node attributes (node.foo.bar) is deprecated and will be removed in Chef 13, please use bracket syntax (node[\"foo\"][\"bar\"])",
+      "url": "https://docs.chef.io/deprecations_attributes.html",
+      "location": "C:/opscode/chef/embedded/lib/ruby/gems/2.3.0/gems/chef-sugar-3.6.0/lib/chef/sugar/node.rb:162:in `method_missing'"
+    },
+    {
+      "message": "Property `sensitive` of resource `aws_s3_file` overwrites an existing method. Please use a different property name. This will raise an exception in Chef 13.",
+      "url": "https://docs.chef.io/deprecations_property_name_collision.html",
+      "location": "c:/chef/cache/cookbooks/aws/resources/s3_file.rb:36:in `class_from_file'"
+    },
+    {
+      "message": "Property `sensitive` of resource `yum_repository` overwrites an existing method. Please use a different property name. This will raise an exception in Chef 13.",
+      "url": "https://docs.chef.io/deprecations_property_name_collision.html",
+      "location": "c:/chef/cache/cookbooks/yum/resources/repository.rb:59:in `class_from_file'"
+    },
+    {
+      "message": "chef_gem[rubyzip] chef_gem compile_time installation is deprecated. Please set `compile_time false` on the resource to use the new behavior, or set `compile_time true` on the resource if compile_time behavior is required.",
+      "url": "https://docs.chef.io/deprecations_chef_gem_compile_time.html",
+      "location": "c:/chef/cache/cookbooks/opscode-ci/recipes/_platform_tweaks.rb:248:in `from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for group[Administrators] from prior resource\nPrevious group[Administrators]: c:/chef/cache/cookbooks/omnibus/recipes/_user.rb:72:in `from_file'\nCurrent  group[Administrators]: c:/chef/cache/cookbooks/opscode-ci/recipes/_users.rb:59:in `from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "c:/chef/cache/cookbooks/opscode-ci/recipes/_users.rb:59:in `from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for windows_path[C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd] from prior resource\nPrevious windows_path[C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd]: c:/chef/cache/cookbooks/opscode-ci/recipes/_omnibus.rb:48:in `block in from_file'\nCurrent  windows_path[C:\\opscode\\omnibus-toolchain\\embedded\\git\\cmd]: c:/chef/cache/cookbooks/opscode-ci/recipes/_omnibus.rb:48:in `block in from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "c:/chef/cache/cookbooks/opscode-ci/recipes/_omnibus.rb:48:in `block in from_file'"
+    },
+    {
+      "message": "Cloning resource attributes for windows_path[C:\\opscode\\omnibus-toolchain\\embedded\\git\\mingw64\\libexec\\git-core] from prior resource\nPrevious windows_path[C:\\opscode\\omnibus-toolchain\\embedded\\git\\mingw64\\libexec\\git-core]: c:/chef/cache/cookbooks/opscode-ci/recipes/_omnibus.rb:49:in `block in from_file'\nCurrent  windows_path[C:\\opscode\\omnibus-toolchain\\embedded\\git\\mingw64\\libexec\\git-core]: c:/chef/cache/cookbooks/opscode-ci/recipes/_omnibus.rb:49:in `block in from_file'",
+      "url": "https://docs.chef.io/deprecations_resource_cloning.html",
+      "location": "c:/chef/cache/cookbooks/opscode-ci/recipes/_omnibus.rb:49:in `block in from_file'"
+    }
+  ]
+}

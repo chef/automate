@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package chef.automate.domain.compliance.api.common;
+option go_package = "github.com/chef/automate/components/compliance-service/api/common";
+
+message Filter {
+	string key = 20;
+	bool exclude = 22;
+	repeated string values = 23;
+}
+
+message Kv {
+	string key = 1;
+	string value = 2;
+}

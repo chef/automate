@@ -1,0 +1,29 @@
+# If we have a config pointing to an specific host,
+# lets use it, otherwise use the ipaddress of the server
+
+[secretskey]
+{{~#if cfg.secrets_key }}
+key = "{{cfg.secrets_key}}"
+file = ""
+{{~else}}
+key = ""
+file = "{{pkg.svc_data_path}}/secrets_key"
+{{~/if}}
+
+[service]
+{{~#if cfg.service.host}}
+host = "{{cfg.service.host}}"
+{{~else}}
+host = "{{sys.ip}}"
+{{~/if}}
+port = {{cfg.service.port}}
+log_level = "{{cfg.log.level}}"
+
+[postgres]
+database = "{{cfg.storage.database}}"
+migrations_path = "{{pkg.svc_static_path}}"
+
+[tls]
+cert_path = "{{pkg.svc_config_path}}/service.crt"
+key_path = "{{pkg.svc_config_path}}/service.key"
+root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"

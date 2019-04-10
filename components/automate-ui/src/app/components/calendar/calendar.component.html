@@ -1,0 +1,17 @@
+<div class="header">
+  <chef-button tertiary class="prev" label="previous month" (click)="onPrevMonthClick()">
+    <chef-icon>navigate_before</chef-icon>
+  </chef-button>
+  <span class="date">{{ month }} {{ year }}</span>
+  <chef-button tertiary class="next" label="next month" (click)="onNextMonthClick()">
+    <chef-icon>navigate_next</chef-icon>
+  </chef-button>
+</div>
+<div class="days">
+  <span class="column-header" *ngFor="let name of weekdays">
+    {{ name }}
+  </span>
+  <span (click)="onDayClick(day[1])" [ngClass]="[ 'day', day[0] ]" *ngFor="let day of days; trackBy: trackBy">
+    {{ day[1] }}
+  </span>
+</div>

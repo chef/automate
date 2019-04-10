@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS node_managers
+  ADD COLUMN IF NOT EXISTS date_added timestamp DEFAULT '0001-01-01T00:00:00Z00:00';

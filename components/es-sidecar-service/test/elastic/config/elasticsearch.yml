@@ -1,0 +1,10 @@
+cluster:
+  name: ${es.cluster.name:chef-es-sidecar-testing}
+
+network:
+  host: ${es.network.host:0.0.0.0}
+
+path:
+  data: ${es.path.data:/usr/share/elasticsearch/data}
+  logs: ${es.path.logs:/usr/share/elasticsearch/logs}
+  repo: ${es.path.repo:/usr/share/elasticsearch/data/repo}

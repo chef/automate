@@ -1,0 +1,6 @@
+# Cypress
+cypress.json
+cypress/
+
+# Node
+package.json

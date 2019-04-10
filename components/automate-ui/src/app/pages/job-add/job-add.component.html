@@ -1,0 +1,72 @@
+<chef-sidebar>
+  <div class="nav-items">
+    <chef-sidebar-entry
+      route="/compliance/scanner/jobs"
+      icon="wifi_tethering">
+      Current jobs
+    </chef-sidebar-entry>
+  </div>
+</chef-sidebar>
+
+<div class="container">
+  <main class="job-add">
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/compliance/scanner/jobs']">Scan jobs</chef-breadcrumb>
+      Create new job
+    </chef-breadcrumbs>
+
+    <div class="job-add-header">
+      <chef-stepper>
+        <chef-step
+          [selected]="isCurrentStep(Step['add-nodes'], (step$ | async))">
+          <a routerLink="./" fragment="add-nodes">Add Nodes</a>
+        </chef-step>
+        <chef-step
+          [selected]="isCurrentStep(Step['add-profiles'], (step$ | async))"
+          [disabled]="!isStepValid(Step['add-nodes'])">
+          <a routerLink="./" fragment="add-profiles">Add Profiles</a>
+        </chef-step>
+        <chef-step
+          [selected]="isCurrentStep(Step['add-schedule'], (step$ | async))"
+          [disabled]="!isStepValid(Step['add-nodes']) || !isStepValid(Step['add-profiles'])">
+          <a routerLink="./" fragment="add-schedule">Add Schedule</a>
+        </chef-step>
+      </chef-stepper>
+
+      <div class="job-add-actions">
+        <ng-container [ngSwitch]="isLastStep(step$ | async)">
+          <chef-button
+            *ngSwitchCase="false"
+            primary
+            routerLink="./"
+            [disabled]="!isStepValid(step$ | async)"
+            fragment="{{nextStepFragment(step$ | async)}}">Next</chef-button>
+          <chef-button
+            *ngSwitchCase="true"
+            primary
+            [disabled]="!isStepValid(step$ | async)"
+            (click)="submit(form)">Save</chef-button>
+        </ng-container>
+        <chef-button routerLink="../" tertiary>Cancel</chef-button>
+      </div>
+    </div>
+
+    <form [formGroup]="form" class="job-add-form" novalidate>
+      <ng-container [ngSwitch]="step$ | async">
+        <chef-job-nodes-form
+          *ngSwitchCase="Step['add-nodes']"
+          [form]="form.controls['nodesGroup']">
+        </chef-job-nodes-form>
+        <chef-job-profiles-form
+          *ngSwitchCase="Step['add-profiles']"
+          [form]="form.controls['profilesGroup']">
+        </chef-job-profiles-form>
+        <chef-job-schedule-form
+          *ngSwitchCase="Step['add-schedule']"
+          [form]="form.controls['scheduleGroup']">
+        </chef-job-schedule-form>
+      </ng-container>
+    </form>
+  </main>
+
+</div>

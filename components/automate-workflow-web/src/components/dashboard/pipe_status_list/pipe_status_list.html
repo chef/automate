@@ -1,0 +1,26 @@
+<section class="delivered-changes" ng-if="pipeStatus.acceptedChanges.length">
+  <h2>Delivered Changes</h2>
+  <div class="urd-items" ng-repeat="change in pipeStatus.acceptedChanges track by change.id">
+    <div cd-change-row change="change"></div>
+    <div class="included" ng-if="change.includes.length > 0">
+      <h3>
+        &mdash; Includes the following
+        <span ng-if="change.includes.length > 1">{{ change.includes.length }}</span>
+        <ng-pluralize count="change.includes.length" when="{'1': 'change', 'other': 'changes'}"></ng-pluralize>,
+        previously merged:
+      </h3>
+      <div cd-change-row ng-repeat="included in change.includes track by included.id" change="included"></div>
+    </div>
+  </div>
+</section>
+
+<section class="active-projects" ng-if="pipeStatus.activeProjects">
+  <h2>Active Projects</h2>
+  <div cd-project-row class="project-items"
+    ng-repeat="project in pipeStatus.activeProjects track by project.key"
+    project="project"></div>
+  <div class="no-items" ng-if="pipeStatus.activeProjects.length === 0">
+    There are no {{ pipeStatus.acceptedChanges.length ? 'other' : '' }} active projects
+    {{ pipeStatus.filtered ? 'matching this filter' : 'at this time' }}.
+  </div>
+</section>

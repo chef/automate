@@ -1,0 +1,10 @@
+<div class="file-comments" ng-class="{ open: showComments }">
+  <div class="file-comments-header" ng-click="toggleComments()">
+    <a class="file-name" href=""><i class="icon icon-page"></i> {{ file[1] }}</a>
+    <a class="comment-count" href="">{{ getFileComments(patchset, file).length }} comments</a>
+    <a class="comments-collapse" href=""><i class="icon"></i></a>
+  </div>
+  <ol class="comments" ng-if="showComments">
+    <li class="comment" ng-repeat="comment in getFileComments(patchset, file) | orderBy:'datetime' track by comment.id" cd-comment="comment"></li>
+  </ol>
+</div>

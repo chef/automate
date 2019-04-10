@@ -1,0 +1,55 @@
+chef-radial-chart {
+  --base-stroke: var(--segment-base-stroke, 1);
+  --expanded-stroke: var(--segment-expanded-stroke, 10);
+  display: block;
+  position: relative;
+
+  chef-data-point {
+    display: none;
+  }
+
+  .segment {
+    color: chef-hsl(var(--chef-dark-grey));
+    fill: currentColor;
+    stroke-width: var(--base-stroke);
+    stroke: currentColor;
+    position: relative;
+    transition-property: stroke-width;
+    transition-duration: 0.25s;
+    transition-timing-function: ease;
+  }
+
+  .secondary .segment {
+    stroke: chef-hsl(var(--chef-white));
+  }
+
+  .primary .segment:hover {
+    stroke-width: var(--expanded-stroke);
+  }
+
+  .primary .segment.empty:hover {
+    stroke-width: var(--base-stroke);
+  }
+
+  svg {
+    position: relative;
+    z-index: 10;
+  }
+
+  .innerText {
+    position: absolute;
+    z-index: 5;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20% 0;
+
+    & > * {
+      padding: 0 20%;
+      text-align: center;
+    }
+  }
+}

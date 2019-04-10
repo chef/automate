@@ -1,0 +1,51 @@
+:host {
+  flex: 0 1 5%;
+
+  .navbar-container {
+    ul {
+      margin: 0;
+      list-style-type: none;
+      padding: 0;
+      width: 210px;
+      background-color: #F3F6F8;
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scrolling if the sidenav has too much content */
+    }
+
+    li {
+      border-bottom: 1px solid #6F7878;
+      color: #3C6DF0;
+
+      a {
+        display: block;
+        color: #3C6DF0;
+        text-decoration: none;
+        padding: 10px;
+      }
+
+      & a:hover {
+        background-color: #DC267F;
+        color: white;
+      }
+    }
+
+    .navbar-header {
+      color: #6F7878;
+      padding: 5px 10px;
+      position: relative;
+
+
+      &::after {
+        position: absolute;
+        right: 5px;
+        color: #3C6DF0;
+        content: '+';
+      }
+    }
+
+    .navbar-items {
+      color: #DC267F;
+      text-align: center;
+    }
+  }
+}

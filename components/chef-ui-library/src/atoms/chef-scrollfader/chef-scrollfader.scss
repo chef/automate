@@ -1,0 +1,14 @@
+chef-scrollfader.hydrated {
+  transition: opacity 0.5s ease-out;
+}
+
+chef-scrollfader.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+chef-scrollfader {
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+}

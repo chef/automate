@@ -1,0 +1,23 @@
+{
+  "filter": {
+    "must": [
+      {
+        "status": "failure"
+      }
+    ],
+    "should": [
+      {
+        "environment": "production"
+      },
+      {
+        "environment": "pre-prod"
+      }
+    ]
+  },
+  "group_by": "status",
+  "range": {
+    "start_time": "now-12h/m",
+    "end_time": "now/m",
+    "interval": "15m"
+  }
+}

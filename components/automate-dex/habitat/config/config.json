@@ -1,0 +1,18 @@
+{
+"service": {{ toJson cfg.service }},
+"storage": {{ toJson cfg.storage }},
+"grpc": {{ toJson cfg.grpc }},
+{{ ~#if cfg.log }}
+"log": {{ toJson cfg.log }},
+{{ ~/if }}
+{{ ~#if cfg.connectors }}
+"connectors": {{ toJson cfg.connectors }},
+{{ ~/if }}
+{{~#if cfg.bootstrap}}
+"bootstrap": {{ toJson cfg.bootstrap }},
+{{ ~/if }}
+{{~#if cfg.expiry}}
+"expiry": {{ toJson cfg.expiry}},
+{{ ~/if }}
+"__placeholder": {}
+}

@@ -1,0 +1,9 @@
+{
+  "filter": {
+    "should": [
+      {
+        "key_@1": "value_1"
+      }
+    ]
+  }
+}

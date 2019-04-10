@@ -1,0 +1,28 @@
+@startuml
+title A2 Configuration
+
+collections "automate-webui" as webui
+collections "chef-automate CLI" as cli
+collections "deployment-service" as ds
+collections "a-domain-service" as domain
+collections "automate-gateway" as api
+
+group Runtime Configuration uses the API "via CLI"
+cli -> api: api.SetAuthConnector
+cli -> api: api.CreateNotificationRule
+cli -> api: api.CreateAuthzPolicy
+cli -> api: api.SetComplianceDataRetention
+else "via Web UI"
+webui -> api: api.SetAuthConnector
+webui -> api: api.CreateNotificationRule
+webui -> api: api.CreateAuthzPolicy
+webui -> api: api.SetComplianceDataRetention
+end
+
+group Bootstrap system configuration via deployment-service
+cli -> ds
+ds -> ds: hab
+end
+
+
+@enduml

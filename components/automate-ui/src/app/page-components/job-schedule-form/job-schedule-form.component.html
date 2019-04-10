@@ -1,0 +1,121 @@
+<div [formGroup]="form">
+  <h3>Name your job and set optional recurrence</h3>
+
+  <chef-card class="name-form">
+    <div class="schedule-header">
+      <div class="schedule-title">
+        <chef-icon>label</chef-icon>
+        <h4>Name your scan job</h4>
+      </div>
+    </div>
+    <div class="schedule-body">
+      <fieldset>
+        <chef-form-field>
+          <label for="name">Name</label>
+          <input id="name" type="text" chefInput formControlName="name" placeholder="Name" />
+          <chef-error *ngIf="form.get('name').touched && form.get('name').invalid">
+            Job name is required.
+          </chef-error>
+        </chef-form-field>
+      </fieldset>
+    </div>
+  </chef-card>
+
+  <chef-card class="schedule-form">
+    <div class="schedule-header">
+      <div class="schedule-title">
+        <chef-icon>date_range</chef-icon>
+        <h4>Set optional scan date and schedule for scans</h4>
+      </div>
+      <label>
+        <input type="checkbox" formControlName="include" />
+        Set schedule
+      </label>
+    </div>
+    <div class="schedule-body" *ngIf="form.controls['include'].value">
+      <fieldset formGroupName="start">
+        <label>Start</label>
+        <div class="field">
+          <chef-form-field formGroupName="datetime">
+            <div class="datetime">
+              <select formControlName="month">
+                <option *ngFor="let n of months" [value]="n">{{ n | number:'2.0-0' }}</option>
+              </select>
+              <select formControlName="date">
+                <option *ngFor="let n of dates" [value]="n">{{ n | number:'2.0-0' }}</option>
+              </select>
+              <select formControlName="year">
+                <option *ngFor="let n of years" [value]="n">{{ n }}</option>
+              </select>
+
+              <span>at</span>
+
+              <select formControlName="hour">
+                <option *ngFor="let n of hours" [value]="n">{{ n | number:'2.0-0' }}</option>
+              </select>
+              <select formControlName="minute">
+                <option *ngFor="let n of minutes" [value]="n">{{ n | number:'2.0-0' }}</option>
+              </select>
+              <select formControlName="meridiem">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
+          </chef-form-field>
+        </div>
+      </fieldset>
+      <fieldset formGroupName="end">
+        <label>
+          <input type="checkbox" formControlName="include" />
+          End
+        </label>
+        <div class="field" *ngIf="form.controls['end'].controls['include'].value">
+          <chef-form-field formGroupName="datetime">
+            <div class="datetime">
+              <select formControlName="month">
+                <option *ngFor="let n of months" [value]="n">{{ n | number:'2.0-0' }}</option>
+              </select>
+              <select formControlName="date">
+                <option *ngFor="let n of dates" [value]="n">{{ n | number:'2.0-0' }}</option>
+              </select>
+              <select formControlName="year">
+                <option *ngFor="let n of years" [value]="n">{{ n }}</option>
+              </select>
+
+              <span>at</span>
+
+              <select formControlName="hour">
+                <option *ngFor="let n of hours" [value]="n">{{ n | number:'2.0-0' }}</option>
+              </select>
+              <select formControlName="minute">
+                <option *ngFor="let n of minutes" [value]="n">{{ n | number:'2.0-0' }}</option>
+              </select>
+              <select formControlName="meridiem">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
+          </chef-form-field>
+        </div>
+      </fieldset>
+      <fieldset formGroupName="repeat">
+        <label>
+          <input type="checkbox" formControlName="include" />
+          Repeat every
+        </label>
+        <div class="field" *ngIf="form.controls['repeat'].controls['include'].value">
+          <chef-form-field>
+            <input type="number" chefInput formControlName="interval" min="1" />
+          </chef-form-field>
+          <select formControlName="freq">
+            <option [value]="RRule.MINUTELY">Minutes</option>
+            <option [value]="RRule.HOURLY">Hours</option>
+            <option [value]="RRule.DAILY">Days</option>
+            <option [value]="RRule.WEEKLY">Weeks</option>
+            <option [value]="RRule.MONTHLY">Months</option>
+          </select>
+        </div>
+      </fieldset>
+    </div>
+  </chef-card>
+</div>

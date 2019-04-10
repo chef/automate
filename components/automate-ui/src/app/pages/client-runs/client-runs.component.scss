@@ -1,0 +1,140 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+// This is temporary until we can hide the whole page
+.permission-denied-banner {
+  position: fixed;
+  top: $navigation-height;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($chef-white, 0.85);
+  z-index: 190;
+  padding-top: 38vh;
+  text-align: center;
+  font-weight: bold;
+
+  & > p {
+    margin: 0;
+    line-height: 1.6;
+    color: $chef-dark-grey;
+  }
+}
+
+chef-page-header {
+  position: relative;
+  padding-bottom: 35px;
+}
+
+app-client-runs-search-bar {
+  display: inline-block;
+  width: calc(100% - 110px);
+}
+
+chef-dropdown {
+  z-index: 2;
+}
+
+.download-nodes {
+  position: relative;
+  float: right;
+  padding-right: 2px;
+
+  .dropdown-toggle {
+    @include base-box-shadow();
+    margin: 0;
+    width: 47px;
+    height: 47px;
+  }
+
+  .dropdown {
+    right: 0;
+  }
+}
+
+.copy-dropdown {
+  position: relative;
+  float: right;
+
+  .dropdown-toggle {
+    @include base-box-shadow();
+    margin: 0;
+    width: 47px;
+    height: 47px;
+
+    chef-icon {
+      position: relative;
+      top: -1px;
+      right: 1px;
+    }
+  }
+
+  .dropdown {
+    right: 0;
+  }
+
+  chef-click-outside {
+    display: block;
+    padding: 1em 0 1em 1em;
+
+    p {
+      margin-bottom: 0.5em;
+    }
+  }
+
+  .copy-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    input {
+      padding: 1em;
+      width: 300px;
+      border-radius: $global-radius;
+      border: 1px solid $chef-grey;
+    }
+  }
+}
+
+app-client-runs-search-filters {
+  display: block;
+  position: relative;
+  margin-top: 2px;
+  width: calc(100% - 63px);
+}
+
+.node-list-container {
+  .stats-box {
+    margin-left: 0;
+  }
+
+  .trend-toggle {
+    display: inline-block;
+    margin-bottom: .5em;
+    padding: .5em 1em;
+    border-radius: $global-radius;
+    color: $gray;
+    font-size: .875em;
+
+    &:hover {
+      color: $chef-primary-dark;
+      cursor: pointer;
+      background-color: $white;
+      box-shadow: 0 0 24px rgba($gray-light, .40);
+      transition: all .2s;
+    }
+
+    i {
+      margin-right: .5em;
+    }
+  }
+}
+
+.node-rollups {
+  display: flex;
+  margin-top: 1em;
+}
+
+#download-modal {
+  text-align: center;
+}

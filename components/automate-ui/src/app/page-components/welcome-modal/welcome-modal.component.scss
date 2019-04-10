@@ -1,0 +1,113 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.modal-overlay {
+  background-color: rgba($chef-primary-dark, 0.4);
+  z-index: 99990;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.modal {
+  @media (max-width: 700px) {
+    width: 90%;
+  }
+
+  @include modal-box();
+  box-shadow: 0 1px 14px rgba($chef-primary-dark, 0.6);
+  position: fixed;
+  z-index: 99995;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 60px 80px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.display2 {
+  margin-bottom: 32px;
+}
+
+.close-button {
+  margin: 0;
+  position: absolute;
+  top: 17px;
+  right: 17px;
+
+  & > chef-icon {
+    vertical-align: -2px;
+  }
+}
+
+.welcome-text {
+  color: inherit;
+}
+
+.modal-content {
+  ul {
+    padding: 0;
+
+    li {
+      display: flex;
+      align-items: center;
+      background-color: transparent;
+      border: 1px solid $gray-pale;
+      border-radius: $global-radius;
+      margin-bottom: 1em;
+      padding: .5em 1em;
+      position: relative;
+      font-size: .875em;
+      transition: background-color .2s;
+
+      &:hover {
+        background-color: $chef-grey;
+        cursor: pointer;
+        transition: background-color .2s;
+      }
+    }
+  }
+
+  a, button {
+    color: $chef-primary-bright;
+    text-decoration: none;
+    width: 100%;
+  }
+
+  button {
+    border: none;
+    -webkit-appearance: none;
+    background: transparent;
+    text-align: left;
+    font-family: inherit;
+  }
+
+  chef-icon {
+    vertical-align: -2px;
+  }
+}
+
+.modal-button {
+  margin-bottom: 1.5em;
+  text-align: center;
+
+  & > chef-button {
+    margin-bottom: 0;
+  }
+}
+
+.modal-footer {
+  color: $chef-dark-grey;
+
+  chef-checkbox {
+    white-space: normal;
+    margin-bottom: 7px;
+  }
+}

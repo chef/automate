@@ -1,0 +1,74 @@
+<chef-loading-spinner *ngIf="(serviceGroupStatus$ | async) == 'loading'" size='50' fixed></chef-loading-spinner>
+<chef-page-header>
+  <chef-heading>Service Groups</chef-heading>
+  <chef-subheading>Group of Habitat services running the same package and configuration.</chef-subheading>
+</chef-page-header>
+<div class="page-body">
+  <chef-status-filter-group>
+    <chef-option class="filter general" value="general" (click)="statusFilter('total')">
+      <div class="filter-label">Total</div>
+      <chef-icon>group_work</chef-icon><div class="filter-total">30</div>
+    </chef-option>
+    <chef-option class="filter critical" value='critical' (click)="statusFilter('critical')">
+      <div class="filter-label">Critical</div>
+      <chef-icon>warning</chef-icon><div class="filter-total">10</div>
+    </chef-option>
+    <chef-option class="filter warning" value='warning' (click)="statusFilter('warning')">
+      <div class="filter-label">Warning</div>
+      <chef-icon>error_outline</chef-icon><div class="filter-total">5</div>
+    </chef-option>
+    <chef-option class="filter success" value='success' (click)="statusFilter('ok')">
+      <div class="filter-label">OK</div>
+      <chef-icon>check_circle</chef-icon><div class="filter-total">5</div>
+    </chef-option>
+    <chef-option class="filter unknown" value='unknown' (click)="statusFilter('unknown')">
+      <div class="filter-label">Unknown</div>
+      <chef-icon>help</chef-icon><div class="filter-total">10</div>
+    </chef-option>
+  </chef-status-filter-group>
+  <chef-table class="service-group-list" *ngIf="(serviceGroupStatus$ | async) == 'loadingSuccess'">
+    <chef-thead>
+        <chef-tr>
+          <chef-th class="health">
+            Health
+          </chef-th>
+          <chef-th class="services">
+            Services
+          </chef-th>
+          <chef-th class="name sort">
+            Name
+          </chef-th>
+          <chef-th class="release">
+            Release
+          </chef-th>
+        </chef-tr>
+      </chef-thead>
+
+     <chef-tbody>
+      <chef-tr class="{{serviceGroup.status}} row" tabindex="0" *ngFor="let serviceGroup of serviceGroups$ | async">
+        <chef-td class="{{serviceGroup.status}} health">
+          <chef-icon class="{{serviceGroup.status}}">{{ serviceGroup.status | serviceStatusIcon }}</chef-icon>
+          <chef-pill class="{{serviceGroup.status}}">
+            <div class="skinny-pill">{{ serviceGroup.health_percentage }}%</div>
+          </chef-pill>
+        </chef-td>
+        <chef-td class="services">
+          {{ serviceGroup.services_health_counts.ok }} of {{ serviceGroup.services_health_counts.total }} OK
+        </chef-td>
+        <chef-td class="name">
+          {{ serviceGroup.name }}
+        </chef-td>
+        <chef-td class="release">
+          {{ serviceGroup.release }}
+        </chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
+  <div class="empty-status" *ngIf="(serviceGroups$ | async)?.length === 0">
+    <div class="status-statement">
+      <h3>No service groups available</h3>
+      <p>Use habitat to run your services and view the group health status here.</p>
+      <chef-button primary>Learn More</chef-button>
+    </div>
+  </div>
+</div>

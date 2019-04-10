@@ -1,0 +1,45 @@
+<main>
+  <header>
+    <h2 class="strong display3">Current Scan Jobs</h2>
+    <span class="strong display5">Add a new job to scan for compliance or modify an existing job</span>
+  </header>
+
+  <chef-table (sort-toggled)="handleSortToggle($event)">
+    <chef-thead>
+      <chef-tr>
+        <chef-th>
+          Scan Job Name
+          <chef-sort-toggle sort="name" [order]="orderFor('name')"></chef-sort-toggle>
+        </chef-th>
+        <chef-th>
+          Total Nodes
+        </chef-th>
+        <chef-th>
+          Scan Schedule
+        </chef-th>
+        <chef-th>
+          Last Scan
+          <chef-sort-toggle sort="end_time" [order]="orderFor('end_time')"></chef-sort-toggle>
+        </chef-th>
+      </chef-tr>
+    </chef-thead>
+
+    <chef-loading-spinner *ngIf="loading(jobStatus$ | async)" size='50'></chef-loading-spinner>
+
+    <chef-tbody>
+      <chef-tr class="empty new-row">
+        <span class="cta">Create a new scan job with nodes and profiles</span>
+        <span class="action">
+          <chef-button primary [routerLink]="['/jobs/add']">Create new job</chef-button>
+        </span>
+      </chef-tr>
+      <chef-tr *ngFor="let job of jobs$ | async">
+        <chef-td>{{ job.name }}</chef-td>
+        <chef-td>{{ job.node_count }}</chef-td>
+        <chef-td>{{ job.recurrence }}</chef-td>
+        <chef-td>{{ job.end_time | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</chef-td>
+      </chef-tr>
+    </chef-tbody>
+  </chef-table>
+
+</main>

@@ -1,0 +1,108 @@
+host = "{{cfg.service.host}}"
+port = {{cfg.service.port}}
+grpc_port = {{cfg.service.grpc_port}}
+external_fqdn = "https://{{cfg.service.external_fqdn}}"
+{{#if cfg.service.trial_license_url ~}}
+trial_license_url = "{{cfg.service.trial_license_url}}"
+{{/if ~}}
+open_api_ui_dir = "{{pkg.path}}/static/swagger-ui/"
+
+enable_apps_feature = {{cfg.service.enable_apps_feature}}
+
+[log]
+{{~#if cfg.log.level}}
+level = "{{cfg.log.level}}"
+{{~ else}}
+level = "{{cfg.service.log.level}}"
+{{~/if}}
+
+[tls]
+  cert_path = "{{pkg.svc_config_path}}/service.crt"
+  key_path = "{{pkg.svc_config_path}}/service.key"
+  root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
+
+[grpc_clients.endpoints]
+{{~#eachAlive bind.authz-service.members as |authz|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.authz-service]
+    target = "{{authz.sys.ip}}:{{authz.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.authn-service.members as |authn|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.authn-service]
+    target = "{{authn.sys.ip}}:{{authn.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.compliance-service.members as |compliance|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.compliance-service]
+    target = "{{compliance.sys.ip}}:{{compliance.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.config-mgmt-service.members as |cfgmgmt|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.config-mgmt-service]
+    target = "{{cfgmgmt.sys.ip}}:{{cfgmgmt.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.deployment-service.members as |deployment|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.deployment-service]
+    target = "{{deployment.sys.ip}}:{{deployment.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.ingest-service.members as |ingest|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.ingest-service]
+    target = "{{ingest.sys.ip}}:{{ingest.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.license-control-service.members as |license|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.license-control-service]
+    target = "{{license.sys.ip}}:{{license.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.local-user-service.members as |local-user|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.local-user-service]
+    target = "{{local-user.sys.ip}}:{{local-user.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.notifications-service.members as |notifications|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.notifications-service]
+    target = "{{notifications.sys.ip}}:{{notifications.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.teams-service.members as |teams|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.teams-service]
+    target = "{{teams.sys.ip}}:{{teams.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.secrets-service.members as |secrets|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.secrets-service]
+    target = "{{secrets.sys.ip}}:{{secrets.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.nodemanager-service.members as |manager|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.nodemanager-service]
+    target = "{{manager.sys.ip}}:{{manager.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}

@@ -1,0 +1,39 @@
+@startuml automate-ui
+title Automate-UI Custom Module Architecture
+
+agent "app" as app
+agent "ApiToken" as token
+agent "ChefComponents" as shared
+agent "ChefPipes" as pipes
+agent "Compliance" as compliance
+agent "ComplianceShared" as complianceShared
+agent "Integrations" as integrations
+agent "Policy" as policy
+agent "Project" as project
+agent "Role" as role
+
+app --> token
+app --> compliance
+app --> complianceShared
+app --> shared
+app --> integrations
+app --> policy
+app --> project
+app --> role
+
+app --> shared
+token --> shared
+complianceShared --> shared
+integrations --> shared
+policy --> shared
+project --> shared
+role --> shared
+
+app --> pipes
+token --> pipes
+integrations --> pipes
+policy --> pipes
+project --> pipes
+role --> pipes
+
+@enduml

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package chef.automate.domain.cfgmgmt.response;
+option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/response";
+
+import "google/protobuf/timestamp.proto";
+
+message InventoryNodes {
+	repeated InventoryNode nodes = 1;
+}
+
+message InventoryNode {
+	string id                                   = 1;
+	google.protobuf.Timestamp checkin           = 2;
+	string organization                         = 3;
+	string platform                             = 4;
+	string platform_family                      = 5;
+	string platform_version                     = 6;
+	string client_version                       = 7;
+	string ec2_instance_id                      = 8;
+	string ec2_instance_type                    = 9;
+	google.protobuf.Timestamp last_ccr_received = 10;
+	string name                                 = 11;
+	string fqdn                                 = 12;
+}

@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package chef.automate.api.authz.response;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/authz/response";
+
+message Policy {
+    string action = 1;
+    repeated string subjects = 2;
+    string id = 3;
+    string resource = 4;
+    string effect = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+message IsAuthorizedResp {
+    bool authorized = 1;
+}
+
+// We aren't using a Policy message here since we want to
+// return a flat object via our external HTTP API.
+message CreatePolicyResp {
+    string action = 1;
+    repeated string subjects = 2;
+    string id = 3;
+    string resource = 4;
+    string effect = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+message ListPoliciesResp {
+    repeated Policy policies = 1;
+}
+
+message DeletePolicyResp {
+    string action = 1;
+    repeated string subjects = 2;
+    string id = 3;
+    string resource = 4;
+    string effect = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+message MethodsAllowed {
+    bool get = 1;
+    bool put = 2;
+    bool post = 3;
+    bool delete = 4;
+    bool patch = 5;
+}
+
+message IntrospectResp {
+    map<string, MethodsAllowed> endpoints = 1;
+}
+
+message IntrospectProjectsResp {
+    repeated string projects = 1;
+}

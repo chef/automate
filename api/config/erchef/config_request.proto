@@ -1,0 +1,118 @@
+// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
+syntax = "proto3";
+
+package chef.automate.domain.erchef;
+option go_package = "github.com/chef/automate/api/config/erchef";
+import "api/config/shared/global.proto";
+import "api/config/shared/tls.proto";
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+message ConfigRequest {
+  option (chef.automate.api.service_config) = {name: "automate-cs-oc-erchef"};
+
+	V1 v1 = 1;
+
+	message V1 {
+		System sys = 1;
+		Service svc = 2;
+
+		message System {
+			chef.automate.infra.config.Mlsa mlsa = 1;
+			Log log = 2;
+			Keygen keygen = 3;
+			ChefApi api = 4;
+			Indexing index = 5;
+			Network network = 6;
+			Sql sql = 7;
+			Authz authz = 8;
+			DataCollector data_collector = 9;
+			Depsolver depsolver = 10;
+			chef.automate.infra.config.TLSCredentials tls = 11;
+			Memory memory = 12;
+
+			message Network {
+				google.protobuf.Int32Value port = 1 [ (chef.automate.api.port) = { name: "service", default: 10203, protocol: "https" } ];
+				google.protobuf.StringValue listen_ip = 2;
+			}
+
+			message Log {
+				google.protobuf.StringValue level = 1;
+				google.protobuf.Int64Value rotation_max_bytes = 2;
+				google.protobuf.Int32Value rotation_max_files = 3;
+				google.protobuf.Int32Value max_error_logs_per_second = 4;
+				// TODO(ssd) 2018-07-24: Different log
+				// rotation configurables require
+				// different units.
+				google.protobuf.Int32Value rotation_max_megabytes = 5;
+			}
+
+			message Keygen {
+				google.protobuf.Int32Value worker_count = 1;
+				google.protobuf.Int32Value cache_size = 2;
+				google.protobuf.Int32Value start_size = 3;
+				google.protobuf.Int32Value timeout = 4;
+			}
+
+			message ChefApi {
+				google.protobuf.Int32Value auth_skew = 1;
+				google.protobuf.Int32Value bulk_fetch_batch_size = 2;
+				google.protobuf.Int32Value max_request_size = 3;
+				google.protobuf.StringValue base_resource_url = 4;
+				google.protobuf.BoolValue strict_search_result_acls = 5;
+			}
+
+			message Indexing {
+				google.protobuf.Int32Value reindex_batch_size = 1;
+				google.protobuf.Int32Value reindex_sleep_min_ms = 2;
+				google.protobuf.Int32Value reindex_sleep_max_ms = 3;
+				google.protobuf.Int32Value reindex_item_retries = 4;
+				google.protobuf.Int32Value timeout = 5;
+				google.protobuf.Int32Value pool_init_size = 6;
+				google.protobuf.Int32Value pool_max_size = 7;
+				google.protobuf.Int32Value pool_queue_max = 8;
+				google.protobuf.Int32Value batch_size = 9;
+				google.protobuf.Int32Value batch_max_wait = 10;
+			}
+
+			message Authz {
+				google.protobuf.Int32Value fanout = 1;
+				google.protobuf.Int32Value timeout = 2;
+				google.protobuf.Int32Value pool_init_size = 3;
+				google.protobuf.Int32Value pool_max_size = 4;
+				google.protobuf.Int32Value pool_queue_max = 5;
+				google.protobuf.Int32Value pool_queue_timeout = 6;
+			}
+
+			message Sql {
+				google.protobuf.Int32Value timeout =  1;
+				google.protobuf.Int32Value pool_init_size = 2;
+				google.protobuf.Int32Value pool_max_size = 3;
+				google.protobuf.Int32Value pool_queue_max = 4;
+				google.protobuf.Int32Value pool_queue_timeout = 5;
+			}
+
+			message DataCollector {
+				google.protobuf.Int32Value timeout =  1;
+				google.protobuf.Int32Value pool_init_size = 2;
+				google.protobuf.Int32Value pool_max_size = 3;
+				google.protobuf.Int32Value pool_queue_max = 4;
+				google.protobuf.BoolValue enabled = 5;
+			}
+
+			message Depsolver {
+				google.protobuf.Int32Value timeout = 1;
+				google.protobuf.Int32Value pool_init_size = 2;
+				google.protobuf.Int32Value pool_max_size = 3;
+				google.protobuf.Int32Value pool_queue_max = 4;
+				google.protobuf.Int32Value pool_queue_timeout = 5;
+			}
+
+			message Memory {
+				google.protobuf.Int64Value max_bytes = 1;
+			}
+
+		}
+		message Service {}
+	}
+}

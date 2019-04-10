@@ -1,0 +1,31 @@
+<div class="feature-flags">
+  <h1>Feature Flags</h1>
+  <div id="{{ flag.key }}" class="feature-flags-flag" ng-if="flags.length > 0" ng-repeat="flag in flags">
+    <h4 class="feature-flags-name">{{ flag.name || flag.key }}</h4>
+    <p class="feature-flags-desc">{{ flag.description }}</p>
+    <div class="feature-flags-switches button-bar">
+      <button
+        type="button"
+        class="feature-flags-switch button small"
+        ng-class="{'active': isOverridden(flag.key) && isOn(flag.key)}"
+        ng-click="enable(flag)">
+        On
+      </button>
+      <button
+        type="button"
+        class="feature-flags-switch button small"
+        ng-class="{'active': isOverridden(flag.key) && !isOn(flag.key)}"
+        ng-click="disable(flag)">
+        Off
+      </button>
+      <button
+        type="button"
+        class="feature-flags-switch button small"
+        ng-class="{'active': !isOverridden(flag.key)}"
+        ng-click="reset(flag)">
+        Default
+      </button>
+    </div>
+  </div>
+  <div ng-if="flags.length === 0"> There are currently no beta features to select.</div>
+</div>

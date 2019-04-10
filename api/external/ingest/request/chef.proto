@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package chef.automate.api.ingest.request;
+option go_package = "github.com/chef/automate/api/external/ingest/request";
+
+import "google/protobuf/struct.proto";
+
+message Run {
+  // 1 through 15 are for frequently occuring fields
+  // Reserving for shared fields between run_start and run_converge mesages.
+  string id = 1; // message Id
+  string run_id = 2;
+  string entity_uuid = 3;
+  string message_version = 4;
+  string message_type = 5;
+  string node_name = 6;
+  string organization_name = 7;
+  string start_time = 8;
+  string chef_server_fqdn = 9;
+  // This new field called 'content' is being used to send the entire raw JSON
+  // message in bytes, this field is heavily used by the gateway for the DataCollector
+  // Func Handler that will send the Run message to the (receiver) ingest-service
+  // that will manually unmarshal the message from this field if it is provided.
+  // The main purpose of this field it to improve the performance of ingestion when
+  // the requests comes in REST/HTTP format.
+  bytes content = 10;
+  string end_time = 16;
+  string status = 17;
+  int32 total_resource_count = 18;
+  int32 updated_resource_count = 19;
+  string source = 20;
+  ExpandedRunList expanded_run_list = 21;
+  repeated Resource resources = 22;
+  repeated string run_list = 23;
+  google.protobuf.Struct node = 24;
+  Error error = 25;
+  string policy_name = 26;
+  string policy_group = 27;
+  repeated Deprecation deprecations = 28;
+  repeated string tags = 29;
+}
+
+message Deprecation {
+	string message = 1;
+	string url = 2;
+	string location = 3;
+}
+
+message ExpandedRunList {
+  string id = 1;
+  repeated RunList run_list = 2;
+}
+
+message RunList {
+  string type = 1;
+  string name = 2;
+  string version = 3;
+  bool skipped = 4;
+  repeated RunList children = 5;
+}
+
+message Resource {
+  string type = 1;
+  string name = 2;
+  string id = 3;
+  google.protobuf.Struct after = 4; //TODO: Define fields?
+  google.protobuf.Struct before = 5; //TODO: Define fields?
+  string duration = 6;
+  string delta = 7;
+  string cookbook_name = 8;
+  string cookbook_version = 9;
+  reserved 10; // bool ignore_failure = 10;
+  string status = 11;
+  string recipe_name = 12;
+  google.protobuf.Value ignore_failure = 13;
+  string conditional = 16;
+  string result = 17;
+}
+
+message Error {
+  string class = 1;
+  string message = 2;
+  repeated string backtrace = 16;
+  Description description = 17;
+}
+
+message Description {
+  string title = 1;
+  repeated google.protobuf.Struct sections = 2;
+}

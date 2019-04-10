@@ -1,0 +1,4 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+# ensure the backup repository is configured and has the correct permissions
+source {{pkg.svc_config_path}}/init_backup

@@ -1,0 +1,61 @@
+.runners {
+  .tabs {
+    .manage-runners {
+      margin-right: 0;
+    }
+  }
+  .no-runners-info {
+    @include empty-item;
+  }
+}
+
+.runners-container {
+  @extend %table-base;
+  padding: 0 2rem 1.5rem;
+
+  table {
+
+    th, td {
+
+      &.hostname {
+        min-width: 80px;
+        font-weight: bold;
+        text-align: left;
+        text-transform: none;
+        padding-left: 30px; // Should this really be absolute?
+      }
+
+      &.enabled, // looks better like this
+      &.health-output // might be empty
+      {
+        width: 60px;
+        text-transform: none;
+      }
+
+      &.runner-job, &.runner-idle {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-transform: none;
+      }
+    }
+
+    button.primary {
+      padding: .5rem 1rem;
+      font-size: .75rem;
+    }
+  }
+
+  .runner-status-error {
+    color: $alertred;
+  }
+
+  .runner-status-in-progress {
+    color: $gray;
+  }
+
+  .runner-status-ok {
+    color: $successgreen;
+  }
+}

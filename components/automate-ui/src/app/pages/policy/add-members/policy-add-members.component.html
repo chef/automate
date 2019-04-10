@@ -1,0 +1,108 @@
+<main>
+  <chef-loading-spinner *ngIf="loading" size='50' fixed></chef-loading-spinner>
+  <ng-container *ngIf="!loading">
+    <chef-modal label="member-expression-label" class="member-expression-modal" [visible]="modalVisible" (close)="closeModal()">
+      <h2>
+        Add Member Expression
+      </h2>
+      <div id="left-align">
+        <form [formGroup]="expressionForm">
+          <chef-form-field>
+            <label>Member expression *</label>
+            <input chefInput formControlName="expression" type="text">
+            <chef-error *ngIf="unparsableMember">Invalid member expression.</chef-error>
+            <chef-error *ngIf="duplicateMember">Member expression already in table.</chef-error>
+            <chef-error *ngIf="alreadyPolicyMember">Member already in policy.</chef-error>
+          </chef-form-field>
+        </form>
+        <p><span class="expression">user | team : local | ldap | saml : &lt;name&gt;</span> or <span class="expression">token : &lt;id&gt;</span>, wildcards (*) are allowed.</p>
+        <p>More details in <a href="https://automate.chef.io/docs/iam-v2-guide/#member-expressions" target="_blank">member expression documentation</a>.</p>
+      </div>
+      <div id="align-buttons">
+        <chef-button primary [disabled]="!expressionForm.valid" (click)="validateAndAddExpression()">Add Expression</chef-button>
+        <chef-button tertiary (click)="closeModal()">Cancel</chef-button>
+      </div>
+    </chef-modal>
+
+    <div class="flex">
+      <div id="header-description" class="flex-left">
+        <chef-page-header>
+          <chef-heading>Add Members to {{policy.name}}</chef-heading>
+          <chef-subheading>Automate only displays local users and local teams.
+            For other types of members add a member expression.</chef-subheading>
+        </chef-page-header>
+      </div>
+      <div id="close-button" class="flex-right">
+        <chef-button secondary class="close-button" label="close" [routerLink]="backRoute()" fragment="members" aria-label="Close" >
+          <chef-icon aria-hidden="true">close</chef-icon>
+        </chef-button>
+      </div>
+    </div>
+    <div id="no-members-container" *ngIf="sortedMembersAvailable.length === 0">
+      <h3>
+        Create more local users or local teams first, or add a member expression.
+      </h3>
+      <chef-button primary class="add-member-button" (click)="openModal()">Add Member Expression</chef-button>
+    </div>
+    <div id="table-container" *ngIf="sortedMembersAvailable.length > 0">
+      <div class="flex">
+        <div id="members-selected" class="flex-right" >
+          {{ membersToAddValues().length | pluralize : 'member' : 's' }} selected
+        </div>
+      </div>
+      <div id="inner-container">
+        <chef-table>
+          <chef-thead>
+            <chef-tr>
+              <chef-th class="checkbox-row"></chef-th>
+              <chef-th>
+                Name
+              </chef-th>
+              <chef-th>
+                Type
+              </chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let member of sortedMembersAvailable">
+              <chef-td class="checkbox-row">
+                <chef-checkbox (change)="addOrRemoveQueuedMember($event.detail, member)" [checked]="isMemberChecked(member)"></chef-checkbox>
+              </chef-td>
+              <!-- TODO get error but properly find page when you click this link for teams -->
+              <chef-td>
+                <a *ngIf="memberHasURL(member)" [routerLink]="memberURL(member)" target="_blank">
+                  {{ member.displayName }}
+                </a>
+                <ng-container *ngIf="!memberHasURL(member)">
+                  {{ member.displayName }}
+                </ng-container>
+              </chef-td>
+              <chef-td>
+                {{ member.displayType }}
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </div>
+    </div>
+    <div id="footer">
+      <chef-button secondary class="add-member-button"
+        (click)="openModal()" *ngIf="sortedMembersAvailable.length > 0">Add Member Expression</chef-button>
+      <div id="right-buttons">
+        <chef-button primary disabled *ngIf="addingMembers">
+          <chef-loading-spinner></chef-loading-spinner>
+          <span *ngIf="membersToAddValues().length === 1">Adding Member...</span>
+          <span *ngIf="membersToAddValues().length > 1">Adding {{  membersToAddValues().length }} Members...</span>
+        </chef-button>
+        <chef-error *ngIf="addMembersFailed">{{ addMembersFailed }}</chef-error>
+        <chef-button *ngIf="sortedMembersAvailable.length > 0 && !addingMembers"
+          primary [disabled]="membersToAddValues().length === 0"
+          (click)="addMembers()">
+          <ng-container *ngIf="membersToAddValues().length < 2">Add Member</ng-container>
+          <ng-container *ngIf="membersToAddValues().length >= 2">Add {{ membersToAddValues().length }} Members</ng-container>
+        </chef-button>
+        <chef-button tertiary [routerLink]="backRoute()" fragment="members">Cancel</chef-button>
+      </div>
+    </div>
+  </ng-container>
+</main>

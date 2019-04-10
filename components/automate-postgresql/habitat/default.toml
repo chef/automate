@@ -1,0 +1,20 @@
+[service]
+port = 5432
+host = '0.0.0.0'
+
+[logger]
+level = 'ERROR'
+
+[pg]
+max_connections = 100
+max_locks_per_transaction = 64
+max_wal_size = "1GB"
+min_wal_size = "80MB"
+wal_keep_segments = 32
+checkpoint_timeout = "5mins"
+checkpoint_completion_target = 0.5
+md5_auth_cidr_addresses = ["0.0.0.0/0", "::0/0"]
+ssl_ciphers = "HIGH:+3DES:!aNULL:!eNULL:!EXPORT"
+
+[superuser]
+name = 'admin'

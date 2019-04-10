@@ -1,0 +1,36 @@
+<div class="feature-flags" [class.active]="isVisible">
+  <div class="modal-content">
+    <div>
+      <div class="header">
+        <chef-icon class="icon">flag</chef-icon>
+        <span class="text">Feature Flags</span>
+        <chef-button class="close" (click)="closeModal()" secondary>
+          <chef-icon>close</chef-icon>
+        </chef-button>
+      </div>
+      <p class="warning"> {{ warning }} </p>    </div>
+    <div class="features" *ngIf="features.length > 0">
+      <div class="feature" *ngFor="let feature of features">
+        <div (click)="updateFlag(feature)" class="title-desc">
+          <div class="title">{{feature.name}}</div>
+        </div>
+        <div class="onoffswitch">
+          <label class="onoffswitch-label">
+            <input
+              type="checkbox"
+              class="onoffswitch-checkbox"
+              [checked]="featureFlagsService.getFeatureStatus(feature.key)"
+              (change)="updateFlag(feature)"
+            />
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="features.length === 0"><b>There are currently no {{ flagType }} features to select.</b></div>
+    <div class="buttons">
+      <chef-button id="cancel-button" (click)="closeModal()" secondary>CLOSE</chef-button>
+    </div>
+  </div>
+</div>

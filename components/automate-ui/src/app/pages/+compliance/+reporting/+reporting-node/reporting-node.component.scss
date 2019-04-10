@@ -1,0 +1,468 @@
+@import "~styles/variables";
+
+chef-loading-spinner {
+  display: block;
+  margin: 100px auto;
+  width: 100px;
+}
+
+.metadata {
+  display: flex;
+  padding: 1em 35px 2em;
+  background: $chef-white;
+  justify-content: space-between;
+
+  chef-card {
+    width: 50%;
+  }
+
+  chef-table {
+    chef-tr {
+      margin: 0;
+
+      chef-th,
+      chef-td {
+        padding: 0.25em 0;
+        border: none;
+        background-color: transparent;
+      }
+
+      chef-td {
+        flex-grow: 3;
+      }
+
+      chef-icon {
+        margin-right: 10px;
+        color: $chef-grey;
+      }
+    }
+  }
+}
+
+#skipped-count {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5em;
+  cursor: pointer;
+
+  chef-icon {
+    margin: 0 0 0 0.25em;
+    color: $chef-primary-bright;
+  }
+}
+
+chef-tooltip[for='skipped-count'] {
+  margin-right: 50px;
+
+  ul {
+    margin: 0;
+    padding-left: 1em;
+
+    li {
+      font-size: 14px;
+      margin-bottom: 1em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.nodes-list-status-filters {
+  display: flex;
+  margin: 35px;
+  align-items: center;
+
+  ::ng-deep .filter {
+    font-size: 14px;
+    height: auto;
+
+    &::before {
+      display: none;
+    }
+
+    .option-content {
+      display: flex;
+      padding: 0;
+      flex-direction: column;
+    }
+
+    .filter-total {
+      display: flex;
+      align-items: center;
+
+      chef-icon {
+        margin: -2px 0.5em 0 0;
+      }
+    }
+
+    &.selected {
+      background: blue;
+
+      .filter-label,
+      .filter-total,
+      .filter-total chef-icon {
+        color: $chef-white;
+      }
+
+      &.all  {
+        background: $chef-primary-bright;
+      }
+
+      &.critical  {
+        background: $chef-critical;
+      }
+
+      &.major  {
+        background: $chef-major;
+      }
+
+      &.minor  {
+        background: $chef-minor;
+      }
+
+      &.skipped  {
+        background: $chef-dark-grey;
+      }
+
+      &.passed  {
+        background: $chef-success;
+      }
+    }
+
+    &:not(.selected) {
+      &.all .filter-total  {
+        color: $chef-primary-bright;
+      }
+
+      &.critical .filter-total  {
+        color: $chef-critical;
+      }
+
+      &.major .filter-total  {
+        color: $chef-major;
+      }
+
+      &.minor .filter-total  {
+        color: $chef-minor;
+      }
+
+      &.skipped .filter-total  {
+        color: $chef-dark-grey;
+      }
+
+      &.passed .filter-total  {
+        color: $chef-success;
+      }
+    }
+  }
+}
+
+.controls-table {
+  margin: 2em 35px;
+
+  chef-th,
+  chef-td {
+    &:first-child {
+      flex-grow: 5;
+      word-break: break-all;
+
+      chef-icon {
+        margin-right: 1em;
+      }
+
+      strong {
+        display: block;
+      }
+    }
+
+    &:last-child {
+      justify-content: flex-end;
+    }
+
+    chef-button {
+      white-space: nowrap;
+    }
+  }
+
+  .control-detail {
+    background: $chef-white;
+    padding: 1em;
+    transform: translateY(-0.5em);
+    border: 1px solid $chef-grey;
+    border-top: none;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+
+    chef-toggle {
+      margin-bottom: 1em;
+    }
+
+    .source {
+      border: 1px solid $chef-grey;
+      border-radius: 4px;
+      background: $chef-lightest-grey;
+
+      ::ng-deep pre {
+        background: transparent;
+      }
+    }
+  }
+
+  .status-icon,
+  .impact-status,
+  .control-result {
+    &.failed {
+      color: $chef-critical;
+    }
+
+    &.passed {
+      color: $chef-success;
+    }
+
+    &.skipped {
+      color: $chef-dark-grey;
+    }
+
+    &.critical {
+      color: $chef-critical;
+    }
+
+    &.major {
+      color: $chef-major;
+    }
+
+    &.minor {
+      color: $chef-minor;
+    }
+  }
+}
+
+.result-item {
+  margin-bottom: 1em;
+  border: 1px solid $chef-grey;
+  border-radius: $global-radius;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .result-item-header {
+    display: flex;
+    padding: 1em;
+    align-items: center;
+    border-radius: $global-radius;
+
+    chef-icon {
+      margin-right: 1em;
+    }
+  }
+
+  .result-item-body {
+    background: $chef-lightest-grey;
+    border-top: 1px solid $chef-grey;
+
+    p {
+      margin: 0;
+      padding: 1em;
+    }
+
+    chef-snippet {
+      background: $chef-lightest-grey;
+
+      ::ng-deep pre {
+        background: transparent;
+      }
+    }
+  }
+}
+
+.reporting-profile-side-panel {
+
+  chef-button {
+    margin: 0;
+  }
+
+  chef-icon.failed {
+    color: $chef-critical;
+  }
+
+  chef-icon.passed {
+    color: $chef-success;
+  }
+
+  chef-icon.skipped {
+    color: $chef-dark-grey;
+  }
+
+  .critical {
+    color: $chef-critical;
+  }
+
+  .major {
+    color: $chef-major;
+  }
+
+  .minor {
+    color: $chef-minor;
+  }
+
+  .side-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background: $chef-white;
+    border-bottom: 1px solid $chef-grey;
+
+    .header-icon {
+      font-size: 2em;
+      color: $chef-dark-grey;
+    }
+
+    .header-text {
+      margin: 0 1em;
+      flex-grow: 1;
+      word-break: break-all;
+
+      p {
+        margin: 0;
+        color: $chef-dark-grey;
+      }
+    }
+  }
+
+  .side-panel-body {
+    .side-panel-body-header {
+      display: flex;
+      padding: 1em;
+      border-bottom: 1px solid $chef-grey;
+      align-items: center;
+
+      chef-button {
+        margin: 0 1em 0 0;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+
+  .results-profile-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .results-profile-list-item {
+    border-bottom: 1px solid $chef-grey;
+    border-left: 4px solid transparent;
+    background: $chef-white;
+
+    &.selected {
+      border-left: 4px solid $chef-primary-bright;
+    }
+  }
+
+  .list-item-summary {
+    display: flex;
+    align-items: center;
+    padding: 1em;
+
+    .list-item-text {
+      margin: 0 1em;
+      flex-grow: 1;
+
+      chef-button,
+      p {
+        margin: 0;
+      }
+
+      p {
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .list-item-detail {
+    border-top: 1px solid $chef-grey;
+    border-left: 4px solid $chef-success;
+    padding: 1em;
+
+    &.failed {
+      border-left-color: $chef-critical;
+    }
+
+    &.passed {
+      border-left-color: $chef-success;
+    }
+
+    &.skipped {
+      border-left-color: $chef-dark-grey;
+    }
+
+    chef-toggle {
+      margin-bottom: 1em;
+      font-size: 14px;
+    }
+
+    chef-snippet.source {
+      border: 1px solid $chef-grey;
+      border-radius: $global-radius;
+      background: $chef-lightest-grey;
+
+      ::ng-deep pre {
+        background: transparent;
+      }
+    }
+  }
+
+  .result-item {
+    margin-bottom: 1em;
+    border: 1px solid $chef-grey;
+    border-radius: $global-radius;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .result-item-header {
+      display: flex;
+      padding: 1em;
+      align-items: center;
+      border-radius: $global-radius;
+
+      chef-icon {
+        margin-right: 1em;
+      }
+    }
+
+    .result-item-body {
+      background: $chef-lightest-grey;
+      border-top: 1px solid $chef-grey;
+
+      p {
+        margin: 0;
+        padding: 1em;
+      }
+
+      chef-snippet {
+        background: $chef-lightest-grey;
+
+        ::ng-deep pre {
+          background: transparent;
+        }
+      }
+    }
+  }
+}

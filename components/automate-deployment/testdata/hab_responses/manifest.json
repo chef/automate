@@ -1,0 +1,18 @@
+{
+  "schema_version": "1",
+  "git_sha": "a_test_sha",
+  "build": "20180207073355",
+  "hab": [
+      "core/hab/0.54.0/20180221022026",
+      "core/hab-sup/0.54.0/20180221023448",
+      "core/hab-launcher/7241/20180321162126"
+  ],
+  "packages": [
+      "chef/automate-cli/0.1.0/20180215154842",
+      "chef/deployment-service/0.1.0/20180215154831",
+      "chef/local-user-service/0.1.0/20180214165011",
+      "chef/automate-postgresql/9.6.6/20180209193636",
+      "chef/teams-service/0.1.0/20180215162042",
+      "chef/license-control-service/0.1.0/20180215162042"
+  ]
+}

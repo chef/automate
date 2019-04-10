@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "hostname": {
+            "type": "string",
+            "required": true,
+            "minLength": 1
+        },
+        "os": {
+            "type": "string",
+            "required": true,
+            "minLength": 1
+        },
+        "platform_family": {
+            "type": "string",
+            "required": true,
+            "minLength": 1
+        },
+        "platform": {
+            "type": "string",
+            "required": true,
+            "minLength": 1
+        },
+        "platform_version": {
+            "type": "string",
+            "required": true,
+            "minLength": 1
+        }
+    }
+}

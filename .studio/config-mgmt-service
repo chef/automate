@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+# Helper methods specific for the config-mgmt-service
+
+document "start_config_mgmt_service" <<DOC
+  Build and start the local config-mgmt-service
+DOC
+function start_config_mgmt_service() {
+  build components/config-mgmt-service/
+  start_deployment_service
+  chef-automate dev deploy-some $HAB_ORIGIN/config-mgmt-service --with-deps
+}
+
+# Run Integration tests for the config-mgmt-service
+document "config_mgmt_integration" <<DOC
+  Runs the integration tests for the config-mgmt-service
+DOC
+function config_mgmt_integration() {
+  go_test "github.com/chef/automate/components/config-mgmt-service/integration_test"
+}
+
+document "debug_cfgmgmt" <<DOC
+  Attaches a remote debugger to config-mgmt-service
+DOC
+function debug_cfgmgmt() {
+  check_if_deployinate_started || return 1
+  debug_go_service config-mgmt-service
+}
+
+document "config_mgmt_grpcurl_list_services" <<DOC
+  Display the list of RPC services inside the config-mgmt-service.
+
+  @(arg:1) Optional: An RPC service to inspect
+
+  Example: Inspect the CfgMgmt service
+  -----------------------------
+  config_mgmt_grpcurl_list_services chef.automate.domain.cfgmgmt.service.CfgMgmt
+DOC
+config_mgmt_grpcurl_list_services() {
+  config_mgmt_grpcurl_get list "$1"
+}
+
+document "config_mgmt_grpcurl_get" <<DOC
+  Make a grpcurl GET request to the provided GRPC function.
+
+  @(arg:1) Required: A GRPC function
+
+  Example: Get a list of Chef Nodes (GetNodes)
+  -----------------------------
+  config_mgmt_grpcurl_get chef.automate.domain.cfgmgmt.service.CfgMgmt.GetNodes
+
+  NOTE: Run 'config_mgmt_grpcurl_list_services' to inspect the RPC services.
+DOC
+function config_mgmt_grpcurl_get() {
+  chef-automate dev grpcurl config-mgmt-service -- "$@"
+}
+
+document "config_mgmt_grpcurl_get_suggestions" <<DOC
+  Hits the suggestions endpoint inside the config-mgmt-service. (GetSuggestions)
+
+  @(arg:1) Type of suggestion to lookup
+  @(arg:2) Text for the provided suggestion type
+
+  Example: Get the suggestions for the chef version 14
+  -----------------------------
+  config_mgmt_grpcurl_get_suggestions chef_version 14*
+DOC
+function config_mgmt_grpcurl_get_suggestions() {
+  chef-automate dev grpcurl config-mgmt-service -- -d '{"type": "'"$1"'", "text": "'"$2"'"}' \
+	  chef.automate.domain.cfgmgmt.service.CfgMgmt.GetSuggestions
+}

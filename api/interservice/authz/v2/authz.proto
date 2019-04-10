@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+
+package chef.automate.domain.authz.v2;
+option go_package = "github.com/chef/automate/api/interservice/authz/v2";
+
+// TODO (sr): consider dropping this validation:
+// a) it takes time
+// b) bad input will with certainty lead to an "unauthorized" response
+message IsAuthorizedReq {
+    repeated string subjects = 1
+      [(validate.rules).repeated = {
+        min_items: 1,
+        items: { string: { pattern: "^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$|^tls:service:[^:*]+:[^:*]+$" } }
+       }];
+    string resource = 2
+      [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*$"];
+    string action = 3
+      [(validate.rules).string.pattern = "^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$"];
+}
+
+message IsAuthorizedResp {
+    bool authorized = 1;
+}
+
+message ProjectsAuthorizedReq {
+  repeated string subjects = 1
+    [(validate.rules).repeated = {
+      min_items: 1,
+      items: { string: { pattern: "^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$|^tls:service:[^:*]+:[^:*]+$" } }
+     }];
+  string resource = 2
+    [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*$"];
+  string action = 3
+    [(validate.rules).string.pattern = "^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$"];
+  repeated string projects_filter = 4 [(validate.rules).repeated = {
+      unique: true,
+      items: {
+          string: {
+              pattern: "^[a-z0-9-]{1,64}$"
+          }
+      }
+     }];
+}
+
+message ProjectsAuthorizedResp {
+  repeated string projects = 1 [(validate.rules).repeated = {
+    unique: true,
+    items: {
+        string: {
+            pattern: "^[a-z0-9-]{1,64}$"
+        }
+    }
+   }];
+}
+
+// FilterAuthorizedProjects uses this SAME request
+message FilterAuthorizedPairsReq {
+    repeated string subjects = 1
+      [(validate.rules).repeated = {
+        min_items: 1,
+        items: { string: { pattern: "^(?:(?:team|user):(?:local|ldap|saml)|token|tls:service:[^:*]+):[^:*]+$" } }
+       }];
+    repeated Pair pairs = 2;
+}
+
+message FilterAuthorizedPairsResp {
+    repeated Pair pairs = 1;
+}
+
+message FilterAuthorizedProjectsResp {
+    repeated string projects = 1;
+}
+
+message Pair {
+    string resource = 2
+      [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*$"];
+    string action = 3
+      [(validate.rules).string.pattern = "^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$"];
+}
+
+service Authorization {
+    rpc IsAuthorized (IsAuthorizedReq) returns (IsAuthorizedResp) {};
+    rpc FilterAuthorizedPairs (FilterAuthorizedPairsReq) returns (FilterAuthorizedPairsResp) {};
+    rpc FilterAuthorizedProjects (FilterAuthorizedPairsReq) returns (FilterAuthorizedProjectsResp) {};
+    rpc ProjectsAuthorized (ProjectsAuthorizedReq) returns (ProjectsAuthorizedResp) {};
+}

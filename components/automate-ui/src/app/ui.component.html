@@ -1,0 +1,27 @@
+<div>
+  <app-license-lockout
+    (triggerApplyLicense)="onTriggerApplyLicense($event); licenseApplyModal.openModal();"
+    #licenseLockoutModal>
+  </app-license-lockout>
+  <app-license-apply
+    [licenseApplyReason]="licenseApplyReason" #licenseApplyModal
+    (openLicenseLockout)="licenseLockoutModal.openModal()"
+    >
+  </app-license-apply>
+  <app-navbar *ngIf="renderNavbar"></app-navbar>
+  <div class="notifications" *ngIf="renderNavbar">
+    <chef-notification *ngFor="let notification of notifications$ | async" [type]="notification.type === 'license' ? 'error' : notification.type"
+      [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
+      {{ notification.message }}
+      <!-- TODO (tc) This code is all temporary. The full experience will be implemented post ChefConf.-->
+      <ng-container *ngIf="notification.type === 'license'">
+        <a href="https://www.chef.io/contact-us/" target="_blank">Get a license from Chef</a>
+        or
+        <a href="#" (click)="onTriggerBannerLicenseApply(); licenseApplyModal.openModal(); false">apply a license</a>
+        if you already have one.
+      </ng-container>
+    </chef-notification>
+  </div>
+  <app-feature-flags [experimentalFeatures]="experimentalFeatures" [betaFeatures]="betaFeatures" [legacyFeatures]="legacyFeatures"></app-feature-flags>
+  <router-outlet></router-outlet>
+</div>

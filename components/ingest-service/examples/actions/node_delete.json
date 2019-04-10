@@ -1,0 +1,19 @@
+{
+  "id": "0766e90f-fa48-44ed-acf4-fa9011758838",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "a2-local-fresh-install-unstable.cd.chef.co",
+  "entity_type": "node",
+  "task": "delete",
+  "organization_name": "chef",
+  "remote_hostname": "172.21.104.226",
+  "recorded_at": "2018-02-24T01:00:14Z",
+  "remote_request_id": "c3896a1f-6415-4e31-a1b9-8ea370512cc4",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAGpKDLIAAIAAAAA",
+  "requestor_name": "cd-infrastructure",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Knife/13.7.16 (ruby-2.4.3-p205; ohai-13.7.1; x86_64-linux; +https://chef.io)",
+  "data": "{}"
+}

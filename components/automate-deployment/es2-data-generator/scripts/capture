@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -ex
+
+automate-ctl stop
+
+HERE=$(pwd)
+
+pushd /
+tar zcvf $HERE/datasets/a1-es2-sample-data-$(date -u '+%Y-%m-%d-%H-%M').tgz /var/opt/delivery/elasticsearch/data/
+popd

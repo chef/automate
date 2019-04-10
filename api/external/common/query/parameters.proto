@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package chef.automate.api.common.query;
+option go_package = "github.com/chef/automate/api/external/common/query";
+
+message Pagination {
+  int32 page = 1;
+  int32 size = 2;
+}
+
+message Sorting {
+  string field = 1;
+  SortOrder order = 2;
+}
+
+message Suggestion {
+  string type = 1;
+  string text = 2;
+}
+
+enum SortOrder {
+  ASC = 0;   // By default we order ascending
+  DESC = 1;
+}

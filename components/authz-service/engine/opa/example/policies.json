@@ -1,0 +1,14 @@
+{
+	"a3e1556f-190b-4ad0-a356-a6bed9618e8c": {
+		"subjects": ["team:local:admins"],
+		"action": "node:read",
+		"resource": "automate:nodes",
+		"effect": "allow"
+	},
+	"651589f0-4f98-4a33-910e-db4011601381": {
+		"subjects": ["team:local:admins"],
+		"action": "node:read",
+		"resource": "automate:nodes:*",
+		"effect": "allow"
+	}
+}

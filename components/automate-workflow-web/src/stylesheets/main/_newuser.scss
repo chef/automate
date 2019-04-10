@@ -1,0 +1,22 @@
+.new-user-form {
+
+  fieldset {
+    width: 75%;
+  }
+
+  .new-user-header {
+    overflow: hidden;
+
+    h2 {
+      margin: 0;
+    }
+
+    > .icon {
+      display: block;
+      font-size: 100px;
+      float: left;
+      color: $cheforange;
+      margin-right: 10px;
+    }
+  }
+}

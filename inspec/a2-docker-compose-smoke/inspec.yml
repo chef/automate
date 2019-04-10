@@ -1,0 +1,11 @@
+name: a2-docker-compose-smoke
+title: InSpec Profile
+maintainer: Chef Software, Inc.
+copyright: Chef Software, Inc.
+copyright_email: engineering@chef.io
+license: All Rights Reserved
+summary: Automate 2.0 Docker Compose smoke tests
+version: 0.1.0
+depends:
+  - name: a2-api-smoke
+    path: ../a2-api-smoke

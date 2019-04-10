@@ -1,0 +1,91 @@
+samples:
+  key_files:
+  - ./vagrant.key
+  platforms:
+  - name: c5
+    target: ssh://root@0.0.0.0:11032
+    profiles:
+    - mylinux-success-1.8.9
+  - name: c6
+    target: ssh://root@0.0.0.0:11024
+    profiles:
+    - cis-centos6-level1-1.1.0-1.4
+    - ssh-baseline-2.2.0
+  - name: c7
+    target: ssh://root@0.0.0.0:11025
+    profiles:
+    - mylinux-success-1.8.9
+  - name: d7
+    target: ssh://root@0.0.0.0:11029
+    profiles:
+    - apache-baseline-2.0.2
+  - name: d8
+    target: ssh://root@0.0.0.0:11028
+    profiles:
+    - mylinux-failure-minor-5.2.0
+  - name: d8-2
+    target: ssh://root@0.0.0.0:11028
+    profiles:
+    - mylinux-failure-major-5.4.4
+  - name: f22
+    target: ssh://root@0.0.0.0:11026
+    profiles:
+    - linux-baseline-2.2.0
+    - ssh-baseline-2.2.0
+    - apache-baseline-2.0.2
+    - mysql-baseline-2.1.0
+  - name: u12
+    target: ssh://root@0.0.0.0:11022
+    profiles:
+    - cis-ubuntu12_04lts-level1-1.1.0-2
+  - name: u14
+    target: ssh://root@0.0.0.0:11031
+    profiles:
+    - mylinux-success-1.8.9
+  - name: u18
+    target: ssh://root@0.0.0.0:11033
+    profiles:
+    - linux-baseline-2.2.0
+    - ssh-baseline-2.2.0
+
+
+# `days`: for how many days to generate scans
+# `format`: the report sample to use(min, full)
+# `nodes`: number of nodes to generate scans for, like this:
+# `max_scans`: number of maximum scans a day that 40% of the nodes will do
+# `total_max_scans`: Limit the maximum scans to be added for a generator run
+# 20% will do one scan a month
+# 40% will do one scan a week
+# 30% will do one scan a day
+# 10% will do `max_scans` a day
+# For testing, days=2, nodes=10, max_scans=2 will do: two scans for the two nodes doing monthly scans, four scans for the four nodes doing weekly scans, six scans for the three nodes doing daily scans and four scans for the node doing max_scans a day. Total: 16 scans
+# For testing, days:14, nodes:1000, max_scans:1 will do 6600 scans in 3.5h over VPN and Atlantic
+# For testing, days:40, nodes:1000, max_scans:2 will do 22800 scans in 50 mins against Automate in vagrant!
+simulation:
+  days: 20
+  nodes: 5000
+  max_scans: 2
+  total_max_scans: 1000000
+  sample_format: full
+
+
+statistics:
+  sets:
+  - nodes: 10
+    scan_per_day: 1
+  - nodes: 10,
+    scan_per_day: 24
+  - nodes: 100
+    scan_per_day: 1
+  - nodes: 100,
+    scan_per_day: 24
+  - nodes: 1000
+    scan_per_day: 1
+  - nodes: 1000
+    scan_per_day: 24
+  - nodes: 10000
+    scan_per_day: 1
+  - nodes: 10000
+    scan_per_day: 24
+  - nodes: 10000
+    scan_per_day: 96

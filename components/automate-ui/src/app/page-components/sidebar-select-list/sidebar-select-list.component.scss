@@ -1,0 +1,50 @@
+@import "~styles/variables";
+
+.select-list {
+
+  h4 {
+    margin: 1em 0 .5em;
+    font-size: .875em;
+  }
+
+  .not-found {
+    font-weight: normal;
+    font-size: .75em;
+    background-color: $gray-shadow;
+    border-radius: $global-radius;
+    padding: .5em;
+  }
+
+  input {
+    border: 1px solid $gray-pale;
+    font-size: .875em;
+    font-family: inherit;
+    padding: .5em;
+    width: 100%;
+  }
+
+  ul {
+    border-top: 1px solid $gray-pale;
+    font-weight: bold;
+    padding-left: 0;
+    padding-top: 1em;
+
+    li {
+      border: 1px solid $gray-pale;
+      border-radius: $global-radius;
+      color: $chef-primary-dark;
+      font-weight: normal;
+      margin-bottom: .5em;
+      padding: .5em 1em;
+      font-size: .75em;
+      list-style-type: none;
+      cursor: pointer;
+      word-wrap: break-word;
+    }
+
+    li:hover {
+      background-color: $gray-shadow;
+      border-radius: $global-radius;
+    }
+  }
+}

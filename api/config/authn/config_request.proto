@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package chef.automate.domain.authn;
+option go_package = "github.com/chef/automate/api/config/authn";
+
+import "api/config/shared/global.proto";
+import "api/config/shared/tls.proto";
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+message ConfigRequest {
+	option (chef.automate.api.service_config) = {name: "authn-service"};
+
+	reserved 1 to 2;
+
+	V1 v1 = 3;
+
+	message V1 {
+		System sys = 1;
+		Service svc =  2;
+
+		message System {
+			chef.automate.infra.config.Mlsa mlsa = 1;
+			chef.automate.infra.config.TLSCredentials tls = 2;
+			Service service = 3;
+			Oidc oidc = 4;
+			reserved 5;
+			Storage storage = 6;
+			Logger logger = 7;
+			chef.automate.infra.config.Proxy proxy = 8;
+                        Http1 http1 = 9;
+
+			message Service {
+				google.protobuf.StringValue host = 1;
+				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10113, protocol: "grpc" } ];
+				google.protobuf.BoolValue debug = 3;
+				google.protobuf.StringValue external_fqdn = 4;
+				google.protobuf.StringValue a1_data_collector_token = 5;
+			}
+
+			message Oidc {
+				google.protobuf.StringValue client_id = 1;
+				google.protobuf.StringValue client_secret = 2;
+				google.protobuf.StringValue redirect_url = 3;
+			}
+
+			message Http1 {
+				google.protobuf.StringValue host = 1;
+				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "http1", default: 10162, protocol: "http" } ];
+			}
+
+			message Storage {
+				reserved 3 to 4;
+				google.protobuf.StringValue database = 1;
+				google.protobuf.StringValue user = 2;
+				google.protobuf.Int32Value max_connections = 5;
+			}
+
+			message Logger {
+				google.protobuf.StringValue format = 1;
+				google.protobuf.StringValue level = 2;
+			}
+		}
+
+		message Service {
+		}
+	}
+}

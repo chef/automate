@@ -1,0 +1,29 @@
+name: chef-automate node-inventory
+synopsis: Display node inventory data
+usage: chef-automate node-inventory [/path/to/outfile.json] [flags]
+description: |+
+  Display node inventory data.
+
+  Print out all the nodes that currently exist in Automate:
+
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for node-inventory
+- name: overwrite
+  shorthand: o
+  default_value: "false"
+  usage: Overwrite existing outfile if another file exists
+inherited_options:
+- name: debug
+  shorthand: d
+  default_value: "false"
+  usage: Enable debug output
+- name: no-check-version
+  default_value: "false"
+  usage: Disable version check
+- name: result-json
+  usage: Write command result as JSON to PATH
+see_also:
+- chef-automate - Chef Automate CLI

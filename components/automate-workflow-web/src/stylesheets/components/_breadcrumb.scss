@@ -1,0 +1,25 @@
+.breadcrumb-nav {
+  color: $gray-light;
+  font-size: .75em;
+}
+
+.breadcrumbs {
+  @include clearfix;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  .breadcrumb {
+    display: inline-block;
+    float: left;
+
+    .fa-angle-right {
+      padding: 0 5px;
+    }
+
+    a {
+      color: $chef-blue;
+      text-decoration: none;
+    }
+  }
+}

@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS jobs
+  ADD COLUMN IF NOT EXISTS node_count int;

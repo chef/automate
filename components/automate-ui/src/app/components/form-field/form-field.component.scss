@@ -1,0 +1,18 @@
+@import '../../../styles/variables.scss';
+
+:host {
+  width: 100%;
+  position: relative;
+}
+
+::ng-deep .check-icon {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  padding: 5px 5px 4px;
+  border-radius: 50%;
+  font-size: 9px;
+  line-height: 1;
+  background: $chef-primary-bright;
+  color: $chef-white;
+}

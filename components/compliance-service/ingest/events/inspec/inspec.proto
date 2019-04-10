@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package chef.automate.domain.compliance.ingest.events.inspec;
+option go_package = "github.com/chef/automate/components/compliance-service/ingest/events/inspec";
+
+import "google/protobuf/struct.proto";
+
+message Report {
+	string version = 1;
+	Platform platform = 2;
+	Statistics statistics = 3;
+	repeated string other_checks = 4;
+	repeated Profile profiles = 20;
+}
+
+message Platform {
+	string name = 1;
+	string release = 2;
+}
+
+message Statistics {
+	float duration = 1;
+}
+
+message Profile {
+	string name = 20;
+	string title = 21;
+	string version = 22;
+	string summary = 23;
+	string maintainer = 24;
+	string license = 25;
+	string copyright = 26;
+	string copyright_email = 27;
+	string sha256 = 28;
+	repeated Control controls = 29;
+	repeated Support supports = 30;
+	repeated Attribute attributes = 31;
+	repeated Dependency depends = 32;
+	repeated Group groups = 33;
+	string parent_profile = 34;
+	string status = 35;
+	string skip_message= 36;
+}
+
+message Control {
+	string id = 1;
+	float impact = 2;
+	string title = 3;
+	string code = 20;
+	string desc = 21;
+	SourceLocation source_location = 22;
+	// TODO handle raw refs and tags
+	repeated google.protobuf.Struct refs = 23;
+	google.protobuf.Struct tags = 24;
+	repeated Result results = 25;
+}
+
+message Result {
+	string status = 1;
+	string code_desc = 2;
+	float run_time = 3;
+	string start_time = 4; // For now, use string
+	string resource = 5;
+	string message = 20;
+	string skip_message = 21;
+}
+
+message SourceLocation {
+	string ref = 1;
+	int32 line = 2;
+}
+
+message Support {
+	string inspec = 1;
+	string os_name = 2 [json_name = "os-name"];
+	string os_family = 3 [json_name = "os-family"];
+	string release = 4;
+	string platform_name = 5 [json_name = "platform-name"];
+	string platform_family = 6 [json_name = "platform-family"];
+	string platform = 7;
+}
+
+//message Attribute {
+//	string name = 1;
+//	Options options = 20;
+//}
+//message Options {
+//	string description = 1;
+//	google.protobuf.Struct default = 20;
+//}
+
+// We can't have options as another message because the default field inside can take any json value(int, string, bool, hash, array)
+// We get options as a struct and handle the unmarshalling and marshaling in the code
+message Attribute {
+	string name = 1;
+	google.protobuf.Struct options = 20;
+}
+
+message Dependency {
+	string name = 21;
+	string url = 22;
+	string path = 23;
+	string git = 24;
+	string branch = 25;
+	string tag = 26;
+	string commit = 27;
+	string version = 28;
+	string supermarket = 29;
+	string compliance = 30;
+	string status = 31;
+	string skip_message= 32;
+}
+
+message Group {
+	string id = 1;
+	string title = 2;
+	repeated string controls = 21;
+}

@@ -1,0 +1,45 @@
+<!-- on instantiation, the count is undefined. adding the ngIf ensures
+that this error form is only shown if it continues to be undefined
+after the async onInit function runs -->
+<chef-alert type="error"
+  *ngIf="count === undefined">
+  Node count was unable to be retrieved
+</chef-alert>
+<div class="chart-container"  *ngIf="count !== undefined">
+  <div class="label">
+    <div class="display3">Chef Client Run Status</div>
+
+    <div class="chart-legend">
+      <div class="display5">
+        Failed Nodes
+        <div class="failure">{{ count.failure }}</div>
+      </div>
+
+      <div class="display5">
+        Passed Nodes
+        <div class="success">{{ count.success }}</div>
+      </div>
+
+      <div class="display5">
+        Missing Nodes
+        <div class="missing">{{ count.missing }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-with-legend">
+    <div>
+      <chef-radial-chart *ngIf="count.total === 0" [tooltips]="false">
+        <span slot="innerText">{{label}}</span>
+        <chef-data-point [value]="1" class="missing empty"></chef-data-point>
+      </chef-radial-chart>
+
+      <chef-radial-chart *ngIf="count.total > 0">
+        <span slot="innerText">{{label}}</span>
+        <chef-data-point [value]="count.missing" class="missing">{{count.missing}} Missing</chef-data-point>
+        <chef-data-point [value]="count.failure" class="failed">{{count.failure}} Failed</chef-data-point>
+        <chef-data-point [value]="count.success" class="success">{{count.success}} Successful</chef-data-point>
+      </chef-radial-chart>
+    </div>
+  </div>
+  <div></div>
+</div>

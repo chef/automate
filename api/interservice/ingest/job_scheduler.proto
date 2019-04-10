@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package chef.automate.domain.ingest;
+option go_package = "github.com/chef/automate/api/interservice/ingest";
+
+import "google/api/annotations.proto";
+
+service JobScheduler {
+	rpc StartJobScheduler (StartJobSchedulerRequest) returns (StartJobSchedulerResponse) {
+		option (google.api.http).post = "/job/job-scheduler/start";
+	};
+
+	rpc StopJobScheduler (StopJobSchedulerRequest) returns (StopJobSchedulerResponse) {
+		option (google.api.http).post = "/job/job-scheduler/stop";
+	};
+
+	rpc GetStatusJobScheduler (JobSchedulerStatusRequest) returns (JobSchedulerStatus) {
+		option (google.api.http).get = "/job/job-scheduler/status";
+	};
+
+	rpc MarkNodesMissing (MarkNodesMissingRequest) returns (MarkNodesMissingResponse) {
+		option (google.api.http).post = "/job/missing-nodes/mark-nodes-missing";
+	};
+
+	rpc ConfigureNodesMissingScheduler (JobSettings) returns (ConfigureNodesMissingSchedulerResponse) {
+		option (google.api.http).post = "/job/missing-nodes/config";
+	};
+
+	rpc StartNodesMissingScheduler (StartNodesMissingSchedulerRequest) returns (StartNodesMissingSchedulerResponse) {
+		option (google.api.http).post = "/job/missing-nodes/start";
+	};
+
+	rpc StopNodesMissingScheduler (StopNodesMissingSchedulerRequest) returns (StopNodesMissingSchedulerResponse) {
+		option (google.api.http).post = "/job/missing-nodes/stop";
+	};
+
+	// DeleteNodesScheduler
+	rpc DeleteMarkedNodes (DeleteMarkedNodesRequest) returns (DeleteMarkedNodesResponse) {
+		option (google.api.http).post = "/job/delete-nodes/delete-marked-nodes";
+	};
+
+	rpc StartDeleteNodesScheduler (StartDeleteNodesSchedulerRequest) returns (StartDeleteNodesSchedulerResponse) {
+		option (google.api.http).post = "/job/delete-nodes/start";
+	};
+
+	rpc StopDeleteNodesScheduler (StopDeleteNodesSchedulerRequest) returns (StopDeleteNodesSchedulerResponse) {
+		option (google.api.http).post = "/job/delete-nodes/stop";
+	};
+
+	rpc ConfigureDeleteNodesScheduler (JobSettings) returns (ConfigureDeleteNodesSchedulerResponse) {
+		option (google.api.http).post = "/job/delete-nodes/config";
+	};
+
+	// MissingNodesForDeletionScheduler
+	rpc MarkMissingNodesForDeletion (MarkMissingNodesForDeletionRequest) returns (MarkMissingNodesForDeletionResponse);
+	rpc ConfigureMissingNodesForDeletionScheduler (JobSettings) returns (ConfigureMissingNodesForDeletionSchedulerResponse);
+	rpc StartMissingNodesForDeletionScheduler (StartMissingNodesForDeletionSchedulerRequest) returns (StartMissingNodesForDeletionSchedulerResponse);
+	rpc StopMissingNodesForDeletionScheduler (StopMissingNodesForDeletionSchedulerRequest) returns (StopMissingNodesForDeletionSchedulerResponse);
+}
+
+// JobSettings - The job settings message to configure any scheduler job
+message JobSettings {
+	string every = 1;      // accepts '1h30m', '1m', '2h30m', ...
+	string threshold = 3;
+	bool running = 4;
+}
+
+message JobSchedulerStatus {
+	bool running = 1;
+	repeated Job jobs = 2;
+}
+
+message Job {
+	bool running = 1;
+	string name = 2;
+	string every = 3;
+	string last_run = 4;
+	string next_run = 5;
+	string last_elapsed = 6;
+	string started_on = 7;
+	string threshold = 8;
+}
+
+message JobSchedulerStatusRequest { }
+message StopJobSchedulerRequest { }
+message StopJobSchedulerResponse { }
+message StartJobSchedulerRequest { }
+message StartJobSchedulerResponse { }
+
+// NodesMissingScheduler
+message MarkNodesMissingRequest { }
+message MarkNodesMissingResponse { }
+message ConfigureNodesMissingSchedulerResponse { }
+message StartNodesMissingSchedulerRequest { }
+message StartNodesMissingSchedulerResponse { }
+message StopNodesMissingSchedulerRequest { }
+message StopNodesMissingSchedulerResponse { }
+
+// DeleteNodesScheduler
+message DeleteMarkedNodesRequest { }
+message DeleteMarkedNodesResponse { }
+message StartDeleteNodesSchedulerRequest { }
+message StartDeleteNodesSchedulerResponse { }
+message StopDeleteNodesSchedulerRequest { }
+message StopDeleteNodesSchedulerResponse { }
+message ConfigureDeleteNodesSchedulerResponse { }
+message MarkMissingNodesForDeletionRequest { }
+
+// MissingNodesForDeletionScheduler
+message MarkMissingNodesForDeletionResponse { }
+message ConfigureMissingNodesForDeletionSchedulerResponse { }
+message StartMissingNodesForDeletionSchedulerRequest { }
+message StartMissingNodesForDeletionSchedulerResponse { }
+message StopMissingNodesForDeletionSchedulerRequest { }
+message StopMissingNodesForDeletionSchedulerResponse { }

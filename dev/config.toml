@@ -1,0 +1,140 @@
+# This is a default Chef Automate configuration file. You can run
+# 'chef-automate deploy' with this config file and it should
+# successfully create a new Chef Automate instance with default settings.
+
+[global.v1]
+  # The external fully qualified domain name.
+  # When the application is deployed you should be able to access 'https://<fqdn>/'
+  # to login.
+  fqdn = "a2-dev.test"
+
+  # TLS certs for all external-facing services
+  [[global.v1.frontend_tls]]
+      # The TLS certificate for the load balancer frontend.
+      cert = """-----BEGIN CERTIFICATE-----
+MIIDfDCCAmSgAwIBAgIJAM77M3Q7fd3GMA0GCSqGSIb3DQEBCwUAMFMxCzAJBgNV
+BAYTAlVTMRYwFAYDVQQKDA1DaGVmIFNvZnR3YXJlMRYwFAYDVQQLDA1DaGVmIEF1
+dG9tYXRlMRQwEgYDVQQDDAthMi1kZXYudGVzdDAeFw0xODA3MTgxMzU0MjRaFw0y
+ODA3MTUxMzU0MjRaMFMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKDA1DaGVmIFNvZnR3
+YXJlMRYwFAYDVQQLDA1DaGVmIEF1dG9tYXRlMRQwEgYDVQQDDAthMi1kZXYudGVz
+dDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOy5P5u4MVazNqAEGaYO
+uBq3j1dgw3L5OUWn0THHpetpRd+bZ8Pb/Z6Kit/GveoSWpvpcKS9NdUROL+iy4yf
+7ArEpbl08eQVbT77JxE42Qo/AGpHMAFRq7FlTVvEkQJtdT4q1v+NVqcHFOAI1QFe
+ifTU4CFi9lL0lD2v1wlFoVWD6+BZqLC5fNRw1oRuNGLDWoM2gom2sG1EubXMOBeB
+OVxjL7PEA5cmVwv2ftnwuxEZu73WsIASMwpFFwjAvlfCwEUwlt4PaFlZ/KdAXh5Z
+qWxQmbBxecjN5v8glCSXKJpnG6o/w0vAYns6J2eh46ocWtkP6KZ0xkLeb7aBO3Xx
+HUECAwEAAaNTMFEwHQYDVR0OBBYEFGT6HbLy4PEDzZ/OBr6lQGLEKKXkMB8GA1Ud
+IwQYMBaAFGT6HbLy4PEDzZ/OBr6lQGLEKKXkMA8GA1UdEwEB/wQFMAMBAf8wDQYJ
+KoZIhvcNAQELBQADggEBADW/bnIzU4wIJmmuiGiDrTtaa37biSmk/y1uzDE6IaWN
+d1wPvLyJt69TTTsBOaWiXwBhS95CIRVpdzUlHrN05e+BgI/o3eQKfzwC6i3VBlkF
+0Wet0ar2s5U+gzUXMo6GnohTChgneGp2bGG+a/SYdrUxPpZD7waIrOirzxawjY9h
+ZgnPNzRwh0dJwdAr4p+GBZ7r+DOOkVVu9a/Nf6XZfgjJYNoOxy4W8xb4I53Qi80Z
+fq6nFbvnZttJiEW9KsfteWP6FnW+T5Y6o2uZungMZDLUv/MEWkWWhaa8ogp4aTXp
+jSobOaBgKjr9whCaa59078oI2zy3rvgbbJ3CditkliA=
+-----END CERTIFICATE-----"""
+
+      # The TLS RSA key for the load balancer frontend.
+    key = """-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDsuT+buDFWszag
+BBmmDrgat49XYMNy+TlFp9Exx6XraUXfm2fD2/2eiorfxr3qElqb6XCkvTXVETi/
+osuMn+wKxKW5dPHkFW0++ycRONkKPwBqRzABUauxZU1bxJECbXU+Ktb/jVanBxTg
+CNUBXon01OAhYvZS9JQ9r9cJRaFVg+vgWaiwuXzUcNaEbjRiw1qDNoKJtrBtRLm1
+zDgXgTlcYy+zxAOXJlcL9n7Z8LsRGbu91rCAEjMKRRcIwL5XwsBFMJbeD2hZWfyn
+QF4eWalsUJmwcXnIzeb/IJQklyiaZxuqP8NLwGJ7OidnoeOqHFrZD+imdMZC3m+2
+gTt18R1BAgMBAAECggEAGH5Oa5FSYZMnesUR1lG9kN4fUb4sWvAYkfF8PrdWnpYE
+6c8NnIFdq5LQLblFmzuM7obn5dPCByrCAWoZv5IofTC9qQPFp4DkDdk0wJ5uLpY4
+N8bn26sUpcVCjNU439RthiIunsCED8I20bt4Nq0OfyuriSjRLeIqmHtiN45h1BQg
+WWXT5B4LDWHYReAzpC0QOVZkOnT/1WtnpQb4HdAJn0M5c9X7cVyKZGbqBA0v+9e/
+LH1hVEiOIpgDyx1+ooYUD7O+fkReB0Zav1Z5HuAJ+pdnVI/Rz9tjpsxjVVvEaOm+
+JmgUnLiaaSXnJItqigndtzP0r4B07iIpw1O7h6j1tQKBgQD2qBh54zl1G3t+xfuz
+UBtC4Izg6EzNXRezMzgFByB/FUZNUa4/VW36W7DwuaIua4SCSyaLINTDPzmrEweL
+jYpqHAB7m8/cjelLInj7QG928Q8D1HsX0xO0OlE9da2vYQ/Yx++6TGsonQi9rzBm
+0Uq6wuL261bYNeaLc7iW2vFEBwKBgQD1sNRefHxS8n9EDDMZIDiOY8gJ3vq7hTzN
+tsR6w6iq5rLZIamrqrXq3ecodbuw0AbljYwGDNSerRnncYp4Xf6NlwR1CK5NBpWA
+VrZhV/Z452cdR2aIBtJXOwykzYaIaZ7gHiRHfD95wS/t/Q5r/f1jyw92t0LCk0An
+Z3XlEm4SdwKBgQCMvZ+xtPDtHHBcBvY2+8eCYoSgNIzWRX8ndltJqyZkvSvvJGNL
+qiBl0Xnl8dZTrG/gtKbajjI48lOihOoyO+I156Jy5ZY2oBb1E0d6/epcMPJDWjOe
+hYdhuEDw07v2LWkQZg0o/T/L3cbGDTeOA3Ajnt5IzEIyfpb9DVvPYEB4cwKBgQCi
+wvptfdp+uNdGpS5Uvtu4uLGUmHtSLvoQ7btL+MKMNTjWT06vwu+xIEA6tYQZpjZr
+bFIO0AEq/VHj2Xv6MYqpEhqJza5qqKnx04APDM7jWakd5GcwRhSiZSQDKYSuagou
+PsmZ8d27MxgleTdMo35x1dvwsYcwj4w4jnmzv3ncEQKBgQCfMrcZlcjyIkh3cM7N
+BFcx3mHj8+EnWdU9BJ1TQZUYRL66axIa1fI7rTNAan/t9Xx1NHwZbbPCMBuolM9p
+8lxQALm1wyg3dFmy0otFLRDzf+Dk3F09S/vcQvjSd3A2MVHagXtZHl8MV3xMLRot
+OhLQB1XeN74ezxt5eHocIRrWow==
+-----END PRIVATE KEY-----"""
+
+[elasticsearch.v1.sys.runtime]
+  es_java_opts = "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=a2-dev.test"
+  heapsize = "2g"
+
+[elasticsearch.v1.sys.network]
+host = "0.0.0.0"
+
+[postgresql.v1.sys.pg]
+shared_buffers = "1GB"
+
+# Deployment service configuration.
+[deployment.v1]
+  [deployment.v1.svc]
+    # Habitat channel to install hartifact from.
+    # Can be 'dev', 'acceptance', or 'current
+    channel = "dev"
+    upgrade_strategy = "at-once"
+    deployment_type = "local"
+    manifest_cache_expiry = "0s"
+    package_cleanup_mode = "disabled"
+    [deployment.v1.svc.admin_user]
+      # Default admin user settings
+      username = "admin"
+      name = "Local Administrator"
+      password = "chefautomate"
+
+# Gateway service configuration.
+[gateway.v1]
+  [gateway.v1.sys]
+    [gateway.v1.sys.service]
+      trial_license_url = "https://licensing-dev.chef.io/create-trial"
+      enable_apps_feature = true
+
+# event-service configuration.
+[event_service.v1]
+  [event_service.v1.sys]
+    [event_service.v1.sys.service]
+      enable_nats_feature = true
+
+# event-gateway
+[event_gateway]
+  [event_gateway.v1]
+    [event_gateway.v1.sys]
+      [event_gateway.v1.sys.service]
+        enable_nats_feature = true
+
+[license_control.v1.sys.telemetry]
+url = "https://telemetry-acceptance.chef.io"
+
+# automate-dex: use chef.io's Okta via SAML
+[dex.v1.sys.connectors.saml]
+ca_contents="""-----BEGIN CERTIFICATE-----
+MIIDnjCCAoagAwIBAgIGAUtB26KcMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG
+A1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU
+MBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB2dldGNoZWYxHDAaBgkqhkiG9w0BCQEWDWlu
+Zm9Ab2t0YS5jb20wHhcNMTUwMTMxMjExNzA4WhcNNDUwMTMxMjExODA4WjCBjzELMAkGA1UEBhMC
+VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM
+BE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdnZXRjaGVmMRwwGgYJKoZIhvcN
+AQkBFg1pbmZvQG9rdGEuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvaLXQkwf
+XxRu8NBruKXftYwVo9+WuH2iw/6cZB1u1sxbXHDlDxGPA5e9kecQNRB/LE/My7byr/gNakAsNIg3
+nTINxBe8pwKCGrNghzrCEbBxA0iphk/mYcM7+pkSqNZpRGPBUn8AIgxtihfUz/f56v2YhA15huO8
+k8fJoUyjwXu9/BGCkCP16ksJ50r9IHI+qabTq4c1lMOGxZGbZ7tQjbpKdiAPclgaTzSdQ/9lomnR
+uCvrnVwciDp60tGuAATdt68Re5X/5uOizlNh6k9snUWH9TQmIdyYn5bNtDa+3STXj0mIMVaAfiqQ
+5pyrWRRXXb4Uqx4/9lQM1/Lh/O8yeQIDAQABMA0GCSqGSIb3DQEBBQUAA4IBAQCgSlK+ZlmQsYtz
+A30/rbU5ZlW8/FtgcH7FjrSfYmfxi79Wtff3mHYDZjpPQQsncGnf+9BxwOEoBXVOoqwd+OSeWIJa
+pSRbDj8Iog7ldXRLo3/+PzRrnjhrP6xj8VwPDFpzdj6Hn/QBhk0qjXd6gV7mrrAJzss3XwHKWPoC
+8m2vkhGDLhmQBKCz18cVn+Z4Xhs0s9l9iWG+Ic9NBZu1KwxXI1e7yR2+xZRDPnBggDa410uDkXSb
+bDZqKKny7qHKs4bioZ/HtS9NfgFV+pz1GpI50nw6ojItCPhqhgaFwtvf2brq9BHSK/DUmA3vF7/d
+XoB1V6vwQXRubclyH8Ei2+1j
+-----END CERTIFICATE-----"""
+sso_url = "https://chef.okta.com/app/chefsoftware_a2localfreshinstallunstable_1/exk1d6ztz4rioEOYA1d8/sso/saml"
+email_attr = "email"
+username_attr = "email"
+groups_attr = "groups"
+entity_issuer = "https://automate.chef.co/dex/callback"

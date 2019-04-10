@@ -1,0 +1,18 @@
+<div class="deps-container">
+  <div class="cards">
+    <div ng-repeat="(pipeline, branch) in interdeps.required_by" class="consumer">
+      <h2>{{ pipeline }}</h2>
+      <div ng-repeat="dep in branch">
+        <div class="dep-card">
+          <header>
+            <h3 class="card-title">
+              <a ui-sref="main.enterprise.organizations.organization.project({ org: dep.organization, project: dep.project })">
+                {{ dep.project }} ({{ dep.pipeline }})
+              </a>
+            </h3>
+          </header>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

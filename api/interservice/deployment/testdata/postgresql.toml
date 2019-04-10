@@ -1,0 +1,25 @@
+max_connections = 100
+port = 5432
+
+
+max_locks_per_transaction = 64
+log_line_prefix = '%t [%p] ...'
+log_level = 'ERROR'
+
+[superuser]
+name = 'admin'
+password = 'secret'
+
+# options for hot standby
+[replication]
+name = 'replication'
+password = 'replication'
+lag_health_threshold = 1048576
+enable = false
+archive_path = "{{pkg.svc_path}}/archive"
+
+[wale.aws]
+prefix = 'eve'
+access_key_id = '6CC7E'
+secret_access_key = 'ODdBMkU3QT'
+region = 'zeta'

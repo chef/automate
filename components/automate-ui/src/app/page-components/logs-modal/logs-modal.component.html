@@ -1,0 +1,42 @@
+<chef-modal class="logs-modal" label="logs-modal-label" [visible]="isVisible" (close)="closeModal()">
+  <h2 id="logs-modal-label" class="logs-modal-heading">
+    <chef-icon aria-hidden="true">description</chef-icon>
+    Run Logs
+  </h2>
+  <div class="logs-modal-content">
+    <div class="run-info">
+      <ul>
+        <li><strong class="nodename">{{nodeRun.nodeName}}</strong></li>
+        <li><strong>Run ID:</strong> {{nodeRun.runId}}</li>
+        <li>{{renderTime(nodeRun.startTime)}} - {{renderTime(nodeRun.endTime)}}</li>
+      </ul>
+    </div>
+
+    <div class="logs">
+      <div class="logs-content header-bar">
+        <h3 class="logs-header">Error Log & Stacktrace</h3>
+        <chef-button (click)="download()" primary>
+          <chef-icon>file_download</chef-icon>
+          <span>Download</span>
+        </chef-button>
+      </div>
+      <div class="logs-content error-message">{{nodeRun?.error?.message}}</div>
+      <div class="logs-content" *ngIf="errorSections()">
+        <div *ngFor="let section of errorSections()" class="logs-code-section">
+          <h4 class="logs-section-heading strong">{{section['heading']}}</h4>
+          <pre>{{section['text']}}</pre>
+        </div>
+      </div>
+      <div class="logs-content backtrace" (click)="hideBacktrace = !hideBacktrace">
+        <chef-icon>
+          <ng-container *ngIf="!hideBacktrace">keyboard_arrow_down</ng-container>
+          <ng-container *ngIf="hideBacktrace">keyboard_arrow_right</ng-container>
+        </chef-icon>
+        <strong>Backtrace</strong>
+        <div class="logs-code-section" *ngIf="!hideBacktrace">
+          <pre>{{formatBacktrace()}}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</chef-modal>

@@ -1,0 +1,28 @@
+[run]
+deadline = "5m"
+tests = false
+
+[issues]
+exclude-use-default = false
+
+[linters]
+enable-all = true
+disable = [
+  "dupl",
+  "goconst",
+  "maligned",
+  "megacheck",
+  "interfacer",
+  "golint",
+  "gas",
+  "gochecknoglobals",
+  "gochecknoinits",
+  "gocritic",
+  "scopelint",
+  "stylecheck",
+  "unparam",
+  "lll",
+]
+
+[linters-settings.gofmt]
+  simplify = false

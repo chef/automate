@@ -1,0 +1,27 @@
+@startuml
+title A2 In-Product Trial Initiation
+
+participant "automate-ui" as webui
+participant "automate-gateway" as api
+participant "license-control-svc" as lcs
+participant "trial-license-svc" as tls
+participant "marketo" as mkt
+participant "license-generation-svc" as lgs
+
+
+webui -> api: api.RequestLicense
+api -> tls: tls.RequestTrialLicense
+tls -> lgs: lgs.CreateLicense
+tls -> mkt: mkt.CreateLead
+tls <-- lgs: trial license
+api <-- tls: license token
+api -> lcs: lcs.Update
+api <-- lcs: status
+
+alt license successfully applied
+  webui <-- api: tada!
+else apply failed
+  webui <-- api: error
+end
+
+@enduml

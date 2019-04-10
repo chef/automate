@@ -1,0 +1,19 @@
+{
+  "id": "467211c6-9844-4b7e-90fd-ecef4caacef9",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "krasnow",
+  "entity_type": "environment",
+  "task": "delete",
+  "organization_name": "testing",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-03-28T21:27:59Z",
+  "remote_request_id": "f0a97298-432c-4c79-8c88-dd6126dcc796",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAFsNURMAAIAAAAA",
+  "requestor_name": "mkrasnow",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Manage/11.16.2 (ruby-2.3.5-p376; ohai-7.4.1; x86_64-linux; +http://opscode.com)",
+  "data": "{}"
+}

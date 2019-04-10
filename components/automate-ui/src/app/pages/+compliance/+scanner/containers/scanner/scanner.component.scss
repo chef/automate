@@ -1,0 +1,48 @@
+@import "~styles/variables";
+
+.nav-tabs {
+  margin: 0;
+  padding: 16px 35px 2px;
+  background: $chef-white;
+}
+
+.nav-tab {
+  display: inline-block;
+  position: relative;
+  width: 160px;
+  padding-bottom: 8px;
+  margin-right: 16px;
+  list-style: none;
+  cursor: pointer;
+  transition: color 0.4s ease;
+
+  // Underline
+  &:before {
+    display: block;
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    height: 2px;
+    left: 0;
+    width: 0;
+    transition: all 0.4s ease;
+    background: transparent;
+  }
+
+  &.active, &:hover {
+    color: $chef-primary-bright;
+
+    &:before {
+      width: 100%;
+      background: $chef-primary-bright;
+    }
+  }
+}
+
+.scanner-body {
+  margin: $content-container-padding;
+
+  ::ng-deep chef-td:last-child {
+    justify-content: flex-end;
+  }
+}

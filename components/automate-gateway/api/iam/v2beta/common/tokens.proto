@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common";
+
+message Token {
+    string id = 1;
+    string name = 2;
+    string value = 3;
+    bool   active = 4;
+    string created_at = 5;
+    string updated_at = 6;
+    repeated string projects = 7;
+}

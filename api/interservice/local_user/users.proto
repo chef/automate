@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+package chef.automate.domain.local_user;
+option go_package = "github.com/chef/automate/api/interservice/local_user";
+
+message Email  {
+  string email = 1 [(validate.rules).string.min_len = 1]; // forbid empty strings;
+};
+
+message GetUsersReq {
+
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message CreateUserReq {
+  string id = 1;
+
+  // forbid empty strings
+  string name = 2 [(validate.rules).string.min_len = 1];
+
+  // Note: we're explicitly more strict than email (RFC 1034), although PGV
+  // knows how to validate an email address using
+  //   [(validate.rules).string.email = true];
+  string email = 3 [(validate.rules).string.pattern = "^[[:alnum:]_.+@-]+$"];
+
+  // Note: password validation happens in the service's handler
+  string password = 4;
+}
+
+message UpdateUserReq {
+  // TODO (tc) Unfortunately ID is not returned by Dex in UpdatePassword.
+  // We currently have ID being returned as part of our update contract
+  // for the gateway API. The only way we are currently populating that
+  // is by passing back to the user exactly what they gave us in the update request.
+  // This isn't ideal, but we have a few options that aren't ideal either:
+  //
+  // 1. Call ListPasswords on every update, find our user, and populate the ID field,
+  // then deprecate the ID field as in input into our update APIs.
+  //
+  // 2.  Break our public API (not an option afaik).
+  //
+  // 3. Wait until my GetPassword API merges into Dex and call that on every
+  // update to get the ID, then deprecate the ID field as in input into our update APIs.
+  // This is probably the best option.
+  // https://github.com/dexidp/dex/pull/1271
+  string id = 1 [(validate.rules).string.min_len = 1];
+
+  // Currently, this validation doesn't make much sense, since user's can't change their
+  // email (aka username) via update, but leaving it in since 1) it doesn't hurt and
+  // 2) keep it consistent if we allow it in the future.
+  string email = 2 [(validate.rules).string.pattern = "^[[:alnum:]_.+@-]+$"];
+  string name = 3 [(validate.rules).string.min_len = 1];
+
+  // Note: for UpdateUserReq, the password is optional
+  string password = 4;
+}
+
+// See UpdateUserReq for other relevant comments.
+message UpdateSelfReq {
+  string id = 1 [(validate.rules).string.min_len = 1];
+  string email = 2 [(validate.rules).string.pattern = "^[[:alnum:]_.+@-]+$"];
+  string name = 3 [(validate.rules).string.min_len = 1];
+
+  // Note: for UpdateSelfReq, the password and previous_password are optional,
+  // but if passed, they must both be passed.
+  string password = 4;
+  string previous_password = 5;
+}
+
+message DeleteUserResp {
+
+}
+
+message Users {
+  map<string, User> users = 1;
+}
+
+service UsersMgmt {
+  rpc GetUsers (GetUsersReq) returns (Users) {};
+  rpc GetUser (Email) returns (User) {};
+  rpc CreateUser (CreateUserReq) returns (User) {};
+  rpc DeleteUser (Email) returns (DeleteUserResp) {};
+  rpc UpdateUser (UpdateUserReq) returns (User) {};
+  rpc UpdateSelf (UpdateSelfReq) returns (User) {};
+}

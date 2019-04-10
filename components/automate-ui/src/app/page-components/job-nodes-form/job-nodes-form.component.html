@@ -1,0 +1,178 @@
+<div [formGroup]="form">
+  <h3>Configure your custom parameters to add nodes</h3>
+  <div class="managers" formArrayName="managers">
+    <chef-card
+      *ngFor="let managerControl of form.get('managers')['controls']; let mIndex = index;"
+      formGroupName="{{mIndex}}"
+      id="{{managerControl.value.id}}"
+      class="manager">
+
+      <div class="manager-header">
+        <input type="checkbox" formControlName="include" class="manager-toggle">
+        <img [src]="logoFor(managerControl.value.type)" alt="{{managerControl.value.type}}" class="manager-type" />
+        <div class="manager-title">
+          <h4>{{managerControl.value.name}}</h4>
+          <p>
+            <span class="available-count">
+              {{availableNodesCountFor(managerControl.value.id) | async | number}} available {{ isAwsApi(managerControl.value.type) ? 'regions' : 'nodes' }}
+            </span>
+            <span class="selected-count" *ngIf="managerControl.value.include">
+              {{previewNodesCountFor(managerControl.value.id) | async | number}} selected {{ isAwsApi(managerControl.value.type) ? 'regions' : 'nodes' }}
+            </span>
+          </p>
+        </div>
+      </div>
+      <div class="manager-body" *ngIf="managerControl.value.include">
+        <div class="manager-nodes-select">
+          <fieldset
+            *ngIf="supportsFilterByRegion(managerControl.value.type)"
+            class="filter-regions"
+            id="manager-{{mIndex}}-regions"
+            formGroupName="regionsGroup">
+            <label>
+              <chef-icon>room</chef-icon>
+              Specify regions (optional)
+            </label>
+            <div class="field" *ngIf="managerControl.get('regionsGroup.values').length">
+              <select formControlName="include">
+                <option [ngValue]="true">Include</option>
+                <option [ngValue]="false">Exclude</option>
+              </select>
+              <div formArrayName="values" class="values-group">
+                <div
+                  *ngFor="let value of managerControl.get('regionsGroup.values').controls; let vIndex = index;"
+                  class="value-group">
+                  <chef-form-field>
+                    <input type="text" chefInput formControlName="{{vIndex}}" placeholder="Region" list="regions" />
+                  </chef-form-field>
+                  <chef-button secondary (click)="addRegionValue(managerControl.get('regionsGroup'), vIndex+1)">
+                    <chef-icon>add</chef-icon>
+                  </chef-button>
+                  <chef-button
+                    (click)="removeRegionValue(managerControl.get('regionsGroup'), vIndex)"
+                    secondary caution>
+                    <chef-icon>delete</chef-icon>
+                  </chef-button>
+                </div>
+              </div>
+              <datalist id="regions">
+                <option *ngFor="let region of (fieldValuesFor(managerControl.value.id, 'regions') | async)" value="{{region}}">{{region}}</option>
+              </datalist>
+            </div>
+            <chef-button
+              secondary
+              (click)="addRegionValue(managerControl.get('regionsGroup'), managerControl.get('regionsGroup.values').length)">
+              <chef-icon>add</chef-icon>
+              <span>Add new rule</span>
+            </chef-button>
+          </fieldset>
+
+          <fieldset
+            *ngIf="supportsFilterByName(managerControl.value.type)"
+            class="filter-names"
+            id="manager-{{mIndex}}-names"
+            formGroupName="namesGroup">
+            <label>
+              <chef-icon>room</chef-icon>
+              Specify names (optional)
+            </label>
+            <div class="field" *ngIf="managerControl.get('namesGroup.values').length">
+              <select formControlName="include">
+                <option [ngValue]="true">Include</option>
+                <option [ngValue]="false">Exclude</option>
+              </select>
+              <div formArrayName="values" class="values-group">
+                <div
+                  *ngFor="let value of managerControl.get('namesGroup.values').controls; let vIndex = index;"
+                  class="value-group">
+                  <chef-form-field>
+                    <input type="text" chefInput formControlName="{{vIndex}}" placeholder="Name" list="names" />
+                  </chef-form-field>
+                  <chef-button secondary (click)="addRegionValue(managerControl.get('namesGroup'), vIndex+1)">
+                    <chef-icon>add</chef-icon>
+                  </chef-button>
+                  <chef-button
+                    (click)="removeRegionValue(managerControl.get('namesGroup'), vIndex)"
+                    secondary caution>
+                    <chef-icon>delete</chef-icon>
+                  </chef-button>
+                </div>
+              </div>
+              <datalist id="names">
+                <option *ngFor="let name of (fieldValuesFor(managerControl.value.id, 'name') | async)" value="{{name}}">{{name}}</option>
+              </datalist>
+            </div>
+            <chef-button
+              secondary
+              (click)="addRegionValue(managerControl.get('namesGroup'), managerControl.get('namesGroup.values').length)">
+              <chef-icon>add</chef-icon>
+              <span>Add new rule</span>
+            </chef-button>
+          </fieldset>
+
+          <fieldset
+            *ngIf="supportsFilterByTag(managerControl.value.type)"
+            class="filter-tags"
+            id="manager-{{mIndex}}-tags"
+            formArrayName="tagsArray">
+            <label>
+              <chef-icon>label</chef-icon>
+              Specify tags (optional)
+            </label>
+            <div
+              *ngFor="let tag of managerControl.get('tagsArray').controls; let tIndex = index;"
+              [formGroup]="tag"
+              id="manager-{{mIndex}}-tag-{{tIndex}}"
+              class="field">
+              <select formControlName="include">
+                <option [ngValue]="true">Include</option>
+                <option [ngValue]="false">Exclude</option>
+              </select>
+              <chef-form-field class="key-field">
+                <input type="text" chefInput formControlName="key" placeholder="Key" [attr.list]="'manager-'+mIndex+'-tags-'+tIndex+'-keys'" />
+              </chef-form-field>
+              <div formArrayName="values" class="values-group">
+                <div *ngFor="let val of tag.get('values').controls; let vIndex = index" class="value-group">
+                  <chef-form-field>
+                    <input type="text" chefInput formControlName="{{vIndex}}" placeholder="Value" [attr.list]="'manager-'+mIndex+'-tags-'+tIndex+'-vals'" />
+                  </chef-form-field>
+                  <chef-button secondary (click)="addTagValue(tag)">
+                    <chef-icon>add</chef-icon>
+                  </chef-button>
+                  <chef-button *ngIf="tag.get('values').controls.length > 1" secondary caution (click)="removeTagValue(tag, vIndex)">
+                    <chef-icon>delete</chef-icon>
+                  </chef-button>
+                  <chef-button *ngIf="tag.get('values').controls.length === 1" secondary caution (click)="removeTag(managerControl, tIndex)">
+                    <chef-icon>delete</chef-icon>
+                  </chef-button>
+                </div>
+              </div>
+              <datalist [attr.id]="'manager-'+mIndex+'-tags-'+tIndex+'-keys'">
+                <option *ngFor="let tagKey of (fieldValuesFor(managerControl.value.id, 'tags') | async)" value="{{tagKey}}"></option>
+              </datalist>
+              <datalist [attr.id]="'manager-'+mIndex+'-tags-'+tIndex+'-vals'">
+                <option *ngFor="let tagVal of (fieldValuesFor(managerControl.value.id, 'tags:'+tag.value.key) | async)" value="{{tagVal}}"></option>
+              </datalist>
+            </div>
+            <chef-button secondary (click)="addTag(managerControl)">
+              <chef-icon>add</chef-icon>
+              <span>Add new rule</span>
+            </chef-button>
+          </fieldset>
+        </div>
+        <div class="manager-nodes-preview">
+          <div
+            class="loading-overlay"
+            [attr.aria-hidden]="!(isLoadingPreviewNodesFor(managerControl.value.id) | async)">
+            <chef-loading-spinner size="50"></chef-loading-spinner>
+          </div>
+          <chef-table>
+            <chef-tr *ngFor="let node of previewNodesFor(managerControl.value.id) | async">
+              <chef-td>{{node}}</chef-td>
+            </chef-tr>
+          </chef-table>
+        </div>
+      </div>
+    </chef-card>
+  </div>
+</div>

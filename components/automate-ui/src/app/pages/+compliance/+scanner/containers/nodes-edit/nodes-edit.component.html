@@ -1,0 +1,125 @@
+<chef-sidebar>
+  <div class="nav-items">
+    <chef-sidebar-entry route="/compliance/scanner" icon="wifi_tethering">Current jobs</chef-sidebar-entry>
+  </div>
+</chef-sidebar>
+
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/compliance/scanner/nodes']">Scan jobs</chef-breadcrumb>
+      Edit node
+    </chef-breadcrumbs>
+
+    <chef-page-header>
+      <chef-heading>Edit node</chef-heading>
+      <chef-subheading>Edit your node details</chef-subheading>
+      <div slot="header-buttons">
+        <chef-button primary type="submit" [disabled]="!form.valid" (click)="submit(form.value)" *ngIf="node">Save Node</chef-button>
+        <chef-button tertiary routerLink="/compliance/scanner/nodes">Cancel</chef-button>
+      </div>
+    </chef-page-header>
+    <div class="page-body">
+      <form [formGroup]="form" (submit)="submit(form.value)" novalidate class="nodes-form" *ngIf="node">
+        <div>
+          <chef-form-field class="field">
+            <label for="name">Name <span class="required">*</span></label>
+            <input id="name" type="text" chefInput formControlName="name" placeholder="Node name" />
+            <chef-error *ngIf="form.get('name').touched && form.get('name').invalid">
+              Node name is required.
+            </chef-error>
+          </chef-form-field>
+        </div>
+        <div formGroupName="target_config">
+          <chef-form-field class="field host">
+            <label for="host">Host <span class="required">*</span></label>
+            <input id="host" type="text" chefInput formControlName="host" placeholder="Hostname" />
+            <chef-error *ngIf="form.get('target_config.host').touched && form.get('target_config.host').invalid">
+              Hostname is required.
+            </chef-error>
+          </chef-form-field>
+          <fieldset>
+            <h3>Credentials settings</h3>
+            <div class="field">
+              <label>Select SSH or WinRM <span class="required">*</span></label>
+              <div class="checkbox-field">
+                <input type="radio" id="backend-ssh" formControlName="backend" name="backend" value="ssh" />
+                <label for="backend-ssh">SSH</label>
+              </div>
+              <div class="checkbox-field">
+                <input type="radio" id="backend-winrm" formControlName="backend" name="backend" value="winrm" />
+                <label for="backend-winrm">WinRM</label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="secrets">Select your credentials <span class="required">*</span></label>
+              <select name="secrets" id="secrets" formControlName="secrets" multiple>
+                <option *ngFor="let secret of secrets$ | async" value="{{secret.id}}">{{secret.name}}</option>
+              </select>
+              <chef-alert
+                *ngIf="form.get('target_config.secrets').touched && form.get('target_config.secrets').invalid"
+                type='error'>
+                At least one credential selection is required.
+              </chef-alert>
+              <a [routerLink]="['/settings', 'node-credentials', 'add']">Add new credentials</a>
+            </div>
+
+            <chef-form-field class="field">
+              <label for="port">Enter optional port access</label>
+              <input id="port" type="number" chefInput formControlName="port" name="port" placeholder="Port" />
+              <div>
+                <ng-container *ngIf="backendControl.value === 'ssh'">
+                  <div class="radio-field">
+                    <input type="checkbox" id="sudo" formControlName="sudo" name="sudo" />
+                    <label for="sudo">Enable Sudo</label>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="backendControl.value === 'winrm'">
+                  <div class="radio-field">
+                    <input type="checkbox" id="ssl" formControlName="ssl" name="ssl" />
+                    <label for="ssl">SSL</label>
+                  </div>
+                  <div class="radio-field">
+                    <input type="checkbox" id="self_signed" formControlName="self_signed" name="self_signed">
+                    <label for="self_signed">Self Signed</label>
+                  </div>
+                </ng-container>
+              </div>
+            </chef-form-field>
+          </fieldset>
+        </div>
+        <fieldset id="tags" formArrayName="tags">
+          <h3>Specify tags (optional)</h3>
+          <div
+            class="kv-field"
+            *ngFor="let tag of form.get('tags')['controls']; let index = index;"
+            [formGroup]="tag">
+            <chef-form-field>
+              <input id="key-{{index}}" type="text" chefInput formControlName="key" placeholder="Key" />
+            </chef-form-field>
+            <chef-form-field>
+              <input id="value-{{index}}" type="text" chefInput formControlName="value" placeholder="Value" />
+            </chef-form-field>
+            <chef-button secondary (click)="addTag(form, index+1)">
+              <chef-icon>add</chef-icon>
+            </chef-button>
+            <chef-button
+              (click)="removeTag(form, index)"
+              secondary caution>
+              <chef-icon>delete</chef-icon>
+            </chef-button>
+          </div>
+          <div class="kv-field">
+            <chef-button
+              secondary
+              (click)="addTag(form, form.get('tags').value.length)">
+              <chef-icon>add</chef-icon>
+              <span>Add new tag</span>
+            </chef-button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </main>
+</div>

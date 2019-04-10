@@ -1,0 +1,85 @@
+// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
+syntax = "proto3";
+
+package chef.automate.domain.deployment;
+option go_package = "github.com/chef/automate/api/config/deployment";
+
+import "api/config/shared/global.proto";
+import "google/protobuf/wrappers.proto";
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+
+message ConfigRequest {
+  option (chef.automate.api.service_config) = {name: "deployment-service"};
+
+	reserved 1 to 2;
+	V1 v1 = 3;
+
+	message V1 {
+		System sys = 1;
+		Service svc = 2;
+
+		message System {
+			chef.automate.infra.config.Mlsa mlsa = 1;
+			Service service = 2;
+			Log log = 3;
+			GatherLogs gather_logs = 4;
+			Proxy proxy = 5;
+			Backup backup = 6;
+
+			message Service {
+				google.protobuf.StringValue listen_address = 1;
+				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10160, protocol: "grpc" } ];
+			}
+
+			message Log {
+				google.protobuf.StringValue level = 1;
+			}
+
+			message GatherLogs {
+				google.protobuf.StringValue staging_dir = 1;
+			}
+
+			message Proxy {
+				google.protobuf.StringValue connection_string = 1;
+				google.protobuf.StringValue no_proxy_string = 2;
+			}
+
+			message Backup {
+				Filesystem filesystem = 1;
+
+				message Filesystem {
+					google.protobuf.StringValue path = 1;
+				}
+			}
+		}
+
+		message Service {
+			google.protobuf.StringValue name = 1;
+			google.protobuf.StringValue origin = 2;
+			google.protobuf.StringValue channel = 3;
+			google.protobuf.StringValue upgrade_strategy = 4;
+			google.protobuf.StringValue deployment_type = 5;
+			google.protobuf.StringValue override_origin = 6;
+			google.protobuf.StringValue hartifacts_path = 7;
+			AdminUser admin_user = 8;
+			google.protobuf.StringValue manifest_cache_expiry = 9;
+			google.protobuf.StringValue manifest_directory = 10;
+			google.protobuf.BoolValue enable_chef_server = 11;
+			google.protobuf.BoolValue enable_deployment_order_stress_mode = 12;
+			google.protobuf.BoolValue feature_flag_s3_backups = 512;
+			google.protobuf.BoolValue enable_workflow = 13;
+			google.protobuf.StringValue package_cleanup_mode = 14;
+
+			google.protobuf.BoolValue enable_dev_monitoring = 15;
+		}
+
+		message AdminUser {
+			// use 'name' instead of 'email' for new code. It hasn't been reserved
+			// because we'll support using 'email' from installations.
+			google.protobuf.StringValue email = 1 [deprecated=true];
+			google.protobuf.StringValue username = 2;
+			google.protobuf.StringValue name = 4;
+			google.protobuf.StringValue password = 3;
+		}
+	}
+}

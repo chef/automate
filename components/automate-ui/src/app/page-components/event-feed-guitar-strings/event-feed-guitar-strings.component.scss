@@ -1,0 +1,121 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.event-feed-guitar-strings {
+  background-color: $chef-white;
+}
+
+.delete {
+  fill: $chef-critical;
+}
+
+.create {
+  fill: $chef-success;
+}
+
+.update {
+  fill: $chef-major;
+}
+
+// Tooltips for guitar string items
+.guitar-tooltip {
+  display: flex;
+  width: 330px;
+  padding: 30px;
+  justify-content: space-between;
+  align-items: center;
+
+  &.offset:after {
+    left: calc(50% + 120px);
+  }
+}
+
+.guitar-tooltip-date {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: $chef-dark-grey;
+}
+
+.guitar-tooltip-text {
+  margin-bottom: 0;
+  font-size: 11px;
+  width: calc(100% - 45px);
+  line-height: 1.5;
+
+  strong {
+    color: $chef-success;
+  }
+}
+
+// Guitar Strings Zoom/Date Controls
+.guitar-string-zoom {
+  display: block;
+  position: relative;
+  margin-top: -5px;
+  border: 1px solid $chef-light-grey;
+  border-left: none;
+  height: 32px;
+}
+
+#guitar-string-zoom-slider {
+  position: absolute;
+  height: 30px;
+  width: 100%;
+  overflow: visible;
+}
+
+.zoom-slider-button {
+  fill: $chef-white;
+  stroke: $chef-primary-bright;
+  stroke-width: 1px;
+  color: $chef-dark-grey;
+  cursor: pointer;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+
+  &:hover {
+    fill: $chef-primary-light;
+    stroke: $chef-primary-light;
+
+    & + .zoom-slider-icon {
+      fill: $chef-white;
+    }
+  }
+
+  &:focus {
+    fill: $chef-primary-bright;
+
+    & + .zoom-slider-icon {
+      fill: $chef-white;
+    }
+  }
+}
+
+.zoom-slider-icon {
+  font-size: 14px;
+  text-anchor: middle;
+  fill: $chef-primary-bright;
+  pointer-events: none;
+  transition: fill 0.2s ease;
+}
+
+.guitar-string-zoom-button {
+  display: block;
+  fill: $chef-white;
+  stroke: $chef-light-grey;
+  cursor: pointer;
+}
+
+.guitar-string-zoom-date {
+  font-size: 11px;
+  fill: $chef-primary-bright;
+  font-weight: bold;
+  text-anchor: middle;
+  pointer-events: none;
+  text-decoration: underline;
+}
+
+.slider-overlay {
+  fill: $chef-grey;
+  opacity: 0.9;
+}

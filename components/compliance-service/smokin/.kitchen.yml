@@ -1,0 +1,50 @@
+driver:
+  name: vagrant
+  customize:
+    cpus: 1
+    memory: 512
+
+driver_config:
+  always_stream_output: true
+
+provisioner:
+  name: chef_zero
+  log_level: info
+  product_name: chef
+  # Without specifying a product_version, latest version from current channel will be installed:
+  #product_version: 14.5.10
+  channel: current
+  client_rb:
+    data_collector.server_url: <%= ENV['COLLECTOR_URL'] %>
+    data_collector.token: <%= ENV['COLLECTOR_TOKEN'] %>
+    ssl_verify_mode: :verify_none
+    verify_api_cert: false
+
+
+platforms:
+  - name: ubuntu18
+    driver:
+      box: 'bento/ubuntu-18.04'
+      network:
+      - ['private_network', {ip: '192.168.56.60'}]
+
+suites:
+  - name: mysuite
+    run_list:
+      - recipe[audit::default]
+    attributes:
+      audit:
+        insecure: true
+        # Without specifying an inspec_version, the version bundled with chef-client will be used:
+        # inspec_version: 3.0.0
+        reporter: ['json-file','chef-automate']
+        fetcher: 'chef-automate'
+        profiles:
+          linux-baseline:
+            url: https://github.com/dev-sec/linux-baseline/archive/2.1.0.tar.gz
+            # test inspec/audit cb's ability to fetch profiles from automate:
+            # compliance: admin/linux-baseline
+          # test profile skip behaviour:
+          # windows-baseline:
+          #   url: https://github.com/dev-sec/windows-baseline/archive/1.1.0.tar.gz
+          

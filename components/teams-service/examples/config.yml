@@ -1,0 +1,12 @@
+---
+grpc: 0.0.0.0:9093
+log-level: debug
+log-format: json
+
+tls:
+  cert_path: ../../../dev/certs/teams-service.crt
+  key_path: ../../../dev/certs/teams-service.key
+  root_ca_path: ../../../dev/certs/Chef_Automate_FAKE_Dev.crt
+    
+pg_url: postgresql://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable
+migrations-path: storage/postgres/migration/sql/

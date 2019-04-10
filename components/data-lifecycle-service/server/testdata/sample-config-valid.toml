@@ -1,0 +1,8 @@
+listen_address = "1.2.3.4"
+port = 1234
+log_level = "error"
+
+[managed]
+
+  [managed.foo]
+  address = "4.3.2.1:9999"

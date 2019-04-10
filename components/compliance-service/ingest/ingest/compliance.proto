@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package chef.automate.domain.compliance.ingest.ingest;
+option go_package = "github.com/chef/automate/components/compliance-service/ingest/ingest";
+
+import "google/api/annotations.proto";
+import "components/compliance-service/ingest/events/compliance/compliance.proto";
+import "google/protobuf/empty.proto";
+import "api/interservice/event/event.proto";
+
+service ComplianceIngester {
+	rpc ProcessComplianceReport (chef.automate.domain.compliance.ingest.events.compliance.Report) returns (google.protobuf.Empty) {
+		option (google.api.http) = {
+			post: "/events/compliance/report"
+			body: "*"
+		};
+	};
+	rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
+}

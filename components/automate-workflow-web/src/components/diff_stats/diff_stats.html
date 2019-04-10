@@ -1,0 +1,8 @@
+<div class="diff-stats" ng-if="hasStats()" title="{{ insertions }} insertions, {{ deletions }} deletions">
+  <span class="stat insertions">{{ insertions }}</span>
+  <div class="graph">
+    <div class="insertions" ng-class="{ only: percentage(insertions) === 100 }" ng-style="width(insertions)"></div>
+    <div class="deletions" ng-class="{ only: percentage(deletions) === 100 }" ng-style="width(deletions)"></div>
+  </div>
+  <span class="stat deletions">{{ deletions }}</span>
+</div>

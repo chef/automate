@@ -1,0 +1,16 @@
+{
+  "filter": {
+    "must": [
+      { "key_1": "value_1" },
+      { "key_2": "value_2" }
+    ],
+    "should": [
+      { "key_1": "value_1" },
+      { "key_2": "value_2" }
+    ]
+  },
+  "range": {
+    "start_time": "a",
+    "end_time": "b"
+  }
+}

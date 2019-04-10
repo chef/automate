@@ -1,0 +1,278 @@
+#!/bin/bash
+#
+# Helper methods specific for the ingest-service
+
+# TODO (tc) These tests should be run against the same deployed environment as
+# the inspec tests in CI.
+#
+# Run Integration tests for the ingest-service
+document "ingest_integration" <<DOC
+  Runs the integration tests for the ingest-service.
+DOC
+function ingest_integration() {
+  check_if_deployinate_started || return 1
+  local rc
+
+  # Go based integration tests
+  go_test "github.com/chef/automate/components/ingest-service/integration_test"
+  rc=$?
+  if [[ $rc != 0 ]]; then
+    return $rc;
+  fi
+
+  # Mocka a NodeJS framework for integration tests (TODO: Replace it for the above method)
+  install_ingest_test_framework
+  # Make sure our service and dependencies are running
+  wait_for_ok_response $ELASTICSEARCH_URL
+  wait_or_fail_for_port_to_listen $INGEST_PORT
+  pushd /src/components/ingest-service >/dev/null;
+    mocha
+    rc=$?
+  popd >/dev/null;
+  if [[ $rc != 0 ]]; then
+    return $rc;
+  fi
+
+  # Ingest A1 -> A2 Migration Test
+  log_line "Launching A1 Migration Test"
+  pushd /src >/dev/null;
+    ingest_test_A1_migration
+    rc=$?
+  popd >/dev/null;
+  if [[ $rc != 0 ]]; then
+   return $rc;
+  fi
+}
+
+document "mark_nodes_missing" <<DOC
+  Run the mark nodes missing job now
+DOC
+function mark_nodes_missing() {
+  ingest_grpcurl_get chef.automate.domain.ingest.JobScheduler.MarkNodesMissing
+}
+
+function ingest_version() {
+  ingest_grpcurl_get chef.automate.domain.ingest.ChefIngester.GetVersion
+}
+
+document "ingest_job_status" <<DOC
+  Get the Job Scheduler's status
+DOC
+function ingest_job_status() {
+  ingest_grpcurl_get chef.automate.domain.ingest.JobScheduler.GetStatusJobScheduler
+}
+
+document "ingest_job_stop" <<DOC
+  Stop the Job Scheduler
+DOC
+function ingest_job_stop() {
+  ingest_grpcurl_get chef.automate.domain.ingest.JobScheduler.StopJobScheduler
+}
+
+document "ingest_job_start" <<DOC
+  Start the Job Scheduler
+DOC
+function ingest_job_start() {
+  ingest_grpcurl_get chef.automate.domain.ingest.JobScheduler.StartJobScheduler
+}
+
+function ingest_migration_status() {
+  ingest_grpcurl_get chef.automate.domain.ingest.IngestStatus.GetMigrationStatus
+}
+
+function install_ingest_test_framework {
+  [ -z ${HAB_INTEGRATION} ] || return 0
+
+  # Install node
+  log_line " Installing NodeJS"
+  install_if_missing core/node npm;
+
+  # https://github.com/mochajs/mocha/blob/master/bin/mocha#L1
+  # This is needed since mocha use env as interpreter:
+  # TODO: Create a plan.sh to bring mocha in the right way
+  install_if_missing core/coreutils env;
+  local HAB_BINLINK_DIR
+  if [ -f /hab/bin/env ]; then
+    HAB_BINLINK_DIR=/hab/bin
+  else
+    HAB_BINLINK_DIR=/bin
+  fi
+  ln -s ${HAB_BINLINK_DIR}/env /usr/bin/env
+  hab pkg binlink core/node
+
+  log_line " Installing NPM Package 'chakram'"
+  npm install chakram
+  log_line " Installing NPM Package 'mocha'"
+  npm install -g mocha
+  install_if_missing core/node mocha;
+  log_line " Installing NPM Package 'request'"
+  npm install request
+  export HAB_INTEGRATION=true
+}
+
+document "start_ingest_service" <<DOC
+  Build and start the local ingest-service
+DOC
+function start_ingest_service {
+  build components/ingest-service/
+  start_deployment_service
+  chef-automate dev deploy-some $HAB_ORIGIN/ingest-service --with-deps
+}
+
+document "debug_ingest_service" <<DOC
+  Attaches a remote debugger to ingest-service
+DOC
+function debug_ingest_service() {
+  check_if_deployinate_started || return 1
+  debug_go_service ingest-service
+}
+
+document "ingest_load_A1_data" <<DOC
+  Load A1 data from the nodes/ directory.
+
+  Before using this command you have to put the A1 data inside the
+  nodes/ directory, there are a couple options to do this:
+
+  1) Use the command: 'download_and_install_A1_backup'
+
+  2) Download A1 data from here:
+     => https://chefio.atlassian.net/wiki/spaces/ENG/pages/455147533/Migrating+A1+Elasticsearch+data
+DOC
+function ingest_load_A1_data() {
+  if [ ! -d nodes ]; then
+    warn "Elasticsearch data not found. (nodes/)"
+    return 1
+  fi
+
+  log_line "Loading A1 Data from nodes/ directory"
+  chef-automate dev remove-some chef/automate-elasticsearch
+  sleep 5
+  mkdir -p /hab/svc/automate-elasticsearch/data/
+  rm -r /hab/svc/automate-elasticsearch/data/nodes
+  cp -r /src/nodes /hab/svc/automate-elasticsearch/data/.
+  chown -R hab:hab /hab/svc/automate-elasticsearch/data
+  chef-automate dev deploy-some chef/automate-elasticsearch
+}
+
+document "ingest_test_A1_migration" <<DOC
+  Run the ingest-service A1 migration test.
+DOC
+function ingest_test_A1_migration() {
+  install_if_missing core/jq-static jq
+
+  download_and_install_A1_backup || return 1
+  ingest_load_A1_data || return 1
+
+  # Restart the ingest-service to kick off the migration
+  restart_ingest_service
+
+  # Wait for 60 seconds until the migration has finished
+  wait_for_success ingest_migration_finished || return 1
+
+  # Assert the status of the migration
+  assert_migration_status
+}
+
+document "restart_ingest_service" <<DOC
+  Restart the local ingest-service
+DOC
+function restart_ingest_service() {
+  log_line "Restarting ingest-service"
+  hab svc stop chef/ingest-service
+  sleep 5
+  hab svc start chef/ingest-service
+}
+
+document "assert_migration_status" <<DOC
+  Assert the status of the ingest-service migration.
+DOC
+function assert_migration_status() {
+  log_line "Asserting Migration Status"
+  local status
+  status=$(ingest_migration_status)
+  log_line "ingest migration status: ${status}"
+
+  if jq -ne --argjson status "$status" '$status.total and $status.completed and $status.total != $status.completed' >/dev/null; then
+    exit_with "$(red "\\xE2\\x9D\\x8C") The total and completed tasks are not equal." 2
+  fi
+  log_line "$(green "\\xE2\\x9C\\x94") The total of completed tasks matches the total tasks."
+
+  MIGRATION_LOGS=$(grep type=migration /hab/sup/default/sup.log)
+  if [ "$(echo "$MIGRATION_LOGS" | grep -v 'level=info')" != "" ]; then
+    echo "$MIGRATION_LOGS"
+    exit_with "$(red "\\xE2\\x9D\\x8C") Interesting logs found." 2
+  fi
+  log_line "$(green "\\xE2\\x9C\\x94") There are only logs with '$(green "level=info")'"
+}
+
+# Verify if the ingest migration has finished
+function ingest_migration_finished() {
+  status="$(ingest_migration_status)"
+  jq -ne --argjson status "$status" '$status | .finished'
+}
+
+document "download_and_install_A1_backup" <<DOC
+  Download and install an A1 backup into the nodes/ directory.
+
+  The function accepts a different backup name that has to be stored
+  in the following S3 location:
+
+  https://s3.console.aws.amazon.com/s3/buckets/a2-bucket/
+
+  Example 1: Download a backup that has a BUG
+  ------------------------------------
+  download_and_install_A1_backup a1_BUG_elasticsearch_backup
+
+  Example2 : Download a BIG backup (4G)
+  ------------------------------------
+  download_and_install_A1_backup a1_BIG_elasticsearch_backup
+DOC
+function download_and_install_A1_backup() {
+  local backup_name=${1-a1_10_nodes_elasticsearch_backup}
+
+  # Remove any other ES backup if exists
+  if [ -d nodes ]; then
+    warn "Elasticsearch data found. Removing '$(yellow nodes/)' directory."
+    rm -rf nodes/
+  fi
+
+  log_line "Downloading backup from S3 bucket"
+  install_if_missing core/wget wget
+  wget "https://s3-us-west-2.amazonaws.com/a2-bucket/$backup_name.tar.gz"
+
+  log_line "Uncompressing $(green "$backup_name.tar.gz") backup"
+  install_if_missing core/tar tar
+  tar zxf "$backup_name.tar.gz"
+  rm -f "$backup_name.tar.gz"
+
+  # Verify nodes/ exists
+  test -d nodes/
+}
+
+document "ingest_grpcurl_list_services" <<DOC
+  Display the list of RPC services inside the ingest-service.
+
+  @(arg:1) Optional: An RPC service to inspec
+
+  Example: Inspect the ChefIngester service
+  -----------------------------
+  ingest_grpcurl_list_services chef.automate.domain.ingest.ChefIngester
+DOC
+function ingest_grpcurl_list_services() {
+  chef-automate dev grpcurl ingest-service -- list "$1"
+}
+
+document "ingest_grpcurl_get" <<DOC
+  Make a grpcurl GET request to the provided GRPC function.
+
+  @(arg:1) Required: A GRPC function
+
+  Example: Get the migration status (GetMigrationStatus)
+  -----------------------------
+  ingest_grpcurl_get chef.automate.domain.ingest.IngestStatus.GetMigrationStatus
+
+  NOTE: Run 'ingest_grpcurl_list_services' to inspec the RPC services.
+DOC
+function ingest_grpcurl_get() {
+  chef-automate dev grpcurl ingest-service -- "$@"
+}

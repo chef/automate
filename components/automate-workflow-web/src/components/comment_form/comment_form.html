@@ -1,0 +1,27 @@
+<div class="comment-form">
+  <h3>New Comment</h3>
+  <form ng-submit="addComment(newComment)">
+    <cd-ace
+      ng-model="newComment.content"
+      on-submit="addComment(newComment)">
+    </cd-ace>
+    <div class="controls">
+      <button
+        class="button primary"
+        type="submit">Add Comment
+      </button>
+    </div>
+  </form>
+  <div class="comment-container">
+    <div cd-embedly>
+      <div
+        ng-embedly
+        key="key"
+        method="method"
+        add-image-styles="addImageStyles"
+        display="display">
+        <div class="comment-text" cd-markdown="newComment.content"></div>
+      </div>
+    </div>
+  </div>
+</div>

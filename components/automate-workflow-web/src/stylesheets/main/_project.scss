@@ -1,0 +1,430 @@
+.project {
+  @include columns(10);
+  position: relative;
+
+  .button-bar {
+    position: absolute;
+    right: 18px;
+    top: 30px;
+  }
+
+  .watch {
+    position: relative;
+    z-index: 2;
+
+    .watch-button, .watch-menu {
+      float: right;
+      clear: right;
+    }
+
+    .watch-menu {
+      @include base-box-shadow;
+      font-size: .75rem;
+      line-height: 16px;
+      max-width: 302px;
+      margin-top: 2px;
+      background: $white;
+      border: 1px solid $gray-pale;
+      border-radius: $global-radius;
+      position: absolute;
+      right: 0;
+      top: 2rem;
+
+      .heading {
+        color: $darkgray;
+        padding: .5rem;
+        border-radius: $global-radius $global-radius 0 0;
+        background-color: $gray-less-pale;
+      }
+
+      .categories {
+        padding: .5rem;
+        border-radius: 0 0 $global-radius $global-radius;
+
+        li {
+
+          label {
+            color: $darkgray;
+            font-size: .875rem;
+          }
+
+          .description {
+            color: $textgray;
+            margin: 4px 0 4px 16px;
+          }
+        }
+
+        li:not(:last-child) {
+          border-bottom: 1px solid $gray-less-pale;
+          margin-bottom: 8px;
+        }
+      }
+    }
+  }
+
+  .project-repo {
+    @include span-columns(9);
+    @include modal-box;
+    overflow: hidden;
+    float: right;
+
+    .cd-tabset {
+      background: none;
+      text-align: right;
+
+      .cd-tab {
+
+        &:first-child {
+          margin-left: 12px;
+        }
+
+        .tablink {
+          padding: 4px 8px 4px 8px;;
+          background: none;
+          color: $textgray;
+          font-size: 10px;
+          margin-right: 0;
+          border: none;
+          border-radius: 3px 3px 0 0;
+        }
+
+        &.active-tab {
+          .tablink {
+            color: $darkgray;
+            background: $white;
+            border-bottom: #fff;
+            margin-bottom: -1px;
+          }
+        }
+      }
+
+      .tabcontent {
+        padding: 4px;
+        border-radius: 2px;
+      }
+
+      fieldset {
+        margin: 0;
+        padding: 0;
+        border: none;
+        background: none;
+
+        .field {
+          margin: 0;
+          padding: 0;
+
+          input {
+            border-radius: 2px;
+            font-family: $monospace;
+            font-size: 12px;
+            color: $darkgray;
+            background-color: #f8f8f8;
+          }
+        }
+      }
+    }
+  }
+
+  .change-container {
+    @include row();
+    @include omega();
+    position: relative;
+
+    .change-filters {
+      margin-bottom: 1.5rem;
+    }
+
+    .change-item {
+      @include span-columns(6);
+      @include modal-box();
+      margin-bottom: 1em;
+
+      @include media($laptop-down) {
+        @include span-columns(12);
+      }
+    }
+
+    .no-items {
+      @include empty-item();
+    }
+  }
+
+  .pipes-container {
+
+    .empty-item {
+      @include empty-item;
+      margin-top: 0;
+    }
+
+    .empty-instructions {
+      @include modal-box;
+      margin-top: 1.5rem;
+    }
+
+    ol {
+      li {
+        margin-bottom: 1.2em;
+        line-height: 1.4em;
+      }
+    }
+
+    pre {
+      color: #4a4a4a;
+      background: #f8f8f8;
+      padding: 4px;
+    }
+
+    code {
+      font-family: $monospace;
+      font-size: .9em;
+      background: #f8f8f8;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
+
+    pre {
+      border-radius: 4px;
+      background: #f8f8f8;
+      padding: 4px 8px;
+
+      code {
+        padding: 0;
+        border: none;
+        line-height: 1.4em;
+      }
+    }
+
+    .pipe-card {
+      @include span-columns(6);
+      @include modal-box;
+      margin-bottom: .5rem;
+      padding: 1rem 1.5rem;
+      clear: left;
+
+      @include media($laptop-down) {
+        @include span-columns(12);
+      }
+
+      header {
+
+        .card-title {
+          margin: 0;
+          vertical-align: middle;
+          font-weight: 700;
+          display: inline-block;
+          font-size: .875rem;
+          color: $chef-blue-dark;
+          font-family: $heading-font;
+
+          a {
+            text-decoration: none;
+            color: $chef-blue;
+            font-size: .875rem;
+
+            &:hover {
+              color: $bluehover;
+            }
+          }
+        }
+
+        .button.square, .scm-type {
+          float: right;
+        }
+
+        .scm-type {
+          margin-right: 1rem;
+          line-height: 2rem;
+        }
+      }
+    }
+
+    .cards {
+      margin: 1.5rem 0 0;
+      padding: 0;
+    }
+  }
+
+  .tab.dependencies, .tab.consumers {
+    .count {
+      font-weight: normal;
+    }
+  }
+
+  .deps-container {
+
+    .dependency, .consumer {
+
+      h2 {
+        color: $darkgray;
+        font-weight: normal;
+        margin: 0 0 12px 6px;
+      }
+
+      &:not(:first-child) {
+        margin-top: 26px;
+        padding-top: 26px;
+        border-top: 1px solid #f1f1f1;
+      }
+    }
+
+    .dep-card {
+
+      header {
+        .card-title {
+          margin: 0 0 2px 6px;
+          vertical-align: middle;
+          font-weight: 400;
+          line-height: 20px;
+          display: inline-block;
+          font-size: 18px;
+
+          a {
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+.project-header {
+  overflow: hidden;
+  border-bottom: 1px solid $lightgray;
+}
+
+.project-nav {
+  float: right;
+  padding-top: 20px;
+
+  li {
+    float: left;
+    padding: 5px 20px 0 20px;
+
+    a {
+      display: block;
+      text-decoration: none;
+      color: $darkgray;
+      padding-bottom: 5px;
+      position: relative;
+
+      &.active {
+        border-bottom: 3px solid #E6772F;
+      }
+
+      .changes-count {
+        display: block;
+        position: absolute;
+        top: -15px;
+        left: -15px;
+        background: rgba($darkgray, 0.8);
+        color: $white;
+        padding: 2px 10px;
+        font-size: 12px;
+        border-radius: 40%;
+
+        &.build {
+          background: rgba(#4A90E2, 0.8);
+        }
+
+        &.acceptance {
+          background: rgba(#58B958, 0.8);
+        }
+      }
+    }
+  }
+}
+
+.project-acceptance {
+  background: #fff;
+  color: $darkgray;
+
+  .project-acceptance-header {
+    padding: 20px;
+    position: relative;
+
+    button {
+      position: absolute;
+      right: 20px;
+      top: 40px;
+    }
+  }
+
+  .change-list {
+
+    li > div:first-child {
+
+      a {
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      &:hover {
+        cursor: default;
+        background: none;
+      }
+    }
+  }
+}
+
+.changes-group {
+  margin-bottom: 20px;
+
+  .changes-group-title {
+    padding: 10px 20px;
+    display: block;
+    border-bottom: 1px solid $lightgray;
+
+    &::after {
+      @extend .icon;
+      @extend .icon-right:before;
+      padding-left: 5px;
+      font-size: 80%;
+    }
+  }
+
+  &.open .changes-group-title::after {
+    @extend .icon-down:before;
+  }
+}
+
+.automate-ui .project {
+  width: 100%;
+  margin: 0;
+  float: none;
+
+  .watch {
+
+    .watch-menu {
+      max-width: 350px;
+
+      .heading {
+        padding: 1rem;
+      }
+
+      .categories {
+        border-radius: 0;
+
+        li {
+          padding: .5rem;
+
+          &:not(:last-child) {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+
+  .button-bar {
+    position: absolute;
+    right: 0;
+    top: 25px;
+  }
+
+  .project-repo {
+    float: none;
+  }
+}

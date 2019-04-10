@@ -1,0 +1,35 @@
+@startuml
+actor "User"
+collections "automate-ui" as aui
+collections "automate-gateway" as gateway
+collections "authz-service" as authzsrv
+collections "automate-dex" as automatedex
+collections "config-reporting-service" as cfgreportsrv
+
+User -> aui : Show Node List
+aui -> gateway: Get Node List (REST)
+gateway -> automatedex : Authenticated?
+group "Authentication" successful case
+	automatedex -> gateway : Yes
+else failure case
+	automatedex -> gateway : No
+	gateway -> aui : 401
+	aui -> User : Login
+end
+gateway -> authzsrv : Authorized?
+note right : This is a grpc  client imported from\n authz-service
+group "Authorized" successful case
+	authzsrv -> gateway : Yes
+else failure case
+	authzsrv -> gateway : No
+	gateway -> aui : 403
+	aui -> User : Nope!
+end
+gateway -> cfgreportsrv : GetNodeList()
+note right : This is a grpc client imported from\nconfig-reporting-service
+cfgreportsrv -> gateway : cfgmgmt.NodeList[Nodes]
+note right: This is a protobuf response\ndefined in this service
+gateway -> aui : { nodes: [Nodes] }
+note right: This is a JSON response\ndefined in the gateway as a protobuf\ntranslated to json automatically
+aui -> User : Node List page renders
+@enduml

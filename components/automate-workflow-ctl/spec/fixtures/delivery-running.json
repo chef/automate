@@ -1,0 +1,390 @@
+{
+  "delivery": {
+    "install_path": "/opt/delivery",
+    "cookbook_path": "/opt/delivery/embedded/cookbooks",
+    "dir": "/opt/delivery",
+    "bootstrap": {
+      "enable": false
+    },
+    "chef_base_path": "/opt/opscode",
+    "user": {
+      "username": "delivery",
+      "shell": "/bin/bash",
+      "home": "/opt/delivery/embedded",
+      "comment": "CHEF Delivery"
+    },
+    "delivery": {
+      "enable": true,
+      "dir": "/var/opt/delivery/delivery",
+      "etc_dir": "/var/opt/delivery/delivery/etc",
+      "chef_config": "/var/opt/delivery/delivery/etc/erlang.cfg",
+      "log_directory": "/var/log/delivery/delivery",
+      "log_rotation": {
+        "file_maxbytes": 10240000,
+        "num_to_keep": 10
+      },
+      "vip": "ec2-52-43-48-67.us-west-2.compute.amazonaws.com",
+      "listen": "127.0.0.1",
+      "port": 9611,
+      "ssl_certificates": {
+
+      },
+      "ca_cert_chain_depth": 2,
+      "api_port": 9611,
+      "db_pool_max_count": 100,
+      "db_pool_init_count": 20,
+      "chef_username": "delivery",
+      "chef_private_key": "/etc/delivery/delivery.pem",
+      "chef_server": "https://ec2-52-43-48-67.us-west-2.compute.amazonaws.com/organizations/delivery",
+      "default_search": "(recipes:delivery_builder OR recipes:delivery_builder\\\\:\\\\:default OR recipes:delivery_build OR recipes:delivery_build\\\\:\\\\:default OR tags:delivery-build-node)",
+      "chef_server_webui": "https://localhost",
+      "db_name": "delivery",
+      "sql_user": "delivery",
+      "sql_password": "dc7ecd862f7af060776b680df00180568e0d7de3ac4c712385d9255f76599915f48db936ecc58bb892da8bf85ece95a5090c",
+      "sql_ro_user": "delivery_ro",
+      "sql_ro_password": "d5fb09c1933ba55775cdd377bf22f27275451425f26e66dc3a92dd14e5ff5337514e0caa9e10e9d09808c2c85ae377df4db6",
+      "sql_repl_user": "delivery_repl",
+      "sql_repl_password": "b15188217c2c4ebabb62f875a20b79f7e188e19c4fe0efa16408bb553ba5b946a91f21bdccab5bc6d0e76b92e3ebfd5cc730",
+      "backup_path": "/var/opt/delivery/backups",
+      "max_backups": 7,
+      "backup_cron_job": false,
+      "restore_backup": false,
+      "cron_backup_times": "0 0 * * *",
+      "git_repo_template": "/opt/delivery/embedded/etc/deliv_git_repo_template",
+      "git_repos": "/var/opt/delivery/delivery/git_repos",
+      "git_working_tree_dir": "/var/opt/delivery/delivery/git_workspace",
+      "push_jobs_max_retries": 3,
+      "push_jobs_overall_timeout": "2h",
+      "push_jobs_run_timeout": "75m",
+      "phase_job_confirmation_timeout": "5m",
+      "is_dev_box": false,
+      "audit_max_events": 100,
+      "read_ttl": "7d",
+      "write_ttl": "7d",
+      "eval_mode": false,
+      "analytics_key": "",
+      "ldap_hosts": [
+
+      ],
+      "ldap_port": 3269,
+      "ldap_timeout": 5000,
+      "ldap_base_dn": "OU=Employees,OU=Domain users,DC=examplecorp,DC=com",
+      "ldap_bind_dn": "ldapbind",
+      "ldap_bind_dn_password": "secret123",
+      "ldap_encryption": "start_tls",
+      "ldap_attr_login": "sAMAccountName",
+      "ldap_attr_mail": "mail",
+      "ldap_attr_full_name": "fullName",
+      "primary": true,
+      "primary_ip": null,
+      "standby_ip": null,
+      "use_ssl_termination": false
+    },
+    "delivery_web": {
+      "root": "/opt/delivery/embedded/service/delivery_web"
+    },
+    "auth": {
+      "enable": true,
+      "oidc_signing_private_key": "/etc/delivery/oidc_signing_key.pem",
+      "oidc_clients": [
+
+      ],
+      "saml_metadata_refresh_interval": "1d",
+      "saml_metadata_retry_interval": "1m"
+    },
+    "lsyncd": {
+      "enable": true,
+      "dir": "/var/opt/delivery/lsyncd",
+      "log_directory": "/var/log/delivery/lsyncd",
+      "status_log_file": "lsyncd-status.log",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "user": "delivery",
+      "ssh_key": "/opt/delivery/embedded/.ssh/id_rsa"
+    },
+    "postgresql": {
+      "version": "9.2",
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/delivery/postgresql/9.2",
+      "data_dir": "/var/opt/delivery/postgresql/9.2/data",
+      "log_directory": "/var/log/delivery/postgresql/9.2",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "username": "chef-pgsql",
+      "sql_user": "chef",
+      "shell": "/bin/bash",
+      "home": "/var/opt/delivery/postgresql",
+      "user_path": "/opt/delivery/embedded/bin:/opt/delivery/bin:$PATH",
+      "sql_password": "snakepliskin",
+      "sql_ro_user": "chef_ro",
+      "sql_ro_password": "shmunzeltazzen",
+      "vip": "127.0.0.1",
+      "port": 5432,
+      "listen_address": "localhost",
+      "max_connections": 350,
+      "md5_auth_cidr_addresses": [
+
+      ],
+      "trust_auth_cidr_addresses": [
+        "127.0.0.1/32",
+        "::1/128"
+      ],
+      "shmmax": 17179869184,
+      "shmall": 4194304,
+      "shared_buffers": "3907MB",
+      "work_mem": "8MB",
+      "effective_cache_size": "128MB",
+      "checkpoint_segments": 3,
+      "checkpoint_timeout": "5min",
+      "checkpoint_completion_target": 0.5,
+      "checkpoint_warning": "30s",
+      "debug": false
+    },
+    "ssh_git": {
+      "hostname": "ec2-52-43-48-67.us-west-2.compute.amazonaws.com",
+      "port": 8989,
+      "keys_dir": "/var/opt/delivery/delivery/etc/ssh_git_server_keys"
+    },
+    "insights": {
+      "enable": true,
+      "data_directory": "/var/opt/delivery/elasticsearch/data"
+    },
+    "data_collector": {
+      "token": "93a49a4f2482c64126f7b6015e6b0f30284287ee4054ff8807fb63d9cbd1c506"
+    },
+    "insights_web": {
+      "root": "/opt/delivery/embedded/service/insights_web"
+    },
+    "elasticsearch": {
+      "home": "/opt/delivery/embedded/elasticsearch",
+      "log_directory": "/var/log/delivery/elasticsearch",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "memory": "3126m",
+      "urls": [
+        "http://127.0.0.1:9200"
+      ],
+      "host_header": null,
+      "schema_version": 2
+    },
+    "logstash": {
+      "log_directory": "/var/log/delivery/logstash",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "port": 8080
+    },
+    "kibana": {
+      "log_directory": "/var/log/delivery/kibana",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "conf_dir": "/var/opt/delivery/kibana/",
+      "port": 5601,
+      "max_old_space_size": 300,
+      "version": "4.5.1"
+    },
+    "rabbitmq": {
+      "dir": "/var/opt/delivery/rabbitmq",
+      "data_dir": "/var/opt/delivery/rabbitmq/db",
+      "log_directory": "/var/log/delivery/rabbitmq",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "vhost": "/insights",
+      "user": "insights",
+      "password": "chefrocks",
+      "node_ip_address": "0.0.0.0",
+      "port": "5672",
+      "nodename": "rabbit@localhost",
+      "vip": "127.0.0.1",
+      "env_path": "/opt/delivery/bin:/opt/delivery/embedded/bin:/usr/bin:/bin",
+      "management_user": "rabbitmgmt",
+      "management_password": "chefrocks",
+      "management_port": 15672,
+      "management_enabled": true
+    },
+    "lb": {
+      "debug": false
+    },
+    "nginx": {
+      "enable": true,
+      "ha": false,
+      "dir": "/var/opt/delivery/nginx",
+      "fqdns": [
+        "ec2-52-43-48-67.us-west-2.compute.amazonaws.com"
+      ],
+      "log_directory": "/var/log/delivery/nginx",
+      "log_rotation": {
+        "file_maxbytes": 104857600,
+        "num_to_keep": 10
+      },
+      "ssl_port": 443,
+      "enable_non_ssl": false,
+      "non_ssl_port": 80,
+      "ssl_protocols": "SSLv3 TLSv1",
+      "ssl_ciphers": "RC4-SHA:RC4-MD5:RC4:RSA:HIGH:MEDIUM:!LOW:!kEDH:!aNULL:!ADH:!eNULL:!EXP:!SSLv2:!SEED:!CAMELLIA:!PSK",
+      "ssl_certificate": null,
+      "ssl_certificate_key": null,
+      "ssl_country_name": "US",
+      "ssl_state_name": "WA",
+      "ssl_locality_name": "Seattle",
+      "ssl_company_name": "Chef",
+      "ssl_organizational_unit_name": "Engineering",
+      "ssl_email_address": "delivery@getchef.com",
+      "worker_processes": 4,
+      "worker_connections": 10240,
+      "sendfile": "on",
+      "tcp_nopush": "on",
+      "tcp_nodelay": "on",
+      "gzip": "on",
+      "gzip_http_version": "1.0",
+      "gzip_comp_level": "2",
+      "gzip_proxied": "any",
+      "gzip_types": [
+        "text/plain",
+        "text/css",
+        "application/x-javascript",
+        "text/xml",
+        "application/javascript",
+        "application/xml",
+        "application/xml+rss",
+        "text/javascript",
+        "application/json"
+      ],
+      "keepalive_timeout": 65,
+      "client_max_body_size": "250m",
+      "cache_max_size": "5000m",
+      "server_name": "ec2-52-43-48-67.us-west-2.compute.amazonaws.com"
+    },
+    "admin": {
+      "account_name": "admin",
+      "full_name": "Chef Delivery Administrator",
+      "email": "admin@example.com",
+      "password": "snakes"
+    },
+    "git": {
+      "username": "git",
+      "home": "/var/opt/delivery/home/git",
+      "ssh_dir": "/var/opt/delivery/home/git/.ssh",
+      "authkeys": "/var/opt/delivery/home/git/.ssh/authorized_keys",
+      "shell": "/opt/delivery/embedded/bin/git-shell"
+    },
+    "deliv_notify": {
+      "config": [
+
+      ]
+    },
+    "backup": {
+      "bucket": null,
+      "create_bucket": true,
+      "chef_server_config": false,
+      "compliance_profiles": {
+          "enabled": true
+      },
+      "config": {
+        "enabled": true
+      },
+      "cron": {
+        "enabled": false,
+        "max_archives": 7,
+        "max_snapshots": 7,
+        "notation": "0 0 * * *"
+      },
+      "db": {
+        "enabled": true
+      },
+      "delete": {
+        "pattern": null,
+        "max_archives": null,
+        "max_snapshots": null
+      },
+      "digest": {
+        "enabled": false,
+        "length": 256
+      },
+      "elasticsearch": {
+        "bucket": null,
+        "enabled": true,
+        "location": "/var/opt/delivery/elasticsearch_backups",
+        "max_restore_bytes_per_sec": "40mb",
+        "max_snapshot_bytes_per_sec": "40mb",
+        "poll_interval": "5",
+        "region": "us-east-1",
+        "request_timeout": "300",
+        "snapshot_timeout": "100",
+        "wait_for_lock": true,
+        "type": "fs"
+      },
+      "force": false,
+      "git": {
+        "enabled": true
+      },
+      "license": {
+        "enabled": true
+      },
+      "list": {
+        "types": "all",
+        "format": "text"
+      },
+      "notifications": {
+        "enabled": true
+      },
+      "location": "/var/opt/delivery/backups",
+      "name": null,
+      "rabbit": {
+        "enabled": false
+      },
+      "region": null,
+      "retry_limit": 5,
+      "type": "fs",
+      "staging_dir": null,
+      "wait": true
+    },
+    "compliance_profiles": {
+      "enable": true,
+      "vip": "127.0.0.1",
+      "port": 2134,
+      "service_directory": "/opt/delivery/embedded/service/compliance-profiles",
+      "log_directory": "/var/log/delivery/compliance-profiles",
+      "storage_directory": "/var/opt/delivery/compliance",
+      "market_path": "/var/opt/delivery/compliance/market",
+      "profiles_path": "/var/opt/delivery/compliance/profiles",
+      "log_rotation": {
+        "file_maxbytes": 10240000,
+        "num_to_keep": 10
+      }
+    },
+    "notifications": {
+      "rule_store_file": "/var/opt/delivery/notifications/rule_store"
+    },
+    "fqdn": "ec2-52-43-48-67.us-west-2.compute.amazonaws.com"
+  },
+  "run_list": [
+  "recipe[delivery]"
+]
+,
+  "runit": {
+    "sv_bin": "/opt/delivery/embedded/bin/sv",
+    "chpst_bin": "/opt/delivery/embedded/bin/chpst",
+    "service_dir": "/opt/delivery/service",
+    "sv_dir": "/opt/delivery/sv",
+    "lsb_init_dir": "/opt/delivery/init",
+    "executable": "/sbin/runit",
+    "prefer_local_yum": false,
+    "start": "/etc/init.d/runit-start start",
+    "stop": "/etc/init.d/runit-start stop",
+    "reload": "/etc/init.d/runit-start reload",
+    "svlogd_bin": "/opt/delivery/embedded/bin/svlogd"
+  }
+}

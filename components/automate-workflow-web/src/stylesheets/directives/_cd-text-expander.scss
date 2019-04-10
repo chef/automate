@@ -1,0 +1,105 @@
+.commit-msgs {
+  margin: 0 20px 40px 0;
+  clear: both;
+}
+
+.commit-msg {
+  overflow: hidden;
+  background: $gray-less-pale;
+  color: $chef-blue-dark;
+
+  .msg-header {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-weight: bold;
+    height: 50px;
+    line-height: 50px;
+    padding: 0 20px 0 50px;
+    border: 1px solid $lightgrayblue;
+    border-left-color: $lightlightgray;
+    border-right-color: $lightlightgray;
+    border-top-width: 0;
+    @include user-select(none);
+
+    h5 {
+      float: left;
+      @include user-select(initial);
+    }
+  }
+
+  .msg-body {
+    background: lighten($gray-less-pale, 2%);
+    border: 1px solid $lightgrayblue;
+    border-left-color: $lightlightgray;
+    border-right-color: $lightlightgray;
+    margin-top: -1px;
+  }
+
+  &.expandable {
+
+    .msg-header {
+      position: relative;
+      cursor: pointer;
+
+      &:before {
+        content: '\e60c';
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 50px;
+        width: 50px;
+        line-height: 50px;
+        text-align: center;
+        @extend .icon;
+      }
+    }
+
+    .msg-body {
+      display: none;
+    }
+  }
+
+  &.expanded {
+
+    .msg-header:before {
+      content: '\e608';
+    }
+
+    .msg-body {
+      display: block;
+    }
+  }
+}
+
+.automate-ui {
+
+  .commit-msg {
+    .msg-header {
+      height: auto;
+      line-height: normal;
+      padding: 0;
+      border: 1px solid lighten($darkblue, 10%);
+
+      h5 {
+        margin: 15px 0 0 0;
+        float: none;
+      }
+    }
+
+    .msg-body {
+      border: 1px solid lighten($darkblue, 10%);
+    }
+
+    &.expandable {
+      .msg-header {
+        &:before {
+          display: none;
+        }
+
+        .fa:before {
+          content: '\f067';
+        }
+      }
+    }
+  }
+}

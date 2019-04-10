@@ -1,0 +1,33 @@
+{
+	"9acbe920-d977-4c4d-a482-f125fe83a95a": {
+		"name": "test-policy",
+		"id": "pol01",
+		"description": "we will perhaps not feed this into the OPA store -- what is the use?",
+		"members": [
+			"team:local:admins",
+			"user:local:*"
+		],
+		"statements": {
+			"900e12b7-8625-4881-985f-8c460b79f142": {
+				"effect": "allow",
+				"resources": [
+					"infra:nodes",
+					"compliance:profiles:*"
+				],
+				"actions": [
+					"infra:nodes:delete",
+					"compliance:upload"
+				]
+			},
+			"7bca8de2-665b-4843-aa2e-c48850bbfe83": {
+				"effect": "allow",
+				"resources": [
+					"iam:teams"
+				],
+				"actions": [
+					"iam:teams:create"
+				]
+			}
+		}
+	}
+}

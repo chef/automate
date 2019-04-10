@@ -1,0 +1,74 @@
+<div class="team card-view">
+  <header class="page-header">
+    <nav class="breadcrumb-nav" role="navigation">
+      <ol class="breadcrumbs">
+        <li class="breadcrumb">
+          <a ui-sref="main.admin.teams" ui-sref-opts="{ reload: true }">Teams</a>
+          <i class="fa fa-angle-right"></i>
+        </li>
+        <li class="breadcrumb">{{ team.name }} <i class="fa fa-angle-right"></i></li>
+      </ol>
+    </nav>
+    <div class="page-header-title">
+      <h2 class="sidebar-content-title">{{ team.name }}</h2>
+      <div class="team-description">{{ team.description }}</div>
+      <div class="team-details">
+        <div class="team-creator">Created by: {{ team.creator_name }}</div>
+        <div class="team-modified">Modified {{ team.updated_at | moment:'MMMM D, YYYY h:mm A' }} by {{ team.updater_name}}</div>
+      </div>
+    </div>
+    <div class="page-header-meta">
+    </div>
+  </header>
+  <div class="team-members cards">
+    <div class="add-team-members">
+      <div class="add-team-members-text">Add Team Members</div>
+      <div class="little-title">USERNAME</div>
+      <div class="new-member-form"
+        ng-class="{'disabled-for-non-admin': !isAdmin }">
+      	<input
+          type="text"
+          class="team-members-input"
+          ng-model="usernameEntry"
+          placeholder="jsmith"
+          bs-options="user for user in users | orderBy"
+          data-comparator="filterUsers"
+          data-limit="10"
+          ng-disabled="!isAdmin"
+          bs-typeahead>
+      	<button
+          class="button primary"
+          type="submit"
+          title="New Member"
+          ng-click="submit()"
+          ng-disabled="!validateUserField()">Add to Team
+        </button>
+      </div>
+    </div>
+
+    <div class="member-container">
+      <table>
+        <thead>
+          <tr>
+            <th class="center"></th>
+            <th>Username</th>
+            <th>Full Name</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="member in members">
+            <td class="center"><i class="fa fa-times-circle"></i></td>
+            <td class="username">{{ member.name }}</td>
+            <td class="full-name">{{ member.full_name }}</td>
+            <td class="role">{{ member.role }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div ng-if="members.length === 0" class="no-members">
+      <p>No one has been added to this team yet.</p>
+    </div>
+  </div>
+</div>

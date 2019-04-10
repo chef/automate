@@ -1,0 +1,7 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+if curl --max-time 2 -k --fail --silent --show-error "https://{{sys.ip}}:{{cfg.ssl_port}}/api/_status"; then
+  exit 0
+else
+  exit 2
+fi

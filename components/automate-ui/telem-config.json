@@ -1,0 +1,6 @@
+{
+  "telemetry_enabled": true,
+  "telemetry_api": "https://telemetry-acceptance.chef.io",
+  "connectivity": {"reachable": true, "proxy": false},
+  "identity": {}
+}

@@ -1,0 +1,129 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.logs-modal {
+  #{--modal-width}: 68%;
+}
+
+.logs-modal-heading {
+  display: flex;
+  margin: 0 0 20px;
+  align-items: center;
+  position: relative;
+  font-weight: 600;
+  font-size: 16px;
+  color: $chef-primary-dark;
+
+  chef-icon {
+    margin-right: 9px;
+    font-size: 1.4em;
+    color: $chef-primary-bright;
+  }
+}
+
+.logs-modal-content {
+  font-size: 12px;
+  max-height: calc(100vh - 200px);
+  overflow-x: scroll;
+  color: $chef-primary-dark;
+}
+
+.run-info {
+  justify-content: space-between;
+  padding-bottom: 20px;
+  color: inherit;
+
+  .nodename {
+    font-size: 16px;
+  }
+
+  ul {
+    display: table;
+    padding: 0;
+    list-style: none;
+    width: 100%;
+
+    li {
+      display: table-cell;
+      padding-left: 10px;
+      padding-right: 10px;
+      text-align: center;
+      border-left: 1px solid $gray-light;
+
+      &:first-child {
+        text-align: left;
+        padding-left: 0;
+        border-left: none;
+      }
+    }
+  }
+}
+
+.logs {
+  border: 2px solid $gray-shadow;
+  border-radius: 5px;
+}
+
+.logs-content {
+  padding: 10px 15px;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  &.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid $gray-shadow;
+
+    & > chef-button {
+      margin: 0;
+    }
+  }
+
+  &.error-message {
+    white-space: pre-wrap;
+    line-height: 30px;
+    font-weight: bold;
+    border-top: 0;
+  }
+
+  &.backtrace {
+    line-height: 50px;
+    cursor: pointer;
+
+    chef-icon {
+      font-size: 1.2em;
+      vertical-align: middle;
+    }
+  }
+
+  pre {
+    display: block;
+    background-color: $pre-background;
+    color: $white;
+    padding: 15px;
+    margin-bottom: 0;
+    border-radius: 5px;
+    white-space: pre-wrap;
+  }
+}
+
+.logs-header {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+  color: inherit;
+}
+
+.logs-section-heading {
+  margin: 0;
+  font-size: 12px;
+  color: inherit;
+  line-height: inherit;
+}
+
+.logs-code-section:not(:last-child) {
+  padding-bottom: 20px;
+}

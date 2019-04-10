@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+puts <<-EOF
+You're currently running automate-ctl from the Chef Automate Habitat package.
+This command will not do anything except print this message.
+
+Use these commands to manage the running services:
+
+# Show status of all services
+
+    sudo systemctl status automate --lines=0 # Status of all automate services
+
+# Start or stop all services
+
+    sudo systemctl start|stop automate
+
+# Manage an individual service
+
+    sudo hab sup start|stop $SERVICE_NAME
+
+$SERVICE_NAME can be any of:
+
+* chef/automate-workflow-nginx
+* chef/automate-workflow-server
+* chef/logstash
+* core/kibana
+* core/postgresql
+* core/rabbitmq
+
+# Show logs for all services
+
+    sudo journalctl -u automate
+
+Running with -f will follow the log output.
+
+EOF

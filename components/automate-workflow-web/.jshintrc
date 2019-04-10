@@ -1,0 +1,52 @@
+// http://jshint.com/docs/
+
+{
+  // http://jshint.com/docs/options/#browser
+  "browser": true,
+
+  // http://jshint.com/docs/options/#browserify
+  "browserify": true,
+
+  // http://jshint.com/docs/options/#esnext
+  "esnext": true,
+
+  // http://jshint.com/docs/options/#jasmine
+  "jasmine": true,
+
+  // http://jshint.com/docs/options/#newcap
+  "newcap": false,
+
+  // http://jshint.com/docs/options/#predef
+  "predef": [
+
+    // Server-sent events
+    "EventSource",
+
+    // AngularJS globals
+    "angular",
+    "element",
+    "inject",
+
+    // Protractor globals
+    "browser",
+
+    // Our custom E2E helpers
+    "featureFlag",
+    "login",
+    "logout",
+    "mockApi",
+    "mockSse"
+  ],
+
+  // http://jshint.com/docs/options/#strict
+  "strict": false,
+
+  // http://jshint.com/docs/options/#undef
+  "undef": true,
+
+  // http://jshint.com/docs/options/#unused
+  "unused": false,
+
+  // http://jshint.com/docs/options/#validthis
+  "validthis": true
+}

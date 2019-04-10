@@ -1,0 +1,25 @@
+<div class="logs-modal">
+  <div class="phase">
+    <span class="name">Phase:</span>
+    <span class="data">{{ log.phase }}</span>
+  </div>
+  <div class="run-id">
+    <span class="name">Run ID:</span>
+    <span class="data">{{ log.run_id }}</span>
+  </div>
+  <div class="status">
+    <span class="name">Status:</span>
+    <span class="data">{{ log.status }}</span>
+  </div>
+  <div class="run-success">
+    <span class="name">Run Success:</span>
+    <span class="data">{{ log.run_success }}</span>
+  </div>
+  <div class="search-query">
+    <span class="name">Search Query:</span>
+    <span class="data">{{ log.search_query }}</span>
+  </div>
+  <div class="logs">
+    <div class="log" cd-log="log.run_log" data-toolbar="false"></div>
+  </div>
+</div>

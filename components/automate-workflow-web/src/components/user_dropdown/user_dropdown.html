@@ -1,0 +1,20 @@
+<div class="user-nav">
+  <div class="user" ng-click="toggleDropdown()">
+    <img class="user-image" gravatar-src="currentUser.email" gravatar-size="30"/>
+    <div class="user-info">
+      <div class="user-name">{{ currentUser.displayName }}</div>
+      <div class="user-enterprise">{{ session.enterprise }}</div>
+    </div>
+    <i class="fa fa-chevron-down"></i>
+  </div>
+  <ul class="logout-dropdown" ng-if="dropdownShowing">
+    <li>
+      <a class="logout-link" ng-click="logout()">Sign Out</a>
+    </li>
+    <li ng-click="toggleDropdown()">
+      <a href="/workflow/status/version" class="version-link" target="_blank">A2 Workflow {{ buildVersion }}</a></li>
+    <li ng-click="toggleDropdown()">
+      <a ng-click="openLicense()" class="license-link">License information</a>
+    </li>
+  </ul>
+</div>

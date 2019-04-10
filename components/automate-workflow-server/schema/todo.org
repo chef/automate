@@ -1,0 +1,117 @@
+#+TITLE: Delivery Schema TODOs
+
+When we move over to Sqitch for managing the schema, there are several
+schema changes that should be made.
+
+* Questions
+** TODO Can we GZIP the JSON data being stored in the database?
+   Similar to what we do in Erchef?  If not, would we ever want / need
+   to be able to directly query the contents of the JSON data?  If so,
+   using PostgreSQL's native JSON type might be useful.
+** TODO In the =phase_run= table, what's the difference between finished = true and status = complete?
+   (probably nothing substantive - certainly, if you're doing a rebuild, I wouldn't stress it - AJ)
+** TODO Is there any reason the lookup-tables (=stages=, =phases=, =statuses=) need to be tables?
+   Users are never going to change these (correct?), so they could be enums instead.
+   (I've never used enums - but seems reasonable - AJ)
+** TODO What other project types can there be?
+   Currently we default to 'application'.  Is this intended to be a
+   fixed set of options, or can users declare their own?
+   (Originally, we thought there might be different pipeline shapes for
+   applications and infrastructure. Turns out it's useless - I would probably bag it. AJ)
+** TODO Should =pipelines.production= be converted to an enum?
+   Currently, if =true=, it implies that a pipeline goes all the way
+   through to the end.  If false, it should stop at the acceptance
+   stage.  Are there other places it could legitimately stop?
+   (I don't think so, no - AJ)
+** TODO What is =projects.deploy_pattern=?
+   (It's the deployment legs - an array of strings that then get mapped to deployment legs. - AJ)
+** TODO What is =projects.assets=?
+   (Probably can go away - originally, it was the patterns for what assets to keep from a build - AJ)
+** TODO What is =stage_run.data=?
+** TODO What is =phase_run.run_log=?
+   (I think it's the completed log from the job - AJ)
+** TODO Are we interested in tracking stage / phase transitions?
+   It seems as though we might, but what we have does this incompletely.
+
+   =stage_run.created_at= seems like it should be
+   =stage_run.started_at=, while =stage_run.updated_at= should be
+   =stage_run.finished_at=.
+
+   Additionally, the =phase_run= table allows us to set status, but
+   the =updated_at= timestamp only refers to the most recent status
+   change.
+
+   Do we care about start times and end times as we progress through
+   the various states?  Would we also want to add something like a
+   =status= column to the =stage_run= table?
+** TODO What is the implied meaning of the various statuses?
+   Does 'idle' imply that the stage run the phase run is a part of has
+   begun, but hasn't yet reached that phase?
+** TODO What is the use of the reset_db.sql file?
+* Overall
+** TODO Singularize table names
+   - user
+   - project
+   - pipeline
+   - stage
+   - phase
+   - status
+   - change
+** TODO Create a =delivery_id= type
+   Use this for =stage_run.id=, =stage_run.change_id=, =phase_run.id=, and =changes.id=
+* =users= Table
+** TODO =created_on= should be =NOT NULL=
+** TODO Is the =id= column needed?
+   Currently, this table is not referenced anywhere, and the userid
+   would be an effective primary key, too.
+** TODO Add a size constraint to the =userid= column
+** TODO Store the password encrypted
+** TODO Remove the named =unique_userid= constraint
+   Having =userid= be unique is fine, but a named constraint isn't necessary
+* =projects= Table
+** TODO Rename all =*_slave= columns to =*_slave_queries=, or similar
+** TODO Move all =*_slave= columns to the =pipelines= table
+   These pertain to individual pipelines, not a project as a whole.
+** TODO All array-valued columns should be =DEFAULT '{}' NOT NULL=
+   Currently there are no defaults or constraints of any kind
+** TODO =created_on= should be =NOT NULL=
+** TODO Remove =unique_name= constraint
+   This is redundant, as the =name= column is already unique
+* =pipelines= Table
+** TODO =production= should be =NOT NULL=
+** TODO =created_on= should be =NOT NULL=
+** TODO =production= should probably default to =true=
+   Seems like going all the way to production would be the normal
+   case, right?
+* =stages= Table
+** TODO Remove table in favor of an enum
+   #+begin_src sql
+     CREATE TYPE stage AS ENUM('verify', 'release', 'acceptance', 'union', 'rehearsal', 'production');
+   #+end_src
+* =phases= Table
+** TODO Remove table in favor of an enum
+   #+begin_src sql
+     CREATE TYPE phase AS ENUM('syntax', 'lint', 'unit', 'security', 'quality', 'release', 'provision','deploy', 'smoke', 'functional');
+   #+end_src
+* =statuses= Table
+** TODO Remove table in favor of an enum
+   #+begin_src sql
+     CREATE TYPE status AS ENUM('idle', 'running', 'complete');
+   #+end_src
+* =stage_run= Table
+** TODO =created_on= should be =NOT NULL=
+** TODO =updated_at= should be =NOT NULL=
+** TODO =stage= should be =NOT NULL=
+** TODO (=pipeline_id=, =stage=) should be =UNIQUE=
+** TODO =change_id= should refer to =changes.id=
+   Right?
+* =phase_run= Table
+** TODO =run_success= should be =NOT NULL=
+** TODO =created_on= should be =NOT NULL=
+** TODO =updated_at= should be =NOT NULL=
+** TODO =phase= should be =NOT NULL=
+** TODO =status= should be =NOT NULL=
+** TODO =status= should probably default to ='idle'=
+** TODO =status= should refer to =statuses.id=
+** TODO =stage_run_id= should be =NOT NULL=
+** TODO =search_query= should be =NOT NULL=

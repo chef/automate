@@ -1,0 +1,18 @@
+{
+  "id": "168f1c92-07be-4234-9a32-519ad5ae4272",
+  "message_type": "action",
+  "message_version": "0.1.1",
+  "entity_name": "jtimberman",
+  "entity_type": "user",
+  "task": "update",
+  "remote_hostname": "127.0.0.1",
+  "recorded_at": "2018-03-28T20:34:38Z",
+  "remote_request_id": "fbabeef0-f65d-40f6-a403-709ba0097929",
+  "request_id": "g3IAA2QAEGVyY2hlZkAxMjcuMC4wLjEBAAA7i0RIAAIAAAAA",
+  "requestor_name": "pivotal",
+  "requestor_type": "user",
+  "revision_id": "",
+  "service_hostname": "chef-server.chef.co",
+  "user_agent": "Chef Knife/12.21.31 (ruby-2.4.3-p205; ohai-8.25.1; x86_64-linux; +https://chef.io)",
+  "data": "{\"display_name\":\"Joshua Timberman\",\"email\":\"joshua@chef.io\",\"first_name\":\"Joshua\",\"last_name\":\"Timberman\",\"middle_name\":\"\",\"private_key\":true,\"username\":\"jtimberman\"}"
+}
