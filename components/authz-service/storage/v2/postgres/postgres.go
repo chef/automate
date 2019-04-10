@@ -172,7 +172,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	}
 
 	// Since we are forcing users to update the entire policy, we should delete
-	// all existing policies for simplicity for now. Let's not delete the actual
+	// all existing statements for simplicity for now. Let's not delete the actual
 	// policy row to preserve that record / id.
 	//
 	// This will cascade delete all related statements.
