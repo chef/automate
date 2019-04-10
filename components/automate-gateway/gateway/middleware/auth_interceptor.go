@@ -18,6 +18,7 @@ import (
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/a2/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -34,8 +35,9 @@ import (
 func NewAuthInterceptor(
 	authn authn.AuthenticationClient,
 	authz GRPCAuthorizationHandler,
+	policy v2.PoliciesClient,
 ) AuthorizationInterceptor {
-	return &authInterceptor{authn: authn, authz: authz}
+	return &authInterceptor{authn: authn, authz: authz, policy: policy}
 }
 
 type SwitchingAuthorizationHandler interface {
@@ -71,7 +73,7 @@ type FilterProjectsResponse struct {
 }
 
 type GRPCAuthorizationHandler interface {
-	Handle(ctx context.Context, subjects []string, projects []string, req interface{}) (context.Context, error)
+	Handle(ctx context.Context, subjects []string, projects []string, req interface{}, version *v2.Version) (context.Context, error)
 }
 
 type HTTPAuthorizationHandler interface {
@@ -98,8 +100,9 @@ type AnnotatedAuthorizationResponse interface {
 }
 
 type authInterceptor struct {
-	authn authn.AuthenticationClient
-	authz GRPCAuthorizationHandler
+	authn  authn.AuthenticationClient
+	authz  GRPCAuthorizationHandler
+	policy v2.PoliciesClient
 }
 
 // UnaryInterceptor returns a grpc UnaryServerInterceptor that performs AuthN/Z.
@@ -150,8 +153,12 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 		projectHeaderEntries := md.Get(runtime.MetadataPrefix + "projects")
 		projects := getProjectsFromMetadata(projectHeaderEntries)
-
-		ctx, err = a.authz.Handle(authCtx, subs, projects, req)
+		resp, err := a.policy.GetPolicyVersion(ctx, &v2.GetPolicyVersionReq{})
+		if err != nil {
+			log.Debugf("error fetching IAM version: %s", err)
+			return nil, err
+		}
+		ctx, err = a.authz.Handle(authCtx, subs, projects, req, resp.Version)
 		if err != nil {
 			return nil, err
 		}
