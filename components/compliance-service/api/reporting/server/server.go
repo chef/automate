@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/chef/automate/lib/stringutils"
 )
@@ -65,8 +66,12 @@ func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*report
 	if len(formattedFilters["profile_name"]) > 1 {
 		return nil, status.Error(codes.InvalidArgument, "Only one 'profile_name' filter is allowed")
 	}
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, in.Id)
+	}
 	// Using ComplianceTwenty as the report might not be in the latest index
-	report, err := srv.es.GetReport(relaxting.ComplianceDailyRepTwenty, in.Id, formattedFilters)
+	report, err = srv.es.GetReport(relaxting.ComplianceDailyRepTwenty, in.Id, formattedFilters)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, in.Id)
 	}
@@ -318,4 +323,17 @@ func validatePaginationAndSorting(in *reporting.Query, validSortFields map[strin
 		sort = defaultSortField
 	}
 	return
+}
+
+func filterByProjects(ctx context.Context, filters map[string][]string) (map[string][]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		return filters, nil
+	}
+
+	filters["projects"] = projectsFilter
+	return filters, nil
 }
