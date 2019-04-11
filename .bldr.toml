@@ -1,0 +1,796 @@
+[automate-scaffolding]
+plan_path = "components/automate-scaffolding"
+paths = [
+  "components/automate-scaffolding/*",
+  "lib/scaffolding/*"
+]
+        
+[automate-scaffolding-go]
+plan_path = "components/automate-scaffolding-go"
+paths = [
+  "components/automate-scaffolding-go/*",
+  "lib/scaffolding/*"
+]
+
+# GENERATED_HAB_PACKAGE_CONFIG_START
+# The following habitat package configuration is auto-generated
+# To update this content run:
+#     go run ./tools/expeditor-config-gen
+
+[automate-platform-tools]
+plan_path = "components/automate-platform-tools"
+paths = [
+  "components/automate-platform-tools/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/interservice/pg_sidecar/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/pg-sidecar-service/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/secrets/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[backup-gateway]
+plan_path = "components/backup-gateway"
+
+[automate-elasticsearch]
+plan_path = "components/automate-elasticsearch"
+
+[automate-postgresql]
+plan_path = "components/automate-postgresql"
+
+[automate-debug]
+plan_path = "components/automate-debug"
+
+[authn-service]
+plan_path = "components/authn-service"
+paths = [
+  "components/authn-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/external/common/*",
+  "api/interservice/authn/*",
+  "api/interservice/authz/*",
+  "api/interservice/teams/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/grpc/*",
+  "lib/httputils/*",
+  "lib/io/*",
+  "lib/logger/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/uuid4/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[authz-service]
+plan_path = "components/authz-service"
+paths = [
+  "components/authz-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/external/common/*",
+  "api/external/ingest/*",
+  "api/interservice/authz/*",
+  "api/interservice/event/*",
+  "api/interservice/ingest/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/compliance-service/*",
+  "components/event-service/*",
+  "lib/authz/*",
+  "lib/event/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/logger/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/uuid4/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[automate-dex]
+plan_path = "components/automate-dex"
+
+[event-gateway]
+plan_path = "components/event-gateway"
+paths = [
+  "components/event-gateway/*",
+  "api/external/common/*",
+  "api/interservice/authn/*",
+  "api/interservice/authz/*",
+  "api/interservice/event/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[automate-gateway]
+plan_path = "components/automate-gateway"
+paths = [
+  "components/automate-gateway/*",
+  "api/config/applications/*",
+  "api/config/authn/*",
+  "api/config/authz/*",
+  "api/config/backup_gateway/*",
+  "api/config/bifrost/*",
+  "api/config/bookshelf/*",
+  "api/config/cfgmgmt/*",
+  "api/config/compliance/*",
+  "api/config/cs_nginx/*",
+  "api/config/data_feed/*",
+  "api/config/data_lifecycle/*",
+  "api/config/deployment/*",
+  "api/config/dex/*",
+  "api/config/elasticsearch/*",
+  "api/config/erchef/*",
+  "api/config/es_sidecar/*",
+  "api/config/esgateway/*",
+  "api/config/event/*",
+  "api/config/event_gateway/*",
+  "api/config/gateway/*",
+  "api/config/ingest/*",
+  "api/config/license_control/*",
+  "api/config/load_balancer/*",
+  "api/config/local_user/*",
+  "api/config/nodemanager/*",
+  "api/config/notifications/*",
+  "api/config/pg_gateway/*",
+  "api/config/pg_sidecar/*",
+  "api/config/postgresql/*",
+  "api/config/prometheus/*",
+  "api/config/secrets/*",
+  "api/config/session/*",
+  "api/config/shared/*",
+  "api/config/teams/*",
+  "api/config/ui/*",
+  "api/config/workflow_nginx/*",
+  "api/config/workflow_server/*",
+  "api/external/applications/*",
+  "api/external/cfgmgmt/*",
+  "api/external/common/*",
+  "api/external/ingest/*",
+  "api/external/secrets/*",
+  "api/interservice/authn/*",
+  "api/interservice/authz/*",
+  "api/interservice/cfgmgmt/*",
+  "api/interservice/deployment/*",
+  "api/interservice/event/*",
+  "api/interservice/ingest/*",
+  "api/interservice/license_control/*",
+  "api/interservice/local_user/*",
+  "api/interservice/teams/*",
+  "components/automate-deployment/*",
+  "components/automate-grpc/*",
+  "components/compliance-service/*",
+  "components/config-mgmt-service/*",
+  "components/ingest-service/*",
+  "components/nodemanager-service/*",
+  "components/notifications-client/*",
+  "components/secrets-service/*",
+  "components/trial-license-service/*",
+  "lib/db/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/license/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[automate-load-balancer]
+plan_path = "components/automate-load-balancer"
+
+[automate-prometheus]
+plan_path = "components/automate-prometheus"
+
+[compliance-service]
+plan_path = "onents/compliance-service"
+paths = [
+  "components/compliance-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/external/common/*",
+  "api/external/ingest/*",
+  "api/external/secrets/*",
+  "api/interservice/authn/*",
+  "api/interservice/authz/*",
+  "api/interservice/data_lifecycle/*",
+  "api/interservice/es_sidecar/*",
+  "api/interservice/event/*",
+  "api/interservice/ingest/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/event-service/*",
+  "components/nodemanager-service/*",
+  "components/notifications-client/*",
+  "components/secrets-service/*",
+  "lib/authz/*",
+  "lib/db/*",
+  "lib/event/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/uuid4/*",
+  "lib/version/*",
+  "Gopkg.lock",
+]
+
+[config-mgmt-service]
+plan_path = "nents/config-mgmt-service"
+paths = [
+  "components/config-mgmt-service/*",
+  "api/external/cfgmgmt/*",
+  "api/interservice/authz/*",
+  "api/interservice/cfgmgmt/*",
+  "api/interservice/event/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/ingest-service/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[data-lifecycle-service]
+plan_path = "ts/data-lifecycle-service"
+paths = [
+  "components/data-lifecycle-service/*",
+  "api/interservice/data_lifecycle/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/compliance-service/*",
+  "components/es-sidecar-service/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[automate-cli]
+plan_path = ": components/automate-cli"
+paths = [
+  "components/automate-cli/*",
+  "api/config/applications/*",
+  "api/config/authn/*",
+  "api/config/authz/*",
+  "api/config/backup_gateway/*",
+  "api/config/bifrost/*",
+  "api/config/bookshelf/*",
+  "api/config/cfgmgmt/*",
+  "api/config/compliance/*",
+  "api/config/cs_nginx/*",
+  "api/config/data_feed/*",
+  "api/config/data_lifecycle/*",
+  "api/config/deployment/*",
+  "api/config/dex/*",
+  "api/config/elasticsearch/*",
+  "api/config/erchef/*",
+  "api/config/es_sidecar/*",
+  "api/config/esgateway/*",
+  "api/config/event/*",
+  "api/config/event_gateway/*",
+  "api/config/gateway/*",
+  "api/config/ingest/*",
+  "api/config/license_control/*",
+  "api/config/load_balancer/*",
+  "api/config/local_user/*",
+  "api/config/nodemanager/*",
+  "api/config/notifications/*",
+  "api/config/pg_gateway/*",
+  "api/config/pg_sidecar/*",
+  "api/config/postgresql/*",
+  "api/config/prometheus/*",
+  "api/config/secrets/*",
+  "api/config/session/*",
+  "api/config/shared/*",
+  "api/config/teams/*",
+  "api/config/ui/*",
+  "api/config/workflow_nginx/*",
+  "api/config/workflow_server/*",
+  "api/external/common/*",
+  "api/interservice/deployment/*",
+  "api/interservice/es_sidecar/*",
+  "components/authz-service/*",
+  "components/automate-deployment/*",
+  "components/automate-gateway/api/auth/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/api/compliance/*",
+  "components/automate-gateway/api/iam/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/es-sidecar-service/*",
+  "lib/grpc/*",
+  "lib/httputils/*",
+  "lib/io/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/secrets/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/uuid4/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[deployment-service]
+plan_path = "onents/automate-deployment"
+paths = [
+  "components/automate-deployment/*",
+  "api/config/applications/*",
+  "api/config/authn/*",
+  "api/config/authz/*",
+  "api/config/backup_gateway/*",
+  "api/config/bifrost/*",
+  "api/config/bookshelf/*",
+  "api/config/cfgmgmt/*",
+  "api/config/compliance/*",
+  "api/config/cs_nginx/*",
+  "api/config/data_feed/*",
+  "api/config/data_lifecycle/*",
+  "api/config/deployment/*",
+  "api/config/dex/*",
+  "api/config/elasticsearch/*",
+  "api/config/erchef/*",
+  "api/config/es_sidecar/*",
+  "api/config/esgateway/*",
+  "api/config/event/*",
+  "api/config/event_gateway/*",
+  "api/config/gateway/*",
+  "api/config/ingest/*",
+  "api/config/license_control/*",
+  "api/config/load_balancer/*",
+  "api/config/local_user/*",
+  "api/config/nodemanager/*",
+  "api/config/notifications/*",
+  "api/config/pg_gateway/*",
+  "api/config/pg_sidecar/*",
+  "api/config/platform/*",
+  "api/config/postgresql/*",
+  "api/config/prometheus/*",
+  "api/config/secrets/*",
+  "api/config/session/*",
+  "api/config/shared/*",
+  "api/config/teams/*",
+  "api/config/ui/*",
+  "api/config/workflow_nginx/*",
+  "api/config/workflow_server/*",
+  "api/external/common/*",
+  "api/external/ingest/*",
+  "api/interservice/authn/*",
+  "api/interservice/authz/*",
+  "api/interservice/cfgmgmt/*",
+  "api/interservice/deployment/*",
+  "api/interservice/es_sidecar/*",
+  "api/interservice/event/*",
+  "api/interservice/ingest/*",
+  "api/interservice/license_control/*",
+  "api/interservice/local_user/*",
+  "api/interservice/teams/*",
+  "components/automate-cli/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/compliance-service/*",
+  "components/config-mgmt-service/*",
+  "components/es-sidecar-service/*",
+  "components/ingest-service/*",
+  "components/teams-service/*",
+  "lib/grpc/*",
+  "lib/httputils/*",
+  "lib/io/*",
+  "lib/license/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/secrets/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/uuid4/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[es-sidecar-service]
+plan_path = "onents/es-sidecar-service"
+paths = [
+  "components/es-sidecar-service/*",
+  "api/interservice/es_sidecar/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/config-mgmt-service/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[automate-es-gateway]
+plan_path = "nents/automate-es-gateway"
+
+[pg-sidecar-service]
+plan_path = "onents/pg-sidecar-service"
+paths = [
+  "components/pg-sidecar-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/interservice/pg_sidecar/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[automate-pg-gateway]
+plan_path = "nents/automate-pg-gateway"
+
+[event-service]
+plan_path = " components/event-service"
+paths = [
+  "components/event-service/*",
+  "api/external/ingest/*",
+  "api/interservice/authz/*",
+  "api/interservice/event/*",
+  "api/interservice/ingest/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/compliance-service/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[applications-service]
+plan_path = "ents/applications-service"
+paths = [
+  "components/applications-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/external/applications/*",
+  "api/external/common/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/db/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[nodemanager-service]
+plan_path = "nents/nodemanager-service"
+paths = [
+  "components/nodemanager-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/external/ingest/*",
+  "api/external/secrets/*",
+  "api/interservice/authz/*",
+  "api/interservice/event/*",
+  "api/interservice/ingest/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/compliance-service/*",
+  "components/event-service/*",
+  "components/secrets-service/*",
+  "lib/db/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[ingest-service]
+plan_path = "components/ingest-service"
+paths = [
+  "components/ingest-service/*",
+  "api/external/ingest/*",
+  "api/interservice/authz/*",
+  "api/interservice/data_lifecycle/*",
+  "api/interservice/es_sidecar/*",
+  "api/interservice/event/*",
+  "api/interservice/ingest/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/compliance-service/*",
+  "components/event-service/*",
+  "lib/authz/*",
+  "lib/event/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[license-control-service]
+plan_path = "/license-control-service"
+paths = [
+  "components/license-control-service/*",
+  "api/interservice/license_control/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/license/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[local-user-service]
+plan_path = "components/local-user-service"
+paths = [
+  "components/local-user-service/*",
+  "api/external/common/*",
+  "api/interservice/authz/*",
+  "api/interservice/local_user/*",
+  "api/interservice/teams/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/session-service/*",
+  "lib/grpc/*",
+  "lib/httputils/*",
+  "lib/io/*",
+  "lib/logger/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/uuid4/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[secrets-service]
+plan_path = "components/secrets-service"
+paths = [
+  "components/secrets-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/external/secrets/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/db/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[session-service]
+plan_path = "components/session-service"
+paths = [
+  "components/session-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/grpc/*",
+  "lib/httputils/*",
+  "lib/io/*",
+  "lib/logger/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[teams-service]
+plan_path = "components/teams-service"
+paths = [
+  "components/teams-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/external/common/*",
+  "api/interservice/authz/*",
+  "api/interservice/event/*",
+  "api/interservice/teams/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/logger/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/uuid4/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[trial-license-service]
+plan_path = "components/trial-license-service"
+paths = [
+  "components/trial-license-service/*",
+  "lib/logger/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[automate-cs-bookshelf]
+plan_path = "components/automate-cs-bookshelf"
+
+[automate-cs-oc-bifrost]
+plan_path = "components/automate-cs-oc-bifrost"
+
+[automate-cs-oc-erchef]
+plan_path = "components/automate-cs-oc-erchef"
+paths = [
+  "components/automate-cs-oc-erchef/*",
+  "Gopkg.lock"
+]
+
+[automate-cs-nginx]
+plan_path = "components/automate-cs-nginx"
+paths = [
+  "components/automate-cs-nginx/*",
+  "lib/io/*",
+  "lib/secrets/*",
+  "Gopkg.lock"
+]
+
+[automate-workflow-nginx]
+plan_path = "/automate-workflow-nginx"
+
+[automate-workflow-web]
+plan_path = "components/automate-workflow-web"
+
+[data-feed-service]
+plan_path = "components/data-feed-service"
+paths = [
+  "components/data-feed-service/*",
+  "api/external/secrets/*",
+  "api/interservice/authz/*",
+  "api/interservice/cfgmgmt/*",
+  "api/interservice/event/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "components/config-mgmt-service/*",
+  "components/ingest-service/*",
+  "components/notifications-client/*",
+  "components/secrets-service/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+# GENERATED_HAB_PACKAGE_CONFIG_END
+
+[automate-workflow-ctl]
+plan_path = "components/automate-workflow-ctl"
+paths = [
+  "components/automate-workflow-server/*",
+  "components/automate-workflow-ctl/*"
+]
+
+[automate-workflow-server]
+plan_path = "automate-workflow-server"
+paths = [
+  "components/automate-workflow-ctl/*",
+  "components/automate-workflow-server/*"
+]
+
+[automate-ui]
+plan_path = ": components/automate-ui"
+paths = [
+  "components/automate-ui/*",
+  "components/chef-ui-library/*"
+]
+
+[automate-chef-io]
+plan_path = "components/automate-chef-io"
+
+[notifications-service]
+plan_path = "components/notifications-service"
+paths = [
+  "components/automate-platform-tools/*",
+  "components/notifications-service/*"
+]
