@@ -167,7 +167,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	if _, found := v1PoliciesToSkip[pol.ID.String()]; found {
 		return nil, nil
 	}
-	allProjects := []string{constants_v2.AllProjectsExternalID}
+	allProjects := []string{constants_v2.AllProjectsID}
 
 	// there's three cfgmgmt policies (which had been deletable) that are now
 	// mapped into one:
