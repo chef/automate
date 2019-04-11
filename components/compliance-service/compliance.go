@@ -627,6 +627,11 @@ func (pm *ProjectsClientMock) GetProjectRules(ctx context.Context, in *iam_v2.Ge
 	return &iam_v2.GetProjectRulesResp{}, nil
 }
 
+func (pm *ProjectsClientMock) HandleEvent(ctx context.Context, in *event.EventMsg,
+	opts ...grpc.CallOption) (*event.EventResponse, error) {
+	return &event.EventResponse{}, nil
+}
+
 type NotifierMock struct {
 }
 

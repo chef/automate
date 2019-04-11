@@ -29,28 +29,32 @@ import (
 
 func TestUpdateProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store, eventServiceClient := setupProjects(t)
+
 	cases := []struct {
 		desc string
 		f    func(*testing.T)
 	}{
 		{"if the project name is empty, returns 'invalid argument'", func(t *testing.T) {
+			cl, _, _ := setupProjects(t)
 			resp, err := cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: "empty-name", Name: ""})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is empty, returns 'invalid argument'", func(t *testing.T) {
+			cl, _, _ := setupProjects(t)
 			resp, err := cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: "", Name: "empty-id"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is invalid, returns 'invalid argument'", func(t *testing.T) {
+			cl, _, _ := setupProjects(t)
 			resp, err := cl.UpdateProject(ctx,
 				&api.UpdateProjectReq{Id: "no_underscores", Name: "any name"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project with that id does not exist, returns 'not found'", func(t *testing.T) {
+			cl, _, _ := setupProjects(t)
 			resp, err := cl.UpdateProject(ctx,
 				&api.UpdateProjectReq{Id: "false-project", Name: "my other foo"})
 			grpctest.AssertCode(t, codes.NotFound, err)
@@ -58,6 +62,7 @@ func TestUpdateProject(t *testing.T) {
 		}},
 		{"if the project already exists and update request is valid, project is updated",
 			func(t *testing.T) {
+				cl, store, _ := setupProjects(t)
 				id, updatedName := "my-foo", "updated name"
 				addProjectToStore(t, store, id, "original name", storage.ChefManaged)
 
@@ -73,6 +78,7 @@ func TestUpdateProject(t *testing.T) {
 			}},
 		{"when a project is updated an event is published",
 			func(t *testing.T) {
+				cl, store, eventServiceClient := setupProjects(t)
 				numberOfPublishes := eventServiceClient.PublishedEvents
 				id, updatedName := "my-foo", "updated name"
 				addProjectToStore(t, store, id, "original name", storage.ChefManaged)
@@ -86,6 +92,7 @@ func TestUpdateProject(t *testing.T) {
 					eventServiceClient.LastestPublishedEvent.Data.Fields["ProjectUpdateID"].GetStringValue())
 			}},
 		{"when a project is not updated an event is not published", func(t *testing.T) {
+			cl, _, eventServiceClient := setupProjects(t)
 			numberOfPublishes := eventServiceClient.PublishedEvents
 			_, _ = cl.UpdateProject(ctx,
 				&api.UpdateProjectReq{Id: "false-project", Name: "my other foo"})
@@ -99,7 +106,6 @@ func TestUpdateProject(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		store.Flush()
 	}
 }
 

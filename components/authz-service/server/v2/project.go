@@ -3,16 +3,12 @@ package v2
 import (
 	"context"
 
-	"github.com/gofrs/uuid"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
-
-	_struct "github.com/golang/protobuf/ptypes/struct"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
@@ -23,16 +19,16 @@ import (
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
-	automate_event_type "github.com/chef/automate/components/event-service/server"
-	project_update_tags "github.com/chef/automate/lib/authz"
+	event "github.com/chef/automate/components/event-service/server"
+	log "github.com/sirupsen/logrus"
 )
 
 // state the server state for projects
 type state struct {
-	log                logger.Logger
-	store              storage.Storage
-	engine             engine.ProjectRulesRetriever
-	eventServiceClient automate_event.EventServiceClient
+	log                  logger.Logger
+	store                storage.Storage
+	engine               engine.ProjectRulesRetriever
+	projectUpdateManager ProjectUpdateManager
 }
 
 // NewMemstoreProjectsServer returns an instance of api.ProjectsServer
@@ -72,10 +68,10 @@ func NewProjectsServer(
 ) (api.ProjectsServer, error) {
 
 	return &state{
-		log:                l,
-		store:              s,
-		engine:             e,
-		eventServiceClient: eventServiceClient,
+		log:                  l,
+		store:                s,
+		engine:               e,
+		projectUpdateManager: NewProjectUpdateManager(eventServiceClient),
 	}, nil
 }
 
@@ -145,48 +141,13 @@ func (s *state) UpdateProject(ctx context.Context,
 			"error converting project with ID %q: %s", resp.ID, err.Error())
 	}
 
-	err = s.startProjectUpdateForDomainResources()
+	err = s.projectUpdateManager.Start()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal,
 			"error starting project update %q: %s", resp.ID, err.Error())
 	}
 
 	return &api.UpdateProjectResp{Project: apiProject}, nil
-}
-
-// In future work this function will start a manager that
-// * only allows one project update to run at a time.
-// * collect statuses from the resources being updated.
-// * handle failures from the domain services updating.
-func (s *state) startProjectUpdateForDomainResources() error {
-	eventUUID, err := uuid.NewV4()
-	if err != nil {
-		return err
-	}
-	projectUpdateID, err := uuid.NewV4()
-	if err != nil {
-		return err
-	}
-
-	event := &automate_event.EventMsg{
-		EventID:   eventUUID.String(),
-		Published: ptypes.TimestampNow(),
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
-					Kind: &_struct.Value_StringValue{
-						StringValue: projectUpdateID.String(),
-					},
-				},
-			},
-		},
-	}
-
-	pubReq := automate_event.PublishRequest{Msg: event}
-	_, err = s.eventServiceClient.Publish(context.Background(), &pubReq)
-
-	return err
 }
 
 func (s *state) ListProjects(ctx context.Context,
@@ -271,6 +232,26 @@ func (s *state) GetProjectRules(ctx context.Context,
 			Rules: rulesToProjectRules(rules),
 		},
 	}, nil
+}
+
+func (s *state) HandleEvent(ctx context.Context,
+	req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
+	log.Debugf("authz is handling your event %s", req.EventID)
+
+	response := &automate_event.EventResponse{}
+	if req.Type.Name == event.ProjectRulesUpdateStatus {
+		err := s.projectUpdateManager.ProcessStatusMessage(req)
+		if err != nil {
+			return response, err
+		}
+	} else if req.Type.Name == event.ProjectRulesUpdateFailed {
+		err := s.projectUpdateManager.ProcessFailMessage(req)
+		if err != nil {
+			return response, err
+		}
+	}
+
+	return response, nil
 }
 
 // we want to reserve the option to return an error in this conversion

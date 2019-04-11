@@ -6,6 +6,7 @@ package v2
 import (
 	"context"
 
+	event "github.com/chef/automate/api/interservice/event"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -36,6 +37,7 @@ type ProjectsServerMock struct {
 	ListProjectsFunc     func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
 	ListProjectRulesFunc func(context.Context, *ListProjectRulesReq) (*ProjectCollectionRulesResp, error)
 	GetProjectRulesFunc  func(context.Context, *GetProjectRulesReq) (*GetProjectRulesResp, error)
+	HandleEventFunc      func(context.Context, *event.EventMsg) (*event.EventResponse, error)
 }
 
 func (m *ProjectsServerMock) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
@@ -122,6 +124,18 @@ func (m *ProjectsServerMock) GetProjectRules(ctx context.Context, req *GetProjec
 	return nil, status.Error(codes.Internal, "mock: 'GetProjectRules' not implemented")
 }
 
+func (m *ProjectsServerMock) HandleEvent(ctx context.Context, req *event.EventMsg) (*event.EventResponse, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.HandleEventFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'HandleEvent' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *ProjectsServerMock) Reset() {
 	m.UpdateProjectFunc = nil
@@ -131,4 +145,5 @@ func (m *ProjectsServerMock) Reset() {
 	m.ListProjectsFunc = nil
 	m.ListProjectRulesFunc = nil
 	m.GetProjectRulesFunc = nil
+	m.HandleEventFunc = nil
 }

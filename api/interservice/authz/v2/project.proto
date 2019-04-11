@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "validate/validate.proto";
 import "api/interservice/authz/v2/type.proto";
+import "api/interservice/event/event.proto";
 
 package chef.automate.domain.authz.v2;
 option go_package = "github.com/chef/automate/api/interservice/authz/v2";
@@ -63,6 +64,7 @@ service Projects {
     // spike (aka keep them out of the gateway for now).
     rpc ListProjectRules(ListProjectRulesReq) returns (ProjectCollectionRulesResp) {};
     rpc GetProjectRules(GetProjectRulesReq) returns (GetProjectRulesResp) {};
+    rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
 }
 
 message ListProjectRulesReq {}

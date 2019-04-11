@@ -103,6 +103,7 @@ habitat_packages:
         - components/compliance-service/*
         - components/event-service/*
         - lib/authz/*
+        - lib/event/*
         - lib/grpc/*
         - lib/io/*
         - lib/logger/*
@@ -126,6 +127,7 @@ habitat_packages:
         - api/external/common/*
         - api/interservice/authn/*
         - api/interservice/authz/*
+        - api/interservice/event/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*
@@ -262,6 +264,7 @@ habitat_packages:
         - api/external/cfgmgmt/*
         - api/interservice/authz/*
         - api/interservice/cfgmgmt/*
+        - api/interservice/event/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*
@@ -479,6 +482,7 @@ habitat_packages:
       bldr_paths:
         - components/event-service/*
         - api/external/ingest/*
+        - api/interservice/authz/*
         - api/interservice/event/*
         - api/interservice/ingest/*
         - components/automate-gateway/api/authz/*
@@ -522,6 +526,7 @@ habitat_packages:
         - api/config/shared/*
         - api/external/ingest/*
         - api/external/secrets/*
+        - api/interservice/authz/*
         - api/interservice/event/*
         - api/interservice/ingest/*
         - components/automate-gateway/api/authz/*
@@ -652,6 +657,7 @@ habitat_packages:
         - api/config/shared/*
         - api/external/common/*
         - api/interservice/authz/*
+        - api/interservice/event/*
         - api/interservice/teams/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
@@ -710,6 +716,7 @@ habitat_packages:
         - api/external/secrets/*
         - api/interservice/authz/*
         - api/interservice/cfgmgmt/*
+        - api/interservice/event/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*

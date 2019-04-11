@@ -72,7 +72,7 @@ function go_test() {
 }
 
 document "go_build_pkg" <<DOC
-  Build one or more go packages within the a2 codebase
+  Build one or more go packages within the automate codebase
 
   Examples:
 
@@ -133,7 +133,7 @@ function reload_component_binary() {
     component_path=$(hab pkg path chef/$component 2> /dev/null)
     if [[ $? -ne 0 ]]; then
       error "Could not find $component deployed under either your origin ($HAB_ORIGIN) or chef origin."
-      error "Deploy A2 and try again."
+      error "Deploy Automate and try again."
       return 1
     fi
   fi
@@ -177,7 +177,7 @@ function go_update_component() {
     go_build_component $component
     reload_component_binary $component
   else
-    error "You must first deploy A2."
+    error "You must first deploy Automate."
     return 1
   fi
 }
