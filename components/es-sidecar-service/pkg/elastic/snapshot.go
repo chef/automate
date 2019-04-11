@@ -257,7 +257,7 @@ func (es *Elastic) GetCreateSnapshotStatus(ctx context.Context, serviceName, sna
 	// found to report status; the bytes stats included in the messages update
 	// the totals as they go so they're not reliable. This approach has proved
 	// reasonable when used for A1 upgrades in our testing. See also:
-	// https://github.com/chef/automate/blob/bb778e82e0fd289d7fcd550b2c4f2963eeba2b39/components/automate-deployment/pkg/a1upgrade/a1commands.go#L128
+	// https://github.com/chef/automate/blob/13e626b60a9ae391a2b70e9d50970b8ddb6742c8/components/automate-deployment/pkg/a1upgrade/a1commands.go#L253
 	s.ProgressPercentage = (float64(esSnapshotStatus.ShardsStats.Done) / float64(esSnapshotStatus.ShardsStats.Total)) * 100
 	s.Message = ""
 
