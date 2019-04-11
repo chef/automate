@@ -400,7 +400,7 @@ test-integration-scanner: start-es start-pg start-ssh-node download-sample-marke
 	  exit 1; \
 	fi;
 
-test-automate-upgrade:
+test-automate-upgrade: clean-all
 	printf "\n===> Running Automate upgrade integration tests with TEST=$(TEST)\n"
 	@if [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ]; then \
 	  printf "===> ${red}Aborting test-automate-upgrade as one of these ENV variables is not true: A1_DATA, A2V1_DATA, A2V2_DATA${reset}\n"; \
