@@ -10,14 +10,14 @@ type SortField int
 
 const (
 	DefaultSortFieldForServiceGroups = "name"
-	DefaultSortFieldForServices      = "status"
+	DefaultSortFieldForServices      = "health"
 	DefaultSortAscending             = true
 
 	// Define here your sort fields
 	DefaultField SortField = iota
 	PercentOkField
 	NameField
-	StatusField
+	HealthField
 )
 
 var (
@@ -28,7 +28,7 @@ var (
 		"":           DefaultField,
 	}
 	validSortFieldsForServices = map[string]SortField{
-		"status": StatusField,
+		"health": HealthField,
 		"":       DefaultField,
 	}
 )
