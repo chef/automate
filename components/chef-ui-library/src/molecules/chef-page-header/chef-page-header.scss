@@ -11,6 +11,8 @@ chef-page-header {
   }
 
   chef-subheading {
+    display: block;
+    max-width: 610px;
     color: chef-hsl(var(--chef-primary-dark));
   }
 
