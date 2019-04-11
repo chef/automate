@@ -192,8 +192,10 @@ func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInf
 		opts := []string{}
 
 		if ssl := c.GetPlatform().GetExternalPostgresql().GetSsl(); ssl != nil {
-			if ssl.GetMode().GetValue() != "" {
-				opts = append(opts, fmt.Sprintf("sslmode=%s", ssl.GetMode().GetValue()))
+			if ssl.GetEnable().GetValue() {
+				opts = append(opts, "sslmode=verify-ca")
+			} else {
+				opts = append(opts, "sslmode=disable")
 			}
 			// TODO: certs
 		}

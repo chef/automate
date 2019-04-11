@@ -92,6 +92,7 @@ nodes = ["${ha_backend_container1_ip}:7432", "${ha_backend_container2_ip}:7432"]
 
 [global.v1.external.postgresql.ssl]
 mode = "disable"
+enable = false
 
 [global.v1.external.postgresql.auth]
 scheme = "password"
