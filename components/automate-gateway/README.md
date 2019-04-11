@@ -6,9 +6,9 @@ automate-gateway component which sits in the application layer of
 Automate's architecture. In this document, we'll use "gateway" to
 refer to the automate-gateway component.
 
-Here's a high-level sequence diagram showing communication paths from
+Here is a high-level sequence diagram showing communication paths from
 a user's browser through to domain services. The gateway is accessible
-via the external load balancer (automate-load-balancer). It's job is
+via the external load balancer (automate-load-balancer). Its job is
 to respond to API calls by leveraging one or more domain services. If
 you're familiar with Model, View, Controller (MVC) architectures, it
 may help you to think of the gateway as a controller and the domain
@@ -19,8 +19,7 @@ services as models.
 ## API Documentation
 
 Today, we generate docs for the HTTP API only. They can be viewed from
-within an A2 deployment by browsing to
-`https://$YOUR_A2/api/v0/openapi/ui/`.
+within an Automate deployment by browsing to `https://$YOUR_A2/api/v0/openapi/ui/`.
 
 (TODO: add notes on how to document your endpoints)
 
@@ -37,8 +36,8 @@ Clients of our GRPC API can expect stability of:
 * Response message type
 
 GRPC request and response message types can evolve by addition of new
-fields. Fields can't be removed from either. Note that for response
-messages values must continue to be set in responses.
+fields. Fields cannot be removed from either. Note that for response
+messages, values must continue to be set in responses.
 
 Clients of our HTTP API can expect stability of:
 
@@ -58,7 +57,7 @@ A change is compatible if:
 
    a. No change in default value or behavior.
 
-   b. Does not change interpretation of fields or values
+   b. Does not change interpretation of fields or values.
 
 3. Validation does not get more strict.
 
@@ -69,7 +68,7 @@ A change is compatible if:
 
 ## Getting Started
 
-1. Launch the A2 Habitat studio dev environment by following the
+1. Launch the Automate Habitat studio dev environment by following the
    [DEV_ENVIRONMENT.md](../../dev-docs/DEV_ENVIRONMENT.md)
    instructions.
 
@@ -81,7 +80,7 @@ A change is compatible if:
 4. If you add or update any of the `.proto` files that define the API,
    you can regenerate code like this: `compile_go_protobuf_component automate-gateway`.
    If you see an error about `invalid ELF header`
-   try unsetting the `CC` environment variable `unset CC` and retry.
+   try unsetting the `CC` environment variable (`unset CC`) and retry.
 
 ## Structure
 
@@ -101,32 +100,34 @@ $ tree -L 1
 
 ## Extend the API
 
-All public APIs are described via a GRPC service definition in a
-`.proto` file.
+All public APIs are described via a GRPC service definition in a `.proto` file.
 
 ### Add a new endpoint to an existing service
 
-1. Write an authz mapping test for the proto, like [this one](https://github.com/chef/automate/blob/a2dc6df2a6660a4ae54725e0398c5d4f90a88d9e/components/automate-gateway/api/auth/users/users_internal_test.go).
-1. Add an authz smoke test for the API [here](https://github.com/chef/automate/blob/a2dc6df2a6660a4ae54725e0398c5d4f90a88d9e/inspec/a2-api-integration/controls/authz_access_control.rb).
-1. Add the method and any new message types for the request and response to the `.proto` file under `a2/components/automate-gateway/api`.
-1. Annotate your API with an http option, defining its http method and endpoint (e.g. `option (google.api.http).get = "/cfgmgmt/nodes";`).
-1. Annotate your API with the authorization resource and action mappings (e.g. `option (chef.automate.api.policy).resource = "cfgmgmt:nodes";
-    option (chef.automate.api.policy).action = "read";`).
-1. Compile the proto file from within your habitat studio, using `compile_go_protobuf_component automate-gateway`.
-1. Add an implementation for the new method in the appropriate file under `handler/...`.
-1. If there isn't a default policy governing the API's resource and action, define one [here](https://github.com/chef/automate/blob/a2dc6df2a6660a4ae54725e0398c5d4f90a88d9e/components/authz-service/storage/storage.go#L83) and add a migration to `a2/components/authz-service` for it like [this one](https://github.com/chef/a2/blob/a2dc6df2a6660a4ae54725e0398c5d4f90a88d9e/components/authz-service/storage/postgres/migration/sql/05_telemetry_default_policy.up.sql). **Note** This whole step isn't necessary if the API should only be accessible to admins.
+1. Add an authz [smoke test](https://github.com/chef/automate/blob/c41a1863627c950c9ec5f5b8d5cd48254b8d8b71/inspec/a2-api-integration/controls/authz_access_control.rb#L14) for the API.
+2. Add the method and any new message types for the request and response to the `.proto` file under `a2/components/automate-gateway/api` ([Example](https://github.com/chef/automate/blob/c41a1863627c950c9ec5f5b8d5cd48254b8d8b71/components/automate-gateway/api/auth/users/users.proto#L16)).
+3. Annotate your API with an `http` option, defining its HTTP method and endpoint (e.g. `option (google.api.http).get = "/cfgmgmt/nodes";`).
+4. Annotate your API with the authorization _resource_ and _action_ mappings
+   (e.g. `option (chef.automate.api.policy).resource = "cfgmgmt:nodes"; option (chef.automate.api.policy).action = "read";`).
+   In the example file just above, the `chef.automate.api.policy` options are for IAM v1 while the
+   `chef.automate.api.iam.policy` options are for IAM v2. During the current transition time you must supply both sets of values.
+5. Compile the proto file from within your habitat studio, using `compile_go_protobuf_component automate-gateway`.
+6. Add an implementation for the new method in the appropriate file under `handler/...`.
+7. If there is no default policy governing the API's resource and action, define one in [storage.go](https://github.com/chef/automate/blob/c41a1863627c950c9ec5f5b8d5cd48254b8d8b71/components/authz-service/storage/v2/storage.go#L84)
+   and add a [migration](https://github.com/chef/automate/blob/c41a1863627c950c9ec5f5b8d5cd48254b8d8b71/components/authz-service/storage/postgres/migration/sql/05_telemetry_default_policy.up.sql#L3) to `a2/components/authz-service`.
+   **Note** This whole step is necessary only if the API should be accessible to non-admins.
 
 ### Add a new service
 
 1. Place your service in `api/...` following the existing pattern.
-1. Follow above steps for adding a new endpoint to existing service. Be sure to generate code by running the following from the project root in the
+2. Follow above steps for adding a new endpoint to existing service. Be sure to generate code by running the following from the project root in the
    dev studio: `compile_go_protobuf_component automate-gateway`
-1. Wire your service into `RegisterRestGWServices` and
+3. Wire your service into `RegisterRestGWServices` and
    `RegisterGRPCServices` in `gateway/services.go`
 
 ### Authorization for API Endpoints
 
-APIs are permissioned using A2's [authorization system](https://github.com/chef/automate/blob/a2dc6df2a6660a4ae54725e0398c5d4f90a88d9e/components/authz-service/README.md). Each public API needs to be mapped to an authorization resource and action. That resource and action must correspond to a default policy defined in the system, so you need to either map to a resource and action governed by an existing default policy, or define a new default policy governing the mapped resource and action.
+APIs are permissioned using Automate's [authorization system](https://github.com/chef/automate/blob/c41a1863627c950c9ec5f5b8d5cd48254b8d8b71/components/authz-service/README.md). Each public API needs to be mapped to an authorization resource and action. That resource and action must correspond to a default policy defined in the system, so you need to either map to a resource and action governed by an existing default policy, or define a new default policy governing the mapped resource and action.
 
 Our authorization policies state which `subjects` have the right to perform which `actions` on which `resources`.  This means the choices we make in resources and action names define the vocabulary our customers will have to use to manage permissioning. That makes these definitions a product concern.
 
@@ -134,7 +135,7 @@ Our authorization policies state which `subjects` have the right to perform whic
 >
 > Should those APIs map to the same resource and action (e.g. `resource: nodes:*`, `action: read`) or should they have different mappings?
 >
-> To answer that question, its important to understand whether our customers would expect that those interactions be permissioned separately from each other, or instead that if someone was allowed to list nodes, it should follow that they are also allowed to see statistics about those nodes.
+> To answer that question, it is important to understand whether our customers would expect that those interactions be permissioned separately from each other, or instead that if someone was allowed to list nodes, it should follow that they are also allowed to see statistics about those nodes.
 >
 > To put it another way, is the customer going to want *"Alex is allowed to read nodes"* to both mean Alex is able list all the nodes and get statistics on those nodes?
 
@@ -147,13 +148,13 @@ Our authorization policies state which `subjects` have the right to perform whic
 
 The sorts of testing we want in place for exposed gateway APIs are meant to ensure:
 
-1. Does each API have a resource/action mapping, and is it mapping to the correct resource and action? You can see an example of this sort of testing [here](https://github.com/chef/automate/blob/a2dc6df2a6660a4ae54725e0398c5d4f90a88d9e/components/automate-gateway/api/auth/users/users_internal_test.go).
-1. Does each API's resource/action mapping and the default policy governing it result in the expected access (e.g. if only admins should be able to access it, is that the case)? Add tests of this sort [here](https://github.com/chef/automate/blob/a2dc6df2a6660a4ae54725e0398c5d4f90a88d9e/inspec/a2-api-integration/controls/authz_access_control.rb).
+1. Does each API have a resource/action mapping, and is it mapping to the correct resource and action? This testing is done automatically by inplace infrastructure. See [How Automate Ensures Integrity of Protobuf Files](docs/proto-integrity.md)
+
+1. Does each API's resource/action mapping and the default policy governing it result in the expected access (e.g. if only admins should be able to access it, is that the case)? Add tests of this sort as [smoke tests](https://github.com/chef/automate/blob/c41a1863627c950c9ec5f5b8d5cd48254b8d8b71/inspec/a2-api-integration/controls/authz_access_control.rb).
 
 ### Documenting the API
 
-Comments on service methods will be integrated into the swagger docs
-for HTTP.
+Comments on service methods will be integrated into the swagger docs for HTTP.
 
 ## Data generation
 
