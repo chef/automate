@@ -566,7 +566,7 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 }
 
 func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -599,7 +599,7 @@ func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -636,7 +636,7 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
 	if err != nil {
 		return p.processError(err)
 	}
@@ -678,7 +678,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -817,7 +817,7 @@ func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -844,7 +844,7 @@ func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 }
 
 func (p *pg) GetProject(ctx context.Context, id string) (*v2.Project, error) {
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -861,7 +861,7 @@ func (p *pg) GetProject(ctx context.Context, id string) (*v2.Project, error) {
 }
 
 func (p *pg) DeleteProject(ctx context.Context, id string) error {
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
 	if err != nil {
 		return p.processError(err)
 	}
@@ -887,7 +887,7 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 }
 
 func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -1010,18 +1010,4 @@ func (p *pg) processError(err error) error {
 		p.logger.Warnf("unknown error type from database: %v", err)
 	}
 	return err
-}
-
-// projectsListFromContext returns the project list from the context.
-// In the case that the project list was ["*"], we return an empty list,
-// since we do not wish to filter on projects.
-func projectsListFromContext(ctx context.Context) ([]string, error) {
-	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if auth_context.AllProjectsRequested(projectsFilter) {
-		projectsFilter = []string{}
-	}
-	return projectsFilter, nil
 }
