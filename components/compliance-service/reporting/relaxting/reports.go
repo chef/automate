@@ -759,12 +759,17 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
-	profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
-	profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
-	controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status", "profiles.controls.impact"}
+	numberOfProfiles := len(filters["profile_id"])
+	numberOfControls := len(filters["control"])
 
-	profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes, profileLevelFscIncludes, controlLevelFscIncludes)
-	boolQuery = boolQuery.Must(profileAndControlQuery)
+	if numberOfProfiles > 0 || numberOfControls > 0 {
+		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
+		profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
+		controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status", "profiles.controls.impact"}
+
+		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes, profileLevelFscIncludes, controlLevelFscIncludes)
+		boolQuery = boolQuery.Must(profileAndControlQuery)
+	}
 
 	if len(filters["role"]) > 0 {
 		termQuery := elastic.NewTermsQuery("roles", stringArrayToInterfaceArray(filters["role"])...)
