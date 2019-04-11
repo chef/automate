@@ -53,22 +53,22 @@ func TestTeamsGRPC(t *testing.T) {
 
 	if migrationConfig == nil {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil, nil)
-		runAllServerTests(ctx, t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
+		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
 	} else {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx,
 			t, l, migrationConfig, convertedConfig)
-		runAllServerTests(ctx, t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
+		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
 
 		// If ciMode, run in-memory AND PG
 		// else just run PG.
 		if os.Getenv("CI") == "true, *authz.SubjectPurgeServerMock" {
 			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil, nil)
-			runAllServerTests(ctx, t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
+			runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
 		}
 	}
 }
 
-func runAllServerTests(ctx context.Context,
+func runAllServerTests(
 	t *testing.T, serv *Server, serviceRef *service.Service,
 	authzMock *authz.SubjectPurgeServerMock, cl teams.TeamsV2Client, close func()) {
 
@@ -76,9 +76,10 @@ func runAllServerTests(ctx context.Context,
 	defer close()
 
 	t.Run("GetTeam", func(t *testing.T) {
-		resetState(ctx, t, serviceRef)
+		resetState(context.Background(), t, serviceRef)
 
 		t.Run("when the team does not exist", func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := cl.GetTeam(ctx, &teams.GetTeamReq{
 				Id: "test team",
 			})
@@ -88,6 +89,7 @@ func runAllServerTests(ctx context.Context,
 		})
 
 		t.Run("when querying for the admins team", func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := cl.GetTeam(ctx, &teams.GetTeamReq{
 				Id: storage.AdminsTeamName,
 			})
@@ -100,6 +102,7 @@ func runAllServerTests(ctx context.Context,
 		})
 
 		t.Run("when the team exists", func(t *testing.T) {
+			ctx := context.Background()
 			initResp, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
 				Id:       "other-team",
 				Name:     "i can be the very best...",
@@ -117,14 +120,15 @@ func runAllServerTests(ctx context.Context,
 			assert.Equal(t, initResp.Team.Id, resp.Team.Id)
 			assert.Equal(t, initResp.Team.Name, resp.Team.Name)
 
-			cleanupTeamV2(ctx, t, cl, initResp.Team.Id)
+			cleanupTeamV2(t, cl, initResp.Team.Id)
 		})
 	})
 
 	t.Run("GetTeams", func(t *testing.T) {
-		resetState(ctx, t, serviceRef)
+		resetState(context.Background(), t, serviceRef)
 
 		t.Run("when the list is successfully returned", func(t *testing.T) {
+			ctx := context.Background()
 			resp1, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
 				Id:       "montag",
 				Name:     "he is a dag",
@@ -145,11 +149,12 @@ func runAllServerTests(ctx context.Context,
 			assert.Contains(t, list.Teams, resp2.Team)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(list.Teams))
 
-			cleanupTeamV2(ctx, t, cl, resp1.Team.Id)
-			cleanupTeamV2(ctx, t, cl, resp2.Team.Id)
+			cleanupTeamV2(t, cl, resp1.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when the list is successfully returned and filtered by projects", func(t *testing.T) {
+			ctx := context.Background()
 			resp1, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
 				Id:       "montag",
 				Name:     "he is a dag",
@@ -168,13 +173,66 @@ func runAllServerTests(ctx context.Context,
 			require.NoError(t, err)
 			require.NotNil(t, list)
 			assert.Contains(t, list.Teams, resp1.Team)
+			assert.Equal(t, 1, len(list.Teams))
+
+			cleanupTeamV2(t, cl, resp1.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
+		})
+
+		t.Run("when the list is successfully returned and filtered by *", func(t *testing.T) {
+			ctx := context.Background()
+			resp1, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "montag",
+				Name:     "he is a dag",
+				Projects: []string{"project1", "project2"},
+			})
+			require.NoError(t, err)
+			resp2, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "other-team",
+				Name:     "does not matter",
+				Projects: []string{"project2"},
+			})
+			require.NoError(t, err)
+
+			ctx = insertProjectsIntoNewContext([]string{"*"})
+			list, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err)
+			require.NotNil(t, list)
+			assert.Contains(t, list.Teams, resp1.Team)
+			assert.Contains(t, list.Teams, resp2.Team)
+			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(list.Teams))
+
+			cleanupTeamV2(t, cl, resp1.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
+		})
+
+		t.Run("when the list is successfully returned and filtered by (unassigned)", func(t *testing.T) {
+			ctx := context.Background()
+			resp1, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:   "montag",
+				Name: "he is a dag",
+			})
+			require.NoError(t, err)
+			resp2, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "other-team",
+				Name:     "does not matter",
+				Projects: []string{"other_project"},
+			})
+			require.NoError(t, err)
+
+			ctx = insertProjectsIntoNewContext([]string{"(unassigned)"})
+			list, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err)
+			require.NotNil(t, list)
+			assert.Contains(t, list.Teams, resp1.Team)
 			assert.Equal(t, 1+len(storage.NonDeletableTeams), len(list.Teams))
 
-			cleanupTeamV2(ctx, t, cl, resp1.Team.Id)
-			cleanupTeamV2(ctx, t, cl, resp2.Team.Id)
+			cleanupTeamV2(t, cl, resp1.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when there is only the non-deletable teams", func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
 			require.NoError(t, err)
 			require.NotNil(t, resp)
@@ -183,9 +241,10 @@ func runAllServerTests(ctx context.Context,
 	})
 
 	t.Run("CreateTeam", func(t *testing.T) {
-		resetState(ctx, t, serviceRef)
+		resetState(context.Background(), t, serviceRef)
 
 		t.Run("when a valid team is submitted", func(t *testing.T) {
+			ctx := context.Background()
 			req := &teams.CreateTeamReq{
 				Id:       "gotta-catch-em-all",
 				Name:     "Corgis Inc.",
@@ -198,10 +257,11 @@ func runAllServerTests(ctx context.Context,
 			assert.Equal(t, req.Id, team.Id)
 			assert.Equal(t, req.Name, team.Name)
 
-			cleanupTeamV2(ctx, t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when no projects are passed", func(t *testing.T) {
+			ctx := context.Background()
 			req := &teams.CreateTeamReq{
 				Id:       "gotta-catch-em-all",
 				Name:     "Corgis Inc.",
@@ -215,10 +275,11 @@ func runAllServerTests(ctx context.Context,
 			assert.Equal(t, req.Name, team.Name)
 			assert.Equal(t, 0, len(team.Projects))
 
-			cleanupTeamV2(ctx, t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when the team exists", func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
 				Id:       "some-name",
 				Name:     "montag",
@@ -233,14 +294,15 @@ func runAllServerTests(ctx context.Context,
 			assert.Nil(t, resp2)
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
 
-			cleanupTeamV2(ctx, t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp.Team.Id)
 		})
 	})
 
 	t.Run("DeleteTeam", func(t *testing.T) {
-		resetState(ctx, t, serviceRef)
+		resetState(context.Background(), t, serviceRef)
 
 		t.Run("when an existing team is deleted", func(t *testing.T) {
+			ctx := context.Background()
 			teamToDeleteName := "First Name"
 
 			authzMock.PurgeSubjectFromPoliciesFunc = func(
@@ -282,10 +344,184 @@ func runAllServerTests(ctx context.Context,
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-			cleanupTeamV2(ctx, t, cl, resp2.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
+		})
+
+		t.Run("when an existing team is deleted and is in the project filter", func(t *testing.T) {
+			ctx := context.Background()
+			teamToDeleteName := "First Name"
+
+			authzMock.PurgeSubjectFromPoliciesFunc = func(
+				_ context.Context, req *authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
+				if req.Subject == "team:local:"+teamToDeleteName {
+					return &authz.PurgeSubjectFromPoliciesResp{}, nil
+				}
+				return nil, errors.New("unexpected team name passed to PurgeSubjectFromPolicies")
+			}
+
+			resp1, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       teamToDeleteName,
+				Name:     "montag",
+				Projects: []string{"project1", "project2"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+			resp2, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "Other Name",
+				Name:     "does not matter",
+				Projects: []string{"project1"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp2)
+
+			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err)
+			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
+
+			ctx = insertProjectsIntoNewContext([]string{"project2"})
+			resp, err2 := cl.DeleteTeam(ctx, &teams.DeleteTeamReq{Id: resp1.Team.Id})
+			require.NoError(t, err2)
+			require.NotNil(t, resp)
+			assert.Equal(t, resp1.Team.Id, resp.Team.Id)
+			assert.Equal(t, resp1.Team.Name, resp.Team.Name)
+
+			teamListAfter, err3 := cl.GetTeams(context.Background(), &teams.GetTeamsReq{})
+			require.NoError(t, err3)
+			assert.Equal(t, len(storage.NonDeletableTeams), len(teamListAfter.Teams)-1)
+			assert.Contains(t, teamListAfter.Teams, resp2.Team)
+
+			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
+			cleanupTeamV2(t, cl, resp2.Team.Id)
+		})
+
+		t.Run("when an existing team is deleted and the project filter is *", func(t *testing.T) {
+			ctx := context.Background()
+			teamToDeleteName := "First Name"
+
+			authzMock.PurgeSubjectFromPoliciesFunc = func(
+				_ context.Context, req *authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
+				if req.Subject == "team:local:"+teamToDeleteName {
+					return &authz.PurgeSubjectFromPoliciesResp{}, nil
+				}
+				return nil, errors.New("unexpected team name passed to PurgeSubjectFromPolicies")
+			}
+
+			resp1, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       teamToDeleteName,
+				Name:     "montag",
+				Projects: []string{"project1", "project2"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+			resp2, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "Other Name",
+				Name:     "does not matter",
+				Projects: []string{"project1"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp2)
+
+			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err)
+			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
+
+			ctx = insertProjectsIntoNewContext([]string{"*"})
+			resp, err2 := cl.DeleteTeam(ctx, &teams.DeleteTeamReq{Id: resp1.Team.Id})
+			require.NoError(t, err2)
+			require.NotNil(t, resp)
+			assert.Equal(t, resp1.Team.Id, resp.Team.Id)
+			assert.Equal(t, resp1.Team.Name, resp.Team.Name)
+
+			teamListAfter, err3 := cl.GetTeams(context.Background(), &teams.GetTeamsReq{})
+			require.NoError(t, err3)
+			assert.Equal(t, len(storage.NonDeletableTeams), len(teamListAfter.Teams)-1)
+			assert.Contains(t, teamListAfter.Teams, resp2.Team)
+
+			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
+			cleanupTeamV2(t, cl, resp2.Team.Id)
+		})
+
+		t.Run("when an existing team is deleted and the project filter is (unassigned)", func(t *testing.T) {
+			ctx := context.Background()
+			teamToDeleteName := "First Name"
+
+			authzMock.PurgeSubjectFromPoliciesFunc = func(
+				_ context.Context, req *authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
+				if req.Subject == "team:local:"+teamToDeleteName {
+					return &authz.PurgeSubjectFromPoliciesResp{}, nil
+				}
+				return nil, errors.New("unexpected team name passed to PurgeSubjectFromPolicies")
+			}
+
+			resp1, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       teamToDeleteName,
+				Name:     "montag",
+				Projects: []string{},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+			resp2, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "Other Name",
+				Name:     "does not matter",
+				Projects: []string{"project1"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp2)
+
+			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err)
+			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
+
+			ctx = insertProjectsIntoNewContext([]string{"(unassigned)"})
+			resp, err2 := cl.DeleteTeam(ctx, &teams.DeleteTeamReq{Id: resp1.Team.Id})
+			require.NoError(t, err2)
+			require.NotNil(t, resp)
+			assert.Equal(t, resp1.Team.Id, resp.Team.Id)
+			assert.Equal(t, resp1.Team.Name, resp.Team.Name)
+
+			teamListAfter, err3 := cl.GetTeams(context.Background(), &teams.GetTeamsReq{})
+			require.NoError(t, err3)
+			assert.Equal(t, len(storage.NonDeletableTeams), len(teamListAfter.Teams)-1)
+			assert.Contains(t, teamListAfter.Teams, resp2.Team)
+
+			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
+			cleanupTeamV2(t, cl, resp2.Team.Id)
+		})
+
+		t.Run("when an existing team is filtered by projects return NotFound", func(t *testing.T) {
+			ctx := context.Background()
+			teamToDeleteName := "First Name"
+
+			resp1, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       teamToDeleteName,
+				Name:     "montag",
+				Projects: []string{"project1", "project2"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+			resp2, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "Other Name",
+				Name:     "does not matter",
+				Projects: []string{"project1"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, resp2)
+
+			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err)
+			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
+
+			ctx = insertProjectsIntoNewContext([]string{"project2"})
+			resp, err2 := cl.DeleteTeam(ctx, &teams.DeleteTeamReq{Id: resp2.Team.Id})
+			require.Nil(t, resp)
+			grpctest.AssertCode(t, codes.NotFound, err2)
+
+			cleanupTeamV2(t, cl, resp1.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when an existing team is deleted but the deletion of their policy membership fails", func(t *testing.T) {
+			ctx := context.Background()
 			authzMock.PurgeSubjectFromPoliciesFunc = func(
 				_ context.Context, req *authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
 				return nil, errors.New("test failure of PurgeSubjectFromPolicies")
@@ -319,10 +555,11 @@ func runAllServerTests(ctx context.Context,
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
 
 			authzMock.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
-			cleanupTeamV2(ctx, t, cl, resp2.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when the team to delete is not found", func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := cl.DeleteTeam(ctx, &teams.DeleteTeamReq{Id: "some-wrong-id"})
 
 			require.Nil(t, resp)
@@ -330,6 +567,7 @@ func runAllServerTests(ctx context.Context,
 		})
 
 		t.Run("when attempting to delete a team that is not allowed to be deleted", func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := cl.DeleteTeam(ctx, &teams.DeleteTeamReq{Id: storage.AdminsTeamName})
 
 			require.Nil(t, resp)
@@ -338,9 +576,10 @@ func runAllServerTests(ctx context.Context,
 	})
 
 	t.Run("UpdateTeam", func(t *testing.T) {
-		resetState(ctx, t, serviceRef)
+		resetState(context.Background(), t, serviceRef)
 
 		t.Run("when a valid team update request is submitted", func(t *testing.T) {
+			ctx := context.Background()
 			id := "gotta-catch-em-all"
 			req := &teams.CreateTeamReq{
 				Id:       id,
@@ -375,10 +614,152 @@ func runAllServerTests(ctx context.Context,
 			}
 			assert.Equal(t, newName, updatedTeam.Name)
 
-			cleanupTeamV2(ctx, t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp.Team.Id)
+		})
+
+		t.Run("when a valid team update request is submitted with the project filter", func(t *testing.T) {
+			ctx := context.Background()
+			id := "gotta-catch-em-all"
+			req := &teams.CreateTeamReq{
+				Id:       id,
+				Name:     "Corgis Inc.",
+				Projects: []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateTeam(ctx, req)
+			require.NoError(t, err)
+
+			newName := "Gotta Catch Only The Most Special"
+			updateReq := &teams.UpdateTeamReq{
+				Id:       id,
+				Name:     newName,
+				Projects: []string{"project2", "project3"},
+			}
+			updatedTeamResp, err := cl.UpdateTeam(insertProjectsIntoNewContext([]string{"project2"}), updateReq)
+			require.NoError(t, err, "update team")
+			require.NotNil(t, resp)
+			assert.Equal(t, updateReq.Id, updatedTeamResp.Team.Id)
+			assert.Equal(t, updateReq.Name, updatedTeamResp.Team.Name)
+			assert.Equal(t, updateReq.Projects, updatedTeamResp.Team.Projects)
+
+			teamsList, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err, "reading back teams")
+
+			require.Equal(t, 2, len(teamsList.Teams))
+			var updatedTeam *teams.Team
+			if teamsList.Teams[0].Id != storage.AdminsTeamName {
+				updatedTeam = teamsList.Teams[0]
+			} else {
+				updatedTeam = teamsList.Teams[1]
+			}
+			assert.Equal(t, newName, updatedTeam.Name)
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
+		})
+
+		t.Run("when a valid team update request is submitted with the project filter of *", func(t *testing.T) {
+			ctx := context.Background()
+			id := "gotta-catch-em-all"
+			req := &teams.CreateTeamReq{
+				Id:       id,
+				Name:     "Corgis Inc.",
+				Projects: []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateTeam(ctx, req)
+			require.NoError(t, err)
+
+			newName := "Gotta Catch Only The Most Special"
+			updateReq := &teams.UpdateTeamReq{
+				Id:       id,
+				Name:     newName,
+				Projects: []string{"project2", "project3"},
+			}
+			updatedTeamResp, err := cl.UpdateTeam(insertProjectsIntoNewContext([]string{"*"}), updateReq)
+			require.NoError(t, err, "update team")
+			require.NotNil(t, resp)
+			assert.Equal(t, updateReq.Id, updatedTeamResp.Team.Id)
+			assert.Equal(t, updateReq.Name, updatedTeamResp.Team.Name)
+			assert.Equal(t, updateReq.Projects, updatedTeamResp.Team.Projects)
+
+			teamsList, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err, "reading back teams")
+
+			require.Equal(t, 2, len(teamsList.Teams))
+			var updatedTeam *teams.Team
+			if teamsList.Teams[0].Id != storage.AdminsTeamName {
+				updatedTeam = teamsList.Teams[0]
+			} else {
+				updatedTeam = teamsList.Teams[1]
+			}
+			assert.Equal(t, newName, updatedTeam.Name)
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
+		})
+
+		t.Run("when a valid team update request is submitted with the project filter of (unassigned)", func(t *testing.T) {
+			ctx := context.Background()
+			id := "gotta-catch-em-all"
+			req := &teams.CreateTeamReq{
+				Id:       id,
+				Name:     "Corgis Inc.",
+				Projects: []string{},
+			}
+			resp, err := cl.CreateTeam(ctx, req)
+			require.NoError(t, err)
+
+			newName := "Gotta Catch Only The Most Special"
+			updateReq := &teams.UpdateTeamReq{
+				Id:       id,
+				Name:     newName,
+				Projects: []string{"project2", "project3"},
+			}
+			updatedTeamResp, err := cl.UpdateTeam(insertProjectsIntoNewContext([]string{"(unassigned)"}), updateReq)
+			require.NoError(t, err, "update team")
+			require.NotNil(t, resp)
+			assert.Equal(t, updateReq.Id, updatedTeamResp.Team.Id)
+			assert.Equal(t, updateReq.Name, updatedTeamResp.Team.Name)
+			assert.Equal(t, updateReq.Projects, updatedTeamResp.Team.Projects)
+
+			teamsList, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err, "reading back teams")
+
+			require.Equal(t, 2, len(teamsList.Teams))
+			var updatedTeam *teams.Team
+			if teamsList.Teams[0].Id != storage.AdminsTeamName {
+				updatedTeam = teamsList.Teams[0]
+			} else {
+				updatedTeam = teamsList.Teams[1]
+			}
+			assert.Equal(t, newName, updatedTeam.Name)
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
+		})
+
+		t.Run("when a valid team update request is submitted but is excluded by the project filter", func(t *testing.T) {
+			ctx := context.Background()
+			id := "gotta-catch-em-all"
+			req := &teams.CreateTeamReq{
+				Id:       id,
+				Name:     "Corgis Inc.",
+				Projects: []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateTeam(ctx, req)
+			require.NoError(t, err)
+
+			newName := "Gotta Catch Only The Most Special"
+			updateReq := &teams.UpdateTeamReq{
+				Id:       id,
+				Name:     newName,
+				Projects: []string{"project2", "project3"},
+			}
+			updatedTeamResp, err := cl.UpdateTeam(insertProjectsIntoNewContext([]string{"project3"}), updateReq)
+			require.Nil(t, updatedTeamResp)
+			grpctest.AssertCode(t, codes.NotFound, err)
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when the team exists but all projects are removed", func(t *testing.T) {
+			ctx := context.Background()
 			id := "gotta-catch-em-all"
 			req := &teams.CreateTeamReq{
 				Id:       id,
@@ -402,10 +783,11 @@ func runAllServerTests(ctx context.Context,
 			assert.Equal(t, req.Name, team.Name)
 			assert.Equal(t, 0, len(team.Projects))
 
-			cleanupTeamV2(ctx, t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp.Team.Id)
 		})
 
 		t.Run("when team to update does not exist", func(t *testing.T) {
+			ctx := context.Background()
 			updateReq := &teams.UpdateTeamReq{
 				Id:       "not-found-id",
 				Name:     "Corgis Inc.",
@@ -419,7 +801,7 @@ func runAllServerTests(ctx context.Context,
 	})
 
 	t.Run("AddTeamMembers", func(t *testing.T) {
-		resetState(ctx, t, serviceRef)
+		resetState(context.Background(), t, serviceRef)
 
 		t.Run("successfully adds user", func(t *testing.T) {
 			tests := []struct {
@@ -435,6 +817,7 @@ func runAllServerTests(ctx context.Context,
 			}
 			for _, test := range tests {
 				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
+					ctx := context.Background()
 
 					// arrange
 					req := &teams.CreateTeamReq{
@@ -459,12 +842,187 @@ func runAllServerTests(ctx context.Context,
 					assert.Equal(t, len(addReq.UserIds), len(resp2.UserIds))
 					assert.ElementsMatch(t, addReq.UserIds, resp2.UserIds)
 
-					cleanupTeamV2(ctx, t, cl, resp.Team.Id)
+					cleanupTeamV2(t, cl, resp.Team.Id)
+				})
+			}
+		})
+
+		t.Run("successfully adds user when the project filter", func(t *testing.T) {
+			tests := []struct {
+				users []string
+				desc  string
+			}{
+				{[]string{"6ed95714-9466-463b-80da-0513ecb42a08"}, "single user"},
+				{[]string{
+					"299ea25b-62d4-4660-965a-e25870298792",
+					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
+				}, "multiple users"},
+				{[]string{}, "no users"},
+			}
+			for _, test := range tests {
+				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
+					ctx := context.Background()
+
+					// arrange
+					req := &teams.CreateTeamReq{
+						Name:     "Gotta Catch Em All",
+						Id:       "corgis-inc",
+						Projects: []string{"project1", "project2"},
+					}
+					resp, err := cl.CreateTeam(ctx, req)
+					require.NoError(t, err)
+
+					addReq := &teams.AddTeamMembersReq{
+						Id:      resp.GetTeam().GetId(),
+						UserIds: test.users,
+					}
+
+					// act
+					resp2, err := cl.AddTeamMembers(insertProjectsIntoNewContext([]string{"project1"}), addReq)
+
+					// assert
+					require.NoError(t, err)
+					require.NotNil(t, resp2)
+					assert.Equal(t, len(addReq.UserIds), len(resp2.UserIds))
+					assert.ElementsMatch(t, addReq.UserIds, resp2.UserIds)
+
+					cleanupTeamV2(t, cl, resp.Team.Id)
+				})
+			}
+		})
+
+		t.Run("successfully adds user when the project filter of *", func(t *testing.T) {
+			tests := []struct {
+				users []string
+				desc  string
+			}{
+				{[]string{"6ed95714-9466-463b-80da-0513ecb42a08"}, "single user"},
+				{[]string{
+					"299ea25b-62d4-4660-965a-e25870298792",
+					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
+				}, "multiple users"},
+				{[]string{}, "no users"},
+			}
+			for _, test := range tests {
+				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
+					ctx := context.Background()
+
+					// arrange
+					req := &teams.CreateTeamReq{
+						Name:     "Gotta Catch Em All",
+						Id:       "corgis-inc",
+						Projects: []string{"project1", "project2"},
+					}
+					resp, err := cl.CreateTeam(ctx, req)
+					require.NoError(t, err)
+
+					addReq := &teams.AddTeamMembersReq{
+						Id:      resp.GetTeam().GetId(),
+						UserIds: test.users,
+					}
+
+					// act
+					resp2, err := cl.AddTeamMembers(insertProjectsIntoNewContext([]string{"*"}), addReq)
+
+					// assert
+					require.NoError(t, err)
+					require.NotNil(t, resp2)
+					assert.Equal(t, len(addReq.UserIds), len(resp2.UserIds))
+					assert.ElementsMatch(t, addReq.UserIds, resp2.UserIds)
+
+					cleanupTeamV2(t, cl, resp.Team.Id)
+				})
+			}
+		})
+
+		t.Run("successfully adds user when the project filter of (unassigned)", func(t *testing.T) {
+			tests := []struct {
+				users []string
+				desc  string
+			}{
+				{[]string{"6ed95714-9466-463b-80da-0513ecb42a08"}, "single user"},
+				{[]string{
+					"299ea25b-62d4-4660-965a-e25870298792",
+					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
+				}, "multiple users"},
+				{[]string{}, "no users"},
+			}
+			for _, test := range tests {
+				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
+					ctx := context.Background()
+
+					// arrange
+					req := &teams.CreateTeamReq{
+						Name:     "Gotta Catch Em All",
+						Id:       "corgis-inc",
+						Projects: []string{},
+					}
+					resp, err := cl.CreateTeam(ctx, req)
+					require.NoError(t, err)
+
+					addReq := &teams.AddTeamMembersReq{
+						Id:      resp.GetTeam().GetId(),
+						UserIds: test.users,
+					}
+
+					// act
+					resp2, err := cl.AddTeamMembers(insertProjectsIntoNewContext([]string{"(unassigned)"}), addReq)
+
+					// assert
+					require.NoError(t, err)
+					require.NotNil(t, resp2)
+					assert.Equal(t, len(addReq.UserIds), len(resp2.UserIds))
+					assert.ElementsMatch(t, addReq.UserIds, resp2.UserIds)
+
+					cleanupTeamV2(t, cl, resp.Team.Id)
+				})
+			}
+		})
+
+		t.Run("fails to adds user with NotFound when a project filter that excludes the team", func(t *testing.T) {
+			tests := []struct {
+				users []string
+				desc  string
+			}{
+				{[]string{"6ed95714-9466-463b-80da-0513ecb42a08"}, "single user"},
+				{[]string{
+					"299ea25b-62d4-4660-965a-e25870298792",
+					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
+				}, "multiple users"},
+				{[]string{}, "no users"},
+			}
+			for _, test := range tests {
+				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
+					ctx := context.Background()
+
+					// arrange
+					req := &teams.CreateTeamReq{
+						Name:     "Gotta Catch Em All",
+						Id:       "corgis-inc",
+						Projects: []string{"project1", "project2"},
+					}
+					resp, err := cl.CreateTeam(ctx, req)
+					require.NoError(t, err)
+
+					addReq := &teams.AddTeamMembersReq{
+						Id:      resp.GetTeam().GetId(),
+						UserIds: test.users,
+					}
+
+					// act
+					resp2, err := cl.AddTeamMembers(insertProjectsIntoNewContext([]string{"wrong_project"}), addReq)
+
+					// assert
+					require.Nil(t, resp2)
+					grpctest.AssertCode(t, codes.NotFound, err)
+
+					cleanupTeamV2(t, cl, resp.Team.Id)
 				})
 			}
 		})
 
 		t.Run("when team exists and user has already been added, does not add duplicate user", func(t *testing.T) {
+			ctx := context.Background()
 			req := &teams.CreateTeamReq{
 				Name:     "with, learning, & wisdom",
 				Id:       "ravenclaw",
@@ -491,10 +1049,11 @@ func runAllServerTests(ctx context.Context,
 			assert.Equal(t, len(users), len(resp2.UserIds))
 			assert.ElementsMatch(t, users, resp2.UserIds)
 
-			cleanupTeamV2(ctx, t, cl, createTeam.Team.Id)
+			cleanupTeamV2(t, cl, createTeam.Team.Id)
 		})
 
 		t.Run("when team does not exist, returns Not Found error", func(t *testing.T) {
+			ctx := context.Background()
 			users := []string{"some-id"}
 			addReq := &teams.AddTeamMembersReq{
 				Id:      "not-found-id",
@@ -509,9 +1068,10 @@ func runAllServerTests(ctx context.Context,
 	})
 
 	t.Run("RemoveTeamMembers", func(t *testing.T) {
-		resetState(ctx, t, serviceRef)
+		resetState(context.Background(), t, serviceRef)
 
 		t.Run("when team does not exist, returns NotFound error", func(t *testing.T) {
+			ctx := context.Background()
 			req := &teams.RemoveTeamMembersReq{
 				Id:      "not-found-id",
 				UserIds: []string{"some-id"},
@@ -524,6 +1084,7 @@ func runAllServerTests(ctx context.Context,
 		})
 
 		t.Run("when team exists without users the list remains empty", func(t *testing.T) {
+			ctx := context.Background()
 			createReq := &teams.CreateTeamReq{
 				Name:     "Guard the galaxy (with dope music)",
 				Id:       "guardians",
@@ -541,7 +1102,143 @@ func runAllServerTests(ctx context.Context,
 			require.NoError(t, err)
 			assert.Equal(t, 0, len(resp.UserIds))
 
-			cleanupTeamV2(ctx, t, cl, createTeam.Team.Id)
+			cleanupTeamV2(t, cl, createTeam.Team.Id)
+		})
+
+		t.Run("when team exists with a project filter", func(t *testing.T) {
+			ctx := context.Background()
+			createReq := &teams.CreateTeamReq{
+				Name:     "Guard the galaxy (with dope music)",
+				Id:       "guardians",
+				Projects: []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateTeam(ctx, createReq)
+			require.NoError(t, err)
+			addReq := &teams.AddTeamMembersReq{
+				Id: resp.GetTeam().GetId(),
+				UserIds: []string{
+					"user-1",
+					"user-2",
+					"user-3",
+				},
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			req := &teams.RemoveTeamMembersReq{
+				Id: resp.Team.Id,
+				UserIds: []string{
+					"user-1",
+					"user-2",
+				},
+			}
+			removeResp, err := cl.RemoveTeamMembers(insertProjectsIntoNewContext([]string{"project1", "other"}), req)
+			require.NoError(t, err)
+			assert.Equal(t, 1, len(removeResp.UserIds))
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
+		})
+
+		t.Run("when team exists with a project filter of *", func(t *testing.T) {
+			ctx := context.Background()
+			createReq := &teams.CreateTeamReq{
+				Name:     "Guard the galaxy (with dope music)",
+				Id:       "guardians",
+				Projects: []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateTeam(ctx, createReq)
+			require.NoError(t, err)
+			addReq := &teams.AddTeamMembersReq{
+				Id: resp.GetTeam().GetId(),
+				UserIds: []string{
+					"user-1",
+					"user-2",
+					"user-3",
+				},
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			req := &teams.RemoveTeamMembersReq{
+				Id: resp.Team.Id,
+				UserIds: []string{
+					"user-1",
+					"user-2",
+				},
+			}
+			removeResp, err := cl.RemoveTeamMembers(insertProjectsIntoNewContext([]string{"*"}), req)
+			require.NoError(t, err)
+			assert.Equal(t, 1, len(removeResp.UserIds))
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
+		})
+
+		t.Run("when team exists with a project filter of (unassigned)", func(t *testing.T) {
+			ctx := context.Background()
+			createReq := &teams.CreateTeamReq{
+				Name:     "Guard the galaxy (with dope music)",
+				Id:       "guardians",
+				Projects: []string{},
+			}
+			resp, err := cl.CreateTeam(ctx, createReq)
+			require.NoError(t, err)
+			addReq := &teams.AddTeamMembersReq{
+				Id: resp.GetTeam().GetId(),
+				UserIds: []string{
+					"user-1",
+					"user-2",
+					"user-3",
+				},
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			req := &teams.RemoveTeamMembersReq{
+				Id: resp.Team.Id,
+				UserIds: []string{
+					"user-1",
+					"user-2",
+				},
+			}
+			removeResp, err := cl.RemoveTeamMembers(insertProjectsIntoNewContext([]string{"(unassigned)"}), req)
+			require.NoError(t, err)
+			assert.Equal(t, 1, len(removeResp.UserIds))
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
+		})
+
+		t.Run("when team exists with a project filter that excludes the team", func(t *testing.T) {
+			ctx := context.Background()
+			createReq := &teams.CreateTeamReq{
+				Name:     "Guard the galaxy (with dope music)",
+				Id:       "guardians",
+				Projects: []string{"project1"},
+			}
+			resp, err := cl.CreateTeam(ctx, createReq)
+			require.NoError(t, err)
+			addReq := &teams.AddTeamMembersReq{
+				Id: resp.GetTeam().GetId(),
+				UserIds: []string{
+					"user-1",
+					"user-2",
+					"user-3",
+				},
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			req := &teams.RemoveTeamMembersReq{
+				Id: resp.Team.Id,
+				UserIds: []string{
+					"user-1",
+					"user-2",
+				},
+			}
+			removeResp, err := cl.RemoveTeamMembers(insertProjectsIntoNewContext([]string{"wrong"}), req)
+			require.Nil(t, removeResp)
+			grpctest.AssertCode(t, codes.NotFound, err)
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
 		})
 
 		tests := map[string]struct {
@@ -583,6 +1280,7 @@ func runAllServerTests(ctx context.Context,
 			},
 		}
 		for desc, test := range tests {
+			ctx := context.Background()
 			t.Run("when team exists "+desc, func(t *testing.T) {
 				createReq := &teams.CreateTeamReq{
 					Name:     "Guard the galaxy (with dope music)",
@@ -606,15 +1304,205 @@ func runAllServerTests(ctx context.Context,
 				require.NoError(t, err)
 				assert.Equal(t, test.expectedLengthRemaining, len(removeResp.UserIds))
 
-				cleanupTeamV2(ctx, t, cl, resp.Team.Id)
+				cleanupTeamV2(t, cl, resp.Team.Id)
 			})
 		}
 	})
 
 	t.Run("GetTeamsForMember", func(t *testing.T) {
-		resetState(ctx, t, serviceRef)
+		resetState(context.Background(), t, serviceRef)
 
-		t.Run("when valid member id provided, returns array of teams", func(t *testing.T) {
+		t.Run("when valid member id provided with a project filter, "+
+			"returns array of teams that are in project", func(t *testing.T) {
+			ctx := context.Background()
+			// create first team
+			req := &teams.CreateTeamReq{
+				Name:     "daring, nerve, & chivalry",
+				Id:       "gryffindor",
+				Projects: []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateTeam(ctx, req)
+			require.NoError(t, err)
+
+			req2 := &teams.CreateTeamReq{
+				Name:     "save the wizarding world",
+				Id:       "aurors",
+				Projects: []string{"project1", "project3"},
+			}
+			resp2, err := cl.CreateTeam(ctx, req2)
+			require.NoError(t, err)
+
+			req3 := &teams.CreateTeamReq{
+				Name:     "destroy the wizarding world",
+				Id:       "death-eaters",
+				Projects: []string{},
+			}
+			resp3, err := cl.CreateTeam(ctx, req3)
+			require.NoError(t, err)
+
+			users := []string{"user-1"}
+			addReq := &teams.AddTeamMembersReq{
+				Id:      resp.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			addReq2 := &teams.AddTeamMembersReq{
+				Id:      resp2.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq2)
+			require.NoError(t, err)
+
+			addReq3 := &teams.AddTeamMembersReq{
+				Id:      resp3.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq3)
+			require.NoError(t, err)
+
+			listReq := &teams.GetTeamsForMemberReq{
+				UserId: users[0],
+			}
+			fetchedData, err := cl.GetTeamsForMember(
+				insertProjectsIntoNewContext([]string{"project2", "(unassigned)"}), listReq)
+
+			require.NoError(t, err)
+			require.NotNil(t, fetchedData)
+			assert.Equal(t, 2, len(fetchedData.Teams))
+			fetchedTeamIDs := []string{fetchedData.Teams[0].Id, fetchedData.Teams[1].Id}
+			assert.Contains(t, fetchedTeamIDs, resp.Team.Id)
+			assert.Contains(t, fetchedTeamIDs, resp3.Team.Id)
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeamV2(t, cl, resp3.Team.Id)
+		})
+
+		t.Run("when valid member id provided with a project filter of *, returns array of all teams", func(t *testing.T) {
+			ctx := context.Background()
+			// create first team
+			req := &teams.CreateTeamReq{
+				Name:     "daring, nerve, & chivalry",
+				Id:       "gryffindor",
+				Projects: []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateTeam(ctx, req)
+			require.NoError(t, err)
+
+			// create second team
+			req2 := &teams.CreateTeamReq{
+				Name:     "save the wizarding world",
+				Id:       "aurors",
+				Projects: []string{"project1", "project2"},
+			}
+			resp2, err := cl.CreateTeam(ctx, req2)
+			require.NoError(t, err)
+
+			// add user to first team
+			users := []string{"user-1"}
+			addReq := &teams.AddTeamMembersReq{
+				Id:      resp.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			// add user to second team
+			addReq2 := &teams.AddTeamMembersReq{
+				Id:      resp2.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq2)
+			require.NoError(t, err)
+
+			// get user's teams
+			listReq := &teams.GetTeamsForMemberReq{
+				UserId: users[0],
+			}
+			fetchedData, err := cl.GetTeamsForMember(insertProjectsIntoNewContext([]string{"*"}), listReq)
+
+			require.NoError(t, err)
+			require.NotNil(t, fetchedData)
+			assert.Equal(t, 2, len(fetchedData.Teams))
+			fetchedTeamIDs := []string{fetchedData.Teams[0].Id, fetchedData.Teams[1].Id}
+			assert.Contains(t, fetchedTeamIDs, resp.Team.Id)
+			assert.Contains(t, fetchedTeamIDs, resp2.Team.Id)
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
+		})
+
+		t.Run("when valid member id provided with a project filter of (unassigned), "+
+			"returns array of (unassigned) teams", func(t *testing.T) {
+
+			ctx := context.Background()
+			req := &teams.CreateTeamReq{
+				Name:     "daring, nerve, & chivalry",
+				Id:       "gryffindor",
+				Projects: []string{},
+			}
+			resp, err := cl.CreateTeam(ctx, req)
+			require.NoError(t, err)
+
+			req2 := &teams.CreateTeamReq{
+				Name:     "save the wizarding world",
+				Id:       "aurors",
+				Projects: []string{"project1", "project2"},
+			}
+			resp2, err := cl.CreateTeam(ctx, req2)
+			require.NoError(t, err)
+
+			req3 := &teams.CreateTeamReq{
+				Name:     "destroy the wizarding world",
+				Id:       "death-eaters",
+				Projects: []string{},
+			}
+			resp3, err := cl.CreateTeam(ctx, req3)
+			require.NoError(t, err)
+
+			users := []string{"user-1"}
+			addReq := &teams.AddTeamMembersReq{
+				Id:      resp.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			addReq2 := &teams.AddTeamMembersReq{
+				Id:      resp2.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq2)
+			require.NoError(t, err)
+
+			addReq3 := &teams.AddTeamMembersReq{
+				Id:      resp3.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq3)
+			require.NoError(t, err)
+
+			listReq := &teams.GetTeamsForMemberReq{
+				UserId: users[0],
+			}
+			fetchedData, err := cl.GetTeamsForMember(insertProjectsIntoNewContext([]string{"(unassigned)"}), listReq)
+
+			require.NoError(t, err)
+			require.NotNil(t, fetchedData)
+			assert.Equal(t, 2, len(fetchedData.Teams))
+			fetchedTeamIDs := []string{fetchedData.Teams[0].Id, fetchedData.Teams[1].Id}
+			assert.Contains(t, fetchedTeamIDs, resp.Team.Id)
+			assert.Contains(t, fetchedTeamIDs, resp3.Team.Id)
+
+			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
+			cleanupTeamV2(t, cl, resp3.Team.Id)
+		})
+
+		t.Run("when valid member id and project filter provided, returns array of teams", func(t *testing.T) {
+			ctx := context.Background()
 			// create first team
 			req := &teams.CreateTeamReq{
 				Name:     "daring, nerve, & chivalry",
@@ -663,11 +1551,12 @@ func runAllServerTests(ctx context.Context,
 			assert.Contains(t, fetchedTeamIDs, resp.Team.Id)
 			assert.Contains(t, fetchedTeamIDs, resp2.Team.Id)
 
-			cleanupTeamV2(ctx, t, cl, resp.Team.Id)
-			cleanupTeamV2(ctx, t, cl, resp2.Team.Id)
+			cleanupTeamV2(t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp2.Team.Id)
 		})
 
 		t.Run("when user id does not exist on any teams, returns empty array", func(t *testing.T) {
+			ctx := context.Background()
 			req := &teams.CreateTeamReq{
 				Name:     "cunning & ambitious",
 				Id:       "slytherin",
@@ -686,14 +1575,15 @@ func runAllServerTests(ctx context.Context,
 			require.NotNil(t, fetchedData)
 			assert.Empty(t, fetchedData.Teams)
 
-			cleanupTeamV2(ctx, t, cl, resp.Team.Id)
+			cleanupTeamV2(t, cl, resp.Team.Id)
 		})
 	})
 
 	t.Run("GetTeamMembership", func(t *testing.T) {
-		resetState(ctx, t, serviceRef)
+		resetState(context.Background(), t, serviceRef)
 
 		t.Run("when the team does not exist", func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := cl.GetTeamMembership(ctx, &teams.GetTeamMembershipReq{
 				Id: "test-team",
 			})
@@ -703,6 +1593,7 @@ func runAllServerTests(ctx context.Context,
 		})
 
 		t.Run("when the team exists but has no members", func(t *testing.T) {
+			ctx := context.Background()
 			initResp, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
 				Id:       "other-team",
 				Name:     "i can be the very best...",
@@ -718,10 +1609,11 @@ func runAllServerTests(ctx context.Context,
 			require.NotNil(t, resp)
 			assert.Equal(t, 0, len(resp.UserIds))
 
-			cleanupTeamV2(ctx, t, cl, initResp.Team.Id)
+			cleanupTeamV2(t, cl, initResp.Team.Id)
 		})
 
 		t.Run("when the team exists with members", func(t *testing.T) {
+			ctx := context.Background()
 			initResp, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
 				Id:       "other-team",
 				Name:     "i can be the very best...",
@@ -746,7 +1638,129 @@ func runAllServerTests(ctx context.Context,
 			assert.Equal(t, len(users), len(resp.UserIds))
 			assert.ElementsMatch(t, users, resp.UserIds)
 
-			cleanupTeamV2(ctx, t, cl, initResp.Team.Id)
+			cleanupTeamV2(t, cl, initResp.Team.Id)
+		})
+
+		t.Run("when the team exists with members and is in the project filter", func(t *testing.T) {
+			ctx := context.Background()
+			initResp, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "other-team",
+				Name:     "i can be the very best...",
+				Projects: []string{"project1", "project2"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, initResp)
+
+			users := []string{"user-1", "user-2"}
+			addReq := &teams.AddTeamMembersReq{
+				Id:      initResp.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			resp, err := cl.GetTeamMembership(
+				insertProjectsIntoNewContext([]string{"project1"}),
+				&teams.GetTeamMembershipReq{
+					Id: initResp.Team.Id,
+				})
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+			assert.Equal(t, len(users), len(resp.UserIds))
+			assert.ElementsMatch(t, users, resp.UserIds)
+
+			cleanupTeamV2(t, cl, initResp.Team.Id)
+		})
+
+		t.Run("when the team exists with members and the project filter is *", func(t *testing.T) {
+			ctx := context.Background()
+			initResp, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "other-team",
+				Name:     "i can be the very best...",
+				Projects: []string{"project1", "project2"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, initResp)
+
+			users := []string{"user-1", "user-2"}
+			addReq := &teams.AddTeamMembersReq{
+				Id:      initResp.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			resp, err := cl.GetTeamMembership(
+				insertProjectsIntoNewContext([]string{"*"}),
+				&teams.GetTeamMembershipReq{
+					Id: initResp.Team.Id,
+				})
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+			assert.Equal(t, len(users), len(resp.UserIds))
+			assert.ElementsMatch(t, users, resp.UserIds)
+
+			cleanupTeamV2(t, cl, initResp.Team.Id)
+		})
+
+		t.Run("when the team exists with members and the project filter is (unassigned)", func(t *testing.T) {
+			ctx := context.Background()
+			initResp, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "other-team",
+				Name:     "i can be the very best...",
+				Projects: []string{},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, initResp)
+
+			users := []string{"user-1", "user-2"}
+			addReq := &teams.AddTeamMembersReq{
+				Id:      initResp.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			resp, err := cl.GetTeamMembership(
+				insertProjectsIntoNewContext([]string{"(unassigned)"}),
+				&teams.GetTeamMembershipReq{
+					Id: initResp.Team.Id,
+				})
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+			assert.Equal(t, len(users), len(resp.UserIds))
+			assert.ElementsMatch(t, users, resp.UserIds)
+
+			cleanupTeamV2(t, cl, initResp.Team.Id)
+		})
+
+		t.Run("when the team exists with members and the project filter is excludes the team", func(t *testing.T) {
+			ctx := context.Background()
+			initResp, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "other-team",
+				Name:     "i can be the very best...",
+				Projects: []string{"project1"},
+			})
+			require.NoError(t, err)
+			require.NotNil(t, initResp)
+
+			users := []string{"user-1", "user-2"}
+			addReq := &teams.AddTeamMembersReq{
+				Id:      initResp.GetTeam().GetId(),
+				UserIds: users,
+			}
+			_, err = cl.AddTeamMembers(ctx, addReq)
+			require.NoError(t, err)
+
+			resp, err := cl.GetTeamMembership(
+				insertProjectsIntoNewContext([]string{"wrong"}),
+				&teams.GetTeamMembershipReq{
+					Id: initResp.Team.Id,
+				})
+			require.Nil(t, resp)
+			grpctest.AssertCode(t, codes.NotFound, err)
+
+			cleanupTeamV2(t, cl, initResp.Team.Id)
 		})
 	})
 }
@@ -758,10 +1772,11 @@ func cleanupTeam(ctx context.Context, t *testing.T, cl teams.TeamsV2Client, team
 	require.NoError(t, err)
 }
 
-func cleanupTeamV2(ctx context.Context, t *testing.T, cl teams.TeamsV2Client, teamName string) {
+func cleanupTeamV2(t *testing.T, cl teams.TeamsV2Client, teamName string) {
 	t.Helper()
+
 	deleteReq := teams.DeleteTeamReq{Id: teamName}
-	_, err := cl.DeleteTeam(ctx, &deleteReq)
+	_, err := cl.DeleteTeam(context.Background(), &deleteReq)
 	require.NoError(t, err)
 }
 
