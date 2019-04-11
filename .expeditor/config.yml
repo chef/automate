@@ -763,9 +763,6 @@ schedules:
   - name: nightly_tests
     description: "Run nightly tests against development environment"
     cronline: "0 6 * * *"
-  - name: run_every_30_minutes
-    description: "Run every 30 minutes"
-    cronline: "*/30 * * * *"
 
 # These are our Buildkite pipelines where deploys take place
 pipelines:
@@ -904,10 +901,7 @@ subscriptions:
       - trigger_pipeline:deploy/proxy
       - trigger_pipeline:basic-a1/dev
       - trigger_pipeline:nightly
-  - workload: schedule_triggered:chef/automate:master:run_every_30_minutes:*
-    actions:
-      - trigger_pipeline:test-license-usage/dev:
-          silent: true
+      - trigger_pipeline:test-license-usage/dev
   - workload: docker_image_published:chefes/buildkite:*
     actions:
       - bash:.expeditor/update_docker_image_version_in_verify_pipeline.sh
