@@ -49,6 +49,11 @@ func NewPolicy(
 		return Policy{}, storage_errors.NewMissingFieldError("name")
 	}
 
+	err := ValidateProjects(projects)
+	if err != nil {
+		return Policy{}, err
+	}
+
 	return Policy{
 		ID:         id,
 		Name:       name,

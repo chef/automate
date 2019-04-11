@@ -1299,7 +1299,7 @@ func TestCreatePolicy(t *testing.T) {
 				Projects: []string{projID},
 			}
 			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.Equal(t, "non-existent projects cannot be included in policies", err.Error())
+			assert.Error(t, err)
 			assert.Nil(t, resp)
 
 			assertEmpty(t,
@@ -2383,7 +2383,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.Equal(t, "non-existent projects cannot be included in policies", err.Error())
+			assert.Error(t, err)
 			assert.Nil(t, resp)
 
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
