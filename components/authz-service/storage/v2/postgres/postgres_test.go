@@ -2576,7 +2576,6 @@ func TestGetProject(t *testing.T) {
 		{"when a chef-managed project exists, returns that project", func(t *testing.T) {
 			ctx := context.Background()
 			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			ctx := context.Background()
 
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
@@ -2809,10 +2808,6 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
 			ctx := context.Background()
-			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
-			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
-
 			ctx = insertProjectsIntoContext(ctx, []string{})
 			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
