@@ -24,6 +24,9 @@ var (
 
 	// ErrForeignKey occurs, among other times, when attempting to insert a foreign key whose referent does not exist
 	ErrForeignKey = errors.New("foreign key violation")
+
+	// ErrInvalidProjectsField occurs typically if a project field "(unassigned)" is passed in
+	ErrInvalidProjectsField = errors.New("invalid field (unassigned)")
 )
 
 // ErrTxCommit occurs when the database attempts to commit a transaction and
