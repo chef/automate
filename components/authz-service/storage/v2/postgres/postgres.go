@@ -702,11 +702,11 @@ func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
 	id string, projectsFilter []string) (bool, error) {
 
 	// If no filter was specified, do not filter.
-	if projectsFilter == nil || len(projectsFilter) == 0 {
+	if len(projectsFilter) == 0 {
 		return true, nil
 	}
 
-	// Return true or false if there is intersection between iam_role_projects and projectsFitler,
+	// Return true or false if there is intersection between iam_role_projects and projectsFilter,
 	// assuming '{(unassigned)}' in the case that iam_role_projects is empty. If a role of id
 	// doesn't exist, this will return 0 rows which will bubble up to NotFoundErr when passed to processError.
 	row := q.QueryRowContext(ctx,

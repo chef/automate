@@ -2873,32 +2873,32 @@ func TestListRoles(t *testing.T) {
 			require.NoError(t, err)
 
 			roles := []*storage.Role{{
-				ID:       "my-id-1",
-				Name:     "name1",
+				ID:       "my-id-0",
+				Name:     "name0",
 				Type:     storage.Custom,
 				Actions:  []string{"action1", "action2"},
 				Projects: []string{},
 			}, {
-				ID:       "my-id-2",
-				Name:     "name2",
+				ID:       "my-id-1",
+				Name:     "name1",
 				Type:     storage.Custom,
 				Actions:  []string{"action3", "action4"},
 				Projects: []string{project1.ID},
 			}, {
-				ID:       "my-id-3",
-				Name:     "name3",
+				ID:       "my-id-2",
+				Name:     "name2",
 				Type:     storage.Custom,
 				Actions:  []string{"action5", "action6"},
 				Projects: []string{project1.ID, project2.ID},
 			}, {
-				ID:       "my-id-4",
-				Name:     "name4",
+				ID:       "my-id-3",
+				Name:     "name3",
 				Type:     storage.Custom,
 				Actions:  []string{"action7", "action8"},
 				Projects: []string{project3.ID},
 			}, {
-				ID:       "my-id-5",
-				Name:     "name5",
+				ID:       "my-id-4",
+				Name:     "name4",
 				Type:     storage.Custom,
 				Actions:  []string{"action7", "action8"},
 				Projects: []string{project2.ID},
@@ -2912,27 +2912,9 @@ func TestListRoles(t *testing.T) {
 
 			require.NoError(t, err)
 			expected := []*storage.Role{
-				{
-					ID:       "my-id-2",
-					Name:     "name2",
-					Type:     storage.Custom,
-					Actions:  []string{"action3", "action4"},
-					Projects: []string{project1.ID},
-				},
-				{
-					ID:       "my-id-3",
-					Name:     "name3",
-					Type:     storage.Custom,
-					Actions:  []string{"action5", "action6"},
-					Projects: []string{project1.ID, project2.ID},
-				},
-				{
-					ID:       "my-id-5",
-					Name:     "name5",
-					Type:     storage.Custom,
-					Actions:  []string{"action7", "action8"},
-					Projects: []string{project2.ID},
-				},
+				roles[1],
+				roles[2],
+				roles[4],
 			}
 			assert.ElementsMatch(t, expected, resp)
 		},
@@ -3064,7 +3046,7 @@ func TestListRoles(t *testing.T) {
 			require.NoError(t, err)
 			assert.ElementsMatch(t, expected, resp)
 		},
-		"returns empty list if projects filter all objects": func(t *testing.T) {
+		"returns empty list if projects filter excludes all objects": func(t *testing.T) {
 			ctx := context.Background()
 			project1 := storage.Project{
 				ID:       "project-1",
@@ -3453,7 +3435,7 @@ func TestDeleteRole(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 		},
-		"deletes role with several roles in database and projects filter has intersection": func(t *testing.T) {
+		"deletes role with several roles in database when projects filter has intersection": func(t *testing.T) {
 			ctx := context.Background()
 			project1 := storage.Project{
 				ID:       "project-1",
@@ -3494,7 +3476,7 @@ func TestDeleteRole(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 		},
-		"deletes role with no projects assigned and projects filter has intersection": func(t *testing.T) {
+		"deletes role with no projects assigned when projects filter has intersection": func(t *testing.T) {
 			ctx := context.Background()
 			project1 := storage.Project{
 				ID:       "project-1",
@@ -3535,7 +3517,7 @@ func TestDeleteRole(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 		},
-		"deletes role with several roles in database and projects filter is *": func(t *testing.T) {
+		"deletes role with several roles in database when projects filter is *": func(t *testing.T) {
 			ctx := context.Background()
 			project1 := storage.Project{
 				ID:       "project-1",
