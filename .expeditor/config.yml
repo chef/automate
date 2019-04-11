@@ -41,6 +41,9 @@ pipelines:
   - deploy/automate-chef-io:
       description: Deploy automate.chef.io
       definition: .expeditor/deploy_automate_chef_io.pipeline.yml
+  - deploy/ui-library:
+      description: Deploy ui-library.cd.chef.co
+      definition: .expeditor/deploy_ui_library.pipeline.yml
   - deploy/proxy:
       description: Deploy a2 proxy test environment
       definition: .expeditor/proxy.pipeline.yml
@@ -121,14 +124,14 @@ subscriptions:
           post_commit: false
           only_if_modified:
             - components/automate-gateway/api/**/*.swagger.json
-      - bash:.expeditor/deploy-ui-library.sh:
-          post_commit: true
-          only_if_modified:
-            - components/chef-ui-library/*
       - trigger_pipeline:habitat/build:
           post_commit: true
       - trigger_pipeline:code_coverage:
           post_commit: true
+      - trigger_pipeline:deploy/ui-library:
+          post_commit: true
+          only_if_modified:
+            - components/chef-ui-library/*
       - unlock_staging_area:post_merge:
           post_commit: true
           always_run: true
