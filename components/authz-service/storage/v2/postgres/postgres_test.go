@@ -404,6 +404,7 @@ func TestListPolicies(t *testing.T) {
 				Members:    []storage.Member{member},
 				Type:       storage.Custom,
 				Statements: []storage.Statement{},
+				Projects:   []string{},
 			}}
 
 			assert.Equal(t, pols, resp)
@@ -584,6 +585,80 @@ func TestListPolicies(t *testing.T) {
 			}
 			assertPolicies(t, expectedPolicies, resp)
 			// require.Equal(t, len(expectedPolicies), len(resp))
+		},
+		"two policies, one with projects, one without": func(t *testing.T) {
+			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
+			name1, name2 := "testPolicy", "anotherTestPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
+				polID1, name1, polID2, name2)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID)
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID2)
+
+			expectedPolicies := []*storage.Policy{
+				{
+					ID:         polID1,
+					Name:       name1,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{projID, projID2},
+				},
+				{
+					ID:         polID2,
+					Name:       name2,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{},
+				},
+			}
+
+			resp, err := store.ListPolicies(ctx)
+			assert.NoError(t, err)
+			assertPolicies(t, expectedPolicies, resp)
+		},
+		"two policies with projects": func(t *testing.T) {
+			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
+			name1, name2 := "testPolicy", "anotherTestPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
+				polID1, name1, polID2, name2)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID)
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
+			insertPolicyProject(t, db, polID2, projID2)
+
+			expectedPolicies := []*storage.Policy{
+				{
+					ID:         polID1,
+					Name:       name1,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{projID},
+				},
+				{
+					ID:         polID2,
+					Name:       name2,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{projID2},
+				},
+			}
+
+			resp, err := store.ListPolicies(ctx)
+			assert.NoError(t, err)
+			assertPolicies(t, expectedPolicies, resp)
 		},
 	}
 
@@ -2189,7 +2264,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
 		},
 		"policy with projects to same projects": func(t *testing.T) {
-			// TODO optimize opt-out if they're the same?
+			// TODO optimize/opt-out if they're the same?
 
 			polID := genSimpleID(t, prngSeed)
 			name := "testPolicy"
@@ -4464,11 +4539,16 @@ func assertPolicies(t *testing.T, expectedPolicies, returnedPolicies []*storage.
 	for i := 0; i < len(returnedPolicies); i++ {
 		// confirm statements of sorted policies match
 		assert.ElementsMatch(t, expectedPolicies[i].Statements, returnedPolicies[i].Statements)
+		// confirm projects of sorted policies match
+		assert.ElementsMatch(t, expectedPolicies[i].Projects, returnedPolicies[i].Projects)
+
 		// then, empty statements so their potentially mismatched order
 		// doesn't cause ElementsMatch on policies to fail
 		// see related issue: https://github.com/stretchr/testify/issues/676
 		expectedPolicies[i].Statements = []storage.Statement{}
 		returnedPolicies[i].Statements = []storage.Statement{}
+		expectedPolicies[i].Projects = []string{}
+		returnedPolicies[i].Projects = []string{}
 	}
 
 	assert.ElementsMatch(t, expectedPolicies, returnedPolicies)
