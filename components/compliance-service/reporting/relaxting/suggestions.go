@@ -277,7 +277,7 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
 	//the reason we may use summary index here is because we always throw away the current profile filter when
 	// getting a suggestion for profile.. if we didn't then we'd only ever see the filter that's in our filter!
-	esIndex, err := GetEsIndex(filters, true, true)
+	esIndex, err := GetEsIndex(filters, len(filters["control"]) == 0, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getProfileSuggestions unable to get index dates")
 	}
@@ -337,7 +337,6 @@ func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typePara
 		return nil, err
 	}
 
-	LogQueryPartMin(esIndex, searchResult, "getProfileSuggestions - searchResult")
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
 
 	type ProfileSource struct {
@@ -437,7 +436,6 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 		return nil, err
 	}
 
-	LogQueryPartMin(esIndex, searchResult, "getControlSuggestions - searchResult")
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
 
 	type ControlSource struct {
