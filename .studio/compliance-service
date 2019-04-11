@@ -41,7 +41,7 @@ document "compliance_integration" <<DOC
 DOC
 function compliance_integration() {
   # Go based integration tests
-  go_test "github.com/chef/automate/components/compliance-service/integration_test"
+  go_test -v "github.com/chef/automate/components/compliance-service/integration_test"
 }
 
 document "go_update_compliance_service" <<DOC

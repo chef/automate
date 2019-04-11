@@ -16,7 +16,6 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
-	"github.com/gofrs/uuid"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
@@ -163,15 +162,16 @@ func (s *Suite) WaitForESJobToComplete(esJobID string) {
 }
 
 // InsertInspecReports ingests a number of reports and at the end, refreshes the report index
-func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) {
+func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) []string {
+	ids := make([]string, len(reports))
+
 	endTime := time.Now()
 	// Insert reports
-	for _, report := range reports {
-		id, err := uuid.NewV4()
-		if err != nil {
-			os.Exit(3)
-		}
-		err = s.ingesticESClient.InsertInspecReport(context.Background(), id.String(), endTime, report)
+	for i, report := range reports {
+		id := newUUID()
+		ids[i] = id
+
+		err := s.ingesticESClient.InsertInspecReport(context.Background(), id, endTime, report)
 		if err != nil {
 			os.Exit(3)
 		}
@@ -181,6 +181,8 @@ func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) {
 
 	// Refresh Indices
 	s.RefreshIndices(index)
+
+	return ids
 }
 
 // InsertInspecSummaries ingests a number of summaries and at the end, refreshes the summary index
@@ -188,11 +190,9 @@ func (s *Suite) InsertInspecSummaries(summaries []*relaxting.ESInSpecSummary) {
 	endTime := time.Now()
 	// Insert summaries
 	for _, summary := range summaries {
-		id, err := uuid.NewV4()
-		if err != nil {
-			os.Exit(3)
-		}
-		err = s.ingesticESClient.InsertInspecSummary(context.Background(), id.String(), endTime, summary)
+		id := newUUID()
+
+		err := s.ingesticESClient.InsertInspecSummary(context.Background(), id, endTime, summary)
 		if err != nil {
 			os.Exit(3)
 		}

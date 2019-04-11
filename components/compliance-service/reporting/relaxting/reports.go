@@ -448,11 +448,20 @@ func (backend *ES2Backend) GetReport(esIndex string, reportid string, filters ma
 		controlIDFilter = filters["control"][0]
 	}
 	logrus.Debugf("GetReport for reportid=%s, filters=%+v", reportid, filters)
+
+	query := elastic.NewBoolQuery()
+
 	idsQuery := elastic.NewIdsQuery(mappings.DocType)
 	idsQuery.Ids(reportid)
+	query = query.Filter(idsQuery)
+
+	if len(filters["projects"]) > 0 {
+		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
+		query = query.Filter(termQuery)
+	}
 
 	searchSource := elastic.NewSearchSource().
-		Query(idsQuery).
+		Query(query).
 		Size(1)
 
 	source, err := searchSource.Source()
