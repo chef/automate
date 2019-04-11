@@ -158,24 +158,4 @@ Comments on service methods will be integrated into the swagger docs for HTTP.
 
 ## Data generation
 
-From within the studio there are two options for generating data.
-
-Running `generate_elasticsearch_data` will generate 100 nodes of data converged
-over the last week. Please note, with the default setting for missing nodes
-currently running as a day, many of these end up missing shortly after generation
-since the end time of the run is so long ago.
-
-Running `send_chef_run_example` will send one chef run converge message from
-static data through the ingest-service. It will create a node with attributes
-but will go missing quickly because of the old date for the end_time.
-The file that is sent can be seen at
-https://raw.github.com/chef/ingest-service/master/examples/converge-success-report.json
-
-Another option for generating data can be found in the ingest-service.
-This generator will run an actual chef-client converge against the ingest service.
-This is a way of getting attributes for a current node. You will need to export
-the following environment variables to hit the legacy endpoint of the gateway.
-`export DATA_COLLECTOR_ENDPOINT=https://localhost:2000/events/data-collector`
-`export DATA_COLLECTOR_TOKEN=dev`
-
-Here is the readme file for that generator: https://github.com/chef/ingest-service/tree/master/test/chef-solo-data-generator
+From within the Habitat studio there are a few options for generating Chef converge runs. Running `chef_load_nodes 100` will generate 100 nodes that converged over the last hour through the data-collector endpoint. To have ongoing ingestion of nodes, run `chef_load_start`. This will start the ingestion of 10 nodes and 10 Chef actions every five minutes. If you only want to send one static Chef converge run, use the `send_chef_run_example` command. This sends data from the following file with only the IDs updated: https://github.com/chef/automate/blob/master/components/ingest-service/examples/converge-success-report.json.  This node will go missing quickly because of the old date for the end_time. 
