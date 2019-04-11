@@ -38,7 +38,7 @@ message ProjectsAuthorizedReq {
       unique: true,
       items: {
           string: {
-              pattern: "^[a-z0-9-]{1,64}$"
+            pattern: "^[a-z0-9()-]{1,64}$"
           }
       }
      }];

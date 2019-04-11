@@ -525,8 +525,13 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 }
 
 func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	var roles []*v2.Role
-	rows, err := p.db.QueryContext(ctx, `SELECT query_roles from query_roles();`)
+	rows, err := p.db.QueryContext(ctx, `SELECT query_roles from query_roles($1);`, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -550,28 +555,79 @@ func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
 }
 
 func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
-	var role v2.Role
-	row := p.db.QueryRowContext(ctx, `SELECT query_role($1);`, id)
-	err := row.Scan(&role)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
+	}
+
+	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	doesIntersect, err := checkIfRoleIntersectsProjectsFilter(ctx, tx, id, projectsFilter)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+	if !doesIntersect {
+		return nil, storage_errors.ErrNotFound
+	}
+
+	var role v2.Role
+	row := tx.QueryRowContext(ctx, `SELECT query_role($1);`, id)
+	err = row.Scan(&role)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
 	return &role, nil
 }
 
 func (p *pg) DeleteRole(ctx context.Context, id string) error {
-	_, err := p.queryRole(ctx, id)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return p.processError(err)
 	}
 
-	_, err = p.db.ExecContext(ctx,
-		`DELETE FROM iam_roles WHERE id=$1;`,
-		id,
-	)
+	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return p.processError(err)
+	}
+
+	doesIntersect, err := checkIfRoleIntersectsProjectsFilter(ctx, tx, id, projectsFilter)
+	if err != nil {
+		return p.processError(err)
+	}
+	if !doesIntersect {
+		return storage_errors.ErrNotFound
+	}
+
+	res, err := tx.ExecContext(ctx, `DELETE FROM iam_roles WHERE id=$1;`, id)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return p.processError(err)
+	} else if count != 1 {
+		return storage_errors.ErrNotFound
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewErrTxCommit(err)
 	}
 
 	return nil
@@ -581,9 +637,22 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
+	}
+
+	doesIntersect, err := checkIfRoleIntersectsProjectsFilter(ctx, tx, role.ID, projectsFilter)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+	if !doesIntersect {
+		return nil, storage_errors.ErrNotFound
 	}
 
 	row := tx.QueryRowContext(ctx,
@@ -629,15 +698,31 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 	return role, nil
 }
 
-// queryRole returns a role based on id or an error.
-func (p *pg) queryRole(ctx context.Context, id string) (*v2.Role, error) {
-	var role v2.Role
-	row := p.db.QueryRowContext(ctx, `SELECT query_role($1)`, id)
-	err := row.Scan(&role)
-	if err != nil {
-		return nil, err
+func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
+	id string, projectsFilter []string) (bool, error) {
+
+	// If no filter was specified, do not filter.
+	if len(projectsFilter) == 0 {
+		return true, nil
 	}
-	return &role, nil
+
+	// Return true or false if there is intersection between iam_role_projects and projectsFilter,
+	// assuming '{(unassigned)}' in the case that iam_role_projects is empty. If a role of id
+	// doesn't exist, this will return 0 rows which will bubble up to NotFoundErr when passed to processError.
+	row := q.QueryRowContext(ctx,
+		`SELECT COALESCE(array_agg(rp.project_id)
+				FILTER (WHERE rp.project_id IS NOT NULL), '{(unassigned)}') && $2 AS intersection
+			FROM iam_roles AS r
+			LEFT OUTER JOIN iam_role_projects AS rp ON rp.role_id=r.db_id
+			WHERE r.id = $1 GROUP BY rp.project_id;`,
+		id, pq.Array(projectsFilter))
+
+	var result bool
+	err := row.Scan(&result)
+	if err != nil {
+		return false, err
+	}
+	return result, nil
 }
 
 func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier) error {
