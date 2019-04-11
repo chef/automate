@@ -1,7 +1,7 @@
 # Automate
 
-[![Build Status](https://badge.buildkite.com/5b173f6ae4e06f22493fb0d354dc7414f73a94433f84b8e3b6.svg?branch=master)](https://buildkite.com/chef-oss/chef-a2-master-verify)
-[![Build Status](https://badge.buildkite.com/6efabfdf8f36e62aa810de7360f6ec8d8674c1e8856a060148.svg?branch=master)](https://buildkite.com/chef/chef-a2-master-verify-private)
+[![Build Status](https://badge.buildkite.com/9c37160ef9872fbdcf42628586fabfbb3048239a99c1f60e3a.svg?branch=master)](https://buildkite.com/chef-oss/chef-automate-master-verify)
+[![Build Status](https://badge.buildkite.com/b550988ee153942e2ed1ad2741ab652b6d9efa76992d022cf8.svg?branch=master)](https://buildkite.com/chef/chef-automate-master-verify-private)
 
 Automate provides a unified view into infrastructure managed by
 Chef, Inspec, and Habitat.
