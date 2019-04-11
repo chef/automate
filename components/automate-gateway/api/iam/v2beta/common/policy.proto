@@ -14,6 +14,7 @@ message Policy {
     Type type = 3;
     repeated string members = 4;
     repeated Statement statements = 5;
+    repeated string projects = 6;
 }
 
 message Statement {

@@ -569,6 +569,12 @@
           "items": {
             "$ref": "#/definitions/v2betaStatement"
           }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "description": "Does not contain type as the enduser can only create 'custom' policies."
@@ -749,6 +755,12 @@
           "items": {
             "$ref": "#/definitions/v2betaStatement"
           }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -897,6 +909,12 @@
         },
         "name": {
           "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "description": "Does not contain type as the enduser can only create 'custom' policies."
