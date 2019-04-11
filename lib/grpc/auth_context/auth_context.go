@@ -142,6 +142,20 @@ func AllProjectsRequested(projectsFilter []string) bool {
 	return len(projectsFilter) == 1 && projectsFilter[0] == AllProjectsKey
 }
 
+// ProjectsListFromContextEmptyListOnAllProjects returns the project list from the context.
+// In the case that the project list was ["*"], we return an empty list,
+// since we do not wish to filter on projects.
+func ProjectsListFromContextEmptyListOnAllProjects(ctx context.Context) ([]string, error) {
+	projectsFilter, err := ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if AllProjectsRequested(projectsFilter) {
+		projectsFilter = []string{}
+	}
+	return projectsFilter, nil
+}
+
 // FromIncomingMetadata translates auth info provided by GRPC metadata into
 // auth_context's representation, to be retrieved via auth_context.FromContext.
 func FromIncomingMetadata(ctx context.Context) context.Context {
