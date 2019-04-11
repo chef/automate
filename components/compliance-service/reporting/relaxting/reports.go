@@ -451,7 +451,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportid string, filters ma
 
 	query := elastic.NewBoolQuery()
 
-	idsQuery := elastic.NewIdsQuery()
+	idsQuery := elastic.NewIdsQuery(mappings.DocType)
 	idsQuery.Ids(reportid)
 	query = query.Filter(idsQuery)
 
