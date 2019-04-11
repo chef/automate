@@ -20,6 +20,7 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+	ingest_api "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
 	"github.com/chef/automate/components/compliance-service/ingest/projectupdater"
@@ -75,6 +76,20 @@ func (srv *ComplianceIngestServer) HandleEvent(ctx context.Context, req *automat
 	}
 
 	return response, nil
+}
+
+func (srv *ComplianceIngestServer) ProjectUpdateStatus(ctx context.Context,
+	req *ingest_api.ProjectUpdateStatusReq) (*ingest_api.ProjectUpdateStatusResp, error) {
+	time, err := ptypes.TimestampProto(srv.updateManager.EstimatedTimeCompelete())
+	if err != nil {
+		log.Errorf("Could not convert EstimatedTimeCompelete to protobuf Timestamp %v", err)
+		time = &tspb.Timestamp{}
+	}
+	return &ingest_api.ProjectUpdateStatusResp{
+		State:                  srv.updateManager.State(),
+		PercentageComplete:     srv.updateManager.PercentageComplete(),
+		EstimatedTimeCompelete: time,
+	}, nil
 }
 
 func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {

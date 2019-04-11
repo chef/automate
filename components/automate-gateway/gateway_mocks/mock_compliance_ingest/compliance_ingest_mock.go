@@ -5,14 +5,14 @@
 package mock_compliance_ingest
 
 import (
-	reflect "reflect"
-
 	event "github.com/chef/automate/api/interservice/event"
 	compliance "github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+	ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	gomock "github.com/golang/mock/gomock"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
+	reflect "reflect"
 )
 
 // MockComplianceIngesterClient is a mock of ComplianceIngesterClient interface
@@ -78,6 +78,26 @@ func (mr *MockComplianceIngesterClientMockRecorder) HandleEvent(ctx, in interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockComplianceIngesterClient)(nil).HandleEvent), varargs...)
 }
 
+// ProjectUpdateStatus mocks base method
+func (m *MockComplianceIngesterClient) ProjectUpdateStatus(ctx context.Context, in *ingest.ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ingest.ProjectUpdateStatusResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ProjectUpdateStatus", varargs...)
+	ret0, _ := ret[0].(*ingest.ProjectUpdateStatusResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ProjectUpdateStatus indicates an expected call of ProjectUpdateStatus
+func (mr *MockComplianceIngesterClientMockRecorder) ProjectUpdateStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockComplianceIngesterClient)(nil).ProjectUpdateStatus), varargs...)
+}
+
 // MockComplianceIngesterServer is a mock of ComplianceIngesterServer interface
 type MockComplianceIngesterServer struct {
 	ctrl     *gomock.Controller
@@ -129,4 +149,19 @@ func (m *MockComplianceIngesterServer) HandleEvent(arg0 context.Context, arg1 *e
 func (mr *MockComplianceIngesterServerMockRecorder) HandleEvent(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockComplianceIngesterServer)(nil).HandleEvent), arg0, arg1)
+}
+
+// ProjectUpdateStatus mocks base method
+func (m *MockComplianceIngesterServer) ProjectUpdateStatus(arg0 context.Context, arg1 *ingest.ProjectUpdateStatusReq) (*ingest.ProjectUpdateStatusResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProjectUpdateStatus", arg0, arg1)
+	ret0, _ := ret[0].(*ingest.ProjectUpdateStatusResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ProjectUpdateStatus indicates an expected call of ProjectUpdateStatus
+func (mr *MockComplianceIngesterServerMockRecorder) ProjectUpdateStatus(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockComplianceIngesterServer)(nil).ProjectUpdateStatus), arg0, arg1)
 }

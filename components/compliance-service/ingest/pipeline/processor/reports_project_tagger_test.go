@@ -1060,3 +1060,8 @@ func (pm *projectsClientMock) HandleEvent(ctx context.Context, in *event.EventMs
 	opts ...grpc.CallOption) (*event.EventResponse, error) {
 	return &event.EventResponse{}, nil
 }
+
+func (pm *projectsClientMock) ProjectUpdateStatus(ctx context.Context,
+	req *iam_v2.ProjectUpdateStatusReq, opts ...grpc.CallOption) (*iam_v2.ProjectUpdateStatusResp, error) {
+	return &iam_v2.ProjectUpdateStatusResp{}, nil
+}

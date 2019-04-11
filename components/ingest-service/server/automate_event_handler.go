@@ -3,15 +3,19 @@ package server
 import (
 	"fmt"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
+	ingest_api "github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/projectupdater"
+	tspb "github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type AutomateEventHandlerServer struct {
@@ -72,6 +76,20 @@ func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 		s.updateManager.Start(projectUpdateID)
 	}
 	return response, nil
+}
+
+func (s *AutomateEventHandlerServer) ProjectUpdateStatus(ctx context.Context,
+	req *ingest_api.ProjectUpdateStatusReq) (*ingest_api.ProjectUpdateStatusResp, error) {
+	time, err := ptypes.TimestampProto(s.updateManager.EstimatedTimeCompelete())
+	if err != nil {
+		log.Errorf("Could not convert EstimatedTimeCompelete to protobuf Timestamp %v", err)
+		time = &tspb.Timestamp{}
+	}
+	return &ingest_api.ProjectUpdateStatusResp{
+		State:                  s.updateManager.State(),
+		PercentageComplete:     float32(s.updateManager.PercentageComplete()),
+		EstimatedTimeCompelete: time,
+	}, nil
 }
 
 func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {

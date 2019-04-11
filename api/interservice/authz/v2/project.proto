@@ -3,6 +3,7 @@ syntax = "proto3";
 import "validate/validate.proto";
 import "api/interservice/authz/v2/type.proto";
 import "api/interservice/event/event.proto";
+import "google/protobuf/timestamp.proto";
 
 package chef.automate.domain.authz.v2;
 option go_package = "github.com/chef/automate/api/interservice/authz/v2";
@@ -65,6 +66,15 @@ service Projects {
     rpc ListProjectRules(ListProjectRulesReq) returns (ProjectCollectionRulesResp) {};
     rpc GetProjectRules(GetProjectRulesReq) returns (GetProjectRulesResp) {};
     rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
+    rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
+}
+
+message ProjectUpdateStatusReq { }
+
+message ProjectUpdateStatusResp { 
+    string state = 1;
+    google.protobuf.Timestamp estimated_time_compelete = 2;
+    float percentage_complete = 3;
 }
 
 message ListProjectRulesReq {}

@@ -844,6 +844,154 @@ var _ interface {
 	ErrorName() string
 } = DeleteProjectRespValidationError{}
 
+// Validate checks the field values on ProjectUpdateStatusReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ProjectUpdateStatusReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ProjectUpdateStatusReqValidationError is the validation error returned by
+// ProjectUpdateStatusReq.Validate if the designated constraints aren't met.
+type ProjectUpdateStatusReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ProjectUpdateStatusReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ProjectUpdateStatusReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ProjectUpdateStatusReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ProjectUpdateStatusReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ProjectUpdateStatusReqValidationError) ErrorName() string {
+	return "ProjectUpdateStatusReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ProjectUpdateStatusReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sProjectUpdateStatusReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ProjectUpdateStatusReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ProjectUpdateStatusReqValidationError{}
+
+// Validate checks the field values on ProjectUpdateStatusResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ProjectUpdateStatusResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for State
+
+	if v, ok := interface{}(m.GetEstimatedTimeCompelete()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ProjectUpdateStatusRespValidationError{
+				field:  "EstimatedTimeCompelete",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for PercentageComplete
+
+	return nil
+}
+
+// ProjectUpdateStatusRespValidationError is the validation error returned by
+// ProjectUpdateStatusResp.Validate if the designated constraints aren't met.
+type ProjectUpdateStatusRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ProjectUpdateStatusRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ProjectUpdateStatusRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ProjectUpdateStatusRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ProjectUpdateStatusRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ProjectUpdateStatusRespValidationError) ErrorName() string {
+	return "ProjectUpdateStatusRespValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ProjectUpdateStatusRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sProjectUpdateStatusResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ProjectUpdateStatusRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ProjectUpdateStatusRespValidationError{}
+
 // Validate checks the field values on ListProjectRulesReq with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

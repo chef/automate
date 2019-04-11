@@ -28,12 +28,14 @@ const (
 
 // Manager - project update manager
 type Manager struct {
-	state               string
-	projectUpdateID     string
-	esJobID             string
-	client              *ingestic.ESClient
-	authzProjectsClient iam_v2.ProjectsClient
-	eventServiceClient  automate_event.EventServiceClient
+	state                 string
+	projectUpdateID       string
+	esJobID               string
+	percentageComplete    float32
+	estimatedEndTimeInSec int64
+	client                *ingestic.ESClient
+	authzProjectsClient   iam_v2.ProjectsClient
+	eventServiceClient    automate_event.EventServiceClient
 }
 
 // TODO
@@ -82,6 +84,35 @@ func (manager *Manager) Start(projectUpdateID string) {
 			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID),
 			projectUpdateID)
 	}
+}
+
+// PercentageComplete - percentage of the job complete
+func (manager *Manager) PercentageComplete() float32 {
+	switch manager.state {
+	case notRunningState:
+	case runningState:
+		return manager.percentageComplete
+	default:
+	}
+
+	return 1.0
+}
+
+// EstimatedTimeCompelete - the estimated date and time of compeletion.
+func (manager *Manager) EstimatedTimeCompelete() time.Time {
+	switch manager.state {
+	case notRunningState:
+	case runningState:
+		return time.Unix(manager.estimatedEndTimeInSec, 0)
+	default:
+	}
+
+	return time.Time{}
+}
+
+// State - The current state of the manager
+func (manager *Manager) State() string {
+	return manager.state
 }
 
 // This is grabbing the latest project rules from the authz-service and kicking off the update
@@ -138,6 +169,8 @@ func (manager *Manager) waitingForJobToComplete() {
 				return
 			}
 		} else {
+			manager.estimatedEndTimeInSec = jobStatus.EstimatedEndTimeInSec
+			manager.percentageComplete = jobStatus.PercentageComplete
 			manager.sendStatusEvent(jobStatus)
 			numberOfConsecutiveFails = 0
 			isJobComplete = jobStatus.Completed

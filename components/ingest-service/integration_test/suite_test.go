@@ -124,6 +124,10 @@ func (pm *ProjectsClientMock) HandleEvent(ctx context.Context, in *event.EventMs
 	opts ...grpc.CallOption) (*event.EventResponse, error) {
 	return &event.EventResponse{}, nil
 }
+func (pm *ProjectsClientMock) ProjectUpdateStatus(ctx context.Context,
+	req *iam_v2.ProjectUpdateStatusReq, opts ...grpc.CallOption) (*iam_v2.ProjectUpdateStatusResp, error) {
+	return &iam_v2.ProjectUpdateStatusResp{}, nil
+}
 
 // Initialize the test suite
 //

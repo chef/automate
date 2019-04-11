@@ -5,14 +5,12 @@
 package mock_authz
 
 import (
-	reflect "reflect"
-
+	version "github.com/chef/automate/api/external/common/version"
+	authz "github.com/chef/automate/api/interservice/authz"
 	gomock "github.com/golang/mock/gomock"
 	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
-
-	authz "github.com/chef/automate/api/interservice/authz"
-	version "github.com/chef/automate/api/external/common/version"
+	reflect "reflect"
 )
 
 // MockAuthorizationClient is a mock of AuthorizationClient interface

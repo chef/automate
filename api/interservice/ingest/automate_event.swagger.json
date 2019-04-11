@@ -95,6 +95,22 @@
         }
       }
     },
+    "ingestProjectUpdateStatusResp": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string"
+        },
+        "estimated_time_compelete": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "percentage_complete": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
     "protobufListValue": {
       "type": "object",
       "properties": {

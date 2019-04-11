@@ -20,6 +20,8 @@ import (
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 	event "github.com/chef/automate/components/event-service/server"
+	"github.com/golang/protobuf/ptypes"
+	tspb "github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -148,6 +150,20 @@ func (s *state) UpdateProject(ctx context.Context,
 	}
 
 	return &api.UpdateProjectResp{Project: apiProject}, nil
+}
+
+func (s *state) ProjectUpdateStatus(ctx context.Context,
+	req *api.ProjectUpdateStatusReq) (*api.ProjectUpdateStatusResp, error) {
+	time, err := ptypes.TimestampProto(s.projectUpdateManager.EstimatedTimeCompelete())
+	if err != nil {
+		log.Errorf("Could not convert EstimatedTimeCompelete to protobuf Timestamp %v", err)
+		time = &tspb.Timestamp{}
+	}
+	return &api.ProjectUpdateStatusResp{
+		State:                  s.projectUpdateManager.State(),
+		PercentageComplete:     float32(s.projectUpdateManager.PercentageComplete()),
+		EstimatedTimeCompelete: time,
+	}, nil
 }
 
 func (s *state) ListProjects(ctx context.Context,

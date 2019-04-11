@@ -7,6 +7,7 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import event "github.com/chef/automate/api/interservice/event"
+import timestamp "github.com/golang/protobuf/ptypes/timestamp"
 
 import (
 	context "golang.org/x/net/context"
@@ -24,6 +25,95 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
+type ProjectUpdateStatusReq struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *ProjectUpdateStatusReq) Reset()         { *m = ProjectUpdateStatusReq{} }
+func (m *ProjectUpdateStatusReq) String() string { return proto.CompactTextString(m) }
+func (*ProjectUpdateStatusReq) ProtoMessage()    {}
+func (*ProjectUpdateStatusReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_automate_event_a9ce9a1806f4cd75, []int{0}
+}
+func (m *ProjectUpdateStatusReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProjectUpdateStatusReq.Unmarshal(m, b)
+}
+func (m *ProjectUpdateStatusReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProjectUpdateStatusReq.Marshal(b, m, deterministic)
+}
+func (dst *ProjectUpdateStatusReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProjectUpdateStatusReq.Merge(dst, src)
+}
+func (m *ProjectUpdateStatusReq) XXX_Size() int {
+	return xxx_messageInfo_ProjectUpdateStatusReq.Size(m)
+}
+func (m *ProjectUpdateStatusReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProjectUpdateStatusReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProjectUpdateStatusReq proto.InternalMessageInfo
+
+type ProjectUpdateStatusResp struct {
+	State                  string               `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty" toml:"state,omitempty" mapstructure:"state,omitempty"`
+	EstimatedTimeCompelete *timestamp.Timestamp `protobuf:"bytes,2,opt,name=estimated_time_compelete,json=estimatedTimeCompelete,proto3" json:"estimated_time_compelete,omitempty" toml:"estimated_time_compelete,omitempty" mapstructure:"estimated_time_compelete,omitempty"`
+	PercentageComplete     float32              `protobuf:"fixed32,3,opt,name=percentage_complete,json=percentageComplete,proto3" json:"percentage_complete,omitempty" toml:"percentage_complete,omitempty" mapstructure:"percentage_complete,omitempty"`
+	XXX_NoUnkeyedLiteral   struct{}             `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized       []byte               `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache          int32                `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *ProjectUpdateStatusResp) Reset()         { *m = ProjectUpdateStatusResp{} }
+func (m *ProjectUpdateStatusResp) String() string { return proto.CompactTextString(m) }
+func (*ProjectUpdateStatusResp) ProtoMessage()    {}
+func (*ProjectUpdateStatusResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_automate_event_a9ce9a1806f4cd75, []int{1}
+}
+func (m *ProjectUpdateStatusResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProjectUpdateStatusResp.Unmarshal(m, b)
+}
+func (m *ProjectUpdateStatusResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProjectUpdateStatusResp.Marshal(b, m, deterministic)
+}
+func (dst *ProjectUpdateStatusResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProjectUpdateStatusResp.Merge(dst, src)
+}
+func (m *ProjectUpdateStatusResp) XXX_Size() int {
+	return xxx_messageInfo_ProjectUpdateStatusResp.Size(m)
+}
+func (m *ProjectUpdateStatusResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProjectUpdateStatusResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProjectUpdateStatusResp proto.InternalMessageInfo
+
+func (m *ProjectUpdateStatusResp) GetState() string {
+	if m != nil {
+		return m.State
+	}
+	return ""
+}
+
+func (m *ProjectUpdateStatusResp) GetEstimatedTimeCompelete() *timestamp.Timestamp {
+	if m != nil {
+		return m.EstimatedTimeCompelete
+	}
+	return nil
+}
+
+func (m *ProjectUpdateStatusResp) GetPercentageComplete() float32 {
+	if m != nil {
+		return m.PercentageComplete
+	}
+	return 0
+}
+
+func init() {
+	proto.RegisterType((*ProjectUpdateStatusReq)(nil), "chef.automate.domain.ingest.ProjectUpdateStatusReq")
+	proto.RegisterType((*ProjectUpdateStatusResp)(nil), "chef.automate.domain.ingest.ProjectUpdateStatusResp")
+}
+
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
 var _ grpc.ClientConn
@@ -37,6 +127,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EventHandlerClient interface {
 	HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error)
+	ProjectUpdateStatus(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateStatusResp, error)
 }
 
 type eventHandlerClient struct {
@@ -56,9 +147,19 @@ func (c *eventHandlerClient) HandleEvent(ctx context.Context, in *event.EventMsg
 	return out, nil
 }
 
+func (c *eventHandlerClient) ProjectUpdateStatus(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateStatusResp, error) {
+	out := new(ProjectUpdateStatusResp)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.ingest.EventHandler/ProjectUpdateStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventHandlerServer is the server API for EventHandler service.
 type EventHandlerServer interface {
 	HandleEvent(context.Context, *event.EventMsg) (*event.EventResponse, error)
+	ProjectUpdateStatus(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
 }
 
 func RegisterEventHandlerServer(s *grpc.Server, srv EventHandlerServer) {
@@ -83,6 +184,24 @@ func _EventHandler_HandleEvent_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EventHandler_ProjectUpdateStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProjectUpdateStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventHandlerServer).ProjectUpdateStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.ingest.EventHandler/ProjectUpdateStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventHandlerServer).ProjectUpdateStatus(ctx, req.(*ProjectUpdateStatusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _EventHandler_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.domain.ingest.EventHandler",
 	HandlerType: (*EventHandlerServer)(nil),
@@ -91,27 +210,40 @@ var _EventHandler_serviceDesc = grpc.ServiceDesc{
 			MethodName: "HandleEvent",
 			Handler:    _EventHandler_HandleEvent_Handler,
 		},
+		{
+			MethodName: "ProjectUpdateStatus",
+			Handler:    _EventHandler_ProjectUpdateStatus_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "api/interservice/ingest/automate_event.proto",
 }
 
 func init() {
-	proto.RegisterFile("api/interservice/ingest/automate_event.proto", fileDescriptor_automate_event_64e7bd12dc81e109)
+	proto.RegisterFile("api/interservice/ingest/automate_event.proto", fileDescriptor_automate_event_a9ce9a1806f4cd75)
 }
 
-var fileDescriptor_automate_event_64e7bd12dc81e109 = []byte{
-	// 177 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0x3d, 0x0b, 0xc2, 0x40,
-	0x0c, 0x86, 0x37, 0x87, 0xea, 0xd4, 0xb1, 0x6e, 0x4e, 0x0e, 0x9a, 0x93, 0xfa, 0x0f, 0x04, 0xc1,
-	0xc5, 0xc5, 0xd1, 0x45, 0xae, 0x6d, 0xda, 0x06, 0x6c, 0x72, 0xdc, 0xa5, 0xfd, 0xfd, 0xd2, 0x2b,
-	0x8a, 0xa0, 0x82, 0x5b, 0x3e, 0xde, 0xf7, 0xc9, 0x47, 0xb2, 0xb1, 0x8e, 0x0c, 0xb1, 0xa2, 0x0f,
-	0xe8, 0x07, 0x2a, 0xd1, 0x10, 0x37, 0x18, 0xd4, 0xd8, 0x5e, 0xa5, 0xb3, 0x8a, 0x37, 0x1c, 0x90,
-	0x15, 0x9c, 0x17, 0x95, 0x74, 0x59, 0xb6, 0x58, 0xc3, 0xb3, 0x05, 0x95, 0x74, 0x96, 0x18, 0x26,
-	0x47, 0xb6, 0xfa, 0x40, 0x45, 0xab, 0x79, 0x03, 0xe4, 0x43, 0xb2, 0x38, 0x8e, 0xe9, 0xc9, 0x72,
-	0x75, 0x47, 0x9f, 0xd6, 0xc9, 0x7c, 0x0a, 0x63, 0x35, 0x5d, 0xc3, 0xd7, 0x01, 0x13, 0xc1, 0x3a,
-	0x82, 0x28, 0x3b, 0x87, 0x26, 0xdb, 0xfe, 0xa5, 0xbc, 0x60, 0x70, 0xc2, 0x01, 0x0f, 0xf9, 0x75,
-	0xd7, 0x90, 0xb6, 0x7d, 0x01, 0xa5, 0x74, 0x66, 0xb4, 0xbe, 0x0e, 0x34, 0x3f, 0x3e, 0x50, 0xcc,
-	0xe2, 0xca, 0xfb, 0x47, 0x00, 0x00, 0x00, 0xff, 0xff, 0x21, 0x2e, 0x48, 0xff, 0x23, 0x01, 0x00,
-	0x00,
+var fileDescriptor_automate_event_a9ce9a1806f4cd75 = []byte{
+	// 336 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x52, 0x31, 0x4f, 0xf3, 0x30,
+	0x10, 0x95, 0xfb, 0xe9, 0x43, 0xc2, 0x65, 0x72, 0x51, 0x89, 0xc2, 0x40, 0xd5, 0x29, 0x03, 0xd8,
+	0xa8, 0xe5, 0x17, 0x50, 0x21, 0xb1, 0x20, 0xa1, 0x50, 0x16, 0x96, 0xca, 0x4d, 0xae, 0xa9, 0x51,
+	0x63, 0x9b, 0xf8, 0xd2, 0x99, 0x5f, 0xc5, 0x7f, 0x63, 0x43, 0xb1, 0x49, 0x41, 0x22, 0x20, 0xd8,
+	0x92, 0x7b, 0xf7, 0xde, 0x3d, 0xbf, 0x3b, 0x7a, 0x2a, 0xad, 0x12, 0x4a, 0x23, 0x54, 0x0e, 0xaa,
+	0xad, 0xca, 0x40, 0x28, 0x5d, 0x80, 0x43, 0x21, 0x6b, 0x34, 0xa5, 0x44, 0x58, 0xc0, 0x16, 0x34,
+	0x72, 0x5b, 0x19, 0x34, 0xec, 0x38, 0x5b, 0xc3, 0x8a, 0xb7, 0x10, 0xcf, 0x4d, 0x29, 0x95, 0xe6,
+	0x81, 0x11, 0x9f, 0x14, 0xc6, 0x14, 0x1b, 0x10, 0xbe, 0x75, 0x59, 0xaf, 0x04, 0xaa, 0x12, 0x1c,
+	0xca, 0xd2, 0x06, 0x76, 0x3c, 0xfe, 0x32, 0xcb, 0x6b, 0x8b, 0x4f, 0x13, 0xc6, 0x11, 0x1d, 0xde,
+	0x56, 0xe6, 0x11, 0x32, 0xbc, 0xb7, 0xb9, 0x44, 0xb8, 0x43, 0x89, 0xb5, 0x4b, 0xe1, 0x69, 0xfc,
+	0x42, 0xe8, 0x51, 0x27, 0xe4, 0x2c, 0x3b, 0xa4, 0xff, 0x1d, 0x4a, 0x84, 0x88, 0x8c, 0x48, 0xb2,
+	0x9f, 0x86, 0x1f, 0x36, 0xa7, 0x11, 0x38, 0x54, 0x8d, 0xd5, 0x7c, 0xd1, 0x98, 0x59, 0x64, 0xa6,
+	0xb4, 0xb0, 0x01, 0x84, 0xa8, 0x37, 0x22, 0x49, 0x7f, 0x12, 0xf3, 0xe0, 0x99, 0xb7, 0x9e, 0xf9,
+	0xbc, 0xf5, 0x9c, 0x0e, 0x77, 0xdc, 0xa6, 0x36, 0x6b, 0x99, 0x4c, 0xd0, 0x81, 0x85, 0x2a, 0x03,
+	0x8d, 0xb2, 0x08, 0x8a, 0x5e, 0xf0, 0xdf, 0x88, 0x24, 0xbd, 0x94, 0x7d, 0x40, 0xb3, 0x77, 0x64,
+	0xf2, 0x4a, 0xe8, 0xc1, 0x55, 0xf3, 0xc4, 0x6b, 0xa9, 0xf3, 0x0d, 0x54, 0x6c, 0x45, 0xfb, 0xe1,
+	0xd3, 0x57, 0x59, 0xc2, 0x3b, 0x53, 0x0d, 0xa9, 0x48, 0xab, 0xb8, 0x6f, 0xbb, 0x71, 0x45, 0x7c,
+	0xf6, 0xab, 0xce, 0x26, 0x11, 0xa3, 0x1d, 0xb0, 0x67, 0x42, 0x07, 0x1d, 0x89, 0xb1, 0x29, 0xff,
+	0x61, 0x8d, 0xbc, 0x3b, 0xfe, 0xf8, 0xe2, 0xef, 0x24, 0x67, 0x2f, 0x27, 0x0f, 0xe7, 0x85, 0xc2,
+	0x75, 0xbd, 0xe4, 0x99, 0x29, 0x45, 0xa3, 0xb0, 0x3b, 0x2c, 0xf1, 0xcd, 0xe5, 0x2d, 0xf7, 0xfc,
+	0x32, 0xa6, 0x6f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x97, 0xc3, 0x5b, 0xf4, 0x9b, 0x02, 0x00, 0x00,
 }

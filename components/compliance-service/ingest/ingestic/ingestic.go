@@ -478,7 +478,7 @@ func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (JobStatus
 
 	if percentageComplete != 0 {
 		runningTimeNanos := float64(tasksGetTaskResponse.Task.RunningTimeInNanos)
-		timeLeftSec := int64((runningTimeNanos/percentageComplete - runningTimeNanos) / float64(1000000000))
+		timeLeftSec := int64(runningTimeNanos / percentageComplete / 1000000000.0)
 		estimatedEndTimeInSec = tasksGetTaskResponse.Task.StartTimeInMillis/1000 + timeLeftSec
 	}
 
