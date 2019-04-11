@@ -18,6 +18,8 @@ import (
 // WARNING
 // TODO (tc): The storage interface is still using V1 verbiage, so
 // name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
+// Also, project filtering has only been implemented for storage functions
+// that are used by the V2 server.
 
 // TODOs
 // - CREATE EXTENSION "uuid-ossp"; (currently done via Makefile for tests)

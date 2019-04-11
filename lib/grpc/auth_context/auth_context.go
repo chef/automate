@@ -150,7 +150,7 @@ func ProjectsListFromContextEmptyListOnAllProjects(ctx context.Context) ([]strin
 	if err != nil {
 		return nil, err
 	}
-	if AllProjectsRequested(projectsFilter) {
+	if projectsFilter == nil || AllProjectsRequested(projectsFilter) {
 		projectsFilter = []string{}
 	}
 	return projectsFilter, nil

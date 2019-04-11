@@ -14,6 +14,7 @@ import (
 	authz "github.com/chef/automate/api/interservice/authz/common"
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	teams "github.com/chef/automate/api/interservice/teams/v2"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
@@ -143,6 +144,31 @@ func runAllServerTests(ctx context.Context,
 			assert.Contains(t, list.Teams, resp1.Team)
 			assert.Contains(t, list.Teams, resp2.Team)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(list.Teams))
+
+			cleanupTeamV2(ctx, t, cl, resp1.Team.Id)
+			cleanupTeamV2(ctx, t, cl, resp2.Team.Id)
+		})
+
+		t.Run("when the list is successfully returned and filtered by projects", func(t *testing.T) {
+			resp1, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "montag",
+				Name:     "he is a dag",
+				Projects: []string{"project1", "project2"},
+			})
+			require.NoError(t, err)
+			resp2, err := cl.CreateTeam(ctx, &teams.CreateTeamReq{
+				Id:       "other-team",
+				Name:     "does not matter",
+				Projects: []string{"project2"},
+			})
+			require.NoError(t, err)
+
+			ctx = insertProjectsIntoNewContext([]string{"project1"})
+			list, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			require.NoError(t, err)
+			require.NotNil(t, list)
+			assert.Contains(t, list.Teams, resp1.Team)
+			assert.Equal(t, 1+len(storage.NonDeletableTeams), len(list.Teams))
 
 			cleanupTeamV2(ctx, t, cl, resp1.Team.Id)
 			cleanupTeamV2(ctx, t, cl, resp2.Team.Id)
@@ -817,4 +843,9 @@ func defaultGetPolicyVersionFunc(context.Context,
 			Minor: authz_v2.Version_V0,
 		},
 	}, nil
+}
+
+func insertProjectsIntoNewContext(projects []string) context.Context {
+	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
+		[]string{}, projects, "resource", "action", "pol"))
 }
