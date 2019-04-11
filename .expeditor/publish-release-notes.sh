@@ -37,4 +37,4 @@ EOH
   git push origin master
 popd
 
-rm -rf a2.wiki
+rm -rf automate.wiki
