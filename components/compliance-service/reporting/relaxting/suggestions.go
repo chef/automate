@@ -456,7 +456,7 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 							var c ControlSource
 							if hit2.Source != nil {
 								err := json.Unmarshal(*hit2.Source, &c)
-								if err == nil {
+								if err == nil && c.ID != "" {
 									if !addedControls[c.ID] {
 										oneSugg := reportingapi.Suggestion{Id: c.ID, Text: c.Title, Score: float32(*hit2.Score)}
 										suggs = append(suggs, &oneSugg)
