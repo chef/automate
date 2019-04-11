@@ -7,7 +7,6 @@ package integration_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
@@ -15,35 +14,35 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetServicesBySGBasic(t *testing.T) {
+func TestGetServicesBasic(t *testing.T) {
 	var (
 		ctx      = context.Background()
-		request  = new(applications.ServicesBySGReq)
-		expected = new(applications.ServicesBySGRes)
+		request  = new(applications.ServicesReq)
+		expected = new(applications.ServicesRes)
 	)
-	response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+	response, err := suite.ApplicationsServer.GetServices(ctx, request)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, response)
 }
 
-func TestGetServicesBySGSortParameterError(t *testing.T) {
+func TestGetServicesSortParameterError(t *testing.T) {
 	var (
 		ctx     = context.Background()
-		request = &applications.ServicesBySGReq{
+		request = &applications.ServicesReq{
 			Sorting: &query.Sorting{
 				Field: "not-valid-sort-field",
 			},
 		}
-		expected = new(applications.ServicesBySGRes)
+		expected = new(applications.ServicesRes)
 	)
-	response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+	response, err := suite.ApplicationsServer.GetServices(ctx, request)
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "InvalidArgument")
 	assert.Contains(t, err.Error(), "Invalid sort field 'not-valid-sort-field'.")
 	assert.Equal(t, expected, response)
 }
 
-func TestGetServicesBySGSingleService(t *testing.T) {
+func TestGetServicesSingleService(t *testing.T) {
 	mockHabService := NewHabServiceMsg("sup1234", a, e, "default", "core",
 		"postgres", "0.1.0", "20190101121212", "OK")
 	suite.IngestService(mockHabService)
@@ -54,11 +53,9 @@ func TestGetServicesBySGSingleService(t *testing.T) {
 	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
 
 		var (
-			ctx     = context.Background()
-			request = &applications.ServicesBySGReq{
-				ServiceGroupId: sgList[0].ID,
-			}
-			expected = &applications.ServicesBySGRes{
+			ctx      = context.Background()
+			request  = &applications.ServicesReq{}
+			expected = &applications.ServicesRes{
 				Services: []*applications.Service{
 					&applications.Service{
 						SupervisorId: "sup1234",
@@ -66,165 +63,66 @@ func TestGetServicesBySGSingleService(t *testing.T) {
 						Release:      "core/postgres/0.1.0/20190101121212",
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_OK,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
+						Application:  a, Environment: e, Fqdn: "",
 					},
 				},
 			}
 		)
 
-		response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
 	}
 }
 
-func TestGetServicesBySGMultiService(t *testing.T) {
-	suite.IngestServices(habServicesMatrix())
+func TestGetServicesMultiService(t *testing.T) {
+	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
 	defer suite.DeleteDataFromStorage()
 
 	var (
-		expectedResponses = []*applications.ServicesBySGRes{
-			&applications.ServicesBySGRes{
-				Services: []*applications.Service{
-					&applications.Service{
-						SupervisorId: "sup2",
-						Group:        "myapp.default",
-						Release:      "core/myapp/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_OK,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
-					&applications.Service{
-						SupervisorId: "sup3",
-						Group:        "myapp.default",
-						Release:      "core/myapp/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_OK,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
-					&applications.Service{
-						SupervisorId: "sup1",
-						Group:        "myapp.default",
-						Release:      "core/myapp/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_WARNING,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
+		ctx      = context.Background()
+		request  = &applications.ServicesReq{}
+		expected = &applications.ServicesRes{
+			Services: []*applications.Service{
+				&applications.Service{
+					SupervisorId: "sup1",
+					Group:        "postgres.default",
+					Release:      "core/postgres/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_CRITICAL,
+					Application:  a, Environment: e, Fqdn: "",
 				},
-			},
-			&applications.ServicesBySGRes{
-				Services: []*applications.Service{
-					&applications.Service{
-						SupervisorId: "sup3",
-						Group:        "postgres.default",
-						Release:      "core/postgres/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_CRITICAL,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
-					&applications.Service{
-						SupervisorId: "sup1",
-						Group:        "postgres.default",
-						Release:      "core/postgres/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_OK,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
-					&applications.Service{
-						SupervisorId: "sup2",
-						Group:        "postgres.default",
-						Release:      "core/postgres/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_UNKNOWN,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
+				&applications.Service{
+					SupervisorId: "sup1",
+					Group:        "redis.default",
+					Release:      "core/redis/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_OK,
+					Application:  a, Environment: e, Fqdn: "",
 				},
-			},
-			&applications.ServicesBySGRes{
-				Services: []*applications.Service{
-					&applications.Service{
-						SupervisorId: "sup1",
-						Group:        "redis.default",
-						Release:      "core/redis/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_OK,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
-					&applications.Service{
-						SupervisorId: "sup2",
-						Group:        "redis.default",
-						Release:      "core/redis/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_OK,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
-					&applications.Service{
-						SupervisorId: "sup3",
-						Group:        "redis.default",
-						Release:      "core/redis/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_OK,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
+				&applications.Service{
+					SupervisorId: "sup2",
+					Group:        "test.default",
+					Release:      "core/test/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_UNKNOWN,
+					Application:  a, Environment: e, Fqdn: "",
 				},
-			},
-			&applications.ServicesBySGRes{
-				Services: []*applications.Service{
-					&applications.Service{
-						SupervisorId: "sup4",
-						Group:        "test.default",
-						Release:      "core/test/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_UNKNOWN,
-						Application:  "app",
-						Environment:  "test-env",
-						Fqdn:         "",
-					},
+				&applications.Service{
+					SupervisorId: "sup1",
+					Group:        "myapp.default",
+					Release:      "core/myapp/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_WARNING,
+					Application:  a, Environment: e, Fqdn: "",
 				},
 			},
 		}
 	)
 
-	// Get the service groups and iterate over to test every service within
-	sgList := suite.GetServiceGroups()
-	if assert.Equal(t, len(expectedResponses), len(sgList),
-		fmt.Sprintf("There should be %d service_group in the db", len(expectedResponses))) {
-
-		for i, sg := range sgList {
-
-			t.Run(fmt.Sprintf("verifying service group %d", sg.ID), func(t *testing.T) {
-				var (
-					ctx     = context.Background()
-					request = &applications.ServicesBySGReq{ServiceGroupId: sg.ID}
-				)
-
-				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
-				assert.Nil(t, err)
-				assertServicesEqual(t, expectedResponses[i].GetServices(), response.GetServices())
-			})
-
-		}
-	}
+	response, err := suite.ApplicationsServer.GetServices(ctx, request)
+	assert.Nil(t, err)
+	assertServicesEqual(t, expected.GetServices(), response.GetServices())
 }
 
 func assertServicesEqual(t *testing.T, expected, actual []*applications.Service) {
@@ -263,5 +161,21 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 				actual[i].Fqdn,
 				"The fqdn of a service is not the expected one")
 		}
+	}
+}
+
+func habServicesMatrixAllHealthStatusDifferent() []*applications.HabService {
+	return []*applications.HabService{
+		// service_group 1 <-> With a Health Status = 'OK'
+		NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK"),
+
+		// service_group 2 <-> With a Health Status = 'WARNING'
+		NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "WARNING"),
+
+		// service_group 3 <-> With a Health Status = 'CRITICAL'
+		NewHabServiceMsg("sup1", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "CRITICAL"),
+
+		// service_group 4 <-> With a Health Status = 'UNKNOWN'
+		NewHabServiceMsg("sup2", a, e, "default", "core", "test", "0.1.0", "20190101121212", "UNKNOWN"),
 	}
 }
