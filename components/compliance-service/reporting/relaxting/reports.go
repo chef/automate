@@ -484,21 +484,11 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 	if queryInfo.level != ReportLevel {
 		fsc.Exclude("profiles")
 	}
-	logrus.Debugf("GetReport for reportid=%s, filters=%+v", reportid, filters)
-
-	query := elastic.NewBoolQuery()
-
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
-	idsQuery.Ids(reportid)
-	query = query.Filter(idsQuery)
-
-	if len(filters["projects"]) > 0 {
-		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
-		query = query.Filter(termQuery)
-	}
+	logrus.Debugf("GetReport for reportid=%s, filters=%+v", reportId, filters)
 
 	searchSource := elastic.NewSearchSource().
-		Query(query).
+		FetchSourceContext(fsc).
+		Query(queryInfo.filtQuery).
 		Size(1)
 
 	source, err := searchSource.Source()
@@ -734,6 +724,11 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		boolQuery = boolQuery.Must(timeRangeQuery)
 	}
 
+	if len(filters["projects"]) > 0 {
+		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
 	if len(filters["environment"]) > 0 {
 		termQuery := elastic.NewTermsQuery("environment", stringArrayToInterfaceArray(filters["environment"])...)
 		boolQuery = boolQuery.Must(termQuery)
@@ -761,7 +756,6 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	numberOfProfiles := len(filters["profile_id"])
 	numberOfControls := len(filters["control"])
-
 	if numberOfProfiles > 0 || numberOfControls > 0 {
 		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
 		profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
@@ -814,25 +808,34 @@ func (backend ES2Backend) getFiltersQueryForDeepReport(reportId string,
 	idsQuery.Ids(reportId)
 	boolQuery = boolQuery.Must(idsQuery)
 
-	profileBaseFscIncludes := []string{
-		"profiles.depends",
-		"profiles.name",
-		"profiles.sha256",
-		"profiles.status",
-		"profiles.skip_message",
-		"profiles.version"}
+	if len(filters["projects"]) > 0 {
+		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
+		boolQuery = boolQuery.Must(termQuery)
+	}
 
-	profileLevelFscIncludes := []string{"profiles"}
-	controlLevelFscIncludes := []string{"profiles.controls"}
+	numberOfProfiles := len(filters["profile_id"])
+	numberOfControls := len(filters["control"])
+	if numberOfProfiles > 0 || numberOfControls > 0 {
+		profileBaseFscIncludes := []string{
+			"profiles.depends",
+			"profiles.name",
+			"profiles.sha256",
+			"profiles.status",
+			"profiles.skip_message",
+			"profiles.version"}
 
-	profileAndControlQuery := getProfileAndControlQuery(
-		filters,
-		profileBaseFscIncludes,
-		profileLevelFscIncludes,
-		controlLevelFscIncludes,
-	)
+		profileLevelFscIncludes := []string{"profiles"}
+		controlLevelFscIncludes := []string{"profiles.controls"}
 
-	boolQuery = boolQuery.Must(profileAndControlQuery)
+		profileAndControlQuery := getProfileAndControlQuery(
+			filters,
+			profileBaseFscIncludes,
+			profileLevelFscIncludes,
+			controlLevelFscIncludes,
+		)
+		boolQuery = boolQuery.Must(profileAndControlQuery)
+	}
+
 	return boolQuery
 }
 

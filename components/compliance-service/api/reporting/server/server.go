@@ -61,6 +61,7 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 
 // ReadReport returns a reports based on id
 func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*reporting.Report, error) {
+	var report *reporting.Report
 	formattedFilters := formatFilters(in.Filters)
 	//todo - deep filtering - should we open this up to more than just one?  only for ReadReport?
 	if len(formattedFilters["profile_id"]) > 1 {
