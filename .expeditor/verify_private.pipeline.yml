@@ -47,9 +47,8 @@ steps:
       executor:
         docker:
 
-  # The build technically depends on AWS access to build
-  # automate-compliance-profiles even though we don't currently have
-  # it piped in here. Further we need to build in order to run the
+  # The build depends on GitHub access to build
+  # automate-chef-io. Further we need to build in order to run the
   # integration tests.
   - label: build
     command:
@@ -61,7 +60,7 @@ steps:
       HAB_NONINTERACTIVE: true
     expeditor:
       secrets:
-        GITHUB_TOKEN:
+        HAB_STUDIO_SECRET_GITHUB_TOKEN:
           account: github/chef-ci
           field: token
       executor:
