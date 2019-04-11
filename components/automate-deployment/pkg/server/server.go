@@ -1989,11 +1989,18 @@ func (s *server) DeployID(ctx context.Context, d *api.DeployIDRequest) (*api.Dep
 	}, nil
 }
 
+// This function isn't perfect. It's intent is that you can wait for the lock with
+// a timeout. In reality, this is not possible using mutexes. So instead, it errors
+// out if the context is expired, and then waits for the lock. This is fine because
+// the next use of the context will error out and then the mutex will be unlocked
+// fairly quickly because of that. We just end up with an extra thread waiting
+// for the lock on the server.
 func (s *server) acquireLock(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
-	case <-s.deployment.AcquireLock():
+	default:
+		s.deployment.Lock()
 		return nil
 	}
 }

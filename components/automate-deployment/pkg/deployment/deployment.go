@@ -197,19 +197,6 @@ func (d *Deployment) Lock() {
 	d.mu.Lock()
 }
 
-// AcquireLock returns a channel that will be closed when the deployment is
-// locked.
-func (d *Deployment) AcquireLock() <-chan struct{} {
-	c := make(chan struct{})
-
-	go func() {
-		d.Lock()
-		close(c)
-	}()
-
-	return c
-}
-
 // Unlock releases a previously help lock.  Panics if called when the
 // lock is not held.
 func (d *Deployment) Unlock() {
