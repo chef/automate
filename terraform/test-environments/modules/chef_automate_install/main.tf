@@ -34,7 +34,7 @@ data "template_file" "install_chef_automate_cli" {
     chef_server_org        = "${var.chef_server_org}"
     create_admin_token     = "${var.create_admin_token}"
     enable_chef_server     = "${var.enable_chef_server}"
-    enable_iam             = "${var.enable_iam}"
+    iam_version            = "${var.iam_version}"
     enable_workflow        = "${var.enable_workflow}"
     hardened_security      = "${var.hardened_security}"
     upgrade                = "${var.upgrade}"
