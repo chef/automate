@@ -1,10 +1,24 @@
-import { $$, browser } from 'protractor';
+import { $, $$, browser } from 'protractor';
 import { expectUrlToBeAccessible } from './helpers/accessibility_helpers';
 
 describe('Compliance Reporting', () => {
 
   beforeEach(() => {
     browser.waitForAngularEnabled(false);
+  });
+
+  it('has a heading and a subheading', () => {
+    browser.get('/compliance/reporting/overview');
+
+    const heading = $('chef-page-header chef-heading');
+    const subheading = $('chef-page-header chef-subheading');
+
+    expect(heading.getText()).toBe('Compliance Reporting');
+    expect(subheading.getText()).toBe([
+      'Compliance reports describe the status of scanned infrastructure. Filtering by a profile,',
+      'or a profile and one associated control, will enable deep filtering, which will also',
+      'reflect on the status of the node.'
+    ].join(' '));
   });
 
   describe('filtering', () => {
