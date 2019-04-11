@@ -7,6 +7,7 @@ package integration_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
@@ -76,6 +77,153 @@ func TestGetServicesBySGSingleService(t *testing.T) {
 		response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesBySGMultiService(t *testing.T) {
+	suite.IngestServices(habServicesMatrix())
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		expectedResponses = []*applications.ServicesBySGRes{
+			&applications.ServicesBySGRes{
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup2",
+						Group:        "myapp.default",
+						Release:      "core/myapp/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_OK,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+					&applications.Service{
+						SupervisorId: "sup3",
+						Group:        "myapp.default",
+						Release:      "core/myapp/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_OK,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+					&applications.Service{
+						SupervisorId: "sup1",
+						Group:        "myapp.default",
+						Release:      "core/myapp/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_WARNING,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+				},
+			},
+			&applications.ServicesBySGRes{
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup3",
+						Group:        "postgres.default",
+						Release:      "core/postgres/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_CRITICAL,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+					&applications.Service{
+						SupervisorId: "sup1",
+						Group:        "postgres.default",
+						Release:      "core/postgres/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_OK,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+					&applications.Service{
+						SupervisorId: "sup2",
+						Group:        "postgres.default",
+						Release:      "core/postgres/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_UNKNOWN,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+				},
+			},
+			&applications.ServicesBySGRes{
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup1",
+						Group:        "redis.default",
+						Release:      "core/redis/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_OK,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+					&applications.Service{
+						SupervisorId: "sup2",
+						Group:        "redis.default",
+						Release:      "core/redis/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_OK,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+					&applications.Service{
+						SupervisorId: "sup3",
+						Group:        "redis.default",
+						Release:      "core/redis/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_OK,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+				},
+			},
+			&applications.ServicesBySGRes{
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup4",
+						Group:        "test.default",
+						Release:      "core/test/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_UNKNOWN,
+						Application:  "app",
+						Environment:  "test-env",
+						Fqdn:         "",
+					},
+				},
+			},
+		}
+	)
+
+	// Get the service groups and iterate over to test every service within
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, len(expectedResponses), len(sgList),
+		fmt.Sprintf("There should be %d service_group in the db", len(expectedResponses))) {
+
+		for i, sg := range sgList {
+
+			t.Run(fmt.Sprintf("verifying service group %d", sg.ID), func(t *testing.T) {
+				var (
+					ctx     = context.Background()
+					request = &applications.ServicesBySGReq{ServiceGroupId: sg.ID}
+				)
+
+				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+				assert.Nil(t, err)
+				assertServicesEqual(t, expectedResponses[i].GetServices(), response.GetServices())
+			})
+
+		}
 	}
 }
 
