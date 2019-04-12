@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# By default, this script creates a manifest.json file that contains all the packages in the unstable channel.
+# By default, this script creates a manifest.json file that contains all the packages in the dev channel
 
 require 'date'
 require 'net/http'
@@ -27,6 +27,15 @@ SKIP_PACKAGES = []
 ALLOW_LOCAL_PACKAGES=(ENV["ALLOW_LOCAL_PACKAGES"] == "true")
 LOCAL_PACKAGE_PATH="results/"
 LOCAL_PACKAGE_ORIGIN=ENV["HAB_ORIGIN"] || "chef"
+
+def channel_for_origin(origin)
+  case origin
+  when "chef"
+    "dev"
+  else
+    "stable"
+  end
+end
 
 def get_latest(channel, origin, name)
   # -- FIXME: PINNED DATABASES - sdelano 2018/07/19 --
@@ -183,7 +192,7 @@ pkg_paths_by_collection.each do |name, pkg_paths|
     pkg_origin = package_ident[0]
     pkg_name = package_ident[1]
 
-    latest_release = get_latest("unstable", pkg_origin, pkg_name)
+    latest_release = get_latest(channel_for_origin(pkg_origin), pkg_origin, pkg_name)
 
     pkg_version = latest_release["version"]
     pkg_release = latest_release["release"]
@@ -202,7 +211,7 @@ end
   pkg_origin = package_ident[0]
   pkg_name = package_ident[1]
 
-  latest_release = get_latest("unstable", pkg_origin, pkg_name)
+  latest_release = get_latest(channel_for_origin(pkg_origin), pkg_origin, pkg_name)
 
   pkg_version = latest_release["version"]
   pkg_release = latest_release["release"]
