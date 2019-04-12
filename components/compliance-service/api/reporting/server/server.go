@@ -50,6 +50,10 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err = filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, "")
+	}
 	reportsList, total, err := srv.es.GetReports(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, "")
