@@ -93,3 +93,36 @@ func TestUniqueStringSlice(t *testing.T) {
 	arr := []string{"a", "b", "c", "b", "f", "a"}
 	assert.Equal(t, []string{"a", "b", "c", "f"}, UniqueStringSlice(arr))
 }
+
+func TestDeDupSlice(t *testing.T) {
+	arr := []string{"item1", "item2", "item2"}
+	arr = deDupSlice(arr)
+	assert.Equal(t, []string{"item1", "item2"}, arr)
+
+	arr = []string{"item1"}
+	arr = deDupSlice(arr)
+	assert.Equal(t, []string{"item1"}, arr)
+
+	arr = []string{}
+	arr = deDupSlice(arr)
+	assert.Equal(t, []string{}, arr)
+
+	arr = []string{"item1", "item1", "item1", "item3", "item2", "item2"}
+	arr = deDupSlice(arr)
+	assert.Equal(t, []string{"item1", "item3", "item2"}, arr)
+}
+
+func TestDeDupFilters(t *testing.T) {
+	filters := make(map[string][]string)
+	filters["profile_id"] = []string{"prof1", "prof2"}
+	DeDupFilters(filters)
+	assert.Equal(t, []string{"prof1", "prof2"}, filters["profile_id"])
+
+	filters["profile_id"] = []string{"prof1", "prof2", "prof2"}
+	DeDupFilters(filters)
+	assert.Equal(t, []string{"prof1", "prof2"}, filters["profile_id"])
+
+	filters["profile_id"] = []string{"prof1", "prof2", "prof2", "prof1", "prof11"}
+	DeDupFilters(filters)
+	assert.Equal(t, []string{"prof1", "prof2", "prof11"}, filters["profile_id"])
+}

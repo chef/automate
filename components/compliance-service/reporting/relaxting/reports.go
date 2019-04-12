@@ -20,7 +20,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
-	elastic "github.com/olivere/elastic"
+	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 )
@@ -57,7 +57,7 @@ func (backend ES2Backend) GetNodeReportIds(esIndex string, filters map[string][]
 func (backend ES2Backend) getDocIdHits(esIndex string,
 	searchSource *elastic.SearchSource) ([]*elastic.SearchHit, time.Duration, error) {
 	defer util.TimeTrack(time.Now(), "getDocIdHits")
-	var startT time.Time = time.Now()
+	var startT = time.Now()
 
 	hits := make([]*elastic.SearchHit, 0)
 
@@ -93,10 +93,11 @@ func (backend ES2Backend) getDocIdHits(esIndex string,
 	}
 }
 
-func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string, filters map[string][]string, latestOnly bool) (map[string]string, error) {
+func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
+	filters map[string][]string,
+	latestOnly bool) (map[string]string, error) {
 	nodeReport := make(map[string]string, 0)
-	useSummaryIndex := strings.Contains(esIndex, "-s-")
-	boolQuery := backend.getFiltersQuery(filters, useSummaryIndex, latestOnly)
+	boolQuery := backend.getFiltersQuery(filters, latestOnly)
 
 	// aggs
 	aggs := elastic.NewTermsAggregation().Field("node_uuid").Size(reporting.ESize).
@@ -148,20 +149,23 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string, filters
 			}
 		}
 
-		// When filtering by controls, we are reducing the array of report ids based on
+		//When filtering by controls, we are reducing the array of report ids based on
 		// another query on inspec_report documents where we have control ids
 		if len(filters["control"]) > 0 {
-			esIndex, err = GetEsIndex(filters, false, false)
+			esIndex, err := GetEsIndex(filters, false, false)
 			if err != nil {
 				return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to GetEsIndex")
 			}
 			filteredReportIds, err := backend.filterIdsByControl(esIndex, MapValues(nodeReport), filters["control"])
 			if err != nil {
-				return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by control")
+				return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by "+
+					"control")
 			}
-			logrus.Debugf("getNodeReportIdsFromTimeseries control filtering, len(nodeReport)=%d, len(filteredNodeIds)=%d\n", len(nodeReport), len(filteredReportIds))
+			logrus.Debugf("getNodeReportIdsFromTimeseries control filtering, len(nodeReport)=%d, "+
+				"len(filteredNodeIds)=%d\n", len(nodeReport), len(filteredReportIds))
 
-			// flipping map[nodeid][reportid] to map[reportid][nodeid] for quicker lookups, to avoid an expensive O(n^2) Contains(filteredReportIds, reportId) call
+			//flipping map[nodeid][reportid] to map[reportid][nodeid] for quicker lookups, to avoid an expensive O(n^2)
+			// Contains(filteredReportIds, reportId) call
 			reportNode := make(map[string]string, len(nodeReport))
 			for nodeID, reportID := range nodeReport {
 				reportNode[reportID] = nodeID
@@ -175,7 +179,8 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string, filters
 			nodeReport = filteredNodeReport
 		}
 
-		logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n", len(nodeReport), searchResult.TookInMillis)
+		logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
+			len(nodeReport), searchResult.TookInMillis)
 
 		return nodeReport, nil
 	}
@@ -308,7 +313,8 @@ func (backend ES2Backend) filterIdsByControl(esIndex string, ids, controls []str
 	termsQuery := elastic.NewTermsQuery("profiles.controls.id", stringArrayToInterfaceArray(controls)...)
 	reportIdsAndControlIdQuery := elastic.NewBoolQuery()
 
-	reportIdsNestedQuery := elastic.NewNestedQuery("profiles.controls", reportIdsAndControlIdQuery.Must(idsQuery, termsQuery))
+	reportIdsNestedQuery := elastic.NewNestedQuery("profiles.controls", reportIdsAndControlIdQuery.Must(idsQuery,
+		termsQuery))
 
 	fsc := elastic.NewFetchSourceContext(false).
 		Include("took", "hits.total", "hits.hits._id")
@@ -344,60 +350,68 @@ func (backend ES2Backend) filterIdsByControl(esIndex string, ids, controls []str
 
 // GetAllReports returns all reports in a given timeframe
 // TODO: support timeframe and pagination
-func (backend *ES2Backend) GetAllReports(from int32, size int32, filters map[string][]string, sort_field string, sort_asc bool) ([]*reportingapi.Report, int64, error) {
+func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string][]string,
+	sortField string, sortAsc bool) ([]*reportingapi.Report, int64, error) {
+	myName := "GetReports"
+
+	depth, err := backend.NewDepth(filters, true, false)
+	if err != nil {
+		return nil, 0, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
+	}
+
+	queryInfo := depth.getQueryInfo()
+
+	logrus.Debugf("%s will retrieve all nodes", myName)
 
 	client, err := backend.ES2Client()
 
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "GetAllReports cannot connect to ElasticSearch")
+		return nil, 0, errors.Wrapf(err, "%s, cannot connect to Elasticsearch", myName)
 	}
-
-	esIndex, err := GetEsIndex(filters, true, true)
-	if err != nil {
-		return nil, 0, errors.Wrap(err, "GetAllReports unable to get index dates")
-	}
-
-	//this one if the list report history for a node so we want all for this day
-	//not just the lastest
-	boolQuery := backend.getFiltersQuery(filters, true, false)
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"node_uuid",
 		"node_name",
-		"end_time",
-		"status",
-		"controls_sums")
+		"environment",
+		"end_time")
+
+	if queryInfo.level == ReportLevel {
+		fsc.Include(
+			"status",
+			"controls_sums")
+	}
+
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
-		Sort(sort_field, sort_asc).
-		Query(boolQuery).
+		Query(queryInfo.filtQuery).
+		Sort(sortField, sortAsc).
 		From(int(from)).
 		Size(int(size))
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "GetAllReports unable to get Source")
+		return nil, 0, errors.Wrapf(err, "%s unable to get Source", myName)
 	}
-	LogQueryPartMin(esIndex, source, "GetAllReports query searchSource")
+	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query searchSource", myName))
 
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
-		Index(esIndex).
+		Index(queryInfo.esIndex).
 		FilterPath(
 			"took",
 			"hits.total",
 			"hits.hits._index",
 			"hits.hits._id",
-			"hits.hits._source").
+			"hits.hits._source",
+			"hits.hits.inner_hits").
 		Do(context.Background())
 
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "GetAllReports unable to complete search")
+		return nil, 0, errors.Wrapf(err, "%s unable to complete search", myName)
 	}
-
-	logrus.Debugf("GetAllReports got %d reports in %d milliseconds\n", searchResult.TotalHits(), searchResult.TookInMillis)
+	logrus.Debugf("GetAllReports got %d reports in %d milliseconds\n", searchResult.TotalHits(),
+		searchResult.TookInMillis)
 	reports := make([]*reportingapi.Report, 0)
-	// Here's how you iterate through results with full control over each step.
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			item := ESInSpecSummary{}
@@ -411,9 +425,24 @@ func (backend *ES2Backend) GetAllReports(from int32, size int32, filters map[str
 						NodeId:   item.NodeID,
 						NodeName: item.NodeName,
 						EndTime:  timestamp,
-						Status:   item.Status,
 					}
-					report.Controls = convertToRSControlSummary(item.ControlsSums)
+
+					var controlSummary reporting.NodeControlSummary
+					var status string
+
+					if queryInfo.level == ReportLevel {
+						controlSummary = item.ControlsSums
+						status = item.Status
+					} else if queryInfo.level == ProfileLevel || queryInfo.level == ControlLevel {
+						controlSummary, status, err = getDeepControlsSums(hit, queryInfo)
+						if err != nil {
+							//todo - handle this
+							logrus.Errorf("%s time error: %s", myName, err.Error())
+						}
+					}
+					report.Controls = convertToRSControlSummary(controlSummary)
+					report.Status = status
+
 					reports = append(reports, &report)
 				} else {
 					logrus.Errorf("GetAllReports unmarshal error: %s", err.Error())
@@ -428,65 +457,63 @@ func (backend *ES2Backend) GetAllReports(from int32, size int32, filters map[str
 }
 
 // GetReport returns the information about a single report
-func (backend *ES2Backend) GetReport(esIndex string, reportid string, filters map[string][]string) (reportingapi.Report, error) {
-	var report reportingapi.Report
+func (backend *ES2Backend) GetReport(esIndex string, reportId string,
+	filters map[string][]string) (*reportingapi.Report, error) {
+	myName := "GetReport"
+	var report *reportingapi.Report
 
-	client, err := backend.ES2Client()
-
+	depth, err := backend.NewDepth(filters, true, false)
 	if err != nil {
-		return report, errors.Wrap(err, "GetReport cannot connect to ElasticSearch")
+		return report, errors.Wrapf(err, "%s unable to get depth level for report", myName)
 	}
 
-	var profileNameFilter, profileIDFilter, controlIDFilter string
-	if len(filters["profile_name"]) == 1 {
-		profileNameFilter = filters["profile_name"][0]
-	} else if len(filters["profile_id"]) == 1 {
-		profileIDFilter = filters["profile_id"][0]
-	}
-	// we only allow filtering by one control
-	if len(filters["control"]) == 1 {
-		controlIDFilter = filters["control"][0]
-	}
-	logrus.Debugf("GetReport for reportid=%s, filters=%+v", reportid, filters)
+	queryInfo := depth.getQueryInfo()
 
-	query := elastic.NewBoolQuery()
+	//normally, we compute the esIndex when we create a new Depth obj.. here we overwrite it what what's been passed in.
+	queryInfo.esIndex = esIndex
 
-	idsQuery := elastic.NewIdsQuery(mappings.DocType)
-	idsQuery.Ids(reportid)
-	query = query.Filter(idsQuery)
+	//normally, we compute the boolQuery when we create a new Depth obj.. here we, instead call a variation of the full
+	// query builder. we need to do this because this variation of filter query provides this func with deeper
+	// information about the report being retrieved.
+	queryInfo.filtQuery = backend.getFiltersQueryForDeepReport(reportId, filters)
 
-	if len(filters["projects"]) > 0 {
-		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
-		query = query.Filter(termQuery)
+	logrus.Debugf("%s will retrieve all nodes", myName)
+
+	fsc := elastic.NewFetchSourceContext(true)
+
+	if queryInfo.level != ReportLevel {
+		fsc.Exclude("profiles")
 	}
+	logrus.Debugf("GetReport for reportid=%s, filters=%+v", reportId, filters)
 
 	searchSource := elastic.NewSearchSource().
-		Query(query).
+		FetchSourceContext(fsc).
+		Query(queryInfo.filtQuery).
 		Size(1)
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return report, errors.Wrap(err, "GetReport unable to get Source")
+		return report, errors.Wrapf(err, "%s unable to get Source", myName)
 	}
-	LogQueryPartMin(esIndex, source, "GetReport query searchSource")
+	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query searchSource", myName))
 
-	searchResult, err := client.Search().
+	searchResult, err := queryInfo.client.Search().
 		SearchSource(searchSource).
-		Index(esIndex).
+		Index(queryInfo.esIndex).
 		FilterPath(
 			"took",
 			"hits.total",
-			"hits.hits._index",
 			"hits.hits._id",
 			"hits.hits._source",
-		).
+			"hits.hits.inner_hits").
 		Do(context.Background())
 
 	if err != nil {
-		return report, errors.Wrap(err, "GetReport unable to complete search")
+		return report, errors.Wrapf(err, "%s unable to complete search", myName)
 	}
 
-	logrus.Debugf("GetReport got %d reports in %d milliseconds\n", searchResult.TotalHits(), searchResult.TookInMillis)
+	logrus.Debugf("%s got %d reports in %d milliseconds\n", myName, searchResult.TotalHits(),
+		searchResult.TookInMillis)
 
 	// we should only receive one value
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
@@ -495,34 +522,36 @@ func (backend *ES2Backend) GetReport(esIndex string, reportid string, filters ma
 			if hit.Source != nil {
 				err := json.Unmarshal(*hit.Source, &esInSpecReport)
 				if err == nil {
-					// TODO: FIX Unmarshal error(json: cannot unmarshal array into Go struct field ESInSpecReportControl.results) and move
-					// the read all profiles section here
+					//TODO: FIX Unmarshal error(json: cannot unmarshal array into Go struct field
+					// ESInSpecReportControl.results) and move the read all profiles section here
 				} else {
-					logrus.Errorf("GetReport unmarshal error: %s", err.Error())
+					logrus.Errorf("%s unmarshal error: %s", myName, err.Error())
 				}
+
+				var esInspecProfiles []ESInSpecReportProfile //`json:"profiles"`
+				var status string
+
+				if queryInfo.level == ReportLevel {
+					esInspecProfiles = esInSpecReport.Profiles
+					status = esInSpecReport.Status
+				} else if queryInfo.level == ProfileLevel || queryInfo.level == ControlLevel {
+					esInspecProfiles, status, err = getDeepInspecProfiles(hit, queryInfo)
+					if err != nil {
+						//todo - handle this
+						logrus.Errorf("%s time error: %s", myName, err.Error())
+					}
+				}
+				esInSpecReport.Status = status
 
 				// read all profiles
 				profiles := make([]*reportingapi.Profile, 0)
-				for _, esInSpecReportProfileMin := range esInSpecReport.Profiles {
-
-					if profileNameFilter != "" {
-						if esInSpecReportProfileMin.Name != profileNameFilter {
-							continue
-						}
-					}
-					if profileIDFilter != "" {
-						if esInSpecReportProfileMin.SHA256 != profileIDFilter {
-							continue
-						}
-					}
-					// we need to enrich the profile information Here
+				for _, esInSpecReportProfileMin := range esInspecProfiles {
 					logrus.Debugf("Determine profile: %s", esInSpecReportProfileMin.Name)
 					esInSpecProfile, err := backend.GetProfile(esInSpecReportProfileMin.SHA256)
 					if err != nil {
-						logrus.Errorf("Could not get profile: %s", err.Error())
+						logrus.Errorf("%s - Could not get profile: %s", myName, err.Error())
 					}
 
-					// TODO: extract mapping from here
 					reportProfile := inspec.Profile{}
 					reportProfile.Name = esInSpecProfile.Name
 					reportProfile.CopyrightEmail = esInSpecProfile.CopyrightEmail
@@ -541,7 +570,8 @@ func (backend *ES2Backend) GetReport(esIndex string, reportid string, filters ma
 						depCopy := esInSpecProfileDependency // to prevent https://github.com/golang/go/issues/20725
 						dependsHash[esInSpecProfileDependency.Name] = &depCopy
 					}
-					// Picking the report specific dependency info(status, skip_message) and adding it to the static info retrieved from comp-profiles
+					// Picking the report specific dependency info(status, skip_message) and adding it to the static
+					// info retrieved from comp-profiles
 					for _, esInSpecProfileDep := range esInSpecProfile.Depends {
 						if hash, ok := dependsHash[esInSpecProfileDep.Name]; ok {
 							esInSpecProfileDep.Status = hash.Status
@@ -551,7 +581,8 @@ func (backend *ES2Backend) GetReport(esIndex string, reportid string, filters ma
 					reportProfile.Dependencies = esInSpecProfile.Depends
 
 					reportProfile.Controls = make([]inspec.Control, len(esInSpecReportProfileMin.Controls))
-					// Creating a map of report control ids to avoid a n^2 complexity later on when we look for the matching profile control id
+					// Creating a map of report control ids to avoid a n^2 complexity later on when we look for the
+					// matching profile control id
 					profileControlsMap := make(map[string]*reportingapi.Control, len(esInSpecProfile.Controls))
 					for _, control := range esInSpecProfile.Controls {
 						profileControlsMap[control.Id] = control
@@ -560,14 +591,6 @@ func (backend *ES2Backend) GetReport(esIndex string, reportid string, filters ma
 					convertedControls := make([]*reportingapi.Control, 0)
 					// Enrich min report controls with profile metadata
 					for _, reportControlMin := range esInSpecReportProfileMin.Controls {
-						if controlIDFilter != "" {
-							if reportControlMin.ID != controlIDFilter {
-								logrus.Debugf("control filter %s requested. skipping control %s", controlIDFilter, reportControlMin.ID)
-								continue
-							}
-						}
-						// reportControlMin contains the controls with their report specific information(results, execution time, etc)
-						// profileControl contains the static metadata of the control
 						profileControl := profileControlsMap[reportControlMin.ID]
 
 						if profileControl != nil {
@@ -642,17 +665,17 @@ func (backend *ES2Backend) GetReport(esIndex string, reportid string, filters ma
 					ipAddress = *esInSpecReport.IPAddress
 				}
 				timestamp, _ := ptypes.TimestampProto(esInSpecReport.EndTime)
-				report = reportingapi.Report{
+				report = &reportingapi.Report{
 					Id:          hit.Id,
 					NodeId:      esInSpecReport.NodeID,
 					NodeName:    esInSpecReport.NodeName,
-					Ipaddress:   ipAddress,
-					Fqdn:        esInSpecReport.FQDN,
 					Environment: esInSpecReport.Environment,
 					Status:      esInSpecReport.Status,
 					EndTime:     timestamp,
 					Version:     esInSpecReport.InSpecVersion,
 					Profiles:    profiles,
+					Ipaddress:   ipAddress,
+					Fqdn:        esInSpecReport.FQDN,
 				}
 				report.Statistics = &reportingapi.Statistics{
 					Duration: esInSpecReport.Statistics.Duration,
@@ -666,25 +689,20 @@ func (backend *ES2Backend) GetReport(esIndex string, reportid string, filters ma
 		return report, nil
 	}
 
-	return report, utils.ProcessNotFound(nil, reportid)
+	return report, utils.ProcessNotFound(nil, reportId)
 }
 
-/*
-  getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in
-  arguments: filters - is a map of filters that serve as the source for generated es query filters
-             useSummaryIndex - specifies whether or not we are building this filter for use against the summary
-                               or detail timeseries indices.  This is important since the nested mapping of the
-                               profile field is named differently if we are referencing summary vs detail
-             latestOnly - specifies whether or not we are only interested in retrieving only the latest report
-
-*/
-func (backend ES2Backend) getFiltersQuery(filters map[string][]string, useSummaryIndex bool, latestOnly bool) *elastic.BoolQuery {
-	//todo - we can get rid of useSummaryIndex once we migrate the indices and have sha256 on all profiles
-
+//getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in
+//  arguments: filters - is a map of filters that serve as the source for generated es query filters
+//             latestOnly - specifies whether or not we are only interested in retrieving only the latest report
+//  return *elastic.BoolQuery
+func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) *elastic.BoolQuery {
 	var (
 		endTime   string
 		startTime string
 	)
+
+	utils.DeDupFilters(filters)
 
 	typeQuery := elastic.NewTypeQuery(mappings.DocType)
 
@@ -704,6 +722,11 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, useSummar
 
 	if len(startTime) > 0 || len(endTime) > 0 {
 		boolQuery = boolQuery.Must(timeRangeQuery)
+	}
+
+	if len(filters["projects"]) > 0 {
+		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
+		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["environment"]) > 0 {
@@ -731,18 +754,15 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, useSummar
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
-	if len(filters["profile_id"]) > 0 {
-		ids := strings.Join(filters["profile_id"], "|")
-		var nestedQuery *elastic.NestedQuery
-		//todo -rdm now that we have harmonized sum and det, we can remove this if and just use the sha256.. nice!
-		if useSummaryIndex {
-			stringQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.profile:/.*\\|(%s)/", ids))
-			nestedQuery = elastic.NewNestedQuery("profiles", stringQuery)
-		} else {
-			stringQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.sha256:(%s)", ids))
-			nestedQuery = elastic.NewNestedQuery("profiles", stringQuery)
-		}
-		boolQuery = boolQuery.Must(nestedQuery)
+	numberOfProfiles := len(filters["profile_id"])
+	numberOfControls := len(filters["control"])
+	if numberOfProfiles > 0 || numberOfControls > 0 {
+		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
+		profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
+		controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status", "profiles.controls.impact"}
+
+		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes, profileLevelFscIncludes, controlLevelFscIncludes)
+		boolQuery = boolQuery.Must(profileAndControlQuery)
 	}
 
 	if len(filters["role"]) > 0 {
@@ -765,4 +785,111 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, useSummar
 	}
 
 	return boolQuery
+}
+
+//  getFiltersQueryForDeepReport - builds up an elasticsearch query filter based on the reportId filters map passed in.
+//   This func ignores all but the profile_id and control filter.  If a single profile_id or a single profile_id and a
+//   child control from the single profile_id is passed in, then we are in deep filtering mode and the
+//   fetchSourceContexts will be adjusted accordingly
+//    arguments:
+//			reportId - the id of the report we are querying for.
+//			filters - is a map of filters that serve as the source for generated es query filters
+//    return *elastic.BoolQuery
+func (backend ES2Backend) getFiltersQueryForDeepReport(reportId string,
+	filters map[string][]string) *elastic.BoolQuery {
+
+	utils.DeDupFilters(filters)
+	typeQuery := elastic.NewTypeQuery(mappings.DocType)
+
+	boolQuery := elastic.NewBoolQuery()
+	boolQuery = boolQuery.Must(typeQuery)
+
+	idsQuery := elastic.NewIdsQuery(mappings.DocType)
+	idsQuery.Ids(reportId)
+	boolQuery = boolQuery.Must(idsQuery)
+
+	if len(filters["projects"]) > 0 {
+		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
+	numberOfProfiles := len(filters["profile_id"])
+	numberOfControls := len(filters["control"])
+	if numberOfProfiles > 0 || numberOfControls > 0 {
+		profileBaseFscIncludes := []string{
+			"profiles.depends",
+			"profiles.name",
+			"profiles.sha256",
+			"profiles.status",
+			"profiles.skip_message",
+			"profiles.version"}
+
+		profileLevelFscIncludes := []string{"profiles"}
+		controlLevelFscIncludes := []string{"profiles.controls"}
+
+		profileAndControlQuery := getProfileAndControlQuery(
+			filters,
+			profileBaseFscIncludes,
+			profileLevelFscIncludes,
+			controlLevelFscIncludes,
+		)
+		boolQuery = boolQuery.Must(profileAndControlQuery)
+	}
+
+	return boolQuery
+}
+
+func getProfileAndControlQuery(filters map[string][]string, profileBaseFscIncludes, profileLevelFscIncludes,
+	controlLevelFscIncludes []string) *elastic.NestedQuery {
+	var profileIds string
+	var profileLevelFsc *elastic.FetchSourceContext
+	numberOfProfiles := len(filters["profile_id"])
+	numberOfControls := len(filters["control"])
+	if numberOfProfiles == 0 {
+		profileIds = ".*"
+	} else {
+		profileIds = strings.Join(filters["profile_id"], "|")
+		if numberOfProfiles == 1 && numberOfControls <= 1 {
+			//we are deep and when that's the case, we know we want at least this stuff.
+			// if we don't have controls, we'll add even more to the profile level context (below)
+			profileLevelFsc = elastic.NewFetchSourceContext(true).
+				Include(profileBaseFscIncludes...)
+		}
+	}
+	profileBoolQuery := elastic.NewBoolQuery()
+	stringQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.sha256:/(%s)/", profileIds))
+	profileBoolQuery.Must(stringQuery)
+
+	var nestedQuery *elastic.NestedQuery
+	nestedQuery = elastic.NewNestedQuery("profiles", profileBoolQuery)
+
+	//add in the control query if it exists
+	if numberOfControls > 0 {
+		controlIds := strings.Join(filters["control"], "|")
+		var nestedControlQuery *elastic.NestedQuery
+
+		controlQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.id:/(%s)/", controlIds))
+		nestedControlQuery = elastic.NewNestedQuery("profiles.controls", controlQuery)
+
+		if numberOfProfiles == 1 && numberOfControls == 1 {
+			//we are control deep and when that's the case, we know we want this stuff in fsc.
+			//we also know that we want to nest it so that we may use it for reports or node info
+			fsc := elastic.NewFetchSourceContext(true).
+				Include(controlLevelFscIncludes...)
+			nestedControlQuery.InnerHit(elastic.NewInnerHit().FetchSourceContext(fsc))
+		}
+
+		profileBoolQuery = profileBoolQuery.Must(nestedControlQuery)
+	} else if numberOfProfiles == 1 && profileLevelFsc != nil {
+		//we are profile deep and when that's the case, we know we want this stuff in fsc.
+		//for deep filtering, we only need to include profile level controls_sums and status at profile level,
+		// if we are filtering at profile level.. to include it when we are at control level would be inefficient
+		profileLevelFsc.Include(profileLevelFscIncludes...)
+	}
+
+	//we are deep so lets add the fetch source context
+	if numberOfProfiles == 1 && numberOfControls <= 1 {
+		nestedQuery.InnerHit(elastic.NewInnerHit().FetchSourceContext(profileLevelFsc))
+	}
+	return nestedQuery
 }

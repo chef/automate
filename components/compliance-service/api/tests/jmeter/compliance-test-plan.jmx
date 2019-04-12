@@ -11,12 +11,40 @@
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
     </TestPlan>
     <hashTree>
-      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request localhost" enabled="true">
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request localhost" enabled="false">
         <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
           <collectionProp name="Arguments.arguments"/>
         </elementProp>
         <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
         <stringProp name="HTTPSampler.port">2000</stringProp>
+        <stringProp name="HTTPSampler.protocol">https</stringProp>
+        <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+        <stringProp name="HTTPSampler.path"></stringProp>
+        <stringProp name="HTTPSampler.concurrentPool">6</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+        <stringProp name="HTTPSampler.response_timeout"></stringProp>
+      </ConfigTestElement>
+      <hashTree/>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request ec2 thru ssh tunnel" enabled="false">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.domain">ec2-18-191-108-8.us-east-2.compute.amazonaws.com</stringProp>
+        <stringProp name="HTTPSampler.port">9223</stringProp>
+        <stringProp name="HTTPSampler.protocol">http</stringProp>
+        <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+        <stringProp name="HTTPSampler.path"></stringProp>
+        <stringProp name="HTTPSampler.concurrentPool">6</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+        <stringProp name="HTTPSampler.response_timeout"></stringProp>
+      </ConfigTestElement>
+      <hashTree/>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request ec2" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.domain">ec2-18-191-108-8.us-east-2.compute.amazonaws.com</stringProp>
+        <stringProp name="HTTPSampler.port"></stringProp>
         <stringProp name="HTTPSampler.protocol">https</stringProp>
         <stringProp name="HTTPSampler.contentEncoding"></stringProp>
         <stringProp name="HTTPSampler.path"></stringProp>
@@ -34,13 +62,13 @@
 String[] startTimes = {
 	&quot;\&quot;2017-10-01T23:59:59Z\&quot;&quot;,
 	&quot;\&quot;2018-01-04T23:59:59Z\&quot;&quot;,
-	&quot;\&quot;2018-02-20T23:59:59Z\&quot;&quot;
+	&quot;\&quot;2019-01-16T23:59:59Z\&quot;&quot;
 };
 
 String[] endTimes = {
-	&quot;\&quot;2018-03-20T23:59:59Z\&quot;&quot;,
-	&quot;\&quot;2018-03-21T23:59:59Z\&quot;&quot;,
-	&quot;\&quot;2018-03-22T23:59:59Z\&quot;&quot;
+	&quot;\&quot;2019-03-31T23:59:59Z\&quot;&quot;,
+	&quot;\&quot;2019-04-01T23:59:59Z\&quot;&quot;,
+	&quot;\&quot;2019-04-02T23:59:59Z\&quot;&quot;
 };
 
 Random randomGenerator = new Random();
@@ -63,9 +91,9 @@ vars.put(&quot;end_time&quot;, endTimes[randomETInt]);
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <intProp name="LoopController.loops">-1</intProp>
+          <stringProp name="LoopController.loops">10</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">200</stringProp>
+        <stringProp name="ThreadGroup.num_threads">25</stringProp>
         <stringProp name="ThreadGroup.ramp_time">3</stringProp>
         <longProp name="ThreadGroup.start_time">1311973757000</longProp>
         <longProp name="ThreadGroup.end_time">1311973757000</longProp>
@@ -91,19 +119,30 @@ vars.put(&quot;end_time&quot;, endTimes[randomETInt]);
             </elementProp>
             <elementProp name="-H &apos;Authorization" elementType="Header">
               <stringProp name="Header.name">Authorization</stringProp>
-              <stringProp name="Header.value">Bearer dev</stringProp>
+              <stringProp name="Header.value">Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk0NDA2ZmNhMmUxNzk4ZTgyNzQ3YjY5ZGM1ZThlMmYyYjM4ZmVmOTAifQ.eyJpc3MiOiJodHRwczovL2VjMi0xOC0xOTEtMTA4LTgudXMtZWFzdC0yLmNvbXB1dGUuYW1hem9uYXdzLmNvbS9kZXgiLCJzdWIiOiJDaVF6TnpJMk1UUXhNQzA1WmpSakxUUm1NVEF0WVdNeU5pMDBNakU1Tm1Wa05XTmpaakVTQld4dlkyRnMiLCJhdWQiOiJhdXRvbWF0ZS1zZXNzaW9uIiwiZXhwIjoxNTU0NDc0MDkwLCJpYXQiOjE1NTQzODc2OTAsImF0X2hhc2giOiJBTl8zdGJjc2N3YXJmSWRlQXNXSkd3IiwiZW1haWwiOiJhZG1pbiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiTG9jYWwgQWRtaW5pc3RyYXRvciIsImZlZGVyYXRlZF9jbGFpbXMiOnsiY29ubmVjdG9yX2lkIjoibG9jYWwiLCJ1c2VyX2lkIjoiMzcyNjE0MTAtOWY0Yy00ZjEwLWFjMjYtNDIxOTZlZDVjY2YxIn19.LRFRdAHKLqH886ShDC3cMbAzuSw9usJ8R9jDXOtjJ9lxRhLanTs6MEtI-UfY90hxAsqpfrMzB5g1I7FYSmtvodAg8LBUiXljdO2a0z28UjGgZQOdPkI07zH5tmPfrqzVPsEWBMwB_2w7rZFPsCJS-zeQ3Ow3CBEmWTBcJPY98g9lrCQwBasNcdDnRetvmxVXZqc2sqqbDfZSqDn7J4VqZB8mCJHrtlvyWH4vKfK5NwXxX-RW9ElFdsDSAMuI2qOod37UGGEtCfYvDHuYqPI4mv6Ds_jAIUJBOqj454bUbgC4mr8AXmGa5_Erz-GQ71s5WbDbs1Jut_yd5xSaD3wvAw</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name"></stringProp>
+              <stringProp name="Header.value"></stringProp>
             </elementProp>
           </collectionProp>
         </HeaderManager>
         <hashTree/>
         <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">true</boolProp>
-          <stringProp name="LoopController.loops">5</stringProp>
+          <stringProp name="LoopController.loops">1</stringProp>
         </LoopController>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="/search/profiles" enabled="false">
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-              <collectionProp name="Arguments.arguments"/>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value"></stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.domain"></stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
@@ -133,8 +172,15 @@ vars.put(&quot;end_time&quot;, endTimes[randomETInt]);
             <hashTree/>
           </hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="/nodes" enabled="false">
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-              <collectionProp name="Arguments.arguments"/>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value"></stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.domain"></stringProp>
             <stringProp name="HTTPSampler.port"></stringProp>
@@ -241,7 +287,7 @@ vars.put(&quot;end_time&quot;, endTimes[randomETInt]);
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/compliance/reporting/stats/trend</stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/stats/trend</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -269,7 +315,7 @@ vars.put(&quot;end_time&quot;, endTimes[randomETInt]);
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/compliance/reporting/stats/failures</stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/stats/failures</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -298,7 +344,238 @@ vars.put(&quot;end_time&quot;, endTimes[randomETInt]);
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/compliance/reporting/stats/summary</stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/stats/summary</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" /compliance/reporting/suggestions (recipe)" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&quot;type&quot;:&quot;recipe&quot;,&quot;text&quot;:&quot;d&quot;,&#xd;
+&quot;filters&quot;:[&#xd;
+{&quot;type&quot;:&quot;start_time&quot;,&quot;values&quot;:[${start_time}]},&#xd;
+{&quot;type&quot;:&quot;end_time&quot;,&quot;values&quot;:[${end_time}]},&#xd;
+{&quot;type&quot;:&quot;control&quot;,&quot;values&quot;:[&quot;xccdf_org.cisecurity.benchmarks_rule_1.1_Install_Updates_Patches_and_Additional_Security_Software&quot;]}&#xd;
+]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/suggestions</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" /compliance/reporting/suggestions (role)" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&quot;type&quot;:&quot;role&quot;,&quot;text&quot;:&quot;d&quot;,&#xd;
+&quot;filters&quot;:[&#xd;
+{&quot;type&quot;:&quot;start_time&quot;,&quot;values&quot;:[${start_time}]},&#xd;
+{&quot;type&quot;:&quot;end_time&quot;,&quot;values&quot;:[${end_time}]},&#xd;
+{&quot;type&quot;:&quot;control&quot;,&quot;values&quot;:[&quot;xccdf_org.cisecurity.benchmarks_rule_1.1_Install_Updates_Patches_and_Additional_Security_Software&quot;]}&#xd;
+]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/suggestions</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" /compliance/reporting/suggestions (node)" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&quot;type&quot;:&quot;node&quot;,&quot;text&quot;:&quot;d&quot;,&#xd;
+&quot;filters&quot;:[&#xd;
+{&quot;type&quot;:&quot;start_time&quot;,&quot;values&quot;:[${start_time}]},&#xd;
+{&quot;type&quot;:&quot;end_time&quot;,&quot;values&quot;:[${end_time}]},&#xd;
+{&quot;type&quot;:&quot;control&quot;,&quot;values&quot;:[&quot;xccdf_org.cisecurity.benchmarks_rule_1.1_Install_Updates_Patches_and_Additional_Security_Software&quot;]}&#xd;
+]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/suggestions</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" /compliance/reporting/suggestions (platform)" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&quot;type&quot;:&quot;platform&quot;,&quot;text&quot;:&quot;d&quot;,&#xd;
+&quot;filters&quot;:[&#xd;
+{&quot;type&quot;:&quot;start_time&quot;,&quot;values&quot;:[${start_time}]},&#xd;
+{&quot;type&quot;:&quot;end_time&quot;,&quot;values&quot;:[${end_time}]},&#xd;
+{&quot;type&quot;:&quot;control&quot;,&quot;values&quot;:[&quot;xccdf_org.cisecurity.benchmarks_rule_1.1_Install_Updates_Patches_and_Additional_Security_Software&quot;]}&#xd;
+]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/suggestions</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" /compliance/reporting/suggestions (env)" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&quot;type&quot;:&quot;environment&quot;,&quot;text&quot;:&quot;d&quot;,&#xd;
+&quot;filters&quot;:[&#xd;
+{&quot;type&quot;:&quot;start_time&quot;,&quot;values&quot;:[${start_time}]},&#xd;
+{&quot;type&quot;:&quot;end_time&quot;,&quot;values&quot;:[${end_time}]},&#xd;
+{&quot;type&quot;:&quot;control&quot;,&quot;values&quot;:[&quot;xccdf_org.cisecurity.benchmarks_rule_1.1_Install_Updates_Patches_and_Additional_Security_Software&quot;]}&#xd;
+]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/suggestions</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" /compliance/reporting/suggestions (control)" enabled="false">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&quot;type&quot;:&quot;control&quot;,&quot;text&quot;:&quot;Install Updates, Patches and Additional Secu&quot;,&#xd;
+&quot;filters&quot;:[&#xd;
+{&quot;type&quot;:&quot;profile_id&quot;,&quot;values&quot;:[&quot;b63e4da3d0db1343be4d3982118495dc29222f48a5afcf1f7a7b594b6ab589da&quot;]},&#xd;
+{&quot;type&quot;:&quot;start_time&quot;,&quot;values&quot;:[${start_time}]},&#xd;
+{&quot;type&quot;:&quot;end_time&quot;,&quot;values&quot;:[${end_time}]},&#xd;
+{&quot;type&quot;:&quot;control&quot;,&quot;values&quot;:[&quot;xccdf_org.cisecurity.benchmarks_rule_1.1_Install_Updates_Patches_and_Additional_Security_Software&quot;]}&#xd;
+]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/suggestions</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" /compliance/reporting/suggestions (profile)" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&quot;type&quot;:&quot;profile&quot;,&quot;text&quot;:&quot;Dev&quot;,&#xd;
+&quot;filters&quot;:[&#xd;
+{&quot;type&quot;:&quot;start_time&quot;,&quot;values&quot;:[${start_time}]},&#xd;
+{&quot;type&quot;:&quot;end_time&quot;,&quot;values&quot;:[${end_time}]}&#xd;
+]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/api/v0/compliance/reporting/suggestions</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

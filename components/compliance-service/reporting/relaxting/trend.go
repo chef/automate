@@ -10,7 +10,6 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	elastic "github.com/olivere/elastic"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 )
 
@@ -52,7 +51,9 @@ func (backend ES2Backend) getTrendBucketsRoundDown(filters map[string][]string, 
 	})
 
 	// Because first bucket to the left has no start time
-	trendBuckets[0].StartTime = nil
+	if len(trendBuckets) > 0 {
+		trendBuckets[0].StartTime = nil
+	}
 
 	return trendBuckets, nil
 }
@@ -60,42 +61,33 @@ func (backend ES2Backend) getTrendBucketsRoundDown(filters map[string][]string, 
 //GetTrend get either a nodes or controls trend graph
 func (backend ES2Backend) GetTrend(filters map[string][]string, interval int, trendType string) ([]*stats.Trend, error) {
 	defer util.TimeTrack(time.Now(), "GetTrend")
+	myName := "GetTrend"
+
 	trendStatsBuckets := make([]*stats.Trend, 0) // stores the final array that will be returned to the user
 
 	if trendType != "controls" && trendType != "nodes" {
-		return trendStatsBuckets, errors.New(fmt.Sprintf("GetTrends supports either trendType of 'controls' or 'nodes' but you"+
-			" passed in %s", trendType))
+		return trendStatsBuckets,
+			errors.New(fmt.Sprintf("%s supports either trendType of 'controls' or 'nodes' but you passed in %s",
+				myName, trendType))
 	}
 
-	endTime := firstOrEmpty(filters["end_time"])
-	startTime := firstOrEmpty(filters["start_time"])
-	esIndex, err := IndexDates(CompDailySumIndexPrefix, startTime, endTime)
+	depth, err := backend.NewDepth(filters, true, true)
 	if err != nil {
-		return trendStatsBuckets, err
+		return trendStatsBuckets, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
 
-	logrus.Debugf("esIndex %s", esIndex)
-	filtQuery := backend.getFiltersQuery(filters, true, true)
+	queryInfo := depth.getQueryInfo()
 
-	var passedFilter, failedFilter, skippedFilter elastic.Aggregation
-	if trendType == "nodes" {
-		passedFilter = elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("status", "passed"))
-		failedFilter = elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("status", "failed"))
-		skippedFilter = elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("status", "skipped"))
-	} else if trendType == "controls" {
-		passedFilter = elastic.NewSumAggregation().Field("controls_sums.passed.total")
-		failedFilter = elastic.NewSumAggregation().Field("controls_sums.failed.total")
-		skippedFilter = elastic.NewSumAggregation().Field("controls_sums.skipped.total")
-	}
 	trendBuckets := elastic.NewDateHistogramAggregation().
-		SubAggregation("passed", passedFilter).
-		SubAggregation("failed", failedFilter).
-		SubAggregation("skipped", skippedFilter).
 		Interval("1d").
 		Field("end_time")
 
+	for aggName, agg := range depth.getTrendAggs(trendType, filters) {
+		trendBuckets.SubAggregation(aggName, agg)
+	}
+
 	searchSource := elastic.NewSearchSource().
-		Query(filtQuery).
+		Query(queryInfo.filtQuery).
 		Aggregation("trend_buckets", trendBuckets).
 		Size(0)
 
@@ -106,73 +98,29 @@ func (backend ES2Backend) GetTrend(filters map[string][]string, interval int, tr
 
 	client, err := backend.ES2Client()
 	if err != nil {
-		return trendStatsBuckets, errors.Wrap(err, "GetTrend cannot connect to elasticsearch")
+		return trendStatsBuckets, errors.Wrapf(err, "%s cannot connect to elasticsearch", myName)
 	}
 
-	LogQueryPartMin(esIndex, source, "GetTrend query searchSource")
+	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query searchSource", myName))
 
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
-		Index(esIndex).
+		Index(queryInfo.esIndex).
 		Do(context.Background())
 
 	if err != nil {
-		return trendStatsBuckets, errors.Wrap(err, "GetTrend cannot get result from elasticsearch")
+		return trendStatsBuckets, errors.Wrapf(err, "%s cannot get result from elasticsearch", myName)
 	}
 
-	trendBucketsAggResult, _ := searchResult.Aggregations.Terms("trend_buckets")
-	var mapOfTrends map[string]*stats.Trend
-	if trendBucketsAggResult != nil {
-		mapOfTrends = make(map[string]*stats.Trend)
-		for _, trendBucket := range trendBucketsAggResult.Buckets {
-
-			endTimeAsTime, err := time.Parse(time.RFC3339, *trendBucket.KeyAsString)
-			if err != nil {
-				logrus.Error("could not parse time")
-				return trendStatsBuckets, err
-			}
-			//endTimeAsString := endTimeAsTime.Format(time.RFC3339)
-
-			//force it to end of day time (UI needs this so that it may render correctly
-			trendIndexDate := time.Date(endTimeAsTime.Year(), endTimeAsTime.Month(), endTimeAsTime.Day(), 23, 59, 59, 0, time.UTC)
-			trendIndexDateAsString := trendIndexDate.Format(time.RFC3339)
-
-			zaStatsBucket := &stats.Trend{
-				ReportTime: trendIndexDateAsString,
-				Passed:     0,
-				Failed:     0,
-				Skipped:    0,
-			}
-
-			if trendType == "nodes" {
-				if passedResult, found := trendBucket.Aggregations.Filter("passed"); found {
-					zaStatsBucket.Passed = int32(passedResult.DocCount)
-				}
-				if failedResult, found := trendBucket.Aggregations.Filter("failed"); found {
-					zaStatsBucket.Failed = int32(failedResult.DocCount)
-				}
-				if skippedResult, found := trendBucket.Aggregations.Filter("skipped"); found {
-					zaStatsBucket.Skipped = int32(skippedResult.DocCount)
-				}
-			} else if trendType == "controls" {
-				if passedResult, found := trendBucket.Aggregations.Sum("passed"); found {
-					zaStatsBucket.Passed = int32(*passedResult.Value)
-				}
-				if failedResult, found := trendBucket.Aggregations.Sum("failed"); found {
-					zaStatsBucket.Failed = int32(*failedResult.Value)
-				}
-				if skippedResult, found := trendBucket.Aggregations.Sum("skipped"); found {
-					zaStatsBucket.Skipped = int32(*skippedResult.Value)
-				}
-			}
-			mapOfTrends[trendIndexDateAsString] = zaStatsBucket
-		}
+	mapOfTrends, err := depth.getTrendResults(trendType, searchResult)
+	if err != nil {
+		return trendStatsBuckets, errors.Wrapf(err, "%s cannot get trendResults", myName)
 	}
 
 	// only used to store the time intervals
 	trendBucketsComputed, err := backend.getTrendBucketsRoundDown(filters, 86400)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("GetTrendBuckets returned error: %s", err.Error()))
+		return nil, errors.New(fmt.Sprintf("%s returned error: %s", myName, err.Error()))
 	}
 
 	if len(trendBucketsComputed) == 0 {
@@ -193,7 +141,7 @@ func (backend ES2Backend) GetTrend(filters map[string][]string, interval int, tr
 		}
 		trendStatsBuckets = append(trendStatsBuckets, zaStatsBucket)
 	}
-	LogQueryPartMin(esIndex, searchResult, "GetTrend query searchResult")
+	LogQueryPartMin(queryInfo.esIndex, searchResult, fmt.Sprintf("%s query searchResult", myName))
 
 	return trendStatsBuckets, nil
 }

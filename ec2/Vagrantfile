@@ -60,10 +60,10 @@ hab_version_from_manifest, git_sha_from_manifest = extract_from_manifest(manifes
 # Only run these checks on `vagrant up`
 if ARGV[0] == "up"
   puts "==> Installing Automate services from #{manifest_url}"
-  puts '==> Checking for ssh identities needed to clone the a2 repo...'
+  puts '==> Checking for ssh identities needed to clone the automate repo...'
 
   unless system('ssh-add -l')
-    raise "No ssh identities are loaded, run `ssh-add` to load the private key that is allowed to clone the a2 repo!"
+    raise "No ssh identities are loaded, run `ssh-add` to load the private key that is allowed to clone the automate repo!"
   end
   if !clean_tree
     puts %q(
@@ -138,11 +138,11 @@ chmod +x $CRON_FILE
 fi
 SCRIPT
 
-$github_clone_a2 = <<SCRIPT
+$github_clone_automate = <<SCRIPT
 ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 cd #{home_dir}
 git clone git@github.com:chef/automate.git
-cd a2
+cd automate
 echo "export GITHUB_TOKEN=\"#{ENV['GITHUB_TOKEN']}\"" > .secrets
 git checkout #{latest_head_commit}
 
@@ -177,7 +177,7 @@ if [ "\\$USER" == "ubuntu" ]; then
   export AZURE_CLIENT_SECRET=#{ENV['AZURE_CLIENT_SECRET']}
   export AZURE_TENANT_ID=#{ENV['AZURE_TENANT_ID']}
 
-  cd #{home_dir}/a2
+  cd #{home_dir}/automate
   source .envrc
   if [ ! -f ~/.hab/etc/cli.toml ]; then
     echo "Setting up HAB_ORIGIN=ubuntu"
@@ -199,7 +199,7 @@ EOT
 fi
 EOF
 hab pkg install -b core/git
-STUDIORC="#{home_dir}/a2/.studiorc"
+STUDIORC="#{home_dir}/automate/.studiorc"
 echo 'printf "\033[0;31m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n>>> TWO MORE STEPS NEEDED TO RUN A2 <<<\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\033[0m\n"' >> $STUDIORC
 echo 'printf "1. Run this here:\033[1;32m start_all_services \033[0m\n"' >> $STUDIORC
 echo 'printf "2. Run the A2 UI:\033[1;34m $(cat /src/url.txt) \033[0m\n"' >> $STUDIORC
@@ -232,7 +232,7 @@ Vagrant.configure('2') do |config|
     aws.region = 'us-east-2'            # US East (Ohio)
     aws.ami = 'ami-026f49896b1af2759'   # Ubuntu 18.04 LTS in region 'us-east-2'
     aws.tags = {
-      'Name' => "#{ENV['USER']}-a2-dev"
+      'Name' => "#{ENV['USER']}-automate-dev"
     }
     aws.block_device_mapping = [{ 'DeviceName' => '/dev/sda1',
                                   'Ebs.VolumeSize' => 100,
@@ -258,6 +258,6 @@ Vagrant.configure('2') do |config|
   config.ssh.forward_agent = true
   config.vm.provision 'shell', inline: $install_hab
   config.vm.provision 'shell', inline: $install_victorias_bits, :privileged => true
-  config.vm.provision 'shell', inline: $github_clone_a2
+  config.vm.provision 'shell', inline: $github_clone_automate
   config.vm.provision 'shell', inline: $enter_studio
 end

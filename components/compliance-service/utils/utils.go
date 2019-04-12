@@ -210,3 +210,30 @@ func UniqueStringSlice(stringSlice []string) []string {
 	}
 	return list
 }
+
+//remove duplicate entries from a string array
+func deDupSlice(stringSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range stringSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
+//Take out the duplicate entries if they exist.. not need to return the map.. maps are passed by ref.
+// getting the duplicates out of the filters avoids the filtersQuery from becoming less efficient by having
+// duplicate clauses.
+// Duplicates in filter entries also make deep filtering impossible because deep filtering
+// at the moment requires that we have exactly one profile and no controls or one profile and one control. If we have
+// duplicates, it's easy to see why deep filtering would therefore, break.
+func DeDupFilters(filters map[string][]string) {
+	for key, value := range filters {
+		if len(value) > 1 {
+			filters[key] = deDupSlice(value)
+		}
+	}
+}

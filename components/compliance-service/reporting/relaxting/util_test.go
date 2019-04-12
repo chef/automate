@@ -66,27 +66,3 @@ func TestRemove(t *testing.T) {
 	Remove(&arr, 0)
 	assert.Equal(t, []string{"item3"}, arr)
 }
-
-//todo - get rid of this.
-//func TestGetEsIndex(t *testing.T) {
-//	var filters map[string][]string
-//	assert.Equal(t, CompSumLatestIndexAccumulated, GetEsIndex(filters))
-//
-//	filters = map[string][]string{
-//		"job_id": []string{"12345-6789"},
-//	}
-//	assert.Equal(t, true, strings.HasPrefix(GetEsIndex(filters), fmt.Sprintf("%s2017", CompDailySumIndexPrefix)))
-//
-//	filters = map[string][]string{
-//		"end_time": []string{time.Now().UTC().Format(time.RFC3339)},
-//	}
-//	assert.Equal(t, CompSumLatestIndexAccumulated, GetEsIndex(filters))
-//
-//	filters = map[string][]string{
-//		"end_time": []string{"2017-02-02T09:18:41Z"},
-//	}
-//	expectedEsIndex := fmt.Sprintf(fmt.Sprintf("%[1]s2017.01*,%[1]s2017.02.01*,%[1]s2017.02.02*",
-//		CompDailySumIndexPrefix))
-//	actualEsIndex := GetEsIndex(filters)
-//	assert.Equal(t, expectedEsIndex, actualEsIndex)
-//}
