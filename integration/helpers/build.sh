@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 build_changed() {
+    hab pkg install core/ruby
+    export PATH=$PATH:$(hab pkg path core/ruby)/bin
+    sudo gem install toml
+
     build_commands=""
     for component in $("$(a2_root_dir)/scripts/changed_components")
     do
@@ -85,7 +89,7 @@ sync_a1_migration_data() {
     # thread 'main' panicked at 'LISTEN_GOSSIP should always have a value.', libcore/option.rs:1000:5
     # note: Run with `RUST_BACKTRACE=1` for a backtrace.
     # ```
-    # 
+    #
     # our workaround for now is to use kill instead of `hab sup term`
     # hab sup term # <- broken
     kill %1

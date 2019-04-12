@@ -3,6 +3,7 @@
 require "json"
 require "yaml"
 require "tsort"
+require "toml"
 
 class Hash
   include TSort
@@ -18,7 +19,7 @@ def get_hab_deps(source_dir)
   depString.lines.last.split
 end
 
-config = YAML.load(File.read(".expeditor/config.yml"))
+config = TOML.load_file(".bldr.toml")
 
 changed_files = `git diff --name-only $(scripts/git_difference_expression)`.split("\n")
 
@@ -40,33 +41,25 @@ build_all = (ENV["BUILDKITE_BRANCH"] || "").include?("verify-rebuild-all")
 #
 changed_packages = Hash.new
 hab_deps = Hash.new
-our_packages = Hash.new
 
-config["habitat_packages"].each do |hab_pkg|
-  our_packages[hab_pkg.keys.first] = hab_pkg.values.first["source"]
-end
-
-config["habitat_packages"].each do |hab_pkg|
-  pkg_name = hab_pkg.keys.first
-  metadata = hab_pkg.values.first
-
+config.each do |pkg_name, metadata|
   # Gather hab dependency information, filtering packages not in this repo
-  hab_deps[pkg_name] = get_hab_deps(metadata["source"]).map do |p|
+  hab_deps[pkg_name] = get_hab_deps(metadata["plan_path"]).map do |p|
     name = p.split("/")[1]
-    name if our_packages[name]
+    name if config[name]
   end.compact
 
   # Look for changed packages based on file diff
   if build_all || changed_files.any? do |file|
-       Array(metadata["bldr_paths"]).any? { |glob| File.fnmatch(glob, file) }
+       Array(metadata["paths"]).any? { |glob| File.fnmatch(glob, file) }
      end
-    changed_packages[pkg_name] = metadata["source"]
+    changed_packages[pkg_name] = metadata["plan_path"]
   end
 end
 
 hab_deps.each do |pkg, deps|
   deps.each do |d|
-    changed_packages[pkg] = our_packages[pkg] if changed_packages[d]
+    changed_packages[pkg] = config[pkg]["plan_path"] if changed_packages[d]
   end
 end
 
