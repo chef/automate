@@ -25,7 +25,7 @@ func TestReadReport(t *testing.T) {
 
 	defer suite.DeleteAllDocuments()
 
-	assert.Len(t, reportIds, 1)
+	require.Len(t, reportIds, 1)
 
 	reportId := reportIds[0]
 
