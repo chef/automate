@@ -141,7 +141,8 @@ func (app *ApplicationsServer) GetServicesBySG(
 		filters        map[string][]string
 	)
 
-	// In the database we will never have ID=0
+	// In the database we will never have ID=0 and zero is our default value in our
+	// protobuf definition, so if it is different it means that this value was specified
 	if request.GetServiceGroupId() != 0 {
 		filters = map[string][]string{
 			"service_group_id": []string{fmt.Sprint(request.GetServiceGroupId())},
@@ -159,7 +160,8 @@ func (app *ApplicationsServer) GetServicesBySG(
 	}
 
 	return &applications.ServicesBySGRes{
-		Group:    "",
+		// TODO: should we make a backend call to get the actual name from the database
+		Group:    services[0].Group,
 		Services: convertStorageServicesToApplicationsServices(services),
 	}, nil
 }

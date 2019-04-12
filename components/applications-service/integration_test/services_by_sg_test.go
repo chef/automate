@@ -59,6 +59,7 @@ func TestGetServicesBySGSingleService(t *testing.T) {
 				ServiceGroupId: sgList[0].ID,
 			}
 			expected = &applications.ServicesBySGRes{
+				Group: "postgres.default",
 				Services: []*applications.Service{
 					&applications.Service{
 						SupervisorId: "sup1234",
@@ -74,6 +75,7 @@ func TestGetServicesBySGSingleService(t *testing.T) {
 
 		response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
 		assert.Nil(t, err)
+		assert.Equal(t, expected.GetGroup(), response.GetGroup())
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
 	}
 }
@@ -84,6 +86,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 
 	expectedResponses := []*applications.ServicesBySGRes{
 		&applications.ServicesBySGRes{
+			Group: "myapp.default",
 			Services: []*applications.Service{
 				&applications.Service{
 					SupervisorId: "sup1",
@@ -112,6 +115,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 			},
 		},
 		&applications.ServicesBySGRes{
+			Group: "postgres.default",
 			Services: []*applications.Service{
 				&applications.Service{
 					SupervisorId: "sup3",
@@ -140,6 +144,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 			},
 		},
 		&applications.ServicesBySGRes{
+			Group: "redis.default",
 			Services: []*applications.Service{
 				&applications.Service{
 					SupervisorId: "sup1",
@@ -168,6 +173,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 			},
 		},
 		&applications.ServicesBySGRes{
+			Group: "test.default",
 			Services: []*applications.Service{
 				&applications.Service{
 					SupervisorId: "sup4",
@@ -196,6 +202,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 
 				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
 				assert.Nil(t, err)
+				assert.Equal(t, expectedResponses[i].GetGroup(), response.GetGroup())
 				assertServicesEqual(t, expectedResponses[i].GetServices(), response.GetServices())
 			})
 
