@@ -38,7 +38,16 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
-  rpc GetServices(ServicesReq) returns (ServicesRes);
+  rpc GetServices(ServicesReq) returns (ServicesRes) {
+    // TODO (afiune, 4/2019): need to replace this once we have resources and such
+    // created in the auth system
+    option (google.api.http).get = "/beta/applications/services";
+    option (chef.automate.api.policy).resource = "nodes";
+    option (chef.automate.api.policy).action = "list";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+
   rpc GetServicesBySG(ServicesBySGReq) returns (ServicesBySGRes) {
     // TODO (afiune, 4/2019): need to replace this once we have resources and such
     // created in the auth system
