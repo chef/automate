@@ -2594,9 +2594,9 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 func TestV1AndV2Queries(t *testing.T) {
 	ctx := context.Background()
 	_ = prng.Seed(t) // used indirectly with rand.Shuffle
-	v2Chan := make(chan bool, 1)
+	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
-	ts := setupV2(t, &responderEngine{}, nil, &emptyV1List, v2Chan)
+	ts := setupV2(t, &responderEngine{}, nil, &emptyV1List, vChan)
 	status := ts.status
 
 	// Note(sr): We're a bit lazy here -- only checking that v2 calls (do not)
@@ -2656,7 +2656,7 @@ func TestV1AndV2Queries(t *testing.T) {
 		ts.projectCache.Flush()
 
 		// reset to v1
-		v2Chan <- false
+		vChan <- api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
 
 		t.Run(test.desc, test.f)
 	}
@@ -2743,7 +2743,7 @@ func setupV2(t *testing.T,
 	authorizer engine.V2Authorizer,
 	writer engine.V2Writer,
 	pl storage_v1.PoliciesLister,
-	v2Chan chan bool) testSetup {
+	vChan chan api_v2.Version) testSetup {
 	t.Helper()
 	ctx := context.Background()
 
@@ -2755,7 +2755,7 @@ func setupV2(t *testing.T,
 	}
 
 	mem_v2 := memstore_v2.New()
-	polV2, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, v2Chan)
+	polV2, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
 	require.NoError(t, err)
 
 	eventServiceClient := &mockEventServiceClient{}
@@ -2773,7 +2773,7 @@ func setupV2(t *testing.T,
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
 			grpc_server.InputValidationInterceptor(),
-			grpc_server.NewSwitch(v2Chan).Interceptor,
+			grpc_server.NewSwitch(vChan).Interceptor,
 			polV2.EngineUpdateInterceptor(),
 		),
 	))

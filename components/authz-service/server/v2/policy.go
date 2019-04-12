@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/lib/logger"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
@@ -30,7 +31,7 @@ type policyServer struct {
 	store  storage.Storage
 	engine engine.V2Writer
 	v1     storage_v1.PoliciesLister
-	v2Chan chan bool
+	vChan  chan api.Version
 }
 
 // PolicyServer is the server interface for policies: what we defined via
@@ -47,9 +48,9 @@ func NewMemstorePolicyServer(
 	l logger.Logger,
 	e engine.V2Writer,
 	pl storage_v1.PoliciesLister,
-	v2Chan chan bool) (PolicyServer, error) {
+	vChan chan api.Version) (PolicyServer, error) {
 
-	return NewPoliciesServer(ctx, l, memstore.New(), e, pl, v2Chan)
+	return NewPoliciesServer(ctx, l, memstore.New(), e, pl, vChan)
 }
 
 // NewPostgresPolicyServer instantiates a server.Server that connects to a postgres backend
@@ -60,13 +61,13 @@ func NewPostgresPolicyServer(
 	migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config,
 	pl storage_v1.PoliciesLister,
-	v2Chan chan bool) (PolicyServer, error) {
+	vChan chan api.Version) (PolicyServer, error) {
 
 	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	return NewPoliciesServer(ctx, l, s, e, pl, v2Chan)
+	return NewPoliciesServer(ctx, l, s, e, pl, vChan)
 }
 
 // NewPoliciesServer returns a new IAM v2 Policy server.
@@ -76,14 +77,14 @@ func NewPoliciesServer(
 	s storage.Storage,
 	e engine.V2Writer,
 	pl storage_v1.PoliciesLister,
-	v2Chan chan bool) (PolicyServer, error) {
+	vChan chan api.Version) (PolicyServer, error) {
 
 	srv := &policyServer{
 		log:    l,
 		store:  s,
 		engine: e,
 		v1:     pl,
-		v2Chan: v2Chan,
+		vChan:  vChan,
 	}
 
 	// If we *could* transition to failure, it means we had an in-progress state
@@ -101,8 +102,18 @@ func NewPoliciesServer(
 	if err != nil {
 		return nil, errors.Wrap(err, "retrieve migration status from storage")
 	}
-	isV2 := ms == storage.Successful
-	srv.setV2(isV2)
+	var v v2.Version
+	switch ms {
+	case storage.SuccessfulBeta1:
+		v = v2.Version{Major: v2.Version_V2, Minor: v2.Version_V1}
+	case storage.Successful:
+		v = v2.Version{Major: v2.Version_V2, Minor: v2.Version_V0}
+	default:
+		v = v2.Version{Major: v2.Version_V1, Minor: v2.Version_V0}
+	}
+	srv.setVersion(v)
+
+	isV2 := v.Major == v2.Version_V2
 
 	if isV2 {
 		err = srv.store.ApplyV2DataMigrations(ctx)
@@ -492,6 +503,7 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		return nil, err
 	}
 	if upgraded == true {
+		s.setVersion(v2.Version{Major: v2.Version_V2, Minor: v2.Version_V1})
 		return &api.MigrateToV2Resp{}, nil
 	}
 
@@ -551,18 +563,21 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 	}
 
 	// we've made it!
+	var v v2.Version
 	switch req.Flag {
 	case api.Flag_VERSION_2_1:
 		err = s.store.SuccessBeta1(ctx)
+		v = v2.Version{Major: v2.Version_V2, Minor: v2.Version_V1}
 	default:
 		err = s.store.Success(ctx)
+		v = v2.Version{Major: v2.Version_V2, Minor: v2.Version_V0}
 	}
 	if err != nil {
 		recordFailure()
 		return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
 	}
 
-	s.setV2(true)
+	s.setVersion(v)
 	return &api.MigrateToV2Resp{Reports: reports}, nil
 }
 
@@ -604,7 +619,7 @@ func (s *policyServer) ResetToV1(ctx context.Context,
 	if err := s.store.Reset(ctx); err != nil {
 		return nil, status.Errorf(codes.Internal, "reset database state: %s", err.Error())
 	}
-	s.setV2(false)
+	s.setVersion(v2.Version{Major: v2.Version_V1, Minor: v2.Version_V0})
 	return &api.ResetToV1Resp{}, nil
 }
 
@@ -973,8 +988,8 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 	s.log.WithFields(kv).Info("Policy definition")
 }
 
-func (s *policyServer) setV2(b bool) {
-	if s.v2Chan != nil {
-		s.v2Chan <- b
+func (s *policyServer) setVersion(v v2.Version) {
+	if s.vChan != nil {
+		s.vChan <- v
 	}
 }
