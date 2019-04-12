@@ -3,9 +3,18 @@ syntax = "proto3";
 package chef.automate.domain.ingest;
 option go_package = "github.com/chef/automate/api/interservice/ingest";
 
-
+import "google/protobuf/timestamp.proto";
 import "api/interservice/event/event.proto";
 
 service EventHandler {
   rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
+  rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
+}
+
+message ProjectUpdateStatusReq { }
+
+message ProjectUpdateStatusResp { 
+    string state = 1;
+    google.protobuf.Timestamp estimated_time_compelete = 2;
+    float percentage_complete = 3;
 }

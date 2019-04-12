@@ -29,15 +29,16 @@ func NewProjectsServerMockWithoutValidation() *ProjectsServerMock {
 // ProjectsServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
 type ProjectsServerMock struct {
-	validateRequests     bool
-	UpdateProjectFunc    func(context.Context, *UpdateProjectReq) (*UpdateProjectResp, error)
-	CreateProjectFunc    func(context.Context, *CreateProjectReq) (*CreateProjectResp, error)
-	GetProjectFunc       func(context.Context, *GetProjectReq) (*GetProjectResp, error)
-	DeleteProjectFunc    func(context.Context, *DeleteProjectReq) (*DeleteProjectResp, error)
-	ListProjectsFunc     func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
-	ListProjectRulesFunc func(context.Context, *ListProjectRulesReq) (*ProjectCollectionRulesResp, error)
-	GetProjectRulesFunc  func(context.Context, *GetProjectRulesReq) (*GetProjectRulesResp, error)
-	HandleEventFunc      func(context.Context, *event.EventMsg) (*event.EventResponse, error)
+	validateRequests        bool
+	UpdateProjectFunc       func(context.Context, *UpdateProjectReq) (*UpdateProjectResp, error)
+	CreateProjectFunc       func(context.Context, *CreateProjectReq) (*CreateProjectResp, error)
+	GetProjectFunc          func(context.Context, *GetProjectReq) (*GetProjectResp, error)
+	DeleteProjectFunc       func(context.Context, *DeleteProjectReq) (*DeleteProjectResp, error)
+	ListProjectsFunc        func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
+	ListProjectRulesFunc    func(context.Context, *ListProjectRulesReq) (*ProjectCollectionRulesResp, error)
+	GetProjectRulesFunc     func(context.Context, *GetProjectRulesReq) (*GetProjectRulesResp, error)
+	HandleEventFunc         func(context.Context, *event.EventMsg) (*event.EventResponse, error)
+	ProjectUpdateStatusFunc func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
 }
 
 func (m *ProjectsServerMock) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
@@ -136,6 +137,18 @@ func (m *ProjectsServerMock) HandleEvent(ctx context.Context, req *event.EventMs
 	return nil, status.Error(codes.Internal, "mock: 'HandleEvent' not implemented")
 }
 
+func (m *ProjectsServerMock) ProjectUpdateStatus(ctx context.Context, req *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.ProjectUpdateStatusFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'ProjectUpdateStatus' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *ProjectsServerMock) Reset() {
 	m.UpdateProjectFunc = nil
@@ -146,4 +159,5 @@ func (m *ProjectsServerMock) Reset() {
 	m.ListProjectRulesFunc = nil
 	m.GetProjectRulesFunc = nil
 	m.HandleEventFunc = nil
+	m.ProjectUpdateStatusFunc = nil
 }

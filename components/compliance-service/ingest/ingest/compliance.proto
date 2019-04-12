@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "components/compliance-service/ingest/events/compliance/compliance.proto";
 import "google/protobuf/empty.proto";
 import "api/interservice/event/event.proto";
+import "google/protobuf/timestamp.proto";
 
 service ComplianceIngester {
 	rpc ProcessComplianceReport (chef.automate.domain.compliance.ingest.events.compliance.Report) returns (google.protobuf.Empty) {
@@ -16,4 +17,13 @@ service ComplianceIngester {
 		};
 	};
 	rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
+  rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
+}
+
+message ProjectUpdateStatusReq { }
+
+message ProjectUpdateStatusResp { 
+    string state = 1;
+    google.protobuf.Timestamp estimated_time_compelete = 2;
+    float percentage_complete = 3;
 }
