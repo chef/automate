@@ -257,6 +257,10 @@ func (r *Runner) DeleteBackups(ctx context.Context, dep *deployment.Deployment, 
 		// Retry deleting remaining objects until the timeout expires.
 		go func() {
 			for {
+				if ctx.Err() != nil {
+					logrus.WithError(err).Errorf("Giving up deleting backup %s", backupTask.TaskID())
+					return
+				}
 				// If any objects remain, something bad has happened
 				remainingObjs, _, err := deleteCtx.bucket.List(ctx, "", false)
 				if err != nil {
