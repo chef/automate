@@ -280,7 +280,7 @@ func (p *pg) insertPolicyStatementsWithQuerier(ctx context.Context,
 			err = p.processError(err)
 			switch err {
 			case storage_errors.ErrForeignKey: // occurs when a project in the statement does not exist
-				return errors.Errorf("non-existent projects cannot be included in policy statements: %s", s.Projects)
+				return errors.Errorf("not allowed: one or more of the projects %s does not exist", s.Projects)
 			default:
 				return err
 			}
@@ -310,7 +310,7 @@ func (p *pg) associatePolicyWithProjects(ctx context.Context,
 			err = p.processError(err)
 			switch err {
 			case storage_errors.ErrForeignKey: // occurs when a project in the policy does not exist
-				return errors.Errorf("non-existent projects cannot be included in policies: %s", inProjects)
+				return errors.Errorf("not allowed: one or more of the projects %s does not exist", inProjects)
 			default:
 				return err
 			}
