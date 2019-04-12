@@ -34,4 +34,5 @@ func init() {
 	)
 
 	RootCmd.AddCommand(newDescribeCmd())
+	RootCmd.AddCommand(newRunCmd())
 }

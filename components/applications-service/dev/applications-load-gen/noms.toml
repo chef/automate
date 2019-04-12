@@ -42,7 +42,7 @@
   [[generator.supervisor]]
     name = "pos_terminals:production1"
     template = "pos_terminal"
-    count = 100
+    count = 10
     channel = "production1"
     environment = "production1"
     site = "site1"
