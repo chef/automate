@@ -9,21 +9,47 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	uuid "github.com/chef/automate/lib/uuid4"
+
+	log "github.com/sirupsen/logrus"
 )
+
+// Everything is hardcoded to 0.1.0 for now
+const versionNumber = "0.1.0"
 
 type RunnerConfig struct {
 	AuthToken string
 	Host      string
 	Tick      int
+	Verbosity int
 }
 
 type LoadGenRunner struct {
 	SupervisorGroups []*SupervisorGroup
+	stats            *RunnerStatsKeeper
 }
 
 func (r *LoadGenRunner) Run(cfg *RunnerConfig) {
+
+	logLevel := log.ErrorLevel
+	switch cfg.Verbosity {
+	case 0:
+	case 1:
+		logLevel = log.InfoLevel
+	default:
+		logLevel = log.DebugLevel
+	}
+
+	log.SetLevel(logLevel)
+
+	for _, supGroup := range r.SupervisorGroups {
+		fmt.Print(supGroup.PrettyStr())
+	}
+
+	r.stats = NewStatsKeeper()
+	go r.stats.RunCollectAndPrintLoop()
+
 	for _, g := range r.SupervisorGroups {
-		g.Run(cfg)
+		g.Run(cfg, r.stats)
 	}
 }
 
@@ -52,18 +78,26 @@ func (s *SupervisorGroup) PrettyStr() string {
 	return b.String()
 }
 
-func (s *SupervisorGroup) Run(cfg *RunnerConfig) {
+func (s *SupervisorGroup) Run(cfg *RunnerConfig, stats *RunnerStatsKeeper) {
 	for n := int32(0); n < s.Count; n++ {
-		fmt.Printf("supervisor group %q (%d)\n", s.Name, n)
-		go s.SpawnSup(n, cfg)
+		log.WithFields(log.Fields{"name": s.Name, "index": n}).Info("spawning supervisor")
+		go s.SpawnSup(n, cfg, stats)
 	}
 }
 
-func (s *SupervisorGroup) SpawnSup(n int32, cfg *RunnerConfig) error {
-	sup, err := NewSupSim(s.Name, n, cfg, s.MessagePrototypes)
+func (s *SupervisorGroup) SpawnSup(n int32, cfg *RunnerConfig, stats *RunnerStatsKeeper) error {
+	uuid, err := uuid.NewV4()
 	if err != nil {
-		fmt.Printf("Supervisor setup failed: %s\n", err)
+		log.WithError(err).Error("Failed to make a V4 UUID")
 		return err
+	}
+
+	sup := &SupSim{
+		Name:              s.Name,
+		UUID:              uuid,
+		Cfg:               cfg,
+		MessagePrototypes: s.MessagePrototypes,
+		Stats:             stats,
 	}
 
 	err = sup.Run()
@@ -81,23 +115,14 @@ type SupSim struct {
 	Cfg               *RunnerConfig
 	UUID              uuid.UUID
 	MessagePrototypes []*MessagePrototype
+	Stats             *RunnerStatsKeeper
 	nc                *nats.NatsClient
 }
 
-func NewSupSim(name string, idx int32, cfg *RunnerConfig, messages []*MessagePrototype) (*SupSim, error) {
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
-	}
-	return &SupSim{
-		Name:              name,
-		UUID:              uuid,
-		Cfg:               cfg,
-		MessagePrototypes: messages,
-	}, nil
-}
-
 func (s *SupSim) Run() error {
+	s.Stats.SupStarted()
+	defer s.Stats.SupDied()
+
 	url := fmt.Sprintf("nats://%s@%s:4222", s.Cfg.AuthToken, s.Cfg.Host)
 	cluster := "event-service"
 	client := fmt.Sprintf("load-generator-%s", s.UUID)
@@ -114,7 +139,7 @@ func (s *SupSim) Run() error {
 	// run loadgen loop
 
 	// TODO: use logger instead
-	fmt.Printf("starting sup %s (%d) (%s)\n", s.Name, s.Idx, s.UUID)
+	log.WithFields(log.Fields{"name": s.Name, "index": s.Idx, "uuid": s.UUID.String()}).Info("starting supervisor")
 
 	// the ticker always waits its full time before publishing. Also we wish to
 	// splay out the simulated sups for a more even distribution of messages. So
@@ -131,8 +156,15 @@ func (s *SupSim) Run() error {
 }
 
 func (s *SupSim) PublishAll() error {
+	log.WithFields(log.Fields{
+		"name":          s.Name,
+		"index":         s.Idx,
+		"uuid":          s.UUID.String(),
+		"service_count": len(s.MessagePrototypes),
+	}).Info("publishing messages")
+
 	for _, m := range s.MessagePrototypes {
-		fmt.Printf("publish messages from sup %s (%d) (%s)\n", s.Name, s.Idx, s.UUID)
+
 		msg := &applications.HabService{
 			SupervisorId: s.UUID.String(),
 			Group:        "default",
@@ -143,10 +175,23 @@ func (s *SupSim) PublishAll() error {
 				Release: m.Release,
 			},
 		}
+
+		log.WithFields(log.Fields{
+			"name":          s.Name,
+			"index":         s.Idx,
+			"uuid":          s.UUID.String(),
+			"service_count": len(s.MessagePrototypes),
+			"pkg_fqid":      fmt.Sprintf("%s/%s/%s/%s", m.Origin, m.PkgName, versionNumber, m.Release),
+		}).Debug("publishing messages")
+
 		err := s.nc.PublishHabService(msg)
+		// TODO NEXT
+		// message publishing stats
 		if err != nil {
+			s.Stats.FailedPublish()
 			return err
 		}
+		s.Stats.SuccessfulPublish()
 	}
 	return nil
 }

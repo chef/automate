@@ -12,6 +12,7 @@ import (
 
 var authToken string
 var tick int
+var verbosity int
 
 func newRunCmd() *cobra.Command {
 	c := &cobra.Command{
@@ -31,6 +32,12 @@ func newRunCmd() *cobra.Command {
 		"tick",
 		30,
 		"interval between hab sup healthcheck ticks",
+	)
+	c.PersistentFlags().CountVarP(
+		&verbosity,
+		"verbose",
+		"V",
+		"log each supervisor cycle; give twice to log every message",
 	)
 
 	return c
@@ -58,6 +65,7 @@ func runRunCmd(cmd *cobra.Command, args []string) error {
 		AuthToken: authToken,
 		Host:      "localhost",
 		Tick:      tick,
+		Verbosity: verbosity,
 	}
 
 	runner := profileCfg.BuildRunner()

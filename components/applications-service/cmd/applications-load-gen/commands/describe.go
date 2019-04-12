@@ -35,7 +35,7 @@ func runDescribeCmd(cmd *cobra.Command, args []string) error {
 	supGroups := profileCfg.BuildSupervisorGroups()
 
 	for _, supGroup := range supGroups {
-		fmt.Println(supGroup.PrettyStr())
+		fmt.Print(supGroup.PrettyStr())
 	}
 
 	return nil
