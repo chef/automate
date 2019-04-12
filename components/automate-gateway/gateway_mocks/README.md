@@ -2,7 +2,7 @@
 
 Files in this directory are generated using a library called [mockgen]('https://github.com/golang/mock#running-mockgen'), which is part of [gomock]('https://github.com/grpc/grpc-go/blob/master/Documentation/gomock-example.md'). These generated files are used for testing the automate-gateway with mocked clients.
 
-Gomock is used for testing client-side logic. All the GRPC clients in the gateway comes from the `ClientsFactory` [interface]('https://github.com/chef/automate/blob/25c39573e4fae51ad7d84c3dbf78e106958cb25f/components/automate-gateway/gateway/clients.go#L64'). This interface has explicit definitions for all the micro-services that the gateway depends on, it is here where we dialing in to connect to those clients. Those clients contains the GRPC functions that we we need to mock so we can run our tests against the mocked version rather than the real version.
+Gomock is used for testing client-side logic. All the GRPC clients in the gateway comes from the `ClientsFactory` [interface](https://github.com/chef/automate/blob/dc2e9abeaf09ad3577e922d0e8afec9f6713cc4e/components/automate-gateway/gateway/clients.go#L81). This interface has explicit definitions for all the micro-services that the gateway depends on, it is here where we dialing in to connect to those clients. Those clients contains the GRPC functions that we we need to mock so we can run our tests against the mocked version rather than the real version.
 
 ## How to generate a new mock
 

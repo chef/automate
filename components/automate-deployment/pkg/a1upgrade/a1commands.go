@@ -71,7 +71,7 @@ type EsShardsStats struct {
 
 // MaintDotFlag is the path to the file which will make A1's nginx go into
 // maintenance mode. See also:
-// https://github.com/chef/automate/blob/e1278c5fbb4478fa31b0853788cad1f6714fecf7/cookbooks/delivery/templates/default/nginx-internal.conf.erb#L146
+// https://github.com/chef/a1/blob/e1278c5fbb4478fa31b0853788cad1f6714fecf7/cookbooks/delivery/templates/default/nginx-internal.conf.erb#L146
 const MaintDotFlag = "/var/opt/delivery/delivery/etc/maint.flag"
 
 const rabbitStatsURL = "https://localhost:15672/api/queues/%2Finsights/data-collector"
