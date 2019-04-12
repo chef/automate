@@ -167,7 +167,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	if _, found := v1PoliciesToSkip[pol.ID.String()]; found {
 		return nil, nil
 	}
-	allProjects := []string{constants_v2.AllProjectsID}
+	noProjects := []string{}
 
 	// there's three cfgmgmt policies (which had been deletable) that are now
 	// mapped into one:
@@ -186,7 +186,8 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		}
 		cfgmgmtPolicy, err := storage.NewPolicy(constants_v2.CfgmgmtPolicyID,
 			"[Legacy] Infrastructure Automation Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{cfgmgmtStatement}, allProjects)
+			storage.Custom, []storage.Member{member},
+			[]storage.Statement{cfgmgmtStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
@@ -205,7 +206,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		}
 		compliancePolicy, err := storage.NewPolicy(constants_v2.CompliancePolicyID,
 			"[Legacy] Compliance Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{complianceStatement}, allProjects)
+			storage.Custom, []storage.Member{member}, []storage.Statement{complianceStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
@@ -224,7 +225,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		}
 		eventsPolicy, err := storage.NewPolicy(constants_v2.EventsPolicyID,
 			"[Legacy] Events Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{eventsStatement}, allProjects)
+			storage.Custom, []storage.Member{member}, []storage.Statement{eventsStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (events)")
 		}
@@ -244,7 +245,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 
 		ingestPolicy, err := storage.NewPolicy(constants_v2.LegacyIngestPolicyID,
 			"[Legacy] Ingest Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{ingestStatement}, allProjects)
+			storage.Custom, []storage.Member{member}, []storage.Statement{ingestStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (ingest)")
 		}
@@ -267,7 +268,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 			storage.Custom,
 			[]storage.Member{member},
 			[]storage.Statement{nodesStatement},
-			allProjects,
+			noProjects,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (nodes)")
@@ -291,7 +292,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 			storage.Custom,
 			[]storage.Member{member},
 			[]storage.Statement{nodeManagersStatement},
-			allProjects,
+			noProjects,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (nodemanagers)")
@@ -315,7 +316,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 			storage.Custom,
 			[]storage.Member{member},
 			[]storage.Statement{secretsStatement},
-			allProjects,
+			noProjects,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (secrets)")
@@ -339,7 +340,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 			storage.Custom,
 			[]storage.Member{member},
 			[]storage.Statement{telemetryStatement},
-			allProjects,
+			noProjects,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (telemetry)")
@@ -363,7 +364,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 			storage.Custom,
 			[]storage.Member{member},
 			[]storage.Statement{complianceTokenStatement},
-			allProjects,
+			noProjects,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (compliance token)")
@@ -410,7 +411,7 @@ func customPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		storage.Custom,
 		members,
 		[]storage.Statement{statement},
-		[]string{constants_v2.AllProjectsExternalID})
+		[]string{})
 	if err != nil {
 		return nil, errors.Wrap(err, "format v2 policy")
 	}
