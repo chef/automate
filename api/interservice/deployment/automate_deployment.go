@@ -2,7 +2,9 @@ package deployment
 
 import (
 	"context"
+	fmt "fmt"
 	"io"
+	"strings"
 
 	"github.com/pkg/errors"
 	grpc "google.golang.org/grpc"
@@ -72,4 +74,28 @@ func isCompleteFail(event *DeployEvent) bool {
 		}
 	}
 	return false
+}
+
+// Format returns the BackupStatusResponse as pretty string
+func (c *BackupStatusResponse) Format() string {
+	msg := ""
+
+	switch c.OpType {
+	case BackupStatusResponse_CREATE:
+		msg = fmt.Sprintf("Creating backup %s", c.GetTaskIds()[0])
+	case BackupStatusResponse_DELETE:
+		if len(c.GetTaskIds()) == 1 {
+			msg = fmt.Sprintf("Deleting backup %s", c.GetTaskIds()[0])
+		} else {
+			msg = fmt.Sprintf("Deleting backups %s", strings.Join(c.GetTaskIds(), ", "))
+		}
+	case BackupStatusResponse_RESTORE:
+		msg = fmt.Sprintf("Restoring backup %s", c.GetTaskIds()[0])
+	case BackupStatusResponse_IDLE:
+		msg = fmt.Sprintf("Idle")
+	default:
+		msg = "Unknown"
+	}
+
+	return msg
 }

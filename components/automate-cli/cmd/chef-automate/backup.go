@@ -27,7 +27,7 @@ import (
 var backupCmdFlags = struct {
 	noProgress     bool
 	requestTimeout int64
-	waitTimeout    int64
+
 	baseBackupDir  string
 	channel        string
 	overrideOrigin string
@@ -37,6 +37,14 @@ var backupCmdFlags = struct {
 	skipBootstrap  bool
 	airgap         string
 	yes            bool
+
+	createWaitTimeout  int64
+	listWaitTimeout    int64
+	showWaitTimeout    int64
+	deleteWaitTimeout  int64
+	restoreWaitTimeout int64
+	statusWaitTimeout  int64
+	cancelWaitTimeout  int64
 
 	s3Endpoint     string
 	s3AccessKey    string
@@ -53,14 +61,25 @@ func init() {
 	backupCmd.AddCommand(deleteBackupCmd)
 	backupCmd.AddCommand(restoreBackupCmd)
 	backupCmd.AddCommand(fixBackupRepoPermissionsCmd)
+	backupCmd.AddCommand(statusBackupCmd)
+	backupCmd.AddCommand(cancelBackupCmd)
 
 	backupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.noProgress, "no-progress", "", false, "Don't follow operation progress")
 	backupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.requestTimeout, "request-timeout", "r", 20, "API request timeout for deployment-service in seconds")
-	backupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.waitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3Endpoint, "s3-endpoint", "", "The S3 region endpoint URL")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3AccessKey, "s3-access-key", "", "The S3 access key ID")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3SecretKey, "s3-secret-key", "", "The S3 secret access key")
 	backupCmd.PersistentFlags().StringVar(&backupCmdFlags.s3SessionToken, "s3-session-token", "", "The S3 session token when assuming an IAM role")
+
+	createBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.createWaitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
+
+	listBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.listWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
+
+	showBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.showWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
+
+	statusBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.statusWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
+
+	cancelBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.cancelWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
 
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.baseBackupDir, "backup-dir", "b", "/var/opt/chef-automate/backups", "Directory used for backups")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.overrideOrigin, "override-origin", "o", "chef", "Habitat origin from which to install packages")
@@ -72,8 +91,10 @@ func init() {
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.airgap, "airgap-bundle", "", "The artifact to use for an air-gapped installation")
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.yes, "yes", "", false, "Skip bootstrapping the machine with Habitat")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.sha256, "sha256", "", "The SHA256 checksum of the backup")
+	restoreBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.restoreWaitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
 
 	deleteBackupCmd.PersistentFlags().BoolVar(&backupDeleteCmdFlags.yes, "yes", false, "Agree to all prompts")
+	deleteBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.deleteWaitTimeout, "wait-timeout", "t", 120, "How long to wait for a operation to complete before raising an error")
 
 	if !isDevMode() {
 		_ = restoreBackupCmd.PersistentFlags().MarkHidden("override-origin")
@@ -146,10 +167,26 @@ var fixBackupRepoPermissionsCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 }
 
+var statusBackupCmd = &cobra.Command{
+	Use:   "status",
+	Short: "show the Chef Automate backup runner status",
+	Long:  "Show the Chef Automate backup runner status",
+	RunE:  runBackupStatusCmd,
+	Args:  cobra.ExactArgs(0),
+}
+
+var cancelBackupCmd = &cobra.Command{
+	Use:   "cancel",
+	Short: "cancel the running backup operation",
+	Long:  "Cancel the currently running backup create, delete, or restore operation",
+	RunE:  runCancelBackupCmd,
+	Args:  cobra.ExactArgs(0),
+}
+
 func runCreateBackupCmd(cmd *cobra.Command, args []string) error {
 	res, err := client.CreateBackup(
 		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-		time.Duration(backupCmdFlags.waitTimeout)*time.Second,
+		time.Duration(backupCmdFlags.createWaitTimeout)*time.Second,
 		writer,
 	)
 	if err != nil {
@@ -166,7 +203,7 @@ func runCreateBackupCmd(cmd *cobra.Command, args []string) error {
 	}
 	lastEvent, err := client.StreamBackupStatus(
 		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-		time.Duration(backupCmdFlags.waitTimeout)*time.Second,
+		time.Duration(backupCmdFlags.createWaitTimeout)*time.Second,
 		res.Backup.TaskID(),
 		writer,
 	)
@@ -283,9 +320,16 @@ func runFixBackupRepoPermissionsCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func listBackupsLocally(locationSpec backup.LocationSpecification) ([]*api.BackupTask, error) {
+func listBackupsLocally(ctx context.Context, locationSpec backup.LocationSpecification) ([]*api.BackupTask, error) {
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		deadline = time.Now().Add(1 * time.Minute)
+	}
+	ctx, cancel := context.WithDeadline(context.Background(), deadline)
+	defer cancel()
+
 	runner := backup.NewRunner(backup.WithBackupLocationSpecification(locationSpec))
-	return runner.ListBackups()
+	return runner.ListBackups(ctx)
 }
 
 var offlineHelpMsg = `The deployment-service failed to respond to our request to list
@@ -310,8 +354,11 @@ func runListBackupCmd(cmd *cobra.Command, args []string) error {
 			return status.Annotate(err, status.BackupError)
 		}
 
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(backupCmdFlags.listWaitTimeout)*time.Second)
+		defer cancel()
+
 		writer.Printf("Listing backups from %s\n", locationSpec)
-		backups, err = listBackupsLocally(locationSpec)
+		backups, err = listBackupsLocally(ctx, locationSpec)
 		if err != nil {
 			return status.Wrapf(
 				err,
@@ -323,7 +370,7 @@ func runListBackupCmd(cmd *cobra.Command, args []string) error {
 	} else {
 		res, err := client.ListBackups(
 			time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-			time.Duration(backupCmdFlags.waitTimeout)*time.Second,
+			time.Duration(backupCmdFlags.listWaitTimeout)*time.Second,
 		)
 		if err != nil {
 			if errors.Cause(err) == context.DeadlineExceeded {
@@ -413,7 +460,7 @@ func runShowBackupCmd(cmd *cobra.Command, args []string) error {
 
 	res, err := client.ShowBackup(
 		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-		time.Duration(backupCmdFlags.waitTimeout)*time.Second,
+		time.Duration(backupCmdFlags.showWaitTimeout)*time.Second,
 		id,
 	)
 	if err != nil {
@@ -424,6 +471,32 @@ func runShowBackupCmd(cmd *cobra.Command, args []string) error {
 	// backup integration test uses `cut` to get the SHA256 from this output. You
 	// will need to fix that if you modify this.
 	writer.Bodyf("SHA256: %s", res.Description.Sha256)
+	return nil
+}
+
+func runBackupStatusCmd(cmd *cobra.Command, args []string) error {
+	res, err := client.BackupStatus(
+		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
+		time.Duration(backupCmdFlags.statusWaitTimeout)*time.Second,
+	)
+	if err != nil {
+		return err
+	}
+
+	writer.Println(res.Format())
+	return nil
+}
+
+func runCancelBackupCmd(cmd *cobra.Command, args []string) error {
+	_, err := client.CancelBackup(
+		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
+		time.Duration(backupCmdFlags.cancelWaitTimeout)*time.Second,
+	)
+	if err != nil {
+		return err
+	}
+
+	writer.Println("Backup operation cancelled")
 	return nil
 }
 
@@ -465,7 +538,7 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 
 	_, err := client.DeleteBackups(
 		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-		time.Duration(backupCmdFlags.waitTimeout)*time.Second,
+		time.Duration(backupCmdFlags.deleteWaitTimeout)*time.Second,
 		ids,
 	)
 	if err != nil {
@@ -507,7 +580,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
 		deployed, err := isA2Deployed()
 		if err != nil {
-			return status.Annotate(err, status.BackupError)
+			return nil
 		}
 
 		if deployed {
@@ -580,7 +653,10 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	// Find matching backup
-	backups, err := listBackupsLocally(locationSpec)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(backupCmdFlags.restoreWaitTimeout)*time.Second)
+	defer cancel()
+
+	backups, err := listBackupsLocally(ctx, locationSpec)
 	if err != nil {
 		return status.Wrap(err, status.BackupRestoreError, "Listing backups failed")
 	}
@@ -607,6 +683,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	// to STDOUT is the restore task ID after we've started the server side
 	// restore. In that case we need to silence all non-error output in the
 	// deployment restore.
+	// TODO: respect a context deadline in the deployment-service restore
 	dsRestore := client.NewDeploymentRestore(
 		client.WithDeploymentRestoreTask(rt),
 		client.WithDeploymentRestoreSkipPreflight(backupCmdFlags.skipPreflight),
@@ -623,7 +700,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	if backupCmdFlags.noProgress {
 		res, err := client.RestoreBackup(
 			time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-			time.Duration(backupCmdFlags.waitTimeout)*time.Second,
+			time.Duration(backupCmdFlags.restoreWaitTimeout)*time.Second,
 			rt,
 		)
 		if err != nil {
@@ -641,7 +718,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	writer.Title("Restoring Chef Automate")
 	res, err := client.RestoreBackup(
 		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-		time.Duration(backupCmdFlags.waitTimeout)*time.Second,
+		time.Duration(backupCmdFlags.restoreWaitTimeout)*time.Second,
 		rt,
 	)
 	if err != nil {
@@ -655,7 +732,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	writer.Body("Connecting to deployment-service to finish restoration")
 	_, err = client.StreamBackupStatus(
 		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-		time.Duration(backupCmdFlags.waitTimeout)*time.Second,
+		time.Duration(backupCmdFlags.restoreWaitTimeout)*time.Second,
 		res.Restore.TaskID(),
 		writer,
 	)

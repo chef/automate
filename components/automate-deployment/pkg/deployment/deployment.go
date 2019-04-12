@@ -191,8 +191,8 @@ func initExpectedServices(c *dc.ConfigRequest) ([]*Service, error) {
 	return allServices, nil
 }
 
-// Lock takes an exclusive lock of the deployment struct for
-// writing. It will block until the lock is available.
+// Lock takes an exclusive lock of the deployment struct for writing. It will
+// block until the lock is available.
 func (d *Deployment) Lock() {
 	d.mu.Lock()
 }

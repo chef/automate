@@ -1,6 +1,8 @@
 package backup
 
 import (
+	"context"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -13,40 +15,43 @@ import (
 	"github.com/stretchr/testify/require"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 )
 
 func TestRunnerCreate(t *testing.T) {
 	t.Run("Creates a backup", func(t *testing.T) {
-		r, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Millisecond)
+		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 		defer cleanup()
 		r.specs = []Spec{}
-		task, err := r.CreateBackup()
+		task, err := r.CreateBackup(ctx, dep, sender)
 
 		require.NoError(t, err)
 		require.NotNil(t, task)
+
+		err = waitForBackup(sender)
+		require.NoError(t, err)
 	})
 
 	t.Run("Creates backup fails when the timeout is exceeded", func(t *testing.T) {
-		r, eventSender, cleanup := testBackupRunner(testDefaultSpecs(), 0)
+		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 0)
 		defer cleanup()
 
 		r.specs = []Spec{}
 
-		task, err := r.CreateBackup()
+		task, err := r.CreateBackup(ctx, dep, sender)
 
 		require.NoError(t, err)
 		require.NotNil(t, task)
 
-		err = waitForBackup(eventSender)
+		err = waitForBackup(sender)
 		require.Error(t, err)
-
 	})
 }
 
 func TestCreateBackupEvent(t *testing.T) {
 	t.Run("builds an aggregate event", func(t *testing.T) {
-		r, _, cleanup := testBackupRunner([]Spec{}, 5*time.Millisecond)
+		r, _, _, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Millisecond)
 		defer cleanup()
 
 		task := &api.BackupTask{Id: ptypes.TimestampNow()}
@@ -101,18 +106,18 @@ func TestListBackups(t *testing.T) {
 		require.NoError(t, err, "test backup directory")
 		defer os.RemoveAll(dir)
 
-		r, eventSender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
+		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 		defer cleanup()
 
 		r.locationSpec = testLocationSpec(dir)
-		task, err := r.CreateBackup()
+		task, err := r.CreateBackup(ctx, dep, sender)
 		require.NoError(t, err)
 		require.NotNil(t, task)
 
-		err = waitForBackup(eventSender)
+		err = waitForBackup(sender)
 		require.NoError(t, err)
 
-		backups, err := r.ListBackups()
+		backups, err := r.ListBackups(ctx)
 		require.NoError(t, err)
 		assert.Equal(t, 1, len(backups))
 	})
@@ -126,7 +131,8 @@ func TestListBackups(t *testing.T) {
 		os.MkdirAll(filepath.Join(dir, "20180418151753"), defaultDirPerms)
 
 		r := NewRunner(WithBackupLocationSpecification(testLocationSpec(dir)))
-		backups, err := r.ListBackups()
+		ctx := context.Background()
+		backups, err := r.ListBackups(ctx)
 		require.NoError(t, err)
 		assert.Equal(t, 1, len(backups))
 	})
@@ -139,24 +145,59 @@ func TestBackupDelete(t *testing.T) {
 		require.NoError(t, err, "test backup directory")
 		defer os.RemoveAll(dir)
 
-		r, eventSender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
+		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 		defer cleanup()
 
 		r.locationSpec = testLocationSpec(dir)
-		task, err := r.CreateBackup()
+		task, err := r.CreateBackup(ctx, dep, sender)
 		require.NoError(t, err)
 		require.NotNil(t, task)
 
-		err = waitForBackup(eventSender)
+		err = waitForBackup(sender)
 		require.NoError(t, err)
 
-		err = r.DeleteBackups([]*api.BackupTask{task})
+		err = r.DeleteBackups(ctx, dep, []*api.BackupTask{task})
 		require.NoError(t, err)
 
-		backups, err := r.ListBackups()
+		backups, err := r.ListBackups(ctx)
 		require.NoError(t, err)
 		assert.Equal(t, 0, len(backups))
 	})
+}
+
+func TestCancelBackup(t *testing.T) {
+	t.Run("when default/idle cancel fails", func(t *testing.T) {
+		r, ctx, _, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
+		defer cleanup()
+
+		require.Equal(t, api.BackupStatusResponse_IDLE, r.RunningTask(ctx).Status.OpType)
+
+		err := r.Cancel(ctx)
+		require.Error(t, err)
+	})
+
+	for oname, ot := range map[string]api.BackupStatusResponse_OperationType{
+		"create":  api.BackupStatusResponse_CREATE,
+		"delete":  api.BackupStatusResponse_DELETE,
+		"restore": api.BackupStatusResponse_RESTORE,
+	} {
+		t.Run(fmt.Sprintf("%s cancel succeeds", oname), func(t *testing.T) {
+			r, ctx, _, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
+			defer cleanup()
+			success := false
+			cancelFunc := func() {
+				success = true
+			}
+			var err error
+
+			r.runningTask, err = newCancellableTask(ot, []string{"backupid"}, cancelFunc)
+			require.NoError(t, err)
+
+			err = r.Cancel(ctx)
+			require.NoError(t, err)
+			require.True(t, success)
+		})
+	}
 }
 
 func waitForBackup(e events.EventSender) error {
@@ -175,17 +216,18 @@ func waitForBackup(e events.EventSender) error {
 	return err
 }
 
-func testBackupRunner(specs []Spec, timeout time.Duration) (*Runner, events.EventSender, func()) {
+func testBackupRunner(specs []Spec, timeout time.Duration) (*Runner, context.Context, *deployment.Deployment, events.EventSender, func()) {
 	tmpDir, _ := ioutil.TempDir("", "runner-test")
 
 	sender := events.NewMemoryEventSender("test-backup")
+	ctx, _ := context.WithTimeout(context.Background(), timeout)
+	dep, _ := deployment.CreateDeployment()
+	dep.Lock()
 
 	return NewRunner(
-		WithEventSender(sender),
 		WithSpecs(specs),
-		WithTimeout(timeout),
 		WithBackupLocationSpecification(testLocationSpec("/tmp")),
-	), sender, func() { os.RemoveAll(tmpDir) }
+	), ctx, dep, sender, func() { os.RemoveAll(tmpDir) }
 }
 
 func testDefaultSpecs() []Spec {
@@ -203,39 +245,4 @@ func testDefaultSpecs() []Spec {
 			testAsyncOps:  []testOperation{{name: "deployment-async"}},
 		},
 	}
-}
-
-func TestRetryFunc(t *testing.T) {
-	t.Run("does not retry on success", func(t *testing.T) {
-		times := 0
-		err := retry(3, 0, func() error {
-			times++
-			return nil
-		})
-		assert.NoError(t, err)
-		assert.Equal(t, times, 1)
-	})
-
-	t.Run("retries a maximum amount of times when function keeps erroring", func(t *testing.T) {
-		times := 0
-		err := retry(3, 0, func() error {
-			times++
-			return errors.New("blah")
-		})
-		assert.Error(t, err)
-		assert.Equal(t, times, 3)
-	})
-
-	t.Run("stops retrying after success", func(t *testing.T) {
-		times := 0
-		err := retry(3, 0, func() error {
-			times++
-			if times == 2 {
-				return nil
-			}
-			return errors.New("blah")
-		})
-		assert.NoError(t, err)
-		assert.Equal(t, times, 2)
-	})
 }

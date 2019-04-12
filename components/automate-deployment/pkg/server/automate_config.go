@@ -83,15 +83,15 @@ func (s *server) PatchAutomateConfig(ctx context.Context,
 			return status.Error(codes.InvalidArgument, err.Error())
 		}
 
-		if err := s.deployment.ReplaceUserOverrideConfig(existingCopy); err != nil {
+		if err = s.deployment.ReplaceUserOverrideConfig(existingCopy); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
-		if err := s.updateExpectedServices(); err != nil {
+		if err = s.updateExpectedServices(); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
-		if err := s.persistDeployment(); err != nil {
+		if err = s.persistDeployment(); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
@@ -121,19 +121,21 @@ func (s *server) SetAutomateConfig(ctx context.Context,
 
 	// Lock the deployment while we merge the config and persist it
 	operation := func(s *server) error {
-		if err := req.Config.ValidateWithGlobalAndDefaults(); err != nil {
+		var err error
+
+		if err = req.Config.ValidateWithGlobalAndDefaults(); err != nil {
 			return status.Error(codes.InvalidArgument, err.Error())
 		}
 
-		if err := s.deployment.ReplaceUserOverrideConfig(req.Config); err != nil {
+		if err = s.deployment.ReplaceUserOverrideConfig(req.Config); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
-		if err := s.updateExpectedServices(); err != nil {
+		if err = s.updateExpectedServices(); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
-		if err := s.persistDeployment(); err != nil {
+		if err = s.persistDeployment(); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 
