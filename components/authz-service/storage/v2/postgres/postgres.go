@@ -851,9 +851,6 @@ func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
 		return nil, p.processError(err)
 	}
 
-	// TODO remove
-	p.logger.Infof("3. HEY! got your projects from context here: %s\n\n", projectsFilter)
-
 	// List all projects that have intersection between projects and projectsFilter,
 	// unless the projectsFilter is empty (v2.0 case).
 	rows, err := p.db.QueryContext(ctx, `SELECT query_projects($1)`, pq.Array(projectsFilter))
