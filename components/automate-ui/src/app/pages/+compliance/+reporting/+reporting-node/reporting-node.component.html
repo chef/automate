@@ -36,9 +36,9 @@
                   <span id="skipped-count" *ngIf="skipped.length > 0">
                     ({{ skipped.length }} Skipped <chef-icon>info</chef-icon>)
                     <chef-tooltip for="skipped-count" position="right">
-                      <p>Skipping profile(s):</p>
+                      <p>Skipped profile<span *ngIf="skipped.length > 1">s</span>:</p>
                       <ul>
-                        <li *ngFor="let profile of skipped">{{ profile.skip_message }}</li>
+                        <li *ngFor="let profile of skipped"><strong>{{ profile.name }}</strong> <span *ngIf="profile.skip_message != ''">({{ profile.skip_message }})</span></li>
                       </ul>
                     </chef-tooltip>
                   </span>

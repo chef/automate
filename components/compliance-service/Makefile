@@ -499,7 +499,7 @@ test-unit:
 	@go test $(shell go list ./... |  grep -v '^github.com/chef/automate/components/compliance-service/\(examples\|feed/\|api/automate-feed\|api/automate-event\|api/tests\|scanner\|integration_test\)') -cover
 
 send-ingest-report:
-	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-success-tiny-report.json --threads 2 --reports-per-thread 2
+	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-success-tiny-report.json --threads 1 --reports-per-thread 1
 
 ## DATA ##
 $(MARKET_PATH):

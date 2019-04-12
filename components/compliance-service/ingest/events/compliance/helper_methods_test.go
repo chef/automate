@@ -57,7 +57,8 @@ func TestSummary(t *testing.T) {
         "impact": 1.0,
         "results":[ {"status":"skipped"} ]
       }
-    ]
+    ],
+    "status": "loaded"
   }`
 	profile1 := parseProfile(&p1json)
 	summary1 := ProfileControlSummary(profile1)
@@ -93,7 +94,8 @@ func TestSummary(t *testing.T) {
         "id":"sysctl-03",
         "results":[ {"status":"passed"} ]
       }
-    ]
+    ],
+    "status": "loaded"
   }`
 	profile2 := parseProfile(&p2json)
 	summary2 := ProfileControlSummary(profile2)
@@ -173,6 +175,31 @@ func TestSummary(t *testing.T) {
 	profilesJson := fileContents("test_data/inspec_report_profiles_min_out.json")
 	expectedProfilesMin := parseProfilesMin(&profilesJson)
 	assert.Equal(t, expectedProfilesMin, actualProfilesMin, "profiles_min match")
+
+	p3json := `{
+		"name": "mywindows",
+		"version": "0.1.3",
+		"sha256": "a41afaeb1d0ac15b9078d7ea139e741b6b27c1706c39ab0b09f3983f43c5940e",
+		"title": "My Demo Windows Profile",
+		"maintainer": "Demo, Inc.",
+		"summary": "Verify that Windows nodes are configured securely",
+		"license": "Proprietary, All rights reserved",
+		"copyright": "Demo, Inc.",
+		"copyright_email": "support@example.com",
+		"supports": [
+			{
+				"platform-family": "windows"
+			}
+		],
+		"attributes": [],
+		"groups": [],
+		"controls": [],
+		"status": "skipped",
+		"skip_message": "Skipping profile: 'mywindows' on unsupported platform: 'mac_os_x/17.7.0'."
+	}`
+	profile3 := parseProfile(&p3json)
+	assert.Equal(t, profile3.Status, "skipped", "profile status match")
+	assert.Equal(t, profile3.SkipMessage, "Skipping profile: 'mywindows' on unsupported platform: 'mac_os_x/17.7.0'.", "profile skip message match")
 
 	// ------------------------------- ProfilesFromReport test --------------------------------- //
 	fixedProfiles := FixInheritedProfiles([]*inspec.Profile{profile1, profile2})
