@@ -68,6 +68,86 @@ describe('ServiceGroupsComponent', () => {
     }));
   });
 
+  describe('onToggleSort', () => {
+    it('when set to an allowed value', () => {
+      spyOn(component.router, 'navigate');
+      component.onToggleSort('name');
+      expect(component.router.navigate).toHaveBeenCalledWith(
+        [], {queryParams: { sortField: ['name'], sortDirection: ['ASC'] }});
+    });
+
+    it('when set to an allowed value', () => {
+      spyOn(component.router, 'navigate');
+      component.onToggleSort('percent_ok');
+      expect(component.router.navigate).toHaveBeenCalledWith(
+        [], {queryParams: { sortField: ['percent_ok'], sortDirection: ['ASC'] }});
+    });
+  });
+
+  describe('onPageChange', () => {
+    it('when the first page is selected remove page from URL', fakeAsync(() => {
+      router.navigate([''], {queryParams: { }});
+
+      tick();
+
+      component.onPageChange(1);
+
+      tick();
+
+      expect('/').toEqual(router.routerState.snapshot.url);
+    }));
+
+    it('when a page is selected', fakeAsync(() => {
+      router.navigate([''], {queryParams: { }});
+
+      tick();
+
+      component.onPageChange(2);
+
+      tick();
+
+      expect('/?page=2').toEqual(router.routerState.snapshot.url);
+    }));
+
+    it('when a page is a negative number do not change the URL', fakeAsync(() => {
+      router.navigate([''], {queryParams: { }});
+
+      tick();
+
+      component.onPageChange(-2);
+
+      tick();
+
+      expect('/').toEqual(router.routerState.snapshot.url);
+    }));
+
+    it('when a page is 0 number do not change the URL', fakeAsync(() => {
+      router.navigate([''], {queryParams: { }});
+
+      tick();
+
+      component.onPageChange(0);
+
+      tick();
+
+      expect('/').toEqual(router.routerState.snapshot.url);
+    }));
+
+    it('when a page changes do not remove existing URL parameters', fakeAsync(() => {
+      router.navigate([''], {queryParams: {sortField: ['name'], sortDirection: ['ASC']}});
+
+      tick();
+
+      component.onPageChange(2);
+
+      tick();
+
+      expect('/?sortField=name&sortDirection=ASC&page=2').
+        toEqual(router.routerState.snapshot.url);
+    }));
+  });
+
+
   describe('updateAllFilters', () => {
     it('when the URL is empty', fakeAsync(() => {
       spyOn(component.store, 'dispatch');
@@ -76,7 +156,11 @@ describe('ServiceGroupsComponent', () => {
 
       expect(component.store.dispatch).toHaveBeenCalledWith(
         new UpdateServiceGroupFilters({filters: {
-          status: undefined
+          status: undefined,
+          sortField: 'name',
+          sortDirection: 'ASC',
+          page: 1,
+          pageSize: 25
         }}));
     }));
 
@@ -88,7 +172,11 @@ describe('ServiceGroupsComponent', () => {
 
       expect(component.store.dispatch).toHaveBeenCalledWith(
         new UpdateServiceGroupFilters({filters: {
-          status: undefined
+          status: undefined,
+          sortField: 'name',
+          sortDirection: 'ASC',
+          page: 1,
+          pageSize: 25
         }}));
     }));
 
@@ -99,7 +187,11 @@ describe('ServiceGroupsComponent', () => {
 
       expect(component.store.dispatch).toHaveBeenCalledWith(
         new UpdateServiceGroupFilters({filters: {
-          status: 'ok'
+          status: 'ok',
+          sortField: 'name',
+          sortDirection: 'ASC',
+          page: 1,
+          pageSize: 25
         }}));
     }));
 
@@ -110,7 +202,11 @@ describe('ServiceGroupsComponent', () => {
 
       expect(component.store.dispatch).toHaveBeenCalledWith(
         new UpdateServiceGroupFilters({filters: {
-          status: undefined
+          status: undefined,
+          sortField: 'name',
+          sortDirection: 'ASC',
+          page: 1,
+          pageSize: 25
         }}));
     }));
   });

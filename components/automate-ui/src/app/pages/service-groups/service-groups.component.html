@@ -29,14 +29,14 @@
   <chef-table class="service-group-list" *ngIf="(serviceGroupStatus$ | async) == 'loadingSuccess'">
     <chef-thead>
         <chef-tr>
-          <chef-th class="health">
-            Health
+          <chef-th class="health sort" (click)="onToggleSort('percent_ok')">
+            Health<i class="sort-icon {{sortIcon('percent_ok')}}"></i>
           </chef-th>
           <chef-th class="services">
             Services
           </chef-th>
-          <chef-th class="name sort">
-            Name
+          <chef-th class="name sort" (click)="onToggleSort('name')">
+            Name <i class="sort-icon {{sortIcon('name')}}"></i>
           </chef-th>
           <chef-th class="release">
             Release
@@ -64,6 +64,12 @@
       </chef-tr>
     </chef-tbody>
   </chef-table>
+  <app-page-picker
+    [total]="totalServiceGroups"
+    [perPage]="pageSize"
+    [page]="currentPage"
+    (pageChanged)="onPageChange($event)">
+  </app-page-picker>
   <div class="empty-status" *ngIf="(serviceGroups$ | async)?.length === 0">
     <div class="status-statement">
       <h3>No service groups available</h3>

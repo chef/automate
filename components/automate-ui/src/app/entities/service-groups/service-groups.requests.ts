@@ -25,10 +25,21 @@ export class ServiceGroupsRequests {
 
   public buildFilterParams(filters?: ServiceGroupFilters): HttpParams {
     let searchParam = new HttpParams();
-
     if (filters) {
       if (filters.status) {
         searchParam = searchParam.append('filter', 'status' + ':' + filters.status);
+      }
+      if (filters.sortField) {
+        searchParam = searchParam.append('sorting.field', filters.sortField);
+      }
+      if (filters.sortDirection) {
+        searchParam = searchParam.append('sorting.order', filters.sortDirection);
+      }
+      if (filters.page) {
+        searchParam = searchParam.append('pagination.page', filters.page.toString());
+      }
+      if (filters.pageSize) {
+        searchParam = searchParam.append('pagination.size', filters.pageSize.toString());
       }
     }
 

@@ -1,4 +1,4 @@
-import { RollupServiceStatus } from '../../types/types';
+import { RollupServiceStatus, SortDirection  } from '../../types/types';
 
 export interface ServiceGroupHealthSummary {
   total: number;
@@ -17,10 +17,18 @@ export interface ServiceGroup {
 }
 
 export interface ServiceGroupFilters {
+  page?: number;
+  pageSize?: number;
   status?: RollupServiceStatus;
+  sortField?: string;
+  sortDirection?: SortDirection;
 }
 
 export interface ServiceGroupsPayload {
   service_groups: ServiceGroup[];
 }
 
+export interface FieldDirection {
+  name: SortDirection;
+  percent_ok: SortDirection;
+}
