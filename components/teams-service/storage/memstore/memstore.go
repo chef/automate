@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/teams-service/storage"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
@@ -38,7 +39,7 @@ func New(ctx context.Context, logger logger.Logger) (storage.Storage, error) {
 
 // StoreTeam saves a created team to the memstore with the default project
 func (m *memstore) StoreTeam(ctx context.Context, name, description string) (storage.Team, error) {
-	return m.StoreTeamWithProjects(ctx, name, description, []string{"default"})
+	return m.StoreTeamWithProjects(ctx, name, description, []string{})
 }
 
 // StoreTeamWithProjects saves a created team to the memstore with the specified teams
@@ -68,12 +69,14 @@ func (m *memstore) StoreTeamWithProjects(_ context.Context,
 }
 
 // GetTeams fetches teams from memory/db
-func (m *memstore) GetTeams(_ context.Context) ([]storage.Team, error) {
-	teamArr := make([]storage.Team, len(m.teams))
+func (m *memstore) GetTeams(ctx context.Context) ([]storage.Team, error) {
+	teamArr := []storage.Team{}
 
 	i := 0
 	for _, team := range m.teams {
-		teamArr[i] = copyTeam(team)
+		if projectsIntersect(ctx, team) {
+			teamArr = append(teamArr, copyTeam(team))
+		}
 		i++
 	}
 
@@ -81,18 +84,26 @@ func (m *memstore) GetTeams(_ context.Context) ([]storage.Team, error) {
 }
 
 // GetTeam fetches a team from memory
-func (m *memstore) GetTeam(_ context.Context, teamID uuid.UUID) (storage.Team, error) {
+func (m *memstore) GetTeam(ctx context.Context, teamID uuid.UUID) (storage.Team, error) {
 	team, teamFound := m.teams[teamID]
 	if !teamFound {
 		return storage.Team{}, storage.ErrNotFound
 	}
+
+	if !projectsIntersect(ctx, team) {
+		return storage.Team{}, storage.ErrNotFound
+	}
+
 	return copyTeam(team), nil
 }
 
 // DeleteTeam deletes a team
-func (m *memstore) DeleteTeam(_ context.Context, teamID uuid.UUID) (storage.Team, error) {
+func (m *memstore) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Team, error) {
 	team, teamFound := m.teams[teamID]
 	if !teamFound {
+		return storage.Team{}, storage.ErrNotFound
+	}
+	if !projectsIntersect(ctx, team) {
 		return storage.Team{}, storage.ErrNotFound
 	}
 
@@ -109,9 +120,12 @@ func (m *memstore) DeleteTeam(_ context.Context, teamID uuid.UUID) (storage.Team
 	return team, nil
 }
 
-func (m *memstore) EditTeam(_ context.Context, t storage.Team) (storage.Team, error) {
+func (m *memstore) EditTeam(ctx context.Context, t storage.Team) (storage.Team, error) {
 	team, teamFound := m.teams[t.ID]
 	if !teamFound {
+		return storage.Team{}, storage.ErrNotFound
+	}
+	if !projectsIntersect(ctx, team) {
 		return storage.Team{}, storage.ErrNotFound
 	}
 
@@ -131,9 +145,12 @@ func (m *memstore) EditTeam(_ context.Context, t storage.Team) (storage.Team, er
 }
 
 // AddUsers adds an array of user IDs to a team's map of user IDs
-func (m *memstore) AddUsers(_ context.Context, teamID uuid.UUID, userIDs []string) (storage.Team, error) {
+func (m *memstore) AddUsers(ctx context.Context, teamID uuid.UUID, userIDs []string) (storage.Team, error) {
 	team, teamFound := m.teams[teamID]
 	if !teamFound {
+		return storage.Team{}, storage.ErrNotFound
+	}
+	if !projectsIntersect(ctx, team) {
 		return storage.Team{}, storage.ErrNotFound
 	}
 
@@ -154,9 +171,12 @@ func (m *memstore) AddUsers(_ context.Context, teamID uuid.UUID, userIDs []strin
 
 // RemoveUsers updates team membership by removing all users from a team it can
 // find that are currently members.
-func (m *memstore) RemoveUsers(_ context.Context, teamID uuid.UUID, userIDs []string) (storage.Team, error) {
+func (m *memstore) RemoveUsers(ctx context.Context, teamID uuid.UUID, userIDs []string) (storage.Team, error) {
 	team, ok := m.teams[teamID]
 	if !ok {
+		return storage.Team{}, storage.ErrNotFound
+	}
+	if !projectsIntersect(ctx, team) {
 		return storage.Team{}, storage.ErrNotFound
 	}
 
@@ -174,9 +194,12 @@ func (m *memstore) RemoveUsers(_ context.Context, teamID uuid.UUID, userIDs []st
 }
 
 // GetTeamByName fetches a team from memory by name instead of ID
-func (m *memstore) GetTeamByName(_ context.Context, teamName string) (storage.Team, error) {
+func (m *memstore) GetTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
 	team, teamFound := m.teamsV2[teamName]
 	if !teamFound {
+		return storage.Team{}, storage.ErrNotFound
+	}
+	if !projectsIntersect(ctx, team) {
 		return storage.Team{}, storage.ErrNotFound
 	}
 	return copyTeam(team), nil
@@ -213,12 +236,14 @@ func (m *memstore) GetUserIDsForTeam(ctx context.Context, teamID uuid.UUID) ([]s
 }
 
 // GetTeamsForUser returns teams to which the user belongs
-func (m *memstore) GetTeamsForUser(_ context.Context, userID string) ([]storage.Team, error) {
+func (m *memstore) GetTeamsForUser(ctx context.Context, userID string) ([]storage.Team, error) {
 	teamArr := []storage.Team{}
 
 	for _, team := range m.teams {
 		if m.teamIncludesUser(team.ID, userID) {
-			teamArr = append(teamArr, team)
+			if projectsIntersect(ctx, team) {
+				teamArr = append(teamArr, team)
+			}
 		}
 	}
 
@@ -228,6 +253,9 @@ func (m *memstore) GetTeamsForUser(_ context.Context, userID string) ([]storage.
 func (m *memstore) DeleteTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
 	team, teamFound := m.teamsV2[teamName]
 	if !teamFound {
+		return storage.Team{}, storage.ErrNotFound
+	}
+	if !projectsIntersect(ctx, team) {
 		return storage.Team{}, storage.ErrNotFound
 	}
 
@@ -249,6 +277,9 @@ func (m *memstore) EditTeamByName(ctx context.Context,
 
 	team, teamFound := m.teamsV2[name]
 	if !teamFound {
+		return storage.Team{}, storage.ErrNotFound
+	}
+	if !projectsIntersect(ctx, team) {
 		return storage.Team{}, storage.ErrNotFound
 	}
 
@@ -309,6 +340,31 @@ func hasUser(userIDs []string, userID string) bool {
 	for _, ID := range userIDs {
 		if ID == userID {
 			return true
+		}
+	}
+	return false
+}
+
+func projectsIntersect(ctx context.Context, team storage.Team) bool {
+	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
+	if err != nil {
+		return false
+	}
+
+	if len(projectsFilter) == 0 {
+		return true
+	}
+
+	teamProjects := team.Projects
+	if len(teamProjects) == 0 {
+		teamProjects = []string{"(unassigned)"}
+	}
+
+	for _, projectFilter := range projectsFilter {
+		for _, project := range teamProjects {
+			if projectFilter == project {
+				return true
+			}
 		}
 	}
 	return false
