@@ -4,7 +4,7 @@ paths = [
   "components/automate-scaffolding/*",
   "lib/scaffolding/*"
 ]
-        
+
 [automate-scaffolding-go]
 plan_path = "components/automate-scaffolding-go"
 paths = [
@@ -15,8 +15,7 @@ paths = [
 # GENERATED_HAB_PACKAGE_CONFIG_START
 # The following habitat package configuration is auto-generated
 # To update this content run:
-#     go run ./tools/expeditor-config-gen
-
+#     go run ./tools/bldr-config-gen
 [automate-platform-tools]
 plan_path = "components/automate-platform-tools"
 paths = [
@@ -43,15 +42,27 @@ paths = [
 
 [backup-gateway]
 plan_path = "components/backup-gateway"
+paths = [
+  "components/backup-gateway/*"
+]
 
 [automate-elasticsearch]
 plan_path = "components/automate-elasticsearch"
+paths = [
+  "components/automate-elasticsearch/*"
+]
 
 [automate-postgresql]
 plan_path = "components/automate-postgresql"
+paths = [
+  "components/automate-postgresql/*"
+]
 
 [automate-debug]
 plan_path = "components/automate-debug"
+paths = [
+  "components/automate-debug/*"
+]
 
 [authn-service]
 plan_path = "components/authn-service"
@@ -115,6 +126,9 @@ paths = [
 
 [automate-dex]
 plan_path = "components/automate-dex"
+paths = [
+  "components/automate-dex/*"
+]
 
 [event-gateway]
 plan_path = "components/event-gateway"
@@ -215,12 +229,18 @@ paths = [
 
 [automate-load-balancer]
 plan_path = "components/automate-load-balancer"
+paths = [
+  "components/automate-load-balancer/*"
+]
 
 [automate-prometheus]
 plan_path = "components/automate-prometheus"
+paths = [
+  "components/automate-prometheus/*"
+]
 
 [compliance-service]
-plan_path = "onents/compliance-service"
+plan_path = "components/compliance-service"
 paths = [
   "components/compliance-service/*",
   "api/config/platform/*",
@@ -254,11 +274,11 @@ paths = [
   "lib/tracing/*",
   "lib/uuid4/*",
   "lib/version/*",
-  "Gopkg.lock",
+  "Gopkg.lock"
 ]
 
 [config-mgmt-service]
-plan_path = "nents/config-mgmt-service"
+plan_path = "components/config-mgmt-service"
 paths = [
   "components/config-mgmt-service/*",
   "api/external/cfgmgmt/*",
@@ -278,7 +298,7 @@ paths = [
 ]
 
 [data-lifecycle-service]
-plan_path = "ts/data-lifecycle-service"
+plan_path = "components/data-lifecycle-service"
 paths = [
   "components/data-lifecycle-service/*",
   "api/interservice/data_lifecycle/*",
@@ -296,7 +316,7 @@ paths = [
 ]
 
 [automate-cli]
-plan_path = ": components/automate-cli"
+plan_path = "components/automate-cli"
 paths = [
   "components/automate-cli/*",
   "api/config/applications/*",
@@ -364,7 +384,7 @@ paths = [
 ]
 
 [deployment-service]
-plan_path = "onents/automate-deployment"
+plan_path = "components/automate-deployment"
 paths = [
   "components/automate-deployment/*",
   "api/config/applications/*",
@@ -443,7 +463,7 @@ paths = [
 ]
 
 [es-sidecar-service]
-plan_path = "onents/es-sidecar-service"
+plan_path = "components/es-sidecar-service"
 paths = [
   "components/es-sidecar-service/*",
   "api/interservice/es_sidecar/*",
@@ -460,10 +480,13 @@ paths = [
 ]
 
 [automate-es-gateway]
-plan_path = "nents/automate-es-gateway"
+plan_path = "components/automate-es-gateway"
+paths = [
+  "components/automate-es-gateway/*"
+]
 
 [pg-sidecar-service]
-plan_path = "onents/pg-sidecar-service"
+plan_path = "components/pg-sidecar-service"
 paths = [
   "components/pg-sidecar-service/*",
   "api/config/platform/*",
@@ -485,10 +508,13 @@ paths = [
 ]
 
 [automate-pg-gateway]
-plan_path = "nents/automate-pg-gateway"
+plan_path = "components/automate-pg-gateway"
+paths = [
+  "components/automate-pg-gateway/*"
+]
 
 [event-service]
-plan_path = " components/event-service"
+plan_path = "components/event-service"
 paths = [
   "components/event-service/*",
   "api/external/ingest/*",
@@ -509,7 +535,7 @@ paths = [
 ]
 
 [applications-service]
-plan_path = "ents/applications-service"
+plan_path = "components/applications-service"
 paths = [
   "components/applications-service/*",
   "api/config/platform/*",
@@ -533,7 +559,7 @@ paths = [
 ]
 
 [nodemanager-service]
-plan_path = "nents/nodemanager-service"
+plan_path = "components/nodemanager-service"
 paths = [
   "components/nodemanager-service/*",
   "api/config/platform/*",
@@ -589,7 +615,7 @@ paths = [
 ]
 
 [license-control-service]
-plan_path = "/license-control-service"
+plan_path = "components/license-control-service"
 paths = [
   "components/license-control-service/*",
   "api/interservice/license_control/*",
@@ -713,9 +739,15 @@ paths = [
 
 [automate-cs-bookshelf]
 plan_path = "components/automate-cs-bookshelf"
+paths = [
+  "components/automate-cs-bookshelf/*"
+]
 
 [automate-cs-oc-bifrost]
 plan_path = "components/automate-cs-oc-bifrost"
+paths = [
+  "components/automate-cs-oc-bifrost/*"
+]
 
 [automate-cs-oc-erchef]
 plan_path = "components/automate-cs-oc-erchef"
@@ -734,10 +766,16 @@ paths = [
 ]
 
 [automate-workflow-nginx]
-plan_path = "/automate-workflow-nginx"
+plan_path = "components/automate-workflow-nginx"
+paths = [
+  "components/automate-workflow-nginx/*"
+]
 
 [automate-workflow-web]
 plan_path = "components/automate-workflow-web"
+paths = [
+  "components/automate-workflow-web/*"
+]
 
 [data-feed-service]
 plan_path = "components/data-feed-service"
@@ -761,7 +799,6 @@ paths = [
   "lib/version/*",
   "Gopkg.lock"
 ]
-
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
