@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
 	"github.com/chef/automate/components/automate-gateway/api/authz/policy"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
@@ -22,7 +22,7 @@ type client struct {
 }
 
 func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
-	req interface{}, _ *v2.Version,
+	req interface{}, _ v2.Version_VersionNumber,
 ) (context.Context, error) {
 	log := ctxlogrus.Extract(ctx)
 
@@ -75,7 +75,7 @@ func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
 			action, resource, subjects)
 	}
 
-	projects := []string{}
+	projects := []string{auth_context.AllProjectsKey}
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV1.String()), nil
 }
 

@@ -24,7 +24,7 @@ type client struct {
 // with incoming project headers, inject headers for downstream, etc.
 
 func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter []string,
-	req interface{}, version *authz.Version,
+	req interface{}, minor authz.Version_VersionNumber,
 ) (context.Context, error) {
 	log := ctxlogrus.Extract(ctx)
 	method, ok := grpc.Method(ctx)
@@ -54,12 +54,6 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 		"iam.version":   "iam_v2",
 	})
 
-	var projects []string
-
-	if version.Minor == authz.Version_V0 {
-		projects = []string{auth_context.AllProjectsKey}
-	}
-
 	// Note: if ANYTHING goes wrong, 403 is the error we return. This is done
 	// on purpose, so our authz response doesn't leak information about what
 	// is happening internally.
@@ -83,7 +77,17 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 			action, resource, subjects)
 	}
 
-	if version.Minor == authz.Version_V1 {
+	var projects []string
+	// TODO drop
+	log.Infof("HEY! here's the minor version passed to v2 middleware: %s\n\n", minor)
+
+	if minor == authz.Version_V0 {
+		projects = []string{auth_context.AllProjectsKey}
+	}
+
+	// TODO drop
+	log.Infof("1. HEY! got your projects from headers here: %s\n\n", projectsToFilter)
+	if minor == authz.Version_V1 {
 		filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
 			Subjects:       subjects,
 			Resource:       resource,
@@ -106,6 +110,8 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 				action, resource, subjects, projectsToFilter)
 		}
 		projects = filteredResp.Projects
+		// TODO drop
+		log.Infof("2. HEY! got your projects filtered projects here: %s\n\n", projects)
 	}
 
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()), nil

@@ -73,7 +73,7 @@ type FilterProjectsResponse struct {
 }
 
 type GRPCAuthorizationHandler interface {
-	Handle(ctx context.Context, subjects []string, projects []string, req interface{}, version *v2.Version) (context.Context, error)
+	Handle(ctx context.Context, subjects []string, projects []string, req interface{}, minor v2.Version_VersionNumber) (context.Context, error)
 }
 
 type HTTPAuthorizationHandler interface {
@@ -153,12 +153,12 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 		projectHeaderEntries := md.Get(runtime.MetadataPrefix + "projects")
 		projects := getProjectsFromMetadata(projectHeaderEntries)
-		resp, err := a.policy.GetPolicyVersion(ctx, &v2.GetPolicyVersionReq{})
-		if err != nil {
-			log.Debugf("error fetching IAM version: %s", err)
-			return nil, err
-		}
-		ctx, err = a.authz.Handle(authCtx, subs, projects, req, resp.Version)
+
+		// pass minor version v0 by default - authorizer will determine correct minor version
+		// based on response from authz-service
+		// (this only works assuming we always pass through authorizer handle)
+		// TODO - this is bad, how can we set this to the right value once we know it?
+		ctx, err = a.authz.Handle(authCtx, subs, projects, req, v2.Version_V0)
 		if err != nil {
 			return nil, err
 		}
