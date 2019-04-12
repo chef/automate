@@ -186,11 +186,14 @@ func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) []strin
 }
 
 // InsertInspecSummaries ingests a number of summaries and at the end, refreshes the summary index
-func (s *Suite) InsertInspecSummaries(summaries []*relaxting.ESInSpecSummary) {
+func (s *Suite) InsertInspecSummaries(summaries []*relaxting.ESInSpecSummary) []string {
+	ids := make([]string, len(summaries))
+
 	endTime := time.Now()
 	// Insert summaries
-	for _, summary := range summaries {
+	for i, summary := range summaries {
 		id := newUUID()
+		ids[i] = id
 
 		err := s.ingesticESClient.InsertInspecSummary(context.Background(), id, endTime, summary)
 		if err != nil {
@@ -202,6 +205,8 @@ func (s *Suite) InsertInspecSummaries(summaries []*relaxting.ESInSpecSummary) {
 
 	// Refresh Indices
 	s.RefreshIndices(index)
+
+	return ids
 }
 
 // RefreshIndices will refresh the provided ES Index or list of Indices
