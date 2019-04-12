@@ -1998,7 +1998,11 @@ func (s *server) DeployID(ctx context.Context, d *api.DeployIDRequest) (*api.Dep
 func (s *server) acquireLock(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
-		return ctx.Err()
+		if ctx.Err() != nil {
+			return status.Errorf(codes.DeadlineExceeded,
+				"deadline exceeded waiting for deployment lock: %s", ctx.Err())
+		}
+		return nil
 	default:
 		s.deployment.Lock()
 		return nil

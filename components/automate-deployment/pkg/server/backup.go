@@ -32,7 +32,7 @@ func (s *server) CreateBackup(ctx context.Context, req *api.CreateBackupRequest)
 	err := s.acquireLock(ctx) // Unlocked by the backup runner
 	if err != nil {
 		logrus.WithError(err).Error("Failed to acquire lock")
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
 	sender := s.newEventSender()
@@ -103,7 +103,7 @@ func (s *server) DeleteBackups(ctx context.Context, req *api.DeleteBackupsReques
 	err := s.acquireLock(ctx) // unlocked by the backupRunner
 	if err != nil {
 		logrus.WithError(err).Error("Failed to acquire lock")
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
 	if err := s.backupRunner.DeleteBackups(ctx, s.deployment, req.GetBackups()); err != nil {
@@ -162,7 +162,7 @@ func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupReques
 	err = s.acquireLock(ctx)
 	if err != nil {
 		logrus.WithError(err).Error("Failed to acquire lock")
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
 	// This file should have already been written during the deployment-service
