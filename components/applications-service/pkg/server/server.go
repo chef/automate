@@ -136,18 +136,20 @@ func (app *ApplicationsServer) GetServicesBySG(
 		return new(applications.ServicesBySGRes), status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	// In the database we will never have ID=0 and zero is our default value in our
+	// protobuf definition, so if the service group id is zero it means that the user
+	// didn't specified and this parameter is required, so we will error
+	if request.GetServiceGroupId() == 0 {
+		return new(applications.ServicesBySGRes),
+			status.Error(codes.InvalidArgument, "Missing service_group_id parameter. [value > 0]")
+	}
+
 	var (
 		page, pageSize = params.GetPageParams(request.GetPagination())
-		filters        map[string][]string
-	)
-
-	// In the database we will never have ID=0 and zero is our default value in our
-	// protobuf definition, so if it is different it means that this value was specified
-	if request.GetServiceGroupId() != 0 {
-		filters = map[string][]string{
+		filters        = map[string][]string{
 			"service_group_id": []string{fmt.Sprint(request.GetServiceGroupId())},
 		}
-	}
+	)
 
 	services, err := app.storageClient.GetServices(sortField, sortAsc, page, pageSize, filters)
 	if err != nil {
