@@ -2,6 +2,7 @@ package authv1
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
 	"github.com/sirupsen/logrus"
@@ -10,7 +11,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
 	"github.com/chef/automate/components/automate-gateway/api/authz/policy"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
@@ -22,7 +22,7 @@ type client struct {
 }
 
 func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
-	req interface{}, _ v2.Version_VersionNumber,
+	req interface{},
 ) (context.Context, error) {
 	log := ctxlogrus.Extract(ctx)
 
@@ -77,6 +77,12 @@ func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
 
 	projects := []string{auth_context.AllProjectsKey}
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV1.String()), nil
+}
+
+func (c *client) HandleFiltering(ctx context.Context,
+	subjects []string, projects []string, req interface{}) (context.Context, error) {
+	fmt.Printf("HEY! this should really not be called: %s\n\n", projects)
+	return nil, nil
 }
 
 func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, action string,

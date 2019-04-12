@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log"
 	"net"
 	"strings"
 
@@ -202,28 +203,30 @@ func (v *versionSwitch) Interceptor(ctx context.Context,
 	}
 
 	v1Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Authorization/")
-	v2Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/")
+	v2Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/IsAuthorized")
+	v2BetaReq := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/ProjectsAuthorized")
 
-	// TODO is it possible to differentiate btwn a v2 and v2.1 request?
-	if v.version.Major == api_v2.Version_V2 && v1Req {
-		if v.version.Minor == api_v2.Version_V1 {
-			st := status.New(codes.FailedPrecondition, "authz-service set to v2.1")
-			st, err := st.WithDetails(&common.ErrorShouldUseV2_1{})
-			if err != nil {
-				return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
-			}
-			return nil, st.Err()
+	log.Printf("HEY! is this a v2BetaReq? %t \n\n", v2BetaReq)
+
+	if v.version.Major == api_v2.Version_V1 && (v2Req || v2BetaReq) {
+		st := status.New(codes.FailedPrecondition, "authz-service set to v1.0")
+		st, err := st.WithDetails(&common.ErrorShouldUseV1{})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
 		}
-		st := status.New(codes.FailedPrecondition, "authz-service set to v2")
+		return nil, st.Err()
+	}
+	if v.version.Major == api_v2.Version_V2 && (v1Req || v2BetaReq) {
+		st := status.New(codes.FailedPrecondition, "authz-service set to v2.0")
 		st, err := st.WithDetails(&common.ErrorShouldUseV2{})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
 		}
 		return nil, st.Err()
 	}
-	if v.version.Major == api_v2.Version_V1 && v2Req {
-		st := status.New(codes.FailedPrecondition, "authz-service set to v1")
-		st, err := st.WithDetails(&common.ErrorShouldUseV1{})
+	if v.version.Minor == api_v2.Version_V1 && (v1Req || v2Req) {
+		st := status.New(codes.FailedPrecondition, "authz-service set to v2.1")
+		st, err := st.WithDetails(&common.ErrorShouldUseV2_1{})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
 		}

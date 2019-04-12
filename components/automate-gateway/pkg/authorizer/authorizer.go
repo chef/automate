@@ -22,21 +22,46 @@ func NewAuthorizer(v1, v2 middleware.AuthorizationHandler) middleware.SwitchingA
 }
 
 func (a *state) Handle(ctx context.Context,
-	subjects []string, projects []string, req interface{}, minor v2.Version_VersionNumber) (context.Context, error) {
+	subjects []string, projects []string, req interface{}) (context.Context, error) {
 
-	// TODO drop
-	fmt.Printf("HEY! here's the minor version in authorizer: %s\n\n", minor)
-	newCtx, err := a.next.Handle(ctx, subjects, projects, req, minor)
+	newCtx, err := a.next.Handle(ctx, subjects, projects, req)
 	st := status.Convert(err)
-	versionSwitch, updatedMinor := a.fromStatus(st)
+	version := a.fromStatus(st)
 	switch st.Code() {
 	case codes.OK:
 		return newCtx, nil
 	case codes.FailedPrecondition:
-		if versionSwitch {
-			// TODO drop
-			fmt.Printf("HEY! here's the updated minor version in authorizer: %s\n\n", updatedMinor)
-			return a.Handle(ctx, subjects, projects, req, updatedMinor)
+		if version.Minor == v2.Version_V0 {
+			return a.Handle(ctx, subjects, projects, req)
+		}
+		if version.Minor == v2.Version_V1 {
+			return a.HandleFiltering(ctx, subjects, projects, req)
+		}
+		fallthrough
+	default: // any other error status
+		return ctx, err
+	}
+}
+
+func (a *state) HandleFiltering(ctx context.Context,
+	subjects []string, projects []string, req interface{}) (context.Context, error) {
+	fmt.Printf("HEY! uh what's happening with projects here: %s\n\n", projects)
+
+	fmt.Printf("HEY! what's next: %s\n\n", a.next)
+	newCtx, err := a.next.HandleFiltering(ctx, subjects, projects, req)
+	st := status.Convert(err)
+	version := a.fromStatus(st)
+	switch st.Code() {
+	case codes.OK:
+		return newCtx, nil
+	case codes.FailedPrecondition:
+		if version.Minor == v2.Version_V0 {
+			fmt.Printf("HEY! a.next.handle: %s\n\n", a.next)
+			return a.Handle(ctx, subjects, projects, req)
+		}
+		if version.Minor == v2.Version_V1 {
+			fmt.Printf("HEY! a.next.handleFiltering: %s\n\n", a.next)
+			return a.HandleFiltering(ctx, subjects, projects, req)
 		}
 		fallthrough
 	default: // any other error status
@@ -64,10 +89,10 @@ func (a *state) IsAuthorized(ctx context.Context, subjects []string,
 		}
 	}
 	st := status.Convert(err)
-	versionSwitch, _ := a.fromStatus(st)
+	version := a.fromStatus(st)
 	switch st.Code() {
 	case codes.FailedPrecondition:
-		if versionSwitch {
+		if version.Major != v2.Version_V0 {
 			return a.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2)
 		}
 		fallthrough
@@ -107,10 +132,11 @@ func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
 		}
 	}
 	st := status.Convert(err)
-	versionSwitch, _ := a.fromStatus(st)
+	version := a.fromStatus(st)
 	switch st.Code() {
 	case codes.FailedPrecondition:
-		if versionSwitch {
+		// if we need to change version
+		if version.Major != v2.Version_V0 {
 			return a.FilterAuthorizedPairs(ctx, subjects,
 				mapByResourceAndActionV1, mapByResourceAndActionV2,
 				methodsInfoV1, methodsInfoV2)
@@ -152,10 +178,10 @@ func (a *state) FilterAuthorizedProjects(ctx context.Context, subjects []string,
 		}
 	}
 	st := status.Convert(err)
-	versionSwitch, _ := a.fromStatus(st)
+	version := a.fromStatus(st)
 	switch st.Code() {
 	case codes.FailedPrecondition:
-		if versionSwitch {
+		if version.Major != v2.Version_V0 {
 			return a.FilterAuthorizedProjects(ctx, subjects,
 				mapByResourceAndActionV1, mapByResourceAndActionV2,
 				methodsInfoV1, methodsInfoV2)
@@ -183,20 +209,22 @@ func annotate(resp middleware.AuthorizationResponse, subjects []string, resource
 		subjects, action, resource)}
 }
 
-func (a *state) fromStatus(st *status.Status) (bool, v2.Version_VersionNumber) {
+func (a *state) fromStatus(st *status.Status) v2.Version {
 	for _, detail := range st.Details() {
 		if _, ok := detail.(*common.ErrorShouldUseV1); ok {
 			a.next = a.v1
-			return true, v2.Version_V0
+			return v2.Version{Major: v2.Version_V1, Minor: v2.Version_V0}
 		}
 		if _, ok := detail.(*common.ErrorShouldUseV2); ok {
 			a.next = a.v2
-			return true, v2.Version_V0
+			return v2.Version{Major: v2.Version_V2, Minor: v2.Version_V0}
 		}
 		if _, ok := detail.(*common.ErrorShouldUseV2_1); ok {
 			a.next = a.v2
-			return true, v2.Version_V1
+			return v2.Version{Major: v2.Version_V2, Minor: v2.Version_V1}
 		}
 	}
-	return false, v2.Version_V0
+	// this version doesn't exist
+	// we return this if the FailedPrecondition error does not require a version swithc
+	return v2.Version{Major: v2.Version_V0, Minor: v2.Version_V0}
 }

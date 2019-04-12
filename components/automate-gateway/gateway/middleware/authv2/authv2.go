@@ -23,8 +23,8 @@ type client struct {
 // Note(sr): The Handle method is V2-only code. We can do anything here -- deal
 // with incoming project headers, inject headers for downstream, etc.
 
-func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter []string,
-	req interface{}, minor authz.Version_VersionNumber,
+func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
+	req interface{},
 ) (context.Context, error) {
 	log := ctxlogrus.Extract(ctx)
 	method, ok := grpc.Method(ctx)
@@ -77,42 +77,71 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 			action, resource, subjects)
 	}
 
-	var projects []string
-	// TODO drop
-	log.Infof("HEY! here's the minor version passed to v2 middleware: %s\n\n", minor)
+	projects := []string{auth_context.AllProjectsKey}
+	log.Infof("HEY! on v2 we just pass: %s\n\n", projects)
 
-	if minor == authz.Version_V0 {
-		projects = []string{auth_context.AllProjectsKey}
+	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()), nil
+}
+
+func (c *client) HandleFiltering(ctx context.Context, subjects []string, projectsToFilter []string,
+	req interface{},
+) (context.Context, error) {
+	log := ctxlogrus.Extract(ctx)
+	method, ok := grpc.Method(ctx)
+	if !ok {
+		return nil, status.Error(codes.Internal, "cannot retrieve method info")
 	}
+
+	polInfo := policy.InfoForMethod(method, req)
+	if polInfo == nil {
+		log.Warnf("no v2 policy annotation for method %s", method)
+		return nil, status.Errorf(codes.Internal,
+			"missing policy info for method %q", method)
+	}
+
+	action, resource := polInfo.Action, polInfo.Resource
+	if action == "" || resource == "" {
+		log.Warnf("no v2 policy annotation for method %s", method)
+		return nil, status.Errorf(codes.Internal,
+			"missing policy info for method %q", method)
+	}
+
+	// We have policyInfo here, use it to determine authorization:
+	ctxlogrus.AddFields(ctx, logrus.Fields{
+		"auth.subjects": subjects,
+		"auth.resource": resource,
+		"auth.action":   action,
+		"iam.version":   "iam_v2.1",
+	})
+
+	var projects []string
 
 	// TODO drop
 	log.Infof("1. HEY! got your projects from headers here: %s\n\n", projectsToFilter)
-	if minor == authz.Version_V1 {
-		filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
-			Subjects:       subjects,
-			Resource:       resource,
-			Action:         action,
-			ProjectsFilter: projectsToFilter,
-		})
-		if err != nil {
-			if status.Convert(err).Code() == codes.FailedPrecondition {
-				return nil, err
-			}
-			log.WithError(err).Error("error authorizing request")
-			return nil, status.Errorf(codes.PermissionDenied,
-				"error authorizing action %q on resource %q for subjects %q filtered by project list %q: %s",
-				action, resource, subjects, projectsToFilter, err.Error())
+	filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
+		Subjects:       subjects,
+		Resource:       resource,
+		Action:         action,
+		ProjectsFilter: projectsToFilter,
+	})
+	if err != nil {
+		if status.Convert(err).Code() == codes.FailedPrecondition {
+			return nil, err
 		}
-		if len(filteredResp.Projects) == 0 {
-			return nil, status.Errorf(codes.PermissionDenied,
-				"unauthorized: subjects %q has no project access for action %q on resource %q "+
-					"(filtered by project list %q)",
-				action, resource, subjects, projectsToFilter)
-		}
-		projects = filteredResp.Projects
-		// TODO drop
-		log.Infof("2. HEY! got your projects filtered projects here: %s\n\n", projects)
+		log.WithError(err).Error("error authorizing request")
+		return nil, status.Errorf(codes.PermissionDenied,
+			"error authorizing action %q on resource %q for subjects %q filtered by project list %q: %s",
+			action, resource, subjects, projectsToFilter, err.Error())
 	}
+	if len(filteredResp.Projects) == 0 {
+		return nil, status.Errorf(codes.PermissionDenied,
+			"unauthorized: subjects %q has no project access for action %q on resource %q "+
+				"(filtered by project list %q)",
+			action, resource, subjects, projectsToFilter)
+	}
+	projects = filteredResp.Projects
+	// TODO drop
+	log.Infof("2. HEY! got your projects filtered projects here: %s\n\n", projects)
 
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()), nil
 }

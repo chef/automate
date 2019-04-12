@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authz/common"
-	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
@@ -19,8 +18,8 @@ import (
 
 func TestAuthorizerHandle(t *testing.T) {
 	ctx := context.Background()
-	args := func() (context.Context, []string, []string, interface{}, v2.Version_VersionNumber) {
-		return ctx, []string{"user:local:admin"}, []string{"project1"}, nil, v2.Version_V0
+	args := func() (context.Context, []string, []string, interface{}) {
+		return ctx, []string{"user:local:admin"}, []string{"project1"}, nil
 	}
 
 	t.Run("if first succeeds, doesn't call second", func(t *testing.T) {
@@ -129,7 +128,11 @@ type (
 	failure struct{ *status.Status }
 )
 
-func (*success) Handle(ctx context.Context, _ []string, _ []string, _ interface{}, _ v2.Version_VersionNumber) (context.Context, error) {
+func (*success) Handle(ctx context.Context, _ []string, _ []string, _ interface{}) (context.Context, error) {
+	return ctx, nil
+}
+
+func (*success) HandleFiltering(ctx context.Context, _ []string, _ []string, _ interface{}) (context.Context, error) {
 	return ctx, nil
 }
 
@@ -145,7 +148,11 @@ func (*success) FilterAuthorizedProjects(context.Context, []string, []*pairs.Pai
 	return nil, errors.New("not implemented")
 }
 
-func (f *failure) Handle(ctx context.Context, _ []string, _ []string, _ interface{}, _ v2.Version_VersionNumber) (context.Context, error) {
+func (f *failure) Handle(ctx context.Context, _ []string, _ []string, _ interface{}) (context.Context, error) {
+	return ctx, f.Err()
+}
+
+func (f *failure) HandleFiltering(ctx context.Context, _ []string, _ []string, _ interface{}) (context.Context, error) {
 	return ctx, f.Err()
 }
 
