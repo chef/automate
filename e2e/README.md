@@ -11,9 +11,6 @@ dev/acceptance environment and records the results in our [A2 Acceptance Testing
 
 ## Running Cypress Locally
 
-If you are developing Cypress tests, you'll want to open the Cypress app
-so you can watch the browser as the tests run. The Cypress tool is a great tool for debugging.
-
 First install cypress if you haven't before. Start at the root of `a2`.
 
 ```bash
@@ -21,15 +18,31 @@ cd e2e
 npm install
 ```
 
+Next set your environment variables. See "Working with Secrets" in
+dev-docs/DEV_ENVIRONMENT.md for details on setting up vault if you
+don't already have `../dev/secrets-env.sh`:
+
+```bash
+source ../dev/secrets-env.sh
+```
+
+Next, specify the Automate instance you wish to target.
+This could be dev or acceptance; typically start with your local box with this:
+
 ```bash
 export CYPRESS_BASE_URL=https://a2-dev.test
+```
+
+If you are developing Cypress tests, you'll want to open the Cypress app
+so you can watch the browser as the tests run. The Cypress tool is great for debugging.
+
+```bash
 npm run cypress:open
 ```
 
-If you'd like to only see test results, you can run the tests in the terminal with Cypress in the background.
+If you'd like to only get test results, you can run the tests in the terminal with Cypress in the background.
 
 ```bash
-export CYPRESS_BASE_URL=https://a2-dev.test
 npm run cypress:run
 ```
 
@@ -55,10 +68,10 @@ To do so, follow these steps.
 
 1. Set your environment variables. See "Working with Secrets" in
    dev-docs/DEV_ENVIRONMENT.md for details on setting up vault if you
-   don't already have `dev/secrets-env.sh`:
+   don't already have `../dev/secrets-env.sh`:
 
   ```bash
-  source dev/secrets-env.sh
+  source ../dev/secrets-env.sh
   export CHANNEL=acceptance # or dev
   ```
 

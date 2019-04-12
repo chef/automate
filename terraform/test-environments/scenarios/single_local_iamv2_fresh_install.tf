@@ -53,5 +53,5 @@ module "single_local_iamv2_fresh_install_deploy" {
   # Automate Install
   channel         = "${var.channel}"
   deployment_type = "local"
-  enable_iamv2    = "true"
+  iam_version     = "v2.1"
 }

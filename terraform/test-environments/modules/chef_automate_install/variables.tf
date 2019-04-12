@@ -106,9 +106,9 @@ variable "alb_fqdn" {
   default = ""
 }
 
-variable "enable_iamv2" {
-  default     = "false"
-  description = "Enable A2 IAMv2."
+variable "iam_version" {
+  default     = "v1"
+  description = "Enable major/minor versions of A2 IAM."
 }
 
 variable "enable_workflow" {
