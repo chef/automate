@@ -121,7 +121,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 
 					timestamp, err := ptypes.TimestampProto(item.EndTime)
 					if err != nil {
-						logrus.Errorf("%s time error: %s", myName, err.Error())
+						return nil, 0, errors.Wrapf(err, "%s time error: ", myName)
 					} else {
 						latestReport.EndTime = timestamp
 					}
@@ -136,8 +136,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 					} else if queryInfo.level == ProfileLevel || queryInfo.level == ControlLevel {
 						nodeControlSummary, status, err = getDeepControlsSums(hit, queryInfo)
 						if err != nil {
-							//todo - handle this
-							logrus.Errorf("%s time error: %s", myName, err.Error())
+							return nil, 0, errors.Wrapf(err, "%s unable to get control sums", myName)
 						}
 					}
 
@@ -146,7 +145,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 
 					nodes = append(nodes, &node)
 				} else {
-					logrus.Errorf("%s unmarshal error: %s", myName, err.Error())
+					return nil, 0, errors.Wrapf(err, "%s unmarshal error: ", myName)
 				}
 			}
 

@@ -844,11 +844,12 @@ func getProfileAndControlQuery(filters map[string][]string, profileBaseFscInclud
 	var profileIds string
 	var profileLevelFsc *elastic.FetchSourceContext
 	numberOfProfiles := len(filters["profile_id"])
+	numberOfControls := len(filters["control"])
 	if numberOfProfiles == 0 {
 		profileIds = ".*"
 	} else {
 		profileIds = strings.Join(filters["profile_id"], "|")
-		if numberOfProfiles == 1 {
+		if numberOfProfiles == 1 && numberOfControls <= 1 {
 			//we are deep and when that's the case, we know we want at least this stuff.
 			// if we don't have controls, we'll add even more to the profile level context (below)
 			profileLevelFsc = elastic.NewFetchSourceContext(true).
@@ -858,25 +859,37 @@ func getProfileAndControlQuery(filters map[string][]string, profileBaseFscInclud
 	profileBoolQuery := elastic.NewBoolQuery()
 	stringQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.sha256:/(%s)/", profileIds))
 	profileBoolQuery.Must(stringQuery)
+
+	var nestedQuery *elastic.NestedQuery
+	nestedQuery = elastic.NewNestedQuery("profiles", profileBoolQuery)
+
 	//add in the control query if it exists
-	if len(filters["control"]) > 0 {
+	if numberOfControls > 0 {
 		controlIds := strings.Join(filters["control"], "|")
 		var nestedControlQuery *elastic.NestedQuery
 
 		controlQuery := elastic.NewQueryStringQuery(fmt.Sprintf("profiles.controls.id:/(%s)/", controlIds))
 		nestedControlQuery = elastic.NewNestedQuery("profiles.controls", controlQuery)
-		fsc := elastic.NewFetchSourceContext(true).
-			Include(controlLevelFscIncludes...)
-		nestedControlQuery.InnerHit(elastic.NewInnerHit().FetchSourceContext(fsc))
+
+		if numberOfProfiles == 1 && numberOfControls == 1 {
+			//we are control deep and when that's the case, we know we want this stuff in fsc.
+			//we also know that we want to nest it so that we may use it for reports or node info
+			fsc := elastic.NewFetchSourceContext(true).
+				Include(controlLevelFscIncludes...)
+			nestedControlQuery.InnerHit(elastic.NewInnerHit().FetchSourceContext(fsc))
+		}
 
 		profileBoolQuery = profileBoolQuery.Must(nestedControlQuery)
 	} else if numberOfProfiles == 1 && profileLevelFsc != nil {
+		//we are profile deep and when that's the case, we know we want this stuff in fsc.
 		//for deep filtering, we only need to include profile level controls_sums and status at profile level,
 		// if we are filtering at profile level.. to include it when we are at control level would be inefficient
 		profileLevelFsc.Include(profileLevelFscIncludes...)
 	}
-	var nestedQuery *elastic.NestedQuery
-	nestedQuery = elastic.NewNestedQuery("profiles", profileBoolQuery)
-	nestedQuery.InnerHit(elastic.NewInnerHit().FetchSourceContext(profileLevelFsc))
+
+	//we are deep so lets add the fetch source context
+	if numberOfProfiles == 1 && numberOfControls <= 1 {
+		nestedQuery.InnerHit(elastic.NewInnerHit().FetchSourceContext(profileLevelFsc))
+	}
 	return nestedQuery
 }
