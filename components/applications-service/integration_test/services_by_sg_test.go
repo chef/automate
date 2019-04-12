@@ -86,6 +86,14 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 		&applications.ServicesBySGRes{
 			Services: []*applications.Service{
 				&applications.Service{
+					SupervisorId: "sup1",
+					Group:        "myapp.default",
+					Release:      "core/myapp/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_WARNING,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+				&applications.Service{
 					SupervisorId: "sup2",
 					Group:        "myapp.default",
 					Release:      "core/myapp/0.1.0/20190101121212",
@@ -99,14 +107,6 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Release:      "core/myapp/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
-				},
-				&applications.Service{
-					SupervisorId: "sup1",
-					Group:        "myapp.default",
-					Release:      "core/myapp/0.1.0/20190101121212",
-					Status:       applications.ServiceStatus_RUNNING,
-					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "",
 				},
 			},
@@ -122,19 +122,19 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Application:  a, Environment: e, Fqdn: "",
 				},
 				&applications.Service{
-					SupervisorId: "sup1",
-					Group:        "postgres.default",
-					Release:      "core/postgres/0.1.0/20190101121212",
-					Status:       applications.ServiceStatus_RUNNING,
-					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
-				},
-				&applications.Service{
 					SupervisorId: "sup2",
 					Group:        "postgres.default",
 					Release:      "core/postgres/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+				&applications.Service{
+					SupervisorId: "sup1",
+					Group:        "postgres.default",
+					Release:      "core/postgres/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
 				},
 			},
