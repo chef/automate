@@ -7,6 +7,7 @@ package integration_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
@@ -80,8 +81,10 @@ func TestGetServicesMultiService(t *testing.T) {
 	defer suite.DeleteDataFromStorage()
 
 	var (
-		ctx      = context.Background()
-		request  = &applications.ServicesReq{}
+		ctx     = context.Background()
+		request = &applications.ServicesReq{}
+		// The expected response should have the services ordered with the default
+		// health status order.  ["CRITICAL", "UNKNOWN", "WARNING", "OK"]
 		expected = &applications.ServicesRes{
 			Services: []*applications.Service{
 				&applications.Service{
@@ -123,6 +126,162 @@ func TestGetServicesMultiService(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServices(ctx, request)
 	assert.Nil(t, err)
 	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+}
+
+func TestGetServicesMultiServicaSortDESC(t *testing.T) {
+	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		ctx     = context.Background()
+		request = &applications.ServicesReq{
+			Sorting: &query.Sorting{
+				Field: "health",
+				Order: query.SortOrder_DESC,
+			},
+		}
+		// The expected response should have the services ordered by
+		// health status in descending order ["OK", "WARN", "UNKNOWN", "CRITICAL"]
+		expected = &applications.ServicesRes{
+			Services: []*applications.Service{
+				&applications.Service{
+					SupervisorId: "sup1",
+					Group:        "redis.default",
+					Release:      "core/redis/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_OK,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+				&applications.Service{
+					SupervisorId: "sup1",
+					Group:        "myapp.default",
+					Release:      "core/myapp/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_WARNING,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+				&applications.Service{
+					SupervisorId: "sup2",
+					Group:        "test.default",
+					Release:      "core/test/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_UNKNOWN,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+				&applications.Service{
+					SupervisorId: "sup1",
+					Group:        "postgres.default",
+					Release:      "core/postgres/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_CRITICAL,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+			},
+		}
+	)
+
+	response, err := suite.ApplicationsServer.GetServices(ctx, request)
+	assert.Nil(t, err)
+	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+}
+
+func TestGetServicesMultiServicaPagination(t *testing.T) {
+	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		ctx     = context.Background()
+		request = &applications.ServicesReq{
+			Pagination: &query.Pagination{
+				Page: 2,
+				Size: 1,
+			},
+		}
+		expected = &applications.ServicesRes{
+			Services: []*applications.Service{
+				&applications.Service{
+					SupervisorId: "sup2",
+					Group:        "test.default",
+					Release:      "core/test/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_UNKNOWN,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+			},
+		}
+	)
+
+	response, err := suite.ApplicationsServer.GetServices(ctx, request)
+	assert.Nil(t, err)
+	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+}
+
+func TestGetServicesMultiServicaPaginationAndSorting(t *testing.T) {
+	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		ctx     = context.Background()
+		request = &applications.ServicesReq{
+			Pagination: &query.Pagination{
+				Page: 2,
+				Size: 1,
+			},
+			Sorting: &query.Sorting{
+				Field: "health",
+				Order: query.SortOrder_DESC,
+			},
+		}
+		expected = &applications.ServicesRes{
+			Services: []*applications.Service{
+				&applications.Service{
+					SupervisorId: "sup1",
+					Group:        "myapp.default",
+					Release:      "core/myapp/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_WARNING,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+			},
+		}
+	)
+
+	response, err := suite.ApplicationsServer.GetServices(ctx, request)
+	assert.Nil(t, err)
+	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+}
+
+func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
+	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 4, len(sgList), "There should be four service_groups in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = fmt.Sprintf("%d", sgList[0].ID)
+			request = &applications.ServicesReq{
+				Filter: []string{"service_group_id:" + sgID},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup1",
+						Group:        "myapp.default",
+						Release:      "core/myapp/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_WARNING,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
 }
 
 func assertServicesEqual(t *testing.T, expected, actual []*applications.Service) {
