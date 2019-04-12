@@ -140,9 +140,9 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 
 func setupAuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
 	ctx := context.Background()
-	v2Chan := make(chan bool, 1)
+	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
-	ts := setupV2(t, eng, nil, &emptyV1List, v2Chan)
+	ts := setupV2(t, eng, nil, &emptyV1List, vChan)
 	_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
 	require.NoError(t, err)
 	return ctx, ts

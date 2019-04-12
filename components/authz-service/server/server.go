@@ -60,10 +60,10 @@ func NewGRPCServer(ctx context.Context,
 	dataMigrationsConfig datamigration.Config,
 	eventServiceAddress string) (*grpc.Server, error) {
 
-	// Note(sr): we're buffering one bool, as NewPostgresPolicyServer writes
+	// Note(sr): we're buffering one version struct, as NewPostgresPolicyServer writes
 	// to this before we've got readers
-	v2Chan := make(chan bool, 1)
-	switcher := NewSwitch(v2Chan)
+	vChan := make(chan api_v2.Version, 1)
+	switcher := NewSwitch(vChan)
 
 	v1Server, err := v1.NewPostgresServer(ctx, l, e, migrationsConfig)
 	if err != nil {
@@ -71,7 +71,7 @@ func NewGRPCServer(ctx context.Context,
 	}
 
 	v2PolServer, err := v2.NewPostgresPolicyServer(ctx, l, e, migrationsConfig,
-		dataMigrationsConfig, v1Server.Storage(), v2Chan)
+		dataMigrationsConfig, v1Server.Storage(), vChan)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 policy server")
 	}
@@ -142,16 +142,21 @@ func NewGRPCServer(ctx context.Context,
 }
 
 type versionSwitch struct {
-	v2 bool
+	version api_v2.Version
 }
 
-func NewSwitch(c chan bool) *versionSwitch {
-	x := versionSwitch{v2: false}
+func NewSwitch(c chan api_v2.Version) *versionSwitch {
+	x := versionSwitch{
+		version: api_v2.Version{
+			Major: api_v2.Version_V1,
+			Minor: api_v2.Version_V0,
+		},
+	}
 	go func() {
 		for {
 			select {
-			case b := <-c:
-				x.v2 = b
+			case v := <-c:
+				x.version = v
 			}
 		}
 	}()
@@ -198,7 +203,17 @@ func (v *versionSwitch) Interceptor(ctx context.Context,
 
 	v1Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Authorization/")
 	v2Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/")
-	if v.v2 && v1Req {
+
+	// TODO is it possible to differentiate btwn a v2 and v2.1 request?
+	if v.version.Major == api_v2.Version_V2 && v1Req {
+		if v.version.Minor == api_v2.Version_V1 {
+			st := status.New(codes.FailedPrecondition, "authz-service set to v2.1")
+			st, err := st.WithDetails(&common.ErrorShouldUseV2_1{})
+			if err != nil {
+				return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
+			}
+			return nil, st.Err()
+		}
 		st := status.New(codes.FailedPrecondition, "authz-service set to v2")
 		st, err := st.WithDetails(&common.ErrorShouldUseV2{})
 		if err != nil {
@@ -206,7 +221,7 @@ func (v *versionSwitch) Interceptor(ctx context.Context,
 		}
 		return nil, st.Err()
 	}
-	if !v.v2 && v2Req {
+	if v.version.Major == api_v2.Version_V1 && v2Req {
 		st := status.New(codes.FailedPrecondition, "authz-service set to v1")
 		st, err := st.WithDetails(&common.ErrorShouldUseV1{})
 		if err != nil {
