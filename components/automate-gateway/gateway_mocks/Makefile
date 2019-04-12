@@ -8,12 +8,6 @@ all: mock_authn/authenticate_mock.go \
 	mock_ingest/chef_ingest_mock.go \
 	mock_notifier/notifier_mock.go
 
-mock_authn/authenticate_mock.go: ../../../api/interservice/authn/authenticate.pb.go
-	mockgen -source $< -destination $@
-
-mock_authz/authz_mock.go: ../../../api/interservice/authz/authz.pb.go
-	mockgen -source $< -destination $@
-
 mock_cfgmgmt/cfgmgmt_mock.go: ../../../api/interservice/cfgmgmt/service/cfgmgmt.pb.go
 	mockgen -source $< -destination $@ -package mock_cfgmgmt
 

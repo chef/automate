@@ -6,10 +6,10 @@ import (
 
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
+	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
-	"github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_cfgmgmt"
 	mock_automate_feed "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_feed"
 	complFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	"github.com/golang/mock/gomock"
@@ -20,7 +20,7 @@ import (
 
 func TestEventTypeCountsAllEmpty(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventTypeCounts(
 		context.Background(),
@@ -51,7 +51,7 @@ func TestEventTypeCountsAllEmpty(t *testing.T) {
 func TestEventTypeCountsBothValues(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetEventTypeCounts(
 		context.Background(),
 		gomock.Any(),
@@ -125,7 +125,7 @@ func TestEventTypeCountsBothValues(t *testing.T) {
 
 func TestEventTypeCountsOneEmpty(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventTypeCounts(
 		context.Background(),
@@ -180,7 +180,7 @@ func TestEventTypeCountsOneEmpty(t *testing.T) {
 
 func TestEventTypeCountsConfigMgmtDown(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventTypeCounts(
 		context.Background(),
@@ -224,7 +224,7 @@ func TestEventTypeCountsConfigMgmtDown(t *testing.T) {
 
 func TestEventTypeCountsComplianceDown(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventTypeCounts(
 		context.Background(),
@@ -269,7 +269,7 @@ func TestEventTypeCountsComplianceDown(t *testing.T) {
 func TestEventTypeCountsAllSubServicesDown(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetEventTypeCounts(
 		context.Background(),
 		gomock.Any(),

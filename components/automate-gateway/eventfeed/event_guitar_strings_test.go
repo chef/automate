@@ -6,10 +6,10 @@ import (
 
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
+	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
-	"github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_cfgmgmt"
 	mock_automate_feed "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_feed"
 	complFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	"github.com/golang/mock/gomock"
@@ -24,7 +24,7 @@ func TestEventGuitarStringsNormal(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -109,7 +109,7 @@ func TestEventGuitarStringsNotEnoughEventsStrings(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -187,7 +187,7 @@ func TestEventGuitarStringsToManyEventsStrings(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -265,7 +265,7 @@ func TestEventGuitarStringsMergeOpenSlots(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -400,7 +400,7 @@ func TestEventGuitarStringsMergeMultipleEventTypesAndCounts(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -537,7 +537,7 @@ func TestEventGuitarStringsMergeBugAIA222(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -631,7 +631,7 @@ func TestEventGuitarStringsMissingString(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -705,7 +705,7 @@ func TestEventGuitarStringsDuplicateString1(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -779,7 +779,7 @@ func TestEventGuitarStringsDuplicateString2(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -853,7 +853,7 @@ func TestEventGuitarStringsConfigMgmtDown(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -943,7 +943,7 @@ func TestEventGuitarStringsComplianceDown(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -1033,7 +1033,7 @@ func TestEventGuitarStringsAllSubServicesDown(t *testing.T) {
 	var hoursBetween int32 = 6
 
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
 		context.Background(),
@@ -1080,7 +1080,7 @@ func TestEventGuitarStringsAllSubServicesDown(t *testing.T) {
 
 func TestEventGuitarStringsTimeZones(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
@@ -1117,7 +1117,7 @@ func TestEventGuitarStringsTimeZones(t *testing.T) {
 
 func TestEventGuitarStringsStartAndEnd(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
@@ -1202,7 +1202,7 @@ func TestEventGuitarStringsStartAndEnd(t *testing.T) {
 
 func TestEventGuitarStringsHoursBetween(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)

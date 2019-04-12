@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -280,7 +281,10 @@ func createAuthzProjectsClient(connectionFactory *secureconn.Factory,
 	if authzEndpoint == "" || authzEndpoint == ":0" {
 		if os.Getenv("RUN_MODE") == "test" {
 			logrus.Infof("using mock ProjectsClient")
-			return &ProjectsClientMock{}
+			mockProjectsClient := iam_v2.NewMockProjectsClient(gomock.NewController(nil))
+			mockProjectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Return(
+				&iam_v2.ProjectCollectionRulesResp{}, nil)
+			return mockProjectsClient
 		}
 		logrus.Fatal("authzEndpoint cannot be empty or Dial will get stuck")
 	}
@@ -588,53 +592,6 @@ func (conf *ServiceInfo) ProfileTarHandler(w http.ResponseWriter, r *http.Reques
 		w.Header().Set("Accept-Ranges", "bytes")
 		w.Write(data.GetData()) // nolint: errcheck
 	}
-}
-
-type ProjectsClientMock struct {
-}
-
-func (pm *ProjectsClientMock) UpdateProject(ctx context.Context, in *iam_v2.UpdateProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.UpdateProjectResp, error) {
-	return &iam_v2.UpdateProjectResp{}, nil
-}
-
-func (pm *ProjectsClientMock) CreateProject(ctx context.Context, in *iam_v2.CreateProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.CreateProjectResp, error) {
-	return &iam_v2.CreateProjectResp{}, nil
-}
-func (pm *ProjectsClientMock) GetProject(ctx context.Context, in *iam_v2.GetProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.GetProjectResp, error) {
-	return &iam_v2.GetProjectResp{}, nil
-}
-
-func (pm *ProjectsClientMock) DeleteProject(ctx context.Context, in *iam_v2.DeleteProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.DeleteProjectResp, error) {
-	return &iam_v2.DeleteProjectResp{}, nil
-}
-
-func (pm *ProjectsClientMock) ListProjects(ctx context.Context, in *iam_v2.ListProjectsReq,
-	opts ...grpc.CallOption) (*iam_v2.ListProjectsResp, error) {
-	return &iam_v2.ListProjectsResp{}, nil
-}
-
-func (pm *ProjectsClientMock) ListProjectRules(ctx context.Context, in *iam_v2.ListProjectRulesReq,
-	opts ...grpc.CallOption) (*iam_v2.ProjectCollectionRulesResp, error) {
-	return &iam_v2.ProjectCollectionRulesResp{}, nil
-}
-
-func (pm *ProjectsClientMock) GetProjectRules(ctx context.Context, in *iam_v2.GetProjectRulesReq,
-	opts ...grpc.CallOption) (*iam_v2.GetProjectRulesResp, error) {
-	return &iam_v2.GetProjectRulesResp{}, nil
-}
-
-func (pm *ProjectsClientMock) HandleEvent(ctx context.Context, in *event.EventMsg,
-	opts ...grpc.CallOption) (*event.EventResponse, error) {
-	return &event.EventResponse{}, nil
-}
-
-func (pm *ProjectsClientMock) ProjectUpdateStatus(ctx context.Context,
-	req *iam_v2.ProjectUpdateStatusReq, opts ...grpc.CallOption) (*iam_v2.ProjectUpdateStatusResp, error) {
-	return &iam_v2.ProjectUpdateStatusResp{}, nil
 }
 
 type NotifierMock struct {

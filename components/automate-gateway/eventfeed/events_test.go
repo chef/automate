@@ -10,9 +10,9 @@ import (
 
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
+	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
-	"github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_cfgmgmt"
 	mock_automate_feed "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_feed"
 	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	"github.com/golang/mock/gomock"
@@ -25,7 +25,7 @@ import (
 func TestEventFeedEmpty(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
 		context.Background(),
 		gomock.Any(),
@@ -59,7 +59,7 @@ func TestEventFeedEmpty(t *testing.T) {
 func TestEventFeedCollectEventFeedCollapseFalse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
 		context.Background(),
 		gomock.Any(),
@@ -95,7 +95,7 @@ func TestEventFeedCollectEventFeedCollapseNonoverlapping(t *testing.T) {
 	// Enable event grouping
 	request := &agReq.EventFilter{Collapse: true, PageSize: 1000}
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
 		context.Background(),
 		gomock.Any(),
@@ -142,7 +142,7 @@ func TestEventFeedCollectEventFeedCollapseOverlapping(t *testing.T) {
 	timestamp3, err := ptypes.TimestampProto(time3)
 	assert.Nil(t, err)
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
 		context.Background(),
 		gomock.Any(),
@@ -234,7 +234,7 @@ func TestEventFeedCollectEventFeedSortedSameDates(t *testing.T) {
 	timestamp1, err := ptypes.TimestampProto(time1)
 	assert.Nil(t, err)
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
 		context.Background(),
 		gomock.Any(),
@@ -330,7 +330,7 @@ func TestEventFeedCollectEventFeedLastFullPage(t *testing.T) {
 		Start:    now.AddDate(0, 0, -6).UnixNano() / int64(time.Millisecond),
 	}
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
 		context.Background(),
 		gomock.Any(),
@@ -459,7 +459,7 @@ func TestEventFeedCollectEventFeedLastHalfFullPage(t *testing.T) {
 	complianceTotalEvents := int64(45)
 	combinedTotalEvents := configMgmtTotalEvents + complianceTotalEvents
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
 		context.Background(),
 		gomock.Any(),
@@ -570,7 +570,7 @@ func TestEventFeedCollectEventFeedSameDatesNextFirstSecondPage(t *testing.T) {
 		Start:    now.AddDate(0, 0, -6).UnixNano() / int64(time.Millisecond),
 	}
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
 		context.Background(),
 		gomock.Any(),
@@ -679,7 +679,7 @@ func TestEventFeedCollectEventFeedSameDatesPreviousThirdToSecondPage(t *testing.
 		Start:    now.AddDate(0, 0, -6).UnixNano() / int64(time.Millisecond),
 	}
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(gomock.NewController(t))
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(gomock.NewController(t))
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
 		context.Background(),
 		gomock.Any(),
@@ -840,7 +840,7 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 			test.request, test.description), func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 
-			mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+			mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 			mockCfgMgmtClient.EXPECT().GetEventFeed(
 				context.Background(),
 				gomock.Any(),
