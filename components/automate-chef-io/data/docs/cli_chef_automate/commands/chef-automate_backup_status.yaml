@@ -1,21 +1,17 @@
-name: chef-automate backup delete
-synopsis: delete backups of Chef Automate
-usage: chef-automate backup delete ID [ID2 IDN...] [flags]
-description: |
-  Delete one or many backups of Chef Automate that match the space separated strings of backup IDs
+name: chef-automate backup status
+synopsis: show the Chef Automate backup runner status
+usage: chef-automate backup status [flags]
+description: Show the Chef Automate backup runner status
 options:
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for delete
+  usage: help for status
 - name: wait-timeout
   shorthand: t
-  default_value: "120"
+  default_value: "60"
   usage: |
     How long to wait for a operation to complete before raising an error
-- name: "yes"
-  default_value: "false"
-  usage: Agree to all prompts
 inherited_options:
 - name: debug
   shorthand: d

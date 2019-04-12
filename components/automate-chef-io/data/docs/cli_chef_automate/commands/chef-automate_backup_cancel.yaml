@@ -1,21 +1,18 @@
-name: chef-automate backup delete
-synopsis: delete backups of Chef Automate
-usage: chef-automate backup delete ID [ID2 IDN...] [flags]
+name: chef-automate backup cancel
+synopsis: cancel the running backup operation
+usage: chef-automate backup cancel [flags]
 description: |
-  Delete one or many backups of Chef Automate that match the space separated strings of backup IDs
+  Cancel the currently running backup create, delete, or restore operation
 options:
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for delete
+  usage: help for cancel
 - name: wait-timeout
   shorthand: t
-  default_value: "120"
+  default_value: "60"
   usage: |
     How long to wait for a operation to complete before raising an error
-- name: "yes"
-  default_value: "false"
-  usage: Agree to all prompts
 inherited_options:
 - name: debug
   shorthand: d
