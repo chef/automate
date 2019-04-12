@@ -771,6 +771,8 @@ pipelines:
       public: true
   - verify_private:
       description: Pull Request validation tests requiring access keys
+  - habitat/build:
+      description: Build the Habitat packages for Chef Automate
   - nightly:
       description: Nightly tests against master
       definition: .expeditor/nightly.pipeline.yml
