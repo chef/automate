@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	uuid "github.com/chef/automate/lib/uuid4"
+	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -138,7 +139,6 @@ func (s *SupSim) Run() error {
 	defer s.nc.Close()
 	// run loadgen loop
 
-	// TODO: use logger instead
 	log.WithFields(log.Fields{"name": s.Name, "index": s.Idx, "uuid": s.UUID.String()}).Info("starting supervisor")
 
 	// the ticker always waits its full time before publishing. Also we wish to
@@ -185,8 +185,6 @@ func (s *SupSim) PublishAll() error {
 		}).Debug("publishing messages")
 
 		err := s.nc.PublishHabService(msg)
-		// TODO NEXT
-		// message publishing stats
 		if err != nil {
 			s.Stats.FailedPublish()
 			return err
@@ -223,12 +221,15 @@ func (m *MessagePrototype) SetRelease() {
 	m.Release = now.Format("20060102150405")
 }
 
-func (m *MessagePrototype) ApplySvcTemplate(t ServiceTemplate) {
-	// TODO: make this safer
+func (m *MessagePrototype) ApplySvcTemplate(t ServiceTemplate) error {
 	parts := strings.Split(t.Package, "/")
+	if len(parts) != 2 {
+		return errors.Errorf("failed to parse package name %q into origin/package components", t.Package)
+	}
 	m.Origin = parts[0]
 	m.PkgName = parts[1]
 	m.Application = t.Application
+	return nil
 }
 
 func (m *MessagePrototype) ApplySupCfg(s SupervisorCfg) {

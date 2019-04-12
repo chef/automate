@@ -11,11 +11,15 @@ type LoadProfileCfg struct {
 	GeneratorCfg GeneratorCfg `toml:"generator"`
 }
 
-func (l *LoadProfileCfg) BuildRunner() *LoadGenRunner {
-	return &LoadGenRunner{SupervisorGroups: l.BuildSupervisorGroups()}
+func (l *LoadProfileCfg) BuildRunner() (*LoadGenRunner, error) {
+	groups, err := l.BuildSupervisorGroups()
+	if err != nil {
+		return nil, err
+	}
+	return &LoadGenRunner{SupervisorGroups: groups}, nil
 }
 
-func (l *LoadProfileCfg) BuildSupervisorGroups() []*SupervisorGroup {
+func (l *LoadProfileCfg) BuildSupervisorGroups() ([]*SupervisorGroup, error) {
 	groups := []*SupervisorGroup{}
 
 	for _, supCfg := range l.GeneratorCfg.Supervisors {
@@ -27,14 +31,17 @@ func (l *LoadProfileCfg) BuildSupervisorGroups() []*SupervisorGroup {
 		for _, svcT := range supT.ServiceTemplates {
 			var m MessagePrototype
 			m.SetRelease()
-			m.ApplySvcTemplate(svcT)
+			err := m.ApplySvcTemplate(svcT)
+			if err != nil {
+				return nil, err
+			}
 			m.ApplySupCfg(supCfg)
 			group.MessagePrototypes = append(group.MessagePrototypes, &m)
 		}
 
 		groups = append(groups, &group)
 	}
-	return groups
+	return groups, nil
 }
 
 // [templates]
