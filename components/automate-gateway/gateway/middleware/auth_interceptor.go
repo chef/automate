@@ -19,7 +19,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/service_authn"
@@ -35,9 +34,8 @@ import (
 func NewAuthInterceptor(
 	authn authn.AuthenticationClient,
 	authz GRPCAuthorizationHandler,
-	policy v2.PoliciesClient,
 ) AuthorizationInterceptor {
-	return &authInterceptor{authn: authn, authz: authz, policy: policy}
+	return &authInterceptor{authn: authn, authz: authz}
 }
 
 type SwitchingAuthorizationHandler interface {
@@ -73,7 +71,8 @@ type FilterProjectsResponse struct {
 }
 
 type GRPCAuthorizationHandler interface {
-	Handle(ctx context.Context, subjects []string, projects []string, req interface{}, minor v2.Version_VersionNumber) (context.Context, error)
+	Handle(ctx context.Context, subjects []string, projects []string, req interface{}) (context.Context, error)
+	HandleFiltering(ctx context.Context, subjects []string, projects []string, req interface{}) (context.Context, error)
 }
 
 type HTTPAuthorizationHandler interface {
@@ -100,9 +99,8 @@ type AnnotatedAuthorizationResponse interface {
 }
 
 type authInterceptor struct {
-	authn  authn.AuthenticationClient
-	authz  GRPCAuthorizationHandler
-	policy v2.PoliciesClient
+	authn authn.AuthenticationClient
+	authz GRPCAuthorizationHandler
 }
 
 // UnaryInterceptor returns a grpc UnaryServerInterceptor that performs AuthN/Z.
@@ -154,11 +152,7 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 		projectHeaderEntries := md.Get(runtime.MetadataPrefix + "projects")
 		projects := getProjectsFromMetadata(projectHeaderEntries)
 
-		// pass minor version v0 by default - authorizer will determine correct minor version
-		// based on response from authz-service
-		// (this only works assuming we always pass through authorizer handle)
-		// TODO - this is bad, how can we set this to the right value once we know it?
-		ctx, err = a.authz.Handle(authCtx, subs, projects, req, v2.Version_V0)
+		ctx, err = a.authz.Handle(authCtx, subs, projects, req)
 		if err != nil {
 			return nil, err
 		}
