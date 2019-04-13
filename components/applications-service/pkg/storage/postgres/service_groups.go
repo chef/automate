@@ -219,6 +219,17 @@ func (db *postgres) GetServiceGroupsHealthCounts() (*storage.HealthCounts, error
 	return &sgHealthCounts, nil
 }
 
+// ServiceGroupExists returns the name of the service group if it exists
+func (db *postgres) ServiceGroupExists(id string) (string, bool) {
+	var sg serviceGroup
+	err := db.SelectOne(&sg, "SELECT * FROM service_group WHERE id = $1", id)
+	if err != nil {
+		return "", false
+	}
+
+	return sg.Name, true
+}
+
 func queryFromStatusFilter(text string) (string, error) {
 	// Make sure that we always have uppercase text
 	switch strings.ToUpper(text) {

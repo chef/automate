@@ -146,10 +146,17 @@ func (app *ApplicationsServer) GetServicesBySG(
 
 	var (
 		page, pageSize = params.GetPageParams(request.GetPagination())
+		sgStringID     = fmt.Sprint(request.GetServiceGroupId())
 		filters        = map[string][]string{
-			"service_group_id": []string{fmt.Sprint(request.GetServiceGroupId())},
+			"service_group_id": []string{sgStringID},
 		}
 	)
+
+	// Verify if the service group exists
+	sgName, sgExist := app.storageClient.ServiceGroupExists(sgStringID)
+	if !sgExist {
+		return new(applications.ServicesBySGRes), status.Error(codes.NotFound, "service-group not found")
+	}
 
 	services, err := app.storageClient.GetServices(sortField, sortAsc, page, pageSize, filters)
 	if err != nil {
@@ -157,17 +164,13 @@ func (app *ApplicationsServer) GetServicesBySG(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if len(services) == 0 {
-		return new(applications.ServicesBySGRes), nil
-	}
-
 	return &applications.ServicesBySGRes{
-		// TODO: should we make a backend call to get the actual name from the database
-		Group:    services[0].Group,
+		Group:    sgName,
 		Services: convertStorageServicesToApplicationsServices(services),
 	}, nil
 }
 
+// GetServices returns a list of services
 func (app *ApplicationsServer) GetServices(
 	c context.Context, request *applications.ServicesReq,
 ) (*applications.ServicesRes, error) {

@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetServicesBySGRequestMustHaveAServiceGroupID(t *testing.T) {
+func TestGetServicesBySGErrorRequestMustHaveAServiceGroupID(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServicesBySGReq)
@@ -28,6 +28,23 @@ func TestGetServicesBySGRequestMustHaveAServiceGroupID(t *testing.T) {
 		assert.Contains(t, err.Error(), "Missing service_group_id parameter.")
 	}
 
+	assert.Equal(t, expected, response)
+}
+
+func TestGetServicesBySGErrorServiceGroupNotFound(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServicesBySGReq{
+			ServiceGroupId: 999,
+		}
+		expected = new(applications.ServicesBySGRes)
+	)
+	response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+	if assert.NotNil(t, err,
+		"if the service_group_id is not found, it should return an error") {
+		assert.Contains(t, err.Error(), "NotFound")
+		assert.Contains(t, err.Error(), "service-group not found")
+	}
 	assert.Equal(t, expected, response)
 }
 

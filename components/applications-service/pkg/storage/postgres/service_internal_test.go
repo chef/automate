@@ -85,12 +85,13 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "with invalid filters with multiple values returns an error",
 			filters: map[string][]string{
-				"not-awesome":      []string{"c", "o", "o", "l"},
 				"not-valid-filter": []string{"value"},
+				"not-awesome":      []string{"c", "o", "o", "l"},
+				"more":             []string{"not", "valid", "filters"},
 			},
 			expected:          noWhereConstraints,
 			shouldReturnError: true,
-			errMsg:            "invalid filter. (not-awesome:[c o o l])",
+			errMsg:            "invalid filter.",
 		},
 		{
 			message: "with valid and invalid filters returns an error",

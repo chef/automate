@@ -9,11 +9,13 @@ import (
 type Client interface {
 	// @param (event)
 	IngestHabEvent(*applications.HabService) error
-	GetServiceGroupsHealthCounts() (*HealthCounts, error)
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServices(string, bool, int32, int32, map[string][]string) ([]*Service, error)
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServiceGroups(string, bool, int32, int32, map[string][]string) ([]*ServiceGroupDisplay, error)
+	// @param (id)
+	ServiceGroupExists(string) (string, bool)
+	GetServiceGroupsHealthCounts() (*HealthCounts, error)
 
 	// Used by our Integration Tests
 	EmptyStorage() error
