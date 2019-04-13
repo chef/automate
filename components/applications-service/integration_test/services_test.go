@@ -216,6 +216,30 @@ func TestGetServicesMultiServicaPagination(t *testing.T) {
 	assertServicesEqual(t, expected.GetServices(), response.GetServices())
 }
 
+// TODO @afiune How do we handle OutOfRange pages???
+// Shouldn't we return an error here?
+func TestGetServicesMultiServicaPaginationOutOfRange(t *testing.T) {
+	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		ctx     = context.Background()
+		request = &applications.ServicesReq{
+			Pagination: &query.Pagination{
+				Page: 9,
+				Size: 1,
+			},
+		}
+		expected = &applications.ServicesRes{
+			Services: []*applications.Service{},
+		}
+	)
+
+	response, err := suite.ApplicationsServer.GetServices(ctx, request)
+	assert.Nil(t, err)
+	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+}
+
 func TestGetServicesMultiServicaPaginationAndSorting(t *testing.T) {
 	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
 	defer suite.DeleteDataFromStorage()
