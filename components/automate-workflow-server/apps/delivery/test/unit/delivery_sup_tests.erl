@@ -10,7 +10,6 @@ gather_routes_fixture_test_() ->
 gather_routes_should_aggregate_routes_from_registered_routers() ->
     hoax:expect(receive
                   jobs_routes:routes() -> [route13, route14];
-                  vis_routes:routes() -> [route15, route16];
                   auth_routes:routes() -> [route11, route12];
                   notification_routes:routes() -> [route9, route10];
                   scm_routes:routes() -> [route7, route8];
@@ -22,6 +21,6 @@ gather_routes_should_aggregate_routes_from_registered_routers() ->
     Result = delivery_sup:gather_routes(),
 
     ?assertEqual([route1, route2, route7, route8, route3, route4, route9,
-                  route10, route11, route12, route13, route14, route15,
-                  route16, route5, route6],
+                  route10, route11, route12, route13, route14,
+                  route5, route6],
                  Result).

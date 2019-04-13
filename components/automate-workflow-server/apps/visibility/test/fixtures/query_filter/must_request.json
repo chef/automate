@@ -1,9 +1,0 @@
-{
-    "filter": {
-        "must": [
-            {
-                "cookbooks": "cookbook_name"
-            }
-        ]
-    }
-}

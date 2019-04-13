@@ -57,13 +57,6 @@ overall_status([]) ->
 
 overall_status(#status_metadata{status=pong}, T) ->
     overall_status(T);
-overall_status(#status_metadata{service = <<"rabbitmq">>, status = not_running}, T) ->
-    case envy:get(insights, enabled, false, atom) of
-        true ->
-            fail;
-        false ->
-            overall_status(T)
-    end;
 overall_status(#status_metadata{status=not_running}, T) ->
     overall_status(T);
 overall_status(#status_metadata{status=_}, _) ->
@@ -72,7 +65,5 @@ overall_status(#status_metadata{status=_}, _) ->
 health_checks(DisasterRecoveryMode) ->
     [
      deliv_db_status:ping(DisasterRecoveryMode),
-     deliv_lsyncd_status:ping(DisasterRecoveryMode),
-     vis_elasticsearch_status:ping(),
-     insights_rabbitmq_status:ping()
+     deliv_lsyncd_status:ping(DisasterRecoveryMode)
     ].
