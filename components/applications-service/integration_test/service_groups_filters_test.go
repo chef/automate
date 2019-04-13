@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -148,7 +147,7 @@ func TestServiceGroupsFilterStatusWrongParameter(t *testing.T) {
 			Filter: []string{"status:not-valid-status"},
 		}
 		expected    = new(applications.ServiceGroups)
-		expectedErr = errors.New("invalid status filter 'not-valid-status'")
+		expectedErr = "invalid status filter 'not-valid-status'"
 	)
 
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
@@ -156,7 +155,7 @@ func TestServiceGroupsFilterStatusWrongParameter(t *testing.T) {
 
 	assert.NotNil(t, err)
 	if assert.Error(t, err) {
-		assert.Equal(t, expectedErr.Error(), err.Error())
+		assert.Contains(t, err.Error(), expectedErr)
 	}
 }
 
@@ -167,7 +166,7 @@ func TestServiceGroupsFilterWrongType(t *testing.T) {
 			Filter: []string{"foo:bar"},
 		}
 		expected    = new(applications.ServiceGroups)
-		expectedErr = errors.New("invalid filter. (foo:[bar])")
+		expectedErr = "invalid filter. (foo:[bar])"
 	)
 
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
@@ -175,6 +174,6 @@ func TestServiceGroupsFilterWrongType(t *testing.T) {
 
 	assert.NotNil(t, err)
 	if assert.Error(t, err) {
-		assert.Equal(t, expectedErr.Error(), err.Error())
+		assert.Contains(t, err.Error(), expectedErr)
 	}
 }

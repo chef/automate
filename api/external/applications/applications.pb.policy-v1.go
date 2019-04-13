@@ -12,6 +12,12 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroupsHealthCounts", "nodes", "list", "GET", "/beta/applications/service_groups_health_counts", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServices", "nodes", "list", "GET", "/beta/applications/services", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesBySG", "nodes", "list", "GET", "/beta/applications/service-groups/{service_group_id}", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetVersion", "service_info:version", "read", "GET", "/beta/applications/version", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
