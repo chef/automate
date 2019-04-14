@@ -3,7 +3,7 @@ require 'optparse'
 module ChefCliUnity
   # Class that sets up optparse with help and a nice standard for usage.
   #
-  # See automate-ctl/lib/runner/install/options.rb for a good
+  # See lib/runner/install/options.rb for a good
   # child class example.
   class Options
     attr_reader :options, :option_parser
@@ -42,7 +42,7 @@ module ChefCliUnity
       output = ""
       output << "#{@description}\n\n" if @description
       output << "Usage:\n"
-      output << "  automate-ctl " + @usage_line + "\n\n"
+      output << "  workflow-ctl " + @usage_line + "\n\n"
 
       if @arguments
         output << "Arguments:\n"

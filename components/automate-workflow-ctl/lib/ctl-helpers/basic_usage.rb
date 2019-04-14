@@ -6,11 +6,11 @@ module CtlHelpers
   #
   # When using with omnibus-ctl, should remove leading args before passing in ARGV.
   # For example, your command "my-command" should receive ARGV like:
-  #   ARGV: [delivery /opt/delivery/embedded/service/omnibus-ctl my-command some args]
+  #   ARGV: [my-command some args]
   # But you should simply pass:
   #   args: [some args]
   # So, you probably wanna initalize this class like:
-  #   CtlHelpers::BasicUsage.new(ARGV[3..-1], "my-command", "Optional description.")
+  #   CtlHelpers::BasicUsage.new(ARGV[1..-1], "my-command", "Optional description.")
   class BasicUsage
 
     include CtlHelpers::ColorPrinter

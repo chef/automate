@@ -101,7 +101,7 @@ module CtlHelpers
     def puts_usage(usage_line, description=nil)
       puts "#{description}\n\n" if description
       puts "Usage: "
-      puts "   automate-ctl " + usage_line
+      puts "   workflow-ctl " + usage_line
     end
 
     private
