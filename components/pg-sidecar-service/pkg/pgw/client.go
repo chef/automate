@@ -257,7 +257,11 @@ func (client *Client) CreateDB(db, role string) error {
 		return err
 	}
 
-	if !exists {
+	if exists {
+		log.Info("Database exists. Asserting correct owner")
+		client.DB.AlterDatabaseOwner(db, role)
+	} else {
+		log.Info("Creating database with owner")
 		err = client.DB.CreateDatabaseWithOwner(db, role)
 		if err != nil {
 			log.WithError(err).Error("failed to create database")
@@ -270,6 +274,31 @@ func (client *Client) CreateDB(db, role string) error {
 		return err
 	}
 
+	chownClient, err := NewClient(
+		WithDb(db),
+		WithPlatformConfig(client.platformConfig),
+	)
+	defer chownClient.Close() // nolint: errcheck
+
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"error": err,
+			"db":    db,
+		}).Error("failed to connect to database")
+
+		return err
+	}
+
+	if err := chownClient.SetPublicSchemaRole(role); err != nil {
+		log.WithFields(logrus.Fields{
+			"error":  err,
+			"schema": "public",
+			"db":     db,
+			"role":   role,
+		}).Error("failed to chown objects in schema")
+
+		return err
+	}
 	log.Info("created database")
 	return nil
 }
@@ -701,10 +730,13 @@ func (client *Client) grantAllOnSchema(role, schema string) error {
 	return client.DB.ExecStatement(query)
 }
 
-func (client *Client) chownAllInSchema(role, schema string) error {
+func renderChownAllInSchemaQuery(role, schema string) string {
 	quotedSchemaName := pg.QuoteLiteral(schema)
 	quotedOwner := pg.QuoteLiteral(role)
-	query := fmt.Sprintf(chownAllInSchemaQuery, quotedSchemaName, quotedOwner)
+	return fmt.Sprintf(chownAllInSchemaQuery, quotedSchemaName, quotedOwner)
+}
+func (client *Client) chownAllInSchema(role, schema string) error {
+	query := renderChownAllInSchemaQuery(role, schema)
 	return client.DB.ExecStatement(query)
 }
 

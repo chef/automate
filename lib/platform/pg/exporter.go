@@ -18,20 +18,25 @@ import (
 // harness replaces this with a stub.
 var PGDumpCmd = []string{"hab", "pkg", "exec", "chef/automate-postgresql", "pg_dump"}
 
+// PGRestoreCmd is the command we will run for pg_restore.
+var PGRestoreCmd = []string{"hab", "pkg", "exec", "chef/automate-postgresql", "pg_restore"}
+
 // PSQLCmd is the command we will run for psql.
 var PSQLCmd = []string{"hab", "pkg", "exec", "chef/automate-postgresql", "psql"}
 
 // DatabaseExporter knows how to export and import a database. See
 // Export and Import for further details.
 type DatabaseExporter struct {
-	DataDir        string
-	Name           string
-	User           string
-	IncludedTables []string
-	ExcludedTables []string
-	ConnInfo       ConnInfo
-	CmdExecutor    command.Executor
-	Timeout        time.Duration
+	DataDir           string
+	Name              string
+	User              string
+	IncludedTables    []string
+	ExcludedTables    []string
+	ConnInfo          ConnInfo
+	CmdExecutor       command.Executor
+	Timeout           time.Duration
+	DisableRoleCreate bool
+	UseCustomFormat   bool
 
 	Stdout io.Writer
 	Stdin  io.Reader
@@ -84,6 +89,10 @@ func (db DatabaseExporter) Export() error {
 			"--no-owner")
 	}
 
+	if db.UseCustomFormat {
+		cmd = append(cmd, "-Fc")
+	}
+
 	for _, t := range db.IncludedTables {
 		cmd = append(cmd, "--table", t)
 	}
@@ -109,6 +118,9 @@ func (db DatabaseExporter) Export() error {
 }
 
 func (db DatabaseExporter) exportFilePath() string {
+	if db.UseCustomFormat {
+		return path.Join(db.DataDir, fmt.Sprintf("%s.fc", db.Name))
+	}
 	return path.Join(db.DataDir, fmt.Sprintf("%s.sql", db.Name))
 }
 
@@ -149,7 +161,11 @@ func (db DatabaseExporter) Import(exitOnError bool) error {
 		return errors.Wrapf(err, "error creating database %q", db.Name)
 	}
 
-	err = db.restoreSQLFile(exitOnError)
+	if db.UseCustomFormat {
+		err = db.restoreCustomFile(exitOnError)
+	} else {
+		err = db.restoreSQLFile(exitOnError)
+	}
 	if err != nil {
 		return errors.Wrapf(err, "error importing database %q", db.Name)
 	}
@@ -173,12 +189,47 @@ func (db DatabaseExporter) restoreSQLFile(exitOnError bool) error {
 		psqlCmd = append(psqlCmd, "-v", "ON_ERROR_STOP=true")
 	}
 
+	psqlCmd = append(psqlCmd, db.ConnInfo.ConnURI(db.Name))
+
 	stderrBuff := new(strings.Builder)
 	err := db.CmdExecutor.Run(
 		psqlCmd[0],
 		append(db.ConnInfo.PsqlCmdOptions(),
 			command.Args(psqlCmd[1:]...),
-			command.Envvar("PGDATABASE", db.Name),
+			command.Stderr(stderrBuff),
+			command.Timeout(db.Timeout),
+			command.Stdin(db.Stdin))...)
+	if err != nil {
+		return errors.Wrapf(err, "failed to import SQL file from %q, stderr: %s", source, stderrBuff.String())
+	}
+	logrus.WithField("stderr", stderrBuff.String()).Debug("psql import complete")
+	return nil
+}
+
+func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
+	pgRestoreCmd := append(PGRestoreCmd, "-Fc", "-d", db.ConnInfo.ConnURI(db.Name))
+
+	if exitOnError {
+		pgRestoreCmd = append(pgRestoreCmd, "-e")
+	}
+
+	pgRestoreCmd = append(pgRestoreCmd, "--no-owner", "--no-acl")
+	if db.User != "" {
+		pgRestoreCmd = append(pgRestoreCmd, "--role", db.User)
+	}
+
+	source := "stdin"
+	if db.Stdin == nil {
+		source = db.exportFilePath()
+		pgRestoreCmd = append(
+			pgRestoreCmd, source)
+	}
+
+	stderrBuff := new(strings.Builder)
+	err := db.CmdExecutor.Run(
+		pgRestoreCmd[0],
+		append(db.ConnInfo.PsqlCmdOptions(),
+			command.Args(pgRestoreCmd[1:]...),
 			command.Stderr(stderrBuff),
 			command.Timeout(db.Timeout),
 			command.Stdin(db.Stdin))...)
@@ -190,6 +241,10 @@ func (db DatabaseExporter) restoreSQLFile(exitOnError bool) error {
 }
 
 func (db DatabaseExporter) maybeCreateUser() error {
+	if db.DisableRoleCreate {
+		return nil
+	}
+
 	if db.User == "" {
 		return nil
 	}
