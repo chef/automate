@@ -7,6 +7,7 @@ import (
 )
 
 var profileFile string
+var useDefaultProfile bool
 
 // RootCmd is the command runner.
 var RootCmd = &cobra.Command{
@@ -31,6 +32,12 @@ func init() {
 		"p",
 		"",
 		"file that configures the shape of the load to be generated",
+	)
+	RootCmd.PersistentFlags().BoolVar(
+		&useDefaultProfile,
+		"use-default-profile",
+		false,
+		"use simple builtin load profile",
 	)
 
 	RootCmd.AddCommand(newDescribeCmd())

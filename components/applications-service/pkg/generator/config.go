@@ -2,9 +2,21 @@ package generator
 
 import (
 	"time"
+
+	"github.com/burntsushi/toml"
+	"github.com/pkg/errors"
 )
 
 var now = time.Now()
+
+func ProfileFromFile(path string) (*LoadProfileCfg, error) {
+	var profileCfg LoadProfileCfg
+	_, err := toml.DecodeFile(path, &profileCfg)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Invalid load profile %q", path)
+	}
+	return &profileCfg, nil
+}
 
 type LoadProfileCfg struct {
 	Templates    Templates    `toml:"templates"`

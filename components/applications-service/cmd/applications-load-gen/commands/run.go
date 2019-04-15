@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/burntsushi/toml"
 	"github.com/chef/automate/components/applications-service/pkg/generator"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -44,7 +43,7 @@ func newRunCmd() *cobra.Command {
 }
 
 func runRunCmd(cmd *cobra.Command, args []string) error {
-	if profileFile == "" {
+	if profileFile == "" && !useDefaultProfile {
 		return errors.New("no profile filename given")
 	}
 
@@ -54,10 +53,15 @@ func runRunCmd(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Reading profile %q\n", profileFile)
 
-	var profileCfg generator.LoadProfileCfg
-	_, err := toml.DecodeFile(profileFile, &profileCfg)
+	var profileCfg *generator.LoadProfileCfg
+	var err error
+
+	if useDefaultProfile {
+		profileCfg, err = generator.BuiltinConfig()
+	} else {
+		profileCfg, err = generator.ProfileFromFile(profileFile)
+	}
 	if err != nil {
-		fmt.Printf("Invalid load profile\nError: %s\n", err)
 		return err
 	}
 
@@ -68,7 +72,10 @@ func runRunCmd(cmd *cobra.Command, args []string) error {
 		Verbosity: verbosity,
 	}
 
-	runner := profileCfg.BuildRunner()
+	runner, err := profileCfg.BuildRunner()
+	if err != nil {
+		return err
+	}
 	runner.Run(runnerCfg)
 	runtime.Goexit() // waits for all the other threads
 	return nil
