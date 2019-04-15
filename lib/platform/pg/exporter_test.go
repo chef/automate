@@ -1,6 +1,7 @@
 package pg_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -39,6 +40,19 @@ var testExpectedEnv = []string{
 	"PGSSLCERT=/hab/svc/automate-postgresql/config/server.crt",
 	"PGSSLROOTCERT=/hab/svc/automate-postgresql/config/root.crt"}
 
+var connInfo = &pg.A2ConnInfo{
+	Host:  "test-db.example.com",
+	User:  "test-user",
+	Port:  5432,
+	Certs: pg.A2SuperuserCerts,
+}
+
+var connURITemplate = "postgresql://test-user@test-db.example.com:5432/%s?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
+
+func connURI(dbName string) string {
+	return fmt.Sprintf(connURITemplate, dbName)
+}
+
 func TestExists(t *testing.T) {
 	setup := func() (*pg.MockDB, func()) {
 		provider, mockDB := NewDBMock()
@@ -49,13 +63,8 @@ func TestExists(t *testing.T) {
 	}
 
 	exporter := pg.DatabaseExporter{
-		Name: "test_database",
-		ConnInfo: &pg.A2ConnInfo{
-			Host:  "test-db.example.com",
-			User:  "test-user",
-			Port:  5432,
-			Certs: pg.A2SuperuserCerts,
-		},
+		Name:     "test_database",
+		ConnInfo: connInfo,
 	}
 
 	t.Run("it returns true if the underlying DB returns true", func(t *testing.T) {
@@ -81,20 +90,14 @@ func TestExport(t *testing.T) {
 	setup := func(t *testing.T) (pg.DatabaseExporter, *command.MockExecutor) {
 		mockExec := command.NewMockExecutor(t)
 		exporter := pg.DatabaseExporter{
-			Name: "test_database",
-			ConnInfo: &pg.A2ConnInfo{
-				Host:  "test-db.example.com",
-				User:  "test-user",
-				Port:  5432,
-				Certs: pg.A2SuperuserCerts,
-			},
+			Name:        "test_database",
+			ConnInfo:    connInfo,
 			CmdExecutor: mockExec,
 		}
 		return exporter, mockExec
 	}
 
-	connURI := "postgresql://test-user@test-db.example.com:5432/test_database?sslmode=verify-ca&sslcert=/hab/svc/automate-postgresql/config/server.crt" +
-		"&sslkey=/hab/svc/automate-postgresql/config/server.key&sslrootcert=/hab/svc/automate-postgresql/config/root.crt"
+	connURI := connURI("test_database")
 	stdArgs := []string{"pkg", "exec", "chef/automate-postgresql", "pg_dump", "--if-exists", "--verbose", "--clean", "--file", "test_database.sql", "--no-privileges", "--no-owner", connURI}
 
 	tests := []struct {
@@ -149,14 +152,9 @@ func TestImport(t *testing.T) {
 
 		mockExec := command.NewMockExecutor(t)
 		exporter := pg.DatabaseExporter{
-			Name:    "test_database",
-			DataDir: tmpDataDir,
-			ConnInfo: &pg.A2ConnInfo{
-				Host:  "test-db.example.com",
-				User:  "test-user",
-				Port:  5432,
-				Certs: pg.A2SuperuserCerts,
-			},
+			Name:        "test_database",
+			DataDir:     tmpDataDir,
+			ConnInfo:    connInfo,
 			CmdExecutor: mockExec,
 		}
 
@@ -184,9 +182,10 @@ func TestImport(t *testing.T) {
 		ioutil.WriteFile(exportFile, testExportContent, 0700)
 
 		mockExec.Expect("Run", command.ExpectedCommand{
-			Cmd:  "hab",
-			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true"},
-			Env:  append(testExpectedEnv, "PGDATABASE=test_database"),
+			Cmd: "hab",
+			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
+				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
+			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
 		}).Return(nil)
 
 		mockDB.On("DropDatabase", "test_database").Return(nil)
@@ -203,9 +202,10 @@ func TestImport(t *testing.T) {
 		ioutil.WriteFile(exportFile, testExportContent, 0700)
 
 		mockExec.Expect("Run", command.ExpectedCommand{
-			Cmd:  "hab",
-			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile},
-			Env:  append(testExpectedEnv, "PGDATABASE=test_database"),
+			Cmd: "hab",
+			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
+				connURI("test_database")},
+			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
 		}).Return(nil)
 
 		mockDB.On("DropDatabase", "test_database").Return(nil)
@@ -223,9 +223,10 @@ func TestImport(t *testing.T) {
 		ioutil.WriteFile(exportFile, testExportContent, 0700)
 
 		mockExec.Expect("Run", command.ExpectedCommand{
-			Cmd:  "hab",
-			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true"},
-			Env:  append(testExpectedEnv, "PGDATABASE=test_database"),
+			Cmd: "hab",
+			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
+				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
+			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
 		}).Return(nil)
 
 		mockDB.On("CreateRole", "testuser").Return(nil)
@@ -244,9 +245,10 @@ func TestImport(t *testing.T) {
 		ioutil.WriteFile(exportFile, testExportContent, 0700)
 
 		mockExec.Expect("Run", command.ExpectedCommand{
-			Cmd:  "hab",
-			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true"},
-			Env:  append(testExpectedEnv, "PGDATABASE=test_database"),
+			Cmd: "hab",
+			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
+				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
+			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
 		}).Return(nil)
 
 		mockDB.On("CreateRole", "testuser").Return(errors.New("test error"))
@@ -261,9 +263,10 @@ func TestImport(t *testing.T) {
 		ioutil.WriteFile(exportFile, testExportContent, 0700)
 
 		mockExec.Expect("Run", command.ExpectedCommand{
-			Cmd:  "hab",
-			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true"},
-			Env:  append(testExpectedEnv, "PGDATABASE=test_database"),
+			Cmd: "hab",
+			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true",
+				connURI("test_database")},
+			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
 		}).Return(nil)
 		mockDB.On("DropDatabase", "test_database").Return(errors.New("test error"))
 		err := exporter.Import(true)
@@ -277,9 +280,10 @@ func TestImport(t *testing.T) {
 		ioutil.WriteFile(exportFile, testExportContent, 0700)
 
 		mockExec.Expect("Run", command.ExpectedCommand{
-			Cmd:  "hab",
-			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true"},
-			Env:  append(testExpectedEnv, "PGDATABASE=test_database"),
+			Cmd: "hab",
+			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
+				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
+			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
 		}).Return(nil)
 		mockDB.On("DropDatabase", "test_database").Return(nil)
 		mockDB.On("CreateDatabase", "test_database").Return(errors.New("test error"))
@@ -295,9 +299,10 @@ func TestImport(t *testing.T) {
 		ioutil.WriteFile(exportFile, testExportContent, 0700)
 
 		mockExec.Expect("Run", command.ExpectedCommand{
-			Cmd:  "hab",
-			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true"},
-			Env:  append(testExpectedEnv, "PGDATABASE=test_database"),
+			Cmd: "hab",
+			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
+				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
+			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
 		}).Return(nil)
 		mockDB.On("CreateRole", "testuser").Return(nil)
 		mockDB.On("DropDatabase", "test_database").Return(nil)
@@ -313,9 +318,10 @@ func TestImport(t *testing.T) {
 		ioutil.WriteFile(exportFile, testExportContent, 0700)
 
 		mockExec.Expect("Run", command.ExpectedCommand{
-			Cmd:  "hab",
-			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true"},
-			Env:  append(testExpectedEnv, "PGDATABASE=test_database"),
+			Cmd: "hab",
+			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
+				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
+			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
 		}).Return(errors.New("test-error"))
 		mockDB.On("DropDatabase", "test_database").Return(nil)
 		mockDB.On("CreateDatabase", "test_database").Return(nil)
