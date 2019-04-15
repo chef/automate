@@ -208,7 +208,7 @@ func getSecretsAgg(ctx context.Context, secretIds []string, secretsClient secret
 		arrMap := make(map[string]string, 0)
 		s, err := secretsClient.Read(ctx, &secrets.Id{Id: id})
 		if err != nil {
-			logrus.Errorf("credential %s not found", id)
+			logrus.WithError(err).Errorf("could not read credential %q", id)
 			continue
 		}
 
