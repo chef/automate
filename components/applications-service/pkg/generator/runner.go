@@ -82,7 +82,7 @@ func (s *SupervisorGroup) PrettyStr() string {
 func (s *SupervisorGroup) Run(cfg *RunnerConfig, stats *RunnerStatsKeeper) {
 	for n := int32(0); n < s.Count; n++ {
 		log.WithFields(log.Fields{"name": s.Name, "index": n}).Info("spawning supervisor")
-		go s.SpawnSup(n, cfg, stats)
+		go s.SpawnSup(n, cfg, stats) // nolint: errcheck
 	}
 }
 
@@ -148,11 +148,11 @@ func (s *SupSim) Run() error {
 	// we get a random splay, publish once, then loop.
 	splay := rand.Int31n(int32(s.Cfg.Tick))
 	time.Sleep(time.Duration(splay) * time.Second)
-	s.PublishAll()
+	s.PublishAll() // nolint: errcheck
 
 	ticker := time.NewTicker(time.Duration(s.Cfg.Tick) * time.Second)
 	for _ = range ticker.C {
-		s.PublishAll()
+		s.PublishAll() // nolint: errcheck
 	}
 	return nil
 }
