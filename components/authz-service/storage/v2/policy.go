@@ -15,6 +15,7 @@ type Policy struct {
 	Members    []Member    `json:"members"`
 	Statements []Statement `json:"statements"`
 	Type       Type        `json:"type"`
+	Projects   []string    `json:"projects"`
 }
 
 // Scan implements pq Scan interface for an Policy reference
@@ -38,6 +39,7 @@ func NewPolicy(
 	typeVal Type,
 	members []Member,
 	statements []Statement,
+	projects []string,
 ) (Policy, error) {
 
 	if id == "" {
@@ -47,11 +49,17 @@ func NewPolicy(
 		return Policy{}, storage_errors.NewMissingFieldError("name")
 	}
 
+	err := ValidateProjects(projects)
+	if err != nil {
+		return Policy{}, err
+	}
+
 	return Policy{
 		ID:         id,
 		Name:       name,
 		Type:       typeVal,
 		Members:    members,
 		Statements: statements,
+		Projects:   projects,
 	}, nil
 }

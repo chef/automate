@@ -12,6 +12,7 @@ message CreatePolicyReq {
     string name = 2;
     repeated string members = 3;
     repeated Statement statements = 4;
+    repeated string projects = 5;
 }
 
 message DeletePolicyReq {
@@ -35,6 +36,7 @@ message UpdatePolicyReq {
     repeated string members = 2;
     repeated Statement statements = 3;
     string name = 8;
+    repeated string projects = 9;
 }
 
 message UpgradeToV2Req {

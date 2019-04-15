@@ -145,6 +145,7 @@ func (s *State) UpdatePolicy(_ context.Context, p *storage.Policy) (*storage.Pol
 	pol.Type = p.Type
 	pol.Members = p.Members
 	pol.Statements = p.Statements
+	pol.Projects = p.Projects
 
 	err := s.policies.Replace(p.ID, pol, cache.NoExpiration) // persist change
 	return pol, err
