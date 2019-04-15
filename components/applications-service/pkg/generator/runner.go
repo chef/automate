@@ -165,16 +165,7 @@ func (s *SupSim) PublishAll() error {
 
 	for _, m := range s.MessagePrototypes {
 
-		msg := &applications.HabService{
-			SupervisorId: s.UUID.String(),
-			Group:        "default",
-			PkgIdent: &applications.PackageIdent{
-				Origin:  m.Origin,
-				Name:    m.PkgName,
-				Version: "0.1.0",
-				Release: m.Release,
-			},
-		}
+		msg := m.CreateMessage(s.UUID.String())
 
 		log.WithFields(log.Fields{
 			"name":          s.Name,
@@ -236,6 +227,19 @@ func (m *MessagePrototype) ApplySupCfg(s SupervisorCfg) {
 	m.Environment = s.Environment
 	m.Channel = s.Channel
 	m.Site = s.Site
+}
+
+func (m *MessagePrototype) CreateMessage(uuid string) *applications.HabService {
+	return &applications.HabService{
+		SupervisorId: uuid,
+		Group:        "default",
+		PkgIdent: &applications.PackageIdent{
+			Origin:  m.Origin,
+			Name:    m.PkgName,
+			Version: "0.1.0",
+			Release: m.Release,
+		},
+	}
 }
 
 func (m *MessagePrototype) PrettyStr() string {
