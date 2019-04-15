@@ -1213,7 +1213,7 @@ func (d *DatabaseDumpOperationV2) Delete(backupCtx Context) error {
 	default:
 	}
 
-	objectPath := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.sql", d.Name))
+	objectPath := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.fc", d.Name))
 
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
