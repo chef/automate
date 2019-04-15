@@ -20,7 +20,7 @@ var (
 
 	// This suite variable will be available for every single test as long as they
 	// belong to the 'integration_test' package.
-	suite = NewSuite(elasticsearchUrl)
+	suite = NewGlobalSuite()
 
 	// The configuration file that the Manager config will use inside the test suite
 	cFile = "/tmp/.ingest-service.toml"

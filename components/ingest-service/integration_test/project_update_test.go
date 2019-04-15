@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	project_update_tags "github.com/chef/automate/lib/authz"
 	rules_tags "github.com/chef/automate/lib/authz"
+	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
@@ -1553,6 +1554,17 @@ func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 }
 
 func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
+	var lastEventSent *automate_event.EventMsg
+	localSuite := NewLocalSuite(t)
+	defer localSuite.GlobalTeardown()
+	localSuite.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
+		func(ctx context.Context, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
+			lastEventSent = in.Msg
+			return &automate_event.PublishResponse{}, nil
+		})
+	localSuite.projectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ProjectCollectionRulesResp{}, nil)
+
 	event := &automate_event.EventMsg{
 		EventID:   "lskdjflsdkfj",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
@@ -1568,13 +1580,12 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 		},
 	}
 
-	_, err := suite.EventHandlerServer.HandleEvent(context.Background(), event)
+	_, err := localSuite.EventHandlerServer.HandleEvent(context.Background(), event)
 	assert.NoError(t, err)
 
 	// Wait for job to complete
 	for {
 		time.Sleep(time.Millisecond * 100)
-		lastEventSent := suite.eventServiceClientMock.LastEventSent
 		assert.Equal(t, lastEventSent.Type.Name, automate_event_type.ProjectRulesUpdateStatus)
 		if lastEventSent.Type.Name != automate_event_type.ProjectRulesUpdateStatus {
 			assert.FailNow(t, "")
@@ -1587,7 +1598,16 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 }
 
 func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
-	suite.eventServiceClientMock.LastEventSent = nil
+	var lastEventSent *automate_event.EventMsg
+	localSuite := NewLocalSuite(t)
+	defer localSuite.GlobalTeardown()
+	localSuite.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
+		func(ctx context.Context, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
+			lastEventSent = in.Msg
+			return &automate_event.PublishResponse{}, nil
+		})
+	localSuite.projectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	event1 := &automate_event.EventMsg{
 		EventID:   "1",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
@@ -1603,10 +1623,9 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 		},
 	}
 
-	_, err := suite.EventHandlerServer.HandleEvent(context.Background(), event1)
+	_, err := localSuite.EventHandlerServer.HandleEvent(context.Background(), event1)
 	assert.NoError(t, err)
 
-	lastEventSent := suite.eventServiceClientMock.LastEventSent
 	assert.True(t, lastEventSent == nil ||
 		lastEventSent.Type.Name == automate_event_type.ProjectRulesUpdateStatus)
 
@@ -1625,10 +1644,9 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 		},
 	}
 
-	_, err = suite.EventHandlerServer.HandleEvent(context.Background(), event2)
+	_, err = localSuite.EventHandlerServer.HandleEvent(context.Background(), event2)
 	assert.NoError(t, err)
-	assert.NotNil(t, suite.eventServiceClientMock.LastEventSent)
-	lastEventSent = suite.eventServiceClientMock.LastEventSent
+	assert.NotNil(t, lastEventSent)
 	assert.Equal(t, automate_event_type.ProjectRulesUpdateFailed, lastEventSent.Type.Name)
 	assert.True(t, len(lastEventSent.Data.Fields["message"].GetStringValue()) > 0)
 
@@ -1637,7 +1655,6 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 	// Wait for job to complete
 	for {
 		time.Sleep(time.Millisecond * 100)
-		lastEventSent := suite.eventServiceClientMock.LastEventSent
 		if lastEventSent == nil || lastEventSent.Type.Name != automate_event_type.ProjectRulesUpdateStatus {
 			continue
 		}

@@ -227,7 +227,10 @@ func getEventConnection(connectionFactory *secureconn.Factory,
 	if eventEndpoint == "" || eventEndpoint == ":0" {
 		if os.Getenv("RUN_MODE") == "test" {
 			logrus.Infof("using mock Event service Client")
-			return &EventServiceClientMock{}
+			eventServiceClientMock := event.NewMockEventServiceClient(gomock.NewController(nil))
+			eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
+				&event.PublishResponse{}, nil)
+			return eventServiceClientMock
 		}
 		logrus.Fatalf("eventEndpoint cannot be empty or Dial will get stuck")
 	}
@@ -603,26 +606,6 @@ func (n *NotifierMock) Send(context.Context, *notifications.Event) {
 
 func (n *NotifierMock) QueueSize() int {
 	return 0
-}
-
-type EventServiceClientMock struct {
-}
-
-func (n *EventServiceClientMock) Publish(ctx context.Context, in *event.PublishRequest,
-	opts ...grpc.CallOption) (*event.PublishResponse, error) {
-	return &event.PublishResponse{}, nil
-}
-func (n *EventServiceClientMock) Subscribe(ctx context.Context, in *event.SubscribeRequest,
-	opts ...grpc.CallOption) (*event.SubscribeResponse, error) {
-	return &event.SubscribeResponse{}, nil
-}
-func (n *EventServiceClientMock) Start(ctx context.Context, in *event.StartRequest,
-	opts ...grpc.CallOption) (*event.StartResponse, error) {
-	return &event.StartResponse{}, nil
-}
-func (n *EventServiceClientMock) Stop(ctx context.Context, in *event.StopRequest,
-	opts ...grpc.CallOption) (*event.StopResponse, error) {
-	return &event.StopResponse{}, nil
 }
 
 type NodeManagerMock struct {

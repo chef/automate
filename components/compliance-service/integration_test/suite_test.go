@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"testing"
 	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
@@ -32,23 +33,23 @@ type Suite struct {
 	ProjectsClientMock     *iam_v2.MockProjectsClient
 	NodeManagerMock        *NodeManagerMock
 	NotifierMock           *NotifierMock
-	EventServiceClientMock *EventServiceClientMock
+	EventServiceClientMock *event.MockEventServiceClient
 }
 
 // Initialize the test suite
 //
 // This verifies the connectivity with Elasticsearch; if we couldn't
 // connect, we do not start the tests and print an error message
-func NewSuite(url string) *Suite {
+func NewGlobalSuite() *Suite {
 	s := new(Suite)
 
 	// Create a new elastic Client
 	esclient, err := elastic.NewClient(
-		elastic.SetURL(url),
+		elastic.SetURL(elasticsearchUrl),
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from %q: %s\n", url, err)
+		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
 		os.Exit(1)
 	}
 
@@ -61,7 +62,38 @@ func NewSuite(url string) *Suite {
 		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	s.NodeManagerMock = &NodeManagerMock{}
 	s.NotifierMock = &NotifierMock{}
-	s.EventServiceClientMock = &EventServiceClientMock{}
+	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
+	s.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&event.PublishResponse{}, nil)
+
+	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
+		s.NodeManagerMock, "", s.NotifierMock,
+		s.ProjectsClientMock, s.EventServiceClientMock)
+
+	return s
+}
+
+func NewLocalSuite(t *testing.T) *Suite {
+	s := new(Suite)
+
+	// Create a new elastic Client
+	esclient, err := elastic.NewClient(
+		elastic.SetURL(elasticsearchUrl),
+		elastic.SetSniff(false),
+	)
+	if err != nil {
+		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
+		os.Exit(1)
+	}
+
+	s.elasticClient = esclient
+	s.ingesticESClient = ingestic.NewESClient(esclient)
+	s.ingesticESClient.InitializeStore(context.Background())
+
+	s.ProjectsClientMock = iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	s.NodeManagerMock = &NodeManagerMock{}
+	s.NotifierMock = &NotifierMock{}
+	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
 
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, "", s.NotifierMock,
@@ -315,28 +347,6 @@ func (s *Suite) Indices() []string {
 	}
 
 	return indices
-}
-
-type EventServiceClientMock struct {
-	LastEventSent *event.EventMsg
-}
-
-func (n *EventServiceClientMock) Publish(ctx context.Context, in *event.PublishRequest,
-	opts ...grpc.CallOption) (*event.PublishResponse, error) {
-	n.LastEventSent = in.Msg
-	return &event.PublishResponse{}, nil
-}
-func (n *EventServiceClientMock) Subscribe(ctx context.Context, in *event.SubscribeRequest,
-	opts ...grpc.CallOption) (*event.SubscribeResponse, error) {
-	return &event.SubscribeResponse{}, nil
-}
-func (n *EventServiceClientMock) Start(ctx context.Context, in *event.StartRequest,
-	opts ...grpc.CallOption) (*event.StartResponse, error) {
-	return &event.StartResponse{}, nil
-}
-func (n *EventServiceClientMock) Stop(ctx context.Context, in *event.StopRequest,
-	opts ...grpc.CallOption) (*event.StopResponse, error) {
-	return &event.StopResponse{}, nil
 }
 
 type NotifierMock struct {

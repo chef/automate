@@ -13,6 +13,7 @@ import (
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	project_update_tags "github.com/chef/automate/lib/authz"
 	rules_tags "github.com/chef/automate/lib/authz"
+	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
@@ -1370,6 +1371,16 @@ func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 }
 
 func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
+	var lastEventSent *automate_event.EventMsg
+	localSuite := NewLocalSuite(t)
+	defer localSuite.GlobalTeardown()
+	localSuite.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
+		func(ctx context.Context, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
+			lastEventSent = in.Msg
+			return &automate_event.PublishResponse{}, nil
+		})
+	localSuite.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	event := &automate_event.EventMsg{
 		EventID:   "lskdjflsdkfj",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
@@ -1385,16 +1396,14 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 		},
 	}
 
-	_, err := suite.ComplianceIngestServer.HandleEvent(context.Background(), event)
+	_, err := localSuite.ComplianceIngestServer.HandleEvent(context.Background(), event)
 	assert.NoError(t, err)
 
 	// Wait for job to complete
 	for {
 		time.Sleep(time.Millisecond * 100)
-		lastEventSent := suite.EventServiceClientMock.LastEventSent
-		assert.Equal(t, lastEventSent.Type.Name, automate_event_type.ProjectRulesUpdateStatus)
 		if lastEventSent.Type.Name != automate_event_type.ProjectRulesUpdateStatus {
-			assert.FailNow(t, "")
+			continue
 		}
 
 		if lastEventSent.Data.Fields["Completed"].GetBoolValue() {
@@ -1404,7 +1413,16 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 }
 
 func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
-	suite.EventServiceClientMock.LastEventSent = nil
+	var lastEventSent *automate_event.EventMsg
+	localSuite := NewLocalSuite(t)
+	defer localSuite.GlobalTeardown()
+	localSuite.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	localSuite.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
+		func(ctx interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
+			lastEventSent = in.Msg
+			return &automate_event.PublishResponse{}, nil
+		})
 	event1 := &automate_event.EventMsg{
 		EventID:   "1",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
@@ -1420,10 +1438,9 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 		},
 	}
 
-	_, err := suite.ComplianceIngestServer.HandleEvent(context.Background(), event1)
+	_, err := localSuite.ComplianceIngestServer.HandleEvent(context.Background(), event1)
 	assert.NoError(t, err)
 
-	lastEventSent := suite.EventServiceClientMock.LastEventSent
 	assert.True(t, lastEventSent == nil ||
 		lastEventSent.Type.Name == automate_event_type.ProjectRulesUpdateStatus)
 
@@ -1442,10 +1459,9 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 		},
 	}
 
-	_, err = suite.ComplianceIngestServer.HandleEvent(context.Background(), event2)
+	_, err = localSuite.ComplianceIngestServer.HandleEvent(context.Background(), event2)
 	assert.NoError(t, err)
-	assert.NotNil(t, suite.EventServiceClientMock.LastEventSent)
-	lastEventSent = suite.EventServiceClientMock.LastEventSent
+	assert.NotNil(t, lastEventSent)
 	assert.Equal(t, automate_event_type.ProjectRulesUpdateFailed, lastEventSent.Type.Name)
 	assert.True(t, len(lastEventSent.Data.Fields["message"].GetStringValue()) > 0)
 
@@ -1454,7 +1470,6 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 	// Wait for job to complete
 	for {
 		time.Sleep(time.Millisecond * 100)
-		lastEventSent := suite.EventServiceClientMock.LastEventSent
 		if lastEventSent == nil || lastEventSent.Type.Name != automate_event_type.ProjectRulesUpdateStatus {
 			continue
 		}
