@@ -41,7 +41,7 @@
       <chef-td>{{ job.status }}</chef-td>
       <chef-td>
         <chef-button secondary
-          *ngIf="job.status === 'completed'"
+          *ngIf="job.status === 'completed' && job.recurrence === ''"
           (click)="viewReport(job.id)">
           Report
         </chef-button>
