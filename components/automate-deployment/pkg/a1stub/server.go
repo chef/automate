@@ -212,6 +212,11 @@ func (m mockDB) BigintQuery(query string, args ...interface{}) (int64, error) {
 	return int64(0), nil
 }
 
+func (m mockDB) AlterDatabaseOwner(dbname string, owner string) error {
+	thPrintf("PGMock AlterDatabaseOwner(%s, %s)\n", dbname, owner)
+	return nil
+}
+
 func servePostgreSQLStub() {
 	thPrintf("Installing mock PgDB provider\n")
 	pg.CurrentDBProvider = mockDBProvider{}
