@@ -107,18 +107,23 @@ func TestExport(t *testing.T) {
 		expectedArgs   []string
 		cmdErr         error
 		expectedErr    bool
+		customFormat   bool
 	}{
-		{"it exports the db with pg_dump", "", []string{}, stdArgs, nil, false},
+		{"it exports the db with pg_dump", "", []string{}, stdArgs, nil, false, false},
 		{"it runs pg_dump with the right --exclude-table options", "", []string{"table1", "table2"},
 			[]string{"pkg", "exec", "chef/automate-postgresql", "pg_dump",
 				"--if-exists", "--verbose", "--clean", "--file", "test_database.sql", "--no-privileges", "--no-owner",
 				"--exclude-table", "table1", "--exclude-table", "table2",
 				connURI},
-			nil, false},
+			nil, false, false},
 		{"it runs pg_dump without --no-privileges and --no-owner if User is set", "testuser", []string{},
 			[]string{"pkg", "exec", "chef/automate-postgresql", "pg_dump", "--if-exists", "--verbose", "--clean", "--file", "test_database.sql", connURI},
-			nil, false},
-		{"it returns an error in psql resturns an error", "", []string{}, stdArgs, errors.New("test-error"), true},
+			nil, false, false},
+		{"it runs pg_dump with -Fc when UseCustomFormat is set to true", "testuser", []string{},
+			[]string{"pkg", "exec", "chef/automate-postgresql", "pg_dump", "--if-exists",
+				"--verbose", "--clean", "--file", "test_database.fc", "-Fc", connURI},
+			nil, false, true},
+		{"it returns an error in psql resturns an error", "", []string{}, stdArgs, errors.New("test-error"), true, false},
 	}
 
 	for _, tt := range tests {
@@ -126,6 +131,7 @@ func TestExport(t *testing.T) {
 			exporter, mockExec := setup(t)
 			exporter.ExcludedTables = tt.excludedTables
 			exporter.User = tt.user
+			exporter.UseCustomFormat = tt.customFormat
 			mockExec.Expect("Run", command.ExpectedCommand{
 				Cmd:  "hab",
 				Env:  testExpectedEnv,
@@ -327,5 +333,28 @@ func TestImport(t *testing.T) {
 		mockDB.On("CreateDatabase", "test_database").Return(nil)
 		err := exporter.Import(true)
 		require.Error(t, err)
+	})
+
+	t.Run("it uses pg_restore and the custom file format on when UseCustomFormat is set", func(t *testing.T) {
+		exporter, mockExec, mockDB, cleanup := setup(t)
+		defer cleanup()
+		exportFile := path.Join(exporter.DataDir, "test_database.fc")
+		ioutil.WriteFile(exportFile, testExportContent, 0700)
+
+		mockExec.Expect("Run", command.ExpectedCommand{
+			Cmd: "hab",
+			Args: []string{"pkg", "exec", "chef/automate-postgresql", "pg_restore", "-Fc", "-d",
+				connURI("test_database"), "-e", "--no-owner", "--no-acl", exportFile,
+			},
+			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+		}).Return(nil)
+
+		mockDB.On("DropDatabase", "test_database").Return(nil)
+		mockDB.On("CreateDatabase", "test_database").Return(nil)
+
+		exporter.UseCustomFormat = true
+
+		err := exporter.Import(true)
+		require.NoError(t, err)
 	})
 }
