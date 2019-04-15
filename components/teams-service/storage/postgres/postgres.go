@@ -134,7 +134,7 @@ func (p *postgres) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Te
 }
 
 func (p *postgres) DeleteTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -178,7 +178,7 @@ func (p *postgres) EditTeam(ctx context.Context, team storage.Team) (storage.Tea
 func (p *postgres) EditTeamByName(ctx context.Context,
 	teamName string, teamDescription string, teamProjects []string) (storage.Team, error) {
 
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -204,7 +204,7 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 
 // GetTeams fetches teams from the database, returning an array of storage teams.
 func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return []storage.Team{}, p.processError(err)
 	}
@@ -284,7 +284,7 @@ func (p *postgres) RemoveUsers(ctx context.Context, teamID uuid.UUID, userIDs []
 
 // GetTeamByName returns the team by name
 func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -424,7 +424,7 @@ func (p *postgres) GetUserIDsForTeam(ctx context.Context, teamID uuid.UUID) ([]s
 
 // GetTeamsForUser returns an array of teams that have the provided user
 func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storage.Team, error) {
-	projectsFilter, err := projectsListFromContext(ctx)
+	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return []storage.Team{}, p.processError(err)
 	}
@@ -433,7 +433,7 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.created_at, t.updated_at FROM teams t
 			LEFT JOIN teams_users_associations tu ON tu.team_id=t.id
-			WHERE projects_match(t.projects, $2::TEXT[])
+			WHERE tu.user_id=$1 AND projects_match(t.projects, $2::TEXT[])
 			GROUP BY t.id`,
 		userID, pq.Array(projectsFilter))
 	if err != nil {
@@ -504,10 +504,10 @@ func (p *postgres) processError(err error) error {
 	return err
 }
 
-// projectsListFromContext returns the project list from the context.
+// ProjectsListFromContext returns the project list from the context.
 // In the case that the project list was ["*"], we return an empty list,
 // since we do not wish to filter on projects.
-func projectsListFromContext(ctx context.Context) ([]string, error) {
+func ProjectsListFromContext(ctx context.Context) ([]string, error) {
 	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
 	if err != nil {
 		return nil, err

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/teams-service/storage"
-	"github.com/chef/automate/lib/grpc/auth_context"
+	"github.com/chef/automate/components/teams-service/storage/postgres"
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
@@ -346,7 +346,7 @@ func hasUser(userIDs []string, userID string) bool {
 }
 
 func projectsIntersect(ctx context.Context, team storage.Team) bool {
-	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
+	projectsFilter, err := postgres.ProjectsListFromContext(ctx)
 	if err != nil {
 		return false
 	}
