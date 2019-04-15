@@ -38,8 +38,6 @@ do_build() {
 do_install() {
     mkdir -pv "$pkg_prefix/www/workflow" "$pkg_prefix/www/loading"
     cp -Rv "$(pkg_path_for ${vendor_origin}/automate-workflow-web)"/dist/* "$pkg_prefix/www/workflow"
-    cp -v "$SRC_PATH/unlicensed_503.html" "$pkg_prefix/www" # either copy files over or remove
-    cp -v "$SRC_PATH/maint_503.html" "$pkg_prefix/www"      # either copy files over or remove
     cp -v "$SRC_PATH/loading.html" "$pkg_prefix/www/loading/index.html"
 }
 
