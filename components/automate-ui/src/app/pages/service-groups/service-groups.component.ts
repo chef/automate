@@ -132,9 +132,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     if (status !== undefined && includes(status.text, this.allowedStatus)) {
       return status.text as RollupServiceStatus;
-    } else {
-      return undefined;
     }
+    return undefined;
   }
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
@@ -182,12 +181,10 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   }
 
   sortIcon(field: string): string {
-
     if (field === this.currentSortField) {
       return 'sort-' + this.currentFieldDirection.toLowerCase();
-    } else {
-      return 'sort';
     }
+    return 'sort';
   }
   private getSelectedPageNumber(allUrlParameters: Chicklet[]): number {
     const pageChicklet = find((chicklet) => {
@@ -198,21 +195,17 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       const n = Number(pageChicklet.text);
       if ( !isNaN(n) && n > 0) {
         return n;
-      } else {
-        return 1;
       }
-    } else {
-      return 1;
     }
+    return 1;
   }
 
   private getSelectedSortField(allUrlParameters: Chicklet[]): string {
     const sortField = find((chicklet) => chicklet.type === 'sortField', allUrlParameters);
     if ( sortField !== undefined && this.defaultFieldDirection.hasOwnProperty(sortField.text) ) {
       return sortField.text;
-    } else {
-      return 'name';
     }
+    return 'name';
   }
 
   private getSortDirection(allUrlParameters: Chicklet[]): 'ASC' | 'DESC' {
