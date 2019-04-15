@@ -82,6 +82,7 @@ function compile_client_mocks() {
     mockgen -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz
     mockgen -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn
     mockgen -source cfgmgmt/service/cfgmgmt.pb.go -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service
+    mockgen -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest
   popd >/dev/null
 }
 
