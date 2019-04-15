@@ -1,0 +1,36 @@
+@startuml
+
+title All/No Project Flow
+actor "user" as actor #99FF99
+participant "automate-gateway" as api
+participant "authz-service" as authz
+entity "OPA engine" as opa
+participant "//other A2 service//" as target #99FF99
+
+actor -> api: header([])
+note left
+  User requests
+  all projects
+end note
+api -> authz: ProjectsAuthorized([])
+authz -> opa: authorized_project([])
+alt policy contains [~ALL-PROJECTS~ ]
+  note over authz, opa
+    We need to represent "all projects"
+    as something //other// than a wildcard to
+    be able to write policies against it
+  end note
+  opa -> authz: [~ALL-PROJECTS~ ]
+  authz -> api: [*]
+  api -> target: [*]
+else policy allows //SOME//: P1, P2, P3, ...
+  opa -> authz: [P1, P2, P3, ...]
+  authz -> api: [P1, P2, P3, ...]
+  api -> target: [P1, P2, P3, ...]
+else policy allows //NONE//
+  opa -> authz: []
+  authz -> api: []
+  api -[#red]> actor: 403
+end
+
+@enduml

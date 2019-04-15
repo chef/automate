@@ -815,6 +815,12 @@ by typically filtering results by the allowable projects (extreme right in the f
 
 FIGURE 11 -- AUTHZ SEQUENCE DIAGRAM *WITH* PROJECTS
 
+The next figure sheds light on how a request for "all projects" is handled.
+
+![Automate 2 Authorization With Projects](../../dev-docs/diagrams/authz-all-or-no-projects.png)
+
+FIGURE 12 -- HANDLING OF "ALL PROJECTS" REQUESTED
+
 There is a lot more to say about projects, but this at least serves as a place holder for now.
 
 ## Spinning up the GRPC Service Locally
