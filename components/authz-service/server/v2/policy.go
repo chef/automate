@@ -101,7 +101,7 @@ func NewPoliciesServer(
 	if err != nil {
 		return nil, errors.Wrap(err, "retrieve migration status from storage")
 	}
-	isV2 := ms == storage.Successful
+	isV2 := ms == storage.Successful || ms == storage.SuccessfulBeta1
 	srv.setV2(isV2)
 
 	if isV2 {
