@@ -134,21 +134,14 @@ func (p *postgres) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Te
 }
 
 func (p *postgres) DeleteTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
-	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
+	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
 
 	var t storage.Team
 	err = p.db.QueryRowContext(ctx,
-		`DELETE FROM teams t WHERE t.name=$1 AND (
-				-- no projects filter requested (length 0) will be the case for v2.0 or v2.1 ["*"]
-					array_length($2::TEXT[], 1) IS NULL
-				-- projects filter intersects with projects for row
-					OR t.projects && $2
-				-- projects for row is an empty array, check if (unassigned) in project filter
-					OR (array_length(t.projects, 1) IS NULL AND '{(unassigned)}' && $2)
-			)
+		`DELETE FROM teams t WHERE t.name=$1 AND projects_match(t.projects, $2::TEXT[])
 			RETURNING t.id, t.name, t.description, t.projects, t.created_at, t.updated_at`,
 		teamName, pq.Array(projectsFilter)).Scan(
 		&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt,
@@ -185,7 +178,7 @@ func (p *postgres) EditTeam(ctx context.Context, team storage.Team) (storage.Tea
 func (p *postgres) EditTeamByName(ctx context.Context,
 	teamName string, teamDescription string, teamProjects []string) (storage.Team, error) {
 
-	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
+	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -198,15 +191,8 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 	err = p.db.QueryRowContext(ctx,
 		`UPDATE teams t SET
 			description = $2, projects = $3, updated_at = now()
-		WHERE t.name = $1 AND (
-			-- no projects filter requested (length 0) will be the case for v2.0 or v2.1 ["*"]
-				array_length($4::TEXT[], 1) IS NULL
-			-- projects filter intersects with projects for row
-				OR t.projects && $4
-			-- projects for row is an empty array, check if (unassigned) in project filter
-				OR (array_length(t.projects, 1) IS NULL AND '{(unassigned)}' && $4)
-		)
-		RETURNING id, name, projects, description, created_at, updated_at`,
+		WHERE t.name = $1 AND projects_match(t.projects, $4::TEXT[])
+		RETURNING id, name, projects, description, created_at, updated_at;`,
 		teamName, teamDescription, pq.Array(teamProjects), pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.Description, &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
@@ -218,7 +204,7 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 
 // GetTeams fetches teams from the database, returning an array of storage teams.
 func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
-	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
+	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return []storage.Team{}, p.processError(err)
 	}
@@ -226,13 +212,7 @@ func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 	var teams []storage.Team
 	// TODO eventually these should be ordered
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at FROM teams t WHERE
-			-- no projects filter requested (length 0) will be the case for v2.0 or v2.1 ["*"]
-				array_length($1::TEXT[], 1) IS NULL
-			-- projects filter intersects with projects for row
-				OR t.projects && $1
-			-- projects for row is an empty array, check if (unassigned) in project filter
-				OR (array_length(t.projects, 1) IS NULL AND '{(unassigned)}' && $1)`,
+		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at FROM teams t WHERE projects_match(t.projects, $1::TEXT[])`,
 		pq.Array(projectsFilter))
 
 	if err != nil {
@@ -304,7 +284,7 @@ func (p *postgres) RemoveUsers(ctx context.Context, teamID uuid.UUID, userIDs []
 
 // GetTeamByName returns the team by name
 func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
-	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
+	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -312,14 +292,7 @@ func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.
 	var t storage.Team
 	err = p.db.QueryRowContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
-			FROM teams t WHERE t.name = $1 AND (
-				-- no projects filter requested (length 0) will be the case for v2.0 or v2.1 ["*"]
-					array_length($2::TEXT[], 1) IS NULL
-				-- projects filter intersects with projects for row
-					OR t.projects && $2
-				-- projects for row is an empty array, check if (unassigned) in project filter
-					OR (array_length(t.projects, 1) IS NULL AND '{(unassigned)}' && $2)
-			)`,
+			FROM teams t WHERE t.name = $1 AND projects_match(t.projects, $2::TEXT[]);`,
 		teamName, pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
@@ -451,7 +424,7 @@ func (p *postgres) GetUserIDsForTeam(ctx context.Context, teamID uuid.UUID) ([]s
 
 // GetTeamsForUser returns an array of teams that have the provided user
 func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storage.Team, error) {
-	projectsFilter, err := auth_context.ProjectsListFromContextEmptyListOnAllProjects(ctx)
+	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return []storage.Team{}, p.processError(err)
 	}
@@ -460,14 +433,7 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.created_at, t.updated_at FROM teams t
 			LEFT JOIN teams_users_associations tu ON tu.team_id=t.id
-			WHERE tu.user_id=$1 AND (
-				-- no projects filter requested (length 0) will be the case for v2.0 or v2.1 ["*"]
-					array_length($2::TEXT[], 1) IS NULL
-				-- projects filter intersects with projects for row
-					OR t.projects && $2
-				-- projects for row is an empty array, check if (unassigned) in project filter
-					OR (array_length(t.projects, 1) IS NULL AND '{(unassigned)}' && $2)
-			)
+			WHERE projects_match(t.projects, $2::TEXT[])
 			GROUP BY t.id`,
 		userID, pq.Array(projectsFilter))
 	if err != nil {
@@ -536,4 +502,18 @@ func (p *postgres) processError(err error) error {
 	}
 	p.logger.Debugf("unknown error type from database: %v", err)
 	return err
+}
+
+// projectsListFromContext returns the project list from the context.
+// In the case that the project list was ["*"], we return an empty list,
+// since we do not wish to filter on projects.
+func projectsListFromContext(ctx context.Context) ([]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		projectsFilter = []string{}
+	}
+	return projectsFilter, nil
 }

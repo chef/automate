@@ -847,7 +847,7 @@ func runAllServerTests(
 			}
 		})
 
-		t.Run("successfully adds user when the project filter", func(t *testing.T) {
+		t.Run("successfully adds user when the project filter matches", func(t *testing.T) {
 			tests := []struct {
 				users []string
 				desc  string
@@ -891,7 +891,7 @@ func runAllServerTests(
 			}
 		})
 
-		t.Run("successfully adds user when the project filter of *", func(t *testing.T) {
+		t.Run("successfully adds user with a project filter of *", func(t *testing.T) {
 			tests := []struct {
 				users []string
 				desc  string
@@ -935,7 +935,7 @@ func runAllServerTests(
 			}
 		})
 
-		t.Run("successfully adds user when the project filter of (unassigned)", func(t *testing.T) {
+		t.Run("successfully adds user with a project filter of (unassigned)", func(t *testing.T) {
 			tests := []struct {
 				users []string
 				desc  string
