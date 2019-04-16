@@ -57,7 +57,6 @@ func NewMockTarget(noDeploymentService ...bool) *target.MockTarget {
 	dsPkg := deploymentServicePackage()
 	if len(noDeploymentService) == 0 {
 		AlreadyInstalled(m, &dsPkg)
-		NoSelfReconfigurePending(m)
 		NoSupervisorUpgradeRequired(m)
 		WithUserToml(m, &dsPkg, "")
 	}
@@ -98,10 +97,6 @@ func (m *mockHabSup) LauncherPid() (int, error) {
 func (m *mockHabSup) Hup(c context.Context) error {
 	args := m.Called(c)
 	return args.Error(0)
-}
-
-func NoSelfReconfigurePending(m *target.MockTarget) {
-	m.On("GetDeploymentServiceReconfigurePending").Return(false, nil)
 }
 
 func AlreadyInstalled(m *target.MockTarget, pkg habpkg.VersionedPackage) {

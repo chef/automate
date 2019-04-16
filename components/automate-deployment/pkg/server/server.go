@@ -468,7 +468,7 @@ func (s *errDeployer) startConverge(task *converge.Task, eventSink converge.Even
 		return
 	}
 
-	err = s.converger.Converge(0, task, *desiredState, eventSink)
+	err = s.converger.Converge(task, *desiredState, eventSink)
 
 	if err != nil {
 		s.err = err
@@ -1064,11 +1064,6 @@ func StartServer(config *Config) error {
 
 	server.convergeLoop = NewLooper(convergeIntervalDuration, periodicConverger(server, grpcServer))
 
-	err = server.target().UnsetDeploymentServiceReconfigurePending()
-	if err != nil {
-		return errors.Wrap(err, "failed to unset reconfigure-pending sentinel")
-	}
-
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGTERM, syscall.SIGINT)
 	go func() {
@@ -1471,9 +1466,8 @@ func (s *server) shutItAllDown() error {
 	defer s.deployment.Unlock()
 
 	logger := newConvergeLoopLogger()
-	desiredStateStopped, _ := s.buildStopDesiredState()
-
-	if err := s.converger.Converge(0, taskStop, desiredStateStopped, logger); err != nil {
+	err = s.converger.PrepareForShutdown(taskStop, s.target(), logger)
+	if err != nil && err != api.ErrRestartPending {
 		return err
 	}
 
@@ -1485,14 +1479,10 @@ func (s *server) shutItAllDown() error {
 	case <-ctx.Done():
 		return ctx.Err()
 	case err := <-taskStop.C:
-		if err != nil {
+		if err != nil && err != api.ErrRestartPending {
 			logrus.WithError(err).Error("Failed to stop services")
 			return err
 		}
-	}
-
-	if err := s.target().SetDeploymentServiceReconfigurePending(); err != nil {
-		return err
 	}
 
 	// NOTE(ssd) 2019-07-12: We use context.Background here

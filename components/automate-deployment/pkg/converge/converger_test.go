@@ -10,7 +10,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
+	"github.com/chef/automate/components/automate-deployment/pkg/depot"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
+	"github.com/chef/automate/components/automate-deployment/pkg/target"
 )
 
 type mockCompiler struct {
@@ -42,13 +44,13 @@ func waitForTask(t *testing.T, task *converge.Task) {
 }
 
 func TestConverger(t *testing.T) {
-	localhost := NewMockTarget()
+	localhost := &target.MockTarget{}
 	desiredState := converge.NewDesiredState(
 		converge.Topology{
 			localhost: []converge.Service{},
 		}, converge.NewSkipSupervisorState(),
 		[]habpkg.HabPkg{},
-		"conservative",
+		depot.ConservativeGC,
 	)
 
 	t.Run("it completes on compile error", func(t *testing.T) {
@@ -58,78 +60,9 @@ func TestConverger(t *testing.T) {
 
 		task, err := converge.NewTask()
 		require.NoError(t, err)
-		err = converger.Converge(0, task, desiredState, nil)
+		err = converger.Converge(task, desiredState, nil)
 		require.NoError(t, err)
 		waitForTask(t, task)
-		converger.Stop()
-	})
-
-	t.Run("versions that do not increase or stay the same are skipped", func(t *testing.T) {
-		// Compiler will return a nil plan and cause problems if we try to use it
-		plan := &mockPlan{}
-		converger := converge.StartConverger(
-			converge.WithCompiler(&mockCompiler{
-				convergePlan: plan,
-			}),
-			converge.WithLastVersion(uint64(1)),
-		)
-
-		task, err := converge.NewTask()
-		require.NoError(t, err)
-		err = converger.Converge(3, task, desiredState, nil)
-		require.NoError(t, err)
-		waitForTask(t, task)
-
-		plan.execFunc = func() error {
-			assert.Fail(t, "Plan should not have executed because version decreased")
-			return nil
-		}
-
-		task, err = converge.NewTask()
-		require.NoError(t, err)
-		err = converger.Converge(2, task, desiredState, nil)
-		require.NoError(t, err)
-		waitForTask(t, task)
-
-		converger.Stop()
-	})
-
-	t.Run("version gets updated if execution of a plan fails", func(t *testing.T) {
-		// Compiler will return a nil plan and cause problems if we try to use it
-		plan := &mockPlan{}
-		plan.execFunc = func() error {
-			return errors.New("Badness happened")
-		}
-		converger := converge.StartConverger(
-			converge.WithCompiler(&mockCompiler{
-				convergePlan: plan,
-			}),
-			converge.WithLastVersion(uint64(1)),
-		)
-
-		task, err := converge.NewTask()
-		require.NoError(t, err)
-		err = converger.Converge(3, task, desiredState, nil)
-		require.NoError(t, err)
-		select {
-		case <-task.C:
-		case <-time.After(time.Second):
-			assert.Fail(t, "Task did not complete in time")
-		}
-
-		planExecuted := false
-		planExecutedPtr := &planExecuted
-		plan.execFunc = func() error {
-			*planExecutedPtr = true
-			return nil
-		}
-
-		task, err = converge.NewTask()
-		require.NoError(t, err)
-		err = converger.Converge(2, task, desiredState, nil)
-		require.NoError(t, err)
-		waitForTask(t, task)
-		assert.False(t, planExecuted)
 		converger.Stop()
 	})
 
@@ -152,7 +85,7 @@ func TestConverger(t *testing.T) {
 		// This work will be picked up
 		task, err := converge.NewTask()
 		require.NoError(t, err)
-		err = converger.Converge(0, task, desiredState, nil)
+		err = converger.Converge(task, desiredState, nil)
 		require.NoError(t, err)
 
 		// Make sure the work go picked up
@@ -161,13 +94,13 @@ func TestConverger(t *testing.T) {
 		//Fill up the queue
 		task, err = converge.NewTask()
 		require.NoError(t, err)
-		err = converger.Converge(0, task, desiredState, nil)
+		err = converger.Converge(task, desiredState, nil)
 		require.NoError(t, err)
 
 		// Queue is filled, now we will fail
 		task, err = converge.NewTask()
 		require.NoError(t, err)
-		err = converger.Converge(0, task, desiredState, nil)
+		err = converger.Converge(task, desiredState, nil)
 		assert.Error(t, err)
 
 		waitChan <- struct{}{}

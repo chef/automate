@@ -94,10 +94,6 @@ type Target interface {
 	SetUserToml(name, config string) error
 	GetUserToml(pkg habpkg.VersionedPackage) (string, error)
 
-	GetDeploymentServiceReconfigurePending() (bool, error)
-	SetDeploymentServiceReconfigurePending() error
-	UnsetDeploymentServiceReconfigurePending() error
-
 	SymlinkHabSup(habSupP habpkg.HabPkg) error
 	GetSymlinkedHabSup() (habpkg.HabPkg, error)
 
@@ -107,6 +103,7 @@ type Target interface {
 
 	SystemdReloadRequired() (bool, error)
 	SystemdReload() error
+	SystemdRestart(context.Context, []string) (bool, error)
 	SystemdRunning() (bool, error)
 
 	HabSupRestartRequired(habpkg.HabPkg) (bool, error)
