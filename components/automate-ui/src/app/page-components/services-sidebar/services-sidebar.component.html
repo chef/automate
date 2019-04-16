@@ -1,0 +1,27 @@
+<chef-click-outside omit="sg-row" (clickOutside)="closeServicesSidebar()">
+  <chef-side-panel id="services-panel" class="services-panel" tabindex="0" [visible]="visible">
+    <chef-page-header>
+      <chef-heading>
+        <chef-icon>grain</chef-icon>
+        Services in {{ serviceGroupName$ | async }}
+      </chef-heading>
+      <chef-subheading>Services run by each Habitat Supervisor on a node.</chef-subheading>
+    </chef-page-header>
+    <!-- Insert here the filters bar -->
+    <ul>
+      <li class="service-item" *ngFor="let service of services$ | async">
+        <div class="header">
+          <div class ="service-line"><chef-icon>storage</chef-icon><b>{{ service.fqdn }}</b></div>
+          <div class ="supervisor-line"><b>Supervisor:</b> {{ service.supervisor_id }}</div>
+        </div>
+        <div class="body">
+          <div class ="service-line"><chef-icon>grain</chef-icon>{{ service.release }}</div>
+          <div class ="service-line">
+            <chef-icon class="{{ service.health_check }}">{{ healthStatusIcon(service) }}</chef-icon>
+            {{ healthCheckStatus(service) }}
+          </div>
+        </div>
+      </li>
+    </ul>
+  </chef-side-panel>
+</chef-click-outside>

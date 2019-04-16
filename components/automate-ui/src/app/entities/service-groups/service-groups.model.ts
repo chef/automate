@@ -7,6 +7,18 @@ export interface ServiceGroupHealthSummary {
   critical: number;
   unknown: number;
 }
+
+export interface Service {
+  supervisor_id: string;
+  release: string;
+  group: string;
+  status: string;
+  health_check: string;
+  applications: string;
+  environment: string;
+  fqdn: string;
+}
+
 export interface ServiceGroup {
   id: string;
   name: string;
@@ -22,6 +34,11 @@ export interface ServiceGroupFilters {
   status?: RollupServiceStatus;
   sortField?: string;
   sortDirection?: SortDirection;
+}
+
+export interface ServicesPayload {
+  group: string;
+  services: Service[];
 }
 
 export interface ServiceGroupsPayload {
