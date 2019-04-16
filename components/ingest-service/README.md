@@ -15,7 +15,7 @@ to get started.
 - fast event processing
 - flexible pipelines
 
-Automate 1.x ingestion pipeline was slow and resource hungry. Many
+Automate 1's ingestion pipeline was slow and resource hungry. Many
 users complained about its memory requirements and it was the cause of
 many operational issues. Our goal is to handle Chef Automate's largest
 users efficiently.
