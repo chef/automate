@@ -381,17 +381,18 @@ func TestListPolicies(t *testing.T) {
 	store, db, prngSeed := setup(t)
 	defer db.close(t)
 	defer store.Close()
-	ctx := context.Background()
 
 	// description => test func (map used for randomization)
 	cases := map[string]func(*testing.T){
 		"empty database": func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := store.ListPolicies(ctx)
 			assert.NoError(t, err)
 			assert.Nil(t, resp)
 			assert.Equal(t, 0, len(resp))
 		},
 		"policy with no statements": func(t *testing.T) {
+			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
@@ -410,6 +411,7 @@ func TestListPolicies(t *testing.T) {
 			assert.Equal(t, pols, resp)
 		},
 		"policy with two statements found": func(t *testing.T) {
+			ctx := context.Background()
 			sID0 := genUUID(t)
 			sID1 := genUUID(t)
 			polID := genSimpleID(t, prngSeed)
@@ -449,9 +451,9 @@ func TestListPolicies(t *testing.T) {
 				},
 			}}
 			assertPolicies(t, expectedPolicies, resp)
-			// require.Equal(t, len(expectedPolicies), len(resp))
 		},
 		"two policies, with one statement each": func(t *testing.T) {
+			ctx := context.Background()
 			sID0, sID1, polID0, polID1 := genUUID(t), genUUID(t), genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 
 			_, err := db.Exec(`
@@ -508,9 +510,9 @@ func TestListPolicies(t *testing.T) {
 				},
 			}
 			assertPolicies(t, expectedPolicies, resp)
-			// require.Equal(t, len(expectedPolicies), len(resp))
 		},
 		"two policies, each with one statement that contains 1+ projects": func(t *testing.T) {
+			ctx := context.Background()
 			sID0, sID1 := genUUID(t), genUUID(t)
 			polID0, polID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
@@ -584,9 +586,9 @@ func TestListPolicies(t *testing.T) {
 				},
 			}
 			assertPolicies(t, expectedPolicies, resp)
-			// require.Equal(t, len(expectedPolicies), len(resp))
 		},
 		"two policies, one with projects, one without": func(t *testing.T) {
+			ctx := context.Background()
 			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2 := "testPolicy", "anotherTestPolicy"
 			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
@@ -624,6 +626,7 @@ func TestListPolicies(t *testing.T) {
 			assertPolicies(t, expectedPolicies, resp)
 		},
 		"two policies with projects": func(t *testing.T) {
+			ctx := context.Background()
 			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2 := "testPolicy", "anotherTestPolicy"
 			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
@@ -656,6 +659,167 @@ func TestListPolicies(t *testing.T) {
 				},
 			}
 
+			resp, err := store.ListPolicies(ctx)
+			assert.NoError(t, err)
+			assertPolicies(t, expectedPolicies, resp)
+		},
+		"when the list is filtered by a policy list, return intersection": func(t *testing.T) {
+			ctx := context.Background()
+			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
+			name1, name2 := "testPolicy", "anotherTestPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
+				polID1, name1, polID2, name2)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID)
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
+			insertPolicyProject(t, db, polID2, projID2)
+
+			expectedPolicies := []*storage.Policy{
+				{
+					ID:         polID2,
+					Name:       name2,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{projID2},
+				},
+			}
+
+			ctx = insertProjectsIntoContext(ctx, []string{projID2})
+			resp, err := store.ListPolicies(ctx)
+			assert.NoError(t, err)
+			assertPolicies(t, expectedPolicies, resp)
+		},
+		"when the list is filtered by a policy list of *, return everything": func(t *testing.T) {
+			ctx := context.Background()
+			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
+			name1, name2 := "testPolicy", "anotherTestPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
+				polID1, name1, polID2, name2)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID)
+
+			expectedPolicies := []*storage.Policy{
+				{
+					ID:         polID1,
+					Name:       name1,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{projID},
+				},
+				{
+					ID:         polID2,
+					Name:       name2,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{},
+				},
+			}
+
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			resp, err := store.ListPolicies(ctx)
+			assert.NoError(t, err)
+			assertPolicies(t, expectedPolicies, resp)
+		},
+		"when the list is filtered by a policy list of (unassigned), return policies with no projects": func(t *testing.T) {
+			ctx := context.Background()
+			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
+			name1, name2 := "testPolicy", "anotherTestPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
+				polID1, name1, polID2, name2)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID)
+
+			expectedPolicies := []*storage.Policy{
+				{
+					ID:         polID2,
+					Name:       name2,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{},
+				},
+			}
+
+			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
+			resp, err := store.ListPolicies(ctx)
+			assert.NoError(t, err)
+			assertPolicies(t, expectedPolicies, resp)
+		},
+		"when the list is filtered by a policy list of (unassigned) and another project, return matched projects": func(t *testing.T) {
+			ctx := context.Background()
+			polID1, polID2, polID3 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
+			name1, name2, name3 := "testPolicy", "anotherTestPolicy", "pika"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4), ($5, $6)`,
+				polID1, name1, polID2, name2, polID3, name3)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID)
+
+			projID2 := "team-rocket"
+			insertTestProject(t, db, projID2, "blasting off again", storage.Custom)
+			insertPolicyProject(t, db, polID3, projID2)
+
+			expectedPolicies := []*storage.Policy{
+				{
+					ID:         polID1,
+					Name:       name1,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{projID},
+				},
+				{
+					ID:         polID2,
+					Name:       name2,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{},
+				},
+			}
+
+			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID, projID})
+			resp, err := store.ListPolicies(ctx)
+			assert.NoError(t, err)
+			assertPolicies(t, expectedPolicies, resp)
+		},
+		"when there is no intersection between projects filter and projects, return empty list": func(t *testing.T) {
+			ctx := context.Background()
+			polID1, polID2, polID3 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
+			name1, name2, name3 := "testPolicy", "anotherTestPolicy", "pika"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4), ($5, $6)`,
+				polID1, name1, polID2, name2, polID3, name3)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID)
+
+			projID2 := "team-rocket"
+			insertTestProject(t, db, projID2, "blasting off again", storage.Custom)
+			insertPolicyProject(t, db, polID3, projID2)
+
+			projID3 := "team-montag"
+			insertTestProject(t, db, projID3, "we like dags", storage.Custom)
+
+			expectedPolicies := []*storage.Policy{}
+
+			ctx = insertProjectsIntoContext(ctx, []string{projID3})
 			resp, err := store.ListPolicies(ctx)
 			assert.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
