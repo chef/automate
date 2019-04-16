@@ -75,7 +75,7 @@ chef-td {
     }
 
     &.UNKNOWN {
-      color: $chef-primary;
+      color: $chef-dark-grey;
     }
 
     &.CRITICAL {
@@ -107,7 +107,7 @@ chef-td {
     }
 
     &.UNKNOWN {
-      background: $chef-primary;
+      background: $chef-dark-grey;
     }
 
     &.CRITICAL {
@@ -147,7 +147,7 @@ chef-tr.row {
   }
 
   &>chef-td.UNKNOWN:first-child:before {
-    background: $chef-primary;
+    background: $chef-dark-grey;
   }
 
   &>chef-td.CRITICAL:first-child:before {

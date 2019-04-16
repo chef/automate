@@ -14,8 +14,8 @@ describe('ServiceStatusIconPipe', () => {
       expect(pipe.transform('CRITICAL')).toEqual('warning');
     });
 
-    it('should convert unknown to warning', () => {
-      expect(pipe.transform('UNKNOWN')).toEqual('warning');
+    it('should convert unknown to help', () => {
+      expect(pipe.transform('UNKNOWN')).toEqual('help');
     });
 
     it('should convert missing to help', () => {
