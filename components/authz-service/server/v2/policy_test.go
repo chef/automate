@@ -2852,7 +2852,7 @@ func setupV2(t *testing.T,
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testProjectRulesRetriever{}, eventServiceClient)
 	require.NoError(t, err)
 
-	authzV2, err := v2.NewAuthzServer(l, authorizer)
+	authzV2, err := v2.NewAuthzServer(l, authorizer, polV2)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")

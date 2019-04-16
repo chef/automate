@@ -87,7 +87,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
 
-	v2AuthzServer, err := v2.NewAuthzServer(l, e)
+	v2AuthzServer, err := v2.NewAuthzServer(l, e, v2PolServer)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 authz server")
 	}
@@ -204,16 +204,7 @@ func (v *versionSwitch) Interceptor(ctx context.Context,
 	v1Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Authorization/")
 	v2Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/")
 
-	// TODO is it possible to differentiate btwn a v2 and v2.1 request?
 	if v.version.Major == api_v2.Version_V2 && v1Req {
-		if v.version.Minor == api_v2.Version_V1 {
-			st := status.New(codes.FailedPrecondition, "authz-service set to v2.1")
-			st, err := st.WithDetails(&common.ErrorShouldUseV2_1{})
-			if err != nil {
-				return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
-			}
-			return nil, st.Err()
-		}
 		st := status.New(codes.FailedPrecondition, "authz-service set to v2")
 		st, err := st.WithDetails(&common.ErrorShouldUseV2{})
 		if err != nil {

@@ -39,6 +39,7 @@ type policyServer struct {
 // protobuf + the update interceptor
 type PolicyServer interface {
 	api.PoliciesServer
+	GetVersion() api.Version
 
 	EngineUpdateInterceptor() grpc.UnaryServerInterceptor
 }
@@ -1011,4 +1012,9 @@ func (s *policyServer) setVersion(v v2.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
 	}
+}
+
+func (s *policyServer) GetVersion() v2.Version {
+	version := <-s.vChan
+	return version
 }

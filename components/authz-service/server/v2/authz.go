@@ -20,13 +20,19 @@ import (
 type authzServer struct {
 	log    logger.Logger
 	engine engine.V2Authorizer
+	getter versionGetter
+}
+
+type versionGetter interface {
+	GetVersion() api.Version
 }
 
 // NewAuthzServer returns a new IAM v2 Authz server.
-func NewAuthzServer(l logger.Logger, e engine.V2Authorizer) (api.AuthorizationServer, error) {
+func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, g versionGetter) (api.AuthorizationServer, error) {
 	return &authzServer{
 		log:    l,
 		engine: e,
+		getter: g,
 	}, nil
 }
 
@@ -51,6 +57,18 @@ func (s *authzServer) IsAuthorized(
 func (s *authzServer) ProjectsAuthorized(
 	ctx context.Context,
 	req *api.ProjectsAuthorizedReq) (*api.ProjectsAuthorizedResp, error) {
+
+	// we check the version set in the channel on policy server
+	// in order to determined whether or not to filter projects for the request
+	version := s.getter.GetVersion()
+	s.log.Infof("HEY! version here: %s", version)
+	s.log.Infof("HEY! minor version here: %s", version.Minor)
+
+	// if IAM version is set to v2.0
+	// we override the projects passed in the request because no filter should be applied
+	if version.Minor == api.Version_V0 {
+		req.ProjectsFilter = []string{constants.AllProjectsExternalID}
+	}
 
 	projectsAuthorized, err := s.engine.V2ProjectsAuthorized(ctx,
 		engine.Subjects(req.Subjects),
@@ -148,3 +166,8 @@ func toEnginePairs(pairs []*api.Pair) []engine.Pair {
 	}
 	return ps
 }
+
+// func extractVersion(vChan chan api.Version) api.Version {
+// 	var version api.Version
+// 	return version
+// }
