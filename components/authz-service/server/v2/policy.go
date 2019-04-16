@@ -509,7 +509,6 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		return nil, err
 	}
 	if upgraded == true {
-		s.setVersion(api.Version{Major: api.Version_V2, Minor: api.Version_V1})
 		return &api.MigrateToV2Resp{}, nil
 	}
 
@@ -588,17 +587,24 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 }
 
 func (s *policyServer) handleMinorUpgrade(ctx context.Context, ms storage.MigrationStatus, f api.Flag) (upgraded bool, err error) {
+	var version api.Version
 	upgraded = true
 	if f == api.Flag_VERSION_2_1 && ms == storage.Successful {
 		err = s.store.SuccessBeta1(ctx)
+		version = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
 	} else if f == api.Flag_VERSION_2_0 && ms == storage.SuccessfulBeta1 {
 		err = s.store.Success(ctx)
+		version = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
 	} else {
 		upgraded = false
 	}
 
 	if err != nil {
 		return false, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
+	}
+
+	if upgraded {
+		s.setVersion(version)
 	}
 	return upgraded, nil
 }
