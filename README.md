@@ -2,7 +2,7 @@
 
 [![Build Status](https://badge.buildkite.com/9c37160ef9872fbdcf42628586fabfbb3048239a99c1f60e3a.svg?branch=master)](https://buildkite.com/chef-oss/chef-automate-master-verify)
 [![Build Status](https://badge.buildkite.com/b550988ee153942e2ed1ad2741ab652b6d9efa76992d022cf8.svg?branch=master)](https://buildkite.com/chef/chef-automate-master-verify-private)
-
+    
 Automate provides a unified view into infrastructure managed by
 Chef, Inspec, and Habitat.
 
