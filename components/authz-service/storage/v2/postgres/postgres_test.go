@@ -55,17 +55,18 @@ func TestGetPolicy(t *testing.T) {
 	store, db, prngSeed := setup(t)
 	defer db.close(t)
 	defer store.Close()
-	ctx := context.Background()
 
 	// description => test func (map used for randomization)
 	cases := map[string]func(*testing.T){
 		"empty database": func(t *testing.T) {
+			ctx := context.Background()
 			resp, err := store.GetPolicy(ctx, genSimpleID(t, prngSeed))
 			assert.Error(t, err)
 			assert.Nil(t, resp)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
 		"policy with projects": func(t *testing.T) {
+			ctx := context.Background()
 			targetProject := "p1"
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
@@ -86,6 +87,7 @@ func TestGetPolicy(t *testing.T) {
 			assert.Equal(t, &pol, resp)
 		},
 		"policy with no statements": func(t *testing.T) {
+			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
@@ -102,6 +104,7 @@ func TestGetPolicy(t *testing.T) {
 			assert.Equal(t, &pol, resp)
 		},
 		"policy with two statements found": func(t *testing.T) {
+			ctx := context.Background()
 			// Note (sr): Is it ugly to put the SQL statement in here, with no
 			// variables or any helper methods? Sure! It also helps isolate this test
 			// case from the others. Let's refactor this if can't bear it anymore, but
@@ -147,6 +150,7 @@ func TestGetPolicy(t *testing.T) {
 			assertPolicy(t, &pol, resp)
 		},
 		"policy with two statements, among other policy": func(t *testing.T) {
+			ctx := context.Background()
 			_, err := db.Exec(`
 		  WITH statement AS (INSERT INTO iam_statements (id, effect, actions, resources)
 		    VALUES (uuid_generate_v4(), 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users']),
@@ -197,6 +201,7 @@ func TestGetPolicy(t *testing.T) {
 			assertPolicy(t, &pol, resp)
 		},
 		"policy with two statements and three members, among other policy": func(t *testing.T) {
+			ctx := context.Background()
 			_, err := db.Exec(`
 		  WITH statement AS (INSERT INTO iam_statements (id, effect, actions, resources)
 		    VALUES (uuid_generate_v4(), 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users']),
@@ -248,6 +253,7 @@ func TestGetPolicy(t *testing.T) {
 			assertPolicy(t, &pol, resp)
 		},
 		"policy with two statements, both with projects, and three members, among other policy": func(t *testing.T) {
+			ctx := context.Background()
 			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			polID := genSimpleID(t, prngSeed)
 			sID0, sID1 := genUUID(t), genUUID(t)
@@ -301,6 +307,60 @@ func TestGetPolicy(t *testing.T) {
 				},
 			}
 			assertPolicy(t, &pol, resp)
+		},
+		"when the policy's projects and the project filter intersect, return policy": func(t *testing.T) {
+			ctx := context.Background()
+			polID := insertTestPolicy(t, db, "testpolicy")
+			projID1 := "team-rocket"
+			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
+			insertPolicyProject(t, db, polID, projID1)
+
+			ctx = insertProjectsIntoContext(ctx, []string{projID1})
+			resp, err := store.GetPolicy(ctx, polID)
+
+			assert.NoError(t, err)
+			assert.Equal(t, polID, resp.ID)
+		},
+		"when the * project filter is passed, return policy": func(t *testing.T) {
+			ctx := context.Background()
+			polID := insertTestPolicy(t, db, "testpolicy")
+			projID1 := "team-rocket"
+			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
+			insertPolicyProject(t, db, polID, projID1)
+
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			resp, err := store.GetPolicy(ctx, polID)
+
+			assert.NoError(t, err)
+			assert.Equal(t, polID, resp.ID)
+		},
+		"when the policy has no projects and (unassigned) is in the projects filter, return policy": func(t *testing.T) {
+			ctx := context.Background()
+			polID := insertTestPolicy(t, db, "testpolicy")
+			projID1 := "team-rocket"
+			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
+
+			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
+			resp, err := store.GetPolicy(ctx, polID)
+
+			assert.NoError(t, err)
+			assert.Equal(t, polID, resp.ID)
+		},
+		"when the policy's projects and projects filter do not intersect, return NotFound": func(t *testing.T) {
+			ctx := context.Background()
+			originalName := "blasting off again"
+			polID := insertTestPolicy(t, db, originalName)
+			projID1 := "team-rocket"
+			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
+			insertPolicyProject(t, db, polID, projID1)
+			projID2 := "team-montag"
+			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
+
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
+			resp, err := store.GetPolicy(ctx, polID)
+
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
 	}
 
@@ -368,6 +428,75 @@ func TestListPolicyMembers(t *testing.T) {
 			members, err := store.ListPolicyMembers(ctx, polID)
 			require.NoError(t, err)
 			assert.Equal(t, []storage.Member{member1, member2, member0}, members)
+		},
+		"when the policy's projects and the project filter intersect, list members": func(t *testing.T) {
+			ctx := context.Background()
+			polID := insertTestPolicy(t, db, "testpolicy")
+			projID1 := "team-rocket"
+			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
+			insertPolicyProject(t, db, polID, projID1)
+			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
+			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+
+			ctx = insertProjectsIntoContext(ctx, []string{projID1})
+			resp, err := store.ListPolicyMembers(ctx, polID)
+
+			require.NoError(t, err)
+			assert.Equal(t, []storage.Member{member1, member2}, resp)
+		},
+		"when the * project filter is passed, list members": func(t *testing.T) {
+			ctx := context.Background()
+			polID := insertTestPolicy(t, db, "testpolicy")
+			projID1 := "team-rocket"
+			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
+			insertPolicyProject(t, db, polID, projID1)
+			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
+			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+
+			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			resp, err := store.ListPolicyMembers(ctx, polID)
+
+			require.NoError(t, err)
+			assert.Equal(t, []storage.Member{member1, member2}, resp)
+		},
+		"when the policy has no projects and (unassigned) is in the projects filter, list members": func(t *testing.T) {
+			ctx := context.Background()
+			polID := insertTestPolicy(t, db, "testpolicy")
+			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
+			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			projID1 := "team-rocket"
+			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
+
+			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
+			resp, err := store.ListPolicyMembers(ctx, polID)
+
+			require.NoError(t, err)
+			assert.Equal(t, []storage.Member{member1, member2}, resp)
+		},
+		"when the policy's projects and projects filter do not intersect, return NotFound": func(t *testing.T) {
+			ctx := context.Background()
+			polID := insertTestPolicy(t, db, "testpolicy")
+			projID1 := "team-rocket"
+			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
+			insertPolicyProject(t, db, polID, projID1)
+			insertTestPolicyMember(t, db, polID, "user:local:fred")
+			insertTestPolicyMember(t, db, polID, "user:local:mary")
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			projID2 := "team-montag"
+			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
+
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
+			resp, err := store.ListPolicyMembers(ctx, polID)
+
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
 	}
 
