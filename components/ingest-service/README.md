@@ -5,14 +5,9 @@ Automate 2.0.
 
 ## Geting Started
 
-Now we use the Global Habitat Studio; follow
-[this](https://github.com/chef/automate/#global-habitat-studio) instructions.
-
-## Event types
-
-At this point the service is intended to handle the following event types:
-
-- Chef run events
+This component uses the habitat studio development environment. See
+[dev-docs/DEV_ENVIRONMENT](https://github.com/chef/automate/blob/master/dev-docs/DEV_ENVIRONMENT.md)
+to get started.
 
 ## Design Goals
 
@@ -20,11 +15,21 @@ At this point the service is intended to handle the following event types:
 - fast event processing
 - flexible pipelines
 
-Automate 1.x was using Logstash for ingest events. This services replaces Logstash as the primary event handler. Many customers complained about the memory requirements for Logstash.
+Automate 1.x ingestion pipeline was slow and resource hungry. Many
+users complained about its memory requirements and it was the cause of
+many operational issues. Our goal is to handle Chef Automate's largest
+users efficiently.
+
+## Event types
+
+At this point the service is intended to handle the following event types:
+
+- Chef run events
+
 
 ## Event Pipelines
 
-We are going to use GoRoutines and GoChannels for our pipeline implementation. The following resources explain the concepts:
+We are going to use goroutines and channels for our pipeline implementation. The following resources explain the concepts:
 
  - [Google I/O 2012 - Go Concurrency Patterns](https://www.youtube.com/watch?v=f6kdp27TYZs)
  - [Go Concurrency Patterns: Pipelines and cancellation](https://blog.golang.org/pipelines)
