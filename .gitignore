@@ -97,7 +97,8 @@ backups
 
 # Do not add automate credentials files.
 components/automate-deployment/automate-credentials-*.toml
-/ec2/out.json
+ec2/out.json
+ec2/mkmf.log
 
 # cypress screenshots/videos and other folders cypress creates
 e2e/cypress/screenshots
