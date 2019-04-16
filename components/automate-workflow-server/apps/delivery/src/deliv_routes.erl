@@ -22,8 +22,6 @@ routes() ->
      {"/api/" ++ ?DELIV_API_VERSION ++ "/canonical_enterprise",
       deliv_hand_canonical_enterprise, State},
 
-     {"/data-collector/v0/[:exchange]", insights_hand_data_collector, State},
-
      {deliv_web_utils:route_prefix() ++ ":ent_name/get-token",
       deliv_hand_user_authn, State},
 

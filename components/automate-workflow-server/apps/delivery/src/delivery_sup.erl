@@ -39,7 +39,6 @@ gather_routes() ->
                                           notification_routes,
                                           auth_routes,
                                           jobs_routes,
-                                          vis_routes,
                                           deliv_routes %% THIS MUST ALWAYS BE AT THE END
                                          ]]),
    log_routes(Routes),

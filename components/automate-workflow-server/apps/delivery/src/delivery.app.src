@@ -19,7 +19,6 @@
                  chef_req,
                  erlware_commons,
                  chef_common,
-                 jobs,
-                 visibility
+                 jobs
                 ]},
   {mod,{delivery_app,[]}}]}.

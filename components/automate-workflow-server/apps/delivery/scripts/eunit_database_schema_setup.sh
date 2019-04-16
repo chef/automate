@@ -18,7 +18,7 @@ if [ -z "$PGHOST" ]; then
   if [ -n "$(is_postgres_running)" ]; then
       echo "postgres is running"
       # Use Git to tell us the concrete directory we need
-      cd $(git rev-parse --show-toplevel)/server/schema
+      cd $(git rev-parse --show-toplevel)/components/automate-workflow-server/schema
 
       if [ -n "$EUNIT_DROP_DATABASE" ];
       then
