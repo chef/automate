@@ -3,9 +3,7 @@ package server
 import (
 	"context"
 	"net"
-	"strings"
 
-	automate_event "github.com/chef/automate/api/interservice/event"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	"github.com/pkg/errors"
@@ -15,6 +13,8 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
+
+	automate_event "github.com/chef/automate/api/interservice/event"
 
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -63,7 +63,7 @@ func NewGRPCServer(ctx context.Context,
 	// Note(sr): we're buffering one version struct, as NewPostgresPolicyServer writes
 	// to this before we've got readers
 	vChan := make(chan api_v2.Version, 1)
-	switcher := NewSwitch(vChan)
+	switcher := v2.NewSwitch(vChan)
 
 	v1Server, err := v1.NewPostgresServer(ctx, l, e, migrationsConfig)
 	if err != nil {
@@ -87,7 +87,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
 
-	v2AuthzServer, err := v2.NewAuthzServer(l, e, v2PolServer)
+	v2AuthzServer, err := v2.NewAuthzServer(l, e, switcher)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 authz server")
 	}
@@ -141,28 +141,6 @@ func NewGRPCServer(ctx context.Context,
 	return g, nil
 }
 
-type versionSwitch struct {
-	version api_v2.Version
-}
-
-func NewSwitch(c chan api_v2.Version) *versionSwitch {
-	x := versionSwitch{
-		version: api_v2.Version{
-			Major: api_v2.Version_V1,
-			Minor: api_v2.Version_V0,
-		},
-	}
-	go func() {
-		for {
-			select {
-			case v := <-c:
-				x.version = v
-			}
-		}
-	}()
-	return &x
-}
-
 func createEventServiceConnection(connFactory *secureconn.Factory,
 	eventServiceAddress string) (automate_event.EventServiceClient, error) {
 	if eventServiceAddress == "" {
@@ -180,47 +158,6 @@ func createEventServiceConnection(connFactory *secureconn.Factory,
 	}
 
 	return eventServiceClient, nil
-}
-
-func (v *versionSwitch) Interceptor(ctx context.Context,
-	req interface{},
-	info *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler) (interface{}, error) {
-	// For Authorization calls (IsAuthorized, FilterAuthorizedPairs), we decline
-	// cross-overs.
-	//
-	// Note: v2 policy related calls have their own service, so, for example, the
-	// endpoint for retrieving whether IAMv1 or v2 is used, GetPolicyVersion, is
-	// "/chef.automate.domain.authz.v2.Policies/GetPolicyVersion", and thus
-	// exempt from this version check.
-
-	// These methods skip the check, thought they are in the relevant service
-	// definition:
-	switch info.FullMethod {
-	case "/chef.automate.domain.authz.Authorization/GetVersion":
-		return handler(ctx, req)
-	}
-
-	v1Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Authorization/")
-	v2Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/")
-
-	if v.version.Major == api_v2.Version_V2 && v1Req {
-		st := status.New(codes.FailedPrecondition, "authz-service set to v2")
-		st, err := st.WithDetails(&common.ErrorShouldUseV2{})
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
-		}
-		return nil, st.Err()
-	}
-	if v.version.Major == api_v2.Version_V1 && v2Req {
-		st := status.New(codes.FailedPrecondition, "authz-service set to v1")
-		st, err := st.WithDetails(&common.ErrorShouldUseV1{})
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
-		}
-		return nil, st.Err()
-	}
-	return handler(ctx, req)
 }
 
 // InputValidationInterceptor is a middleware for running the protobuf validation.

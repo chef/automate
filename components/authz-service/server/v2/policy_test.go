@@ -2852,7 +2852,8 @@ func setupV2(t *testing.T,
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testProjectRulesRetriever{}, eventServiceClient)
 	require.NoError(t, err)
 
-	authzV2, err := v2.NewAuthzServer(l, authorizer, polV2)
+	vSwitch := v2.NewSwitch(vChan)
+	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -2863,7 +2864,7 @@ func setupV2(t *testing.T,
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
 			grpc_server.InputValidationInterceptor(),
-			grpc_server.NewSwitch(vChan).Interceptor,
+			vSwitch.Interceptor,
 			polV2.EngineUpdateInterceptor(),
 		),
 	))

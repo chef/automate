@@ -10,10 +10,13 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/lib/logger"
 
+	// TODO: Fix this--two imports for the same thing!
 	api "github.com/chef/automate/api/interservice/authz/v2"
+	v2 "github.com/chef/automate/api/interservice/authz/v2"
+
+	// TODO: Fix this--two imports for the same thing!
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
@@ -39,7 +42,6 @@ type policyServer struct {
 // protobuf + the update interceptor
 type PolicyServer interface {
 	api.PoliciesServer
-	GetVersion() api.Version
 
 	EngineUpdateInterceptor() grpc.UnaryServerInterceptor
 }
@@ -1012,9 +1014,4 @@ func (s *policyServer) setVersion(v v2.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
 	}
-}
-
-func (s *policyServer) GetVersion() v2.Version {
-	version := <-s.vChan
-	return version
 }

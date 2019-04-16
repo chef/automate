@@ -3,14 +3,18 @@ package v2
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 
+	"github.com/chef/automate/api/interservice/authz/common"
 	api "github.com/chef/automate/api/interservice/authz/v2"
+	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 )
@@ -18,21 +22,17 @@ import (
 // These do not have to be the same
 // but seems reasonable to make them the same by convention.
 type authzServer struct {
-	log    logger.Logger
-	engine engine.V2Authorizer
-	getter versionGetter
-}
-
-type versionGetter interface {
-	GetVersion() api.Version
+	log     logger.Logger
+	engine  engine.V2Authorizer
+	vSwitch *versionSwitch
 }
 
 // NewAuthzServer returns a new IAM v2 Authz server.
-func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, g versionGetter) (api.AuthorizationServer, error) {
+func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *versionSwitch) (api.AuthorizationServer, error) {
 	return &authzServer{
-		log:    l,
-		engine: e,
-		getter: g,
+		log:     l,
+		engine:  e,
+		vSwitch: v,
 	}, nil
 }
 
@@ -59,8 +59,8 @@ func (s *authzServer) ProjectsAuthorized(
 	req *api.ProjectsAuthorizedReq) (*api.ProjectsAuthorizedResp, error) {
 
 	// we check the version set in the channel on policy server
-	// in order to determined whether or not to filter projects for the request
-	version := s.getter.GetVersion()
+	// in order to determine whether or not to filter projects for the request
+	version := s.vSwitch.version
 	s.log.Infof("HEY! version here: %s", version)
 	s.log.Infof("HEY! minor version here: %s", version.Minor)
 
@@ -167,7 +167,65 @@ func toEnginePairs(pairs []*api.Pair) []engine.Pair {
 	return ps
 }
 
-// func extractVersion(vChan chan api.Version) api.Version {
-// 	var version api.Version
-// 	return version
-// }
+type versionSwitch struct {
+	version api_v2.Version
+}
+
+func (v *versionSwitch) Interceptor(ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler) (interface{}, error) {
+	// For Authorization calls (IsAuthorized, FilterAuthorizedPairs), we decline
+	// cross-overs.
+	//
+	// Note: v2 policy related calls have their own service, so, for example, the
+	// endpoint for retrieving whether IAMv1 or v2 is used, GetPolicyVersion, is
+	// "/chef.automate.domain.authz.v2.Policies/GetPolicyVersion", and thus
+	// exempt from this version check.
+
+	// These methods skip the check, thought they are in the relevant service
+	// definition:
+	switch info.FullMethod {
+	case "/chef.automate.domain.authz.Authorization/GetVersion":
+		return handler(ctx, req)
+	}
+
+	v1Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Authorization/")
+	v2Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/")
+
+	if v.version.Major == api_v2.Version_V2 && v1Req {
+		st := status.New(codes.FailedPrecondition, "authz-service set to v2")
+		st, err := st.WithDetails(&common.ErrorShouldUseV2{})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
+		}
+		return nil, st.Err()
+	}
+	if v.version.Major == api_v2.Version_V1 && v2Req {
+		st := status.New(codes.FailedPrecondition, "authz-service set to v1")
+		st, err := st.WithDetails(&common.ErrorShouldUseV1{})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
+		}
+		return nil, st.Err()
+	}
+	return handler(ctx, req)
+}
+
+func NewSwitch(c chan api_v2.Version) *versionSwitch {
+	x := versionSwitch{
+		version: api_v2.Version{
+			Major: api_v2.Version_V1,
+			Minor: api_v2.Version_V0,
+		},
+	}
+	go func() {
+		for {
+			select {
+			case v := <-c:
+				x.version = v
+			}
+		}
+	}()
+	return &x
+}
