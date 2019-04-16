@@ -111,9 +111,14 @@ SELECT array_agg(policy_id) FROM pol_ids`,
 }
 
 func (p *pg) ListPolicies(ctx context.Context) ([]*v2.Policy, error) {
-	var pols []*v2.Policy
-	rows, err := p.db.QueryContext(ctx, `SELECT query_policies from query_policies();`)
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
 
+	var pols []*v2.Policy
+	rows, err := p.db.QueryContext(ctx,
+		`SELECT query_policies from query_policies($1);`, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -137,7 +142,7 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*v2.Policy, error) {
 }
 
 func (p *pg) GetPolicy(ctx context.Context, id string) (*v2.Policy, error) {
-	pol, err := p.queryPolicy(ctx, id)
+	pol, err := p.queryPolicy(ctx, id, p.db)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -146,17 +151,31 @@ func (p *pg) GetPolicy(ctx context.Context, id string) (*v2.Policy, error) {
 }
 
 func (p *pg) DeletePolicy(ctx context.Context, id string) error {
-	_, err := p.queryPolicy(ctx, id)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return p.processError(err)
 	}
 
-	_, err = p.db.ExecContext(ctx,
+	// Project filtering handled in here
+	_, err = p.queryPolicy(ctx, id, tx)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx,
 		`DELETE FROM iam_policies WHERE id=$1;`,
 		id,
 	)
 	if err != nil {
 		return p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewErrTxCommit(err)
 	}
 
 	return nil
@@ -167,6 +186,13 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	defer cancel()
 
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	// Project filtering handled in here. We'll return a 404 right away if we can't find
+	// the policy via ID as filtered by projects.
+	_, err = p.queryPolicy(ctx, pol.ID, tx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -321,10 +347,16 @@ func (p *pg) associatePolicyWithProjects(ctx context.Context,
 }
 
 // queryPolicy returns a policy based on id or an error.
-func (p *pg) queryPolicy(ctx context.Context, id string) (*v2.Policy, error) {
+func (p *pg) queryPolicy(ctx context.Context, id string, q Querier) (*v2.Policy, error) {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	var pol v2.Policy
-	row := p.db.QueryRowContext(ctx, `SELECT query_policy from query_policy($1);`, id)
-	err := row.Scan(&pol)
+	row := q.QueryRowContext(ctx,
+		`SELECT query_policy from query_policy($1, $2);`, id, pq.Array(projectsFilter))
+	err = row.Scan(&pol)
 	if err != nil {
 		return nil, err
 	}
@@ -336,9 +368,29 @@ func (p *pg) queryPolicy(ctx context.Context, id string) (*v2.Policy, error) {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 func (p *pg) ListPolicyMembers(ctx context.Context, id string) ([]v2.Member, error) {
-	members, err := p.getPolicyMembers(ctx, id)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
+	}
+
+	// Project filtering handled in here. We'll return a database here right away if
+	// we can't find the policy via ID as filtered by projects.
+	_, err = p.queryPolicy(ctx, id, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	members, err := p.getPolicyMembersWithQuerier(ctx, id, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
 	return members, nil
@@ -349,6 +401,13 @@ func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []v2.Membe
 	defer cancel()
 
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	// Project filtering handled in here. We'll return a 404 right away if we can't find
+	// the policy via ID as filtered by projects.
+	_, err = p.queryPolicy(ctx, id, tx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -387,6 +446,13 @@ func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members 
 		return nil, p.processError(err)
 	}
 
+	// Project filtering handled in here. We'll return a 404 right away if we can't find
+	// the policy via ID as filtered by projects.
+	_, err = p.queryPolicy(ctx, policyID, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	err = p.replacePolicyMembersWithQuerier(ctx, policyID, members, tx)
 	if err != nil {
 		err = p.processError(err)
@@ -421,6 +487,13 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 	defer cancel()
 
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	// Project filtering handled in here. We'll return a 404 right away if we can't find
+	// the policy via ID as filtered by projects.
+	_, err = p.queryPolicy(ctx, policyID, tx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -498,20 +571,7 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 	return err
 }
 
-func (p *pg) getPolicyMembers(ctx context.Context, id string) ([]v2.Member, error) {
-	return p.getPolicyMembersWithQuerier(ctx, id, p.db)
-}
-
 func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Querier) ([]v2.Member, error) {
-	var exists bool
-	err := q.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM iam_policies WHERE id=$1)`, id).Scan(&exists)
-	if err != nil {
-		return nil, errors.Wrap(err, "check policy existence")
-	}
-	if !exists {
-		return nil, storage_errors.ErrNotFound
-	}
-
 	rows, err := q.QueryContext(ctx,
 		`SELECT m.id, m.name FROM iam_policy_members AS pm
 			INNER JOIN iam_members AS m ON pm.member_id=m.id
