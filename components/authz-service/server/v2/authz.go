@@ -58,16 +58,6 @@ func (s *authzServer) ProjectsAuthorized(
 	ctx context.Context,
 	req *api.ProjectsAuthorizedReq) (*api.ProjectsAuthorizedResp, error) {
 
-	// we check the version set in the channel on policy server
-	// in order to determine whether or not to filter projects for the request
-	version := s.vSwitch.version
-
-	// if IAM version is set to v2.0
-	// we override the projects passed in the request because no filter should be applied
-	if version.Minor == api.Version_V0 {
-		req.ProjectsFilter = []string{constants.AllProjectsExternalID}
-	}
-
 	projectsAuthorized, err := s.engine.V2ProjectsAuthorized(ctx,
 		engine.Subjects(req.Subjects),
 		engine.Action(req.Action),
@@ -77,7 +67,13 @@ func (s *authzServer) ProjectsAuthorized(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	// we check the version set in the channel on policy server
+	// in order to determine whether or not to filter projects for the request
+	version := s.vSwitch.version
 	if version.Minor == api.Version_V0 && len(projectsAuthorized) > 0 {
+		// if IAM version is set to v2.0
+		// as long as at least one project is authorized
+		// we override the filtered projects because no filter should be applied on v2
 		projectsAuthorized = []string{constants.AllProjectsExternalID}
 	} else if stringutils.SliceContains(projectsAuthorized, constants.AllProjectsID) {
 		// Generally we return the engine's response verbatim
