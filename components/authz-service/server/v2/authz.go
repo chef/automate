@@ -61,10 +61,6 @@ func (s *authzServer) ProjectsAuthorized(
 	// we check the version set in the channel on policy server
 	// in order to determine whether or not to filter projects for the request
 	version := s.vSwitch.version
-	s.log.Infof("HEY! version here: %s", version)
-	s.log.Infof("HEY! minor version here: %s", version.Minor)
-	originalFilter := make([]string, len(req.ProjectsFilter))
-	copy(originalFilter, req.ProjectsFilter)
 
 	// if IAM version is set to v2.0
 	// we override the projects passed in the request because no filter should be applied
@@ -80,17 +76,20 @@ func (s *authzServer) ProjectsAuthorized(
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	// Generally we return the engine's response verbatim
-	// but there are two cases that need to be intercepted and adjusted.
-	if stringutils.SliceContains(projectsAuthorized, constants.AllProjectsID) {
-		if len(originalFilter) == 0 {
+
+	if version.Minor == api.Version_V0 && len(projectsAuthorized) > 0 {
+		projectsAuthorized = []string{constants.AllProjectsExternalID}
+	} else if stringutils.SliceContains(projectsAuthorized, constants.AllProjectsID) {
+		// Generally we return the engine's response verbatim
+		// but there are two cases that need to be intercepted and adjusted.
+		if len(req.ProjectsFilter) == 0 {
 			// Engine allows all and we requested all, so signify it as all.
 			// This must be different than the requested notion of all,
 			// an empty array, because an empty array coming back from the engine means none!
 			projectsAuthorized = []string{constants.AllProjectsExternalID}
 		} else {
 			// Engine allows all--but we want that to mean just the *requested* ones.
-			projectsAuthorized = originalFilter
+			projectsAuthorized = req.ProjectsFilter
 		}
 		s.logProjectQuery(req, projectsAuthorized)
 	}

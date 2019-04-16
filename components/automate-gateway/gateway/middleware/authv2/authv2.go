@@ -79,7 +79,6 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 			action, resource, subjects, projectsToFilter)
 	}
 	projects := filteredResp.Projects
-	log.Infof("HEY! got your projects filtered projects here: %s\n\n", projects)
 
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()), nil
 }
