@@ -24,7 +24,7 @@ type client struct {
 // with incoming project headers, inject headers for downstream, etc.
 
 func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter []string,
-	req interface{}, minor authz.Version_VersionNumber,
+	req interface{},
 ) (context.Context, error) {
 	log := ctxlogrus.Extract(ctx)
 	method, ok := grpc.Method(ctx)
@@ -57,10 +57,11 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 	// Note: if ANYTHING goes wrong, 403 is the error we return. This is done
 	// on purpose, so our authz response doesn't leak information about what
 	// is happening internally.
-	resp, err := c.client.IsAuthorized(ctx, &authz.IsAuthorizedReq{
-		Subjects: subjects,
-		Resource: resource,
-		Action:   action,
+	filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
+		Subjects:       subjects,
+		Resource:       resource,
+		Action:         action,
+		ProjectsFilter: projectsToFilter,
 	})
 	if err != nil {
 		if status.Convert(err).Code() == codes.FailedPrecondition {
@@ -68,51 +69,17 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 		}
 		log.WithError(err).Error("error authorizing request")
 		return nil, status.Errorf(codes.PermissionDenied,
-			"error authorizing action %q on resource %q for subjects %q: %s",
-			action, resource, subjects, err.Error())
+			"error authorizing action %q on resource %q for subjects %q filtered by project list %q: %s",
+			action, resource, subjects, projectsToFilter, err.Error())
 	}
-	if !resp.GetAuthorized() {
+	if len(filteredResp.Projects) == 0 {
 		return nil, status.Errorf(codes.PermissionDenied,
-			"unauthorized action %q on resource %q for subjects %q",
-			action, resource, subjects)
+			"unauthorized: subjects %q has no project access for action %q on resource %q "+
+				"(filtered by project list %q)",
+			action, resource, subjects, projectsToFilter)
 	}
-
-	var projects []string
-	// TODO drop
-	log.Infof("HEY! here's the minor version passed to v2 middleware: %s\n\n", minor)
-
-	if minor == authz.Version_V0 {
-		projects = []string{auth_context.AllProjectsKey}
-	}
-
-	// TODO drop
-	log.Infof("1. HEY! got your projects from headers here: %s\n\n", projectsToFilter)
-	if minor == authz.Version_V1 {
-		filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
-			Subjects:       subjects,
-			Resource:       resource,
-			Action:         action,
-			ProjectsFilter: projectsToFilter,
-		})
-		if err != nil {
-			if status.Convert(err).Code() == codes.FailedPrecondition {
-				return nil, err
-			}
-			log.WithError(err).Error("error authorizing request")
-			return nil, status.Errorf(codes.PermissionDenied,
-				"error authorizing action %q on resource %q for subjects %q filtered by project list %q: %s",
-				action, resource, subjects, projectsToFilter, err.Error())
-		}
-		if len(filteredResp.Projects) == 0 {
-			return nil, status.Errorf(codes.PermissionDenied,
-				"unauthorized: subjects %q has no project access for action %q on resource %q "+
-					"(filtered by project list %q)",
-				action, resource, subjects, projectsToFilter)
-		}
-		projects = filteredResp.Projects
-		// TODO drop
-		log.Infof("2. HEY! got your projects filtered projects here: %s\n\n", projects)
-	}
+	projects := filteredResp.Projects
+	log.Infof("HEY! got your projects filtered projects here: %s\n\n", projects)
 
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()), nil
 }

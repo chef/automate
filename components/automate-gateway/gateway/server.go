@@ -274,12 +274,7 @@ func (s *Server) NewGRPCServer() (*grpc.Server, error) {
 		return nil, errors.Wrap(err, "create auth client")
 	}
 
-	polClient, err := s.clientsFactory.PoliciesClient()
-	if err != nil {
-		return nil, errors.Wrap(err, "create policies client")
-	}
-
-	authInterceptor := middleware.NewAuthInterceptor(authClient, s.authorizer, polClient)
+	authInterceptor := middleware.NewAuthInterceptor(authClient, s.authorizer)
 
 	logrusEntry := log.NewEntry(log.StandardLogger())
 

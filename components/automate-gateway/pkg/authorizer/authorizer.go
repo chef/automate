@@ -8,7 +8,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authz/common"
-	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 )
@@ -22,21 +21,16 @@ func NewAuthorizer(v1, v2 middleware.AuthorizationHandler) middleware.SwitchingA
 }
 
 func (a *state) Handle(ctx context.Context,
-	subjects []string, projects []string, req interface{}, minor v2.Version_VersionNumber) (context.Context, error) {
+	subjects []string, projects []string, req interface{}) (context.Context, error) {
 
-	// TODO drop
-	fmt.Printf("HEY! here's the minor version in authorizer: %s\n\n", minor)
-	newCtx, err := a.next.Handle(ctx, subjects, projects, req, minor)
+	newCtx, err := a.next.Handle(ctx, subjects, projects, req)
 	st := status.Convert(err)
-	versionSwitch, updatedMinor := a.fromStatus(st)
 	switch st.Code() {
 	case codes.OK:
 		return newCtx, nil
 	case codes.FailedPrecondition:
-		if versionSwitch {
-			// TODO drop
-			fmt.Printf("HEY! here's the updated minor version in authorizer: %s\n\n", updatedMinor)
-			return a.Handle(ctx, subjects, projects, req, updatedMinor)
+		if a.fromStatus(st) {
+			return a.Handle(ctx, subjects, projects, req)
 		}
 		fallthrough
 	default: // any other error status
@@ -64,10 +58,9 @@ func (a *state) IsAuthorized(ctx context.Context, subjects []string,
 		}
 	}
 	st := status.Convert(err)
-	versionSwitch, _ := a.fromStatus(st)
 	switch st.Code() {
 	case codes.FailedPrecondition:
-		if versionSwitch {
+		if a.fromStatus(st) {
 			return a.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2)
 		}
 		fallthrough
@@ -107,10 +100,9 @@ func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
 		}
 	}
 	st := status.Convert(err)
-	versionSwitch, _ := a.fromStatus(st)
 	switch st.Code() {
 	case codes.FailedPrecondition:
-		if versionSwitch {
+		if a.fromStatus(st) {
 			return a.FilterAuthorizedPairs(ctx, subjects,
 				mapByResourceAndActionV1, mapByResourceAndActionV2,
 				methodsInfoV1, methodsInfoV2)
@@ -152,10 +144,9 @@ func (a *state) FilterAuthorizedProjects(ctx context.Context, subjects []string,
 		}
 	}
 	st := status.Convert(err)
-	versionSwitch, _ := a.fromStatus(st)
 	switch st.Code() {
 	case codes.FailedPrecondition:
-		if versionSwitch {
+		if a.fromStatus(st) {
 			return a.FilterAuthorizedProjects(ctx, subjects,
 				mapByResourceAndActionV1, mapByResourceAndActionV2,
 				methodsInfoV1, methodsInfoV2)
@@ -183,20 +174,16 @@ func annotate(resp middleware.AuthorizationResponse, subjects []string, resource
 		subjects, action, resource)}
 }
 
-func (a *state) fromStatus(st *status.Status) (bool, v2.Version_VersionNumber) {
+func (a *state) fromStatus(st *status.Status) bool {
 	for _, detail := range st.Details() {
 		if _, ok := detail.(*common.ErrorShouldUseV1); ok {
 			a.next = a.v1
-			return true, v2.Version_V0
+			return true
 		}
 		if _, ok := detail.(*common.ErrorShouldUseV2); ok {
 			a.next = a.v2
-			return true, v2.Version_V0
-		}
-		if _, ok := detail.(*common.ErrorShouldUseV2_1); ok {
-			a.next = a.v2
-			return true, v2.Version_V1
+			return true
 		}
 	}
-	return false, v2.Version_V0
+	return false
 }
