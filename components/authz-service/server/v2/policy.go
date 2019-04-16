@@ -12,13 +12,8 @@ import (
 
 	"github.com/chef/automate/lib/logger"
 
-	// TODO: Fix this--two imports for the same thing!
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	v2 "github.com/chef/automate/api/interservice/authz/v2"
-
-	// TODO: Fix this--two imports for the same thing!
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -106,18 +101,18 @@ func NewPoliciesServer(
 	if err != nil {
 		return nil, errors.Wrap(err, "retrieve migration status from storage")
 	}
-	var v v2.Version
+	var v api.Version
 	switch ms {
 	case storage.SuccessfulBeta1:
-		v = v2.Version{Major: v2.Version_V2, Minor: v2.Version_V1}
+		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
 	case storage.Successful:
-		v = v2.Version{Major: v2.Version_V2, Minor: v2.Version_V0}
+		v = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
 	default:
-		v = v2.Version{Major: v2.Version_V1, Minor: v2.Version_V0}
+		v = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
 	}
 	srv.setVersion(v)
 
-	isV2 := v.Major == v2.Version_V2
+	isV2 := v.Major == api.Version_V2
 
 	if isV2 {
 		err = srv.store.ApplyV2DataMigrations(ctx)
@@ -357,7 +352,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 	}
 
 	// TODO replace this check with a policy once we've got RemovePolicyMember
-	if req.Id == constants_v2.AdminPolicyID {
+	if req.Id == constants.AdminPolicyID {
 		for _, member := range members {
 			if member.Name == "team:local:admins" {
 				return nil, status.Error(codes.PermissionDenied, `cannot remove local team: 
@@ -514,7 +509,7 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		return nil, err
 	}
 	if upgraded == true {
-		s.setVersion(v2.Version{Major: v2.Version_V2, Minor: v2.Version_V1})
+		s.setVersion(api.Version{Major: api.Version_V2, Minor: api.Version_V1})
 		return &api.MigrateToV2Resp{}, nil
 	}
 
@@ -574,14 +569,14 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 	}
 
 	// we've made it!
-	var v v2.Version
+	var v api.Version
 	switch req.Flag {
 	case api.Flag_VERSION_2_1:
 		err = s.store.SuccessBeta1(ctx)
-		v = v2.Version{Major: v2.Version_V2, Minor: v2.Version_V1}
+		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
 	default:
 		err = s.store.Success(ctx)
-		v = v2.Version{Major: v2.Version_V2, Minor: v2.Version_V0}
+		v = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
 	}
 	if err != nil {
 		recordFailure()
@@ -630,7 +625,7 @@ func (s *policyServer) ResetToV1(ctx context.Context,
 	if err := s.store.Reset(ctx); err != nil {
 		return nil, status.Errorf(codes.Internal, "reset database state: %s", err.Error())
 	}
-	s.setVersion(v2.Version{Major: v2.Version_V1, Minor: v2.Version_V0})
+	s.setVersion(api.Version{Major: api.Version_V1, Minor: api.Version_V0})
 	return &api.ResetToV1Resp{}, nil
 }
 
@@ -1010,7 +1005,7 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 	s.log.WithFields(kv).Info("Policy definition")
 }
 
-func (s *policyServer) setVersion(v v2.Version) {
+func (s *policyServer) setVersion(v api.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
 	}
