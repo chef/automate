@@ -354,6 +354,46 @@ func TestServiceGroupsHealthSortedPercent(t *testing.T) {
 	assert.Equal(t, int32(0), response.ServiceGroups[2].HealthPercentage)
 }
 
+func TestServiceGroupsHealthSortedPercentAsc(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Sorting: &query.Sorting{
+				Field: "percent_ok",
+				Order: query.SortOrder_ASC,
+			},
+		}
+		mockHabServices = []*applications.HabService{
+			NewHabServiceMsg("sup2", a, e, "default", "core",
+				"a", "0.1.0", "20190101121212", "UNKNOWN"),
+			NewHabServiceMsg("sup3", a, e, "default", "core",
+				"b", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup4", a, e, "default", "core",
+				"c", "0.1.0", "20190101121212", "WARNING"),
+			NewHabServiceMsg("sup5", a, e, "default", "core",
+				"c", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup6", a, e, "default", "core",
+				"d", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup7", a, e, "default", "core",
+				"d", "0.1.0", "20190101121212", "UNKNOWN"),
+			NewHabServiceMsg("sup8", a, e, "default", "core",
+				"d", "0.1.0", "20190101121212", "WARNING"),
+			NewHabServiceMsg("sup9", a, e, "default", "core",
+				"d", "0.1.0", "20190101121212", "CRITICAL"),
+		}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+
+	assert.Equal(t, int32(0), response.ServiceGroups[0].HealthPercentage)
+	assert.Equal(t, int32(25), response.ServiceGroups[1].HealthPercentage)
+	assert.Equal(t, int32(50), response.ServiceGroups[2].HealthPercentage)
+	assert.Equal(t, int32(100), response.ServiceGroups[3].HealthPercentage)
+}
+
 func TestServiceGroupsHealthPage(t *testing.T) {
 	var (
 		ctx     = context.Background()
