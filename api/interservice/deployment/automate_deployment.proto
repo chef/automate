@@ -539,6 +539,7 @@ message BackupRestoreTask {
 	string sha256 = 10;
 
 	ReleaseManifest manifest = 11;
+	AutomateConfig patch_config = 12;
 }
 
 message BackupDeleteTask {
