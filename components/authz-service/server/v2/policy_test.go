@@ -2752,6 +2752,96 @@ func TestV1AndV2Queries(t *testing.T) {
 	}
 }
 
+func TestVersionChannel(t *testing.T) {
+	ctx := context.Background()
+	_ = prng.Seed(t) // used indirectly with rand.Shuffle
+	vChan := make(chan api_v2.Version, 1)
+	emptyV1List := v1Lister{}
+	ts := setupV2(t, &responderEngine{}, nil, &emptyV1List, vChan)
+	status := ts.status
+	assert := assert.New(t)
+	require := require.New(t)
+
+	iamV1 := api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
+	iamV2 := api_v2.Version{Major: api_v2.Version_V2, Minor: api_v2.Version_V0}
+	iamV2Beta := api_v2.Version{Major: api_v2.Version_V2, Minor: api_v2.Version_V1}
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"when not upgraded, the channel is set to v1.0", func(t *testing.T) {
+			assert.Equal(iamV1, ts.switcher.Version)
+		}},
+		{"when upgraded from v1.0 to v2.0, the channel is set to v2.0", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
+			require.NoError(err)
+
+			assert.Equal(iamV2, ts.switcher.Version)
+		}},
+		{"when reset from v2.0 to v1.0, channel changes to v1.0", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
+			require.NoError(err)
+			require.Equal(iamV2, ts.switcher.Version)
+			ts.policy.ResetToV1(ctx, &api_v2.ResetToV1Req{})
+
+			assert.Equal(iamV1, ts.switcher.Version)
+		}},
+		{"when upgraded from v1.0 to v2.1, channel changes to v2.1", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+			require.NoError(err)
+
+			assert.Equal(iamV2Beta, ts.switcher.Version)
+		}},
+		{"when reset from v2.1 to v1.0, channel changes to v1.0", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+			require.NoError(err)
+			require.Equal(iamV2Beta, ts.switcher.Version)
+			ts.policy.ResetToV1(ctx, &api_v2.ResetToV1Req{})
+
+			assert.Equal(iamV1, ts.switcher.Version)
+		}},
+		{"when upgraded from v2.0 to v2.1, channel changes to v2.1", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
+			require.NoError(err)
+			require.Equal(iamV2, ts.switcher.Version)
+			_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+			require.NoError(err)
+
+			assert.Equal(iamV2Beta, ts.switcher.Version)
+		}},
+		{"when downgraded from v2.1 to v2.0, channel changes to v2.0", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+			require.NoError(err)
+			require.Equal(iamV2Beta, ts.switcher.Version)
+			_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
+			require.NoError(err)
+
+			assert.Equal(iamV2, ts.switcher.Version)
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		// reset memstore to "no migrations ever attempted" status
+		require.NoError(status.Pristine(ctx))
+
+		// reset (v2) store to empty
+		ts.policyCache.Flush()
+		ts.roleCache.Flush()
+		ts.projectCache.Flush()
+
+		// reset to v1
+		ts.switcher.Version = api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
+		require.Equal(iamV1, ts.switcher.Version)
+
+		t.Run(test.desc, test.f)
+	}
+}
+
 func getPolicyFromStore(t *testing.T, store *cache.Cache, id string) storage.Policy {
 	t.Helper()
 	storedPol, ok := store.Get(id)
@@ -2822,6 +2912,7 @@ type testSetup struct {
 	roleCache    *cache.Cache
 	projectCache *cache.Cache
 	status       storage.MigrationStatusProvider
+	switcher     *v2.VersionSwitch
 }
 
 func setupV2WithWriter(t *testing.T,
@@ -2889,6 +2980,7 @@ func setupV2(t *testing.T,
 		roleCache:    mem_v2.RolesCache(),
 		projectCache: mem_v2.ProjectsCache(),
 		status:       mem_v2,
+		switcher:     vSwitch,
 	}
 }
 

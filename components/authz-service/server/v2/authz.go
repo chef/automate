@@ -14,7 +14,6 @@ import (
 
 	"github.com/chef/automate/api/interservice/authz/common"
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 )
@@ -24,11 +23,11 @@ import (
 type authzServer struct {
 	log     logger.Logger
 	engine  engine.V2Authorizer
-	vSwitch *versionSwitch
+	vSwitch *VersionSwitch
 }
 
 // NewAuthzServer returns a new IAM v2 Authz server.
-func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *versionSwitch) (api.AuthorizationServer, error) {
+func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch) (api.AuthorizationServer, error) {
 	return &authzServer{
 		log:     l,
 		engine:  e,
@@ -69,7 +68,7 @@ func (s *authzServer) ProjectsAuthorized(
 
 	// we check the version set in the channel on policy server
 	// in order to determine whether or not to filter projects for the request
-	version := s.vSwitch.version
+	version := s.vSwitch.Version
 	if version.Minor == api.Version_V0 && len(projectsAuthorized) > 0 {
 		// if IAM version is set to v2.0
 		// as long as at least one project is authorized
@@ -164,11 +163,11 @@ func toEnginePairs(pairs []*api.Pair) []engine.Pair {
 	return ps
 }
 
-type versionSwitch struct {
-	version api_v2.Version
+type VersionSwitch struct {
+	Version api.Version
 }
 
-func (v *versionSwitch) Interceptor(ctx context.Context,
+func (v *VersionSwitch) Interceptor(ctx context.Context,
 	req interface{},
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler) (interface{}, error) {
@@ -190,7 +189,7 @@ func (v *versionSwitch) Interceptor(ctx context.Context,
 	v1Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Authorization/")
 	v2Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/")
 
-	if v.version.Major == api_v2.Version_V2 && v1Req {
+	if v.Version.Major == api.Version_V2 && v1Req {
 		st := status.New(codes.FailedPrecondition, "authz-service set to v2")
 		st, err := st.WithDetails(&common.ErrorShouldUseV2{})
 		if err != nil {
@@ -198,7 +197,7 @@ func (v *versionSwitch) Interceptor(ctx context.Context,
 		}
 		return nil, st.Err()
 	}
-	if v.version.Major == api_v2.Version_V1 && v2Req {
+	if v.Version.Major == api.Version_V1 && v2Req {
 		st := status.New(codes.FailedPrecondition, "authz-service set to v1")
 		st, err := st.WithDetails(&common.ErrorShouldUseV1{})
 		if err != nil {
@@ -209,18 +208,18 @@ func (v *versionSwitch) Interceptor(ctx context.Context,
 	return handler(ctx, req)
 }
 
-func NewSwitch(c chan api_v2.Version) *versionSwitch {
-	x := versionSwitch{
-		version: api_v2.Version{
-			Major: api_v2.Version_V1,
-			Minor: api_v2.Version_V0,
+func NewSwitch(c chan api.Version) *VersionSwitch {
+	x := VersionSwitch{
+		Version: api.Version{
+			Major: api.Version_V1,
+			Minor: api.Version_V0,
 		},
 	}
 	go func() {
 		for {
 			select {
 			case v := <-c:
-				x.version = v
+				x.Version = v
 			}
 		}
 	}()

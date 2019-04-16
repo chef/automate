@@ -67,16 +67,16 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			return nil, err
 		}
+		// TODO bd: add projects 
 		log.WithError(err).Error("error authorizing request")
 		return nil, status.Errorf(codes.PermissionDenied,
-			"error authorizing action %q on resource %q for subjects %q filtered by project list %q: %s",
-			action, resource, subjects, projectsToFilter, err.Error())
+			"error authorizing action %q on resource %q for subjects %q: %s",
+			action, resource, subjects, err.Error())
 	}
 	if len(filteredResp.Projects) == 0 {
 		return nil, status.Errorf(codes.PermissionDenied,
-			"unauthorized: subjects %q has no project access for action %q on resource %q "+
-				"(filtered by project list %q)",
-			action, resource, subjects, projectsToFilter)
+			"unauthorized: subjects %q has no project access for action %q on resource %q",
+			action, resource, subjects)
 	}
 	projects := filteredResp.Projects
 
