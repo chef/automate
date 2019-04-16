@@ -63,6 +63,8 @@ func (s *authzServer) ProjectsAuthorized(
 	version := s.vSwitch.version
 	s.log.Infof("HEY! version here: %s", version)
 	s.log.Infof("HEY! minor version here: %s", version.Minor)
+	originalFilter := make([]string, len(req.ProjectsFilter))
+	copy(originalFilter, req.ProjectsFilter)
 
 	// if IAM version is set to v2.0
 	// we override the projects passed in the request because no filter should be applied
@@ -81,14 +83,14 @@ func (s *authzServer) ProjectsAuthorized(
 	// Generally we return the engine's response verbatim
 	// but there are two cases that need to be intercepted and adjusted.
 	if stringutils.SliceContains(projectsAuthorized, constants.AllProjectsID) {
-		if len(req.ProjectsFilter) == 0 {
+		if len(originalFilter) == 0 {
 			// Engine allows all and we requested all, so signify it as all.
 			// This must be different than the requested notion of all,
 			// an empty array, because an empty array coming back from the engine means none!
 			projectsAuthorized = []string{constants.AllProjectsExternalID}
 		} else {
 			// Engine allows all--but we want that to mean just the *requested* ones.
-			projectsAuthorized = req.ProjectsFilter
+			projectsAuthorized = originalFilter
 		}
 		s.logProjectQuery(req, projectsAuthorized)
 	}
