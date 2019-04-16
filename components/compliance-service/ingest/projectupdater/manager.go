@@ -194,12 +194,12 @@ func (manager *Manager) sendFaildEvent(msg string, projectUpdateID string) {
 		},
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: projectUpdateID,
 					},
 				},
-				"message": &_struct.Value{
+				"message": {
 					Kind: &_struct.Value_StringValue{
 						StringValue: msg,
 					},
@@ -226,22 +226,22 @@ func (manager *Manager) sendStatusEvent(jobStatus ingestic.JobStatus) {
 		},
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				"Completed": &_struct.Value{
+				"Completed": {
 					Kind: &_struct.Value_BoolValue{
 						BoolValue: jobStatus.Completed,
 					},
 				},
-				"PercentageComplete": &_struct.Value{
+				"PercentageComplete": {
 					Kind: &_struct.Value_NumberValue{
 						NumberValue: float64(jobStatus.PercentageComplete),
 					},
 				},
-				"EstimatedTimeCompeleteInSec": &_struct.Value{
+				"EstimatedTimeCompeleteInSec": {
 					Kind: &_struct.Value_NumberValue{
 						NumberValue: float64(jobStatus.EstimatedEndTimeInSec),
 					},
 				},
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: manager.projectUpdateID,
 					},
