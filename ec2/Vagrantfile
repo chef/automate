@@ -2,6 +2,7 @@ require 'json'
 require 'open-uri'
 require 'vagrant-aws'
 require 'resolv'
+require 'mkmf'
 
 home_dir="/home/ubuntu"
 current_branch=`git rev-parse --abbrev-ref HEAD`
@@ -13,6 +14,7 @@ automate_license = ENV['AUTOMATE_LICENSE']
 automate_license_path = '../dev/license.jwt'
 automate_channel = 'dev'
 automate_build = 'latest'
+manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
 es_ebs_snapshot = 'snap-09008b989ac450bf1'  # this is a snapshot of a 75GB empty volume partitioned and ext4 formatted. Use EBS_SNAPSHOT ENV variable to overwrite
 # Other good EBS snapshot candidates with ElasticSearch data on them:
 # snap-01c2a3639d3146721 : comp-2 indices for 50k nodes scanned on 2019.03.29
@@ -26,6 +28,39 @@ def extract_from_manifest(manifest, build)
   return hab_version, git_sha
 end
 
+# Extract the AWS credentials from a file without additional dependencies, like toml parsing gem
+def extract_aws_creds(file, profile)
+  key = nil
+  secret = nil
+  token = nil
+  found_profile = false
+  File.open(file).read.each_line do |line|
+    if line =~ /^\s*\[\s*#{Regexp.escape(profile)}s*\]/
+      found_profile = true
+      next
+    end
+    if found_profile
+      if line =~ /^\s*aws_access_key_id\s*=\s*"?(.+)"?/
+        key = $1
+        next
+      end
+      if line =~ /^\s*aws_secret_access_key\s*=\s*"?(.+)"?/
+        secret = $1
+        next
+      end
+      if line =~ /^\s*aws_session_token\s*=\s*"?(.+)"?/
+        token = $1
+        next
+      end
+      if ((key && secret && token) || line =~ /^\s*\[/)
+        # return if we found all properties or we reached another [profile]
+        return key, secret, token
+      end
+    end
+  end
+  return key, secret, token
+end
+
 def latest_build_from_versions(channel)
   raise "Invalid channel #{channel}, can only be 'dev', 'current' or 'acceptance'" unless ['dev', 'current', 'acceptance'].include?(channel)
   versions_url = "https://packages.chef.io/manifests/#{channel}/automate/versions.json"
@@ -36,29 +71,64 @@ def latest_build_from_versions(channel)
   return build
 end
 
-if !ENV['STOP_HOURS'].nil?
-  stop_hours = ENV['STOP_HOURS']
-end
+aws_session_token = ''
+aws_access_key_id = ENV['AWS_ACCESS_KEY_ID']
+aws_secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
 
-if !ENV['EBS_SNAPSHOT'].nil? && ENV['EBS_SNAPSHOT'] =~ /^snap-\w+$/
-  es_ebs_snapshot = ENV['EBS_SNAPSHOT']
-  puts " * Using specified EBS snapshot #{es_ebs_snapshot} for the ElasticSearch data directory"
-end
-
-if !ENV['VERSION'].nil?
-  version = ENV['VERSION'].strip.split('/')
-  automate_channel = version[0]
-  if version[1].to_s =~ /^\d+$/
-    automate_build = version[1]
+# Only run these checks on `vagrant up/ssh/destroy`
+if ['up', 'ssh', 'destroy'].include?(ARGV[0])
+  if (aws_access_key_id && aws_secret_access_key)
+    puts " * Using the provided ENV variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to continue..."
   else
-    automate_build = latest_build_from_versions(automate_channel)
+    aws_profile = ENV['AWS_PROFILE']
+    aws_profile ||= 'chef-engineering'
+    aws_creds_file = "#{ENV['HOME']}/.aws/credentials"
+
+    if find_executable('okta_aws')
+      puts " * okta_aws command detected, using it to refresh the temporary AWS credentials..."
+      unless File.exist?("#{ENV['HOME']}/.okta_aws.toml")
+        raise "#{ENV['HOME']}/.okta_aws.toml is not defined, cannot continue. Please read README.md for an example and usage details."
+      end
+      puts " * You might be prompted for your Okta password now..."
+      `okta_aws "#{aws_profile}"`
+    end
+
+    unless File.exist?(aws_creds_file)
+      raise "Without ENV variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY or #{aws_creds_file} the ec2 instances can't be created, aborting..."
+    end
+    puts " * Looking for '#{aws_profile}' AWS credentials in #{aws_creds_file}"
+    aws_access_key_id, aws_secret_access_key, aws_session_token = extract_aws_creds(aws_creds_file, aws_profile)
+    if aws_access_key_id && aws_secret_access_key && aws_session_token
+      puts " * Found AWS credentials in #{aws_creds_file}, moving on..."
+    else
+      raise "Unable to locate '#{aws_profile}' AWS credentials in #{aws_creds_file}, aborting..."
+    end
   end
 end
-manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
-hab_version_from_manifest, git_sha_from_manifest = extract_from_manifest(manifest_url, automate_build)
 
 # Only run these checks on `vagrant up`
 if ARGV[0] == "up"
+  if !ENV['STOP_HOURS'].nil?
+    stop_hours = ENV['STOP_HOURS']
+  end
+
+  if !ENV['EBS_SNAPSHOT'].nil? && ENV['EBS_SNAPSHOT'] =~ /^snap-\w+$/
+    es_ebs_snapshot = ENV['EBS_SNAPSHOT']
+    puts " * Using specified EBS snapshot #{es_ebs_snapshot} for the ElasticSearch data directory"
+  end
+
+  if !ENV['VERSION'].nil?
+    version = ENV['VERSION'].strip.split('/')
+    automate_channel = version[0]
+    if version[1].to_s =~ /^\d+$/
+      automate_build = version[1]
+    else
+      automate_build = latest_build_from_versions(automate_channel)
+    end
+  end
+  manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
+  hab_version_from_manifest, git_sha_from_manifest = extract_from_manifest(manifest_url, automate_build)
+
   puts "==> Installing Automate services from #{manifest_url}"
   puts '==> Checking for ssh identities needed to clone the automate repo...'
 
@@ -171,8 +241,9 @@ cat<<EOF >/etc/profile.d/hab_studio_setup.sh
 if [ "\\$USER" == "ubuntu" ]; then
   export GITHUB_TOKEN=#{ENV['GITHUB_TOKEN']}
   export HAB_STUDIO_SECRET_GITHUB_TOKEN=#{ENV['GITHUB_TOKEN']}
-  export AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']}
-  export AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']}
+  export AWS_ACCESS_KEY_ID=#{aws_access_key_id}
+  export AWS_SECRET_ACCESS_KEY=#{aws_secret_access_key}
+  export AWS_SESSION_TOKEN="#{aws_session_token}"
   export AZURE_CLIENT_ID=#{ENV['AZURE_CLIENT_ID']}
   export AZURE_CLIENT_SECRET=#{ENV['AZURE_CLIENT_SECRET']}
   export AZURE_TENANT_ID=#{ENV['AZURE_TENANT_ID']}
@@ -214,17 +285,15 @@ end
 Vagrant.configure('2') do |config|
   config.trigger.before :all do |trigger|
     trigger.info = "Running a before trigger!"
-    if ENV['AWS_ACCESS_KEY_ID'].nil? || ENV['AWS_SECRET_ACCESS_KEY'].nil?
-      raise "ENV variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be defined for this, aborting..."
-    end
   end
 
   config.vm.box = 'aws'
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   config.vm.provider 'aws' do |aws, override|
-    aws.access_key_id = "#{ENV['AWS_ACCESS_KEY_ID']}"
-    aws.secret_access_key = "#{ENV['AWS_SECRET_ACCESS_KEY']}"
+    aws.access_key_id = "#{aws_access_key_id}"
+    aws.secret_access_key = "#{aws_secret_access_key}"
+    aws.session_token = "#{aws_session_token}" if aws_session_token
     aws.keypair_name = ENV['AWS_SSH_KEY_NAME']
     aws.instance_type = 'm5.large'      # 2CPU, 8GB RAM
     #aws.instance_type = 'm5.xlarge'    # 4CPU, 16GB RAM

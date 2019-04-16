@@ -59,6 +59,7 @@ func TestCreatePolicy(t *testing.T) {
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
 				Statements: []*api_v2.Statement{&statement0},
+				Projects:   []string{"project-1"},
 			}
 			resp, err := cl.CreatePolicy(ctx, &req)
 			require.NoError(t, err)
@@ -83,6 +84,7 @@ func TestCreatePolicy(t *testing.T) {
 			assert.Equal(t, "my favorite policy", pol.Name)
 			assert.Equal(t, "team:local:admins", pol.Members[0].Name)
 			assert.Equal(t, "user:local:alice", pol.Members[1].Name)
+			assert.ElementsMatch(t, []string{"project-1"}, pol.Projects)
 			require.Equal(t, 1, len(pol.Statements))
 			ras := pol.Statements[0]
 			assert.Equal(t, storage.Deny, ras.Effect, "effect is deny")
@@ -100,6 +102,7 @@ func TestCreatePolicy(t *testing.T) {
 				Name:       "my favorite policy",
 				Members:    []string{"team:local:admins", "user:local:alice"},
 				Statements: []*api_v2.Statement{&statement0},
+				Projects:   []string{"project-1"},
 			}
 
 			resp, err := cl.CreatePolicy(ctx, &req)
@@ -208,6 +211,93 @@ func TestCreatePolicy(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			assert.Equal(t, len(items)+1, store.ItemCount())
+		}},
+		{"successfully creates policy with one project", func(t *testing.T) {
+			statement0 := api_v2.Statement{
+				Effect:  api_v2.Statement_DENY,
+				Actions: []string{"cfgmgmt:nodes:*"},
+			}
+			expProjects := []string{"project-1"}
+			_, items := addSomePoliciesToStore(t, store, prng)
+			req := api_v2.CreatePolicyReq{
+				Id:         "policy1",
+				Name:       "my favorite policy",
+				Members:    []string{"team:local:admins", "user:local:alice"},
+				Statements: []*api_v2.Statement{&statement0},
+				Projects:   expProjects,
+			}
+
+			resp, err := cl.CreatePolicy(ctx, &req)
+
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+			assert.Equal(t, len(items)+1, store.ItemCount())
+			assert.ElementsMatch(t, expProjects, resp.Projects)
+		}},
+		{"successfully creates policy with multiple projects", func(t *testing.T) {
+			statement0 := api_v2.Statement{
+				Effect:  api_v2.Statement_DENY,
+				Actions: []string{"cfgmgmt:nodes:*"},
+			}
+			expProjects := []string{"project-1", "project-2"}
+			_, items := addSomePoliciesToStore(t, store, prng)
+			req := api_v2.CreatePolicyReq{
+				Id:         "policy1",
+				Name:       "my favorite policy",
+				Members:    []string{"team:local:admins", "user:local:alice"},
+				Statements: []*api_v2.Statement{&statement0},
+				Projects:   expProjects,
+			}
+
+			resp, err := cl.CreatePolicy(ctx, &req)
+
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+			assert.Equal(t, len(items)+1, store.ItemCount())
+			assert.ElementsMatch(t, expProjects, resp.Projects)
+		}},
+		{"successfully creates policy with no projects", func(t *testing.T) {
+			statement0 := api_v2.Statement{
+				Effect:  api_v2.Statement_DENY,
+				Actions: []string{"cfgmgmt:nodes:*"},
+			}
+			_, items := addSomePoliciesToStore(t, store, prng)
+			req := api_v2.CreatePolicyReq{
+				Id:         "policy1",
+				Name:       "my favorite policy",
+				Members:    []string{"team:local:admins", "user:local:alice"},
+				Statements: []*api_v2.Statement{&statement0},
+			}
+
+			resp, err := cl.CreatePolicy(ctx, &req)
+
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+			assert.Equal(t, len(items)+1, store.ItemCount())
+			assert.ElementsMatch(t, []string{}, resp.Projects)
+		}},
+		{"successfully creates policy with empty projects", func(t *testing.T) {
+			statement0 := api_v2.Statement{
+				Effect:  api_v2.Statement_DENY,
+				Actions: []string{"cfgmgmt:nodes:*"},
+			}
+
+			expProjects := []string{}
+			_, items := addSomePoliciesToStore(t, store, prng)
+			req := api_v2.CreatePolicyReq{
+				Id:         "policy1",
+				Name:       "my favorite policy",
+				Members:    []string{"team:local:admins", "user:local:alice"},
+				Statements: []*api_v2.Statement{&statement0},
+				Projects:   expProjects,
+			}
+
+			resp, err := cl.CreatePolicy(ctx, &req)
+
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+			assert.Equal(t, len(items)+1, store.ItemCount())
+			assert.ElementsMatch(t, expProjects, resp.Projects)
 		}},
 		{"successfully creates policy with duplicate name", func(t *testing.T) {
 			target, items := addSomePoliciesToStore(t, store, prng)

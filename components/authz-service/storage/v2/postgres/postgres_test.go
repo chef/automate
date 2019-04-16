@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/chef/automate/components/authz-service/constants/v2"
+	v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/prng"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -32,113 +32,23 @@ CREATE SCHEMA public;
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO public;`
 
+// Note: to set up PG locally for running these tests,
+// run the following from your command line from the components/authz-service folder:
+//
+// To start postgres in a docker container:
+//
+// make setup_docker_pg
+//
+// To run the tests, you can run this multiple times:
+//
+// make test_with_db
+//
+// When you are done testing, spin down the postgres container:
+//
+// make kill_docker_pg
+
 type testDB struct {
 	*sql.DB
-}
-
-func (d *testDB) flush(t *testing.T) {
-	_, err := d.Exec(`DELETE FROM iam_policies CASCADE; DELETE FROM iam_members CASCADE;
-		DELETE FROM iam_roles CASCADE; DELETE FROM iam_projects CASCADE; DELETE FROM iam_role_projects CASCADE;
-		DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
-	require.NoError(t, err)
-}
-
-func (d *testDB) close(t *testing.T) {
-	t.Helper()
-	require.NoError(t, d.Close())
-}
-
-func setup(t *testing.T) (storage.Storage, *testDB, *prng.Prng) {
-	t.Helper()
-	ctx := context.Background()
-	// Note: to set up PG locally for running these tests,
-	// run the following from your command line from the components/authz-service folder:
-	//
-	// To start postgres in a docker container:
-	//
-	// make setup_docker_pg
-	//
-	// To run the tests, you can run this multiple times:
-	//
-	// make test_with_db
-	//
-	// When you are done testing, spin down the postgres container:
-	//
-	// make kill_docker_pg
-	l, err := logger.NewLogger("text", "error")
-	require.NoError(t, err, "init logger for postgres storage")
-
-	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/migration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	if migrationConfig == nil && dataMigrationConfig == nil {
-		t.Skipf("start pg container and set PG_URL to run")
-	}
-
-	// reset database the hard way -- we do this to ensure that our comparison
-	// between database content and hardcoded storage default policies actually
-	// compares the migrated policies with the hardcoded ones (and NOT the
-	// hardcoded policies with the hardcoded policies).
-	db := openDB(t)
-	_, err = db.ExecContext(ctx, resetDatabaseStatement)
-	require.NoError(t, err, "error resetting database")
-	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
-	require.NoError(t, err, "error creating extension")
-
-	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
-	require.NoError(t, err)
-	return backend, &testDB{DB: db}, prng.Seed(t)
-}
-
-// Will fail on conflict with existing name.
-func insertTestPolicyMember(t *testing.T, db *testDB, polID string, memberName string) storage.Member {
-	member := genMember(t, memberName)
-
-	_, err := db.Exec(`INSERT INTO iam_members (id, name) values ($1, $2)`, member.ID, member.Name)
-	require.NoError(t, err)
-	_, err = db.Exec(`INSERT INTO iam_policy_members (policy_id, member_id) values($1, $2)`, polID, member.ID)
-	require.NoError(t, err)
-
-	return member
-}
-
-func insertTestRole(t *testing.T,
-	db *testDB, id string, name string, actions []string, projects []string) storage.Role {
-
-	role := genRole(t, id, name, actions, projects)
-
-	row := db.QueryRow(`INSERT INTO iam_roles (id, name, type, actions)  VALUES ($1, $2, $3, $4)
-	RETURNING db_id;`,
-		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
-	var dbID string
-	err := row.Scan(&dbID)
-	require.NoError(t, err)
-
-	for _, project := range role.Projects {
-		_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id) VALUES ($1, $2)`,
-			&dbID, &project)
-		require.NoError(t, err)
-	}
-
-	return role
-}
-
-func insertTestPolicy(t *testing.T, db *testDB, policyName string) string {
-	row := db.QueryRow(fmt.Sprintf("INSERT INTO iam_policies "+
-		"(id, name) VALUES (uuid_generate_v4(), '%s') "+
-		"RETURNING id", policyName))
-	require.NotNil(t, row)
-	var polID string
-	err := row.Scan(&polID)
-	require.NoError(t, err)
-	return polID
 }
 
 func TestGetPolicy(t *testing.T) {
@@ -155,6 +65,26 @@ func TestGetPolicy(t *testing.T) {
 			assert.Nil(t, resp)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
+		"policy with projects": func(t *testing.T) {
+			targetProject := "p1"
+			polID := insertTestPolicy(t, db, "testpolicy")
+			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
+			insertTestProject(t, db, targetProject, "test project 1", storage.Custom)
+			// also test the invalid case  where a specified project does not exist
+			insertPolicyProject(t, db, polID, targetProject)
+
+			resp, err := store.GetPolicy(ctx, polID)
+			require.NoError(t, err)
+
+			pol := storage.Policy{
+				ID:         polID,
+				Name:       "testpolicy",
+				Members:    []storage.Member{member},
+				Statements: []storage.Statement{},
+				Projects:   []string{targetProject},
+			}
+			assert.Equal(t, &pol, resp)
+		},
 		"policy with no statements": func(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
@@ -167,6 +97,7 @@ func TestGetPolicy(t *testing.T) {
 				Name:       "testpolicy",
 				Members:    []storage.Member{member},
 				Statements: []storage.Statement{},
+				Projects:   []string{},
 			}
 			assert.Equal(t, &pol, resp)
 		},
@@ -322,8 +253,8 @@ func TestGetPolicy(t *testing.T) {
 			sID0, sID1 := genUUID(t), genUUID(t)
 
 			// insert projects
-			project0 := insertTestProject(t, db, projID0, "test project 1")
-			project1 := insertTestProject(t, db, projID1, "test project 2")
+			project0 := insertTestProject(t, db, projID0, "test project 1", storage.Custom)
+			project1 := insertTestProject(t, db, projID1, "test project 2", storage.Custom)
 
 			// insert policy with statements
 			_, err := db.Exec(`
@@ -336,10 +267,9 @@ func TestGetPolicy(t *testing.T) {
 			require.NoError(t, err)
 
 			// insert projects in statements
-			_, err = db.Exec(`
-			INSERT INTO iam_statement_projects (statement_id, project_id)
-			  VALUES ($1, $3), ($2, $3), ($2, $4);`, sID0, sID1, projID0, projID1)
-			require.NoError(t, err)
+			insertStatementProject(t, db, sID0, projID0)
+			insertStatementProject(t, db, sID1, projID0)
+			insertStatementProject(t, db, sID1, projID1)
 
 			// insert members
 			member0 := insertTestPolicyMember(t, db, polID, "user:local:charmander")
@@ -474,6 +404,7 @@ func TestListPolicies(t *testing.T) {
 				Members:    []storage.Member{member},
 				Type:       storage.Custom,
 				Statements: []storage.Statement{},
+				Projects:   []string{},
 			}}
 
 			assert.Equal(t, pols, resp)
@@ -585,8 +516,8 @@ func TestListPolicies(t *testing.T) {
 			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 
 			// insert projects
-			project0 := insertTestProject(t, db, projID0, "test project 1")
-			project1 := insertTestProject(t, db, projID1, "test project 2")
+			project0 := insertTestProject(t, db, projID0, "test project 1", storage.Custom)
+			project1 := insertTestProject(t, db, projID1, "test project 2", storage.Custom)
 
 			// insert first policy with statement
 			_, err := db.Exec(`
@@ -599,10 +530,7 @@ func TestListPolicies(t *testing.T) {
 			require.NoError(t, err)
 
 			// associate statement with project
-			_, err = db.Exec(`
-			INSERT INTO iam_statement_projects (statement_id, project_id)
-			  VALUES ($1, $2);`, sID0, projID0)
-			require.NoError(t, err)
+			insertStatementProject(t, db, sID0, projID0)
 
 			// insert second policy with statement
 			_, err = db.Exec(`
@@ -615,10 +543,8 @@ func TestListPolicies(t *testing.T) {
 			require.NoError(t, err)
 
 			// associate statement with projects
-			_, err = db.Exec(`
-			INSERT INTO iam_statement_projects (statement_id, project_id)
-			  VALUES ($1, $2), ($1, $3);`, sID1, projID0, projID1)
-			require.NoError(t, err)
+			insertStatementProject(t, db, sID1, projID0)
+			insertStatementProject(t, db, sID1, projID1)
 
 			member0 := insertTestPolicyMember(t, db, polID0, "user:local:albertine0")
 			member1 := insertTestPolicyMember(t, db, polID1, "user:local:albertine1")
@@ -659,6 +585,80 @@ func TestListPolicies(t *testing.T) {
 			}
 			assertPolicies(t, expectedPolicies, resp)
 			// require.Equal(t, len(expectedPolicies), len(resp))
+		},
+		"two policies, one with projects, one without": func(t *testing.T) {
+			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
+			name1, name2 := "testPolicy", "anotherTestPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
+				polID1, name1, polID2, name2)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID)
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID2)
+
+			expectedPolicies := []*storage.Policy{
+				{
+					ID:         polID1,
+					Name:       name1,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{projID, projID2},
+				},
+				{
+					ID:         polID2,
+					Name:       name2,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{},
+				},
+			}
+
+			resp, err := store.ListPolicies(ctx)
+			assert.NoError(t, err)
+			assertPolicies(t, expectedPolicies, resp)
+		},
+		"two policies with projects": func(t *testing.T) {
+			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
+			name1, name2 := "testPolicy", "anotherTestPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
+				polID1, name1, polID2, name2)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID1, projID)
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
+			insertPolicyProject(t, db, polID2, projID2)
+
+			expectedPolicies := []*storage.Policy{
+				{
+					ID:         polID1,
+					Name:       name1,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{projID},
+				},
+				{
+					ID:         polID2,
+					Name:       name2,
+					Members:    []storage.Member{},
+					Type:       storage.Custom,
+					Statements: []storage.Statement{},
+					Projects:   []string{projID2},
+				},
+			}
+
+			resp, err := store.ListPolicies(ctx)
+			assert.NoError(t, err)
+			assertPolicies(t, expectedPolicies, resp)
 		},
 	}
 
@@ -779,8 +779,8 @@ func TestDeletePolicy(t *testing.T) {
 			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 
 			// insert projects
-			insertTestProject(t, db, projID0, "let's go eevee - prod")
-			insertTestProject(t, db, projID1, "let's go eevee - dev")
+			insertTestProject(t, db, projID0, "let's go eevee - prod", storage.Custom)
+			insertTestProject(t, db, projID1, "let's go eevee - dev", storage.Custom)
 
 			// insert policy with statements
 			_, err := db.Exec(`
@@ -792,10 +792,8 @@ func TestDeletePolicy(t *testing.T) {
 			require.NoError(t, err)
 
 			// insert project into statements
-			_, err = db.Exec(`
-			INSERT INTO iam_statement_projects (statement_id, project_id)
-			  VALUES ($1, $2), ($1, $3);`, sID0, projID0, projID1)
-			require.NoError(t, err)
+			insertStatementProject(t, db, sID0, projID0)
+			insertStatementProject(t, db, sID0, projID1)
 
 			insertTestPolicyMember(t, db, polID, "user:local:eevee")
 
@@ -1126,7 +1124,7 @@ func TestCreatePolicy(t *testing.T) {
 			resources0, actions0 := []string{"iam:teams"}, []string{"iam:teams:create", "iam:teams:delete"}
 			resources1, actions1 := []string{"infra:nodes"}, []string{"infra:nodes:delete", "infra:nodes:rerun"}
 
-			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret")
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
 			statement0 := storage.Statement{
 				ID:        sID0,
@@ -1204,6 +1202,114 @@ func TestCreatePolicy(t *testing.T) {
 			resp, err := store.CreatePolicy(ctx, &pol)
 			require.Error(t, err)
 			assert.Nil(t, resp)
+		},
+		"policy with empty projects": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+
+			name, members, typeVal := "toBeCreated", []storage.Member{}, storage.Custom
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Type:     typeVal,
+				Members:  members,
+				Projects: []string{},
+			}
+			resp, err := store.CreatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, &pol, resp)
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
+		"policy with single project": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+
+			name, members, typeVal := "toBeCreated", []storage.Member{}, storage.Custom
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Type:     typeVal,
+				Members:  members,
+				Projects: []string{projID},
+			}
+			resp, err := store.CreatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, &pol, resp)
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
+		"policy with multiple projects": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "so ordinary", storage.Custom)
+
+			name, members, typeVal := "toBeCreated", []storage.Member{}, storage.Custom
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Type:     typeVal,
+				Members:  members,
+				Projects: []string{projID, projID2},
+			}
+			resp, err := store.CreatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, &pol, resp)
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+
+			projCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID)
+			assertCount(t, 2, projCount)
+		},
+		"policy with non-existent project fails": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+
+			projID := "not-real-project"
+
+			name, members, typeVal := "toBeCreated", []storage.Member{}, storage.Custom
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Type:     typeVal,
+				Members:  members,
+				Projects: []string{projID},
+			}
+			resp, err := store.CreatePolicy(ctx, &pol)
+			assert.Error(t, err)
+			assert.Nil(t, resp)
+
+			assertEmpty(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
 		},
 	}
 
@@ -2016,7 +2122,7 @@ func TestUpdatePolicy(t *testing.T) {
 			require.NoError(t, err)
 
 			member := insertTestPolicyMember(t, db, polID, "user:local:totodile")
-			insertTestProject(t, db, projID, "pokemon crystal")
+			insertTestProject(t, db, projID, "pokemon crystal", storage.Custom)
 
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			statement := storage.Statement{
@@ -2103,6 +2209,190 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4`,
 				sID, pq.Array(resources), pq.Array(actions), "allow"))
 		},
+		"policy with no projects to some projects": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: []string{projID},
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []string{projID}, resp.Projects)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
+		"policy with project to no projects": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			expProjs := []string{}
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: expProjs,
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, expProjs, resp.Projects)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
+		"policy with projects to same projects": func(t *testing.T) {
+			// TODO optimize/opt-out if they're the same?
+
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
+			insertPolicyProject(t, db, polID, projID2)
+			initPolProjCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID)
+			assertCount(t, 2, initPolProjCount)
+
+			expProjs := []string{projID, projID2}
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: expProjs,
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, expProjs, resp.Projects)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			expPolProjCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID)
+			assertCount(t, 2, expPolProjCount)
+		},
+		"policy with single project to diff project": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			projID2 := "ordinary-project"
+			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: []string{projID2},
+			}
+
+			expProjs := []string{projID2}
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, expProjs, resp.Projects)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
+		"policy with one project to additional project": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			projID2 := "another-project"
+			insertTestProject(t, db, projID2, "more", storage.Custom)
+
+			expProjs := []string{projID, projID2}
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: expProjs,
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.NoError(t, err)
+			assert.Equal(t, expProjs, resp.Projects)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+
+			projCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID)
+			assertCount(t, 2, projCount)
+		},
+		"policy with project to add non-existent project fails": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name := "testPolicy"
+			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			require.NoError(t, err)
+
+			projID := "special-project"
+			insertTestProject(t, db, projID, "too special", storage.Custom)
+			insertPolicyProject(t, db, polID, projID)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Projects: []string{projID, "not-real"},
+			}
+
+			resp, err := store.UpdatePolicy(ctx, &pol)
+			assert.Error(t, err)
+			assert.Nil(t, resp)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=$1`, polID))
+		},
 	}
 
 	for name, test := range cases {
@@ -2183,8 +2473,7 @@ func TestUpdateProject(t *testing.T) {
 	cases := map[string]func(*testing.T){
 		"successfully updates existing custom project": func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
 				ID:       "foo",
@@ -2200,8 +2489,7 @@ func TestUpdateProject(t *testing.T) {
 		},
 		"successfully updates existing custom project with a project filter": func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
 				ID:       "foo",
@@ -2218,8 +2506,7 @@ func TestUpdateProject(t *testing.T) {
 		},
 		"successfully updates existing custom project with a project filter of *": func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
 				ID:       "foo",
@@ -2249,8 +2536,7 @@ func TestUpdateProject(t *testing.T) {
 		},
 		"returns ErrNotFound if the project exists but does not have a project in the project filter list": func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
 				ID:       "foo",
@@ -2289,9 +2575,7 @@ func TestGetProject(t *testing.T) {
 		}},
 		{"when a chef-managed project exists, returns that project", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
@@ -2305,25 +2589,7 @@ func TestGetProject(t *testing.T) {
 		}},
 		{"when a custom project exists, returns that project", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
-
-			p, err := store.GetProject(ctx, "foo")
-			require.NoError(t, err)
-			expectedProject := storage.Project{
-				ID:       "foo",
-				Name:     "my foo project",
-				Type:     storage.Custom,
-				Projects: []string{"foo"},
-			}
-			assert.Equal(t, &expectedProject, p)
-		}},
-		{"when a custom project exists with a project filter, returns that project", func(t *testing.T) {
-			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 
@@ -2339,9 +2605,7 @@ func TestGetProject(t *testing.T) {
 		}},
 		{"when a custom project exists with a project filter of *, returns that project", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
@@ -2357,9 +2621,7 @@ func TestGetProject(t *testing.T) {
 		}},
 		{"when a custom project exists but the project filter does not overlap, return NotFoundErr", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects)
-				VALUES ('foo', 'my foo project', 'custom', array['foo'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"wrong", "project"})
 
@@ -2395,16 +2657,16 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"returns project not found with several projects in database", func(t *testing.T) {
 			ctx := context.Background()
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			err := store.DeleteProject(ctx, "test-project")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		}},
 		{"deletes project with one project in database", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
 
 			err := store.DeleteProject(ctx, "test-project")
 
@@ -2413,10 +2675,10 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"deletes project with several projects in database", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			err := store.DeleteProject(ctx, "test-project")
 
@@ -2426,10 +2688,10 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"deletes project with several projects in database with a project filter", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"foo", "test-project"})
 
@@ -2441,10 +2703,10 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"deletes project with several projects in database with a project filter of *", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
@@ -2456,10 +2718,10 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"returns not found when the project filter excludes the project in question", func(t *testing.T) {
 			ctx := context.Background()
-			proj := insertTestProject(t, db, "test-project", "name")
-			insertTestProject(t, db, "my-id-1", "name")
-			insertTestProject(t, db, "my-id-2", "name")
-			insertTestProject(t, db, "my-id-3", "name")
+			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
+			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"my-id-1", "my-id-2"})
 
@@ -2476,18 +2738,6 @@ func TestDeleteProject(t *testing.T) {
 		t.Run(test.desc, test.f)
 		db.flush(t)
 	}
-}
-
-func insertTestProject(t *testing.T, db *testDB, id string, name string) storage.Project {
-	t.Helper()
-	proj, err := storage.NewProject(id, name, storage.Custom)
-	require.NoError(t, err)
-
-	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) values ($1, $2, $3, $4)`,
-		proj.ID, proj.Name, proj.Type.String(), pq.Array([]string{id}))
-	require.NoError(t, err)
-
-	return proj
 }
 
 func TestListProjects(t *testing.T) {
@@ -2507,10 +2757,8 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"when two projects (custom and chef-managed) exist, returns them", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('bar', 'my bar project', 'custom', array['bar'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -2533,12 +2781,9 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"when multiple projects exist, filter based on projects lists", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('bar', 'my bar project', 'custom', array['bar'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('baz', 'my baz project', 'custom', array['baz'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 
@@ -2563,14 +2808,64 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('bar', 'my bar project', 'custom', array['bar'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('baz', 'my baz project', 'custom', array['baz'])`)
-			require.NoError(t, err)
-
 			ctx = insertProjectsIntoContext(ctx, []string{})
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+			expectedProjects := []*storage.Project{
+				&storage.Project{
+					ID:       "foo",
+					Name:     "my foo project",
+					Type:     storage.ChefManaged,
+					Projects: []string{"foo"},
+				},
+				&storage.Project{
+					ID:       "bar",
+					Name:     "my bar project",
+					Type:     storage.Custom,
+					Projects: []string{"bar"},
+				},
+			}
+
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"when multiple projects exist, filter based on projects lists", func(t *testing.T) {
+			ctx := context.Background()
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{"foo", "bar"}, "resource", "action", "pol"))
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+			expectedProjects := []*storage.Project{
+				&storage.Project{
+					ID:       "foo",
+					Name:     "my foo project",
+					Type:     storage.ChefManaged,
+					Projects: []string{"foo"},
+				},
+				&storage.Project{
+					ID:       "bar",
+					Name:     "my bar project",
+					Type:     storage.Custom,
+					Projects: []string{"bar"},
+				},
+			}
+
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
+			ctx := context.Background()
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
+
+			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
+				[]string{}, []string{}, "resource", "action", "pol"))
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -2599,12 +2894,9 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"when multiple projects exist, returns all projects will * filter passed", func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('foo', 'my foo project', 'chef-managed', array['foo'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('bar', 'my bar project', 'custom', array['bar'])`)
-			require.NoError(t, err)
-			_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) VALUES ('baz', 'my baz project', 'custom', array['baz'])`)
-			require.NoError(t, err)
+			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
@@ -4220,6 +4512,7 @@ func assertPolicy(t *testing.T, expectedPolicy, returnedPolicy *storage.Policy) 
 	assert.Equal(t, expectedPolicy.Name, returnedPolicy.Name)
 	assert.Equal(t, expectedPolicy.Type, returnedPolicy.Type)
 	assert.ElementsMatch(t, expectedPolicy.Members, returnedPolicy.Members)
+	assert.ElementsMatch(t, expectedPolicy.Projects, returnedPolicy.Projects)
 	assert.ElementsMatch(t, expectedPolicy.Statements, returnedPolicy.Statements)
 }
 
@@ -4241,11 +4534,16 @@ func assertPolicies(t *testing.T, expectedPolicies, returnedPolicies []*storage.
 	for i := 0; i < len(returnedPolicies); i++ {
 		// confirm statements of sorted policies match
 		assert.ElementsMatch(t, expectedPolicies[i].Statements, returnedPolicies[i].Statements)
+		// confirm projects of sorted policies match
+		assert.ElementsMatch(t, expectedPolicies[i].Projects, returnedPolicies[i].Projects)
+
 		// then, empty statements so their potentially mismatched order
 		// doesn't cause ElementsMatch on policies to fail
 		// see related issue: https://github.com/stretchr/testify/issues/676
 		expectedPolicies[i].Statements = []storage.Statement{}
 		returnedPolicies[i].Statements = []storage.Statement{}
+		expectedPolicies[i].Projects = []string{}
+		returnedPolicies[i].Projects = []string{}
 	}
 
 	assert.ElementsMatch(t, expectedPolicies, returnedPolicies)
@@ -4276,6 +4574,113 @@ func genRole(t *testing.T, id string, name string, actions []string, projects []
 	role, err := storage.NewRole(id, name, storage.Custom, actions, projects)
 	require.NoError(t, err)
 	return *role
+}
+
+func insertTestPolicy(t *testing.T, db *testDB, policyName string) string {
+	row := db.QueryRow(fmt.Sprintf("INSERT INTO iam_policies "+
+		"(id, name) VALUES (uuid_generate_v4(), '%s') "+
+		"RETURNING id", policyName))
+	require.NotNil(t, row)
+	var polID string
+	err := row.Scan(&polID)
+	require.NoError(t, err)
+	return polID
+}
+
+// Will fail on conflict with existing name.
+func insertTestPolicyMember(t *testing.T, db *testDB, polID string, memberName string) storage.Member {
+	member := genMember(t, memberName)
+
+	_, err := db.Exec(`INSERT INTO iam_members (id, name) values ($1, $2)`, member.ID, member.Name)
+	require.NoError(t, err)
+	_, err = db.Exec(`INSERT INTO iam_policy_members (policy_id, member_id) values($1, $2)`, polID, member.ID)
+	require.NoError(t, err)
+
+	return member
+}
+
+func insertTestRole(t *testing.T,
+	db *testDB, id string, name string, actions []string, projects []string) storage.Role {
+
+	role := genRole(t, id, name, actions, projects)
+
+	row := db.QueryRow(`INSERT INTO iam_roles (id, name, type, actions)  VALUES ($1, $2, $3, $4)
+	RETURNING db_id;`,
+		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
+	var dbID string
+	err := row.Scan(&dbID)
+	require.NoError(t, err)
+
+	for _, project := range role.Projects {
+		_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id) VALUES ($1, $2)`,
+			&dbID, &project)
+		require.NoError(t, err)
+	}
+
+	return role
+}
+
+func insertTestProject(t *testing.T, db *testDB, id string, name string, projType storage.Type) storage.Project {
+	t.Helper()
+	proj, err := storage.NewProject(id, name, projType)
+	require.NoError(t, err)
+
+	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) values ($1, $2, $3, $4)`,
+		proj.ID, proj.Name, projType.String(), pq.Array([]string{proj.ID}))
+	require.NoError(t, err)
+
+	return proj
+}
+
+func insertPolicyProject(t *testing.T, db *testDB, policyID string, projectId string) {
+	t.Helper()
+	_, err := db.Exec(`
+			INSERT INTO iam_policy_projects (policy_id, project_id) VALUES ($1, $2);`,
+		policyID, projectId)
+	require.NoError(t, err)
+}
+
+func insertStatementProject(t *testing.T, db *testDB, statementID uuid.UUID, projectId string) {
+	t.Helper()
+	_, err := db.Exec(`
+			INSERT INTO iam_statement_projects (statement_id, project_id) VALUES ($1, $2);`,
+		statementID, projectId)
+	require.NoError(t, err)
+}
+
+func setup(t *testing.T) (storage.Storage, *testDB, *prng.Prng) {
+	t.Helper()
+	ctx := context.Background()
+	l, err := logger.NewLogger("text", "error")
+	require.NoError(t, err, "init logger for postgres storage")
+
+	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/migration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
+	}
+
+	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/datamigration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
+	}
+
+	if migrationConfig == nil && dataMigrationConfig == nil {
+		t.Skipf("start pg container and set PG_URL to run")
+	}
+
+	// reset database the hard way -- we do this to ensure that our comparison
+	// between database content and hardcoded storage default policies actually
+	// compares the migrated policies with the hardcoded ones (and NOT the
+	// hardcoded policies with the hardcoded policies).
+	db := openDB(t)
+	_, err = db.ExecContext(ctx, resetDatabaseStatement)
+	require.NoError(t, err, "error resetting database")
+	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+	require.NoError(t, err, "error creating extension")
+
+	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
+	require.NoError(t, err)
+	return backend, &testDB{DB: db}, prng.Seed(t)
 }
 
 // migrationConfigIfPGTestsToBeRun either returns the pg migration config
@@ -4329,4 +4734,16 @@ func openDB(t *testing.T) *sql.DB {
 func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
 		[]string{}, projects, "resource", "action", "pol"))
+}
+
+func (d *testDB) flush(t *testing.T) {
+	_, err := d.Exec(`DELETE FROM iam_policies CASCADE; DELETE FROM iam_members CASCADE;
+		DELETE FROM iam_roles CASCADE; DELETE FROM iam_projects CASCADE; DELETE FROM iam_role_projects CASCADE;
+		DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
+	require.NoError(t, err)
+}
+
+func (d *testDB) close(t *testing.T) {
+	t.Helper()
+	require.NoError(t, d.Close())
 }

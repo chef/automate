@@ -19,8 +19,6 @@ import (
 	ingest "github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv1"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
-	mock_authn "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_authn"
-	mock_authz "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_authz"
 	mock_gateway "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_gateway"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
 	compliance_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
@@ -137,8 +135,8 @@ func newAuthorizationMocks(t *testing.T, resource, action string) (
 	authn.AuthenticationClient, authz.AuthorizationClient) {
 	var (
 		ctrl            = gomock.NewController(t)
-		mockAuthClient  = mock_authn.NewMockAuthenticationClient(ctrl)
-		mockAuthzClient = mock_authz.NewMockAuthorizationClient(ctrl)
+		mockAuthClient  = authn.NewMockAuthenticationClient(ctrl)
+		mockAuthzClient = authz.NewMockAuthorizationClient(ctrl)
 	)
 
 	// Mocking AuthN Calls

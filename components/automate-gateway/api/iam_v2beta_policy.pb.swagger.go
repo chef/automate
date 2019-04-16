@@ -572,6 +572,12 @@ func init() {
           "items": {
             "$ref": "#/definitions/v2betaStatement"
           }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "description": "Does not contain type as the enduser can only create 'custom' policies."
@@ -752,6 +758,12 @@ func init() {
           "items": {
             "$ref": "#/definitions/v2betaStatement"
           }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -900,6 +912,12 @@ func init() {
         },
         "name": {
           "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "description": "Does not contain type as the enduser can only create 'custom' policies."

@@ -8,6 +8,11 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for delete
+- name: wait-timeout
+  shorthand: t
+  default_value: "120"
+  usage: |
+    How long to wait for a operation to complete before raising an error
 - name: "yes"
   default_value: "false"
   usage: Agree to all prompts
@@ -36,10 +41,5 @@ inherited_options:
   usage: The S3 secret access key
 - name: s3-session-token
   usage: The S3 session token when assuming an IAM role
-- name: wait-timeout
-  shorthand: t
-  default_value: "7200"
-  usage: |
-    How long to wait for a operation to complete before raising an error
 see_also:
 - chef-automate backup - Chef Automate backup

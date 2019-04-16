@@ -3,14 +3,14 @@ package params
 import "github.com/chef/automate/api/external/common/query"
 
 const (
-	DEFAULT_PAGE      int32 = 1
-	DEFAULT_PAGE_SIZE int32 = 25
+	DefaultPage     int32 = 1
+	DefaultPageSize int32 = 25
 )
 
 func GetPageParams(p *query.Pagination) (int32, int32) {
 	var (
-		page = DEFAULT_PAGE
-		size = DEFAULT_PAGE_SIZE
+		page = DefaultPage
+		size = DefaultPageSize
 	)
 
 	if p != nil {

@@ -10,11 +10,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"testing"
 	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/event"
-	automate_event "github.com/chef/automate/api/interservice/event"
 	cfgBackend "github.com/chef/automate/components/config-mgmt-service/backend"
 	cfgElastic "github.com/chef/automate/components/config-mgmt-service/backend/elastic"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
@@ -22,9 +22,9 @@ import (
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/server"
+	"github.com/golang/mock/gomock"
 	"github.com/olivere/elastic"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 )
 
 // TODO @afiune most of this file is very similar to the suite_test.go living
@@ -57,76 +57,8 @@ type Suite struct {
 	cfgmgmt                cfgBackend.Client
 	ingest                 iBackend.Client
 	client                 *elastic.Client
-	projectsClient         *ProjectsClientMock
-	eventServiceClientMock *EventServiceClientMock
-}
-
-type ProjectsClientMock struct {
-	ProjectCollectionRulesResp *iam_v2.ProjectCollectionRulesResp
-}
-
-func (pm *ProjectsClientMock) UpdateProject(ctx context.Context, in *iam_v2.UpdateProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.UpdateProjectResp, error) {
-	return &iam_v2.UpdateProjectResp{}, nil
-}
-
-func (pm *ProjectsClientMock) CreateProject(ctx context.Context, in *iam_v2.CreateProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.CreateProjectResp, error) {
-	return &iam_v2.CreateProjectResp{}, nil
-}
-func (pm *ProjectsClientMock) GetProject(ctx context.Context, in *iam_v2.GetProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.GetProjectResp, error) {
-	return &iam_v2.GetProjectResp{}, nil
-}
-
-func (pm *ProjectsClientMock) DeleteProject(ctx context.Context, in *iam_v2.DeleteProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.DeleteProjectResp, error) {
-	return &iam_v2.DeleteProjectResp{}, nil
-}
-
-func (pm *ProjectsClientMock) ListProjects(ctx context.Context, in *iam_v2.ListProjectsReq,
-	opts ...grpc.CallOption) (*iam_v2.ListProjectsResp, error) {
-	return &iam_v2.ListProjectsResp{}, nil
-}
-
-func (pm *ProjectsClientMock) ListProjectRules(ctx context.Context, in *iam_v2.ListProjectRulesReq,
-	opts ...grpc.CallOption) (*iam_v2.ProjectCollectionRulesResp, error) {
-	return pm.ProjectCollectionRulesResp, nil
-}
-
-func (pm *ProjectsClientMock) GetProjectRules(ctx context.Context, in *iam_v2.GetProjectRulesReq,
-	opts ...grpc.CallOption) (*iam_v2.GetProjectRulesResp, error) {
-	return &iam_v2.GetProjectRulesResp{}, nil
-}
-
-type EventServiceClientMock struct {
-	LastEventSent *automate_event.EventMsg
-}
-
-func (esc *EventServiceClientMock) Publish(ctx context.Context, in *automate_event.PublishRequest,
-	opts ...grpc.CallOption) (*automate_event.PublishResponse, error) {
-	esc.LastEventSent = in.Msg
-	return &automate_event.PublishResponse{}, nil
-}
-func (esc *EventServiceClientMock) Subscribe(ctx context.Context, in *automate_event.SubscribeRequest,
-	opts ...grpc.CallOption) (*automate_event.SubscribeResponse, error) {
-	return &automate_event.SubscribeResponse{}, nil
-}
-func (esc *EventServiceClientMock) Start(ctx context.Context, in *automate_event.StartRequest,
-	opts ...grpc.CallOption) (*automate_event.StartResponse, error) {
-	return &automate_event.StartResponse{}, nil
-}
-func (esc *EventServiceClientMock) Stop(ctx context.Context, in *automate_event.StopRequest,
-	opts ...grpc.CallOption) (*automate_event.StopResponse, error) {
-	return &automate_event.StopResponse{}, nil
-}
-func (pm *ProjectsClientMock) HandleEvent(ctx context.Context, in *event.EventMsg,
-	opts ...grpc.CallOption) (*event.EventResponse, error) {
-	return &event.EventResponse{}, nil
-}
-func (pm *ProjectsClientMock) ProjectUpdateStatus(ctx context.Context,
-	req *iam_v2.ProjectUpdateStatusReq, opts ...grpc.CallOption) (*iam_v2.ProjectUpdateStatusResp, error) {
-	return &iam_v2.ProjectUpdateStatusResp{}, nil
+	projectsClient         *iam_v2.MockProjectsClient
+	eventServiceClientMock *event.MockEventServiceClient
 }
 
 // Initialize the test suite
@@ -136,62 +68,19 @@ func (pm *ProjectsClientMock) ProjectUpdateStatus(ctx context.Context,
 //
 // NOTE: This function expects ES to be already up and running.
 // (@afiune) We are going to start ES from the studio
-func NewSuite(url string) *Suite {
+func NewGlobalSuite() *Suite {
 	s := new(Suite)
 
-	// Create a new elastic Client
-	esClient, err := elastic.NewClient(
-		elastic.SetURL(url),
-		elastic.SetSniff(false),
-	)
-	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from %q: %s\n", url, err)
-		os.Exit(1)
-	}
+	createMocksWithDefaultFunctions(s)
+	createServices(s)
+	return s
+}
 
-	s.client = esClient
-	s.cfgmgmt = cfgElastic.New(elasticsearchUrl)
-	iClient, err := iElastic.New(elasticsearchUrl)
-	if err != nil {
-		fmt.Printf("Could not create ingest backend client from %q: %s\n", url, err)
-		os.Exit(3)
-	}
+func NewLocalSuite(t *testing.T) *Suite {
+	s := new(Suite)
 
-	s.ingest = iClient
-	s.projectsClient = &ProjectsClientMock{
-		ProjectCollectionRulesResp: &iam_v2.ProjectCollectionRulesResp{},
-	}
-
-	s.eventServiceClientMock = &EventServiceClientMock{}
-
-	// TODO @afiune Modify the time of the jobs
-	s.JobScheduler = server.NewJobScheduler()
-	s.ConfigManager = config.NewManager()
-	// TODO Handle the Close() functions
-	//defer JobScheduler.Close()
-	//defer ConfigManager.Close()
-
-	// A global ChefIngestServer instance to call any rpc function
-	//
-	// From any test you can directly call:
-	// ```
-	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
-	// ```
-	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient)
-	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
-		s.projectsClient, s.eventServiceClientMock)
-
-	// A global JobSchedulerServer instance to call any rpc function
-	//
-	// From any test you can directly call:
-	// ```
-	// // To test the 'marked nodes missing' job
-	// res, err := suite.JobSchedulerServer.MarkNodesMissing(ctx, &req)
-	//
-	// // To test the 'mark missing nodes for deletion' job
-	// res, err := suite.JobSchedulerServer.MarkMissingNodesForDeletion(ctx, &req)
-	// ```
-	s.JobSchedulerServer = server.NewJobSchedulerServer(s.ingest, s.JobScheduler, s.ConfigManager)
+	createMocksWithTestObject(s, t)
+	createServices(s)
 
 	return s
 }
@@ -372,4 +261,70 @@ func (s *Suite) Indices() []string {
 	}
 
 	return indices
+}
+
+func createServices(s *Suite) {
+	// Create a new elastic Client
+	esClient, err := elastic.NewClient(
+		elastic.SetURL(elasticsearchUrl),
+		elastic.SetSniff(false),
+	)
+	if err != nil {
+		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
+		os.Exit(1)
+	}
+
+	s.client = esClient
+	s.cfgmgmt = cfgElastic.New(elasticsearchUrl)
+	iClient, err := iElastic.New(elasticsearchUrl)
+	if err != nil {
+		fmt.Printf("Could not create ingest backend client from %q: %s\n", elasticsearchUrl, err)
+		os.Exit(3)
+	}
+
+	s.ingest = iClient
+
+	// TODO @afiune Modify the time of the jobs
+	s.JobScheduler = server.NewJobScheduler()
+	s.ConfigManager = config.NewManager()
+	// TODO Handle the Close() functions
+	//defer JobScheduler.Close()
+	//defer ConfigManager.Close()
+
+	// A global ChefIngestServer instance to call any rpc function
+	//
+	// From any test you can directly call:
+	// ```
+	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
+	// ```
+	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient)
+	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
+		s.projectsClient, s.eventServiceClientMock)
+
+	// A global JobSchedulerServer instance to call any rpc function
+	//
+	// From any test you can directly call:
+	// ```
+	// // To test the 'marked nodes missing' job
+	// res, err := suite.JobSchedulerServer.MarkNodesMissing(ctx, &req)
+	//
+	// // To test the 'mark missing nodes for deletion' job
+	// res, err := suite.JobSchedulerServer.MarkMissingNodesForDeletion(ctx, &req)
+	// ```
+	s.JobSchedulerServer = server.NewJobSchedulerServer(s.ingest, s.JobScheduler, s.ConfigManager)
+}
+
+func createMocksWithDefaultFunctions(s *Suite) {
+	s.projectsClient = iam_v2.NewMockProjectsClient(gomock.NewController(nil))
+	s.projectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ProjectCollectionRulesResp{}, nil)
+
+	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
+	s.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&event.PublishResponse{}, nil)
+}
+
+func createMocksWithTestObject(s *Suite, t *testing.T) {
+	s.projectsClient = iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
 }

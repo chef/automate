@@ -4,7 +4,9 @@ Welcome to the Config Management API service.
 
 ## Geting Started
 
-Now we use the Global Habitat Studio; follow [this](https://github.com/chef/automate/#global-habitat-studio) instructions.
+This component uses the habitat studio development environment. See
+[dev-docs/DEV_ENVIRONMENT](https://github.com/chef/automate/blob/master/dev-docs/DEV_ENVIRONMENT.md)
+to get started.
 
 ### Debug Go code (with VS Code)
 
@@ -25,4 +27,3 @@ After that you can just open your VS Code editor and start debugging, you should
 a configuration pointing to the studio called `Remote Habitat Studio`.
 
 ![](docs/images/vs_code_debug_habitat_studio.gif)
-

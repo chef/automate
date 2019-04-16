@@ -70,6 +70,11 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 		return nil, p.processError(err)
 	}
 
+	err = p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	err = p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, tx)
 	if err != nil {
 		return nil, p.processError(err)
@@ -167,7 +172,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	}
 
 	// Since we are forcing users to update the entire policy, we should delete
-	// all existing policies for simplicity for now. Let's not delete the actual
+	// all existing statements for simplicity for now. Let's not delete the actual
 	// policy row to preserve that record / id.
 	//
 	// This will cascade delete all related statements.
@@ -211,6 +216,12 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	err = rows.Close()
 	if err != nil {
 		p.logger.Warnf("failed to close db rows: %s", err.Error())
+		return nil, p.processError(err)
+	}
+
+	// Update policy's projects
+	err = p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, tx)
+	if err != nil {
 		return nil, p.processError(err)
 	}
 
@@ -269,7 +280,37 @@ func (p *pg) insertPolicyStatementsWithQuerier(ctx context.Context,
 			err = p.processError(err)
 			switch err {
 			case storage_errors.ErrForeignKey: // occurs when a project in the statement does not exist
-				return errors.New("non-existent projects cannot be included in policy statements")
+				return errors.Errorf("not allowed: one or more of the projects %s does not exist", s.Projects)
+			default:
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// insertPolicyProjectsWithQuerier creates new associations between a policy and its projects.
+func (p *pg) associatePolicyWithProjects(ctx context.Context,
+	policyID string, inProjects []string,
+	q Querier) error {
+
+	// TODO this might be simplified as we modify how projects are assigned
+	// Drop any existing associations.
+	_, err := q.ExecContext(ctx,
+		`DELETE FROM iam_policy_projects WHERE policy_id=$1;`, policyID)
+	if err != nil {
+		return err
+	}
+	for _, project := range inProjects {
+		_, err := q.ExecContext(ctx,
+			`INSERT INTO iam_policy_projects (policy_id, project_id) VALUES ($1, $2)`,
+			&policyID, &project)
+		if err != nil {
+			err = p.processError(err)
+			switch err {
+			case storage_errors.ErrForeignKey: // occurs when a project in the policy does not exist
+				return errors.Errorf("not allowed: one or more of the projects %s does not exist", inProjects)
 			default:
 				return err
 			}

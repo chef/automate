@@ -43,6 +43,7 @@ func (p *Server) CreatePolicy(
 		Name:       in.Name,
 		Members:    in.Members,
 		Statements: statements,
+		Projects:   in.Projects,
 	})
 	if err != nil {
 		return nil, err
@@ -126,6 +127,7 @@ func (p *Server) UpdatePolicy(
 		Name:       in.Name,
 		Members:    in.Members,
 		Statements: statements,
+		Projects:   in.Projects,
 	})
 	if err != nil {
 		return nil, err
@@ -451,6 +453,7 @@ func convertDomainPolicyToAPIPolicy(policy *authz.Policy) (*pb_common.Policy, er
 		Type:       t,
 		Members:    policy.Members,
 		Statements: statements,
+		Projects:   policy.Projects,
 	}, nil
 }
 

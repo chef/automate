@@ -208,7 +208,8 @@ func getSecretsAgg(ctx context.Context, secretIds []string, secretsClient secret
 		arrMap := make(map[string]string, 0)
 		s, err := secretsClient.Read(ctx, &secrets.Id{Id: id})
 		if err != nil {
-			return nil, errors.Wrap(err, "GetSecretsAgg error")
+			logrus.WithError(err).Errorf("could not read credential %q", id)
+			continue
 		}
 
 		for _, kv := range s.Data {

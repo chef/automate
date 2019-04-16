@@ -6,7 +6,7 @@ Once the requirements are fulfilled, it takes around 5 minutes to have your a2 b
 
 # Requirements:
 
-## Install the AWS vagrant plugin
+## Install the most recent AWS vagrant plugin
 ```
 vagrant plugin install vagrant-aws
 ```
@@ -22,18 +22,19 @@ vagrant box add aws https://github.com/mitchellh/vagrant-aws/raw/master/dummy.bo
 
 1. `GITHUB_TOKEN` env variable with private repo read access to `chef` org repos
 
-2. `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY` of `Chef Engineering AWS` account.
-You can create them by reachable via Okta
-
-3. `AWS_SSH_KEY_NAME` needs to be set to the name of your SSH key added to the [EC2 Key Pairs](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#KeyPairs:sort=keyName). This is not used outside of this Vagrantfile so is often passed as an env parameter (see below).
+2. `AWS_SSH_KEY_NAME` needs to be set to the name of your SSH key added to the [EC2 Key Pairs](https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#KeyPairs:sort=keyName). This is not used outside of this Vagrantfile so is often passed as an env parameter (see below).
 
 ### Optional ENV variables
 
 1. `STOP_HOURS` (default: 48) can be used to specify after how many hours the server to self shutdown (stop). Used to prevent unused ec2 instances from running long periods of time.
 
-2. `AWS_EC2_IP` can be used to specify an elastic IP that you prefer to be assigned to the box instead of an ephemeral public IP.
+2. `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY`. If not defined, authentication will fallback to `~/.aws/credentials`, created or auto-generated via `okta_aws`.
 
-3. `VERSION` in format 'channel[/build]' (default: 'dev/latest') can be used to specify which versions to use when pulling the Automate components. Valid examples: 'dev/20190328132226', 'current', 'acceptance'. The latest build will be pulled from channel if the build timestamp is not specified.
+3. `AWS_PROFILE` can be used to specify the profile to be used from `~/.aws/credentials`. Default: `chef-engineering`. If the `okta_aws` command is installed, it will be invoked with `AWS_PROFILE`.
+
+4. `AWS_EC2_IP` can be used to specify an elastic IP that you prefer to be assigned to the box instead of an ephemeral public IP.
+
+5. `VERSION` in format 'channel[/build]' (default: 'dev/latest') can be used to specify which versions to use when pulling the Automate components. Valid examples: 'dev/20190328132226', 'current', 'acceptance'. The latest build will be pulled from channel if the build timestamp is not specified.
 
 Pick previous build timestamps from the three supported channels from here:
  * [dev versions](https://packages.chef.io/manifests/dev/automate/versions.json)

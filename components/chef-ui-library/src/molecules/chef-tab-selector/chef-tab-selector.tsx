@@ -62,9 +62,12 @@ export class ChefTabSelector {
   selected: HTMLChefOptionElement;
 
   @Listen('click') handleClick(event) {
-    this.value = event.target.closest('chef-option').value;
-    this.change.emit();
-    this.input.emit();
+    const option = event.target.closest('chef-option');
+    if (option) {
+      this.value = option.value;
+      this.change.emit();
+      this.input.emit();
+    }
   }
 
   componentDidLoad() {

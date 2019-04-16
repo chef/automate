@@ -192,6 +192,7 @@ habitat_packages:
         - api/interservice/license_control/*
         - api/interservice/local_user/*
         - api/interservice/teams/*
+        - components/authz-service/*
         - components/automate-deployment/*
         - components/automate-grpc/*
         - components/compliance-service/*
@@ -236,6 +237,7 @@ habitat_packages:
         - api/interservice/es_sidecar/*
         - api/interservice/event/*
         - api/interservice/ingest/*
+        - components/authz-service/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*
@@ -485,6 +487,7 @@ habitat_packages:
         - api/interservice/authz/*
         - api/interservice/event/*
         - api/interservice/ingest/*
+        - components/authz-service/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*
@@ -529,6 +532,7 @@ habitat_packages:
         - api/interservice/authz/*
         - api/interservice/event/*
         - api/interservice/ingest/*
+        - components/authz-service/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*
@@ -556,6 +560,7 @@ habitat_packages:
         - api/interservice/es_sidecar/*
         - api/interservice/event/*
         - api/interservice/ingest/*
+        - components/authz-service/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*

@@ -431,7 +431,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	assert.Equal(t, "", report.SourceAccountId)
 
 	// Verify the 'Profiles' field
-	assert.Len(t, report.Profiles, 2)
+	assert.Len(t, report.Profiles, 3)
 
 	p1 := report.Profiles[0]
 	assert.Equal(t, "mylinux-success", p1.Name)
@@ -442,6 +442,8 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	assert.Equal(t, "Apache 2 license", p1.License)
 	assert.Equal(t, "Chef Software, Inc.", p1.Copyright)
 	assert.Equal(t, "support@chef.io", p1.CopyrightEmail)
+	assert.Equal(t, "loaded", p1.Status)
+	assert.Equal(t, "", p1.SkipMessage)
 	assert.Equal(t, "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27", p1.Sha256)
 	assert.Len(t, p1.Controls, 2)
 	expectedP1Support := []*inspecEvent.Support{&inspecEvent.Support{Inspec: "~> 1.0"}}
@@ -540,6 +542,8 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	assert.Equal(t, "Chef Software, Inc.", p2.Copyright)
 	assert.Equal(t, "support@chef.io", p2.CopyrightEmail)
 	assert.Equal(t, "9490b16f32922b284a82a36d4f111e1474fcd9b53c4689f77de7ef68a1664487", p2.Sha256)
+	assert.Equal(t, "loaded", p2.Status)
+	assert.Equal(t, "", p2.SkipMessage)
 	expectedP2Controls := []*inspecEvent.Control{
 		&inspecEvent.Control{
 			Id:     "/etc/services must exist",
@@ -601,4 +605,10 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	assert.Len(t, p2.Groups, 1)
 	assert.Equal(t, expectedP2Groups, p2.Groups)
 	assert.Equal(t, "", p2.ParentProfile)
+
+	p3 := report.Profiles[2]
+	assert.Equal(t, "mywindows", p3.Name)
+	assert.Equal(t, "My Demo Windows Profile", p3.Title)
+	assert.Equal(t, "skipped", p3.Status)
+	assert.Equal(t, "Skipping profile: 'mywindows' on unsupported platform: 'mac_os_x/17.7.0'.", p3.SkipMessage)
 }

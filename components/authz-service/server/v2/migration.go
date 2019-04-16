@@ -167,6 +167,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	if _, found := v1PoliciesToSkip[pol.ID.String()]; found {
 		return nil, nil
 	}
+	noProjects := []string{}
 
 	// there's three cfgmgmt policies (which had been deletable) that are now
 	// mapped into one:
@@ -185,7 +186,8 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		}
 		cfgmgmtPolicy, err := storage.NewPolicy(constants_v2.CfgmgmtPolicyID,
 			"[Legacy] Infrastructure Automation Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{cfgmgmtStatement})
+			storage.Custom, []storage.Member{member},
+			[]storage.Statement{cfgmgmtStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
@@ -204,7 +206,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		}
 		compliancePolicy, err := storage.NewPolicy(constants_v2.CompliancePolicyID,
 			"[Legacy] Compliance Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{complianceStatement})
+			storage.Custom, []storage.Member{member}, []storage.Statement{complianceStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
@@ -223,7 +225,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		}
 		eventsPolicy, err := storage.NewPolicy(constants_v2.EventsPolicyID,
 			"[Legacy] Events Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{eventsStatement})
+			storage.Custom, []storage.Member{member}, []storage.Statement{eventsStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (events)")
 		}
@@ -243,7 +245,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 
 		ingestPolicy, err := storage.NewPolicy(constants_v2.LegacyIngestPolicyID,
 			"[Legacy] Ingest Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{ingestStatement})
+			storage.Custom, []storage.Member{member}, []storage.Statement{ingestStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (ingest)")
 		}
@@ -260,9 +262,14 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (nodes)")
 		}
-		nodesPolicy, err := storage.NewPolicy(constants_v2.NodesPolicyID,
+		nodesPolicy, err := storage.NewPolicy(
+			constants_v2.NodesPolicyID,
 			"[Legacy] Nodes Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{nodesStatement})
+			storage.Custom,
+			[]storage.Member{member},
+			[]storage.Statement{nodesStatement},
+			noProjects,
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (nodes)")
 		}
@@ -279,9 +286,14 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (nodemanagers)")
 		}
-		nodeManagersPolicy, err := storage.NewPolicy(constants_v2.NodeManagersPolicyID,
+		nodeManagersPolicy, err := storage.NewPolicy(
+			constants_v2.NodeManagersPolicyID,
 			"[Legacy] Node Managers Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{nodeManagersStatement})
+			storage.Custom,
+			[]storage.Member{member},
+			[]storage.Statement{nodeManagersStatement},
+			noProjects,
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (nodemanagers)")
 		}
@@ -298,9 +310,14 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (secrets)")
 		}
-		secretsPolicy, err := storage.NewPolicy(constants_v2.SecretsPolicyID,
+		secretsPolicy, err := storage.NewPolicy(
+			constants_v2.SecretsPolicyID,
 			"[Legacy] Secrets Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{secretsStatement})
+			storage.Custom,
+			[]storage.Member{member},
+			[]storage.Statement{secretsStatement},
+			noProjects,
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (secrets)")
 		}
@@ -317,9 +334,14 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (telemetry)")
 		}
-		telemetryPolicy, err := storage.NewPolicy(constants_v2.TelemetryPolicyID,
+		telemetryPolicy, err := storage.NewPolicy(
+			constants_v2.TelemetryPolicyID,
 			"[Legacy] Telemetry Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{telemetryStatement})
+			storage.Custom,
+			[]storage.Member{member},
+			[]storage.Statement{telemetryStatement},
+			noProjects,
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (telemetry)")
 		}
@@ -336,9 +358,14 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (compliance token)")
 		}
-		complianceTokenPolicy, err := storage.NewPolicy(constants_v2.ComplianceTokenPolicyID,
+		complianceTokenPolicy, err := storage.NewPolicy(
+			constants_v2.ComplianceTokenPolicyID,
 			"[Legacy] Compliance Profile Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{complianceTokenStatement})
+			storage.Custom,
+			[]storage.Member{member},
+			[]storage.Statement{complianceTokenStatement},
+			noProjects,
+		)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (compliance token)")
 		}
@@ -378,8 +405,13 @@ func customPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 		members[i] = memberInt
 	}
 
-	policy, err := storage.NewPolicy(pol.ID.String(),
-		name, storage.Custom, members, []storage.Statement{statement})
+	policy, err := storage.NewPolicy(
+		pol.ID.String(),
+		name,
+		storage.Custom,
+		members,
+		[]storage.Statement{statement},
+		[]string{})
 	if err != nil {
 		return nil, errors.Wrap(err, "format v2 policy")
 	}

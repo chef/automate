@@ -41,6 +41,8 @@ service Deployment {
 	rpc ShowBackup(ShowBackupRequest) returns(ShowBackupResponse);
 	rpc DeleteBackups(DeleteBackupsRequest) returns(DeleteBackupsResponse);
 	rpc RestoreBackup(RestoreBackupRequest) returns(RestoreBackupResponse);
+	rpc BackupStatus(BackupStatusRequest) returns(BackupStatusResponse);
+	rpc CancelBackup(CancelBackupRequest) returns(CancelBackupResponse);
 	rpc Upgrade(UpgradeRequest) returns (UpgradeResponse);
 	rpc SetLogLevel(SetLogLevelRequest) returns (SetLogLevelResponse);
 	rpc GenerateAdminToken(GenerateAdminTokenRequest) returns (GenerateAdminTokenResponse);
@@ -535,9 +537,7 @@ message BackupDeleteTask {
 }
 
 message CreateBackupRequest {
-	// backup_timeout_seconds is the number of seconds to wait for
-	// a backup to be created
-	int64 backup_timeout_seconds = 9;
+	reserved 9; // backup_timeout_seconds, replaced with context deadline
 };
 
 message CreateBackupResponse {
@@ -574,6 +574,30 @@ message RestoreBackupRequest {
 
 message RestoreBackupResponse {
 	BackupRestoreTask restore = 1;
+};
+
+message BackupStatusRequest {
+};
+
+message BackupStatusResponse {
+	OperationType op_type = 1;
+	repeated string task_ids = 2;
+
+	enum OperationType {
+		CREATE = 0;
+		DELETE = 1;
+		RESTORE = 3;
+		LIST = 4;
+		SHOW = 5;
+		CANCEL = 6;
+		IDLE = 7;
+	}
+};
+
+message CancelBackupRequest {
+};
+
+message CancelBackupResponse {
 };
 
 message UpgradeRequest {

@@ -130,6 +130,7 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
 	//
 	// Fetch the UUID since that's what the membership table uses.
+	// Will fail the request here if the user in question is filtered by projects.
 	teamForUUID, err := s.service.Storage.GetTeamByName(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")
@@ -162,6 +163,7 @@ func (s *Server) RemoveTeamMembers(ctx context.Context,
 	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
 	//
 	// Fetch the UUID since that's what the membership table uses.
+	// Will fail the request here if the user in question is filtered by projects.
 	teamForUUID, err := s.service.Storage.GetTeamByName(ctx, req.Id)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "team")

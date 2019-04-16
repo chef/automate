@@ -28,11 +28,13 @@ import (
 	"google.golang.org/grpc/status"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	papi "github.com/chef/automate/api/config/platform"
 	platformconf "github.com/chef/automate/api/config/platform"
 	config "github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	lc "github.com/chef/automate/api/interservice/license_control"
 	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
+	"github.com/chef/automate/components/automate-deployment/pkg/backup"
 	"github.com/chef/automate/components/automate-deployment/pkg/certauthority"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
@@ -51,6 +53,7 @@ import (
 	usermgmt_client "github.com/chef/automate/components/automate-deployment/pkg/usermgmt/client"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/io/chunks"
+	"github.com/chef/automate/lib/platform"
 	"github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/tls/certs"
@@ -69,6 +72,7 @@ type server struct {
 	senderStore          eventSenderStore
 	ensureStatusTimeout  time.Duration
 	ensureStatusInterval time.Duration
+	backupRunner         *backup.Runner
 
 	releaseManifestProvider manifest.CachingReleaseManifestProvider
 
@@ -470,6 +474,12 @@ func (s *errDeployer) startConverge(task *converge.Task, eventSink converge.Even
 
 	err = s.converger.Converge(0, task, *desiredState, eventSink)
 
+	if err != nil {
+		s.err = err
+		return
+	}
+
+	err = s.reloadBackupRunner()
 	if err != nil {
 		s.err = err
 		return
@@ -1033,6 +1043,10 @@ func StartServer(config *Config) error {
 			tracing.ServerInterceptor(tracing.GlobalTracer()))))
 
 	server.converger = converge.StartConverger()
+	err = server.reloadBackupRunner()
+	if err != nil {
+		return errors.Wrap(err, "failed to load the backup runner")
+	}
 
 	// register grpc services
 	api.RegisterDeploymentServer(grpcServer, server)
@@ -1973,4 +1987,93 @@ func (s *server) DeployID(ctx context.Context, d *api.DeployIDRequest) (*api.Dep
 	return &api.DeployIDResponse{
 		DeploymentId: s.deployment.ID,
 	}, nil
+}
+
+// This function isn't perfect. It's intent is that you can wait for the lock with
+// a timeout. In reality, this is not possible using mutexes. So instead, it errors
+// out if the context is expired, and then waits for the lock. This is fine because
+// the next use of the context will error out and then the mutex will be unlocked
+// fairly quickly because of that. We just end up with an extra thread waiting
+// for the lock on the server.
+func (s *server) acquireLock(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+		if ctx.Err() != nil {
+			return status.Errorf(codes.DeadlineExceeded,
+				"deadline exceeded waiting for deployment lock: %s", ctx.Err())
+		}
+		return nil
+	default:
+		s.deployment.Lock()
+		return nil
+	}
+}
+
+func (s *server) reloadBackupRunner() error {
+	// platformConfig knows how to deal with superuser, and external vs internal PG
+	platformConfig := platform.Config{
+		Config: &papi.Config{
+			Postgresql: &papi.Config_Postgresql{
+				Ip: s.deployment.Config.GetPgGateway().GetV1().GetSys().GetService().GetHost().GetValue(),
+				Cfg: &papi.Config_Postgresql_Cfg{
+					Port: int64(s.deployment.Config.GetPgGateway().GetV1().GetSys().GetService().GetPort().GetValue()),
+				},
+			},
+			Platform: &papi.Config_Platform{
+				ExternalPostgresql: s.deployment.Config.GetGlobal().GetV1().GetExternal().GetPostgresql(),
+			},
+		},
+	}
+
+	// Get the correct ConnInfo
+	superuser, err := platformConfig.PGSuperUser()
+	if err != nil {
+		return err
+	}
+
+	if superuser == "" {
+		return errors.New("unable to determine superuser")
+	}
+
+	pgConnInfo, err := platformConfig.GetPGConnInfoURI(superuser)
+	if err != nil {
+		return err
+	}
+
+	configRenderer, err := s.configRenderer()
+	if err != nil {
+		return err
+	}
+
+	locationSpec, err := s.backupGatewayLocationSpec()
+	if err != nil {
+		return err
+	}
+
+	esSidecarInfo := backup.ESSidecarConnInfo{
+		Host: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetHost().GetValue(),
+		Port: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetPort().GetValue(),
+	}
+
+	chefServerEnabled := s.deployment.Config.GetDeployment().GetV1().GetSvc().GetEnableChefServer().GetValue()
+	workflowEnabled := s.deployment.Config.GetDeployment().GetV1().GetSvc().GetEnableWorkflow().GetValue()
+	target := target.NewLocalTarget(airgap.AirgapInUse())
+
+	if s.backupRunner == nil {
+		s.backupRunner = backup.NewRunner()
+	}
+
+	s.backupRunner.Configure(
+		backup.WithConfigRenderer(configRenderer),
+		backup.WithConnFactory(s.connFactory),
+		backup.WithSpecs(backup.DefaultSpecs(chefServerEnabled, workflowEnabled)),
+		backup.WithBackupLocationSpecification(locationSpec),
+		backup.WithPGConnInfo(pgConnInfo),
+		backup.WithEsSidecarInfo(esSidecarInfo),
+		backup.WithConnFactory(s.connFactory),
+		backup.WithTarget(target),
+		backup.WithReleaseManifest(s.deployment.CurrentReleaseManifest),
+	)
+
+	return nil
 }

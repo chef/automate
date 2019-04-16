@@ -13,9 +13,9 @@ import (
 
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
+	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
-	"github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_cfgmgmt"
 	mock_automate_feed "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_feed"
 	subject "github.com/chef/automate/components/automate-gateway/handler"
 	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
@@ -27,7 +27,7 @@ import (
 // TestEventFeedFuncGetEventFeedEmptyRequest a very simple mock with empty request/response
 func TestEventFeedFuncGetEventFeedEmptyRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	c := ctx.Background()
 	mockCfgMgmtClient.EXPECT().GetEventFeed(
@@ -62,7 +62,7 @@ func TestEventFeedFuncGetEventFeedSingleErrorShouldNotFail(t *testing.T) {
 	var (
 		ctrl                  = gomock.NewController(t)
 		c                     = ctx.Background()
-		mockCfgMgmtClient     = mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+		mockCfgMgmtClient     = cmsService.NewMockCfgMgmtClient(ctrl)
 		mockFeedServiceClient = mock_automate_feed.NewMockFeedServiceClient(ctrl)
 		request               = &agReq.EventFilter{
 			PageSize: 1000,
@@ -96,7 +96,7 @@ func TestEventFeedFuncGetEventFeedAllSubscribersFailedThenExpectFailure(t *testi
 	var (
 		ctrl                  = gomock.NewController(t)
 		c                     = ctx.Background()
-		mockCfgMgmtClient     = mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+		mockCfgMgmtClient     = cmsService.NewMockCfgMgmtClient(ctrl)
 		mockFeedServiceClient = mock_automate_feed.NewMockFeedServiceClient(ctrl)
 		request               = &agReq.EventFilter{
 			PageSize: 1000,
@@ -146,7 +146,7 @@ func TestEventStringsFuncGetEventStringBucketsEmptyRequest(t *testing.T) {
 	startDate := time.Now().In(loc)
 	ctrl := gomock.NewController(t)
 	hoursBetween := int32(3)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	c := ctx.Background()
 	mockCfgMgmtClient.EXPECT().GetEventStringBuckets(
@@ -189,7 +189,7 @@ func TestEventStringsFuncGetEventStringBucketsEmptyRequest(t *testing.T) {
 // TestEventStringsFuncGetEventStringBucketsCorrectRequest sends correct response
 func TestEventStringsFuncGetEventStringBucketsCorrectRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	c := ctx.Background()
 

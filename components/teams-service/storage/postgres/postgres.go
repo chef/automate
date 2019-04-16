@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
@@ -17,6 +18,8 @@ import (
 // WARNING
 // TODO (tc): The storage interface is still using V1 verbiage, so
 // name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
+// Also, project filtering has only been implemented for storage functions
+// that are used by the V2 server.
 
 // TODOs
 // - CREATE EXTENSION "uuid-ossp"; (currently done via Makefile for tests)
@@ -131,11 +134,18 @@ func (p *postgres) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Te
 }
 
 func (p *postgres) DeleteTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return storage.Team{}, p.processError(err)
+	}
+
 	var t storage.Team
-	err := p.db.QueryRowContext(ctx,
-		`DELETE FROM teams WHERE name=$1
-		RETURNING id, name, description, projects, created_at, updated_at`,
-		teamName).Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
+	err = p.db.QueryRowContext(ctx,
+		`DELETE FROM teams t WHERE t.name=$1 AND projects_match(t.projects, $2::TEXT[])
+			RETURNING t.id, t.name, t.description, t.projects, t.created_at, t.updated_at`,
+		teamName, pq.Array(projectsFilter)).Scan(
+		&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt,
+	)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -168,16 +178,22 @@ func (p *postgres) EditTeam(ctx context.Context, team storage.Team) (storage.Tea
 func (p *postgres) EditTeamByName(ctx context.Context,
 	teamName string, teamDescription string, teamProjects []string) (storage.Team, error) {
 
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return storage.Team{}, p.processError(err)
+	}
+
 	var t storage.Team
 	if teamProjects == nil {
 		teamProjects = []string{}
 	}
-	err := p.db.QueryRowContext(ctx,
-		`UPDATE teams SET
-		description = $2, projects = $3, updated_at = now()
-		WHERE name = $1
-		RETURNING id, name, projects, description, created_at, updated_at`,
-		teamName, teamDescription, pq.Array(teamProjects)).
+
+	err = p.db.QueryRowContext(ctx,
+		`UPDATE teams t SET
+			description = $2, projects = $3, updated_at = now()
+		WHERE t.name = $1 AND projects_match(t.projects, $4::TEXT[])
+		RETURNING id, name, projects, description, created_at, updated_at;`,
+		teamName, teamDescription, pq.Array(teamProjects), pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.Description, &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
@@ -188,10 +204,17 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 
 // GetTeams fetches teams from the database, returning an array of storage teams.
 func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return []storage.Team{}, p.processError(err)
+	}
+
 	var teams []storage.Team
 	// TODO eventually these should be ordered
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at FROM teams t`)
+		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at FROM teams t WHERE projects_match(t.projects, $1::TEXT[])`,
+		pq.Array(projectsFilter))
+
 	if err != nil {
 		return []storage.Team{}, p.processError(err)
 	}
@@ -214,6 +237,13 @@ func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 }
 
 // RemoveUsers deletes teams_users_association rows by teamID and userID, returning the storage team.
+//
+//
+// NOTE: We aren't filtering on projects here for expediency since the server call
+// is already calling GetTeamByName which does project filtering and will bail in the
+// server code before we get here if the team in question was filtered, but if we call this
+// from a different context we should apply project filtering in this function as well.
+// Not doing it to save us a database call since it's not needed currently.
 func (p *postgres) RemoveUsers(ctx context.Context, teamID uuid.UUID, userIDs []string) (storage.Team, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -254,11 +284,16 @@ func (p *postgres) RemoveUsers(ctx context.Context, teamID uuid.UUID, userIDs []
 
 // GetTeamByName returns the team by name
 func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return storage.Team{}, p.processError(err)
+	}
+
 	var t storage.Team
-	err := p.db.QueryRowContext(ctx,
+	err = p.db.QueryRowContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
-		FROM teams t WHERE t.name = $1`,
-		teamName).
+			FROM teams t WHERE t.name = $1 AND projects_match(t.projects, $2::TEXT[]);`,
+		teamName, pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
@@ -315,6 +350,12 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 
 // AddUsers adds users to a team (adding rows to teams_users_associations and updating
 // team updated_at)
+//
+// NOTE: We aren't filtering on projects here for expediency since the server call
+// is already calling GetTeamByName which does project filtering and will bail in the
+// server code before we get here if the team in question was filtered, but if we call this
+// from a different context we should apply project filtering in this function as well.
+// Not doing it to save us a database call since it's not needed currently.
 func (p *postgres) AddUsers(ctx context.Context,
 	teamID uuid.UUID,
 	userIDs []string) (storage.Team, error) {
@@ -362,6 +403,13 @@ func (p *postgres) AddUsers(ctx context.Context,
 	return team, nil
 }
 
+// GetUserIDsForTeam returns the user IDs for all members of the team.
+//
+// NOTE: We aren't filtering on projects here for expediency since the server call
+// is already calling GetTeamByName which does project filtering and will bail in the
+// server code before we get here if the team in question was filtered, but if we call this
+// from a different context we should apply project filtering in this function as well.
+// Not doing it to save us a database call since it's not needed currently.
 func (p *postgres) GetUserIDsForTeam(ctx context.Context, teamID uuid.UUID) ([]string, error) {
 	var users []string
 	row := p.db.QueryRowContext(ctx,
@@ -376,13 +424,18 @@ func (p *postgres) GetUserIDsForTeam(ctx context.Context, teamID uuid.UUID) ([]s
 
 // GetTeamsForUser returns an array of teams that have the provided user
 func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storage.Team, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return []storage.Team{}, p.processError(err)
+	}
+
 	teams := []storage.Team{}
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.created_at, t.updated_at FROM teams t
-		LEFT JOIN teams_users_associations tu ON tu.team_id=t.id
-		WHERE tu.user_id=$1
-		GROUP BY t.id`,
-		userID)
+			LEFT JOIN teams_users_associations tu ON tu.team_id=t.id
+			WHERE tu.user_id=$1 AND projects_match(t.projects, $2::TEXT[])
+			GROUP BY t.id`,
+		userID, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -449,4 +502,18 @@ func (p *postgres) processError(err error) error {
 	}
 	p.logger.Debugf("unknown error type from database: %v", err)
 	return err
+}
+
+// ProjectsListFromContext returns the project list from the context.
+// In the case that the project list was ["*"], we return an empty list,
+// since we do not wish to filter on projects.
+func ProjectsListFromContext(ctx context.Context) ([]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		projectsFilter = []string{}
+	}
+	return projectsFilter, nil
 }

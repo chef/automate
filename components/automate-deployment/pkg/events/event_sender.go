@@ -16,6 +16,10 @@ import (
 // debugging production issues.
 var traceLogging = false
 
+// SendFun is the prototype for the function that will get called during
+// StreamTo
+type SendFun = func(*api.DeployEvent) error
+
 // EventSender is the interface we use to instrument the
 // deployment-service to be able to capture status/progress events of
 // its actions. Right now, we use it to send progress updates of an
@@ -27,12 +31,19 @@ type EventSender interface {
 		stepName string, errStr string)
 	// streamTo is used by the server to provide the streaming
 	// status of events out to the client.
-	StreamTo(func(*api.DeployEvent) error) error
+	StreamTo(SendFun) error
 	// TaskComplete signals that the server isn't doing anything else and the
 	// stream should end.
 	TaskComplete()
 	Backup(backup api.DeployEvent_Backup)
 	Stop()
+}
+
+// stream encapsulates a function to send events to and a channel
+// to report error/finished on
+type stream struct {
+	sendFun  SendFun
+	doneChan chan error
 }
 
 type memoryEventSender struct {
@@ -57,22 +68,21 @@ type memoryEventSender struct {
 	// registeredChans is a set of registered listening
 	// channels. The eventSender run loop sends all received
 	// messages to each registered channel.
-	registeredChans map[chan *api.DeployEvent]uint64
+	streams map[*stream]uint64
 }
 
 // controlMessage is sent to the memoryEventSender to allow register,
 // deregister, and deploymentCompleted.
 type controlMessage struct {
-	op      controlOp
-	regChan chan *api.DeployEvent
+	op     controlOp
+	stream *stream
 }
 
 type controlOp int
 
 const (
-	ctlRegister   controlOp = 0
-	ctlDeregister controlOp = 1
-	ctlStop       controlOp = 2
+	ctlRegister controlOp = 0
+	ctlStop     controlOp = 2
 )
 
 func (cm *controlMessage) String() string {
@@ -80,8 +90,6 @@ func (cm *controlMessage) String() string {
 	switch cm.op {
 	case ctlRegister:
 		s = "ctlRegister"
-	case ctlDeregister:
-		s = "ctlDeregister"
 	case ctlStop:
 		s = "ctlStop"
 	}
@@ -92,12 +100,12 @@ func (cm *controlMessage) String() string {
 // a specified deploymentID.
 func NewMemoryEventSender(deploymentID string) EventSender {
 	sender := &memoryEventSender{
-		deploymentID:    deploymentID,
-		seq:             0,
-		ctlChan:         make(chan controlMessage),
-		eventLog:        make([]*api.DeployEvent, 0, 100),
-		eventChan:       make(chan *api.DeployEvent),
-		registeredChans: make(map[chan *api.DeployEvent]uint64, 10),
+		deploymentID: deploymentID,
+		seq:          0,
+		ctlChan:      make(chan controlMessage),
+		eventLog:     make([]*api.DeployEvent, 0, 100),
+		eventChan:    make(chan *api.DeployEvent),
+		streams:      make(map[*stream]uint64, 10),
 	}
 	sender.run()
 	return sender
@@ -129,11 +137,15 @@ func runLoop(es *memoryEventSender, logEvent func(*api.DeployEvent, string)) {
 			}
 			es.eventLog = append(es.eventLog, event)
 			logEvent(event, "start_distribution")
-			for regChan, lastSeq := range es.registeredChans {
+			for s, lastSeq := range es.streams {
 				if lastSeq < event.Sequence {
-					logEvent(event, fmt.Sprintf("distribute: %v", regChan))
-					regChan <- event
-					es.registeredChans[regChan] = event.Sequence
+					logEvent(event, fmt.Sprintf("distribute: %v", s))
+					if err := es.sendToStream(s, event); err != nil {
+						logrus.WithError(err).WithFields(logrus.Fields{
+							"mod":  "server.memoryEventSender.runLoop",
+							"chan": "eventChan",
+						}).Warn("failed to send event")
+					}
 				}
 			}
 			logEvent(event, "end_distribution")
@@ -154,40 +166,54 @@ func runLoopHandleCtl(es *memoryEventSender, ctl controlMessage) {
 
 	switch ctl.op {
 	case ctlRegister:
-		es.registeredChans[ctl.regChan] = 0
-		es.sendPastEvents(ctl.regChan)
-	case ctlDeregister:
-		delete(es.registeredChans, ctl.regChan)
+		es.streams[ctl.stream] = 0
+		es.sendPastEvents(ctl.stream)
 	}
 }
 
-func (es *memoryEventSender) sendPastEvents(regChan chan *api.DeployEvent) {
-	var lastSeq uint64
+func (es *memoryEventSender) sendPastEvents(s *stream) {
 	for _, pastEvent := range es.eventLog {
-		regChan <- pastEvent
-		lastSeq = pastEvent.Sequence
+		if err := es.sendToStream(s, pastEvent); err != nil {
+			return
+		}
 	}
-	es.registeredChans[regChan] = lastSeq
 }
 
-func (es *memoryEventSender) register(c chan *api.DeployEvent) {
-	ctl := controlMessage{
-		op:      ctlRegister,
-		regChan: c,
+func (es *memoryEventSender) sendToStream(s *stream, ev *api.DeployEvent) error {
+	if err := s.sendFun(ev); err != nil {
+		es.deregister(s, err)
+		return err
 	}
-	logrus.Debugf("reg: %v", c)
-	es.ctlChan <- ctl
-	logrus.Debugf("reg accepted: %v", c)
+	if done := ev.GetTaskComplete(); done != nil {
+		es.deregister(s, nil)
+		return nil
+	}
+	es.streams[s] = ev.Sequence
+	return nil
 }
 
-func (es *memoryEventSender) deregister(c chan *api.DeployEvent) {
-	ctl := controlMessage{
-		op:      ctlDeregister,
-		regChan: c,
+func (es *memoryEventSender) deregister(s *stream, err error) {
+	if err != nil {
+		s.doneChan <- err
 	}
-	logrus.Debugf("dereg: %v", c)
+	close(s.doneChan)
+	delete(es.streams, s)
+}
+
+func (es *memoryEventSender) register(sendFun SendFun) chan error {
+	s := stream{
+		doneChan: make(chan error, 1),
+		sendFun:  sendFun,
+	}
+	ctl := controlMessage{
+		op:     ctlRegister,
+		stream: &s,
+	}
+	logrus.Debugf("reg: %v", ctl)
 	es.ctlChan <- ctl
-	logrus.Debugf("dereg accepted: %v", c)
+	logrus.Debugf("reg accepted: %v", ctl)
+
+	return s.doneChan
 }
 
 func (es *memoryEventSender) Stop() {
@@ -199,26 +225,10 @@ func (es *memoryEventSender) Stop() {
 	logrus.Debugf("ctlStop accepted")
 }
 
-func (es *memoryEventSender) StreamTo(sendFun func(*api.DeployEvent) error) error {
-	listenChan := make(chan *api.DeployEvent, 1)
-	es.register(listenChan)
-	for event := range listenChan {
-		if done := event.GetTaskComplete(); done != nil {
-			logrus.Debugf("server.memoryEventSender.streamTo client_ended: %v", listenChan)
-			// If we can't send, it doesn't matter, there is nothing else to send.
-			_ = sendFun(event) // nolint: gas
-			es.deregister(listenChan)
-			return nil
-		}
-
-		if err := sendFun(event); err != nil {
-			es.deregister(listenChan)
-			return err
-		}
-	}
-	logrus.Debugf("server.memoryEventSender.streamTo server_ended: %v", listenChan)
-	es.deregister(listenChan)
-	return nil
+func (es *memoryEventSender) StreamTo(sendFun SendFun) error {
+	doneChan := es.register(sendFun)
+	err := <-doneChan
+	return err
 }
 
 func (es *memoryEventSender) Deploy(status api.DeployEvent_Status) {

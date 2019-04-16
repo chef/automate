@@ -72,6 +72,7 @@ func (s *authzServer) ProjectsAuthorized(
 			// Engine allows all--but we want that to mean just the *requested* ones.
 			projectsAuthorized = req.ProjectsFilter
 		}
+		s.logProjectQuery(req, projectsAuthorized)
 	}
 
 	return &api.ProjectsAuthorizedResp{
@@ -120,6 +121,16 @@ func (s *authzServer) logQuery(req *api.IsAuthorizedReq, authorized bool, err er
 		"action":   req.Action,
 		"resource": req.Resource,
 	}).Info("Authorization Query")
+}
+
+func (s *authzServer) logProjectQuery(req *api.ProjectsAuthorizedReq, authorizedProjects []string) {
+	s.log.WithFields(logger.KV{
+		"result":   authorizedProjects,
+		"subject":  req.Subjects,
+		"action":   req.Action,
+		"resource": req.Resource,
+		"projects": req.ProjectsFilter,
+	}).Info("Projects Authorized Query")
 }
 
 func toPBPairs(pairs []engine.Pair) []*api.Pair {

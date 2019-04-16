@@ -14,8 +14,8 @@ import (
 	"testing"
 
 	ingestReq "github.com/chef/automate/api/external/ingest/request"
+	"github.com/chef/automate/api/interservice/ingest"
 	mock_compliance_ingest "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_compliance_ingest"
-	mock_ingest "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_ingest"
 	mock_notifier "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_notifier"
 	"github.com/golang/mock/gomock"
 	gp "github.com/golang/protobuf/ptypes/empty"
@@ -62,7 +62,7 @@ func TestDataCollectorHandlerChefActionMsgOk(t *testing.T) {
 	for a, body := range rawactions {
 		t.Run("action_type: "+a, func(t *testing.T) {
 			// Mock the IngestClient
-			mockIngest := mock_ingest.NewMockChefIngesterClient(gomock.NewController(t))
+			mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
 			// Assert that we will call the ProcessChefAction() func
 			mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any())
 
@@ -85,7 +85,7 @@ func TestDataCollectorHandlerChefActionMsgOk(t *testing.T) {
 
 func TestDataCollectorHandlerMsgErrorWithNonGRPCError(t *testing.T) {
 	// Mock the IngestClient to test  the behavior when we've got a Non GRPC Error
-	mockIngest := mock_ingest.NewMockChefIngesterClient(gomock.NewController(t))
+	mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
 	mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
 			return &gp.Empty{}, errors.New("A Non GRPC Error")
@@ -112,7 +112,7 @@ func TestDataCollectorHandlerMsgErrorWithNonGRPCError(t *testing.T) {
 
 func TestDataCollectorHandlerChefActionMsgError(t *testing.T) {
 	// Mock the IngestClient to assert that we've got an error calling ProcessChefAction() func
-	mockIngest := mock_ingest.NewMockChefIngesterClient(gomock.NewController(t))
+	mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
 	mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {
 			return &gp.Empty{}, status.Error(codes.Internal, "Something happened")
@@ -168,7 +168,7 @@ func TestDataCollectorHandlerChefRunConvergeMsgOk(t *testing.T) {
 		t.Run("JSON file"+r, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			// Mock the IngestClient
-			mockIngest := mock_ingest.NewMockChefIngesterClient(ctrl)
+			mockIngest := ingest.NewMockChefIngesterClient(ctrl)
 			// Assert that we will call the ProcessChefRun() func
 			mockIngest.EXPECT().ProcessChefRun(gomock.Any(), gomock.Any())
 
@@ -197,7 +197,7 @@ func TestDataCollectorHandlerChefRunConvergeMsgOk(t *testing.T) {
 func TestDataCollectorHandlerChefRunMsgError(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	// Mock the IngestClient
-	mockIngest := mock_ingest.NewMockChefIngesterClient(ctrl)
+	mockIngest := ingest.NewMockChefIngesterClient(ctrl)
 	// Assert that we've got an error calling ProcessChefRun() func
 	mockIngest.EXPECT().ProcessChefRun(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, _ *ingestReq.Run) (*gp.Empty, error) {
@@ -232,7 +232,7 @@ func TestDataCollectorHandlerChefRunMsgError(t *testing.T) {
 
 func TestDataCollectorHandlerLivenessAgentMsg(t *testing.T) {
 	// Mock the IngestClient
-	mockIngest := mock_ingest.NewMockChefIngesterClient(gomock.NewController(t))
+	mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
 	// Assert that we will call the ProcessLivenessPing() func
 	mockIngest.EXPECT().ProcessLivenessPing(gomock.Any(), gomock.Any())
 
@@ -317,7 +317,7 @@ func TestDataCollectorHandlerWithPartialMalformedJSON(t *testing.T) {
 	}`)
 
 	// Mock the IngestClient
-	mockIngest := mock_ingest.NewMockChefIngesterClient(gomock.NewController(t))
+	mockIngest := ingest.NewMockChefIngesterClient(gomock.NewController(t))
 	// Assert that we will call the ProcessChefAction() func and return and error
 	mockIngest.EXPECT().ProcessChefAction(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, _ *ingestReq.Action) (*gp.Empty, error) {

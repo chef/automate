@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# By default, this script creates a manifest.json file that contains all the packages in the unstable channel.
+# By default, this script creates a manifest.json file that contains all the packages in the dev channel
 
 require 'date'
 require 'net/http'
@@ -28,6 +28,15 @@ ALLOW_LOCAL_PACKAGES=(ENV["ALLOW_LOCAL_PACKAGES"] == "true")
 LOCAL_PACKAGE_PATH="results/"
 LOCAL_PACKAGE_ORIGIN=ENV["HAB_ORIGIN"] || "chef"
 
+def channel_for_origin(origin)
+  case origin
+  when "chef"
+    "dev"
+  else
+    "stable"
+  end
+end
+
 def get_latest(channel, origin, name)
   # -- FIXME: PINNED DATABASES - sdelano 2018/07/19 --
   #
@@ -48,9 +57,9 @@ def get_latest(channel, origin, name)
   # IF YOU UPDATE THESE PINS YOU MUST ALSO UPDATE THE core/hab PIN IN components/automate-deployment/habitat/plan.sh
   #
   pinned_hab_components = {
-    "hab"          => { "origin" => "core", "name" => "hab",          "version" => "0.69.0", "release" => "20181127182011"},
-    "hab-sup"      => { "origin" => "core", "name" => "hab-sup",      "version" => "0.69.0", "release" => "20181127183841"},
-    "hab-launcher" => { "origin" => "core", "name" => "hab-launcher", "version" => "9106",   "release" => "20181126205526"}
+    "hab"          => { "origin" => "core", "name" => "hab",          "version" => "0.79.1", "release" => "20190410220617"},
+    "hab-sup"      => { "origin" => "core", "name" => "hab-sup",      "version" => "0.79.1", "release" => "20190410223329"},
+    "hab-launcher" => { "origin" => "core", "name" => "hab-launcher", "version" => "10180",   "release" => "20190409144132"}
   }
 
   if pinned_databases.keys.include?(name)
@@ -183,7 +192,7 @@ pkg_paths_by_collection.each do |name, pkg_paths|
     pkg_origin = package_ident[0]
     pkg_name = package_ident[1]
 
-    latest_release = get_latest("unstable", pkg_origin, pkg_name)
+    latest_release = get_latest(channel_for_origin(pkg_origin), pkg_origin, pkg_name)
 
     pkg_version = latest_release["version"]
     pkg_release = latest_release["release"]
@@ -202,7 +211,7 @@ end
   pkg_origin = package_ident[0]
   pkg_name = package_ident[1]
 
-  latest_release = get_latest("unstable", pkg_origin, pkg_name)
+  latest_release = get_latest(channel_for_origin(pkg_origin), pkg_origin, pkg_name)
 
   pkg_version = latest_release["version"]
   pkg_release = latest_release["release"]

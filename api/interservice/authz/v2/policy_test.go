@@ -45,11 +45,13 @@ func TestWhatItLooksLikeInJSON(t *testing.T) {
 	t.Log(string(j))
 }
 
-func TestValidationCreatePolicy_Statements(t *testing.T) {
+func TestValidationCreatePolicy(t *testing.T) {
 	negativeCases := map[string]*v2.CreatePolicyReq{
+		// ID
 		"with uppercase ID": &v2.CreatePolicyReq{
 			Id: "TestID",
 		},
+		// Members
 		"zero-length members in create req": &v2.CreatePolicyReq{
 			Id:      "test-id",
 			Members: []string{""},
@@ -106,12 +108,30 @@ func TestValidationCreatePolicy_Statements(t *testing.T) {
 			Id:      "test-id",
 			Members: []string{"tls:other:a:b"},
 		},
+		// projects
+		"whitespace projects list": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"     ", "test"},
+		},
+		"repeated projects in list": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"repeat", "repeat"},
+		},
+		"Project has invalid characters": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"valid", "wrong~"},
+		},
+		"Project has spaces": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"valid", "wrong space"},
+		},
+		"project has uppercase characters": &v2.CreatePolicyReq{
+			Id:       "this-is-valid-1",
+			Projects: []string{"valid", "PROJECT1"},
+		},
 	}
 	positiveCases := map[string]*v2.CreatePolicyReq{
-		"without members": &v2.CreatePolicyReq{
-			Id:   "test-id",
-			Name: "test",
-		},
+		// ID
 		"with ID all lowercase": &v2.CreatePolicyReq{
 			Id: "test",
 		},
@@ -123,6 +143,10 @@ func TestValidationCreatePolicy_Statements(t *testing.T) {
 		},
 		"with ID that has only numbers": &v2.CreatePolicyReq{
 			Id: "1235",
+		},
+		// Members
+		"without members": &v2.CreatePolicyReq{
+			Id: "test-id",
 		},
 		"a single member": &v2.CreatePolicyReq{
 			Id:      "test-id",
@@ -136,6 +160,7 @@ func TestValidationCreatePolicy_Statements(t *testing.T) {
 				"user:*", "team:*", "token:*", "tls:*", "tls:service:*", "tls:service:any", "tls:service:any:*",
 				"tls:service:any:other", "*"},
 		},
+		// Statements
 		"a single statement deny": &v2.CreatePolicyReq{
 			Id:      "test-id",
 			Members: []string{"user:local:member1", "user:local:member2", "user:local:member3"},
@@ -158,28 +183,6 @@ func TestValidationCreatePolicy_Statements(t *testing.T) {
 				},
 			},
 		},
-		"no resources (validated in server.go)": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:local:member1", "user:local:member2", "user:local:member3"},
-			Statements: []*v2.Statement{
-				&v2.Statement{
-					Effect:    v2.Statement_DENY,
-					Resources: []string{},
-					Actions:   []string{"infra:some:action", "infra:some:other"},
-				},
-			},
-		},
-		"no actions (validated in server.go)": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:local:member1", "user:local:member2", "user:local:member3"},
-			Statements: []*v2.Statement{
-				&v2.Statement{
-					Effect:    v2.Statement_DENY,
-					Resources: []string{"some-resource", "some-other-resource"},
-					Actions:   []string{},
-				},
-			},
-		},
 		"multi-statement": &v2.CreatePolicyReq{
 			Id:      "test-id",
 			Members: []string{"user:local:member1", "user:local:member2", "user:local:member3"},
@@ -197,6 +200,46 @@ func TestValidationCreatePolicy_Statements(t *testing.T) {
 				&v2.Statement{
 					Effect:    v2.Statement_ALLOW,
 					Resources: []string{},
+					Actions:   []string{},
+				},
+			},
+		},
+		// Projects
+		"without projects": &v2.CreatePolicyReq{
+			Id: "test-id",
+		},
+		"empty projects": &v2.CreatePolicyReq{
+			Id:       "test-id",
+			Projects: []string{},
+		},
+		"a single project": &v2.CreatePolicyReq{
+			Id:       "test-id",
+			Projects: []string{"project-1"},
+		},
+		"multiple projects": &v2.CreatePolicyReq{
+			Id:       "test-id",
+			Projects: []string{"project-1", "project-2", "project-3"},
+		},
+		// Resources
+		"no resources (validated in server.go)": &v2.CreatePolicyReq{
+			Id:      "test-id",
+			Members: []string{"user:local:member1", "user:local:member2", "user:local:member3"},
+			Statements: []*v2.Statement{
+				&v2.Statement{
+					Effect:    v2.Statement_DENY,
+					Resources: []string{},
+					Actions:   []string{"infra:some:action", "infra:some:other"},
+				},
+			},
+		},
+		// Actions
+		"no actions (validated in server.go)": &v2.CreatePolicyReq{
+			Id:      "test-id",
+			Members: []string{"user:local:member1", "user:local:member2", "user:local:member3"},
+			Statements: []*v2.Statement{
+				&v2.Statement{
+					Effect:    v2.Statement_DENY,
+					Resources: []string{"some-resource", "some-other-resource"},
 					Actions:   []string{},
 				},
 			},
