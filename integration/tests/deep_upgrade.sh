@@ -21,6 +21,10 @@ CURRENT_OLDEST_VERSION=20180519154949
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 
+do_create_config() {
+    log_info "Deferring configuration creation until do_deploy"
+}
+
 do_deploy() {
     cat $DEEP_UPGRADE_PATH > $test_manifest_path
     install_hab "0.54.0"
@@ -29,7 +33,17 @@ do_deploy() {
     $upgrade_scaffold_bin serve $test_manifest_path $upgrade_scaffold_pid_file &
     sleep 5
 
-    echo -e "[load_balancer.v1.sys.service]\nhttps_port = 4443" >> $test_config_path
+    log_info "Generating Automate configuration"
+    /bin/chef-automate init-config \
+        --channel $test_channel \
+        --file "$test_config_path" \
+        --upgrade-strategy "$test_upgrade_strategy"
+    # shellcheck disable=SC2129
+    echo -e "[deployment.v1.sys.log]\nlevel = \"debug\"" >> "$test_config_path"
+    echo -e "[dex.v1.sys.expiry]\nid_tokens = \"5m\"" >> "$test_config_path"
+    echo -e "[postgresql.v1.sys.pg]\nshared_buffers = \"1GB\"" >> "$test_config_path"
+    echo -e "[load_balancer.v1.sys.service]\nhttps_port = 4443" >> "$test_config_path"
+
     /bin/chef-automate deploy "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
