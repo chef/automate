@@ -7,7 +7,6 @@ option go_package = "github.com/chef/automate/api/interservice/authz/common";
 
 message ErrorShouldUseV1 {};
 message ErrorShouldUseV2 {};
-message ErrorShouldUseV2_1 {};
 
 message PurgeSubjectFromPoliciesReq {
     // Q: Right now, this allows purging subject wildcards (like "user:*").
