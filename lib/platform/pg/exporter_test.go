@@ -191,7 +191,7 @@ func TestImport(t *testing.T) {
 			Cmd: "hab",
 			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
-			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+			Env: testExpectedEnv,
 		}).Return(nil)
 
 		mockDB.On("DropDatabase", "test_database").Return(nil)
@@ -211,7 +211,7 @@ func TestImport(t *testing.T) {
 			Cmd: "hab",
 			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
 				connURI("test_database")},
-			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+			Env: testExpectedEnv,
 		}).Return(nil)
 
 		mockDB.On("DropDatabase", "test_database").Return(nil)
@@ -232,7 +232,7 @@ func TestImport(t *testing.T) {
 			Cmd: "hab",
 			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
-			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+			Env: testExpectedEnv,
 		}).Return(nil)
 
 		mockDB.On("CreateRole", "testuser").Return(nil)
@@ -254,7 +254,7 @@ func TestImport(t *testing.T) {
 			Cmd: "hab",
 			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
-			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+			Env: testExpectedEnv,
 		}).Return(nil)
 
 		mockDB.On("CreateRole", "testuser").Return(errors.New("test error"))
@@ -272,7 +272,7 @@ func TestImport(t *testing.T) {
 			Cmd: "hab",
 			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile, "-v", "ON_ERROR_STOP=true",
 				connURI("test_database")},
-			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+			Env: testExpectedEnv,
 		}).Return(nil)
 		mockDB.On("DropDatabase", "test_database").Return(errors.New("test error"))
 		err := exporter.Import(true)
@@ -289,7 +289,7 @@ func TestImport(t *testing.T) {
 			Cmd: "hab",
 			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
-			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+			Env: testExpectedEnv,
 		}).Return(nil)
 		mockDB.On("DropDatabase", "test_database").Return(nil)
 		mockDB.On("CreateDatabase", "test_database").Return(errors.New("test error"))
@@ -308,7 +308,7 @@ func TestImport(t *testing.T) {
 			Cmd: "hab",
 			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
-			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+			Env: testExpectedEnv,
 		}).Return(nil)
 		mockDB.On("CreateRole", "testuser").Return(nil)
 		mockDB.On("DropDatabase", "test_database").Return(nil)
@@ -327,7 +327,7 @@ func TestImport(t *testing.T) {
 			Cmd: "hab",
 			Args: []string{"pkg", "exec", "chef/automate-postgresql", "psql", "-f", exportFile,
 				"-v", "ON_ERROR_STOP=true", connURI("test_database")},
-			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+			Env: testExpectedEnv,
 		}).Return(errors.New("test-error"))
 		mockDB.On("DropDatabase", "test_database").Return(nil)
 		mockDB.On("CreateDatabase", "test_database").Return(nil)
@@ -346,7 +346,7 @@ func TestImport(t *testing.T) {
 			Args: []string{"pkg", "exec", "chef/automate-postgresql", "pg_restore", "-Fc", "-d",
 				connURI("test_database"), "-e", "--no-owner", "--no-acl", exportFile,
 			},
-			Env: append(testExpectedEnv, "PGDATABASE=test_database"),
+			Env: testExpectedEnv,
 		}).Return(nil)
 
 		mockDB.On("DropDatabase", "test_database").Return(nil)
