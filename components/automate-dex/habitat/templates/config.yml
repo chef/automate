@@ -19,8 +19,10 @@ storage:
     {{- end }}
     {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl }}
     ssl:
-      {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetMode.GetValue }}
-      mode: {{ .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetMode.GetValue }}
+      {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetEnable.GetValue }}
+      mode: verify-ca
+      {{- else }}
+      mode: disable
       {{- end }}
     {{- end }}
 {{- else }}

@@ -86,10 +86,11 @@ message External {
 		}
 
 		message SSL {
-			google.protobuf.StringValue mode = 1; // disabled by default
+			google.protobuf.StringValue mode = 1 [deprecated=true];
 			google.protobuf.StringValue cert = 2;
 			google.protobuf.StringValue key = 3;
 			google.protobuf.StringValue root_cert = 4;
+			google.protobuf.BoolValue enable = 5; // disabled by default
 		}
 
 		google.protobuf.BoolValue enable = 1;
