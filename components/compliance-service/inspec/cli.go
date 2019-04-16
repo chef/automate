@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,8 +32,9 @@ const logSensitiveData = false
 
 func inspecShimEnv() map[string]string {
 	return map[string]string{
-		"HOME":   TmpDir,
-		"TMPDIR": TmpDir,
+		"HOME":         TmpDir,
+		"TMPDIR":       TmpDir,
+		"CHEF_LICENSE": "accept-no-persist",
 	}
 }
 
@@ -43,6 +44,14 @@ func isTimeoutSane(timeout time.Duration, max time.Duration) error {
 	}
 	if timeout > max {
 		return errors.New(fmt.Sprintf("Timeouts of more than %s should not be set for the inspec cli.", max))
+	}
+	return nil
+}
+
+func AcceptInspecLicense() error {
+	err := os.Setenv("CHEF_LICENSE", "accept-no-persist")
+	if err != nil {
+		return errors.Wrap(err, "Unable to set CHEF_LICENSE env variable")
 	}
 	return nil
 }
