@@ -1,10 +1,12 @@
 package es
 
 import (
+	"fmt"
 	"math"
 
 	ac "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/chef/automate/lib/platform/sys"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -101,10 +103,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	// runtime
 	sys.Runtime.MaxLockedMemory = w.String("unlimited")
 	sys.Runtime.EsJavaOpts = w.String("")
-	// TODO(ssd) 2019-01-24: We aren't using RecommendedHeapSizeGB
-	// here yet because we aren't sure we want to do a restart for
-	// this.
-	sys.Runtime.Heapsize = w.String("1g")
+	sys.Runtime.Heapsize = w.String(defaultHeapSize())
 
 	// s3
 	sys.S3.Client.Name = w.String("default")
@@ -186,6 +185,14 @@ const (
 	// KBPerGB is the number of KB in a GB, used for conversions
 	KBPerGB = 1048576
 )
+
+func defaultHeapSize() string {
+	sysMem, err := sys.SystemMemoryKB()
+	if err != nil {
+		sysMem = 0
+	}
+	return fmt.Sprintf("%dg", RecommendedHeapSizeGB(sysMem))
+}
 
 // RecommendedHeapSizeGB returns the recommended size of the
 // Elasticsearch heap settings. The returned value is in Gigabytes.
