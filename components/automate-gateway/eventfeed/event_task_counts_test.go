@@ -6,10 +6,10 @@ import (
 
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
+	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
-	"github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_cfgmgmt"
 	mock_automate_feed "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_feed"
 	complFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	"github.com/golang/mock/gomock"
@@ -18,7 +18,7 @@ import (
 
 func TestEventTaskCountsAllEmpty(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 
 	mockCfgMgmtClient.EXPECT().GetEventTaskCounts(
 		context.Background(),
@@ -49,7 +49,7 @@ func TestEventTaskCountsAllEmpty(t *testing.T) {
 func TestEventTaskCountsBothValues(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetEventTaskCounts(
 		context.Background(),
 		gomock.Any(),
@@ -133,7 +133,7 @@ func TestEventTaskCountsBothValues(t *testing.T) {
 func TestEventTaskCountsOneEmpty(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
-	mockCfgMgmtClient := mock_cfgmgmt.NewMockCfgMgmtClient(ctrl)
+	mockCfgMgmtClient := cmsService.NewMockCfgMgmtClient(ctrl)
 	mockCfgMgmtClient.EXPECT().GetEventTaskCounts(
 		context.Background(),
 		gomock.Any(),

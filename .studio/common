@@ -42,7 +42,7 @@ function compile_go_protobuf_component() {
 
   # "api" doesn't compile the config directory so let's not delete the config directory in that case
   if [ "$path" == "api" ]; then
-      find "$path" -not -path 'api/config/*' \( -name '*.pb.go' -o -name '*.pb.*.go' -o -name '*.swagger.json' \) -delete
+      find "$path" -not -path 'api/config/*' \( -name '*.pb.go' -o -name '*.pb.*.go' -o -name '*.swagger.json' -o -name '*pb.client_mock.go' \) -delete
   else
       find "$path" \( -name '*.pb.go' -o -name '*.pb.*.go' -o -name '*.swagger.json' \) -delete
   fi
@@ -64,9 +64,28 @@ function compile_go_protobuf_component() {
               return 1
       esac
   fi
+
+  if [ "$1" == "api" ]; then
+    log_line "compiling client mocks"
+    compile_client_mocks
+  fi
 }
 # Adding auto tab complete
 complete -F _component_auto_complete compile_go_protobuf_component
+
+
+function compile_client_mocks() {
+  install_gomock
+  pushd "$scaffolding_go_pkg_path/api/interservice" >/dev/null
+    mockgen -source event/event.pb.go -destination event/event.pb.client_mock.go -package event
+    mockgen -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2
+    mockgen -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz
+    mockgen -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn
+    mockgen -source cfgmgmt/service/cfgmgmt.pb.go -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service
+    mockgen -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest
+  popd >/dev/null
+}
+
 
 document "compile_all_protobuf_components" <<DOC
   Compile every protobuf file for every component in A2.

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"testing"
 	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
@@ -16,6 +17,7 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
+	"github.com/golang/mock/gomock"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
@@ -28,26 +30,26 @@ type Suite struct {
 	elasticClient          *elastic.Client
 	ingesticESClient       *ingestic.ESClient
 	ComplianceIngestServer *server.ComplianceIngestServer
-	ProjectsClientMock     *ProjectsClientMock
+	ProjectsClientMock     *iam_v2.MockProjectsClient
 	NodeManagerMock        *NodeManagerMock
 	NotifierMock           *NotifierMock
-	EventServiceClientMock *EventServiceClientMock
+	EventServiceClientMock *event.MockEventServiceClient
 }
 
 // Initialize the test suite
 //
 // This verifies the connectivity with Elasticsearch; if we couldn't
 // connect, we do not start the tests and print an error message
-func NewSuite(url string) *Suite {
+func NewGlobalSuite() *Suite {
 	s := new(Suite)
 
 	// Create a new elastic Client
 	esclient, err := elastic.NewClient(
-		elastic.SetURL(url),
+		elastic.SetURL(elasticsearchUrl),
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from %q: %s\n", url, err)
+		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
 		os.Exit(1)
 	}
 
@@ -55,10 +57,43 @@ func NewSuite(url string) *Suite {
 	s.ingesticESClient = ingestic.NewESClient(esclient)
 	s.ingesticESClient.InitializeStore(context.Background())
 
-	s.ProjectsClientMock = &ProjectsClientMock{}
+	s.ProjectsClientMock = iam_v2.NewMockProjectsClient(gomock.NewController(nil))
+	s.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	s.NodeManagerMock = &NodeManagerMock{}
 	s.NotifierMock = &NotifierMock{}
-	s.EventServiceClientMock = &EventServiceClientMock{}
+	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
+	s.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&event.PublishResponse{}, nil)
+
+	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
+		s.NodeManagerMock, "", s.NotifierMock,
+		s.ProjectsClientMock, s.EventServiceClientMock)
+
+	return s
+}
+
+func NewLocalSuite(t *testing.T) *Suite {
+	s := new(Suite)
+
+	// Create a new elastic Client
+	esclient, err := elastic.NewClient(
+		elastic.SetURL(elasticsearchUrl),
+		elastic.SetSniff(false),
+	)
+	if err != nil {
+		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
+		os.Exit(1)
+	}
+
+	s.elasticClient = esclient
+	s.ingesticESClient = ingestic.NewESClient(esclient)
+	s.ingesticESClient.InitializeStore(context.Background())
+
+	s.ProjectsClientMock = iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	s.NodeManagerMock = &NodeManagerMock{}
+	s.NotifierMock = &NotifierMock{}
+	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
 
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, "", s.NotifierMock,
@@ -319,28 +354,6 @@ func (s *Suite) Indices() []string {
 	return indices
 }
 
-type EventServiceClientMock struct {
-	LastEventSent *event.EventMsg
-}
-
-func (n *EventServiceClientMock) Publish(ctx context.Context, in *event.PublishRequest,
-	opts ...grpc.CallOption) (*event.PublishResponse, error) {
-	n.LastEventSent = in.Msg
-	return &event.PublishResponse{}, nil
-}
-func (n *EventServiceClientMock) Subscribe(ctx context.Context, in *event.SubscribeRequest,
-	opts ...grpc.CallOption) (*event.SubscribeResponse, error) {
-	return &event.SubscribeResponse{}, nil
-}
-func (n *EventServiceClientMock) Start(ctx context.Context, in *event.StartRequest,
-	opts ...grpc.CallOption) (*event.StartResponse, error) {
-	return &event.StartResponse{}, nil
-}
-func (n *EventServiceClientMock) Stop(ctx context.Context, in *event.StopRequest,
-	opts ...grpc.CallOption) (*event.StopResponse, error) {
-	return &event.StopResponse{}, nil
-}
-
 type NotifierMock struct {
 }
 
@@ -432,51 +445,4 @@ func (nm *NodeManagerMock) GetNodeWithSecrets(ctx context.Context, in *manager.I
 func (nm *NodeManagerMock) SearchManagerNodes(ctx context.Context, in *manager.NodeQuery,
 	opts ...grpc.CallOption) (*manager.ManagerNodes, error) {
 	return &manager.ManagerNodes{}, nil
-}
-
-type ProjectsClientMock struct {
-}
-
-func (pm *ProjectsClientMock) UpdateProject(ctx context.Context, in *iam_v2.UpdateProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.UpdateProjectResp, error) {
-	return &iam_v2.UpdateProjectResp{}, nil
-}
-
-func (pm *ProjectsClientMock) CreateProject(ctx context.Context, in *iam_v2.CreateProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.CreateProjectResp, error) {
-	return &iam_v2.CreateProjectResp{}, nil
-}
-func (pm *ProjectsClientMock) GetProject(ctx context.Context, in *iam_v2.GetProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.GetProjectResp, error) {
-	return &iam_v2.GetProjectResp{}, nil
-}
-
-func (pm *ProjectsClientMock) DeleteProject(ctx context.Context, in *iam_v2.DeleteProjectReq,
-	opts ...grpc.CallOption) (*iam_v2.DeleteProjectResp, error) {
-	return &iam_v2.DeleteProjectResp{}, nil
-}
-
-func (pm *ProjectsClientMock) ListProjects(ctx context.Context, in *iam_v2.ListProjectsReq,
-	opts ...grpc.CallOption) (*iam_v2.ListProjectsResp, error) {
-	return &iam_v2.ListProjectsResp{}, nil
-}
-
-func (pm *ProjectsClientMock) ListProjectRules(ctx context.Context, in *iam_v2.ListProjectRulesReq,
-	opts ...grpc.CallOption) (*iam_v2.ProjectCollectionRulesResp, error) {
-	return &iam_v2.ProjectCollectionRulesResp{}, nil
-}
-
-func (pm *ProjectsClientMock) GetProjectRules(ctx context.Context, in *iam_v2.GetProjectRulesReq,
-	opts ...grpc.CallOption) (*iam_v2.GetProjectRulesResp, error) {
-	return &iam_v2.GetProjectRulesResp{}, nil
-}
-
-func (pm *ProjectsClientMock) HandleEvent(ctx context.Context, in *event.EventMsg,
-	opts ...grpc.CallOption) (*event.EventResponse, error) {
-	return &event.EventResponse{}, nil
-}
-
-func (pm *ProjectsClientMock) ProjectUpdateStatus(ctx context.Context,
-	req *iam_v2.ProjectUpdateStatusReq, opts ...grpc.CallOption) (*iam_v2.ProjectUpdateStatusResp, error) {
-	return &iam_v2.ProjectUpdateStatusResp{}, nil
 }

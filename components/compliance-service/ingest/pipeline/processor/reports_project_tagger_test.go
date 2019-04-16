@@ -6,11 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	rules_tags "github.com/chef/automate/lib/authz"
@@ -873,7 +872,13 @@ func TestReportProjectRulesMatching(t *testing.T) {
 func TestBundler5Messages(t *testing.T) {
 	numberOfMessages := 5
 	inbox := make(chan message.Compliance, numberOfMessages)
-	authzClient := &projectsClientMock{listProjectRulesCount: 0}
+	listProjectRulesCount := 0
+	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx interface{}, in interface{}) (*iam_v2.ProjectCollectionRulesResp, error) {
+			listProjectRulesCount++
+			return &iam_v2.ProjectCollectionRulesResp{}, nil
+		})
 	done := make(chan error)
 	ctx := context.Background()
 
@@ -894,7 +899,7 @@ func TestBundler5Messages(t *testing.T) {
 		<-out
 	}
 
-	assert.Equal(t, 1, authzClient.listProjectRulesCount)
+	assert.Equal(t, 1, listProjectRulesCount)
 }
 
 // A simple run through of the bundle project tagger processor.
@@ -916,9 +921,10 @@ func TestBundlerMatchProjectRule(t *testing.T) {
 			},
 		},
 	}
-	authzClient := &projectsClientMock{
-		listProjectRulesCount: 0,
-		projectRules:          projectRules}
+	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Return(
+		&iam_v2.ProjectCollectionRulesResp{ProjectRules: projectRules}, nil)
+
 	done := make(chan error)
 	ctx := context.Background()
 
@@ -971,9 +977,12 @@ func TestBundlerWithScanJobReport(t *testing.T) {
 			},
 		},
 	}
-	authzClient := &projectsClientMock{
-		listProjectRulesCount: 0,
-		projectRules:          projectRules}
+	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Return(
+		&iam_v2.ProjectCollectionRulesResp{ProjectRules: projectRules}, nil)
+	// {
+	// 	listProjectRulesCount: 0,
+	// 	projectRules:          projectRules}
 	done := make(chan error)
 	ctx := context.Background()
 
@@ -1019,49 +1028,4 @@ func TestBundlerWithScanJobReport(t *testing.T) {
 	processMsg3 := <-out
 	assert.Equal(t, []string{testProjectName}, processMsg3.InspecReport.Projects)
 	assert.Equal(t, []string{testProjectName}, processMsg3.InspecSummary.Projects)
-}
-
-type projectsClientMock struct {
-	listProjectRulesCount int
-	projectRules          map[string]*iam_v2.ProjectRules
-}
-
-func (pm *projectsClientMock) UpdateProject(ctx context.Context, in *iam_v2.UpdateProjectReq, opts ...grpc.CallOption) (*iam_v2.UpdateProjectResp, error) {
-	return &iam_v2.UpdateProjectResp{}, nil
-}
-
-func (pm *projectsClientMock) CreateProject(ctx context.Context, in *iam_v2.CreateProjectReq, opts ...grpc.CallOption) (*iam_v2.CreateProjectResp, error) {
-	return &iam_v2.CreateProjectResp{}, nil
-}
-func (pm *projectsClientMock) GetProject(ctx context.Context, in *iam_v2.GetProjectReq, opts ...grpc.CallOption) (*iam_v2.GetProjectResp, error) {
-	return &iam_v2.GetProjectResp{}, nil
-}
-
-func (pm *projectsClientMock) DeleteProject(ctx context.Context, in *iam_v2.DeleteProjectReq, opts ...grpc.CallOption) (*iam_v2.DeleteProjectResp, error) {
-	return &iam_v2.DeleteProjectResp{}, nil
-}
-
-func (pm *projectsClientMock) ListProjects(ctx context.Context, in *iam_v2.ListProjectsReq, opts ...grpc.CallOption) (*iam_v2.ListProjectsResp, error) {
-	return &iam_v2.ListProjectsResp{}, nil
-}
-
-func (pm *projectsClientMock) ListProjectRules(ctx context.Context, in *iam_v2.ListProjectRulesReq, opts ...grpc.CallOption) (*iam_v2.ProjectCollectionRulesResp, error) {
-	pm.listProjectRulesCount++
-	return &iam_v2.ProjectCollectionRulesResp{
-		ProjectRules: pm.projectRules,
-	}, nil
-}
-
-func (pm *projectsClientMock) GetProjectRules(ctx context.Context, in *iam_v2.GetProjectRulesReq, opts ...grpc.CallOption) (*iam_v2.GetProjectRulesResp, error) {
-	return &iam_v2.GetProjectRulesResp{}, nil
-}
-
-func (pm *projectsClientMock) HandleEvent(ctx context.Context, in *event.EventMsg,
-	opts ...grpc.CallOption) (*event.EventResponse, error) {
-	return &event.EventResponse{}, nil
-}
-
-func (pm *projectsClientMock) ProjectUpdateStatus(ctx context.Context,
-	req *iam_v2.ProjectUpdateStatusReq, opts ...grpc.CallOption) (*iam_v2.ProjectUpdateStatusResp, error) {
-	return &iam_v2.ProjectUpdateStatusResp{}, nil
 }
