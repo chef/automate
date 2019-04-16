@@ -14,12 +14,15 @@ import (
 
 	"sort"
 
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/stringutils"
+
 	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
@@ -725,8 +728,24 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	}
 
 	if len(filters["projects"]) > 0 {
-		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
-		boolQuery = boolQuery.Must(termQuery)
+		projectsQuery := elastic.NewBoolQuery()
+
+		if stringutils.SliceContains(filters["projects"], authzConstants.UnassignedProjectID) {
+			emptyProjectQuery := elastic.NewBoolQuery()
+			emptyProjectQuery.MustNot(elastic.NewExistsQuery("projects"))
+			projectsQuery.Should(emptyProjectQuery)
+		}
+
+		assignedProjectIds := stringutils.SliceFilter(filters["projects"], func(projectId string) bool {
+			return projectId != authzConstants.UnassignedProjectID
+		})
+
+		if len(assignedProjectIds) > 0 {
+			projectMatchQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(assignedProjectIds)...)
+			projectsQuery.Should(projectMatchQuery)
+		}
+
+		boolQuery = boolQuery.Filter(projectsQuery)
 	}
 
 	if len(filters["environment"]) > 0 {
