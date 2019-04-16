@@ -200,6 +200,42 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 	})
 }
 
+func TestVersionSwitch(t *testing.T) {
+	eng := responderEngine{}
+	ctx, ts := setupAuthTests(t, &eng)
+
+	t.Run("ProjectsAuthorized reacts to version switching", func(t *testing.T) {
+		// setupAuthTests sets the version to v2.0
+		// filtering should be ignored
+		requestedProjects := []string{"p1", "p2", "p3"}
+		v2ExpectedProjects := []string{constants.AllProjectsExternalID}
+		v2BetaExpectedProjects := []string{"p1", "p2"}
+		eng.projects = v2BetaExpectedProjects
+
+		resp1, err := ts.authz.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{
+			Subjects:       []string{"user:local:admin"},
+			Resource:       "some:thing",
+			Action:         "do:that:thing",
+			ProjectsFilter: requestedProjects,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, v2ExpectedProjects, resp1.Projects)
+
+		// we upgrade to v2.1
+		_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+		require.NoError(t, err)
+
+		resp2, err := ts.authz.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{
+			Subjects:       []string{"user:local:admin"},
+			Resource:       "some:thing",
+			Action:         "do:that:thing",
+			ProjectsFilter: requestedProjects,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, v2BetaExpectedProjects, resp2.Projects)
+	})
+}
+
 func setupAuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
 	ctx := context.Background()
 	vChan := make(chan api_v2.Version, 1)
