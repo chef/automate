@@ -782,7 +782,7 @@ func (d *DatabaseDumpOperation) Backup(backupCtx Context, om ObjectManifest, pro
 	// DatabaseDumpOperation should no longer be used for backing up.
 	// Use DatabaseDumpOperationV2. DatabaseDumpOperation dumped the
 	// roles in the db dump, which was problematic for external pg.
-	return errors.New("Unimplemented")
+	return errors.New("deprecated backup operation")
 }
 
 // Restore executes a backup operation.
