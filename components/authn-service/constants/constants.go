@@ -11,3 +11,7 @@ const AdvisoryLockID = 8701 // Usher Baby!
 
 // LocalConnectorID is the ID used for dex' local user connector
 const LocalConnectorID = "local"
+
+// UnassignedProjectsFilter represents a filter for
+// resources (tokens) without projects
+const UnassignedProjectsFilter = "(unassigned)"

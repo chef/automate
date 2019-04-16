@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"time"
 
-	"go.uber.org/zap"
-
+	pg "github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
 	"github.com/chef/automate/lib/tls/certs"
 	uuid "github.com/chef/automate/lib/uuid4"
+	"go.uber.org/zap"
 )
 
 // Config is used for configuring mock adapters
@@ -30,7 +30,14 @@ func (cfg *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger) (tokens.Stora
 }
 
 func (m *mock) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
-	return m.tokens, nil
+	tokensToRet := []*tokens.Token{}
+	for i, tok := range m.tokens {
+		if projectsIntersect(ctx, tok) {
+			tokensToRet = append(tokensToRet, tok)
+		}
+		i++
+	}
+	return tokensToRet, nil
 }
 
 func (m *mock) GetTokenIDWithValue(ctx context.Context, value string) (string, error) {
@@ -158,4 +165,33 @@ func (m *mock) UpdateToken(ctx context.Context,
 
 func mockToken(id string) string {
 	return fmt.Sprintf("%v-token", id)
+}
+
+func projectsIntersect(ctx context.Context, token *tokens.Token) bool {
+	projectsFilter, err := pg.ProjectsListFromContext(ctx)
+	if err != nil {
+		return false
+	}
+
+	if len(projectsFilter) == 0 {
+		return true
+	}
+
+	tokenProjects := token.Projects
+	if len(tokenProjects) == 0 {
+		tokenProjects = []string{"(unassigned)"}
+	}
+
+	for _, projectFilter := range projectsFilter {
+		for _, project := range tokenProjects {
+			if projectFilter == project {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (m *mock) Reset() {
+	m.tokens = []*tokens.Token{}
 }

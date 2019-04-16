@@ -8,6 +8,7 @@ import (
 
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -131,9 +132,15 @@ func (a *adapter) GetTokenIDWithValue(ctx context.Context, value string) (string
 }
 
 func (a *adapter) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return []*tokens.Token{}, processSQLError(err, "get projects filter for tokens")
+	}
+
 	ts := []*tokens.Token{}
 	rows, err := a.db.QueryContext(ctx,
-		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens`)
+		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens cat WHERE projects_match(cat.project_ids, $1::TEXT[])`,
+		pq.Array(projectsFilter))
 	if err != nil {
 		return nil, err
 	}
@@ -152,6 +159,20 @@ func (a *adapter) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
 		ts = append(ts, &t)
 	}
 	return ts, nil
+}
+
+// ProjectsListFromContext returns the project list from the context.
+// In the case that the project list was ["*"], we return an empty list,
+// since we do not wish to filter on projects.
+func ProjectsListFromContext(ctx context.Context) ([]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		projectsFilter = []string{}
+	}
+	return projectsFilter, nil
 }
 
 // Reset deletes all tokens from the database /!\
