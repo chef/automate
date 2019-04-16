@@ -8,7 +8,7 @@
 .service-item {
   @include modal-box();
   display: block;
-  background-color: #f2f5f7;
+  background-color: #F2F5F7;
   margin-bottom: 1em;
   margin-right: 2em;
   margin-left: -.5em;
@@ -19,8 +19,8 @@
   border-radius: .4em;
 
   .body {
-    background-color: #FFFFFF;
     display: block;
+    background-color: #FFFFFF;
     padding: 1em;
     position: relative;
     width: 100%;
@@ -35,8 +35,8 @@
   }
 
   .service-line {
-    align-items: center;
     display: flex;
+    align-items: center;
     margin-bottom: .6em;
   }
 

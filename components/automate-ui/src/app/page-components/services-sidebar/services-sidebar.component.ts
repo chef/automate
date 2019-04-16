@@ -24,7 +24,7 @@ export class ServicesSidebarComponent implements OnInit {
   ngOnInit() {
     this.services$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.servicesList));
-    
+
     this.serviceGroupName$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.selectedServiceGroupName));
   }
