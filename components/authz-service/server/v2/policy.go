@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/lib/logger"
@@ -640,6 +641,15 @@ func (s *policyServer) GetPolicyVersion(ctx context.Context,
 
 // updates OPA engine store with policy
 func (s *policyServer) updateEngineStore(ctx context.Context) error {
+	// We need to remove project filters from the request context
+	// otherwise they will be applied for store updates.
+	// This will fail on service start context, so only remove projects if ok.
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		delete(md, "projects")
+		ctx = metadata.NewOutgoingContext(ctx, md)
+	}
+
 	policyMap, err := s.getPolicyMap(ctx)
 	if err != nil {
 		return err
@@ -652,6 +662,7 @@ func (s *policyServer) updateEngineStore(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
 	return s.engine.V2SetPolicies(ctx, policyMap, roleMap, ruleMap)
 }
 
