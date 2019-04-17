@@ -6,8 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var profileFile string
-var useDefaultProfile bool
+var rootFlags struct {
+	profileFile       string
+	useDefaultProfile bool
+}
 
 // RootCmd is the command runner.
 var RootCmd = &cobra.Command{
@@ -27,14 +29,14 @@ func Execute() {
 func init() {
 	// global config
 	RootCmd.PersistentFlags().StringVarP(
-		&profileFile,
+		&rootFlags.profileFile,
 		"profile",
 		"p",
 		"",
 		"file that configures the shape of the load to be generated",
 	)
 	RootCmd.PersistentFlags().BoolVar(
-		&useDefaultProfile,
+		&rootFlags.useDefaultProfile,
 		"use-default-profile",
 		false,
 		"use simple builtin load profile",

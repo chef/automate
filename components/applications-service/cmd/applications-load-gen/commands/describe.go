@@ -18,19 +18,19 @@ func newDescribeCmd() *cobra.Command {
 }
 
 func runDescribeCmd(cmd *cobra.Command, args []string) error {
-	if profileFile == "" && !useDefaultProfile {
+	if rootFlags.profileFile == "" && !rootFlags.useDefaultProfile {
 		return errors.New("no profile filename given")
 	}
 
-	fmt.Printf("Reading profile %q\n", profileFile)
+	fmt.Printf("Reading profile %q\n", rootFlags.profileFile)
 
 	var profileCfg *generator.LoadProfileCfg
 	var err error
 
-	if useDefaultProfile {
+	if rootFlags.useDefaultProfile {
 		profileCfg, err = generator.BuiltinConfig()
 	} else {
-		profileCfg, err = generator.ProfileFromFile(profileFile)
+		profileCfg, err = generator.ProfileFromFile(rootFlags.profileFile)
 	}
 	if err != nil {
 		return err

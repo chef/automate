@@ -9,9 +9,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var authToken string
-var tick int
-var verbosity int
+var runFlags struct {
+	authToken string
+	tick      int
+	verbosity int
+}
 
 func newRunCmd() *cobra.Command {
 	c := &cobra.Command{
@@ -20,20 +22,20 @@ func newRunCmd() *cobra.Command {
 		RunE:  runRunCmd,
 	}
 	c.PersistentFlags().StringVarP(
-		&authToken,
+		&runFlags.authToken,
 		"auth-token",
 		"t",
 		"",
 		"Automate auth token",
 	)
 	c.PersistentFlags().IntVar(
-		&tick,
+		&runFlags.tick,
 		"tick",
 		30,
 		"interval between hab sup healthcheck ticks",
 	)
 	c.PersistentFlags().CountVarP(
-		&verbosity,
+		&runFlags.verbosity,
 		"verbose",
 		"V",
 		"log each supervisor cycle; give twice to log every message",
@@ -43,33 +45,33 @@ func newRunCmd() *cobra.Command {
 }
 
 func runRunCmd(cmd *cobra.Command, args []string) error {
-	if profileFile == "" && !useDefaultProfile {
+	if rootFlags.profileFile == "" && !rootFlags.useDefaultProfile {
 		return errors.New("no profile filename given")
 	}
 
-	if authToken == "" {
+	if runFlags.authToken == "" {
 		return errors.New("no auth token given")
 	}
 
-	fmt.Printf("Reading profile %q\n", profileFile)
+	fmt.Printf("Reading profile %q\n", rootFlags.profileFile)
 
 	var profileCfg *generator.LoadProfileCfg
 	var err error
 
-	if useDefaultProfile {
+	if rootFlags.useDefaultProfile {
 		profileCfg, err = generator.BuiltinConfig()
 	} else {
-		profileCfg, err = generator.ProfileFromFile(profileFile)
+		profileCfg, err = generator.ProfileFromFile(rootFlags.profileFile)
 	}
 	if err != nil {
 		return err
 	}
 
 	runnerCfg := &generator.RunnerConfig{
-		AuthToken: authToken,
+		AuthToken: runFlags.authToken,
 		Host:      "localhost",
-		Tick:      tick,
-		Verbosity: verbosity,
+		Tick:      runFlags.tick,
+		Verbosity: runFlags.verbosity,
 	}
 
 	runner, err := profileCfg.BuildRunner()

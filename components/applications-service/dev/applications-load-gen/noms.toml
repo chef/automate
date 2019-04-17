@@ -47,7 +47,6 @@
     environment = "production1"
     site = "site1"
 
-
   [[generator.supervisor]]
     name = "order_mgmt:production1"
     template = "order_mgmt"

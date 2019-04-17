@@ -124,11 +124,13 @@ func (s *SupSim) Run() error {
 	s.Stats.SupStarted()
 	defer s.Stats.SupDied()
 
-	url := fmt.Sprintf("nats://%s@%s:4222", s.Cfg.AuthToken, s.Cfg.Host)
-	cluster := "event-service"
-	client := fmt.Sprintf("load-generator-%s", s.UUID)
-	durable := client
-	subject := "habitat"
+	var (
+		url     = fmt.Sprintf("nats://%s@%s:4222", s.Cfg.AuthToken, s.Cfg.Host)
+		cluster = "event-service"
+		client  = fmt.Sprintf("load-generator-%s", s.UUID)
+		durable = client
+		subject = "habitat"
+	)
 
 	s.nc = nats.NewExternalClient(url, cluster, client, durable, subject)
 	s.nc.InsecureSkipVerify = true
@@ -172,7 +174,7 @@ func (s *SupSim) PublishAll() error {
 			"index":         s.Idx,
 			"uuid":          s.UUID.String(),
 			"service_count": len(s.MessagePrototypes),
-			"pkg_fqid":      fmt.Sprintf("%s/%s/%s/%s", m.Origin, m.PkgName, versionNumber, m.Release),
+			"pkg_fqid":      m.PkgFQID(),
 		}).Debug("publishing messages")
 
 		err := s.nc.PublishHabService(msg)
@@ -240,6 +242,10 @@ func (m *MessagePrototype) CreateMessage(uuid string) *applications.HabService {
 			Release: m.Release,
 		},
 	}
+}
+
+func (m *MessagePrototype) PkgFQID() string {
+	return fmt.Sprintf("%s/%s/%s/%s", m.Origin, m.PkgName, versionNumber, m.Release)
 }
 
 func (m *MessagePrototype) PrettyStr() string {
