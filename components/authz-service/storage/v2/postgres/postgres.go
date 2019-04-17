@@ -376,7 +376,7 @@ func (p *pg) ListPolicyMembers(ctx context.Context, id string) ([]v2.Member, err
 		return nil, p.processError(err)
 	}
 
-	// Project filtering handled in here. We'll return a database here right away if
+	// Project filtering handled in here. We'll return a 404 here right away if
 	// we can't find the policy via ID as filtered by projects.
 	_, err = p.queryPolicy(ctx, id, tx)
 	if err != nil {

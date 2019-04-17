@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION
   RETURNS BOOLEAN AS $$
     BEGIN
       RETURN (
-        -- no projects filter requested (length 0) will be the case for v1.0 or v2.1 ["*"]
+        -- no projects filter requested (length 0) will be the case for v2.0 or v2.1 ["*"]
         array_length(_projects_filter, 1) IS NULL
         -- projects filter intersects with projects for row
         OR _projects && _projects_filter

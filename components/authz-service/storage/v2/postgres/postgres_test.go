@@ -887,7 +887,7 @@ func TestListPolicies(t *testing.T) {
 			assert.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
 		},
-		"when the list is filtered by a policy list of (unassigned) and another project, return matched projects": func(t *testing.T) {
+		"when the list is filtered by a project list of (unassigned) and another project, return matched policies": func(t *testing.T) {
 			ctx := context.Background()
 			polID1, polID2, polID3 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2, name3 := "testPolicy", "anotherTestPolicy", "pika"
@@ -1118,7 +1118,7 @@ func TestDeletePolicy(t *testing.T) {
 			assert.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 		},
-		"when the policy is has no projects with a filter of (unassigned), delete the policy": func(t *testing.T) {
+		"when the policy has no projects with a filter of (unassigned), delete the policy": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
@@ -1145,7 +1145,7 @@ func TestDeletePolicy(t *testing.T) {
 			assert.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 		},
-		"when the policy does not overlaps with the project filter, return not found": func(t *testing.T) {
+		"when the policy does not overlap with the project filter, return not found": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
@@ -2381,7 +2381,7 @@ func TestAddPolicyMembers(t *testing.T) {
 
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
-		"when the * project filter is passed, remove members": func(t *testing.T) {
+		"when the * project filter is passed, add members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			projID1 := "team-rocket"
@@ -2403,7 +2403,7 @@ func TestAddPolicyMembers(t *testing.T) {
 
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
-		"when the policy has no projects and (unassigned) is in the projects filter, remove members": func(t *testing.T) {
+		"when the policy has no projects and (unassigned) is in the projects filter, add members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
