@@ -14,32 +14,33 @@ With the plugin installed, this TOC will update automatically when you save the 
 <!-- TOC depthFrom:2 depthTo:3 -->
 
 - [AuthZ Approach](#authz-approach)
-    - [Terminology](#terminology)
-    - [AuthZ with OPA](#authz-with-opa)
-    - [Elements of the AuthZ Query](#elements-of-the-authz-query)
-    - [Elements of the AuthZ Policy](#elements-of-the-authz-policy)
-    - [Mapping Requests to Endpoints to Policies](#mapping-requests-to-endpoints-to-policies)
-    - [Wildcards](#wildcards)
-    - [Policy Semantics](#policy-semantics)
+  - [Terminology](#terminology)
+  - [AuthZ with OPA](#authz-with-opa)
+  - [Elements of the AuthZ Query](#elements-of-the-authz-query)
+  - [Elements of the AuthZ Policy](#elements-of-the-authz-policy)
+  - [Mapping Requests to Endpoints to Policies](#mapping-requests-to-endpoints-to-policies)
+  - [Wildcards](#wildcards)
+  - [Policy Semantics](#policy-semantics)
 - [Managing Policies](#managing-policies)
-    - [So You Want to Create Policies](#so-you-want-to-create-policies)
-    - [Default Policies](#default-policies)
-    - [Policy API](#policy-api)
-    - [Introspection (How to Query Permissions)](#introspection-how-to-query-permissions)
+  - [So You Want to Create Policies](#so-you-want-to-create-policies)
+  - [Default Policies](#default-policies)
+  - [Policy API](#policy-api)
+  - [Introspection (How to Query Permissions)](#introspection-how-to-query-permissions)
+- [Introducing Projects](#introducing-projects)
 - [Spinning up the GRPC Service Locally](#spinning-up-the-grpc-service-locally)
-    - [Start the service](#start-the-service)
-    - [Connect to the service directly](#connect-to-the-service-directly)
-    - [Connect to the service through Automate Gateway](#connect-to-the-service-through-automate-gateway)
+  - [Start the service](#start-the-service)
+  - [Connect to the service directly](#connect-to-the-service-directly)
+  - [Connect to the service through Automate Gateway](#connect-to-the-service-through-automate-gateway)
 - [Spinning up the GRPC Service in Habitat Studio Locally](#spinning-up-the-grpc-service-in-habitat-studio-locally)
-    - [Start the service in Habitat Studio](#start-the-service-in-habitat-studio)
-    - [Connect to the service directly in Habitat Studio](#connect-to-the-service-directly-in-habitat-studio)
-    - [Connect to the service through Automate Gateway in Habitat Studio](#connect-to-the-service-through-automate-gateway-in-habitat-studio)
+  - [Start the service in Habitat Studio](#start-the-service-in-habitat-studio)
+  - [Connect to the service directly in Habitat Studio](#connect-to-the-service-directly-in-habitat-studio)
+  - [Connect to the service through Automate Gateway in Habitat Studio](#connect-to-the-service-through-automate-gateway-in-habitat-studio)
 - [API](#api)
-    - [func GetVersion](#func-getversion)
-    - [func IsAuthorized](#func-isauthorized)
-    - [type IsAuthorizedReq](#type-isauthorizedreq)
-    - [type IsAuthorizedResp](#type-isauthorizedresp)
-    - [type VersionInfo](#type-versioninfo)
+  - [func GetVersion](#func-getversion)
+  - [func IsAuthorized](#func-isauthorized)
+  - [type IsAuthorizedReq](#type-isauthorizedreq)
+  - [type IsAuthorizedResp](#type-isauthorizedresp)
+  - [type VersionInfo](#type-versioninfo)
 - [Other Resources](#other-resources)
 
 <!-- /TOC -->
@@ -148,7 +149,7 @@ is **deny**[4] so the gateway aborts the original HTTP request and returns a 403
 
 ![Automate 2 Authorization](../../dev-docs/diagrams/authz-sequence.png)
 
-FIGURE 1
+FIGURE 1 -- AUTHZ SEQUENCE DIAGRAM
 
 > ![Warning](../../dev-docs/images/warning.png)
 > It is important to note that in order to achieve a secure system,
@@ -324,7 +325,7 @@ illustrating how the pieces interconnect.
 
 ![AuthZ Mapping](../../dev-docs/images/AuthZ/AuthZ_mapping.png)
 
-FIGURE 2
+FIGURE 2 -- REQUEST-TO-DECISION
 
 As another example--this time with wildcards--assume that a request comes in for
 the `/compliance/special/5` endpoint.
@@ -734,7 +735,7 @@ methods in the proto file map to the resultant list.
 
 ![IntrospectAll](../../dev-docs/images/AuthZ/introspect_all.png)
 
-FIGURE 9
+FIGURE 9 -- MAPPING PROTOBUFS TO INTROSPECTION
 
 That list returned by `IntrospectAll` skips all the parameterized endpoints
 because it would be impossible to know a priori the exhaustive set.
@@ -774,7 +775,7 @@ is sent off to the policy store to determine if any policies permit the operatio
 
 ![Introspect](../../dev-docs/images/AuthZ/introspect_one.png)
 
-FIGURE 10
+FIGURE 10 -- PARAMETERIZED INTROSPECTION
 
 Most, but not all, endpoints in the public API put their parameters directly in the URL,
 similar to the above example. But a given endpoint might accept its data in the body of the
@@ -802,6 +803,25 @@ those should not be included when introspecting the endpoint.
 
 Introspection on these POST endpoints works almost the same as shown for GET in Figure 10.
 But rather than extract parameters from the URL, they come from the request body.
+
+## Introducing Projects
+
+With IAM v2.1, we introduce projects into the mix.
+Figure 11 is analogous to Figure 1, but now includes projects.
+The major thing to note here is that now downstream services need to be an active participant
+by typically filtering results by the allowable projects (extreme right in the figure) .
+
+![Automate 2 Authorization With Projects](../../dev-docs/diagrams/authz-projects-sequence.png)
+
+FIGURE 11 -- AUTHZ SEQUENCE DIAGRAM *WITH* PROJECTS
+
+The next figure sheds light on how a request for "all projects" is handled.
+
+![Automate 2 Authorization With Projects](../../dev-docs/diagrams/authz-all-or-no-projects.png)
+
+FIGURE 12 -- HANDLING OF "ALL PROJECTS" REQUESTED
+
+There is a lot more to say about projects, but this at least serves as a place holder for now.
 
 ## Spinning up the GRPC Service Locally
 

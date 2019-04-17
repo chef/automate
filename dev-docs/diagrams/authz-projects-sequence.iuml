@@ -1,0 +1,34 @@
+@startuml
+autonumber "[<b>#</b>]"
+title Projects in the Authorization Flow
+participant "actor" as actor
+participant "automate-gateway" as api
+participant "authz-service" as authz
+entity "OPA engine" as opa
+participant "//other chef service//" as target
+
+  actor -> api: <Requested Projects>
+
+	  api -> authz: ProjectsAuthorized?
+    note left
+	    send subjects, action & resource
+      plus REQUESTED projects
+    end note
+    authz -> opa: engine.ProjectsAuthorized?
+    opa -> authz: <Allowed Projects>
+    authz -> api: <Allowed Projects>
+
+    alt at least one project allowed
+      api -> target: pass through original request with ALLOWED projects
+      target -> target
+      note right
+        compare TAGGED projects
+        with ALLOWED projects
+        to filter results
+      end note
+      target -> actor: <FILTERED result>
+	  else NO allowed projects
+      api -[#red]> actor: deny (403)
+    end
+
+@enduml
