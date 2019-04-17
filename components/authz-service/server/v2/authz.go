@@ -63,7 +63,7 @@ func (s *authzServer) ProjectsAuthorized(
 	if version.Minor == api.Version_V0 {
 		// if IAM version is set to v2.0
 		// we override the requested projects because no filter should be applied on v2
-		projects = []string{constants.AllProjectsExternalID}
+		projects = []string{}
 	} else {
 		projects = req.ProjectsFilter
 	}
