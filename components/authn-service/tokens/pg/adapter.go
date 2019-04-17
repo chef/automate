@@ -100,9 +100,16 @@ func (a *adapter) UpdateToken(ctx context.Context,
 }
 
 func (a *adapter) DeleteToken(ctx context.Context, id string) error {
-	if _, err := a.db.ExecContext(ctx,
-		`DELETE FROM chef_authn_tokens WHERE id=$1`,
-		id); err != nil {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return processSQLError(err, "get projects filter for tokens")
+	}
+	fmt.Printf("FILTER %s", projectsFilter)
+	_, err = a.db.ExecContext(ctx,
+		`DELETE FROM chef_authn_tokens cat WHERE cat.id=$1
+		AND projects_match(cat.project_ids, $2::TEXT[])`,
+		id, pq.Array(projectsFilter))
+	if err != nil {
 		return processSQLError(err, "delete token by id")
 	} // TODO: check rows affected?
 	return nil
