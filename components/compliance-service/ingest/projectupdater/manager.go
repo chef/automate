@@ -148,10 +148,10 @@ func (manager *Manager) startProjectTagUpdater() ([]string, error) {
 }
 
 func (manager *Manager) waitingForJobToComplete() {
-	var (
-		isJobComplete            = false
-		numberOfConsecutiveFails = 0
-	)
+	numberOfConsecutiveFails := 0
+	mergedJobStatus := ingestic.JobStatus{
+		Completed: false,
+	}
 
 	// initial status
 	manager.updateStatus(ingestic.JobStatus{})
@@ -161,12 +161,11 @@ func (manager *Manager) waitingForJobToComplete() {
 		logrus.Errorf("Failed to check the running job: %v", err)
 		numberOfConsecutiveFails++
 	} else {
-		mergedJobStatus := MergeJobStatus(jobStatuses)
-		isJobComplete = mergedJobStatus.Completed
+		mergedJobStatus = MergeJobStatus(jobStatuses)
 		manager.updateStatus(mergedJobStatus)
 	}
 
-	for !isJobComplete {
+	for !mergedJobStatus.Completed {
 		time.Sleep(time.Millisecond * sleepTimeBetweenStatusChecksMilliSec)
 		jobStatuses, err = manager.collectJobStatus()
 		if err != nil {
@@ -177,8 +176,7 @@ func (manager *Manager) waitingForJobToComplete() {
 				return
 			}
 		} else {
-			mergedJobStatus := MergeJobStatus(jobStatuses)
-			isJobComplete = mergedJobStatus.Completed
+			mergedJobStatus = MergeJobStatus(jobStatuses)
 			manager.updateStatus(mergedJobStatus)
 			numberOfConsecutiveFails = 0
 		}
