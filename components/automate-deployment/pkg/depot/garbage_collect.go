@@ -7,6 +7,12 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 )
 
+const (
+	ConservativeGC = "conservative"
+	AggressiveGC   = "aggressive"
+	DisabledGC     = "disabled"
+)
+
 // TODO(jaym): I'm not sure what to call this thing
 type HabCache interface {
 	TDepsForPackage(habpkg.VersionedPackage) ([]habpkg.HabPkg, error)
@@ -26,11 +32,11 @@ func NewGarbageCollector(cache HabCache) *GarbageCollector {
 
 func (gc *GarbageCollector) Collect(roots []habpkg.HabPkg, cleanupMode string) error {
 	switch cleanupMode {
-	case "conservative":
+	case ConservativeGC:
 		return gc.ConservativeCollect(roots)
-	case "aggressive":
+	case AggressiveGC:
 		return gc.AggressiveCollect(roots)
-	case "disabled":
+	case DisabledGC:
 		return nil
 	default:
 		return errors.Errorf("invalid package cleanup mode %q given to gc.Collect()", cleanupMode)
@@ -84,7 +90,7 @@ func (gc *GarbageCollector) ConservativeCollect(rootPackages []habpkg.HabPkg) er
 	if len(pkgsToDelete) > 0 {
 		logrus.WithFields(logrus.Fields{
 			"roots": rootPackages,
-			"mode":  "conservative",
+			"mode":  ConservativeGC,
 		}).Info("Cleaning up unused packages")
 	}
 
@@ -138,7 +144,7 @@ func (gc *GarbageCollector) AggressiveCollect(roots []habpkg.HabPkg) error {
 			if !loggedOnce {
 				logrus.WithFields(logrus.Fields{
 					"roots": roots,
-					"mode":  "aggressive",
+					"mode":  AggressiveGC,
 				}).Info("Cleaning up unused packages")
 				loggedOnce = true
 			}

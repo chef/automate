@@ -11,6 +11,7 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/depot"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 )
 
@@ -151,6 +152,6 @@ func (s *server) buildStopDesiredState() (converge.DesiredState, []string) {
 	return converge.NewDesiredState(topology,
 			converge.NewSkipSupervisorState(),
 			s.deployment.CurrentReleaseManifest.ListPackages(),
-			s.getPackageCleanupMode()),
+			depot.DisabledGC),
 		servicesGoingDown
 }

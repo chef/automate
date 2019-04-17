@@ -81,7 +81,7 @@ func (r *safeServiceShutdownRunner) RunIfRequired(t target.Target, pkg habpkg.Ve
 	if !required {
 		return nil
 	}
-	logrus.Info("Restart mitigation is required.")
+	logrus.Infof("Restart mitigation is required for service %s", pkg.Name())
 	return r.run(t, pkg)
 }
 
@@ -116,7 +116,7 @@ func (r *safeServiceShutdownRunner) run(t target.Target, pkg habpkg.VersionedPac
 			logrus.WithError(err).Warn("Some reverse dependencies failed to stop")
 		}
 	}
-
+	logrus.Infof("Restart mitigation for service %s complete", pkg.Name())
 	return nil
 }
 
