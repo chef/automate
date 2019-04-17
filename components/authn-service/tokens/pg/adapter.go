@@ -110,9 +110,16 @@ func (a *adapter) DeleteToken(ctx context.Context, id string) error {
 
 func (a *adapter) GetToken(ctx context.Context, id string) (*tokens.Token, error) {
 	t := tokens.Token{}
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return &t, processSQLError(err, "get projects filter for tokens")
+	}
+
 	if err := a.db.QueryRowContext(ctx,
-		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens WHERE id=$1`,
-		id).
+		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens cat 
+			WHERE cat.id=$1
+			AND projects_match(cat.project_ids, $2::TEXT[])`,
+		id, pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
 		return nil, processSQLError(err, "select token by id")
 	}
