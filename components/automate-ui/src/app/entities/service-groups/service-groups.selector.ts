@@ -13,3 +13,8 @@ export const allServiceGroups = createSelector(
   serviceGroupState,
   (state) => state.serviceGroups
 );
+
+export const allServiceGroupHealth = createSelector(
+  serviceGroupState,
+  (state) => state.serviceGroupHealthCounts
+);

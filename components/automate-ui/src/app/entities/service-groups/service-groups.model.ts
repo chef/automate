@@ -7,6 +7,11 @@ export interface ServiceGroupHealthSummary {
   critical: number;
   unknown: number;
 }
+
+export interface ServiceGroupHealthCountPayload {
+  service_groups_health_count: ServiceGroupHealthSummary[];
+}
+
 export interface ServiceGroup {
   id: string;
   name: string;

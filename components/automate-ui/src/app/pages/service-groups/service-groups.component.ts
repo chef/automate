@@ -8,10 +8,11 @@ import { Chicklet, RollupServiceStatus, SortDirection } from '../../types/types'
 import { EntityStatus } from '../../entities/entities';
 import { UpdateServiceGroupFilters } from 'app/entities/service-groups/service-groups.actions';
 import {
-  ServiceGroup, ServiceGroupFilters, FieldDirection
+  ServiceGroup, ServiceGroupFilters, FieldDirection,
+  ServiceGroupHealthCountPayload
 } from '../../entities/service-groups/service-groups.model';
 import {
-  serviceGroupStatus, allServiceGroups, serviceGroupState
+  serviceGroupStatus, allServiceGroups, serviceGroupState, allServiceGroupHealth
 } from '../../entities/service-groups/service-groups.selector';
 import { find, includes } from 'lodash/fp';
 
@@ -24,6 +25,7 @@ import { find, includes } from 'lodash/fp';
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
+  public serviceGroupHealthCountPayload$: Observable<ServiceGroupHealthCountPayload[]>;
 
   // The collection of allowable status
   private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
@@ -68,6 +70,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
     this.serviceGroups$ = this.store.select(allServiceGroups);
+    this.serviceGroupHealthCountPayload$ = this.store.select(allServiceGroupHealth);
 
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.status));

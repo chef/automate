@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 import {
-  ServiceGroupsPayload, ServiceGroupFilters
+  ServiceGroupsPayload, ServiceGroupHealthCountPayload, ServiceGroupFilters
 } from './service-groups.model';
 import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
@@ -44,5 +44,11 @@ export class ServiceGroupsRequests {
     }
 
     return searchParam;
+  }
+
+  public fetchServiceGroupHealth(): Observable<ServiceGroupHealthCountPayload> {
+    const url = `${APPLICATIONS_URL}/service_groups_health_counts`;
+
+    return this.httpClient.get<ServiceGroupHealthCountPayload>(url);
   }
 }
