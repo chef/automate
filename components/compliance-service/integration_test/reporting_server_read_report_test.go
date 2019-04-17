@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/compliance-service/api/reporting"
 	reportingServer "github.com/chef/automate/components/compliance-service/api/reporting/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -36,7 +37,7 @@ func TestReadReport(t *testing.T) {
 	}{
 		{
 			description:     "Projects: user has access to all projects",
-			allowedProjects: []string{"*"},
+			allowedProjects: []string{authzConstants.AllProjectsExternalID},
 			expectedId:      reportId,
 		},
 		{
