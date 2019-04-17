@@ -18,11 +18,13 @@ func BuildRunProjectTagger(authzClient iam_v2.ProjectsClient) message.ChefRunPip
 	}
 }
 
-// This processor is bundling all the messages that are currently in the 'in' channel. The bundling of messages
-// decreases the number of times the authz-service is called for project rules. The way it works is when a message
-// comes in, we make a call to the authz-service for the rules. We use these rules for all the messages that are
-// currently in the queue. The 'bundleSize' is the number of messages that can use the current project rules from authz.
-func runBundleProjectTagger(in <-chan message.ChefRun, authzClient iam_v2.ProjectsClient) <-chan message.ChefRun {
+// This processor is bundling all the messages that are currently in the 'in' channel. The bundling
+// of messages decreases the number of times the authz-service is called for project rules. The way
+// it works is when a message comes in, we make a call to the authz-service for the rules. We use
+// these rules for all the messages that are currently in the queue. The 'bundleSize' is the number
+// of messages that can use the current project rules from authz.
+func runBundleProjectTagger(in <-chan message.ChefRun,
+	authzClient iam_v2.ProjectsClient) <-chan message.ChefRun {
 	out := make(chan message.ChefRun, 100)
 	go func() {
 		bundleSize := 0
@@ -62,7 +64,8 @@ func findMatchingProjects(node backend.Node, projects map[string]*iam_v2.Project
 	return matchingProjects
 }
 
-func getProjectRulesFromAuthz(ctx context.Context, authzClient iam_v2.ProjectsClient) map[string]*iam_v2.ProjectRules {
+func getProjectRulesFromAuthz(ctx context.Context,
+	authzClient iam_v2.ProjectsClient) map[string]*iam_v2.ProjectRules {
 	projectsCollection, err := authzClient.ListProjectRules(ctx, &iam_v2.ListProjectRulesReq{})
 	if err != nil {
 		// If there is an error getting the project rules from authz crash the service.
@@ -75,7 +78,7 @@ func getProjectRulesFromAuthz(ctx context.Context, authzClient iam_v2.ProjectsCl
 // Only one rule has to be true for the project to match (ORed together).
 func nodeMatchesRules(node backend.Node, rules []*iam_v2.ProjectRule) bool {
 	for _, rule := range rules {
-		if nodeMatchesAllConditions(node, rule.Conditions) {
+		if rule.Type == rules_tags.RuleTypeNodeTag && nodeMatchesAllConditions(node, rule.Conditions) {
 			return true
 		}
 	}

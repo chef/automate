@@ -9,4 +9,6 @@ const (
 	PolicyGroupTag      = "PolicyGroup"
 	PolicyNameTag       = "PolicyName"
 	ProjectUpdateIDTag  = "ProjectUpdateID"
+	RuleTypeEventTag    = "RuleTypeEventTag"
+	RuleTypeNodeTag     = "RuleTypeNodeTag"
 )

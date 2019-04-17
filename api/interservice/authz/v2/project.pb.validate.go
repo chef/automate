@@ -1362,6 +1362,8 @@ func (m *ProjectRule) Validate() error {
 		return nil
 	}
 
+	// no validation rules for Type
+
 	for idx, item := range m.GetConditions() {
 		_, _ = idx, item
 

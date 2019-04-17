@@ -20,6 +20,7 @@ import (
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 	event "github.com/chef/automate/components/event-service/server"
+	tags "github.com/chef/automate/lib/authz"
 	"github.com/golang/protobuf/ptypes"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
@@ -290,8 +291,10 @@ func rulesToProjectRules(rules []engine.Rule) []*api.ProjectRule {
 			Values: r.Values,
 		}
 	}
+	// TODO: The ProjectRule Type needs to be added to the database
 	rule := &api.ProjectRule{
 		Conditions: pr,
+		Type:       tags.RuleTypeNodeTag,
 	}
 	return []*api.ProjectRule{rule}
 }

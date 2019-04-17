@@ -94,6 +94,7 @@ message ProjectRules {
     repeated ProjectRule rules = 2;
 }
 message ProjectRule {
+    string type = 1;
     repeated Condition conditions = 2;
 }
 
