@@ -823,8 +823,24 @@ func (backend ES2Backend) getFiltersQueryForDeepReport(reportId string,
 	boolQuery = boolQuery.Must(idsQuery)
 
 	if len(filters["projects"]) > 0 {
-		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
-		boolQuery = boolQuery.Must(termQuery)
+		projectsQuery := elastic.NewBoolQuery()
+
+		if stringutils.SliceContains(filters["projects"], authzConstants.UnassignedProjectID) {
+			emptyProjectQuery := elastic.NewBoolQuery()
+			emptyProjectQuery.MustNot(elastic.NewExistsQuery("projects"))
+			projectsQuery.Should(emptyProjectQuery)
+		}
+
+		assignedProjectIds := stringutils.SliceFilter(filters["projects"], func(projectId string) bool {
+			return projectId != authzConstants.UnassignedProjectID
+		})
+
+		if len(assignedProjectIds) > 0 {
+			projectMatchQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(assignedProjectIds)...)
+			projectsQuery.Should(projectMatchQuery)
+		}
+
+		boolQuery = boolQuery.Filter(projectsQuery)
 	}
 
 	numberOfProfiles := len(filters["profile_id"])
