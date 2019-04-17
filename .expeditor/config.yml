@@ -519,6 +519,7 @@ habitat_packages:
         - lib/stringutils/*
         - lib/tls/*
         - lib/tracing/*
+        - lib/uuid4/*
         - lib/version/*
         - Gopkg.lock
   - nodemanager-service:
