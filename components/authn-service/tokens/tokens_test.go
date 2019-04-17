@@ -142,7 +142,7 @@ func testGetTokens(ctx context.Context, t *testing.T, ta tokens.Storage) {
 	assert.ElementsMatch(t, []*tokens.Token{tok, tok2}, actualToks)
 }
 
-func testGetTokensWhenSingleProjectsSingleFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
+func testGetTokensWithSingleProjectsSingleFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
 	tok, err := ta.CreateToken(ctx, "id0", "node0", true, []string{"overlapping"})
 	require.NoError(t, err)
 	_, err = ta.CreateToken(ctx, "id1", "node1", true, []string{"no-overlap"})
