@@ -75,13 +75,10 @@ wait_for_upgrade() {
 
         case "$errcode" in
             0)
-                log_info "Retrying in 10 seconds"
-                sleep 10
+                :
                 ;;
             98|99)
                 log_warning "Error calling deployment service"
-                log_info "Retrying in 10 seconds"
-                sleep 10
                 ;;
             *)
                 if [[ "$check_for_broken_cli" = true ]]; then
@@ -95,10 +92,10 @@ wait_for_upgrade() {
             upgrade_complete="true"
             break
         else
-            log_info "Retrying in 10 seconds"
             if [[ "$check_for_broken_packages" = true ]]; then
                 fix_broken_packages
             fi
+            log_info "Retrying in 10 seconds"
             sleep 10
         fi
     done
