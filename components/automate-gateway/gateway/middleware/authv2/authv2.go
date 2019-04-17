@@ -67,7 +67,7 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			return nil, err
 		}
-		// TODO bd: add projects 
+		// TODO bd: add projects back into error message once v2 is GA
 		log.WithError(err).Error("error authorizing request")
 		return nil, status.Errorf(codes.PermissionDenied,
 			"error authorizing action %q on resource %q for subjects %q: %s",

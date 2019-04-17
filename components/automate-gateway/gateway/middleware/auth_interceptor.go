@@ -19,7 +19,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/service_authn"
@@ -99,9 +98,8 @@ type AnnotatedAuthorizationResponse interface {
 }
 
 type authInterceptor struct {
-	authn  authn.AuthenticationClient
-	authz  GRPCAuthorizationHandler
-	policy v2.PoliciesClient
+	authn authn.AuthenticationClient
+	authz GRPCAuthorizationHandler
 }
 
 // UnaryInterceptor returns a grpc UnaryServerInterceptor that performs AuthN/Z.

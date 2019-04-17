@@ -112,9 +112,7 @@ func NewPoliciesServer(
 	}
 	srv.setVersion(v)
 
-	isV2 := v.Major == api.Version_V2
-
-	if isV2 {
+	if v.Major == api.Version_V2 {
 		err = srv.store.ApplyV2DataMigrations(ctx)
 		if err != nil {
 			return nil, errors.Wrap(err, "error migrating v2 data")

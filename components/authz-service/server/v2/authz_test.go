@@ -48,9 +48,9 @@ func TestIsAuthorized(t *testing.T) {
 	})
 }
 
-func TestV2BetaProjectsAuthorized(t *testing.T) {
+func TestV2p1ProjectsAuthorized(t *testing.T) {
 	eng := responderEngine{}
-	ctx, ts := setupV2BetaAuthTests(t, &eng)
+	ctx, ts := setupV2p1AuthTests(t, &eng)
 
 	t.Run("authorized", func(t *testing.T) {
 		cases := map[string]struct {
@@ -209,8 +209,8 @@ func TestVersionSwitch(t *testing.T) {
 		// filtering should be ignored
 		requestedProjects := []string{"p1", "p2", "p3"}
 		v2ExpectedProjects := []string{constants.AllProjectsExternalID}
-		v2BetaExpectedProjects := []string{"p1", "p2"}
-		eng.projects = v2BetaExpectedProjects
+		v2p1ExpectedProjects := []string{"p1", "p2"}
+		eng.projects = v2p1ExpectedProjects
 
 		resp1, err := ts.authz.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{
 			Subjects:       []string{"user:local:admin"},
@@ -232,7 +232,7 @@ func TestVersionSwitch(t *testing.T) {
 			ProjectsFilter: requestedProjects,
 		})
 		require.NoError(t, err)
-		assert.Equal(t, v2BetaExpectedProjects, resp2.Projects)
+		assert.Equal(t, v2p1ExpectedProjects, resp2.Projects)
 	})
 }
 
@@ -246,7 +246,7 @@ func setupAuthTests(t *testing.T, eng *responderEngine) (context.Context, testSe
 	return ctx, ts
 }
 
-func setupV2BetaAuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
+func setupV2p1AuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
 	ctx := context.Background()
 	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}

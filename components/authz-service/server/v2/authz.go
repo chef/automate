@@ -56,19 +56,27 @@ func (s *authzServer) IsAuthorized(
 func (s *authzServer) ProjectsAuthorized(
 	ctx context.Context,
 	req *api.ProjectsAuthorizedReq) (*api.ProjectsAuthorizedResp, error) {
+	// we check the version set in the channel on policy server
+	// in order to determine whether or not to filter projects for the request
+	version := s.vSwitch.Version
+	var projects []string
+	if version.Minor == api.Version_V0 {
+		// if IAM version is set to v2.0
+		// we override the requested projects because no filter should be applied on v2
+		projects = []string{constants.AllProjectsExternalID}
+	} else {
+		projects = req.ProjectsFilter
+	}
 
 	projectsAuthorized, err := s.engine.V2ProjectsAuthorized(ctx,
 		engine.Subjects(req.Subjects),
 		engine.Action(req.Action),
 		engine.Resource(req.Resource),
-		engine.ProjectList(req.ProjectsFilter...))
+		engine.ProjectList(projects...))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// we check the version set in the channel on policy server
-	// in order to determine whether or not to filter projects for the request
-	version := s.vSwitch.Version
 	if version.Minor == api.Version_V0 && len(projectsAuthorized) > 0 {
 		// if IAM version is set to v2.0
 		// as long as at least one project is authorized
@@ -179,7 +187,7 @@ func (v *VersionSwitch) Interceptor(ctx context.Context,
 	// "/chef.automate.domain.authz.v2.Policies/GetPolicyVersion", and thus
 	// exempt from this version check.
 
-	// These methods skip the check, thought they are in the relevant service
+	// These methods skip the check, though they are in the relevant service
 	// definition:
 	switch info.FullMethod {
 	case "/chef.automate.domain.authz.Authorization/GetVersion":
