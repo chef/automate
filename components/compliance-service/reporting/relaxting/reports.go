@@ -700,30 +700,25 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 //             latestOnly - specifies whether or not we are only interested in retrieving only the latest report
 //  return *elastic.BoolQuery
 func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) *elastic.BoolQuery {
-	var (
-		endTime   string
-		startTime string
-	)
-
 	utils.DeDupFilters(filters)
 
 	typeQuery := elastic.NewTypeQuery(mappings.DocType)
 
-	endTime = firstOrEmpty(filters["end_time"])
-	startTime = firstOrEmpty(filters["start_time"])
-
-	timeRangeQuery := elastic.NewRangeQuery("end_time")
-	if len(startTime) > 0 {
-		timeRangeQuery.Gte(startTime)
-	}
-	if len(endTime) > 0 {
-		timeRangeQuery.Lte(endTime)
-	}
-
 	boolQuery := elastic.NewBoolQuery()
 	boolQuery = boolQuery.Must(typeQuery)
 
-	if len(startTime) > 0 || len(endTime) > 0 {
+	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
+		endTime := firstOrEmpty(filters["end_time"])
+		startTime := firstOrEmpty(filters["start_time"])
+
+		timeRangeQuery := elastic.NewRangeQuery("end_time")
+		if len(startTime) > 0 {
+			timeRangeQuery.Gte(startTime)
+		}
+		if len(endTime) > 0 {
+			timeRangeQuery.Lte(endTime)
+		}
+
 		boolQuery = boolQuery.Must(timeRangeQuery)
 	}
 
