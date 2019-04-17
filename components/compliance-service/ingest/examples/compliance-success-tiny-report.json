@@ -219,5 +219,12 @@
   "environment": "DevSec Prod Beta",
   "roles": ["base_linux", "apache_linux", "linux-hardening-prod", "dot.role"],
   "recipes": ["apache_extras", "apache_extras::harden", "java::default", "nagios::fix"],
-  "end_time": "2018-10-25T10:18:41+01:00"
+  "end_time": "2018-10-25T10:18:41+01:00",
+  "policy_name": "tiny-policy-name",
+  "policy_group": "tiny-policy-group",
+  "organization_name": "tiny",
+  "source_fqdn": "api.chef.io",
+  "chef_tags": ["mylinux", "my.tag", "some=tag"],
+  "ipaddress": "192.168.56.33",
+  "fqdn": "lb-deb.example.com"
 }
