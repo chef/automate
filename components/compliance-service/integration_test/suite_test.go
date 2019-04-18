@@ -17,6 +17,8 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
+	"github.com/chef/automate/lib/grpc/auth_context"
+
 	"github.com/golang/mock/gomock"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/olivere/elastic"
@@ -445,4 +447,9 @@ func (nm *NodeManagerMock) GetNodeWithSecrets(ctx context.Context, in *manager.I
 func (nm *NodeManagerMock) SearchManagerNodes(ctx context.Context, in *manager.NodeQuery,
 	opts ...grpc.CallOption) (*manager.ManagerNodes, error) {
 	return &manager.ManagerNodes{}, nil
+}
+
+func contextWithProjects(projects []string) context.Context {
+	ctx := context.Background()
+	return auth_context.NewContext(ctx, []string{}, projects, "", "", "")
 }

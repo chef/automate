@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,44 +10,56 @@ import (
 	"github.com/chef/automate/components/compliance-service/api/reporting"
 	reportingServer "github.com/chef/automate/components/compliance-service/api/reporting/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
-	"github.com/chef/automate/lib/grpc/auth_context"
 )
-
-func contextWithProjects(projects []string) context.Context {
-	ctx := context.Background()
-	return auth_context.NewContext(ctx, []string{}, projects, "", "", "")
-}
 
 func TestReadReport(t *testing.T) {
 	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
-	report := relaxting.ESInSpecReport{Projects: []string{"project1", "project2"}}
-	reportIds := suite.InsertInspecReports([]*relaxting.ESInSpecReport{&report})
+	reports := []*relaxting.ESInSpecReport{
+		{
+			Projects: []string{},
+		},
+		{
+			Projects: []string{"project1", "project2"},
+		},
+	}
+	reportIds := suite.InsertInspecReports(reports)
 
 	defer suite.DeleteAllDocuments()
 
-	require.Len(t, reportIds, 1)
+	require.Len(t, reportIds, 2)
 
-	reportId := reportIds[0]
+	unassignedReportId := reportIds[0]
+	assignedReportId := reportIds[1]
 
 	successCases := []struct {
 		description     string
 		allowedProjects []string
-		expectedId      string
+		reportId        string
 	}{
 		{
-			description:     "Projects: user has access to all projects",
+			description:     "Projects: user has access to all projects accessing an assigned report",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
-			expectedId:      reportId,
+			reportId:        assignedReportId,
 		},
 		{
-			description:     "Projects: user has access to all projects a report belongs to",
+			description:     "Projects: user has access to all projects accessing an unassigned report",
+			allowedProjects: []string{authzConstants.AllProjectsExternalID},
+			reportId:        unassignedReportId,
+		},
+		{
+			description:     "Projects: user has access to all projects a report belongs to acessing an assigned report",
 			allowedProjects: []string{"project1", "project2"},
-			expectedId:      reportId,
+			reportId:        assignedReportId,
 		},
 		{
-			description:     "Projects: user has access to one project a report belongs to",
-			allowedProjects: []string{"project1"},
-			expectedId:      reportId,
+			description:     "Projects: user has access to some projects a report belongs to accessing an assigned report",
+			allowedProjects: []string{"project1", "project3"},
+			reportId:        assignedReportId,
+		},
+		{
+			description:     "Projects: user has access to unassigned reports accessing an unassigned report",
+			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
+			reportId:        unassignedReportId,
 		},
 	}
 
@@ -56,22 +67,44 @@ func TestReadReport(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			ctx := contextWithProjects(test.allowedProjects)
 
-			response, err := server.ReadReport(ctx, &reporting.Query{Id: reportId})
+			response, err := server.ReadReport(ctx, &reporting.Query{Id: test.reportId})
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
-			assert.Equal(t, test.expectedId, response.Id)
+			assert.Equal(t, test.reportId, response.Id)
 		})
 	}
 
-	description := "Projects: user does not have access to any projects a report belongs to"
-	allowedProjects := []string{"project3"}
-	t.Run(description, func(t *testing.T) {
-		ctx := contextWithProjects(allowedProjects)
+	failureCases := []struct {
+		description     string
+		allowedProjects []string
+		reportId        string
+	}{
+		{
+			description:     "Projects: user does not have access to any projects an assigned report belongs to",
+			allowedProjects: []string{"project3"},
+			reportId:        assignedReportId,
+		},
+		{
+			description:     "Projects: user with unassigned access accessing an assigned report",
+			allowedProjects: []string{authzConstants.UnassignedProjectID},
+			reportId:        assignedReportId,
+		},
+		{
+			description:     "Projects: user without unassigned access accessing an unassinged report",
+			allowedProjects: []string{"project1"},
+			reportId:        unassignedReportId,
+		},
+	}
 
-		response, err := server.ReadReport(ctx, &reporting.Query{Id: reportId})
+	for _, test := range failureCases {
+		t.Run(test.description, func(t *testing.T) {
+			ctx := contextWithProjects(test.allowedProjects)
 
-		assert.Error(t, err)
-		assert.Nil(t, response)
-	})
+			response, err := server.ReadReport(ctx, &reporting.Query{Id: test.reportId})
+
+			assert.Error(t, err)
+			assert.Nil(t, response)
+		})
+	}
 }
