@@ -2,6 +2,7 @@ package token
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"os"
 	"reflect"
@@ -60,34 +61,34 @@ func TestToken(t *testing.T) {
 	//       (any failures in these "setup creates" are triggering a test failure,
 	//       i.e., they're t.Fatal'ing out)-
 	tests := []adapterTestFunc{
-		testGetTokens,
-		testGetTokensWithSingleProjectsSingleFilter,
-		testGetTokensWithMultipleProjectsSingleFilter,
-		testGetTokensWithMultipleProjectsMultipleFilters,
-		testGetTokensWithUnassignedAndOtherFilter,
-		testGetTokensWithoutProjectsWithUnassignedFilter,
-		testGetToken,
+		// testGetTokens,
+		// testGetTokensWithSingleProjectsSingleFilter,
+		// testGetTokensWithMultipleProjectsSingleFilter,
+		// testGetTokensWithMultipleProjectsMultipleFilters,
+		// testGetTokensWithUnassignedAndOtherFilter,
+		// testGetTokensWithoutProjectsWithUnassignedFilter,
+		// testGetToken,
 		testGetTokenWithSingleProjectSingleFilter,
-		testGetTokenWithMultipleProjectsSingleFilter,
-		testGetTokenWithMultipleProjectsMultipleFilters,
-		testGetTokenNoProjectsUnassignedFilter,
-		testGetTokenNoProjectsUnassignedAndOtherFilter,
-		testGetTokenIDWithValue,
-		testGetTokenIDWithValueNotFound,
-		testCreateToken,
-		testCreateTokenWithInvalidValueFails,
-		testCreateTokenWithValue,
-		testCreateLegacyTokenWithInvalidValueFails,
-		testCreateLegacyTokenWithValue,
-		testDeleteToken,
-		testDeleteTokenWithSingleProjectSingleFilter,
-		testDeleteTokenWithMultipleProjectsSingleFilter,
-		testDeleteTokenWithMultipleProjectsMultipleFilters,
-		testDeleteTokenWithUnassignedAndOtherFilter,
+		// testGetTokenWithMultipleProjectsSingleFilter,
+		// testGetTokenWithMultipleProjectsMultipleFilters,
+		// testGetTokenNoProjectsUnassignedFilter,
+		// testGetTokenNoProjectsUnassignedAndOtherFilter,
+		// testGetTokenIDWithValue,
+		// testGetTokenIDWithValueNotFound,
+		// testCreateToken,
+		// testCreateTokenWithInvalidValueFails,
+		// testCreateTokenWithValue,
+		// testCreateLegacyTokenWithInvalidValueFails,
+		// testCreateLegacyTokenWithValue,
+		// testDeleteToken,
+		// testDeleteTokenWithSingleProjectSingleFilter,
+		// testDeleteTokenWithMultipleProjectsSingleFilter,
+		// testDeleteTokenWithMultipleProjectsMultipleFilters,
+		// testDeleteTokenWithUnassignedAndOtherFilter,
 		testDeleteTokenWithoutProjectsWithUnassignedFilter,
-		testDeleteTokenNotFound,
-		testUpdateTokenActiveOnly,
-		testUpdateTokenNotFound,
+		// testDeleteTokenNotFound,
+		// testUpdateTokenActiveOnly,
+		// testUpdateTokenNotFound,
 	} // Note: if a "not found" case is last, we'll leave a tidy test database
 
 	for adpName, adpCfg := range adapters {

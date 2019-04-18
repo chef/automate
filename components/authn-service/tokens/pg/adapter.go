@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/lib/pq"
 	"go.uber.org/zap"
@@ -73,6 +74,10 @@ func (a *adapter) insertToken(ctx context.Context,
 
 func (a *adapter) UpdateToken(ctx context.Context,
 	id, description string, active bool, projects []string) (*tokens.Token, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return nil, processSQLError(err, "get projects filter for tokens")
+	}
 	t := tokens.Token{}
 
 	// ensure we do not pass null projects to db
@@ -81,9 +86,10 @@ func (a *adapter) UpdateToken(ctx context.Context,
 	}
 	if description != "" {
 		if err := a.db.QueryRowContext(ctx,
-			`UPDATE chef_authn_tokens SET active=$2, description=$3, project_ids=$4, updated=NOW() WHERE id=$1
+			`UPDATE chef_authn_tokens cat SET active=$2, description=$3, project_ids=$4, updated=NOW() 
+			WHERE id=$1 AND projects_match(cat.project_ids, $5::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, description, pq.Array(projects)).
+			id, active, description, pq.Array(projects), pq.Array(projectsFilter)).
 			Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
 			return nil, processSQLError(err, "update token")
 		}
