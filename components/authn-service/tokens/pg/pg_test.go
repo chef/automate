@@ -387,7 +387,6 @@ func TestUpdateToken(t *testing.T) {
 
 func TestDeleteToken(t *testing.T) {
 	store, db, ctx := setup(t)
-
 	require := require.New(t)
 
 	id := "coolest-token-on-the-block"
@@ -399,15 +398,39 @@ func TestDeleteToken(t *testing.T) {
 		Active:      active,
 		Value:       value,
 	}
-	insertToken(t, db, tok)
-	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-	WHERE id=$1`, id))
 
-	err := store.DeleteToken(ctx, tok.ID)
-	require.NoError(err)
+	// description => test func (map used for randomization)
+	cases := map[string]func(*testing.T){
+		"empty database": func(t *testing.T) {
+			err := store.DeleteToken(ctx, "not-real-token")
+			assert.Error(t, err)
+			assert.Equal(t, tokens.NotFoundError{}, err)
+		},
+		"token not found with existing token in store": func(t *testing.T) {
+			insertToken(t, db, tok)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
 
-	assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-	WHERE id=$1`, id))
+			err := store.DeleteToken(ctx, "not-real-token")
+			assert.Equal(t, tokens.NotFoundError{}, err)
+		},
+		"token found in store": func(t *testing.T) {
+			insertToken(t, db, tok)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+
+			err := store.DeleteToken(ctx, tok.ID)
+			require.NoError(err)
+
+			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		reset(t, db)
+	}
 }
 
 func insertToken(t *testing.T, db *sql.DB, tok tokens.Token) {
