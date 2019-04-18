@@ -6,7 +6,7 @@
 test_name="iam v2.1 only"
 # Note: the inspec profile takes care of deleting any migrated v1 legacy
 # policies
-test_deploy_inspec_profiles=(a2-iam-v2-1-only-integration)
+test_deploy_inspec_profiles=(a2-iam-v2p1-only-integration)
 # Note: we can't run diagnostics AND inspec, so skip diagnostics
 test_skip_diagnostics=true
 

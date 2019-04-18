@@ -1,4 +1,4 @@
-name: a2-iam-v2-1-only-integration
+name: a2-iam-v2p1-only-integration
 title: InSpec Automate Integration Profile for IAM v2.1 (removing all legacy policies)
 maintainer: Chef Software, Inc.
 copyright: Chef Software, Inc.
