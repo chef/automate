@@ -36,7 +36,6 @@ type ESInSpecSummary struct {
 	OrganizationName string   `json:"organization_name"`
 	SourceFQDN       string   `json:"source_fqdn"`
 	ChefTags         []string `json:"chef_tags"`
-	FQDN             string   `json:"fqdn"`
 	Projects         []string `json:"projects"`
 }
 
