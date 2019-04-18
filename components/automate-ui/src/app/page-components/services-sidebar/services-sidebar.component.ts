@@ -4,7 +4,8 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable } from 'rxjs';
 import { serviceGroupState } from '../../entities/service-groups/service-groups.selector';
 import { createSelector } from '@ngrx/store';
-import { Service } from '../../entities/service-groups/service-groups.model';
+import { Service, ServicesFilters } from '../../entities/service-groups/service-groups.model';
+import { UpdateSelectedSG } from '../../entities/service-groups/service-groups.actions';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -13,6 +14,7 @@ import { Service } from '../../entities/service-groups/service-groups.model';
 })
 
 export class ServicesSidebarComponent implements OnInit {
+  @Input() serviceGroupId: number;
   @Input() visible: boolean;
   @Output() closeServicesSidebarEvent: EventEmitter<any> = new EventEmitter();
 
@@ -31,6 +33,14 @@ export class ServicesSidebarComponent implements OnInit {
 
   public closeServicesSidebar() {
     this.closeServicesSidebarEvent.emit(null);
+  }
+
+  public updateServicesFilters(health: string): void {
+    const servicesFilters: ServicesFilters = {
+      service_group_id: this.serviceGroupId,
+      health: health
+    };
+    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
   }
 
   // healthCheckStatus returns the formated health_check status from the provided service

@@ -1,6 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { ServiceGroupsPayload, ServicesPayload } from './service-groups.model';
+import {
+  ServiceGroupsPayload, ServicesPayload, ServicesFilters
+} from './service-groups.model';
 
 export enum ServiceGroupsActionTypes {
   GET_SERVICE_GROUPS         = 'SERVICE_GROUPS::GET',
@@ -43,7 +45,7 @@ export class UpdateServiceGroupFilters implements Action {
 export class UpdateSelectedSG implements Action {
   readonly type = ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP;
 
-  constructor(public payload: number) {}
+  constructor(public payload: ServicesFilters) {}
 }
 
 export class GetServicesBySG implements Action {

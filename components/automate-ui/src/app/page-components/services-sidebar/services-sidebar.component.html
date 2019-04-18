@@ -7,7 +7,30 @@
       </chef-heading>
       <chef-subheading>Services run by each Habitat Supervisor on a node.</chef-subheading>
     </chef-page-header>
-    <!-- Insert here the filters bar -->
+
+    <chef-status-filter-group>
+      <chef-option class="filter general" value="general" (click)="updateServicesFilters('total')">
+        <div class="filter-label">Total</div>
+        <chef-icon>group_work</chef-icon><div class="filter-total">30</div>
+      </chef-option>
+      <chef-option class="filter critical" value='critical' (click)="updateServicesFilters('CRITICAL')">
+        <div class="filter-label">Critical</div>
+        <chef-icon>warning</chef-icon><div class="filter-total">10</div>
+      </chef-option>
+      <chef-option class="filter warning" value='warning' (click)="updateServicesFilters('WARNING')">
+        <div class="filter-label">Warning</div>
+        <chef-icon>error_outline</chef-icon><div class="filter-total">5</div>
+      </chef-option>
+      <chef-option class="filter success" value='success' (click)="updateServicesFilters('OK')">
+        <div class="filter-label">OK</div>
+        <chef-icon>check_circle</chef-icon><div class="filter-total">5</div>
+      </chef-option>
+      <chef-option class="filter unknown" value='unknown' (click)="updateServicesFilters('UNKNOWN')">
+        <div class="filter-label">Unknown</div>
+        <chef-icon>help</chef-icon><div class="filter-total">10</div>
+      </chef-option>
+    </chef-status-filter-group>
+
     <ul>
       <li class="service-item" *ngFor="let service of services$ | async">
         <div class="header">
@@ -20,6 +43,11 @@
             <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
             {{ healthCheckStatus(service) }}
           </div>
+        </div>
+      </li>
+      <li class="service-item" *ngIf="(services$ | async)?.length === 0">
+        <div class="no-services">
+          No services available
         </div>
       </li>
     </ul>

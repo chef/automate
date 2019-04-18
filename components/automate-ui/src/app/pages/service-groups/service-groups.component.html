@@ -82,6 +82,7 @@
     </div>
   </div>
   <app-services-sidebar
+    [serviceGroupId]="selectedServiceGroupId"
     [visible]="servicesSidebarVisible"
     class="services-sidebar-container"
     (closeServicesSidebarEvent)="closeServicesSidebar()">

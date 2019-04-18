@@ -60,7 +60,7 @@ export class ServiceGroupsEffects {
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
       const serviceGroupsState: ServiceGroupEntityState = storeState.serviceGroups;
-      return this.requests.fetchServicesBySG(serviceGroupsState.selectedServiceGroupId).pipe(
+      return this.requests.fetchServicesBySG(serviceGroupsState.servicesFilters).pipe(
         map((payload: ServicesPayload) => new GetServicesBySGSuccess(payload)),
         catchError((error: HttpErrorResponse) => of(new GetServicesBySGFailure(error)))
       );

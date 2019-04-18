@@ -36,6 +36,11 @@ export interface ServiceGroupFilters {
   sortDirection?: SortDirection;
 }
 
+export interface ServicesFilters {
+  service_group_id?: number;
+  health?: string;
+}
+
 export interface ServicesPayload {
   group: string;
   services: Service[];
