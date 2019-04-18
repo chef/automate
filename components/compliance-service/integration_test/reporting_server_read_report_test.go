@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,14 +10,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/api/reporting"
 	reportingServer "github.com/chef/automate/components/compliance-service/api/reporting/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
-	"github.com/chef/automate/lib/grpc/auth_context"
 )
-
-// TODO: Move this function
-func contextWithProjects(projects []string) context.Context {
-	ctx := context.Background()
-	return auth_context.NewContext(ctx, []string{}, projects, "", "", "")
-}
 
 func TestReadReport(t *testing.T) {
 	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
