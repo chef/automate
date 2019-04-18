@@ -136,7 +136,7 @@ func (m *mock) UpdateToken(ctx context.Context,
 		return nil, err
 	}
 	if t == nil {
-		return nil, nil // not deleted, because not found
+		return nil, &tokens.NotFoundError{} // not deleted, because not found
 	}
 
 	now := time.Now().UTC()

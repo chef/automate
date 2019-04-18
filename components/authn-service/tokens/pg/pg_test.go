@@ -19,9 +19,8 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
-func setup(t *testing.T) (tokens.Storage, *sql.DB, context.Context) {
+func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 	t.Helper()
-	ctx := context.Background()
 
 	// Note: to set up PG locally for running these tests,
 	// run the following from your command line from the components/authn-service folder:
@@ -58,7 +57,7 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB, context.Context) {
 	db := openDB(t)
 	reset(t, db)
 
-	return backend, db, ctx
+	return backend, db
 }
 
 func initializePG() (*pg.Config, error) {
@@ -100,7 +99,8 @@ func reset(t *testing.T, db *sql.DB) {
 }
 
 func TestGetToken(t *testing.T) {
-	store, db, ctx := setup(t)
+	ctx := context.Background()
+	store, db := setup(t)
 
 	assert := assert.New(t)
 	require := require.New(t)
@@ -125,7 +125,8 @@ func TestGetToken(t *testing.T) {
 }
 
 func TestGetTokens(t *testing.T) {
-	store, db, ctx := setup(t)
+	ctx := context.Background()
+	store, db := setup(t)
 
 	assert := assert.New(t)
 	require := require.New(t)
@@ -167,7 +168,8 @@ func TestGetTokens(t *testing.T) {
 }
 
 func TestGetTokenIDWithValue(t *testing.T) {
-	store, db, ctx := setup(t)
+	ctx := context.Background()
+	store, db := setup(t)
 
 	assert := assert.New(t)
 	require := require.New(t)
@@ -202,7 +204,8 @@ func TestGetTokenIDWithValue(t *testing.T) {
 }
 
 func TestCreateToken(t *testing.T) {
-	store, db, ctx := setup(t)
+	ctx := context.Background()
+	store, db := setup(t)
 
 	assert := assert.New(t)
 	require := require.New(t)
@@ -265,9 +268,9 @@ func TestCreateToken(t *testing.T) {
 }
 
 func TestCreateTokenWithValue(t *testing.T) {
-	store, db, ctx := setup(t)
+	ctx := context.Background()
+	store, db := setup(t)
 	assert := assert.New(t)
-	require := require.New(t)
 
 	id := "coolest-token-on-the-block"
 	desc := "THE coolest token on the block"
@@ -275,8 +278,8 @@ func TestCreateTokenWithValue(t *testing.T) {
 	value := "2flYtvKNAISyGAX9SlvuJOWQ1fU="
 	project_ids := []string{}
 	tok, err := store.CreateTokenWithValue(ctx, id, value, desc, active, project_ids)
-	require.NoError(err)
-	require.NotNil(tok)
+	assert.NoError(err)
+	assert.NotNil(tok)
 
 	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 		WHERE id=$1`, id))
@@ -289,11 +292,9 @@ func TestCreateTokenWithValue(t *testing.T) {
 }
 
 func TestUpdateToken(t *testing.T) {
-	store, db, ctx := setup(t)
+	store, db := setup(t)
 
 	assert := assert.New(t)
-	require := require.New(t)
-
 	//DB time and Golang time are rounded differently
 	tme := time.Now().UTC().Round(time.Second)
 	id := "coolest-token-on-the-block"
@@ -313,8 +314,10 @@ func TestUpdateToken(t *testing.T) {
 
 	cases := map[string]func(*testing.T){
 		"when original values unchanged": func(t *testing.T) {
+			ctx := context.Background()
+			insertToken(t, db, tok)
 			resp, err := store.UpdateToken(ctx, tok.ID, tok.Description, tok.Active, tok.Projects)
-			require.NoError(err)
+			assert.NoError(err)
 
 			assert.Equal(tok.ID, resp.ID)
 			assert.Equal(tok.Description, resp.Description)
@@ -325,9 +328,11 @@ func TestUpdateToken(t *testing.T) {
 			assert.NotEqual(tok.Updated, resp.Updated)
 		},
 		"when only description changed": func(t *testing.T) {
+			ctx := context.Background()
+			insertToken(t, db, tok)
 			updatedDesc := "THE coolest token on the block"
 			resp, err := store.UpdateToken(ctx, tok.ID, updatedDesc, tok.Active, tok.Projects)
-			require.NoError(err)
+			assert.NoError(err)
 
 			assert.Equal(tok.ID, resp.ID)
 			assert.Equal(updatedDesc, resp.Description)
@@ -338,9 +343,11 @@ func TestUpdateToken(t *testing.T) {
 			assert.NotEqual(tok.Updated, resp.Updated)
 		},
 		"when only active changed": func(t *testing.T) {
+			ctx := context.Background()
+			insertToken(t, db, tok)
 			updatedActive := false
 			resp, err := store.UpdateToken(ctx, tok.ID, tok.Description, updatedActive, tok.Projects)
-			require.NoError(err)
+			assert.NoError(err)
 
 			assert.Equal(tok.ID, resp.ID)
 			assert.Equal(tok.Description, resp.Description)
@@ -351,9 +358,11 @@ func TestUpdateToken(t *testing.T) {
 			assert.NotEqual(tok.Updated, resp.Updated)
 		},
 		"when only projects changed": func(t *testing.T) {
+			ctx := context.Background()
+			insertToken(t, db, tok)
 			updatedProjects := []string{"project-ABC"}
 			resp, err := store.UpdateToken(ctx, tok.ID, tok.Description, tok.Active, updatedProjects)
-			require.NoError(err)
+			assert.NoError(err)
 
 			assert.Equal(tok.ID, resp.ID)
 			assert.Equal(tok.Description, resp.Description)
@@ -364,6 +373,8 @@ func TestUpdateToken(t *testing.T) {
 			assert.NotEqual(tok.Updated, resp.Updated)
 		},
 		"when all values changed": func(t *testing.T) {
+			ctx := context.Background()
+			insertToken(t, db, tok)
 			updatedDesc := "THE coolest token on the block!"
 			updatedActive := false
 			updatedProjects := []string{"project-ABC", "project-XYZ"}
@@ -378,18 +389,102 @@ func TestUpdateToken(t *testing.T) {
 			assert.Equal(tok.Created, resp.Created)
 			assert.NotEqual(tok.Updated, resp.Updated)
 		},
+		"token has single project, one project in filter matches": func(t *testing.T) {
+			tok.Projects = []string{"overlapping"}
+			insertToken(t, db, tok)
+
+			ctx := insertProjectsIntoNewContext([]string{"overlapping"})
+			updatedDesc := "THE coolest token on the block!"
+			updatedActive := false
+			updatedProjects := []string{"project-ABC", "project-XYZ"}
+			resp, err := store.UpdateToken(ctx, tok.ID, updatedDesc, updatedActive, updatedProjects)
+			assert.NoError(err)
+
+			assert.Equal(tok.ID, resp.ID)
+			assert.Equal(updatedDesc, resp.Description)
+			assert.Equal(updatedActive, resp.Active)
+			assert.Equal(tok.Value, resp.Value)
+			assert.Equal(updatedProjects, resp.Projects)
+			assert.Equal(tok.Created, resp.Created)
+			assert.NotEqual(tok.Updated, resp.Updated)
+		},
+		"token has multiple projects, filter matches both exactly": func(t *testing.T) {
+			tok.Projects = []string{"overlapping", "foo"}
+			insertToken(t, db, tok)
+
+			ctx := insertProjectsIntoNewContext([]string{"overlapping"})
+			updatedDesc := "THE coolest token on the block!"
+			updatedActive := false
+			updatedProjects := []string{"project-ABC", "project-XYZ"}
+			resp, err := store.UpdateToken(ctx, tok.ID, updatedDesc, updatedActive, updatedProjects)
+			assert.NoError(err)
+
+			assert.Equal(tok.ID, resp.ID)
+			assert.Equal(updatedDesc, resp.Description)
+			assert.Equal(updatedActive, resp.Active)
+			assert.Equal(tok.Value, resp.Value)
+			assert.Equal(updatedProjects, resp.Projects)
+			assert.Equal(tok.Created, resp.Created)
+			assert.NotEqual(tok.Updated, resp.Updated)
+		},
+		"token has no projects, filter has unassigned and other project": func(t *testing.T) {
+			tok.Projects = []string{}
+			insertToken(t, db, tok)
+
+			ctx := insertProjectsIntoNewContext([]string{"overlapping", constants.UnassignedProjectsFilter})
+			updatedDesc := "THE coolest token on the block!"
+			updatedActive := false
+			updatedProjects := []string{"project-ABC", "project-XYZ"}
+			resp, err := store.UpdateToken(ctx, tok.ID, updatedDesc, updatedActive, updatedProjects)
+			assert.NoError(err)
+
+			assert.Equal(tok.ID, resp.ID)
+			assert.Equal(updatedDesc, resp.Description)
+			assert.Equal(updatedActive, resp.Active)
+			assert.Equal(tok.Value, resp.Value)
+			assert.Equal(updatedProjects, resp.Projects)
+			assert.Equal(tok.Created, resp.Created)
+			assert.NotEqual(tok.Updated, resp.Updated)
+		},
+		"token has no projects, filter has (unassigned)": func(t *testing.T) {
+			tok.Projects = []string{}
+			insertToken(t, db, tok)
+
+			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter})
+			updatedDesc := "THE coolest token on the block!"
+			updatedActive := false
+			updatedProjects := []string{"project-ABC", "project-XYZ"}
+			resp, err := store.UpdateToken(ctx, tok.ID, updatedDesc, updatedActive, updatedProjects)
+			assert.NoError(err)
+
+			assert.Equal(tok.ID, resp.ID)
+			assert.Equal(updatedDesc, resp.Description)
+			assert.Equal(updatedActive, resp.Active)
+			assert.Equal(tok.Value, resp.Value)
+			assert.Equal(updatedProjects, resp.Projects)
+			assert.Equal(tok.Created, resp.Created)
+			assert.NotEqual(tok.Updated, resp.Updated)
+		},
+		"no tokens have projects matching filter": func(t *testing.T) {
+			tok.Projects = []string{"i-wish-i-matched"}
+			insertToken(t, db, tok)
+			ctx := insertProjectsIntoNewContext([]string{"no-match"})
+			updatedDesc := "THE coolest token on the block!"
+
+			_, err := store.UpdateToken(ctx, tok.ID, updatedDesc, tok.Active, tok.Projects)
+
+			assert.Equal(&tokens.NotFoundError{}, err)
+		},
 	}
 
 	for name, test := range cases {
 		reset(t, db)
-		insertToken(t, db, tok)
 		t.Run(name, test)
 	}
 }
 
 func TestDeleteToken(t *testing.T) {
-	store, db, ctx := setup(t)
-	require := require.New(t)
+	store, db := setup(t)
 
 	id := "coolest-token-on-the-block"
 	active := true
@@ -405,11 +500,13 @@ func TestDeleteToken(t *testing.T) {
 	// description => test func (map used for randomization)
 	cases := map[string]func(*testing.T){
 		"empty database": func(t *testing.T) {
+			ctx := context.Background()
 			err := store.DeleteToken(ctx, "not-real-token")
 			assert.Error(t, err)
 			assert.Equal(t, &tokens.NotFoundError{}, err)
 		},
 		"token not found with existing token in store": func(t *testing.T) {
+			ctx := context.Background()
 			insertToken(t, db, tok)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
@@ -418,6 +515,7 @@ func TestDeleteToken(t *testing.T) {
 			assert.Equal(t, &tokens.NotFoundError{}, err)
 		},
 		"token found in store": func(t *testing.T) {
+			ctx := context.Background()
 			insertToken(t, db, tok)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
@@ -434,7 +532,7 @@ func TestDeleteToken(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
 
-			ctx = insertProjectsIntoNewContext([]string{"overlapping"})
+			ctx := insertProjectsIntoNewContext([]string{"overlapping"})
 			err := store.DeleteToken(ctx, tok.ID)
 			assert.NoError(t, err)
 
@@ -447,7 +545,7 @@ func TestDeleteToken(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
 
-			ctx = insertProjectsIntoNewContext([]string{"overlapping", "not-overlapping"})
+			ctx := insertProjectsIntoNewContext([]string{"overlapping", "not-overlapping"})
 			err := store.DeleteToken(ctx, tok.ID)
 			assert.NoError(t, err)
 
@@ -460,7 +558,7 @@ func TestDeleteToken(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
 
-			ctx = insertProjectsIntoNewContext([]string{"overlapping", "foo"})
+			ctx := insertProjectsIntoNewContext([]string{"overlapping", "foo"})
 			err := store.DeleteToken(ctx, tok.ID)
 			assert.NoError(t, err)
 
@@ -472,7 +570,7 @@ func TestDeleteToken(t *testing.T) {
 			insertToken(t, db, tok)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
-			ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter, "foo"})
+			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter, "foo"})
 
 			err := store.DeleteToken(ctx, "not-real-token")
 
@@ -483,10 +581,10 @@ func TestDeleteToken(t *testing.T) {
 			insertToken(t, db, tok)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
-			ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter})
+			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter})
 
 			err := store.DeleteToken(ctx, tok.ID)
-			require.NoError(err)
+			assert.NoError(t, err)
 
 			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
@@ -496,15 +594,15 @@ func TestDeleteToken(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
 
-			ctx = insertProjectsIntoNewContext([]string{"no-match"})
+			ctx := insertProjectsIntoNewContext([]string{"no-match"})
 			err := store.DeleteToken(ctx, tok.ID)
 			assert.Equal(t, &tokens.NotFoundError{}, err)
 		},
 	}
 
 	for name, test := range cases {
-		t.Run(name, test)
 		reset(t, db)
+		t.Run(name, test)
 	}
 }
 
