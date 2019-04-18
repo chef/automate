@@ -66,7 +66,7 @@ func initializePG() (*pg.Config, error) {
 	// If in CI mode, use the default
 	if ciMode {
 		return &pg.Config{
-			PGURL: "postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable",
+			PGURL: constants.PgURL,
 		}, nil
 	}
 
@@ -85,7 +85,7 @@ func initializePG() (*pg.Config, error) {
 
 func openDB(t *testing.T) *sql.DB {
 	t.Helper()
-	db, err := sql.Open("postgres", "postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable")
+	db, err := sql.Open("postgres", constants.PgURL)
 	require.NoError(t, err, "error opening db")
 	err = db.Ping()
 	require.NoError(t, err, "error pinging db")

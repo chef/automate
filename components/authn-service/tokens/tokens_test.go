@@ -43,7 +43,7 @@ func TestToken(t *testing.T) {
 
 	// Note: this matches CI
 	pgCfg := pg.Config{
-		PGURL: "postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable",
+		PGURL: constants.PgURL,
 	}
 	if v, found := os.LookupEnv("PG_URL"); found {
 		pgCfg.PGURL = v

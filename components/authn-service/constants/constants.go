@@ -15,3 +15,6 @@ const LocalConnectorID = "local"
 // UnassignedProjectID represents the project ID for
 // resources (tokens) without projects
 const UnassignedProjectID = "(unassigned)"
+
+// PgURL is the URL to connect to the authn DB
+const PgURL = "postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable"

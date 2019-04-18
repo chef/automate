@@ -18,6 +18,7 @@ import (
 	"github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz/common"
 	tokenauthn "github.com/chef/automate/components/authn-service/authenticator/tokens"
+	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/server"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
 	"github.com/chef/automate/components/authn-service/tokens/pg/testconstants"
@@ -61,7 +62,7 @@ func TestChefClientAuthn(t *testing.T) {
 
 	pgURLGiven := false
 	pgCfg := pg.Config{
-		PGURL: "postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable",
+		PGURL: constants.PgURL,
 	}
 	if v, found := os.LookupEnv("PG_URL"); found {
 		pgCfg.PGURL = v
