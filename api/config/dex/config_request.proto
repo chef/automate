@@ -105,6 +105,14 @@ message ConfigRequest {
 			google.protobuf.StringValue base_group_search_dn = 6;
 			google.protobuf.StringValue user_query_filter = 7;
 			google.protobuf.StringValue group_query_filter = 8;
+			google.protobuf.StringValue username_attr = 9;
+			google.protobuf.StringValue user_id_attr = 10;
+			google.protobuf.StringValue email_attr = 11;
+			google.protobuf.StringValue user_display_name_attr = 12;
+			google.protobuf.StringValue filter_groups_by_user_attr = 13;
+			google.protobuf.StringValue filter_groups_by_user_value = 14;
+			google.protobuf.StringValue group_display_name_attr = 15;
+			google.protobuf.BoolValue insecure_no_ssl = 16;
 		}
 
 		message Saml {

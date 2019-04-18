@@ -243,16 +243,16 @@ policies will be incorrectly labelled as `ldap`.
 
 Chef Automate comes with a default LDAP configuration for Microsoft Active Directory (MSAD).
 The MSAD configuration is intended for getting started with minimal configuration for standard MSAD systems.
-If you need to customize your configuration further, see the [LDAP section]({{< relref "configuration.md#LDAP" >}}) below.
+Default values in this MSAD configuration can be overridden.
 
 {{< warning >}}
 Chef Automate's default configuration for Microsoft AD is specific to LDAP.
-To configure Microsoft AD using SAML, see the SAML configuration section below.
+To configure Microsoft AD using SAML, see the [SAML configuration section]({{< relref "configuration.md#saml" >}}).
 {{< /warning >}}
 
-In this config, all fields are required except for `ca_contents`, `user_query_filter`,
-`base_group_search_dn` and `group_query_filter`. See [LDAP]({{< relref "ldap.md" >}}) integration for more information.
-goes into further detail about what each of those config fields represents.
+In this config, the required fields are `host`, `bind_dn`,
+`bind_password`, `base_user_search_dn`, and `base_group_search_dn`.
+See [LDAP Integration]({{< relref "ldap.md" >}}) for more information on config fields, including optional fields.
 
 ```toml
 [dex.v1.sys.connectors.msad_ldap]
@@ -261,31 +261,43 @@ bind_dn = "<your bind_dn>"
 bind_password = "<your bind_password>"
 base_user_search_dn = "<your base user search DN>"
 base_group_search_dn = "<your base group search DN>"
-ca_contents = "<your ca contents>"
-user_query_filter = "<your filter for user queries>"
-group_query_filter = "<your filter for group queries>"
+ca_contents = "<your ca contents>" # optional, but recommended
 ```
 
 The MSAD configuration is an LDAP configuration with more provided default
-values that are commonly a good fit for Active Directory:
+values that are commonly a good fit for Active Directory. Override any single default value by uncommenting it in the config and setting its value:
 
 ```toml
-user_query_filter = "(objectClass=person)" # can be overridden
-group_query_filter = "(objectClass=group)" # can be overridden
-username_attr = "sAMAccountName"
-user_id_attr = "sAMAccountName"
-email_attr = "mail"
-user_display_name_attr = "displayName"
-filter_groups_by_user_attr = "DN"
-filter_groups_by_user_value = "member"
-group_display_name_attr = "displayName"
+[dex.v1.sys.connectors.msad_ldap]
+host = "<your host>"
+bind_dn = "<your bind_dn>"
+bind_password = "<your bind_password>"
+base_user_search_dn = "<your base user search DN>"
+base_group_search_dn = "<your base group search DN>"
+ca_contents = "<your ca contents>" # optional
+
+# MSAD default values (uncomment to override a specific one)
+# insecure_no_ssl = false
+# user_query_filter = "(objectClass=person)"
+# user_id_attr = "sAMAccountName"
+# username_attr = "sAMAccountName"
+# email_attr = "mail"
+# user_display_name_attr = "displayName"
+# group_query_filter = "(objectClass=group)"
+# filter_groups_by_user_value = "DN"
+# filter_groups_by_user_attr = "member"
+# group_display_name_attr = "displayName"
 ```
 
 {{< warning >}}
-The MSAD configuration assumes all users have an email address corresponding to the MSAD attribute mail.
-To use MSAD login without configuring user email addresses, follow the LDAP configuration,
-which is discussed below.
+Connecting to an LDAP service without TLS is not recommended.
 {{< /warning >}}
+
+However, if you wish to integrate with an LDAP server with TLS disabled:
+
+```toml
+insecure_no_ssl = true
+```
 
 ##### LDAP
 
