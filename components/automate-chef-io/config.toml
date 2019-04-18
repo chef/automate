@@ -109,7 +109,7 @@ identifier = "troubleshooting"
 url = "/docs/troubleshooting"
 
 [[menu.docs]]
-name = "Workflow (Legacy)"
+name = "Workflow (Deprecated)"
 weight = 140
 identifier = "workflow"
 
