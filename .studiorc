@@ -67,12 +67,12 @@ export HAB_HART_COMPRESSION_LEVEL=0
 
 getting_started << GETTING_STARTED
 
-Welcome to the Habitat-based development environment for the A2 mono-repo!
+Welcome to the Habitat-based development environment for the Automate mono-repo!
 
-===== Deploy A2 =====
+===== Deploy Automate =====
 
     To get started, use this to start the deployment service, download the latest 'dev' images for
-    each service, and spin up A2. (when you don't need local UI development)
+    each service, and spin up Automate. (when you don't need local UI development)
 
         # start_all_services
 
@@ -86,7 +86,7 @@ Welcome to the Habitat-based development environment for the A2 mono-repo!
 
 ===== Rebuild Components and Hot-load the Results =====
 
-    After A2 is running, you can rebuild an entire component's hab package from source,
+    After Automate is running, you can rebuild an entire component's hab package from source,
     then HOT LOAD IT INTO YOUR DEPLOY, replacing the dev image that was there previously.
     (Use 'build' instead of 'rebuild' if you want to check dependencies also.)
 
@@ -121,7 +121,7 @@ total_memory_kb=$(cat /proc/meminfo | grep MemTotal | grep -o -E '[[:digit:]]+')
 # 8 gigs == 8164340kb, subtract a few kb so we can just do a less than comp
 if (( $total_memory_kb < 8164000 )); then
   warn "!!!"
-  warn "This system has less than 8Gb of RAM. You will not be able to run a full A2 deployment."
+  warn "This system has less than 8Gb of RAM. You will not be able to run a full Automate deployment."
   warn "!!!"
 fi
 
@@ -167,7 +167,7 @@ function check_if_deployinate_started() {
 
   if ! chef-automate status > /dev/null 2>&1; then
     error "The current status of your deploy is unhealthy."
-    log_line "If you have yet to do so, run '${GREEN}chef-automate dev deployinate${NC}' to deploy A2."
+    log_line "If you have yet to do so, run '${GREEN}chef-automate dev deployinate${NC}' to deploy Automate."
     log_line "If you have already deployed, there is an issue with your deploy."
     log_line "You can check the logs with '${YELLOW}sl${NC}' and the status with '${YELLOW}chef-automate status${NC}'."
     return 1
