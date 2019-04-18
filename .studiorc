@@ -22,10 +22,11 @@ fi
 
 # Install busybox-static so script evaluations (e.g. #!/bin/bash) will work
 # This ensures normal linxu studios work like Docker studios
-hab pkg install core/busybox-static
-hab pkg binlink -d /bin core/busybox-static
-hab pkg install core/bash
-hab pkg binlink -d /bin/ -f core/bash
+log_line "Install busybox-static & bash hart packages"
+hab pkg install core/busybox-static >/dev/null
+hab pkg binlink -d /bin core/busybox-static >/dev/null
+hab pkg install core/bash >/dev/null
+hab pkg binlink -d /bin/ -f core/bash >/dev/null
 
 # TODO (tc) Let's get rid of this hard-coded config long-term.
 # Elasticsearch
