@@ -83,7 +83,7 @@ func (db DatabaseExporter) Export() error {
 		)
 	}
 
-	if db.User == "" {
+	if db.User == "" && !db.UseCustomFormat {
 		cmd = append(cmd,
 			"--no-privileges",
 			"--no-owner")
