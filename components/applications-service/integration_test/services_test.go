@@ -416,13 +416,19 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 	}
 }
 
+// @afiune there are cases where the order of the services that are returned are not
+// exactly the same, we do care about order but in some degree, for example health check
+// status and fqdn, but we don't care about things like order of supervidor_id so we can
+// skip that check by not specifying it into the expected response
 func assertServicesEqual(t *testing.T, expected, actual []*applications.Service) {
 	if assert.Equal(t, len(expected), len(actual), "The number of services are not the same") {
 		for i, svc := range expected {
-			assert.Equal(t,
-				svc.SupervisorId,
-				actual[i].SupervisorId,
-				"The supervisor_id of a service is not the expected one")
+			if len(svc.SupervisorId) != 0 {
+				assert.Equal(t,
+					svc.SupervisorId,
+					actual[i].SupervisorId,
+					"The supervisor_id of a service is not the expected one")
+			}
 			assert.Equal(t,
 				svc.Release,
 				actual[i].Release,

@@ -152,6 +152,11 @@ func (app *ApplicationsServer) GetServicesBySG(
 		}
 	)
 
+	// Adds the health filter if any was specified
+	if len(request.GetHealth()) != 0 {
+		filters["health"] = []string{request.GetHealth()}
+	}
+
 	// Verify if the service group exists
 	sgName, sgExist := app.storageClient.ServiceGroupExists(sgStringID)
 	if !sgExist {
