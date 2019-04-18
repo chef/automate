@@ -13,8 +13,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
+	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
 func setup(t *testing.T) (tokens.Storage, *sql.DB, context.Context) {
@@ -397,6 +399,7 @@ func TestDeleteToken(t *testing.T) {
 		Description: "Cool Token",
 		Active:      active,
 		Value:       value,
+		Projects:    []string{},
 	}
 
 	// description => test func (map used for randomization)
@@ -420,10 +423,82 @@ func TestDeleteToken(t *testing.T) {
 				WHERE id=$1`, id))
 
 			err := store.DeleteToken(ctx, tok.ID)
+			assert.NoError(t, err)
+
+			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+		},
+		"token has single project, filter matches exactly": func(t *testing.T) {
+			tok.Projects = []string{"overlapping"}
+			insertToken(t, db, tok)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+
+			ctx = insertProjectsIntoNewContext([]string{"overlapping"})
+			err := store.DeleteToken(ctx, tok.ID)
+			assert.NoError(t, err)
+
+			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+		},
+		"token has single project, one project in filter matches": func(t *testing.T) {
+			tok.Projects = []string{"overlapping"}
+			insertToken(t, db, tok)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+
+			ctx = insertProjectsIntoNewContext([]string{"overlapping", "not-overlapping"})
+			err := store.DeleteToken(ctx, tok.ID)
+			assert.NoError(t, err)
+
+			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+		},
+		"token has multiple projects, filter matches both exactly": func(t *testing.T) {
+			tok.Projects = []string{"overlapping", "foo"}
+			insertToken(t, db, tok)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+
+			ctx = insertProjectsIntoNewContext([]string{"overlapping", "foo"})
+			err := store.DeleteToken(ctx, tok.ID)
+			assert.NoError(t, err)
+
+			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+		},
+		"token has no projects, filter has unassigned and other project": func(t *testing.T) {
+			tok.Projects = []string{}
+			insertToken(t, db, tok)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+			ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter, "foo"})
+
+			err := store.DeleteToken(ctx, "not-real-token")
+
+			assert.Equal(t, &tokens.NotFoundError{}, err)
+		},
+		"token has no projects, filter has (unassigned)": func(t *testing.T) {
+			tok.Projects = []string{}
+			insertToken(t, db, tok)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+			ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter})
+
+			err := store.DeleteToken(ctx, tok.ID)
 			require.NoError(err)
 
 			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
+		},
+		"no tokens found with projects matching filter": func(t *testing.T) {
+			insertToken(t, db, tok)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
+				WHERE id=$1`, id))
+
+			ctx = insertProjectsIntoNewContext([]string{"no-match"})
+			err := store.DeleteToken(ctx, tok.ID)
+			assert.Equal(t, &tokens.NotFoundError{}, err)
 		},
 	}
 
@@ -449,4 +524,9 @@ func assertCount(t *testing.T, expected int, row *sql.Row) {
 	var count int
 	require.NoError(t, row.Scan(&count))
 	assert.Equal(t, expected, count)
+}
+
+func insertProjectsIntoNewContext(projects []string) context.Context {
+	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
+		[]string{}, projects, "resource", "action", "pol"))
 }

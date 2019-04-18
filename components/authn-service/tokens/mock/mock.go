@@ -113,7 +113,7 @@ func (m *mock) DeleteToken(ctx context.Context, id string) error {
 	found := false
 	newTokens := []*tokens.Token{}
 	for i, t := range m.tokens {
-		if t.ID == id {
+		if t.ID == id && projectsIntersect(ctx, t) {
 			found = true
 			continue
 		}
