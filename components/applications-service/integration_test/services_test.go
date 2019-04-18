@@ -104,6 +104,14 @@ func TestGetServicesMultiService(t *testing.T) {
 					Application:  a, Environment: e, Fqdn: "",
 				},
 				&applications.Service{
+					SupervisorId: "sup3",
+					Group:        "test.default",
+					Release:      "core/test/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_UNKNOWN,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+				&applications.Service{
 					SupervisorId: "sup1",
 					Group:        "myapp.default",
 					Release:      "core/myapp/0.1.0/20190101121212",
@@ -115,6 +123,14 @@ func TestGetServicesMultiService(t *testing.T) {
 					SupervisorId: "sup1",
 					Group:        "redis.default",
 					Release:      "core/redis/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_OK,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+				&applications.Service{
+					SupervisorId: "sup4",
+					Group:        "test.default",
+					Release:      "core/test/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
@@ -153,6 +169,14 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Application:  a, Environment: e, Fqdn: "",
 				},
 				&applications.Service{
+					SupervisorId: "sup4",
+					Group:        "test.default",
+					Release:      "core/test/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_OK,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+				&applications.Service{
 					SupervisorId: "sup1",
 					Group:        "myapp.default",
 					Release:      "core/myapp/0.1.0/20190101121212",
@@ -162,6 +186,14 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 				},
 				&applications.Service{
 					SupervisorId: "sup2",
+					Group:        "test.default",
+					Release:      "core/test/0.1.0/20190101121212",
+					Status:       applications.ServiceStatus_RUNNING,
+					HealthCheck:  applications.HealthStatus_UNKNOWN,
+					Application:  a, Environment: e, Fqdn: "",
+				},
+				&applications.Service{
+					SupervisorId: "sup3",
 					Group:        "test.default",
 					Release:      "core/test/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
@@ -260,10 +292,10 @@ func TestGetServicesMultiServicaPaginationAndSorting(t *testing.T) {
 			Services: []*applications.Service{
 				&applications.Service{
 					SupervisorId: "sup1",
-					Group:        "myapp.default",
-					Release:      "core/myapp/0.1.0/20190101121212",
+					Group:        "redis.default",
+					Release:      "core/redis/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
-					HealthCheck:  applications.HealthStatus_WARNING,
+					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
 				},
 			},
@@ -297,6 +329,82 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 						Release:      "core/myapp/0.1.0/20190101121212",
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_WARNING,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithHealthFilter(t *testing.T) {
+	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 4, len(sgList), "There should be four service_groups in the db") {
+
+		var (
+			ctx     = context.Background()
+			request = &applications.ServicesReq{
+				Filter: []string{"health:WARNING"},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup1",
+						Group:        "myapp.default",
+						Release:      "core/myapp/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_WARNING,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) {
+	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 4, len(sgList), "There should be four service_groups in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = fmt.Sprintf("%d", sgList[3].ID)
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"health:UNKNOWN",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup2",
+						Group:        "test.default",
+						Release:      "core/test/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_UNKNOWN,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+					&applications.Service{
+						SupervisorId: "sup3",
+						Group:        "test.default",
+						Release:      "core/test/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_UNKNOWN,
 						Application:  a, Environment: e, Fqdn: "",
 					},
 				},
@@ -360,5 +468,7 @@ func habServicesMatrixAllHealthStatusDifferent() []*applications.HabService {
 
 		// service_group 4 <-> With a Health Status = 'UNKNOWN'
 		NewHabServiceMsg("sup2", a, e, "default", "core", "test", "0.1.0", "20190101121212", "UNKNOWN"),
+		NewHabServiceMsg("sup3", a, e, "default", "core", "test", "0.1.0", "20190101121212", "UNKNOWN"),
+		NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "OK"),
 	}
 }

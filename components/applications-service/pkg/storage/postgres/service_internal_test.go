@@ -39,24 +39,23 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 			expected:          "WHERE group_id = '123' OR group_id = '456'",
 			shouldReturnError: false,
 		},
-		// TODO @afiune uncomment this code to power the right side panel Health Status Filters
-		//{
-		//message: "with health filter with single value returns built WHERE statement",
-		//filters: map[string][]string{
-		//"health": []string{"UNKNOWN"},
-		//},
-		//expected:          "WHERE health = 'UNKNOWN'",
-		//shouldReturnError: false,
-		//},
-		//{
-		//message: "with multiple valid filters and multiple values returns built WHERE statement",
-		//filters: map[string][]string{
-		//"service_group_id": []string{"123", "456"},
-		//"health":           []string{"WARNING", "OK"},
-		//},
-		//expected:          "WHERE group_id = '123' OR group_id = '456' AND health = 'WARNING' OR health = 'OK'",
-		//shouldReturnError: false,
-		//},
+		{
+			message: "with health filter with single value returns built WHERE statement",
+			filters: map[string][]string{
+				"health": []string{"UNKNOWN"},
+			},
+			expected:          "WHERE health = 'UNKNOWN'",
+			shouldReturnError: false,
+		},
+		{
+			message: "with multiple valid filters and multiple values returns built WHERE statement",
+			filters: map[string][]string{
+				"service_group_id": []string{"123", "456"},
+				"health":           []string{"WARNING", "OK"},
+			},
+			expected:          "WHERE group_id = '123' OR group_id = '456' AND health = 'WARNING' OR health = 'OK'",
+			shouldReturnError: false,
+		},
 		{
 			message: "valid filter with no value returns empty where constraints",
 			filters: map[string][]string{
