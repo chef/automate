@@ -80,7 +80,7 @@ func (s *authzServer) ProjectsAuthorized(
 	if version.Minor == api.Version_V0 && len(projectsAuthorized) > 0 {
 		// if IAM version is set to v2.0
 		// as long as at least one project is authorized
-		// we override the filtered projects because no filter should be applied on v2
+		// we override the filtered projects because no filter should be applied on v2.0
 		projectsAuthorized = []string{constants.AllProjectsExternalID}
 	} else if stringutils.SliceContains(projectsAuthorized, constants.AllProjectsID) {
 		// Generally we return the engine's response verbatim
@@ -94,9 +94,9 @@ func (s *authzServer) ProjectsAuthorized(
 			// Engine allows all--but we want that to mean just the *requested* ones.
 			projectsAuthorized = req.ProjectsFilter
 		}
-		s.logProjectQuery(req, projectsAuthorized)
 	}
 
+	s.logProjectQuery(req, projectsAuthorized)
 	return &api.ProjectsAuthorizedResp{
 		Projects: projectsAuthorized,
 	}, nil
