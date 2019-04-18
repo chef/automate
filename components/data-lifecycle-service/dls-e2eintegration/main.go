@@ -57,10 +57,6 @@ func manualTriggerTest() {
 	name = fmt.Sprintf("comp-%s-r", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
 	es.CreateTimeNamedIndices(context.Background(), time.Now(), name, 5)
 
-	if err != nil {
-		panic(err)
-	}
-
 	client := data_lifecycle.NewDataLifecycleClient(conn)
 
 	dlsResp, err := client.TriggerPurge(context.Background(), &data_lifecycle.TriggerPurgeRequest{

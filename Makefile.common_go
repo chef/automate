@@ -11,13 +11,13 @@ endif
 ifeq ($(UNAME_S),Darwin)
   PLATFORM:=darwin-amd64
 endif
-GOLANGCILINTVERSION?=1.15.0
+GOLANGCILINTVERSION?=1.16.0
 GOLANGCILINTTARBALL:=golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM).tar.gz
 
 LINTERARGS?=./...
 
 $(REPOROOT)/cache/$(GOLANGCILINTTARBALL):
-	curl -L https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCILINTVERSION)/$(GOLANGCILINTTARBALL) > $(REPOROOT)/cache/$(GOLANGCILINTTARBALL)
+	curl --output $(REPOROOT)/cache/$(GOLANGCILINTTARBALL) -L https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCILINTVERSION)/$(GOLANGCILINTTARBALL)
 
 $(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint: $(REPOROOT)/cache/$(GOLANGCILINTTARBALL)
 	tar zxf $(REPOROOT)/cache/$(GOLANGCILINTTARBALL) -C $(REPOROOT)/cache/

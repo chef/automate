@@ -74,6 +74,7 @@ func ConfigFromViper() (*Config, error) {
 	}).Info("Telemetry opt out path.")
 
 	if config.OptOutPath == "" {
+		err = fmt.Errorf("Telemetry opt-out path is blank, unable to determine if telemetry should be disabled.")
 		log.WithFields(log.Fields{
 			"err": err.Error(),
 		}).Error("Unable to determine telemetry opt out path.")
