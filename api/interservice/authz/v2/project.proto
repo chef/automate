@@ -104,9 +104,17 @@ enum ProjectRuleTypes {
     EVENT = 1;
 }
 
-// type = "ChefServers"
-// values = ['chef_server_1.org', 'chef_server_2.org', 'chef_*']
+enum ProjectRuleConditionTypes {
+    CHEF_SERVERS = 0;
+    CHEF_ORGS = 1;
+    CHEF_ENVIRONMENTS = 2;
+    ROLES = 3;
+    CHEF_TAGS = 4;
+    POLICY_GROUP = 5;
+    POLICY_NAME = 6;
+}
+
 message Condition {
-    string type = 1;
+    ProjectRuleConditionTypes type = 1;
     repeated string values = 2;
 }

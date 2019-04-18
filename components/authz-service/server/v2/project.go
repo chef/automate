@@ -290,7 +290,7 @@ func rulesToProjectRules(rules []engine.Rule) []*api.ProjectRule {
 	conditions := make([]*api.Condition, len(rules))
 	for j, rule := range rules {
 		conditions[j] = &api.Condition{
-			Type:   rule.Type,
+			Type:   api.ProjectRuleConditionTypes(api.ProjectRuleConditionTypes_value[rule.Type]),
 			Values: rule.Values,
 		}
 	}

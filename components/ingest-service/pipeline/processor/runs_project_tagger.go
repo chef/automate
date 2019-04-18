@@ -6,7 +6,6 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
-	rules_tags "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/stringutils"
 	log "github.com/sirupsen/logrus"
 )
@@ -95,27 +94,27 @@ func nodeMatchesAllConditions(node backend.Node, conditions []*iam_v2.Condition)
 
 	for _, condition := range conditions {
 		switch condition.Type {
-		case rules_tags.ChefServersTag:
+		case iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS:
 			if !stringutils.SliceContains(condition.Values, node.SourceFqdn) {
 				return false
 			}
-		case rules_tags.ChefOrgsTag:
+		case iam_v2.ProjectRuleConditionTypes_CHEF_ORGS:
 			if !stringutils.SliceContains(condition.Values, node.OrganizationName) {
 				return false
 			}
-		case rules_tags.ChefEnvironmentsTag:
+		case iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS:
 			if !stringutils.SliceContains(condition.Values, node.Environment) {
 				return false
 			}
-		case rules_tags.PolicyGroupTag:
+		case iam_v2.ProjectRuleConditionTypes_POLICY_GROUP:
 			if !stringutils.SliceContains(condition.Values, node.PolicyGroup) {
 				return false
 			}
-		case rules_tags.PolicyNameTag:
+		case iam_v2.ProjectRuleConditionTypes_POLICY_NAME:
 			if !stringutils.SliceContains(condition.Values, node.PolicyName) {
 				return false
 			}
-		case rules_tags.RolesTag:
+		case iam_v2.ProjectRuleConditionTypes_ROLES:
 			foundMatch := false
 			for _, projectRole := range condition.Values {
 				if stringutils.SliceContains(node.Roles, projectRole) {
@@ -126,7 +125,7 @@ func nodeMatchesAllConditions(node backend.Node, conditions []*iam_v2.Condition)
 			if !foundMatch {
 				return false
 			}
-		case rules_tags.ChefTagsTag:
+		case iam_v2.ProjectRuleConditionTypes_CHEF_TAGS:
 			foundMatch := false
 			for _, projectRole := range condition.Values {
 				if stringutils.SliceContains(node.ChefTags, projectRole) {
