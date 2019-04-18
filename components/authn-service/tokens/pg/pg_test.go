@@ -404,7 +404,7 @@ func TestDeleteToken(t *testing.T) {
 		"empty database": func(t *testing.T) {
 			err := store.DeleteToken(ctx, "not-real-token")
 			assert.Error(t, err)
-			assert.Equal(t, tokens.NotFoundError{}, err)
+			assert.Equal(t, &tokens.NotFoundError{}, err)
 		},
 		"token not found with existing token in store": func(t *testing.T) {
 			insertToken(t, db, tok)
@@ -412,7 +412,7 @@ func TestDeleteToken(t *testing.T) {
 				WHERE id=$1`, id))
 
 			err := store.DeleteToken(ctx, "not-real-token")
-			assert.Equal(t, tokens.NotFoundError{}, err)
+			assert.Equal(t, &tokens.NotFoundError{}, err)
 		},
 		"token found in store": func(t *testing.T) {
 			insertToken(t, db, tok)
