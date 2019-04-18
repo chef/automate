@@ -99,11 +99,20 @@ func (a *adapter) UpdateToken(ctx context.Context,
 }
 
 func (a *adapter) DeleteToken(ctx context.Context, id string) error {
-	if _, err := a.db.ExecContext(ctx,
+	res, err := a.db.ExecContext(ctx,
 		`DELETE FROM chef_authn_tokens WHERE id=$1`,
-		id); err != nil {
+		id)
+	if err != nil {
 		return processSQLError(err, "delete token by id")
-	} // TODO: check rows affected?
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return processSQLError(err, "delete token by id")
+	} else if count != 1 {
+		return &tokens.NotFoundError{}
+	}
+
 	return nil
 }
 
