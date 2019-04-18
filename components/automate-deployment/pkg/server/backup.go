@@ -161,6 +161,7 @@ func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupReques
 	// file.
 	err = s.acquireLock(ctx)
 	if err != nil {
+		s.deployment.Unlock()
 		logrus.WithError(err).Error("Failed to acquire lock")
 		return nil, err
 	}
