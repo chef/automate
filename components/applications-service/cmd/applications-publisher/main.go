@@ -30,6 +30,7 @@ NATS Options:
 Options to build a Habitat Event message:
 	--sup-id      <id>     The Supervisor ID
 	--group       <group>  The group name of a service (part of the service_group)
+	--fqdn        <fqdn>   The fqdn of the server where the service is running
 	--application <name>   The application name that this service is part of
 	--environment <name>   The environment name of the current deployment
 	--health      <code>   The health check code of a service
@@ -86,6 +87,7 @@ func main() {
 	flag.StringVar(&event.Group, "group", "default", "The group name of a service (part of the service_group)")
 	flag.StringVar(&event.Application, "application", "demo", "The application name that this service is part of")
 	flag.StringVar(&event.Environment, "environment", "demo", "The environment name of the current deployment")
+	flag.StringVar(&event.Fqdn, "fqdn", "localhost", "The fqdn of the server where the service is running")
 	flag.StringVar(&event.PkgIdent.Origin, "origin", "core", "The origin of a package")
 	flag.StringVar(&event.PkgIdent.Name, "name", "redis", "The name of a package")
 	flag.StringVar(&event.PkgIdent.Version, "version", "0.1.0", "The version of a package")

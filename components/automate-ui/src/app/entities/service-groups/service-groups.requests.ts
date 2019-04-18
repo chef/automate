@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 import {
-  ServiceGroupsPayload, ServiceGroupFilters
+  ServiceGroupsPayload, ServiceGroupFilters, ServicesPayload
 } from './service-groups.model';
 import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
@@ -44,5 +44,11 @@ export class ServiceGroupsRequests {
     }
 
     return searchParam;
+  }
+
+  public fetchServicesBySG(serviceGroupId?: number): Observable<ServicesPayload> {
+    const url = `${APPLICATIONS_URL}/service-groups/${serviceGroupId}`;
+
+    return this.httpClient.get<ServicesPayload>(url);
   }
 }

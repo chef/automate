@@ -164,6 +164,9 @@ import { RunSummaryComponent } from './page-components/run-summary/run-summary.c
 import {
   SelectListItemComponent
 } from './page-components/select-list-item/select-list-item.component';
+import {
+  ServicesSidebarComponent
+} from './page-components/services-sidebar/services-sidebar.component';
 import { ServiceGroupsComponent } from './pages/service-groups/service-groups.component';
 import {
   ServerOrgFilterSidebarComponent
@@ -242,6 +245,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     SelectListItemComponent,
     ServiceGroupsComponent,
     ServerOrgFilterSidebarComponent,
+    ServicesSidebarComponent,
     SettingsLandingComponent,
     SidebarSelectListComponent,
     SigninComponent,

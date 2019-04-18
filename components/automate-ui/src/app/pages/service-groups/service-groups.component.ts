@@ -6,7 +6,9 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Chicklet, RollupServiceStatus, SortDirection } from '../../types/types';
 import { EntityStatus } from '../../entities/entities';
-import { UpdateServiceGroupFilters } from 'app/entities/service-groups/service-groups.actions';
+import {
+  UpdateServiceGroupFilters, UpdateSelectedSG
+} from 'app/entities/service-groups/service-groups.actions';
 import {
   ServiceGroup, ServiceGroupFilters, FieldDirection
 } from '../../entities/service-groups/service-groups.model';
@@ -24,6 +26,9 @@ import { find, includes } from 'lodash/fp';
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
+
+  // Weather or not the the services sidebar is visible
+  public servicesSidebarVisible = false;
 
   // The collection of allowable status
   private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
@@ -123,6 +128,18 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     delete queryParams['page'];
 
     this.router.navigate([], {queryParams});
+  }
+
+  public openServicesSidebar(id: number) {
+    this.servicesSidebarVisible = true;
+    this.store.dispatch(new UpdateSelectedSG(id));
+    document.getElementById('services-panel').focus();
+  }
+
+  public closeServicesSidebar() {
+    if (this.servicesSidebarVisible) {
+      this.servicesSidebarVisible = false;
+    }
   }
 
   private getSelectedStatus(allParameters: Chicklet[]): RollupServiceStatus {
