@@ -73,6 +73,15 @@ func (srv *ComplianceIngestServer) HandleEvent(ctx context.Context, req *automat
 		}
 
 		srv.updateManager.Start(projectUpdateID)
+	} else if req.Type.Name == event.ProjectRulesCancelUpdate {
+		projectUpdateID, err := getProjectUpdateID(req)
+		if err != nil {
+			logrus.Errorf("Project Rule Update Cancel sent without a ProjectUpdateID. eventID %q",
+				req.EventID)
+			return response, err
+		}
+
+		srv.updateManager.Cancel(projectUpdateID)
 	}
 
 	return response, nil

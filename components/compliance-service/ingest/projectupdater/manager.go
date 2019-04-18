@@ -53,6 +53,33 @@ func NewManager(client *ingestic.ESClient, authzProjectsClient iam_v2.ProjectsCl
 	}
 }
 
+func (manager *Manager) Cancel(projectUpdateID string) {
+	switch manager.state {
+	case notRunningState:
+		// do nothing job is not running
+	case runningState:
+		if manager.projectUpdateID == projectUpdateID {
+			logrus.Debugf("Cancelling project tag update for ID %q elasticsearch task ID %v",
+				manager.projectUpdateID, manager.esJobIDs)
+
+			for _, esJobID := range manager.esJobIDs {
+				err := manager.client.JobCancel(context.Background(), esJobID)
+				if err != nil {
+					logrus.Errorf("Failed to canceled Elasticsearch task. "+
+						" Elasticsearch Task ID %q; projectUpdateID: %q", esJobID, projectUpdateID)
+				}
+			}
+		} else {
+			// do nothing because the requested project update job is not running
+		}
+	default:
+		// error state not found
+		manager.sendFailedEvent(fmt.Sprintf(
+			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID),
+			projectUpdateID)
+	}
+}
+
 // Start - start a project update
 func (manager *Manager) Start(projectUpdateID string) {
 	switch manager.state {

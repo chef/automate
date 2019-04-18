@@ -463,6 +463,17 @@ func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectT
 	return startTaskResult.TaskId, err
 }
 
+func (backend *ESClient) JobCancel(ctx context.Context, jobID string) error {
+	_, err := elastic.NewTasksCancelService(backend.client).
+		TaskId(jobID).
+		Do(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (JobStatus, error) {
 	tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(backend.client).
 		TaskId(jobID).

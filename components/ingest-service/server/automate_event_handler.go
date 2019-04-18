@@ -74,6 +74,15 @@ func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 		}
 
 		s.updateManager.Start(projectUpdateID)
+	} else if req.Type.Name == server.ProjectRulesCancelUpdate {
+		projectUpdateID, err := getProjectUpdateID(req)
+		if err != nil {
+			logrus.Errorf("Project Rule Update Cancel sent without a ProjectUpdateID. eventID %q",
+				req.EventID)
+			return response, err
+		}
+
+		s.updateManager.Cancel(projectUpdateID)
 	}
 	return response, nil
 }

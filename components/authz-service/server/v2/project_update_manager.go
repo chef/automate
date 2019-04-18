@@ -115,6 +115,25 @@ func (manager *ProjectUpdateManager) State() string {
 	return manager.state
 }
 
+func (manager *ProjectUpdateManager) Cancel() error {
+	switch manager.state {
+	case NotRunningState:
+		// do nothing job is not running
+	case RunningState:
+		logrus.Debugf("Cancelling project update for ID %q", manager.projectUpdateID)
+		err := manager.cancelProjectUpdateForDomainResources()
+		if err != nil {
+			return err
+		}
+	default:
+		// error state not found
+		return errors.New(fmt.Sprintf(
+			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID))
+	}
+
+	return nil
+}
+
 // Start - start a project update
 func (manager *ProjectUpdateManager) Start() error {
 	switch manager.state {
@@ -257,6 +276,30 @@ func (manager *ProjectUpdateManager) startProjectUpdateForDomainResources(
 				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
 					Kind: &_struct.Value_StringValue{
 						StringValue: projectUpdateID,
+					},
+				},
+			},
+		},
+	}
+
+	pubReq := automate_event.PublishRequest{Msg: event}
+	_, err := manager.eventServiceClient.Publish(context.Background(), &pubReq)
+
+	return err
+}
+
+func (manager *ProjectUpdateManager) cancelProjectUpdateForDomainResources() error {
+	eventUUID := createEventUUID()
+
+	event := &automate_event.EventMsg{
+		EventID:   eventUUID,
+		Published: ptypes.TimestampNow(),
+		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesCancelUpdate},
+		Data: &_struct.Struct{
+			Fields: map[string]*_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+					Kind: &_struct.Value_StringValue{
+						StringValue: manager.projectUpdateID,
 					},
 				},
 			},
