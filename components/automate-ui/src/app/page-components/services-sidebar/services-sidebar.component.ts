@@ -33,21 +33,6 @@ export class ServicesSidebarComponent implements OnInit {
     this.closeServicesSidebarEvent.emit(null);
   }
 
-  public healthStatusIcon(service: Service): string {
-    switch (service.health_check) {
-      case 'OK':
-        return 'check_circle';
-      case 'CRITICAL':
-        return 'warning';
-      case 'WARNING':
-        return 'error_outline';
-      case 'UNKNOWN':
-        return 'help';
-      default:
-        return 'help';
-    }
-  }
-
   // healthCheckStatus returns the formated health_check status from the provided service
   // TODO: @afiune here is where we can inject an error message from the health check
   public healthCheckStatus(service: Service): string {

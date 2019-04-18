@@ -17,7 +17,7 @@
         <div class="body">
           <div class ="service-line"><chef-icon>grain</chef-icon>{{ service.release }}</div>
           <div class ="service-line">
-            <chef-icon class="{{ service.health_check }}">{{ healthStatusIcon(service) }}</chef-icon>
+            <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
             {{ healthCheckStatus(service) }}
           </div>
         </div>
