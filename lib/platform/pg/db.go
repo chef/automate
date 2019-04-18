@@ -18,6 +18,7 @@ type DBProvider interface {
 type DB interface {
 	CreateDatabase(string) error
 	CreateDatabaseWithOwner(string, string) error
+	AlterDatabaseOwner(string, string) error
 	CreateRole(string) error
 	RemovePassword(string) error
 	GrantAll(string, string) error
@@ -74,6 +75,10 @@ func (s *sqlDB) CreateDatabase(dbname string) error {
 
 func (s *sqlDB) CreateDatabaseWithOwner(dbname string, owner string) error {
 	return s.ExecStatement(CreateDatabaseWithOwnerQuery(dbname, owner))
+}
+
+func (s *sqlDB) AlterDatabaseOwner(dbname string, owner string) error {
+	return s.ExecStatement(AlterDatabaseOwner(dbname, owner))
 }
 
 func (s *sqlDB) CreateRole(role string) error {

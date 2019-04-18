@@ -779,63 +779,10 @@ var _ Operation = &DatabaseDumpOperation{}
 
 // Backup executes a backup operation.
 func (d *DatabaseDumpOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
-	// Make the context isn't dead before we start the operation
-	select {
-	case <-backupCtx.ctx.Done():
-		return backupCtx.ctx.Err()
-	default:
-	}
-
-	progChan <- OperationProgress{
-		Name:     d.String(),
-		Progress: float64(0),
-	}
-
-	objectName := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.sql", d.Name))
-	writer, err := backupCtx.bucket.NewWriter(backupCtx.ctx, objectName)
-	if err != nil {
-		return errors.Wrapf(err, "failed to create writer for %s", objectName)
-	}
-
-	p := pg.DatabaseExporter{
-		Name:        d.Name,
-		User:        d.User,
-		CmdExecutor: d.cmdExecutor,
-		ConnInfo:    backupCtx.pgConnInfo,
-		Stdout:      writer,
-	}
-
-	logrus.WithFields(logrus.Fields{
-		"name":        d.Name,
-		"backup_id":   backupCtx.backupTask.TaskID(),
-		"user":        d.User,
-		"object_name": objectName,
-		"operation":   "database_dump",
-		"action":      "backup",
-	}).Info("Running backup operation")
-
-	// TODO(ssd) 2018-04-16: Pass the progress bar and context
-	// into here.
-	err = p.Export()
-	if err != nil {
-		return writer.Fail(
-			errors.Wrapf(err, "failed to export database for %s", objectName),
-		)
-	}
-
-	err = writer.Close()
-	if err != nil {
-		return errors.Wrapf(err, "failed to commit database dump to %s", objectName)
-	}
-
-	om.WriteFinished(objectName, writer)
-
-	progChan <- OperationProgress{
-		Name:     d.String(),
-		Progress: float64(100),
-	}
-
-	return nil
+	// DatabaseDumpOperation should no longer be used for backing up.
+	// Use DatabaseDumpOperationV2. DatabaseDumpOperation dumped the
+	// roles in the db dump, which was problematic for external pg.
+	return errors.New("deprecated backup operation")
 }
 
 // Restore executes a backup operation.
@@ -875,11 +822,12 @@ func (d *DatabaseDumpOperation) Restore(backupCtx Context, serviceName string, v
 	defer reader.Close()
 
 	p := &pg.DatabaseExporter{
-		Name:        d.Name,
-		User:        d.User,
-		CmdExecutor: d.cmdExecutor,
-		ConnInfo:    backupCtx.pgConnInfo,
-		Stdin:       reader,
+		Name:              d.Name,
+		User:              d.User,
+		DisableRoleCreate: backupCtx.IsExternalPG(),
+		CmdExecutor:       d.cmdExecutor,
+		ConnInfo:          backupCtx.pgConnInfo,
+		Stdin:             reader,
 	}
 
 	if err := p.Import(false); err != nil {
@@ -1129,4 +1077,160 @@ func rsyncListOnlyCmd(src string, matchers []RsyncMatcher) (cmd string, args []s
 	}
 	rsyncCmd = append(rsyncCmd, src)
 	return rsyncCmd[0], rsyncCmd[1:]
+}
+
+// DatabaseDumpOperationV2 represents a database that the service depends on.
+type DatabaseDumpOperationV2 struct {
+	Name        string   `json:"name"`
+	User        string   `json:"user"`
+	ObjectName  []string `json:"storage_key"`
+	cmdExecutor command.Executor
+}
+
+var _ Operation = &DatabaseDumpOperation{}
+
+// Backup executes a backup operation.
+func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
+	// Make the context isn't dead before we start the operation
+	select {
+	case <-backupCtx.ctx.Done():
+		return backupCtx.ctx.Err()
+	default:
+	}
+
+	progChan <- OperationProgress{
+		Name:     d.String(),
+		Progress: float64(0),
+	}
+
+	objectName := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.fc", d.Name))
+	writer, err := backupCtx.bucket.NewWriter(backupCtx.ctx, objectName)
+	if err != nil {
+		return errors.Wrapf(err, "failed to create writer for %s", objectName)
+	}
+
+	p := pg.DatabaseExporter{
+		Name:              d.Name,
+		DisableRoleCreate: backupCtx.IsExternalPG(),
+		CmdExecutor:       d.cmdExecutor,
+		ConnInfo:          backupCtx.pgConnInfo,
+		Stdout:            writer,
+		UseCustomFormat:   true,
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"name":        d.Name,
+		"backup_id":   backupCtx.backupTask.TaskID(),
+		"object_name": objectName,
+		"operation":   "database_dump_v2",
+		"action":      "backup",
+	}).Info("Running backup operation")
+
+	// TODO(ssd) 2018-04-16: Pass the progress bar and context
+	// into here.
+	err = p.Export()
+	if err != nil {
+		return writer.Fail(
+			errors.Wrapf(err, "failed to export database for %s", objectName),
+		)
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return errors.Wrapf(err, "failed to commit database dump to %s", objectName)
+	}
+
+	om.WriteFinished(objectName, writer)
+
+	progChan <- OperationProgress{
+		Name:     d.String(),
+		Progress: float64(100),
+	}
+
+	return nil
+}
+
+// Restore executes a backup operation.
+func (d *DatabaseDumpOperationV2) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
+	// Make the context isn't dead before we start the operation
+	select {
+	case <-backupCtx.ctx.Done():
+		return backupCtx.ctx.Err()
+	default:
+	}
+
+	progChan <- OperationProgress{
+		Name:     d.String(),
+		Progress: float64(0),
+	}
+
+	objectName := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.fc", d.Name))
+
+	logrus.WithFields(logrus.Fields{
+		"name":        d.Name,
+		"backup_id":   backupCtx.backupTask.TaskID(),
+		"restore_id":  backupCtx.restoreTask.TaskID(),
+		"object_name": objectName,
+		"operation":   "database_dump_v2",
+		"action":      "restore",
+	}).Info("Running backup operation")
+
+	if err := verifier.ObjectValid(objectName); err != nil {
+		return err
+	}
+
+	reader, err := backupCtx.bucket.NewReader(backupCtx.ctx, objectName, verifier)
+	if err != nil {
+		return errors.Wrapf(err, "could not open object with name %s", objectName)
+	}
+	defer reader.Close()
+
+	p := &pg.DatabaseExporter{
+		Name:              d.Name,
+		DisableRoleCreate: true,
+		CmdExecutor:       d.cmdExecutor,
+		ConnInfo:          backupCtx.pgConnInfo,
+		Stdin:             reader,
+		UseCustomFormat:   true,
+	}
+
+	if err := p.Import(false); err != nil {
+		return errors.Wrapf(err, "failed to import database dump from %s", objectName)
+	}
+
+	progChan <- OperationProgress{
+		Name:     d.String(),
+		Progress: float64(100),
+	}
+
+	return nil
+}
+
+func (d *DatabaseDumpOperationV2) Delete(backupCtx Context) error {
+	select {
+	case <-backupCtx.ctx.Done():
+		return backupCtx.ctx.Err()
+	default:
+	}
+
+	objectPath := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.fc", d.Name))
+
+	logrus.WithFields(logrus.Fields{
+		"name":        d.Name,
+		"backup_id":   backupCtx.backupTask.TaskID(),
+		"object_path": objectPath,
+		"operation":   "database_dump_v2",
+		"action":      "delete",
+	}).Info("Running backup operation")
+
+	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objectPath}); err != nil {
+		return errors.Wrapf(err, "failed to delete object %s", objectPath)
+	}
+
+	return nil
+}
+
+// String returns the string representation of the operation
+func (d *DatabaseDumpOperationV2) String() string {
+	return d.Name
 }

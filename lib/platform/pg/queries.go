@@ -25,6 +25,7 @@ END
 $$
 `
 	renameDBQuery        = `ALTER DATABASE %s RENAME TO %s`
+	alterDBOwner         = `ALTER DATABASE %s OWNER TO %s`
 	removePWQuery        = `ALTER ROLE %s WITH PASSWORD NULL`
 	grantAllQuery        = `GRANT ALL ON DATABASE %s TO %s`
 	createExtensionQuery = `CREATE EXTENSION IF NOT EXISTS %s`
@@ -46,6 +47,12 @@ func CreateDatabaseWithOwnerQuery(dbname string, owner string) string {
 	quotedDBname := QuoteIdentifier(dbname)
 	quotedOwner := QuoteIdentifier(owner)
 	return fmt.Sprintf(createDBWithOwnerQuery, quotedDBname, quotedOwner)
+}
+
+func AlterDatabaseOwner(dbname string, owner string) string {
+	quotedDBname := QuoteIdentifier(dbname)
+	quotedOwner := QuoteIdentifier(owner)
+	return fmt.Sprintf(alterDBOwner, quotedDBname, quotedOwner)
 }
 
 func DropDatabaseQuery(dbname string) string {
