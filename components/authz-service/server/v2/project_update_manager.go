@@ -362,18 +362,6 @@ func (manager *ProjectUpdateManager) resetDomainServicesData() {
 	}
 }
 
-func (manager *ProjectUpdateManager) domainServicesComplete() bool {
-	complete := true
-	for _, domainService := range manager.domainServices {
-		if !domainService.complete {
-			complete = false
-			break
-		}
-	}
-
-	return complete
-}
-
 func createProjectUpdateID() (string, error) {
 	uuid, err := uuid.NewV4()
 	if err != nil {
