@@ -211,7 +211,7 @@ func testGetTokensWithUnassignedAndOtherFilter(ctx context.Context, t *testing.T
 	unassignedProj, err := ta.CreateToken(ctx, "id3", "node3", true, []string{})
 	require.NoError(t, err)
 
-	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter, "overlapping"})
+	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectID, "overlapping"})
 
 	expectedToks := []*tokens.Token{match1, match2, unassignedProj}
 	actualToks, err := ta.GetTokens(ctx)
@@ -233,7 +233,7 @@ func testGetTokensWithoutProjectsWithUnassignedFilter(ctx context.Context, t *te
 	unassignedProj, err := ta.CreateToken(ctx, "id3", "node3", true, []string{})
 	require.NoError(t, err)
 
-	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter})
+	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
 
 	expectedToks := []*tokens.Token{unassignedProj}
 	actualToks, err := ta.GetTokens(ctx)
@@ -304,7 +304,7 @@ func testGetTokenNoProjectsUnassignedFilter(ctx context.Context, t *testing.T, t
 	expectedTok, err := ta.CreateToken(ctx, id, "node1", true, []string{})
 	require.NoError(t, err)
 
-	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter})
+	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
 
 	actualTok, err := ta.GetToken(ctx, id)
 	assert.NoError(t, err)
@@ -316,7 +316,7 @@ func testGetTokenNoProjectsUnassignedAndOtherFilter(ctx context.Context, t *test
 	expectedTok, err := ta.CreateToken(ctx, id, "node1", true, []string{})
 	require.NoError(t, err)
 
-	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter, "another-filter"})
+	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectID, "another-filter"})
 
 	actualTok, err := ta.GetToken(ctx, id)
 	assert.NoError(t, err)

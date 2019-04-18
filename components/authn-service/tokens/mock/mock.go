@@ -9,6 +9,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/chef/automate/components/authn-service/constants"
 	pg "github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
@@ -179,7 +180,7 @@ func projectsIntersect(ctx context.Context, token *tokens.Token) bool {
 
 	tokenProjects := token.Projects
 	if len(tokenProjects) == 0 {
-		tokenProjects = []string{"(unassigned)"}
+		tokenProjects = []string{constants.UnassignedProjectID}
 	}
 
 	for _, projectFilter := range projectsFilter {

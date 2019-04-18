@@ -450,7 +450,7 @@ func TestUpdateToken(t *testing.T) {
 			tok.Projects = []string{}
 			insertToken(t, db, tok)
 
-			ctx := insertProjectsIntoNewContext([]string{"overlapping", constants.UnassignedProjectsFilter})
+			ctx := insertProjectsIntoNewContext([]string{"overlapping", constants.UnassignedProjectID})
 			updatedDesc := "THE coolest token on the block!"
 			updatedActive := false
 			updatedProjects := []string{"project-ABC", "project-XYZ"}
@@ -469,7 +469,7 @@ func TestUpdateToken(t *testing.T) {
 			tok.Projects = []string{}
 			insertToken(t, db, tok)
 
-			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter})
+			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
 			updatedDesc := "THE coolest token on the block!"
 			updatedActive := false
 			updatedProjects := []string{"project-ABC", "project-XYZ"}
@@ -589,7 +589,7 @@ func TestDeleteToken(t *testing.T) {
 			insertToken(t, db, tok)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
-			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter, "foo"})
+			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID, "foo"})
 
 			err := store.DeleteToken(ctx, "not-real-token")
 
@@ -600,7 +600,7 @@ func TestDeleteToken(t *testing.T) {
 			insertToken(t, db, tok)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
 				WHERE id=$1`, id))
-			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter})
+			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
 
 			err := store.DeleteToken(ctx, tok.ID)
 			assert.NoError(t, err)
