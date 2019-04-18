@@ -7,12 +7,13 @@ import (
 	"fmt"
 	"time"
 
+	"go.uber.org/zap"
+
 	pg "github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
 	"github.com/chef/automate/lib/tls/certs"
 	uuid "github.com/chef/automate/lib/uuid4"
-	"go.uber.org/zap"
 )
 
 // Config is used for configuring mock adapters
@@ -31,11 +32,10 @@ func (cfg *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger) (tokens.Stora
 
 func (m *mock) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
 	tokensToRet := []*tokens.Token{}
-	for i, tok := range m.tokens {
+	for _, tok := range m.tokens {
 		if projectsIntersect(ctx, tok) {
 			tokensToRet = append(tokensToRet, tok)
 		}
-		i++
 	}
 	return tokensToRet, nil
 }
