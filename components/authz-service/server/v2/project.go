@@ -20,7 +20,6 @@ import (
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 	event "github.com/chef/automate/components/event-service/server"
-	tags "github.com/chef/automate/lib/authz"
 	"github.com/golang/protobuf/ptypes"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
@@ -283,18 +282,22 @@ func fromStorageProject(p *storage.Project) (*api.Project, error) {
 	}, nil
 }
 
+// TODO: Currently there is only collection of conditions in a project, which are called 'Rule'.
+// We need to update this data structure to have projects have collection of rules. The rules have a
+// collection of conditions. The conditions have a 'type' and 'values' (like rules currently do).
+// The rules should have a 'type' either 'node' or 'event'.
 func rulesToProjectRules(rules []engine.Rule) []*api.ProjectRule {
-	pr := make([]*api.Condition, len(rules))
-	for j, r := range rules {
-		pr[j] = &api.Condition{
-			Type:   r.Type,
-			Values: r.Values,
+	conditions := make([]*api.Condition, len(rules))
+	for j, rule := range rules {
+		conditions[j] = &api.Condition{
+			Type:   rule.Type,
+			Values: rule.Values,
 		}
 	}
 	// TODO: The ProjectRule Type needs to be added to the database
 	rule := &api.ProjectRule{
-		Conditions: pr,
-		Type:       tags.RuleTypeNodeTag,
+		Conditions: conditions,
+		Type:       api.ProjectRuleTypes_NODE,
 	}
 	return []*api.ProjectRule{rule}
 }

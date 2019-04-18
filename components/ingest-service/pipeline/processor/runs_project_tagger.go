@@ -78,7 +78,7 @@ func getProjectRulesFromAuthz(ctx context.Context,
 // Only one rule has to be true for the project to match (ORed together).
 func nodeMatchesRules(node backend.Node, rules []*iam_v2.ProjectRule) bool {
 	for _, rule := range rules {
-		if rule.Type == rules_tags.RuleTypeNodeTag && nodeMatchesAllConditions(node, rule.Conditions) {
+		if rule.Type == iam_v2.ProjectRuleTypes_NODE && nodeMatchesAllConditions(node, rule.Conditions) {
 			return true
 		}
 	}

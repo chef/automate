@@ -65,7 +65,8 @@ service Projects {
     // spike (aka keep them out of the gateway for now).
     rpc ListProjectRules(ListProjectRulesReq) returns (ProjectCollectionRulesResp) {};
     rpc GetProjectRules(GetProjectRulesReq) returns (GetProjectRulesResp) {};
-    rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
+    rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (
+        chef.automate.domain.event.api.EventResponse);
     rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
 }
 
@@ -94,8 +95,13 @@ message ProjectRules {
     repeated ProjectRule rules = 2;
 }
 message ProjectRule {
-    string type = 1;
+    ProjectRuleTypes type = 1;
     repeated Condition conditions = 2;
+}
+
+enum ProjectRuleTypes {
+    NODE = 0;
+    EVENT = 1;
 }
 
 // type = "ChefServers"

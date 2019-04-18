@@ -88,7 +88,7 @@ func findMatchingProjects(report *relaxting.ESInSpecReport, projects map[string]
 // Only one rule has to match for the entire project to match (ORed together).
 func reportMatchesRules(report *relaxting.ESInSpecReport, rules []*iam_v2.ProjectRule) bool {
 	for _, rule := range rules {
-		if rule.Type == rules_tags.RuleTypeNodeTag && reportMatchesAllConditions(report, rule.Conditions) {
+		if rule.Type == iam_v2.ProjectRuleTypes_NODE && reportMatchesAllConditions(report, rule.Conditions) {
 			return true
 		}
 	}

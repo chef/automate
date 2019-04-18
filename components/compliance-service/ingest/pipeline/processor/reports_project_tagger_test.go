@@ -38,7 +38,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report:      &relaxting.ESInSpecReport{},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 				},
 			},
 		},
@@ -48,7 +48,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			report:      &relaxting.ESInSpecReport{},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeEventTag,
+					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefEnvironmentsTag,
@@ -68,7 +68,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefEnvironmentsTag,
@@ -86,7 +86,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefEnvironmentsTag,
@@ -105,7 +105,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefEnvironmentsTag,
@@ -132,7 +132,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefEnvironmentsTag,
@@ -154,7 +154,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefEnvironmentsTag,
@@ -174,7 +174,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -192,7 +192,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -210,7 +210,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -228,7 +228,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -248,7 +248,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefServersTag,
@@ -266,7 +266,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefServersTag,
@@ -284,7 +284,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefServersTag,
@@ -302,7 +302,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefServersTag,
@@ -322,7 +322,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -340,7 +340,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -358,7 +358,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -367,7 +367,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					},
 				},
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -385,7 +385,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -403,7 +403,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -425,7 +425,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -443,7 +443,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -461,7 +461,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -480,7 +480,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.RolesTag,
@@ -505,7 +505,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefTagsTag,
@@ -524,7 +524,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefTagsTag,
@@ -543,7 +543,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefTagsTag,
@@ -561,7 +561,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefTagsTag,
@@ -579,7 +579,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefTagsTag,
@@ -597,7 +597,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefTagsTag,
@@ -616,7 +616,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefTagsTag,
@@ -625,7 +625,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					},
 				},
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -644,7 +644,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefTagsTag,
@@ -653,7 +653,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					},
 				},
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -673,7 +673,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyGroupTag,
@@ -691,7 +691,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyGroupTag,
@@ -709,7 +709,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyGroupTag,
@@ -727,7 +727,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyGroupTag,
@@ -746,7 +746,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyGroupTag,
@@ -755,7 +755,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					},
 				},
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -774,7 +774,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyGroupTag,
@@ -783,7 +783,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					},
 				},
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -803,7 +803,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyNameTag,
@@ -821,7 +821,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyNameTag,
@@ -839,7 +839,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyNameTag,
@@ -857,7 +857,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyNameTag,
@@ -876,7 +876,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyNameTag,
@@ -885,7 +885,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					},
 				},
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -904,7 +904,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.PolicyNameTag,
@@ -913,7 +913,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					},
 				},
 				{
-					Type: rules_tags.RuleTypeNodeTag,
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   rules_tags.ChefOrgsTag,
@@ -980,7 +980,7 @@ func TestBundlerMatchProjectRule(t *testing.T) {
 	projectRules[testProjectName] = &iam_v2.ProjectRules{
 		Rules: []*iam_v2.ProjectRule{
 			{
-				Type: rules_tags.RuleTypeNodeTag,
+				Type: iam_v2.ProjectRuleTypes_NODE,
 				Conditions: []*iam_v2.Condition{
 					{
 						Type:   rules_tags.ChefEnvironmentsTag,
@@ -1035,7 +1035,7 @@ func TestBundlerMatchProjectRuleEventRuleType(t *testing.T) {
 	projectRules[testProjectName] = &iam_v2.ProjectRules{
 		Rules: []*iam_v2.ProjectRule{
 			{
-				Type: rules_tags.RuleTypeEventTag,
+				Type: iam_v2.ProjectRuleTypes_EVENT,
 				Conditions: []*iam_v2.Condition{
 					{
 						Type:   rules_tags.ChefEnvironmentsTag,
@@ -1093,7 +1093,7 @@ func TestBundlerWithScanJobReport(t *testing.T) {
 	projectRules[testProjectName] = &iam_v2.ProjectRules{
 		Rules: []*iam_v2.ProjectRule{
 			{
-				Type: rules_tags.RuleTypeNodeTag,
+				Type: iam_v2.ProjectRuleTypes_NODE,
 				Conditions: []*iam_v2.Condition{
 					{
 						Type:   rules_tags.ChefEnvironmentsTag,
