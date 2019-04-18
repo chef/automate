@@ -379,7 +379,26 @@ func TestUpdateToken(t *testing.T) {
 			updatedActive := false
 			updatedProjects := []string{"project-ABC", "project-XYZ"}
 			resp, err := store.UpdateToken(ctx, tok.ID, updatedDesc, updatedActive, updatedProjects)
-			require.NoError(err)
+			assert.NoError(err)
+
+			assert.Equal(tok.ID, resp.ID)
+			assert.Equal(updatedDesc, resp.Description)
+			assert.Equal(updatedActive, resp.Active)
+			assert.Equal(tok.Value, resp.Value)
+			assert.Equal(updatedProjects, resp.Projects)
+			assert.Equal(tok.Created, resp.Created)
+			assert.NotEqual(tok.Updated, resp.Updated)
+		},
+		"token has single project, filter matches exactly": func(t *testing.T) {
+			tok.Projects = []string{"overlapping"}
+			insertToken(t, db, tok)
+
+			ctx := insertProjectsIntoNewContext([]string{"overlapping"})
+			updatedDesc := "THE coolest token on the block!"
+			updatedActive := false
+			updatedProjects := []string{"project-ABC", "project-XYZ"}
+			resp, err := store.UpdateToken(ctx, tok.ID, updatedDesc, updatedActive, updatedProjects)
+			assert.NoError(err)
 
 			assert.Equal(tok.ID, resp.ID)
 			assert.Equal(updatedDesc, resp.Description)
