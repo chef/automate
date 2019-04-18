@@ -42,7 +42,7 @@ func (m *mock) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
 
 func (m *mock) GetTokenIDWithValue(ctx context.Context, value string) (string, error) {
 	for i, t := range m.tokens {
-		if (t.Value == value) && t.Active {
+		if (t.Value == value) && t.Active && projectsIntersect(ctx, t) {
 			return m.tokens[i].ID, nil
 		}
 	}
@@ -51,7 +51,7 @@ func (m *mock) GetTokenIDWithValue(ctx context.Context, value string) (string, e
 
 func (m *mock) GetToken(ctx context.Context, id string) (*tokens.Token, error) {
 	for i, t := range m.tokens {
-		if t.ID == id {
+		if t.ID == id && projectsIntersect(ctx, t) {
 			return m.tokens[i], nil
 		}
 	}

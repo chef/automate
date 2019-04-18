@@ -2,7 +2,6 @@ package token
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"os"
 	"reflect"
@@ -61,34 +60,29 @@ func TestToken(t *testing.T) {
 	//       (any failures in these "setup creates" are triggering a test failure,
 	//       i.e., they're t.Fatal'ing out)-
 	tests := []adapterTestFunc{
-		// testGetTokens,
-		// testGetTokensWithSingleProjectsSingleFilter,
-		// testGetTokensWithMultipleProjectsSingleFilter,
-		// testGetTokensWithMultipleProjectsMultipleFilters,
-		// testGetTokensWithUnassignedAndOtherFilter,
-		// testGetTokensWithoutProjectsWithUnassignedFilter,
-		// testGetToken,
+		testGetTokens,
+		testGetTokensWithSingleProjectsSingleFilter,
+		testGetTokensWithMultipleProjectsSingleFilter,
+		testGetTokensWithMultipleProjectsMultipleFilters,
+		testGetTokensWithUnassignedAndOtherFilter,
+		testGetTokensWithoutProjectsWithUnassignedFilter,
+		testGetToken,
 		testGetTokenWithSingleProjectSingleFilter,
-		// testGetTokenWithMultipleProjectsSingleFilter,
-		// testGetTokenWithMultipleProjectsMultipleFilters,
-		// testGetTokenNoProjectsUnassignedFilter,
-		// testGetTokenNoProjectsUnassignedAndOtherFilter,
-		// testGetTokenIDWithValue,
-		// testGetTokenIDWithValueNotFound,
-		// testCreateToken,
-		// testCreateTokenWithInvalidValueFails,
-		// testCreateTokenWithValue,
-		// testCreateLegacyTokenWithInvalidValueFails,
-		// testCreateLegacyTokenWithValue,
-		// testDeleteToken,
-		// testDeleteTokenWithSingleProjectSingleFilter,
-		// testDeleteTokenWithMultipleProjectsSingleFilter,
-		// testDeleteTokenWithMultipleProjectsMultipleFilters,
-		// testDeleteTokenWithUnassignedAndOtherFilter,
-		testDeleteTokenWithoutProjectsWithUnassignedFilter,
-		// testDeleteTokenNotFound,
-		// testUpdateTokenActiveOnly,
-		// testUpdateTokenNotFound,
+		testGetTokenWithMultipleProjectsSingleFilter,
+		testGetTokenWithMultipleProjectsMultipleFilters,
+		testGetTokenNoProjectsUnassignedFilter,
+		testGetTokenNoProjectsUnassignedAndOtherFilter,
+		testGetTokenIDWithValue,
+		testGetTokenIDWithValueNotFound,
+		testCreateToken,
+		testCreateTokenWithInvalidValueFails,
+		testCreateTokenWithValue,
+		testCreateLegacyTokenWithInvalidValueFails,
+		testCreateLegacyTokenWithValue,
+		testDeleteToken,
+		testDeleteTokenNotFound,
+		testUpdateTokenActiveOnly,
+		testUpdateTokenNotFound,
 	} // Note: if a "not found" case is last, we'll leave a tidy test database
 
 	for adpName, adpCfg := range adapters {
@@ -414,109 +408,6 @@ func testDeleteToken(ctx context.Context, t *testing.T, ta tokens.Storage) {
 	id := "id0"
 	_, err := ta.CreateToken(ctx, id, "node1", true, []string{"project-1"})
 	require.NoError(t, err)
-
-	err = ta.DeleteToken(ctx, id)
-	assert.NoError(t, err)
-
-	_, err = ta.GetToken(ctx, id)
-	assert.Error(t, err)
-	if _, ok := errors.Cause(err).(*tokens.NotFoundError); !ok {
-		t.Errorf("expected not found token error, got err=%v", err)
-	}
-}
-
-func testDeleteTokenWithSingleProjectSingleFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	id := "id0"
-	_, err := ta.CreateToken(ctx, id, "node1", true, []string{"overlapping"})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{"overlapping"})
-
-	err = ta.DeleteToken(ctx, id)
-	assert.NoError(t, err)
-
-	_, err = ta.GetToken(ctx, id)
-	assert.Error(t, err)
-	if _, ok := errors.Cause(err).(*tokens.NotFoundError); !ok {
-		t.Errorf("expected not found token error, got err=%v", err)
-	}
-}
-
-func testDeleteTokenWithMultipleProjectsSingleFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	id := "id0"
-	_, err := ta.CreateToken(ctx, id, "node1", true, []string{"overlapping", "another-project"})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{"overlapping"})
-
-	err = ta.DeleteToken(ctx, id)
-	assert.NoError(t, err)
-
-	_, err = ta.GetToken(ctx, id)
-	assert.Error(t, err)
-	if _, ok := errors.Cause(err).(*tokens.NotFoundError); !ok {
-		t.Errorf("expected not found token error, got err=%v", err)
-	}
-}
-
-func testDeleteTokenWithSingleProjectMultipleFilters(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	id := "id0"
-	_, err := ta.CreateToken(ctx, id, "node1", true, []string{"overlapping"})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{"overlapping", "another-project"})
-
-	err = ta.DeleteToken(ctx, id)
-	assert.NoError(t, err)
-
-	_, err = ta.GetToken(ctx, id)
-	assert.Error(t, err)
-	if _, ok := errors.Cause(err).(*tokens.NotFoundError); !ok {
-		t.Errorf("expected not found token error, got err=%v", err)
-	}
-}
-
-func testDeleteTokenWithMultipleProjectsMultipleFilters(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	id := "id0"
-	_, err := ta.CreateToken(ctx, id, "node1", true, []string{"overlapping", "no-overlap", "more-overlap"})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{"overlapping", "more-overlap"})
-
-	err = ta.DeleteToken(ctx, id)
-	assert.NoError(t, err)
-
-	_, err = ta.GetToken(ctx, id)
-	assert.Error(t, err)
-	if _, ok := errors.Cause(err).(*tokens.NotFoundError); !ok {
-		t.Errorf("expected not found token error, got err=%v", err)
-	}
-}
-
-func testDeleteTokenWithoutProjectsWithUnassignedFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	id := "id0"
-	tk, err := ta.CreateToken(ctx, id, "node1", true, []string{"foo"})
-	require.NoError(t, err)
-
-	fmt.Printf("\nTOKEN: %v\n", tk)
-	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter})
-	fmt.Printf("\nCTX: %s\n", ctx)
-	err = ta.DeleteToken(ctx, id)
-	assert.NoError(t, err)
-
-	_, err = ta.GetToken(ctx, id)
-	assert.Error(t, err)
-	if _, ok := errors.Cause(err).(*tokens.NotFoundError); !ok {
-		t.Errorf("expected not found token error, got err=%v", err)
-	}
-}
-
-func testDeleteTokenWithUnassignedAndOtherFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	id := "id0"
-	_, err := ta.CreateToken(ctx, id, "node1", true, []string{"foo"})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectsFilter, "another-filter"})
 
 	err = ta.DeleteToken(ctx, id)
 	assert.NoError(t, err)
