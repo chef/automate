@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/lib/pq"
 	"go.uber.org/zap"
@@ -83,23 +84,25 @@ func (a *adapter) UpdateToken(ctx context.Context,
 	if projects == nil {
 		projects = []string{}
 	}
+	var row *sql.Row
 	if description != "" {
-		if err := a.db.QueryRowContext(ctx,
-			`UPDATE chef_authn_tokens cat SET active=$2, description=$3, project_ids=$4, updated=NOW() 
+		row = a.db.QueryRowContext(ctx,
+			`UPDATE chef_authn_tokens cat
+			SET active=$2, description=$3, project_ids=$4, updated=NOW() 
 			WHERE id=$1 AND projects_match(cat.project_ids, $5::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, description, pq.Array(projects), pq.Array(projectsFilter)).
-			Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
-			return nil, processSQLError(err, "update token")
-		}
+			id, active, description, pq.Array(projects), pq.Array(projectsFilter))
 	} else {
-		if err := a.db.QueryRowContext(ctx,
-			`UPDATE chef_authn_tokens SET active=$2, project_ids=$3, updated=NOW() WHERE id=$1
+		row = a.db.QueryRowContext(ctx,
+			// TODO: This should be failing a test!
+			`UPDATE chef_authn_tokens
+			SET active=$2, project_ids=$3, updated=NOW()
+			WHERE id=$1
 			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, pq.Array(projects)).
-			Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
-			return nil, processSQLError(err, "update token")
-		}
+			id, active, pq.Array(projects))
+	}
+	if err := row.Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
+		return nil, processSQLError(err, "update token")
 	}
 	return &t, nil
 }
@@ -111,8 +114,9 @@ func (a *adapter) DeleteToken(ctx context.Context, id string) error {
 	}
 
 	res, err := a.db.ExecContext(ctx,
-		`DELETE FROM chef_authn_tokens cat WHERE cat.id=$1
-		AND projects_match(cat.project_ids, $2::TEXT[])`,
+		`DELETE FROM chef_authn_tokens cat
+     WHERE cat.id=$1
+     AND projects_match(cat.project_ids, $2::TEXT[])`,
 		id, pq.Array(projectsFilter))
 	if err != nil {
 		return processSQLError(err, "delete token by id")
@@ -136,9 +140,10 @@ func (a *adapter) GetToken(ctx context.Context, id string) (*tokens.Token, error
 	}
 
 	if err := a.db.QueryRowContext(ctx,
-		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens cat 
-			WHERE cat.id=$1
-			AND projects_match(cat.project_ids, $2::TEXT[])`,
+		`SELECT id, description, value, active, project_ids, created, updated
+     FROM chef_authn_tokens cat 
+		 WHERE cat.id=$1
+		 AND projects_match(cat.project_ids, $2::TEXT[])`,
 		id, pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
 		return nil, processSQLError(err, "select token by id")
@@ -166,7 +171,9 @@ func (a *adapter) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
 
 	ts := []*tokens.Token{}
 	rows, err := a.db.QueryContext(ctx,
-		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens cat WHERE projects_match(cat.project_ids, $1::TEXT[])`,
+		`SELECT id, description, value, active, project_ids, created, updated
+     FROM chef_authn_tokens cat
+     WHERE projects_match(cat.project_ids, $1::TEXT[])`,
 		pq.Array(projectsFilter))
 	if err != nil {
 		return nil, err
