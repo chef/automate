@@ -117,9 +117,7 @@ fi
 # Update to whatever the latest version of hab that got installed is
 hab pkg binlink core/hab --force
 
-set -x
 if [[ ! -f /root/a2-iamv2-enabled ]]; then
-    echo ${iam_version}
     case "${iam_version}" in
     "v2.1")
       chef-automate iam upgrade-to-v2 --beta2.1
@@ -134,7 +132,6 @@ if [[ ! -f /root/a2-iamv2-enabled ]]; then
       ;;
     esac
 fi
-set +x
 
 if [[ "${create_admin_token}" == "true" ]]; then
     if [[ ! -f /root/admin-token.txt ]]; then
