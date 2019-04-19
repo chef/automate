@@ -18,6 +18,7 @@ export class ServicesSidebarComponent implements OnInit {
   @Input() visible: boolean;
   @Output() closeServicesSidebarEvent: EventEmitter<any> = new EventEmitter();
 
+  public selectedHealth: string;
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
 
@@ -36,6 +37,7 @@ export class ServicesSidebarComponent implements OnInit {
   }
 
   public updateServicesFilters(health: string): void {
+    this.selectedHealth = health;
     const servicesFilters: ServicesFilters = {
       service_group_id: this.serviceGroupId,
       health: health

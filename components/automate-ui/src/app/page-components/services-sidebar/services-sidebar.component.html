@@ -13,19 +13,19 @@
         <div class="filter-label">Total</div>
         <chef-icon>group_work</chef-icon><div class="filter-total">30</div>
       </chef-option>
-      <chef-option class="filter critical" value='critical' (click)="updateServicesFilters('CRITICAL')">
+      <chef-option class="filter critical" value='critical' (click)="updateServicesFilters('critical')">
         <div class="filter-label">Critical</div>
         <chef-icon>warning</chef-icon><div class="filter-total">10</div>
       </chef-option>
-      <chef-option class="filter warning" value='warning' (click)="updateServicesFilters('WARNING')">
+      <chef-option class="filter warning" value='warning' (click)="updateServicesFilters('warning')">
         <div class="filter-label">Warning</div>
         <chef-icon>error_outline</chef-icon><div class="filter-total">5</div>
       </chef-option>
-      <chef-option class="filter success" value='success' (click)="updateServicesFilters('OK')">
+      <chef-option class="filter success" value='success' (click)="updateServicesFilters('ok')">
         <div class="filter-label">OK</div>
         <chef-icon>check_circle</chef-icon><div class="filter-total">5</div>
       </chef-option>
-      <chef-option class="filter unknown" value='unknown' (click)="updateServicesFilters('UNKNOWN')">
+      <chef-option class="filter unknown" value='unknown' (click)="updateServicesFilters('unknown')">
         <div class="filter-label">Unknown</div>
         <chef-icon>help</chef-icon><div class="filter-total">10</div>
       </chef-option>
@@ -45,11 +45,9 @@
           </div>
         </div>
       </li>
-      <li class="service-item" *ngIf="(services$ | async)?.length === 0">
-        <div class="no-services">
-          No services available
-        </div>
-      </li>
     </ul>
+    <div class="no-services" *ngIf="(services$ | async)?.length === 0">
+      No available services with <b>{{ selectedHealth }}</b> status
+    </div>
   </chef-side-panel>
 </chef-click-outside>

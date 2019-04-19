@@ -34,14 +34,6 @@
     position: relative;
   }
 
-  .no-services {
-    display: block;
-    padding: 1em;
-    width: 100%;
-    position: relative;
-    text-align: center;
-  }
-
   .service-line {
     display: flex;
     align-items: center;
@@ -72,4 +64,11 @@
       color: $chef-critical;
     }
   }
+}
+
+.no-services {
+  padding-top: 5em;
+  display: block;
+  position: relative;
+  text-align: center;
 }

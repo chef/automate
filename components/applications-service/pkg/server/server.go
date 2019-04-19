@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/chef/automate/api/external/applications"
 	ver_api "github.com/chef/automate/api/external/common/version"
@@ -152,9 +153,9 @@ func (app *ApplicationsServer) GetServicesBySG(
 		}
 	)
 
-	// Adds the health filter if any was specified
+	// Adds the health filter if any was specified and converts the string to be uppercases
 	if len(request.GetHealth()) != 0 {
-		filters["health"] = []string{request.GetHealth()}
+		filters["health"] = []string{strings.ToUpper(request.GetHealth())}
 	}
 
 	// Verify if the service group exists
