@@ -162,14 +162,14 @@ func (manager *Manager) waitingForJobToComplete() {
 	)
 
 	// initial status
-	manager.sendStatusEvent(backend.JobStatus{})
+	manager.updateStatus(backend.JobStatus{})
 
 	jobStatus, err := manager.client.JobStatus(context.Background(), manager.esJobID)
 	if err != nil {
 		logrus.Errorf("Failed to check the running job: %v", err)
 		numberOfConsecutiveFails++
 	} else {
-		manager.sendStatusEvent(jobStatus)
+		manager.updateStatus(jobStatus)
 		isJobComplete = jobStatus.Completed
 	}
 
@@ -187,9 +187,7 @@ func (manager *Manager) waitingForJobToComplete() {
 				return
 			}
 		} else {
-			manager.estimatedEndTimeInSec = jobStatus.EstimatedEndTimeInSec
-			manager.percentageComplete = jobStatus.PercentageComplete
-			manager.sendStatusEvent(jobStatus)
+			manager.updateStatus(jobStatus)
 			numberOfConsecutiveFails = 0
 			isJobComplete = jobStatus.Completed
 		}
@@ -198,6 +196,12 @@ func (manager *Manager) waitingForJobToComplete() {
 	logrus.Debugf("Finished Project rule update with Elasticsearch job ID: %q and projectUpdate ID %q",
 		manager.esJobID, manager.projectUpdateID)
 
+	manager.completeJob()
+}
+
+func (manager *Manager) completeJob() {
+	manager.percentageComplete = 1.0
+	manager.estimatedEndTimeInSec = 0
 	manager.state = notRunningState
 }
 
@@ -234,7 +238,10 @@ func (manager *Manager) sendFailedEvent(msg string, projectUpdateID string) {
 }
 
 // publish a project update status event
-func (manager *Manager) sendStatusEvent(jobStatus backend.JobStatus) {
+func (manager *Manager) updateStatus(jobStatus backend.JobStatus) {
+	manager.estimatedEndTimeInSec = jobStatus.EstimatedEndTimeInSec
+	manager.percentageComplete = jobStatus.PercentageComplete
+
 	event := &automate_event.EventMsg{
 		EventID:   createEventUUID(),
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateStatus},

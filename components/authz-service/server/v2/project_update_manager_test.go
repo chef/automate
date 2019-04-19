@@ -130,6 +130,48 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 	assert.Equal(t, v2.NotRunningState, manager.State())
 }
 
+func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
+	var lastestPublishedEvent *automate_event.EventMsg
+	mockEventServiceClient := automate_event.NewMockEventServiceClient(gomock.NewController(t))
+	mockEventServiceClient.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
+		func(cxt interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
+			lastestPublishedEvent = in.Msg
+			return &automate_event.PublishResponse{}, nil
+		})
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient)
+	assert.Equal(t, v2.NotRunningState, manager.State())
+
+	err := manager.Start()
+	assert.NoError(t, err)
+	assert.Equal(t, v2.RunningState, manager.State())
+
+	eventData := lastestPublishedEvent.Data
+
+	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
+
+	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+		0.0,  // EstimatedTimeCompeleteInSec
+		1.0,  // percentageComplete
+		true, // completed
+		event_ids.InfraClientRunsProducerID)
+
+	manager.ProcessStatusMessage(infraStatusEvent)
+
+	complianceStatusEvent := createStatusEventMsg(
+		projectUpdateIDTag, // projectUpdateID not matching current
+		0.0,                // EstimatedTimeCompeleteInSec
+		1.0,                // percentageComplete
+		true,               // completed
+		event_ids.ComplianceInspecReportProducerID)
+
+	manager.ProcessStatusMessage(complianceStatusEvent)
+
+	assert.Equal(t, v2.NotRunningState, manager.State())
+
+	manager.Cancel()
+	assert.NotEqual(t, automate_event_type.ProjectRulesCancelUpdate, lastestPublishedEvent.Type.Name)
+}
+
 func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T) {
 	var lastestPublishedEvent *automate_event.EventMsg
 	mockEventServiceClient := automate_event.NewMockEventServiceClient(gomock.NewController(t))

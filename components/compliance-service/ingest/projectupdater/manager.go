@@ -211,6 +211,12 @@ func (manager *Manager) waitingForJobToComplete() {
 
 	logrus.Debugf("Finished Project rule update")
 
+	manager.completeJob()
+}
+
+func (manager *Manager) completeJob() {
+	manager.percentageComplete = 1.0
+	manager.estimatedEndTimeInSec = 0
 	manager.state = notRunningState
 }
 
