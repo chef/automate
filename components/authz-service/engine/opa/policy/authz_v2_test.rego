@@ -214,8 +214,14 @@ test_authorized_project_matches_some_multiple_input_projects {
 
 test_authorized_project_returns_none_when_projects_do_not_match {
 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
-		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p1", "p2"]}}}
-		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p3"]}
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p2"]},
+				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p3"]},
+			},
+		 }
+		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p4"]}	
 
 	actual_projects == set()
 }
@@ -264,16 +270,22 @@ test_authorized_project_real_data {
 		"statements": {
 			"sid1": {"effect": "allow", "actions": ["infra:*:list"], "resources": ["*"], "projects": ["project-p1", "project-p2"]},
 			"sid2": {"effect": "allow", "actions": ["infra:ingest:create"], "resources": ["*"], "projects": ["project-p3"]},
-		},
-	}
-		 with input as {"subjects": ["team:local:viewers"], "action": "infra:ingest:create", "resource": "infra:nodes:52", "projects": ["project-p3"]}
+		 },
+	  }
+		with input as {"subjects": ["team:local:viewers"], "action": "infra:ingest:create", "resource": "infra:nodes:52", "projects": ["project-p3"]}
 
 	actual_projects == {"project-p3"}
 }
 
 test_authorized_project_denies_single_input_project {
 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
-		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p2"]}}}
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1"]},
+				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p2"]},
+			},
+		 }
 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1"]}
 
 	actual_projects == set()
@@ -281,62 +293,70 @@ test_authorized_project_denies_single_input_project {
 
 test_authorized_project_denies_multiple_input_projects {
 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
-		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p2", "p3"]}}}
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p2", "p3"]},
+				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p4"]},
+			},
+		 }
 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3"]}
 
 	actual_projects == set()
 }
 
-test_authorized_project_denies_some_multiple_input_projects {
-	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
-		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p3"]}}}
-		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3", "p5"]}
-
-	actual_projects == set()
-}
-
-test_authorized_project_returns_none_when_denied_project_does_not_match {
-	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
-		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p2"]}}}
-		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p3"]}
-
-	actual_projects == set()
-}
-
-test_authorized_project_denies_when_filter_list_is_empty {
-	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
-		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p2"]}}}
-		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": []}
-
-	actual_projects == set()
-}
-
-test_authorized_project_denies_when_filter_criteria_is_omitted_entirely {
-	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
-		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p2"]}}}
-		 with input as {"subjects": ["x"], "action": "y", "resource": "z"}
-
-	actual_projects == set()
-}
-
-test_authorized_project_denies_if_wildcard_policy_present {
-	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
-		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]}}}
-		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3"]}
-
-	actual_projects == set()
-}
-
-test_authorized_project_denies_projects_mixed_with_wildcard {
+test_authorized_project_denies_some_multiple_input_projects {	
 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
 		 with data.policies.polid as {
 			"members": ["x"],
 			"statements": {
 				"sid-1": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p3"]},
-				"sid-2": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]},
+				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p4"]},
 			},
-		}
-		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3", "p5"]}
+		 }
+		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3", "p5"]}	
+
+ 	actual_projects == set()	
+}	
+
+ test_authorized_project_returns_only_allowed_project_when_filter_list_is_empty {	
+	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1"]},
+				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p2"]},
+			},
+		 }
+		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": []}	
+
+ 	actual_projects == {"p2"}	
+}	
+
+ test_authorized_project_returns_only_allowed_project_when_filter_criteria_is_omitted_entirely {	
+	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1"]},
+				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p2"]},
+			},
+		 }
+		 with input as {"subjects": ["x"], "action": "y", "resource": "z"}	
+
+ 	actual_projects == {"p2"}	
+}
+
+test_authorized_project_denies_if_wildcard_policy_present {
+	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]},
+				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p2"]},
+			},
+		 }
+		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3"]}
 
 	actual_projects == set()
 }
@@ -355,15 +375,15 @@ test_authorized_project_matches_some_projects_mixed_with_allow_and_deny {
 	actual_projects == {"p1", "p3"}
 }
 
-test_authorized_project_deny_real_data {
-	actual_projects = authorized_project with data.policies.polid as {
-		"members": ["team:local:viewers"],
-		"statements": {
-			"sid1": {"effect": "deny", "actions": ["infra:*:list"], "resources": ["*"], "projects": ["project-p1", "project-p2"]},
-			"sid2": {"effect": "deny", "actions": ["infra:ingest:create"], "resources": ["*"], "projects": ["project-p3"]},
-		},
-	}
-		 with input as {"subjects": ["team:local:viewers"], "action": "infra:ingest:create", "resource": "infra:nodes:52", "projects": ["project-p3"]}
+test_authorized_project_deny_real_data {	
+	actual_projects = authorized_project with data.policies.polid as {	
+		"members": ["team:local:viewers"],	
+		"statements": {	
+			"sid1": {"effect": "allow", "actions": ["infra:*:list"], "resources": ["*"], "projects": ["project-p1", "project-p2"]},	
+			"sid2": {"effect": "deny", "actions": ["infra:ingest:create"], "resources": ["*"], "projects": ["project-p3"]},	
+		},	
+	}	
+		 with input as {"subjects": ["team:local:viewers"], "action": "infra:ingest:create", "resource": "infra:nodes:52", "projects": ["project-p3"]}	
 
-	actual_projects == set()
-}
+ 	actual_projects == set()	
+}	
