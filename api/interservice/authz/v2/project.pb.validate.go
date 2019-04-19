@@ -844,6 +844,140 @@ var _ interface {
 	ErrorName() string
 } = DeleteProjectRespValidationError{}
 
+// Validate checks the field values on ProjectUpdateCancelReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ProjectUpdateCancelReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ProjectUpdateCancelReqValidationError is the validation error returned by
+// ProjectUpdateCancelReq.Validate if the designated constraints aren't met.
+type ProjectUpdateCancelReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ProjectUpdateCancelReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ProjectUpdateCancelReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ProjectUpdateCancelReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ProjectUpdateCancelReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ProjectUpdateCancelReqValidationError) ErrorName() string {
+	return "ProjectUpdateCancelReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ProjectUpdateCancelReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sProjectUpdateCancelReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ProjectUpdateCancelReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ProjectUpdateCancelReqValidationError{}
+
+// Validate checks the field values on ProjectUpdateCancelResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ProjectUpdateCancelResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ProjectUpdateCancelRespValidationError is the validation error returned by
+// ProjectUpdateCancelResp.Validate if the designated constraints aren't met.
+type ProjectUpdateCancelRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ProjectUpdateCancelRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ProjectUpdateCancelRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ProjectUpdateCancelRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ProjectUpdateCancelRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ProjectUpdateCancelRespValidationError) ErrorName() string {
+	return "ProjectUpdateCancelRespValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ProjectUpdateCancelRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sProjectUpdateCancelResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ProjectUpdateCancelRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ProjectUpdateCancelRespValidationError{}
+
 // Validate checks the field values on ProjectUpdateStatusReq with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
