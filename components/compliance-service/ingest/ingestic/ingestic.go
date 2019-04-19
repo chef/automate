@@ -467,11 +467,7 @@ func (backend *ESClient) JobCancel(ctx context.Context, jobID string) error {
 	_, err := elastic.NewTasksCancelService(backend.client).
 		TaskId(jobID).
 		Do(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (JobStatus, error) {

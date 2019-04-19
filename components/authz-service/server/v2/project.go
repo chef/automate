@@ -170,7 +170,7 @@ func (s *state) ProjectUpdateCancel(ctx context.Context,
 	req *api.ProjectUpdateStatusReq) (*api.ProjectUpdateCancelResp, error) {
 	err := s.projectUpdateManager.Cancel()
 	if err != nil {
-		log.Errorf("Could not Cancel Project Update")
+		log.Errorf("Could not cancel project update: %v", err.Error())
 	}
 	return &api.ProjectUpdateCancelResp{}, nil
 }

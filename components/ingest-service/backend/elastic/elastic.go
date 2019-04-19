@@ -68,11 +68,7 @@ func (es *Backend) JobCancel(ctx context.Context, jobID string) error {
 	_, err := elastic.NewTasksCancelService(es.client).
 		TaskId(jobID).
 		Do(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // Adds data to specified index, which will have timeseries string added to the end of it

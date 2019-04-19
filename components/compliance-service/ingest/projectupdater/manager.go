@@ -65,7 +65,7 @@ func (manager *Manager) Cancel(projectUpdateID string) {
 			for _, esJobID := range manager.esJobIDs {
 				err := manager.client.JobCancel(context.Background(), esJobID)
 				if err != nil {
-					logrus.Errorf("Failed to canceled Elasticsearch task. "+
+					logrus.Errorf("Failed to cancel Elasticsearch task. "+
 						" Elasticsearch Task ID %q; projectUpdateID: %q", esJobID, projectUpdateID)
 				}
 			}
