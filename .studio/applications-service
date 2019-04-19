@@ -156,81 +156,83 @@ document "applications_populate_database" <<DOC
   Populates the database by publishing messages to power the mockups.
 DOC
 function applications_populate_database() {
+  install_if_missing core/util-linux uuidgen
+
   for i in $(seq 1 12); do
     applications_publish_supervisor_message --name nginx --group "kansas-prod"\
       --origin custom --version "1.0.1" --release "20190115184823" --health 2\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
 
   for i in $(seq 1 11); do
     applications_publish_supervisor_message --name "billing-svc" --group "kansas-prod"\
       --origin custom --version "1.3.4" --release "20190115182382" --health 2\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
 
   # 40 Critical
   for i in $(seq 1 40); do
     applications_publish_supervisor_message --name nginx --group dev\
       --origin custom --version "2.0.0" --release "20190115189976" --health 2\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
   # 10 OK
   for i in $(seq 41 50); do
     applications_publish_supervisor_message --name nginx --group dev\
       --origin custom --version "2.0.0" --release "20190115189976" --health 0\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
 
   # 40 Critical
   for i in $(seq 1 40); do
     applications_publish_supervisor_message --name redis --group default\
       --origin custom --version "1.0.1" --release "20190115189830" --health 2\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
   # 10 OK
   for i in $(seq 41 50); do
     applications_publish_supervisor_message --name redis --group default\
       --origin custom --version "1.0.1" --release "20190115189830" --health 0\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
 
   # Sample-app
   for i in $(seq 1 3); do
     applications_publish_supervisor_message --name "sample-app" --group "default"\
       --origin custom --version "0.0.1" --release "20190115184890" --health 0\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
   for i in $(seq 4 5); do
     applications_publish_supervisor_message --name "sample-app" --group "default"\
       --origin custom --version "0.0.1" --release "20190115184890" --health 1\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
 
   for i in $(seq 1 4); do
     applications_publish_supervisor_message --name "sample-app" --group "test"\
       --origin custom --version "0.0.1" --release "20190115184823" --health 0\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
   applications_publish_supervisor_message --name "sample-app" --group "test"\
     --origin custom --version "0.0.1" --release "20190115184823" --health 1\
-    --sup-id "sup5"
+    --sup-id "$(uuidgen)"
 
   # Acceptance Unknown
   applications_publish_supervisor_message --name "sample-app" --group "acceptance"\
-    --origin custom --version "0.0.1" --health 3 --status 2 --sup-id "sup1"
+    --origin custom --version "0.0.1" --health 3 --status 2 --sup-id "$(uuidgen)"
 
   # postgres.japan-prod
   for i in $(seq 1 120); do
     applications_publish_supervisor_message --name "postgres" --group "japan-prod"\
       --origin custom --version "2.3" --release "20190115184823" --health 0\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
 
   # postgres.us-west1-prod (different supervisors than the postgres db above)
   for i in $(seq 121 130); do
     applications_publish_supervisor_message --name "postgres" --group "us-west1-prod"\
       --origin custom --version "1.9.2" --release "20190115181111" --health 0\
-      --sup-id "sup$i"
+      --sup-id "$(uuidgen)"
   done
 }
 

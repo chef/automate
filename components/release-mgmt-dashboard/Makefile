@@ -3,7 +3,7 @@ DNS_SUFFIX?=dev
 
 build: print-version-info install
 	ng --version
-	ng build --prod --env=$(NG_ENV)
+	ng build --prod --configuration=$(NG_ENV)
 
 install:
 	npm install

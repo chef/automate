@@ -1593,6 +1593,7 @@
     "github.com/stretchr/testify/suite",
     "github.com/teambition/rrule-go",
     "github.com/uber/jaeger-client-go/config",
+    "go.uber.org/atomic",
     "go.uber.org/multierr",
     "go.uber.org/zap",
     "go.uber.org/zap/zapcore",

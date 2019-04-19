@@ -154,7 +154,7 @@ func supervisorFromHabEvent(event *applications.HabService) *supervisor {
 	return &supervisor{
 		MemberID: event.GetSupervisorId(),
 		// TODO: figure out how habitat will provide this information
-		//Fqdn:     event.GetFqdn(),
+		Fqdn: event.GetFqdn(),
 	}
 }
 

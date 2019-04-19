@@ -64,6 +64,13 @@ func (es *Backend) JobStatus(ctx context.Context, jobID string) (backend.JobStat
 	}, nil
 }
 
+func (es *Backend) JobCancel(ctx context.Context, jobID string) error {
+	_, err := elastic.NewTasksCancelService(es.client).
+		TaskId(jobID).
+		Do(ctx)
+	return err
+}
+
 // Adds data to specified index, which will have timeseries string added to the end of it
 // Allows elasticsearch generate a flake ID for the document.
 func (es *Backend) addDataToTimeseriesIndex(ctx context.Context,

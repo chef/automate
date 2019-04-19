@@ -71,6 +71,8 @@ type Client interface {
 	UpdateNodeProjectTags(context.Context, map[string]*iam_v2.ProjectRules) (string, error)
 	// @param (context, jobID)
 	JobStatus(context.Context, string) (JobStatus, error)
+	// @param (context, jobID)
+	JobCancel(context.Context, string) error
 
 	// Migration contracts
 	ReindexInsightstoConvergeHistory(context.Context, string, string) error

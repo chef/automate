@@ -281,15 +281,11 @@ func createA1VersionManifest() error {
 	// sanity-check
 	f, err := os.Create("/opt/delivery/.created-by-a2-self-test")
 	if err != nil {
+		thPrintf("error creating directory: %v\n", err)
 		return err
 	}
 	err = f.Close()
 	if err != nil {
-		return err
-	}
-
-	if err != nil {
-		thPrintf("error creating directory: %v\n", err)
 		return err
 	}
 

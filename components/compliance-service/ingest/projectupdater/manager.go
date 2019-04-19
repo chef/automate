@@ -30,7 +30,7 @@ const (
 type Manager struct {
 	state                 string
 	projectUpdateID       string
-	esJobID               string
+	esJobIDs              []string
 	percentageComplete    float32
 	estimatedEndTimeInSec int64
 	client                *ingestic.ESClient
@@ -53,20 +53,49 @@ func NewManager(client *ingestic.ESClient, authzProjectsClient iam_v2.ProjectsCl
 	}
 }
 
+func (manager *Manager) Cancel(projectUpdateID string) {
+	switch manager.state {
+	case notRunningState:
+		// do nothing job is not running
+	case runningState:
+		if manager.projectUpdateID == projectUpdateID {
+			logrus.Debugf("Cancelling project tag update for ID %q elasticsearch task ID %v",
+				manager.projectUpdateID, manager.esJobIDs)
+
+			for _, esJobID := range manager.esJobIDs {
+				err := manager.client.JobCancel(context.Background(), esJobID)
+				if err != nil {
+					logrus.Errorf("Failed to cancel Elasticsearch task. "+
+						" Elasticsearch Task ID %q; projectUpdateID: %q", esJobID, projectUpdateID)
+				}
+			}
+		} else {
+			// do nothing because the requested project update job is not running
+		}
+	default:
+		// error state not found
+		manager.sendFailedEvent(fmt.Sprintf(
+			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID),
+			projectUpdateID)
+	}
+}
+
 // Start - start a project update
 func (manager *Manager) Start(projectUpdateID string) {
 	switch manager.state {
 	case notRunningState:
 		// Start elasticsearch update job async and return the job ID
-		esJobID, err := manager.startProjectTagUpdater()
+		esJobIDs, err := manager.startProjectTagUpdater()
 		if err != nil {
-			logrus.Errorf("Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID)
-			manager.sendFaildEvent(fmt.Sprintf(
+			logrus.Errorf("Failed to start Elasticsearch Project rule update job projectUpdateID: %q",
+				projectUpdateID)
+			manager.sendFailedEvent(fmt.Sprintf(
 				"Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID),
 				projectUpdateID)
 			return
 		}
-		manager.esJobID = esJobID // Store the job ID and event ID
+		manager.esJobIDs = esJobIDs
+
 		manager.projectUpdateID = projectUpdateID
 		manager.state = runningState
 		go manager.waitingForJobToComplete()
@@ -74,13 +103,13 @@ func (manager *Manager) Start(projectUpdateID string) {
 		if manager.projectUpdateID == projectUpdateID {
 			//  Do nothing. The job has ready started
 		} else {
-			manager.sendFaildEvent(fmt.Sprintf(
+			manager.sendFailedEvent(fmt.Sprintf(
 				"Can not start another project update %q is running", manager.projectUpdateID),
 				projectUpdateID)
 		}
 	default:
 		// error state not found
-		manager.sendFaildEvent(fmt.Sprintf(
+		manager.sendFailedEvent(fmt.Sprintf(
 			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID),
 			projectUpdateID)
 	}
@@ -117,74 +146,115 @@ func (manager *Manager) State() string {
 
 // This is grabbing the latest project rules from the authz-service and kicking off the update
 // process in elasticsearch.
-func (manager *Manager) startProjectTagUpdater() (string, error) {
+func (manager *Manager) startProjectTagUpdater() ([]string, error) {
 	logrus.Debug("starting project updater")
 	ctx := context.Background()
 
 	projectCollectionRulesResp, err := manager.authzProjectsClient.ListProjectRules(ctx,
 		&iam_v2.ListProjectRulesReq{})
 	if err != nil {
-		return "", errors.Wrap(err, "Failed to get authz project rules")
+		return []string{}, errors.Wrap(err, "Failed to get authz project rules")
 	}
 
-	esJobID, err := manager.client.UpdateReportProjectsTags(ctx, projectCollectionRulesResp.ProjectRules)
+	esReportJobID, err := manager.client.UpdateReportProjectsTags(ctx,
+		projectCollectionRulesResp.ProjectRules)
 	if err != nil {
-		return "", errors.Wrap(err, "Failed to start Elasticsearch Node project tags update")
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Node project tags update")
 	}
 
-	logrus.Debugf("Started Project rule update with job ID: %q", esJobID)
+	esSummaryJobID, err := manager.client.UpdateSummaryProjectsTags(ctx,
+		projectCollectionRulesResp.ProjectRules)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Node project tags update")
+	}
 
-	return esJobID, nil
+	logrus.Debugf("Started Project rule updates with report job ID: %q and summary job ID %q",
+		esReportJobID, esSummaryJobID)
+
+	return []string{esReportJobID, esSummaryJobID}, nil
 }
 
 func (manager *Manager) waitingForJobToComplete() {
-	var (
-		isJobComplete            = false
-		numberOfConsecutiveFails = 0
-	)
+	numberOfConsecutiveFails := 0
+	mergedJobStatus := ingestic.JobStatus{
+		Completed: false,
+	}
 
 	// initial status
-	manager.sendStatusEvent(ingestic.JobStatus{})
+	manager.updateStatus(ingestic.JobStatus{})
 
-	jobStatus, err := manager.client.JobStatus(context.Background(), manager.esJobID)
+	jobStatuses, err := manager.collectJobStatus()
 	if err != nil {
 		logrus.Errorf("Failed to check the running job: %v", err)
 		numberOfConsecutiveFails++
 	} else {
-		manager.sendStatusEvent(jobStatus)
-		isJobComplete = jobStatus.Completed
+		mergedJobStatus = MergeJobStatus(jobStatuses)
+		manager.updateStatus(mergedJobStatus)
 	}
 
-	for !isJobComplete {
+	for !mergedJobStatus.Completed {
 		time.Sleep(time.Millisecond * sleepTimeBetweenStatusChecksMilliSec)
-		jobStatus, err = manager.client.JobStatus(context.Background(), manager.esJobID)
+		jobStatuses, err = manager.collectJobStatus()
 		if err != nil {
 			logrus.Errorf("Failed to check the running job: %v", err)
 			numberOfConsecutiveFails++
 			if numberOfConsecutiveFails > maxNumberOfConsecutiveFails {
-				logrus.Errorf("Failed to check Elasticsearch job %q %d times",
-					manager.esJobID, numberOfConsecutiveFails)
-				manager.sendFaildEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times",
-					manager.esJobID, numberOfConsecutiveFails), manager.projectUpdateID)
+				manager.sendFailedEvent(err.Error(), manager.projectUpdateID)
 				return
 			}
 		} else {
-			manager.estimatedEndTimeInSec = jobStatus.EstimatedEndTimeInSec
-			manager.percentageComplete = jobStatus.PercentageComplete
-			manager.sendStatusEvent(jobStatus)
+			mergedJobStatus = MergeJobStatus(jobStatuses)
+			manager.updateStatus(mergedJobStatus)
 			numberOfConsecutiveFails = 0
-			isJobComplete = jobStatus.Completed
 		}
 	}
 
-	logrus.Debugf("Finished Project rule update with Elasticsearch job ID: %q and projectUpdate ID %q",
-		manager.esJobID, manager.projectUpdateID)
+	logrus.Debugf("Finished Project rule update")
 
+	manager.completeJob()
+}
+
+func (manager *Manager) completeJob() {
+	manager.percentageComplete = 1.0
+	manager.estimatedEndTimeInSec = 0
 	manager.state = notRunningState
 }
 
+func (manager *Manager) collectJobStatus() ([]ingestic.JobStatus, error) {
+	jobStatuses := make([]ingestic.JobStatus, len(manager.esJobIDs))
+	for index, esJobID := range manager.esJobIDs {
+		jobStatus, err := manager.client.JobStatus(context.Background(), esJobID)
+		if err != nil {
+			return jobStatuses, err
+		}
+
+		jobStatuses[index] = jobStatus
+	}
+
+	return jobStatuses, nil
+}
+
+// MergeJobStatus - combine multiple jobStatus objects into one
+func MergeJobStatus(jobStatuses []ingestic.JobStatus) ingestic.JobStatus {
+	combinedJobStatus := ingestic.JobStatus{
+		Completed:          true,
+		PercentageComplete: 1.0,
+	}
+	for _, jobStatus := range jobStatuses {
+		if !jobStatus.Completed {
+			combinedJobStatus.Completed = false
+			if jobStatus.EstimatedEndTimeInSec > combinedJobStatus.EstimatedEndTimeInSec {
+				combinedJobStatus.EstimatedEndTimeInSec = jobStatus.EstimatedEndTimeInSec
+				combinedJobStatus.PercentageComplete = jobStatus.PercentageComplete
+			}
+		}
+	}
+
+	return combinedJobStatus
+}
+
 // publish a project update failed event
-func (manager *Manager) sendFaildEvent(msg string, projectUpdateID string) {
+func (manager *Manager) sendFailedEvent(msg string, projectUpdateID string) {
 	event := &automate_event.EventMsg{
 		EventID:   createEventUUID(),
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateFailed},
@@ -216,7 +286,10 @@ func (manager *Manager) sendFaildEvent(msg string, projectUpdateID string) {
 }
 
 // publish a project update status event
-func (manager *Manager) sendStatusEvent(jobStatus ingestic.JobStatus) {
+func (manager *Manager) updateStatus(jobStatus ingestic.JobStatus) {
+	manager.estimatedEndTimeInSec = jobStatus.EstimatedEndTimeInSec
+	manager.percentageComplete = jobStatus.PercentageComplete
+
 	event := &automate_event.EventMsg{
 		EventID:   createEventUUID(),
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateStatus},

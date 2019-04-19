@@ -43,9 +43,6 @@ func generateAdminToken(ctx context.Context,
 	defer authnConnection.Close() // nolint: errcheck
 
 	authnClient := authn.NewTokensMgmtClient(authnConnection)
-	if err != nil {
-		return nil, errors.Wrap(err, "initialize AuthN client")
-	}
 
 	authzConnection, err := connFactory.DialContext(
 		ctx,

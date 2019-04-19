@@ -328,9 +328,6 @@ func (db *DB) UpdateOrInsertInstanceSourceStateInDb(instance InstanceState, mgrI
 		if err != nil {
 			return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to update instance %s", instance.ID)
 		}
-		if err != nil {
-			return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to determine rows updated %s", instance.ID)
-		}
 		return isRowsUpdated(pgResult)
 	case "running":
 		pgResult, err := db.Exec(sqlUpsertInstanceSourceState, uuid, name, instance.ID, instanceState, instance.Region, sourceAcctID, tcByte, nowTime, mgrType)

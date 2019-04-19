@@ -113,7 +113,7 @@ For more information, please contact your Chef account representative.
 * **FIPS:** Chef Automate 2 cannot currently operate in FIPS mode
 * **Disaster Recovery:** Chef Automate 2 cannot currently operate in a primary/standby mode
 * **Custom Kibana dashboards:** Chef Automate 2 does not include Kibana in its technology stack
-* **SAML config migration:** Chef Automate 2 supports SAML integration, however due to configuration incompatibilities Chef Automate 2 cannot migrate Chef Automate 1 SAML settings to Chef Automate 2 as part of the upgrade. After the upgrade is completed, you may follow [these configuration instructions]({{< ref "configuration.md#saml" >}}) to set up SAML.
+* **SAML config migration:** Chef Automate 2 supports SAML integration, however due to configuration incompatibilities Chef Automate 2 cannot migrate Chef Automate 1 SAML settings to Chef Automate 2 as part of the upgrade. After the upgrade is completed, you may follow [these configuration instructions]({{< relref "configuration.md#saml" >}}) to set up SAML.
 
 Should you wish to upgrade to Chef Automate 2 without these features, invoke the upgrade with the appropriate flags:
 
@@ -140,6 +140,7 @@ If you use dedicated disks or partitions for either of these applications in Che
 
 ### Workflow
 
+Follow the instructions in [Upgrade Workflow]{{< relref "workflow_install.md" >}}
 The upgrade process will stop if it detects that you used the Workflow component of Chef Automate 1.
 To use Workflow with Chef Automate 2 specify the `--enable-workflow` option to enable the Workflow component. You can enable the Workflow component after upgrading with `chef-automate deploy --enable-workflow`.
 
@@ -153,10 +154,10 @@ contact your Chef account representative for a Chef Automate 2 license.
 
 ## Upgrade
 
-1. Backup your Chef Automate 1 install, to minimize the amount of data that will need to be backed up while the system is down:
+1. Create a backup your Chef Automate 1 installation:
 
     ```shell
-    workflow-ctl create-backup
+    automate-ctl create-backup
     ```
 
 2. Once the backup has completed, initiate the upgrade process. If your host is internet-connected,

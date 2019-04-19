@@ -115,6 +115,25 @@ func (manager *ProjectUpdateManager) State() string {
 	return manager.state
 }
 
+func (manager *ProjectUpdateManager) Cancel() error {
+	switch manager.state {
+	case NotRunningState:
+		// do nothing job is not running
+	case RunningState:
+		logrus.Debugf("Cancelling project update for ID %q", manager.projectUpdateID)
+		err := manager.cancelProjectUpdateForDomainResources()
+		if err != nil {
+			return err
+		}
+	default:
+		// error state not found
+		return errors.New(fmt.Sprintf(
+			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID))
+	}
+
+	return nil
+}
+
 // Start - start a project update
 func (manager *ProjectUpdateManager) Start() error {
 	switch manager.state {
@@ -269,6 +288,30 @@ func (manager *ProjectUpdateManager) startProjectUpdateForDomainResources(
 	return err
 }
 
+func (manager *ProjectUpdateManager) cancelProjectUpdateForDomainResources() error {
+	eventUUID := createEventUUID()
+
+	event := &automate_event.EventMsg{
+		EventID:   eventUUID,
+		Published: ptypes.TimestampNow(),
+		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesCancelUpdate},
+		Data: &_struct.Struct{
+			Fields: map[string]*_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+					Kind: &_struct.Value_StringValue{
+						StringValue: manager.projectUpdateID,
+					},
+				},
+			},
+		},
+	}
+
+	pubReq := automate_event.PublishRequest{Msg: event}
+	_, err := manager.eventServiceClient.Publish(context.Background(), &pubReq)
+
+	return err
+}
+
 // Watching the domain services complete the update process.
 // A domain service is complete if it fails or sends a complete status.
 //
@@ -317,18 +360,6 @@ func (manager *ProjectUpdateManager) resetDomainServicesData() {
 			complete: false,
 		},
 	}
-}
-
-func (manager *ProjectUpdateManager) domainServicesComplete() bool {
-	complete := true
-	for _, domainService := range manager.domainServices {
-		if !domainService.complete {
-			complete = false
-			break
-		}
-	}
-
-	return complete
 }
 
 func createProjectUpdateID() (string, error) {
