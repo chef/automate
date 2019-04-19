@@ -22,6 +22,7 @@ import (
 	"github.com/pkg/errors"
 
 	es "github.com/chef/automate/api/config/elasticsearch"
+	license_control "github.com/chef/automate/api/config/license_control"
 	global "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/components/automate-deployment/pkg/assets"
@@ -158,9 +159,10 @@ func (c InitConfig) Render() (string, error) {
 // AutomateConfig returns an AutomateConfig with the appropriate
 // fields from an InitConfig filled in
 func (c InitConfig) AutomateConfig() *AutomateConfig {
-	cfg := NewAutomateConfig()
-	cfg.Global.V1.Fqdn = w.String(c.Fqdn)
-	cfg.Global.V1.FrontendTls = []*global.FrontendTLSCredential{
+	// Fill out global config
+	g := global.DefaultGlobalConfig()
+	g.V1.Fqdn = w.String(c.Fqdn)
+	g.V1.FrontendTls = []*global.FrontendTLSCredential{
 		{
 			Cert: c.FrontendCert,
 			Key:  c.FrontendKey,
@@ -168,28 +170,62 @@ func (c InitConfig) AutomateConfig() *AutomateConfig {
 	}
 
 	if c.ProxyHost != "" {
-		cfg.Global.V1.Proxy = &global.Proxy{}
-		cfg.Global.V1.Proxy.Host = w.String(c.ProxyHost)
+		g.V1.Proxy = &global.Proxy{}
+		g.V1.Proxy.Host = w.String(c.ProxyHost)
 		if c.ProxyPort != 0 {
-			cfg.Global.V1.Proxy.Port = w.Int32(c.ProxyPort)
+			g.V1.Proxy.Port = w.Int32(c.ProxyPort)
 		}
 		if c.ProxyUser != "" {
-			cfg.Global.V1.Proxy.User = w.String(c.ProxyUser)
+			g.V1.Proxy.User = w.String(c.ProxyUser)
 		}
 		if c.ProxyPassword != "" {
-			cfg.Global.V1.Proxy.Password = w.String(c.ProxyPassword)
+			g.V1.Proxy.Password = w.String(c.ProxyPassword)
 		}
 		if len(c.NoProxy) > 0 {
-			cfg.Global.V1.Proxy.NoProxy = c.NoProxy
+			g.V1.Proxy.NoProxy = c.NoProxy
 		}
 	}
 
-	cfg.Deployment.V1.Svc.Channel = w.String(c.Channel)
-	cfg.Deployment.V1.Svc.UpgradeStrategy = w.String(c.UpgradeStrategy)
-	cfg.Deployment.V1.Svc.DeploymentType = w.String(c.DeploymentType)
-	cfg.LicenseControl.V1.Svc.License = w.String(c.License)
-	cfg.Elasticsearch.V1.Sys.Runtime.Heapsize = w.String(c.ESHeapSize)
-	return cfg
+	// Fill out automate config
+	cfg := AutomateConfig{}
+	cfg.Global = g
+
+	cfg.SetChannel(c.Channel)
+	cfg.SetUpgradeStrategy(c.UpgradeStrategy)
+
+	cfg.OverrideConfigValues(&AutomateConfig{
+		Deployment: &ConfigRequest{
+			V1: &ConfigRequest_V1{
+				Svc: &ConfigRequest_V1_Service{
+					DeploymentType: w.String(c.DeploymentType),
+				},
+			},
+		},
+	})
+
+	cfg.OverrideConfigValues(&AutomateConfig{
+		LicenseControl: &license_control.ConfigRequest{
+			V1: &license_control.ConfigRequest_V1{
+				Svc: &license_control.ConfigRequest_V1_Service{
+					License: w.String(c.License),
+				},
+			},
+		},
+	})
+
+	cfg.OverrideConfigValues(&AutomateConfig{
+		Elasticsearch: &es.ConfigRequest{
+			V1: &es.ConfigRequest_V1{
+				Sys: &es.ConfigRequest_V1_System{
+					Runtime: &es.ConfigRequest_V1_Runtime{
+						Heapsize: w.String(c.ESHeapSize),
+					},
+				},
+			},
+		},
+	})
+
+	return &cfg
 }
 
 // LbFQDN -- First try executing `hostname -f` and if that fails use ip address.
