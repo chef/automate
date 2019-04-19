@@ -30,6 +30,18 @@ export class ServiceGroupsRequests {
       if (filters.status) {
         params = params.append('filter', 'status' + ':' + filters.status);
       }
+      if (filters.sortField) {
+        params = params.append('sorting.field', filters.sortField);
+      }
+      if (filters.sortDirection) {
+        params = params.append('sorting.order', filters.sortDirection);
+      }
+      if (filters.page) {
+        params = params.append('pagination.page', filters.page.toString());
+      }
+      if (filters.pageSize) {
+        params = params.append('pagination.size', filters.pageSize.toString());
+      }
     }
 
     return params;

@@ -67,8 +67,13 @@
 }
 
 .no-services {
-  padding-top: 5em;
   display: block;
+  padding-top: 5em;
   position: relative;
   text-align: center;
+}
+
+.status-filter-bar {
+  padding-left: 1.8em;
+  padding-right: 1.5em;
 }

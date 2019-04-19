@@ -7,30 +7,35 @@
       </chef-heading>
       <chef-subheading>Services run by each Habitat Supervisor on a node.</chef-subheading>
     </chef-page-header>
-
-    <chef-status-filter-group>
-      <chef-option class="filter general" value="general" (click)="updateServicesFilters('total')">
-        <div class="filter-label">Total</div>
-        <chef-icon>group_work</chef-icon><div class="filter-total">30</div>
-      </chef-option>
-      <chef-option class="filter critical" value='critical' (click)="updateServicesFilters('critical')">
-        <div class="filter-label">Critical</div>
-        <chef-icon>warning</chef-icon><div class="filter-total">10</div>
-      </chef-option>
-      <chef-option class="filter warning" value='warning' (click)="updateServicesFilters('warning')">
-        <div class="filter-label">Warning</div>
-        <chef-icon>error_outline</chef-icon><div class="filter-total">5</div>
-      </chef-option>
-      <chef-option class="filter success" value='success' (click)="updateServicesFilters('ok')">
-        <div class="filter-label">OK</div>
-        <chef-icon>check_circle</chef-icon><div class="filter-total">5</div>
-      </chef-option>
-      <chef-option class="filter unknown" value='unknown' (click)="updateServicesFilters('unknown')">
-        <div class="filter-label">Unknown</div>
-        <chef-icon>help</chef-icon><div class="filter-total">10</div>
-      </chef-option>
-    </chef-status-filter-group>
-
+    <div class="status-filter-bar">
+      <chef-status-filter-group>
+        <chef-option class="lean-filter general" value="general" (click)="updateServicesFilters('total')">
+          <chef-icon>group_work</chef-icon>
+          <div class="lean-filter-label">Total</div>
+          <div class="filter-total">30</div>
+        </chef-option>
+        <chef-option class="lean-filter critical" value='critical' (click)="updateServicesFilters('critical')">
+          <chef-icon>warning</chef-icon>
+          <div class="lean-filter-label">Critical</div>
+          <div class="filter-total">10</div>
+        </chef-option>
+        <chef-option class="lean-filter warning" value='warning' (click)="updateServicesFilters('warning')">
+          <chef-icon>error</chef-icon>
+          <div class="lean-filter-label">Warning</div>
+          <div class="filter-total">5</div>
+        </chef-option>
+        <chef-option class="lean-filter success" value='success' (click)="updateServicesFilters('ok')">
+          <chef-icon>check_circle</chef-icon>
+          <div class="lean-filter-label">OK</div>
+          <div class="filter-total">5</div>
+        </chef-option>
+        <chef-option class="lean-filter unknown" value='unknown' (click)="updateServicesFilters('unknown')">
+          <chef-icon>help</chef-icon>
+          <div class="lean-filter-label">Unknown</div>
+          <div class="filter-total">10</div>
+        </chef-option>
+      </chef-status-filter-group>
+    </div>
     <ul>
       <li class="service-item" *ngFor="let service of services$ | async">
         <div class="header">
