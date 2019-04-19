@@ -215,6 +215,26 @@ func (mr *MockProjectsClientMockRecorder) ProjectUpdateStatus(ctx, in interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockProjectsClient)(nil).ProjectUpdateStatus), varargs...)
 }
 
+// ProjectUpdateCancel mocks base method
+func (m *MockProjectsClient) ProjectUpdateCancel(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateCancelResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ProjectUpdateCancel", varargs...)
+	ret0, _ := ret[0].(*ProjectUpdateCancelResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ProjectUpdateCancel indicates an expected call of ProjectUpdateCancel
+func (mr *MockProjectsClientMockRecorder) ProjectUpdateCancel(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateCancel", reflect.TypeOf((*MockProjectsClient)(nil).ProjectUpdateCancel), varargs...)
+}
+
 // MockProjectsServer is a mock of ProjectsServer interface
 type MockProjectsServer struct {
 	ctrl     *gomock.Controller
@@ -371,4 +391,19 @@ func (m *MockProjectsServer) ProjectUpdateStatus(arg0 context.Context, arg1 *Pro
 func (mr *MockProjectsServerMockRecorder) ProjectUpdateStatus(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockProjectsServer)(nil).ProjectUpdateStatus), arg0, arg1)
+}
+
+// ProjectUpdateCancel mocks base method
+func (m *MockProjectsServer) ProjectUpdateCancel(arg0 context.Context, arg1 *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProjectUpdateCancel", arg0, arg1)
+	ret0, _ := ret[0].(*ProjectUpdateCancelResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ProjectUpdateCancel indicates an expected call of ProjectUpdateCancel
+func (mr *MockProjectsServerMockRecorder) ProjectUpdateCancel(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateCancel", reflect.TypeOf((*MockProjectsServer)(nil).ProjectUpdateCancel), arg0, arg1)
 }

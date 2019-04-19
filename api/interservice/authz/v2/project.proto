@@ -67,7 +67,12 @@ service Projects {
     rpc GetProjectRules(GetProjectRulesReq) returns (GetProjectRulesResp) {};
     rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
     rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
+    rpc ProjectUpdateCancel(ProjectUpdateStatusReq) returns (ProjectUpdateCancelResp);
 }
+
+message ProjectUpdateCancelReq { }
+
+message ProjectUpdateCancelResp { }
 
 message ProjectUpdateStatusReq { }
 
