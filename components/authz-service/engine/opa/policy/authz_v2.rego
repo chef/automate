@@ -64,14 +64,20 @@ has_project[[project, pol_id, statement_id]] {
 	not input.projects
 }
 
+# if the policy statement contains the All Projects ID
+# then we get a match no matter what the request's projects are
 project_matches(_, stored) {
 	stored == "~~ALL-PROJECTS~~"
 }
 
+# if the policy statement contains some project
+# then we match when the request's projects contains that project
 project_matches(in, stored) {
 	stored == in
 }
 
+# if the request's projects are empty
+# then we match regardless of the policy statement's projects
 project_matches(in, _) {
 	count(in) == 0
 }
@@ -97,6 +103,19 @@ allowed_project[project] {
 	has_project[[project, pol_id, statement_id]]
 }
 
+denied_project[project] {
+	match[["deny", pol_id, statement_id]]
+	has_project[[project, pol_id, statement_id]]
+}
+
+denied_all_projects[project] {
+	match[["deny", pol_id, statement_id]]
+	project := policies[pol_id].statements[statement_id].projects[_]
+	project == "~~ALL-PROJECTS~~"
+}
+
 authorized_project[project] {
+	not denied_all_projects[project]
 	allowed_project[project]
+	not denied_project[project]
 }
