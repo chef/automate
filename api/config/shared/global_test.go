@@ -227,7 +227,7 @@ func TestValidate(t *testing.T) {
 		expected := NewInvalidConfigError()
 		expected.AddInvalidValue("global.v1.log.level",
 			"'trace' must be one of 'debug, 'info', 'warning', 'error', 'fatal', 'panic'")
-		assert.EqualError(t, cfgErr, expected.Error(), "")
+		assert.EqualError(t, cfgErr, expected.Error())
 	})
 
 	t.Run("with invalid log format", func(t *testing.T) {
@@ -240,7 +240,7 @@ func TestValidate(t *testing.T) {
 		require.True(t, ok)
 		expected := NewInvalidConfigError()
 		expected.AddInvalidValue("global.v1.log.format", "'xml' must be 'text' or 'json'")
-		assert.EqualError(t, cfgErr, expected.Error(), "")
+		assert.EqualError(t, cfgErr, expected.Error())
 	})
 
 	t.Run("with DefaultGlobalConfig", func(t *testing.T) {
@@ -313,7 +313,7 @@ format = "json"
 		require.True(t, ok)
 		expected := NewInvalidConfigError()
 		expected.AddInvalidValue("global.v1.external.elasticsearch.nodes", "Cannot mix http and https nodes")
-		assert.EqualError(t, cfgErr, expected.Error(), "")
+		assert.EqualError(t, cfgErr, expected.Error())
 	})
 
 	t.Run("with both root_cert and root_cert_file set", func(t *testing.T) {
@@ -337,7 +337,7 @@ format = "json"
 		require.True(t, ok)
 		expected := NewInvalidConfigError()
 		expected.AddInvalidValue("global.v1.external.elasticsearch.ssl", "Specify either global.v1.external.elasticsearch.ssl.root_cert or global.v1.external.elasticsearch.ssl.root_cert_file, but not both.")
-		assert.EqualError(t, cfgErr, expected.Error(), "")
+		assert.EqualError(t, cfgErr, expected.Error())
 	})
 
 	t.Run("with invalid auth scheme for external elasticsearch", func(t *testing.T) {
@@ -360,7 +360,7 @@ format = "json"
 		require.True(t, ok)
 		expected := NewInvalidConfigError()
 		expected.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Scheme should be 'basic_auth'.")
-		assert.EqualError(t, cfgErr, expected.Error(), "")
+		assert.EqualError(t, cfgErr, expected.Error())
 	})
 
 	t.Run("with external elasticsearch basic auth but no username and password set", func(t *testing.T) {
@@ -406,7 +406,7 @@ format = "json"
 		require.True(t, ok)
 		expected := NewInvalidConfigError()
 		expected.AddInvalidValue("global.v1.external.postgresql.auth.scheme", "Scheme should be 'password'.")
-		assert.EqualError(t, cfgErr, expected.Error(), "")
+		assert.EqualError(t, cfgErr, expected.Error())
 	})
 
 	t.Run("with external password auth but no superuser and dbuser username and password set", func(t *testing.T) {

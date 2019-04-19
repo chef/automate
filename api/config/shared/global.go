@@ -188,7 +188,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 		httpsNodes := make([]string, 0)
 		for _, n := range nodes {
 			ns := n.GetValue()
-			if strings.Contains(ns, "https") {
+			if strings.HasPrefix(ns, "https") {
 				httpsNodes = append(httpsNodes, ns)
 			}
 		}
@@ -243,8 +243,8 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 			}
 
 			// dbuser username and password
-			du := auth.GetPassword().GetSuperuser().GetUsername().GetValue()
-			dp := auth.GetPassword().GetSuperuser().GetPassword().GetValue()
+			du := auth.GetPassword().GetDbuser().GetUsername().GetValue()
+			dp := auth.GetPassword().GetDbuser().GetPassword().GetValue()
 			if du == "" {
 				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.dbuser.username")
 			}
