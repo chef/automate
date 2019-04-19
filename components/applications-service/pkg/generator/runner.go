@@ -235,6 +235,11 @@ func (m *MessagePrototype) CreateMessage(uuid string) *applications.HabService {
 	return &applications.HabService{
 		SupervisorId: uuid,
 		Group:        "default",
+		HealthCheck:  applications.HealthStatus_OK,
+		Status:       applications.ServiceStatus_RUNNING,
+		Application:  m.Application,
+		Environment:  m.Environment,
+		Fqdn:         fmt.Sprintf("%s.example", uuid),
 		PkgIdent: &applications.PackageIdent{
 			Origin:  m.Origin,
 			Name:    m.PkgName,
