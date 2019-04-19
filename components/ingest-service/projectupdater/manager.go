@@ -3,7 +3,11 @@ package projectupdater
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"time"
+
+	"encoding/json"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
@@ -23,6 +27,7 @@ const (
 	notRunningState                      = "not_running"
 	sleepTimeBetweenStatusChecksMilliSec = 1000
 	maxNumberOfConsecutiveFails          = 10
+	stateFile                            = "./.project_update_state"
 )
 
 // Manager - project update manager
@@ -44,12 +49,27 @@ type Manager struct {
 // NewManager - create a new project update manager
 func NewManager(client backend.Client, authzProjectsClient iam_v2.ProjectsClient,
 	eventServiceClient automate_event.EventServiceClient) Manager {
-	return Manager{
+	manager := Manager{
 		state:               notRunningState,
 		client:              client,
 		authzProjectsClient: authzProjectsClient,
 		eventServiceClient:  eventServiceClient,
 	}
+	manager.resumePreviousState()
+	return manager
+}
+
+func (manager *Manager) resumePreviousState() {
+	// read file
+	// if file does not exists {
+	// return
+	// }
+	//
+	// if state == runningState {
+	//   state = runningState
+	//   projectUpdateID = projectUpdateID
+	//   esJobID = esJobID
+	// }
 }
 
 // Start - start a project update
@@ -67,7 +87,7 @@ func (manager *Manager) Start(projectUpdateID string) {
 		}
 		manager.esJobID = esJobID // Store the job ID and event ID
 		manager.projectUpdateID = projectUpdateID
-		manager.state = runningState
+		manager.changeState(runningState)
 		go manager.waitingForJobToComplete()
 	case runningState:
 		if manager.projectUpdateID == projectUpdateID {
@@ -179,7 +199,52 @@ func (manager *Manager) waitingForJobToComplete() {
 	logrus.Debugf("Finished Project rule update with Elasticsearch job ID: %q and projectUpdate ID %q",
 		manager.esJobID, manager.projectUpdateID)
 
-	manager.state = notRunningState
+	manager.changeState(notRunningState)
+}
+
+func (manager *Manager) changeState(newState string) {
+	if manager.state != newState {
+		manager.state = newState
+		manager.saveState()
+	}
+}
+
+type persistedState struct {
+	state           string
+	projectUpdateID string
+	esJobID         string
+}
+
+func (manager *Manager) saveState() {
+
+	state := persistedState{
+		state:           manager.state,
+		projectUpdateID: manager.projectUpdateID,
+		esJobID:         manager.esJobID,
+	}
+
+	raw, err := json.Marshal(state)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"error": err,
+			"state": state,
+		}).Error("Error converted state object to json")
+		return
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"project_update_state_file": stateFile,
+	}).Info("Saving Project Update State File")
+
+	// create a file with the permissions of the running user can read/write other can only read.
+	var permissions os.FileMode = 0644
+	err = ioutil.WriteFile(stateFile, raw, permissions)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"error":                     err,
+			"project_update_state_file": stateFile,
+		}).Error("Error writing Project Update State File")
+	}
 }
 
 // publish a project update failed event
