@@ -21,6 +21,7 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 	"github.com/chef/automate/lib/tracing"
 
+	"github.com/chef/automate/components/teams-service/constants"
 	"github.com/chef/automate/components/teams-service/service"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
@@ -220,7 +221,7 @@ func runAllServerTests(
 			})
 			require.NoError(t, err)
 
-			ctx = insertProjectsIntoNewContext([]string{"(unassigned)"})
+			ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
 			list, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
 			require.NoError(t, err)
 			require.NotNil(t, list)
@@ -472,7 +473,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
 
-			ctx = insertProjectsIntoNewContext([]string{"(unassigned)"})
+			ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
 			resp, err2 := cl.DeleteTeam(ctx, &teams.DeleteTeamReq{Id: resp1.Team.Id})
 			require.NoError(t, err2)
 			require.NotNil(t, resp)
@@ -712,7 +713,7 @@ func runAllServerTests(
 				Name:     newName,
 				Projects: []string{"project2", "project3"},
 			}
-			updatedTeamResp, err := cl.UpdateTeam(insertProjectsIntoNewContext([]string{"(unassigned)"}), updateReq)
+			updatedTeamResp, err := cl.UpdateTeam(insertProjectsIntoNewContext([]string{constants.UnassignedProjectID}), updateReq)
 			require.NoError(t, err, "update team")
 			require.NotNil(t, resp)
 			assert.Equal(t, updateReq.Id, updatedTeamResp.Team.Id)
@@ -966,7 +967,7 @@ func runAllServerTests(
 					}
 
 					// act
-					resp2, err := cl.AddTeamMembers(insertProjectsIntoNewContext([]string{"(unassigned)"}), addReq)
+					resp2, err := cl.AddTeamMembers(insertProjectsIntoNewContext([]string{constants.UnassignedProjectID}), addReq)
 
 					// assert
 					require.NoError(t, err)
@@ -1200,7 +1201,7 @@ func runAllServerTests(
 					"user-2",
 				},
 			}
-			removeResp, err := cl.RemoveTeamMembers(insertProjectsIntoNewContext([]string{"(unassigned)"}), req)
+			removeResp, err := cl.RemoveTeamMembers(insertProjectsIntoNewContext([]string{constants.UnassignedProjectID}), req)
 			require.NoError(t, err)
 			assert.Equal(t, 1, len(removeResp.UserIds))
 
@@ -1366,7 +1367,7 @@ func runAllServerTests(
 				UserId: users[0],
 			}
 			fetchedData, err := cl.GetTeamsForMember(
-				insertProjectsIntoNewContext([]string{"project2", "(unassigned)"}), listReq)
+				insertProjectsIntoNewContext([]string{"project2", constants.UnassignedProjectID}), listReq)
 
 			require.NoError(t, err)
 			require.NotNil(t, fetchedData)
@@ -1487,7 +1488,7 @@ func runAllServerTests(
 			listReq := &teams.GetTeamsForMemberReq{
 				UserId: users[0],
 			}
-			fetchedData, err := cl.GetTeamsForMember(insertProjectsIntoNewContext([]string{"(unassigned)"}), listReq)
+			fetchedData, err := cl.GetTeamsForMember(insertProjectsIntoNewContext([]string{constants.UnassignedProjectID}), listReq)
 
 			require.NoError(t, err)
 			require.NotNil(t, fetchedData)
@@ -1722,7 +1723,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 
 			resp, err := cl.GetTeamMembership(
-				insertProjectsIntoNewContext([]string{"(unassigned)"}),
+				insertProjectsIntoNewContext([]string{constants.UnassignedProjectID}),
 				&teams.GetTeamMembershipReq{
 					Id: initResp.Team.Id,
 				})
