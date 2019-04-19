@@ -61,11 +61,6 @@ func TestToken(t *testing.T) {
 	//       i.e., they're t.Fatal'ing out)-
 	tests := []adapterTestFunc{
 		testGetTokens,
-		testGetTokensWithSingleProjectsSingleFilter,
-		testGetTokensWithMultipleProjectsSingleFilter,
-		testGetTokensWithMultipleProjectsMultipleFilters,
-		testGetTokensWithUnassignedAndOtherFilter,
-		testGetTokensWithoutProjectsWithUnassignedFilter,
 		testGetToken,
 		testGetTokenIDWithValue,
 		testGetTokenIDWithValueNotFound,
@@ -135,105 +130,6 @@ func testGetTokens(ctx context.Context, t *testing.T, ta tokens.Storage) {
 	actualToks, err := ta.GetTokens(ctx)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, []*tokens.Token{tok, tok2}, actualToks)
-}
-
-func testGetTokensWithSingleProjectsSingleFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	tok, err := ta.CreateToken(ctx, "id0", "node0", true, []string{"overlapping"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id1", "node1", true, []string{"no-overlap"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id2", "node2", true, []string{})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{"overlapping"})
-
-	actualToks, err := ta.GetTokens(ctx)
-	assert.NoError(t, err)
-	assert.ElementsMatch(t, []*tokens.Token{tok}, actualToks)
-}
-
-func testGetTokensWithMultipleProjectsSingleFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	match1, err := ta.CreateToken(ctx, "id0", "node0", true, []string{"overlapping"})
-	require.NoError(t, err)
-	match2, err := ta.CreateToken(ctx, "id1", "node1", true, []string{"overlapping", "project-4"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id2", "node2", true, []string{"no-overlap"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id3", "node3", true, []string{})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{"overlapping"})
-
-	expectedToks := []*tokens.Token{match1, match2}
-	actualToks, err := ta.GetTokens(ctx)
-	assert.NoError(t, err)
-	assert.ElementsMatch(t, expectedToks, actualToks)
-}
-
-func testGetTokensWithMultipleProjectsMultipleFilters(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	match1, err := ta.CreateToken(ctx, "id", "node", true, []string{"overlapping"})
-	require.NoError(t, err)
-	match2, err := ta.CreateToken(ctx, "id-0", "node-0", true, []string{"more-overlap"})
-	require.NoError(t, err)
-	match3, err := ta.CreateToken(ctx, "id0", "node0", true, []string{"overlapping", "more-overlap"})
-	require.NoError(t, err)
-	match4, err := ta.CreateToken(ctx, "id1", "node1", true, []string{"more-overlap", "project-4"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id2", "node2", true, []string{"no-overlap"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id3", "node3", true, []string{})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{"overlapping", "more-overlap"})
-
-	expectedToks := []*tokens.Token{match1, match2, match3, match4}
-	actualToks, err := ta.GetTokens(ctx)
-	assert.NoError(t, err)
-	assert.ElementsMatch(t, expectedToks, actualToks)
-}
-
-func testGetTokensWithUnassignedAndOtherFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	match1, err := ta.CreateToken(ctx, "id", "node", true, []string{"overlapping"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id-0", "node-0", true, []string{"more-overlap"})
-	require.NoError(t, err)
-	match2, err := ta.CreateToken(ctx, "id0", "node0", true, []string{"overlapping", "more-overlap"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id1", "node1", true, []string{"more-overlap", "project-4"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id2", "node2", true, []string{"no-overlap"})
-	require.NoError(t, err)
-	unassignedProj, err := ta.CreateToken(ctx, "id3", "node3", true, []string{})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectID, "overlapping"})
-
-	expectedToks := []*tokens.Token{match1, match2, unassignedProj}
-	actualToks, err := ta.GetTokens(ctx)
-	assert.NoError(t, err)
-	assert.ElementsMatch(t, expectedToks, actualToks)
-}
-
-func testGetTokensWithoutProjectsWithUnassignedFilter(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	_, err := ta.CreateToken(ctx, "id", "node", true, []string{"overlapping"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id-0", "node-0", true, []string{"more-overlap"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id0", "node0", true, []string{"overlapping", "more-overlap"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id1", "node1", true, []string{"more-overlap", "project-4"})
-	require.NoError(t, err)
-	_, err = ta.CreateToken(ctx, "id2", "node2", true, []string{"no-overlap"})
-	require.NoError(t, err)
-	unassignedProj, err := ta.CreateToken(ctx, "id3", "node3", true, []string{})
-	require.NoError(t, err)
-
-	ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
-
-	expectedToks := []*tokens.Token{unassignedProj}
-	actualToks, err := ta.GetTokens(ctx)
-	assert.NoError(t, err)
-	assert.ElementsMatch(t, expectedToks, actualToks)
 }
 
 func testGetToken(ctx context.Context, t *testing.T, ta tokens.Storage) {
