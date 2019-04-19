@@ -98,6 +98,11 @@ func reset(t *testing.T, db *sql.DB) {
 	require.NoError(t, err)
 }
 
+type tokenTestData struct {
+	tokProjects   []string
+	projectFilter []string
+}
+
 func TestGetToken(t *testing.T) {
 	store, db := setup(t)
 
@@ -114,110 +119,131 @@ func TestGetToken(t *testing.T) {
 		Projects:    []string{},
 	}
 
-	// description => test func (map used for randomization)
-	cases := map[string]func(*testing.T){
-		"empty database": func(t *testing.T) {
-			ctx := context.Background()
+	t.Run("standard cases", func(t *testing.T) {
+		positiveCases := map[string]tokenTestData{
 
-			_, err := store.GetToken(ctx, "not-real-token")
-			assert.Error(t, err)
-			assert.Equal(t, &tokens.NotFoundError{}, err)
-		},
-		"token not found": func(t *testing.T) {
-			ctx := context.Background()
-			tok.Projects = []string{}
-			insertToken(t, db, tok)
+			"no filter specified matches token with no projects": {
+				[]string{},
+				[]string{},
+			},
+			"all projects filter specified matches token with (unassigned) projects": {
+				[]string{},
+				[]string{constants.AllProjectsExternalID},
+			},
+			"all projects filter specified matches token with some projects": {
+				[]string{"p1", "p2", "p3"},
+				[]string{constants.AllProjectsExternalID},
+			},
+			"token has single project, filter matches exactly": {
+				[]string{"overlapping"},
+				[]string{"overlapping"},
+			},
+			"token has single project, one project in filter matches": {
+				[]string{"overlapping"},
+				[]string{"overlapping", "not-overlapping"},
+			},
+			"token has multiple projects, filter matches both exactly": {
+				[]string{"overlapping", "foo"},
+				[]string{"overlapping", "foo"},
+			},
+			"token has no projects, filter has unassigned and other project": {
+				[]string{},
+				[]string{constants.UnassignedProjectID, "foo"},
+			},
+			"token has no projects, filter has (unassigned)": {
+				[]string{},
+				[]string{constants.UnassignedProjectID},
+			},
+		}
+		negativeCases := map[string]tokenTestData{
+			"returns not found when single project filter does not intersect token projects": {
+				[]string{"p1", "p2"},
+				[]string{"no-match"},
+			},
+			"returns not found when multiple project filter does not intersect token projects": {
+				[]string{"p1", "p2"},
+				[]string{"p3", "p4"},
+			},
+			"returns not found when token has no projects but looking for some": {
+				[]string{},
+				[]string{"no-match"},
+			},
+			"returns not found when token has a project but looking for unassigned": {
+				[]string{"p1"},
+				[]string{constants.UnassignedProjectID},
+			},
+		}
 
-			_, err := store.GetToken(ctx, "not-real-token")
-			assert.Equal(t, &tokens.NotFoundError{}, err)
-		},
-		"no filter specified matches token with no projects": func(t *testing.T) {
-			ctx := context.Background()
-			tok.Projects = []string{}
-			insertToken(t, db, tok)
+		classes := map[bool]map[string]tokenTestData{
+			true:  positiveCases,
+			false: negativeCases,
+		}
 
-			resp, err := store.GetToken(ctx, tok.ID)
-			require.NoError(t, err)
-			assert.Equal(t, &tok, resp)
-		},
-		"all projects filter specified matches token with (unassigned) projects": func(t *testing.T) {
-			tok.Projects = []string{}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{constants.AllProjectsExternalID})
+		for expectedSuccess, cases := range classes {
+			for name, test := range cases {
+				t.Run(name, func(t *testing.T) {
+					reset(t, db)
+					tok.Projects = test.tokProjects
+					insertToken(t, db, tok)
+					ctx := insertProjectsIntoNewContext(test.projectFilter)
+					resp, err := store.GetToken(ctx, tok.ID)
 
-			resp, err := store.GetToken(ctx, tok.ID)
-			require.NoError(t, err)
-			assert.Equal(t, &tok, resp)
-		},
-		"all projects filter specified matches token with some projects": func(t *testing.T) {
-			tok.Projects = []string{"p1", "p2", "p3"}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{constants.AllProjectsExternalID})
+					if expectedSuccess {
+						assert.NoError(t, err)
+						assert.Equal(t, &tok, resp)
+					} else {
+						assert.Error(t, err)
+						assert.Equal(t, &tokens.NotFoundError{}, err)
+					}
+				})
+			}
+		}
+	})
 
-			resp, err := store.GetToken(ctx, tok.ID)
-			require.NoError(t, err)
-			assert.Equal(t, &tok, resp)
-		},
-		"token has single project, filter matches exactly": func(t *testing.T) {
-			tok.Projects = []string{"overlapping"}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{"overlapping"})
+	t.Run("outlier cases", func(t *testing.T) {
+		cases := map[string]struct {
+			emptyDB       bool
+			tokenID       string
+			projectFilter []string
+		}{
+			"with empty database no project filter returns not found": {
+				true,
+				"any-token",
+				[]string{},
+			},
+			"with empty database some project filter returns not found": {
+				true,
+				"any-token",
+				[]string{"project2", "project3"},
+			},
+			"unknown token with no project filter returns not found": {
+				false,
+				"unknown-token",
+				[]string{},
+			},
+			"unknown token with some project filter returns not found": {
+				false,
+				"unknown-token",
+				[]string{"project2", "project3"},
+			},
+		}
+		for name, test := range cases {
+			t.Run(name, func(t *testing.T) {
+				reset(t, db)
+				if !test.emptyDB {
+					tok.Projects = []string{}
+					insertToken(t, db, tok)
+				}
+				ctx := insertProjectsIntoNewContext(test.projectFilter)
 
-			resp, err := store.GetToken(ctx, tok.ID)
-			require.NoError(t, err)
-			assert.Equal(t, &tok, resp)
-		},
-		"token has single project, one project in filter matches": func(t *testing.T) {
-			tok.Projects = []string{"overlapping"}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{"overlapping", "not-overlapping"})
+				resp, err := store.GetToken(ctx, test.tokenID)
 
-			resp, err := store.GetToken(ctx, tok.ID)
-			require.NoError(t, err)
-			assert.Equal(t, &tok, resp)
-		},
-		"token has multiple projects, filter matches both exactly": func(t *testing.T) {
-			tok.Projects = []string{"overlapping", "foo"}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{"overlapping", "foo"})
-
-			resp, err := store.GetToken(ctx, tok.ID)
-			require.NoError(t, err)
-			assert.Equal(t, &tok, resp)
-		},
-		"token has no projects, filter has unassigned and other project": func(t *testing.T) {
-			tok.Projects = []string{}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID, "foo"})
-
-			_, err := store.GetToken(ctx, "not-real-token")
-			assert.Error(t, err)
-			assert.Equal(t, &tokens.NotFoundError{}, err)
-		},
-		"token has no projects, filter has (unassigned)": func(t *testing.T) {
-			tok.Projects = []string{}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
-
-			resp, err := store.GetToken(ctx, tok.ID)
-			require.NoError(t, err)
-			assert.Equal(t, &tok, resp)
-		},
-		"returns token not found if projects filter excludes token": func(t *testing.T) {
-			tok.Projects = []string{"p1", "p2"}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{"no-match"})
-
-			_, err := store.GetToken(ctx, tok.ID)
-			assert.Error(t, err)
-			assert.Equal(t, &tokens.NotFoundError{}, err)
-		},
-	}
-
-	for name, test := range cases {
-		reset(t, db)
-		t.Run(name, test)
-	}
+				assert.Nil(t, resp)
+				assert.Error(t, err)
+				assert.Equal(t, &tokens.NotFoundError{}, err)
+			})
+		}
+	})
 }
 
 func TestGetTokens(t *testing.T) {
