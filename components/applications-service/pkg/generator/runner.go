@@ -25,7 +25,7 @@ type RunnerConfig struct {
 }
 
 type LoadGenRunner struct {
-	SupervisorGroups []*SupervisorGroup
+	SupervisorGroups SupervisorGroupCollection
 	stats            *RunnerStatsKeeper
 }
 
@@ -42,6 +42,8 @@ func (r *LoadGenRunner) Run(cfg *RunnerConfig) {
 
 	log.SetLevel(logLevel)
 
+	fmt.Print(r.SupervisorGroups.RollupStats())
+
 	for _, supGroup := range r.SupervisorGroups {
 		fmt.Print(supGroup.PrettyStr())
 	}
@@ -52,6 +54,44 @@ func (r *LoadGenRunner) Run(cfg *RunnerConfig) {
 	for _, g := range r.SupervisorGroups {
 		g.Run(cfg, r.stats)
 	}
+}
+
+type SupervisorGroupCollection []*SupervisorGroup
+
+func (s SupervisorGroupCollection) RollupStats() string {
+	var b strings.Builder
+
+	headerStr := fmt.Sprintf("Totals")
+	fmt.Fprintln(&b, headerStr)
+	fmt.Fprintln(&b, strings.Repeat("=", len(headerStr)))
+
+	fmt.Fprintf(&b, "Supervisor groups:  %d\n", len(s))
+	fmt.Fprintf(&b, "Total Supervisors:  %d\n", s.TotalSups())
+	fmt.Fprintf(&b, "Total Services:     %d\n", s.TotalSvcs())
+	fmt.Fprintf(&b, "HealthCheck rate/s: %.2f\n", s.HealthCheckRate())
+	fmt.Fprintln(&b, "")
+	return b.String()
+}
+
+func (s SupervisorGroupCollection) TotalSups() int32 {
+	var total int32
+	for _, supGroup := range s {
+		total += supGroup.Count
+	}
+	return total
+}
+
+func (s SupervisorGroupCollection) TotalSvcs() int32 {
+	var total int32
+	for _, supGroup := range s {
+		total += supGroup.Count * int32(len(supGroup.MessagePrototypes))
+	}
+	return total
+}
+
+// Have to assume a default RunnerConfig.Tick of 30s here.
+func (s SupervisorGroupCollection) HealthCheckRate() float64 {
+	return float64(s.TotalSvcs()) / float64(30)
 }
 
 type SupervisorGroup struct {
