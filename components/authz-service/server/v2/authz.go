@@ -96,6 +96,8 @@ func (s *authzServer) ProjectsAuthorized(
 		}
 	}
 
+	// TODO bd: parse result and send gateway different errors based on version
+
 	s.logProjectQuery(req, projectsAuthorized)
 	return &api.ProjectsAuthorizedResp{
 		Projects: projectsAuthorized,
