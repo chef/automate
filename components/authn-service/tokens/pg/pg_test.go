@@ -126,8 +126,6 @@ func TestGetToken(t *testing.T) {
 		"token not found with existing token in store": func(t *testing.T) {
 			ctx := context.Background()
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 
 			_, err := store.GetToken(ctx, "not-real-token")
 			assert.Equal(t, &tokens.NotFoundError{}, err)
@@ -135,8 +133,6 @@ func TestGetToken(t *testing.T) {
 		"token found in store": func(t *testing.T) {
 			ctx := context.Background()
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 
 			resp, err := store.GetToken(ctx, tok.ID)
 			require.NoError(t, err)
@@ -145,8 +141,6 @@ func TestGetToken(t *testing.T) {
 		"token has single project, filter matches exactly": func(t *testing.T) {
 			tok.Projects = []string{"overlapping"}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 			ctx := insertProjectsIntoNewContext([]string{"overlapping"})
 
 			resp, err := store.GetToken(ctx, tok.ID)
@@ -156,8 +150,6 @@ func TestGetToken(t *testing.T) {
 		"token has single project, one project in filter matches": func(t *testing.T) {
 			tok.Projects = []string{"overlapping"}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 			ctx := insertProjectsIntoNewContext([]string{"overlapping", "not-overlapping"})
 
 			resp, err := store.GetToken(ctx, tok.ID)
@@ -167,8 +159,6 @@ func TestGetToken(t *testing.T) {
 		"token has multiple projects, filter matches both exactly": func(t *testing.T) {
 			tok.Projects = []string{"overlapping", "foo"}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 			ctx := insertProjectsIntoNewContext([]string{"overlapping", "foo"})
 
 			resp, err := store.GetToken(ctx, tok.ID)
@@ -178,8 +168,6 @@ func TestGetToken(t *testing.T) {
 		"token has no projects, filter has unassigned and other project": func(t *testing.T) {
 			tok.Projects = []string{}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID, "foo"})
 
 			_, err := store.GetToken(ctx, "not-real-token")
@@ -189,8 +177,6 @@ func TestGetToken(t *testing.T) {
 		"token has no projects, filter has (unassigned)": func(t *testing.T) {
 			tok.Projects = []string{}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
 
 			resp, err := store.GetToken(ctx, tok.ID)
@@ -199,8 +185,6 @@ func TestGetToken(t *testing.T) {
 		},
 		"no tokens found with projects matching filter": func(t *testing.T) {
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 			ctx := insertProjectsIntoNewContext([]string{"no-match"})
 
 			_, err := store.GetToken(ctx, tok.ID)
@@ -694,8 +678,6 @@ func TestDeleteToken(t *testing.T) {
 		"token not found with existing token in store": func(t *testing.T) {
 			ctx := context.Background()
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 
 			err := store.DeleteToken(ctx, "not-real-token")
 			assert.Equal(t, &tokens.NotFoundError{}, err)
@@ -703,8 +685,6 @@ func TestDeleteToken(t *testing.T) {
 		"token found in store": func(t *testing.T) {
 			ctx := context.Background()
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 
 			err := store.DeleteToken(ctx, tok.ID)
 			assert.NoError(t, err)
@@ -715,8 +695,6 @@ func TestDeleteToken(t *testing.T) {
 		"token has single project, filter matches exactly": func(t *testing.T) {
 			tok.Projects = []string{"overlapping"}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 
 			ctx := insertProjectsIntoNewContext([]string{"overlapping"})
 			err := store.DeleteToken(ctx, tok.ID)
@@ -728,8 +706,6 @@ func TestDeleteToken(t *testing.T) {
 		"token has single project, one project in filter matches": func(t *testing.T) {
 			tok.Projects = []string{"overlapping"}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 
 			ctx := insertProjectsIntoNewContext([]string{"overlapping", "not-overlapping"})
 			err := store.DeleteToken(ctx, tok.ID)
@@ -741,8 +717,6 @@ func TestDeleteToken(t *testing.T) {
 		"token has multiple projects, filter matches both exactly": func(t *testing.T) {
 			tok.Projects = []string{"overlapping", "foo"}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 
 			ctx := insertProjectsIntoNewContext([]string{"overlapping", "foo"})
 			err := store.DeleteToken(ctx, tok.ID)
@@ -754,8 +728,6 @@ func TestDeleteToken(t *testing.T) {
 		"token has no projects, filter has unassigned and other project": func(t *testing.T) {
 			tok.Projects = []string{}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID, "foo"})
 
 			err := store.DeleteToken(ctx, "not-real-token")
@@ -765,8 +737,6 @@ func TestDeleteToken(t *testing.T) {
 		"token has no projects, filter has (unassigned)": func(t *testing.T) {
 			tok.Projects = []string{}
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
 
 			err := store.DeleteToken(ctx, tok.ID)
@@ -777,8 +747,6 @@ func TestDeleteToken(t *testing.T) {
 		},
 		"no tokens found with projects matching filter": func(t *testing.T) {
 			insertToken(t, db, tok)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens
-				WHERE id=$1`, id))
 
 			ctx := insertProjectsIntoNewContext([]string{"no-match"})
 			err := store.DeleteToken(ctx, tok.ID)
@@ -800,6 +768,7 @@ func insertToken(t *testing.T, db *sql.DB, tok tokens.Token) {
 		values ($1, $2, $3, $4, $5, $6, $7)`, tok.ID, tok.Description, tok.Active, tok.Value, pq.Array(tok.Projects),
 		tok.Created, tok.Updated)
 	require.NoError(t, err)
+	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
 }
 
 func assertCount(t *testing.T, expected int, row *sql.Row) {
