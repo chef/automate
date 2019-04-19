@@ -190,10 +190,10 @@ func (c InitConfig) AutomateConfig() *AutomateConfig {
 	cfg := AutomateConfig{}
 	cfg.Global = g
 
-	cfg.SetChannel(c.Channel)
-	cfg.SetUpgradeStrategy(c.UpgradeStrategy)
+	cfg.SetChannel(c.Channel)                 // nolint: errcheck
+	cfg.SetUpgradeStrategy(c.UpgradeStrategy) // nolint: errcheck
 
-	cfg.OverrideConfigValues(&AutomateConfig{
+	cfg.OverrideConfigValues(&AutomateConfig{ // nolint: errcheck
 		Deployment: &ConfigRequest{
 			V1: &ConfigRequest_V1{
 				Svc: &ConfigRequest_V1_Service{
@@ -203,7 +203,7 @@ func (c InitConfig) AutomateConfig() *AutomateConfig {
 		},
 	})
 
-	cfg.OverrideConfigValues(&AutomateConfig{
+	cfg.OverrideConfigValues(&AutomateConfig{ // nolint: errcheck
 		LicenseControl: &license_control.ConfigRequest{
 			V1: &license_control.ConfigRequest_V1{
 				Svc: &license_control.ConfigRequest_V1_Service{
@@ -213,7 +213,7 @@ func (c InitConfig) AutomateConfig() *AutomateConfig {
 		},
 	})
 
-	cfg.OverrideConfigValues(&AutomateConfig{
+	cfg.OverrideConfigValues(&AutomateConfig{ // nolint: errcheck
 		Elasticsearch: &es.ConfigRequest{
 			V1: &es.ConfigRequest_V1{
 				Sys: &es.ConfigRequest_V1_System{
