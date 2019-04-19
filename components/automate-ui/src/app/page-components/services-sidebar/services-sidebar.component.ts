@@ -4,7 +4,8 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable } from 'rxjs';
 import { serviceGroupState } from '../../entities/service-groups/service-groups.selector';
 import { createSelector } from '@ngrx/store';
-import { Service } from '../../entities/service-groups/service-groups.model';
+import { Service, ServicesFilters } from '../../entities/service-groups/service-groups.model';
+import { UpdateSelectedSG } from '../../entities/service-groups/service-groups.actions';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -13,9 +14,11 @@ import { Service } from '../../entities/service-groups/service-groups.model';
 })
 
 export class ServicesSidebarComponent implements OnInit {
+  @Input() serviceGroupId: number;
   @Input() visible: boolean;
   @Output() closeServicesSidebarEvent: EventEmitter<any> = new EventEmitter();
 
+  public selectedHealth: string;
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
 
@@ -33,19 +36,13 @@ export class ServicesSidebarComponent implements OnInit {
     this.closeServicesSidebarEvent.emit(null);
   }
 
-  public healthStatusIcon(service: Service): string {
-    switch (service.health_check) {
-      case 'OK':
-        return 'check_circle';
-      case 'CRITICAL':
-        return 'warning';
-      case 'WARNING':
-        return 'error_outline';
-      case 'UNKNOWN':
-        return 'help';
-      default:
-        return 'help';
-    }
+  public updateServicesFilters(health: string): void {
+    this.selectedHealth = health;
+    const servicesFilters: ServicesFilters = {
+      service_group_id: this.serviceGroupId,
+      health: health
+    };
+    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
   }
 
   // healthCheckStatus returns the formated health_check status from the provided service

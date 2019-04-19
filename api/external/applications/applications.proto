@@ -76,6 +76,7 @@ message ServicesBySGReq {
   int32 service_group_id = 1;
   common.query.Pagination pagination = 2;
   common.query.Sorting sorting = 3;
+  string health = 4;
 }
 
 message ServicesBySGRes {

@@ -10,7 +10,7 @@ import {
   UpdateServiceGroupFilters, UpdateSelectedSG
 } from 'app/entities/service-groups/service-groups.actions';
 import {
-  ServiceGroup, ServiceGroupFilters, FieldDirection
+  ServiceGroup, ServiceGroupFilters, FieldDirection, ServicesFilters
 } from '../../entities/service-groups/service-groups.model';
 import {
   serviceGroupStatus, allServiceGroups, serviceGroupState
@@ -26,6 +26,9 @@ import { find, includes } from 'lodash/fp';
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
+
+  // The selected service-group id that will be sent to the services-sidebar
+  public selectedServiceGroupId: number;
 
   // Weather or not the the services sidebar is visible
   public servicesSidebarVisible = false;
@@ -131,8 +134,13 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   }
 
   public openServicesSidebar(id: number) {
+    const servicesFilters: ServicesFilters = {
+      service_group_id: id,
+      health: 'total'
+    };
+    this.selectedServiceGroupId = id;
     this.servicesSidebarVisible = true;
-    this.store.dispatch(new UpdateSelectedSG(id));
+    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
     document.getElementById('services-panel').focus();
   }
 
