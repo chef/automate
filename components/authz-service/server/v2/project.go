@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -214,15 +215,18 @@ func (s *state) ListProjectRules(ctx context.Context,
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	projectRules := make(map[string]*api.ProjectRules, len(ruleMap))
+	projects := make(map[string]*api.ProjectRules, len(ruleMap))
 	for projectID, rules := range ruleMap {
-		pr := rulesToProjectRules(rules)
-		projectRules[projectID] = &api.ProjectRules{
-			Rules: pr,
+		projectRules, err := rulesToProjectRules(rules)
+		if err != nil {
+			return &api.ProjectCollectionRulesResp{}, err
+		}
+		projects[projectID] = &api.ProjectRules{
+			Rules: projectRules,
 		}
 	}
 	return &api.ProjectCollectionRulesResp{
-		ProjectRules: projectRules,
+		ProjectRules: projects,
 	}, nil
 }
 
@@ -243,9 +247,14 @@ func (s *state) GetProjectRules(ctx context.Context,
 			"could not find project mapping rules for project %s", req.ProjectId)
 	}
 
+	projectRules, err := rulesToProjectRules(rules)
+	if err != nil {
+		return &api.GetProjectRulesResp{}, err
+	}
+
 	return &api.GetProjectRulesResp{
 		RulesForProject: &api.ProjectRules{
-			Rules: rulesToProjectRules(rules),
+			Rules: projectRules,
 		},
 	}, nil
 }
@@ -286,11 +295,15 @@ func fromStorageProject(p *storage.Project) (*api.Project, error) {
 // We need to update this data structure to have projects have collection of rules. The rules have a
 // collection of conditions. The conditions have a 'type' and 'values' (like rules currently do).
 // The rules should have a 'type' either 'node' or 'event'.
-func rulesToProjectRules(rules []engine.Rule) []*api.ProjectRule {
+func rulesToProjectRules(rules []engine.Rule) ([]*api.ProjectRule, error) {
 	conditions := make([]*api.Condition, len(rules))
 	for j, rule := range rules {
+		conditionType, exists := api.ProjectRuleConditionTypes_value[rule.Type]
+		if !exists {
+			return []*api.ProjectRule{}, errors.New(fmt.Sprintf("Condition type %s is not supported", rule.Type))
+		}
 		conditions[j] = &api.Condition{
-			Type:   api.ProjectRuleConditionTypes(api.ProjectRuleConditionTypes_value[rule.Type]),
+			Type:   api.ProjectRuleConditionTypes(conditionType),
 			Values: rule.Values,
 		}
 	}
@@ -299,5 +312,5 @@ func rulesToProjectRules(rules []engine.Rule) []*api.ProjectRule {
 		Conditions: conditions,
 		Type:       api.ProjectRuleTypes_NODE,
 	}
-	return []*api.ProjectRule{rule}
+	return []*api.ProjectRule{rule}, nil
 }
