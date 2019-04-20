@@ -62,14 +62,10 @@ func (es Backend) GetNode(id string) (backend.Node, error) {
 // non-random access pagination and custom selection of how the docs are sorted.
 func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	end time.Time, filters map[string][]string, cursorDate time.Time,
-	cursorID string, pageSize int, sortField string,
+	cursorID string, pageSize int, _ string,
 	ascending bool) ([]backend.InventoryNode, error) {
 
 	mainQuery := newBoolQueryFromFilters(filters)
-
-	if sortField == "" {
-		sortField = CheckinTimestamp
-	}
 
 	rangeQuery, ok := newRangeQueryTime(start, end, CheckinTimestamp)
 
@@ -83,7 +79,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 		Query(mainQuery).
 		Index(IndexNodeState).
 		Size(pageSize).
-		Sort(sortField, ascending).
+		Sort(CheckinTimestamp, ascending).
 		Sort(NodeFieldID, ascending).
 		FetchSourceContext(fetchSource)
 
