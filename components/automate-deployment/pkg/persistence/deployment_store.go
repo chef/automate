@@ -23,4 +23,5 @@ type DeploymentStore interface {
 	UpdateDeployment(DeploymentUpdateCallback) (*deployment.Deployment, error)
 	GetDeployment() (*deployment.Deployment, error)
 	WriteTo(w io.Writer) error // nolint: vet
+	Close() error
 }

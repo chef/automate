@@ -217,3 +217,7 @@ func (s *DeploymentStore) WriteTo(w io.Writer) error {
 		return err
 	})
 }
+
+func (s *DeploymentStore) Close() error {
+	return s.db.Close()
+}
