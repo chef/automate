@@ -103,14 +103,100 @@ type tokenTestData struct {
 	projectFilter []string
 }
 
+var positiveCases = map[string]tokenTestData{
+
+	"no filter specified matches token with no projects": {
+		[]string{},
+		[]string{},
+	},
+	"all projects filter specified matches token with (unassigned) projects": {
+		[]string{},
+		[]string{constants.AllProjectsExternalID},
+	},
+	"all projects filter specified matches token with some projects": {
+		[]string{"p1", "p2", "p3"},
+		[]string{constants.AllProjectsExternalID},
+	},
+	"token has single project, filter matches exactly": {
+		[]string{"overlapping"},
+		[]string{"overlapping"},
+	},
+	"token has single project, one project in filter matches": {
+		[]string{"overlapping"},
+		[]string{"overlapping", "not-overlapping"},
+	},
+	"token has multiple projects, filter matches both exactly": {
+		[]string{"overlapping", "foo"},
+		[]string{"overlapping", "foo"},
+	},
+	"token has no projects, filter has unassigned and other project": {
+		[]string{},
+		[]string{constants.UnassignedProjectID, "foo"},
+	},
+	"token has no projects, filter has (unassigned)": {
+		[]string{},
+		[]string{constants.UnassignedProjectID},
+	},
+}
+
+var negativeCases = map[string]tokenTestData{
+	"returns not found when single project filter does not intersect token projects": {
+		[]string{"p1", "p2"},
+		[]string{"no-match"},
+	},
+	"returns not found when multiple project filter does not intersect token projects": {
+		[]string{"p1", "p2"},
+		[]string{"p3", "p4"},
+	},
+	"returns not found when token has no projects but looking for some": {
+		[]string{},
+		[]string{"no-match"},
+	},
+	"returns not found when token has a project but looking for unassigned": {
+		[]string{"p1"},
+		[]string{constants.UnassignedProjectID},
+	},
+}
+
+var standardCases = map[bool]map[string]tokenTestData{
+	true:  positiveCases,
+	false: negativeCases,
+}
+
+var outlierCases = map[string]struct {
+	emptyDB       bool
+	tokenID       string
+	projectFilter []string
+}{
+	"with empty database no project filter returns not found": {
+		true,
+		"any-token",
+		[]string{},
+	},
+	"with empty database some project filter returns not found": {
+		true,
+		"any-token",
+		[]string{"project2", "project3"},
+	},
+	"unknown token with no project filter returns not found": {
+		false,
+		"unknown-token",
+		[]string{},
+	},
+	"unknown token with some project filter returns not found": {
+		false,
+		"unknown-token",
+		[]string{"project2", "project3"},
+	},
+}
+
 func TestGetToken(t *testing.T) {
 	store, db := setup(t)
 
 	//DB time and Golang time are rounded differently
 	tme := time.Now().UTC().Round(time.Second)
-	id := "coolest-token-on-the-block"
 	tok := tokens.Token{
-		ID:          id,
+		ID:          "coolest-token-on-the-block",
 		Description: "Cool Token",
 		Active:      true,
 		Value:       "asdf",
@@ -120,66 +206,8 @@ func TestGetToken(t *testing.T) {
 	}
 
 	t.Run("standard cases", func(t *testing.T) {
-		positiveCases := map[string]tokenTestData{
 
-			"no filter specified matches token with no projects": {
-				[]string{},
-				[]string{},
-			},
-			"all projects filter specified matches token with (unassigned) projects": {
-				[]string{},
-				[]string{constants.AllProjectsExternalID},
-			},
-			"all projects filter specified matches token with some projects": {
-				[]string{"p1", "p2", "p3"},
-				[]string{constants.AllProjectsExternalID},
-			},
-			"token has single project, filter matches exactly": {
-				[]string{"overlapping"},
-				[]string{"overlapping"},
-			},
-			"token has single project, one project in filter matches": {
-				[]string{"overlapping"},
-				[]string{"overlapping", "not-overlapping"},
-			},
-			"token has multiple projects, filter matches both exactly": {
-				[]string{"overlapping", "foo"},
-				[]string{"overlapping", "foo"},
-			},
-			"token has no projects, filter has unassigned and other project": {
-				[]string{},
-				[]string{constants.UnassignedProjectID, "foo"},
-			},
-			"token has no projects, filter has (unassigned)": {
-				[]string{},
-				[]string{constants.UnassignedProjectID},
-			},
-		}
-		negativeCases := map[string]tokenTestData{
-			"returns not found when single project filter does not intersect token projects": {
-				[]string{"p1", "p2"},
-				[]string{"no-match"},
-			},
-			"returns not found when multiple project filter does not intersect token projects": {
-				[]string{"p1", "p2"},
-				[]string{"p3", "p4"},
-			},
-			"returns not found when token has no projects but looking for some": {
-				[]string{},
-				[]string{"no-match"},
-			},
-			"returns not found when token has a project but looking for unassigned": {
-				[]string{"p1"},
-				[]string{constants.UnassignedProjectID},
-			},
-		}
-
-		classes := map[bool]map[string]tokenTestData{
-			true:  positiveCases,
-			false: negativeCases,
-		}
-
-		for expectedSuccess, cases := range classes {
+		for expectedSuccess, cases := range standardCases {
 			for name, test := range cases {
 				t.Run(name, func(t *testing.T) {
 					reset(t, db)
@@ -201,33 +229,7 @@ func TestGetToken(t *testing.T) {
 	})
 
 	t.Run("outlier cases", func(t *testing.T) {
-		cases := map[string]struct {
-			emptyDB       bool
-			tokenID       string
-			projectFilter []string
-		}{
-			"with empty database no project filter returns not found": {
-				true,
-				"any-token",
-				[]string{},
-			},
-			"with empty database some project filter returns not found": {
-				true,
-				"any-token",
-				[]string{"project2", "project3"},
-			},
-			"unknown token with no project filter returns not found": {
-				false,
-				"unknown-token",
-				[]string{},
-			},
-			"unknown token with some project filter returns not found": {
-				false,
-				"unknown-token",
-				[]string{"project2", "project3"},
-			},
-		}
-		for name, test := range cases {
+		for name, test := range outlierCases {
 			t.Run(name, func(t *testing.T) {
 				reset(t, db)
 				if !test.emptyDB {
@@ -712,97 +714,54 @@ func TestUpdateToken(t *testing.T) {
 func TestDeleteToken(t *testing.T) {
 	store, db := setup(t)
 
-	id := "coolest-token-on-the-block"
-	active := true
-	value := "asdf"
 	tok := tokens.Token{
-		ID:          id,
+		ID:          "coolest-token-on-the-block",
 		Description: "Cool Token",
-		Active:      active,
-		Value:       value,
+		Active:      true,
+		Value:       "asdf",
 		Projects:    []string{},
 	}
 
-	// description => test func (map used for randomization)
-	cases := map[string]func(*testing.T){
-		"empty database": func(t *testing.T) {
-			ctx := context.Background()
-			err := store.DeleteToken(ctx, "not-real-token")
-			assert.Error(t, err)
-			assert.Equal(t, &tokens.NotFoundError{}, err)
-		},
-		"token not found": func(t *testing.T) {
-			ctx := context.Background()
-			insertToken(t, db, tok)
+	t.Run("standard cases", func(t *testing.T) {
+		for expectedSuccess, cases := range standardCases {
+			for name, test := range cases {
+				t.Run(name, func(t *testing.T) {
+					reset(t, db)
+					tok.Projects = test.tokProjects
+					insertToken(t, db, tok)
+					ctx := insertProjectsIntoNewContext(test.projectFilter)
+					err := store.DeleteToken(ctx, tok.ID)
 
-			err := store.DeleteToken(ctx, "not-real-token")
-			assert.Equal(t, &tokens.NotFoundError{}, err)
-		},
-		"no filter specified matches token with no projects": func(t *testing.T) {
-			ctx := context.Background()
-			insertToken(t, db, tok)
+					if expectedSuccess {
+						assert.NoError(t, err)
+						assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
+					} else {
+						assert.Error(t, err)
+						assert.Equal(t, &tokens.NotFoundError{}, err)
+						assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
+					}
+				})
+			}
+		}
+	})
 
-			err := store.DeleteToken(ctx, tok.ID)
-			assert.NoError(t, err)
-			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, id))
-		},
-		"token has single project, filter matches exactly": func(t *testing.T) {
-			tok.Projects = []string{"overlapping"}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{"overlapping"})
+	t.Run("outlier cases", func(t *testing.T) {
+		for name, test := range outlierCases {
+			t.Run(name, func(t *testing.T) {
+				reset(t, db)
+				if !test.emptyDB {
+					tok.Projects = []string{}
+					insertToken(t, db, tok)
+				}
+				ctx := insertProjectsIntoNewContext(test.projectFilter)
 
-			err := store.DeleteToken(ctx, tok.ID)
-			assert.NoError(t, err)
-			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, id))
-		},
-		"token has single project, one project in filter matches": func(t *testing.T) {
-			tok.Projects = []string{"overlapping"}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{"overlapping", "not-overlapping"})
+				err := store.DeleteToken(ctx, test.tokenID)
 
-			err := store.DeleteToken(ctx, tok.ID)
-			assert.NoError(t, err)
-			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, id))
-		},
-		"token has multiple projects, filter matches both exactly": func(t *testing.T) {
-			tok.Projects = []string{"overlapping", "foo"}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{"overlapping", "foo"})
-
-			err := store.DeleteToken(ctx, tok.ID)
-			assert.NoError(t, err)
-			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, id))
-		},
-		"token has no projects, filter has unassigned and other project": func(t *testing.T) {
-			tok.Projects = []string{}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID, "foo"})
-
-			err := store.DeleteToken(ctx, "not-real-token")
-			assert.Equal(t, &tokens.NotFoundError{}, err)
-		},
-		"token has no projects, filter has (unassigned)": func(t *testing.T) {
-			tok.Projects = []string{}
-			insertToken(t, db, tok)
-			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
-
-			err := store.DeleteToken(ctx, tok.ID)
-			assert.NoError(t, err)
-			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, id))
-		},
-		"returns token not found if projects filter excludes token": func(t *testing.T) {
-			insertToken(t, db, tok)
-
-			ctx := insertProjectsIntoNewContext([]string{"no-match"})
-			err := store.DeleteToken(ctx, tok.ID)
-			assert.Equal(t, &tokens.NotFoundError{}, err)
-		},
-	}
-
-	for name, test := range cases {
-		reset(t, db)
-		t.Run(name, test)
-	}
+				assert.Error(t, err)
+				assert.Equal(t, &tokens.NotFoundError{}, err)
+			})
+		}
+	})
 }
 
 func insertToken(t *testing.T, db *sql.DB, tok tokens.Token) {
