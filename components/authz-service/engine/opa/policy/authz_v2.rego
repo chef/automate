@@ -108,7 +108,15 @@ denied_project[project] {
 	has_project[[project, pol_id, statement_id]]
 }
 
+# all_projects_denied[project] {
+# 	match[["deny", pol_id, statement_id]]
+#   project := policies[pol_id].statements[statement_id].projects[_]
+#   project == "~~ALL-PROJECTS~~"
+# }
+
 authorized_project[project] {
 	allowed_project[project]
 	not denied_project[project]
+	# 1. not all_projects_denied[project] - any deny * overrides any other allow
+	# 2. all_projects allows any non-denied project
 }

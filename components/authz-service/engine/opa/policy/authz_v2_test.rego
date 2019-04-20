@@ -373,3 +373,37 @@ test_authorized_project_deny_real_data {
 
 	actual_projects == set()
 }
+
+# 1. deny override case
+test_authorized_project_returns_no_projects_when_all_projects_denied {
+	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p1", "p3"]},
+				"sid-2": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]},
+			},
+		}
+		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3", "p5"]}
+
+	# currently returns:
+	# actual_projects == {"p1", "p3"}
+	actual_projects == set()
+}
+
+# 2. deny override case
+test_authorized_project_matches_only_allowed_projects_when_some_projects_denied {
+	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p1", "p3"]},
+				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]},
+			},
+		}
+		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p2", "p3"]}
+
+	# currently returns:
+	# actual_projects == {"~~ALL-PROJECTS~~"}
+	actual_projects == {"p2"}
+}
