@@ -571,6 +571,30 @@ func TestUpdateToken(t *testing.T) {
 						assertCount(t, db, 1, tok.ID)
 					}
 				})
+
+				t.Run(name+" (description skipped)", func(t *testing.T) {
+					assert := assert.New(t)
+					reset(t, db)
+					tok.Projects = test.tokProjects
+					insertToken(t, db, tok)
+					ctx := insertProjectsIntoNewContext(test.projectFilter)
+
+					resp, err := store.UpdateToken(
+						ctx, tok.ID, "", updatedTok.Active, updatedTok.Projects)
+
+					if expectedSuccess {
+						assert.NoError(err)
+						assertCount(t, db, 1, tok.ID)
+						resp.Created = updatedTok.Created // ignore the timestamps in comparison
+						resp.Updated = updatedTok.Updated
+						updatedTok.Description = tok.Description // should have the original value
+						assert.Equal(updatedTok, *resp)
+					} else {
+						assert.Error(err)
+						assert.Equal(&tokens.NotFoundError{}, err)
+						assertCount(t, db, 1, tok.ID)
+					}
+				})
 			}
 		}
 	})

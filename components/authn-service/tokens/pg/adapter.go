@@ -94,14 +94,15 @@ func (a *adapter) UpdateToken(ctx context.Context,
 			id, active, description, pq.Array(projects), pq.Array(projectsFilter))
 	} else {
 		row = a.db.QueryRowContext(ctx,
-			// TODO: This should be failing a test!
-			`UPDATE chef_authn_tokens
+			`UPDATE chef_authn_tokens cat
 			SET active=$2, project_ids=$3, updated=NOW()
-			WHERE id=$1
+			WHERE id=$1 AND projects_match(cat.project_ids, $4::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, pq.Array(projects))
+			id, active, pq.Array(projects), pq.Array(projectsFilter))
 	}
-	if err := row.Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
+	err = row.Scan(
+		&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated)
+	if err != nil {
 		return nil, processSQLError(err, "update token")
 	}
 	return &t, nil
