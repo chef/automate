@@ -83,7 +83,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 		Query(mainQuery).
 		Index(IndexNodeState).
 		Size(pageSize).
-		Sort(CheckinTimestamp, ascending).
+		Sort(sortField, ascending).
 		Sort(NodeFieldID, ascending).
 		FetchSourceContext(fetchSource)
 
@@ -261,11 +261,11 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 	for _, bucket := range statusNodesBuckets {
 		switch bucket.Key {
 		case "success":
-			ns.Success = int64(bucket.DocCount)
+			ns.Success = bucket.DocCount
 		case "failure":
-			ns.Failure = int64(bucket.DocCount)
+			ns.Failure = bucket.DocCount
 		case "missing":
-			ns.Missing = int64(bucket.DocCount)
+			ns.Missing = bucket.DocCount
 		}
 	}
 
