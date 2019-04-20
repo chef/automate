@@ -290,79 +290,91 @@ func TestGetTokens(t *testing.T) {
 		},
 	}
 
-	// description => test func (map used for randomization)
-	cases := map[string]func(*testing.T){
-		// "successfully returns empty list when the database is empty": func(t *testing.T) {
-		// 	ctx := context.Background()
-
-		// 	resp, err := store.GetTokens(ctx)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, resp, []*types.Token{})
-		// },
-		"no project filter returns all tokens": func(t *testing.T) {
-			ctx := context.Background()
-
-			resp, err := store.GetTokens(ctx)
-			require.NoError(t, err)
-			assert.ElementsMatch(t, testTokens, resp)
-		},
-		"all projects filter matches all tokens": func(t *testing.T) {
-			ctx := insertProjectsIntoNewContext([]string{constants.AllProjectsExternalID})
-
-			resp, err := store.GetTokens(ctx)
-			require.NoError(t, err)
-			assert.ElementsMatch(t, testTokens, resp)
-		},
-		"single-project filter matches single token": func(t *testing.T) {
-			ctx := insertProjectsIntoNewContext([]string{"project2"})
-
-			resp, err := store.GetTokens(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, 1, len(resp))
-			assert.Contains(t, resp, testTokens[1])
-		},
-		"single-project filter matches multiple tokens": func(t *testing.T) {
-			ctx := insertProjectsIntoNewContext([]string{"project1"})
-
-			resp, err := store.GetTokens(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, 2, len(resp))
-			assert.Contains(t, resp, testTokens[1])
-			assert.Contains(t, resp, testTokens[2])
-		},
-		"single-project filter matches unassigned project": func(t *testing.T) {
-			ctx := insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
-
-			resp, err := store.GetTokens(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, 1, len(resp))
-			assert.Contains(t, resp, testTokens[3])
-		},
-		"multiple-project filter matches multiple tokens": func(t *testing.T) {
-			ctx := insertProjectsIntoNewContext([]string{"project2", constants.UnassignedProjectID})
-
-			resp, err := store.GetTokens(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, 2, len(resp))
-			assert.Contains(t, resp, testTokens[1])
-			assert.Contains(t, resp, testTokens[3])
-		},
-		"returns empty list if projects filter excludes all tokens": func(t *testing.T) {
-			ctx := insertProjectsIntoNewContext([]string{"project-other"})
-
-			resp, err := store.GetTokens(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, 0, len(resp))
-		},
-	}
-
-	for name, test := range cases {
-		reset(t, db)
-		for _, tok := range testTokens {
-			insertToken(t, db, *tok)
+	t.Run("standard cases", func(t *testing.T) {
+		cases := map[string]struct {
+			projectFilter []string
+			results       []*tokens.Token
+		}{
+			"no project filter returns all tokens": {
+				[]string{},
+				testTokens,
+			},
+			"all projects filter matches all tokens": {
+				[]string{constants.AllProjectsExternalID},
+				testTokens,
+			},
+			"single-project filter matches single token": {
+				[]string{"project2"},
+				[]*tokens.Token{testTokens[1]},
+			},
+			"single-project filter matches multiple tokens": {
+				[]string{"project1"},
+				[]*tokens.Token{testTokens[1], testTokens[2]},
+			},
+			"single-project filter matches unassigned project": {
+				[]string{constants.UnassignedProjectID},
+				[]*tokens.Token{testTokens[3]},
+			},
+			"multiple-project filter matches multiple tokens": {
+				[]string{"project2", constants.UnassignedProjectID},
+				[]*tokens.Token{testTokens[1], testTokens[3]},
+			},
+			"mix of included/excluded projects returns just included ones": {
+				[]string{"project2", constants.UnassignedProjectID, "project-unknown"},
+				[]*tokens.Token{testTokens[1], testTokens[3]},
+			},
+			"returns empty list if projects filter excludes all tokens": {
+				[]string{"project-other", "project-unknown"},
+				[]*tokens.Token{},
+			},
 		}
-		t.Run(name, test)
-	}
+
+		for name, test := range cases {
+			t.Run(name, func(t *testing.T) {
+				reset(t, db)
+				for _, tok := range testTokens {
+					insertToken(t, db, *tok)
+				}
+				ctx := insertProjectsIntoNewContext(test.projectFilter)
+
+				resp, err := store.GetTokens(ctx)
+
+				require.NoError(t, err)
+				assert.Equal(t, len(test.results), len(resp))
+				for _, tok := range test.results {
+					assert.Contains(t, resp, tok)
+				}
+			})
+		}
+	})
+
+	t.Run("outlier cases", func(t *testing.T) {
+		cases := map[string]struct {
+			projectFilter []string
+		}{
+			"with empty database no project filter returns empty list": {
+				[]string{},
+			},
+			"with empty database and all projects filter returns empty list": {
+				[]string{constants.AllProjectsExternalID},
+			},
+			"with empty database and some project filter returns empty list": {
+				[]string{"project2", "project3"},
+			},
+		}
+
+		for name, test := range cases {
+			t.Run(name, func(t *testing.T) {
+				reset(t, db)
+				ctx := insertProjectsIntoNewContext(test.projectFilter)
+
+				resp, err := store.GetTokens(ctx)
+
+				require.NoError(t, err)
+				assert.Equal(t, 0, len(resp))
+			})
+		}
+	})
 }
 
 func TestGetTokenIDWithValue(t *testing.T) {
