@@ -206,7 +206,6 @@ func TestGetToken(t *testing.T) {
 	}
 
 	t.Run("standard cases", func(t *testing.T) {
-
 		for expectedSuccess, cases := range standardCases {
 			for name, test := range cases {
 				t.Run(name, func(t *testing.T) {
@@ -214,6 +213,7 @@ func TestGetToken(t *testing.T) {
 					tok.Projects = test.tokProjects
 					insertToken(t, db, tok)
 					ctx := insertProjectsIntoNewContext(test.projectFilter)
+
 					resp, err := store.GetToken(ctx, tok.ID)
 
 					if expectedSuccess {
@@ -434,7 +434,7 @@ func TestCreateToken(t *testing.T) {
 			require.NoError(err)
 			require.NotNil(tok)
 
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, id))
+			assertCount(t, db, 1, id)
 
 			var value string
 			err = db.QueryRow(`SELECT value FROM chef_authn_tokens WHERE id=$1`, id).Scan(&value)
@@ -455,7 +455,7 @@ func TestCreateToken(t *testing.T) {
 			require.NoError(err)
 			require.NotNil(tok)
 
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, id))
+			assertCount(t, db, 1, id)
 
 			var value string
 			err = db.QueryRow(`SELECT value FROM chef_authn_tokens WHERE id=$1`, id).Scan(&value)
@@ -491,7 +491,7 @@ func TestCreateTokenWithValue(t *testing.T) {
 	assert.NoError(err)
 	assert.NotNil(tok)
 
-	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, id))
+	assertCount(t, db, 1, id)
 	assert.Equal(id, tok.ID)
 	assert.Equal(desc, tok.Description)
 	assert.Equal(active, tok.Active)
@@ -526,46 +526,49 @@ func TestUpdateToken(t *testing.T) {
 					Updated:     tok.Updated,
 					Projects:    []string{"project-ABC", "project-XYZ"},
 				}
+
 				t.Run(name+" (fields updated)", func(t *testing.T) {
 					assert := assert.New(t)
 					reset(t, db)
 					tok.Projects = test.tokProjects
 					insertToken(t, db, tok)
 					ctx := insertProjectsIntoNewContext(test.projectFilter)
+
 					resp, err := store.UpdateToken(
 						ctx, tok.ID, updatedTok.Description, updatedTok.Active, updatedTok.Projects)
 
 					if expectedSuccess {
 						assert.NoError(err)
-						assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
-						resp.Created = updatedTok.Created // ignore the timestamps for comparison
+						assertCount(t, db, 1, tok.ID)
+						resp.Created = updatedTok.Created // ignore the timestamps in comparison
 						resp.Updated = updatedTok.Updated
 						assert.Equal(updatedTok, *resp)
 					} else {
 						assert.Error(err)
 						assert.Equal(&tokens.NotFoundError{}, err)
-						assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
+						assertCount(t, db, 1, tok.ID)
 					}
 				})
+
 				t.Run(name+" (fields unchanged)", func(t *testing.T) {
 					assert := assert.New(t)
 					reset(t, db)
 					tok.Projects = test.tokProjects
 					insertToken(t, db, tok)
 					ctx := insertProjectsIntoNewContext(test.projectFilter)
+
 					resp, err := store.UpdateToken(ctx, tok.ID, tok.Description, tok.Active, tok.Projects)
 
 					if expectedSuccess {
 						assert.NoError(err)
-						assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
-						resp.Created = tme // ignore the timestamps for comparison
+						assertCount(t, db, 1, tok.ID)
+						resp.Created = tme // ignore the timestamps in comparison
 						resp.Updated = tme
 						assert.Equal(tok, *resp)
 					} else {
 						assert.Error(err)
 						assert.Equal(&tokens.NotFoundError{}, err)
-						assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
-						// assert.Equal(tok, resp)
+						assertCount(t, db, 1, tok.ID)
 					}
 				})
 			}
@@ -626,15 +629,16 @@ func TestDeleteToken(t *testing.T) {
 					tok.Projects = test.tokProjects
 					insertToken(t, db, tok)
 					ctx := insertProjectsIntoNewContext(test.projectFilter)
+
 					err := store.DeleteToken(ctx, tok.ID)
 
 					if expectedSuccess {
 						assert.NoError(t, err)
-						assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
+						assertCount(t, db, 0, tok.ID)
 					} else {
 						assert.Error(t, err)
 						assert.Equal(t, &tokens.NotFoundError{}, err)
-						assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
+						assertCount(t, db, 1, tok.ID)
 					}
 				})
 			}
@@ -670,11 +674,12 @@ func insertToken(t *testing.T, db *sql.DB, tok tokens.Token) {
 		tok.ID, tok.Description, tok.Active, tok.Value, pq.Array(tok.Projects),
 		tok.Created, tok.Updated)
 	require.NoError(t, err)
-	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, tok.ID))
+	assertCount(t, db, 1, tok.ID)
 }
 
-func assertCount(t *testing.T, expected int, row *sql.Row) {
+func assertCount(t *testing.T, db *sql.DB, expected int, id string) {
 	t.Helper()
+	row := db.QueryRow(`SELECT count(*) FROM chef_authn_tokens WHERE id=$1`, id)
 	require.NotNil(t, row)
 	var count int
 	require.NoError(t, row.Scan(&count))
@@ -682,6 +687,7 @@ func assertCount(t *testing.T, expected int, row *sql.Row) {
 }
 
 func insertProjectsIntoNewContext(projects []string) context.Context {
-	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
-		[]string{}, projects, "resource", "action", "pol"))
+	return auth_context.NewOutgoingProjectsContext(
+		auth_context.NewContext(
+			context.Background(), []string{}, projects, "resource", "action", "pol"))
 }
