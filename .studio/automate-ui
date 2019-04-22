@@ -124,13 +124,23 @@ document "automate_ui_lint" <<DOC
   Executes the lint tests for the automate-ui.
 DOC
 function automate_ui_lint() {
-  ( cd /src/components/chef-ui-library || return 1
+  ( cd /src/components/automate-ui || return 1
     log_line "Running lint-typescript test (npm run lint)"
     npm run lint || return 1
     log_line "Running lint-sass test (npm run lint:sass)"
     npm run lint:sass || return 1
     log_line "Running lint-html test (npm run lint:html)"
     npm run lint:html || return 1
+  )
+}
+
+document "chef_ui_library_lint" <<DOC
+  Executes the lint tests for the chef-ui-library.
+DOC
+function chef_ui_library_lint() {
+  ( cd /src/components/chef-ui-library || return 1
+    log_line "Running lint-typescript test (npm run lint)"
+    npm run lint || return 1
   )
 }
 
