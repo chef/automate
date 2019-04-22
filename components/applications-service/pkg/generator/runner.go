@@ -122,15 +122,25 @@ func (s *SupervisorGroup) PrettyStr() string {
 func (s *SupervisorGroup) Run(cfg *RunnerConfig, stats *RunnerStatsKeeper) {
 	for n := int32(0); n < s.Count; n++ {
 		log.WithFields(log.Fields{"name": s.Name, "index": n}).Info("spawning supervisor")
-		go s.SpawnSup(n, cfg, stats) // nolint: errcheck
+		sup, err := s.NewSup(n, cfg, stats) // nolint: errcheck
+		if err != nil {
+			log.WithError(err).Error("failed to spawn supervisor")
+			continue
+		}
+		err = sup.Connect()
+		if err != nil {
+			log.WithError(err).Error("failed to spawn supervisor")
+			continue
+		}
+		go sup.Run()
 	}
 }
 
-func (s *SupervisorGroup) SpawnSup(n int32, cfg *RunnerConfig, stats *RunnerStatsKeeper) error {
+func (s *SupervisorGroup) NewSup(n int32, cfg *RunnerConfig, stats *RunnerStatsKeeper) (*SupSim, error) {
 	uuid, err := uuid.NewV4()
 	if err != nil {
 		log.WithError(err).Error("Failed to make a V4 UUID")
-		return err
+		return nil, err
 	}
 
 	sup := &SupSim{
@@ -140,14 +150,15 @@ func (s *SupervisorGroup) SpawnSup(n int32, cfg *RunnerConfig, stats *RunnerStat
 		MessagePrototypes: s.MessagePrototypes,
 		Stats:             stats,
 	}
+	return sup, nil
 
-	err = sup.Run()
-	if err != nil {
-		fmt.Printf("Supervisor failed to run: %s\n", err)
-		return err
-	}
+	// err = sup.Run()
+	// if err != nil {
+	// 	fmt.Printf("Supervisor failed to run: %s\n", err)
+	// 	return err
+	// }
 
-	return nil
+	// return nil
 }
 
 type SupSim struct {
@@ -160,10 +171,7 @@ type SupSim struct {
 	nc                *nats.NatsClient
 }
 
-func (s *SupSim) Run() error {
-	s.Stats.SupStarted()
-	defer s.Stats.SupDied()
-
+func (s *SupSim) Connect() error {
 	var (
 		url     = fmt.Sprintf("nats://%s@%s:4222", s.Cfg.AuthToken, s.Cfg.Host)
 		cluster = "event-service"
@@ -174,10 +182,12 @@ func (s *SupSim) Run() error {
 
 	s.nc = nats.NewExternalClient(url, cluster, client, durable, subject)
 	s.nc.InsecureSkipVerify = true
-	err := s.nc.Connect()
-	if err != nil {
-		return err
-	}
+	return s.nc.Connect()
+}
+
+func (s *SupSim) Run() error {
+	s.Stats.SupStarted()
+	defer s.Stats.SupDied()
 	defer s.nc.Close()
 	// run loadgen loop
 
