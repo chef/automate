@@ -21,6 +21,10 @@ export class ServicesSidebarComponent implements OnInit {
   public selectedHealth: string;
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
+  currentPage = 1;
+  pageSize = 25;
+  //TODO: Wire this up with real total
+  totalServices = 50;
 
   constructor(private store: Store<NgrxStateAtom>) { }
 
@@ -30,19 +34,28 @@ export class ServicesSidebarComponent implements OnInit {
 
     this.serviceGroupName$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.selectedServiceGroupName));
+
+    this.currentPage = 1;
   }
 
   public closeServicesSidebar() {
     this.closeServicesSidebarEvent.emit(null);
   }
 
-  public updateServicesFilters(health: string): void {
+  public updateServicesFilters(health: string, page?: number): void {
     this.selectedHealth = health;
     const servicesFilters: ServicesFilters = {
       service_group_id: this.serviceGroupId,
-      health: health
+      health: health,
+      page: page,
+      pageSize: this.pageSize
     };
     this.store.dispatch(new UpdateSelectedSG(servicesFilters));
+  }
+
+  updatePageNumber(pageNumber) {
+    this.currentPage = pageNumber;
+    this.updateServicesFilters(this.selectedHealth, pageNumber);
   }
 
   // healthCheckStatus returns the formated health_check status from the provided service

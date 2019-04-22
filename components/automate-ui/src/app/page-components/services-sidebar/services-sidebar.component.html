@@ -54,5 +54,11 @@
     <div class="no-services" *ngIf="(services$ | async)?.length === 0">
       No available services with <b>{{ selectedHealth }}</b> status
     </div>
+    <app-page-picker
+      [total]="totalServices"
+      [perPage]="pageSize"
+      [page]="currentPage"
+      (pageChanged)="updatePageNumber($event)">
+    </app-page-picker>
   </chef-side-panel>
 </chef-click-outside>
