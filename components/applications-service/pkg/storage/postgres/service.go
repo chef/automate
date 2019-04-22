@@ -58,7 +58,7 @@ FROM service AS s
 // GetServicesHealthCounts retrieves the health counts from all services in the database.
 // This function accepts a set of filters that can be applied to the SQL query to get the
 // health counts of a subset of the services in the database
-func (db *postgres) GetServicesHealthCounts(filters map[string][]string) (*storage.HealthCounts, error) {
+func (db *Postgres) GetServicesHealthCounts(filters map[string][]string) (*storage.HealthCounts, error) {
 	var (
 		sHealthCounts         storage.HealthCounts
 		WhereConstraints, err = buildWhereConstraintsFromFilters(filters)
@@ -79,7 +79,7 @@ func (db *postgres) GetServicesHealthCounts(filters map[string][]string) (*stora
 }
 
 // GetServices returns a list of services
-func (db *postgres) GetServices(
+func (db *Postgres) GetServices(
 	sortField string, sortAsc bool,
 	page int32, pageSize int32,
 	filters map[string][]string,
@@ -115,7 +115,7 @@ func (db *postgres) GetServices(
 }
 
 // getServiceFromUniqueFields retreives a service from the db without the need of an id
-func (db *postgres) getServiceFromUniqueFields(origin, name, member string) (*service, bool) {
+func (db *Postgres) getServiceFromUniqueFields(origin, name, member string) (*service, bool) {
 	var svc service
 	err := db.SelectOne(&svc, selectService, origin, name, member)
 	if err != nil {
