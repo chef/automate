@@ -102,6 +102,14 @@ EOF
 cp /services/ha_backend_private/htpasswd /hab/user/"$NGINX_PKG_NAME"/config/.elasticsearch_htpasswd
 cp /services/ha_backend_private/nginx-selfsigned* /hab/user/"$NGINX_PKG_NAME"/config/
 
+mkdir -p "/hab/user/${PG_PKG_NAME}/config/"
+cat > "/hab/user/${PG_PKG_NAME}/config/user.toml" <<EOF
+[superuser]
+password = 'thisisapassword'
+EOF
+
+
+
 echo "Starting HA Backend Habitat services"
 hab svc load ${postgresql_pkg_ident} --topology leader --channel ${channel}
 hab svc load ${pgleaderchk_pkg_ident} --topology leader --bind database:"$PG_PKG_NAME".default --binding-mode=relaxed --channel ${channel}

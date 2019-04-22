@@ -705,7 +705,7 @@ func (s *server) ConfigureDeployment(ctx context.Context,
 	request *api.ConfigureDeploymentRequest) (*api.ConfigureDeploymentResponse, error) {
 
 	overrideConfig := request.Config
-	logrus.WithFields(logrus.Fields{"overrideConfig": overrideConfig}).Debug("attempting to configure deployment")
+	logrus.Debug("attempting to configure deployment")
 
 	if err := overrideConfig.ValidateWithGlobalAndDefaultsAndCredentials(); err != nil {
 		// Don't include the override config in the log message in case it has passwords in it
