@@ -17,15 +17,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// TODO
 // Failure cases
 // * No status event for one minute
 // * Domain service sends failure message
 // On failure send a cancel event to stop non failed domain service's task.
 
 const (
-	RunningState    = "running"
-	NotRunningState = "not_running"
+	RunningState                    = "running"
+	NotRunningState                 = "not_running"
+	minutesWithoutCheckingInFailure = 5
 )
 
 type domainService struct {
@@ -82,6 +82,7 @@ func (manager *ProjectUpdateManager) UpdateFailed() bool {
 	return false
 }
 
+// FailureMessages - list out the detailed descriptions of the failure
 func (manager *ProjectUpdateManager) FailureMessages() []string {
 	failureMessages := make([]string, 0)
 	if manager.UpdateFailed() {
@@ -192,6 +193,7 @@ func (manager *ProjectUpdateManager) Start() error {
 	}
 }
 
+// ProcessFailEvent - react to a domain service failing to update project tags
 func (manager *ProjectUpdateManager) ProcessFailEvent(
 	eventMessage *automate_event.EventMsg) error {
 	switch manager.state {
@@ -221,13 +223,15 @@ func (manager *ProjectUpdateManager) ProcessFailEvent(
 		domainService.failureMessage = failureMessage
 		domainService.failed = true
 		domainService.lastUpdate = time.Now()
+		manager.cancelProjectUpdateForDomainResources()
 	default:
 	}
 
 	return nil
 }
 
-func (manager *ProjectUpdateManager) ProcessStatusMessage(
+// ProcessStatusEvent - record the status update from the domain service.
+func (manager *ProjectUpdateManager) ProcessStatusEvent(
 	eventMessage *automate_event.EventMsg) error {
 	switch manager.state {
 	case NotRunningState:
@@ -352,14 +356,22 @@ func (manager *ProjectUpdateManager) cancelProjectUpdateForDomainResources() err
 
 // Watching the domain services complete the update process.
 // A domain service is complete if it fails or sends a complete status.
-//
-// TODO
-// * Allow a failed domain service some extra time to resolve its self
-// * Act when a domain service has not send a status for over a minute
 func (manager *ProjectUpdateManager) waitingForJobToComplete() {
 	for manager.state == RunningState {
 		manager.checkIfComplete()
+		manager.checkForMissingDomainServices()
 		time.Sleep(time.Second * 5)
+	}
+}
+
+func (manager *ProjectUpdateManager) checkForMissingDomainServices() {
+	fiveMinutesAgo := time.Now().Add((-1) * time.Minute * minutesWithoutCheckingInFailure)
+	for _, domainService := range manager.domainServices {
+		if domainService.lastUpdate.Before(fiveMinutesAgo) {
+			domainService.failed = false
+			domainService.failureMessage = fmt.Sprintf("Has not check in for over %d minutes",
+				minutesWithoutCheckingInFailure)
+		}
 	}
 }
 
@@ -369,10 +381,6 @@ func (manager *ProjectUpdateManager) checkIfComplete() {
 	for _, domainService := range manager.domainServices {
 		if !domainService.complete && !domainService.failed {
 			complete = false
-
-			if domainService.failed {
-				failure = true
-			}
 			break
 		}
 	}
@@ -390,10 +398,12 @@ func (manager *ProjectUpdateManager) checkIfComplete() {
 func (manager *ProjectUpdateManager) resetDomainServicesData() {
 	manager.domainServices = []*domainService{
 		&domainService{
-			name: event_ids.ComplianceInspecReportProducerID,
+			name:       event_ids.ComplianceInspecReportProducerID,
+			lastUpdate: time.Now(),
 		},
 		&domainService{
-			name: event_ids.InfraClientRunsProducerID,
+			name:       event_ids.InfraClientRunsProducerID,
+			lastUpdate: time.Now(),
 		},
 	}
 }

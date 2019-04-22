@@ -31,7 +31,7 @@ type state struct {
 	log                  logger.Logger
 	store                storage.Storage
 	engine               engine.ProjectRulesRetriever
-	projectUpdateManager ProjectUpdateManager
+	projectUpdateManager *ProjectUpdateManager
 }
 
 // NewMemstoreProjectsServer returns an instance of api.ProjectsServer
@@ -275,7 +275,7 @@ func (s *state) HandleEvent(ctx context.Context,
 
 	response := &automate_event.EventResponse{}
 	if req.Type.Name == event.ProjectRulesUpdateStatus {
-		err := s.projectUpdateManager.ProcessStatusMessage(req)
+		err := s.projectUpdateManager.ProcessStatusEvent(req)
 		if err != nil {
 			return response, err
 		}
