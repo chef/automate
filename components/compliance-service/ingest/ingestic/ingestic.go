@@ -8,7 +8,6 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
-	rules_tags "github.com/chef/automate/lib/authz"
 	elastic "github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -535,19 +534,19 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2
 				policyGroups := []string{}
 				policyNames := []string{}
 				switch condition.Type {
-				case rules_tags.ChefServersTag:
+				case iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS:
 					chefServers = condition.Values
-				case rules_tags.ChefOrgsTag:
+				case iam_v2.ProjectRuleConditionTypes_CHEF_ORGS:
 					organizations = condition.Values
-				case rules_tags.ChefEnvironmentsTag:
+				case iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS:
 					environments = condition.Values
-				case rules_tags.RolesTag:
+				case iam_v2.ProjectRuleConditionTypes_ROLES:
 					roles = condition.Values
-				case rules_tags.ChefTagsTag:
+				case iam_v2.ProjectRuleConditionTypes_CHEF_TAGS:
 					chefTags = condition.Values
-				case rules_tags.PolicyGroupTag:
+				case iam_v2.ProjectRuleConditionTypes_POLICY_GROUP:
 					policyGroups = condition.Values
-				case rules_tags.PolicyNameTag:
+				case iam_v2.ProjectRuleConditionTypes_POLICY_NAME:
 					policyNames = condition.Values
 				}
 				esConditionCollection[conditionIndex] = map[string]interface{}{

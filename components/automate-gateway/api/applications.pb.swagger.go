@@ -126,6 +126,12 @@ func init() {
               "DESC"
             ],
             "default": "ASC"
+          },
+          {
+            "name": "health",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

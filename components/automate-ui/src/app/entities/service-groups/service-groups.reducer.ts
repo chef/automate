@@ -2,17 +2,19 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { EntityStatus } from '../entities';
 import { ServiceGroupsActionTypes, ServiceGroupsActions } from './service-groups.actions';
 import { set, pipe } from 'lodash/fp';
-import { ServiceGroup, ServiceGroupFilters, Service } from './service-groups.model';
+import {
+  ServiceGroup, ServiceGroupFilters, Service, ServicesFilters
+} from './service-groups.model';
 
 export interface ServiceGroupEntityState {
   serviceGroups: ServiceGroup[];
   status: EntityStatus;
   filters: ServiceGroupFilters;
   servicesStatus: EntityStatus;
-  selectedServiceGroupId: number;
-  selectedServiceGroupName: string;
-  servicesList: Service[];
   errorResp: HttpErrorResponse;
+  servicesFilters: ServicesFilters;
+  servicesList: Service[];
+  selectedServiceGroupName: string;
 }
 
 export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
@@ -20,10 +22,10 @@ export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
   status: EntityStatus.notLoaded,
   filters: { },
   servicesStatus: EntityStatus.notLoaded,
-  selectedServiceGroupId: undefined,
-  selectedServiceGroupName: undefined,
+  errorResp: null,
+  servicesFilters: { },
   servicesList: [],
-  errorResp: null
+  selectedServiceGroupName: undefined
 };
 
 export function serviceGroupEntityReducer(
@@ -51,7 +53,7 @@ export function serviceGroupEntityReducer(
     }
 
     case ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP:
-      return set('selectedServiceGroupId', action.payload, state);
+      return set('servicesFilters', action.payload, state);
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP:
       return set('serviceStatus', EntityStatus.loading, state);

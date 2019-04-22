@@ -12,7 +12,6 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
-	rules_tags "github.com/chef/automate/lib/authz"
 )
 
 // All the conditions must be true for a rule to be true (ANDed together).
@@ -37,9 +36,28 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			matching:    false,
 			report:      &relaxting.ESInSpecReport{},
 			rules: []*iam_v2.ProjectRule{
-				{},
+				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
+				},
 			},
 		},
+		{
+			description: "Single rule single condition matching incorrect rule type",
+			matching:    false,
+			report:      &relaxting.ESInSpecReport{},
+			rules: []*iam_v2.ProjectRule{
+				{
+					Type: iam_v2.ProjectRuleTypes_EVENT,
+					Conditions: []*iam_v2.Condition{
+						{
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
+							Values: []string{"production"},
+						},
+					},
+				},
+			},
+		},
+
 		// Environment
 		{
 			description: "Environment: Single rule single condition; matching",
@@ -49,9 +67,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefEnvironmentsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 							Values: []string{"production"},
 						},
 					},
@@ -66,9 +85,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefEnvironmentsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 							Values: []string{"production", "dev"},
 						},
 					},
@@ -84,9 +104,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefEnvironmentsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 							Values: []string{"production"},
 						},
 					},
@@ -94,7 +115,7 @@ func TestReportProjectRulesMatching(t *testing.T) {
 				{
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"north-side"},
 						},
 					},
@@ -110,13 +131,14 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefEnvironmentsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 							Values: []string{"production"},
 						},
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"north-side"},
 						},
 					},
@@ -131,9 +153,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefEnvironmentsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 							Values: []string{"production"},
 						},
 					},
@@ -150,9 +173,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -167,9 +191,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -184,9 +209,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_2"},
 						},
 					},
@@ -201,9 +227,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_1", "org_2"},
 						},
 					},
@@ -220,9 +247,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefServersTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 							Values: []string{"chef_server_1"},
 						},
 					},
@@ -237,9 +265,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefServersTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 							Values: []string{"chef_server_1"},
 						},
 					},
@@ -254,9 +283,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefServersTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 							Values: []string{"chef_server_1"},
 						},
 					},
@@ -271,9 +301,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefServersTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 							Values: []string{"chef_server_1", "chef_server_2"},
 						},
 					},
@@ -290,9 +321,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_51"},
 						},
 					},
@@ -307,9 +339,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_51"},
 						},
 					},
@@ -324,17 +357,19 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_51"},
 						},
 					},
 				},
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_54"},
 						},
 					},
@@ -349,9 +384,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_51", "area_54"},
 						},
 					},
@@ -366,13 +402,14 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_51"},
 						},
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_54"},
 						},
 					},
@@ -387,9 +424,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_51"},
 						},
 					},
@@ -404,9 +442,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_51"},
 						},
 					},
@@ -421,9 +460,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_51", "area_52"},
 						},
 					},
@@ -439,13 +479,14 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.RolesTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 							Values: []string{"area_52"},
 						},
 						{
-							Type:   rules_tags.ChefEnvironmentsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 							Values: []string{"production"},
 						},
 					},
@@ -463,9 +504,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefTagsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 							Values: []string{"area_51"},
 						},
 					},
@@ -481,9 +523,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefTagsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 							Values: []string{"area_51"},
 						},
 					},
@@ -499,9 +542,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefTagsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 							Values: []string{"area_51"},
 						},
 					},
@@ -516,9 +560,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefTagsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 							Values: []string{"area_51"},
 						},
 					},
@@ -533,9 +578,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefTagsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 							Values: []string{"area_51", "area_52"},
 						},
 					},
@@ -550,9 +596,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefTagsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 							Values: []string{"area_51", "area_52"},
 						},
 					},
@@ -568,17 +615,19 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefTagsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 							Values: []string{"area_52"},
 						},
 					},
 				},
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -594,17 +643,19 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefTagsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 							Values: []string{"area_52"},
 						},
 					},
 				},
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -621,9 +672,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyGroupTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 							Values: []string{"PolicyGroup"},
 						},
 					},
@@ -638,9 +690,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyGroupTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 							Values: []string{"policygroup"},
 						},
 					},
@@ -655,9 +708,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyGroupTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 							Values: []string{"area_51"},
 						},
 					},
@@ -672,9 +726,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyGroupTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 							Values: []string{"area_51", "area_52"},
 						},
 					},
@@ -690,17 +745,19 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyGroupTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 							Values: []string{"area_52"},
 						},
 					},
 				},
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -716,17 +773,19 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyGroupTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 							Values: []string{"area_52"},
 						},
 					},
 				},
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -743,9 +802,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyNameTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 							Values: []string{"PolicyName"},
 						},
 					},
@@ -760,9 +820,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyNameTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 							Values: []string{"policygroup"},
 						},
 					},
@@ -777,9 +838,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyNameTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 							Values: []string{"area_51"},
 						},
 					},
@@ -794,9 +856,10 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyNameTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 							Values: []string{"area_51", "area_52"},
 						},
 					},
@@ -812,17 +875,19 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyNameTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 							Values: []string{"area_52"},
 						},
 					},
 				},
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -838,17 +903,19 @@ func TestReportProjectRulesMatching(t *testing.T) {
 			},
 			rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.PolicyNameTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 							Values: []string{"area_52"},
 						},
 					},
 				},
 				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   rules_tags.ChefOrgsTag,
+							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -912,9 +979,10 @@ func TestBundlerMatchProjectRule(t *testing.T) {
 	projectRules[testProjectName] = &iam_v2.ProjectRules{
 		Rules: []*iam_v2.ProjectRule{
 			{
+				Type: iam_v2.ProjectRuleTypes_NODE,
 				Conditions: []*iam_v2.Condition{
 					{
-						Type:   rules_tags.ChefEnvironmentsTag,
+						Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 						Values: []string{environmentsName},
 					},
 				},
@@ -952,10 +1020,66 @@ func TestBundlerMatchProjectRule(t *testing.T) {
 
 	processMsg1 := <-out
 	assert.Equal(t, []string{testProjectName}, processMsg1.InspecReport.Projects)
-	assert.Equal(t, []string{testProjectName}, processMsg1.InspecReport.Projects)
+	assert.Equal(t, []string{testProjectName}, processMsg1.InspecSummary.Projects)
 
 	processMsg2 := <-out
 	assert.Equal(t, []string{}, processMsg2.InspecReport.Projects)
+}
+
+func TestBundlerMatchProjectRuleEventRuleType(t *testing.T) {
+	inbox := make(chan message.Compliance, 2)
+	testProjectName := "Test"
+	environmentsName := "env_1"
+	projectRules := map[string]*iam_v2.ProjectRules{}
+	projectRules[testProjectName] = &iam_v2.ProjectRules{
+		Rules: []*iam_v2.ProjectRule{
+			{
+				Type: iam_v2.ProjectRuleTypes_EVENT,
+				Conditions: []*iam_v2.Condition{
+					{
+						Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
+						Values: []string{environmentsName},
+					},
+				},
+			},
+		},
+	}
+	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Return(
+		&iam_v2.ProjectCollectionRulesResp{ProjectRules: projectRules}, nil)
+
+	done := make(chan error)
+	ctx := context.Background()
+
+	report1 := message.Compliance{
+		QueueTime:     time.Now(),
+		InspecReport:  &relaxting.ESInSpecReport{Environment: environmentsName, Roles: []string{}},
+		InspecSummary: &relaxting.ESInSpecSummary{},
+		Ctx:           ctx,
+		Done:          done,
+	}
+
+	report2 := message.Compliance{
+		QueueTime:     time.Now(),
+		InspecReport:  &relaxting.ESInSpecReport{Environment: "no_match", Roles: []string{}},
+		InspecSummary: &relaxting.ESInSpecSummary{},
+		Ctx:           ctx,
+		Done:          done,
+	}
+
+	inbox <- report1
+	inbox <- report2
+	close(inbox)
+
+	out := BundleReportProjectTagger(authzClient)(inbox)
+
+	processMsg1 := <-out
+	assert.Equal(t, []string{}, processMsg1.InspecReport.Projects)
+	assert.Equal(t, []string{}, processMsg1.InspecSummary.Projects)
+
+	processMsg2 := <-out
+	assert.Equal(t, []string{}, processMsg2.InspecReport.Projects)
+	assert.Equal(t, []string{}, processMsg2.InspecSummary.Projects)
 }
 
 // A scan job report should not be tagged.
@@ -968,9 +1092,10 @@ func TestBundlerWithScanJobReport(t *testing.T) {
 	projectRules[testProjectName] = &iam_v2.ProjectRules{
 		Rules: []*iam_v2.ProjectRule{
 			{
+				Type: iam_v2.ProjectRuleTypes_NODE,
 				Conditions: []*iam_v2.Condition{
 					{
-						Type:   rules_tags.ChefEnvironmentsTag,
+						Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 						Values: []string{environmentsName},
 					},
 				},

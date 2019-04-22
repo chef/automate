@@ -16,3 +16,10 @@ do_create_config() {
     do_create_config_default
     cat /services/ha_backend.toml >> $test_config_path
 }
+
+do_cleanup() {
+    if journalctl -u chef-automate | grep 'thisisapassword'; then
+        log_error "The logs contain the postgres password"
+        return 1
+    fi
+}
