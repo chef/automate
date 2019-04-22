@@ -807,7 +807,8 @@ func (phase *SupervisorUpgradePhase) updateHapSupSymlink(_ *eventWriter, target 
 	}
 
 	desiredPkg := phase.desiredSupState.SupPkg()
-	if err != nil || !habpkg.GreaterOrEqual(&currentPkg, &desiredPkg) {
+
+	if err != nil || currentPkg != desiredPkg {
 		if err := target.SymlinkHabSup(desiredPkg); err != nil {
 			return errors.Wrap(err, "failed to create hab-sup symlink")
 		}
