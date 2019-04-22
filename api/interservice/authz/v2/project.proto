@@ -81,6 +81,8 @@ message ProjectUpdateStatusResp {
     string state = 1;
     google.protobuf.Timestamp estimated_time_compelete = 2;
     float percentage_complete = 3;
+    bool failed = 4;
+    repeated string failure_messages = 5;
 }
 
 message ListProjectRulesReq {}

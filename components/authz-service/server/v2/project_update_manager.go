@@ -35,6 +35,7 @@ type domainService struct {
 	lastUpdate             time.Time
 	complete               bool
 	failed                 bool
+	failureMessage         string
 }
 
 // ProjectUpdateManager - project update manager
@@ -47,8 +48,8 @@ type ProjectUpdateManager struct {
 
 // NewProjectUpdateManager - create a new project update manager
 func NewProjectUpdateManager(
-	eventServiceClient automate_event.EventServiceClient) ProjectUpdateManager {
-	return ProjectUpdateManager{
+	eventServiceClient automate_event.EventServiceClient) *ProjectUpdateManager {
+	return &ProjectUpdateManager{
 		state:              NotRunningState,
 		eventServiceClient: eventServiceClient,
 	}
@@ -70,21 +71,48 @@ func (manager *ProjectUpdateManager) Complete() bool {
 	return true
 }
 
+// UpdateFailed - did the last update attempt fail
+func (manager *ProjectUpdateManager) UpdateFailed() bool {
+	for _, ds := range manager.domainServices {
+		if ds.failed {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (manager *ProjectUpdateManager) FailureMessages() []string {
+	failureMessages := make([]string, 0)
+	if manager.UpdateFailed() {
+		for _, ds := range manager.domainServices {
+			if ds.failed {
+				failureMessages = append(failureMessages, fmt.Sprint("%s failed with %s",
+					ds.name, ds.failureMessage))
+			}
+		}
+	}
+
+	return failureMessages
+}
+
 // PercentageComplete - percentage of the job complete
 func (manager *ProjectUpdateManager) PercentageComplete() float64 {
 	switch manager.state {
 	case NotRunningState:
 	case RunningState:
-		latestEstimatedTimeCompelete := time.Time{}
-		var latestDomainService *domainService
-		for _, ds := range manager.domainServices {
-			if !ds.complete && ds.estimatedTimeCompelete.After(latestEstimatedTimeCompelete) {
-				latestEstimatedTimeCompelete = ds.estimatedTimeCompelete
-				latestDomainService = ds
+		if !manager.UpdateFailed() {
+			latestEstimatedTimeCompelete := time.Time{}
+			var latestDomainService *domainService
+			for _, ds := range manager.domainServices {
+				if !ds.complete && ds.estimatedTimeCompelete.After(latestEstimatedTimeCompelete) {
+					latestEstimatedTimeCompelete = ds.estimatedTimeCompelete
+					latestDomainService = ds
+				}
 			}
-		}
-		if latestDomainService != nil {
-			return latestDomainService.percentageComplete
+			if latestDomainService != nil {
+				return latestDomainService.percentageComplete
+			}
 		}
 	default:
 	}
@@ -98,9 +126,11 @@ func (manager *ProjectUpdateManager) EstimatedTimeCompelete() time.Time {
 	case NotRunningState:
 	case RunningState:
 		latestEstimatedTimeCompelete := time.Time{}
-		for _, ds := range manager.domainServices {
-			if !ds.complete && ds.estimatedTimeCompelete.After(latestEstimatedTimeCompelete) {
-				latestEstimatedTimeCompelete = ds.estimatedTimeCompelete
+		if !manager.UpdateFailed() {
+			for _, ds := range manager.domainServices {
+				if !ds.complete && ds.estimatedTimeCompelete.After(latestEstimatedTimeCompelete) {
+					latestEstimatedTimeCompelete = ds.estimatedTimeCompelete
+				}
 			}
 		}
 		return latestEstimatedTimeCompelete
@@ -162,7 +192,7 @@ func (manager *ProjectUpdateManager) Start() error {
 	}
 }
 
-func (manager *ProjectUpdateManager) ProcessFailMessage(
+func (manager *ProjectUpdateManager) ProcessFailEvent(
 	eventMessage *automate_event.EventMsg) error {
 	switch manager.state {
 	case NotRunningState:
@@ -186,6 +216,9 @@ func (manager *ProjectUpdateManager) ProcessFailMessage(
 			return err
 		}
 
+		failureMessage := getFailureMessage(eventMessage)
+
+		domainService.failureMessage = failureMessage
 		domainService.failed = true
 		domainService.lastUpdate = time.Now()
 	default:
@@ -394,6 +427,16 @@ func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {
 
 	return "", fmt.Errorf("Event message sent without a %s field eventID: %q",
 		fieldName, event.EventID)
+}
+
+func getFailureMessage(event *automate_event.EventMsg) string {
+	fieldName := "message"
+	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil &&
+		event.Data.Fields[fieldName].GetStringValue() != "" {
+		return event.Data.Fields[fieldName].GetStringValue()
+	}
+
+	return ""
 }
 
 func getCompleted(event *automate_event.EventMsg) (bool, error) {

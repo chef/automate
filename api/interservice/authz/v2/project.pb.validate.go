@@ -1067,6 +1067,8 @@ func (m *ProjectUpdateStatusResp) Validate() error {
 
 	// no validation rules for PercentageComplete
 
+	// no validation rules for Failed
+
 	return nil
 }
 

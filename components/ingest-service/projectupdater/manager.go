@@ -27,7 +27,7 @@ const (
 	notRunningState                      = "not_running"
 	sleepTimeBetweenStatusChecksMilliSec = 1000
 	maxNumberOfConsecutiveFails          = 10
-	stateFile                            = "./.project_update_state"
+	stateFile                            = "/hab/svc/ingest-service/data/.project_update_state"
 )
 
 // Manager - project update manager
@@ -42,13 +42,10 @@ type Manager struct {
 	eventServiceClient    automate_event.EventServiceClient
 }
 
-// TODO
-// * Store running job IDs so if service restart it can pick up where it left off
-
 // NewManager - create a new project update manager
 func NewManager(client backend.Client, authzProjectsClient iam_v2.ProjectsClient,
-	eventServiceClient automate_event.EventServiceClient) Manager {
-	manager := Manager{
+	eventServiceClient automate_event.EventServiceClient) *Manager {
+	manager := &Manager{
 		state:               notRunningState,
 		client:              client,
 		authzProjectsClient: authzProjectsClient,
@@ -56,19 +53,6 @@ func NewManager(client backend.Client, authzProjectsClient iam_v2.ProjectsClient
 	}
 	manager.resumePreviousState()
 	return manager
-}
-
-func (manager *Manager) resumePreviousState() {
-	// read file
-	// if file does not exists {
-	// return
-	// }
-	//
-	// if state == runningState {
-	//   state = runningState
-	//   projectUpdateID = projectUpdateID
-	//   esJobID = esJobID
-	// }
 }
 
 func (manager *Manager) Cancel(projectUpdateID string) {
@@ -181,6 +165,8 @@ func (manager *Manager) waitingForJobToComplete() {
 		numberOfConsecutiveFails = 0
 	)
 
+	logrus.Info("waitingForJobToComplete")
+
 	// initial status
 	manager.updateStatus(backend.JobStatus{})
 
@@ -195,15 +181,16 @@ func (manager *Manager) waitingForJobToComplete() {
 
 	for !isJobComplete {
 		time.Sleep(time.Millisecond * sleepTimeBetweenStatusChecksMilliSec)
+
 		jobStatus, err = manager.client.JobStatus(context.Background(), manager.esJobID)
+		logrus.Infof("waitingForJobToComplete jobStatus: %v", jobStatus)
 		if err != nil {
 			logrus.Errorf("Failed to check the running job: %v", err)
 			numberOfConsecutiveFails++
 			if numberOfConsecutiveFails > maxNumberOfConsecutiveFails {
 				logrus.Errorf("Failed to check Elasticsearch job %q %d times",
 					manager.esJobID, numberOfConsecutiveFails)
-				manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times",
-					manager.esJobID, numberOfConsecutiveFails), manager.projectUpdateID)
+				manager.failedJob()
 				return
 			}
 		} else {
@@ -227,17 +214,47 @@ func (manager *Manager) changeState(newState string) {
 }
 
 type persistedState struct {
-	state           string
-	projectUpdateID string
-	esJobID         string
+	State           string `json:"state"`
+	ProjectUpdateID string `json:"projectUpdateID"`
+	EsJobID         string `json:"esJobID"`
+}
+
+func (manager *Manager) resumePreviousState() {
+	if _, err := os.Stat(stateFile); os.IsNotExist(err) {
+		return
+	}
+
+	persistedStateJSON, err := ioutil.ReadFile(stateFile)
+	if err != nil {
+		logrus.Errorf("Could not read file %s error: %v", stateFile, err)
+		return
+	}
+
+	var savedState persistedState
+	err = json.Unmarshal(persistedStateJSON, &savedState)
+	if err != nil {
+		logrus.Errorf("Error parsing project update manager state error %v", err)
+		return
+	}
+
+	logrus.Infof("Read saved state %v", savedState)
+
+	if savedState.State == runningState {
+		manager.state = runningState
+		manager.projectUpdateID = savedState.ProjectUpdateID
+		manager.esJobID = savedState.EsJobID
+		logrus.Infof("Setting smanager.state: %s manager.projectUpdateID: %s manager.esJobID: %s",
+			manager.state, manager.projectUpdateID, manager.esJobID)
+		go manager.waitingForJobToComplete()
+	}
 }
 
 func (manager *Manager) saveState() {
 
 	state := persistedState{
-		state:           manager.state,
-		projectUpdateID: manager.projectUpdateID,
-		esJobID:         manager.esJobID,
+		State:           manager.state,
+		ProjectUpdateID: manager.projectUpdateID,
+		EsJobID:         manager.esJobID,
 	}
 
 	raw, err := json.Marshal(state)
@@ -262,6 +279,14 @@ func (manager *Manager) saveState() {
 			"project_update_state_file": stateFile,
 		}).Error("Error writing Project Update State File")
 	}
+}
+
+func (manager *Manager) failedJob() {
+	manager.percentageComplete = 1.0
+	manager.estimatedEndTimeInSec = 0
+	manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times",
+		manager.esJobID, maxNumberOfConsecutiveFails), manager.projectUpdateID)
+	manager.changeState(notRunningState)
 }
 
 func (manager *Manager) completeJob() {

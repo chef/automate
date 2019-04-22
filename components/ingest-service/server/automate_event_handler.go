@@ -21,7 +21,7 @@ import (
 type AutomateEventHandlerServer struct {
 	client           backend.Client
 	chefIngestServer ChefIngestServer
-	updateManager    projectupdater.Manager
+	updateManager    *projectupdater.Manager
 }
 
 func NewAutomateEventHandlerServer(client backend.Client, chefIngestServer ChefIngestServer,

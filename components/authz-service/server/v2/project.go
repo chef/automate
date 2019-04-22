@@ -164,6 +164,7 @@ func (s *state) ProjectUpdateStatus(ctx context.Context,
 		State:                  s.projectUpdateManager.State(),
 		PercentageComplete:     float32(s.projectUpdateManager.PercentageComplete()),
 		EstimatedTimeCompelete: time,
+		Failed:                 s.projectUpdateManager.UpdateFailed(),
 	}, nil
 }
 
@@ -279,7 +280,7 @@ func (s *state) HandleEvent(ctx context.Context,
 			return response, err
 		}
 	} else if req.Type.Name == event.ProjectRulesUpdateFailed {
-		err := s.projectUpdateManager.ProcessFailMessage(req)
+		err := s.projectUpdateManager.ProcessFailEvent(req)
 		if err != nil {
 			return response, err
 		}
