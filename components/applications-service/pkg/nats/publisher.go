@@ -33,8 +33,7 @@ func (nc *NatsClient) PublishHabService(msg *applications.HabService) error {
 	if err != nil {
 		return err
 	}
-	nc.conn.Publish(nc.subject, b)
-	return nil
+	return nc.conn.Publish(nc.subject, b)
 }
 
 // PublishBytes publishes an array of bytes to the NATS server
@@ -50,6 +49,5 @@ func (nc *NatsClient) PublishBytes(b []byte) error {
 		"message": string(b),
 	}).Info("Publishing message")
 
-	nc.conn.Publish(nc.subject, b)
-	return nil
+	return nc.conn.Publish(nc.subject, b)
 }

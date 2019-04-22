@@ -69,7 +69,7 @@ steps:
 
   - label: "[unit] applications-service"
     command:
-      - hab studio run "source .studiorc && go_component_unit applications-service && go_component_static_tests applications-service"
+      - hab studio run "source .studiorc && go_component_make components/applications-service ci"
     timeout_in_minutes: 10
     retry:
       automatic:
