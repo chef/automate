@@ -420,7 +420,7 @@ func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 		Projects: []string{},
 	})
 	if err != nil {
-		return status.Wrap(err, status.APIError, "Failed to generate new admin token.")
+		return status.Wrap(err, status.APIError, "Failed to generate new token.")
 	}
 
 	if iamCmdFlags.adminToken {
