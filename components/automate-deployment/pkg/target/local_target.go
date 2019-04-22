@@ -676,7 +676,7 @@ func (t *LocalTarget) HabSupRestartRequired(desiredPkg habpkg.HabPkg) (bool, err
 		return false, errors.Wrap(err, "determining running hab-sup version")
 	}
 
-	restartRequired := !habpkg.GreaterOrEqual(&runningHabVersion, &desiredPkg)
+	restartRequired := runningHabVersion != desiredPkg
 	logrus.WithFields(logrus.Fields{
 		"restart_required": restartRequired,
 		"desired_version":  habpkg.VersionString(&desiredPkg),
