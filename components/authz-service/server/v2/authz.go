@@ -82,18 +82,13 @@ func (s *authzServer) ProjectsAuthorized(
 		// as long as at least one project is authorized
 		// we override the filtered projects because no filter should be applied on v2.0
 		projectsAuthorized = []string{constants.AllProjectsExternalID}
-	} else if stringutils.SliceContains(projectsAuthorized, constants.AllProjectsID) {
-		// Generally we return the engine's response verbatim
-		// but there are two cases that need to be intercepted and adjusted.
-		if len(req.ProjectsFilter) == 0 {
-			// Engine allows all and we requested all, so signify it as all.
-			// This must be different than the requested notion of all,
-			// an empty array, because an empty array coming back from the engine means none!
-			projectsAuthorized = []string{constants.AllProjectsExternalID}
-		} else {
-			// Engine allows all--but we want that to mean just the *requested* ones.
-			projectsAuthorized = req.ProjectsFilter
-		}
+	}
+
+	if stringutils.SliceContains(projectsAuthorized, constants.AllProjectsID) {
+		// Engine allows all and we requested all, so signify it as all.
+		// This must be different than the requested notion of all,
+		// an empty array, because an empty array coming back from the engine means none!
+		projectsAuthorized = []string{constants.AllProjectsExternalID}
 	}
 
 	// TODO bd: parse result and send gateway different errors based on version
