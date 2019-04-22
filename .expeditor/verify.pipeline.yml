@@ -69,9 +69,7 @@ steps:
 
   - label: "[unit] applications-service"
     command:
-      - scripts/install_golang
-      - cd components/applications-service
-      - make ci
+      - hab studio run "source .studiorc && go_component_make components/applications-service ci"
     timeout_in_minutes: 10
     retry:
       automatic:
