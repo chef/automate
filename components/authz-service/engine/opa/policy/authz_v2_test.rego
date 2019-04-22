@@ -374,7 +374,6 @@ test_authorized_project_deny_real_data {
 	actual_projects == set()
 }
 
-# 1. deny override case
 test_authorized_project_returns_no_projects_when_all_projects_denied {
 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
 		 with data.policies.polid as {
@@ -386,12 +385,9 @@ test_authorized_project_returns_no_projects_when_all_projects_denied {
 		}
 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3", "p5"]}
 
-	# currently returns:
-	# actual_projects == {"p1", "p3"}
 	actual_projects == set()
 }
 
-# 2. deny override case
 test_authorized_project_matches_only_allowed_projects_when_some_projects_denied {
 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
 		 with data.policies.polid as {
@@ -403,7 +399,54 @@ test_authorized_project_matches_only_allowed_projects_when_some_projects_denied 
 		}
 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p2", "p3"]}
 
-	# currently returns:
-	# actual_projects == {"~~ALL-PROJECTS~~"}
 	actual_projects == {"p2"}
 }
+
+test_authorized_project_allows_with_wildcard_when_filter_list_is_empty {
+	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]},
+			},
+		}
+		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": []}
+
+	actual_projects == {"~~ALL-PROJECTS~~"}
+}
+
+test_authorized_project_denies_with_wildcard_when_filter_list_is_empty {
+	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
+		 with data.policies.polid as {
+			"members": ["x"],
+			"statements": {
+				"sid-1": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]},
+				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p2"]},
+			},
+		}
+		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": []}
+
+	actual_projects == set()
+}
+
+# not calculable by opa ( in one call)
+# test_authorized_project_allows_with_wildcard_and_deny_present_when_filter_list_is_empty {
+# 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
+# 		 with data.policies.polid as {
+# 			"members": ["x"],
+# 			"statements": {
+# 				"sid-1": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]},
+# 				"sid-2": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p2"]},
+# 			},
+# 		}
+# 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": []}
+
+# 	actual_projects == "all other projects"
+# }
+
+# call comes in with empty list
+# gateway passes empty list
+# authz introspects all allowed projects and passes those to ProjectsAuthorized
+# so ProjectsAuthorized never gets an empty list
+
+# maybe post-process?
