@@ -18,7 +18,11 @@ import (
 )
 
 // TODO
-// Add a partial update state - when an update is canceled or failed
+// Failure cases
+// * No status event for one minute
+// * Domain service sends failure message
+// On failure send a cancel event to stop non failed domain service's task.
+
 const (
 	RunningState    = "running"
 	NotRunningState = "not_running"
@@ -40,10 +44,6 @@ type ProjectUpdateManager struct {
 	eventServiceClient automate_event.EventServiceClient
 	domainServices     []*domainService
 }
-
-// TODO
-// * Store running job IDs so if service restart it can pick up where it left off
-// * Add a cancel function
 
 // NewProjectUpdateManager - create a new project update manager
 func NewProjectUpdateManager(
@@ -115,6 +115,7 @@ func (manager *ProjectUpdateManager) State() string {
 	return manager.state
 }
 
+// Cancel - stop or cancel domain service project update process
 func (manager *ProjectUpdateManager) Cancel() error {
 	switch manager.state {
 	case NotRunningState:
@@ -134,7 +135,7 @@ func (manager *ProjectUpdateManager) Cancel() error {
 	return nil
 }
 
-// Start - start a project update
+// Start - start the domain services project update process
 func (manager *ProjectUpdateManager) Start() error {
 	switch manager.state {
 	case NotRunningState:
@@ -147,9 +148,8 @@ func (manager *ProjectUpdateManager) Start() error {
 			return err
 		}
 
-		manager.resetDomainServicesData()
+		manager.changeState(RunningState)
 		manager.projectUpdateID = projectUpdateID
-		manager.state = RunningState
 		go manager.waitingForJobToComplete()
 		return nil
 	case RunningState:
@@ -241,14 +241,19 @@ func (manager *ProjectUpdateManager) ProcessStatusMessage(
 		domainService.estimatedTimeCompelete = estimatedTimeCompelete
 		domainService.percentageComplete = percentageComplete
 		domainService.lastUpdate = time.Now()
-		// A domain service can recover from a failure
-		domainService.failed = false
 
 		manager.checkIfComplete()
 	default:
 	}
 
 	return nil
+}
+
+func (manager *ProjectUpdateManager) changeState(newState string) {
+	if manager.state != newState {
+		manager.resetDomainServicesData()
+		manager.state = newState
+	}
 }
 
 func (manager *ProjectUpdateManager) findDomainService(
@@ -345,19 +350,17 @@ func (manager *ProjectUpdateManager) checkIfComplete() {
 		} else {
 			log.Info("Finished domain services project update with success")
 		}
-		manager.state = NotRunningState
+		manager.changeState(NotRunningState)
 	}
 }
 
 func (manager *ProjectUpdateManager) resetDomainServicesData() {
 	manager.domainServices = []*domainService{
 		&domainService{
-			name:     event_ids.ComplianceInspecReportProducerID,
-			complete: false,
+			name: event_ids.ComplianceInspecReportProducerID,
 		},
 		&domainService{
-			name:     event_ids.InfraClientRunsProducerID,
-			complete: false,
+			name: event_ids.InfraClientRunsProducerID,
 		},
 	}
 }
