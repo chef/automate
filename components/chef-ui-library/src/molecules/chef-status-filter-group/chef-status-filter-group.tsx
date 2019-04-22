@@ -15,23 +15,59 @@ import find from 'lodash/fp/find';
  * <chef-status-filter-group>
  *   <chef-option class="filter general" value="general">
  *     <div class="filter-label">Total</div>
- *     <chef-icon>group_work</chef-icon><div class="filter-total">30</div>
+ *     <div class="filter-total"><chef-icon>group_work</chef-icon> 30</div>
  *   </chef-option>
  *   <chef-option class="filter critical" value='critical'>
  *     <div class="filter-label">Critical</div>
- *     <chef-icon>warning</chef-icon><div class="filter-total">10</div>
+ *     <div class="filter-total"><chef-icon>warning</chef-icon> 10</div>
  *   </chef-option>
  *   <chef-option class="filter warning" value='warning'>
  *     <div class="filter-label">Warning</div>
- *     <chef-icon>error</chef-icon><div class="filter-total">5</div>
- * </chef-option>
+ *     <div class="filter-total"><chef-icon>error</chef-icon> 5</div>
+ *   </chef-option>
  *   <chef-option class="filter success" value='success'>
  *     <div class="filter-label">OK</div>
- *     <chef-icon>check_circle</chef-icon><div class="filter-total">5</div>
- * </chef-option>
+ *     <div class="filter-total"><chef-icon>check_circle</chef-icon> 5</div>
+ *   </chef-option>
  *   <chef-option class="filter unknown" value='unknown'>
- *     <div class="filter-label">Deploying</div>
- *     <chef-icon>help</chef-icon><div class="filter-total">10</div>
+ *     <div class="filter-label">Unknown</div>
+ *     <div class="filter-total"><chef-icon>help</chef-icon> 10</div>
+ *   </chef-option>
+ * </chef-status-filter-group>
+ *
+ * A lean status filter bar:
+ *
+ * @example
+ * <chef-status-filter-group>
+ *   <chef-option class="lean-filter general" value="general">
+ *     <div class="lean-filter-label">
+ *       <chef-icon>group_work</chef-icon>Total
+ *       <div class="lean-filter-total">30</div>
+ *     </div>
+ *   </chef-option>
+ *   <chef-option class="lean-filter critical" value='critical'>
+ *     <div class="lean-filter-label">
+ *       <chef-icon>warning</chef-icon>Critical
+ *       <div class="lean-filter-total">10</div>
+ *     </div>
+ *   </chef-option>
+ *   <chef-option class="lean-filter warning" value='warning'>
+ *     <div class="lean-filter-label">
+ *       <chef-icon>error</chef-icon>Warning
+ *       <div class="lean-filter-total">5</div>
+ *     </div>
+ *   </chef-option>
+ *   <chef-option class="lean-filter success" value='success'>
+ *     <div class="lean-filter-label">
+ *       <chef-icon>check_circle</chef-icon>OK
+ *       <div class="lean-filter-total">5</div>
+ *     </div>
+ *   </chef-option>
+ *   <chef-option class="lean-filter unknown" value='unknown'>
+ *     <div class="lean-filter-label">
+ *       <chef-icon>help</chef-icon>Unknown
+ *       <div class="lean-filter-total">10</div>
+ *     </div>
  *   </chef-option>
  * </chef-status-filter-group>
  */

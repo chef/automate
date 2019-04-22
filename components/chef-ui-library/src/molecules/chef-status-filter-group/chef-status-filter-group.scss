@@ -1,7 +1,6 @@
 chef-status-filter-group {
   --active-color: var(--toggle-active-color, chef-hsl(var(--chef-primary-bright)));
   display: block;
-  align-items: center;
 
   chef-option {
     cursor: pointer;
@@ -9,11 +8,7 @@ chef-status-filter-group {
     box-shadow: 0 0 0 1px #DAE1E6 inset;
     border-radius: 4px;
     font-size: 14px;
-    display: inline-flex;
-
-    &:nth-child(n+2) {
-      margin-left: 8px;
-    }
+    display: inline-table;
 
     &.filter {
       padding-bottom: 8px;
@@ -22,11 +17,12 @@ chef-status-filter-group {
       padding-top: 8px;
       height: auto;
       width: auto;
-      margin-right: 16px;
+      margin-right: 10px; // This marging should be 8px but something is adding margin-left 6px
+      margin-bottom: 16px;
 
       .option-content {
         min-width: 100px;
-        flex-direction: column;
+        display: block;
       }
 
 
@@ -67,7 +63,7 @@ chef-status-filter-group {
 
     &.lean-filter {
       padding: 8px;
-      margin-right: 8px;
+      margin-right: 2px; // This marging should be 8px but something is adding margin-left 6px
       margin-bottom: 10px;
 
       .option-content {
@@ -110,21 +106,27 @@ chef-status-filter-group {
       }
     }
 
+    .lean-filter-total {
+      margin-left: 8px;
+      font-weight: bold;
+    }
+
     .lean-filter-label {
       display: inline-flex;
+      vertical-align: middle;
+    }
+
+    .filter-label {
+      height: 20px;
     }
 
     .filter-total {
       display: inline-flex;
-      align-items: center;
-      vertical-align: center;
     }
 
     chef-icon {
-      display: inline-flex;
-      vertical-align: center;
-      height: 16px;
-      width: 16px;
+      display: flex;
+      font-size: 16px;
       margin-right: 4px;
     }
 
