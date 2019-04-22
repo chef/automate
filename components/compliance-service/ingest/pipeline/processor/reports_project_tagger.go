@@ -6,7 +6,6 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
-	rules_tags "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/sirupsen/logrus"
 )
@@ -88,7 +87,7 @@ func findMatchingProjects(report *relaxting.ESInSpecReport, projects map[string]
 // Only one rule has to match for the entire project to match (ORed together).
 func reportMatchesRules(report *relaxting.ESInSpecReport, rules []*iam_v2.ProjectRule) bool {
 	for _, rule := range rules {
-		if reportMatchesAllConditions(report, rule.Conditions) {
+		if rule.Type == iam_v2.ProjectRuleTypes_NODE && reportMatchesAllConditions(report, rule.Conditions) {
 			return true
 		}
 	}
@@ -105,11 +104,11 @@ func reportMatchesAllConditions(report *relaxting.ESInSpecReport, conditions []*
 
 	for _, condition := range conditions {
 		switch condition.Type {
-		case rules_tags.ChefEnvironmentsTag:
+		case iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS:
 			if !stringutils.SliceContains(condition.Values, report.Environment) {
 				return false
 			}
-		case rules_tags.RolesTag:
+		case iam_v2.ProjectRuleConditionTypes_ROLES:
 			foundMatch := false
 			for _, projectRole := range condition.Values {
 				if stringutils.SliceContains(report.Roles, projectRole) {
@@ -120,23 +119,23 @@ func reportMatchesAllConditions(report *relaxting.ESInSpecReport, conditions []*
 			if !foundMatch {
 				return false
 			}
-		case rules_tags.ChefServersTag:
+		case iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS:
 			if !stringutils.SliceContains(condition.Values, report.SourceFQDN) {
 				return false
 			}
-		case rules_tags.ChefOrgsTag:
+		case iam_v2.ProjectRuleConditionTypes_CHEF_ORGS:
 			if !stringutils.SliceContains(condition.Values, report.OrganizationName) {
 				return false
 			}
-		case rules_tags.PolicyGroupTag:
+		case iam_v2.ProjectRuleConditionTypes_POLICY_GROUP:
 			if !stringutils.SliceContains(condition.Values, report.PolicyGroup) {
 				return false
 			}
-		case rules_tags.PolicyNameTag:
+		case iam_v2.ProjectRuleConditionTypes_POLICY_NAME:
 			if !stringutils.SliceContains(condition.Values, report.PolicyName) {
 				return false
 			}
-		case rules_tags.ChefTagsTag:
+		case iam_v2.ProjectRuleConditionTypes_CHEF_TAGS:
 			foundMatch := false
 			for _, projectChefTag := range condition.Values {
 				if stringutils.SliceContains(report.ChefTags, projectChefTag) {
