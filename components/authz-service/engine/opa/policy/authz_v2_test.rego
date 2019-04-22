@@ -91,7 +91,7 @@ test_has_project_matches_policy_statement_with_wildcard_with_some_input_projects
 	has_project[[project, "polid", "sid"]] with data.policies.polid as {"statements": {"sid": {"projects": ["~~ALL-PROJECTS~~"]}}}
 		 with input.projects as ["z"]
 
-	project == "~~ALL-PROJECTS~~"
+	project == "z"
 }
 
 test_has_project_matches_policy_statement_with_wildcard_with_no_input_projects {
@@ -242,26 +242,26 @@ test_authorized_project_returns_all_projects_when_filter_criteria_is_omitted_ent
 	actual_projects == {"p1", "p2"}
 }
 
-test_authorized_project_returns_wildcard_if_wildcard_policy_present {
+test_authorized_project_returns_all_input_projects_if_only_wildcard_statement_present {
 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
 		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]}}}
 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3"]}
 
-	actual_projects == {"~~ALL-PROJECTS~~"}
+	actual_projects == {"p1","p3"}
 }
 
-test_authorized_project_matches_projects_mixed_with_wildcard {
+test_authorized_project_returns_all_input_projects_when_projects_mixed_with_wildcard_statement {
 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
 		 with data.policies.polid as {
 			"members": ["x"],
 			"statements": {
-				"sid-1": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p1", "p3"]},
+				"sid-1": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["p1", "p3", "p9"]},
 				"sid-2": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": ["~~ALL-PROJECTS~~"]},
 			},
 		}
 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3", "p5"]}
 
-	actual_projects == {"p1", "p3", "~~ALL-PROJECTS~~"}
+	actual_projects == {"p1", "p3", "p5"}
 }
 
 test_authorized_project_real_data {
