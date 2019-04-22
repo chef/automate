@@ -10,29 +10,34 @@
     <div class="status-filter-bar">
       <chef-status-filter-group>
         <chef-option class="lean-filter general" value="general" (click)="updateServicesFilters('total')">
-          <chef-icon>group_work</chef-icon>
-          <div class="lean-filter-label">Total</div>
-          <div class="filter-total">30</div>
+          <div class="lean-filter-label">
+            <chef-icon>group_work</chef-icon>Total
+            <div class="lean-filter-total">30</div>
+          </div>
         </chef-option>
         <chef-option class="lean-filter critical" value='critical' (click)="updateServicesFilters('critical')">
-          <chef-icon>warning</chef-icon>
-          <div class="lean-filter-label">Critical</div>
-          <div class="filter-total">10</div>
+          <div class="lean-filter-label">
+            <chef-icon>warning</chef-icon>Critical
+            <div class="lean-filter-total">10</div>
+          </div>
         </chef-option>
         <chef-option class="lean-filter warning" value='warning' (click)="updateServicesFilters('warning')">
-          <chef-icon>error</chef-icon>
-          <div class="lean-filter-label">Warning</div>
-          <div class="filter-total">5</div>
+          <div class="lean-filter-label">
+            <chef-icon>error</chef-icon>Warning
+            <div class="lean-filter-total">5</div>
+          </div>
         </chef-option>
         <chef-option class="lean-filter success" value='success' (click)="updateServicesFilters('ok')">
-          <chef-icon>check_circle</chef-icon>
-          <div class="lean-filter-label">OK</div>
-          <div class="filter-total">5</div>
+          <div class="lean-filter-label">
+            <chef-icon>check_circle</chef-icon>OK
+            <div class="lean-filter-total">5</div>
+          </div>
         </chef-option>
         <chef-option class="lean-filter unknown" value='unknown' (click)="updateServicesFilters('unknown')">
-          <chef-icon>help</chef-icon>
-          <div class="lean-filter-label">Unknown</div>
-          <div class="filter-total">10</div>
+          <div class="lean-filter-label">
+            <chef-icon>help</chef-icon>Unknown
+            <div class="lean-filter-total">10</div>
+          </div>
         </chef-option>
       </chef-status-filter-group>
     </div>
