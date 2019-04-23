@@ -92,12 +92,14 @@ func TestGetServicesBySGSingleService(t *testing.T) {
 						Application:  a, Environment: e, Fqdn: "",
 					},
 				},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 1, Ok: 1},
 			}
 		)
 
 		response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
 		assert.Nil(t, err)
 		assert.Equal(t, expected.GetGroup(), response.GetGroup())
+		assert.Equal(t, expected.GetServicesHealthCounts(), response.GetServicesHealthCounts())
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
 	}
 }
@@ -108,7 +110,8 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 
 	expectedResponses := []*applications.ServicesBySGRes{
 		&applications.ServicesBySGRes{
-			Group: "myapp.default",
+			Group:                "myapp.default",
+			ServicesHealthCounts: &applications.HealthCounts{Total: 3, Warning: 1, Ok: 2},
 			Services: []*applications.Service{
 				&applications.Service{
 					SupervisorId: "sup1",
@@ -137,7 +140,8 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 			},
 		},
 		&applications.ServicesBySGRes{
-			Group: "postgres.default",
+			Group:                "postgres.default",
+			ServicesHealthCounts: &applications.HealthCounts{Total: 3, Critical: 1, Ok: 1, Unknown: 1},
 			Services: []*applications.Service{
 				&applications.Service{
 					SupervisorId: "sup3",
@@ -166,7 +170,8 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 			},
 		},
 		&applications.ServicesBySGRes{
-			Group: "redis.default",
+			Group:                "redis.default",
+			ServicesHealthCounts: &applications.HealthCounts{Total: 3, Ok: 3},
 			Services: []*applications.Service{
 				&applications.Service{
 					SupervisorId: "sup1",
@@ -195,7 +200,8 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 			},
 		},
 		&applications.ServicesBySGRes{
-			Group: "test.default",
+			Group:                "test.default",
+			ServicesHealthCounts: &applications.HealthCounts{Total: 1, Unknown: 1},
 			Services: []*applications.Service{
 				&applications.Service{
 					SupervisorId: "sup4",
@@ -225,6 +231,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
 				assert.Nil(t, err)
 				assert.Equal(t, expectedResponses[i].GetGroup(), response.GetGroup())
+				assert.Equal(t, expectedResponses[i].GetServicesHealthCounts(), response.GetServicesHealthCounts())
 				assertServicesEqual(t, expectedResponses[i].GetServices(), response.GetServices())
 			})
 
@@ -239,7 +246,8 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 	var (
 		expectedOKResponses = []*applications.ServicesBySGRes{
 			&applications.ServicesBySGRes{
-				Group: "myapp.default",
+				Group:                "myapp.default",
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Warning: 1, Ok: 2},
 				Services: []*applications.Service{
 					&applications.Service{
 						SupervisorId: "sup2",
@@ -260,7 +268,8 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				},
 			},
 			&applications.ServicesBySGRes{
-				Group: "postgres.default",
+				Group:                "postgres.default",
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Critical: 1, Ok: 1, Unknown: 1},
 				Services: []*applications.Service{
 					&applications.Service{
 						SupervisorId: "sup1",
@@ -273,7 +282,8 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				},
 			},
 			&applications.ServicesBySGRes{
-				Group: "redis.default",
+				Group:                "redis.default",
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Ok: 3},
 				Services: []*applications.Service{
 					&applications.Service{
 						Group:       "redis.default",
@@ -299,18 +309,21 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				},
 			},
 			&applications.ServicesBySGRes{
-				Group:    "test.default",
-				Services: []*applications.Service{},
+				Group:                "test.default",
+				Services:             []*applications.Service{},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 1, Unknown: 1},
 			},
 		}
 
 		expectedCRITICALResponses = []*applications.ServicesBySGRes{
 			&applications.ServicesBySGRes{
-				Group:    "myapp.default",
-				Services: []*applications.Service{},
+				Group:                "myapp.default",
+				Services:             []*applications.Service{},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Warning: 1, Ok: 2},
 			},
 			&applications.ServicesBySGRes{
-				Group: "postgres.default",
+				Group:                "postgres.default",
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Critical: 1, Ok: 1, Unknown: 1},
 				Services: []*applications.Service{
 					&applications.Service{
 						SupervisorId: "sup3",
@@ -323,18 +336,21 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				},
 			},
 			&applications.ServicesBySGRes{
-				Group:    "redis.default",
-				Services: []*applications.Service{},
+				Group:                "redis.default",
+				Services:             []*applications.Service{},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Ok: 3},
 			},
 			&applications.ServicesBySGRes{
-				Group:    "test.default",
-				Services: []*applications.Service{},
+				Group:                "test.default",
+				Services:             []*applications.Service{},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 1, Unknown: 1},
 			},
 		}
 
 		expectedWARNINGResponses = []*applications.ServicesBySGRes{
 			&applications.ServicesBySGRes{
-				Group: "myapp.default",
+				Group:                "myapp.default",
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Warning: 1, Ok: 2},
 				Services: []*applications.Service{
 					&applications.Service{
 						SupervisorId: "sup1",
@@ -347,26 +363,31 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				},
 			},
 			&applications.ServicesBySGRes{
-				Group:    "postgres.default",
-				Services: []*applications.Service{},
+				Group:                "postgres.default",
+				Services:             []*applications.Service{},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Critical: 1, Ok: 1, Unknown: 1},
 			},
 			&applications.ServicesBySGRes{
-				Group:    "redis.default",
-				Services: []*applications.Service{},
+				Group:                "redis.default",
+				Services:             []*applications.Service{},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Ok: 3},
 			},
 			&applications.ServicesBySGRes{
-				Group:    "test.default",
-				Services: []*applications.Service{},
+				Group:                "test.default",
+				Services:             []*applications.Service{},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 1, Unknown: 1},
 			},
 		}
 
 		expectedUNKNOWNResponses = []*applications.ServicesBySGRes{
 			&applications.ServicesBySGRes{
-				Group:    "myapp.default",
-				Services: []*applications.Service{},
+				Group:                "myapp.default",
+				Services:             []*applications.Service{},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Warning: 1, Ok: 2},
 			},
 			&applications.ServicesBySGRes{
-				Group: "postgres.default",
+				Group:                "postgres.default",
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Critical: 1, Ok: 1, Unknown: 1},
 				Services: []*applications.Service{
 					&applications.Service{
 						SupervisorId: "sup2",
@@ -379,11 +400,13 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				},
 			},
 			&applications.ServicesBySGRes{
-				Group:    "redis.default",
-				Services: []*applications.Service{},
+				Group:                "redis.default",
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Ok: 3},
+				Services:             []*applications.Service{},
 			},
 			&applications.ServicesBySGRes{
-				Group: "test.default",
+				Group:                "test.default",
+				ServicesHealthCounts: &applications.HealthCounts{Total: 1, Unknown: 1},
 				Services: []*applications.Service{
 					&applications.Service{
 						SupervisorId: "sup4",
@@ -418,6 +441,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
 				assert.Nil(t, err)
 				assert.Equal(t, expectedOKResponses[i].GetGroup(), response.GetGroup())
+				assert.Equal(t, expectedOKResponses[i].GetServicesHealthCounts(), response.GetServicesHealthCounts())
 				assertServicesEqual(t, expectedOKResponses[i].GetServices(), response.GetServices())
 			})
 
@@ -434,6 +458,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
 				assert.Nil(t, err)
 				assert.Equal(t, expectedCRITICALResponses[i].GetGroup(), response.GetGroup())
+				assert.Equal(t, expectedCRITICALResponses[i].GetServicesHealthCounts(), response.GetServicesHealthCounts())
 				assertServicesEqual(t, expectedCRITICALResponses[i].GetServices(), response.GetServices())
 			})
 
@@ -450,6 +475,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
 				assert.Nil(t, err)
 				assert.Equal(t, expectedWARNINGResponses[i].GetGroup(), response.GetGroup())
+				assert.Equal(t, expectedWARNINGResponses[i].GetServicesHealthCounts(), response.GetServicesHealthCounts())
 				assertServicesEqual(t, expectedWARNINGResponses[i].GetServices(), response.GetServices())
 			})
 
@@ -466,6 +492,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
 				assert.Nil(t, err)
 				assert.Equal(t, expectedUNKNOWNResponses[i].GetGroup(), response.GetGroup())
+				assert.Equal(t, expectedUNKNOWNResponses[i].GetServicesHealthCounts(), response.GetServicesHealthCounts())
 				assertServicesEqual(t, expectedUNKNOWNResponses[i].GetServices(), response.GetServices())
 			})
 		}
