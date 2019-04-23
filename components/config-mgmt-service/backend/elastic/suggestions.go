@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/olivere/elastic"
 	"github.com/schollz/closestmatch"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/config-mgmt-service/backend"
 )
 
 // GetSuggestions - get a collection of suggestions
@@ -175,7 +176,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string) ([]backend.Su
 
 	finalSuggs := make([]backend.Suggestion, 0)
 	for i, sug := range suggs {
-		oneSugg := backend.Suggestion{Text: string(sug), Score: float32(len(suggs) - i)}
+		oneSugg := backend.Suggestion{Text: sug, Score: float32(len(suggs) - i)}
 		finalSuggs = append(finalSuggs, oneSugg)
 	}
 
