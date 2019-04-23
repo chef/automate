@@ -7,6 +7,7 @@ host = "{{sys.ip}}"
 port = {{cfg.service.port}}
 metrics_port = {{cfg.service.metrics_port}}
 log_level = "{{cfg.log.level}}"
+enabled = {{cfg.service.enable_nats_feature}}
 
 [events]
 {{~#eachAlive bind.event-service.members as |events|}}
