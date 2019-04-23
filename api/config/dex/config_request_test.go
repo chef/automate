@@ -13,6 +13,16 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
+func completeMSADWithoutOverrides() *dex.ConfigRequest_V1_Msad_Ldap {
+	return &dex.ConfigRequest_V1_Msad_Ldap{
+		Host:              w.String("ad.au"),
+		BindDn:            w.String("cn=admin,dc=org"),
+		BindPassword:      w.String("ChefAutomate1"),
+		BaseUserSearchDn:  w.String("ou=people,dc=org"),
+		BaseGroupSearchDn: w.String("ou=groups,dc=org"),
+	}
+}
+
 func TestValidate(t *testing.T) {
 	t.Run("Validates when there are no connectors", func(t *testing.T) {
 		cfg := dex.DefaultConfigRequest()
@@ -33,15 +43,7 @@ func TestValidate(t *testing.T) {
 			BaseGroupSearchDn: w.String("ou=groups,dc=org"),
 		}
 	}
-	completeMSAD := func() *dex.ConfigRequest_V1_Msad_Ldap {
-		return &dex.ConfigRequest_V1_Msad_Ldap{
-			Host:              w.String("ad.au"),
-			BindDn:            w.String("cn=admin,dc=org"),
-			BindPassword:      w.String("ChefAutomate1"),
-			BaseUserSearchDn:  w.String("ou=people,dc=org"),
-			BaseGroupSearchDn: w.String("ou=groups,dc=org"),
-		}
-	}
+
 	completeSAML := func() *dex.ConfigRequest_V1_Saml {
 		return &dex.ConfigRequest_V1_Saml{
 			CaContents:   w.String(string(devCert)),
@@ -91,14 +93,14 @@ func TestValidate(t *testing.T) {
 		t.Run("full config", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{
-				MsadLdap: completeMSAD(),
+				MsadLdap: completeMSADWithoutOverrides(),
 			}
 			assert.Nil(t, cfg.Validate())
 		})
 
 		t.Run("anon bind (no bind_dn or bind_password)", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
-			msad := completeMSAD()
+			msad := completeMSADWithoutOverrides()
 			msad.BindPassword = nil
 			msad.BindDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
@@ -107,7 +109,7 @@ func TestValidate(t *testing.T) {
 
 		t.Run("unauthenticated bind (no bind_password))", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
-			msad := completeMSAD()
+			msad := completeMSADWithoutOverrides()
 			msad.BindPassword = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
 			assert.Nil(t, cfg.Validate())
@@ -115,7 +117,7 @@ func TestValidate(t *testing.T) {
 
 		t.Run("no base_group_search_dn", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
-			msad := completeMSAD()
+			msad := completeMSADWithoutOverrides()
 			msad.BaseGroupSearchDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
 			assert.Nil(t, cfg.Validate())
@@ -217,7 +219,7 @@ func TestValidate(t *testing.T) {
 	t.Run("missing values (msad)", func(t *testing.T) {
 		t.Run("host", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
-			msad := completeMSAD()
+			msad := completeMSADWithoutOverrides()
 			msad.Host = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
 			assert.NotNil(t, cfg.Validate())
@@ -225,7 +227,7 @@ func TestValidate(t *testing.T) {
 
 		t.Run("bind_password without bind_dn", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
-			msad := completeMSAD()
+			msad := completeMSADWithoutOverrides()
 			msad.BindDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
 			assert.NotNil(t, cfg.Validate())
@@ -233,7 +235,7 @@ func TestValidate(t *testing.T) {
 
 		t.Run("base_user_search_dn", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
-			msad := completeMSAD()
+			msad := completeMSADWithoutOverrides()
 			msad.BaseUserSearchDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
 			assert.NotNil(t, cfg.Validate())
@@ -243,7 +245,7 @@ func TestValidate(t *testing.T) {
 	t.Run("empty-string values (msad)", func(t *testing.T) {
 		t.Run("host", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
-			msad := completeMSAD()
+			msad := completeMSADWithoutOverrides()
 			msad.Host = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
 			assert.NotNil(t, cfg.Validate())
@@ -251,7 +253,7 @@ func TestValidate(t *testing.T) {
 
 		t.Run("bind_password without bind_dn", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
-			msad := completeMSAD()
+			msad := completeMSADWithoutOverrides()
 			msad.BindDn = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
 			assert.NotNil(t, cfg.Validate())
@@ -259,7 +261,7 @@ func TestValidate(t *testing.T) {
 
 		t.Run("base_user_search_dn", func(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
-			msad := completeMSAD()
+			msad := completeMSADWithoutOverrides()
 			msad.BaseUserSearchDn = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
 			assert.NotNil(t, cfg.Validate())
@@ -347,7 +349,7 @@ func TestValidate(t *testing.T) {
 				return &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
 			},
 			"msad": func(certs string) *dex.ConfigRequest_V1_Connectors {
-				msad := completeMSAD()
+				msad := completeMSADWithoutOverrides()
 				msad.CaContents = w.String(certs)
 				return &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
 			},
@@ -427,6 +429,85 @@ func TestValidate(t *testing.T) {
 			require.True(t, ok)
 			assert.Equal(t, 1, len(cfgErr.InvalidValues()))
 		}
+	})
+}
+
+func TestMSADConfig(t *testing.T) {
+	t.Run("returns empty results for optional fields", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		msadConfig := completeMSADWithoutOverrides()
+		cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{
+			MsadLdap: msadConfig,
+		}
+		sys, err := cfg.PrepareSystemConfig(&shared.TLSCredentials{})
+		require.NoError(t, err)
+		require.NotNil(t, sys)
+		c, ok := sys.(*dex.ConfigRequest_V1_System)
+		require.True(t, ok)
+
+		// User defined
+		assert.Equal(t, "ad.au", c.GetConnectors().GetMsadLdap().GetHost().GetValue())
+		assert.Equal(t, "cn=admin,dc=org", c.GetConnectors().GetMsadLdap().GetBindDn().GetValue())
+		assert.Equal(t, "ChefAutomate1", c.GetConnectors().GetMsadLdap().GetBindPassword().GetValue())
+		assert.Equal(t, "ChefAutomate1", c.GetConnectors().GetMsadLdap().GetBindPassword().GetValue())
+		assert.Equal(t, "ou=people,dc=org", c.GetConnectors().GetMsadLdap().GetBaseUserSearchDn().GetValue())
+		assert.Equal(t, "ou=groups,dc=org", c.GetConnectors().GetMsadLdap().GetBaseGroupSearchDn().GetValue())
+
+		// Defaults are unset so that they receive overrides in config
+		assert.Equal(t, false, c.GetConnectors().GetMsadLdap().GetInsecureNoSsl().GetValue())
+		assert.Equal(t, "", c.GetConnectors().GetMsadLdap().GetUserQueryFilter().GetValue())
+		assert.Equal(t, "", c.GetConnectors().GetMsadLdap().GetUsernameAttr().GetValue())
+		assert.Equal(t, "", c.GetConnectors().GetMsadLdap().GetUserIdAttr().GetValue())
+		assert.Equal(t, "", c.GetConnectors().GetMsadLdap().GetEmailAttr().GetValue())
+		assert.Equal(t, "", c.GetConnectors().GetMsadLdap().GetUserDisplayNameAttr().GetValue())
+		assert.Equal(t, "", c.GetConnectors().GetMsadLdap().GetGroupQueryFilter().GetValue())
+		assert.Equal(t, "", c.GetConnectors().GetMsadLdap().GetFilterGroupsByUserValue().GetValue())
+		assert.Equal(t, "", c.GetConnectors().GetMsadLdap().GetFilterGroupsByUserAttr().GetValue())
+		assert.Equal(t, "", c.GetConnectors().GetMsadLdap().GetGroupDisplayNameAttr().GetValue())
+	})
+
+	t.Run("returns populated fields if specified by user", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		msadConfig := completeMSADWithoutOverrides()
+		msadConfig.InsecureNoSsl = w.Bool(true)
+		msadConfig.UserQueryFilter = w.String("(objectClass=NotPerson)")
+		msadConfig.UsernameAttr = w.String("NotsAMAccountName")
+		msadConfig.UserIdAttr = w.String("DefinitelyNotsAMAccountName")
+		msadConfig.EmailAttr = w.String("NotMail")
+		msadConfig.EmailAttr = w.String("NotMail")
+		msadConfig.UserDisplayNameAttr = w.String("NotDisplayName")
+		msadConfig.GroupQueryFilter = w.String("(objectClass=NotGroup)")
+		msadConfig.FilterGroupsByUserValue = w.String("NotDN")
+		msadConfig.FilterGroupsByUserAttr = w.String("NotMember")
+		msadConfig.GroupDisplayNameAttr = w.String("DefinitelyNotGroupDisplayName")
+		cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{
+			MsadLdap: msadConfig,
+		}
+		sys, err := cfg.PrepareSystemConfig(&shared.TLSCredentials{})
+		require.NoError(t, err)
+		require.NotNil(t, sys)
+		c, ok := sys.(*dex.ConfigRequest_V1_System)
+		require.True(t, ok)
+
+		// User defined
+		assert.Equal(t, "ad.au", c.GetConnectors().GetMsadLdap().GetHost().GetValue())
+		assert.Equal(t, "cn=admin,dc=org", c.GetConnectors().GetMsadLdap().GetBindDn().GetValue())
+		assert.Equal(t, "ChefAutomate1", c.GetConnectors().GetMsadLdap().GetBindPassword().GetValue())
+		assert.Equal(t, "ChefAutomate1", c.GetConnectors().GetMsadLdap().GetBindPassword().GetValue())
+		assert.Equal(t, "ou=people,dc=org", c.GetConnectors().GetMsadLdap().GetBaseUserSearchDn().GetValue())
+		assert.Equal(t, "ou=groups,dc=org", c.GetConnectors().GetMsadLdap().GetBaseGroupSearchDn().GetValue())
+
+		// Defaults are unset so that they recieve overrides in config
+		assert.Equal(t, true, c.GetConnectors().GetMsadLdap().GetInsecureNoSsl().GetValue())
+		assert.Equal(t, "(objectClass=NotPerson)", c.GetConnectors().GetMsadLdap().GetUserQueryFilter().GetValue())
+		assert.Equal(t, "NotsAMAccountName", c.GetConnectors().GetMsadLdap().GetUsernameAttr().GetValue())
+		assert.Equal(t, "DefinitelyNotsAMAccountName", c.GetConnectors().GetMsadLdap().GetUserIdAttr().GetValue())
+		assert.Equal(t, "NotMail", c.GetConnectors().GetMsadLdap().GetEmailAttr().GetValue())
+		assert.Equal(t, "NotDisplayName", c.GetConnectors().GetMsadLdap().GetUserDisplayNameAttr().GetValue())
+		assert.Equal(t, "(objectClass=NotGroup)", c.GetConnectors().GetMsadLdap().GetGroupQueryFilter().GetValue())
+		assert.Equal(t, "NotDN", c.GetConnectors().GetMsadLdap().GetFilterGroupsByUserValue().GetValue())
+		assert.Equal(t, "NotMember", c.GetConnectors().GetMsadLdap().GetFilterGroupsByUserAttr().GetValue())
+		assert.Equal(t, "DefinitelyNotGroupDisplayName", c.GetConnectors().GetMsadLdap().GetGroupDisplayNameAttr().GetValue())
 	})
 }
 
