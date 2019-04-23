@@ -12,64 +12,45 @@ import find from 'lodash/fp/find';
  * A toggle button. Uses the chef-option atom to define it's different states.
  *
  * @example
- * <chef-status-filter-group>
+ * <chef-status-filter-group id="filters-example">
  *   <chef-option class="filter general" value="general">
+ *     <chef-icon class="filter-icon">group_work</chef-icon>
  *     <div class="filter-label">Total</div>
- *     <div class="filter-total"><chef-icon>group_work</chef-icon> 30</div>
+ *     <div class="filter-total">30</div>
  *   </chef-option>
  *   <chef-option class="filter critical" value='critical'>
+ *     <chef-icon class="filter-icon">warning</chef-icon>
  *     <div class="filter-label">Critical</div>
- *     <div class="filter-total"><chef-icon>warning</chef-icon> 10</div>
+ *     <div class="filter-total">10</div>
  *   </chef-option>
  *   <chef-option class="filter warning" value='warning'>
+ *     <chef-icon class="filter-icon">error</chef-icon>
  *     <div class="filter-label">Warning</div>
- *     <div class="filter-total"><chef-icon>error</chef-icon> 5</div>
+ *     <div class="filter-total">5</div>
  *   </chef-option>
  *   <chef-option class="filter success" value='success'>
+ *     <chef-icon class="filter-icon">check_circle</chef-icon>
  *     <div class="filter-label">OK</div>
- *     <div class="filter-total"><chef-icon>check_circle</chef-icon> 5</div>
+ *     <div class="filter-total">5</div>
  *   </chef-option>
  *   <chef-option class="filter unknown" value='unknown'>
+ *     <chef-icon class="filter-icon">help</chef-icon>
  *     <div class="filter-label">Unknown</div>
- *     <div class="filter-total"><chef-icon>help</chef-icon> 10</div>
+ *     <div class="filter-total">10</div>
  *   </chef-option>
  * </chef-status-filter-group>
  *
- * A lean status filter bar:
+ * <chef-button id="lean-toggle" primary>Toggle lean attribute</chef-button>
  *
- * @example
- * <chef-status-filter-group>
- *   <chef-option class="lean-filter general" value="general">
- *     <div class="lean-filter-label">
- *       <chef-icon>group_work</chef-icon>Total
- *       <div class="lean-filter-total">30</div>
- *     </div>
- *   </chef-option>
- *   <chef-option class="lean-filter critical" value='critical'>
- *     <div class="lean-filter-label">
- *       <chef-icon>warning</chef-icon>Critical
- *       <div class="lean-filter-total">10</div>
- *     </div>
- *   </chef-option>
- *   <chef-option class="lean-filter warning" value='warning'>
- *     <div class="lean-filter-label">
- *       <chef-icon>error</chef-icon>Warning
- *       <div class="lean-filter-total">5</div>
- *     </div>
- *   </chef-option>
- *   <chef-option class="lean-filter success" value='success'>
- *     <div class="lean-filter-label">
- *       <chef-icon>check_circle</chef-icon>OK
- *       <div class="lean-filter-total">5</div>
- *     </div>
- *   </chef-option>
- *   <chef-option class="lean-filter unknown" value='unknown'>
- *     <div class="lean-filter-label">
- *       <chef-icon>help</chef-icon>Unknown
- *       <div class="lean-filter-total">10</div>
- *     </div>
- *   </chef-option>
- * </chef-status-filter-group>
+ * <script>
+ *   const button = document.getElementById('lean-toggle');
+ *   const filters = document.getElementById('filters-example');
+ *   button.addEventListener('click', () => filters.toggleAttribute('lean'));
+ * </script>
+ *
+ * <style>
+ *   #lean-toggle { margin-left: 0; }
+ * </style>
  */
 @Component({
   tag: 'chef-status-filter-group',
