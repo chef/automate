@@ -70,8 +70,7 @@ func (manager *Manager) Cancel(projectUpdateID string) {
 	default:
 		// error state not found
 		manager.sendFailedEvent(fmt.Sprintf(
-			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID),
-			projectUpdateID)
+			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID))
 	}
 }
 
@@ -84,8 +83,7 @@ func (manager *Manager) Start(projectUpdateID string) {
 		if err != nil {
 			logrus.Errorf("Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID)
 			manager.sendFailedEvent(fmt.Sprintf(
-				"Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID),
-				projectUpdateID)
+				"Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID))
 			return
 		}
 		manager.esJobID = esJobID // Store the job ID and event ID
@@ -97,14 +95,12 @@ func (manager *Manager) Start(projectUpdateID string) {
 			//	Do nothing. The job has ready started
 		} else {
 			manager.sendFailedEvent(fmt.Sprintf(
-				"Can not start another project update %q is running", manager.projectUpdateID),
-				projectUpdateID)
+				"Can not start another project update %q is running", manager.projectUpdateID))
 		}
 	default:
 		// error state not found
 		manager.sendFailedEvent(fmt.Sprintf(
-			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID),
-			projectUpdateID)
+			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID))
 	}
 }
 
@@ -183,14 +179,13 @@ func (manager *Manager) waitingForJobToComplete() {
 		time.Sleep(time.Millisecond * sleepTimeBetweenStatusChecksMilliSec)
 
 		jobStatus, err = manager.client.JobStatus(context.Background(), manager.esJobID)
-		logrus.Infof("waitingForJobToComplete jobStatus: %v", jobStatus)
 		if err != nil {
 			logrus.Errorf("Failed to check the running job: %v", err)
 			numberOfConsecutiveFails++
 			if numberOfConsecutiveFails > maxNumberOfConsecutiveFails {
 				logrus.Errorf("Failed to check Elasticsearch job %q %d times",
 					manager.esJobID, numberOfConsecutiveFails)
-				manager.failedJob()
+				manager.failedJob(err.Error())
 				return
 			}
 		} else {
@@ -281,11 +276,11 @@ func (manager *Manager) saveState() {
 	}
 }
 
-func (manager *Manager) failedJob() {
+func (manager *Manager) failedJob(errMsg string) {
 	manager.percentageComplete = 1.0
 	manager.estimatedEndTimeInSec = 0
-	manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times",
-		manager.esJobID, maxNumberOfConsecutiveFails), manager.projectUpdateID)
+	manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times; error message %q",
+		manager.esJobID, maxNumberOfConsecutiveFails, errMsg))
 	manager.changeState(notRunningState)
 }
 
@@ -296,7 +291,8 @@ func (manager *Manager) completeJob() {
 }
 
 // publish a project update failed event
-func (manager *Manager) sendFailedEvent(msg string, projectUpdateID string) {
+func (manager *Manager) sendFailedEvent(msg string) {
+	logrus.Infof("Sending sendFailedEvent msg: %s", msg)
 	event := &automate_event.EventMsg{
 		EventID:   createEventUUID(),
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateFailed},
@@ -308,7 +304,7 @@ func (manager *Manager) sendFailedEvent(msg string, projectUpdateID string) {
 			Fields: map[string]*_struct.Value{
 				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
 					Kind: &_struct.Value_StringValue{
-						StringValue: projectUpdateID,
+						StringValue: manager.projectUpdateID,
 					},
 				},
 				"message": &_struct.Value{

@@ -18,8 +18,11 @@ import (
 )
 
 // Failure cases
-// * No status event for one minute
+// * No status event for 5 minutes
 // * Domain service sends failure message
+// * Domain service was down during start
+// * Authz service restarts
+//
 // On failure send a cancel event to stop non failed domain service's task.
 
 const (
@@ -44,6 +47,8 @@ type ProjectUpdateManager struct {
 	projectUpdateID    string
 	eventServiceClient automate_event.EventServiceClient
 	domainServices     []*domainService
+	failureMessages    []string
+	failed             bool
 }
 
 // NewProjectUpdateManager - create a new project update manager
@@ -73,28 +78,12 @@ func (manager *ProjectUpdateManager) Complete() bool {
 
 // UpdateFailed - did the last update attempt fail
 func (manager *ProjectUpdateManager) UpdateFailed() bool {
-	for _, ds := range manager.domainServices {
-		if ds.failed {
-			return true
-		}
-	}
-
-	return false
+	return manager.failed
 }
 
 // FailureMessages - list out the detailed descriptions of the failure
 func (manager *ProjectUpdateManager) FailureMessages() []string {
-	failureMessages := make([]string, 0)
-	if manager.UpdateFailed() {
-		for _, ds := range manager.domainServices {
-			if ds.failed {
-				failureMessages = append(failureMessages, fmt.Sprint("%s failed with %s",
-					ds.name, ds.failureMessage))
-			}
-		}
-	}
-
-	return failureMessages
+	return manager.failureMessages
 }
 
 // PercentageComplete - percentage of the job complete
@@ -179,6 +168,8 @@ func (manager *ProjectUpdateManager) Start() error {
 			return err
 		}
 
+		manager.clearFailedState()
+
 		manager.changeState(RunningState)
 		manager.projectUpdateID = projectUpdateID
 		go manager.waitingForJobToComplete()
@@ -211,7 +202,6 @@ func (manager *ProjectUpdateManager) ProcessFailEvent(
 			// projectUpdateID does not match currently running update; ignore
 			return nil
 		}
-		log.Infof("Fail message from producer %q projectUpdateID %q", fromProducer, projectUpdateID)
 
 		domainService, err := manager.findDomainService(fromProducer)
 		if err != nil {
@@ -219,6 +209,9 @@ func (manager *ProjectUpdateManager) ProcessFailEvent(
 		}
 
 		failureMessage := getFailureMessage(eventMessage)
+
+		log.Infof("Fail message from producer %q projectUpdateID %q failureMessage: %s",
+			fromProducer, projectUpdateID, failureMessage)
 
 		domainService.failureMessage = failureMessage
 		domainService.failed = true
@@ -284,6 +277,11 @@ func (manager *ProjectUpdateManager) ProcessStatusEvent(
 	}
 
 	return nil
+}
+
+func (manager *ProjectUpdateManager) clearFailedState() {
+	manager.failed = false
+	manager.failureMessages = []string{}
 }
 
 func (manager *ProjectUpdateManager) changeState(newState string) {
@@ -366,11 +364,17 @@ func (manager *ProjectUpdateManager) waitingForJobToComplete() {
 
 func (manager *ProjectUpdateManager) checkForMissingDomainServices() {
 	fiveMinutesAgo := time.Now().Add((-1) * time.Minute * minutesWithoutCheckingInFailure)
+	oneMinutesAgo := time.Now().Add((-1) * time.Minute)
 	for _, domainService := range manager.domainServices {
 		if domainService.lastUpdate.Before(fiveMinutesAgo) {
-			domainService.failed = false
+			domainService.failed = true
 			domainService.failureMessage = fmt.Sprintf("Has not check in for over %d minutes",
 				minutesWithoutCheckingInFailure)
+		} else if domainService.lastUpdate.Before(oneMinutesAgo) {
+			// This domain service as not checked in within a minute
+			// Send another start event
+			log.Info("resending project update start event")
+			manager.startProjectUpdateForDomainResources(manager.projectUpdateID)
 		}
 	}
 }
@@ -382,12 +386,23 @@ func (manager *ProjectUpdateManager) checkIfComplete() {
 		if !domainService.complete && !domainService.failed {
 			complete = false
 			break
+		} else if domainService.failed {
+			failure = true
 		}
 	}
 
 	if complete {
 		if failure {
 			log.Info("Finished domain services project update with a failure")
+			failureMessages := make([]string, 0)
+			for _, ds := range manager.domainServices {
+				if ds.failed {
+					failureMessages = append(failureMessages, fmt.Sprintf("%s failed with %s",
+						ds.name, ds.failureMessage))
+				}
+			}
+			manager.failed = true
+			manager.failureMessages = failureMessages
 		} else {
 			log.Info("Finished domain services project update with success")
 		}
