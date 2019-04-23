@@ -131,4 +131,80 @@ control 'iam-v2-projects-1' do
       expect(resp.parsed_response_body[:roles].length).to be > 3
     end
   end
+
+  describe 'roles with policies' do
+    TIMESTAMP = 257 # Time.now.utc.to_i
+    POLICY_ID = "inspec-test-policy-1-#{TIMESTAMP}"
+    ROLE_ID = "inspec-test-role-1-#{TIMESTAMP}"
+    ProjectIDs = [
+      "inspec-test-project-1-#{TIMESTAMP}",
+      "inspec-test-project-2-#{TIMESTAMP}",
+      "inspec-test-project-3-#{TIMESTAMP}"
+    ]
+
+    before(:all) do
+
+      ProjectIDs.each do|project|
+        resp = automate_api_request("/apis/iam/v2beta/projects",
+          http_method: 'POST',
+          request_body: {
+            id: project,
+            name: project
+          }.to_json
+        )
+        expect(resp.http_status).to eq 200
+      end
+ 
+      resp = automate_api_request("/apis/iam/v2beta/roles",
+        http_method: 'POST',
+        request_body: {
+          id: ROLE_ID,
+          name: "display name !#$#",
+          actions: ["iam:roles:*"]
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+ 
+      resp = automate_api_request("/apis/iam/v2beta/policies",
+        http_method: 'POST',
+        request_body: {
+          id: POLICY_ID,
+          name: 'brand new name',
+          members: ["user:local:*", "token:*"],
+          statements: [
+            {
+              effect: "DENY",
+              role: ROLE_ID,
+              projects: [ProjectIDs[0]]
+            },
+             {
+              effect: "ALLOW",
+              role: ROLE_ID,
+              projects: [ProjectIDs[1], ProjectIDs[2]]
+            }
+          ]
+        }.to_json()
+      )
+      expect(resp.http_status).to eq 200
+
+   end
+
+    after(:all) do
+      resp = automate_api_request("/apis/iam/v2beta/policies/#{POLICY_ID}", http_method: 'DELETE')
+      expect(resp.http_status).to eq 200
+      resp = automate_api_request("/apis/iam/v2beta/roles/#{ROLE_ID}", http_method: 'DELETE')
+      expect(resp.http_status).to eq 200
+      ProjectIDs.each do|project_id|
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{project_id}", http_method: 'DELETE')
+        expect(resp.http_status).to eq 200
+      end
+    end
+
+    it 'does some stuff' do
+      expect(200).to eq 200
+    end
+
+  end
+
 end
+
