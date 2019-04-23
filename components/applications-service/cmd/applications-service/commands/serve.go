@@ -22,7 +22,7 @@ import (
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Launches applications services",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		conf, err := configFromViper()
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -56,7 +56,10 @@ var serveCmd = &cobra.Command{
 			)
 
 			// Trigger NATS Subscription
-			natsClient.ConnectAndSubscribe()
+			err := natsClient.ConnectAndSubscribe()
+			if err != nil {
+				log.WithError(err).Fatal("could not connect to nats-streaming")
+			}
 
 			// Receive digested messages from the event channel and
 			// send them to the datastore for processing
@@ -96,7 +99,7 @@ var serveCmd = &cobra.Command{
 		}()
 
 		// GRPC Server
-		grpc.Spawn(conf, connFactory)
+		return grpc.Spawn(conf, connFactory)
 	},
 }
 

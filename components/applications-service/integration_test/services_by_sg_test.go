@@ -231,3 +231,243 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 		}
 	}
 }
+
+func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
+	suite.IngestServices(habServicesMatrix())
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		expectedOKResponses = []*applications.ServicesBySGRes{
+			&applications.ServicesBySGRes{
+				Group: "myapp.default",
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup2",
+						Group:        "myapp.default",
+						Release:      "core/myapp/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_OK,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+					&applications.Service{
+						SupervisorId: "sup3",
+						Group:        "myapp.default",
+						Release:      "core/myapp/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_OK,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+			},
+			&applications.ServicesBySGRes{
+				Group: "postgres.default",
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup1",
+						Group:        "postgres.default",
+						Release:      "core/postgres/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_OK,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+			},
+			&applications.ServicesBySGRes{
+				Group: "redis.default",
+				Services: []*applications.Service{
+					&applications.Service{
+						Group:       "redis.default",
+						Release:     "core/redis/0.1.0/20190101121212",
+						Status:      applications.ServiceStatus_RUNNING,
+						HealthCheck: applications.HealthStatus_OK,
+						Application: a, Environment: e, Fqdn: "",
+					},
+					&applications.Service{
+						Group:       "redis.default",
+						Release:     "core/redis/0.1.0/20190101121212",
+						Status:      applications.ServiceStatus_RUNNING,
+						HealthCheck: applications.HealthStatus_OK,
+						Application: a, Environment: e, Fqdn: "",
+					},
+					&applications.Service{
+						Group:       "redis.default",
+						Release:     "core/redis/0.1.0/20190101121212",
+						Status:      applications.ServiceStatus_RUNNING,
+						HealthCheck: applications.HealthStatus_OK,
+						Application: a, Environment: e, Fqdn: "",
+					},
+				},
+			},
+			&applications.ServicesBySGRes{
+				Group:    "test.default",
+				Services: []*applications.Service{},
+			},
+		}
+
+		expectedCRITICALResponses = []*applications.ServicesBySGRes{
+			&applications.ServicesBySGRes{
+				Group:    "myapp.default",
+				Services: []*applications.Service{},
+			},
+			&applications.ServicesBySGRes{
+				Group: "postgres.default",
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup3",
+						Group:        "postgres.default",
+						Release:      "core/postgres/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_CRITICAL,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+			},
+			&applications.ServicesBySGRes{
+				Group:    "redis.default",
+				Services: []*applications.Service{},
+			},
+			&applications.ServicesBySGRes{
+				Group:    "test.default",
+				Services: []*applications.Service{},
+			},
+		}
+
+		expectedWARNINGResponses = []*applications.ServicesBySGRes{
+			&applications.ServicesBySGRes{
+				Group: "myapp.default",
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup1",
+						Group:        "myapp.default",
+						Release:      "core/myapp/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_WARNING,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+			},
+			&applications.ServicesBySGRes{
+				Group:    "postgres.default",
+				Services: []*applications.Service{},
+			},
+			&applications.ServicesBySGRes{
+				Group:    "redis.default",
+				Services: []*applications.Service{},
+			},
+			&applications.ServicesBySGRes{
+				Group:    "test.default",
+				Services: []*applications.Service{},
+			},
+		}
+
+		expectedUNKNOWNResponses = []*applications.ServicesBySGRes{
+			&applications.ServicesBySGRes{
+				Group:    "myapp.default",
+				Services: []*applications.Service{},
+			},
+			&applications.ServicesBySGRes{
+				Group: "postgres.default",
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup2",
+						Group:        "postgres.default",
+						Release:      "core/postgres/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_UNKNOWN,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+			},
+			&applications.ServicesBySGRes{
+				Group:    "redis.default",
+				Services: []*applications.Service{},
+			},
+			&applications.ServicesBySGRes{
+				Group: "test.default",
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup4",
+						Group:        "test.default",
+						Release:      "core/test/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_UNKNOWN,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+			},
+		}
+	)
+
+	// Get the service groups and iterate over to test every service within
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, len(expectedOKResponses), len(sgList),
+		fmt.Sprintf("There should be %d service_group in the db", len(expectedOKResponses))) {
+
+		for i, sg := range sgList {
+
+			// OK Health
+			t.Run(fmt.Sprintf("verifying service group %d with health:OK", sg.ID), func(t *testing.T) {
+				var (
+					ctx     = context.Background()
+					request = &applications.ServicesBySGReq{
+						ServiceGroupId: sg.ID,
+						Health:         "OK", // This is the filter we are testing in this function
+					}
+				)
+
+				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+				assert.Nil(t, err)
+				assert.Equal(t, expectedOKResponses[i].GetGroup(), response.GetGroup())
+				assertServicesEqual(t, expectedOKResponses[i].GetServices(), response.GetServices())
+			})
+
+			// CRITICAL Health
+			t.Run(fmt.Sprintf("verifying service group %d with health:CRITICAL", sg.ID), func(t *testing.T) {
+				var (
+					ctx     = context.Background()
+					request = &applications.ServicesBySGReq{
+						ServiceGroupId: sg.ID,
+						Health:         "CRITICAL", // This is the filter we are testing in this function
+					}
+				)
+
+				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+				assert.Nil(t, err)
+				assert.Equal(t, expectedCRITICALResponses[i].GetGroup(), response.GetGroup())
+				assertServicesEqual(t, expectedCRITICALResponses[i].GetServices(), response.GetServices())
+			})
+
+			// WARNING Health
+			t.Run(fmt.Sprintf("verifying service group %d with health:WARNING", sg.ID), func(t *testing.T) {
+				var (
+					ctx     = context.Background()
+					request = &applications.ServicesBySGReq{
+						ServiceGroupId: sg.ID,
+						Health:         "WARNING", // This is the filter we are testing in this function
+					}
+				)
+
+				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+				assert.Nil(t, err)
+				assert.Equal(t, expectedWARNINGResponses[i].GetGroup(), response.GetGroup())
+				assertServicesEqual(t, expectedWARNINGResponses[i].GetServices(), response.GetServices())
+			})
+
+			// UNKNOWN Health
+			t.Run(fmt.Sprintf("verifying service group %d with health:UNKNOWN", sg.ID), func(t *testing.T) {
+				var (
+					ctx     = context.Background()
+					request = &applications.ServicesBySGReq{
+						ServiceGroupId: sg.ID,
+						Health:         "UNKNOWN", // This is the filter we are testing in this function
+					}
+				)
+
+				response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+				assert.Nil(t, err)
+				assert.Equal(t, expectedUNKNOWNResponses[i].GetGroup(), response.GetGroup())
+				assertServicesEqual(t, expectedUNKNOWNResponses[i].GetServices(), response.GetServices())
+			})
+		}
+	}
+}

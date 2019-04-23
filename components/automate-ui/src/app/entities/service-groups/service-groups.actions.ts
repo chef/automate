@@ -1,6 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
-import { ServiceGroupsPayload, ServiceGroupHealthCountPayload } from './service-groups.model';
+import {
+  ServiceGroupsPayload, ServicesPayload, ServicesFilters,
+  ServiceGroupHealthCountPayload
+} from './service-groups.model';
 
 export enum ServiceGroupsActionTypes {
   GET_SERVICE_GROUPS         = 'SERVICE_GROUPS::GET',
@@ -12,7 +15,13 @@ export enum ServiceGroupsActionTypes {
   GET_SERVICE_GROUPS_COUNTS_FAILURE  = 'SERVICE_GROUPS_COUNTS::GET::FAILURE',
 
   UPDATE_SERVICE_GROUPS_FILTER = 'SERVICE_GROUPS::FILTER::UPDATE',
-  UPDATE_SERVICE_GROUPS_SORTING = 'SERVICE_GROUPS::SORTING::UPDATE'
+  UPDATE_SERVICE_GROUPS_SORTING = 'SERVICE_GROUPS::SORTING::UPDATE',
+
+  UPDATE_SELECTED_SERVICE_GROUP = 'SERVICE_GROUPS::SELECTED::SG::UPDATE',
+
+  GET_SERVICES_BY_SERVICE_GROUP = 'SERVICE_GROUPS::SERVICES::GET',
+  GET_SERVICES_BY_SERVICE_GROUP_SUCCESS = 'SERVICE_GROUPS::SERVICES::GET::SUCCESS',
+  GET_SERVICES_BY_SERVICE_GROUP_FAILURE = 'SERVICE_GROUPS::SERVICES::GET::FAILURE'
 }
 
 export class GetServiceGroups implements Action {
@@ -51,6 +60,27 @@ export class GetServiceGroupsCountsSuccess implements Action {
 
 export class GetServiceGroupsCountsFailure implements Action {
   readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_FAILURE;
+}
+
+export class UpdateSelectedSG implements Action {
+  readonly type = ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP;
+
+  constructor(public payload: ServicesFilters) {}
+}
+
+export class GetServicesBySG implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP;
+  constructor() {}
+}
+
+export class GetServicesBySGSuccess implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_SUCCESS;
+
+  constructor(public payload: ServicesPayload ) {}
+}
+
+export class GetServicesBySGFailure implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_FAILURE;
 
   constructor(public payload: HttpErrorResponse) { }
 }
@@ -62,4 +92,9 @@ export type ServiceGroupsActions =
   | GetServiceGroups
   | GetServiceGroupsCounts
   | GetServiceGroupsCountsSuccess
-  | GetServiceGroupsCountsFailure;
+  | GetServiceGroupsCountsFailure
+  | UpdateSelectedSG
+  | GetServicesBySG
+  | GetServicesBySGSuccess
+  | GetServicesBySGFailure
+  | GetServiceGroups;

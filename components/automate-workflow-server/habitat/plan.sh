@@ -150,7 +150,7 @@ export OMNIBUS_FILES="\${ctl_path}/lib"
 export RUBYLIB="\${ctl_path}/lib"
 export KNIFE_PATH="\${ctl_path}/bin/knife"
 cd \$ctl_path
-bundle exec bin/automate-ctl.rb "\$@"
+bundle exec bin/workflow-ctl "\$@"
 EOF
   chmod +x "${pkg_prefix}/bin/workflow-ctl"
 }

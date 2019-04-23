@@ -22,7 +22,6 @@ import (
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
@@ -398,7 +397,7 @@ func TestCreatePolicy(t *testing.T) {
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{constants.UnassignedProjectID},
+				Projects:  []string{constants_v2.UnassignedProjectID},
 			}
 			req := api_v2.CreatePolicyReq{
 				Id:         "policy1",
@@ -412,7 +411,7 @@ func TestCreatePolicy(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			assert.Equal(t, len(items)+1, store.ItemCount())
-			assert.ElementsMatch(t, []string{constants.UnassignedProjectID}, resp.Statements[0].Projects)
+			assert.ElementsMatch(t, []string{constants_v2.UnassignedProjectID}, resp.Statements[0].Projects)
 		}},
 
 		{"successfully creates policy with wildcard projects", func(t *testing.T) {
@@ -452,8 +451,8 @@ func TestCreatePolicy(t *testing.T) {
 			require.ElementsMatch(t, []string{"my-other-project"}, resp.Statements[2].Projects)
 
 			// key check: internal vs external representation
-			assert.ElementsMatch(t, []string{constants.AllProjectsID}, pol.Statements[1].Projects)
-			assert.ElementsMatch(t, []string{constants.AllProjectsExternalID}, resp.Statements[1].Projects)
+			assert.ElementsMatch(t, []string{constants_v2.AllProjectsID}, pol.Statements[1].Projects)
+			assert.ElementsMatch(t, []string{constants_v2.AllProjectsExternalID}, resp.Statements[1].Projects)
 		}},
 	}
 
@@ -634,7 +633,7 @@ func TestListPolicies(t *testing.T) {
 		{"returns mapped meta-project when present", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
 			storedPol := genPolicy(t, "", prng)
-			storedPol.Statements[0].Projects = []string{constants.AllProjectsID}
+			storedPol.Statements[0].Projects = []string{constants_v2.AllProjectsID}
 			store.Add(storedPol.ID, &storedPol, cache.NoExpiration)
 
 			resp, err := cl.ListPolicies(ctx, &req)
@@ -643,7 +642,7 @@ func TestListPolicies(t *testing.T) {
 			require.Equal(t, len(items)+1, len(resp.Policies))
 			for _, pol := range resp.Policies {
 				if pol.Id == storedPol.ID {
-					assert.Equal(t, constants.AllProjectsExternalID, pol.Statements[0].Projects[0])
+					assert.Equal(t, constants_v2.AllProjectsExternalID, pol.Statements[0].Projects[0])
 				} else {
 					p := items[pol.Id]
 					assertPoliciesMatch(t, &p, pol)
@@ -778,7 +777,7 @@ func TestGetPolicy(t *testing.T) {
 		}},
 		{"returns mapped meta-project when present", func(t *testing.T) {
 			storedPol := genPolicy(t, "", prng)
-			storedPol.Statements[0].Projects = []string{constants.AllProjectsID}
+			storedPol.Statements[0].Projects = []string{constants_v2.AllProjectsID}
 			require.Zero(t, store.ItemCount())
 			store.Add(storedPol.ID, &storedPol, cache.NoExpiration)
 			req := api_v2.GetPolicyReq{
@@ -788,7 +787,7 @@ func TestGetPolicy(t *testing.T) {
 			pol, err := cl.GetPolicy(ctx, &req)
 			require.NoError(t, err)
 
-			assert.Equal(t, constants.AllProjectsExternalID, pol.Statements[0].Projects[0])
+			assert.Equal(t, constants_v2.AllProjectsExternalID, pol.Statements[0].Projects[0])
 		}},
 		{"fails with NotFound when ID doesn't match any policies", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
@@ -2684,9 +2683,9 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 func TestV1AndV2Queries(t *testing.T) {
 	ctx := context.Background()
 	_ = prng.Seed(t) // used indirectly with rand.Shuffle
-	v2Chan := make(chan bool, 1)
+	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
-	ts := setupV2(t, &responderEngine{}, nil, &emptyV1List, v2Chan)
+	ts := setupV2(t, &responderEngine{}, nil, &emptyV1List, vChan)
 	status := ts.status
 
 	// Note(sr): We're a bit lazy here -- only checking that v2 calls (do not)
@@ -2746,7 +2745,97 @@ func TestV1AndV2Queries(t *testing.T) {
 		ts.projectCache.Flush()
 
 		// reset to v1
-		v2Chan <- false
+		vChan <- api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
+
+		t.Run(test.desc, test.f)
+	}
+}
+
+func TestVersionChannel(t *testing.T) {
+	ctx := context.Background()
+	_ = prng.Seed(t) // used indirectly with rand.Shuffle
+	vChan := make(chan api_v2.Version, 1)
+	emptyV1List := v1Lister{}
+	ts := setupV2(t, &responderEngine{}, nil, &emptyV1List, vChan)
+	status := ts.status
+	assert := assert.New(t)
+	require := require.New(t)
+
+	iamV1 := api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
+	iamV2 := api_v2.Version{Major: api_v2.Version_V2, Minor: api_v2.Version_V0}
+	iamV2Beta := api_v2.Version{Major: api_v2.Version_V2, Minor: api_v2.Version_V1}
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"when not upgraded, the channel is set to v1.0", func(t *testing.T) {
+			assert.Equal(iamV1, ts.switcher.Version)
+		}},
+		{"when upgraded from v1.0 to v2.0, the channel is set to v2.0", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
+			require.NoError(err)
+
+			assert.Equal(iamV2, ts.switcher.Version)
+		}},
+		{"when reset from v2.0 to v1.0, channel changes to v1.0", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
+			require.NoError(err)
+			require.Equal(iamV2, ts.switcher.Version)
+			ts.policy.ResetToV1(ctx, &api_v2.ResetToV1Req{})
+
+			assert.Equal(iamV1, ts.switcher.Version)
+		}},
+		{"when upgraded from v1.0 to v2.1, channel changes to v2.1", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+			require.NoError(err)
+
+			assert.Equal(iamV2Beta, ts.switcher.Version)
+		}},
+		{"when reset from v2.1 to v1.0, channel changes to v1.0", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+			require.NoError(err)
+			require.Equal(iamV2Beta, ts.switcher.Version)
+			ts.policy.ResetToV1(ctx, &api_v2.ResetToV1Req{})
+
+			assert.Equal(iamV1, ts.switcher.Version)
+		}},
+		{"when upgraded from v2.0 to v2.1, channel changes to v2.1", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
+			require.NoError(err)
+			require.Equal(iamV2, ts.switcher.Version)
+			_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+			require.NoError(err)
+
+			assert.Equal(iamV2Beta, ts.switcher.Version)
+		}},
+		{"when downgraded from v2.1 to v2.0, channel changes to v2.0", func(t *testing.T) {
+			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+			require.NoError(err)
+			require.Equal(iamV2Beta, ts.switcher.Version)
+			_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
+			require.NoError(err)
+
+			assert.Equal(iamV2, ts.switcher.Version)
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		// reset memstore to "no migrations ever attempted" status
+		require.NoError(status.Pristine(ctx))
+
+		// reset (v2) store to empty
+		ts.policyCache.Flush()
+		ts.roleCache.Flush()
+		ts.projectCache.Flush()
+
+		// reset to v1
+		ts.switcher.Version = api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
+		require.Equal(iamV1, ts.switcher.Version)
 
 		t.Run(test.desc, test.f)
 	}
@@ -2822,6 +2911,7 @@ type testSetup struct {
 	roleCache    *cache.Cache
 	projectCache *cache.Cache
 	status       storage.MigrationStatusProvider
+	switcher     *v2.VersionSwitch
 }
 
 func setupV2WithWriter(t *testing.T,
@@ -2833,7 +2923,7 @@ func setupV2(t *testing.T,
 	authorizer engine.V2Authorizer,
 	writer engine.V2Writer,
 	pl storage_v1.PoliciesLister,
-	v2Chan chan bool) testSetup {
+	vChan chan api_v2.Version) testSetup {
 	t.Helper()
 	ctx := context.Background()
 
@@ -2845,14 +2935,15 @@ func setupV2(t *testing.T,
 	}
 
 	mem_v2 := memstore_v2.New()
-	polV2, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, v2Chan)
+	polV2, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
 	require.NoError(t, err)
 
 	eventServiceClient := &mockEventServiceClient{}
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testProjectRulesRetriever{}, eventServiceClient)
 	require.NoError(t, err)
 
-	authzV2, err := v2.NewAuthzServer(l, authorizer)
+	vSwitch := v2.NewSwitch(vChan)
+	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -2863,7 +2954,7 @@ func setupV2(t *testing.T,
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
 			grpc_server.InputValidationInterceptor(),
-			grpc_server.NewSwitch(v2Chan).Interceptor,
+			vSwitch.Interceptor,
 			polV2.EngineUpdateInterceptor(),
 		),
 	))
@@ -2888,6 +2979,7 @@ func setupV2(t *testing.T,
 		roleCache:    mem_v2.RolesCache(),
 		projectCache: mem_v2.ProjectsCache(),
 		status:       mem_v2,
+		switcher:     vSwitch,
 	}
 }
 

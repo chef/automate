@@ -5,6 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -34,9 +35,18 @@ func init() {
 	RootCmd.PersistentFlags().String("key", "", "path to key")
 	RootCmd.PersistentFlags().String("cert", "", "path to cert")
 
-	viper.BindPFlag("cert", RootCmd.PersistentFlags().Lookup("cert"))
-	viper.BindPFlag("root-cert", RootCmd.PersistentFlags().Lookup("root-cert"))
-	viper.BindPFlag("key", RootCmd.PersistentFlags().Lookup("key"))
+	bindPFlag("cert", RootCmd.PersistentFlags().Lookup("cert"))
+	bindPFlag("root-cert", RootCmd.PersistentFlags().Lookup("root-cert"))
+	bindPFlag("key", RootCmd.PersistentFlags().Lookup("key"))
+}
+
+func bindPFlag(name string, flag *pflag.Flag) {
+	err := viper.BindPFlag("cert", RootCmd.PersistentFlags().Lookup("cert"))
+	if err != nil {
+		// This is a programming error and should not happen
+		// at runtime.
+		panic("could not bind flag!")
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.

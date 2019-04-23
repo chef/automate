@@ -204,8 +204,8 @@ func (nc *NatsClient) ConnectAndPublish(msg *applications.HabService) error {
 // order to configure TLS, we are responsible for closing it.
 func (nc *NatsClient) Close() {
 	natsConn := nc.conn.NatsConn()
-	nc.conn.Close()
-	natsConn.Close()
+	nc.conn.Close()  // nolint: errcheck
+	natsConn.Close() // nolint: errcheck
 }
 
 func (nc *NatsClient) natsTLSConfig() (*tls.Config, error) {

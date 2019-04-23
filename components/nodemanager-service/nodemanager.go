@@ -58,7 +58,7 @@ func Serve(conf config.Nodemanager, grpcBinding string) error {
 }
 
 func serve(ctx context.Context, config *config.Nodemanager, connFactory *secureconn.Factory) error {
-	log.Infof("getting db connection for %+v", config.Postgres)
+	log.Infof("getting db connection")
 	db, err := pgdb.New(&config.Postgres)
 	if err != nil {
 		log.WithError(err).Error("Creating postgres connection")

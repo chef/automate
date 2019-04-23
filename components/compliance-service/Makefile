@@ -3,6 +3,8 @@
 # nakedret: naked returns in long functions
 # prealloc: slices that could be preallocated
 LINTERARGS=-v -D lll -D unparam -D nakedret -D prealloc --deadline 1m ./...
+# govet in 1.16 is very confused by some of the code in this component
+GOLANGCILINTVERSION?=1.15.0
 include ../../Makefile.common_go
 
 .PHONY: test

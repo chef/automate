@@ -12,7 +12,6 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	project_update_tags "github.com/chef/automate/lib/authz"
-	rules_tags "github.com/chef/automate/lib/authz"
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"
 	_struct "github.com/golang/protobuf/ptypes/struct"
@@ -42,12 +41,12 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefEnvironmentsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 									Values: []string{"env1"},
 								},
 							},
@@ -68,12 +67,12 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefEnvironmentsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 									Values: []string{"env1", "env2"},
 								},
 							},
@@ -96,16 +95,16 @@ func TestProjectUpdate(t *testing.T) {
 				Roles:       []string{"backend"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefEnvironmentsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 									Values: []string{"env1"},
 								},
-								&iam_v2.Condition{
-									Type:   rules_tags.RolesTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 									Values: []string{"backend"},
 								},
 							},
@@ -128,16 +127,16 @@ func TestProjectUpdate(t *testing.T) {
 				Roles:       []string{"backend"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefEnvironmentsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 									Values: []string{"env1"},
 								},
-								&iam_v2.Condition{
-									Type:   rules_tags.RolesTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 									Values: []string{"frontend"},
 								},
 							},
@@ -158,20 +157,20 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefEnvironmentsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 									Values: []string{"env2"},
 								},
 							},
 						},
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefEnvironmentsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 									Values: []string{"env1"},
 								},
 							},
@@ -192,24 +191,24 @@ func TestProjectUpdate(t *testing.T) {
 				Projects:    []string{"old_tag"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefEnvironmentsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 									Values: []string{"env2"},
 								},
 							},
 						},
 					},
 				},
-				"project3": &iam_v2.ProjectRules{
+				"project3": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefEnvironmentsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 									Values: []string{"env1"},
 								},
 							},
@@ -232,24 +231,24 @@ func TestProjectUpdate(t *testing.T) {
 				Roles:       []string{"backend"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.RolesTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 									Values: []string{"backend"},
 								},
 							},
 						},
 					},
 				},
-				"project3": &iam_v2.ProjectRules{
+				"project3": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefEnvironmentsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
 									Values: []string{"env1"},
 								},
 							},
@@ -272,12 +271,12 @@ func TestProjectUpdate(t *testing.T) {
 				Roles:    []string{"area_51"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.RolesTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 									Values: []string{"area_51"},
 								},
 							},
@@ -298,12 +297,12 @@ func TestProjectUpdate(t *testing.T) {
 				Roles:    []string{"area_51"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.RolesTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 									Values: []string{"area_52"},
 								},
 							},
@@ -324,12 +323,12 @@ func TestProjectUpdate(t *testing.T) {
 				Roles:    []string{"Area_51"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.RolesTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 									Values: []string{"area_51"},
 								},
 							},
@@ -350,12 +349,12 @@ func TestProjectUpdate(t *testing.T) {
 				Roles:    []string{"area_51"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.RolesTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 									Values: []string{"area_51", "area_52"},
 								},
 							},
@@ -376,12 +375,12 @@ func TestProjectUpdate(t *testing.T) {
 				Roles:    []string{"area_51", "area_52", "area_53"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.RolesTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 									Values: []string{"area_51"},
 								},
 							},
@@ -402,12 +401,12 @@ func TestProjectUpdate(t *testing.T) {
 				Roles:    []string{"area_51", "area_52", "area_53"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.RolesTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
 									Values: []string{"area_54"},
 								},
 							},
@@ -430,12 +429,12 @@ func TestProjectUpdate(t *testing.T) {
 				SourceFQDN: "chef-server.org",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefServersTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 									Values: []string{"chef-server.org"},
 								},
 							},
@@ -456,12 +455,12 @@ func TestProjectUpdate(t *testing.T) {
 				SourceFQDN: "chef-server2.org",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefServersTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 									Values: []string{"chef-server.org"},
 								},
 							},
@@ -482,12 +481,12 @@ func TestProjectUpdate(t *testing.T) {
 				SourceFQDN: "Chef-server.org",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefServersTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 									Values: []string{"chef-server.org"},
 								},
 							},
@@ -508,12 +507,12 @@ func TestProjectUpdate(t *testing.T) {
 				SourceFQDN: "chef-server.org",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefServersTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 									Values: []string{"chef-server.org", "chef-server2.org"},
 								},
 							},
@@ -536,20 +535,20 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefServersTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 									Values: []string{"chef-server.org"},
 								},
 							},
 						},
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -572,20 +571,20 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefServersTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
 									Values: []string{"chef-server2.org"},
 								},
 							},
 						},
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -608,12 +607,12 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -634,12 +633,12 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org2"},
 								},
 							},
@@ -660,12 +659,12 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"old_tag": &iam_v2.ProjectRules{
+				"old_tag": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -688,12 +687,12 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyGroup: "prod",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyGroupTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 									Values: []string{"prod"},
 								},
 							},
@@ -714,12 +713,12 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyGroup: "prod",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyGroupTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 									Values: []string{"dev"},
 								},
 							},
@@ -740,12 +739,12 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyGroup: "prod",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyGroupTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 									Values: []string{"Prod"},
 								},
 							},
@@ -766,12 +765,12 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyGroup: "prod",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyGroupTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 									Values: []string{"prod", "dev"},
 								},
 							},
@@ -794,20 +793,20 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyGroupTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 									Values: []string{"prod"},
 								},
 							},
 						},
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -830,20 +829,20 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyGroupTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
 									Values: []string{"dev"},
 								},
 							},
 						},
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -866,12 +865,12 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyName: "prod",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyNameTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 									Values: []string{"prod"},
 								},
 							},
@@ -892,12 +891,12 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyName: "prod",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyNameTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 									Values: []string{"dev"},
 								},
 							},
@@ -918,12 +917,12 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyName: "prod",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyNameTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 									Values: []string{"Prod"},
 								},
 							},
@@ -944,12 +943,12 @@ func TestProjectUpdate(t *testing.T) {
 				PolicyName: "prod",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyNameTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 									Values: []string{"prod", "dev"},
 								},
 							},
@@ -972,20 +971,20 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyNameTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 									Values: []string{"prod"},
 								},
 							},
 						},
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -1008,16 +1007,16 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.PolicyNameTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
 									Values: []string{"dev"},
 								},
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -1040,12 +1039,12 @@ func TestProjectUpdate(t *testing.T) {
 				ChefTags: []string{"area_51"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefTagsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 									Values: []string{"area_51"},
 								},
 							},
@@ -1066,12 +1065,12 @@ func TestProjectUpdate(t *testing.T) {
 				ChefTags: []string{"area_51"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefTagsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 									Values: []string{"area_52"},
 								},
 							},
@@ -1092,12 +1091,12 @@ func TestProjectUpdate(t *testing.T) {
 				ChefTags: []string{"Area_51"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefTagsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 									Values: []string{"area_51"},
 								},
 							},
@@ -1118,12 +1117,12 @@ func TestProjectUpdate(t *testing.T) {
 				ChefTags: []string{"area_51"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefTagsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 									Values: []string{"area_51", "area_52"},
 								},
 							},
@@ -1146,20 +1145,20 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefTagsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 									Values: []string{"area_51"},
 								},
 							},
 						},
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -1182,20 +1181,20 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefTagsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 									Values: []string{"area_51"},
 								},
 							},
 						},
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org2"},
 								},
 							},
@@ -1218,16 +1217,16 @@ func TestProjectUpdate(t *testing.T) {
 				OrganizationName: "org1",
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefTagsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 									Values: []string{"area_51"},
 								},
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefOrgsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 									Values: []string{"org2"},
 								},
 							},
@@ -1248,12 +1247,12 @@ func TestProjectUpdate(t *testing.T) {
 				ChefTags: []string{"area_51", "area_52", "area_53"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefTagsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 									Values: []string{"area_51"},
 								},
 							},
@@ -1274,12 +1273,12 @@ func TestProjectUpdate(t *testing.T) {
 				ChefTags: []string{"area_51", "area_52", "area_53"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
-				"project9": &iam_v2.ProjectRules{
+				"project9": {
 					Rules: []*iam_v2.ProjectRule{
-						&iam_v2.ProjectRule{
+						{
 							Conditions: []*iam_v2.Condition{
-								&iam_v2.Condition{
-									Type:   rules_tags.ChefTagsTag,
+								{
+									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
 									Values: []string{"area_54"},
 								},
 							},
@@ -1359,7 +1358,7 @@ func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: "",
 					},
@@ -1387,7 +1386,7 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: "TestNoErrorWhenProjectUpdateIDIsSent",
 					},
@@ -1429,7 +1428,7 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: "one",
 					},
@@ -1450,7 +1449,7 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: "two",
 					},

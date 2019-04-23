@@ -700,30 +700,25 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 //             latestOnly - specifies whether or not we are only interested in retrieving only the latest report
 //  return *elastic.BoolQuery
 func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnly bool) *elastic.BoolQuery {
-	var (
-		endTime   string
-		startTime string
-	)
-
 	utils.DeDupFilters(filters)
 
 	typeQuery := elastic.NewTypeQuery(mappings.DocType)
 
-	endTime = firstOrEmpty(filters["end_time"])
-	startTime = firstOrEmpty(filters["start_time"])
-
-	timeRangeQuery := elastic.NewRangeQuery("end_time")
-	if len(startTime) > 0 {
-		timeRangeQuery.Gte(startTime)
-	}
-	if len(endTime) > 0 {
-		timeRangeQuery.Lte(endTime)
-	}
-
 	boolQuery := elastic.NewBoolQuery()
 	boolQuery = boolQuery.Must(typeQuery)
 
-	if len(startTime) > 0 || len(endTime) > 0 {
+	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
+		endTime := firstOrEmpty(filters["end_time"])
+		startTime := firstOrEmpty(filters["start_time"])
+
+		timeRangeQuery := elastic.NewRangeQuery("end_time")
+		if len(startTime) > 0 {
+			timeRangeQuery.Gte(startTime)
+		}
+		if len(endTime) > 0 {
+			timeRangeQuery.Lte(endTime)
+		}
+
 		boolQuery = boolQuery.Must(timeRangeQuery)
 	}
 
@@ -828,8 +823,24 @@ func (backend ES2Backend) getFiltersQueryForDeepReport(reportId string,
 	boolQuery = boolQuery.Must(idsQuery)
 
 	if len(filters["projects"]) > 0 {
-		termQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(filters["projects"])...)
-		boolQuery = boolQuery.Must(termQuery)
+		projectsQuery := elastic.NewBoolQuery()
+
+		if stringutils.SliceContains(filters["projects"], authzConstants.UnassignedProjectID) {
+			emptyProjectQuery := elastic.NewBoolQuery()
+			emptyProjectQuery.MustNot(elastic.NewExistsQuery("projects"))
+			projectsQuery.Should(emptyProjectQuery)
+		}
+
+		assignedProjectIds := stringutils.SliceFilter(filters["projects"], func(projectId string) bool {
+			return projectId != authzConstants.UnassignedProjectID
+		})
+
+		if len(assignedProjectIds) > 0 {
+			projectMatchQuery := elastic.NewTermsQuery("projects", stringArrayToInterfaceArray(assignedProjectIds)...)
+			projectsQuery.Should(projectMatchQuery)
+		}
+
+		boolQuery = boolQuery.Filter(projectsQuery)
 	}
 
 	numberOfProfiles := len(filters["profile_id"])

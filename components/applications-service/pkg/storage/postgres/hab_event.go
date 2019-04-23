@@ -26,7 +26,7 @@ var (
 
 	timeLastEventSeen = float64(time.Now().Unix())
 
-	timeLastEventSeenCounter = promauto.NewCounterFunc(prometheus.CounterOpts{
+	_ = promauto.NewCounterFunc(prometheus.CounterOpts{
 		Name: "applications_ingest_ops_last_time",
 		Help: "Time when the last applications message was accepted for ingestion",
 	},
@@ -154,7 +154,7 @@ func supervisorFromHabEvent(event *applications.HabService) *supervisor {
 	return &supervisor{
 		MemberID: event.GetSupervisorId(),
 		// TODO: figure out how habitat will provide this information
-		//Fqdn:     event.GetFqdn(),
+		Fqdn: event.GetFqdn(),
 	}
 }
 

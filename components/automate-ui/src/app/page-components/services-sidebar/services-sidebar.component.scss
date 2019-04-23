@@ -1,0 +1,79 @@
+@import "~styles/variables";
+@import "~styles/mixins";
+
+.services-panel {
+  background-color: #FFFFFF;
+}
+
+.service-item {
+  @include modal-box();
+  display: block;
+  background-color: #F2F5F7;
+  margin-bottom: 1em;
+  margin-right: 2em;
+  margin-left: -.5em;
+  padding: 0em;
+  position: relative;
+  border-radius: 0;
+  transition: all .2s;
+  border-radius: .4em;
+
+  .body {
+    display: block;
+    background-color: #FFFFFF;
+    padding: 1em;
+    position: relative;
+    width: 100%;
+    font-size: .8em;
+  }
+
+  .header {
+    display: block;
+    padding: 1em;
+    width: 100%;
+    position: relative;
+  }
+
+  .service-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: .6em;
+  }
+
+  .supervisor-line {
+    font-size: .8em;
+  }
+
+  chef-icon {
+    font-size: 19px;
+    margin-right: 8px;
+
+    &.OK {
+      color: $chef-success;
+    }
+
+    &.WARNING {
+      color: $chef-primary;
+    }
+
+    &.UNKNOWN {
+      color: $chef-dark-grey;
+    }
+
+    &.CRITICAL {
+      color: $chef-critical;
+    }
+  }
+}
+
+.no-services {
+  display: block;
+  padding-top: 5em;
+  position: relative;
+  text-align: center;
+}
+
+.status-filter-bar {
+  padding-left: 1.8em;
+  padding-right: 1.5em;
+}

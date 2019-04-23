@@ -249,7 +249,7 @@ func stringArrayToListValue(strings []string, list *gpStruct.ListValue) error {
 
 	for i, string := range strings {
 		v := &gpStruct.Value{
-			Kind: &gpStruct.Value_StringValue{string},
+			Kind: &gpStruct.Value_StringValue{StringValue: string},
 		}
 
 		list.Values[i] = v

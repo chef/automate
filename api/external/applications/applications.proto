@@ -76,6 +76,7 @@ message ServicesBySGReq {
   int32 service_group_id = 1;
   common.query.Pagination pagination = 2;
   common.query.Sorting sorting = 3;
+  string health = 4;
 }
 
 message ServicesBySGRes {
@@ -170,7 +171,7 @@ message HabService {
   string environment = 8;
 
   // @afiune We need to figure out how the fqdn will be provided
-  /*string fqdn = 9;*/
+  string fqdn = 9;
 }
 
 // The package indentifier of a service is unique and is the combination

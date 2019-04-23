@@ -6,11 +6,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/olivere/elastic"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	"github.com/olivere/elastic"
-	log "github.com/sirupsen/logrus"
 )
 
 // GetRun - Get a node's last run
@@ -93,12 +94,12 @@ func (es Backend) GetRunsCounts(filters map[string][]string, start string, end s
 	for _, bucket := range statusRunsBuckets {
 		switch bucket.Key {
 		case "success":
-			ns.Success = int64(bucket.DocCount)
+			ns.Success = bucket.DocCount
 		case "failure":
-			ns.Failure = int64(bucket.DocCount)
+			ns.Failure = bucket.DocCount
 		}
 
-		totalRuns += int64(bucket.DocCount)
+		totalRuns += bucket.DocCount
 	}
 
 	ns.Total = totalRuns
@@ -192,7 +193,7 @@ func (es Backend) getAllConvergeIndiceNames() ([]string, error) {
 		return []string{}, err
 	}
 
-	var names []string
+	names := make([]string, 0, len(res))
 	for name := range res {
 		names = append(names, name)
 	}

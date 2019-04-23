@@ -50,6 +50,7 @@ type Context struct {
 	locationSpec        LocationSpecification
 	restoreLocationSpec LocationSpecification
 	metadataWritten     ObjectManifest
+	isExternalPG        bool
 }
 
 type MetadataChecksums struct {
@@ -144,6 +145,14 @@ func WithContextEsSidecarInfo(esSidecarInfo ESSidecarConnInfo) ContextOpt {
 func WithContextReleaseManifest(releaseManifest manifest.ReleaseManifest) ContextOpt {
 	return func(ctx *Context) {
 		ctx.releaseManifest = releaseManifest
+	}
+}
+
+// WithContextExternalPG sets the postgres mode. If external pg is enabled, certain things like
+// role creation will not happen.
+func WithContextExternalPG(isExternal bool) ContextOpt {
+	return func(ctx *Context) {
+		ctx.isExternalPG = isExternal
 	}
 }
 
@@ -266,4 +275,8 @@ func (ctx Context) writeStringToBlob(storageKey string, str string) error {
 	}
 
 	return nil
+}
+
+func (ctx *Context) IsExternalPG() bool {
+	return ctx.isExternalPG
 }

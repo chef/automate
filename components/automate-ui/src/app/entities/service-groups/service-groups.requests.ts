@@ -3,7 +3,9 @@ import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 import {
-  ServiceGroupsPayload, ServiceGroupHealthCountPayload, ServiceGroupFilters
+  ServiceGroupsPayload, ServiceGroupFilters,
+  ServiceGroupHealthCountPayload,
+  ServicesPayload, ServicesFilters
 } from './service-groups.model';
 import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
@@ -17,33 +19,56 @@ export class ServiceGroupsRequests {
     const url = `${APPLICATIONS_URL}/service-groups`;
 
     const options = {
-      params: this.buildFilterParams(filters)
+      params: this.buildServiceGroupsFilterParams(filters)
     };
 
     return this.httpClient.get<ServiceGroupsPayload>(url, options);
   }
 
-  public buildFilterParams(filters?: ServiceGroupFilters): HttpParams {
-    let searchParam = new HttpParams();
+  public buildServiceGroupsFilterParams(filters?: ServiceGroupFilters): HttpParams {
+    let params = new HttpParams();
+
     if (filters) {
       if (filters.status) {
-        searchParam = searchParam.append('filter', 'status' + ':' + filters.status);
+        params = params.append('filter', 'status' + ':' + filters.status);
       }
       if (filters.sortField) {
-        searchParam = searchParam.append('sorting.field', filters.sortField);
+        params = params.append('sorting.field', filters.sortField);
       }
       if (filters.sortDirection) {
-        searchParam = searchParam.append('sorting.order', filters.sortDirection);
+        params = params.append('sorting.order', filters.sortDirection);
       }
       if (filters.page) {
-        searchParam = searchParam.append('pagination.page', filters.page.toString());
+        params = params.append('pagination.page', filters.page.toString());
       }
       if (filters.pageSize) {
-        searchParam = searchParam.append('pagination.size', filters.pageSize.toString());
+        params = params.append('pagination.size', filters.pageSize.toString());
       }
     }
 
-    return searchParam;
+    return params;
+  }
+
+  public fetchServicesBySG(filters?: ServicesFilters): Observable<ServicesPayload> {
+    const url = `${APPLICATIONS_URL}/service-groups/${filters.service_group_id}`;
+
+    const options = {
+      params: this.buildServicesBySGFilterParams(filters)
+    };
+
+    return this.httpClient.get<ServicesPayload>(url, options);
+  }
+
+  public buildServicesBySGFilterParams(filters?: ServicesFilters): HttpParams {
+    let params = new HttpParams();
+
+    if (filters) {
+      if (filters.health && filters.health !== 'total') {
+        params = params.append('health', filters.health);
+      }
+    }
+
+    return params;
   }
 
   public fetchServiceGroupHealth(): Observable<ServiceGroupHealthCountPayload> {

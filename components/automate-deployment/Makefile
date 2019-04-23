@@ -100,7 +100,7 @@ mocks:
 	@echo "Regenerating mocks..."
 	cd pkg/target && mockery -name=Target -case=underscore -inpkg -recursive
 	cd pkg/events && mockery -name=EventSender -case underscore -inpkg -recursive
-	cd pkg/pg && mockery -name=DB -case underscore -inpkg -recursive
+	cd ../../lib/platform/pg && mockery -name=DB -case underscore -inpkg -recursive
 
 bin:
 	mkdir -p bin

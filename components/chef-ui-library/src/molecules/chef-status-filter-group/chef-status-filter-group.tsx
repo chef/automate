@@ -23,7 +23,7 @@ import find from 'lodash/fp/find';
  *   </chef-option>
  *   <chef-option class="filter warning" value='warning'>
  *     <div class="filter-label">Warning</div>
- *     <chef-icon>error_outline</chef-icon><div class="filter-total">5</div>
+ *     <chef-icon>error</chef-icon><div class="filter-total">5</div>
  * </chef-option>
  *   <chef-option class="filter success" value='success'>
  *     <div class="filter-label">OK</div>

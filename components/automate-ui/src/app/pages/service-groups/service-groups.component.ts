@@ -6,10 +6,11 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Chicklet, RollupServiceStatus, SortDirection } from '../../types/types';
 import { EntityStatus } from '../../entities/entities';
-import { UpdateServiceGroupFilters } from 'app/entities/service-groups/service-groups.actions';
 import {
-  ServiceGroup, ServiceGroupFilters, FieldDirection,
-  ServiceGroupHealthCountPayload
+  UpdateServiceGroupFilters, UpdateSelectedSG
+} from 'app/entities/service-groups/service-groups.actions';
+import {
+  ServiceGroup, ServiceGroupFilters, FieldDirection, ServiceGroupHealthCountPayload, ServicesFilters
 } from '../../entities/service-groups/service-groups.model';
 import {
   serviceGroupStatus, allServiceGroups, serviceGroupState, allServiceGroupHealth
@@ -26,6 +27,12 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
   public serviceGroupHealthCountPayload$: Observable<ServiceGroupHealthCountPayload[]>;
+
+  // The selected service-group id that will be sent to the services-sidebar
+  public selectedServiceGroupId: number;
+
+  // Weather or not the the services sidebar is visible
+  public servicesSidebarVisible = false;
 
   // The collection of allowable status
   private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
@@ -126,6 +133,23 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     delete queryParams['page'];
 
     this.router.navigate([], {queryParams});
+  }
+
+  public openServicesSidebar(id: number) {
+    const servicesFilters: ServicesFilters = {
+      service_group_id: id,
+      health: 'total'
+    };
+    this.selectedServiceGroupId = id;
+    this.servicesSidebarVisible = true;
+    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
+    document.getElementById('services-panel').focus();
+  }
+
+  public closeServicesSidebar() {
+    if (this.servicesSidebarVisible) {
+      this.servicesSidebarVisible = false;
+    }
   }
 
   private getSelectedStatus(allParameters: Chicklet[]): RollupServiceStatus {

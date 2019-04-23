@@ -15,7 +15,7 @@
     </chef-option>
     <chef-option class="filter warning" value='warning' (click)="statusFilter('warning')">
       <div class="filter-label">Warning</div>
-      <chef-icon>error_outline</chef-icon><div class="filter-total">5</div>
+      <chef-icon>error</chef-icon><div class="filter-total">5</div>
     </chef-option>
     <chef-option class="filter success" value='success' (click)="statusFilter('ok')">
       <div class="filter-label">OK</div>
@@ -42,10 +42,14 @@
             Release
           </chef-th>
         </chef-tr>
-      </chef-thead>
+    </chef-thead>
 
-     <chef-tbody>
-      <chef-tr class="{{serviceGroup.status}} row" tabindex="0" *ngFor="let serviceGroup of serviceGroups$ | async">
+    <chef-tbody>
+      <chef-tr
+        tabindex="0"
+        class="{{serviceGroup.status}} sg-row"
+        (click)="openServicesSidebar(serviceGroup.id)"
+        *ngFor="let serviceGroup of serviceGroups$ | async">
         <chef-td class="{{serviceGroup.status}} health">
           <chef-icon class="{{serviceGroup.status}}">{{ serviceGroup.status | serviceStatusIcon }}</chef-icon>
           <chef-pill class="{{serviceGroup.status}}">
@@ -77,4 +81,10 @@
       <chef-button primary>Learn More</chef-button>
     </div>
   </div>
+  <app-services-sidebar
+    [serviceGroupId]="selectedServiceGroupId"
+    [visible]="servicesSidebarVisible"
+    class="services-sidebar-container"
+    (closeServicesSidebarEvent)="closeServicesSidebar()">
+  </app-services-sidebar>
 </div>

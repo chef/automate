@@ -60,16 +60,16 @@ func (es Backend) GetNode(id string) (backend.Node, error) {
 
 // GetInventoryNodes - Collect inventory nodes from elasticsearch. This function allows
 // non-random access pagination and custom selection of how the docs are sorted.
+//
+// TODO(ssd) 2019-04-23: The sortField argument is ignored in this
+// call. The linter pointed out that it was previously ignored and an
+// attempt to not ignore it caused multiple tests to fail.
 func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	end time.Time, filters map[string][]string, cursorDate time.Time,
-	cursorID string, pageSize int, sortField string,
+	cursorID string, pageSize int, _ string,
 	ascending bool) ([]backend.InventoryNode, error) {
 
 	mainQuery := newBoolQueryFromFilters(filters)
-
-	if sortField == "" {
-		sortField = CheckinTimestamp
-	}
 
 	rangeQuery, ok := newRangeQueryTime(start, end, CheckinTimestamp)
 
@@ -261,11 +261,11 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 	for _, bucket := range statusNodesBuckets {
 		switch bucket.Key {
 		case "success":
-			ns.Success = int64(bucket.DocCount)
+			ns.Success = bucket.DocCount
 		case "failure":
-			ns.Failure = int64(bucket.DocCount)
+			ns.Failure = bucket.DocCount
 		case "missing":
-			ns.Missing = int64(bucket.DocCount)
+			ns.Missing = bucket.DocCount
 		}
 	}
 

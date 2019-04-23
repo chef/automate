@@ -463,7 +463,7 @@ func (s *State) evalQuery(
 	}
 
 	if tracer.Enabled() {
-		topdown.PrettyTrace(os.Stderr, *tracer)
+		topdown.PrettyTrace(os.Stderr, *tracer) //nolint: govet // tracer can be nil only if tracer.Enabled() == false
 	}
 
 	return rs, nil

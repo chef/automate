@@ -1,0 +1,57 @@
+################################################################################
+# Data elements of a message that currently exist:
+# sup-id         AUTO
+# group          hardcode to "default"
+# application    assign per-service in sup template
+# environment    <name>   The environment name of the current deployment
+# health         hardcode to 0 (OK) for now.
+# status         hardcode to 0 (RUNNING) for now
+# 
+# Package Indentifier
+# --origin      parse from service name 
+# --name        parse from service name 
+# --version     hardcode to 1.0.0 for now
+# --release     generate from the startup time of the generator
+
+[templates]
+  [[templates.supervisor]]
+    name = "pos_terminal"
+    [[ templates.supervisor.service ]]
+      package = "noms/pos-service-1"
+      application = "pos_terminal"
+    [[ templates.supervisor.service ]]
+      package = "noms/pos-service-2"
+      application = "pos_terminal"
+    [[ templates.supervisor.service ]]
+      package = "noms/pos-service-3"
+      application = "pos_terminal"
+
+  [[templates.supervisor]]
+    name = "order_mgmt"
+    [[ templates.supervisor.service ]]
+      package = "noms/om-service-1"
+      application = "order_mgmt"
+    [[ templates.supervisor.service ]]
+      package = "noms/om-service-2"
+      application = "order_mgmt"
+    [[ templates.supervisor.service ]]
+      package = "noms/om-service-3"
+      application = "order_mgmt"
+
+[generator]
+  [[generator.supervisor]]
+    name = "pos_terminals:production1"
+    template = "pos_terminal"
+    count = 10
+    channel = "production1"
+    environment = "production1"
+    site = "site1"
+
+  [[generator.supervisor]]
+    name = "order_mgmt:production1"
+    template = "order_mgmt"
+    count = 10
+    channel = "production1"
+    environment = "production1"
+    site = "site1"
+

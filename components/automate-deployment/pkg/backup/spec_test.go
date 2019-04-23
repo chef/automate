@@ -302,14 +302,14 @@ func testRequirePath(t *testing.T, spec Spec, mode, path string, matchers ...Rsy
 	}
 }
 
-func findDbByName(name string, dbs []DatabaseDumpOperation) DatabaseDumpOperation {
+func findDbByName(name string, dbs []DatabaseDumpOperationV2) DatabaseDumpOperationV2 {
 	for _, d := range dbs {
 		if d.Name == name {
 			return d
 		}
 	}
 
-	return DatabaseDumpOperation{}
+	return DatabaseDumpOperationV2{}
 }
 
 func testRequireDb(t *testing.T, spec Spec, mode, name string, user string) {
@@ -319,12 +319,12 @@ func testRequireDb(t *testing.T, spec Spec, mode, name string, user string) {
 		mode, name,
 	)
 
-	var p DatabaseDumpOperation
+	var p DatabaseDumpOperationV2
 	if mode == "sync" {
-		p = findDbByName(name, spec.SyncDbs)
+		p = findDbByName(name, spec.SyncDbsV2)
 	}
 	if mode == "async" {
-		p = findDbByName(name, spec.SyncDbs)
+		p = findDbByName(name, spec.AsyncDbsV2)
 	}
 
 	assert.Equal(t, name, p.Name, "could not find database matching %s", name)

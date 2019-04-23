@@ -1,0 +1,58 @@
+<chef-click-outside omit="sg-row" (clickOutside)="closeServicesSidebar()">
+  <chef-side-panel id="services-panel" class="services-panel" tabindex="0" [visible]="visible">
+    <chef-page-header>
+      <chef-heading>
+        <chef-icon>grain</chef-icon>
+        Services in {{ serviceGroupName$ | async }}
+      </chef-heading>
+      <chef-subheading>Services run by each Habitat Supervisor on a node.</chef-subheading>
+    </chef-page-header>
+    <div class="status-filter-bar">
+      <chef-status-filter-group>
+        <chef-option class="lean-filter general" value="general" (click)="updateServicesFilters('total')">
+          <chef-icon>group_work</chef-icon>
+          <div class="lean-filter-label">Total</div>
+          <div class="filter-total">30</div>
+        </chef-option>
+        <chef-option class="lean-filter critical" value='critical' (click)="updateServicesFilters('critical')">
+          <chef-icon>warning</chef-icon>
+          <div class="lean-filter-label">Critical</div>
+          <div class="filter-total">10</div>
+        </chef-option>
+        <chef-option class="lean-filter warning" value='warning' (click)="updateServicesFilters('warning')">
+          <chef-icon>error</chef-icon>
+          <div class="lean-filter-label">Warning</div>
+          <div class="filter-total">5</div>
+        </chef-option>
+        <chef-option class="lean-filter success" value='success' (click)="updateServicesFilters('ok')">
+          <chef-icon>check_circle</chef-icon>
+          <div class="lean-filter-label">OK</div>
+          <div class="filter-total">5</div>
+        </chef-option>
+        <chef-option class="lean-filter unknown" value='unknown' (click)="updateServicesFilters('unknown')">
+          <chef-icon>help</chef-icon>
+          <div class="lean-filter-label">Unknown</div>
+          <div class="filter-total">10</div>
+        </chef-option>
+      </chef-status-filter-group>
+    </div>
+    <ul>
+      <li class="service-item" *ngFor="let service of services$ | async">
+        <div class="header">
+          <div class ="service-line"><chef-icon>storage</chef-icon><b>{{ service.fqdn }}</b></div>
+          <div class ="supervisor-line"><b>Supervisor:</b> {{ service.supervisor_id }}</div>
+        </div>
+        <div class="body">
+          <div class ="service-line"><chef-icon>grain</chef-icon>{{ service.release }}</div>
+          <div class ="service-line">
+            <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
+            {{ healthCheckStatus(service) }}
+          </div>
+        </div>
+      </li>
+    </ul>
+    <div class="no-services" *ngIf="(services$ | async)?.length === 0">
+      No available services with <b>{{ selectedHealth }}</b> status
+    </div>
+  </chef-side-panel>
+</chef-click-outside>

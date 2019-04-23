@@ -34,9 +34,6 @@ func StartServer(ctx context.Context, config Config) error {
 	}
 
 	connFactory := secureconn.NewFactory(*serviceCerts)
-	if err != nil {
-		return errors.Wrap(err, "Could not create secure connection")
-	}
 
 	address := config.getAddressString()
 

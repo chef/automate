@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'omnibus-ctl'
 require 'ctl-helpers/error_handler'
 
 describe CtlHelpers::ErrorHandler do

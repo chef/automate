@@ -11,9 +11,9 @@ export class ServiceStatusIconPipe implements PipeTransform {
         return 'check_circle';
 
       case 'CRITICAL':
-      case 'UNKNOWN':
         return 'warning';
 
+      case 'UNKNOWN':
       case 'DEPLOYING':
         return 'help';
 

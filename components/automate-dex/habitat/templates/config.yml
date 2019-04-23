@@ -151,6 +151,9 @@ connectors:
       {{- else}}
       insecureSkipVerify: true
       {{- end}}
+      {{- if cfg.connectors.msad_ldap.insecure_no_ssl}}
+      insecureNoSSL: {{cfg.connectors.msad_ldap.insecure_no_ssl}}
+      {{- end}}
       userSearch:
         baseDN: {{cfg.connectors.msad_ldap.base_user_search_dn}}
         {{- if cfg.connectors.msad_ldap.user_query_filter}}
@@ -158,10 +161,26 @@ connectors:
         {{- else}}
         filter: (objectClass=person)
         {{- end}}
+        {{- if cfg.connectors.msad_ldap.username_attr}}
+        username: {{cfg.connectors.msad_ldap.username_attr}}
+        {{- else}}
         username: sAMAccountName
+        {{- end}}
+        {{- if cfg.connectors.msad_ldap.user_id_attr}}
+        idAttr: {{cfg.connectors.msad_ldap.user_id_attr}}
+        {{- else}}
         idAttr: sAMAccountName
+        {{- end}}
+        {{- if cfg.connectors.msad_ldap.email_attr}}
+        emailAttr: {{cfg.connectors.msad_ldap.email_attr}}
+        {{- else}}
         emailAttr: mail
+        {{- end}}
+        {{- if cfg.connectors.msad_ldap.user_display_name_attr}}
+        nameAttr: {{cfg.connectors.msad_ldap.user_display_name_attr}}
+        {{- else}}
         nameAttr: displayName
+        {{- end}}
       groupSearch:
         baseDN: {{cfg.connectors.msad_ldap.base_group_search_dn}}
         {{- if cfg.connectors.msad_ldap.group_query_filter}}
@@ -169,9 +188,21 @@ connectors:
         {{- else}}
         filter: (objectClass=group)
         {{- end}}
+        {{if cfg.connectors.msad_ldap.filter_groups_by_user_value}}
+        userAttr: {{cfg.connectors.msad_ldap.filter_groups_by_user_value}}
+        {{- else}}
         userAttr: DN
+        {{- end}}
+        {{- if cfg.connectors.msad_ldap.filter_groups_by_user_attr}}
+        groupAttr: {{cfg.connectors.msad_ldap.filter_groups_by_user_attr}}
+        {{- else}}
         groupAttr: member
+        {{- end}}
+        {{- if cfg.connectors.msad_ldap.group_display_name_attr}}
+        nameAttr: {{cfg.connectors.msad_ldap.group_display_name_attr}}
+        {{- else}}
         nameAttr: displayName
+        {{- end}}
   {{- end}}
   {{- if cfg.connectors.saml}}
   - type: saml

@@ -7,13 +7,13 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/lib/logger"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -30,7 +30,7 @@ type policyServer struct {
 	store  storage.Storage
 	engine engine.V2Writer
 	v1     storage_v1.PoliciesLister
-	v2Chan chan bool
+	vChan  chan api.Version
 }
 
 // PolicyServer is the server interface for policies: what we defined via
@@ -47,9 +47,9 @@ func NewMemstorePolicyServer(
 	l logger.Logger,
 	e engine.V2Writer,
 	pl storage_v1.PoliciesLister,
-	v2Chan chan bool) (PolicyServer, error) {
+	vChan chan api.Version) (PolicyServer, error) {
 
-	return NewPoliciesServer(ctx, l, memstore.New(), e, pl, v2Chan)
+	return NewPoliciesServer(ctx, l, memstore.New(), e, pl, vChan)
 }
 
 // NewPostgresPolicyServer instantiates a server.Server that connects to a postgres backend
@@ -60,13 +60,13 @@ func NewPostgresPolicyServer(
 	migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config,
 	pl storage_v1.PoliciesLister,
-	v2Chan chan bool) (PolicyServer, error) {
+	vChan chan api.Version) (PolicyServer, error) {
 
 	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	return NewPoliciesServer(ctx, l, s, e, pl, v2Chan)
+	return NewPoliciesServer(ctx, l, s, e, pl, vChan)
 }
 
 // NewPoliciesServer returns a new IAM v2 Policy server.
@@ -76,14 +76,14 @@ func NewPoliciesServer(
 	s storage.Storage,
 	e engine.V2Writer,
 	pl storage_v1.PoliciesLister,
-	v2Chan chan bool) (PolicyServer, error) {
+	vChan chan api.Version) (PolicyServer, error) {
 
 	srv := &policyServer{
 		log:    l,
 		store:  s,
 		engine: e,
 		v1:     pl,
-		v2Chan: v2Chan,
+		vChan:  vChan,
 	}
 
 	// If we *could* transition to failure, it means we had an in-progress state
@@ -101,10 +101,18 @@ func NewPoliciesServer(
 	if err != nil {
 		return nil, errors.Wrap(err, "retrieve migration status from storage")
 	}
-	isV2 := ms == storage.Successful || ms == storage.SuccessfulBeta1
-	srv.setV2(isV2)
+	var v api.Version
+	switch ms {
+	case storage.SuccessfulBeta1:
+		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
+	case storage.Successful:
+		v = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
+	default:
+		v = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
+	}
+	srv.setVersion(v)
 
-	if isV2 {
+	if v.Major == api.Version_V2 {
 		err = srv.store.ApplyV2DataMigrations(ctx)
 		if err != nil {
 			return nil, errors.Wrap(err, "error migrating v2 data")
@@ -342,7 +350,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 	}
 
 	// TODO replace this check with a policy once we've got RemovePolicyMember
-	if req.Id == constants_v2.AdminPolicyID {
+	if req.Id == constants.AdminPolicyID {
 		for _, member := range members {
 			if member.Name == "team:local:admins" {
 				return nil, status.Error(codes.PermissionDenied, `cannot remove local team: 
@@ -398,13 +406,6 @@ func (s *policyServer) CreateRole(
 // ListRoles fetches a list of all IAM v2 roles.
 func (s *policyServer) ListRoles(ctx context.Context,
 	_ *api.ListRolesReq) (*api.ListRolesResp, error) {
-
-	// TODO (TC): This is an example of how we can get the projects in the domain to filter on.
-	// projects, err := auth_context.ProjectsFromIncomingContext(ctx)
-	// if err != nil {
-	// 	return nil, status.Error(codes.Internal, err.Error())
-	// }
-	// s.log.Infof("PROJECTS: here are the authorized projects for this request: %s", projects)
 
 	internalRoles, err := s.store.ListRoles(ctx)
 	if err != nil {
@@ -565,33 +566,43 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 	}
 
 	// we've made it!
+	var v api.Version
 	switch req.Flag {
 	case api.Flag_VERSION_2_1:
 		err = s.store.SuccessBeta1(ctx)
+		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
 	default:
 		err = s.store.Success(ctx)
+		v = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
 	}
 	if err != nil {
 		recordFailure()
 		return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
 	}
 
-	s.setV2(true)
+	s.setVersion(v)
 	return &api.MigrateToV2Resp{Reports: reports}, nil
 }
 
 func (s *policyServer) handleMinorUpgrade(ctx context.Context, ms storage.MigrationStatus, f api.Flag) (upgraded bool, err error) {
+	var version api.Version
 	upgraded = true
 	if f == api.Flag_VERSION_2_1 && ms == storage.Successful {
 		err = s.store.SuccessBeta1(ctx)
+		version = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
 	} else if f == api.Flag_VERSION_2_0 && ms == storage.SuccessfulBeta1 {
 		err = s.store.Success(ctx)
+		version = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
 	} else {
 		upgraded = false
 	}
 
 	if err != nil {
 		return false, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
+	}
+
+	if upgraded {
+		s.setVersion(version)
 	}
 	return upgraded, nil
 }
@@ -618,7 +629,7 @@ func (s *policyServer) ResetToV1(ctx context.Context,
 	if err := s.store.Reset(ctx); err != nil {
 		return nil, status.Errorf(codes.Internal, "reset database state: %s", err.Error())
 	}
-	s.setV2(false)
+	s.setVersion(api.Version{Major: api.Version_V1, Minor: api.Version_V0})
 	return &api.ResetToV1Resp{}, nil
 }
 
@@ -640,6 +651,15 @@ func (s *policyServer) GetPolicyVersion(ctx context.Context,
 
 // updates OPA engine store with policy
 func (s *policyServer) updateEngineStore(ctx context.Context) error {
+	// We need to remove project filters from the request context
+	// otherwise they will be applied for store updates.
+	// This will fail on service start context, so only remove projects if ok.
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		delete(md, "projects")
+		ctx = metadata.NewOutgoingContext(ctx, md)
+	}
+
 	policyMap, err := s.getPolicyMap(ctx)
 	if err != nil {
 		return err
@@ -652,6 +672,7 @@ func (s *policyServer) updateEngineStore(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+
 	return s.engine.V2SetPolicies(ctx, policyMap, roleMap, ruleMap)
 }
 
@@ -988,8 +1009,8 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 	s.log.WithFields(kv).Info("Policy definition")
 }
 
-func (s *policyServer) setV2(b bool) {
-	if s.v2Chan != nil {
-		s.v2Chan <- b
+func (s *policyServer) setVersion(v api.Version) {
+	if s.vChan != nil {
+		s.vChan <- v
 	}
 }

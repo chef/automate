@@ -427,12 +427,6 @@ func (r *Runner) RestoreBackup(
 	r.locationSpec = bgw
 	r.restoreLocationSpec = remote
 	r.restoreTask = rt
-	r.pgConnInfo = &pg.A2ConnInfo{
-		Host:  dep.Config.GetPostgresql().GetV1().GetSys().GetService().GetHost().GetValue(),
-		Port:  uint64(dep.Config.GetPostgresql().GetV1().GetSys().GetService().GetPort().GetValue()),
-		User:  dep.Config.GetPostgresql().GetV1().GetSys().GetSuperuser().GetName().GetValue(),
-		Certs: pg.A2SuperuserCerts,
-	}
 
 	r.infof("Backup restore running")
 	r.publishBackupEvent(r.restoreTask.TaskID(), api.DeployEvent_RUNNING)

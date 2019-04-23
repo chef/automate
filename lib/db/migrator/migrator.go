@@ -12,7 +12,7 @@ import (
 
 // Migrate executes all migrations we have
 func Migrate(pgURL string, migrationsPath string) error {
-	logrus.Infof("Running db migrations for %q from %q", pgURL, migrationsPath)
+	logrus.Infof("Running db migrations from %q", migrationsPath)
 	m, err := migrate.New(addScheme(migrationsPath), pgURL)
 	if err != nil {
 		return errors.Wrap(err, "init migrator")

@@ -30,8 +30,8 @@ type Spec struct {
 
 	// Databases to dump. Broken down into which phase the database dumps should
 	// occur. When DB operations have been implemented they should be used here.
-	SyncDbs  []DatabaseDumpOperation `json:"sync_dbs"`
-	AsyncDbs []DatabaseDumpOperation `json:"async_dbs"`
+	SyncDbsV2  []DatabaseDumpOperationV2 `json:"sync_dbs_v2"`
+	AsyncDbsV2 []DatabaseDumpOperationV2 `json:"async_dbs_v2"`
 
 	SyncEsIndices  []ElasticsearchOperation `json:"sync_es"`
 	AsyncEsIndices []ElasticsearchOperation `json:"async_es"`
@@ -39,6 +39,10 @@ type Spec struct {
 	// Test operations
 	testSyncOps  []testOperation
 	testAsyncOps []testOperation
+
+	// DEPRECATED
+	SyncDbs  []DatabaseDumpOperation `json:"sync_dbs"`
+	AsyncDbs []DatabaseDumpOperation `json:"async_dbs"`
 }
 
 // SyncOps returns a slice of Operations that should be run synchronously
@@ -56,6 +60,11 @@ func (s *Spec) SyncOps() []Operation {
 	}
 
 	for _, sc := range s.SyncDbs {
+		c := sc
+		ops = append(ops, &c)
+	}
+
+	for _, sc := range s.SyncDbsV2 {
 		c := sc
 		ops = append(ops, &c)
 	}
@@ -88,6 +97,11 @@ func (s *Spec) AsyncOps() []Operation {
 	}
 
 	for _, sc := range s.AsyncDbs {
+		c := sc
+		ops = append(ops, &c)
+	}
+
+	for _, sc := range s.AsyncDbsV2 {
 		c := sc
 		ops = append(ops, &c)
 	}
@@ -128,7 +142,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		{
 			Name:          "authn-service",
 			WriteMetadata: true,
-			SyncDbs: []DatabaseDumpOperation{
+			SyncDbsV2: []DatabaseDumpOperationV2{
 				{
 					Name: "chef_authn_service",
 					User: "authn",
@@ -138,7 +152,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		{
 			Name:          "authz-service",
 			WriteMetadata: true,
-			SyncDbs: []DatabaseDumpOperation{
+			SyncDbsV2: []DatabaseDumpOperationV2{
 				{
 					Name: "chef_authz_service",
 					User: "authz",
@@ -148,7 +162,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		{
 			Name:          "automate-dex",
 			WriteMetadata: true,
-			SyncDbs: []DatabaseDumpOperation{
+			SyncDbsV2: []DatabaseDumpOperationV2{
 				{
 					Name: "dex",
 					User: "dex",
@@ -171,7 +185,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 					},
 				},
 			},
-			SyncDbs: []DatabaseDumpOperation{
+			SyncDbsV2: []DatabaseDumpOperationV2{
 				{
 					Name: "chef_compliance_service",
 					User: "compliance",
@@ -252,7 +266,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		{
 			Name:          "teams-service",
 			WriteMetadata: true,
-			SyncDbs: []DatabaseDumpOperation{
+			SyncDbsV2: []DatabaseDumpOperationV2{
 				{
 					Name: "chef_teams_service",
 					User: "teams",
@@ -262,7 +276,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		{
 			Name:          "session-service",
 			WriteMetadata: true,
-			SyncDbs: []DatabaseDumpOperation{
+			SyncDbsV2: []DatabaseDumpOperationV2{
 				{
 					Name: "chef_session_service",
 					User: "session",
@@ -288,7 +302,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		{
 			Name:          "notifications-service",
 			WriteMetadata: true,
-			SyncDbs: []DatabaseDumpOperation{
+			SyncDbsV2: []DatabaseDumpOperationV2{
 				{
 					Name: "notifications_service",
 					User: "notifications",
@@ -298,7 +312,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		{
 			Name:          "secrets-service",
 			WriteMetadata: true,
-			SyncDbs: []DatabaseDumpOperation{
+			SyncDbsV2: []DatabaseDumpOperationV2{
 				{
 					Name: "secrets_service",
 					User: "secrets",
@@ -318,7 +332,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		{
 			Name:          "nodemanager-service",
 			WriteMetadata: true,
-			SyncDbs: []DatabaseDumpOperation{
+			SyncDbsV2: []DatabaseDumpOperationV2{
 				{
 					Name: "nodemanager_service",
 					User: "nodemanager",
@@ -357,7 +371,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 			{
 				Name:          "automate-cs-bookshelf",
 				WriteMetadata: true,
-				SyncDbs: []DatabaseDumpOperation{
+				SyncDbsV2: []DatabaseDumpOperationV2{
 					{
 						Name: "automate-cs-bookshelf",
 						User: "automate-cs-bookshelf",
@@ -367,7 +381,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 			{
 				Name:          "automate-cs-oc-bifrost",
 				WriteMetadata: true,
-				SyncDbs: []DatabaseDumpOperation{
+				SyncDbsV2: []DatabaseDumpOperationV2{
 					{
 						Name: "automate-cs-oc-bifrost",
 						User: "automate-cs-oc-bifrost",
@@ -377,7 +391,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 			{
 				Name:          "automate-cs-oc-erchef",
 				WriteMetadata: true,
-				SyncDbs: []DatabaseDumpOperation{
+				SyncDbsV2: []DatabaseDumpOperationV2{
 					{
 						Name: "automate-cs-oc-erchef",
 						User: "automate-cs-oc-erchef",
@@ -436,7 +450,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 			{
 				Name:          "automate-workflow-server",
 				WriteMetadata: true,
-				SyncDbs: []DatabaseDumpOperation{
+				SyncDbsV2: []DatabaseDumpOperationV2{
 					{
 						Name: "chef_workflow",
 						User: "workflow",
@@ -535,6 +549,14 @@ func setDefaults(spec Spec) {
 	for i := range spec.AsyncDbs {
 		spec.AsyncDbs[i].ObjectName = []string{spec.Name, "pg_data"}
 	}
+
+	for i := range spec.SyncDbsV2 {
+		spec.SyncDbsV2[i].ObjectName = []string{spec.Name, "pg_data"}
+	}
+
+	for i := range spec.AsyncDbsV2 {
+		spec.AsyncDbsV2[i].ObjectName = []string{spec.Name, "pg_data"}
+	}
 }
 
 // SetCommandExecutor sets the command executor for a given spec
@@ -559,5 +581,13 @@ func SetCommandExecutor(spec Spec, exec command.Executor) {
 
 	for i := range spec.AsyncDbs {
 		spec.AsyncDbs[i].cmdExecutor = exec
+	}
+
+	for i := range spec.SyncDbsV2 {
+		spec.SyncDbsV2[i].cmdExecutor = exec
+	}
+
+	for i := range spec.AsyncDbsV2 {
+		spec.AsyncDbsV2[i].cmdExecutor = exec
 	}
 }

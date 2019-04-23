@@ -132,9 +132,8 @@ func buildWhereConstraintsFromFilters(filters map[string][]string) (string, erro
 		case "service_group_id":
 			WhereConstraints = WhereConstraints + buildORStatementFromValues("group_id", values)
 
-		// TODO @afiune uncomment this code to power the right side panel Health Status Filters
-		//case "health":
-		//WhereConstraints = WhereConstraints + buildORStatementFromValues("health", values)
+		case "health":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("health", values)
 
 		default:
 			return "", errors.Errorf("invalid filter. (%s:%s)", filter, values)
