@@ -30,12 +30,6 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-const (
-	EventInitializeDeploymentService history.EventClass = "StartupInit"
-	EventCreateDeployment                               = "StartupCreateDeployment"
-	EventGenerateSecret                                 = "GenerateSecret"
-)
-
 func openDatabase() (*bolt.DB, error) {
 
 	dbFile := path.Join(DataDir, DBName)
@@ -122,10 +116,10 @@ func (s *server) initSecretStore(ctx context.Context) error {
 		}
 
 		if !exists {
-			err := history.WithTags(
-				history.Tag{"secret_group", secret.Group},
-				history.Tag{"secret_name", secret.Name},
-			).Do(ctx, EventGenerateSecret, "Generating Secret", func(ctx context.Context) error {
+			err := history.WithContext(ctx).WithTags(
+				history.Tag{Key: "secret_group", Value: secret.Group},
+				history.Tag{Key: "secret_name", Value: secret.Name},
+			).Record(history.EventStartupGenerateSecret, func(ctx context.Context) error {
 				randomBytes, err := secrets.GenerateRandomBytes(64)
 				if err != nil {
 					return err
@@ -182,8 +176,7 @@ func StartServer(config *Config) error {
 		ensureStatusInterval: durationFromSecs(config.EnsureStatusIntervalSecs, defaultEnsureStatusInterval),
 	}
 
-	err := history.Do(context.Background(), EventInitializeDeploymentService,
-		"Initializing Deployment Service", server.initialize)
+	err := history.Record(context.Background(), history.EventStartupInit, server.initialize)
 	if err != nil {
 		return err
 	}

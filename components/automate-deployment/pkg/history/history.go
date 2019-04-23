@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,82 +12,94 @@ var nowProvider = func() time.Time {
 	return time.Now()
 }
 
-type Logger struct {
-	Tags []Tag
+// Recorder records an event
+type Recorder struct {
+	tags []Tag
+	ctx  context.Context
 }
 
-func WithTags(tags ...Tag) *Logger {
-	return &Logger{
-		Tags: tags,
-	}
+// WithContext returns a recorder that will use the given context as the parent context
+// to record events. If the context has history metadata, recorded events will be linked
+// to the ID contained in that metadata
+func WithContext(ctx context.Context) *Recorder {
+	return &Recorder{ctx: ctx}
 }
 
-func LogEvent(ctx context.Context, name EventClass, description string) context.Context {
-	lopts := Logger{}
-	return lopts.LogEvent(ctx, name, description)
+// WithTags modifies the recorder to use the given tags to record an event
+func (recorder *Recorder) WithTags(tags ...Tag) *Recorder {
+	recorder.tags = tags
+	return recorder
 }
 
-func (lopts *Logger) LogEvent(ctx context.Context, name EventClass, description string) context.Context {
+// RecordEvent starts recording an event with default options. Success or
+// Fail/FailErr should be called with the returned context to complete the event
+func RecordEvent(ctx context.Context, eventClass EventClass) context.Context {
+	return WithContext(ctx).RecordEvent(eventClass)
+}
+
+// RecordEvent starts recording an event with the options set in the recorder. Success or
+// Fail/FailErr should be called with the returned context to complete the event
+func (recorder *Recorder) RecordEvent(eventClass EventClass) context.Context {
+	ctx := recorder.ctx
 	id, err := genID()
 	if err != nil {
 		logrus.WithError(err).Debug("Failed to generate event id")
 		return ctx
 	}
 
-	hCtx := &historyContext{
-		id: id,
+	m := &metadata{
+		id:         id,
+		eventClass: eventClass,
 	}
 
-	hasParent := accessInternalCtx(ctx, func(req *historyContext) {
-		hCtx.cause = req
+	accessMetadata(ctx, func(req *metadata) {
+		m.cause = req
 	})
-
-	if !hasParent {
-		logrus.Warnf("Parent not found for %s", name)
-	}
 
 	logStart(&StartEvent{
-		Event:       hCtx.toEvent(),
-		Cause:       hCtx.cause.GetID(),
-		Name:        name,
-		Description: description,
-		Tags:        lopts.Tags,
+		Event: m.toEvent(),
+		Cause: m.cause.GetID(),
+		Tags:  recorder.tags,
 	})
-	return toContextContext(ctx, hCtx)
+	return attachMetadataToContext(ctx, m)
 }
 
+// Fail fails the event being recorded in the given context
 func Fail(ctx context.Context, msg string) {
 	FailErr(ctx, errors.New(msg))
 }
 
+// FailErr fails the event being recorded in the given context
 func FailErr(ctx context.Context, err error) {
-	accessInternalCtx(ctx, func(hCtx *historyContext) {
-		hCtx.done = true
+	accessMetadata(ctx, func(m *metadata) {
+		m.done = true
 		logComplete(&CompleteEvent{
-			Event: hCtx.toEvent(),
+			Event: m.toEvent(),
 			Err:   err,
 		})
 	})
 }
 
+// Succeed marks the event being recorded in the given context as successful
 func Succeed(ctx context.Context) {
-	hasHistory := accessInternalCtx(ctx, func(hCtx *historyContext) {
-		hCtx.done = true
+	accessMetadata(ctx, func(m *metadata) {
+		m.done = true
 		logComplete(&CompleteEvent{
-			Event: hCtx.toEvent(),
+			Event: m.toEvent(),
 		})
 	})
-	if !hasHistory {
-		logrus.Error("History context not found")
-	}
 }
 
-func Do(ctx context.Context, name EventClass, description string, f func(context.Context) error) error {
-	logger := Logger{}
-	return logger.Do(ctx, name, description, f)
+// Record records the start and end of an event defined by the function provided. If the function
+// returns an error, the event is marked as failed.
+func Record(ctx context.Context, eventClass EventClass, f func(context.Context) error) error {
+	return WithContext(ctx).Record(eventClass, f)
 }
-func (logger *Logger) Do(ctx context.Context, name EventClass, description string, f func(context.Context) error) error {
-	childCtx := logger.LogEvent(ctx, name, description)
+
+// Record records the start and end of an event defined by the function provided. If the function
+// returns an error, the event is marked as failed.
+func (recorder *Recorder) Record(eventClass EventClass, f func(context.Context) error) error {
+	childCtx := recorder.RecordEvent(eventClass)
 	err := f(childCtx)
 	if err != nil {
 		FailErr(childCtx, err)
@@ -96,13 +107,4 @@ func (logger *Logger) Do(ctx context.Context, name EventClass, description strin
 	}
 	Succeed(childCtx)
 	return nil
-}
-
-func genID() (EventID, error) {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return errEventID, err
-	}
-
-	return EventID(id.String()), nil
 }

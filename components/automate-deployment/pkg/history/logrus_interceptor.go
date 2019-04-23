@@ -12,24 +12,29 @@ func NewLogrusInterceptor() EventInterceptor {
 
 func (logrusInterceptor) LogStart(ev *StartEvent) {
 	logrus.WithFields(logrus.Fields{
-		"id":          ev.ID,
-		"class":       ev.Name,
-		"description": ev.Description,
-		"cause":       ev.Cause,
-		"tags":        ev.Tags,
-	}).Info("Event Start")
+		"id":     ev.ID,
+		"class":  ev.EventClass.Name,
+		"cause":  ev.Cause,
+		"tags":   ev.Tags,
+		"status": "starting",
+	}).Info(ev.EventClass.Description)
 }
 
 func (logrusInterceptor) LogComplete(ev *CompleteEvent) {
-	var status string
 	if ev.IsSuccess() {
-		status = "success"
+		logrus.WithFields(logrus.Fields{
+			"id":     ev.ID,
+			"class":  ev.EventClass.Name,
+			"status": "success",
+			"err":    ev.Err,
+		}).Info(ev.EventClass.Description)
 	} else {
-		status = "fail"
+		logrus.WithFields(logrus.Fields{
+			"id":     ev.ID,
+			"class":  ev.EventClass.Name,
+			"status": "fail",
+			"err":    ev.Err,
+		}).WithError(ev.Err).Error(ev.EventClass.Description)
 	}
-	logrus.WithFields(logrus.Fields{
-		"id":     ev.ID,
-		"status": status,
-		"err":    ev.Err,
-	}).Info("Event Complete")
+
 }
