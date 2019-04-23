@@ -247,7 +247,7 @@ test_authorized_project_returns_all_input_projects_if_only_wildcard_statement_pr
 		 with data.policies.polid as {"members": ["x"], "statements": {"statementid": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": [const_all_projects]}}}
 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": ["p1", "p3"]}
 
-	actual_projects == {"p1","p3"}
+	actual_projects == {"p1", "p3"}
 }
 
 test_authorized_project_returns_all_input_projects_when_projects_mixed_with_wildcard_statement {
@@ -406,9 +406,7 @@ test_authorized_project_allows_with_wildcard_when_filter_list_is_empty {
 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
 		 with data.policies.polid as {
 			"members": ["x"],
-			"statements": {
-				"sid-1": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": [const_all_projects]},
-			},
+			"statements": {"sid-1": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": [const_all_projects]}},
 		}
 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": []}
 
@@ -428,25 +426,3 @@ test_authorized_project_denies_with_wildcard_when_filter_list_is_empty {
 
 	actual_projects == set()
 }
-
-# not calculable by opa ( in one call)
-# test_authorized_project_allows_with_wildcard_and_deny_present_when_filter_list_is_empty {
-# 	actual_projects = authorized_project with data.roles.operator.actions as ["y"]
-# 		 with data.policies.polid as {
-# 			"members": ["x"],
-# 			"statements": {
-# 				"sid-1": {"effect": "allow", "role": "operator", "resources": ["*"], "projects": [const_all_projects]},
-# 				"sid-2": {"effect": "deny", "role": "operator", "resources": ["*"], "projects": ["p2"]},
-# 			},
-# 		}
-# 		 with input as {"subjects": ["x"], "action": "y", "resource": "z", "projects": []}
-
-# 	actual_projects == "all other projects"
-# }
-
-# call comes in with empty list
-# gateway passes empty list
-# authz introspects all allowed projects and passes those to ProjectsAuthorized
-# so ProjectsAuthorized never gets an empty list
-
-# maybe post-process?
