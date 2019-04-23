@@ -48,10 +48,10 @@ end
 #       already parsed input -- not be a cli.
 #       However, flat out crashing when someone passes --help is pretty bad.
 def add_enterprise_command(command, description, useless, &block)
-  add_command command, description, 2 do
+  add_command command, description do
     usage = command + " [ARGS] [options..]\n"
-    usage += "\nTry passing automate-ctl #{command} with no arguments for additional details on usage."
-    CtlHelpers::BasicUsage.new(ARGV[3..-1], usage, description).parse_help_and_display_usage
+    usage += "\nTry passing workflow-ctl #{command} with no arguments for additional details on usage."
+    CtlHelpers::BasicUsage.new(ARGV[1..-1], usage, description).parse_help_and_display_usage
     block.call
   end
 end
@@ -60,15 +60,15 @@ end
 
 add_enterprise_command "create-enterprise",
                        "Create a new enterprise", 2 do
-  enterprise_ctl!('create enterprise', ARGV[3..-1])
+  enterprise_ctl!('create enterprise', ARGV[1..-1])
 end
 
 add_enterprise_command "delete-enterprise", "Deletes an existing enterprise", 2 do
-  enterprise_ctl!('delete enterprise', ARGV[3..-1])
+  enterprise_ctl!('delete enterprise', ARGV[1..-1])
 end
 
 add_enterprise_command "rename-enterprise", "Renames an existing enterprise", 2 do
-  enterprise_ctl!('rename enterprise', ARGV[3..-1])
+  enterprise_ctl!('rename enterprise', ARGV[1..-1])
 end
 
 add_enterprise_command "list-enterprises", "Lists all enterprises", 2 do
@@ -78,31 +78,31 @@ end
 ## User-level commands
 
 add_enterprise_command "create-user", "Create a new user", 2 do
-  enterprise_ctl!('create user', ARGV[3..-1])
+  enterprise_ctl!('create user', ARGV[1..-1])
 end
 
 add_enterprise_command "create-users", "Create new users from a tsv file", 2 do
-  enterprise_ctl!('create users', ARGV[3..-1])
+  enterprise_ctl!('create users', ARGV[1..-1])
 end
 
 add_enterprise_command "delete-user", "Deletes an existing user", 2 do
-  enterprise_ctl!('delete user', ARGV[3..-1])
+  enterprise_ctl!('delete user', ARGV[1..-1])
 end
 
 add_enterprise_command "list-users", "Lists all users", 2 do
-  enterprise_ctl!('list users', ARGV[3..-1])
+  enterprise_ctl!('list users', ARGV[1..-1])
 end
 
 add_enterprise_command "reset-password", "Resets the password of a user", 2 do
-  enterprise_ctl!('reset password', ARGV[3..-1])
+  enterprise_ctl!('reset password', ARGV[1..-1])
 end
 
 add_enterprise_command "generate-password-reset-token", "Generate a password reset token and unset the password for a user", 2 do
-  enterprise_ctl!('generate password reset token', ARGV[3..-1])
+  enterprise_ctl!('generate password reset token', ARGV[1..-1])
 end
 
 add_enterprise_command "revoke-token", "Revoke's a user's token", 2 do
-  enterprise_ctl!('revoke-token', ARGV[3..-1])
+  enterprise_ctl!('revoke-token', ARGV[1..-1])
 end
 
 ## Project-level commands
@@ -111,13 +111,7 @@ add_enterprise_command "update-project-hooks", "Update git hooks for all project
 end
 
 add_enterprise_command "delete-project", "Deletes an existing project", 2 do
-  enterprise_ctl!('delete project', ARGV[3..-1])
-end
-
-## 911
-
-add_enterprise_command "doctor", "Ask the doctor what's wrong", 2 do
-  enterprise_ctl!('doctor')
+  enterprise_ctl!('delete project', ARGV[1..-1])
 end
 
 ## Migrations

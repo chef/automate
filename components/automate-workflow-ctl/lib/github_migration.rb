@@ -1,11 +1,11 @@
-add_command "migrate-github-project", "Migrate a project to new GitHub integration.", 2 do
+add_command "migrate-github-project", "Migrate a project to new GitHub integration." do
   require "ctl-helpers/erl"
   require "delivery-ctl-helpers/help"
 
-  args = ARGV[3..-1]
+  args = ARGV[1..-1]
 
   if DeliveryCtlHelpers::Help.help_asked_for? || args.empty?
-    puts "Command: automate-ctl migrate-github-project (ENTERPRISE | ENTERPRISE ORG | ENTERPRISE ORG PROJECT)"
+    puts "Command: workflow-ctl migrate-github-project (ENTERPRISE | ENTERPRISE ORG | ENTERPRISE ORG PROJECT)"
   else
     nag!
     run_command!("#{CtlHelpers::Erl.escript_path}/github_migration #{args.join(' ')}")

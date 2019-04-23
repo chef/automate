@@ -25,7 +25,7 @@ pkg_bin_dirs=(bin)
 pkg_description="Command line tool to control Chef Automate"
 pkg_upstream_url="https://www.chef.io/automate/"
 
-CTL_BIN_NAME="automate-ctl" # the binary/script inside the package
+CTL_BIN_NAME="workflow-ctl" # the binary/script inside the package
 
 do_download() {
   return 0
@@ -53,9 +53,7 @@ do_build() {
 
 do_install() {
   cp -R lib/* "$pkg_prefix/lib"
-  install -m 0755 "bin/${CTL_BIN_NAME}.rb" "$pkg_prefix/bin/${CTL_BIN_NAME}.rb"
-  install -m 0755 "bin/${CTL_BIN_NAME}.sh" "$pkg_prefix/bin/${CTL_BIN_NAME}"
-  sed -i "s/{{CTL_ORIGIN}}/$pkg_origin/g" "$pkg_prefix/bin/${CTL_BIN_NAME}"
+  install -m 0755 "bin/${CTL_BIN_NAME}" "$pkg_prefix/bin/${CTL_BIN_NAME}"
   install -m 0644 Gemfile.lock "$pkg_prefix/Gemfile.lock"
   install -m 0644 Gemfile "$pkg_prefix/Gemfile"
   cd $pkg_prefix
@@ -69,8 +67,6 @@ do_install() {
 
   fix_interpreter "$pkg_prefix/bin/*" core/coreutils bin/env
   fix_interpreter "$pkg_prefix/bin/*" core/ruby bin/ruby
-  fix_interpreter "$pkg_prefix/bin/$pkg_name" core/coreutils bin/env
-  fix_interpreter "$pkg_prefix/bin/$pkg_name.rb" core/coreutils bin/env
   fix_interpreter "$pkg_prefix/bin/knife" core/coreutils bin/env
 
   build_line "Creating bundler config"
