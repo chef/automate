@@ -77,40 +77,39 @@ function applications_integration() {
   A2_SVC_NAME="applications-service" A2_SVC_PATH="/hab/svc/applications-service" go_test "github.com/chef/automate/components/applications-service/integration_test" -v
 }
 
-document "applications_publish_message" <<DOC
-  Publish a message to the NATS server inside the event-gateway.
+document "applications_publish_raw_message" <<DOC
+  Publish a raw message to the Internal NATS Server (event-service)
 
   Example: Publish a hello world message
   --------------------------------------
-  # applications_publish_message "Hello World!"
+  # applications_publish_raw_message "Hello World!"
 DOC
-function applications_publish_message() {
+function applications_publish_raw_message() {
+  local message
+  message="${1-dummy-ping-message}"
+
+  install_if_missing "$(app_service_origin)/applications-service" applications-publisher
+  applications-publisher --internal-nats --port 10140 --raw-message "$message"
+}
+
+document "applications_publish_raw_message_via_gw" <<DOC
+  Publish a raw message to the External NATS Server (event-gateway)
+
+  Example: Publish a hello world message
+  --------------------------------------
+  # applications_publish_raw_message_via_gw "Hello World!"
+DOC
+function applications_publish_raw_message_via_gw() {
+  install_if_missing "$(app_service_origin)/applications-service" applications-publisher
+
   if ! get_admin_token; then
     log_error "cannot publish application message without admin token"
     return 1
   fi
 
-  local nats_go_pkg="github.com/nats-io/go-nats-streaming"
-  local client_id="dev-studio"
-  local cluster_id="event-service"
-  local subject="habitat"
   local message
-  local nats_server
-
-  nats_server="nats://$(get_admin_token)@localhost:4222"
   message="${1-dummy-ping-message}"
-
-  setup_go_workspace
-
-  ( cd "$scaffolding_go_workspace_src" || return 1
-    if ! test -d $nats_go_pkg
-    then
-      GO_TOOL_METHOD="get" install_go_tool "$nats_go_pkg"
-    fi
-    go run "${nats_go_pkg}/examples/stan-pub/main.go"\
-	    -s "$nats_server" -id "$client_id"\
-	    -c "$cluster_id" "$subject" "$message"
-  )
+  applications-publisher --auth-token "$(get_admin_token)" --raw-message "$message"
 }
 
 document "applications_publish_supervisor_message_via_gw" <<DOC
