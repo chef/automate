@@ -185,7 +185,7 @@ func (s *SupSim) Connect() error {
 	return s.nc.Connect()
 }
 
-func (s *SupSim) Run() error {
+func (s *SupSim) Run() {
 	s.Stats.SupStarted()
 	defer s.Stats.SupDied()
 	defer s.nc.Close()
@@ -204,7 +204,6 @@ func (s *SupSim) Run() error {
 	for _ = range ticker.C {
 		s.PublishAll() // nolint: errcheck
 	}
-	return nil
 }
 
 func (s *SupSim) PublishAll() error {

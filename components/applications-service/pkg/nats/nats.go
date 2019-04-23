@@ -133,7 +133,7 @@ func (nc *NatsClient) Connect() error {
 		}).Error("Unable to connect to server")
 
 		baseSleep := int64(uint32(1) << tries)
-		randomization := rand.Int63n(int64(baseSleep))
+		randomization := rand.Int63n(baseSleep)
 		totalSleep := baseSleep + randomization
 		time.Sleep(time.Duration(totalSleep) * time.Second)
 
