@@ -68,6 +68,22 @@ func (s *authzServer) ProjectsAuthorized(
 		projects = req.ProjectsFilter
 	}
 
+	// this call checks for all allowed projects (without considering deny)
+	if version.Minor == api.Version_V1 && len(req.ProjectsFilter) == 0 {
+		pair := []engine.Pair{
+			engine.Pair{
+				Resource: engine.Resource(req.Resource),
+				Action:   engine.Action(req.Action),
+			},
+		}
+		allowedProjects, err := s.engine.V2FilterAuthorizedProjects(ctx, req.Subjects, pair)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		projects = allowedProjects
+	}
+
+	// this call returns allowed projects that are not overriden by deny
 	projectsAuthorized, err := s.engine.V2ProjectsAuthorized(ctx,
 		engine.Subjects(req.Subjects),
 		engine.Action(req.Action),
