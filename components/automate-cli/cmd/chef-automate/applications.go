@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/spf13/cobra"
 
+	apps "github.com/chef/automate/api/config/applications"
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/event"
 	eventgw "github.com/chef/automate/api/config/event_gateway"
@@ -80,6 +81,12 @@ func runApplicationsDisableCmd(*cobra.Command, []string) error {
 //     [event_gateway.v1.sys]
 //       [event_gateway.v1.sys.service]
 //         enable_nats_feature = $ENABLE
+// # applications-service
+// [applications]
+//   [applications.v1]
+//     [applications.v1.sys]
+//       [applications.v1.sys.service]
+//         enable_nats_feature = $ENABLE
 func newApplicationsToggleConfig(enable bool) *deployment.AutomateConfig {
 	return &deployment.AutomateConfig{
 		Gateway: &gateway.ConfigRequest{
@@ -104,6 +111,15 @@ func newApplicationsToggleConfig(enable bool) *deployment.AutomateConfig {
 			V1: &eventgw.ConfigRequest_V1{
 				Sys: &eventgw.ConfigRequest_V1_System{
 					Service: &eventgw.ConfigRequest_V1_System_Service{
+						EnableNatsFeature: w.Bool(enable),
+					},
+				},
+			},
+		},
+		Applications: &apps.ConfigRequest{
+			V1: &apps.ConfigRequest_V1{
+				Sys: &apps.ConfigRequest_V1_System{
+					Service: &apps.ConfigRequest_V1_System_Service{
 						EnableNatsFeature: w.Bool(enable),
 					},
 				},

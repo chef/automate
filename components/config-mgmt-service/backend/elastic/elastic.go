@@ -7,15 +7,14 @@ package elastic
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/olivere/elastic"
-	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/config-mgmt-service/errors"
 )
 
 const (
@@ -289,15 +288,6 @@ func (es Backend) GetListForField(searchTerm string) ([]string, error) {
 	}
 
 	return orgs, nil
-}
-
-func logQueryPart(partToPrint interface{}, name string) {
-	part, err := json.MarshalIndent(partToPrint, "", "  ")
-	if err != nil {
-		log.Errorf("%s", err)
-	}
-	log.Debugf("\n------------------%s-(start)------------------\n%s\n------------------%s-(end)------------------\n",
-		name, string(part), name)
 }
 
 // EmptyStringIfNil asserts an interface as a string, and if that fails it returns empty string

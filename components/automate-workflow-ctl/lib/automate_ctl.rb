@@ -1,4 +1,4 @@
 require "automate_ctl/version"
 
-class AutomateCtl
+module AutomateCtl
 end

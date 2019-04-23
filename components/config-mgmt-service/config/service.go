@@ -25,12 +25,12 @@ var SERVICE_NAME = "config-mgmt-service"
 
 // Service config definition
 type Service struct {
-	Name         string          `json:"name" mapstructure:"name"`
-	Version      string          `json:"version" mapstructure:"version"`
-	Host         string          `json:"host" mapstructure:"host"`
-	Port         int             `json:"port" mapstructure:"port"`
-	LogLevel     string          `json:"log_level" mapstructure:"log_level"`
-	client       backend.Client  `json:"-"`
+	Name         string `json:"name" mapstructure:"name"`
+	Version      string `json:"version" mapstructure:"version"`
+	Host         string `json:"host" mapstructure:"host"`
+	Port         int    `json:"port" mapstructure:"port"`
+	LogLevel     string `json:"log_level" mapstructure:"log_level"`
+	client       backend.Client
 	TLSConfig    certs.TLSConfig `mapstructure:"tls"`
 	serviceCerts *certs.ServiceCerts
 }

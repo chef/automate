@@ -1,4 +1,4 @@
-add_command "install-runner", "Configure a new runner in Automate for job dispatch.", 2 do
+add_command "install-runner", "Configure a new runner in Automate for job dispatch." do
   require 'runner/install/command'
-  Runner::Install::Command.new(ARGV[3..-1]).run
+  Runner::Install::Command.new(ARGV[1..-1]).run
 end

@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/platform"
+	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/version"
 )
 
@@ -30,13 +31,13 @@ var serveCmd = &cobra.Command{
 			}).Fatal("Failed to load config")
 		}
 		conf.Service.SetLogLevel()
-		certs, err := conf.ReadCerts()
+		svcCerts, err := conf.ReadCerts()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"error": err.Error(),
 			}).Fatal("Failed to load SSL key/cert files")
 		}
-		connFactory := secureconn.NewFactory(*certs,
+		connFactory := secureconn.NewFactory(*svcCerts,
 			secureconn.WithVersionInfo(version.Version, version.GitSHA))
 
 		// Storage client (Postgres)
@@ -48,55 +49,13 @@ var serveCmd = &cobra.Command{
 		}
 		conf.SetStorage(dbClient)
 
-		go func() {
-			natsClient := nats.NewDefaults(
-				fmt.Sprintf("nats://%s:%d", conf.Events.Host, conf.Events.Port),
-				conf.Events.ClusterID,
-				*conf.TLSConfig,
-			)
+		if conf.Service.Enabled {
+			// Ingestion of messages (NAT Subscriber)
+			go StartIngestion(conf)
+		}
 
-			// Trigger NATS Subscription
-			err := natsClient.ConnectAndSubscribe()
-			if err != nil {
-				log.WithError(err).Fatal("could not connect to nats-streaming")
-			}
-
-			// Receive digested messages from the event channel and
-			// send them to the datastore for processing
-			// TODO @afiune Move this logic into an ingestion pipeline
-			for {
-				select {
-				case event := <-natsClient.HabServiceEventCh:
-					err := dbClient.IngestHabEvent(event)
-					if err != nil {
-						log.WithFields(log.Fields{
-							"error": err.Error(),
-						}).Error("Unable to ingest habitat event")
-					}
-				}
-			}
-		}()
-
-		go func() {
-			// TODO (dan): this is getting long and should move out of this file
-			r := http.NewServeMux()
-			r.Handle("/metrics", promhttp.Handler())
-
-			httpServer := http.Server{
-				Addr:    fmt.Sprintf("%s:%d", conf.Service.Host, conf.Service.MetricsPort),
-				Handler: r,
-				TLSConfig: &tls.Config{
-					Certificates:             []tls.Certificate{*certs.ServiceKeyPair},
-					ClientCAs:                certs.NewCertPool(),
-					ClientAuth:               tls.RequireAndVerifyClientCert,
-					PreferServerCipherSuites: true,
-					MinVersion:               tls.VersionTLS12,
-					CipherSuites:             secureconn.DefaultCipherSuites(),
-				},
-			}
-
-			log.Fatal(httpServer.ListenAndServeTLS("", ""))
-		}()
+		// Metrics Server
+		go StartMetricsServer(conf, svcCerts)
 
 		// GRPC Server
 		return grpc.Spawn(conf, connFactory)
@@ -126,4 +85,55 @@ func configFromViper() (*config.Applications, error) {
 
 func init() {
 	RootCmd.AddCommand(serveCmd)
+}
+
+// TODO (afiune): this is getting long and should move out of this file
+func StartIngestion(conf *config.Applications) {
+	natsClient := nats.NewDefaults(
+		fmt.Sprintf("nats://%s:%d", conf.Events.Host, conf.Events.Port),
+		conf.Events.ClusterID,
+		*conf.TLSConfig,
+	)
+
+	// Trigger NATS Subscription
+	err := natsClient.ConnectAndSubscribe()
+	if err != nil {
+		log.WithError(err).Fatal("could not connect to nats-streaming")
+	}
+
+	// Receive digested messages from the event channel and
+	// send them to the datastore for processing
+	// TODO @afiune Move this logic into an ingestion pipeline
+	for {
+		select {
+		case event := <-natsClient.HabServiceEventCh:
+			err := conf.GetStorage().IngestHabEvent(event)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error": err.Error(),
+				}).Error("Unable to ingest habitat event")
+			}
+		}
+	}
+}
+
+// TODO (dan): this is getting long and should move out of this file
+func StartMetricsServer(conf *config.Applications, svcCerts *certs.ServiceCerts) {
+	r := http.NewServeMux()
+	r.Handle("/metrics", promhttp.Handler())
+
+	httpServer := http.Server{
+		Addr:    fmt.Sprintf("%s:%d", conf.Service.Host, conf.Service.MetricsPort),
+		Handler: r,
+		TLSConfig: &tls.Config{
+			Certificates:             []tls.Certificate{*svcCerts.ServiceKeyPair},
+			ClientCAs:                svcCerts.NewCertPool(),
+			ClientAuth:               tls.RequireAndVerifyClientCert,
+			PreferServerCipherSuites: true,
+			MinVersion:               tls.VersionTLS12,
+			CipherSuites:             secureconn.DefaultCipherSuites(),
+		},
+	}
+
+	log.Fatal(httpServer.ListenAndServeTLS("", ""))
 }

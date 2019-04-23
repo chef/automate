@@ -6,7 +6,6 @@
 
 -export([main/1]).
 
--define(DOCTOR_SSH_PUB_KEY, <<"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBAODllGk/jNjA6xZ+IqgUC1wOm7pqqHoF3d06AmBXix0KtEn3SYacfJHsk+dQQP0OYtWinBQf5I+OUi7fPSrRhEHsSUjrJl7HRh4SkcQ2r8wIIHCyBk4Qb6DezOwuuq7TgP0Ac7HCpHBXFVlAWGhFbLu7ydYSpXSishgHRTLh4Q2NbxUXu4VORMIdFd3nGqai/bqAmV9fKCBbSz8ebfEw+yV8lju2s+wWgQyNDToIJtLdxSdXWxxjkPyBb9VpAJohXcvFHSe9fA7YZGvfHm2ixqT4sl6Whd7JAjCsHt5h4MI5e6KncSUjg0kEM3W1i+FYE9Ej7KOFGt+SCEYKOJG1 builder@delivery">>).
 %% Note: this will become node name cdx_$PID@127.0.0.1
 -define(SELF_PREFIX, "cdx_").
 -define(SELF_HOST, "127.0.0.1").
@@ -116,14 +115,6 @@ usage_error(Proper) ->
     io:format("This command was not used with the correct arguments.~n"),
     io:format("Usage: automate-ctl ~s~n", [Proper]),
     {error, usage}.
-
--spec parse_input2(list(string()), proplists:proplist()) -> ok | error | {error, any()}.
-parse_input2(["doctor"], _Opts) ->
-    io:format("Validating configuration files..~n"),
-    validate_configs(),
-    io:format("Everything seems ok.~n");
-parse_input2(["doctor", _|_], _Opts) ->
-    usage_error("doctor");
 
 parse_input2(["create", "enterprise", Enterprise], Opts) ->
     case get_option(ssh_pub_key, Opts) of
@@ -287,9 +278,6 @@ create_only_enterprise(Enterprise, Opts, []) ->
                           {ssh_pub_key, SshPubKey},
                           {roles, Roles}]),
     set_admin_privs(EntName, <<"builder">>),
-
-    WebLogin = rpc_call(?CD, deliv_web_utils, make_web_url_for_base,
-                        [EntName]),
     io:format("Created enterprise: ~s~n", [EntName]).
 
 delete_enterprise(Enterprise) ->
@@ -474,8 +462,7 @@ finish_network() ->
         pong ->
             ok;
         pang ->
-            perror(io_lib:format("Unable to connect to Delivery node: ~p~n"
-                                 "Try automate-ctl reconfigure~n", [?CD]))
+            perror(io_lib:format("Unable to connect to Workflow server: ~p~n", [?CD]))
     end.
 
 net_kernel_start({ok, _}) ->
@@ -487,35 +474,6 @@ net_kernel_start({error, Reason}) ->
     io_lib:format("Unable to start network: ~p~n",[Reason]),
     {error, Reason}.
 
-
-%% Do simple validation to check for syntax errors in essential files
-validate_configs() ->
-    ConfigFiles =
-        filelib:wildcard("/opt/delivery/embedded/service/delivery/lib/delivery-*/priv/authz_rules") ++
-        ["/var/opt/delivery/delivery/etc/erlang.cfg",
-         "/var/opt/delivery/delivery/etc/sys.config"],
-    lists:map(fun(X) ->
-                      case file:consult(X) of
-                          {ok, _} ->
-                              ok;
-                          {error, _Error} ->
-                              io:format("Syntax error in " ++ X)
-                      end
-              end, ConfigFiles),
-
-    %% We use wildcard to get the correct directory, since delivery is versioned
-    JsonFiles =
-        filelib:wildcard("/opt/delivery/embedded/service/delivery/lib/delivery-*/priv/schemas/*.json"),
-    lists:map(fun(X) ->
-                      {ok, JsonBin} = rpc_call(?CD, file, read_file, [X]),
-                      case rpc_call(?CD, jiffy, decode, [JsonBin]) of
-                          {error, _Error} ->
-                              io:format("Syntax error in " ++ X);
-                          _ ->
-                              ok
-                      end
-              end, JsonFiles).
-
 maybe_merge_key_val(Key, MergeList, PropList) ->
     case proplists:get_value(Key, PropList) of
         undefined ->
@@ -523,7 +481,6 @@ maybe_merge_key_val(Key, MergeList, PropList) ->
         SshKey ->
             lists:append(MergeList, [{Key, SshKey}])
     end.
-
 
 %% These are private
 update_project_hooks_for_ent({_, _, EntName}) ->
