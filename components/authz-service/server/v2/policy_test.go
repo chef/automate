@@ -22,7 +22,6 @@ import (
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
@@ -398,7 +397,7 @@ func TestCreatePolicy(t *testing.T) {
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{constants.UnassignedProjectID},
+				Projects:  []string{constants_v2.UnassignedProjectID},
 			}
 			req := api_v2.CreatePolicyReq{
 				Id:         "policy1",
@@ -412,7 +411,7 @@ func TestCreatePolicy(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			assert.Equal(t, len(items)+1, store.ItemCount())
-			assert.ElementsMatch(t, []string{constants.UnassignedProjectID}, resp.Statements[0].Projects)
+			assert.ElementsMatch(t, []string{constants_v2.UnassignedProjectID}, resp.Statements[0].Projects)
 		}},
 
 		{"successfully creates policy with wildcard projects", func(t *testing.T) {
@@ -452,8 +451,8 @@ func TestCreatePolicy(t *testing.T) {
 			require.ElementsMatch(t, []string{"my-other-project"}, resp.Statements[2].Projects)
 
 			// key check: internal vs external representation
-			assert.ElementsMatch(t, []string{constants.AllProjectsID}, pol.Statements[1].Projects)
-			assert.ElementsMatch(t, []string{constants.AllProjectsExternalID}, resp.Statements[1].Projects)
+			assert.ElementsMatch(t, []string{constants_v2.AllProjectsID}, pol.Statements[1].Projects)
+			assert.ElementsMatch(t, []string{constants_v2.AllProjectsExternalID}, resp.Statements[1].Projects)
 		}},
 	}
 
@@ -634,7 +633,7 @@ func TestListPolicies(t *testing.T) {
 		{"returns mapped meta-project when present", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
 			storedPol := genPolicy(t, "", prng)
-			storedPol.Statements[0].Projects = []string{constants.AllProjectsID}
+			storedPol.Statements[0].Projects = []string{constants_v2.AllProjectsID}
 			store.Add(storedPol.ID, &storedPol, cache.NoExpiration)
 
 			resp, err := cl.ListPolicies(ctx, &req)
@@ -643,7 +642,7 @@ func TestListPolicies(t *testing.T) {
 			require.Equal(t, len(items)+1, len(resp.Policies))
 			for _, pol := range resp.Policies {
 				if pol.Id == storedPol.ID {
-					assert.Equal(t, constants.AllProjectsExternalID, pol.Statements[0].Projects[0])
+					assert.Equal(t, constants_v2.AllProjectsExternalID, pol.Statements[0].Projects[0])
 				} else {
 					p := items[pol.Id]
 					assertPoliciesMatch(t, &p, pol)
@@ -778,7 +777,7 @@ func TestGetPolicy(t *testing.T) {
 		}},
 		{"returns mapped meta-project when present", func(t *testing.T) {
 			storedPol := genPolicy(t, "", prng)
-			storedPol.Statements[0].Projects = []string{constants.AllProjectsID}
+			storedPol.Statements[0].Projects = []string{constants_v2.AllProjectsID}
 			require.Zero(t, store.ItemCount())
 			store.Add(storedPol.ID, &storedPol, cache.NoExpiration)
 			req := api_v2.GetPolicyReq{
@@ -788,7 +787,7 @@ func TestGetPolicy(t *testing.T) {
 			pol, err := cl.GetPolicy(ctx, &req)
 			require.NoError(t, err)
 
-			assert.Equal(t, constants.AllProjectsExternalID, pol.Statements[0].Projects[0])
+			assert.Equal(t, constants_v2.AllProjectsExternalID, pol.Statements[0].Projects[0])
 		}},
 		{"fails with NotFound when ID doesn't match any policies", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
