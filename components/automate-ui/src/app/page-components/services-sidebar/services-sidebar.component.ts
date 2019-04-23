@@ -23,7 +23,7 @@ export class ServicesSidebarComponent implements OnInit {
   public serviceGroupName$: Observable<string>;
   currentPage = 1;
   pageSize = 25;
-  //TODO: Wire this up with real total
+  // TODO: Wire this up with real total
   totalServices = 50;
 
   constructor(private store: Store<NgrxStateAtom>) { }

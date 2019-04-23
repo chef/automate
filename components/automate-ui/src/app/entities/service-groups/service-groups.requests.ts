@@ -64,8 +64,8 @@ export class ServiceGroupsRequests {
         params = params.append('health', filters.health);
       }
       if (filters.page && filters.pageSize) {
-        params = params.append('pagination.page', filters.page.toString())
-        params = params.append('pagination.size', filters.pageSize.toString())
+        params = params.append('pagination.page', filters.page.toString());
+        params = params.append('pagination.size', filters.pageSize.toString());
       }
     }
 
