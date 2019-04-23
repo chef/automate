@@ -472,9 +472,10 @@ func convertAPIStatementSliceToDomain(external []*pb_common.Statement) ([]*authz
 
 		// Note: this is where we ignore the request's statements' resources
 		internal = append(internal, &authz.Statement{
-			Effect:  authz.Statement_Effect(effectValue),
-			Actions: statement.Actions,
-			Role:    statement.Role,
+			Effect:   authz.Statement_Effect(effectValue),
+			Actions:  statement.Actions,
+			Role:     statement.Role,
+			Projects: statement.Projects,
 		})
 	}
 	return internal, nil
