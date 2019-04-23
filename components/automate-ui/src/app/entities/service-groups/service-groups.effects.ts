@@ -6,13 +6,15 @@ import { Injectable } from '@angular/core';
 import { Actions, ofType, Effect } from '@ngrx/effects';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { ServiceGroupsPayload, ServiceGroupHealthCountPayload } from './service-groups.model';
-import { ServiceGroupsPayload, ServicesPayload } from './service-groups.model';
+import { ServiceGroupsPayload,
+  ServiceGroupHealthSummary,
+  ServicesPayload
+      } from './service-groups.model';
 import { ServiceGroupEntityState } from './service-groups.reducer';
 import {
   ServiceGroupsActionTypes,
   GetServiceGroups,
-  // GetServiceGroupsCounts,
+  GetServiceGroupsCounts,
   GetServiceGroupsCountsSuccess,
   GetServiceGroupsCountsFailure,
   GetServicesBySG,
@@ -46,19 +48,15 @@ export class ServiceGroupsEffects {
   @Effect()
   updateServiceGroupsFilters$ = this.actions$.pipe(
       ofType(ServiceGroupsActionTypes.UPDATE_SERVICE_GROUPS_FILTER),
-      mergeMap(() => [
-        new GetServiceGroups()
-        // , new GetServiceGroupsCounts() // When this function is ready, uncomment this line!
-      ]));
+      mergeMap(() => [ new GetServiceGroups(), new GetServiceGroupsCounts() ]));
 
   @Effect()
   getServiceGroupsCounts$ = this.actions$.pipe(
       ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS),
       withLatestFrom(this.store),
       switchMap(([_action]) => {
-        // const serviceGroupHealthCountState: ServiceGroupEntityState = storeState.serviceGroups;
         return this.requests.fetchServiceGroupHealth().pipe(
-        map((payload: ServiceGroupHealthCountPayload) => new GetServiceGroupsCountsSuccess(payload)),
+        map((payload: ServiceGroupHealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
         catchError((error: HttpErrorResponse) => of(new GetServiceGroupsCountsFailure(error)))
       );
       }));

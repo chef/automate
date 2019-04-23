@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 
 import {
   ServiceGroupsPayload, ServiceGroupFilters,
-  ServiceGroupHealthCountPayload,
+  ServiceGroupHealthSummary,
   ServicesPayload, ServicesFilters
 } from './service-groups.model';
 import { environment } from '../../../environments/environment';
@@ -71,9 +71,9 @@ export class ServiceGroupsRequests {
     return params;
   }
 
-  public fetchServiceGroupHealth(): Observable<ServiceGroupHealthCountPayload> {
+  public fetchServiceGroupHealth(): Observable<ServiceGroupHealthSummary> {
     const url = `${APPLICATIONS_URL}/service_groups_health_counts`;
 
-    return this.httpClient.get<ServiceGroupHealthCountPayload>(url);
+    return this.httpClient.get<ServiceGroupHealthSummary>(url);
   }
 }

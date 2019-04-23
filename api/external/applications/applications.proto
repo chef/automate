@@ -161,7 +161,7 @@ message HabService {
   HealthStatus health_check = 4;
   ServiceStatus status = 5;
 
-  // @afiune Proposal to start receiving informatino about the hab-ring
+  // @afiune Proposal to start receiving information about the hab-ring
   /*repeated string members = 6;*/
 
   // @afiune These information will come as tags, once we have the data structure

@@ -8,10 +8,6 @@ export interface ServiceGroupHealthSummary {
   unknown: number;
 }
 
-export interface ServiceGroupHealthCountPayload {
-  service_groups_health_count: ServiceGroupHealthSummary[];
-}
-
 export interface Service {
   supervisor_id: string;
   release: string;

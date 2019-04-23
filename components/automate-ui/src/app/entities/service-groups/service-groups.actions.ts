@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import {
-  ServiceGroupsPayload, ServicesPayload, ServicesFilters,
-  ServiceGroupHealthCountPayload
+  ServiceGroupsPayload, ServicesPayload,
+  ServicesFilters, ServiceGroupHealthSummary
 } from './service-groups.model';
 
 export enum ServiceGroupsActionTypes {
@@ -55,11 +55,13 @@ export class GetServiceGroupsCounts implements Action {
 export class GetServiceGroupsCountsSuccess implements Action {
   readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_SUCCESS;
 
-  constructor(public payload: ServiceGroupHealthCountPayload) {}
+  constructor(public payload: ServiceGroupHealthSummary) {}
 }
 
 export class GetServiceGroupsCountsFailure implements Action {
   readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
 }
 
 export class UpdateSelectedSG implements Action {

@@ -5,13 +5,13 @@ import { set, pipe } from 'lodash/fp';
 
 import {
   ServiceGroup, ServiceGroupFilters,
-  ServiceGroupHealthCountPayload,
+  ServiceGroupHealthSummary,
   Service, ServicesFilters
 } from './service-groups.model';
 
 export interface ServiceGroupEntityState {
   serviceGroups: ServiceGroup[];
-  serviceGroupHealthCounts: ServiceGroupHealthCountPayload[];
+  serviceGroupHealthCounts: ServiceGroupHealthSummary[];
   status: EntityStatus;
   filters: ServiceGroupFilters;
   servicesStatus: EntityStatus;
@@ -63,7 +63,7 @@ export function serviceGroupEntityReducer(
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_SUCCESS:
     return pipe(
       set('status', EntityStatus.loadingSuccess),
-      set('serviceGroups', action.payload.service_groups_health_count))(state);
+      set('serviceGroupHealthCounts', action.payload))(state);
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_FAILURE:
     return set('status', EntityStatus.loadingFailure, state);
