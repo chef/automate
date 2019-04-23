@@ -4,7 +4,9 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable } from 'rxjs';
 import { serviceGroupState } from '../../entities/service-groups/service-groups.selector';
 import { createSelector } from '@ngrx/store';
-import { Service, ServicesFilters } from '../../entities/service-groups/service-groups.model';
+import {
+  Service, ServicesFilters, HealthSummary
+} from '../../entities/service-groups/service-groups.model';
 import { UpdateSelectedSG } from '../../entities/service-groups/service-groups.actions';
 
 @Component({
@@ -21,6 +23,7 @@ export class ServicesSidebarComponent implements OnInit {
   public selectedHealth: string;
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
+  public servicesHealthSummary$: Observable<HealthSummary>;
 
   constructor(private store: Store<NgrxStateAtom>) { }
 
@@ -30,6 +33,9 @@ export class ServicesSidebarComponent implements OnInit {
 
     this.serviceGroupName$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.selectedServiceGroupName));
+
+    this.servicesHealthSummary$ = this.store.select(createSelector(serviceGroupState,
+      (state) => state.servicesHealthSummary));
   }
 
   public closeServicesSidebar() {

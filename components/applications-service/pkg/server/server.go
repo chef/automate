@@ -170,9 +170,22 @@ func (app *ApplicationsServer) GetServicesBySG(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	svcsHealthCounts, err := app.storageClient.GetServicesHealthCounts(filters)
+	if err != nil {
+		log.WithError(err).Error("Error retrieving services health counts by service_group(s)")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &applications.ServicesBySGRes{
 		Group:    sgName,
 		Services: convertStorageServicesToApplicationsServices(services),
+		ServicesHealthCounts: &applications.HealthCounts{
+			Total:    svcsHealthCounts.Total,
+			Ok:       svcsHealthCounts.Ok,
+			Warning:  svcsHealthCounts.Warning,
+			Critical: svcsHealthCounts.Critical,
+			Unknown:  svcsHealthCounts.Unknown,
+		},
 	}, nil
 }
 
