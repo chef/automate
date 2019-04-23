@@ -21,17 +21,19 @@ import (
 // These do not have to be the same
 // but seems reasonable to make them the same by convention.
 type authzServer struct {
-	log     logger.Logger
-	engine  engine.V2Authorizer
-	vSwitch *VersionSwitch
+	log      logger.Logger
+	engine   engine.V2Authorizer
+	vSwitch  *VersionSwitch
+	projects api.ProjectsServer
 }
 
 // NewAuthzServer returns a new IAM v2 Authz server.
-func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch) (api.AuthorizationServer, error) {
+func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p api.ProjectsServer) (api.AuthorizationServer, error) {
 	return &authzServer{
-		log:     l,
-		engine:  e,
-		vSwitch: v,
+		log:      l,
+		engine:   e,
+		vSwitch:  v,
+		projects: p,
 	}, nil
 }
 
@@ -70,17 +72,22 @@ func (s *authzServer) ProjectsAuthorized(
 
 	// this call checks for all allowed projects (without considering deny)
 	if version.Minor == api.Version_V1 && len(req.ProjectsFilter) == 0 {
-		pair := []engine.Pair{
-			engine.Pair{
-				Resource: engine.Resource(req.Resource),
-				Action:   engine.Action(req.Action),
+		pairs := []*api.Pair{
+			&api.Pair{
+				Resource: req.Resource,
+				Action:   req.Action,
 			},
 		}
-		allowedProjects, err := s.engine.V2FilterAuthorizedProjects(ctx, req.Subjects, pair)
+		filterReq := api.FilterAuthorizedPairsReq{
+			Subjects: req.Subjects,
+			Pairs:    pairs,
+		}
+		resp, err := s.FilterAuthorizedProjects(ctx, &filterReq)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
-		projects = allowedProjects
+
+		projects = resp.Projects
 	}
 
 	// this call returns allowed projects that are not overriden by deny
@@ -140,8 +147,24 @@ func (s *authzServer) FilterAuthorizedProjects(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	var projectIDs []string
+	if stringutils.SliceContains(resp, constants.AllProjectsID) {
+		list, err := s.projects.ListProjects(ctx, &api.ListProjectsReq{})
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		for _, project := range list.Projects {
+			projectIDs = append(projectIDs, project.Id)
+		}
+
+		// all projects also includes unassigned
+		projectIDs = append(projectIDs, constants.UnassignedProjectID)
+	} else {
+		projectIDs = resp
+	}
+
 	return &api.FilterAuthorizedProjectsResp{
-		Projects: resp,
+		Projects: projectIDs,
 	}, nil
 }
 

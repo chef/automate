@@ -87,7 +87,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
 
-	v2AuthzServer, err := v2.NewAuthzServer(l, e, switcher)
+	v2AuthzServer, err := v2.NewAuthzServer(l, e, switcher, v2ProjectsServer)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 authz server")
 	}
