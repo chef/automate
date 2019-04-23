@@ -493,6 +493,7 @@ func convertDomainStatementSliceToAPI(internal []*authz.Statement) ([]*pb_common
 			Actions:   statement.Actions,
 			Role:      statement.Role,
 			Resources: statement.Resources,
+			Projects:  statement.Projects,
 		})
 	}
 	return external, nil
