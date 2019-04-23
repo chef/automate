@@ -75,6 +75,11 @@ if [ ${#test_external_services[@]} -ne 0 ]; then
     done
 fi
 
+if [ ! -z "$EXTERNAL_ONLY" ]; then
+    echo "Started external services... exiting"
+    exit 0
+fi
+
 echo "${docker_run_args[*]}"
 
 docker run "${docker_run_args[@]}" chefes/a2-integration:latest
