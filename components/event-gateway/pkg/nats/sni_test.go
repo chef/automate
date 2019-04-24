@@ -101,3 +101,42 @@ func TestNATSWithSNI(t *testing.T) {
 	_, err = natsc.Connect(natsURL, natsc.Secure(clientTLSConfigBAD))
 	require.Error(t, err)
 }
+
+func TestNATSWithTLSDisabled(t *testing.T) {
+	c := &config.EventGatewayConfig{
+		Service: config.Nats{
+			Host: "localhost",
+			// use a different port so you can run the tests while having Automate
+			// running
+			Port:                       24222,
+			GatewayPort:                0, // not used
+			Enabled:                    true,
+			HealthCheckCredentialsFile: "/NOT_USED",
+			DisableFrontendTLS:         true,
+		},
+		LogConfig: config.LogConfig{
+			LogFormat: "text",
+			LogLevel:  "debug",
+		},
+		FrontendTLS: nil,
+	}
+
+	configurators := []NATSdConfigurator{
+		WithNATSLogging(c),
+		WithNATSListenOpts(c),
+		WithNATSHTTPMonitoringDisabled(c),
+		WithNATSFrontEndCerts(c),
+	}
+
+	ns, err := ServerWithNATSConfig(configurators...)
+
+	require.NoError(t, err)
+
+	go ns.Start()
+	defer ns.Shutdown()
+
+	natsURL := "nats://localhost:24222"
+	connOne, err := natsc.Connect(natsURL)
+	require.NoError(t, err)
+	connOne.Close()
+}
