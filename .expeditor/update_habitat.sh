@@ -2,8 +2,12 @@
 
 set -eou pipefail
 
-branch="expeditor/bump-hab"
-git checkout -b "$branch"
+NO_GIT=${NO_GIT:-false}
+
+if [[ "$NO_GIT" != "true" ]]; then
+    branch="expeditor/bump-hab"
+    git checkout -b "$branch"
+fi
 
 HAB_SUP_VERSION=$EXPEDITOR_VERSION
 HAB_SUP_RELEASE=$(curl "https://bldr.habitat.sh/v1/depot/channels/core/stable/pkgs/hab-sup/$HAB_SUP_VERSION/latest" | jq -r .ident.release)
@@ -24,14 +28,16 @@ sed -i -r "s|\"hab-launcher\".*\"version\" =>.*|\"hab-launcher\" => { \"origin\"
 sed -i -r "s|core/hab/[0-9]+\\.[0-9]+\\.[0-9]+/[0-9]{14}|core/hab/$HAB_VERSION/$HAB_RELEASE|" components/automate-deployment/habitat/plan.sh
 sed -i -r "s|RECOMMENDED_HAB_VERSION=\".*\"|RECOMMENDED_HAB_VERSION=\"$HAB_VERSION\"|" .studiorc
 
-git add .expeditor/create-manifest.rb
-git add components/automate-deployment/habitat/plan.sh
-git add .studiorc
+if [[ "$NO_GIT" != "true" ]]; then
+    git add .expeditor/create-manifest.rb
+    git add components/automate-deployment/habitat/plan.sh
+    git add .studiorc
 
-git commit --message "Bump Habitat version"  --message "This pull request was triggered automatically via Expeditor." --message "This change falls under the obvious fix policy so no Developer Certificate of Origin (DCO) sign-off is required."
+    git commit --message "Bump Habitat version"  --message "This pull request was triggered automatically via Expeditor." --message "This change falls under the obvious fix policy so no Developer Certificate of Origin (DCO) sign-off is required."
 
-open_pull_request
+    open_pull_request
 
-# Get back to master and cleanup the leftovers - any changed files left over at the end of this script will get committed to master.
-git checkout -
-git branch -D "$branch"
+    # Get back to master and cleanup the leftovers - any changed files left over at the end of this script will get committed to master.
+    git checkout -
+    git branch -D "$branch"
+fi
