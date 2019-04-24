@@ -25,7 +25,7 @@ type Nats struct {
 	GatewayPort                int    `mapstructure:"gateway_port"`
 	Enabled                    bool   `mapstructure:"enabled"`
 	HealthCheckCredentialsFile string `mapstructure:"health_check_credentials_file"`
-	DisableFrontendTLS         bool
+	DisableFrontendTLS         bool   `mapstructure:"disable_frontend_tls"`
 }
 
 type NatsGateway struct {
