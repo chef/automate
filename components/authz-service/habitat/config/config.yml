@@ -17,3 +17,5 @@ data-migrations-path: {{ pkg.svc_static_path }}/data-migrations
 event-address: {{event-service.sys.ip}}:{{event-service.cfg.port}}
   {{~/if}}
 {{~/eachAlive}}
+
+config: {{pkg.svc_data_path}}/.authz-service.toml

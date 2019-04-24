@@ -407,7 +407,7 @@ func (manager *Manager) resumePreviousState() {
 
 	if projectUpdateConfig.State == runningState {
 		manager.stage.state = runningState
-		logrus.Infof("Setting smanager.state: %s manager.projectUpdateID: %s manager.esJobID: %s",
+		logrus.Infof("Setting manager.state: %s manager.projectUpdateID: %s manager.esJobID: %s",
 			manager.stage.state, manager.stage.projectUpdateID, manager.stage.esJobIDs)
 		go manager.waitingForJobToComplete()
 	}

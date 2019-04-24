@@ -22,12 +22,10 @@ type Manager struct {
 }
 
 // NewManager - create a new config. There should only be one config for the service.
-func NewManager(configFile string, defaultConfig interface{}) *Manager {
-	config := readinConfig(configFile, defaultConfig)
-
+func NewManager(configFile string, initialConfig interface{}) *Manager {
 	updateQueue := make(chan func(interface{}) interface{}, 100)
 	manager := &Manager{
-		Config:      config,
+		Config:      initialConfig,
 		configFile:  configFile,
 		updateQueue: updateQueue,
 	}
@@ -61,7 +59,7 @@ func (manager *Manager) Send(updateFunc func(interface{}) interface{}) {
 func (manager *Manager) SaveToFile(config interface{}) error {
 	log.WithFields(log.Fields{
 		"config_file": manager.configFile,
-	}).Info("Saving Config File")
+	}).Debug("Saving Config File")
 
 	tomlData, err := toml.Marshal(config)
 	if err != nil {
@@ -83,29 +81,4 @@ func (manager *Manager) SaveToFile(config interface{}) error {
 	}
 
 	return err
-}
-
-func readinConfig(configFile string, defaultConfig interface{}) interface{} {
-	config := defaultConfig
-
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		// config file does not exists
-		return config
-	}
-
-	tomlData, err := ioutil.ReadFile(configFile)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"config_file": configFile,
-		}).WithError(err).Error("Unable to read config file")
-	}
-
-	err = toml.Unmarshal(tomlData, &config)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"config_file": configFile,
-		}).WithError(err).Error("Unable to load manager configuration")
-	}
-
-	return config
 }

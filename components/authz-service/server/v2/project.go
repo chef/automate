@@ -13,6 +13,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/authz-service/config"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -40,9 +41,10 @@ func NewMemstoreProjectsServer(
 	l logger.Logger,
 	e engine.ProjectRulesRetriever,
 	eventServiceClient automate_event.EventServiceClient,
+	configManager *config.Manager,
 ) (api.ProjectsServer, error) {
 
-	return NewProjectsServer(ctx, l, memstore.New(), e, eventServiceClient)
+	return NewProjectsServer(ctx, l, memstore.New(), e, eventServiceClient, configManager)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
@@ -53,13 +55,14 @@ func NewPostgresProjectsServer(
 	dataMigrationsConfig datamigration.Config,
 	e engine.ProjectRulesRetriever,
 	eventServiceClient automate_event.EventServiceClient,
+	configManager *config.Manager,
 ) (api.ProjectsServer, error) {
 
 	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	return NewProjectsServer(ctx, l, s, e, eventServiceClient)
+	return NewProjectsServer(ctx, l, s, e, eventServiceClient, configManager)
 }
 
 func NewProjectsServer(
@@ -68,13 +71,14 @@ func NewProjectsServer(
 	s storage.Storage,
 	e engine.ProjectRulesRetriever,
 	eventServiceClient automate_event.EventServiceClient,
+	configManager *config.Manager,
 ) (api.ProjectsServer, error) {
 
 	return &state{
 		log:                  l,
 		store:                s,
 		engine:               e,
-		projectUpdateManager: NewProjectUpdateManager(eventServiceClient),
+		projectUpdateManager: NewProjectUpdateManager(eventServiceClient, configManager),
 	}, nil
 }
 

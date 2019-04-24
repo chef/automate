@@ -1,8 +1,13 @@
 package config
 
 import (
+	"io/ioutil"
+	"os"
+
 	"github.com/chef/automate/api/interservice/ingest"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	base_config "github.com/chef/automate/lib/config"
+	log "github.com/sirupsen/logrus"
 )
 
 // TODO @afiune We are unable to use this custom type because the underlying go-toml
@@ -134,8 +139,9 @@ type aggregateConfig struct {
 
 // NewManager - create a new config. There should only be one config for the service.
 func NewManager(configFile string) *Manager {
+	config := readinConfig(configFile, defaultConfig())
 	return &Manager{
-		baseConfigManager: base_config.NewManager(configFile, defaultConfig()),
+		baseConfigManager: base_config.NewManager(configFile, config),
 	}
 }
 
@@ -264,4 +270,29 @@ func (manager *Manager) send(updateFunc func(aggregateConfig) aggregateConfig) {
 		return updateFunc(config.(aggregateConfig))
 	}
 	manager.baseConfigManager.Send(baseUpdateFunc)
+}
+
+func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} {
+	config := defaultConfig
+
+	if _, err := os.Stat(configFile); os.IsNotExist(err) {
+		// config file does not exists
+		return config
+	}
+
+	tomlData, err := ioutil.ReadFile(configFile)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"config_file": configFile,
+		}).WithError(err).Error("Unable to read config file")
+	}
+
+	err = toml.Unmarshal(tomlData, &config)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"config_file": configFile,
+		}).WithError(err).Error("Unable to load manager configuration")
+	}
+
+	return config
 }

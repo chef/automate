@@ -1,7 +1,12 @@
 package config
 
 import (
+	"io/ioutil"
+	"os"
+
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	base_config "github.com/chef/automate/lib/config"
+	log "github.com/sirupsen/logrus"
 )
 
 // ProjectUpdateConfig - the config for project updating
@@ -29,8 +34,9 @@ type aggregateConfig struct {
 
 // NewConfigManager - create a new config. There should only be one config for the service.
 func NewConfigManager(configFile string) *ConfigManager {
+	config := readinConfig(configFile, defaultConfig())
 	return &ConfigManager{
-		baseConfigManager: base_config.NewManager(configFile, defaultConfig()),
+		baseConfigManager: base_config.NewManager(configFile, config),
 	}
 }
 
@@ -63,4 +69,29 @@ func (manager *ConfigManager) send(updateFunc func(aggregateConfig) aggregateCon
 		return updateFunc(config.(aggregateConfig))
 	}
 	manager.baseConfigManager.Send(baseUpdateFunc)
+}
+
+func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} {
+	config := defaultConfig
+
+	if _, err := os.Stat(configFile); os.IsNotExist(err) {
+		// config file does not exists
+		return config
+	}
+
+	tomlData, err := ioutil.ReadFile(configFile)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"config_file": configFile,
+		}).WithError(err).Error("Unable to read config file")
+	}
+
+	err = toml.Unmarshal(tomlData, &config)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"config_file": configFile,
+		}).WithError(err).Error("Unable to load manager configuration")
+	}
+
+	return config
 }
