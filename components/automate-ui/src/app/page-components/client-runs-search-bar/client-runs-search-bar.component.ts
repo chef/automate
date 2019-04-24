@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
-import { clamp } from 'lodash';
+import { clamp, compact } from 'lodash';
 import { Chicklet } from '../../types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
@@ -70,17 +70,18 @@ export class ClientRunsSearchBarComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.filterValues) {
-      if (changes.filterValues.currentValue.length > 0 && changes.filterValues.currentValue[0] !== undefined){
-        this.suggestions = List<string>(changes.filterValues.currentValue);
-      } else {
-        this.suggestions = List<string>();
-      }
+      const listValues = this.handleFiltersValues(changes.filterValues.currentValue);
+      this.suggestions = List<string>(listValues);
       this.isLoadingSuggestions = false;
     }
 
     if (changes.filterTypes) {
       this.visibleCategories = List<Chicklet>(changes.filterTypes.currentValue);
     }
+  }
+
+  handleFiltersValues(currentValues) {
+    return compact(currentValues);
   }
 
   handleFiltersClick() {
