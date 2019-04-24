@@ -58,15 +58,17 @@ export function serviceGroupEntityReducer(
     }
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS:
-    return set('status', EntityStatus.loading, state);
+      return set('status', EntityStatus.loading, state);
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_SUCCESS:
-    return pipe(
-      set('status', EntityStatus.loadingSuccess),
-      set('serviceGroupHealthCounts', action.payload))(state);
+      return pipe(
+        set('status', EntityStatus.loadingSuccess),
+        set('serviceGroupHealthCounts', action.payload))(state);
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_FAILURE:
-    return set('status', EntityStatus.loadingFailure, state);
+      return pipe(
+        set('status', EntityStatus.loadingFailure),
+        set('errorResp', action.payload))(state);
 
     case ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP:
       return set('servicesFilters', action.payload, state);
