@@ -12,28 +12,45 @@ import find from 'lodash/fp/find';
  * A toggle button. Uses the chef-option atom to define it's different states.
  *
  * @example
- * <chef-status-filter-group>
+ * <chef-status-filter-group id="filters-example">
  *   <chef-option class="filter general" value="general">
+ *     <chef-icon class="filter-icon">group_work</chef-icon>
  *     <div class="filter-label">Total</div>
- *     <chef-icon>group_work</chef-icon><div class="filter-total">30</div>
+ *     <div class="filter-total">30</div>
  *   </chef-option>
  *   <chef-option class="filter critical" value='critical'>
+ *     <chef-icon class="filter-icon">warning</chef-icon>
  *     <div class="filter-label">Critical</div>
- *     <chef-icon>warning</chef-icon><div class="filter-total">10</div>
+ *     <div class="filter-total">10</div>
  *   </chef-option>
  *   <chef-option class="filter warning" value='warning'>
+ *     <chef-icon class="filter-icon">error</chef-icon>
  *     <div class="filter-label">Warning</div>
- *     <chef-icon>error</chef-icon><div class="filter-total">5</div>
- * </chef-option>
+ *     <div class="filter-total">5</div>
+ *   </chef-option>
  *   <chef-option class="filter success" value='success'>
+ *     <chef-icon class="filter-icon">check_circle</chef-icon>
  *     <div class="filter-label">OK</div>
- *     <chef-icon>check_circle</chef-icon><div class="filter-total">5</div>
- * </chef-option>
+ *     <div class="filter-total">5</div>
+ *   </chef-option>
  *   <chef-option class="filter unknown" value='unknown'>
- *     <div class="filter-label">Deploying</div>
- *     <chef-icon>help</chef-icon><div class="filter-total">10</div>
+ *     <chef-icon class="filter-icon">help</chef-icon>
+ *     <div class="filter-label">Unknown</div>
+ *     <div class="filter-total">10</div>
  *   </chef-option>
  * </chef-status-filter-group>
+ *
+ * <chef-button id="lean-toggle" primary>Toggle lean attribute</chef-button>
+ *
+ * <script>
+ *   const button = document.getElementById('lean-toggle');
+ *   const filters = document.getElementById('filters-example');
+ *   button.addEventListener('click', () => filters.toggleAttribute('lean'));
+ * </script>
+ *
+ * <style>
+ *   #lean-toggle { margin-left: 0; }
+ * </style>
  */
 @Component({
   tag: 'chef-status-filter-group',
