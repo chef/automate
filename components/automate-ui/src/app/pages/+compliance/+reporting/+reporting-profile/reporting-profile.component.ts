@@ -10,6 +10,7 @@ import { StatsService } from '../../shared/reporting/stats.service';
 import { ReportQueryService } from '../../shared/reporting/report-query.service';
 import { ScanResultsService } from '../../shared/reporting/scan-results.service';
 import { paginationOverride } from '../shared';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-reporting-profile',
@@ -204,5 +205,9 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  formatDaysAgo(timestamp) {
+    return moment(timestamp).fromNow();
   }
 }

@@ -6,6 +6,7 @@ import { Filter } from '../types';
 import { paginationOverride } from '../shared';
 import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
 import { ChefSessionService } from '../../../../services/chef-session/chef-session.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-reporting-profiles',
@@ -207,4 +208,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     this.openControls[control.id].pane = pane;
   }
 
+  formatDaysAgo(timestamp) {
+    return moment(timestamp).fromNow();
+  }
 }
