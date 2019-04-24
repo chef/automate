@@ -21,7 +21,7 @@ export class ServicesSidebarComponent implements OnInit {
   public selectedHealth: string;
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
-  currentPage: number = 1;
+  currentPage = 1;
   pageSize = 25;
   // TODO: Wire this up with real total
   totalServices = 50;
