@@ -889,6 +889,12 @@ func init() {
             "type": "string"
           },
           "title": "Note: these are for display only, not to be set in CreatePolicy/UpdatePolicy"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
