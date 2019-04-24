@@ -5,19 +5,20 @@ import { set, pipe } from 'lodash/fp';
 
 import {
   ServiceGroup, ServiceGroupFilters,
-  ServiceGroupHealthSummary,
-  Service, ServicesFilters
+  Service, ServicesFilters,
+  HealthSummary
 } from './service-groups.model';
 
 export interface ServiceGroupEntityState {
   serviceGroups: ServiceGroup[];
-  serviceGroupHealthCounts: ServiceGroupHealthSummary[];
+  serviceGroupHealthCounts: HealthSummary[];
   status: EntityStatus;
   filters: ServiceGroupFilters;
   servicesStatus: EntityStatus;
   errorResp: HttpErrorResponse;
   servicesFilters: ServicesFilters;
   servicesList: Service[];
+  servicesHealthSummary: HealthSummary;
   selectedServiceGroupName: string;
 }
 
@@ -30,6 +31,7 @@ export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
   errorResp: null,
   servicesFilters: { },
   servicesList: [],
+  servicesHealthSummary: undefined,
   selectedServiceGroupName: undefined
 };
 
@@ -80,6 +82,7 @@ export function serviceGroupEntityReducer(
       return pipe(
         set('selectedServiceGroupName', action.payload.group),
         set('serviceStatus', EntityStatus.loadingSuccess),
+        set('servicesHealthSummary', action.payload.services_health_counts),
         set('servicesList', action.payload.services))(state);
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_FAILURE:

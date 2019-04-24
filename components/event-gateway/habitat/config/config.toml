@@ -7,6 +7,7 @@ host = "{{sys.ip}}"
 port = {{cfg.service.port}}
 gateway_port = {{cfg.service.gateway_port}}
 enabled = {{cfg.service.enable_nats_feature}}
+disable_frontend_tls = {{cfg.service.disable_frontend_tls}}
 
 health_check_credentials_file = "{{pkg.svc_data_path}}/health_check_token"
 

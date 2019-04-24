@@ -7,7 +7,7 @@ import { Actions, ofType, Effect } from '@ngrx/effects';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { ServiceGroupsPayload,
-  ServiceGroupHealthSummary,
+  HealthSummary,
   ServicesPayload
       } from './service-groups.model';
 import { ServiceGroupEntityState } from './service-groups.reducer';
@@ -56,7 +56,7 @@ export class ServiceGroupsEffects {
       withLatestFrom(this.store),
       switchMap(([_action]) => {
         return this.requests.fetchServiceGroupHealth().pipe(
-        map((payload: ServiceGroupHealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
+        map((payload: HealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
         catchError((error: HttpErrorResponse) => of(new GetServiceGroupsCountsFailure(error)))
       );
       }));

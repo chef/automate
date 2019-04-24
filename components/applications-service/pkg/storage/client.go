@@ -15,6 +15,8 @@ type Client interface {
 	GetServiceGroups(string, bool, int32, int32, map[string][]string) ([]*ServiceGroupDisplay, error)
 	// @param (id)
 	ServiceGroupExists(string) (string, bool)
+	// @param (filters)
+	GetServicesHealthCounts(map[string][]string) (*HealthCounts, error)
 	GetServiceGroupsHealthCounts() (*HealthCounts, error)
 
 	// Used by our Integration Tests

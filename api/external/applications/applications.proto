@@ -82,6 +82,7 @@ message ServicesBySGReq {
 message ServicesBySGRes {
   string group = 1;
   repeated Service services = 2;
+  HealthCounts services_health_counts = 3;
 }
 
 message ServicesRes {
