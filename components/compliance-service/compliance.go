@@ -161,6 +161,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	if err != nil {
 		logrus.Fatalf("could not connect to elasticsearch: %v", err)
 	}
+	configManager := config.NewConfigManager()
 
 	eventClient := getEventConnection(connFactory, conf.EventConfig.Endpoint)
 	notifier := getNotificationsConnection(connFactory, conf.Notifications.Target)
@@ -174,7 +175,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServer(s,
 		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
-			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient))
+			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient, configManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Service.Endpoint, conf.Secrets.Endpoint, conf.Manager.Endpoint))

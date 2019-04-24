@@ -119,7 +119,7 @@ func Spawn(opts *serveropts.Opts) error {
 
 	// EventHandler
 	eventHandlerServer := server.NewAutomateEventHandlerServer(client, *chefIngest,
-		authzProjectsClient, eventServiceClient)
+		authzProjectsClient, eventServiceClient, configManager)
 	ingest.RegisterEventHandlerServer(grpcServer, eventHandlerServer)
 
 	// Data Lifecycle Interface

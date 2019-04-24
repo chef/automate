@@ -19,6 +19,7 @@ import (
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	ingest_api "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
@@ -37,18 +38,18 @@ type ComplianceIngestServer struct {
 	mgrClient          manager.NodeManagerServiceClient
 	automateURL        string
 	notifierClient     notifier.Notifier
-	updateManager      projectupdater.Manager
+	updateManager      *projectupdater.Manager
 }
 
 var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
 
 func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.NodeManagerServiceClient,
 	automateURL string, notifierClient notifier.Notifier, authzProjectsClient iam_v2.ProjectsClient,
-	eventServiceClient automate_event.EventServiceClient) *ComplianceIngestServer {
+	eventServiceClient automate_event.EventServiceClient, configManager *config.ConfigManager) *ComplianceIngestServer {
 
 	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient)
 
-	updateManager := projectupdater.NewManager(esClient, authzProjectsClient, eventServiceClient)
+	updateManager := projectupdater.NewManager(esClient, authzProjectsClient, eventServiceClient, configManager)
 
 	return &ComplianceIngestServer{
 		compliancePipeline: compliancePipeline,
@@ -61,7 +62,7 @@ func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.No
 }
 
 func (srv *ComplianceIngestServer) HandleEvent(ctx context.Context, req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
-	log.Debugf("ingest-service is handling your event %s", req.EventID)
+	log.Debugf("compliance ingest is handling your event %s", req.EventID)
 
 	response := &automate_event.EventResponse{}
 	if req.Type.Name == event.ProjectRulesUpdate {

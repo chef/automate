@@ -89,6 +89,13 @@ type JobSchedulerConfig struct {
 	Running bool `toml:"running"`
 }
 
+// ProjectUpdateConfig - the config for project updating
+type ProjectUpdateConfig struct {
+	State           string `toml:"state"`
+	ProjectUpdateID string `toml:"project_update_id"`
+	EsJobID         string `toml:"es_job_id"`
+}
+
 func defaultConfig() aggregateConfig {
 	return aggregateConfig{
 		JobSchedulerConfig: JobSchedulerConfig{
@@ -114,6 +121,7 @@ func defaultConfig() aggregateConfig {
 				Running:   true,
 			},
 		},
+		ProjectUpdateConfig: ProjectUpdateConfig{},
 	}
 }
 
@@ -133,8 +141,9 @@ type Manager struct {
 
 // Config - stores the configuration for the service
 type aggregateConfig struct {
-	JobsConfig         []JobConfig        `toml:"jobs_config"`
-	JobSchedulerConfig JobSchedulerConfig `toml:"job_scheduler_config"`
+	JobsConfig          []JobConfig         `toml:"jobs_config"`
+	JobSchedulerConfig  JobSchedulerConfig  `toml:"job_scheduler_config"`
+	ProjectUpdateConfig ProjectUpdateConfig `toml:"project_update_config"`
 }
 
 // NewManager - create a new config. There should only be one config for the service.
@@ -180,6 +189,25 @@ func (manager *Manager) UpdateJobSchedulerConfig(jobSchedulerConfig JobScheduler
 
 	updateFunc := func(config aggregateConfig) aggregateConfig {
 		config.JobSchedulerConfig = jobSchedulerConfig
+		errc <- saveToFile(config)
+		return config
+	}
+
+	manager.send(updateFunc)
+	return <-errc
+}
+
+// GetProjectUpdateConfig
+func (manager *Manager) GetProjectUpdateConfig() ProjectUpdateConfig {
+	return manager.config.ProjectUpdateConfig
+}
+
+// UpdateProjectUpdateConfig - update the project update config
+func (manager *Manager) UpdateProjectUpdateConfig(projectUpdateConfig ProjectUpdateConfig) error {
+	errc := make(chan error)
+
+	updateFunc := func(config aggregateConfig) aggregateConfig {
+		config.ProjectUpdateConfig = projectUpdateConfig
 		errc <- saveToFile(config)
 		return config
 	}

@@ -12,6 +12,7 @@ import (
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	project_update_tags "github.com/chef/automate/lib/authz"
@@ -36,23 +37,24 @@ type Manager struct {
 	client                *ingestic.ESClient
 	authzProjectsClient   iam_v2.ProjectsClient
 	eventServiceClient    automate_event.EventServiceClient
+	configManager         *config.ConfigManager
 }
-
-// TODO
-// * Store running job IDs so if service restart it can pick up where it left off
-// * Add a cancel function
 
 // NewManager - create a new project update manager
 func NewManager(client *ingestic.ESClient, authzProjectsClient iam_v2.ProjectsClient,
-	eventServiceClient automate_event.EventServiceClient) Manager {
-	return Manager{
+	eventServiceClient automate_event.EventServiceClient, configManager *config.ConfigManager) *Manager {
+	manager := &Manager{
 		state:               notRunningState,
 		client:              client,
 		authzProjectsClient: authzProjectsClient,
 		eventServiceClient:  eventServiceClient,
+		configManager:       configManager,
 	}
+	manager.resumePreviousState()
+	return manager
 }
 
+// Cancel - stop any running job
 func (manager *Manager) Cancel(projectUpdateID string) {
 	switch manager.state {
 	case notRunningState:
@@ -83,6 +85,16 @@ func (manager *Manager) Cancel(projectUpdateID string) {
 func (manager *Manager) Start(projectUpdateID string) {
 	switch manager.state {
 	case notRunningState:
+		// TODO store and run through past projectUpdateIDs to check for a match
+		if manager.projectUpdateID == projectUpdateID {
+			// Update has already start and completed with this project update ID
+			status := ingestic.JobStatus{
+				Completed:          true,
+				PercentageComplete: 1.0,
+			}
+			manager.updateStatus(status, projectUpdateID)
+			return
+		}
 		// Start elasticsearch update job async and return the job ID
 		esJobIDs, err := manager.startProjectTagUpdater()
 		if err != nil {
@@ -92,10 +104,10 @@ func (manager *Manager) Start(projectUpdateID string) {
 				"Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID))
 			return
 		}
-		manager.esJobIDs = esJobIDs
 
+		manager.esJobIDs = esJobIDs
 		manager.projectUpdateID = projectUpdateID
-		manager.state = runningState
+		manager.changeState(runningState)
 		go manager.waitingForJobToComplete()
 	case runningState:
 		if manager.projectUpdateID == projectUpdateID {
@@ -177,7 +189,7 @@ func (manager *Manager) waitingForJobToComplete() {
 	}
 
 	// initial status
-	manager.updateStatus(ingestic.JobStatus{})
+	manager.updateStatus(ingestic.JobStatus{}, manager.projectUpdateID)
 
 	jobStatuses, err := manager.collectJobStatus()
 	if err != nil {
@@ -185,7 +197,7 @@ func (manager *Manager) waitingForJobToComplete() {
 		numberOfConsecutiveFails++
 	} else {
 		mergedJobStatus = MergeJobStatus(jobStatuses)
-		manager.updateStatus(mergedJobStatus)
+		manager.updateStatus(mergedJobStatus, manager.projectUpdateID)
 	}
 
 	for !mergedJobStatus.Completed {
@@ -200,7 +212,7 @@ func (manager *Manager) waitingForJobToComplete() {
 			}
 		} else {
 			mergedJobStatus = MergeJobStatus(jobStatuses)
-			manager.updateStatus(mergedJobStatus)
+			manager.updateStatus(mergedJobStatus, manager.projectUpdateID)
 			numberOfConsecutiveFails = 0
 		}
 	}
@@ -228,7 +240,7 @@ func (manager *Manager) completeJob() {
 func (manager *Manager) changeState(newState string) {
 	if manager.state != newState {
 		manager.state = newState
-		// manager.saveState()
+		manager.saveState()
 	}
 }
 
@@ -298,7 +310,7 @@ func (manager *Manager) sendFailedEvent(msg string) {
 }
 
 // publish a project update status event
-func (manager *Manager) updateStatus(jobStatus ingestic.JobStatus) {
+func (manager *Manager) updateStatus(jobStatus ingestic.JobStatus, projectUpdateID string) {
 	manager.estimatedEndTimeInSec = jobStatus.EstimatedEndTimeInSec
 	manager.percentageComplete = jobStatus.PercentageComplete
 
@@ -328,7 +340,7 @@ func (manager *Manager) updateStatus(jobStatus ingestic.JobStatus) {
 				},
 				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
-						StringValue: manager.projectUpdateID,
+						StringValue: projectUpdateID,
 					},
 				},
 			},
@@ -351,4 +363,33 @@ func createEventUUID() string {
 	}
 
 	return uuid.String()
+}
+
+func (manager *Manager) resumePreviousState() {
+	projectUpdateConfig := manager.configManager.GetProjectUpdateConfig()
+
+	manager.projectUpdateID = projectUpdateConfig.ProjectUpdateID
+	manager.esJobIDs = projectUpdateConfig.EsJobIDs
+
+	if projectUpdateConfig.State == runningState {
+		manager.state = runningState
+		logrus.Infof("Setting smanager.state: %s manager.projectUpdateID: %s manager.esJobID: %s",
+			manager.state, manager.projectUpdateID, manager.esJobIDs)
+		go manager.waitingForJobToComplete()
+	}
+}
+
+func (manager *Manager) saveState() {
+	projectUpdateConfig := config.ProjectUpdateConfig{
+		State:           manager.state,
+		ProjectUpdateID: manager.projectUpdateID,
+		EsJobIDs:        manager.esJobIDs,
+	}
+
+	err := manager.configManager.UpdateProjectUpdateConfig(projectUpdateConfig)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Update Project Update Config")
+	}
 }
