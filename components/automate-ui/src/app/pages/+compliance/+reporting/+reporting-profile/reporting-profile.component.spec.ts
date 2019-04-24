@@ -64,7 +64,7 @@ describe('ReportingProfileComponent', () => {
           {type: { name: 'profile_id' }, value: { text: '123'} },
           {type: { name: 'control_id' }, value: { text: '321'} }
         ],
-        { perPage: 1000, page: 1, sort: 'latest_report.end_time', order: 'DESC' });
+        { perPage: 1000, page: 1, sort: 'latest_report.end_time', order: 'desc' });
     });
   });
 });
