@@ -135,6 +135,10 @@ func TestNATSWithTLSDisabled(t *testing.T) {
 	go ns.Start()
 	defer ns.Shutdown()
 
+	// Wait for it to be able to accept connections
+	ready := ns.ReadyForConnections(10 * time.Second)
+	require.True(t, ready)
+
 	natsURL := "nats://localhost:24222"
 	conn, err := natsc.Connect(natsURL)
 	require.NoError(t, err)
