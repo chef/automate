@@ -4,12 +4,12 @@
 
     <app-projects-dropdown
       [projects]="dropdownProjects"
-      (onSelection)="projectsDropdownAction($event.detail)">
+      (onSelection)="projectsDropdownAction($event)">
     </app-projects-dropdown>
     <app-projects-dropdown
       [disabled]="true"
       [projects]="dropdownProjects"
-      (onSelection)="projectsDropdownAction($event.detail)">
+      (onSelection)="projectsDropdownAction($event)">
     </app-projects-dropdown>
   </app-cl-section>
 
@@ -38,30 +38,24 @@ import {{'{'}} Component {{'}'}} from '@angular/core';
 export class DemoProjectsDropdownComponent {{'{'}}
   dropdownProjects = [{{'{'}}
     'name': 'Project 1',
-    'id': 'project-1',
-    'enabled': false
+    'id': 'project-1'
   {{'}'}}, {{'{'}}
     'name': 'Project 2',
-    'id': 'project-2',
-    'enabled': false
+    'id': 'project-2'
   {{'}'}}, {{'{'}}
     'name': 'Project 3',
-    'id': 'project-3',
-    'enabled': false
+    'id': 'project-3'
   {{'}'}}, {{'{'}}
     'name': 'Project 4',
-    'id': 'project-4',
-    'enabled': false
+    'id': 'project-4'
   {{'}'}}, {{'{'}}
     'name': 'Project 5',
-    'id': 'project-5',
-    'enabled': false
+    'id': 'project-5'
   {{'}'}}, {{'{'}}
     'name':
     `Project 6 Has A Really Ridiculously Long Name and It should Stay on the same line
     Stay on the same line`,
-    'id': 'project-6',
-    'enabled': false
+    'id': 'project-6'
 {{'}'}}];
 
 

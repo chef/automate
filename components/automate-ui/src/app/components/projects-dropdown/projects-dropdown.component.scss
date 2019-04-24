@@ -8,6 +8,15 @@
 .dropdown-wrap {
   position: relative;
   width: 250px;
+
+  #projects-selected {
+    // TODO (tc): the value for $chef-dark-grey here
+    // and what it says in the card description conflict.
+    // From the card:
+    //
+    // The value shown uses `chef-dark-gray` #212234
+    color: #212234;
+  }
 }
 
 .dropdown-button {
@@ -35,6 +44,7 @@
     color: rgba($chef-primary-dark, 0.5);
     cursor: default;
     pointer-events: none;
+    opacity: 0.5;
   }
 
   &:focus {
