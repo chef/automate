@@ -130,7 +130,10 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     const profileFilter = {type: { name: 'profile_id' } , value: { text: params.profileId}};
     const controlFilter = {type: { name: 'control_id' } , value: { text: params.controlId}};
     filters = [profileFilter, controlFilter].concat(filters);
-    return this.statsService.getNodes(filters, paginationOverride).pipe(
+    params = paginationOverride;
+    params['sort'] = 'latest_report.end_time';
+    params['order'] = 'desc';
+    return this.statsService.getNodes(filters, params).pipe(
       map(data => {
         return data.items.map(node => {
           node.status = node.latest_report.status;

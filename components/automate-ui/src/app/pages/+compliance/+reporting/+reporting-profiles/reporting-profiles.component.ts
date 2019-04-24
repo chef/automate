@@ -114,7 +114,8 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
       type: { name: 'profile_id' },
       value: { text: profile.id }
     };
-
+    listParams['sort'] = 'latest_report.end_time';
+    listParams['order'] = 'desc';
     this.statsService.getNodes(filters, listParams).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
