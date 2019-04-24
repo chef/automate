@@ -69,7 +69,7 @@ export class ServiceGroupsEffects {
     ]));
 
   @Effect()
-    getServicesBySG$ = this.actions$.pipe(
+  getServicesBySG$ = this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP),
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
