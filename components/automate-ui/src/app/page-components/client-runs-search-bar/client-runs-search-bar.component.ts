@@ -70,7 +70,11 @@ export class ClientRunsSearchBarComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.filterValues) {
-      this.suggestions = List<string>(changes.filterValues.currentValue);
+      if (changes.filterValues.currentValue.length > 0 && changes.filterValues.currentValue[0] !== undefined){
+        this.suggestions = List<string>(changes.filterValues.currentValue);
+      } else {
+        this.suggestions = List<string>();
+      }
       this.isLoadingSuggestions = false;
     }
 
