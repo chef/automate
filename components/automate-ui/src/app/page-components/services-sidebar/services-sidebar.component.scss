@@ -9,6 +9,12 @@ ul {
   background-color: #FFFFFF;
 }
 
+app-page-picker {
+  margin-left: auto;
+  margin-right: auto;
+  width: 225px;
+}
+
 .service-item {
   @include modal-box();
   display: block;
