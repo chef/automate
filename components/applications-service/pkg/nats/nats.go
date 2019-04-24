@@ -40,6 +40,7 @@ type NatsClient struct {
 	retries            int
 	HabServiceEventCh  chan *applications.HabService // TODO: @afiune make a pipeline instead
 	InsecureSkipVerify bool
+	DisableTLS         bool
 }
 
 func NewExternalClient(url, cluster, client, durable, subject string) *NatsClient {
@@ -209,6 +210,10 @@ func (nc *NatsClient) Close() {
 }
 
 func (nc *NatsClient) natsTLSConfig() (*tls.Config, error) {
+	if nc.DisableTLS {
+		return nil, nil
+	}
+
 	t := &tls.Config{
 		MinVersion:         tls.VersionTLS12,
 		InsecureSkipVerify: nc.InsecureSkipVerify,

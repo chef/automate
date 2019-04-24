@@ -29,6 +29,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 4222, protocol: "nats" } ];
 				google.protobuf.Int32Value gateway_port = 3 [ (chef.automate.api.port) = { name: "nats_gateway", default: 10148, protocol: "nats-gateway" } ];
 				google.protobuf.BoolValue enable_nats_feature = 4;
+				google.protobuf.BoolValue disable_frontend_tls = 5;
 			}
 
 			message Log {
