@@ -56,7 +56,7 @@ func (x ServiceStatus) String() string {
 	return proto.EnumName(ServiceStatus_name, int32(x))
 }
 func (ServiceStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{0}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{0}
 }
 
 // The HealthStatus enum matches the habitat implementation for health-check status:
@@ -87,7 +87,7 @@ func (x HealthStatus) String() string {
 	return proto.EnumName(HealthStatus_name, int32(x))
 }
 func (HealthStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{1}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{1}
 }
 
 type ServicesReq struct {
@@ -103,7 +103,7 @@ func (m *ServicesReq) Reset()         { *m = ServicesReq{} }
 func (m *ServicesReq) String() string { return proto.CompactTextString(m) }
 func (*ServicesReq) ProtoMessage()    {}
 func (*ServicesReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{0}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{0}
 }
 func (m *ServicesReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServicesReq.Unmarshal(m, b)
@@ -158,7 +158,7 @@ func (m *ServicesBySGReq) Reset()         { *m = ServicesBySGReq{} }
 func (m *ServicesBySGReq) String() string { return proto.CompactTextString(m) }
 func (*ServicesBySGReq) ProtoMessage()    {}
 func (*ServicesBySGReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{1}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{1}
 }
 func (m *ServicesBySGReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServicesBySGReq.Unmarshal(m, b)
@@ -218,7 +218,7 @@ func (m *ServicesBySGRes) Reset()         { *m = ServicesBySGRes{} }
 func (m *ServicesBySGRes) String() string { return proto.CompactTextString(m) }
 func (*ServicesBySGRes) ProtoMessage()    {}
 func (*ServicesBySGRes) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{2}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{2}
 }
 func (m *ServicesBySGRes) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServicesBySGRes.Unmarshal(m, b)
@@ -263,7 +263,7 @@ func (m *ServicesRes) Reset()         { *m = ServicesRes{} }
 func (m *ServicesRes) String() string { return proto.CompactTextString(m) }
 func (*ServicesRes) ProtoMessage()    {}
 func (*ServicesRes) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{3}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{3}
 }
 func (m *ServicesRes) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServicesRes.Unmarshal(m, b)
@@ -308,7 +308,7 @@ func (m *Service) Reset()         { *m = Service{} }
 func (m *Service) String() string { return proto.CompactTextString(m) }
 func (*Service) ProtoMessage()    {}
 func (*Service) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{4}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{4}
 }
 func (m *Service) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Service.Unmarshal(m, b)
@@ -394,7 +394,7 @@ func (m *ServiceGroupsHealthCountsReq) Reset()         { *m = ServiceGroupsHealt
 func (m *ServiceGroupsHealthCountsReq) String() string { return proto.CompactTextString(m) }
 func (*ServiceGroupsHealthCountsReq) ProtoMessage()    {}
 func (*ServiceGroupsHealthCountsReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{5}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{5}
 }
 func (m *ServiceGroupsHealthCountsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServiceGroupsHealthCountsReq.Unmarshal(m, b)
@@ -427,7 +427,7 @@ func (m *ServiceGroupsReq) Reset()         { *m = ServiceGroupsReq{} }
 func (m *ServiceGroupsReq) String() string { return proto.CompactTextString(m) }
 func (*ServiceGroupsReq) ProtoMessage()    {}
 func (*ServiceGroupsReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{6}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{6}
 }
 func (m *ServiceGroupsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServiceGroupsReq.Unmarshal(m, b)
@@ -489,7 +489,7 @@ func (m *ServiceGroup) Reset()         { *m = ServiceGroup{} }
 func (m *ServiceGroup) String() string { return proto.CompactTextString(m) }
 func (*ServiceGroup) ProtoMessage()    {}
 func (*ServiceGroup) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{7}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{7}
 }
 func (m *ServiceGroup) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServiceGroup.Unmarshal(m, b)
@@ -566,7 +566,7 @@ func (m *HealthCounts) Reset()         { *m = HealthCounts{} }
 func (m *HealthCounts) String() string { return proto.CompactTextString(m) }
 func (*HealthCounts) ProtoMessage()    {}
 func (*HealthCounts) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{8}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{8}
 }
 func (m *HealthCounts) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HealthCounts.Unmarshal(m, b)
@@ -667,7 +667,7 @@ func (m *HabService) Reset()         { *m = HabService{} }
 func (m *HabService) String() string { return proto.CompactTextString(m) }
 func (*HabService) ProtoMessage()    {}
 func (*HabService) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{9}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{9}
 }
 func (m *HabService) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HabService.Unmarshal(m, b)
@@ -761,7 +761,7 @@ func (m *PackageIdent) Reset()         { *m = PackageIdent{} }
 func (m *PackageIdent) String() string { return proto.CompactTextString(m) }
 func (*PackageIdent) ProtoMessage()    {}
 func (*PackageIdent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{10}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{10}
 }
 func (m *PackageIdent) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PackageIdent.Unmarshal(m, b)
@@ -820,7 +820,7 @@ func (m *ServiceGroups) Reset()         { *m = ServiceGroups{} }
 func (m *ServiceGroups) String() string { return proto.CompactTextString(m) }
 func (*ServiceGroups) ProtoMessage()    {}
 func (*ServiceGroups) Descriptor() ([]byte, []int) {
-	return fileDescriptor_applications_8aa49a15163b12a6, []int{11}
+	return fileDescriptor_applications_69ca0db9e0ac5dba, []int{11}
 }
 func (m *ServiceGroups) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServiceGroups.Unmarshal(m, b)
@@ -1069,10 +1069,10 @@ var _ApplicationsService_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("api/external/applications/applications.proto", fileDescriptor_applications_8aa49a15163b12a6)
+	proto.RegisterFile("api/external/applications/applications.proto", fileDescriptor_applications_69ca0db9e0ac5dba)
 }
 
-var fileDescriptor_applications_8aa49a15163b12a6 = []byte{
+var fileDescriptor_applications_69ca0db9e0ac5dba = []byte{
 	// 1207 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x57, 0x41, 0x6f, 0x1b, 0xc5,
 	0x17, 0xef, 0xae, 0xe3, 0xd8, 0x7e, 0x76, 0x52, 0xff, 0xe7, 0x5f, 0x45, 0x8b, 0x1b, 0x4a, 0xd8,
