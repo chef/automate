@@ -104,6 +104,47 @@ func TestGetServicesBySGSingleService(t *testing.T) {
 	}
 }
 
+func TestGetServicesBySGWithPaginationParameter(t *testing.T) {
+	suite.IngestServices(habServicesMatrix())
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID of the service-groups
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 4, len(sgList), "There should be four service_groups in the db") {
+
+		var (
+			ctx     = context.Background()
+			request = &applications.ServicesBySGReq{
+				ServiceGroupId: sgList[0].ID,
+				Pagination: &query.Pagination{
+					Page: 1,
+					Size: 1,
+				},
+			}
+			expected = &applications.ServicesBySGRes{
+				Group: "myapp.default",
+				Services: []*applications.Service{
+					&applications.Service{
+						SupervisorId: "sup1",
+						Group:        "myapp.default",
+						Release:      "core/myapp/0.1.0/20190101121212",
+						Status:       applications.ServiceStatus_RUNNING,
+						HealthCheck:  applications.HealthStatus_WARNING,
+						Application:  a, Environment: e, Fqdn: "",
+					},
+				},
+				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Warning: 1, Ok: 2},
+			}
+		)
+
+		response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+		assert.Nil(t, err)
+		assert.Equal(t, expected.GetGroup(), response.GetGroup())
+		assert.Equal(t, expected.GetServicesHealthCounts(), response.GetServicesHealthCounts())
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
 func TestGetServicesBySGMultiService(t *testing.T) {
 	suite.IngestServices(habServicesMatrix())
 	defer suite.DeleteDataFromStorage()
