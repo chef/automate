@@ -24,13 +24,18 @@ func ConnectivityCheck(c *config.EventGatewayConfig) error {
 
 	natsURL := fmt.Sprintf("nats://%s@localhost:4222", token)
 
-	t := &tls.Config{
-		MinVersion:         tls.VersionTLS12,
-		InsecureSkipVerify: true,
+	opts := []natsc.Option{}
+
+	if !c.Service.DisableFrontendTLS {
+		t := &tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: true,
+		}
+		opts = append(opts, natsc.Secure(t))
 	}
 
 	log.WithFields(log.Fields{"url": natsURL}).Debug("connecting to event gateway")
-	conn, err := natsc.Connect(natsURL, natsc.Secure(t))
+	conn, err := natsc.Connect(natsURL, opts...)
 	if err != nil {
 		return errors.Wrapf(err, "failed to connect to NATS server %q", natsURL)
 	}
