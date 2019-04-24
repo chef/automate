@@ -41,7 +41,8 @@ followed by the [Chef UI Library setup instructions](../components/chef-ui-libra
    the UI builds.
 
 1. Optional step: Run `start_chef_ui_library` if you want to start and watch for modifications to the
-   chef-ui-library. Run `ui_logs` to see when the chef-ui-library rebuilds.
+   chef-ui-library. Open your browser and navigate to the URL `http://localhost:3334`. Run `ui_logs`
+   to see how the chef-ui-library rebuilds.
 
 1. Optional step: Run the necessary commands to bring up data in your environment,
    for example `chef_load_actions` or `chef_load_nodes` to load events in the event feed. 

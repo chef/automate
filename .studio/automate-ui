@@ -30,10 +30,11 @@ DOC
 function start_automate_ui_background {
   _verify_if_automate_ui_running && return 0
   _verify_devproxy_config || return 1
-  log_line "Launching the ${GREEN}automate-ui${NC} in the background."
+
+  log_line "Launching the $(green automate-ui) in the background."
   start_automate_ui background >> $UI_LOG_FILE 2>&1 &
-  log_line "Run '${YELLOW}ui_logs${NC}' to see how the automate-ui builds."
-  log_line "You can stop the automate ui with the helper method '${YELLOW}stop_automate_ui${NC}'."
+  log_line "Run '$(yellow ui_logs)' to see how the automate-ui builds."
+  log_line "You can stop the automate ui with the helper method '$(yellow stop_automate_ui)'."
 }
 
 document "ui_logs" <<DOC
@@ -49,20 +50,19 @@ DOC
 function start_automate_ui {
   _verify_if_automate_ui_running && return 0
   _verify_devproxy_config || return 1
-  local component="automate-ui"
 
   if [[ "$1" != "background" ]]; then
     warn "This helper method will take over your terminal, if you want to avoid it"
-    warn "you can execute the function '${GREEN}start_automate_ui_background${NC}' instead."
+    warn "you can execute the function '$(green start_automate_ui_background)' instead."
     warn "Press [enter] to continue. (Ctrl+C to abort)"
-    read
+    read -r
   fi
 
-  pushd "/src/components/$component" >/dev/null;
-    _prepare_automate_ui
-    log_line "Building $component application (npm run serve:hab)"
+  _prepare_automate_ui
+  ( cd /src/components/automate-ui || return 1
+    log_line "Building $(green automate-ui) application (npm run serve:hab)"
     npm run serve:hab
-  popd >/dev/null;
+  )
 }
 
 document "stop_automate_ui" <<DOC
@@ -73,7 +73,7 @@ function stop_automate_ui {
   local UI_PID
   UI_PID=$(pgrep npm);
   if [ ! -z "$UI_PID" ]; then
-    log_line "Stopping automate-ui PID '${RED}${UI_PID}${NC}'"
+    log_line "Stopping automate-ui PID '$(red "$UI_PID")'"
     kill "$UI_PID"
 
     # When we kill the automate-ui sometimes there are a few
@@ -82,58 +82,66 @@ function stop_automate_ui {
     install_if_missing core/busybox-static fuser;
     fuser 4200/tcp -k
   else
-    log_line "The automate-ui is not running. Start it with '${GREEN}start_automate_ui${NC}'"
+    log_line "The automate-ui is not running. Start it with '$(green start_automate_ui)'"
   fi;
 }
 
 document "build_chef_ui_library" <<DOC
-  Builds the chef-ui-library
+  Builds the chef-ui-library.
 DOC
 function build_chef_ui_library {
-  local component="chef-ui-library"
-
-  pushd "/src/components/$component" >/dev/null;
-    _prepare_chef_ui_library
-    log_line "Building $component application (npm run build)"
+  _prepare_chef_ui_library
+  ( cd /src/components/chef-ui-library || return 1
+    log_line "Building $(green chef-ui-library) application (npm run build)"
     npm run build
-  popd >/dev/null
+  )
 }
 
-# TODO @afiune Open port 3333 inside the studio
-# This might block others to build/develop from the outside, maybe
-# we can have two ports, one for inside the studio and one for the outside
 document "start_chef_ui_library" <<DOC
-  Starts the chef-ui-library for development. (http://localhost:3333)
+  Starts the chef-ui-library for development. (http://localhost:3334)
 DOC
 function start_chef_ui_library {
-  local component="chef-ui-library"
+  _prepare_chef_ui_library
+  ( cd /src/components/chef-ui-library || return 1
+    build_chef_ui_library_docs
+    log_line "Starting the $(green chef-ui-library) in the background."
+    stencil build --dev --watch --serve --no-open --port 3334 >> $UI_LOG_FILE 2>&1 &
+    log_line "Run '$(yellow ui_logs)' to see how the chef-ui-library builds."
+  )
+}
 
-  pushd "/src/components/$component" >/dev/null;
-    _prepare_chef_ui_library
-    log_line "Starting $component application"
-    # 'npm run build' we don't use this command because it runs sd to parallelize the two stencil commands
-    npm run docs
-    log_line "Launching the ${GREEN}${component}${NC} in the background."
-    stencil build --dev --watch >> $UI_LOG_FILE 2>&1 &
-    stencil-dev-server --no-open >> $UI_LOG_FILE 2>&1 &
-    log_line "Run '${YELLOW}ui_logs${NC}' to see when the $component builds."
-  popd >/dev/null
+document "build_chef_ui_library_docs" <<DOC
+  Build the chef-ui-library docs.
+DOC
+function build_chef_ui_library_docs {
+  ( cd /src/components/chef-ui-library || return 1
+    log_line "Building the $(green chef-ui-library) docs."
+    npm run docs >> $UI_LOG_FILE 2>&1 &
+  )
 }
 
 document "automate_ui_lint" <<DOC
   Executes the lint tests for the automate-ui.
 DOC
 function automate_ui_lint() {
-  local component="automate-ui"
-
-  pushd "/src/components/$component" >/dev/null;
-    log_line "Running lint-typescript test for $component (npm run lint)"
+  ( cd /src/components/automate-ui || return 1
+    log_line "Running lint-typescript test (npm run lint)"
     npm run lint || return 1
-    log_line "Running lint-sass test for $component (npm run lint:sass)"
+    log_line "Running lint-sass test (npm run lint:sass)"
     npm run lint:sass || return 1
-    log_line "Running lint-html test for $component (npm run lint:html)"
+    log_line "Running lint-html test (npm run lint:html)"
     npm run lint:html || return 1
-  popd >/dev/null
+  )
+}
+
+document "chef_ui_library_lint" <<DOC
+  Executes the lint tests for the chef-ui-library.
+DOC
+function chef_ui_library_lint() {
+  ( cd /src/components/chef-ui-library || return 1
+    log_line "Running lint-typescript test (npm run lint)"
+    npm run lint || return 1
+  )
 }
 
 document "automate_ui_reload_chef_ui_library" <<DOC
@@ -146,17 +154,13 @@ document "automate_ui_reload_chef_ui_library" <<DOC
         method 'start_automate_ui' or 'start_automate_ui_background'
 DOC
 function automate_ui_reload_chef_ui_library(){
-  local component="automate-ui"
-
-  pushd "/src/components/$component" >/dev/null;
-    # This function is running what we defined in the package.json as the 'install' command
-    #
-    # "install": "npm run clean-ui-lib && scripts/build_chef_ui_lib && npm run copy-ui-lib",
-    #
-    build_chef_ui_library
+  build_chef_ui_library
+  # This function is running what we defined in the package.json as the 'install' command
+  # "install": "npm run clean-ui-lib && scripts/build_chef_ui_lib && npm run copy-ui-lib",
+  ( cd /src/components/automate-ui || return 1
     npm run clean-ui-lib
     npm run copy-ui-lib
-  popd >/dev/null;
+  )
 }
 
 #
@@ -165,15 +169,13 @@ function automate_ui_reload_chef_ui_library(){
 
 # (Internal) Prepare chef-ui-library to be either build or run
 function _prepare_chef_ui_library(){
-  local component="chef-ui-library"
-
-  pushd "/src/components/$component" >/dev/null;
+  pushd /src/components/chef-ui-library >/dev/null || return 1
     _install_nodejs_from_nvmrc
-    log_line "Installing npm modules for $component (npm install)"
+    log_line "Installing npm modules for chef-ui-library (npm install)"
     npm install
-    _verify_stencil_cli_from_node_modules $component
+    _verify_stencil_cli_from_node_modules chef-ui-library 
     _maybe_rebuild_node_sass
-  popd >/dev/null
+  popd >/dev/null || return 1
 }
 
 # (Internal) Verify if there is an npm start already running
@@ -182,8 +184,8 @@ function _verify_if_automate_ui_running() {
   local UI_PID
   UI_PID=$(pgrep npm)
   if [ ! -z "$UI_PID" ]; then
-    warn "The ${RED}automate-ui${NC} is already running with PID '${RED}${UI_PID}${NC}'"
-    warn "Stop the process with '${GREEN}stop_automate_ui${NC}' retry.'"
+    warn "The $(red automate-ui) is already running with PID '$(red "$UI_PID")'"
+    warn "Stop the process with '$(green stop_automate_ui)' retry.'"
     return 0
   fi
   return 1
@@ -196,17 +198,17 @@ function _verify_devproxy_config() {
   msg="$msg\\n\\t# build components/automate-ui-devproxy/\\n"
 
   if [ "$DEVPROXY_URL" != "localhost" ]; then
-    error "Most likely you are trying to do development in the ${YELLOW}automate-ui from within the studio.${NC}"
-    error "The configuration of the ${RED}\$DEVPROXY_URL${NC} variable is incorrect. (currently set to: ${RED}${DEVPROXY_URL}${NC})"
-    error "Make sure you have it set to '${GREEN}localhost${NC}', then build an '${GREEN}automate-ui-devproxy${NC}' package and retry this function.\\n"
+    error "Most likely you are trying to do development in the $(yellow automate-ui from within the studio)."
+    error "The configuration of the $(red \$DEVPROXY_URL) variable is incorrect. (currently set to: $(red "$DEVPROXY_URL"))"
+    error "Make sure you have it set to '$(green localhost)', then build an '$(green automate-ui-devproxy)' package and retry this function.\\n"
     log_line "$msg"
     return 1
   fi
 
   # We are searching for 'automate-ui' packages because the automate-ui-devproxy plan builds a mocked ui package
   if ! ls -1 "/src/results/$HAB_ORIGIN-automate-ui-"* >/dev/null 2>&1; then
-    error "Most likely you are trying to do development in the ${YELLOW}automate-ui from within the studio.${NC}"
-    error "There are ${RED}no 'automate-ui' packages inside your results/ folder${NC}."
+    error "Most likely you are trying to do development in the $(yellow "automate-ui from within the studio")."
+    error "There are $(red "no 'automate-ui' packages inside your results/ folder")."
     error "Please build at least one and retry this function.\\n"
     log_line "$msg"
     return 1
@@ -216,21 +218,21 @@ function _verify_devproxy_config() {
 
 # (Internal) Verify that stencil is accessible
 function _verify_stencil_cli_from_node_modules() {
-    local component=${1:-chef-ui-library}
-    if [ -z "$(stencil -v 2>/dev/null)" ]; then
-      # Add @stencil/core/bin to the PATH so we can run stencil
-      # stencil is coming from the npm install above
-      # TODO @afiune should this be a separate npm commend to install stencil instead?
-      # => npm install @bigcommerce/stencil-cli
-      local NODE_MODULE_PATH="/src/components/$component/node_modules"
-      export PATH="$PATH:$NODE_MODULE_PATH/.bin"
-      export PATH="$PATH:$NODE_MODULE_PATH/@stencil/core/bin"
-      export PATH="$PATH:$NODE_MODULE_PATH/@stencil/dev-server/bin"
-      export PATH="$PATH:$NODE_MODULE_PATH/typedoc/bin"
-      # typedoc cmd by default is not executable! :sadpanda:
-      chmod a+x "/src/components/$component/node_modules/typedoc/bin/typedoc"
-    fi;
-    log_line "Using Stencil $(stencil -v)"
+  local component
+  component=${1:-chef-ui-library}
+  if [ -z "$(stencil -v 2>/dev/null)" ]; then
+    # Add @stencil/core/bin to the PATH so we can run stencil
+    # stencil is coming from the npm install above
+    # TODO @afiune should this be a separate npm commend to install stencil instead?
+    # => npm install @bigcommerce/stencil-cli
+    local NODE_MODULE_PATH="/src/components/$component/node_modules"
+    export PATH="$PATH:$NODE_MODULE_PATH/.bin"
+    export PATH="$PATH:$NODE_MODULE_PATH/@stencil/core/bin"
+    export PATH="$PATH:$NODE_MODULE_PATH/typedoc/bin"
+    # typedoc cmd by default is not executable! :sadpanda:
+    chmod a+x "/src/components/$component/node_modules/typedoc/bin/typedoc"
+  fi;
+  log_line "Using Stencil $(stencil -v)"
 }
 
 # (Internal) Rebuild node-sass module if we can find it inside the node_modules/ dir
@@ -276,23 +278,20 @@ function _install_nodejs_from_nvmrc() {
 
 # (Internal) Prepare automate-ui to be either build or run
 function _prepare_automate_ui(){
-  local component="automate-ui"
-
-  pushd "/src/components/$component" >/dev/null;
-    log_line "Installing npm modules for $component (npm install)"
+  pushd /src/components/automate-ui >/dev/null || return 1
+    _install_nodejs_from_nvmrc
+    log_line "Installing npm modules for automate-ui (npm install)"
     npm install
-    # @afiune We do not just run `npm install` here because for some reason there are times that
-    # npm doesn't actually run whats defined in the package.json as the 'install' command, so
-    # instead we will run it manually.
     automate_ui_reload_chef_ui_library
-    _verify_ng_from_node_modules $component
+    _verify_ng_from_node_modules automate-ui
     _maybe_rebuild_node_sass
-  popd >/dev/null;
+  popd >/dev/null || return 1
 }
 
 # (Internal) Verify that ng is accessible
 function _verify_ng_from_node_modules() {
-    local component=${1:-automate-ui}
+    local component
+   component=${1:-automate-ui}
     if [ -z "$(ng -v 2>/dev/null)" ]; then
       # Add @angular/cli/bin to the PATH so we can run ng commands
       # ng is coming from the npm install above

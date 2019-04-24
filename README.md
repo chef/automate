@@ -17,6 +17,12 @@ For more information see:
 - Documentation: https://automate.chef.io/docs/
 - Release Notes: https://automate.chef.io/release-notes/
 
+**Project State**: [Active](https://github.com/chef/chef-oss-practices/blob/master/repo-management/repo-states.md#active)
+
+**Issues Response SLA**: 5 business days
+
+**Pull Request Response SLA**: 5 business days
+
 ## Components
 
 Chef Automate is a collection of microservices.  Each service is

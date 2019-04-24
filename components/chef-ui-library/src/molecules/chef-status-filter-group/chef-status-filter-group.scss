@@ -1,131 +1,74 @@
 chef-status-filter-group {
   --active-color: var(--toggle-active-color, chef-hsl(var(--chef-primary-bright)));
-  display: block;
-  align-items: center;
+  display: flex;
 
-  chef-option {
+  .filter {
+    padding: 8px 12px;
     cursor: pointer;
     background-color: chef-hsl(var(--chef-white));
     box-shadow: 0 0 0 1px #DAE1E6 inset;
     border-radius: 4px;
     font-size: 14px;
     display: inline-flex;
+    margin-bottom: 16px;
 
-    &:nth-child(n+2) {
-      margin-left: 8px;
-    }
-
-    &.filter {
-      padding-bottom: 8px;
-      padding-right: 12px;
-      padding-left: 12px;
-      padding-top: 8px;
-      height: auto;
-      width: auto;
+    &:not(:last-child) {
       margin-right: 16px;
-
-      .option-content {
-        min-width: 100px;
-        flex-direction: column;
-      }
-
-
-      &::before {
-        display: none;
-      }
-
-      &.general {
-        chef-icon {
-          color: #212334;
-        }
-      }
-
-      &.critical {
-        chef-icon {
-          color: chef-hsl(var(--chef-critical));
-        }
-      }
-
-      &.warning {
-        chef-icon {
-          color: chef-hsl(var(--chef-primary));
-        }
-      }
-
-      &.success {
-        chef-icon {
-          color: chef-hsl(var(--chef-success));
-        }
-      }
-
-      &.unknown {
-        chef-icon {
-          color: chef-hsl(var(--chef-dark-grey));
-        }
-      }
     }
 
-    &.lean-filter {
-      padding: 8px;
-      margin-right: 8px;
-      margin-bottom: 10px;
-
-      .option-content {
-        flex-direction: column;
-      }
-
-
-      &::before {
-        display: none;
-      }
-
-      &.general {
-        chef-icon {
-          color: #212334;
-        }
-      }
-
-      &.critical {
-        chef-icon {
-          color: chef-hsl(var(--chef-critical));
-        }
-      }
-
-      &.warning {
-        chef-icon {
-          color: chef-hsl(var(--chef-primary));
-        }
-      }
-
-      &.success {
-        chef-icon {
-          color: chef-hsl(var(--chef-success));
-        }
-      }
-
-      &.unknown {
-        chef-icon {
-          color: chef-hsl(var(--chef-dark-grey));
-        }
-      }
+    .option-content {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      min-width: 100px;
     }
 
-    .lean-filter-label {
-      display: inline-flex;
-    }
-
-    .filter-total {
+    .filter-icon {
       display: inline-flex;
       align-items: center;
-      vertical-align: center;
-    }
-
-    chef-icon {
-      display: inline-flex;
-      vertical-align: center;
       height: 16px;
       width: 16px;
       margin-right: 4px;
+    }
+
+    .filter-total {
+      font-weight: 600;
+    }
+
+    .filter-label {
+      order: -1;
+      flex-basis: 100%;
+      margin-bottom: 4px;
+    }
+
+    &.general {
+      chef-icon {
+        color: #212334;
+      }
+    }
+
+    &.critical {
+      chef-icon {
+        color: chef-hsl(var(--chef-critical));
+      }
+    }
+
+    &.warning {
+      chef-icon {
+        color: chef-hsl(var(--chef-primary));
+      }
+    }
+
+    &.success {
+      chef-icon {
+        color: chef-hsl(var(--chef-success));
+      }
+    }
+
+    &.unknown {
+      chef-icon {
+        color: chef-hsl(var(--chef-dark-grey));
+      }
     }
 
     &.selected {
@@ -186,4 +129,28 @@ chef-status-filter-group {
       }
     }
   }
+
+  &[lean] {
+    flex-wrap: wrap;
+
+    .filter {
+      margin-bottom: 8px;
+
+      &:not(:last-child) {
+        margin-right: 8px;
+      }
+
+      .option-content {
+        flex-wrap: nowrap;
+        min-width: auto;
+      }
+
+      .filter-label {
+        order: 0;
+        flex-basis: auto;
+        margin: 0 8px 0 0;
+      }
+    }
+  }
 }
+
