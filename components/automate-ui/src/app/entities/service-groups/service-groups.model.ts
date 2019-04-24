@@ -1,6 +1,6 @@
 import { RollupServiceStatus, SortDirection  } from '../../types/types';
 
-export interface ServiceGroupHealthSummary {
+export interface HealthSummary {
   total: number;
   ok: number;
   warning: number;
@@ -25,7 +25,7 @@ export interface ServiceGroup {
   release: string;
   status: string;
   health_percentage: boolean;
-  services_health_counts: ServiceGroupHealthSummary;
+  services_health_counts: HealthSummary;
 }
 
 export interface ServiceGroupFilters {
@@ -44,6 +44,7 @@ export interface ServicesFilters {
 export interface ServicesPayload {
   group: string;
   services: Service[];
+  services_health_counts: HealthSummary;
 }
 
 export interface ServiceGroupsPayload {

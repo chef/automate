@@ -43,7 +43,40 @@ ORDER BY %s %s
 LIMIT $1
 OFFSET $2
 `
+
+	selectServicesHealthCounts = `
+SELECT COUNT(*) AS total
+  , COUNT(*) FILTER (WHERE s.health = 'CRITICAL') AS critical
+  , COUNT(*) FILTER (WHERE s.health = 'UNKNOWN') AS unknown
+  , COUNT(*) FILTER (WHERE s.health = 'WARNING') AS warning
+  , COUNT(*) FILTER (WHERE s.health = 'OK') AS ok
+FROM service AS s
+ %s
+`
 )
+
+// GetServicesHealthCounts retrieves the health counts from all services in the database.
+// This function accepts a set of filters that can be applied to the SQL query to get the
+// health counts of a subset of the services in the database
+func (db *postgres) GetServicesHealthCounts(filters map[string][]string) (*storage.HealthCounts, error) {
+	var (
+		sHealthCounts         storage.HealthCounts
+		WhereConstraints, err = buildWhereConstraintsFromFilters(filters)
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Formatting our Query with where constraints
+	formattedQuery := fmt.Sprintf(selectServicesHealthCounts, WhereConstraints)
+
+	err = db.SelectOne(&sHealthCounts, formattedQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sHealthCounts, nil
+}
 
 // GetServices returns a list of services
 func (db *postgres) GetServices(
