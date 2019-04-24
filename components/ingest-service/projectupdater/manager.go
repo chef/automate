@@ -104,8 +104,10 @@ func (manager *Manager) Start(projectUpdateID string) {
 	updateFunc := func(stage stage) stage {
 		switch stage.state {
 		case notRunningState:
+			// TODO store and run through past projectUpdateIDs to check for a match
 			if stage.projectUpdateID == projectUpdateID {
 				// Update has already completed with this project update ID
+				// Send a complete status
 				status := backend.JobStatus{
 					Completed:          true,
 					PercentageComplete: 1.0,
