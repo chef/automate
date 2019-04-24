@@ -28,6 +28,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.Port = w.Int32(4222)
 	c.V1.Sys.Service.GatewayPort = w.Int32(10148)
 	c.V1.Sys.Service.EnableNatsFeature = w.Bool(false)
+	c.V1.Sys.Service.DisableFrontendTls = w.Bool(false)
 	c.V1.Sys.Log.Level = w.String("info")
 	c.V1.Sys.Log.Format = w.String("text")
 	return c

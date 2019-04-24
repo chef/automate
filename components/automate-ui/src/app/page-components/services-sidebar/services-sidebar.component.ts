@@ -4,7 +4,9 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable } from 'rxjs';
 import { serviceGroupState } from '../../entities/service-groups/service-groups.selector';
 import { createSelector } from '@ngrx/store';
-import { Service, ServicesFilters } from '../../entities/service-groups/service-groups.model';
+import {
+  Service, ServicesFilters, HealthSummary
+} from '../../entities/service-groups/service-groups.model';
 import { UpdateSelectedSG } from '../../entities/service-groups/service-groups.actions';
 
 @Component({
@@ -21,10 +23,10 @@ export class ServicesSidebarComponent implements OnInit {
   public selectedHealth: string;
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
-  currentPage = 1;
-  pageSize = 25;
-  // TODO: Wire this up with real total
-  totalServices = 50;
+  public currentPage = 1;
+  public pageSize = 25;
+  public totalServices = 0;
+  public servicesHealthSummary$: Observable<HealthSummary>;
 
   constructor(private store: Store<NgrxStateAtom>) { }
 
@@ -35,7 +37,12 @@ export class ServicesSidebarComponent implements OnInit {
     this.serviceGroupName$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.selectedServiceGroupName));
 
+    this.servicesHealthSummary$ = this.store.select(createSelector(serviceGroupState,
+      (state) => state.servicesHealthSummary));
+
     this.currentPage = 1;
+
+    this.servicesHealthSummary$.subscribe(heathSummary => this.totalServices = heathSummary.total);
   }
 
   public closeServicesSidebar() {

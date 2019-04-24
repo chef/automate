@@ -24,6 +24,10 @@ type NATSdConfigurator func(*natsd.Options) error
 // will work.
 func WithNATSFrontEndCerts(c *config.EventGatewayConfig) NATSdConfigurator {
 	return func(nopts *natsd.Options) error {
+		if c.Service.DisableFrontendTLS {
+			return nil
+		}
+
 		keyPairs := []tls.Certificate{}
 
 		for _, cert := range c.FrontendTLS {

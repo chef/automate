@@ -357,6 +357,9 @@ func init() {
           "items": {
             "$ref": "#/definitions/applicationsService"
           }
+        },
+        "services_health_counts": {
+          "$ref": "#/definitions/applicationsHealthCounts"
         }
       }
     },
