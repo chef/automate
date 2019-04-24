@@ -64,9 +64,7 @@ module CtlHelpers
       true
     rescue Errno::ENOENT => e
       raise CtlHelpers::Exceptions::ConfigurationError.new(
-        "Missing required configuration file '#{delivery_config_path}'",
-        "Please ensure that #{delivery_config_path} exists and that "\
-        "you have run 'automate-ctl reconfigure' before proceeding.")
+        "Missing required configuration file '#{delivery_config_path}'")
     rescue IOError => e
       raise CtlHelpers::Exceptions::ConfigurationError, e.message
     end

@@ -3,12 +3,13 @@ package server
 import (
 	"context"
 
+	"github.com/pkg/errors"
+	logs "github.com/sirupsen/logrus"
+
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/secrets-service/dao"
 	"github.com/chef/automate/components/secrets-service/utils"
 	"github.com/chef/automate/lib/grpc/health"
-	"github.com/pkg/errors"
-	logs "github.com/sirupsen/logrus"
 )
 
 // SecretsServer is the interface to this component.
@@ -64,7 +65,7 @@ func (ss *SecretsServer) Update(ctx context.Context, in *secrets.Secret) (*secre
 		return nil, utils.FormatErrorMsg(utils.ProcessInvalid(err, "updateSecretValidation: unable to validate secret"), in.Id)
 	}
 
-	_, err = ss.secretsDb.UpdateSecret(newSecret)
+	err = ss.secretsDb.UpdateSecret(newSecret)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, in.Id)
 	}

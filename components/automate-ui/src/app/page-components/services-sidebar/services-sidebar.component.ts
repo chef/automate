@@ -21,7 +21,7 @@ export class ServicesSidebarComponent implements OnInit {
   public selectedHealth: string;
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
-  currentPage = 1;
+  currentPage: number = 1;
   pageSize = 25;
   // TODO: Wire this up with real total
   totalServices = 50;
@@ -42,20 +42,20 @@ export class ServicesSidebarComponent implements OnInit {
     this.closeServicesSidebarEvent.emit(null);
   }
 
-  public updateServicesFilters(health: string, page?: number): void {
+  public updateServicesFilters(health: string): void {
     this.selectedHealth = health;
     const servicesFilters: ServicesFilters = {
       service_group_id: this.serviceGroupId,
       health: health,
-      page: page,
+      page: this.currentPage,
       pageSize: this.pageSize
     };
     this.store.dispatch(new UpdateSelectedSG(servicesFilters));
   }
 
-  updatePageNumber(pageNumber) {
+  updatePageNumber(pageNumber: number) {
     this.currentPage = pageNumber;
-    this.updateServicesFilters(this.selectedHealth, pageNumber);
+    this.updateServicesFilters(this.selectedHealth);
   }
 
   // healthCheckStatus returns the formated health_check status from the provided service

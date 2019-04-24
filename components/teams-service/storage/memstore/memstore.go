@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/chef/automate/components/teams-service/constants"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/postgres"
 	"github.com/chef/automate/lib/logger"
@@ -357,7 +358,7 @@ func projectsIntersect(ctx context.Context, team storage.Team) bool {
 
 	teamProjects := team.Projects
 	if len(teamProjects) == 0 {
-		teamProjects = []string{"(unassigned)"}
+		teamProjects = []string{constants.UnassignedProjectID}
 	}
 
 	for _, projectFilter := range projectsFilter {

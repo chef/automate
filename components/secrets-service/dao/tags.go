@@ -3,8 +3,9 @@ package dao
 import (
 	"encoding/json"
 
-	"github.com/chef/automate/api/external/secrets"
 	"github.com/pkg/errors"
+
+	"github.com/chef/automate/api/external/secrets"
 )
 
 type secretTag struct {
@@ -63,11 +64,13 @@ func KeyValueToRawMap(arr []*secrets.Kv) (json.RawMessage, error) {
 // RawMapToKeyValue helps convert an array of KeyValues in a Map and convert it to json
 func RawMapToKeyValue(rawJSON json.RawMessage) ([]*secrets.Kv, error) {
 	var zaMap map[string]string
-	var zaArray []*secrets.Kv
+
 	err := json.Unmarshal(rawJSON, &zaMap)
 	if err != nil {
-		return zaArray, errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map")
+		return nil, errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map")
 	}
+
+	zaArray := make([]*secrets.Kv, 0, len(zaMap))
 	for k, v := range zaMap {
 		zaArray = append(zaArray, &secrets.Kv{Key: k, Value: v})
 	}

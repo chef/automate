@@ -74,7 +74,7 @@ func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
 			action, resource, subjects)
 	}
 
-	projects := []string{}
+	projects := []string{auth_context.AllProjectsKey}
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV1.String()), nil
 }
 

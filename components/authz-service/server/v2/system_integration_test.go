@@ -63,9 +63,9 @@ func setupWithOPA(t *testing.T) testSetup {
 	o, err := opa.New(ctx, l)
 	require.NoError(t, err, "init OPA")
 
-	v2Chan := make(chan bool, 1)
+	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
-	ts := setupV2(t, o, o, &emptyV1List, v2Chan)
+	ts := setupV2(t, o, o, &emptyV1List, vChan)
 	_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
 	require.NoError(t, err)
 	return ts

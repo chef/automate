@@ -5,18 +5,16 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-)
 
-const (
-	UnassignedID = "(unassigned)"
+	constants "github.com/chef/automate/components/authz-service/constants/v2"
 )
 
 func ValidateProjects(projects []string) error {
 	for _, project := range projects {
-		if project == UnassignedID {
+		if project == constants.UnassignedProjectID {
 			return errors.Errorf("%q cannot explicitly be set. "+
 				"If you wish to create an object in %q, you should pass no projects on creation.",
-				UnassignedID, UnassignedID)
+				constants.UnassignedProjectID, constants.UnassignedProjectID)
 		}
 	}
 	return nil

@@ -54,65 +54,31 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 		"iam.version":   "iam_v2",
 	})
 
-	var projects []string
-	// TODO (TC) Needs feature flag work to be implemented before
-	// we can toggle between 2.0 and 2.1 aka enable projects AuthZ.
-
-	// if minorVersion == "0" {
-
 	// Note: if ANYTHING goes wrong, 403 is the error we return. This is done
 	// on purpose, so our authz response doesn't leak information about what
 	// is happening internally.
-	resp, err := c.client.IsAuthorized(ctx, &authz.IsAuthorizedReq{
-		Subjects: subjects,
-		Resource: resource,
-		Action:   action,
+	filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
+		Subjects:       subjects,
+		Resource:       resource,
+		Action:         action,
+		ProjectsFilter: projectsToFilter,
 	})
 	if err != nil {
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			return nil, err
 		}
+		// TODO bd: add projects back into error message once v2.1 is GA
 		log.WithError(err).Error("error authorizing request")
 		return nil, status.Errorf(codes.PermissionDenied,
 			"error authorizing action %q on resource %q for subjects %q: %s",
 			action, resource, subjects, err.Error())
 	}
-	if !resp.GetAuthorized() {
+	if len(filteredResp.Projects) == 0 {
 		return nil, status.Errorf(codes.PermissionDenied,
-			"unauthorized action %q on resource %q for subjects %q",
-			action, resource, subjects)
+			"unauthorized: subjects %q cannot perform action %q on resource %q",
+			subjects, action, resource)
 	}
-	// Projects are only relevant in v2.1
-	projects = []string{}
-
-	// } // TODO This should be an else instead of two `if`s but leaving as is for clarity for now.
-
-	// TODO (TC): This code should replace IsAuthorized call when in
-	// v2.1 mode. Need feature flag work to land first.
-	// if minorVersion == "1" {
-	// resp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
-	// 	Subjects:       subjects,
-	// 	Resource:       resource,
-	// 	Action:         action,
-	// 	ProjectsFilter: projectsToFilter,
-	// })
-	// if err != nil {
-	// 	if status.Convert(err).Code() == codes.FailedPrecondition {
-	// 		return nil, err
-	// 	}
-	// 	log.WithError(err).Error("error authorizing request")
-	// 	return nil, status.Errorf(codes.PermissionDenied,
-	// 		"error authorizing action %q on resource %q for subjects %q: %s",
-	// 		action, resource, subjects, err.Error())
-	// }
-	// if len(resp.Projects) == 0 {
-	// 	return nil, status.Errorf(codes.PermissionDenied,
-	// 		"unauthorized: subjects %q has no project access for action %q on resource %q "+
-	// 			"(filtered by project list %q)",
-	// 		action, resource, subjects, projectsToFilter)
-	// }
-	// projects = resp.Projects
-	// }
+	projects := filteredResp.Projects
 
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()), nil
 }

@@ -111,9 +111,9 @@ func (p *postgres) getTeam(ctx context.Context, q querier, teamID uuid.UUID) (st
 	var t storage.Team
 	err := q.QueryRowContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
-	    FROM teams t WHERE t.id=$1`, teamID).Scan(
-		&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects),
-		&t.CreatedAt, &t.UpdatedAt)
+		FROM teams t
+		WHERE t.id=$1`, teamID).
+		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -124,8 +124,8 @@ func (p *postgres) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Te
 	var t storage.Team
 	err := p.db.QueryRowContext(ctx,
 		`DELETE FROM teams WHERE id=$1
-		RETURNING id, name, description, projects, created_at, updated_at`,
-		teamID).Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
+		RETURNING id, name, description, projects, created_at, updated_at`, teamID).
+		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -141,11 +141,11 @@ func (p *postgres) DeleteTeamByName(ctx context.Context, teamName string) (stora
 
 	var t storage.Team
 	err = p.db.QueryRowContext(ctx,
-		`DELETE FROM teams t WHERE t.name=$1 AND projects_match(t.projects, $2::TEXT[])
-			RETURNING t.id, t.name, t.description, t.projects, t.created_at, t.updated_at`,
-		teamName, pq.Array(projectsFilter)).Scan(
-		&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt,
-	)
+		`DELETE FROM teams t
+		WHERE t.name=$1 AND projects_match(t.projects, $2::TEXT[])
+		RETURNING t.id, t.name, t.description, t.projects, t.created_at, t.updated_at`,
+		teamName, pq.Array(projectsFilter)).
+		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
@@ -189,8 +189,8 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 	}
 
 	err = p.db.QueryRowContext(ctx,
-		`UPDATE teams t SET
-			description = $2, projects = $3, updated_at = now()
+		`UPDATE teams t
+		SET description = $2, projects = $3, updated_at = now()
 		WHERE t.name = $1 AND projects_match(t.projects, $4::TEXT[])
 		RETURNING id, name, projects, description, created_at, updated_at;`,
 		teamName, teamDescription, pq.Array(teamProjects), pq.Array(projectsFilter)).
@@ -212,7 +212,9 @@ func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 	var teams []storage.Team
 	// TODO eventually these should be ordered
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at FROM teams t WHERE projects_match(t.projects, $1::TEXT[])`,
+		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
+		FROM teams t
+		WHERE projects_match(t.projects, $1::TEXT[])`,
 		pq.Array(projectsFilter))
 
 	if err != nil {
@@ -292,7 +294,8 @@ func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.
 	var t storage.Team
 	err = p.db.QueryRowContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
-			FROM teams t WHERE t.name = $1 AND projects_match(t.projects, $2::TEXT[]);`,
+		FROM teams t
+		WHERE t.name = $1 AND projects_match(t.projects, $2::TEXT[]);`,
 		teamName, pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
@@ -431,10 +434,11 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 
 	teams := []storage.Team{}
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT t.id, t.name, t.description, t.projects, t.created_at, t.updated_at FROM teams t
-			LEFT JOIN teams_users_associations tu ON tu.team_id=t.id
-			WHERE tu.user_id=$1 AND projects_match(t.projects, $2::TEXT[])
-			GROUP BY t.id`,
+		`SELECT t.id, t.name, t.description, t.projects, t.created_at, t.updated_at
+		FROM teams t
+		LEFT JOIN teams_users_associations tu ON tu.team_id=t.id
+		WHERE tu.user_id=$1 AND projects_match(t.projects, $2::TEXT[])
+		GROUP BY t.id`,
 		userID, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)

@@ -9,9 +9,10 @@
     [disabled]="disabled"
     (keydown.arrowup)="moveFocus($event)"
     (keydown.arrowdown)="moveFocus($event)">
-    Select projects... <chef-icon aria-hidden>keyboard_arrow_down</chef-icon>
+    <div id="projects-selected">{{ (label.length &gt; 25)? (label | slice:0:25)+'...' : label }}</div>
+    <chef-icon aria-hidden>keyboard_arrow_down</chef-icon>
   </button>
-  <chef-click-outside omit="column-dropdown-toggle" (clickOutside)="closeColumnDropdown()">
+  <chef-click-outside (clickOutside)="closeDropdown()">
     <chef-dropdown [attr.visible]="active">
       <chef-checkbox
         *ngFor="let project of projects; index as i"

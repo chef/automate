@@ -30,6 +30,13 @@ then run `npm start` to run a live-reload server at `http://localhost:3333`
 npm start
 ```
 
+## Developing inside the Habitat Studio
+
+Enter the habitat studio `hab studio enter` and then, run the helper method `start_chef_ui_library`.
+This will start the live-reload server at `http://localhost:3334` (Note that this is a different port
+from the default used for local development outside the studio) that will watch for any modification
+to the chef-ui-library. Run `ui_logs` to see how the chef-ui-library builds.
+
 ## Developing against Automate UI and the Hab Studio
 
 Please see the extensive "getting started" docs for developing against the
