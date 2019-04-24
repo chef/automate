@@ -202,6 +202,7 @@ habitat_packages:
         - components/notifications-client/*
         - components/secrets-service/*
         - components/trial-license-service/*
+        - lib/config/*
         - lib/db/*
         - lib/grpc/*
         - lib/io/*
@@ -246,6 +247,7 @@ habitat_packages:
         - components/notifications-client/*
         - components/secrets-service/*
         - lib/authz/*
+        - lib/config/*
         - lib/db/*
         - lib/event/*
         - lib/grpc/*
@@ -568,6 +570,7 @@ habitat_packages:
         - components/compliance-service/*
         - components/event-service/*
         - lib/authz/*
+        - lib/config/*
         - lib/event/*
         - lib/grpc/*
         - lib/io/*

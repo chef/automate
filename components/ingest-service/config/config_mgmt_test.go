@@ -17,7 +17,7 @@ func init() {
 }
 
 func TestManagerNewDefaultConfig(t *testing.T) {
-	config := subject.NewManager()
+	config := subject.NewManager("")
 
 	// Only three jobs configured
 	assert.Equal(t, 3, len(config.GetJobsID()))
@@ -27,7 +27,7 @@ func TestManagerNewDefaultConfig(t *testing.T) {
 }
 
 func TestManagerGetJobConfigThatExists(t *testing.T) {
-	config := subject.NewManager()
+	config := subject.NewManager("")
 	jConfig := config.GetJobConfig(subject.DeleteNodes)
 	assert.Equal(t, config.GetDeleteNodesSchedulerConfig(), jConfig, "should return the 'delete_nodes' job config")
 
@@ -65,7 +65,7 @@ func TestManagerConfigFileExists(t *testing.T) {
 	assert.Nil(t, err)
 
 	// New config should load the file
-	config := subject.NewManager()
+	config := subject.NewManager("")
 	schedulerConfig := config.GetJobSchedulerConfig()
 	assert.Equal(t, false, schedulerConfig.Running, "the scheduler should not be running")
 }
@@ -91,7 +91,7 @@ threshold = "1d"
 	assert.Nil(t, err)
 
 	// When the file is corrupt, we log out the failure and use the default config
-	config := subject.NewManager()
+	config := subject.NewManager("")
 	schedulerConfig := config.GetJobSchedulerConfig()
 	assert.Equal(t, true, schedulerConfig.Running, "the scheduler should be running by default")
 }
@@ -102,7 +102,7 @@ func TestManagerWriteConfigOnUpdatesAndLoadChanges(t *testing.T) {
 
 	// Default config
 	var (
-		config                 = subject.NewManager()
+		config                 = subject.NewManager("")
 		deleteNodesConfig      = config.GetDeleteNodesSchedulerConfig()
 		nodesMissingConfig     = config.GetNodesMissingSchedulerConfig()
 		missingNodes4DelConfig = config.GetMissingNodesForDeletionSchedulerConfig()
@@ -121,7 +121,7 @@ func TestManagerWriteConfigOnUpdatesAndLoadChanges(t *testing.T) {
 	assert.Nil(t, err, "config file should exist")
 
 	// Create a new Manager config that should load the config automatically
-	newConfig := subject.NewManager()
+	newConfig := subject.NewManager("")
 	assertEqualManagerConfigs(t, newConfig, config)
 
 	// Finally check that the object was updated
@@ -133,7 +133,7 @@ func TestManagerWriteConfigOnUpdatesAndLoadChanges(t *testing.T) {
 
 func TestManagerWriteConfigThreadSafe(t *testing.T) {
 	// default config
-	config := subject.NewManager()
+	config := subject.NewManager("")
 
 	// Lets use this job to send multiple updates
 	jConfig := config.GetDeleteNodesSchedulerConfig()
@@ -153,7 +153,7 @@ func TestManagerWriteConfigThreadSafe(t *testing.T) {
 	assert.Equal(t, jConfig, newJobConfig, "jobs should match")
 
 	// Create a new Manager config that should load the config automatically
-	newConfig := subject.NewManager()
+	newConfig := subject.NewManager("")
 	assertEqualManagerConfigs(t, newConfig, config)
 }
 

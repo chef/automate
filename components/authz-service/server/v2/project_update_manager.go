@@ -216,7 +216,10 @@ func (manager *ProjectUpdateManager) ProcessFailEvent(
 		domainService.failureMessage = failureMessage
 		domainService.failed = true
 		domainService.lastUpdate = time.Now()
-		manager.cancelProjectUpdateForDomainResources()
+		err = manager.cancelProjectUpdateForDomainResources()
+		if err != nil {
+			return err
+		}
 	default:
 	}
 
@@ -374,7 +377,10 @@ func (manager *ProjectUpdateManager) checkForMissingDomainServices() {
 			// This domain service as not checked in within a minute
 			// Send another start event
 			log.Info("resending project update start event")
-			manager.startProjectUpdateForDomainResources(manager.projectUpdateID)
+			err := manager.startProjectUpdateForDomainResources(manager.projectUpdateID)
+			if err != nil {
+				log.Errorf("Starting Project Update for domain resources. %v", err)
+			}
 		}
 	}
 }

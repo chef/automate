@@ -10,6 +10,7 @@ import (
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/ingest/server"
@@ -36,6 +37,7 @@ type Suite struct {
 	NodeManagerMock        *NodeManagerMock
 	NotifierMock           *NotifierMock
 	EventServiceClientMock *event.MockEventServiceClient
+	ConfigManager          *config.ConfigManager
 }
 
 // Initialize the test suite
@@ -68,9 +70,11 @@ func NewGlobalSuite() *Suite {
 	s.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&event.PublishResponse{}, nil)
 
+	s.ConfigManager = config.NewConfigManager("")
+
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, "", s.NotifierMock,
-		s.ProjectsClientMock, s.EventServiceClientMock)
+		s.ProjectsClientMock, s.EventServiceClientMock, s.ConfigManager)
 
 	return s
 }
@@ -96,10 +100,11 @@ func NewLocalSuite(t *testing.T) *Suite {
 	s.NodeManagerMock = &NodeManagerMock{}
 	s.NotifierMock = &NotifierMock{}
 	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
+	s.ConfigManager = config.NewConfigManager("")
 
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, "", s.NotifierMock,
-		s.ProjectsClientMock, s.EventServiceClientMock)
+		s.ProjectsClientMock, s.EventServiceClientMock, s.ConfigManager)
 
 	return s
 }
