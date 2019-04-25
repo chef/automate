@@ -115,6 +115,7 @@
                 <p class="node-name">
                   <strong>{{ node.name }}</strong>
                 </p>
+                <p>{{formatDaysAgo(node.latest_report.end_time)}}</p>
               </div>
               <chef-button secondary (click)="onNodeSelected(node)">
                 <chef-icon>add</chef-icon>
