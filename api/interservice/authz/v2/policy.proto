@@ -74,7 +74,7 @@ message Statement {
         unique: true,
         items: {
             string: {
-                pattern: "^[*]$|^[a-z0-9-]{1,64}$"
+                pattern: "^[*]$|^\\(unassigned\\)$|^[a-z0-9-]{1,64}$"
             }
         }
        }];

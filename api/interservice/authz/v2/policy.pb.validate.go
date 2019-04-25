@@ -552,7 +552,7 @@ func (m *Statement) Validate() error {
 		if !_Statement_Projects_Pattern.MatchString(item) {
 			return StatementValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[*]$|^[a-z0-9-]{1,64}$\"",
+				reason: "value does not match regex pattern \"^[*]$|^\\\\(unassigned\\\\)$|^[a-z0-9-]{1,64}$\"",
 			}
 		}
 
@@ -621,7 +621,7 @@ var _Statement_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-Z]*$
 
 var _Statement_Role_Pattern = regexp.MustCompile("$^|^[a-z0-9-]{1,64}$")
 
-var _Statement_Projects_Pattern = regexp.MustCompile("^[*]$|^[a-z0-9-]{1,64}$")
+var _Statement_Projects_Pattern = regexp.MustCompile("^[*]$|^\\(unassigned\\)$|^[a-z0-9-]{1,64}$")
 
 // Validate checks the field values on ListPoliciesReq with the rules defined
 // in the proto definition for this message. If any rules are violated, an
