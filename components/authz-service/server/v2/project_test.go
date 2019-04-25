@@ -140,7 +140,7 @@ func TestCreateProject(t *testing.T) {
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
 			assert.Nil(t, resp)
 		}},
-		{"does not create project if max projects allow surpassed", func(t *testing.T) {
+		{"does not create project if max projects surpassed", func(t *testing.T) {
 			for i := 1; i <= constants.MaxProjects+len(storage.DefaultProjectIDs()); i++ {
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := &api.CreateProjectReq{

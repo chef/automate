@@ -25,7 +25,7 @@ var (
 	// ErrForeignKey occurs, among other times, when attempting to insert a foreign key whose referent does not exist
 	ErrForeignKey = errors.New("foreign key violation")
 
-	// ErrNonDeletableTeams indicates that a new project cannot be created
+	// ErrMaxProjectsAllowed indicates that a new project cannot be created
 	// since the max allowed are already created.
 	ErrMaxProjectsAllowed = errors.New("max projects allowed")
 )
