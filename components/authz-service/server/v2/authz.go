@@ -90,7 +90,7 @@ func (s *authzServer) ProjectsAuthorized(
 		projects = resp.Projects
 	}
 
-	// this call returns allowed projects that are not overriden by deny
+	// this call returns allowed projects that are not overridden by deny
 	projectsAuthorized, err := s.engine.V2ProjectsAuthorized(ctx,
 		engine.Subjects(req.Subjects),
 		engine.Action(req.Action),

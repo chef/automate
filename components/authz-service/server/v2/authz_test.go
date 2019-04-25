@@ -79,10 +79,10 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 				[]string{},    // no projects
 				[]string(nil), // well, almost verbatim
 			},
-			"when the request includes SOME projects and the engine response is ALL projects, returns the requested projects": {
+			"when the request includes SOME projects and the engine response is ALL projects, returns external ALL projects": {
 				[]string{"p1", "p2", "p3"},
 				[]string{constants.AllProjectsID, "p3"},
-				[]string{"p1", "p2", "p3"},
+				[]string{constants.AllProjectsExternalID},
 			},
 			"when the request includes ALL projects and the engine response is ALL projects, returns external ALL projects": {
 				[]string{},
@@ -218,7 +218,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 				Pairs:    []*api_v2.Pair{},
 			})
 		require.NoError(t, err)
-		assert.Equal(t, allProjects, resp.Projects)
+		assert.ElementsMatch(t, allProjects, resp.Projects)
 	})
 }
 
