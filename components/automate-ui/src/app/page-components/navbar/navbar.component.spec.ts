@@ -16,6 +16,7 @@ describe('NavbarComponent', () => {
       declarations: [
         NavbarComponent,
         MockComponent({ selector: 'app-profile' }),
+        MockComponent({ selector: 'app-projects-filter' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-tooltip' }),
         MockComponent({ selector: 'app-authorized',
@@ -57,7 +58,14 @@ describe('NavbarComponent', () => {
     });
   });
 
-  it('should display the profile dropdown', () => {
+  it('displays the projects filter', () => {
+    element = fixture.nativeElement;
+    fixture.detectChanges();
+
+    expect(element.querySelector('app-projects-filter')).not.toBeNull();
+  });
+
+  it('displays the profile dropdown', () => {
     element = fixture.nativeElement;
     fixture.detectChanges();
 
