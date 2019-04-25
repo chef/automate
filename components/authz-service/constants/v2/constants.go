@@ -45,3 +45,8 @@ const (
 	AllProjectsExternalID = "*"
 	UnassignedProjectID   = "(unassigned)"
 )
+
+// Busniess logic constants
+const (
+	MaxProjects = 6
+)

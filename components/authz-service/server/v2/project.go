@@ -11,8 +11,13 @@ import (
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 
+	"github.com/golang/protobuf/ptypes"
+	tspb "github.com/golang/protobuf/ptypes/timestamp"
+	log "github.com/sirupsen/logrus"
+
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
+	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -21,9 +26,6 @@ import (
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 	event "github.com/chef/automate/components/event-service/server"
-	"github.com/golang/protobuf/ptypes"
-	tspb "github.com/golang/protobuf/ptypes/timestamp"
-	log "github.com/sirupsen/logrus"
 )
 
 // state the server state for projects
@@ -108,6 +110,10 @@ func (s *state) CreateProject(ctx context.Context,
 	if err != nil {
 		if err == storage_errors.ErrConflict {
 			return nil, status.Errorf(codes.AlreadyExists, "project with ID %q already exists", req.Id)
+		} else if err == storage_errors.ErrMaxProjectsAllowed {
+			return nil, status.Errorf(codes.FailedPrecondition,
+				"while IAM V2 beta is in progress, there is a max project count of %d: "+
+					"you must delete a project before you can add another one", v2_constants.MaxProjects)
 		}
 		return nil, status.Errorf(codes.Internal,
 			"error retrieving project with ID %q: %s", req.Id, err.Error())
