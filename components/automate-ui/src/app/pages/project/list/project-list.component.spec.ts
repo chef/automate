@@ -30,7 +30,7 @@ describe('ProjectListComponent', () => {
         }),
          MockComponent({
           selector: 'app-authorized',
-          inputs: ['allOf'],
+          inputs: ['allOf', 'not'],
           template: '<ng-content></ng-content>'
         }),
         MockComponent({ selector: 'app-admin-sidebar' }),
@@ -74,7 +74,27 @@ describe('ProjectListComponent', () => {
     }).compileComponents();
   }));
 
+  let store: Store<NgrxStateAtom>;
   beforeEach(() => {
+    store = TestBed.get(Store);
+
+    store.dispatch(new GetProjectsSuccess({
+      projects: [
+        {
+          id: 'uuid-1', name: 'Default',
+          type: <IAMType>'CHEF_MANAGED'
+        },
+        {
+          id: 'uuid-2', name: 'another-project',
+          type: <IAMType>'CUSTOM'
+        },
+        {
+          id: 'uuid-5', name: 'zzz-project',
+          type: <IAMType>'CUSTOM'
+        }
+      ]
+    }));
+
     jasmine.addMatchers(customMatchers);
     fixture = TestBed.createComponent(ProjectListComponent);
     component = fixture.componentInstance;
@@ -82,50 +102,65 @@ describe('ProjectListComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should be created', () => {
-    expect(component).toBeTruthy();
+  describe('when there are no projects', () => {
   });
 
-  it('displays project data for v2', () => {
-    component.iamMajorVersion$ = observableOf('v2');
-    component.iamMinorVersion$ = observableOf('v1');
-    fixture.detectChanges();
-    expect(element).toContainPath('chef-table');
-  });
-
-  it('does not display project data for v1', () => {
-    component.iamMajorVersion$ = observableOf('v1');
-    component.iamMinorVersion$ = observableOf('v0');
-    fixture.detectChanges();
-    expect(element).not.toContainPath('chef-table');
-  });
-
-  describe('create modal', () => {
-    it('create modal opens upon clicking create button', () => {
-      component.iamMajorVersion$ = observableOf('v2');
-      component.iamMinorVersion$ = observableOf('v1');
-      fixture.detectChanges();
-      expect(component.createModalVisible).toBe(false);
-      (<HTMLButtonElement>(element.querySelector('#create-button'))).click();
-      expect(component.createModalVisible).toBe(true);
+  describe('when there are projects', () => {
+    beforeEach(() => {
+      store.dispatch(new GetProjectsSuccess({
+        projects: [
+          {
+            id: 'uuid-1', name: 'Default',
+            type: <IAMType>'CHEF_MANAGED'
+          },
+          {
+            id: 'uuid-2', name: 'another-project',
+            type: <IAMType>'CUSTOM'
+          },
+          {
+            id: 'uuid-5', name: 'zzz-project',
+            type: <IAMType>'CUSTOM'
+          }
+        ]
+      }));
     });
 
-    it('opening create modal resets name to empty string', () => {
+    it('displays project data for v2', () => {
       component.iamMajorVersion$ = observableOf('v2');
       component.iamMinorVersion$ = observableOf('v1');
       fixture.detectChanges();
-      component.createProjectForm.controls['name'].setValue('any');
-      (<HTMLButtonElement>(element.querySelector('#create-button'))).click();
-      expect(component.createProjectForm.controls['name'].value).toBe(null);
+      expect(element).toContainPath('chef-table');
+    });
+
+    it('does not display project data for v1', () => {
+      component.iamMajorVersion$ = observableOf('v1');
+      component.iamMinorVersion$ = observableOf('v0');
+      fixture.detectChanges();
+      expect(element).not.toContainPath('chef-table');
+    });
+
+    describe('create modal', () => {
+      it('create modal opens upon clicking create button', () => {
+        component.iamMajorVersion$ = observableOf('v2');
+        component.iamMinorVersion$ = observableOf('v1');
+        fixture.detectChanges();
+        expect(component.createModalVisible).toBe(false);
+        (<HTMLButtonElement>(element.querySelector('#create-button'))).click();
+        expect(component.createModalVisible).toBe(true);
+      });
+
+      it('opening create modal resets name to empty string', () => {
+        component.iamMajorVersion$ = observableOf('v2');
+        component.iamMinorVersion$ = observableOf('v1');
+        fixture.detectChanges();
+        component.createProjectForm.controls['name'].setValue('any');
+        (<HTMLButtonElement>(element.querySelector('#create-button'))).click();
+        expect(component.createProjectForm.controls['name'].value).toBe(null);
+      });
     });
   });
 
   describe('sortedProject$', () => {
-    let store: Store<NgrxStateAtom>;
-    beforeEach(() => {
-      store = TestBed.get(Store);
-    });
-
     it('intermixes capitals and lowercase with lowercase first', () => {
       store.dispatch(new GetProjectsSuccess({
         projects: [
