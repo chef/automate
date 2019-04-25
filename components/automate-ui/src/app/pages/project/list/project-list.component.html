@@ -56,7 +56,7 @@
               <chef-button primary (click)="openCreateModal()">Create Project</chef-button>
           </div>
         </app-authorized>
-        <app-authorized [allOf]="['/iam/v2beta/projects', 'post']" [notAuthorized]="true">
+        <app-authorized not [allOf]="['/iam/v2beta/projects', 'post']">
           <div class="empty-case-container">
             <h1>It looks like no one has created any projects yet and you<br/>
               don't have permission to create them.<br/><br/>

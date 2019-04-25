@@ -38,10 +38,8 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
     this._anyOf = this.normalizeInput(val);
   }
 
-  // Set to true if you wish the component to be visible
-  // when the authroization check fails.
-  @Input() notAuthorized?: boolean;
-
+  // Include the bare `not` attribute in your HTML element to negate the check.
+  @Input() not?: boolean;
 
   // If you wish to override the permissions check and set content to visible anyway.
   // Defaults to false. Useful when trying to generalize components that contain
@@ -68,13 +66,9 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
       filter(perms => !isEmpty(perms)))
       .subscribe(perms => {
         const oldVisible = this.visible;
-        let newVisible: boolean;
-        if (this.notAuthorized === undefined || this.notAuthorized === false) {
-          newVisible = this.authorizedChecker.evalPerms(perms);
-        } else { // notAuthorized was set to true, take the inverse result of authorizedChecker
-          newVisible = !this.authorizedChecker.evalPerms(perms);
-        }
-        this.visible = newVisible;
+        const newVisible = this.authorizedChecker.evalPerms(perms);
+        this.visible = this.not === undefined ? newVisible : !newVisible;
+
         // Allow this component to receive updates on pages with "OnPush" strategy.
         if (oldVisible !== this.visible) {
           this.cdr.detectChanges();
