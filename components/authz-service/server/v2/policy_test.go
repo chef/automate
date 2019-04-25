@@ -21,6 +21,7 @@ import (
 	uuid "github.com/chef/automate/lib/uuid4"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/components/authz-service/config"
 	constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
@@ -2849,7 +2850,8 @@ func setupV2(t *testing.T,
 	require.NoError(t, err)
 
 	eventServiceClient := &mockEventServiceClient{}
-	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testProjectRulesRetriever{}, eventServiceClient)
+	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
+		&testProjectRulesRetriever{}, eventServiceClient, config.NewManager(""))
 	require.NoError(t, err)
 
 	authzV2, err := v2.NewAuthzServer(l, authorizer)

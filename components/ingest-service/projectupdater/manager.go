@@ -34,7 +34,7 @@ type stage struct {
 
 // Manager - project update manager
 type Manager struct {
-	// stage should only be updated by using the 'send' function
+	// stage should only be updated by using the 'updateStage' function
 	stage                 stage
 	percentageComplete    float32
 	estimatedEndTimeInSec int64
@@ -62,46 +62,41 @@ func NewManager(client backend.Client, authzProjectsClient iam_v2.ProjectsClient
 	}
 
 	// Single goroutine that updates the stage data
-	go func() {
-		for update := range updateQueue {
-			stage := update(manager.stage)
-
-			manager.stage = stage
-		}
-	}()
+	go manager.stageUpdater(updateQueue)
 
 	manager.resumePreviousState()
 	return manager
 }
 
 // Cancel - stop any running job
+// Action
 func (manager *Manager) Cancel(projectUpdateID string) {
-	updateFunc := func(stage stage) stage {
-		switch stage.state {
+	manager.updateStage(func(stage stage) stage {
+		switch manager.stage.state {
 		case notRunningState:
 			// do nothing job is not running
 		case runningState:
-			if stage.projectUpdateID == projectUpdateID {
-				logrus.Debugf("Cancelling project tag update for ID %q elasticsearch task ID %q",
-					stage.projectUpdateID, stage.esJobID)
-				manager.client.JobCancel(context.Background(), stage.esJobID)
-			} else {
+			if manager.stage.projectUpdateID != projectUpdateID {
 				// do nothing because the requested project update job is not running
+				return stage
 			}
+			logrus.Debugf("Cancelling project tag update for ID %q elasticsearch task ID %q",
+				manager.stage.projectUpdateID, manager.stage.esJobID)
+			manager.client.JobCancel(context.Background(), manager.stage.esJobID)
 		default:
 			// error state not found
 			manager.sendFailedEvent(fmt.Sprintf(
-				"Internal error state %q eventID %q", stage.state, stage.projectUpdateID))
+				"Internal error state %q eventID %q", manager.stage.state, manager.stage.projectUpdateID))
 		}
-		return stage
-	}
 
-	manager.send(updateFunc)
+		return stage
+	})
 }
 
 // Start - start a project update
+// Action
 func (manager *Manager) Start(projectUpdateID string) {
-	updateFunc := func(stage stage) stage {
+	manager.updateStage(func(stage stage) stage {
 		switch stage.state {
 		case notRunningState:
 			// TODO store and run through past projectUpdateIDs to check for a match
@@ -122,10 +117,9 @@ func (manager *Manager) Start(projectUpdateID string) {
 					manager.sendFailedEvent(fmt.Sprintf(
 						"Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID))
 				} else {
-					stage.esJobID = esJobID // Store the job ID and event ID
+					stage.esJobID = esJobID
 					stage.projectUpdateID = projectUpdateID
 					stage.state = runningState
-					manager.saveState(stage)
 					go manager.waitingForJobToComplete()
 				}
 			}
@@ -142,8 +136,7 @@ func (manager *Manager) Start(projectUpdateID string) {
 				"Internal error state %q eventID %q", stage.state, stage.projectUpdateID))
 		}
 		return stage
-	}
-	manager.send(updateFunc)
+	})
 }
 
 // PercentageComplete - percentage of the job complete
@@ -273,30 +266,26 @@ func (manager *Manager) saveState(stage stage) {
 }
 
 func (manager *Manager) failedJob(errMsg string) {
-	updateFunc := func(stage stage) stage {
+	manager.updateStage(func(stage stage) stage {
 		manager.percentageComplete = 1.0
 		manager.estimatedEndTimeInSec = 0
 		manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times; error message %q",
 			manager.stage.esJobID, maxNumberOfConsecutiveFails, errMsg))
 
 		stage.state = notRunningState
-		manager.saveState(stage)
 
 		return stage
-	}
-	manager.send(updateFunc)
+	})
 }
 
 func (manager *Manager) completeJob() {
-	updateFunc := func(stage stage) stage {
+	manager.updateStage(func(stage stage) stage {
 		manager.percentageComplete = 1.0
 		manager.estimatedEndTimeInSec = 0
 		stage.state = notRunningState
-		manager.saveState(stage)
 
 		return stage
-	}
-	manager.send(updateFunc)
+	})
 }
 
 // publish a project update failed event
@@ -388,6 +377,33 @@ func createEventUUID() string {
 	return uuid.String()
 }
 
-func (manager *Manager) send(updateFunc func(stage) stage) {
+func (manager *Manager) stageUpdater(updateQueue <-chan func(stage) stage) {
+	for update := range updateQueue {
+		stage := update(manager.stage)
+
+		if !stage.equal(manager.stage) {
+			manager.saveState(stage)
+			manager.stage = stage
+		}
+	}
+}
+
+func (manager *Manager) updateStage(updateFunc func(stage) stage) {
 	manager.updateQueue <- updateFunc
+}
+
+func (stage1 stage) equal(stage2 stage) bool {
+	if stage1.state != stage2.state {
+		return false
+	}
+
+	if stage1.projectUpdateID != stage2.projectUpdateID {
+		return false
+	}
+
+	if stage1.esJobID != stage2.esJobID {
+		return false
+	}
+
+	return true
 }

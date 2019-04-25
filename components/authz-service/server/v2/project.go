@@ -168,8 +168,8 @@ func (s *state) ProjectUpdateStatus(ctx context.Context,
 		State:                  s.projectUpdateManager.State(),
 		PercentageComplete:     float32(s.projectUpdateManager.PercentageComplete()),
 		EstimatedTimeCompelete: time,
-		Failed:                 s.projectUpdateManager.UpdateFailed(),
-		FailureMessages:        s.projectUpdateManager.FailureMessages(),
+		Failed:                 s.projectUpdateManager.Failed(),
+		FailureMessage:         s.projectUpdateManager.FailureMessage(),
 	}, nil
 }
 

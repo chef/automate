@@ -5,6 +5,7 @@ import (
 	"time"
 
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/authz-service/config"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	project_update_tags "github.com/chef/automate/lib/authz"
@@ -25,9 +26,9 @@ func TestProjectUpdateManagerOneUpdateRunningAtATime(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient)
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
 
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	assert.Equal(t, config.NotRunningState, manager.State())
 
 	originalNumberOfPublishedEvents := numberOfPublishedEvents
 
@@ -36,7 +37,7 @@ func TestProjectUpdateManagerOneUpdateRunningAtATime(t *testing.T) {
 
 	assert.Equal(t, originalNumberOfPublishedEvents+1, numberOfPublishedEvents)
 	assert.Equal(t, automate_event_type.ProjectRulesUpdate, lastestPublishedEvent.Type.Name)
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 
 	// Starting a second update without finishing the first one should return an error.
 	err = manager.Start()
@@ -45,7 +46,7 @@ func TestProjectUpdateManagerOneUpdateRunningAtATime(t *testing.T) {
 	// No extra events were published
 	assert.Equal(t, originalNumberOfPublishedEvents+1, numberOfPublishedEvents)
 
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 }
 
 func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
@@ -56,12 +57,12 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient)
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	assert.Equal(t, config.NotRunningState, manager.State())
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 
 	eventData := lastestPublishedEvent.Data
 
@@ -73,7 +74,7 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
 
-	manager.ProcessStatusMessage(infraStatusEvent)
+	manager.ProcessStatusEvent(infraStatusEvent)
 
 	complianceStatusEvent := createStatusEventMsg(
 		projectUpdateIDTag, // projectUpdateID not matching current
@@ -82,9 +83,9 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 		true,               // completed
 		event_ids.ComplianceInspecReportProducerID)
 
-	manager.ProcessStatusMessage(complianceStatusEvent)
+	manager.ProcessStatusEvent(complianceStatusEvent)
 
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	assert.Equal(t, config.NotRunningState, manager.State())
 }
 
 func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
@@ -95,12 +96,12 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient)
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	assert.Equal(t, config.NotRunningState, manager.State())
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 
 	eventData := lastestPublishedEvent.Data
 
@@ -112,10 +113,10 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
 
-	manager.ProcessStatusMessage(infraStatusEvent)
+	manager.ProcessStatusEvent(infraStatusEvent)
 
 	manager.Cancel()
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 	assert.Equal(t, automate_event_type.ProjectRulesCancelUpdate, lastestPublishedEvent.Type.Name)
 
 	complianceStatusEvent := createStatusEventMsg(
@@ -125,9 +126,9 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 		true,               // completed
 		event_ids.ComplianceInspecReportProducerID)
 
-	manager.ProcessStatusMessage(complianceStatusEvent)
+	manager.ProcessStatusEvent(complianceStatusEvent)
 
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	assert.Equal(t, config.NotRunningState, manager.State())
 }
 
 func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
@@ -138,12 +139,12 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient)
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	assert.Equal(t, config.NotRunningState, manager.State())
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 
 	eventData := lastestPublishedEvent.Data
 
@@ -155,7 +156,7 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
 
-	manager.ProcessStatusMessage(infraStatusEvent)
+	manager.ProcessStatusEvent(infraStatusEvent)
 
 	complianceStatusEvent := createStatusEventMsg(
 		projectUpdateIDTag, // projectUpdateID not matching current
@@ -164,9 +165,9 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 		true,               // completed
 		event_ids.ComplianceInspecReportProducerID)
 
-	manager.ProcessStatusMessage(complianceStatusEvent)
+	manager.ProcessStatusEvent(complianceStatusEvent)
 
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	assert.Equal(t, config.NotRunningState, manager.State())
 
 	manager.Cancel()
 	assert.NotEqual(t, automate_event_type.ProjectRulesCancelUpdate, lastestPublishedEvent.Type.Name)
@@ -180,12 +181,12 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient)
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	assert.Equal(t, config.NotRunningState, manager.State())
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 
 	eventData := lastestPublishedEvent.Data
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
@@ -196,7 +197,7 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
 
-	err = manager.ProcessStatusMessage(infraStatusEvent)
+	err = manager.ProcessStatusEvent(infraStatusEvent)
 	assert.NoError(t, err)
 
 	complianceStatusEvent := createStatusEventMsg(
@@ -206,10 +207,10 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 		true,                           // completed
 		event_ids.ComplianceInspecReportProducerID)
 
-	err = manager.ProcessStatusMessage(complianceStatusEvent)
+	err = manager.ProcessStatusEvent(complianceStatusEvent)
 	assert.NoError(t, err)
 
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 }
 
 // the compliance status is estimated to be longer so its percentage will be used.
@@ -221,12 +222,12 @@ func TestProjectUpdateManagerPercentageComplete(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient)
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	assert.Equal(t, config.NotRunningState, manager.State())
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 
 	eventData := lastestPublishedEvent.Data
 
@@ -238,7 +239,7 @@ func TestProjectUpdateManagerPercentageComplete(t *testing.T) {
 		false,        // completed
 		event_ids.InfraClientRunsProducerID)
 
-	manager.ProcessStatusMessage(infraStatusEvent)
+	manager.ProcessStatusEvent(infraStatusEvent)
 
 	complianceStatusEvent := createStatusEventMsg(projectUpdateIDTag,
 		1554845823.0, // This update is estimated to be longer than infra
@@ -246,7 +247,7 @@ func TestProjectUpdateManagerPercentageComplete(t *testing.T) {
 		false,        // completed
 		event_ids.ComplianceInspecReportProducerID)
 
-	manager.ProcessStatusMessage(complianceStatusEvent)
+	manager.ProcessStatusEvent(complianceStatusEvent)
 
 	assert.InDelta(t, 0.4, manager.PercentageComplete(), 0.001)
 	assert.Equal(t, time.Unix(1554845823, 0), manager.EstimatedTimeCompelete())
@@ -260,12 +261,12 @@ func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient)
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	assert.Equal(t, config.NotRunningState, manager.State())
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 
 	eventData := lastestPublishedEvent.Data
 
@@ -277,7 +278,7 @@ func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
 		true,         // completed
 		event_ids.InfraClientRunsProducerID)
 
-	manager.ProcessStatusMessage(infraStatusEvent)
+	manager.ProcessStatusEvent(infraStatusEvent)
 
 	complianceStatusEvent := createStatusEventMsg(projectUpdateIDTag,
 		1554845823.0, // This update is estimated to be longer than infra
@@ -285,7 +286,7 @@ func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
 		true,         // completed
 		event_ids.ComplianceInspecReportProducerID)
 
-	manager.ProcessStatusMessage(complianceStatusEvent)
+	manager.ProcessStatusEvent(complianceStatusEvent)
 
 	assert.InDelta(t, 1.0, manager.PercentageComplete(), 0.001)
 	assert.Equal(t, time.Time{}, manager.EstimatedTimeCompelete())
@@ -299,12 +300,12 @@ func TestProjectUpdateManagerFailureMessagesOldUpdate(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient)
-	assert.Equal(t, v2.NotRunningState, manager.State())
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	assert.Equal(t, config.NotRunningState, manager.State())
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, v2.RunningState, manager.State())
+	assert.Equal(t, config.RunningState, manager.State())
 
 	eventData := lastestPublishedEvent.Data
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
@@ -315,7 +316,7 @@ func TestProjectUpdateManagerFailureMessagesOldUpdate(t *testing.T) {
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
 
-	err = manager.ProcessStatusMessage(infraStatusEvent)
+	err = manager.ProcessStatusEvent(infraStatusEvent)
 	assert.NoError(t, err)
 
 	complianceStatusEvent := createFailureEventMsg(
@@ -323,7 +324,7 @@ func TestProjectUpdateManagerFailureMessagesOldUpdate(t *testing.T) {
 		event_ids.ComplianceInspecReportProducerID)
 
 	// Get an error when processing the message.
-	err = manager.ProcessFailMessage(complianceStatusEvent)
+	err = manager.ProcessFailEvent(complianceStatusEvent)
 	assert.NoError(t, err)
 }
 

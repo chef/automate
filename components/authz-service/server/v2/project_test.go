@@ -15,6 +15,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/authz-service/config"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
@@ -359,7 +360,7 @@ func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventSe
 	mem_v2 := memstore_v2.New()
 	eventServiceClient := &mockEventServiceClient{}
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testProjectRulesRetriever{},
-		eventServiceClient)
+		eventServiceClient, config.NewManager(""))
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")

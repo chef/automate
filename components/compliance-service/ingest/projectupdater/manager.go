@@ -60,21 +60,16 @@ func NewManager(client *ingestic.ESClient, authzProjectsClient iam_v2.ProjectsCl
 		updateQueue:         updateQueue,
 	}
 	// Single goroutine that updates the stage data
-	go func() {
-		for update := range updateQueue {
-			stage := update(manager.stage)
-
-			manager.stage = stage
-		}
-	}()
+	go manager.stageUpdater(updateQueue)
 
 	manager.resumePreviousState()
 	return manager
 }
 
 // Cancel - stop any running job
+// Action
 func (manager *Manager) Cancel(projectUpdateID string) {
-	updateFunc := func(stage stage) stage {
+	manager.updateStage(func(stage stage) stage {
 		switch stage.state {
 		case notRunningState:
 			// do nothing job is not running
@@ -99,14 +94,13 @@ func (manager *Manager) Cancel(projectUpdateID string) {
 				"Internal error state %q eventID %q", stage.state, stage.projectUpdateID))
 		}
 		return stage
-	}
-
-	manager.send(updateFunc)
+	})
 }
 
-// Start - start a project update
+// Start - start a project tags update
+// Action
 func (manager *Manager) Start(projectUpdateID string) {
-	updateFunc := func(stage stage) stage {
+	manager.updateStage(func(stage stage) stage {
 		switch stage.state {
 		case notRunningState:
 			// TODO store and run through past projectUpdateIDs to check for a match
@@ -130,7 +124,6 @@ func (manager *Manager) Start(projectUpdateID string) {
 					stage.esJobIDs = esJobIDs
 					stage.projectUpdateID = projectUpdateID
 					stage.state = runningState
-					manager.saveState(stage)
 					go manager.waitingForJobToComplete()
 				}
 			}
@@ -147,11 +140,11 @@ func (manager *Manager) Start(projectUpdateID string) {
 				"Internal error state %q eventID %q", stage.state, stage.projectUpdateID))
 		}
 		return stage
-	}
-	manager.send(updateFunc)
+	})
 }
 
 // PercentageComplete - percentage of the job complete
+// Read
 func (manager *Manager) PercentageComplete() float32 {
 	switch manager.stage.state {
 	case notRunningState:
@@ -164,6 +157,7 @@ func (manager *Manager) PercentageComplete() float32 {
 }
 
 // EstimatedTimeCompelete - the estimated date and time of compeletion.
+// Read
 func (manager *Manager) EstimatedTimeCompelete() time.Time {
 	switch manager.stage.state {
 	case notRunningState:
@@ -176,6 +170,7 @@ func (manager *Manager) EstimatedTimeCompelete() time.Time {
 }
 
 // State - The current state of the manager
+// Read
 func (manager *Manager) State() string {
 	return manager.stage.state
 }
@@ -252,30 +247,26 @@ func (manager *Manager) waitingForJobToComplete() {
 }
 
 func (manager *Manager) failedJob(mgs string) {
-	updateFunc := func(stage stage) stage {
+	manager.updateStage(func(stage stage) stage {
 		manager.percentageComplete = 1.0
 		manager.estimatedEndTimeInSec = 0
 		manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times; error message %q",
 			manager.stage.esJobIDs, maxNumberOfConsecutiveFails, mgs))
 
 		stage.state = notRunningState
-		manager.saveState(stage)
 
 		return stage
-	}
-	manager.send(updateFunc)
+	})
 }
 
 func (manager *Manager) completeJob() {
-	updateFunc := func(stage stage) stage {
+	manager.updateStage(func(stage stage) stage {
 		manager.percentageComplete = 1.0
 		manager.estimatedEndTimeInSec = 0
 		stage.state = notRunningState
-		manager.saveState(stage)
 
 		return stage
-	}
-	manager.send(updateFunc)
+	})
 }
 
 func (manager *Manager) collectJobStatus() ([]ingestic.JobStatus, error) {
@@ -428,6 +419,51 @@ func (manager *Manager) saveState(stage stage) {
 	}
 }
 
-func (manager *Manager) send(updateFunc func(stage) stage) {
+func (manager *Manager) stageUpdater(updateQueue <-chan func(stage) stage) {
+	for update := range updateQueue {
+		stage := update(manager.stage.copy())
+
+		if !stage.equal(manager.stage) {
+			manager.saveState(stage)
+			manager.stage = stage
+		}
+	}
+}
+
+func (manager *Manager) updateStage(updateFunc func(stage) stage) {
 	manager.updateQueue <- updateFunc
+}
+
+func (s stage) copy() stage {
+	esJobIDs := make([]string, len(s.esJobIDs))
+
+	for index, esJobID := range s.esJobIDs {
+		esJobIDs[index] = esJobID
+	}
+	return stage{
+		state:           s.state,
+		projectUpdateID: s.projectUpdateID,
+		esJobIDs:        esJobIDs,
+	}
+}
+
+func (s stage) equal(stage2 stage) bool {
+	if s.state != stage2.state {
+		return false
+	}
+
+	if s.projectUpdateID != stage2.projectUpdateID {
+		return false
+	}
+
+	if len(s.esJobIDs) != len(stage2.esJobIDs) {
+		return false
+	}
+	for index, esJobID1 := range s.esJobIDs {
+		if esJobID1 != stage2.esJobIDs[index] {
+			return false
+		}
+	}
+
+	return true
 }

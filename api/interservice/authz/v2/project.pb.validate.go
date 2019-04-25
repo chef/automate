@@ -1069,6 +1069,8 @@ func (m *ProjectUpdateStatusResp) Validate() error {
 
 	// no validation rules for Failed
 
+	// no validation rules for FailureMessage
+
 	return nil
 }
 

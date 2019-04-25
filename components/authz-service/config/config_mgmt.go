@@ -16,35 +16,16 @@ const (
 	NotRunningState = "not_running"
 )
 
-type ProjectUpdateDomainService struct {
-	Name                   string
-	PercentageComplete     float64
-	EstimatedTimeCompelete time.Time
-	LastUpdate             time.Time
-	Complete               bool
-	Failed                 bool
-	FailureMessage         string
-}
-
-// ProjectUpdateStage - the config for project updating
-type ProjectUpdateStage struct {
-	State           string                        `toml:"state"`
-	ProjectUpdateID string                        `toml:"project_update_id"`
-	DomainServices  []*ProjectUpdateDomainService `toml:"domain_services"`
-	FailureMessages []string                      `toml:"failure_messages"`
-	Failed          bool                          `toml:"failed"`
-}
-
 func defaultConfig() aggregateConfig {
 	return aggregateConfig{
 		ProjectUpdateStage: ProjectUpdateStage{
 			State: NotRunningState,
-			DomainServices: []*ProjectUpdateDomainService{
-				&ProjectUpdateDomainService{
+			DomainServices: []ProjectUpdateDomainService{
+				ProjectUpdateDomainService{
 					Name:       event_ids.ComplianceInspecReportProducerID,
 					LastUpdate: time.Now(),
 				},
-				&ProjectUpdateDomainService{
+				ProjectUpdateDomainService{
 					Name:       event_ids.InfraClientRunsProducerID,
 					LastUpdate: time.Now(),
 				},
