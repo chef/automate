@@ -262,8 +262,8 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 		"status":                                 "status",
 		"latest_report.status":                   "status",
 		"latest_report.end_time":                 "end_time",
-		"latest_report.controls.failed.total":    "controls.failed.total",
-		"latest_report.controls.failed.critical": "controls.failed.critical",
+		"latest_report.controls.failed.total":    "controls_sums.failed.total",
+		"latest_report.controls.failed.critical": "controls_sums.failed.critical",
 	}
 	from, perPage, sort, asc, err := validatePaginationAndSorting(in, SORT_FIELDS, "latest_report.end_time")
 	if err != nil {

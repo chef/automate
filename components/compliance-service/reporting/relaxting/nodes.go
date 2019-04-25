@@ -31,8 +31,8 @@ type ControlSource struct {
 
 // TODO: header with amount of results
 // TODO: need to be able to sort on
-//  "latest_report.controls.failed.total":    "controls.failed.total",
-//  "latest_report.controls.failed.critical": "controls.failed.critical"
+//  "latest_report.controls.failed.total":    "controls_sums.failed.total",
+//  "latest_report.controls.failed.critical": "controls_sums.failed.critical"
 //GetNodes - list all of the nodes or all nodes for a profile-id
 func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][]string,
 	sortField string, sortAsc bool) ([]*reportingapi.Node, int64, error) {
