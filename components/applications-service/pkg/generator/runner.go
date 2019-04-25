@@ -151,14 +151,6 @@ func (s *SupervisorGroup) NewSup(n int32, cfg *RunnerConfig, stats *RunnerStatsK
 		Stats:             stats,
 	}
 	return sup, nil
-
-	// err = sup.Run()
-	// if err != nil {
-	// 	fmt.Printf("Supervisor failed to run: %s\n", err)
-	// 	return err
-	// }
-
-	// return nil
 }
 
 type SupSim struct {
