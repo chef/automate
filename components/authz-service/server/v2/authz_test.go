@@ -10,6 +10,7 @@ import (
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
+	storage "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 /************ ************ ************ ************ ************ ************
@@ -185,11 +186,14 @@ func TestFilterAuthorizedPairs(t *testing.T) {
 }
 
 func TestFilterAuthorizedProjects(t *testing.T) {
-	var expProjects = []string{"project-1", "project-2", "project-3"}
-	eng := responderEngine{projects: expProjects}
-	ctx, ts := setupAuthTests(t, &eng)
+	var expProjects []string
+	var eng responderEngine
 
 	t.Run("returns engine response", func(t *testing.T) {
+		expProjects = []string{"project-1", "project-2", "project-3"}
+		eng = responderEngine{projects: expProjects}
+		ctx, ts := setupAuthTests(t, &eng)
+
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
 			&api_v2.FilterAuthorizedPairsReq{
 				Subjects: []string{"user:local:admin"},
@@ -197,6 +201,24 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 			})
 		require.NoError(t, err)
 		assert.Equal(t, expProjects, resp.Projects)
+	})
+
+	t.Run("if engine returns all projects, returns list of all projects and unassigned", func(t *testing.T) {
+		expProjects = []string{constants.AllProjectsID}
+		eng = responderEngine{projects: expProjects}
+		ctx, ts := setupAuthTests(t, &eng)
+		addProjectToStore(t, ts.projectCache, "project-1", "Numero 1", storage.Custom)
+		addProjectToStore(t, ts.projectCache, "project-2", "Numero 2", storage.Custom)
+		ts.projectCache.Add("project-1", "project-2", 0)
+		allProjects := []string{"project-1", "project-2", "(unassigned)"}
+
+		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
+			&api_v2.FilterAuthorizedPairsReq{
+				Subjects: []string{"user:local:admin"},
+				Pairs:    []*api_v2.Pair{},
+			})
+		require.NoError(t, err)
+		assert.Equal(t, allProjects, resp.Projects)
 	})
 }
 
