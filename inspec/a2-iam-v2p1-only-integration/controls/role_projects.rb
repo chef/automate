@@ -48,7 +48,7 @@ control 'iam-v2-projects-1' do
 
   Projects = [ CUSTOM_PROJECT_1, CUSTOM_PROJECT_2 ]
 
-  describe 'get roles' do
+  describe 'roles with default admin policy' do
 
     before(:all) do
       Projects.each do|project|
@@ -66,7 +66,7 @@ control 'iam-v2-projects-1' do
         )
         expect(resp.http_status).to eq 200
       end
-   end
+    end
 
     after(:all) do
       Roles.each do|role|
@@ -79,7 +79,7 @@ control 'iam-v2-projects-1' do
       end
     end
 
-    it 'returns 1 filtered role' do
+    it 'returns single role containing a project' do
       resp = automate_api_request(
         "/apis/iam/v2beta/roles",
         request_headers: { 'projects': CUSTOM_PROJECT_ID_1 },
@@ -89,7 +89,7 @@ control 'iam-v2-projects-1' do
       expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_1 }).to_not be_nil
     end
 
-    it 'returns 2 filtered roles' do
+    it 'returns multiple roles containing a project' do
       resp = automate_api_request(
         "/apis/iam/v2beta/roles",
         request_headers: { 'projects': CUSTOM_PROJECT_ID_2 },
@@ -132,33 +132,32 @@ control 'iam-v2-projects-1' do
     end
   end
 
-  describe 'roles with policies' do
+  describe 'roles with deny statements' do
     TIMESTAMP = 257 # Time.now.utc.to_i
     POLICY_ID = "inspec-test-policy-1-#{TIMESTAMP}"
-    ROLE_ID = "inspec-test-role-1-#{TIMESTAMP}"
-    ProjectIDs = [
-      "inspec-test-project-1-#{TIMESTAMP}",
-      "inspec-test-project-2-#{TIMESTAMP}",
-      "inspec-test-project-3-#{TIMESTAMP}"
-    ]
+    POLICY_ROLE_ID = "inspec-test-role-1-#{TIMESTAMP}"
 
     before(:all) do
-
-      ProjectIDs.each do|project|
+      Projects.each do|project|
         resp = automate_api_request("/apis/iam/v2beta/projects",
           http_method: 'POST',
-          request_body: {
-            id: project,
-            name: project
-          }.to_json
+          request_body: project.to_json
         )
         expect(resp.http_status).to eq 200
       end
  
+      Roles.each do|role|
+        resp = automate_api_request("/apis/iam/v2beta/roles",
+          http_method: 'POST',
+          request_body: role.to_json
+        )
+        expect(resp.http_status).to eq 200
+      end
+
       resp = automate_api_request("/apis/iam/v2beta/roles",
         http_method: 'POST',
         request_body: {
-          id: ROLE_ID,
+          id: POLICY_ROLE_ID,
           name: "display name !#$#",
           actions: ["iam:roles:*"]
         }.to_json
@@ -174,34 +173,133 @@ control 'iam-v2-projects-1' do
           statements: [
             {
               effect: "DENY",
-              role: ROLE_ID,
-              projects: [ProjectIDs[0]]
+              role: POLICY_ROLE_ID,
+              projects: [CUSTOM_PROJECT_ID_1]
             },
              {
               effect: "ALLOW",
-              role: ROLE_ID,
-              projects: [ProjectIDs[1], ProjectIDs[2]]
+              role: POLICY_ROLE_ID,
+              projects: [CUSTOM_PROJECT_ID_1, CUSTOM_PROJECT_ID_2]
             }
           ]
         }.to_json()
       )
       expect(resp.http_status).to eq 200
 
-   end
-
-    after(:all) do
-      resp = automate_api_request("/apis/iam/v2beta/policies/#{POLICY_ID}", http_method: 'DELETE')
-      expect(resp.http_status).to eq 200
-      resp = automate_api_request("/apis/iam/v2beta/roles/#{ROLE_ID}", http_method: 'DELETE')
-      expect(resp.http_status).to eq 200
-      ProjectIDs.each do|project_id|
-        resp = automate_api_request("/apis/iam/v2beta/projects/#{project_id}", http_method: 'DELETE')
-        expect(resp.http_status).to eq 200
-      end
     end
 
-    it 'does some stuff' do
-      expect(200).to eq 200
+    after(:all) do
+      roles.each do|role|
+        resp = automate_api_request("/apis/iam/v2beta/roles/#{role[:id]}", http_method: 'delete')
+        expect(resp.http_status).to eq 200
+      end
+      projects.each do|project|
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{project[:id]}", http_method: 'delete')
+        expect(resp.http_status).to eq 200
+      end
+      resp = automate_api_request("/apis/iam/v2beta/policies/#{policy_id}", http_method: 'delete')
+      expect(resp.http_status).to eq 200
+      resp = automate_api_request("/apis/iam/v2beta/roles/#{role_id}", http_method: 'delete')
+      expect(resp.http_status).to eq 200
+    end
+
+    it 'returns roles for allowed project' do
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles",
+        request_headers: { 'projects': [ CUSTOM_PROJECT_ID_2 ] },
+        )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:roles].length).to eq 2
+      expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_2 }).to_not be_nil
+      expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_1 }).to_not be_nil
+    end
+
+    it 'returns 403 due to explicitly denied project' do
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles",
+        request_headers: { 'projects': CUSTOM_PROJECT_ID_1 },
+        )
+      expect(resp.http_status).to eq 403
+    end
+
+    it 'returns no roles due to project not found' do
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles",
+        request_headers: { 'projects': "unknown-project" },
+        )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:roles].length).to eq 0
+    end
+
+    it 'returns roles for allowed project even though denied on another project' do
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles",
+        request_headers: { 'projects': [ CUSTOM_PROJECT_ID_2, CUSTOM_PROJECT_ID_1 ] },
+        )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:roles].length).to eq 2
+      expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_2 }).to_not be_nil
+      expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_1 }).to_not be_nil
+    end
+
+    it 'returns roles for allowed project even though other project not found' do
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles",
+        request_headers: { 'projects': [ CUSTOM_PROJECT_ID_2, "unknown-project" ] },
+        )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:roles].length).to eq 2
+      expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_2 }).to_not be_nil
+      expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_1 }).to_not be_nil
+    end
+
+    it 'returns role for allowed project filtered by that project' do
+      # role2 includes project2, which is allowed by policy
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles/#{CUSTOM_ROLE_ID_2}",
+        request_headers: { 'projects': [ CUSTOM_PROJECT_ID_2 ] },
+        )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:role][:name]).to eq CUSTOM_ROLE_2[:name]
+      expect(resp.parsed_response_body[:role][:id]).to eq CUSTOM_ROLE_2[:id]
+    end
+
+    # TODO: failing test!
+    it 'returns role for other project' do
+      # role1 includes project1 & project2, and project2 is allowed, so should return it
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles/#{CUSTOM_ROLE_ID_1}",
+        request_headers: { 'projects': [ CUSTOM_PROJECT_ID_2 ] },
+        )
+      expect(resp.http_status).to eq 200
+    end
+
+    it 'returns role for project with no filters applied' do
+      # role1 includes project1 (denied by policy) & project2 (allowed by policy)
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles/#{CUSTOM_ROLE_ID_1}",
+        )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:role][:name]).to eq CUSTOM_ROLE_1[:name]
+      expect(resp.parsed_response_body[:role][:id]).to eq CUSTOM_ROLE_1[:id]
+    end
+
+    it 'returns 403 for denied project on the role' do
+      # role1 includes project1 (denied by policy) so result is denied
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles/#{CUSTOM_ROLE_ID_1}",
+        request_headers: { 'projects': [ CUSTOM_PROJECT_ID_1 ] },
+        )
+      expect(resp.http_status).to eq 403
+    end
+
+    it 'returns 404 when not found after applying project filter' do
+      # role1 does not include the project so should not be found
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles/#{CUSTOM_ROLE_ID_1}",
+        request_headers: { 'projects': [ "unknown-project" ] },
+        )
+      expect(resp.http_status).to eq 404
     end
 
   end
