@@ -50,7 +50,7 @@
       <ng-container *ngIf="(sortedProjects$ | async)?.length === 0">
         <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
           <div class="empty-case-container">
-            <h1>Create the first project to get started!</h1>
+            <p>Create the first project to get started!</p>
           </div>
           <div class="empty-case-container">
               <chef-button primary (click)="openCreateModal()">Create Project</chef-button>
@@ -58,10 +58,10 @@
         </app-authorized>
         <app-authorized not [allOf]="['/iam/v2beta/projects', 'post']">
           <div class="empty-case-container">
-            <h1>It looks like no one has created any projects yet and you<br/>
+            <p>It looks like no one has created any projects yet and you<br/>
               don't have permission to create them.<br/><br/>
               If this is a mistake, then reach out to your administrator.
-            </h1>
+            </p>
           </div>
         </app-authorized>
       </ng-container>
