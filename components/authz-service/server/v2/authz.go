@@ -62,32 +62,38 @@ func (s *authzServer) ProjectsAuthorized(
 	// in order to determine whether or not to filter projects for the request
 	version := s.vSwitch.Version
 	var projects []string
-	if version.Minor == api.Version_V0 {
+	if isBeta2p1(version) {
+		// we make this extra call to cover the case when the following are true:
+		// - no project filter has been provided
+		// - one statement allows All Projects for the given resource/action
+		// - at least one statement denies 1 or more projects for the same resource/action
+		// in order to return a complete list of projects exclusive of the denied projects,
+		// we must provide ProjectsAuthorized with the list of all projects instead of an empty list
+		if len(req.ProjectsFilter) == 0 {
+			pairs := []*api.Pair{
+				&api.Pair{
+					Resource: req.Resource,
+					Action:   req.Action,
+				},
+			}
+			// this call checks for all allowed projects (without considering deny)
+			filterReq := api.FilterAuthorizedPairsReq{
+				Subjects: req.Subjects,
+				Pairs:    pairs,
+			}
+			allowed, err := s.FilterAuthorizedProjects(ctx, &filterReq)
+			if err != nil {
+				return nil, status.Error(codes.Internal, err.Error())
+			}
+
+			projects = allowed.Projects
+		} else {
+			projects = req.ProjectsFilter
+		}
+	} else {
 		// if IAM version is set to v2.0
 		// we override the requested projects because no filter should be applied on v2
 		projects = []string{}
-	} else {
-		projects = req.ProjectsFilter
-	}
-
-	// this call checks for all allowed projects (without considering deny)
-	if version.Minor == api.Version_V1 && len(req.ProjectsFilter) == 0 {
-		pairs := []*api.Pair{
-			&api.Pair{
-				Resource: req.Resource,
-				Action:   req.Action,
-			},
-		}
-		filterReq := api.FilterAuthorizedPairsReq{
-			Subjects: req.Subjects,
-			Pairs:    pairs,
-		}
-		resp, err := s.FilterAuthorizedProjects(ctx, &filterReq)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		projects = resp.Projects
 	}
 
 	// this call returns allowed projects that are not overridden by deny
@@ -100,7 +106,7 @@ func (s *authzServer) ProjectsAuthorized(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if version.Minor == api.Version_V0 && len(projectsAuthorized) > 0 {
+	if !isBeta2p1(version) && len(projectsAuthorized) > 0 {
 		// if IAM version is set to v2.0
 		// as long as at least one project is authorized
 		// we override the filtered projects because no filter should be applied on v2.0
@@ -108,9 +114,11 @@ func (s *authzServer) ProjectsAuthorized(
 	}
 
 	if stringutils.SliceContains(projectsAuthorized, constants.AllProjectsID) {
-		// Engine allows all and we requested all, so signify it as all.
-		// This must be different than the requested notion of all,
-		// an empty array, because an empty array coming back from the engine means none!
+		// Though incoming requests signify All Projects with an empty array
+		// we cannot return an empty array here because when the engine returns an empty array
+		// it means No Projects Allowed
+		// so instead, here we set All Projects as *, to be passed on to the domain services
+		// this is more explicit and avoids the issue of golang coercing empty arrays into nil
 		projectsAuthorized = []string{constants.AllProjectsExternalID}
 	}
 
@@ -268,4 +276,8 @@ func NewSwitch(c chan api.Version) *VersionSwitch {
 		}
 	}()
 	return &x
+}
+
+func isBeta2p1(version api.Version) bool {
+	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
 }
