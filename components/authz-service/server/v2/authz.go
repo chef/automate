@@ -70,23 +70,15 @@ func (s *authzServer) ProjectsAuthorized(
 		// in order to return a complete list of projects exclusive of the denied projects,
 		// we must provide ProjectsAuthorized with the list of all projects instead of an empty list
 		if len(req.ProjectsFilter) == 0 {
-			pairs := []*api.Pair{
-				&api.Pair{
-					Resource: req.Resource,
-					Action:   req.Action,
-				},
-			}
-			// this call checks for all allowed projects (without considering deny)
-			filterReq := api.FilterAuthorizedPairsReq{
-				Subjects: req.Subjects,
-				Pairs:    pairs,
-			}
-			allowed, err := s.FilterAuthorizedProjects(ctx, &filterReq)
+			list, err := s.projects.ListProjects(ctx, &api.ListProjectsReq{})
 			if err != nil {
 				return nil, status.Error(codes.Internal, err.Error())
 			}
-
-			projects = allowed.Projects
+			var projectIDs []string
+			for _, project := range list.Projects {
+				projectIDs = append(projectIDs, project.Id)
+			}
+			projects = projectIDs
 		} else {
 			projects = req.ProjectsFilter
 		}
