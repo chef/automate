@@ -550,6 +550,16 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
+      # Compliance Summary without filters for a node skipped due to unsupported os
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(type: "nodes", filters: [
+        Stats::ListFilter.new(type: 'end_time', values: ['2018-03-07T23:59:59Z'])
+      ])
+      expected_data = {
+        "nodeSummary" => {
+          "skipped" => 1
+        }
+      }
+      assert_equal_json_content(expected_data, actual_data)
 
       # Compliance Summary Nodes with filters
       actual_data = GRPC stats, :read_summary, Stats::Query.new(

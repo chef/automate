@@ -329,15 +329,15 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       Stats::ListFilter.new(type: 'control', values: ['nginx-01'])
       ])
       expected_data = {
-          "reportSummary" => {
+        "reportSummary" => {
           "status" => "failed",
           "stats" => {
-              "nodes" => 4,
-          "platforms" => 2,
-          "environments" => 2,
-          "profiles" => 1
-      }
-      }
+            "nodes" => 4,
+            "platforms" => 2,
+            "environments" => 2,
+            "profiles" => 1
+          }
+        }
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
@@ -349,15 +349,15 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           Stats::ListFilter.new(type: "platform", values: ["centos"])
       ])
       expected_data = {
-          "reportSummary" => {
+        "reportSummary" => {
           "status" => "passed",   #look at this business! yes! for this control, we have a status of passed! notice the test above, we had 4 nodes with a status of failed
           "stats" => {
-              "nodes" => 1,
-          "platforms" => 1,
-          "environments" => 1,
-          "profiles" => 1
-      }
-      }
+            "nodes" => 1,
+            "platforms" => 1,
+            "environments" => 1,
+            "profiles" => 1
+          }
+        }
       }.to_json
 
       assert_equal(expected_data, actual_data.to_json)
