@@ -1,5 +1,9 @@
 import { Component, isDevMode, OnInit } from '@angular/core';
-import { FeatureFlagsService } from '../../../app/services/feature-flags/feature-flags.service';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { iamMinorVersion, iamMajorVersion } from 'app/entities/policies/policy.selectors';
 
 @Component({
   selector: 'app-navbar',
@@ -10,8 +14,13 @@ import { FeatureFlagsService } from '../../../app/services/feature-flags/feature
 export class NavbarComponent implements OnInit {
   public applicationsFeatureFlagOn: boolean;
 
+  public iamMajorVersion$: Observable<string>;
+
+  public iamMinorVersion$: Observable<string>;
+
   constructor(
-    private featureFlagsService: FeatureFlagsService
+    private featureFlagsService: FeatureFlagsService,
+    private store: Store<NgrxStateAtom>
   ) {}
 
   isDevMode() {
@@ -20,5 +29,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
+    this.iamMajorVersion$ = this.store.select(iamMajorVersion);
+    this.iamMinorVersion$ = this.store.select(iamMinorVersion);
   }
 }
