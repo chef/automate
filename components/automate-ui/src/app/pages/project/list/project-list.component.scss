@@ -5,3 +5,19 @@ chef-table {
     justify-content: flex-end;
   }
 }
+
+.empty-case-container {
+  display: flex;
+  justify-content: center;
+
+  p {
+    margin-top: 42px;
+    font-size: 18px;
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  chef-button {
+    margin-top: 18px;
+  }
+}
