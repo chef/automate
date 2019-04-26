@@ -94,7 +94,7 @@ export class ProfilesOverviewComponent implements OnInit, OnDestroy {
     const value = event.target.value;
     const filter = profile => {
       return ['name', 'version', 'title'].some(key => {
-        return profile[key].toLowerCase().includes(value);
+        return profile[key].toLowerCase().includes(value.toLowerCase());
       });
     };
     this.filteredProfiles = this.installedProfiles.filter(filter);
