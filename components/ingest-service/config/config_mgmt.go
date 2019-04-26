@@ -121,7 +121,9 @@ func defaultConfig() aggregateConfig {
 				Running:   true,
 			},
 		},
-		ProjectUpdateConfig: ProjectUpdateConfig{},
+		ProjectUpdateConfig: ProjectUpdateConfig{
+			State: "not_running",
+		},
 	}
 }
 
@@ -156,16 +158,10 @@ func (manager *Manager) GetJobSchedulerConfig() JobSchedulerConfig {
 
 // UpdateJobSchedulerConfig - update the job scheduler config
 func (manager *Manager) UpdateJobSchedulerConfig(jobSchedulerConfig JobSchedulerConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.JobSchedulerConfig = jobSchedulerConfig
-		errc <- manager.baseConfigManager.SaveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
 // GetProjectUpdateConfig
@@ -175,16 +171,10 @@ func (manager *Manager) GetProjectUpdateConfig() ProjectUpdateConfig {
 
 // UpdateProjectUpdateConfig - update the project update config
 func (manager *Manager) UpdateProjectUpdateConfig(projectUpdateConfig ProjectUpdateConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.ProjectUpdateConfig = projectUpdateConfig
-		errc <- manager.baseConfigManager.SaveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
 // GetJobsID returns a list of job ids loaded in the manager config
@@ -225,51 +215,32 @@ func (manager *Manager) GetMissingNodesForDeletionSchedulerConfig() JobConfig {
 
 // UpdateDeleteNodesSchedulerConfig - update the delete node config
 func (manager *Manager) UpdateDeleteNodesSchedulerConfig(jConfig JobConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.JobsConfig[DeleteNodes] = jConfig
-		errc <- manager.baseConfigManager.SaveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
 // UpdateNodesMissingSchedulerConfig update the missing nodes for deletion task
 func (manager *Manager) UpdateNodesMissingSchedulerConfig(jConfig JobConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.JobsConfig[NodesMissing] = jConfig
-		errc <- manager.baseConfigManager.SaveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
 // UpdateMissingNodesForDeletionSchedulerConfig update the missing nodes for deletion config
 func (manager *Manager) UpdateMissingNodesForDeletionSchedulerConfig(jConfig JobConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.JobsConfig[MissingNodesForDeletion] = jConfig
-		errc <- manager.baseConfigManager.SaveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
-func (manager *Manager) send(updateFunc func(aggregateConfig) aggregateConfig) {
-	baseUpdateFunc := func(config interface{}) interface{} {
+func (manager *Manager) updateConfig(updateFunc func(aggregateConfig) (aggregateConfig, error)) error {
+	return manager.baseConfigManager.UpdateConfig(func(config interface{}) (interface{}, error) {
 		return updateFunc(config.(aggregateConfig))
-	}
-	manager.baseConfigManager.Send(baseUpdateFunc)
+	})
 }
 
 func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} {

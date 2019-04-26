@@ -65,23 +65,16 @@ func (manager *Manager) GetProjectUpdateStage() ProjectUpdateStage {
 
 // UpdateProjectUpdateStage - update the project update stage
 func (manager *Manager) UpdateProjectUpdateStage(projectUpdateStage ProjectUpdateStage) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.ProjectUpdateStage = projectUpdateStage
-		errc <- manager.baseConfigManager.SaveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
-func (manager *Manager) send(updateFunc func(aggregateConfig) aggregateConfig) {
-	baseUpdateFunc := func(config interface{}) interface{} {
+func (manager *Manager) updateConfig(updateFunc func(aggregateConfig) (aggregateConfig, error)) error {
+	return manager.baseConfigManager.UpdateConfig(func(config interface{}) (interface{}, error) {
 		return updateFunc(config.(aggregateConfig))
-	}
-	manager.baseConfigManager.Send(baseUpdateFunc)
+	})
 }
 
 func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} {

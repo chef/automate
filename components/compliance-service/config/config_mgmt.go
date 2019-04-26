@@ -45,30 +45,23 @@ func (manager *ConfigManager) Close() {
 	manager.baseConfigManager.Close()
 }
 
-// GetProjectUpdateConfig
+// GetProjectUpdateConfig - get project update config
 func (manager *ConfigManager) GetProjectUpdateConfig() ProjectUpdateConfig {
 	return manager.baseConfigManager.Config.(aggregateConfig).ProjectUpdateConfig
 }
 
 // UpdateProjectUpdateConfig - update the project update config
 func (manager *ConfigManager) UpdateProjectUpdateConfig(projectUpdateConfig ProjectUpdateConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.ProjectUpdateConfig = projectUpdateConfig
-		errc <- manager.baseConfigManager.SaveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
-func (manager *ConfigManager) send(updateFunc func(aggregateConfig) aggregateConfig) {
-	baseUpdateFunc := func(config interface{}) interface{} {
+func (manager *ConfigManager) updateConfig(updateFunc func(aggregateConfig) (aggregateConfig, error)) error {
+	return manager.baseConfigManager.UpdateConfig(func(config interface{}) (interface{}, error) {
 		return updateFunc(config.(aggregateConfig))
-	}
-	manager.baseConfigManager.Send(baseUpdateFunc)
+	})
 }
 
 func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} {

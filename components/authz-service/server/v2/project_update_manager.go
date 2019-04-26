@@ -368,8 +368,12 @@ func (manager *ProjectUpdateManager) updateStage(
 func (manager *ProjectUpdateManager) stageUpdater(updateQueue <-chan update) {
 	for update := range updateQueue {
 		updatedStage, err := update.fun(manager.stage.Copy())
-		oldStage := manager.stage
+		if err != nil {
+			update.errc <- err
+			continue
+		}
 
+		oldStage := manager.stage
 		if !updatedStage.Equal(oldStage) {
 			err := manager.configManager.UpdateProjectUpdateStage(updatedStage)
 			if err != nil {
@@ -380,7 +384,7 @@ func (manager *ProjectUpdateManager) stageUpdater(updateQueue <-chan update) {
 			manager.stageUpdateEvent(oldStage, updatedStage)
 		}
 
-		update.errc <- err
+		update.errc <- nil
 	}
 }
 
