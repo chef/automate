@@ -82,7 +82,7 @@ func (s *authzServer) ProjectsAuthorized(
 		}, nil
 	}
 
-	var requestedProjects []string
+	requestedProjects := req.ProjectsFilter
 	var err error
 	if len(req.ProjectsFilter) == 0 {
 		requestedProjects, err = s.setAllProjects(ctx)
@@ -90,7 +90,6 @@ func (s *authzServer) ProjectsAuthorized(
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
-	requestedProjects = req.ProjectsFilter
 
 	engineResp, err := s.engine.V2ProjectsAuthorized(ctx,
 		engine.Subjects(req.Subjects),
@@ -102,9 +101,6 @@ func (s *authzServer) ProjectsAuthorized(
 	}
 
 	authorizedProjects = translateEngineResponse(engineResp)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
 
 	s.logProjectQuery(req, authorizedProjects)
 	return &api.ProjectsAuthorizedResp{
