@@ -65,12 +65,12 @@ export class ProjectsFilterService {
         value: 'super-project',
         label: 'Super Duper Project',
         checked: false
+      },
+      {
+        value: 'unassigned-resources',
+        label: 'Unassigned Resources',
+        checked: false
       }
-      // {
-      //   value: 'unassigned-resources',
-      //   label: 'Unassigned Resources',
-      //   checked: false
-      // }
     ]);
   }
 }
