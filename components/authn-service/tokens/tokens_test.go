@@ -43,7 +43,7 @@ func TestToken(t *testing.T) {
 
 	// Note: this matches CI
 	pgCfg := pg.Config{
-		PGURL: constants.PgURL,
+		PGURL: constants.TestPgURL,
 	}
 	if v, found := os.LookupEnv("PG_URL"); found {
 		pgCfg.PGURL = v

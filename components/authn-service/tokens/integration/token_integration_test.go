@@ -62,7 +62,7 @@ func TestChefClientAuthn(t *testing.T) {
 
 	pgURLGiven := false
 	pgCfg := pg.Config{
-		PGURL: constants.PgURL,
+		PGURL: constants.TestPgURL,
 	}
 	if v, found := os.LookupEnv("PG_URL"); found {
 		pgCfg.PGURL = v

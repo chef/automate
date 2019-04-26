@@ -66,7 +66,7 @@ func initializePG() (*pg.Config, error) {
 	// If in CI mode, use the default
 	if ciMode {
 		return &pg.Config{
-			PGURL: constants.PgURL,
+			PGURL: constants.TestPgURL,
 		}, nil
 	}
 
@@ -85,7 +85,7 @@ func initializePG() (*pg.Config, error) {
 
 func openDB(t *testing.T) *sql.DB {
 	t.Helper()
-	db, err := sql.Open("postgres", constants.PgURL)
+	db, err := sql.Open("postgres", constants.TestPgURL)
 	require.NoError(t, err, "error opening db")
 	err = db.Ping()
 	require.NoError(t, err, "error pinging db")
