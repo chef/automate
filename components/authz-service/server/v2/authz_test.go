@@ -55,37 +55,22 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 
 	t.Run("authorized", func(t *testing.T) {
 		cases := map[string]struct {
-			requestedProjects []string
-			allowedProjects   []string
-			result            []string
+			allowedProjects []string
+			result          []string
 		}{
-			"request includes SOME projects and engine response is SOME projects, returns the engine response verbatim": {
-				[]string{"p1", "p2", "p3"},
+			"when engine response is SOME projects, returns the engine response verbatim": {
 				[]string{"p1", "p2"},
 				[]string{"p1", "p2"},
 			},
-			"request includes ALL projects and engine response is SOME projects, returns the engine response verbatim": {
-				[]string{}, // all projects
-				[]string{"p1", "p2"},
-				[]string{"p1", "p2"},
-			},
-			"request includes SOME projects and engine response is NO projects, returns the engine response verbatim": {
-				[]string{"p1", "p2", "p3"},
+			"when engine response is NO projects, returns the engine response verbatim": {
 				[]string{},    // no projects
 				[]string(nil), // well, almost verbatim
 			},
-			"when the request includes ALL projects and the engine response is NO projects, returns the engine response verbatim": {
-				[]string{},    // all projects
-				[]string{},    // no projects
-				[]string(nil), // well, almost verbatim
-			},
-			"when the request includes SOME projects and the engine response is ALL projects, returns external ALL projects": {
-				[]string{"p1", "p2", "p3"},
+			"when engine response is ALL projects and another project, returns external ALL projects": {
 				[]string{constants.AllProjectsID, "p3"},
 				[]string{constants.AllProjectsExternalID},
 			},
-			"when the request includes ALL projects and the engine response is ALL projects, returns external ALL projects": {
-				[]string{},
+			"when engine response is ALL projects, returns external ALL projects": {
 				[]string{constants.AllProjectsID},
 				[]string{constants.AllProjectsExternalID},
 			},
@@ -97,7 +82,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					Subjects:       []string{"user:local:admin"},
 					Resource:       "some:thing",
 					Action:         "do:that:thing",
-					ProjectsFilter: tc.requestedProjects,
+					ProjectsFilter: []string{},
 				})
 				require.NoError(t, err)
 				assert.Equal(t, tc.result, resp.Projects)
@@ -112,27 +97,14 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 
 	t.Run("authorized", func(t *testing.T) {
 		cases := map[string]struct {
-			requestedProjects []string
-			allowed           bool
-			result            []string
+			allowed bool
+			result  []string
 		}{
-			"request includes SOME projects and engine response is true, returns external ALL projects": {
-				[]string{"p1", "p2", "p3"},
+			"when engine response is true, returns external ALL projects": {
 				true,
 				[]string{constants.AllProjectsExternalID},
 			},
-			"request includes ALL projects and engine response is true, returns external ALL projects": {
-				[]string{}, // all projects
-				true,
-				[]string{constants.AllProjectsExternalID},
-			},
-			"request includes SOME projects and engine response is false, returns NO projects": {
-				[]string{"p1", "p2", "p3"},
-				false,
-				[]string(nil), // well, almost verbatim
-			},
-			"when the request includes ALL projects and engine response is NO projects, returns the engine response verbatim": {
-				[]string{}, // all projects
+			"when engine response is false, returns NO projects": {
 				false,
 				[]string(nil), // well, almost verbatim
 			},
@@ -144,7 +116,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 					Subjects:       []string{"user:local:admin"},
 					Resource:       "some:thing",
 					Action:         "do:that:thing",
-					ProjectsFilter: tc.requestedProjects,
+					ProjectsFilter: []string{},
 				})
 				require.NoError(t, err)
 				assert.Equal(t, tc.result, resp.Projects)
