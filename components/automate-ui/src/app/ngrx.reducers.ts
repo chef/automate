@@ -5,6 +5,7 @@ import * as credentials from './pages/+compliance/+credentials/credentials.state
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
 import * as sidebar from './services/sidebar/sidebar.reducer';
+import * as projectsFilter from './services/projects-filter/projects-filter.reducer';
 
 import {
   ApiTokenEntityState,
@@ -65,6 +66,7 @@ export interface NgrxStateAtom {
   router: RouterReducerState;
   scanner: scanner.ScannerState;
   sidebar: sidebar.SidebarState;
+  projectsFilter: projectsFilter.ProjectsFilterState;
 
   // UI State
   integrations_add: IntegrationsAddState;
@@ -154,6 +156,7 @@ export const ngrxReducers = {
   scanner: scanner.scannerReducer,
   router: routerReducer,
   event_feed: eventFeed.eventFeedReducer,
+  projectsFilter: projectsFilter.projectsFilterReducer,
   sidebar: sidebar.sidebarReducer,
 
   // UI State

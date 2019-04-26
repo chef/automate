@@ -51,6 +51,7 @@ import {
   NodeNoRunsDetailsResolverService
 } from './services/node-details/node-noruns-details-resolver.service';
 import { NodeRunsService } from './services/node-details/node-runs.service';
+import { ProjectsFilterService } from './services/projects-filter/projects-filter.service';
 import { RulesService } from './services/rules/rules.service';
 import { RunHistoryStore } from './services/run-history-store/run-history.store';
 import { SessionStorageService } from './services/storage/sessionstorage.service';
@@ -146,6 +147,12 @@ import {
 import { NodeRollupComponent } from './page-components/node-rollup/node-rollup.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
+import {
+  ProjectsFilterComponent
+} from './page-components/projects-filter/projects-filter.component';
+import {
+  ProjectsFilterDropdownComponent
+} from './page-components/projects-filter-dropdown/projects-filter-dropdown.component';
 import { ProfileComponent } from './page-components/profile/profile.component';
 import { ProfileDetailsComponent } from './pages/profile-details/profile-details.component';
 import {
@@ -231,6 +238,8 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     NodeRollupComponent,
     NotificationFormComponent,
     NotificationsComponent,
+    ProjectsFilterComponent,
+    ProjectsFilterDropdownComponent,
     ProfileComponent,
     ProfileDetailsComponent,
     ProfileSidebarComponent,
@@ -314,6 +323,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     PolicyRequests,
     ProfileRequests,
     ProjectRequests,
+    ProjectsFilterService,
     RoleRequests,
     { provide: RouterStateSerializer, useClass: RouterSerializer },
     RulesService,
