@@ -15,10 +15,7 @@ automate_license_path = '../dev/license.jwt'
 automate_channel = 'dev'
 automate_build = 'latest'
 manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
-es_ebs_snapshot = 'snap-09008b989ac450bf1'  # this is a snapshot of a 75GB empty volume partitioned and ext4 formatted. Use EBS_SNAPSHOT ENV variable to overwrite
-# Other good EBS snapshot candidates with ElasticSearch data on them:
-# snap-01c2a3639d3146721 : comp-2 indices for 50k nodes scanned on 2019.03.29
-# snap-08726019113625ec7 : comp-2 indices for 50k nodes scanned on 2019.03.29, 2019.04.08, 2019.04.09
+es_ebs_snapshot = ''
 
 def extract_from_manifest(manifest, build)
   manifest_json = JSON.parse(open(manifest).read)
@@ -262,10 +259,13 @@ EOT
   fi
   hab studio run 'wget -O results/build.json "#{manifest_url}"'
   hab studio run 'echo "https://$(curl -Ss http://169.254.169.254/latest/meta-data/public-hostname)" > url.txt'
-  hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data'
-  # Volume must be 75G, a hardcoding as I wasn't able to find a good way to identify the attached volume device
-  hab studio run 'mount -o discard /dev/\\$(lsblk | grep "75G" | cut -f1 -d" ") /hab/svc/automate-elasticsearch/data'
-  hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data/es_data && chown -R hab:hab /hab/svc/automate-elasticsearch/data/es_data'
+  # captures an Amazon EBS volume that is not mounted and has a UUID(avoids matching the root EBS volume)
+  device_to_mount=\\$(lsblk -o NAME,MODEL,MOUNTPOINT,UUID | grep -P "Amazon Elastic Block Store[^/]+\\w" | cut -f1 -d" ")
+  if [ -n "\\$device_to_mount" ]; then
+    hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data'
+    hab studio run "mount -o discard /dev/\\$device_to_mount /hab/svc/automate-elasticsearch/data"
+    hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data/es_data && chown -R hab:hab /hab/svc/automate-elasticsearch/data/es_data'
+  fi
   hab studio enter
 fi
 EOF
@@ -307,13 +307,15 @@ Vagrant.configure('2') do |config|
                                   'Ebs.VolumeSize' => 100,
                                   'Ebs.DeleteOnTermination' => true,
                                   'VirtualName' => 'rdm'
-                                },
-                                { 'DeviceName' => '/dev/sdf',
-                                  'Ebs.SnapshotId' => es_ebs_snapshot,
-                                  'Ebs.VolumeSize' => 75,
-                                  'Ebs.DeleteOnTermination' => true,
-                                  'Ebs.VolumeType' => 'standard'
                                 }]
+
+    if es_ebs_snapshot != ''
+      aws.block_device_mapping << { 'DeviceName' => '/dev/sdf',
+        'Ebs.SnapshotId' => es_ebs_snapshot,
+        'Ebs.DeleteOnTermination' => true,
+        'Ebs.VolumeType' => 'standard'
+      }
+    end
 
     if (ENV['AWS_EC2_IP'] =~ Resolv::IPv4::Regex)
       aws.elastic_ip = ENV['AWS_EC2_IP']
