@@ -69,7 +69,7 @@ message Statement {
         items: { string: { pattern: "^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$" } } }];
 
     // references
-    string role = 4 [(validate.rules).string.pattern = "$^|^[a-z0-9-]{1,64}$"];
+    string role = 4 [(validate.rules).string.pattern = "^$|^[a-z0-9-]{1,64}$"];
     repeated string projects = 5 [(validate.rules).repeated = {
         unique: true,
         items: {

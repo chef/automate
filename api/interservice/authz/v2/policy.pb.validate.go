@@ -531,7 +531,7 @@ func (m *Statement) Validate() error {
 	if !_Statement_Role_Pattern.MatchString(m.GetRole()) {
 		return StatementValidationError{
 			field:  "Role",
-			reason: "value does not match regex pattern \"$^|^[a-z0-9-]{1,64}$\"",
+			reason: "value does not match regex pattern \"^$|^[a-z0-9-]{1,64}$\"",
 		}
 	}
 
@@ -619,7 +619,7 @@ var _Statement_Resources_Pattern = regexp.MustCompile("^[a-z][^:*]*(?::[^:*]+)*(
 
 var _Statement_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$")
 
-var _Statement_Role_Pattern = regexp.MustCompile("$^|^[a-z0-9-]{1,64}$")
+var _Statement_Role_Pattern = regexp.MustCompile("^$|^[a-z0-9-]{1,64}$")
 
 var _Statement_Projects_Pattern = regexp.MustCompile("^[*]$|^\\(unassigned\\)$|^[a-z0-9-]{1,64}$")
 
