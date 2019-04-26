@@ -70,13 +70,24 @@ control 'iam-v2-projects-1' do
 
     after(:all) do
       Roles.each do|role|
-        resp = automate_api_request("/apis/iam/v2beta/roles/#{role[:id]}", http_method: 'DELETE')
+        resp = automate_api_request("/apis/iam/v2beta/roles/#{role[:id]}", http_method: 'delete')
         expect(resp.http_status).to eq 200
       end
       Projects.each do|project|
-        resp = automate_api_request("/apis/iam/v2beta/projects/#{project[:id]}", http_method: 'DELETE')
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{project[:id]}", http_method: 'delete')
         expect(resp.http_status).to eq 200
       end
+    end
+ 
+    it 'returns roles for allowed project' do
+      resp = automate_api_request(
+        "/apis/iam/v2beta/roles",
+        request_headers: { 'projects': [ CUSTOM_PROJECT_ID_2 ] },
+        )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:roles].length).to eq 2
+      expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_2 }).to_not be_nil
+      expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_1 }).to_not be_nil
     end
 
     it 'returns single role containing a project' do
@@ -185,28 +196,28 @@ control 'iam-v2-projects-1' do
         }.to_json()
       )
       expect(resp.http_status).to eq 200
-
     end
 
     after(:all) do
-      roles.each do|role|
+      resp = automate_api_request("/apis/iam/v2beta/policies/#{POLICY_ID}", http_method: 'delete')
+      expect(resp.http_status).to eq 200
+      resp = automate_api_request("/apis/iam/v2beta/roles/#{POLICY_ROLE_ID}", http_method: 'delete')
+      expect(resp.http_status).to eq 200
+      Roles.each do|role|
         resp = automate_api_request("/apis/iam/v2beta/roles/#{role[:id]}", http_method: 'delete')
         expect(resp.http_status).to eq 200
       end
-      projects.each do|project|
+      Projects.each do|project|
         resp = automate_api_request("/apis/iam/v2beta/projects/#{project[:id]}", http_method: 'delete')
         expect(resp.http_status).to eq 200
       end
-      resp = automate_api_request("/apis/iam/v2beta/policies/#{policy_id}", http_method: 'delete')
-      expect(resp.http_status).to eq 200
-      resp = automate_api_request("/apis/iam/v2beta/roles/#{role_id}", http_method: 'delete')
-      expect(resp.http_status).to eq 200
     end
 
-    it 'returns roles for allowed project' do
+    describe 'ListRoles' do
+    it 'returns roles for allowed projects' do
       resp = automate_api_request(
         "/apis/iam/v2beta/roles",
-        request_headers: { 'projects': [ CUSTOM_PROJECT_ID_2 ] },
+        request_headers: { 'projects': CUSTOM_PROJECT_ID_2 },
         )
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:roles].length).to eq 2
@@ -252,7 +263,9 @@ control 'iam-v2-projects-1' do
       expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_2 }).to_not be_nil
       expect(resp.parsed_response_body[:roles].find { |item| item[:id] == CUSTOM_ROLE_ID_1 }).to_not be_nil
     end
+    end
 
+    describe 'GetRole' do
     it 'returns role for allowed project filtered by that project' do
       # role2 includes project2, which is allowed by policy
       resp = automate_api_request(
@@ -264,7 +277,7 @@ control 'iam-v2-projects-1' do
       expect(resp.parsed_response_body[:role][:id]).to eq CUSTOM_ROLE_2[:id]
     end
 
-    # TODO: failing test!
+    # TODO: previously failing test
     it 'returns role for other project' do
       # role1 includes project1 & project2, and project2 is allowed, so should return it
       resp = automate_api_request(
@@ -272,6 +285,8 @@ control 'iam-v2-projects-1' do
         request_headers: { 'projects': [ CUSTOM_PROJECT_ID_2 ] },
         )
       expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:role][:name]).to eq CUSTOM_ROLE_1[:name]
+      expect(resp.parsed_response_body[:role][:id]).to eq CUSTOM_ROLE_1[:id]
     end
 
     it 'returns role for project with no filters applied' do
@@ -301,8 +316,8 @@ control 'iam-v2-projects-1' do
         )
       expect(resp.http_status).to eq 404
     end
+    end
 
   end
 
 end
-
