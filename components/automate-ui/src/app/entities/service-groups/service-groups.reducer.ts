@@ -2,12 +2,16 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { EntityStatus } from '../entities';
 import { ServiceGroupsActionTypes, ServiceGroupsActions } from './service-groups.actions';
 import { set, pipe } from 'lodash/fp';
+
 import {
-  ServiceGroup, ServiceGroupFilters, Service, ServicesFilters, HealthSummary
+  ServiceGroup, ServiceGroupFilters,
+  Service, ServicesFilters,
+  HealthSummary
 } from './service-groups.model';
 
 export interface ServiceGroupEntityState {
   serviceGroups: ServiceGroup[];
+  serviceGroupHealthCounts: HealthSummary[];
   status: EntityStatus;
   filters: ServiceGroupFilters;
   servicesStatus: EntityStatus;
@@ -20,6 +24,7 @@ export interface ServiceGroupEntityState {
 
 export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
   serviceGroups: [],
+  serviceGroupHealthCounts: [],
   status: EntityStatus.notLoaded,
   filters: { },
   servicesStatus: EntityStatus.notLoaded,
@@ -53,6 +58,19 @@ export function serviceGroupEntityReducer(
       const {filters: filters} = action.payload;
       return set('filters', filters)(state);
     }
+
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS:
+      return set('status', EntityStatus.loading, state);
+
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_SUCCESS:
+      return pipe(
+        set('status', EntityStatus.loadingSuccess),
+        set('serviceGroupHealthCounts', action.payload))(state);
+
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_FAILURE:
+      return pipe(
+        set('status', EntityStatus.loadingFailure),
+        set('errorResp', action.payload))(state);
 
     case ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP:
       return set('servicesFilters', action.payload, state);

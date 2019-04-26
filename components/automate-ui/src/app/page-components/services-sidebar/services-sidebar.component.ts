@@ -42,7 +42,8 @@ export class ServicesSidebarComponent implements OnInit {
 
     this.currentPage = 1;
 
-    this.servicesHealthSummary$.subscribe(heathSummary => this.totalServices = heathSummary.total);
+    // this.servicesHealthSummary$.subscribe(healthSummary =>
+    // this.totalServices = healthSummary.total);
   }
 
   public closeServicesSidebar() {

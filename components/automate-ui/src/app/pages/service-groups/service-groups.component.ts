@@ -10,10 +10,10 @@ import {
   UpdateServiceGroupFilters, UpdateSelectedSG
 } from 'app/entities/service-groups/service-groups.actions';
 import {
-  ServiceGroup, ServiceGroupFilters, FieldDirection, ServicesFilters
+  ServiceGroup, ServiceGroupFilters, FieldDirection, HealthSummary, ServicesFilters
 } from '../../entities/service-groups/service-groups.model';
 import {
-  serviceGroupStatus, allServiceGroups, serviceGroupState
+  serviceGroupStatus, allServiceGroups, serviceGroupState, allServiceGroupHealth
 } from '../../entities/service-groups/service-groups.selector';
 import { find, includes } from 'lodash/fp';
 
@@ -26,6 +26,7 @@ import { find, includes } from 'lodash/fp';
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
+  public HealthSummary$: Observable<HealthSummary[]>;
 
   // The selected service-group id that will be sent to the services-sidebar
   public selectedServiceGroupId: number;
@@ -76,7 +77,10 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
     this.serviceGroups$ = this.store.select(allServiceGroups);
-
+    this.HealthSummary$ = this.store.select(allServiceGroupHealth);
+    this.HealthSummary$.subscribe((sgHealthSummary) => {
+      this.totalServiceGroups = sgHealthSummary['total'];
+    });
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.status));
 
