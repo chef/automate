@@ -7,7 +7,7 @@ import { ProjectsFilterService } from 'app/services/projects-filter/projects-fil
   styleUrls: [ './projects-filter.component.scss' ]
 })
 export class ProjectsFilterComponent {
-  constructor(private projectsFilter: ProjectsFilterService) {
+  constructor(public projectsFilter: ProjectsFilterService) {
     this.projectsFilter.loadOptions();
   }
 }

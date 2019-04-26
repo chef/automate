@@ -1,7 +1,7 @@
 <button class="dropdown-label"
   aria-label="Projects filter"
   [attr.title]="selectionLabel"
-  (click)="handleLabelClick($event)">
+  (click)="handleLabelClick()">
   <span class="selection-label">{{ selectionLabel }}</span>
   <span class="selection-count"
     *ngIf="selectionCountVisible"
