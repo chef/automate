@@ -2,6 +2,7 @@ package memstore
 
 import (
 	"context"
+	"sync/atomic"
 
 	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
@@ -12,20 +13,27 @@ import (
 )
 
 type State struct {
-	policies *cache.Cache
-	roles    *cache.Cache
-	projects *cache.Cache
-	ms       storage.MigrationStatus
+	policies       *cache.Cache
+	roles          *cache.Cache
+	projects       *cache.Cache
+	ms             storage.MigrationStatus
+	policyChangeID int64
 }
 
 var ErrTypeAssertionFailed = errors.New("type assertion failed: could not convert interface{} to *storage.Policy")
 
 func New() *State {
-	return &State{
-		policies: cache.New(cache.NoExpiration, -1 /* never run cleanup */),
-		roles:    cache.New(cache.NoExpiration, -1),
-		projects: cache.New(cache.NoExpiration, -1),
+	s := &State{
+		policies:       cache.New(cache.NoExpiration, -1 /* never run cleanup */),
+		roles:          cache.New(cache.NoExpiration, -1),
+		projects:       cache.New(cache.NoExpiration, -1),
+		policyChangeID: 0,
 	}
+	return s
+}
+
+func (s *State) bumpPolicyVersion() {
+	atomic.AddInt64(&s.policyChangeID, int64(1))
 }
 
 func (s *State) CreatePolicy(_ context.Context, inputPol *storage.Policy) (*storage.Policy, error) {
@@ -40,6 +48,7 @@ func (s *State) CreatePolicy(_ context.Context, inputPol *storage.Policy) (*stor
 		return nil, storage_errors.ErrConflict
 	}
 
+	s.bumpPolicyVersion()
 	return &copyPol, nil
 }
 
@@ -58,6 +67,8 @@ func (s *State) PurgeSubjectFromPolicies(_ context.Context, sub string) ([]strin
 			pol.Members = newMembers
 		}
 	}
+
+	s.bumpPolicyVersion()
 	return affected, nil
 }
 
@@ -127,6 +138,7 @@ func (s *State) AddPolicyMembers(
 		}
 	}
 
+	s.bumpPolicyVersion()
 	return pol.Members, nil
 }
 
@@ -149,7 +161,12 @@ func (s *State) UpdatePolicy(_ context.Context, p *storage.Policy) (*storage.Pol
 	pol.Projects = p.Projects
 
 	err := s.policies.Replace(p.ID, pol, cache.NoExpiration) // persist change
-	return pol, err
+	if err != nil {
+		return nil, err
+	}
+
+	s.bumpPolicyVersion()
+	return pol, nil
 }
 
 func (s *State) ReplacePolicyMembers(
@@ -165,6 +182,7 @@ func (s *State) ReplacePolicyMembers(
 	}
 	pol.Members = members
 
+	s.bumpPolicyVersion()
 	return members, nil
 }
 
@@ -192,6 +210,7 @@ func (s *State) RemovePolicyMembers(ctx context.Context,
 	}
 	pol.Members = tmpMembers
 
+	s.bumpPolicyVersion()
 	return tmpMembers, nil
 }
 
@@ -203,7 +222,13 @@ func (s *State) DeletePolicy(ctx context.Context, policyID string) error {
 	}
 
 	s.policies.Delete(policyID)
+	s.bumpPolicyVersion()
+
 	return nil
+}
+
+func (s *State) GetPolicyChangeID(_ context.Context) (string, error) {
+	return string(atomic.LoadInt64(&s.policyChangeID)), nil
 }
 
 func (s *State) CreateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {
@@ -294,6 +319,7 @@ func (s *State) CreateRole(_ context.Context, role *storage.Role) (*storage.Role
 		return nil, storage_errors.ErrConflict
 	}
 
+	s.bumpPolicyVersion()
 	return role, nil
 }
 
@@ -332,6 +358,8 @@ func (s *State) DeleteRole(ctx context.Context, roleID string) error {
 	}
 
 	s.roles.Delete(roleID)
+
+	s.bumpPolicyVersion()
 	return nil
 }
 
@@ -352,7 +380,11 @@ func (s *State) UpdateRole(_ context.Context, r *storage.Role) (*storage.Role, e
 	role.Projects = r.Projects
 
 	err := s.roles.Replace(r.ID, role, cache.NoExpiration) // persist change
-	return role, err
+	if err != nil {
+		return nil, err
+	}
+	s.bumpPolicyVersion()
+	return role, nil
 }
 
 func (s *State) Reset(ctx context.Context) error {
@@ -360,6 +392,7 @@ func (s *State) Reset(ctx context.Context) error {
 	s.roles.Flush()
 	s.projects.Flush()
 
+	s.bumpPolicyVersion()
 	return nil
 }
 

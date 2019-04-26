@@ -81,6 +81,11 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 		return nil, p.processError(err)
 	}
 
+	err = p.notifyPolicyChange(ctx, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, storage_errors.NewErrTxCommit(err)
@@ -92,18 +97,35 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 
 func (p *pg) PurgeSubjectFromPolicies(ctx context.Context, sub string) ([]string, error) {
 	var polIDs []string
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
+	if err != nil {
+		return nil, p.processError(err)
+	}
 	// Note(sr) 2018-11-26: We're keeping the iam_members reference. Should we
 	// remove it? "Just" removing the iam_members entry and relying to CASCADE to
 	// remove the membership rows from iam_policy_members doesn't do the trick here
 	// -- not if we care about the affected policy IDs. (We at the moment don't
 	// prescribe this, but it feels like the better choice.)
-	row := p.db.QueryRowContext(ctx, `
+
+	row := tx.QueryRowContext(ctx, `
 WITH pol_ids AS (DELETE FROM iam_policy_members
                  WHERE member_id=(SELECT id FROM iam_members WHERE name=$1)
                  RETURNING policy_id)
 SELECT array_agg(policy_id) FROM pol_ids`,
 		sub)
-	err := row.Scan(pq.Array(&polIDs))
+	err = row.Scan(pq.Array(&polIDs))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = p.notifyPolicyChange(ctx, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -170,6 +192,11 @@ func (p *pg) DeletePolicy(ctx context.Context, id string) error {
 		`DELETE FROM iam_policies WHERE id=$1;`,
 		id,
 	)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	err = p.notifyPolicyChange(ctx, tx)
 	if err != nil {
 		return p.processError(err)
 	}
@@ -263,6 +290,11 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 		return nil, p.processError(err)
 	}
 
+	err = p.notifyPolicyChange(ctx, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, storage_errors.NewErrTxCommit(err)
@@ -274,6 +306,18 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 
 func (p *pg) ApplyV2DataMigrations(_ context.Context) error {
 	return p.dataMigConf.Migrate()
+}
+
+func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {
+	var policyChangeID string
+
+	row := p.db.QueryRowContext(ctx, "SELECT policy_change_id FROM policy_change_tracker LIMIT 1;")
+
+	if err := row.Scan(&policyChangeID); err != nil {
+		return "", p.processError(err)
+	}
+
+	return policyChangeID, nil
 }
 
 // insertPolicyWithQuerier inserts a new custom policy. It does not return the
@@ -345,6 +389,19 @@ func (p *pg) associatePolicyWithProjects(ctx context.Context,
 	}
 
 	return nil
+}
+
+func (p *pg) notifyPolicyChange(ctx context.Context, q Querier) error {
+	// We keep track of an id with each change. This lets us be smart about only updating
+	// the OPA rules when it might change.
+	_, err := q.ExecContext(ctx, "UPDATE policy_change_tracker SET policy_change_id = uuid_generate_v4();")
+	if err != nil {
+		return err
+	}
+	_, err = q.ExecContext(ctx,
+		"NOTIFY policychange;",
+	)
+	return err
 }
 
 // queryPolicy returns a policy based on id or an error.
@@ -431,6 +488,11 @@ func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []v2.Membe
 		return nil, p.processError(err)
 	}
 
+	err = p.notifyPolicyChange(ctx, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, storage_errors.NewErrTxCommit(err)
@@ -467,6 +529,11 @@ func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members 
 
 	// fetch fresh data so returned data will reflect that any pre-existing members re-use existing IDs
 	members, err = p.getPolicyMembersWithQuerier(ctx, policyID, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = p.notifyPolicyChange(ctx, tx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -517,6 +584,11 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 
 	// fetch fresh data so returned data will reflect that any pre-existing members re-use existing IDs
 	members, err = p.getPolicyMembersWithQuerier(ctx, policyID, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = p.notifyPolicyChange(ctx, tx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -614,6 +686,11 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 	}
 
 	err = p.insertRoleWithQuerier(ctx, role, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = p.notifyPolicyChange(ctx, tx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -727,6 +804,11 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 		return storage_errors.ErrNotFound
 	}
 
+	err = p.notifyPolicyChange(ctx, tx)
+	if err != nil {
+		return p.processError(err)
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return storage_errors.NewErrTxCommit(err)
@@ -790,6 +872,11 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 		if err != nil {
 			return nil, p.processError(err)
 		}
+	}
+
+	err = p.notifyPolicyChange(ctx, tx)
+	if err != nil {
+		return nil, p.processError(err)
 	}
 
 	err = tx.Commit()

@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/components/automate-cli/pkg/diagnostics"
@@ -19,6 +20,9 @@ var diagnosticsCmd = &cobra.Command{
 	Use:    "diagnostics COMMAND",
 	Short:  "diagnostics runs integration tests",
 	Hidden: true,
+	Annotations: map[string]string{
+		NoRequireRootAnnotation: NoRequireRootAnnotation,
+	},
 }
 
 const runDiagnosticsRunLongDesc = `
@@ -46,6 +50,9 @@ var diagnosticsRunCmd = &cobra.Command{
 	Short: "Runs diagnostic tests against Chef Automate",
 	Long:  runDiagnosticsRunLongDesc,
 	RunE:  runDiagnosticsRunCmd,
+	Annotations: map[string]string{
+		NoRequireRootAnnotation: NoRequireRootAnnotation,
+	},
 }
 
 var diagnosticsRunCmdOpts = struct {
@@ -62,7 +69,10 @@ func runDiagnosticsRunCmd(cmd *cobra.Command, args []string) error {
 
 	dsClient, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
-		return err
+		logrus.WithError(err).Warn("could not connect to deployment service")
+		if diagnosticsRunCmdOpts.adminToken == "" {
+			return err
+		}
 	}
 
 	lbURL, err := url.Parse(diagnosticsRunCmdOpts.lbURL)
