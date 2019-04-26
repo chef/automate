@@ -8,7 +8,7 @@
       <chef-subheading>Services run by each Habitat Supervisor on a node.</chef-subheading>
     </chef-page-header>
     <div class="status-filter-bar">
-      <chef-status-filter-group lean>
+      <!-- <chef-status-filter-group lean>
         <chef-option class="filter general" value="general" (click)="updateServicesFilters('total')">
           <chef-icon class="filter-icon">group_work</chef-icon>
           <div class="filter-label">Total</div>
@@ -34,7 +34,7 @@
           <div class="filter-label">Unknown</div>
           <div class="filter-total">{{ (servicesHealthSummary$ | async).unknown }}</div>
         </chef-option>
-      </chef-status-filter-group>
+      </chef-status-filter-group> -->
     </div>
     <ul>
       <li class="service-item" *ngFor="let service of services$ | async">
