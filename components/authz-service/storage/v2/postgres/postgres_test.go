@@ -3182,7 +3182,7 @@ func TestCreateProject(t *testing.T) {
 			assert.Equal(t, storage_errors.ErrConflict, err)
 			assert.Nil(t, resp)
 		},
-		"does not create project if max number projects of allow surpassed": func(t *testing.T) {
+		"does not create project if max number of projects allowed has been reached": func(t *testing.T) {
 			for i := 1; i <= v2.MaxProjects; i++ {
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := storage.Project{

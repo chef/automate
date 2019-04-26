@@ -877,7 +877,6 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		return nil, p.processError(err)
 	}
 
-	p.logger.Warnf("projects %d", numProjects)
 	if numProjects >= v2_constants.MaxProjects {
 		return nil, storage_errors.ErrMaxProjectsExceeded
 	}
