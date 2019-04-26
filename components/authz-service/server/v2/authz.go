@@ -158,6 +158,43 @@ func (s *authzServer) FilterAuthorizedProjects(
 	}, nil
 }
 
+func isBeta2p1(version api.Version) bool {
+	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
+}
+
+// setAllProjects replaces an empty projects filter with a list of all projects
+func (s *authzServer) setAllProjects(ctx context.Context) ([]string, error) {
+	// we make this extra call to cover the case when the following are true:
+	// - no project filter has been provided
+	// - one statement allows All Projects for the given resource/action
+	// - at least one statement denies 1 or more projects for the same resource/action
+	// in order to return a complete list of projects exclusive of the denied projects,
+	// we must provide the engine with the list of all projects instead of an empty list
+	list, err := s.projects.ListProjects(ctx, &api.ListProjectsReq{})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	projectIDs := make([]string, len(list.Projects))
+	for i, project := range list.Projects {
+		projectIDs[i] = project.Id
+	}
+
+	return projectIDs, nil
+}
+
+// translateEngineResponse adjusts the engine project response depending on which projects are returned
+func translateEngineResponse(authorizedProjects []string) []string {
+	if stringutils.SliceContains(authorizedProjects, constants.AllProjectsID) {
+		// though incoming requests signify All Projects with an empty array
+		// we cannot return an empty array here because when the engine returns an empty array
+		// it means No Projects Allowed.
+		// so instead, here we set All Projects as *, to be passed on to the domain services
+		// this is more explicit and avoids the issue of golang coercing empty arrays into nil
+		authorizedProjects = []string{constants.AllProjectsExternalID}
+	}
+	return authorizedProjects
+}
+
 func (s *authzServer) logQuery(req *api.IsAuthorizedReq, authorized bool, err error) {
 	result := fmt.Sprintf("%t", authorized)
 	if err != nil {
@@ -258,44 +295,4 @@ func NewSwitch(c chan api.Version) *VersionSwitch {
 		}
 	}()
 	return &x
-}
-
-func isBeta2p1(version api.Version) bool {
-	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
-}
-
-// setAllProjects replaces an empty projects filter with a list of all projects
-func (s *authzServer) setAllProjects(ctx context.Context) ([]string, error) {
-	// we make this extra call to cover the case when the following are true:
-	// - no project filter has been provided
-	// - one statement allows All Projects for the given resource/action
-	// - at least one statement denies 1 or more projects for the same resource/action
-	// in order to return a complete list of projects exclusive of the denied projects,
-	// we must provide the engine with the list of all projects instead of an empty list
-	list, err := s.projects.ListProjects(ctx, &api.ListProjectsReq{})
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-	projectIDs := make([]string, len(list.Projects))
-	for i, project := range list.Projects {
-		projectIDs[i] = project.Id
-	}
-
-	return projectIDs, nil
-}
-
-// translateEngineResponse adjusts the engine project response depending on which projects are returned
-func translateEngineResponse(allowedProjects []string) []string {
-	authorizedProjects := allowedProjects
-
-	if stringutils.SliceContains(allowedProjects, constants.AllProjectsID) {
-		// though incoming requests signify All Projects with an empty array
-		// we cannot return an empty array here because when the engine returns an empty array
-		// it means No Projects Allowed.
-		// so instead, here we set All Projects as *, to be passed on to the domain services
-		// this is more explicit and avoids the issue of golang coercing empty arrays into nil
-		authorizedProjects = []string{constants.AllProjectsExternalID}
-	}
-
-	return authorizedProjects
 }
