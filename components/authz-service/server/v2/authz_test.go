@@ -24,7 +24,7 @@ import (
 
 func TestIsAuthorized(t *testing.T) {
 	eng := responderEngine{}
-	ctx, ts := setupAuthTests(t, &eng)
+	ctx, ts := setupV2AuthTests(t, &eng)
 
 	t.Run("when the engine response is true, returns Authorized: true", func(t *testing.T) {
 		eng.authorized = true
@@ -108,53 +108,38 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 
 func TestV2ProjectsAuthorized(t *testing.T) {
 	eng := responderEngine{}
-	ctx, ts := setupAuthTests(t, &eng)
+	ctx, ts := setupV2AuthTests(t, &eng)
 
 	t.Run("authorized", func(t *testing.T) {
 		cases := map[string]struct {
 			requestedProjects []string
-			allowedProjects   []string
+			allowed           bool
 			result            []string
 		}{
-			"request includes SOME projects and engine response is SOME projects, returns external ALL projects": {
+			"request includes SOME projects and engine response is true, returns external ALL projects": {
 				[]string{"p1", "p2", "p3"},
-				[]string{"p1", "p2"},
+				true,
 				[]string{constants.AllProjectsExternalID},
 			},
-			"request includes ALL projects and engine response is SOME projects, returns external ALL projects": {
+			"request includes ALL projects and engine response is true, returns external ALL projects": {
 				[]string{}, // all projects
-				[]string{"p1", "p2"},
+				true,
 				[]string{constants.AllProjectsExternalID},
 			},
-			"request includes ALL projects and engine response is ALL projects, returns external ALL projects": {
-				[]string{}, // all projects
-				[]string{constants.AllProjectsID},
-				[]string{constants.AllProjectsExternalID},
-			},
-			"request includes SOME projects and engine response is NO projects, returns the engine response verbatim": {
+			"request includes SOME projects and engine response is false, returns NO projects": {
 				[]string{"p1", "p2", "p3"},
-				[]string{},    // no projects
+				false,
 				[]string(nil), // well, almost verbatim
 			},
-			"when the request includes ALL projects and the engine response is NO projects, returns the engine response verbatim": {
-				[]string{},    // all projects
-				[]string{},    // no projects
+			"when the request includes ALL projects and engine response is NO projects, returns the engine response verbatim": {
+				[]string{}, // all projects
+				false,
 				[]string(nil), // well, almost verbatim
-			},
-			"when the request includes SOME projects and the engine response is ALL projects, returns external ALL projects": {
-				[]string{"p1", "p2", "p3"},
-				[]string{constants.AllProjectsID, "p3"},
-				[]string{constants.AllProjectsExternalID},
-			},
-			"when the request includes ALL projects and the engine response is ALL projects, returns external ALL projects": {
-				[]string{},
-				[]string{constants.AllProjectsID},
-				[]string{constants.AllProjectsExternalID},
 			},
 		}
 		for name, tc := range cases {
 			t.Run(name, func(t *testing.T) {
-				eng.projects = tc.allowedProjects
+				eng.authorized = tc.allowed
 				resp, err := ts.authz.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{
 					Subjects:       []string{"user:local:admin"},
 					Resource:       "some:thing",
@@ -173,7 +158,7 @@ func TestFilterAuthorizedPairs(t *testing.T) {
 		pairs: []engine.Pair{
 			{Action: "iam:users:create", Resource: "iam:users"},
 		}}
-	ctx, ts := setupAuthTests(t, &eng)
+	ctx, ts := setupV2AuthTests(t, &eng)
 
 	t.Run("returns engine response", func(t *testing.T) {
 		resp, err := ts.authz.FilterAuthorizedPairs(ctx, &api_v2.FilterAuthorizedPairsReq{
@@ -192,7 +177,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 	t.Run("returns engine response", func(t *testing.T) {
 		expProjects = []string{"project-1", "project-2", "project-3"}
 		eng = responderEngine{projects: expProjects}
-		ctx, ts := setupAuthTests(t, &eng)
+		ctx, ts := setupV2AuthTests(t, &eng)
 
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
 			&api_v2.FilterAuthorizedPairsReq{
@@ -206,7 +191,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 	t.Run("if engine returns all projects, returns list of all projects and unassigned", func(t *testing.T) {
 		expProjects = []string{constants.AllProjectsID}
 		eng = responderEngine{projects: expProjects}
-		ctx, ts := setupAuthTests(t, &eng)
+		ctx, ts := setupV2AuthTests(t, &eng)
 		addProjectToStore(t, ts.projectCache, "project-1", "Numero 1", storage.Custom)
 		addProjectToStore(t, ts.projectCache, "project-2", "Numero 2", storage.Custom)
 		ts.projectCache.Add("project-1", "project-2", 0)
@@ -224,15 +209,16 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 
 func TestVersionSwitch(t *testing.T) {
 	eng := responderEngine{}
-	ctx, ts := setupAuthTests(t, &eng)
+	ctx, ts := setupV2AuthTests(t, &eng)
 
 	t.Run("ProjectsAuthorized reacts to version switching", func(t *testing.T) {
-		// setupAuthTests sets the version to v2.0
+		// setupV2AuthTests sets the version to v2.0
 		// filtering should be ignored
 		requestedProjects := []string{"p1", "p2", "p3"}
 		v2ExpectedProjects := []string{constants.AllProjectsExternalID}
 		v2p1ExpectedProjects := []string{"p1", "p2"}
 		eng.projects = v2p1ExpectedProjects
+		eng.authorized = true
 
 		resp1, err := ts.authz.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{
 			Subjects:       []string{"user:local:admin"},
@@ -258,7 +244,7 @@ func TestVersionSwitch(t *testing.T) {
 	})
 }
 
-func setupAuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
+func setupV2AuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
 	ctx := context.Background()
 	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}

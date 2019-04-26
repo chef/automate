@@ -58,32 +58,57 @@ func (s *authzServer) IsAuthorized(
 func (s *authzServer) ProjectsAuthorized(
 	ctx context.Context,
 	req *api.ProjectsAuthorizedReq) (*api.ProjectsAuthorizedResp, error) {
+	var authorizedProjects []string
 	// we check the version set in the channel on policy server
 	// in order to determine whether or not projects should factor in the authorization decision
 	version := s.vSwitch.Version
-	projects, err := s.setRequestProjects(ctx, version, req.ProjectsFilter)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+	if !isBeta2p1(version) {
+		authorized, err := s.engine.V2IsAuthorized(ctx,
+			engine.Subjects(req.Subjects),
+			engine.Action(req.Action),
+			engine.Resource(req.Resource))
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		// we translate the IsAuthorized bool response into an all or no projects response
+		if authorized {
+			authorizedProjects = []string{constants.AllProjectsExternalID}
+		} else {
+			authorizedProjects = []string{}
+		}
+		return &api.ProjectsAuthorizedResp{
+			Projects: authorizedProjects,
+		}, nil
 	}
 
-	projectsAuthorized, err := s.engine.V2ProjectsAuthorized(ctx,
+	var requestedProjects []string
+	var err error
+	if len(req.ProjectsFilter) == 0 {
+		requestedProjects, err = s.setAllProjects(ctx)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+	requestedProjects = req.ProjectsFilter
+
+	engineResp, err := s.engine.V2ProjectsAuthorized(ctx,
 		engine.Subjects(req.Subjects),
 		engine.Action(req.Action),
 		engine.Resource(req.Resource),
-		engine.ProjectList(projects...))
+		engine.ProjectList(requestedProjects...))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// depending on the IAM version, we may adjust the engine's response
-	parsedProjects := parseAuthorizedProjects(version, projectsAuthorized)
+	authorizedProjects = translateEngineResponse(engineResp)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	s.logProjectQuery(req, projectsAuthorized)
+	s.logProjectQuery(req, authorizedProjects)
 	return &api.ProjectsAuthorizedResp{
-		Projects: parsedProjects,
+		Projects: authorizedProjects,
 	}, nil
 }
 
@@ -239,55 +264,31 @@ func isBeta2p1(version api.Version) bool {
 	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
 }
 
-// setRequestProjects sets the project filter based on the current IAM version
-func (s *authzServer) setRequestProjects(ctx context.Context, v api.Version, p []string) ([]string, error) {
-	var projects []string
-	// while on v2.1, either the requested projects or a complete list of projects
-	// is passed on to the engine
-	if isBeta2p1(v) {
-		if len(p) == 0 {
-			// we make this extra call to cover the case when the following are true:
-			// - no project filter has been provided
-			// - one statement allows All Projects for the given resource/action
-			// - at least one statement denies 1 or more projects for the same resource/action
-			// in order to return a complete list of projects exclusive of the denied projects,
-			// we must provide the engine with the list of all projects instead of an empty list
-			list, err := s.projects.ListProjects(ctx, &api.ListProjectsReq{})
-			if err != nil {
-				return nil, status.Error(codes.Internal, err.Error())
-			}
-			var projectIDs []string
-			for _, project := range list.Projects {
-				projectIDs = append(projectIDs, project.Id)
-			}
-			projects = projectIDs
-		} else {
-			// we pass the requested projects as is
-			projects = p
-		}
+// setAllProjects replaces an empty projects filter with a list of all projects
+func (s *authzServer) setAllProjects(ctx context.Context) ([]string, error) {
+	// we make this extra call to cover the case when the following are true:
+	// - no project filter has been provided
+	// - one statement allows All Projects for the given resource/action
+	// - at least one statement denies 1 or more projects for the same resource/action
+	// in order to return a complete list of projects exclusive of the denied projects,
+	// we must provide the engine with the list of all projects instead of an empty list
+	list, err := s.projects.ListProjects(ctx, &api.ListProjectsReq{})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	projectIDs := make([]string, len(list.Projects))
+	for i, project := range list.Projects {
+		projectIDs[i] = project.Id
 	}
 
-	// while on v2, we always pass an empty project list to the engine because projects
-	// can't have an effect on the permission decision
-	if !isBeta2p1(v) {
-		// we override the requested projects because no filter should be applied on v2
-		projects = []string{}
-	}
-
-	return projects, nil
+	return projectIDs, nil
 }
 
-// parseAuthorizedProjects sets the engine's allowed project response based on the current IAM version
-func parseAuthorizedProjects(v api.Version, p []string) []string {
-	authorizedProjects := p
-	if !isBeta2p1(v) && len(p) > 0 {
-		// as long as at least one project is authorized
-		// we override the filtered projects with All Projects
-		// because no project filter should be applied on v2.0
-		authorizedProjects = []string{constants.AllProjectsExternalID}
-	}
+// translateEngineResponse adjusts the engine project response depending on which projects are returned
+func translateEngineResponse(allowedProjects []string) []string {
+	authorizedProjects := allowedProjects
 
-	if isBeta2p1(v) && stringutils.SliceContains(p, constants.AllProjectsID) {
+	if stringutils.SliceContains(allowedProjects, constants.AllProjectsID) {
 		// though incoming requests signify All Projects with an empty array
 		// we cannot return an empty array here because when the engine returns an empty array
 		// it means No Projects Allowed.
@@ -296,6 +297,5 @@ func parseAuthorizedProjects(v api.Version, p []string) []string {
 		authorizedProjects = []string{constants.AllProjectsExternalID}
 	}
 
-	// TODO bd: parse result and send gateway different errors based on version
 	return authorizedProjects
 }
