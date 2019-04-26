@@ -871,24 +871,14 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		return nil, p.processError(err)
 	}
 
-	rows, err := tx.QueryContext(ctx, `SELECT query_projects($1)`, pq.Array([]string{}))
-	if err != nil {
+	row := tx.QueryRowContext(ctx, ` WITH t as (SELECT id from iam_projects WHERE type='custom') SELECT COUNT(*) FROM t;`)
+	var numProjects int64
+	if err := row.Scan(&numProjects); err != nil {
 		return nil, p.processError(err)
 	}
 
-	defer func() {
-		if err := rows.Close(); err != nil {
-			p.logger.Warnf("failed to close db rows: %s", err.Error())
-		}
-	}()
-
-	numProjects := 0
-	for rows.Next() {
-		numProjects++
-	}
-
 	p.logger.Warnf("projects %d", numProjects)
-	if numProjects >= v2_constants.MaxProjects+len(v2.DefaultProjectIDs()) {
+	if numProjects >= v2_constants.MaxProjects {
 		return nil, storage_errors.ErrMaxProjectsAllowed
 	}
 
