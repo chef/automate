@@ -25,9 +25,9 @@ var (
 	// ErrForeignKey occurs, among other times, when attempting to insert a foreign key whose referent does not exist
 	ErrForeignKey = errors.New("foreign key violation")
 
-	// ErrMaxProjectsAllowed indicates that a new project cannot be created
+	// ErrMaxProjectsExceeded indicates that a new project cannot be created
 	// since the max allowed are already created.
-	ErrMaxProjectsAllowed = errors.New("max projects allowed")
+	ErrMaxProjectsExceeded = errors.New("max projects allowed")
 )
 
 // ErrTxCommit occurs when the database attempts to commit a transaction and

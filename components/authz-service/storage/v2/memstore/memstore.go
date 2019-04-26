@@ -208,9 +208,18 @@ func (s *State) DeletePolicy(ctx context.Context, policyID string) error {
 
 func (s *State) CreateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {
 	items := s.projects.Items()
+	projects := make([]*storage.Project, 0, len(items))
 
-	if len(items) >= v2_constants.MaxProjects+len(storage.DefaultProjectIDs()) {
-		return nil, storage_errors.ErrMaxProjectsAllowed
+	for _, item := range items {
+		if p, ok := item.Object.(*storage.Project); ok {
+			if p.Type == storage.Custom {
+				projects = append(projects, p)
+			}
+		}
+	}
+
+	if len(projects) >= v2_constants.MaxProjects {
+		return nil, storage_errors.ErrMaxProjectsExceeded
 	}
 
 	if err := s.projects.Add(project.ID, project, cache.NoExpiration); err != nil {

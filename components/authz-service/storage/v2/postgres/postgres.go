@@ -879,7 +879,7 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 
 	p.logger.Warnf("projects %d", numProjects)
 	if numProjects >= v2_constants.MaxProjects {
-		return nil, storage_errors.ErrMaxProjectsAllowed
+		return nil, storage_errors.ErrMaxProjectsExceeded
 	}
 
 	if err := p.insertProjectWithQuerier(ctx, project, tx); err != nil {

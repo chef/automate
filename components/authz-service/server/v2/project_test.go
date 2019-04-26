@@ -141,7 +141,7 @@ func TestCreateProject(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"does not create project if max projects surpassed", func(t *testing.T) {
-			for i := 1; i <= constants.MaxProjects+len(storage.DefaultProjectIDs()); i++ {
+			for i := 1; i <= constants.MaxProjects; i++ {
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := &api.CreateProjectReq{
 					Id:   projectID,

@@ -3182,26 +3182,12 @@ func TestCreateProject(t *testing.T) {
 			assert.Equal(t, storage_errors.ErrConflict, err)
 			assert.Nil(t, resp)
 		},
-		"does not create project if max projects allow surpassed": func(t *testing.T) {
+		"does not create project if max number projects of allow surpassed": func(t *testing.T) {
 			for i := 1; i <= v2.MaxProjects; i++ {
-				fmt.Printf("wtf %s\n", "my-id-"+strconv.Itoa(i))
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := storage.Project{
 					ID:       projectID,
 					Name:     "name-" + strconv.Itoa(i),
-					Type:     storage.Custom,
-					Projects: []string{projectID},
-				}
-				resp, err := store.CreateProject(ctx, &project)
-				require.NoError(t, err)
-				require.Equal(t, &project, resp)
-			}
-
-			for _, id := range storage.DefaultProjectIDs() {
-				projectID := id
-				project := storage.Project{
-					ID:       projectID,
-					Name:     "name-" + id,
 					Type:     storage.Custom,
 					Projects: []string{projectID},
 				}
@@ -3219,7 +3205,7 @@ func TestCreateProject(t *testing.T) {
 			}
 			resp, err := store.CreateProject(ctx, &oneProjectTooMany)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrMaxProjectsAllowed, err)
+			assert.Equal(t, storage_errors.ErrMaxProjectsExceeded, err)
 		},
 	}
 

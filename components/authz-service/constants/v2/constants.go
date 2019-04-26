@@ -46,7 +46,7 @@ const (
 	UnassignedProjectID   = "(unassigned)"
 )
 
-// Busniess logic constants
+// Business logic constants
 const (
 	MaxProjects = 6
 )

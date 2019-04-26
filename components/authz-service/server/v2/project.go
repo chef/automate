@@ -110,7 +110,7 @@ func (s *state) CreateProject(ctx context.Context,
 	if err != nil {
 		if err == storage_errors.ErrConflict {
 			return nil, status.Errorf(codes.AlreadyExists, "project with ID %q already exists", req.Id)
-		} else if err == storage_errors.ErrMaxProjectsAllowed {
+		} else if err == storage_errors.ErrMaxProjectsExceeded {
 			return nil, status.Errorf(codes.FailedPrecondition,
 				"max of %d projects allowed while IAM v2 Beta", v2_constants.MaxProjects)
 		}
