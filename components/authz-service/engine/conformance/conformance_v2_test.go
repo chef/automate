@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 )
 
@@ -265,6 +266,79 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 				actual, err := e.V2ProjectsAuthorized(args())
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj2}, actual)
+			})
+
+			t.Run("policy that denies all projects and allows one project returns no projects", func(t *testing.T) {
+				pol := map[string]interface{}{
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-0": map[string]interface{}{
+							"actions":   []string{act},
+							"resources": []string{res},
+							"effect":    "deny",
+							"projects":  []string{constants.AllProjectsID},
+						},
+						"statement-id-1": map[string]interface{}{
+							"actions":   []string{act},
+							"resources": []string{res},
+							"effect":    "allow",
+							"projects":  []string{proj1},
+						},
+					},
+				}
+				setPoliciesV2(t, e, pol)
+				actual, err := e.V2ProjectsAuthorized(args())
+				require.NoError(t, err)
+				assert.ElementsMatch(t, []string{}, actual)
+			})
+
+			t.Run("policy that denies all projects returns no projects when request contains no projects", func(t *testing.T) {
+				pol := map[string]interface{}{
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-0": map[string]interface{}{
+							"actions":   []string{act},
+							"resources": []string{res},
+							"effect":    "deny",
+							"projects":  []string{constants.AllProjectsID},
+						},
+						"statement-id-1": map[string]interface{}{
+							"actions":   []string{act},
+							"resources": []string{res},
+							"effect":    "allow",
+							"projects":  []string{proj1},
+						},
+					},
+				}
+				setPoliciesV2(t, e, pol)
+				actual, err := e.V2ProjectsAuthorized(ctx, engine.Subject(sub), engine.Action(act), engine.Resource(res), engine.ProjectList())
+				require.NoError(t, err)
+				assert.ElementsMatch(t, []string{}, actual)
+			})
+
+			t.Run("policy that allows all projects and denies one project returns list of all projects minus denied project", func(t *testing.T) {
+				proj3, proj4 := "proj-3", "proj-4"
+				pol := map[string]interface{}{
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-0": map[string]interface{}{
+							"actions":   []string{act},
+							"resources": []string{res},
+							"effect":    "allow",
+							"projects":  []string{constants.AllProjectsID},
+						},
+						"statement-id-1": map[string]interface{}{
+							"actions":   []string{act},
+							"resources": []string{res},
+							"effect":    "deny",
+							"projects":  []string{proj1},
+						},
+					},
+				}
+				setPoliciesV2(t, e, pol)
+				actual, err := e.V2ProjectsAuthorized(ctx, engine.Subject(sub), engine.Action(act), engine.Resource(res), engine.ProjectList(proj1, proj2, proj3, proj4))
+				require.NoError(t, err)
+				assert.ElementsMatch(t, []string{proj2, proj3, proj4}, actual)
 			})
 		})
 	}
