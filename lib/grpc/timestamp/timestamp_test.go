@@ -7,6 +7,16 @@ import (
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 )
 
+const (
+	// Seconds field of the earliest valid Timestamp.
+	// This is time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC).Unix().
+	minValidSeconds = -62135596800
+
+	// Seconds field just after the latest valid Timestamp.
+	// This is time.Date(10000, 1, 1, 0, 0, 0, 0, time.UTC).Unix().
+	maxValidSeconds = 253402300800
+)
+
 func TestTimestampString(t *testing.T) {
 	for _, test := range []struct {
 		ts       *tspb.Timestamp
