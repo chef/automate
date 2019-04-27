@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
+	tspb "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/spf13/cobra"
 	grpc_codes "google.golang.org/grpc/codes"
 	grpc_status "google.golang.org/grpc/status"
@@ -20,6 +20,7 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
+	tslib "github.com/chef/automate/lib/grpc/timestamp"
 )
 
 var licenseCmd = &cobra.Command{
@@ -86,6 +87,7 @@ type scanNode struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
 	ScanJobID string `json:"scan_job_id"`
+	LastSeen  string `json:"last_seen"`
 }
 
 func runLicenseStatusCmd(cmd *cobra.Command, args []string) error {
@@ -247,7 +249,7 @@ func maybeFromFile(maybeToken string) (string, error) {
 	return maybeToken, nil
 }
 
-func getConfigMgmtUsageNodes(hourAgo *timestamp.Timestamp) ([]*api.NodeUsage, error) {
+func getConfigMgmtUsageNodes(hourAgo *tspb.Timestamp) ([]*api.NodeUsage, error) {
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
 		return nil, err
@@ -265,7 +267,7 @@ func getConfigMgmtUsageNodes(hourAgo *timestamp.Timestamp) ([]*api.NodeUsage, er
 	return usageInfo.Nodes, nil
 }
 
-func getScanInfo(hourAgo *timestamp.Timestamp) ([]*scanNode, error) {
+func getScanInfo(hourAgo *tspb.Timestamp) ([]*scanNode, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
@@ -289,6 +291,7 @@ func getScanInfo(hourAgo *timestamp.Timestamp) ([]*scanNode, error) {
 			ID:        node.NodeId,
 			Name:      node.NodeName,
 			ScanJobID: node.JobId,
+			LastSeen:  tslib.TimestampString(node.EndTime),
 		}
 		scanJobNodes = append(scanJobNodes, sn)
 	}
