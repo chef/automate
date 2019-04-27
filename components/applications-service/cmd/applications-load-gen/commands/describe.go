@@ -41,6 +41,8 @@ func runDescribeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	fmt.Print(supGroups.RollupStats())
+
 	for _, supGroup := range supGroups {
 		fmt.Print(supGroup.PrettyStr())
 	}

@@ -125,7 +125,7 @@ func (sgh *serviceGroupHealth) OverallHealth() string {
 }
 
 // getServiceFromUniqueFields retrieve a service from the db without the need of an id
-func (db *postgres) GetServiceGroups(
+func (db *Postgres) GetServiceGroups(
 	sortField string, sortAsc bool,
 	page int32, pageSize int32,
 	filters map[string][]string) ([]*storage.ServiceGroupDisplay, error) {
@@ -209,7 +209,7 @@ func (sgh *serviceGroupHealth) ReleaseString() string {
 }
 
 // GetServiceGroupsHealthCounts retrieves the health counts from all service groups in the database
-func (db *postgres) GetServiceGroupsHealthCounts() (*storage.HealthCounts, error) {
+func (db *Postgres) GetServiceGroupsHealthCounts() (*storage.HealthCounts, error) {
 	var sgHealthCounts storage.HealthCounts
 	err := db.SelectOne(&sgHealthCounts, selectServiceGroupsHealthCounts)
 	if err != nil {
@@ -220,7 +220,7 @@ func (db *postgres) GetServiceGroupsHealthCounts() (*storage.HealthCounts, error
 }
 
 // ServiceGroupExists returns the name of the service group if it exists
-func (db *postgres) ServiceGroupExists(id string) (string, bool) {
+func (db *Postgres) ServiceGroupExists(id string) (string, bool) {
 	var sg serviceGroup
 	err := db.SelectOne(&sg, "SELECT * FROM service_group WHERE id = $1", id)
 	if err != nil {
