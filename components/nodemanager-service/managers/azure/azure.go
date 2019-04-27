@@ -678,7 +678,7 @@ func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, fi
 		if err != nil {
 			return nil, errors.Wrap(err, "QueryField unable to list locations")
 		}
-	case "names":
+	case "names", "tags:name":
 		vmsResult, err := creds.QueryVMs(ctx, []*common.Filter{})
 		if err != nil {
 			return nil, errors.Wrap(err, "QueryField unable to query vms")
@@ -696,6 +696,7 @@ func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, fi
 		for k := range tags {
 			resultArray = append(resultArray, k)
 		}
+		resultArray = append(resultArray, "name")
 	case "subscriptions":
 		for _, sub := range subs {
 			resultArray = append(resultArray, fmt.Sprintf("%s:%s", sub.Name, sub.Id))
