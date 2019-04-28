@@ -1370,12 +1370,12 @@ func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 }
 
 func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
-	var lastEventSent *automate_event.EventMsg
+	var eventsSent []*automate_event.EventMsg
 	localSuite := NewLocalSuite(t)
 	defer localSuite.GlobalTeardown()
 	localSuite.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(ctx context.Context, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			lastEventSent = in.Msg
+			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
 	localSuite.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
@@ -1398,30 +1398,32 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 	_, err := localSuite.ComplianceIngestServer.HandleEvent(context.Background(), event)
 	assert.NoError(t, err)
 
+	complete := false
 	// Wait for job to complete
-	for {
+	for !complete {
 		time.Sleep(time.Millisecond * 100)
-		if lastEventSent.Type.Name != automate_event_type.ProjectRulesUpdateStatus {
-			continue
-		}
 
-		if lastEventSent.Data.Fields["Completed"].GetBoolValue() {
-			break
+		for _, event := range eventsSent {
+			assert.Equal(t, event.Type.Name, automate_event_type.ProjectRulesUpdateStatus)
+			if event.Data.Fields["Completed"].GetBoolValue() {
+				complete = true
+			}
 		}
 	}
 }
 
 func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
-	var lastEventSent *automate_event.EventMsg
+	var eventsSent []*automate_event.EventMsg
 	localSuite := NewLocalSuite(t)
 	defer localSuite.GlobalTeardown()
 	localSuite.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	localSuite.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(ctx interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			lastEventSent = in.Msg
+			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
+
 	event1 := &automate_event.EventMsg{
 		EventID:   "1",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
@@ -1439,9 +1441,9 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 
 	_, err := localSuite.ComplianceIngestServer.HandleEvent(context.Background(), event1)
 	assert.NoError(t, err)
-
-	assert.True(t, lastEventSent == nil ||
-		lastEventSent.Type.Name == automate_event_type.ProjectRulesUpdateStatus)
+	for _, event := range eventsSent {
+		assert.Equal(t, event.Type.Name, automate_event_type.ProjectRulesUpdateStatus)
+	}
 
 	event2 := &automate_event.EventMsg{
 		EventID:   "2",
@@ -1460,20 +1462,39 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 
 	_, err = localSuite.ComplianceIngestServer.HandleEvent(context.Background(), event2)
 	assert.NoError(t, err)
-	assert.NotNil(t, lastEventSent)
-	assert.Equal(t, automate_event_type.ProjectRulesUpdateFailed, lastEventSent.Type.Name)
-	assert.True(t, len(lastEventSent.Data.Fields["message"].GetStringValue()) > 0)
+	timeout := time.Now().Add(time.Second * 3)
+	for {
+		found := false
+		for _, event := range eventsSent {
+			if automate_event_type.ProjectRulesUpdateFailed == event.Type.Name {
+				assert.True(t, len(event.Data.Fields["message"].GetStringValue()) > 0)
+				assert.Equal(t, "two", event.Data.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue())
+				found = true
+				break
+			}
+		}
+		if found {
+			break
+		}
 
-	assert.Equal(t, "two", lastEventSent.Data.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue())
+		if timeout.Before(time.Now()) {
+			assert.Fail(t, "Did not get the Failed event")
+			break
+		}
+		time.Sleep(time.Millisecond * 10)
+	}
 
 	// Wait for job to complete
 	for {
 		time.Sleep(time.Millisecond * 100)
-		if lastEventSent == nil || lastEventSent.Type.Name != automate_event_type.ProjectRulesUpdateStatus {
-			continue
+		found := false
+		for _, event := range eventsSent {
+			if event.Data.Fields["Completed"].GetBoolValue() {
+				found = true
+				break
+			}
 		}
-
-		if lastEventSent.Data.Fields["Completed"].GetBoolValue() {
+		if found {
 			break
 		}
 	}

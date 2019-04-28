@@ -67,18 +67,9 @@ func (manager *Manager) configUpdater(updateQueue <-chan update) {
 			continue
 		}
 
-		err = manager.saveToFile(c)
-		if err != nil {
-			update.errc <- err
-			continue
-		}
-
-		// Once the config object is updated and save to the file,
-		// Update the manager's config object so 'Get' requests will
-		// see the change.
 		manager.Config = c
 
-		update.errc <- nil
+		update.errc <- manager.saveToFile(c)
 	}
 }
 

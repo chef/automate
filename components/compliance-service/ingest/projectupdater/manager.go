@@ -91,7 +91,7 @@ func (manager *Manager) Cancel(projectUpdateID string) {
 		default:
 			// error state not found
 			manager.sendFailedEvent(fmt.Sprintf(
-				"Internal error state %q eventID %q", stage.state, stage.projectUpdateID))
+				"Internal error state %q eventID %q", stage.state, projectUpdateID), projectUpdateID)
 		}
 		return stage
 	})
@@ -119,7 +119,8 @@ func (manager *Manager) Start(projectUpdateID string) {
 					logrus.Errorf("Failed to start Elasticsearch Project rule update job projectUpdateID: %q",
 						projectUpdateID)
 					manager.sendFailedEvent(fmt.Sprintf(
-						"Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID))
+						"Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID),
+						projectUpdateID)
 				} else {
 					stage.esJobIDs = esJobIDs
 					stage.projectUpdateID = projectUpdateID
@@ -132,12 +133,12 @@ func (manager *Manager) Start(projectUpdateID string) {
 				//  Do nothing. The job has ready started
 			} else {
 				manager.sendFailedEvent(fmt.Sprintf(
-					"Can not start another project update %q is running", manager.stage.projectUpdateID))
+					"Can not start another project update %q is running", projectUpdateID), projectUpdateID)
 			}
 		default:
 			// error state not found
 			manager.sendFailedEvent(fmt.Sprintf(
-				"Internal error state %q eventID %q", stage.state, stage.projectUpdateID))
+				"Internal error state %q eventID %q", stage.state, projectUpdateID), projectUpdateID)
 		}
 		return stage
 	})
@@ -251,7 +252,7 @@ func (manager *Manager) failedJob(mgs string) {
 		manager.percentageComplete = 1.0
 		manager.estimatedEndTimeInSec = 0
 		manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times; error message %q",
-			manager.stage.esJobIDs, maxNumberOfConsecutiveFails, mgs))
+			manager.stage.esJobIDs, maxNumberOfConsecutiveFails, mgs), manager.stage.projectUpdateID)
 
 		stage.state = notRunningState
 
@@ -303,7 +304,7 @@ func MergeJobStatus(jobStatuses []ingestic.JobStatus) ingestic.JobStatus {
 }
 
 // publish a project update failed event
-func (manager *Manager) sendFailedEvent(msg string) {
+func (manager *Manager) sendFailedEvent(msg string, projectUpdateID string) {
 	event := &automate_event.EventMsg{
 		EventID:   createEventUUID(),
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateFailed},
@@ -315,7 +316,7 @@ func (manager *Manager) sendFailedEvent(msg string) {
 			Fields: map[string]*_struct.Value{
 				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
-						StringValue: manager.stage.projectUpdateID,
+						StringValue: projectUpdateID,
 					},
 				},
 				"message": {

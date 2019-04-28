@@ -286,7 +286,7 @@ func createServices(s *Suite) {
 
 	// TODO @afiune Modify the time of the jobs
 	s.JobScheduler = server.NewJobScheduler()
-	s.ConfigManager = config.NewManager("")
+	s.ConfigManager = config.NewManager("/tmp/.ingest-service.toml")
 	// TODO Handle the Close() functions
 	//defer JobScheduler.Close()
 	//defer ConfigManager.Close()
