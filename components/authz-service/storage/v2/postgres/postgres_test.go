@@ -5194,7 +5194,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 func assertProjectsMatch(t *testing.T, db *testDB, project storage.Project) {
 	t.Helper()
 	dbProject := storage.Project{}
-	err := db.QueryRow(`SELECT query_project($1);`, project.ID).Scan(&dbProject)
+	err := db.QueryRow(`SELECT query_project($1, '{}');`, project.ID).Scan(&dbProject)
 	require.NoError(t, err)
 	assert.Equal(t, project, dbProject)
 }
