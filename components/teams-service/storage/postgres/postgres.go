@@ -76,10 +76,12 @@ func (p *postgres) UpgradeToV2(ctx context.Context) error {
 	return nil
 }
 
+// StoreTeam saves a team to the DB. This is used by IAM v1 ONLY!
 func (p *postgres) StoreTeam(ctx context.Context, name string, description string) (storage.Team, error) {
 	return p.StoreTeamWithProjects(ctx, name, description, []string{})
 }
 
+// StoreTeam saves a team to the DB.
 func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 	name string, description string, projects []string) (storage.Team, error) {
 
@@ -101,8 +103,7 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 	return team, nil
 }
 
-// GetTeam fetches a database team by id and its users, returning a storage team
-// with users
+// GetTeam fetches a team by id. This is used by IAM v1 ONLY!
 func (p *postgres) GetTeam(ctx context.Context, teamID uuid.UUID) (storage.Team, error) {
 	return p.getTeam(ctx, p.db, teamID)
 }
@@ -120,6 +121,7 @@ func (p *postgres) getTeam(ctx context.Context, q querier, teamID uuid.UUID) (st
 	return t, nil
 }
 
+// DeleteTeam deletes a team from the DB. This is used by IAM v1 ONLY!
 func (p *postgres) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Team, error) {
 	var t storage.Team
 	err := p.db.QueryRowContext(ctx,
@@ -133,6 +135,7 @@ func (p *postgres) DeleteTeam(ctx context.Context, teamID uuid.UUID) (storage.Te
 	return t, nil
 }
 
+// DeleteTeam deletes a team from the DB.
 func (p *postgres) DeleteTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
 	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
@@ -153,7 +156,7 @@ func (p *postgres) DeleteTeamByName(ctx context.Context, teamName string) (stora
 	return t, nil
 }
 
-// EditTeam does a full update on a database team.
+// EditTeam does a full update on a database team. This is used by IAM v1 ONLY!
 func (p *postgres) EditTeam(ctx context.Context, team storage.Team) (storage.Team, error) {
 	var t storage.Team
 	// ensure we do not pass null projects to db
@@ -202,7 +205,7 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 	return t, nil
 }
 
-// GetTeams fetches teams from the database, returning an array of storage teams.
+// GetTeams fetches teams from the DB as an array.
 func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
@@ -284,7 +287,7 @@ func (p *postgres) RemoveUsers(ctx context.Context, teamID uuid.UUID, userIDs []
 	return team, nil
 }
 
-// GetTeamByName returns the team by name
+// GetTeamByName fetches a team by name.
 func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.Team, error) {
 	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
