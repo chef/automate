@@ -68,8 +68,9 @@ export function projectsFilterReducer(
   return state;
 }
 
+const UNASSIGNED_PROJECT = '(unassigned)';
+
 function selectionLabel(options: ProjectsFilterOption[]): string {
-  const UNASSIGNED_PROJECT = '(unassigned)';
   const checkedOptions = options.filter(o => o.checked);
   const projectOptions = options.filter(o => o.value !== UNASSIGNED_PROJECT);
   const checkedProjects = projectOptions.filter(o => o.checked);
@@ -108,7 +109,7 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
 }
 
 function selectionCount(options: ProjectsFilterOption[]): number {
-  const checkedProjects = options.filter(o => o.checked && o.value !== 'unassigned-resources');
+  const checkedProjects = options.filter(o => o.checked && o.value !== UNASSIGNED_PROJECT);
   return checkedProjects.length > 0 ? checkedProjects.length : options.length;
 }
 
@@ -119,7 +120,7 @@ function selectionCountVisible(options: ProjectsFilterOption[]): boolean {
   }
 
   const checkedOptions = options.filter(o => o.checked);
-  const projectOptions = options.filter(o => o.value !== 'unassigned-resources');
+  const projectOptions = options.filter(o => o.value !== UNASSIGNED_PROJECT);
   const checkedProjects = projectOptions.filter(o => o.checked);
   const hasOnlyProjects = projectOptions.length === options.length;
   const hasNoneChecked = checkedOptions.length === 0;
