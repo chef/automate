@@ -34,32 +34,36 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   // Weather or not the the services sidebar is visible
   public servicesSidebarVisible = false;
 
+  // The current page the user is visualizing
+  public currentPage = 1;
+
+  // The number of service groups to display per page
+  public pageSize = 25;
+
+  // Total number of service groups
+  public totalServiceGroups = 0;
+
   // The collection of allowable status
   private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
 
   // The currently selected health status filter
-  selectedStatus$: Observable<string>;
+  public selectedStatus$: Observable<string>;
 
   // Has this component been destroyed
   private isDestroyed: Subject<boolean> = new Subject();
 
-  selectedFieldDirection$: Observable<SortDirection>;
-  selectedSortField$: Observable<string>;
-  currentPage$: Observable<number>;
+  private selectedFieldDirection$: Observable<SortDirection>;
+  private selectedSortField$: Observable<string>;
+  private currentPage$: Observable<number>;
 
-  currentFieldDirection: SortDirection;
-  currentSortField: string;
+  private currentFieldDirection: SortDirection;
+  private currentSortField: string;
 
-  defaultFieldDirection: FieldDirection = {
+  private defaultFieldDirection: FieldDirection = {
     name: 'ASC',
     percent_ok: 'ASC'
   };
 
-  currentPage = 1;
-  // The number of service groups to display per page
-  pageSize = 25;
-  // TODO: Wire this up with real data
-  totalServiceGroups = 50;
   // The collection of allowable sort directions
   private allowedSortDirections = ['asc', 'desc', 'ASC', 'DESC'];
 
