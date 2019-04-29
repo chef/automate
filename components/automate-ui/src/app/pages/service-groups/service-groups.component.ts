@@ -77,10 +77,12 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
     this.serviceGroups$ = this.store.select(allServiceGroups);
+
     this.HealthSummary$ = this.store.select(allServiceGroupHealth);
     this.HealthSummary$.subscribe((sgHealthSummary) => {
       this.totalServiceGroups = sgHealthSummary['total'];
     });
+
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.status));
 
@@ -100,7 +102,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       (state) => state.filters.page));
 
     this.currentPage$.subscribe(currentPage => this.currentPage = currentPage);
-
   }
 
   ngOnDestroy() {
