@@ -14,7 +14,7 @@ do_create_config() {
     # For now, I'm hardcoding it
     #log_info "Determining latest release of automate-livenes-agent"
     #latest=$(curl "https://api.github.com/repos/chef/automate-liveness-agent/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-    latest="v0.7.6"
+    latest="v0.7.7"
     log_info "Downloading automate-livenes-agent/$latest"
     curl -L -o "/tmp/required_recipe.rb" \
         "https://github.com/chef/automate-liveness-agent/releases/download/$latest/automate-liveness-recipe.rb"
