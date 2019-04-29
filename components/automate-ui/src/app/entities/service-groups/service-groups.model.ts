@@ -1,11 +1,11 @@
 import { RollupServiceStatus, SortDirection  } from '../../types/types';
 
 export interface HealthSummary {
-  total?: number;
-  ok?: number;
-  warning?: number;
-  critical?: number;
-  unknown?: number;
+  total: number;
+  ok: number;
+  warning: number;
+  critical: number;
+  unknown: number;
 }
 
 export interface Service {

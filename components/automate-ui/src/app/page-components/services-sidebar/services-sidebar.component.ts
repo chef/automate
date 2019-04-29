@@ -8,6 +8,7 @@ import {
   Service, ServicesFilters, HealthSummary
 } from '../../entities/service-groups/service-groups.model';
 import { UpdateSelectedSG } from '../../entities/service-groups/service-groups.actions';
+import { get } from 'lodash/fp';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -41,8 +42,9 @@ export class ServicesSidebarComponent implements OnInit {
       (state) => state.servicesHealthSummary));
 
     this.currentPage = 1;
+
     this.servicesHealthSummary$.subscribe((healthSummary) => {
-      this.totalServices = healthSummary.total;
+      this.totalServices = get('total', healthSummary);
     });
   }
 
