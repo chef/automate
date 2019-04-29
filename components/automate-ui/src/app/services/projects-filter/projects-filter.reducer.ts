@@ -69,21 +69,17 @@ export function projectsFilterReducer(
 }
 
 function selectionLabel(options: ProjectsFilterOption[]): string {
+  const UNASSIGNED_PROJECT = '(unassigned)';
   const checkedOptions = options.filter(o => o.checked);
-  const projectOptions = options.filter(o => o.value !== 'unassigned-resources');
+  const projectOptions = options.filter(o => o.value !== UNASSIGNED_PROJECT);
   const checkedProjects = projectOptions.filter(o => o.checked);
-  const hasOnlyProjects = projectOptions.length === options.length;
-  const hasNoneChecked = checkedOptions.length === 0;
-  const hasAllChecked = checkedOptions.length === options.length;
   const hasOneOption = options.length === 1;
   const hasOneChecked = checkedOptions.length === 1;
   const hasOneProjectChecked = checkedProjects.length === 1;
   const hasSomeProjectsChecked = checkedProjects.length > 1;
-  const hasOnlySomeProjectsChecked = hasSomeProjectsChecked && !hasAllChecked;
   const hasAllProjectsChecked = checkedProjects.length === projectOptions.length;
-  const hasOnlyAllProjectsChecked = hasOnlyProjects ?
-    hasAllProjectsChecked || hasNoneChecked :
-    hasAllProjectsChecked && !hasAllChecked;
+  const hasUnassignedChecked =
+    options.filter(o => o.value === UNASSIGNED_PROJECT && o.checked).length === 1;
 
   if (hasOneOption) {
     return options[0].label;
@@ -97,12 +93,12 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
     return checkedProjects[0].label;
   }
 
-  if (hasOnlySomeProjectsChecked) {
-    return 'Multiple projects';
+  if (hasAllProjectsChecked && !hasUnassignedChecked) {
+    return 'All projects';
   }
 
-  if (hasOnlyAllProjectsChecked) {
-    return 'All projects';
+  if (hasSomeProjectsChecked && !hasUnassignedChecked) {
+    return 'Multiple projects';
   }
 
   return 'All resources';
