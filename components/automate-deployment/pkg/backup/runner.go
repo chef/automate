@@ -469,6 +469,9 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 		// and that any listeners on the event stream will get the task complete
 		// signal.
 		r.unlockDeployment()
+		if r.eventSender != nil {
+			r.eventSender.TaskComplete()
+		}
 		close(r.errChan)
 		close(r.eventTerm)
 		r.clearRunningTask()
