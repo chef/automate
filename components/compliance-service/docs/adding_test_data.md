@@ -6,10 +6,11 @@ from hab studio:
 
 # Adding nodes to populate the nodes and scan jobs pages
 
-_note: this should be run on your local system, not from within the studio_
-
 ensure you have `jq` installed
+the token is retrieved by running `get_admin_token` from within the studio
+if you've never run the get_secrets script, or haven't in a while, run `CHEF_USERNAME=username scripts/get_secrets` from the studio
 
+_note: this should be run on your local system, not from within the studio_
 `source dev/secrets-env.sh`
 `A2_URL='https://a2-dev.test' A2_TOKEN='token_val' components/compliance-service/scripts/create-pg-data.sh`
 

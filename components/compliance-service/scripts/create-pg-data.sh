@@ -107,7 +107,7 @@ for i in $(seq 1 ${job_count}); do
       "name": "my job",
       "tags": [],
       "type": "exec",
-      "nodes": ['${vagrant_node_id}', '${ec2_node_id}', '${docker_node_id}'],
+      "nodes": ['${ec2_node_id}'],
       "profiles": ["https://github.com/dev-sec/linux-baseline/archive/master.tar.gz", "https://github.com/dev-sec/ssh-baseline/archive/master.tar.gz"],
       "retries": 1,
       "node_selectors": []
