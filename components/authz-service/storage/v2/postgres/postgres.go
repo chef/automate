@@ -815,7 +815,7 @@ func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
 				FILTER (WHERE rp.project_id IS NOT NULL), '{(unassigned)}') && $2 AS intersection
 			FROM iam_roles AS r
 			LEFT OUTER JOIN iam_role_projects AS rp ON rp.role_id=r.db_id
-			WHERE r.id = $1 GROUP BY rp.project_id;`,
+			WHERE r.id = $1;`,
 		id, pq.Array(projectsFilter))
 
 	var result bool
