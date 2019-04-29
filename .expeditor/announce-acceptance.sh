@@ -4,7 +4,7 @@ current=$(curl https://packages.chef.io/manifests/current/automate/latest.json 2
 acceptance=$(curl https://packages.chef.io/manifests/acceptance/automate/latest.json 2>/dev/null | jq -r '.git_sha');
 
 read -r -d '' message <<EOF
-@here :success: A2 has been promoted from \`dev\` to \`acceptance\` :success:
+<!here> :success: A2 has been promoted from \`dev\` to \`acceptance\` :success:
 
 The list of changes can be found here: https://github.com/chef/automate/compare/${current}...${acceptance}
 
