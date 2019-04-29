@@ -15,6 +15,7 @@ do_deploy() {
         --airgap-bundle bundle.aib \
         --admin-password chefautomate \
         --accept-terms-and-mlsa \
+        --upgrade-strategy none \
         --debug
 }
 
@@ -25,4 +26,5 @@ do_restore() {
         --override-origin "$HAB_ORIGIN" \
         --debug \
         "${test_backup_id}"
+    chef-automate upgrade status
 }
