@@ -1,4 +1,4 @@
-import { set, pipe } from 'lodash/fp';
+import { set, pipe, find } from 'lodash/fp';
 import { LoadingStatus } from 'app/types/types';
 import {
   ProjectsFilterActions,
@@ -40,8 +40,19 @@ export function projectsFilterReducer(
     }
 
     case ProjectsFilterActionTypes.LOAD_OPTIONS_SUCCESS: {
+      const sortedOptions = action.payload.filter(o => o.value !== UNASSIGNED_PROJECT).sort(
+          (a, b) => {
+            const opts = { numeric: true, sensitivity: 'base' };
+            return a.label.localeCompare(b.label, undefined, opts)
+              || a.label.localeCompare(b.label, undefined, { numeric: true });
+          }
+        );
+      const unassignedProject = find(['value', UNASSIGNED_PROJECT], action.payload);
+      if (unassignedProject) {
+        sortedOptions.push(unassignedProject)
+      }
       return pipe(
-        set('options', action.payload),
+        set('options', sortedOptions),
         set('optionsLoadingStatus', LoadingStatus.loadingSuccess),
         set('selectionLabel', selectionLabel(action.payload)),
         set('selectionCount', selectionCount(action.payload)),

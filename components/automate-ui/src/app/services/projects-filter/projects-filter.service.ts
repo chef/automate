@@ -52,8 +52,13 @@ export class ProjectsFilterService {
         checked: false
       },
       {
-        value: 'project-5',
-        label: 'Project 5',
+        value: '(unassigned)',
+        label: 'Unassigned Resources',
+        checked: false
+      },
+      {
+        value: 'ze end of the alpha project',
+        label: 'ZETA PROJ',
         checked: false
       },
       {
@@ -64,11 +69,6 @@ export class ProjectsFilterService {
       {
         value: 'super-project',
         label: 'Super Duper Project',
-        checked: false
-      },
-      {
-        value: '(unassigned)',
-        label: 'Unassigned Resources',
         checked: false
       }
     ]);
