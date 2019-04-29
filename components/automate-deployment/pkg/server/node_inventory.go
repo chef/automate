@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
-	google_protobuf1 "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/chef/automate/api/interservice/cfgmgmt/service"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/compliance-service/api/reporting"
+	tslib "github.com/chef/automate/lib/grpc/timestamp"
 )
 
 func (s *server) NodeInventory(ctx context.Context,
@@ -62,7 +62,7 @@ func (s *server) NodeInventory(ctx context.Context,
 				PlatformFamily:  node.PlatformFamily,
 				Platform:        node.Platform,
 				PlatformVersion: node.PlatformVersion,
-				Checkin:         toTimeString(node.Checkin),
+				Checkin:         tslib.TimestampString(node.Checkin),
 				ClientVersion:   node.ClientVersion,
 				Ec2InstanceId:   node.Ec2InstanceId,
 				Ec2InstanceType: node.Ec2InstanceType,
@@ -96,17 +96,6 @@ func (s *server) NodeInventory(ctx context.Context,
 	return &api.NodeInventoryResponse{
 		Nodes: nodeCollection,
 	}, nil
-}
-
-func toTimeString(timestamp *google_protobuf1.Timestamp) string {
-	if timestamp == nil {
-		return ""
-	}
-	t, err := ptypes.Timestamp(timestamp)
-	if err != nil {
-		return ""
-	}
-	return t.Format(time.RFC3339)
 }
 
 func (s *server) getComplianceNodes(ctx context.Context, hourAgo time.Time) ([]*reporting.Node, error) {
@@ -164,7 +153,7 @@ func includeIfNotAlreadyInList(configMgmtNodes map[string]*api.InventoryNode, co
 				Status:          "active",
 				Platform:        node.GetPlatform().GetName(),
 				PlatformVersion: node.GetPlatform().GetRelease(),
-				Checkin:         toTimeString(node.GetLatestReport().GetEndTime()),
+				Checkin:         tslib.TimestampString(node.GetLatestReport().GetEndTime()),
 			}
 			nodeCollection = append(nodeCollection, n)
 		}

@@ -188,7 +188,7 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 					assert.NotEqual(tstCtx, "", node.ID)
 					assert.NotEqual(tstCtx, "", node.Name)
 					assert.NotEqual(tstCtx, "", node.ScanJobID)
-
+					//assert.NotEqual(tstCtx, "", node.LastSeen)
 				}
 
 				if !containsEntity {
