@@ -26,7 +26,7 @@ import { find, includes } from 'lodash/fp';
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
-  public HealthSummary$: Observable<HealthSummary[]>;
+  public HealthSummary$: Observable<HealthSummary>;
 
   // The selected service-group id that will be sent to the services-sidebar
   public selectedServiceGroupId: number;
