@@ -200,8 +200,6 @@ func (manager *Manager) waitingForJobToComplete() {
 		numberOfConsecutiveFails = 0
 	)
 
-	logrus.Info("waitingForJobToComplete")
-
 	// initial status
 	manager.updateStatus(backend.JobStatus{}, manager.stage.projectUpdateID)
 
@@ -248,8 +246,6 @@ func (manager *Manager) resumePreviousState() {
 
 	if projectUpdateConfig.State == runningState {
 		manager.stage.state = runningState
-		logrus.Infof("Setting smanager.state: %s manager.projectUpdateID: %s manager.esJobID: %s",
-			manager.stage.state, manager.stage.projectUpdateID, manager.stage.esJobID)
 		go manager.waitingForJobToComplete()
 	}
 }
@@ -294,7 +290,7 @@ func (manager *Manager) completeJob() {
 
 // publish a project update failed event
 func (manager *Manager) sendFailedEvent(msg string, projectUpdateID string) {
-	logrus.Infof("Sending sendFailedEvent msg: %s", msg)
+	logrus.Infof("Sending Failed Event message: %s", msg)
 	event := &automate_event.EventMsg{
 		EventID:   createEventUUID(),
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateFailed},

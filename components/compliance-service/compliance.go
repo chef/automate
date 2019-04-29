@@ -14,7 +14,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
@@ -162,7 +161,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	if err != nil {
 		logrus.Fatalf("could not connect to elasticsearch: %v", err)
 	}
-	configManager := config.NewConfigManager(viper.ConfigFileUsed())
+	configManager := config.NewConfigManager(conf.Service.ConfigFilePath)
 
 	eventClient := getEventConnection(connFactory, conf.EventConfig.Endpoint)
 	notifier := getNotificationsConnection(connFactory, conf.Notifications.Target)

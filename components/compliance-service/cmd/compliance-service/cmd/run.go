@@ -5,7 +5,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"os"
 
@@ -14,8 +13,6 @@ import (
 	"github.com/chef/automate/lib/platform"
 	"github.com/chef/automate/lib/tracing"
 )
-
-var cfgFile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -91,11 +88,6 @@ var runCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(runCmd)
 
-	cobra.OnInitialize(initConfig)
-
-	// global config
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.compliance-service.toml)")
-
 	// General Service Flags
 	runCmd.Flags().StringVar(&conf.Service.HostBind, "host", conf.Service.HostBind, "Host")
 	runCmd.Flags().IntVar(&conf.Service.Port, "port", conf.Service.Port, "Port")
@@ -104,6 +96,7 @@ func init() {
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.KeyPath, "key", "", "Service certificate key")
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.RootCACertPath, "root-cert", "", "Root CA Cert to use to verify clients")
 	runCmd.Flags().Int32Var(&conf.DataRetention.ComplianceReportDays, "reports-retention-days", -1, "Number of days to keep compliance reports")
+	runCmd.Flags().StringVar(&conf.Service.ConfigFilePath, "config", "", "config file")
 
 	// Postgres Config Flags
 	runCmd.Flags().StringVar(&conf.Postgres.ConnectionString, "postgres-uri", conf.Postgres.ConnectionString, "PostgreSQL connection string to use")
@@ -152,32 +145,4 @@ func init() {
 
 	// Event Service Flags
 	runCmd.Flags().StringVar(&conf.EventConfig.Endpoint, "event-endpoint", conf.EventConfig.Endpoint, "Event Service Endpoint")
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" { // enable ability to specify where the config file via flag
-		viper.SetConfigFile(cfgFile)
-		// If a config file is found, read it in.
-		if err := viper.ReadInConfig(); err != nil {
-			logrus.WithFields(logrus.Fields{"warning": err}).Info("Given config file not found")
-			logrus.WithFields(logrus.Fields{"path": cfgFile}).Info("Creating config file")
-		}
-	} else {
-		viper.SetConfigName(".compliance-service") // name of config file (without extension)
-		viper.AddConfigPath("$HOME")               // adding home directory as first search path
-		viper.AddConfigPath(".")
-		viper.AutomaticEnv() // read in environment variables that match
-
-		// If a config file is found, read it in.
-		if err := viper.ReadInConfig(); err == nil {
-			logrus.WithFields(logrus.Fields{"file": viper.ConfigFileUsed()}).Info("Using config file")
-		} else {
-			logrus.WithFields(logrus.Fields{"warning": err}).Info("Config file not found")
-			viper.SetConfigFile(".compliance-service.toml")
-			logrus.Info("Creating a config file .compliance-service.toml in your local directory")
-		}
-	}
-
-	logrus.WithFields(logrus.Fields{"path": viper.ConfigFileUsed()}).Info("Config loaded")
 }
