@@ -93,6 +93,10 @@ func (srv *Server) ListSuggestions(ctx context.Context, in *reporting.Suggestion
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("Parameter 'type' not specified"))
 	}
 	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, "")
+	}
 	suggestionsList, err := srv.es.GetSuggestions(in.Type, formattedFilters, in.Text, in.Size)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, "")
