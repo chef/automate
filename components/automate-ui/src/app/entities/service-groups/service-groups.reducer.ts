@@ -31,7 +31,7 @@ export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
   errorResp: null,
   servicesFilters: { },
   servicesList: [],
-  servicesHealthSummary: undefined,
+  servicesHealthSummary: { },
   selectedServiceGroupName: undefined
 };
 
