@@ -70,8 +70,14 @@ func (s *authzServer) ProjectsAuthorized(
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+		s.logQuery(&api.IsAuthorizedReq{
+			Subjects: req.Subjects,
+			Resource: req.Resource,
+			Action:   req.Action,
+		}, authorized, err)
 
 		// we translate the IsAuthorized bool response into an all or no projects response
+		// to align with what the `V2ProjectsAuthorized` call returns from the engine.
 		if authorized {
 			authorizedProjects = []string{constants.AllProjectsExternalID}
 		} else {
