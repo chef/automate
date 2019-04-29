@@ -50,11 +50,11 @@ func TestProjectUpdateManagerOneUpdateRunningAtATime(t *testing.T) {
 }
 
 func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
-	var lastestPublishedEvent *automate_event.EventMsg
+	var eventsSent []*automate_event.EventMsg
 	mockEventServiceClient := automate_event.NewMockEventServiceClient(gomock.NewController(t))
 	mockEventServiceClient.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(cxt interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			lastestPublishedEvent = in.Msg
+			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
 	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
@@ -62,9 +62,16 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, config.RunningState, manager.State())
 
-	eventData := lastestPublishedEvent.Data
+	waitForWithTimeout(t, func() bool {
+		return config.RunningState == manager.State()
+	}, time.Second*3, "State did not switch to Running")
+
+	waitFor(func() bool {
+		return len(eventsSent) > 0
+	})
+
+	eventData := eventsSent[0].Data
 
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
@@ -85,15 +92,17 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 
 	manager.ProcessStatusEvent(complianceStatusEvent)
 
-	assert.Equal(t, config.NotRunningState, manager.State())
+	waitForWithTimeout(t, func() bool {
+		return config.NotRunningState == manager.State()
+	}, time.Second*3, "State did not switch to NotRunning")
 }
 
 func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
-	var lastestPublishedEvent *automate_event.EventMsg
+	var eventsSent []*automate_event.EventMsg
 	mockEventServiceClient := automate_event.NewMockEventServiceClient(gomock.NewController(t))
 	mockEventServiceClient.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(cxt interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			lastestPublishedEvent = in.Msg
+			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
 	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
@@ -101,9 +110,15 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, config.RunningState, manager.State())
+	waitForWithTimeout(t, func() bool {
+		return config.RunningState == manager.State()
+	}, time.Second*3, "State did not switch to Running")
 
-	eventData := lastestPublishedEvent.Data
+	waitFor(func() bool {
+		return len(eventsSent) > 0
+	})
+
+	eventData := eventsSent[0].Data
 
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
@@ -116,8 +131,18 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 	manager.ProcessStatusEvent(infraStatusEvent)
 
 	manager.Cancel()
+	waitForWithTimeout(t, func() bool {
+		for _, event := range eventsSent {
+			if event.Type.Name == automate_event_type.ProjectRulesCancelUpdate {
+				return true
+			}
+		}
+		return config.RunningState == manager.State()
+	}, time.Second*3, "Cancel event not sent")
+
+	time.Sleep(time.Millisecond * 100)
+	// State does not change from running cancel
 	assert.Equal(t, config.RunningState, manager.State())
-	assert.Equal(t, automate_event_type.ProjectRulesCancelUpdate, lastestPublishedEvent.Type.Name)
 
 	complianceStatusEvent := createStatusEventMsg(
 		projectUpdateIDTag, // projectUpdateID not matching current
@@ -128,15 +153,17 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 
 	manager.ProcessStatusEvent(complianceStatusEvent)
 
-	assert.Equal(t, config.NotRunningState, manager.State())
+	waitForWithTimeout(t, func() bool {
+		return config.NotRunningState == manager.State()
+	}, time.Second*3, "State did not switch to NotRunning")
 }
 
 func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
-	var lastestPublishedEvent *automate_event.EventMsg
+	var eventsSent []*automate_event.EventMsg
 	mockEventServiceClient := automate_event.NewMockEventServiceClient(gomock.NewController(t))
 	mockEventServiceClient.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(cxt interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			lastestPublishedEvent = in.Msg
+			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
 	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
@@ -144,10 +171,15 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 
 	err := manager.Start()
 	assert.NoError(t, err)
-	assert.Equal(t, config.RunningState, manager.State())
+	waitForWithTimeout(t, func() bool {
+		return config.RunningState == manager.State()
+	}, time.Second*3, "State did not switch to Running")
 
-	eventData := lastestPublishedEvent.Data
+	waitFor(func() bool {
+		return len(eventsSent) > 0
+	})
 
+	eventData := eventsSent[0].Data
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
 	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
@@ -167,10 +199,16 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 
 	manager.ProcessStatusEvent(complianceStatusEvent)
 
-	assert.Equal(t, config.NotRunningState, manager.State())
+	waitForWithTimeout(t, func() bool {
+		return config.NotRunningState == manager.State()
+	}, time.Second*3, "State did not switch to NotRunning")
 
 	manager.Cancel()
-	assert.NotEqual(t, automate_event_type.ProjectRulesCancelUpdate, lastestPublishedEvent.Type.Name)
+	time.Sleep(time.Millisecond * 100)
+	// Check that no cancel event is sent.
+	for _, event := range eventsSent {
+		assert.NotEqual(t, automate_event_type.ProjectRulesCancelUpdate, event.Type.Name)
+	}
 }
 
 func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T) {
@@ -381,5 +419,32 @@ func createStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompeleteInSec
 				},
 			},
 		},
+	}
+}
+
+func waitFor(f func() bool) {
+	period := time.Millisecond * 10
+
+	for {
+		if f() {
+			break
+		}
+
+		time.Sleep(period)
+	}
+}
+
+func waitForWithTimeout(t *testing.T, f func() bool, timeout time.Duration, message string) {
+	expired := time.Now().Add(timeout)
+	for {
+		if f() {
+			break
+		}
+
+		if expired.Before(time.Now()) {
+			assert.Fail(t, message)
+			break
+		}
+		time.Sleep(time.Millisecond * 10)
 	}
 }

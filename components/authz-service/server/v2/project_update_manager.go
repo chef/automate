@@ -153,7 +153,7 @@ func (manager *ProjectUpdateManager) ProcessFailEvent(eventMessage *automate_eve
 		default:
 		}
 
-		return stage, nil
+		return manager.checkedDomainServices(stage)
 	})
 }
 
@@ -210,7 +210,7 @@ func (manager *ProjectUpdateManager) ProcessStatusEvent(
 		default:
 		}
 
-		return stage, nil
+		return manager.checkedDomainServices(stage)
 	})
 }
 
@@ -286,52 +286,54 @@ func (manager *ProjectUpdateManager) State() string {
 func (manager *ProjectUpdateManager) waitingForJobToComplete() {
 	for manager.stage.State == config.RunningState {
 		time.Sleep(time.Second * sleepTimeBetweenStatusChecksSec)
-		err := manager.checkedDomainServices()
+		err := manager.updateStage(
+			func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
+				return manager.checkedDomainServices(stage)
+			})
 		if err != nil {
 			log.Errorf("checked Domain Services. %v", err)
 		}
 	}
 }
 
-func (manager *ProjectUpdateManager) checkedDomainServices() error {
-	return manager.updateStage(func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
-		oldestDomainServiceUpdateTime := stage.OldestDomainServiceUpdateTime()
-		if stage.AreDomainServicesComplete() {
-			stage = stage.StopRunning()
-		} else if stage.HasFailedDomainService() {
-			failureMessage := ""
-			for _, ds := range stage.DomainServices {
-				if ds.Failed {
-					if failureMessage != "" {
-						failureMessage = fmt.Sprintf("%s; %s: %s",
-							failureMessage, ds.Name, ds.FailureMessage)
-					} else {
-						failureMessage = fmt.Sprintf("%s: %s", ds.Name, ds.FailureMessage)
-					}
+func (manager *ProjectUpdateManager) checkedDomainServices(
+	stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
+	oldestDomainServiceUpdateTime := stage.OldestDomainServiceUpdateTime()
+	if stage.AreDomainServicesComplete() {
+		stage = stage.StopRunning()
+	} else if stage.HasFailedDomainService() {
+		failureMessage := ""
+		for _, ds := range stage.DomainServices {
+			if ds.Failed {
+				if failureMessage != "" {
+					failureMessage = fmt.Sprintf("%s; %s: %s",
+						failureMessage, ds.Name, ds.FailureMessage)
+				} else {
+					failureMessage = fmt.Sprintf("%s: %s", ds.Name, ds.FailureMessage)
 				}
 			}
-			stage.Failed = true
-			stage.FailureMessage = failureMessage
-			stage = stage.StopRunning()
-		} else if oldestDomainServiceUpdateTime.Before(
-			time.Now().Add((-1) * time.Minute * minutesWithoutCheckingInFailure)) {
-			stage.Failed = true
-			stage.FailureMessage = fmt.Sprintf("A domain service has not check in for over %d minutes",
-				minutesWithoutCheckingInFailure)
-
-			stage = stage.StopRunning()
-		} else if oldestDomainServiceUpdateTime.Before(time.Now().Add((-1) * time.Minute)) {
-			// This domain service as not checked in within a minute
-			// Send another start event
-			log.Debug("Resending project update start event")
-			err := manager.sendProjectUpdateStartEvent(stage.ProjectUpdateID)
-			if err != nil {
-				log.Errorf("Starting Project Update for domain resources. %v", err)
-			}
 		}
+		stage.Failed = true
+		stage.FailureMessage = failureMessage
+		stage = stage.StopRunning()
+	} else if oldestDomainServiceUpdateTime.Before(
+		time.Now().Add((-1) * time.Minute * minutesWithoutCheckingInFailure)) {
+		stage.Failed = true
+		stage.FailureMessage = fmt.Sprintf("A domain service has not check in for over %d minutes",
+			minutesWithoutCheckingInFailure)
 
-		return stage, nil
-	})
+		stage = stage.StopRunning()
+	} else if oldestDomainServiceUpdateTime.Before(time.Now().Add((-1) * time.Minute)) {
+		// This domain service as not checked in within a minute
+		// Send another start event
+		log.Debug("Resending project update start event")
+		err := manager.sendProjectUpdateStartEvent(stage.ProjectUpdateID)
+		if err != nil {
+			log.Errorf("Starting Project Update for domain resources. %v", err)
+		}
+	}
+
+	return stage, nil
 }
 
 func (manager *ProjectUpdateManager) resumePreviousState() {
