@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/secrets"
+	"github.com/chef/automate/lib/platform/secrets"
 )
 
 func TestSecretNameFromString(t *testing.T) {

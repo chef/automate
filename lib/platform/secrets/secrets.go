@@ -23,10 +23,16 @@ import (
 
 // Commonly used secrets names. When accessing this library from
 // Golang code, these vars are provided to avoid copy-pasta errors
-var BifrostSuperuserIDName = SecretName{
-	Group: "oc_bifrost",
-	Name:  "superuser_id",
-}
+var (
+	BifrostSuperuserIDName = SecretName{
+		Group: "oc_bifrost",
+		Name:  "superuser_id",
+	}
+	SecretsServiceKeyName = SecretName{
+		Group: "secrets-services",
+		Name:  "key",
+	}
+)
 
 // SecretName represents a secret that a service may want to generate
 // or read. Secrets are placed into groups. Conventionally, the group

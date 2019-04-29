@@ -19,7 +19,7 @@ pg-helper ensure-service-database "$DBNAME" || exit 1
 # Copy the migrations files
 cp -r {{pkg.path}}/migrations/* {{pkg.svc_static_path}}/
 
-secrets-service init "{{pkg.svc_data_path}}/secrets_key" || exit 1
+secrets-service init || exit 1
 
 # Start our service
 exec secrets-service serve --config {{pkg.svc_config_path}}/config.toml

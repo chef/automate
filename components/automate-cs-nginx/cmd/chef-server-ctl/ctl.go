@@ -19,7 +19,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/lib/secrets"
+	"github.com/chef/automate/lib/platform/secrets"
 )
 
 // TODO(ssd) 2018-08-09: Mad about something that seems hard-coded?

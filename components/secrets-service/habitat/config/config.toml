@@ -1,13 +1,9 @@
 # If we have a config pointing to an specific host,
 # lets use it, otherwise use the ipaddress of the server
 
-[secretskey]
 {{~#if cfg.secrets_key }}
+[secretskey]
 key = "{{cfg.secrets_key}}"
-file = ""
-{{~else}}
-key = ""
-file = "{{pkg.svc_data_path}}/secrets_key"
 {{~/if}}
 
 [service]

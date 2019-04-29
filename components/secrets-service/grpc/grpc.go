@@ -2,9 +2,7 @@ package grpc
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net"
-	"strings"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -17,11 +15,11 @@ import (
 	"github.com/chef/automate/components/secrets-service/server"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	platformSecrets "github.com/chef/automate/lib/platform/secrets"
 )
 
 // Spawn starts a grpc server using the provided host and port.
 func Spawn(config *config.Secrets, connFactory *secureconn.Factory) error {
-
 	secretsKey, err := getSecretsKey(&config.SecretsKey)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Fatal("Finding secrets key")
@@ -48,19 +46,17 @@ func Spawn(config *config.Secrets, connFactory *secureconn.Factory) error {
 }
 
 func getSecretsKey(secretsKeyConf *config.SecretsKey) (string, error) {
-	if secretsKeyConf.File != "" {
-		data, err := ioutil.ReadFile(secretsKeyConf.File)
-		if err != nil {
-			return "", errors.Wrapf(err, "failed to read secrets key from file %s", secretsKeyConf.File)
-		}
-		strippedData := strings.TrimSpace(string(data))
-
-		return strippedData, nil
-	} else if secretsKeyConf.Key == "" {
-		return "", errors.Errorf("failed to find the secrets key")
+	if secretsKeyConf != nil && secretsKeyConf.Key != "" {
+		return secretsKeyConf.Key, nil
 	}
 
-	return secretsKeyConf.Key, nil
+	s := platformSecrets.NewDiskStoreReader(platformSecrets.DefaultDiskStoreDataDir)
+	secret, err := s.GetSecret(platformSecrets.SecretsServiceKeyName)
+	if err != nil {
+		return "", errors.Wrap(err, "could not retrieved shared key from platform secrets store")
+	}
+
+	return string(secret), nil
 }
 
 // NewGRPCServer returns a server that provides our services: secrets

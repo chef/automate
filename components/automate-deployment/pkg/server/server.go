@@ -54,7 +54,7 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/chef/automate/lib/platform"
-	"github.com/chef/automate/lib/secrets"
+	"github.com/chef/automate/lib/platform/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tracing"

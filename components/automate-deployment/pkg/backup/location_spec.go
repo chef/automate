@@ -18,7 +18,7 @@ import (
 	config "github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/lib/httputils"
-	"github.com/chef/automate/lib/secrets"
+	"github.com/chef/automate/lib/platform/secrets"
 )
 
 // LocationSpecification describes where data lives. It returns a bucket to write to

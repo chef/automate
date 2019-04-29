@@ -37,7 +37,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/chef/automate/lib/secrets"
+	"github.com/chef/automate/lib/platform/secrets"
 )
 
 //
