@@ -21,17 +21,19 @@ import (
 // These do not have to be the same
 // but seems reasonable to make them the same by convention.
 type authzServer struct {
-	log     logger.Logger
-	engine  engine.V2Authorizer
-	vSwitch *VersionSwitch
+	log      logger.Logger
+	engine   engine.V2Authorizer
+	vSwitch  *VersionSwitch
+	projects api.ProjectsServer
 }
 
 // NewAuthzServer returns a new IAM v2 Authz server.
-func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch) (api.AuthorizationServer, error) {
+func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p api.ProjectsServer) (api.AuthorizationServer, error) {
 	return &authzServer{
-		log:     l,
-		engine:  e,
-		vSwitch: v,
+		log:      l,
+		engine:   e,
+		vSwitch:  v,
+		projects: p,
 	}, nil
 }
 
@@ -56,51 +58,59 @@ func (s *authzServer) IsAuthorized(
 func (s *authzServer) ProjectsAuthorized(
 	ctx context.Context,
 	req *api.ProjectsAuthorizedReq) (*api.ProjectsAuthorizedResp, error) {
+	var authorizedProjects []string
 	// we check the version set in the channel on policy server
-	// in order to determine whether or not to filter projects for the request
+	// in order to determine whether or not projects should factor in the authorization decision
 	version := s.vSwitch.Version
-	var projects []string
-	if version.Minor == api.Version_V0 {
-		// if IAM version is set to v2.0
-		// we override the requested projects because no filter should be applied on v2
-		projects = []string{}
-	} else {
-		projects = req.ProjectsFilter
+	if !isBeta2p1(version) {
+		authorized, err := s.engine.V2IsAuthorized(ctx,
+			engine.Subjects(req.Subjects),
+			engine.Action(req.Action),
+			engine.Resource(req.Resource))
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		s.logQuery(&api.IsAuthorizedReq{
+			Subjects: req.Subjects,
+			Resource: req.Resource,
+			Action:   req.Action,
+		}, authorized, err)
+
+		// we translate the IsAuthorized bool response into an all or no projects response
+		// to align with what the `V2ProjectsAuthorized` call returns from the engine.
+		if authorized {
+			authorizedProjects = []string{constants.AllProjectsExternalID}
+		} else {
+			authorizedProjects = []string{}
+		}
+		return &api.ProjectsAuthorizedResp{
+			Projects: authorizedProjects,
+		}, nil
 	}
 
-	projectsAuthorized, err := s.engine.V2ProjectsAuthorized(ctx,
+	requestedProjects := req.ProjectsFilter
+	var err error
+	if len(req.ProjectsFilter) == 0 {
+		requestedProjects, err = s.setAllProjects(ctx)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	engineResp, err := s.engine.V2ProjectsAuthorized(ctx,
 		engine.Subjects(req.Subjects),
 		engine.Action(req.Action),
 		engine.Resource(req.Resource),
-		engine.ProjectList(projects...))
+		engine.ProjectList(requestedProjects...))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	if version.Minor == api.Version_V0 && len(projectsAuthorized) > 0 {
-		// if IAM version is set to v2.0
-		// as long as at least one project is authorized
-		// we override the filtered projects because no filter should be applied on v2.0
-		projectsAuthorized = []string{constants.AllProjectsExternalID}
-	} else if stringutils.SliceContains(projectsAuthorized, constants.AllProjectsID) {
-		// Generally we return the engine's response verbatim
-		// but there are two cases that need to be intercepted and adjusted.
-		if len(req.ProjectsFilter) == 0 {
-			// Engine allows all and we requested all, so signify it as all.
-			// This must be different than the requested notion of all,
-			// an empty array, because an empty array coming back from the engine means none!
-			projectsAuthorized = []string{constants.AllProjectsExternalID}
-		} else {
-			// Engine allows all--but we want that to mean just the *requested* ones.
-			projectsAuthorized = req.ProjectsFilter
-		}
-	}
+	authorizedProjects = translateEngineResponse(engineResp)
 
-	// TODO bd: parse result and send gateway different errors based on version
-
-	s.logProjectQuery(req, projectsAuthorized)
+	s.logProjectQuery(req, authorizedProjects)
 	return &api.ProjectsAuthorizedResp{
-		Projects: projectsAuthorized,
+		Projects: authorizedProjects,
 	}, nil
 }
 
@@ -129,9 +139,62 @@ func (s *authzServer) FilterAuthorizedProjects(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	var projectIDs []string
+	if stringutils.SliceContains(resp, constants.AllProjectsID) {
+		list, err := s.projects.ListProjects(ctx, &api.ListProjectsReq{})
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		for _, project := range list.Projects {
+			projectIDs = append(projectIDs, project.Id)
+		}
+
+		// all projects also includes unassigned
+		projectIDs = append(projectIDs, constants.UnassignedProjectID)
+	} else {
+		projectIDs = resp
+	}
+
 	return &api.FilterAuthorizedProjectsResp{
-		Projects: resp,
+		Projects: projectIDs,
 	}, nil
+}
+
+func isBeta2p1(version api.Version) bool {
+	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
+}
+
+// setAllProjects replaces an empty projects filter with a list of all projects
+func (s *authzServer) setAllProjects(ctx context.Context) ([]string, error) {
+	// we make this extra call to cover the case when the following are true:
+	// - no project filter has been provided
+	// - one statement allows All Projects for the given resource/action
+	// - at least one statement denies 1 or more projects for the same resource/action
+	// in order to return a complete list of projects exclusive of the denied projects,
+	// we must provide the engine with the list of all projects instead of an empty list
+	list, err := s.projects.ListProjects(ctx, &api.ListProjectsReq{})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	projectIDs := make([]string, len(list.Projects))
+	for i, project := range list.Projects {
+		projectIDs[i] = project.Id
+	}
+
+	return projectIDs, nil
+}
+
+// translateEngineResponse adjusts the engine project response depending on which projects are returned
+func translateEngineResponse(authorizedProjects []string) []string {
+	if stringutils.SliceContains(authorizedProjects, constants.AllProjectsID) {
+		// though incoming requests signify All Projects with an empty array
+		// we cannot return an empty array here because when the engine returns an empty array
+		// it means No Projects Allowed.
+		// so instead, here we set All Projects as *, to be passed on to the domain services
+		// this is more explicit and avoids the issue of golang coercing empty arrays into nil
+		authorizedProjects = []string{constants.AllProjectsExternalID}
+	}
+	return authorizedProjects
 }
 
 func (s *authzServer) logQuery(req *api.IsAuthorizedReq, authorized bool, err error) {

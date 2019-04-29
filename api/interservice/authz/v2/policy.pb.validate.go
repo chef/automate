@@ -528,7 +528,35 @@ func (m *Statement) Validate() error {
 
 	}
 
-	// no validation rules for Role
+	if !_Statement_Role_Pattern.MatchString(m.GetRole()) {
+		return StatementValidationError{
+			field:  "Role",
+			reason: "value does not match regex pattern \"^$|^[a-z0-9-]{1,64}$\"",
+		}
+	}
+
+	_Statement_Projects_Unique := make(map[string]struct{}, len(m.GetProjects()))
+
+	for idx, item := range m.GetProjects() {
+		_, _ = idx, item
+
+		if _, exists := _Statement_Projects_Unique[item]; exists {
+			return StatementValidationError{
+				field:  fmt.Sprintf("Projects[%v]", idx),
+				reason: "repeated value must contain unique items",
+			}
+		} else {
+			_Statement_Projects_Unique[item] = struct{}{}
+		}
+
+		if !_Statement_Projects_Pattern.MatchString(item) {
+			return StatementValidationError{
+				field:  fmt.Sprintf("Projects[%v]", idx),
+				reason: "value does not match regex pattern \"^[*]$|^\\\\(unassigned\\\\)$|^[a-z0-9-]{1,64}$\"",
+			}
+		}
+
+	}
 
 	return nil
 }
@@ -590,6 +618,10 @@ var _ interface {
 var _Statement_Resources_Pattern = regexp.MustCompile("^[a-z][^:*]*(?::[^:*]+)*(?::[*])?$|^[*]$")
 
 var _Statement_Actions_Pattern = regexp.MustCompile("^[*]$|^[*]:[a-z][-a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[*]$|^[a-z][a-zA-Z]*:[*]:[a-z][a-zA-Z]*$|^[a-z][a-zA-Z]*:[a-z][a-zA-Z]*:[*]$")
+
+var _Statement_Role_Pattern = regexp.MustCompile("^$|^[a-z0-9-]{1,64}$")
+
+var _Statement_Projects_Pattern = regexp.MustCompile("^[*]$|^\\(unassigned\\)$|^[a-z0-9-]{1,64}$")
 
 // Validate checks the field values on ListPoliciesReq with the rules defined
 // in the proto definition for this message. If any rules are violated, an
