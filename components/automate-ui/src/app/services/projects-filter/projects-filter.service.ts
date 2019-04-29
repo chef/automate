@@ -67,7 +67,7 @@ export class ProjectsFilterService {
         checked: false
       },
       {
-        value: 'unassigned-resources',
+        value: '(unassigned)',
         label: 'Unassigned Resources',
         checked: false
       }
