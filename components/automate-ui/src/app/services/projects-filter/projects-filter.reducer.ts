@@ -76,10 +76,12 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
   const hasOneOption = options.length === 1;
   const hasOneChecked = checkedOptions.length === 1;
   const hasOneProjectChecked = checkedProjects.length === 1;
-  const hasSomeProjectsChecked = checkedProjects.length > 1;
+  const hasNoProjectsChecked = checkedProjects.length === 0;
   const hasAllProjectsChecked = checkedProjects.length === projectOptions.length;
+  const hasSomeProjectsChecked = checkedProjects.length > 1 && !hasAllProjectsChecked;
   const hasUnassignedChecked =
     options.filter(o => o.value === UNASSIGNED_PROJECT && o.checked).length === 1;
+  const unassignedAvailable = options.filter(o => o.value === UNASSIGNED_PROJECT).length === 1;
 
   if (hasOneOption) {
     return options[0].label;
@@ -93,11 +95,12 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
     return checkedProjects[0].label;
   }
 
-  if (hasAllProjectsChecked && !hasUnassignedChecked) {
-    return 'All projects';
+  if ((hasAllProjectsChecked && (!hasUnassignedChecked || !unassignedAvailable))
+    || (hasNoProjectsChecked && !unassignedAvailable)){
+      return 'All projects';
   }
 
-  if (hasSomeProjectsChecked && !hasUnassignedChecked) {
+  if (hasSomeProjectsChecked) {
     return 'Multiple projects';
   }
 
