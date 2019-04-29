@@ -8,7 +8,6 @@ import (
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	project_update_tags "github.com/chef/automate/lib/authz"
@@ -1302,14 +1301,14 @@ func TestProjectUpdate(t *testing.T) {
 
 				suite.WaitForESJobToComplete(esJobID)
 
-				suite.RefreshIndices(fmt.Sprintf("%s-%s", mappings.ComplianceRepDate.Index, "*"))
+				suite.RefreshComplianceReportIndex()
 
 				esJobID, err = suite.ingesticESClient.UpdateSummaryProjectsTags(ctx, test.projects)
 				assert.Nil(t, err)
 
 				suite.WaitForESJobToComplete(esJobID)
 
-				suite.RefreshIndices(fmt.Sprintf("%s-%s", mappings.ComplianceSumDate.Index, "*"))
+				suite.RefreshComplianceSummaryIndex()
 
 				reports, err := suite.GetAllReportsESInSpecReport()
 				assert.NoError(t, err)
