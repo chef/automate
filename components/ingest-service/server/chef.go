@@ -30,7 +30,7 @@ type ChefIngestServer struct {
 func NewChefIngestServer(client backend.Client, authzClient iam_v2.ProjectsClient) *ChefIngestServer {
 	return &ChefIngestServer{
 		chefRunPipeline:    pipeline.NewChefRunPipeline(client, authzClient),
-		chefActionPipeline: pipeline.NewChefActionPipeline(client),
+		chefActionPipeline: pipeline.NewChefActionPipeline(client, authzClient),
 		client:             client,
 		authzClient:        authzClient,
 	}
