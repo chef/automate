@@ -185,7 +185,6 @@ func SystemPolicies() []*storage.Policy {
 				},
 				Projects: []string{constants.AllProjectsID},
 			},
-			// TODO can't delete admin team from admin policy
 		},
 	}
 
