@@ -198,20 +198,7 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
     }
   }
 
-  statusControls(controls) {
-    const failed = controls.failed.total;
-    const skipped = controls.skipped.total;
-    const passed = controls.passed.total;
-    switch (true) {
-      case (failed > 0): return 'failed';
-      case (passed > 0 || skipped === 0): return 'passed';
-      case (passed === 0 && skipped > 0): return 'skipped';
-      default: return '';
-    }
-  }
-
-  statusControlsSeverity(controls) {
-    const status = this.statusControls(controls);
+  statusControlsSeverity(controls, status) {
     switch (status) {
       case ('failed'): return `${controls.failed.total} Failed`;
       case ('passed'): return 'Passed';

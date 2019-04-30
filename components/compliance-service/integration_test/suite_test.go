@@ -27,6 +27,9 @@ import (
 	"google.golang.org/grpc"
 )
 
+var complianceReportIndex = fmt.Sprintf("%s-%s", mappings.ComplianceRepDate.Index, "*")
+var complianceSummaryIndex = fmt.Sprintf("%s-%s", mappings.ComplianceSumDate.Index, "*")
+
 // Suite helps you manipulate various stages of your tests, it provides
 // common functionality.
 type Suite struct {
@@ -124,10 +127,8 @@ func (s *Suite) GlobalTeardown() {
 func (s *Suite) GetAllReportsESInSpecReport() ([]*relaxting.ESInSpecReport, error) {
 	reports := make([]*relaxting.ESInSpecReport, 0)
 
-	index := fmt.Sprintf("%s-%s", mappings.ComplianceRepDate.Index, "*")
-
 	searchResult, err := s.elasticClient.Search().
-		Index(index).
+		Index(complianceReportIndex).
 		FilterPath(
 			"took",
 			"hits.total",
@@ -157,10 +158,8 @@ func (s *Suite) GetAllReportsESInSpecReport() ([]*relaxting.ESInSpecReport, erro
 func (s *Suite) GetAllSummaryESInSpecSummary() ([]*relaxting.ESInSpecSummary, error) {
 	summaries := make([]*relaxting.ESInSpecSummary, 0)
 
-	index := fmt.Sprintf("%s-%s", mappings.ComplianceSumDate.Index, "*")
-
 	searchResult, err := s.elasticClient.Search().
-		Index(index).
+		Index(complianceSummaryIndex).
 		FilterPath(
 			"took",
 			"hits.total",
@@ -219,10 +218,7 @@ func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) []strin
 		}
 	}
 
-	index := fmt.Sprintf("%s-%s", mappings.ComplianceRepDate.Index, "*")
-
-	// Refresh Indices
-	s.RefreshIndices(index)
+	s.RefreshComplianceReportIndex()
 
 	return ids
 }
@@ -243,12 +239,17 @@ func (s *Suite) InsertInspecSummaries(summaries []*relaxting.ESInSpecSummary) []
 		}
 	}
 
-	index := fmt.Sprintf("%s-%s", mappings.ComplianceSumDate.Index, "*")
-
-	// Refresh Indices
-	s.RefreshIndices(index)
+	s.RefreshComplianceSummaryIndex()
 
 	return ids
+}
+
+func (s *Suite) RefreshComplianceReportIndex() {
+	s.RefreshIndices(complianceReportIndex)
+}
+
+func (s *Suite) RefreshComplianceSummaryIndex() {
+	s.RefreshIndices(complianceSummaryIndex)
 }
 
 // RefreshIndices will refresh the provided ES Index or list of Indices

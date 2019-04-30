@@ -26,6 +26,7 @@ NATS Flags:
 NATS Options:
 	--auth-token <token>   Automate auth token (must have ingest permissions)
 	--port       <port>    NATS port to connect (default:4222)
+	--disable-tls          Disables TLS when connecting to the server (only applies for event-gateway/external NATS)
 
 Options to build a Habitat Event message:
 	--sup-id      <id>     The Supervisor ID
@@ -69,6 +70,7 @@ func main() {
 		uniqID       bool
 		infiniteLoop bool
 		internalNats bool
+		disableTLS   bool
 		health       int
 		status       int
 		client       *nats.NatsClient
@@ -97,10 +99,15 @@ func main() {
 	flag.BoolVar(&uniqID, "uniq-client-id", false, "Generate a unique client-id to connect to server")
 	flag.BoolVar(&infiniteLoop, "infinite-stream", false, "Publish message every second infinitely")
 	flag.BoolVar(&internalNats, "internal-nats", false, "Connect to the Automate Internal NATS Server")
+	flag.BoolVar(&disableTLS, "disable-tls", false, "Disable TLS when connecting to NATS")
 
 	log.SetFlags(0)
 	flag.Usage = usage
 	flag.Parse()
+
+	if uniqID {
+		clientID = "applications-publisher-" + strconv.FormatInt(t.UnixNano(), 10)
+	}
 
 	if internalNats {
 		client = nats.New(
@@ -122,15 +129,12 @@ func main() {
 			fmt.Sprintf("nats://%s@0.0.0.0:%s", authToken, port),
 			"event-service", clientID, "", "habitat")
 		client.InsecureSkipVerify = true
+		client.DisableTLS = disableTLS
 	}
 
 	// Convert proto enums
 	event.HealthCheck = applications.HealthStatus(health)
 	event.Status = applications.ServiceStatus(status)
-
-	if uniqID {
-		clientID = "applications-publisher-" + strconv.FormatInt(t.UnixNano(), 10)
-	}
 
 	if infiniteLoop {
 		err := client.Connect()

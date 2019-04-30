@@ -24,6 +24,7 @@ type Service struct {
 	Port        int    `mapstructure:"port"`
 	MetricsPort int    `mapstructure:"metrics_port"`
 	LogLevel    string `mapstructure:"log_level"`
+	Enabled     bool   `mapstructure:"enabled"`
 }
 
 // Events holds configuration to connect to the NATS server inside the event-service

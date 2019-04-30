@@ -15,6 +15,7 @@ import { ManagerEffects } from './entities/managers/manager.effects';
 import { PolicyEffects } from './entities/policies/policy.effects';
 import { ProfileEffects } from './entities/profiles/profile.effects';
 import { ProjectEffects } from './entities/projects/project.effects';
+import { ProjectsFilterEffects } from './services/projects-filter/projects-filter.effects';
 import { RoleEffects } from './entities/roles/role.effects';
 import { ServiceGroupsEffects } from './entities/service-groups/service-groups.effects';
 import { ScannerEffects } from './pages/+compliance/+scanner/state/scanner.effects';
@@ -38,6 +39,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       PolicyEffects,
       ProfileEffects,
       ProjectEffects,
+      ProjectsFilterEffects,
       RoleEffects,
       ServiceGroupsEffects,
       ScannerEffects,

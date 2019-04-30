@@ -21,6 +21,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
+	"github.com/chef/automate/components/automate-deployment/pkg/persistence"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	es "github.com/chef/automate/components/es-sidecar-service/pkg/elastic"
@@ -47,6 +48,9 @@ type Runner struct {
 	// Since we rely on a deployment lock for operations that change state
 	// we only need to track a single task and don't need another mutex.
 	runningTask *CancellableTask
+
+	// Used to save the backup manifest at the end of the restore
+	deploymentStore persistence.DeploymentStore
 
 	pgConnInfo      pg.ConnInfo
 	esSidecarInfo   ESSidecarConnInfo
@@ -146,6 +150,13 @@ func WithTarget(target target.Target) RunnerOpt {
 func WithReleaseManifest(releaseManifest manifest.ReleaseManifest) RunnerOpt {
 	return func(runner *Runner) {
 		runner.releaseManifest = releaseManifest
+	}
+}
+
+// WithDeploymentStore sets the deployment store for the runner
+func WithDeploymentStore(deploymentStore persistence.DeploymentStore) RunnerOpt {
+	return func(runner *Runner) {
+		runner.deploymentStore = deploymentStore
 	}
 }
 
@@ -469,6 +480,9 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 		// and that any listeners on the event stream will get the task complete
 		// signal.
 		r.unlockDeployment()
+		if r.eventSender != nil {
+			r.eventSender.TaskComplete()
+		}
 		close(r.errChan)
 		close(r.eventTerm)
 		r.clearRunningTask()
@@ -544,6 +558,27 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 
 	if err = r.restoreServices(desiredServices, restoreCtx, cancel); err != nil {
 		r.failf(err, "Failed to restore services")
+		return
+	}
+
+	m, ok := backupManifest.(*manifest.A2)
+	if !ok {
+		r.failf(errors.New("Unknown backup manifest type"), "Failed to persist manifest")
+		return
+	}
+
+	r.lockedDeployment.CurrentReleaseManifest = m
+	_, err = r.deploymentStore.UpdateDeployment(func(d *deployment.Deployment) error {
+		// TODO(jaym) This is not the right way to interact with deployment store. We should
+		//            modify the deployment it gives us with the updates we want and not
+		//            keep around a copy of it in memory. It turns out that doing that is
+		//            still too hard because there are objects that need to be initialized
+		//            one the deployment after deserialization.
+		*d = *r.lockedDeployment // nolint: govet
+		return nil
+	})
+	if err != nil {
+		r.failf(err, "Failed to persist deployment")
 		return
 	}
 

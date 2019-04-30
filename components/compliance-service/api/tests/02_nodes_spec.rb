@@ -922,15 +922,20 @@ describe File.basename(__FILE__) do
     assert_equal(expected_nodes, actual_nodes.to_json)
 
     # Cover the other sort fields:
-    resp = GRPC reporting, :list_nodes, Reporting::Query.new(sort: 'platform', order: 1)
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])], sort: 'platform', order: 1)
     assert_equal(Reporting::Nodes, resp.class)
-    resp = GRPC reporting, :list_nodes, Reporting::Query.new(sort: 'latest_report.status')
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])], sort: 'latest_report.status')
     assert_equal(Reporting::Nodes, resp.class)
-    resp = GRPC reporting, :list_nodes, Reporting::Query.new(sort: 'latest_report.end_time')
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])], sort: 'latest_report.end_time')
     assert_equal(Reporting::Nodes, resp.class)
-    resp = GRPC reporting, :list_nodes, Reporting::Query.new(sort: 'latest_report.controls.failed.total')
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])], sort: 'latest_report.controls.failed.total')
     assert_equal(Reporting::Nodes, resp.class)
-    resp = GRPC reporting, :list_nodes, Reporting::Query.new(sort: 'latest_report.controls.failed.critical')
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(
+      filters: [Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])], sort: 'latest_report.controls.failed.critical')
     assert_equal(Reporting::Nodes, resp.class)
 
     # Node details API

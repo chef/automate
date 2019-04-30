@@ -14,6 +14,11 @@ export const allServiceGroups = createSelector(
   (state) => state.serviceGroups
 );
 
+export const allServiceGroupHealth = createSelector(
+  serviceGroupState,
+  (state) => state.serviceGroupHealthCounts
+);
+
 export const serviceGroupErrorResp = createSelector(
   serviceGroupState,
   (state) => state.errorResp

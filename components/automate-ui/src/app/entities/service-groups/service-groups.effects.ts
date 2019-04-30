@@ -6,11 +6,17 @@ import { Injectable } from '@angular/core';
 import { Actions, ofType, Effect } from '@ngrx/effects';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { ServiceGroupsPayload, ServicesPayload } from './service-groups.model';
+import { ServiceGroupsPayload,
+  HealthSummary,
+  ServicesPayload
+      } from './service-groups.model';
 import { ServiceGroupEntityState } from './service-groups.reducer';
 import {
   ServiceGroupsActionTypes,
   GetServiceGroups,
+  GetServiceGroupsCounts,
+  GetServiceGroupsCountsSuccess,
+  GetServiceGroupsCountsFailure,
   GetServicesBySG,
   GetServicesBySGSuccess,
   GetServicesBySGFailure,
@@ -42,17 +48,25 @@ export class ServiceGroupsEffects {
   @Effect()
   updateServiceGroupsFilters$ = this.actions$.pipe(
       ofType(ServiceGroupsActionTypes.UPDATE_SERVICE_GROUPS_FILTER),
-      mergeMap(() => [
-        new GetServiceGroups()
-        // new GetServiceGroupsCounts() // When this function is ready, uncomment this line!
-      ]));
+      mergeMap(() => [ new GetServiceGroups(), new GetServiceGroupsCounts() ]));
+
+  @Effect()
+  getServiceGroupsCounts$ = this.actions$.pipe(
+      ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS),
+      withLatestFrom(this.store),
+      switchMap(([_action]) => {
+        return this.requests.fetchServiceGroupHealth().pipe(
+        map((payload: HealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
+        catchError((error: HttpErrorResponse) => of(new GetServiceGroupsCountsFailure(error)))
+      );
+      }));
 
   @Effect()
   updateSelectedServiceGroup$ = this.actions$.pipe(
-      ofType(ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP),
-      mergeMap(() => [
-        new GetServicesBySG()
-      ]));
+    ofType(ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP),
+    mergeMap(() => [
+      new GetServicesBySG()
+    ]));
 
   @Effect()
   getServicesBySG$ = this.actions$.pipe(

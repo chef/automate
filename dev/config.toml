@@ -109,6 +109,13 @@ shared_buffers = "1GB"
       [event_gateway.v1.sys.service]
         enable_nats_feature = true
 
+# applications-service
+[applications]
+  [applications.v1]
+    [applications.v1.sys]
+      [applications.v1.sys.service]
+        enable_nats_feature = true
+
 [license_control.v1.sys.telemetry]
 url = "https://telemetry-acceptance.chef.io"
 

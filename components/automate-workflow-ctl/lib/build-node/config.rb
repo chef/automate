@@ -146,7 +146,7 @@ module BuildNode
     def self.parse_args!(args, stdout)
       options = {}
       OptionParser.new do |opts|
-        opts.banner = "Command: automate-ctl install-build-node [...options...]"
+        opts.banner = "Command: workflow-ctl install-build-node [...options...]"
         opts.on("-h", "--help", "Prints this help") do
           stdout.call opts
           exit

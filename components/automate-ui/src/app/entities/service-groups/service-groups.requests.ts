@@ -3,7 +3,9 @@ import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 import {
-  ServiceGroupsPayload, ServiceGroupFilters, ServicesPayload, ServicesFilters
+  ServiceGroupsPayload, ServiceGroupFilters,
+  HealthSummary,
+  ServicesPayload, ServicesFilters
 } from './service-groups.model';
 import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
@@ -59,13 +61,22 @@ export class ServiceGroupsRequests {
 
   public buildServicesBySGFilterParams(filters?: ServicesFilters): HttpParams {
     let params = new HttpParams();
-
     if (filters) {
       if (filters.health && filters.health !== 'total') {
         params = params.append('health', filters.health);
       }
+      if (filters.page && filters.pageSize) {
+        params = params.append('pagination.page', filters.page.toString());
+        params = params.append('pagination.size', filters.pageSize.toString());
+      }
     }
 
     return params;
+  }
+
+  public fetchServiceGroupHealth(): Observable<HealthSummary> {
+    const url = `${APPLICATIONS_URL}/service_groups_health_counts`;
+
+    return this.httpClient.get<HealthSummary>(url);
   }
 }

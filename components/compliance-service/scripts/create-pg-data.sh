@@ -10,9 +10,12 @@
 
 url=${A2_URL}
 token=${A2_TOKEN}
-node_count=10
-job_count=2
+node_count=12
+job_count=3
+docker_machine=`docker ps | awk 'FNR == 2 {print $1}'`
 
+echo "target docker machine: " $docker_machine
+echo "target acceptance host: " $AUTOMATE_ACCEPTANCE_TARGET_HOST
 echo "running data generation script for pg data against ${url} with ${token}"
 
 # create the ssh secrets
@@ -33,8 +36,8 @@ ssh_secret_ec2=$(curl -s --insecure -H "api-token: $token" $url/api/v0/secrets -
   "name": "my ssh secret",
   "type": "ssh",
   "data": [
-    { "key": "username", "value": "$AUTOMATE_ACCEPTANCE_TARGET_USERNAME" },
-    { "key": "password", "value": "$AUTOMATE_ACCEPTANCE_TARGET_PASSWORD" }
+    { "key": "username", "value": "'${AUTOMATE_ACCEPTANCE_TARGET_USERNAME}'" },
+    { "key": "password", "value": "'${AUTOMATE_ACCEPTANCE_TARGET_PASSWORD}'" }
   ]
 }'  | jq '.id')
 
@@ -42,7 +45,7 @@ echo $ssh_secret_ec2
 
 
 # add nodes
-for i in $(seq 1 $((node_count/2))); do
+for i in $(seq 1 $((node_count/3))); do
   echo "creating node" $i
   vagrant_node_id=$( curl -s --insecure -H "api-token: $token" $url/api/v0/nodes -d '{
     "name": "my-vagrant-node",
@@ -55,19 +58,35 @@ for i in $(seq 1 $((node_count/2))); do
       },
       "tags": [
         { "key":"test-node", "value":"is amazing" },
-        { "key":"compliance-service", "value":"rockin like whoa" },
-        { "key": "_no_auto_detect", "value": "true"}
+        { "key":"compliance-service", "value":"rockin like whoa" }
       ]
   }' | jq '.id'); echo $vagrant_node_id; done
 
-for i in $(seq 1 $((node_count/2))); do
+ for i in $(seq 1 $((node_count/3))); do
+  echo "creating node" $i
+  docker_node_id=$( curl -s --insecure -H "api-token: $token" $url/api/v0/nodes -d '{
+    "name": "my-docker-node",
+    "manager":"automate",
+      "target_config": {
+        "backend":"docker",
+        "host":"'${docker_machine}'",
+        "secrets":[],
+        "port": 22
+      },
+      "tags": [
+        { "key":"test-node", "value":"is amazing" },
+        { "key":"compliance-service", "value":"rockin like whoa" }
+      ]
+  }' | jq '.id'); echo $docker_node_id; done 
+
+for i in $(seq 1 $((node_count/3))); do
   echo "creating node" $i
   ec2_node_id=$( curl -s --insecure -H "api-token: $token" $url/api/v0/nodes -d '{
     "name": "my-ssh-node",
     "manager":"automate",
       "target_config": {
         "backend":"ssh",
-        "host":"$AUTOMATE_ACCEPTANCE_TARGET_HOST",
+        "host":"'${AUTOMATE_ACCEPTANCE_TARGET_HOST}'",
         "secrets":['${ssh_secret_ec2}'],
         "port": 22
       },
@@ -88,7 +107,7 @@ for i in $(seq 1 ${job_count}); do
       "name": "my job",
       "tags": [],
       "type": "exec",
-      "nodes": ['${vagrant_node_id}', '${ec2_node_id}'],
+      "nodes": ['${ec2_node_id}'],
       "profiles": ["https://github.com/dev-sec/linux-baseline/archive/master.tar.gz", "https://github.com/dev-sec/ssh-baseline/archive/master.tar.gz"],
       "retries": 1,
       "node_selectors": []

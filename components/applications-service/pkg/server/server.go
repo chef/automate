@@ -153,6 +153,15 @@ func (app *ApplicationsServer) GetServicesBySG(
 		}
 	)
 
+	// Get the HealthCounts for every single service that belongs to the provided service-group id
+	// NOTE: @afiune We do not add the 'health' filter here that will alter the result of the services
+	// HealthCounts and as we mentioned earlier, we want all services from the provided service-group id
+	svcsHealthCounts, err := app.storageClient.GetServicesHealthCounts(filters)
+	if err != nil {
+		log.WithError(err).Error("Error retrieving services health counts by service_group(s)")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	// Adds the health filter if any was specified and converts the string to be uppercases
 	if len(request.GetHealth()) != 0 {
 		filters["health"] = []string{strings.ToUpper(request.GetHealth())}
@@ -173,6 +182,13 @@ func (app *ApplicationsServer) GetServicesBySG(
 	return &applications.ServicesBySGRes{
 		Group:    sgName,
 		Services: convertStorageServicesToApplicationsServices(services),
+		ServicesHealthCounts: &applications.HealthCounts{
+			Total:    svcsHealthCounts.Total,
+			Ok:       svcsHealthCounts.Ok,
+			Warning:  svcsHealthCounts.Warning,
+			Critical: svcsHealthCounts.Critical,
+			Unknown:  svcsHealthCounts.Unknown,
+		},
 	}, nil
 }
 

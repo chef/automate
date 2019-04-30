@@ -212,15 +212,15 @@ func decryptString(ciphertext string, key string) (*string, error) {
 }
 
 //UpdateSecret updates a secret in the db with input values
-func (secretsDb *DB) UpdateSecret(inSecret *secrets.Secret) (count int64, err error) {
+func (secretsDb *DB) UpdateSecret(inSecret *secrets.Secret) error {
 	secret, err := secretsDb.toDBSecret(inSecret)
 	if err != nil {
 		err = errors.Wrap(err, fmt.Sprintf("UpdateSecret: unable to translate secret to db struct %+v", inSecret))
-		return
+		return err
 	}
 	secret.LastModified = timeNowRef()
 
-	err = Transact(secretsDb, func(tx *DBTrans) error {
+	return Transact(secretsDb, func(tx *DBTrans) error {
 		//get list of tags from current secret
 		_, err := tx.Exec(deleteSecretTags, secret.ID)
 		if err != nil {
@@ -243,8 +243,6 @@ func (secretsDb *DB) UpdateSecret(inSecret *secrets.Secret) (count int64, err er
 		}
 		return nil
 	})
-
-	return
 }
 
 // AddSecret adds a secret to the db

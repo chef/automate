@@ -259,3 +259,21 @@ function go_component_static_tests() {
 }
 # Adding auto tab complete
 complete -F _component_auto_complete go_component_static_tests
+
+document "go_component_make" <<DOC
+  Runs the given make target(s) for the given component inside the scaffolding_go_pkg_path
+DOC
+function go_component_make() {
+  [[ "$1" == "" ]] && error "Missing component name argument" && return 1;
+  setup_go_workspace
+  local component_relpath=$1
+  local component_path="$GOPATH/src/github.com/chef/automate/$component_relpath"
+  shift
+  pushd "$component_path" > /dev/null || (echo "invalid component; cannot cd to $component_path" && return 1)
+  echo "in $component_path"
+  echo "make $*"
+  make "$@"
+  local return_code=$?
+  popd > /dev/null || return 1
+  return $return_code
+}

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/golang/protobuf/ptypes/timestamp"
+	tspb "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 
@@ -12,6 +12,7 @@ import (
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
 	"github.com/chef/automate/api/interservice/cfgmgmt/service"
 	api "github.com/chef/automate/api/interservice/deployment"
+	tslib "github.com/chef/automate/lib/grpc/timestamp"
 )
 
 func (s *server) Usage(ctx context.Context,
@@ -32,7 +33,7 @@ func (s *server) Usage(ctx context.Context,
 	}, nil
 }
 
-func (s *server) getConfigMgmtNodes(ctx context.Context, startTime *timestamp.Timestamp) ([]*api.NodeUsage, error) {
+func (s *server) getConfigMgmtNodes(ctx context.Context, startTime *tspb.Timestamp) ([]*api.NodeUsage, error) {
 	var nodeCollection []*api.NodeUsage
 
 	configMgmtAddr := s.AddressForService("config-mgmt-service")
@@ -96,8 +97,8 @@ type nodeUsageMetadata struct {
 }
 
 func populateUsageNode(node *response.InventoryNode) (*api.NodeUsage, error) {
-	lastSeen := toTimeString(node.Checkin)
-	lastCcrReceived := toTimeString(node.LastCcrReceived)
+	lastSeen := tslib.TimestampString(node.Checkin)
+	lastCcrReceived := tslib.TimestampString(node.LastCcrReceived)
 	checkinType := ""
 	if lastSeen == lastCcrReceived {
 		checkinType = "chef-client"

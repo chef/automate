@@ -6,6 +6,8 @@ import data.roles
 
 default authorized = false
 
+const_all_projects = "~~ALL-PROJECTS~~"
+
 has_member[pol_id] {
 	pol_sub := policies[pol_id].members[_]
 	input_sub := input.subjects[_]
@@ -50,8 +52,9 @@ has_action[[pol_id, statement_id]] {
 }
 
 has_project[[project, pol_id, statement_id]] {
-	project := policies[pol_id].statements[statement_id].projects[_]
-	project_matches(input.projects[_], project)
+	proj := policies[pol_id].statements[statement_id].projects[_]
+	projects := project_matches(proj)
+	project := projects[_]
 }
 
 has_project[[project, pol_id, statement_id]] {
@@ -64,16 +67,15 @@ has_project[[project, pol_id, statement_id]] {
 	not input.projects
 }
 
-project_matches(_, stored) {
-	stored == "~~ALL-PROJECTS~~"
+project_matches(proj) = projects {
+	proj == const_all_projects
+	projects := input.projects
 }
 
-project_matches(in, stored) {
-	stored == in
-}
-
-project_matches(in, _) {
-	count(in) == 0
+project_matches(proj) = projects {
+	proj != const_all_projects
+	proj = input.projects[_]
+	projects := [proj]
 }
 
 match[[effect, pol_id, statement_id]] {
@@ -97,6 +99,19 @@ allowed_project[project] {
 	has_project[[project, pol_id, statement_id]]
 }
 
+denied_project[project] {
+	match[["deny", pol_id, statement_id]]
+	has_project[[project, pol_id, statement_id]]
+}
+
+# when no input is provided, this rule short-circuits checking any other allowed projects
+denied_all_projects {
+	match[["deny", pol_id, statement_id]]
+	const_all_projects == policies[pol_id].statements[statement_id].projects[_]
+}
+
 authorized_project[project] {
+	not denied_all_projects
 	allowed_project[project]
+	not denied_project[project]
 }

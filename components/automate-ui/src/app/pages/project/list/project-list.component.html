@@ -14,37 +14,57 @@
     </section>
 
     <section *ngIf="(iamMinorVersion$ | async) === 'v1'" class="page-body">
-      <chef-toolbar>
-        <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
-          <chef-button id="create-button" primary (click)="openCreateModal()">Create Project</chef-button>
+      <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
+        <chef-toolbar>
+          <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+            <chef-button id="create-button" primary (click)="openCreateModal()">Create Project</chef-button>
+          </app-authorized>
+        </chef-toolbar>
+        <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Name</chef-th>
+                <chef-th>Type</chef-th>
+                <chef-th class="controls"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let project of sortedProjects$ | async">
+                <chef-td>
+                  <a [routerLink]="['/settings/projects', project.id]">{{ project.name }}</a>
+                </chef-td>
+                <chef-td>{{ project.type | iamType }}</chef-td>
+                <chef-td class="controls">
+                  <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
+                    <chef-control-menu>
+                      <chef-option (click)="startProjectDelete(project)">Delete Project</chef-option>
+                    </chef-control-menu>
+                  </app-authorized>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
         </app-authorized>
-      </chef-toolbar>
-      <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
-        <chef-table>
-          <chef-thead>
-            <chef-tr>
-              <chef-th>Name</chef-th>
-              <chef-th>Type</chef-th>
-              <chef-th class="controls"></chef-th>
-            </chef-tr>
-          </chef-thead>
-          <chef-tbody>
-            <chef-tr *ngFor="let project of sortedProjects$ | async">
-              <chef-td>
-                <a [routerLink]="['/settings/projects', project.id]">{{ project.name }}</a>
-              </chef-td>
-              <chef-td>{{ project.type | iamType }}</chef-td>
-              <chef-td class="controls">
-                <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
-                  <chef-control-menu>
-                    <chef-option (click)="startProjectDelete(project)">Delete Project</chef-option>
-                  </chef-control-menu>
-                </app-authorized>
-              </chef-td>
-            </chef-tr>
-          </chef-tbody>
-        </chef-table>
-      </app-authorized>
+      </ng-container>
+      <ng-container *ngIf="(sortedProjects$ | async)?.length === 0">
+        <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+          <div class="empty-case-container">
+            <p>Create the first project to get started!</p>
+          </div>
+          <div class="empty-case-container">
+              <chef-button primary (click)="openCreateModal()">Create Project</chef-button>
+          </div>
+        </app-authorized>
+        <app-authorized not [allOf]="['/iam/v2beta/projects', 'post']">
+          <div class="empty-case-container">
+            <p>It looks like no one has created any projects yet and you<br/>
+              don't have permission to create them.<br/><br/>
+              If this is a mistake, then reach out to your administrator.
+            </p>
+          </div>
+        </app-authorized>
+      </ng-container>
     </section>
 
     <app-create-object-modal

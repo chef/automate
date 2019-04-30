@@ -25,21 +25,20 @@ var serveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		conf, err := configFromViper()
 		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Fatal("Failed to load config")
+			log.WithError(err).Fatal("Failed to load config")
 		}
 		conf.Service.SetLogLevel()
 		tlsOpts, err := conf.ReadCerts()
 		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Fatal("Failed to load SSL key/cert files")
+			log.WithError(err).Fatal("Failed to load SSL key/cert files")
 		}
 		connFactory := secureconn.NewFactory(*tlsOpts)
 		log.Info("Starting Secrets Services")
 
-		grpc.Spawn(conf, connFactory)
+		err = grpc.Spawn(conf, connFactory)
+		if err != nil {
+			log.WithError(err).Fatal("gRPC server failed")
+		}
 	},
 }
 

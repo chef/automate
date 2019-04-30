@@ -26,7 +26,7 @@ var (
 
 	timeLastEventSeen = float64(time.Now().Unix())
 
-	timeLastEventSeenCounter = promauto.NewCounterFunc(prometheus.CounterOpts{
+	_ = promauto.NewCounterFunc(prometheus.CounterOpts{
 		Name: "applications_ingest_ops_last_time",
 		Help: "Time when the last applications message was accepted for ingestion",
 	},
@@ -45,7 +45,7 @@ var (
 )
 
 // IngestHabEvents process habitat events and store them into the database
-func (db *postgres) IngestHabEvent(event *applications.HabService) error {
+func (db *Postgres) IngestHabEvent(event *applications.HabService) error {
 	opsInFlight.Inc()
 	defer opsInFlight.Dec()
 	processingStart := time.Now()
@@ -66,7 +66,7 @@ func (db *postgres) IngestHabEvent(event *applications.HabService) error {
 }
 
 // IngestHabEvents process habitat events and store them into the database
-func (db *postgres) IngestHabEventWithoutMetrics(event *applications.HabService) error {
+func (db *Postgres) IngestHabEventWithoutMetrics(event *applications.HabService) error {
 	log.WithFields(log.Fields{
 		"storage": "postgres",
 		"message": event,
@@ -98,7 +98,7 @@ func (db *postgres) IngestHabEventWithoutMetrics(event *applications.HabService)
 // insertNewService assumes the service to be inserted doesn't exist already,
 // this function is wrapped with a transaction func since it could do multiple things
 // like insert a supervisor, service_group, deployment and the service itself.
-func (db *postgres) insertNewService(event *applications.HabService) error {
+func (db *Postgres) insertNewService(event *applications.HabService) error {
 
 	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
 
@@ -194,7 +194,7 @@ WHERE app_name = $1
   AND environment = $2
 `
 
-func (db *postgres) getDeploymentID(app, env string) (int32, bool) {
+func (db *Postgres) getDeploymentID(app, env string) (int32, bool) {
 	var id int32
 	err := db.SelectOne(&id, selectDeploymentID, app, env)
 	if err != nil {
@@ -209,7 +209,7 @@ SELECT id FROM supervisor
 WHERE member_id = $1
 `
 
-func (db *postgres) getSupervisorID(member string) (int32, bool) {
+func (db *Postgres) getSupervisorID(member string) (int32, bool) {
 	var sid int32
 	err := db.SelectOne(&sid, selectSupervisorID, member)
 	if err != nil {
@@ -224,7 +224,7 @@ SELECT id FROM service_group
 WHERE name = $1
 `
 
-func (db *postgres) getServiceGroupID(name string) (int32, bool) {
+func (db *Postgres) getServiceGroupID(name string) (int32, bool) {
 	var gid int32
 	err := db.SelectOne(&gid, selectServiceGroupID, name)
 	if err != nil {

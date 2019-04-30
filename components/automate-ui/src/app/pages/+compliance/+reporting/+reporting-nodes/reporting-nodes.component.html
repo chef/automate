@@ -60,8 +60,8 @@
         <chef-td>{{ node.environment }}</chef-td>
         <chef-td>{{ formatTime(node.latest_report.end_time) }}</chef-td>
         <chef-td>
-          <span class="controls-status" [ngClass]="statusControls(node.latest_report.controls)">
-            {{ statusControlsSeverity(node.latest_report.controls) | uppercase }}
+          <span class="controls-status" [ngClass]="node.latest_report.status">
+            {{ statusControlsSeverity(node.latest_report.controls, node.latest_report.status) | uppercase }}
           </span>
         </chef-td>
         <chef-td>

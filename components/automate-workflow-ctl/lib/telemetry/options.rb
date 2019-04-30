@@ -6,7 +6,7 @@ module Telemetry
 
     def initialize(args, desc)
       super(args,
-            "Usage: automate-ctl telemetry ACTION",
+            "Usage: workflow-ctl telemetry ACTION",
             description: desc,
             arguments: {
                 "ACTION" => "Action to take on Telemetry. It must be enable, disable or status.",

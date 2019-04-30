@@ -6,6 +6,7 @@ import { Filter } from '../types';
 import { paginationOverride } from '../shared';
 import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
 import { ChefSessionService } from '../../../../services/chef-session/chef-session.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-reporting-profiles',
@@ -113,7 +114,8 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
       type: { name: 'profile_id' },
       value: { text: profile.id }
     };
-
+    listParams['sort'] = 'latest_report.end_time';
+    listParams['order'] = 'desc';
     this.statsService.getNodes(filters, listParams).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
@@ -207,4 +209,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     this.openControls[control.id].pane = pane;
   }
 
+  formatDaysAgo(timestamp) {
+    return moment(timestamp).fromNow();
+  }
 }

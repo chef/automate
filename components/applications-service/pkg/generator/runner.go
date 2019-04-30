@@ -25,7 +25,7 @@ type RunnerConfig struct {
 }
 
 type LoadGenRunner struct {
-	SupervisorGroups []*SupervisorGroup
+	SupervisorGroups SupervisorGroupCollection
 	stats            *RunnerStatsKeeper
 }
 
@@ -42,6 +42,8 @@ func (r *LoadGenRunner) Run(cfg *RunnerConfig) {
 
 	log.SetLevel(logLevel)
 
+	fmt.Print(r.SupervisorGroups.RollupStats())
+
 	for _, supGroup := range r.SupervisorGroups {
 		fmt.Print(supGroup.PrettyStr())
 	}
@@ -52,6 +54,44 @@ func (r *LoadGenRunner) Run(cfg *RunnerConfig) {
 	for _, g := range r.SupervisorGroups {
 		g.Run(cfg, r.stats)
 	}
+}
+
+type SupervisorGroupCollection []*SupervisorGroup
+
+func (s SupervisorGroupCollection) RollupStats() string {
+	var b strings.Builder
+
+	headerStr := fmt.Sprintf("Totals")
+	fmt.Fprintln(&b, headerStr)
+	fmt.Fprintln(&b, strings.Repeat("=", len(headerStr)))
+
+	fmt.Fprintf(&b, "Supervisor groups:  %d\n", len(s))
+	fmt.Fprintf(&b, "Total Supervisors:  %d\n", s.TotalSups())
+	fmt.Fprintf(&b, "Total Services:     %d\n", s.TotalSvcs())
+	fmt.Fprintf(&b, "HealthCheck rate/s: %.2f\n", s.HealthCheckRate())
+	fmt.Fprintln(&b, "")
+	return b.String()
+}
+
+func (s SupervisorGroupCollection) TotalSups() int32 {
+	var total int32
+	for _, supGroup := range s {
+		total += supGroup.Count
+	}
+	return total
+}
+
+func (s SupervisorGroupCollection) TotalSvcs() int32 {
+	var total int32
+	for _, supGroup := range s {
+		total += supGroup.Count * int32(len(supGroup.MessagePrototypes))
+	}
+	return total
+}
+
+// Have to assume a default RunnerConfig.Tick of 30s here.
+func (s SupervisorGroupCollection) HealthCheckRate() float64 {
+	return float64(s.TotalSvcs()) / float64(30)
 }
 
 type SupervisorGroup struct {
@@ -82,15 +122,25 @@ func (s *SupervisorGroup) PrettyStr() string {
 func (s *SupervisorGroup) Run(cfg *RunnerConfig, stats *RunnerStatsKeeper) {
 	for n := int32(0); n < s.Count; n++ {
 		log.WithFields(log.Fields{"name": s.Name, "index": n}).Info("spawning supervisor")
-		go s.SpawnSup(n, cfg, stats)
+		sup, err := s.NewSup(n, cfg, stats) // nolint: errcheck
+		if err != nil {
+			log.WithError(err).Error("failed to spawn supervisor")
+			continue
+		}
+		err = sup.Connect()
+		if err != nil {
+			log.WithError(err).Error("failed to spawn supervisor")
+			continue
+		}
+		go sup.Run()
 	}
 }
 
-func (s *SupervisorGroup) SpawnSup(n int32, cfg *RunnerConfig, stats *RunnerStatsKeeper) error {
+func (s *SupervisorGroup) NewSup(n int32, cfg *RunnerConfig, stats *RunnerStatsKeeper) (*SupSim, error) {
 	uuid, err := uuid.NewV4()
 	if err != nil {
 		log.WithError(err).Error("Failed to make a V4 UUID")
-		return err
+		return nil, err
 	}
 
 	sup := &SupSim{
@@ -100,14 +150,7 @@ func (s *SupervisorGroup) SpawnSup(n int32, cfg *RunnerConfig, stats *RunnerStat
 		MessagePrototypes: s.MessagePrototypes,
 		Stats:             stats,
 	}
-
-	err = sup.Run()
-	if err != nil {
-		fmt.Printf("Supervisor failed to run: %s\n", err)
-		return err
-	}
-
-	return nil
+	return sup, nil
 }
 
 type SupSim struct {
@@ -120,10 +163,7 @@ type SupSim struct {
 	nc                *nats.NatsClient
 }
 
-func (s *SupSim) Run() error {
-	s.Stats.SupStarted()
-	defer s.Stats.SupDied()
-
+func (s *SupSim) Connect() error {
 	var (
 		url     = fmt.Sprintf("nats://%s@%s:4222", s.Cfg.AuthToken, s.Cfg.Host)
 		cluster = "event-service"
@@ -134,10 +174,12 @@ func (s *SupSim) Run() error {
 
 	s.nc = nats.NewExternalClient(url, cluster, client, durable, subject)
 	s.nc.InsecureSkipVerify = true
-	err := s.nc.Connect()
-	if err != nil {
-		return err
-	}
+	return s.nc.Connect()
+}
+
+func (s *SupSim) Run() {
+	s.Stats.SupStarted()
+	defer s.Stats.SupDied()
 	defer s.nc.Close()
 	// run loadgen loop
 
@@ -148,13 +190,12 @@ func (s *SupSim) Run() error {
 	// we get a random splay, publish once, then loop.
 	splay := rand.Int31n(int32(s.Cfg.Tick))
 	time.Sleep(time.Duration(splay) * time.Second)
-	s.PublishAll()
+	s.PublishAll() // nolint: errcheck
 
 	ticker := time.NewTicker(time.Duration(s.Cfg.Tick) * time.Second)
 	for _ = range ticker.C {
-		s.PublishAll()
+		s.PublishAll() // nolint: errcheck
 	}
-	return nil
 }
 
 func (s *SupSim) PublishAll() error {

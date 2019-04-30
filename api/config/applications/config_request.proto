@@ -28,6 +28,7 @@ message ConfigRequest {
 				google.protobuf.StringValue host = 1;
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10133, protocol: "grpc" } ];
 				google.protobuf.Int32Value metrics_port = 3 [ (chef.automate.api.port) = { name: "prometheus", default: 20133, protocol: "http" } ];
+				google.protobuf.BoolValue enable_nats_feature = 4;
 			}
 
 			message Log {

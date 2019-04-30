@@ -338,19 +338,13 @@ func (depth *ReportDepth) getStatsSummaryResult(aggRoot *elastic.SearchResult) *
 
 func (depth *ReportDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggregation {
 	aggCompliant := elastic.NewFilterAggregation().
-		Filter(elastic.NewBoolQuery().
-			Must(elastic.NewTermQuery("controls_sums.failed.total", 0)).
-			Should(elastic.NewTermQuery("controls_sums.skipped.total", 0),
-				elastic.NewRangeQuery("controls_sums.passed.total").Gt(0)))
+		Filter(elastic.NewTermQuery("status", "passed"))
 
 	aggSkipped := elastic.NewFilterAggregation().
-		Filter(elastic.NewBoolQuery().
-			Must(elastic.NewTermQuery("controls_sums.failed.total", 0)).
-			Must(elastic.NewTermQuery("controls_sums.passed.total", 0)).
-			Must(elastic.NewRangeQuery("controls_sums.skipped.total").Gt(0)))
+		Filter(elastic.NewTermQuery("status", "skipped"))
 
 	aggNoncompliant := elastic.NewFilterAggregation().
-		Filter(elastic.NewRangeQuery("controls_sums.failed.total").Gt(0))
+		Filter(elastic.NewTermQuery("status", "failed"))
 
 	aggHighRisk := elastic.NewFilterAggregation().
 		Filter(elastic.NewRangeQuery("controls_sums.failed.critical").Gt(0))

@@ -70,7 +70,7 @@ wait_for_upgrade() {
 }
 
 hardened_security_inspec_scan() {
-    /opt/chef/embedded/bin/inspec exec /tmp/a2-hardened-security || exit_status=$?
+    CHEF_LICENSE="accept-no-persist" /opt/chef/embedded/bin/inspec exec /tmp/a2-hardened-security || exit_status=$?
     if [[ $exit_status -ne 0 && $exit_status -ne 101 ]]; then
         exit $exit_status
     fi

@@ -122,6 +122,39 @@ func runNATSStreamingServer(c *config.EventConfig, m *multiEmbeddedServer) error
 	opts.ID = c.StreamService.ClusterID
 	opts.StoreType = stores.TypeFile
 	opts.FilestoreDir = c.StreamService.Store
+
+	// Set limits on the number of unprocessed messages we will store.
+	// Defaults are defined here: https://github.com/nats-io/nats-streaming-server/blob/2e8a79288316e0128d2257681d764b7d67f31ed6/stores/store.go#L89-L102
+	// As of this writing, the default limits that we care about are:
+	// * 1 million messages (per channel)
+	// * OR, 1GiB (per channel)
+	// Our most recent performance test on a 4vCPU/16GB RAM EC2 instance shows
+	// that applications service is processing ~600 messages per second. At that
+	// rate, it takes ~30min to process 1M messages (assuming incoming load is
+	// stopped), which would be an operational hassle. In the future we would
+	// like to consider making the storage limits configurable or possibly even
+	// auto-configured based on system resources. But for now we just need a more
+	// sensible limit that works for a beta. We somewhat arbitrarily choose 100k
+	// messages as the limit; this provides the following behaviors:
+	// * At a processing rate of 500 messages/s, the backlog can be cleared in
+	//   less than 5 minutes if load is removed at the front-end.
+	// * If the system has 100 messages/s of headroom, the backlog can be cleared
+	//   in less than 25 minutes.
+	// This should provide enough buffer for a short duration of overload or
+	// restart of the applications service with acceptable recovery.
+	opts.StoreLimits = stores.StoreLimits{
+		MaxChannels: stores.DefaultStoreLimits.MaxChannels,
+		ChannelLimits: stores.ChannelLimits{
+			MsgStoreLimits: stores.MsgStoreLimits{
+				MaxMsgs:  100000,
+				MaxBytes: stores.DefaultStoreLimits.ChannelLimits.MsgStoreLimits.MaxBytes,
+			},
+			SubStoreLimits: stores.DefaultStoreLimits.ChannelLimits.SubStoreLimits,
+			MaxInactivity:  stores.DefaultStoreLimits.ChannelLimits.MaxInactivity,
+		},
+		PerChannel: stores.DefaultStoreLimits.PerChannel,
+	}
+
 	opts.ClientCert = c.TLSConfig.CertPath
 	opts.ClientKey = c.TLSConfig.KeyPath
 	opts.ClientCA = c.TLSConfig.RootCACertPath

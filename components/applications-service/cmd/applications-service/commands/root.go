@@ -34,9 +34,20 @@ func init() {
 	RootCmd.PersistentFlags().String("key", "", "path to key")
 	RootCmd.PersistentFlags().String("cert", "", "path to cert")
 
-	viper.BindPFlag("cert", RootCmd.PersistentFlags().Lookup("cert"))
-	viper.BindPFlag("root-cert", RootCmd.PersistentFlags().Lookup("root-cert"))
-	viper.BindPFlag("key", RootCmd.PersistentFlags().Lookup("key"))
+	// https://github.com/spf13/viper/blob/7a605a50e69cd1ea431c4a1e6eebe9b287ef6de4/viper.go#L939
+	// err is non-nil when the flag doesn't exist. panic here should get caught quickly by Ci.
+	err := viper.BindPFlag("cert", RootCmd.PersistentFlags().Lookup("cert"))
+	if err != nil {
+		panic("viper configuration does not match command line flags")
+	}
+	err = viper.BindPFlag("root-cert", RootCmd.PersistentFlags().Lookup("root-cert"))
+	if err != nil {
+		panic("viper configuration does not match command line flags")
+	}
+	err = viper.BindPFlag("key", RootCmd.PersistentFlags().Lookup("key"))
+	if err != nil {
+		panic("viper configuration does not match command line flags")
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.

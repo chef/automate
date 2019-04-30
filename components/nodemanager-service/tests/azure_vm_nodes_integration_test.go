@@ -111,9 +111,17 @@ func TestAzureVMSearchNodeFields(t *testing.T) {
 	fields, err = mgrClient.SearchNodeFields(ctx, &query)
 	require.NoError(t, err)
 	require.NotEqual(t, 0, len(fields.GetFields()))
+	t.Logf("fields found are %v", fields)
+	require.Equal(t, mgrtesthelpers.Contains(fields.GetFields(), "name"), true)
 
 	t.Log("search node fields for list of values for tags:Test")
 	query.Field = "tags:Test"
+	fields, err = mgrClient.SearchNodeFields(ctx, &query)
+	require.NoError(t, err)
+	require.NotEqual(t, 0, len(fields.GetFields()))
+
+	t.Log("search node fields for list of values for names")
+	query.Field = "tags:name"
 	fields, err = mgrClient.SearchNodeFields(ctx, &query)
 	require.NoError(t, err)
 	require.NotEqual(t, 0, len(fields.GetFields()))
