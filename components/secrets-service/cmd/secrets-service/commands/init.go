@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -87,7 +88,7 @@ func keyFromPath(store secrets.SecretStore, path string) error {
 		return errors.Wrapf(err, "failed to read key from %s", path)
 	}
 
-	return store.SetSecret(secrets.SecretsServiceKeyName, key)
+	return store.SetSecret(secrets.SecretsServiceKeyName, bytes.TrimSpace(key))
 }
 
 func generateKey() ([]byte, error) {
