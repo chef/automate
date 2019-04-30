@@ -7,11 +7,12 @@ title 'IAM v2.1 project filtering API integration tests'
 control 'iam-v2-projects-1' do
   title 'v2.1-only access for project filtering'
 
-  CUSTOM_PROJECT_ID_1 = 'inspec-custom-project-1'
-  CUSTOM_PROJECT_ID_2 = 'inspec-custom-project-2'
-  CUSTOM_ROLE_ID_1 = 'inspec-custom-role-1'
-  CUSTOM_ROLE_ID_2 = 'inspec-custom-role-2'
-  CUSTOM_ROLE_ID_3 = 'inspec-custom-role-3'
+  TIMESTAMP = Time.now.utc.to_i
+  CUSTOM_PROJECT_ID_1 = "inspec-custom-project-1-#{TIMESTAMP}"
+  CUSTOM_PROJECT_ID_2 = "inspec-custom-project-2-#{TIMESTAMP}"
+  CUSTOM_ROLE_ID_1 = "inspec-custom-role-1-#{TIMESTAMP}"
+  CUSTOM_ROLE_ID_2 = "inspec-custom-role-2-#{TIMESTAMP}"
+  CUSTOM_ROLE_ID_3 = "inspec-custom-role-3-#{TIMESTAMP}"
 
   CUSTOM_ROLE_1 = {
           id: CUSTOM_ROLE_ID_1,
@@ -139,13 +140,13 @@ control 'iam-v2-projects-1' do
         "/apis/iam/v2beta/roles"
         )
       expect(resp.http_status).to eq 200
+      # expect(resp.parsed_response_body[:roles].map{|r| r[:id] }).to match_array(["a","b"])
       expect(resp.parsed_response_body[:roles].length).to be > 3
     end
   end
 
   describe 'roles with deny statements' do
 
-    TIMESTAMP = 257 # Time.now.utc.to_i
     POLICY_ID = "inspec-test-policy-1-#{TIMESTAMP}"
     POLICY_ROLE_ID = "inspec-test-role-1-#{TIMESTAMP}"
 
