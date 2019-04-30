@@ -90,9 +90,10 @@ func (s *authzServer) ProjectsAuthorized(
 
 	requestedProjects := req.ProjectsFilter
 
+	allProjectsRequested := len(req.ProjectsFilter) == 0
 	var allProjects []string
 	var err error
-	if len(req.ProjectsFilter) == 0 {
+	if allProjectsRequested {
 		allProjects, err = s.getAllProjects(ctx)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
@@ -109,7 +110,10 @@ func (s *authzServer) ProjectsAuthorized(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	authorizedProjects = handleAllProjectsResponse(engineResp, allProjects)
+	authorizedProjects = engineResp
+	if allProjectsRequested {
+		authorizedProjects = handleAllProjectsResponse(engineResp, allProjects)
+	}
 
 	s.logProjectQuery(req, authorizedProjects)
 	return &api.ProjectsAuthorizedResp{
