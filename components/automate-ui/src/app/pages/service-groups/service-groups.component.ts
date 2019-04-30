@@ -220,6 +220,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }
     return 'sort';
   }
+
   private getSelectedPageNumber(allUrlParameters: Chicklet[]): number {
     const pageChicklet = find((chicklet) => {
       return chicklet.type === 'page';

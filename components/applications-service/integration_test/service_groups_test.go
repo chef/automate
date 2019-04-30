@@ -394,7 +394,37 @@ func TestServiceGroupsHealthSortedPercentAsc(t *testing.T) {
 	assert.Equal(t, int32(100), response.ServiceGroups[3].HealthPercentage)
 }
 
-func TestServiceGroupsHealthPage(t *testing.T) {
+func TestGetServiceGroupsInvalidPageNumberReturnsDefaultPageValues(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Pagination: &query.Pagination{
+				Page: -2,
+				Size: 1,
+			},
+		}
+		mockHabServices = []*applications.HabService{
+			NewHabServiceMsg("sup2", a, e, "default", "core",
+				"a", "0.1.0", "20190101121212", "UNKNOWN"),
+			NewHabServiceMsg("sup3", a, e, "default", "core",
+				"b", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup4", a, e, "default", "core",
+				"c", "0.1.0", "20190101121212", "WARNING"),
+			NewHabServiceMsg("sup5", a, e, "default", "core",
+				"d", "0.1.0", "20190101121212", "CRITICAL"),
+		}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+
+	// a.default should be returned since we default to page number one
+	assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
+}
+
+func TestGetServiceGroupsPage(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
