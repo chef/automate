@@ -15,7 +15,7 @@ import {
 import {
   serviceGroupStatus, allServiceGroups, serviceGroupState, allServiceGroupHealth
 } from '../../entities/service-groups/service-groups.selector';
-import { find, includes } from 'lodash/fp';
+import { find, includes, get } from 'lodash/fp';
 
 @Component({
   selector: 'app-service-groups',
@@ -90,9 +90,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       // This code enables the pagination of service groups correctly, when the user selects
       // a Health Filter, we adjust the total number of service groups
       if ( includes(status, this.allowedStatus) ) {
-          this.totalServiceGroups = this.sgHealthSummary[status];
+          this.totalServiceGroups = get(status, this.sgHealthSummary);
       } else {
-          this.totalServiceGroups = this.sgHealthSummary['total'];
+          this.totalServiceGroups = get('total', this.sgHealthSummary);
       }
     });
 
@@ -151,6 +151,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public openServicesSidebar(id: number) {
     const servicesFilters: ServicesFilters = {
       service_group_id: id,
+      page: 1,
       health: 'total'
     };
     this.selectedServiceGroupId = id;

@@ -5,7 +5,7 @@
 </chef-page-header>
 <div class="page-body">
   <chef-status-filter-group [value]="selectedStatus$ | async">
-    <chef-option class="filter general" value="general" (click)="statusFilter('total')" selected>
+    <chef-option class="filter general" value="total" (click)="statusFilter('total')" selected>
       <chef-icon class="filter-icon">group_work</chef-icon>
       <div class="filter-label">Total</div>
       <div class="filter-total">{{ sgHealthSummary["total"] }}</div>
