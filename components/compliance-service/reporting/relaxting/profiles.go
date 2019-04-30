@@ -88,10 +88,10 @@ func (esprofile *ESInspecProfile) parseInspecProfile(profile inspec.Profile) err
 	esprofile.Sha256 = profile.Sha256
 	// no need for Status and SkipMessage here as it's not static metadata of the profile
 	var groups []inspec.Group
-	for _, group := range groups {
+	for _, group := range profile.Groups {
 		eGroup := inspec.Group{
-			ID:       group.ID,
-			Title:    group.Title,
+			ID:       group.Id,
+			Title:    &group.Title,
 			Controls: group.Controls,
 		}
 		groups = append(groups, eGroup)
