@@ -554,7 +554,7 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 				reportIds[i] = hit.Id
 			}
 
-			esInSpecReports, _ := getReportsA2v2(esClient, ctx, srcRepIndex, srcRepType, reportIds)
+			esInSpecReports, err := getReportsA2v2(esClient, ctx, srcRepIndex, srcRepType, reportIds)
 			if err != nil {
 				return errors.Wrapf(err, "migrateTimeSeries unable to get reports from index %s", srcRepIndex)
 			}
