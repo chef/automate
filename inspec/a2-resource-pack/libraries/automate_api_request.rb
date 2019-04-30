@@ -157,7 +157,9 @@ class AutomateApiRequest < Inspec.resource(1)
   end
 
   def target_hostname
-    if inspec.backend.respond_to?(:hostname)
+    if ENV['TARGET_HOSTNAME']
+      ENV['TARGET_HOSTNAME']
+    elsif inspec.backend.respond_to?(:hostname)
       inspec.backend.hostname
     else
       "localhost"
