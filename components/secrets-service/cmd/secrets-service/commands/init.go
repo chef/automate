@@ -81,7 +81,7 @@ func generateOrMigrateKey(store secrets.SecretStore) error {
 }
 
 func keyFromPath(store secrets.SecretStore, path string) error {
-	fmt.Println("Migrating secret key from %s", path)
+	fmt.Printf("Migrating secret key from %s\n", path)
 	key, err := ioutil.ReadFile(path)
 	if err != nil {
 		return errors.Wrapf(err, "failed to read key from %s", path)
