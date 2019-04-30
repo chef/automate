@@ -1170,6 +1170,24 @@ func TestDeletePolicy(t *testing.T) {
 	}
 }
 
+func assertPolicyChange(t *testing.T, store storage.Storage, f func()) {
+	before, err := store.GetPolicyChangeID(context.Background())
+	require.NoError(t, err)
+	f()
+	after, err := store.GetPolicyChangeID(context.Background())
+	require.NoError(t, err)
+	assert.NotEqual(t, before, after)
+}
+
+func assertNoPolicyChange(t *testing.T, store storage.Storage, f func()) {
+	before, err := store.GetPolicyChangeID(context.Background())
+	require.NoError(t, err)
+	f()
+	after, err := store.GetPolicyChangeID(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, before, after)
+}
+
 func TestCreatePolicy(t *testing.T) {
 	store, db, prngSeed := setup(t)
 	defer db.close(t)
@@ -1187,9 +1205,12 @@ func TestCreatePolicy(t *testing.T) {
 				Type:    typeVal,
 				Members: members,
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1209,9 +1230,12 @@ func TestCreatePolicy(t *testing.T) {
 				Type:    typeVal,
 				Members: members,
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1240,9 +1264,12 @@ func TestCreatePolicy(t *testing.T) {
 				Type:       typeVal,
 				Statements: []storage.Statement{statement},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1274,9 +1301,12 @@ func TestCreatePolicy(t *testing.T) {
 				Type:       typeVal,
 				Statements: []storage.Statement{statement0},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1312,9 +1342,12 @@ func TestCreatePolicy(t *testing.T) {
 				Type:       typeVal,
 				Statements: []storage.Statement{statement0, statement1},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1347,9 +1380,12 @@ func TestCreatePolicy(t *testing.T) {
 				Type:       typeVal,
 				Statements: []storage.Statement{statement0},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1382,9 +1418,12 @@ func TestCreatePolicy(t *testing.T) {
 				Type:       typeVal,
 				Statements: []storage.Statement{statement, statement},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			require.Error(t, err)
-			assert.Nil(t, resp)
+
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				require.Error(t, err)
+				assert.Nil(t, resp)
+			})
 		},
 		"policy with same resources+actions, but different ID statements": func(t *testing.T) {
 			// Note (sr): I don't think this is wrong, just worth noting; so, here's
@@ -1412,9 +1451,12 @@ func TestCreatePolicy(t *testing.T) {
 				Type:       typeVal,
 				Statements: []storage.Statement{statement0, statement1},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1457,9 +1499,12 @@ func TestCreatePolicy(t *testing.T) {
 					Actions:   actions,
 				}},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.Equal(t, storage_errors.ErrConflict, err)
-			assert.Nil(t, resp)
+
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.Equal(t, storage_errors.ErrConflict, err)
+				assert.Nil(t, resp)
+			})
 
 			// the second policy was NOT added,
 			assertEmpty(t,
@@ -1506,9 +1551,12 @@ func TestCreatePolicy(t *testing.T) {
 				Type:       typeVal,
 				Statements: []storage.Statement{statement0, statement1},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1556,9 +1604,11 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, projID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=$1`, projID))
 
-			resp, err := store.CreatePolicy(ctx, &pol)
-			require.Error(t, err)
-			assert.Nil(t, resp)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				require.Error(t, err)
+				assert.Nil(t, resp)
+			})
 		},
 		"policy with empty projects": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
@@ -1571,9 +1621,12 @@ func TestCreatePolicy(t *testing.T) {
 				Members:  members,
 				Projects: []string{},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1598,9 +1651,12 @@ func TestCreatePolicy(t *testing.T) {
 				Members:  members,
 				Projects: []string{projID},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1627,9 +1683,12 @@ func TestCreatePolicy(t *testing.T) {
 				Members:  members,
 				Projects: []string{projID, projID2},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -1655,9 +1714,12 @@ func TestCreatePolicy(t *testing.T) {
 				Members:  members,
 				Projects: []string{projID},
 			}
-			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.Error(t, err)
-			assert.Nil(t, resp)
+
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+			})
 
 			assertEmpty(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
