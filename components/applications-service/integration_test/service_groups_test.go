@@ -454,27 +454,57 @@ func TestGetServiceGroupsPage(t *testing.T) {
 	assert.Equal(t, "b.default", response.ServiceGroups[0].Name)
 }
 
-func assertServiceGroupsEqual(t *testing.T, expected, actual *applications.ServiceGroups) {
-	for i := range expected.ServiceGroups {
-		assert.Equal(t,
-			expected.ServiceGroups[i].Name,
-			actual.ServiceGroups[i].Name,
-			"The service_group name is not the expected one")
-		assert.Equal(t,
-			expected.ServiceGroups[i].Release,
-			actual.ServiceGroups[i].Release,
-			"The service_group release is not the expected one")
-		assert.Equal(t,
-			expected.ServiceGroups[i].HealthPercentage,
-			actual.ServiceGroups[i].HealthPercentage,
-			"The service_group health percentage is not the expected one")
-		assert.Equal(t,
-			expected.ServiceGroups[i].Status,
-			actual.ServiceGroups[i].Status,
-			"The service_group status is not the expected one")
-		assert.Equal(t,
-			expected.ServiceGroups[i].ServicesHealthCounts,
-			actual.ServiceGroups[i].ServicesHealthCounts,
-			"The services health counts from the service_group is not the expected one")
-	}
+// This test is verifying that when users specify a filter the paginator works as expected
+func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
+	var (
+		ctx = context.Background()
+		// For this test we are adding:
+		//  * 3 OK       service-groups
+		//  * 1 UNKNOWN  service-groups
+		//  * 1 WARNING  service-groups
+		//  * 1 CRITICAL service-groups
+		mockHabServices = []*applications.HabService{
+			NewHabServiceMsg("sup1", a, e, "default", "core",
+				"a", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup2", a, e, "default", "core",
+				"b", "0.1.0", "20190101121212", "UNKNOWN"),
+			NewHabServiceMsg("sup3", a, e, "default", "core",
+				"c", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup4", a, e, "default", "core",
+				"d", "0.1.0", "20190101121212", "WARNING"),
+			NewHabServiceMsg("sup5", a, e, "default", "core",
+				"e", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup5", a, e, "default", "core",
+				"f", "0.1.0", "20190101121212", "CRITICAL"),
+		}
+		// This request is asking only for service groups that have an OK status
+		// plus, showing only the page two with a page size of one and they are all
+		// ordered by name, therefor this test should return only the following service:
+		//
+		// => name:"c.default" release:"core/c/0.1.0/20190101121212" status:OK
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"STATUS:OK"},
+			Pagination: &query.Pagination{
+				Page: 2,
+				Size: 1,
+			},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				&applications.ServiceGroup{
+					Name:                 "c.default",
+					Release:              "core/c/0.1.0/20190101121212",
+					Status:               applications.HealthStatus_OK,
+					HealthPercentage:     100,
+					ServicesHealthCounts: &applications.HealthCounts{Total: 1, Ok: 1},
+				},
+			},
+		}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
 }
