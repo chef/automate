@@ -47,7 +47,7 @@ export class IntegrationsDetailComponent {
     if (event.currentTarget['checked']) {
       this.selectedNodes = [];
     } else {
-      nodes.forEach((node)=> {
+      nodes.forEach((node) => {
         this.selectedNodes.push(node.id);
       });
     }

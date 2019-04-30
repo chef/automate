@@ -51,7 +51,9 @@ import {
 import { CreateNotification } from '../notifications/notification.actions';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
-import { IntegrationsDetailState } from '../../pages/integrations/detail/integrations-detail.reducer';
+import {
+  IntegrationsDetailState
+} from '../../pages/integrations/detail/integrations-detail.reducer';
 import { Type } from '../notifications/notification.model';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 
