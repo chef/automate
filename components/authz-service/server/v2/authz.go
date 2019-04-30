@@ -176,10 +176,14 @@ func (s *authzServer) setAllProjects(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	projectIDs := make([]string, len(list.Projects))
+	projectIDs := make([]string, len(list.Projects)+1)
 	for i, project := range list.Projects {
 		projectIDs[i] = project.Id
 	}
+	// ListProjects never returns UnassignedProjectID
+	// because we do not want it to show up in the ListProjects view;
+	// vital to have it here though, so add it back!
+	projectIDs[len(list.Projects)] = constants.UnassignedProjectID
 
 	return projectIDs, nil
 }
