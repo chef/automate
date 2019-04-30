@@ -110,6 +110,15 @@ func (s *Suite) GetNodes(x int) ([]cfgBackend.Node, error) {
 	return s.cfgmgmt.GetNodes(1, x, "node_name", true, filterMap)
 }
 
+// GetActions retrives X Chef Actions
+func (s *Suite) GeActions(x int) ([]cfgBackend.Action, error) {
+	filterMap := make(map[string][]string, 0)
+	actions, _, err := s.cfgmgmt.GetActions(filterMap,
+		time.Time{}, time.Now().Add(time.Hour*24*365), x, time.Time{}, "", true)
+
+	return actions, err
+}
+
 // GetNonExistingNodes retrives X Chef Nodes that doesn't actually exist :thinking:
 //
 // We need this custom function since we need a way to verify the nodes we update and
@@ -151,6 +160,17 @@ func (s *Suite) IngestNodes(nodes []iBackend.Node) {
 
 	// Refresh Indices
 	s.RefreshIndices(mappings.NodeState.Index)
+}
+
+// IngestActions ingests a number of actions then refreshe the all the action indexes
+func (s *Suite) IngestActions(actions []iBackend.InternalChefAction) {
+	// Insert actions
+	for _, action := range actions {
+		s.ingest.InsertAction(context.Background(), action)
+	}
+
+	// Refresh Indices
+	s.RefreshIndices(mappings.Actions.Index + "-*")
 }
 
 // RefreshIndices will refresh the provided ES Index or list of Indices
