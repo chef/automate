@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"sort"
+	"strconv"
 	"testing"
 
 	"github.com/jaswdr/faker"
@@ -3180,6 +3181,56 @@ func TestCreateProject(t *testing.T) {
 			assert.Error(t, err)
 			assert.Equal(t, storage_errors.ErrConflict, err)
 			assert.Nil(t, resp)
+		},
+		"does not create custom project if max number of custom projects allowed has been reached": func(t *testing.T) {
+			for i := 1; i <= v2.MaxProjects; i++ {
+				projectID := "my-id-" + strconv.Itoa(i)
+				project := storage.Project{
+					ID:       projectID,
+					Name:     "name-" + strconv.Itoa(i),
+					Type:     storage.Custom,
+					Projects: []string{projectID},
+				}
+				resp, err := store.CreateProject(ctx, &project)
+				require.NoError(t, err)
+				require.Equal(t, &project, resp)
+			}
+
+			oneProjectTooManyID := "my-id-" + strconv.Itoa(v2.MaxProjects+1)
+			oneProjectTooMany := storage.Project{
+				ID:       oneProjectTooManyID,
+				Name:     "Something Else",
+				Type:     storage.Custom,
+				Projects: []string{oneProjectTooManyID},
+			}
+			resp, err := store.CreateProject(ctx, &oneProjectTooMany)
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrMaxProjectsExceeded, err)
+		},
+		"does create chef-managed project if max number of custom projects allowed has been reached": func(t *testing.T) {
+			for i := 1; i <= v2.MaxProjects; i++ {
+				projectID := "my-id-" + strconv.Itoa(i)
+				project := storage.Project{
+					ID:       projectID,
+					Name:     "name-" + strconv.Itoa(i),
+					Type:     storage.Custom,
+					Projects: []string{projectID},
+				}
+				resp, err := store.CreateProject(ctx, &project)
+				require.NoError(t, err)
+				require.Equal(t, &project, resp)
+			}
+
+			chefManagedProjectID := "my-id-" + strconv.Itoa(v2.MaxProjects+1)
+			chefManagedProject := storage.Project{
+				ID:       chefManagedProjectID,
+				Name:     "Something Else",
+				Type:     storage.ChefManaged,
+				Projects: []string{chefManagedProjectID},
+			}
+			resp, err := store.CreateProject(ctx, &chefManagedProject)
+			require.NoError(t, err)
+			require.Equal(t, &chefManagedProject, resp)
 		},
 	}
 

@@ -3,6 +3,7 @@ package v2_test
 import (
 	"context"
 	"math/rand"
+	"strconv"
 	"testing"
 
 	cache "github.com/patrickmn/go-cache"
@@ -138,6 +139,25 @@ func TestCreateProject(t *testing.T) {
 			resp, err := cl.CreateProject(ctx, &api.CreateProjectReq{Id: id, Name: "my other foo"})
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
 			assert.Nil(t, resp)
+		}},
+		{"does not create project if max projects surpassed", func(t *testing.T) {
+			for i := 1; i <= constants.MaxProjects; i++ {
+				projectID := "my-id-" + strconv.Itoa(i)
+				project := &api.CreateProjectReq{
+					Id:   projectID,
+					Name: "name-" + strconv.Itoa(i),
+				}
+				_, err := cl.CreateProject(ctx, project)
+				require.NoError(t, err)
+			}
+
+			oneProjectTooMany := &api.CreateProjectReq{
+				Id:   "my-id-" + strconv.Itoa(constants.MaxProjects+1),
+				Name: "name-" + strconv.Itoa(constants.MaxProjects+1),
+			}
+			resp, err := cl.CreateProject(ctx, oneProjectTooMany)
+			assert.Nil(t, resp)
+			grpctest.AssertCode(t, codes.FailedPrecondition, err)
 		}},
 		{"if the project was successfully created, returns hydrated project", func(t *testing.T) {
 			id, name := "my-foo", "my foo"

@@ -6,6 +6,7 @@ import (
 	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
+	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 )
@@ -206,6 +207,23 @@ func (s *State) DeletePolicy(ctx context.Context, policyID string) error {
 }
 
 func (s *State) CreateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {
+	if project.Type == storage.Custom {
+		items := s.projects.Items()
+		projects := make([]*storage.Project, 0, len(items))
+
+		for _, item := range items {
+			if p, ok := item.Object.(*storage.Project); ok {
+				if p.Type == storage.Custom {
+					projects = append(projects, p)
+				}
+			}
+		}
+
+		if len(projects) >= v2_constants.MaxProjects {
+			return nil, storage_errors.ErrMaxProjectsExceeded
+		}
+	}
+
 	if err := s.projects.Add(project.ID, project, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}

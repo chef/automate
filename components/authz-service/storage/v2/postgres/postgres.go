@@ -9,6 +9,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
+	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -865,8 +866,30 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if err := p.insertProjectWithQuerier(ctx, project, p.db); err != nil {
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
 		return nil, p.processError(err)
+	}
+
+	if project.Type == v2.Custom {
+		row := tx.QueryRowContext(ctx, ` WITH t as (SELECT id from iam_projects WHERE type='custom') SELECT COUNT(*) FROM t;`)
+		var numProjects int64
+		if err := row.Scan(&numProjects); err != nil {
+			return nil, p.processError(err)
+		}
+
+		if numProjects >= v2_constants.MaxProjects {
+			return nil, storage_errors.ErrMaxProjectsExceeded
+		}
+	}
+
+	if err := p.insertProjectWithQuerier(ctx, project, tx); err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
 	// Currently, we don't change anything from what is passed in.
