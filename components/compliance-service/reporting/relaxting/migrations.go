@@ -391,9 +391,9 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 		Index(dest).
 		Type(mappings.DocType)
 	//source, err = reindexDestination.Source()
-	if err != nil {
-		return nil, indexToMigrateExists, errors.Wrap(err, fmt.Sprintf("%s unable to get reindexDest Source", myName))
-	}
+	//if err != nil {
+	//	return nil, indexToMigrateExists, errors.Wrap(err, fmt.Sprintf("%s unable to get reindexDest Source", myName))
+	//}
 	//LogQueryPartMin(dest, source, fmt.Sprintf("%s query reindexDest", myName))
 
 	script := elastic.NewScript(reindexScript)
