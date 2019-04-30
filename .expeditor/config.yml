@@ -38,7 +38,6 @@ habitat_packages:
         - lib/platform/*
         - lib/proc/*
         - lib/proxy/*
-        - lib/secrets/*
         - lib/stringutils/*
         - lib/tls/*
         - lib/tracing/*
@@ -352,7 +351,6 @@ habitat_packages:
         - lib/platform/*
         - lib/proc/*
         - lib/proxy/*
-        - lib/secrets/*
         - lib/stringutils/*
         - lib/tls/*
         - lib/tracing/*
@@ -429,7 +427,6 @@ habitat_packages:
         - lib/platform/*
         - lib/proc/*
         - lib/proxy/*
-        - lib/secrets/*
         - lib/stringutils/*
         - lib/tls/*
         - lib/tracing/*
@@ -705,7 +702,7 @@ habitat_packages:
       bldr_paths:
         - components/automate-cs-nginx/*
         - lib/io/*
-        - lib/secrets/*
+        - lib/platform/*
         - Gopkg.lock
   - automate-workflow-nginx:
       source: components/automate-workflow-nginx
