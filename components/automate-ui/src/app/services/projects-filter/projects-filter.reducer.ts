@@ -1,5 +1,5 @@
 import { set, pipe, find } from 'lodash/fp';
-import { LoadingStatus } from 'app/types/types';
+import { EntityStatus } from 'app/entities/entities';
 import {
   ProjectsFilterActions,
   ProjectsFilterActionTypes
@@ -13,7 +13,7 @@ export interface ProjectsFilterOption {
 
 export interface ProjectsFilterState {
   options: ProjectsFilterOption[];
-  optionsLoadingStatus: LoadingStatus;
+  optionsLoadingStatus: EntityStatus;
   selectionLabel: string;
   selectionCount: number;
   selectionCountVisible: boolean;
@@ -22,7 +22,7 @@ export interface ProjectsFilterState {
 
 export const projectsFilterInitialState: ProjectsFilterState = {
   options: [],
-  optionsLoadingStatus: LoadingStatus.notLoaded,
+  optionsLoadingStatus: EntityStatus.notLoaded,
   selectionLabel: 'All resources',
   selectionCount: 0,
   selectionCountVisible: false,
@@ -36,7 +36,7 @@ export function projectsFilterReducer(
   switch (action.type) {
 
     case ProjectsFilterActionTypes.LOAD_OPTIONS: {
-      return set('optionsLoadingStatus', LoadingStatus.loading, state);
+      return set('optionsLoadingStatus', EntityStatus.loading, state);
     }
 
     case ProjectsFilterActionTypes.LOAD_OPTIONS_SUCCESS: {
@@ -49,11 +49,11 @@ export function projectsFilterReducer(
         );
       const unassignedProject = find(['value', UNASSIGNED_PROJECT], action.payload);
       if (unassignedProject) {
-        sortedOptions.push(unassignedProject)
+        sortedOptions.push(unassignedProject);
       }
       return pipe(
         set('options', sortedOptions),
-        set('optionsLoadingStatus', LoadingStatus.loadingSuccess),
+        set('optionsLoadingStatus', EntityStatus.loadingSuccess),
         set('selectionLabel', selectionLabel(action.payload)),
         set('selectionCount', selectionCount(action.payload)),
         set('selectionCountVisible', selectionCountVisible(action.payload)),
@@ -62,7 +62,7 @@ export function projectsFilterReducer(
     }
 
     case ProjectsFilterActionTypes.LOAD_OPTIONS_FAILURE: {
-      return set('optionsLoadingStatus', LoadingStatus.loadingFailure, state);
+      return set('optionsLoadingStatus', EntityStatus.loadingFailure, state);
     }
 
     case ProjectsFilterActionTypes.SAVE_OPTIONS: {
@@ -108,7 +108,7 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
   }
 
   if ((hasAllProjectsChecked && (!hasUnassignedChecked || !unassignedAvailable))
-    || (hasNoProjectsChecked && !unassignedAvailable)){
+    || (hasNoProjectsChecked && !unassignedAvailable)) {
       return 'All projects';
   }
 
