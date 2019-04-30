@@ -105,15 +105,15 @@ type tokenTestData struct {
 
 var positiveCases = map[string]tokenTestData{
 
-	"no filter specified matches token with no projects": {
+	"token with (unassigned) projects matches filter with nothing specified": {
 		[]string{},
 		[]string{},
 	},
-	"all projects filter specified matches token with (unassigned) projects": {
+	"token with (unassigned) projects matches filter specifying all projects": {
 		[]string{},
 		[]string{constants.AllProjectsExternalID},
 	},
-	"all projects filter specified matches token with some projects": {
+	"token with some projects matches filter specifying all projects": {
 		[]string{"p1", "p2", "p3"},
 		[]string{constants.AllProjectsExternalID},
 	},
@@ -140,19 +140,19 @@ var positiveCases = map[string]tokenTestData{
 }
 
 var negativeCases = map[string]tokenTestData{
-	"returns not found when single project filter does not intersect token projects": {
+	"token has multiple project but filter has one non-intersecting project returns not found": {
 		[]string{"p1", "p2"},
 		[]string{"no-match"},
 	},
-	"returns not found when multiple project filter does not intersect token projects": {
+	"token has projects but filter has non-intersecting projects returns not found": {
 		[]string{"p1", "p2"},
 		[]string{"p3", "p4"},
 	},
-	"returns not found when token has no projects but looking for some": {
+	"token has no projects but filter contains some returns not found": {
 		[]string{},
 		[]string{"no-match"},
 	},
-	"returns not found when token has a project but looking for unassigned": {
+	"token has project but filter contains only (unassigned) returns not found": {
 		[]string{"p1"},
 		[]string{constants.UnassignedProjectID},
 	},
