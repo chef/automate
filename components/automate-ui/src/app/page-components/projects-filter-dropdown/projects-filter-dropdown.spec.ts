@@ -31,17 +31,16 @@ describe('ProjectsFilterDropdownComponent', () => {
       component.selectionCountVisible = true;
       component.selectionCountActive = true;
       fixture.detectChanges();
-
-      label = fixture.nativeElement.querySelector('.dropdown-label');
-      count = fixture.nativeElement.querySelector('.selection-count');
     });
 
     it('displays label text', () => {
+      label = fixture.nativeElement.querySelector('.dropdown-label');
       expect(label).not.toBeNull();
       expect(label.textContent.trim()).toContain(component.selectionLabel);
     });
 
     it('has an "aria-label"', () => {
+      label = fixture.nativeElement.querySelector('.dropdown-label');
       expect(label.getAttribute('aria-label')).toEqual('Projects filter');
     });
 
@@ -49,10 +48,10 @@ describe('ProjectsFilterDropdownComponent', () => {
       beforeEach(() => {
         component.selectionCountVisible = false;
         fixture.detectChanges();
-        count = fixture.nativeElement.querySelector('.selection-count');
       });
 
       it('the selection count is hidden', () => {
+        count = fixture.nativeElement.querySelector('.selection-count');
         expect(count).toBeNull();
       });
     });
@@ -64,6 +63,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
 
       it('the selection count is visible', () => {
+        count = fixture.nativeElement.querySelector('.selection-count');
         expect(count).not.toBeNull();
         expect(count.textContent.trim()).toEqual(component.selectionCount.toString());
       });
@@ -76,6 +76,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
 
       it('the selection count does not have an "active" className', () => {
+        count = fixture.nativeElement.querySelector('.selection-count');
         expect(count.classList.contains('active')).toEqual(false);
       });
     });
@@ -87,6 +88,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
 
       it('the selection count has an "active" className', () => {
+        count = fixture.nativeElement.querySelector('.selection-count');
         expect(count.classList.contains('active')).toEqual(true);
       });
     });
@@ -180,12 +182,26 @@ describe('ProjectsFilterDropdownComponent', () => {
 
   describe('resetOptions()', () => {
     beforeEach(() => {
+      component.options = [
+        {
+          value: 'project-1',
+          label: 'Project 1',
+          checked: false
+        },
+        {
+          value: 'project-2',
+          label: 'Project 2',
+          checked: true
+        }
+      ];
       component.editableOptions = [];
       component.optionsEdited = true;
+
       component.resetOptions();
     });
 
     it('resets any previous selection changes by copying the provided options', () => {
+      expect(component.editableOptions).not.toEqual([]);
       expect(component.editableOptions).not.toBe(component.options);
       expect(component.editableOptions).toEqual(component.options);
     });
