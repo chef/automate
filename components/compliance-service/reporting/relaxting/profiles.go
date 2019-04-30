@@ -109,7 +109,7 @@ func (esprofile *ESInspecProfile) parseInspecProfile(profile inspec.Profile) err
 		if err != nil {
 			return errors.Wrap(err, "parseInspecProfile unable to marshal options")
 		}
-		json.Unmarshal(data, defaultVal) // nolint: errcheck
+		json.Unmarshal(data, &defaultVal) // nolint: errcheck
 		esAttribute.Options.Default = defaultVal
 
 		esprofile.Attributes = append(esprofile.Attributes, esAttribute)
@@ -146,12 +146,12 @@ func (esprofile *ESInspecProfile) parseInspecProfile(profile inspec.Profile) err
 		}
 		var refs string
 		byteRefs, _ := json.Marshal(control.Refs)
-		json.Unmarshal(byteRefs, refs) // nolint: errcheck
+		json.Unmarshal(byteRefs, &refs) // nolint: errcheck
 		esControl.Refs = refs
 
 		var tags string
 		bytetags, _ := json.Marshal(control.Tags)
-		json.Unmarshal(bytetags, tags) // nolint: errcheck
+		json.Unmarshal(bytetags, &tags) // nolint: errcheck
 		esControl.Tags = tags
 
 		esprofile.Controls = append(esprofile.Controls, esControl)
@@ -203,7 +203,7 @@ func (esprofile *ESInspecProfile) convertToInspecProfile() (reportingapi.Profile
 			options := reportingapi.Option{
 				Description: esOption.Description,
 			}
-			if err := json.Unmarshal([]byte(esOption.Default), options.Default); err != nil {
+			if err := json.Unmarshal([]byte(esOption.Default), &options.Default); err != nil {
 				return inspecProfile, errors.Wrap(err, "convertToInspecProfile unable to unmarshal options")
 			}
 
@@ -243,12 +243,12 @@ func (esprofile *ESInspecProfile) convertToInspecProfile() (reportingapi.Profile
 		}
 		var refs []*reportingapi.Ref
 		byteRefs, _ := json.Marshal(esControl.Refs)
-		json.Unmarshal(byteRefs, refs) // nolint: errcheck
+		json.Unmarshal(byteRefs, &refs) // nolint: errcheck
 		control.Refs = refs
 
 		var tags map[string]string
 		byteTags, _ := json.Marshal(esControl.Tags)
-		json.Unmarshal(byteTags, tags) // nolint: errcheck
+		json.Unmarshal(byteTags, &tags) // nolint: errcheck
 		control.Tags = tags
 
 		inspecProfile.Controls = append(inspecProfile.Controls, &control)

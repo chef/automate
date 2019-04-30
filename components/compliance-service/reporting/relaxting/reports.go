@@ -621,11 +621,11 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 								}
 								var jsonTags map[string]string
 								tags, _ := json.Marshal(profileControl.Tags)
-								json.Unmarshal(tags, jsonTags) // nolint: errcheck
+								json.Unmarshal(tags, &jsonTags) // nolint: errcheck
 								convertedControl.Tags = jsonTags
 								var jsonRefs []*reportingapi.Ref
 								refs, _ := json.Marshal(profileControl.Refs)
-								json.Unmarshal(refs, jsonRefs) // nolint: errcheck
+								json.Unmarshal(refs, &jsonRefs) // nolint: errcheck
 								convertedControl.Refs = jsonRefs
 								// store controls to returned report
 								convertedControls = append(convertedControls, &convertedControl)
