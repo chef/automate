@@ -34,9 +34,17 @@
     </chef-page-header>
 
     <div class="page-body">
+      <chef-button primary caution 
+        [disabled]="!hasSelectedNodes()" 
+        (click)="deleteNodes()">
+        Remove Nodes
+      </chef-button>
       <chef-table id="manager-nodes-list">
         <chef-thead>
           <chef-tr>
+            <chef-th>
+              <chef-checkbox (click)="selectAllNodes($event, managerDetail.managerNodes)"></chef-checkbox>
+            </chef-th>
             <chef-th>Name</chef-th>
             <chef-th>Platform</chef-th>
             <chef-th>Status</chef-th>
@@ -44,6 +52,10 @@
         </chef-thead>
         <chef-tbody>
           <chef-tr *ngFor="let node of managerDetail.managerNodes">
+            <chef-td>
+                <chef-checkbox *ngIf="isNodeSelected(node.id)" checked (click)="unselectNode(node.id)"></chef-checkbox>
+                <chef-checkbox *ngIf="!isNodeSelected(node.id)" (click)="selectNode(node.id)"></chef-checkbox>
+            </chef-td>
             <chef-td>{{ node.name }}</chef-td>
             <chef-td>{{ node.platform }}</chef-td>
             <chef-td>{{ node.status }}</chef-td>
