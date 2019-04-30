@@ -8,27 +8,27 @@
     <chef-option class="filter general" value="general" (click)="statusFilter('total')" selected>
       <chef-icon class="filter-icon">group_work</chef-icon>
       <div class="filter-label">Total</div>
-      <div class="filter-total">{{(HealthSummary$ | async)["total"]}}</div>
+      <div class="filter-total">{{ sgHealthSummary["total"] }}</div>
     </chef-option>
     <chef-option class="filter critical" value='critical' (click)="statusFilter('critical')">
       <chef-icon class="filter-icon">warning</chef-icon>
       <div class="filter-label">Critical</div>
-      <div class="filter-total">{{(HealthSummary$ | async)["critical"]}}</div>
+      <div class="filter-total">{{ sgHealthSummary["critical"] }}</div>
     </chef-option>
     <chef-option class="filter warning" value='warning' (click)="statusFilter('warning')">
       <chef-icon class="filter-icon">error</chef-icon>
       <div class="filter-label">Warning</div>
-      <div class="filter-total">{{(HealthSummary$ | async)["warning"]}}</div>
+      <div class="filter-total">{{ sgHealthSummary["warning"] }}</div>
     </chef-option>
     <chef-option class="filter success" value='success' (click)="statusFilter('ok')">
       <chef-icon class="filter-icon">check_circle</chef-icon>
       <div class="filter-label">OK</div>
-      <div class="filter-total">{{(HealthSummary$ | async)["ok"]}}</div>
+      <div class="filter-total">{{ sgHealthSummary["ok"] }}</div>
     </chef-option>
     <chef-option class="filter unknown" value='unknown' (click)="statusFilter('unknown')">
       <chef-icon class="filter-icon">help</chef-icon>
       <div class="filter-label">Unknown</div>
-      <div class="filter-total">{{(HealthSummary$ | async)["unknown"]}}</div>
+      <div class="filter-total">{{ sgHealthSummary["unknown"] }}</div>
     </chef-option>
   </chef-status-filter-group>
   <chef-table class="service-group-list" *ngIf="(serviceGroupStatus$ | async) == 'loadingSuccess'">
