@@ -16,7 +16,10 @@ import (
 var logCmdTimeout = 5 * time.Second
 
 func habVersion() string {
-	output, err := command.Output("hab", command.Args("--version"), command.Timeout(logCmdTimeout))
+	output, err := command.Output("hab",
+		command.Args("--version"),
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
+		command.Timeout(logCmdTimeout))
 	if err != nil {
 		return fmt.Sprintf("unknown (hab --version failed with: %s)", output)
 	}
@@ -25,7 +28,10 @@ func habVersion() string {
 }
 
 func habSupVersion() string {
-	output, _ := command.Output("hab", command.Args("sup", "--version"), command.Timeout(logCmdTimeout))
+	output, _ := command.Output("hab",
+		command.Args("sup", "--version"),
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
+		command.Timeout(logCmdTimeout))
 	// hab sup --version returns non-zero even when it hasn't errored
 	// so for now we can just return the output I guess.
 	return strings.TrimSpace(output)

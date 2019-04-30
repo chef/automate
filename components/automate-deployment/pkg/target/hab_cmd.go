@@ -10,6 +10,8 @@ var stdHabOptions = []command.Opt{
 	command.Envvar("HAB_NOCOLORING", "true"),
 	// Don't use progress bars in output
 	command.Envvar("HAB_NONINTERACTIVE", "true"),
+	// Don't prompt for license acceptance
+	command.Envvar("HAB_LICENSE", "accept-no-persist"),
 }
 
 // A HabCmd runs the `hab` command-line tool with a standard set of
@@ -38,6 +40,9 @@ type HabCmd interface {
 	// StopService stops an already-loaded service identified by
 	// the given habpkg.VersionedPackage.
 	StopService(habpkg.VersionedPackage) (string, error)
+
+	// Terminate supervisor, does not block
+	SupTerm() error
 }
 
 type LoadOption func([]string) []string
@@ -141,6 +146,12 @@ func (c *habCmd) StartService(svc habpkg.VersionedPackage) (string, error) {
 func (c *habCmd) StopService(svc habpkg.VersionedPackage) (string, error) {
 	args := command.Args("svc", "stop", habpkg.ShortIdent(svc))
 	return c.executor.CombinedOutput("hab", append(standardHabOptions(), args)...)
+}
+
+func (c *habCmd) SupTerm() error {
+	args := command.Args("sup", "term")
+	_, err := c.executor.Start("hab", append(standardHabOptions(), args)...)
+	return err
 }
 
 func standardHabOptions() []command.Opt {

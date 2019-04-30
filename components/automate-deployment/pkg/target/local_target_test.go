@@ -96,7 +96,7 @@ type execMock struct {
 func expectHabCommand(cmd string, args ...string) command.ExpectedCommand {
 	return command.ExpectedCommand{
 		Cmd:  cmd,
-		Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+		Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
 		Args: args,
 	}
 }
@@ -424,7 +424,7 @@ func Test_installHabComponents(t *testing.T) {
 }
 
 func TestStop(t *testing.T) {
-	stopCmd := expectCommand("hab", "sup", "term")
+	stopCmd := expectHabCommand("hab", "sup", "term")
 	tests := []struct {
 		name    string
 		wantErr bool

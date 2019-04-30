@@ -5,8 +5,9 @@ import (
 	"os/exec"
 	"syscall"
 
-	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/spf13/cobra"
+
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 )
 
 var startCommand = &cobra.Command{
@@ -32,7 +33,11 @@ func runStartCmd(cmd *cobra.Command, args []string) error {
 		}
 		startSupCmd := exec.Command("hab", "sup", "run")
 		startSupCmd.Env = os.Environ()
-		startSupCmd.Env = append(startSupCmd.Env, "DS_DEV=true", "CHEF_AUTOMATE_SKIP_SYSTEMD=true")
+		startSupCmd.Env = append(startSupCmd.Env,
+			"DS_DEV=true",
+			"CHEF_AUTOMATE_SKIP_SYSTEMD=true",
+			"HAB_LICENSE=accept-no-persist",
+		)
 		startSupCmd.Stdout = out
 		startSupCmd.Stderr = out
 		startSupCmd.SysProcAttr = &syscall.SysProcAttr{
