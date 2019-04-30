@@ -11,6 +11,7 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/config"
+	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/ingest/server"
@@ -21,6 +22,7 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 
 	"github.com/golang/mock/gomock"
+	"github.com/golang/protobuf/jsonpb"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
@@ -134,6 +136,38 @@ func (s *Suite) GlobalSetup() {
 // executing all our test suite
 func (s *Suite) GlobalTeardown() {
 
+}
+
+func (s *Suite) ingestReport(fileName string, f func(*compliance.Report)) error {
+	fileData, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+	defer fileData.Close()
+	var iReport compliance.Report
+	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err = unmarshaler.Unmarshal(fileData, &iReport); err != nil {
+		return err
+	}
+
+	f(&iReport)
+
+	ctx := context.Background()
+	_, err = s.ComplianceIngestServer.ProcessComplianceReport(ctx, &iReport)
+
+	return err
+}
+
+func waitFor(f func() bool) {
+	period := time.Millisecond * 10
+
+	for {
+		if f() {
+			break
+		}
+
+		time.Sleep(period)
+	}
 }
 
 func (s *Suite) GetAllReportsESInSpecReport() ([]*relaxting.ESInSpecReport, error) {
