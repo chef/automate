@@ -871,14 +871,16 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		return nil, p.processError(err)
 	}
 
-	row := tx.QueryRowContext(ctx, ` WITH t as (SELECT id from iam_projects WHERE type='custom') SELECT COUNT(*) FROM t;`)
-	var numProjects int64
-	if err := row.Scan(&numProjects); err != nil {
-		return nil, p.processError(err)
-	}
+	if project.Type == v2.Custom {
+		row := tx.QueryRowContext(ctx, ` WITH t as (SELECT id from iam_projects WHERE type='custom') SELECT COUNT(*) FROM t;`)
+		var numProjects int64
+		if err := row.Scan(&numProjects); err != nil {
+			return nil, p.processError(err)
+		}
 
-	if numProjects >= v2_constants.MaxProjects {
-		return nil, storage_errors.ErrMaxProjectsExceeded
+		if numProjects >= v2_constants.MaxProjects {
+			return nil, storage_errors.ErrMaxProjectsExceeded
+		}
 	}
 
 	if err := p.insertProjectWithQuerier(ctx, project, tx); err != nil {
