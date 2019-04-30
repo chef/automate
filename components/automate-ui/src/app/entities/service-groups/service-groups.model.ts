@@ -17,6 +17,8 @@ export interface Service {
   applications: string;
   environment: string;
   fqdn: string;
+  site: string;
+  channel: string;
 }
 
 export interface ServiceGroup {

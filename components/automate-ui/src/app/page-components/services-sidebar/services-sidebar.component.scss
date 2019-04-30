@@ -49,8 +49,17 @@ app-page-picker {
     margin-bottom: .6em;
   }
 
+  .channel-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: .6em;
+  }
+
   .supervisor-line {
-    font-size: .8em;
+    b {
+      font-size: .8em;
+    }
+
   }
 
   chef-icon {

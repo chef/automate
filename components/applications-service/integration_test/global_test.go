@@ -26,6 +26,13 @@ var (
 // NewHabServiceMsg returns a new hab service message with the provided args
 func NewHabServiceMsg(supID, app, env, group,
 	origin, name, version, release, health string) *applications.HabService {
+	return NewHabServiceChannelMsg(supID, app, env, group,
+		origin, name, version, release, health, "stable", "test")
+}
+
+// NewHabServiceMsg returns a new hab service message with the provided args
+func NewHabServiceChannelMsg(supID, app, env, group,
+	origin, name, version, release, health, channel, site string) *applications.HabService {
 	return &applications.HabService{
 		SupervisorId: supID,
 		Application:  app,
@@ -39,6 +46,8 @@ func NewHabServiceMsg(supID, app, env, group,
 		},
 		Status:      applications.ServiceStatus(int32(0)), // @afiune customize it when we use this
 		HealthCheck: applications.HealthStatus(HealthCheckStringToInt32(health)),
+		Channel:     channel,
+		Site:        site,
 	}
 }
 

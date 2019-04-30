@@ -44,8 +44,8 @@ func TestGetServicesSortParameterError(t *testing.T) {
 }
 
 func TestGetServicesSingleService(t *testing.T) {
-	mockHabService := NewHabServiceMsg("sup1234", a, e, "default", "core",
-		"postgres", "0.1.0", "20190101121212", "OK")
+	mockHabService := NewHabServiceChannelMsg("sup1234", a, e, "default", "core",
+		"postgres", "0.1.0", "20190101121212", "OK", "stable", "testsite")
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
 
@@ -64,7 +64,11 @@ func TestGetServicesSingleService(t *testing.T) {
 						Release:      "core/postgres/0.1.0/20190101121212",
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_OK,
-						Application:  a, Environment: e, Fqdn: "",
+						Application:  a,
+						Environment:  e,
+						Fqdn:         "",
+						Channel:      "stable",
+						Site:         "testsite",
 					},
 				},
 			}

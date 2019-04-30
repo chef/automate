@@ -172,6 +172,8 @@ func updateServiceFromHabEvent(event *applications.HabService, svc *service) {
 	svc.Release = event.GetPkgIdent().GetRelease()
 	svc.Health = event.GetHealthCheck().String()
 	svc.Status = event.GetStatus().String()
+	svc.Channel = event.GetChannel()
+	svc.Site = event.GetSite()
 }
 
 func serviceFromHabEvent(event *applications.HabService, did, sid, gid int32) *service {
@@ -185,6 +187,8 @@ func serviceFromHabEvent(event *applications.HabService, did, sid, gid int32) *s
 		GroupID:      gid,
 		DeploymentID: did,
 		SupID:        sid,
+		Channel:      event.GetChannel(),
+		Site:         event.GetSite(),
 	}
 }
 

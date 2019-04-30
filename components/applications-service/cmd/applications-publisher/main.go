@@ -97,6 +97,8 @@ func main() {
 	flag.StringVar(&event.PkgIdent.Name, "name", "redis", "The name of a package")
 	flag.StringVar(&event.PkgIdent.Version, "version", "0.1.0", "The version of a package")
 	flag.StringVar(&event.PkgIdent.Release, "release", t.Format("20060102150405"), "The release of a package")
+	flag.StringVar(&event.Site, "site", "", "The site of the server where the service is running")
+	flag.StringVar(&event.Channel, "channel", "", "The channel that the supervisor is subscribed to")
 	flag.IntVar(&health, "health", 0, "The health check code of a service")
 	flag.IntVar(&status, "status", 0, "The status code of a service")
 	flag.BoolVar(&uniqID, "uniq-client-id", false, "Generate a unique client-id to connect to server")
