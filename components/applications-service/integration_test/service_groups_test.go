@@ -25,7 +25,7 @@ func TestServiceGroupsBasic(t *testing.T) {
 	assert.Equal(t, expected, response)
 }
 
-func TestServiceGroupsHealthOneOk(t *testing.T) {
+func TestGetServiceGroupsOneOk(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
@@ -58,7 +58,7 @@ func TestServiceGroupsHealthOneOk(t *testing.T) {
 	assertServiceGroupsEqual(t, expected, response)
 }
 
-func TestServiceGroupsHealthOneCritical(t *testing.T) {
+func TestGetServiceGroupsOneCritical(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
@@ -152,7 +152,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 	assertServiceGroupsEqual(t, expected, response)
 }
 
-func TestServiceGroupsHealthOneWarning(t *testing.T) {
+func TestGetServiceGroupsOneWarning(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
@@ -185,7 +185,7 @@ func TestServiceGroupsHealthOneWarning(t *testing.T) {
 	assertServiceGroupsEqual(t, expected, response)
 }
 
-func TestServiceGroupsHealthOneUnknown(t *testing.T) {
+func TestGetServiceGroupsOneUnknown(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
@@ -217,7 +217,7 @@ func TestServiceGroupsHealthOneUnknown(t *testing.T) {
 	assert.Nil(t, err)
 	assertServiceGroupsEqual(t, expected, response)
 }
-func TestServiceGroupsHealthOneEach(t *testing.T) {
+func TestGetServiceGroupsOneEach(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
@@ -259,7 +259,7 @@ func TestServiceGroupsHealthOneEach(t *testing.T) {
 	assertServiceGroupsEqual(t, expected, response)
 }
 
-func TestServiceGroupsHealthSortedDesc(t *testing.T) {
+func TestGetServiceGroupsSortedDesc(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
@@ -291,7 +291,7 @@ func TestServiceGroupsHealthSortedDesc(t *testing.T) {
 	assert.Equal(t, "a.default", response.ServiceGroups[3].Name)
 }
 
-func TestServiceGroupsHealthSortedAsc(t *testing.T) {
+func TestGetServiceGroupsSortedAsc(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
@@ -323,7 +323,7 @@ func TestServiceGroupsHealthSortedAsc(t *testing.T) {
 	assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
 }
 
-func TestServiceGroupsHealthSortedPercent(t *testing.T) {
+func TestGetServiceGroupsSortedPercent(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
@@ -354,7 +354,7 @@ func TestServiceGroupsHealthSortedPercent(t *testing.T) {
 	assert.Equal(t, int32(0), response.ServiceGroups[2].HealthPercentage)
 }
 
-func TestServiceGroupsHealthSortedPercentAsc(t *testing.T) {
+func TestGetServiceGroupsSortedPercentAsc(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
