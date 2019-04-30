@@ -89,12 +89,15 @@ func (s *authzServer) ProjectsAuthorized(
 	}
 
 	requestedProjects := req.ProjectsFilter
+
+	var allProjects []string
 	var err error
 	if len(req.ProjectsFilter) == 0 {
-		requestedProjects, err = s.setAllProjects(ctx)
+		allProjects, err = s.getAllProjects(ctx)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+		requestedProjects = allProjects
 	}
 
 	engineResp, err := s.engine.V2ProjectsAuthorized(ctx,
@@ -106,7 +109,7 @@ func (s *authzServer) ProjectsAuthorized(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	authorizedProjects = translateEngineResponse(engineResp)
+	authorizedProjects = handleAllProjectsResponse(engineResp, allProjects)
 
 	s.logProjectQuery(req, authorizedProjects)
 	return &api.ProjectsAuthorizedResp{
@@ -164,8 +167,7 @@ func isBeta2p1(version api.Version) bool {
 	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
 }
 
-// setAllProjects replaces an empty projects filter with a list of all projects
-func (s *authzServer) setAllProjects(ctx context.Context) ([]string, error) {
+func (s *authzServer) getAllProjects(ctx context.Context) ([]string, error) {
 	// we make this extra call to cover the case when the following are true:
 	// - no project filter has been provided
 	// - one statement allows All Projects for the given resource/action
@@ -188,14 +190,14 @@ func (s *authzServer) setAllProjects(ctx context.Context) ([]string, error) {
 	return projectIDs, nil
 }
 
-// translateEngineResponse adjusts the engine project response depending on which projects are returned
-func translateEngineResponse(authorizedProjects []string) []string {
-	if stringutils.SliceContains(authorizedProjects, constants.AllProjectsID) {
-		// though incoming requests signify All Projects with an empty array
-		// we cannot return an empty array here because when the engine returns an empty array
-		// it means No Projects Allowed.
-		// so instead, here we set All Projects as *, to be passed on to the domain services
-		// this is more explicit and avoids the issue of golang coercing empty arrays into nil
+// handleAllProjectsResponse sets the response to * if all projects returned
+func handleAllProjectsResponse(authorizedProjects, allProjects []string) []string {
+	// though incoming requests signify All Projects with an empty array
+	// we cannot return an empty array here because when the engine returns an empty array
+	// it means No Projects Allowed.
+	// so instead, here we set All Projects as *, to be passed on to the domain services
+	// this is more explicit and avoids the issue of golang coercing empty arrays into nil
+	if len(authorizedProjects) == len(allProjects) {
 		authorizedProjects = []string{constants.AllProjectsExternalID}
 	}
 	return authorizedProjects
