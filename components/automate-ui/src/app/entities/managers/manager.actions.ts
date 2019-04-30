@@ -10,6 +10,9 @@ export enum ManagerActionTypes {
   GET_NODES             = 'MANAGER::GET_NODES',
   GET_NODES_SUCCESS     = 'MANAGER::GET_NODES::SUCCESS',
   GET_NODES_FAILURE     = 'MANAGER::GET_NODES::FAILURE',
+  DELETE_NODES          = 'MANAGER::NODES::DELETE',
+  DELETE_NODES_SUCCESS  = 'MANAGER::NODES::DELETE::SUCCESS',
+  DELETE_NODES_FAILURE  = 'MANAGER::NODES::DELETE::FAILURE',
   SEARCH_NODES          = 'MANAGER::SEARCH_NODES',
   SEARCH_NODES_SUCCESS  = 'MANAGER::SEARCH_NODES::SUCCESS',
   SEARCH_NODES_FAILURE  = 'MANAGER::SEARCH_NODES::FAILURE',
@@ -85,6 +88,23 @@ export class ManagerGetNodesSuccess implements Action {
 export class ManagerGetNodesFailure implements Action {
   readonly type = ManagerActionTypes.GET_NODES_FAILURE;
   constructor(public payload: HttpErrorResponse) {}
+}
+
+export class ManagerDeleteNodes implements Action {
+  readonly type = ManagerActionTypes.DELETE_NODES;
+  constructor(public payload: { ids: string[] }) {}
+}
+
+export class ManagerDeleteNodesSuccess implements Action {
+  readonly type = ManagerActionTypes.DELETE_NODES_SUCCESS;
+
+  constructor( ) {}
+}
+
+export class ManagerDeleteNodesFailure implements Action {
+  readonly type = ManagerActionTypes.DELETE_NODES_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
 }
 
 export interface ManagerSearchNodesPayload {
@@ -273,6 +293,9 @@ export type ManagerActions =
   | ManagerGetNodes
   | ManagerGetNodesSuccess
   | ManagerGetNodesFailure
+  | ManagerDeleteNodes
+  | ManagerDeleteNodesSuccess
+  | ManagerDeleteNodesFailure
   | ManagerSearchNodes
   | ManagerSearchNodesSuccess
   | ManagerAllNodes

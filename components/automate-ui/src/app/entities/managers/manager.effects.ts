@@ -1,4 +1,4 @@
-import { catchError, mergeMap, map, filter } from 'rxjs/operators';
+import { catchError, withLatestFrom, switchMap, mergeMap, map, filter } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
@@ -14,6 +14,9 @@ import {
   ManagerGetNodes,
   ManagerGetNodesSuccess,
   ManagerGetNodesFailure,
+  ManagerDeleteNodes,
+  ManagerDeleteNodesSuccess,
+  ManagerDeleteNodesFailure,
   ManagerSearchNodes,
   ManagerSearchNodesSuccess,
   ManagerSearchNodesFailure,
@@ -46,6 +49,9 @@ import {
   ManagerSearchFieldsResponse
 } from './manager.requests';
 import { CreateNotification } from '../notifications/notification.actions';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from '../../ngrx.reducers';
+import { IntegrationsDetailState } from '../../pages/integrations/detail/integrations-detail.reducer';
 import { Type } from '../notifications/notification.model';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 
@@ -53,7 +59,8 @@ import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 export class ManagerEffects {
   constructor(
     private actions$: Actions,
-    private requests: ManagerRequests
+    private requests: ManagerRequests,
+    private store: Store<NgrxStateAtom>
   ) {}
 
   @Effect()
@@ -173,6 +180,27 @@ export class ManagerEffects {
           type: Type.error,
           message: `Could not get manager nodes: ${msg || payload.error}`
         });
+      }));
+
+  @Effect()
+  deleteNodes$ = this.actions$.pipe(
+      ofType(ManagerActionTypes.DELETE_NODES),
+      mergeMap((action: ManagerDeleteNodes) =>
+        this.requests.deleteNodes(action.payload.ids)),
+      map(_success => new ManagerDeleteNodesSuccess()),
+      catchError((error) => of(new ManagerDeleteNodesFailure(error)))
+    );
+
+  @Effect()
+  deleteNodesSuccess$ = this.actions$.pipe(
+      ofType(ManagerActionTypes.DELETE_NODES_SUCCESS),
+      withLatestFrom(this.store),
+      map(([_action, storeState]) => {
+        const integrationsDetailState: IntegrationsDetailState = storeState.integrations_detail;
+        const managerId = integrationsDetailState.manager.id;
+        const page = integrationsDetailState.managerNodesPage;
+        const per_page = integrationsDetailState.managerNodesPerPage;
+        return new ManagerGetNodes({ managerId, page, per_page });
       }));
 
   @Effect()

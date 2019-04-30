@@ -7,7 +7,7 @@ import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { IntegrationsDetailState } from './integrations-detail.reducer';
 import { integrationsDetail } from './integrations-detail.selectors';
 import { includes, without } from 'lodash';
-import { DeleteNodes } from 'app/entities/client-runs/client-runs.actions';
+import { ManagerDeleteNodes } from 'app/entities/managers/manager.actions';
 
 @Component({
   selector: 'app-integrations-detail',
@@ -31,7 +31,8 @@ export class IntegrationsDetailComponent {
   }
 
   deleteNodes() {
-    this.store.dispatch(new DeleteNodes({ nodeIdsToDelete: this.selectedNodes }));
+    this.store.dispatch(new ManagerDeleteNodes({ ids: this.selectedNodes }));
+    this.selectedNodes = [];
   }
 
   selectNode(id: string) {
