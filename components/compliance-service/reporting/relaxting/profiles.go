@@ -288,7 +288,9 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 	}
 
 	logrus.Debugf("GetProfile got %d profiles in %d milliseconds\n", searchResult.TotalHits(), searchResult.TookInMillis)
-	LogQueryPartMin(CompProfilesIndex, searchResult, "GetProfile query results")
+
+	// This is too verbose even for debug logging. Keeping it off unless needed for troubleshooting
+	// LogQueryPartMin(CompProfilesIndex, searchResult, "GetProfile query results")
 
 	// we should only receive one value
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
