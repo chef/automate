@@ -27,6 +27,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
+
 // TODO @afiune most of this file is very similar to the suite_test.go living
 // inside config-mgmt-service, we could have a single suite file for both (or more)
 
@@ -170,7 +172,7 @@ func (s *Suite) IngestActions(actions []iBackend.InternalChefAction) {
 	}
 
 	// Refresh Indices
-	s.RefreshIndices(mappings.Actions.Index + "-*")
+	s.RefreshIndices(actionIndexes)
 }
 
 // RefreshIndices will refresh the provided ES Index or list of Indices
