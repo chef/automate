@@ -971,9 +971,11 @@ func TestDeletePolicy(t *testing.T) {
 	cases := map[string]func(*testing.T){
 		"empty database": func(t *testing.T) {
 			ctx := context.Background()
-			err := store.DeletePolicy(ctx, genSimpleID(t, prngSeed))
-			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertNoPolicyChange(t, store, func() {
+				err := store.DeletePolicy(ctx, genSimpleID(t, prngSeed))
+				assert.Error(t, err)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 		},
 		"policy not found with existing policies in store": func(t *testing.T) {
 			ctx := context.Background()
@@ -987,16 +989,20 @@ func TestDeletePolicy(t *testing.T) {
 			require.NoError(t, err)
 
 			polID := genSimpleID(t, prngSeed)
-			err = store.DeletePolicy(ctx, polID)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertNoPolicyChange(t, store, func() {
+				err = store.DeletePolicy(ctx, polID)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 		},
 		"attached policy with no statements": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
-			err := store.DeletePolicy(ctx, polID)
-			require.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err := store.DeletePolicy(ctx, polID)
+				require.NoError(t, err)
+			})
 
 			// assert that stuff happened to the database
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
@@ -1005,8 +1011,10 @@ func TestDeletePolicy(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 
-			err := store.DeletePolicy(ctx, polID)
-			require.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err := store.DeletePolicy(ctx, polID)
+				require.NoError(t, err)
+			})
 
 			// assert that stuff happened to the database
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
@@ -1025,8 +1033,10 @@ func TestDeletePolicy(t *testing.T) {
 			require.NoError(t, err)
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
-			err = store.DeletePolicy(ctx, polID)
-			require.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err := store.DeletePolicy(ctx, polID)
+				require.NoError(t, err)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
@@ -1059,8 +1069,10 @@ func TestDeletePolicy(t *testing.T) {
 			require.NoError(t, err)
 			member := insertTestPolicyMember(t, db, polID1, "user:local:charmander")
 
-			err = store.DeletePolicy(ctx, polID1)
-			require.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err := store.DeletePolicy(ctx, polID1)
+				require.NoError(t, err)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID1))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
@@ -1097,8 +1109,10 @@ func TestDeletePolicy(t *testing.T) {
 
 			insertTestPolicyMember(t, db, polID, "user:local:eevee")
 
-			err = store.DeletePolicy(ctx, polID)
-			require.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err := store.DeletePolicy(ctx, polID)
+				require.NoError(t, err)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
@@ -1115,8 +1129,10 @@ func TestDeletePolicy(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
-			err := store.DeletePolicy(ctx, polID)
-			assert.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err := store.DeletePolicy(ctx, polID)
+				assert.NoError(t, err)
+			})
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 		},
 		"when the policy has no projects with a filter of (unassigned), delete the policy": func(t *testing.T) {
@@ -1128,8 +1144,10 @@ func TestDeletePolicy(t *testing.T) {
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
-			err := store.DeletePolicy(ctx, polID)
-			assert.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err := store.DeletePolicy(ctx, polID)
+				assert.NoError(t, err)
+			})
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 		},
 		"when the the policy filter is *, delete the policy": func(t *testing.T) {
@@ -1159,8 +1177,10 @@ func TestDeletePolicy(t *testing.T) {
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
 
 			ctx = insertProjectsIntoContext(ctx, []string{projID2})
-			err := store.DeletePolicy(ctx, polID)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertNoPolicyChange(t, store, func() {
+				err := store.DeletePolicy(ctx, polID)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 		},
 	}
 
@@ -1168,24 +1188,6 @@ func TestDeletePolicy(t *testing.T) {
 		t.Run(name, test)
 		db.flush(t)
 	}
-}
-
-func assertPolicyChange(t *testing.T, store storage.Storage, f func()) {
-	before, err := store.GetPolicyChangeID(context.Background())
-	require.NoError(t, err)
-	f()
-	after, err := store.GetPolicyChangeID(context.Background())
-	require.NoError(t, err)
-	assert.NotEqual(t, before, after)
-}
-
-func assertNoPolicyChange(t *testing.T, store storage.Storage, f func()) {
-	before, err := store.GetPolicyChangeID(context.Background())
-	require.NoError(t, err)
-	f()
-	after, err := store.GetPolicyChangeID(context.Background())
-	require.NoError(t, err)
-	assert.Equal(t, before, after)
 }
 
 func TestCreatePolicy(t *testing.T) {
@@ -1749,20 +1751,24 @@ func TestReplacePolicyMembers(t *testing.T) {
 			wrongPolID := genSimpleID(t, prngSeed)
 			member := genMember(t, "user:local:test")
 
-			resp, err := store.ReplacePolicyMembers(ctx, wrongPolID, []storage.Member{member})
-			assert.Error(t, err)
-			assert.Empty(t, resp)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, wrongPolID, []storage.Member{member})
+				assert.Error(t, err)
+				assert.Empty(t, resp)
+			})
 		},
 		"policy not found reports an error": func(t *testing.T) {
 			ctx := context.Background()
 			insertTestPolicy(t, db, "testpolicy")
 			member1 := genMember(t, "user:local:fred")
 
-			resp, err := store.ReplacePolicyMembers(ctx, genSimpleID(t, prngSeed), []storage.Member{member1})
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, genSimpleID(t, prngSeed), []storage.Member{member1})
 
-			assert.Error(t, err)
-			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 		},
 		"updating policy with NO members to SOME members": func(t *testing.T) {
 			ctx := context.Background()
@@ -1772,9 +1778,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
-			resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{member1, member2})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{member1, member2})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -1788,9 +1796,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
-			resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			// deleting last use of member does NOT delete member
@@ -1809,9 +1819,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			member4 := genMember(t, "team:saml:editors")
 			members := []storage.Member{member1, member2, member3, member4}
 
-			resp, err := store.ReplacePolicyMembers(ctx, polID, members)
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, members)
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertCount(t, len(members), db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, len(members)+2, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -1837,9 +1849,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			member4 := genMember(t, "team:saml:editors")
 			members := []storage.Member{member1, member2, member3, member4}
 
-			resp, err := store.ReplacePolicyMembers(ctx, polID, members)
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, members)
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -1870,9 +1884,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, otherPolID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 
-			resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{member})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{member})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			// now still just one member but in two policies
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -1893,9 +1909,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, otherPolID))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 
-			resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			// now member remains in just one policy
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -1914,9 +1932,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
-			resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			// deleting last use of member does NOT delete member
@@ -1934,9 +1954,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
-			resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			// deleting last use of member does NOT delete member
@@ -1953,9 +1975,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
-			resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			// deleting last use of member does NOT delete member
@@ -1975,9 +1999,11 @@ func TestReplacePolicyMembers(t *testing.T) {
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
-			resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
-			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
+				assert.Nil(t, resp)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
 	}
@@ -1999,20 +2025,24 @@ func TestRemovePolicyMembers(t *testing.T) {
 			wrongPolID := genSimpleID(t, prngSeed)
 			member := genMember(t, "user:local:test")
 
-			resp, err := store.RemovePolicyMembers(ctx, wrongPolID, []storage.Member{member})
-			assert.Error(t, err)
-			assert.Empty(t, resp)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, wrongPolID, []storage.Member{member})
+				assert.Error(t, err)
+				assert.Empty(t, resp)
+			})
 		},
 		"policy not found reports an error": func(t *testing.T) {
 			ctx := context.Background()
 			insertTestPolicy(t, db, "testpolicy")
 			member := genMember(t, "user:local:fred")
 
-			resp, err := store.RemovePolicyMembers(ctx, genSimpleID(t, prngSeed), []storage.Member{member})
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, genSimpleID(t, prngSeed), []storage.Member{member})
 
-			assert.Error(t, err)
-			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 		},
 		"removing members from policy with NO members results in an empty member list": func(t *testing.T) {
 			ctx := context.Background()
@@ -2021,10 +2051,12 @@ func TestRemovePolicyMembers(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
-			resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Empty(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Empty(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2039,10 +2071,12 @@ func TestRemovePolicyMembers(t *testing.T) {
 
 			member1 := genMember(t, "user:local:fred")
 			member2 := genMember(t, "user:local:mary")
-			resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Empty(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Empty(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2057,11 +2091,13 @@ func TestRemovePolicyMembers(t *testing.T) {
 
 			member1 := genMember(t, "user:local:fred")
 			member2 := genMember(t, "user:local:fred")
-			resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Equal(t, 1, len(resp))
-			require.Contains(t, resp, remainingMember)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Equal(t, 1, len(resp))
+				require.Contains(t, resp, remainingMember)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1 and member_id=$2`,
@@ -2076,10 +2112,12 @@ func TestRemovePolicyMembers(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
 			member1 := genMember(t, "user:local:fred")
-			resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Empty(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Empty(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2092,12 +2130,14 @@ func TestRemovePolicyMembers(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
-			resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Equal(t, 2, len(resp))
-			require.Contains(t, resp, member1)
-			require.Contains(t, resp, member2)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Equal(t, 2, len(resp))
+				require.Contains(t, resp, member1)
+				require.Contains(t, resp, member2)
+			})
 
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2118,13 +2158,15 @@ func TestRemovePolicyMembers(t *testing.T) {
 			member4 := genMember(t, "team:saml:notfound2")
 			members := []storage.Member{member1, member2, member3, member4}
 
-			resp, err := store.RemovePolicyMembers(ctx, polID, members)
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Equal(t, 3, len(resp))
-			require.Contains(t, resp, polMember3)
-			require.Contains(t, resp, polMember4)
-			require.Contains(t, resp, polMember5)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, members)
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Equal(t, 3, len(resp))
+				require.Contains(t, resp, polMember3)
+				require.Contains(t, resp, polMember4)
+				require.Contains(t, resp, polMember5)
+			})
 
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2143,9 +2185,11 @@ func TestRemovePolicyMembers(t *testing.T) {
 			members := []storage.Member{member1, member2}
 
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
-			resp, err := store.RemovePolicyMembers(ctx, polID, members)
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, members)
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
@@ -2161,9 +2205,11 @@ func TestRemovePolicyMembers(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
-			resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
@@ -2178,9 +2224,11 @@ func TestRemovePolicyMembers(t *testing.T) {
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
-			resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
@@ -2198,9 +2246,11 @@ func TestRemovePolicyMembers(t *testing.T) {
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
-			resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
-			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
+				assert.Nil(t, resp)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
 	}
@@ -2222,22 +2272,26 @@ func TestAddPolicyMembers(t *testing.T) {
 			wrongPolID := genSimpleID(t, prngSeed)
 			member := genMember(t, "user:local:test")
 
-			resp, err := store.AddPolicyMembers(ctx, wrongPolID, []storage.Member{member})
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, wrongPolID, []storage.Member{member})
 
-			assert.Error(t, err)
-			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 		},
 		"fails to add with ErrNotFound when a policy exists but members are added to a non-existent policy": func(t *testing.T) {
 			ctx := context.Background()
 			insertTestPolicy(t, db, "testpolicy")
 			member := genMember(t, "user:local:fred")
 
-			resp, err := store.AddPolicyMembers(ctx, genSimpleID(t, prngSeed), []storage.Member{member})
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, genSimpleID(t, prngSeed), []storage.Member{member})
 
-			assert.Error(t, err)
-			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 		},
 		"adding one member to a policy with NO members results in member being added": func(t *testing.T) {
 			ctx := context.Background()
@@ -2246,10 +2300,12 @@ func TestAddPolicyMembers(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
-			resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.NotEmpty(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.NotEmpty(t, resp)
+			})
 
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2265,10 +2321,12 @@ func TestAddPolicyMembers(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
-			resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member1, member2, member3, member4})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.NotEmpty(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member1, member2, member3, member4})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.NotEmpty(t, resp)
+			})
 
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2284,10 +2342,12 @@ func TestAddPolicyMembers(t *testing.T) {
 			assertMembers(t, db, polID, []storage.Member{member1, member2})
 			member3 := genMember(t, "user:local:max")
 
-			resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member3})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.NotEmpty(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member3})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.NotEmpty(t, resp)
+			})
 
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2306,10 +2366,12 @@ func TestAddPolicyMembers(t *testing.T) {
 			member5 := genMember(t, "user:local:barry")
 			member6 := genMember(t, "user:local:jack")
 
-			resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member3, member4, member5, member6})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.NotEmpty(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member3, member4, member5, member6})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.NotEmpty(t, resp)
+			})
 
 			assertCount(t, 6, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 6, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2325,10 +2387,12 @@ func TestAddPolicyMembers(t *testing.T) {
 			member3 := genMember(t, "user:local:ellen")
 			repeatMember3 := genMember(t, "user:local:ellen")
 
-			resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member3, repeatMember3})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Equal(t, 3, len(resp))
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member3, repeatMember3})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Equal(t, 3, len(resp))
+			})
 
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2343,21 +2407,27 @@ func TestAddPolicyMembers(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 			member3 := genMember(t, "user:local:ellen")
 
-			// add ellen to the policy
-			resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member3})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Equal(t, 3, len(resp))
+			assertPolicyChange(t, store, func() {
+				// add ellen to the policy
+				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member3})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Equal(t, 3, len(resp))
+			})
 
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_members`))
 			assertMembers(t, db, polID, []storage.Member{member1, member2, member3})
 
-			// attempt to add ellen again in a duplicate request
-			resp, err = store.AddPolicyMembers(ctx, polID, []storage.Member{member3})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Equal(t, 3, len(resp))
+			// This isn't quite right. It's better if we don't update the change id, but that requires
+			// the transaction to fail
+			assertPolicyChange(t, store, func() {
+				// attempt to add ellen again in a duplicate request
+				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member3})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Equal(t, 3, len(resp))
+			})
 
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2374,10 +2444,12 @@ func TestAddPolicyMembers(t *testing.T) {
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID1))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID2))
 
-			resp, err := store.AddPolicyMembers(ctx, polID2, []storage.Member{member1, member2, member3, member4})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Equal(t, 4, len(resp))
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID2, []storage.Member{member1, member2, member3, member4})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Equal(t, 4, len(resp))
+			})
 
 			assertMembers(t, db, polID1, []storage.Member{member1, member2, member3})
 			assertMembers(t, db, polID2, []storage.Member{member1, member2, member3, member4})
@@ -2393,10 +2465,12 @@ func TestAddPolicyMembers(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
-			resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member1, member2})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Equal(t, 2, len(resp))
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member1, member2})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Equal(t, 2, len(resp))
+			})
 
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
@@ -2411,10 +2485,12 @@ func TestAddPolicyMembers(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID1))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID2))
 
-			resp, err := store.AddPolicyMembers(ctx, polID2, []storage.Member{member})
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			require.Equal(t, 1, len(resp))
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID2, []storage.Member{member})
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+				require.Equal(t, 1, len(resp))
+			})
 
 			assertMembers(t, db, polID1, []storage.Member{member})
 			assertMembers(t, db, polID2, []storage.Member{member})
@@ -2437,10 +2513,12 @@ func TestAddPolicyMembers(t *testing.T) {
 			member2 := genMember(t, "user:local:sue")
 			members := []storage.Member{member1, member2}
 
-			ctx = insertProjectsIntoContext(ctx, []string{projID1})
-			resp, err := store.AddPolicyMembers(ctx, polID, members)
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				ctx = insertProjectsIntoContext(ctx, []string{projID1})
+				resp, err := store.AddPolicyMembers(ctx, polID, members)
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
@@ -2460,9 +2538,11 @@ func TestAddPolicyMembers(t *testing.T) {
 			members := []storage.Member{member1, member2}
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
-			resp, err := store.AddPolicyMembers(ctx, polID, members)
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID, members)
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
@@ -2481,9 +2561,11 @@ func TestAddPolicyMembers(t *testing.T) {
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
-			resp, err := store.AddPolicyMembers(ctx, polID, members)
-			require.NoError(t, err)
-			require.NotNil(t, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID, members)
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+			})
 
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
@@ -2505,9 +2587,11 @@ func TestAddPolicyMembers(t *testing.T) {
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
-			resp, err := store.AddPolicyMembers(ctx, polID, members)
-			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.AddPolicyMembers(ctx, polID, members)
+				assert.Nil(t, resp)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
 		},
 	}
@@ -2535,10 +2619,12 @@ func TestUpdatePolicy(t *testing.T) {
 				Type:    typeVal,
 				Members: []storage.Member{member},
 			}
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
-			assert.Nil(t, resp)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.Error(t, err)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Nil(t, resp)
+			})
 		},
 		"policy not found with existing policies in store": func(t *testing.T) {
 			ctx := context.Background()
@@ -2562,10 +2648,12 @@ func TestUpdatePolicy(t *testing.T) {
 				Type:    typeVal,
 				Members: []storage.Member{member},
 			}
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
-			assert.Nil(t, resp)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.Error(t, err)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+				assert.Nil(t, resp)
+			})
 		},
 		"policy with no statements, updating fields": func(t *testing.T) {
 			ctx := context.Background()
@@ -2581,9 +2669,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{member},
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -2615,9 +2705,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Statements: []storage.Statement{},
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -2655,9 +2747,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Statements: []storage.Statement{statement0, statement1},
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -2703,9 +2797,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Statements: []storage.Statement{statement},
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -2772,9 +2868,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Statements: []storage.Statement{statement0, statement1},
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.Error(t, err)
-			assert.Nil(t, resp)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+			})
 
 			// The first policy was left intact
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, originalPolID))
@@ -2830,9 +2928,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Statements: []storage.Statement{statement},
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
@@ -2880,9 +2980,11 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, projID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=$1`, projID))
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			require.Error(t, err)
-			assert.Nil(t, resp)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				require.Error(t, err)
+				assert.Nil(t, resp)
+			})
 
 			// no update to policy or members
 			assertEmpty(t,
@@ -2916,9 +3018,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Projects: []string{projID},
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.ElementsMatch(t, []string{projID}, resp.Projects)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.ElementsMatch(t, []string{projID}, resp.Projects)
+			})
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
@@ -2945,9 +3049,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Projects: expProjs,
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.ElementsMatch(t, expProjs, resp.Projects)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.ElementsMatch(t, expProjs, resp.Projects)
+			})
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
@@ -2980,9 +3086,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Projects: expProjs,
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.Equal(t, expProjs, resp.Projects)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, expProjs, resp.Projects)
+			})
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
@@ -3013,9 +3121,11 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			expProjs := []string{projID2}
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.ElementsMatch(t, expProjs, resp.Projects)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.ElementsMatch(t, expProjs, resp.Projects)
+			})
 
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
@@ -3047,9 +3157,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Projects: expProjs,
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.NoError(t, err)
-			assert.Equal(t, expProjs, resp.Projects)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.NoError(t, err)
+				assert.Equal(t, expProjs, resp.Projects)
+			})
 
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
@@ -3078,9 +3190,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Projects: []string{projID, "not-real"},
 			}
 
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.Error(t, err)
-			assert.Nil(t, resp)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.Error(t, err)
+				assert.Nil(t, resp)
+			})
 
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_statements WHERE policy_id=$1`, polID))
@@ -3104,10 +3218,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
-			resp, err := store.UpdatePolicy(ctx, &pol)
-
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
 					polID, name, typeVal.String()))
@@ -3127,10 +3242,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
-			resp, err := store.UpdatePolicy(ctx, &pol)
-
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
 					polID, name, typeVal.String()))
@@ -3148,10 +3264,11 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 			projID1 := "team-rocket"
 			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
-			resp, err := store.UpdatePolicy(ctx, &pol)
-
-			require.NoError(t, err)
-			assert.Equal(t, &pol, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
 					polID, name, typeVal.String()))
@@ -3174,9 +3291,11 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
-			resp, err := store.UpdatePolicy(ctx, &pol)
-			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol)
+				assert.Nil(t, resp)
+				assert.Equal(t, storage_errors.ErrNotFound, err)
+			})
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2`, polID, originalName))
 		},
@@ -3789,9 +3908,11 @@ func TestCreateRole(t *testing.T) {
 				Actions:  []string{},
 				Projects: []string{},
 			}
-			resp, err := store.CreateRole(ctx, &role)
-			require.NoError(t, err)
-			require.Equal(t, &role, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreateRole(ctx, &role)
+				require.NoError(t, err)
+				require.Equal(t, &role, resp)
+			})
 
 			assertRolesMatch(t, db, role)
 		},
@@ -3803,9 +3924,11 @@ func TestCreateRole(t *testing.T) {
 				Actions:  []string{"action1", "action2", "action3"},
 				Projects: []string{},
 			}
-			resp, err := store.CreateRole(ctx, &role)
-			require.NoError(t, err)
-			require.Equal(t, &role, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreateRole(ctx, &role)
+				require.NoError(t, err)
+				require.Equal(t, &role, resp)
+			})
 
 			assertRolesMatch(t, db, role)
 		},
@@ -3816,6 +3939,7 @@ func TestCreateRole(t *testing.T) {
 				Type:     storage.Custom,
 				Projects: []string{"my-id-1"},
 			}
+
 			_, err := store.CreateProject(ctx, &project)
 			require.NoError(t, err)
 
@@ -3826,9 +3950,11 @@ func TestCreateRole(t *testing.T) {
 				Actions:  []string{"action1", "action2", "action3"},
 				Projects: []string{project.ID},
 			}
-			resp, err := store.CreateRole(ctx, &role)
-			require.NoError(t, err)
-			require.Equal(t, &role, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreateRole(ctx, &role)
+				require.NoError(t, err)
+				require.Equal(t, &role, resp)
+			})
 
 			assertRolesMatch(t, db, role)
 		},
@@ -3858,9 +3984,11 @@ func TestCreateRole(t *testing.T) {
 				Actions:  []string{"action1", "action2", "action3"},
 				Projects: []string{project1.ID, project2.ID},
 			}
-			resp, err := store.CreateRole(ctx, &role)
-			require.NoError(t, err)
-			require.Equal(t, &role, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreateRole(ctx, &role)
+				require.NoError(t, err)
+				require.Equal(t, &role, resp)
+			})
 
 			assertRolesMatch(t, db, role)
 		},
@@ -3872,9 +4000,11 @@ func TestCreateRole(t *testing.T) {
 				Type:    storage.Custom,
 				Actions: []string{"action1", "action2"},
 			}
-			resp, err := store.CreateRole(ctx, &role)
-			require.NoError(t, err)
-			require.Equal(t, &role, resp)
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreateRole(ctx, &role)
+				require.NoError(t, err)
+				require.Equal(t, &role, resp)
+			})
 
 			role2 := storage.Role{
 				ID:      roleID,
@@ -3882,10 +4012,12 @@ func TestCreateRole(t *testing.T) {
 				Type:    storage.Custom,
 				Actions: []string{"action3", "action4"},
 			}
-			resp, err = store.CreateRole(ctx, &role2)
-			assert.Error(t, err)
-			assert.Equal(t, storage_errors.ErrConflict, err)
-			assert.Nil(t, resp)
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.CreateRole(ctx, &role2)
+				assert.Error(t, err)
+				assert.Equal(t, storage_errors.ErrConflict, err)
+				assert.Nil(t, resp)
+			})
 		},
 	}
 
@@ -5487,6 +5619,7 @@ func insertStatementProject(t *testing.T, db *testDB, statementID uuid.UUID, pro
 
 func setup(t *testing.T) (storage.Storage, *testDB, *prng.Prng) {
 	t.Helper()
+
 	ctx := context.Background()
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for postgres storage")
@@ -5583,4 +5716,26 @@ func (d *testDB) flush(t *testing.T) {
 func (d *testDB) close(t *testing.T) {
 	t.Helper()
 	require.NoError(t, d.Close())
+}
+
+func assertPolicyChange(t *testing.T, store storage.Storage, f func()) {
+	t.Helper()
+
+	before, err := store.GetPolicyChangeID(context.Background())
+	require.NoError(t, err)
+	f()
+	after, err := store.GetPolicyChangeID(context.Background())
+	require.NoError(t, err)
+	assert.NotEqual(t, before, after)
+}
+
+func assertNoPolicyChange(t *testing.T, store storage.Storage, f func()) {
+	t.Helper()
+
+	before, err := store.GetPolicyChangeID(context.Background())
+	require.NoError(t, err)
+	f()
+	after, err := store.GetPolicyChangeID(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, before, after)
 }
