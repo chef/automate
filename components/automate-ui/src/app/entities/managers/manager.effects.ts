@@ -1,4 +1,4 @@
-import { catchError, withLatestFrom, switchMap, mergeMap, map, filter } from 'rxjs/operators';
+import { catchError, withLatestFrom, mergeMap, map, filter } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
