@@ -33,10 +33,12 @@ const (
 
 // IAM v2 well-known role IDs
 const (
-	OwnerRoleID  = "owner"
-	EditorRoleID = "editor"
-	ViewerRoleID = "viewer"
-	IngestRoleID = "ingest"
+	OwnerRoleID            = "owner"
+	EditorRoleID           = "editor"
+	ViewerRoleID           = "viewer"
+	IngestRoleID           = "ingest"
+	ProjectAdminRoleID     = "project-admin"
+	IAMMembersViewerRoleID = "iam-members-viewer"
 )
 
 // IAM v2 well-known project IDs
