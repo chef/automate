@@ -9,11 +9,13 @@ import (
 
 	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage/v2"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 type State struct {
 	policyChangeID int64 // DO NOT MOVE, must be 64-bit aligned for atomic increment
+	changeManager  *policyChangeNotifierManager
 	policies       *cache.Cache
 	roles          *cache.Cache
 	projects       *cache.Cache
@@ -28,12 +30,14 @@ func New() *State {
 		roles:          cache.New(cache.NoExpiration, -1),
 		projects:       cache.New(cache.NoExpiration, -1),
 		policyChangeID: 0,
+		changeManager:  newPolicyChangeNotifierManager(),
 	}
 	return s
 }
 
 func (s *State) bumpPolicyVersion() {
 	atomic.AddInt64(&s.policyChangeID, int64(1))
+	s.changeManager.notifyChange()
 }
 
 func (s *State) CreatePolicy(_ context.Context, inputPol *storage.Policy) (*storage.Policy, error) {
@@ -229,6 +233,11 @@ func (s *State) DeletePolicy(ctx context.Context, policyID string) error {
 
 func (s *State) GetPolicyChangeID(_ context.Context) (string, error) {
 	return string(atomic.LoadInt64(&s.policyChangeID)), nil
+}
+
+func (s *State) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNotifier, error) {
+	notifier := s.changeManager.register()
+	return notifier, nil
 }
 
 func (s *State) CreateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {

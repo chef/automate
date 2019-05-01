@@ -5721,12 +5721,19 @@ func (d *testDB) close(t *testing.T) {
 func assertPolicyChange(t *testing.T, store storage.Storage, f func()) {
 	t.Helper()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	notifier, err := store.GetPolicyChangeNotifier(ctx)
+	require.NoError(t, err)
+
 	before, err := store.GetPolicyChangeID(context.Background())
 	require.NoError(t, err)
 	f()
 	after, err := store.GetPolicyChangeID(context.Background())
 	require.NoError(t, err)
-	assert.NotEqual(t, before, after)
+	require.NotEqual(t, before, after)
+	<-notifier.C()
 }
 
 func assertNoPolicyChange(t *testing.T, store storage.Storage, f func()) {
