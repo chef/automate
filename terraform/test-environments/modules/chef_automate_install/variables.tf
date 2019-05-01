@@ -116,6 +116,11 @@ variable "enable_workflow" {
   description = "Enable A2 Workflow feature."
 }
 
+variable "enable_eas_dashboard" {
+  default     = "false"
+  description = "Enable A2 EAS Dashboard feature that will enable NATS Streaming Server."
+}
+
 variable "workflow_enterprise" {
   default     = "demo"
   description = "A2 Workflow enterprise name."
