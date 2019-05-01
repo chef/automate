@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
@@ -310,33 +311,29 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 			func(t *testing.T) {
 				test.action.RecordedAt = time.Now()
 				suite.IngestActions([]iBackend.InternalChefAction{test.action})
+				defer suite.DeleteAllDocuments()
 				// Send a project rules update event
 				esJobID, err := suite.ingest.UpdateActionProjectTags(ctx, test.projects)
-				assert.Nil(t, err)
+				require.Nil(t, err)
 
 				jobStatus, err := suite.ingest.JobStatus(ctx, esJobID)
-				assert.Nil(t, err)
+				require.Nil(t, err)
 				for !jobStatus.Completed {
 					time.Sleep(time.Millisecond * 5)
 					jobStatus, err = suite.ingest.JobStatus(ctx, esJobID)
-					assert.Nil(t, err)
-					if err != nil {
-						assert.FailNow(t, "testing job complete")
-					}
+					require.Nil(t, err, "testing elasticsearch job complete")
 				}
 
 				suite.RefreshIndices(fmt.Sprintf("%s-%s", mappings.Actions.Index, "*"))
 
 				// assert the node's project IDs
 				actualActions, err := suite.GeActions(100)
-				assert.Nil(t, err)
-				assert.Equal(t, 1, len(actualActions), "wrong number of actions retrieved")
+				require.Nil(t, err)
+				require.Equal(t, 1, len(actualActions), "wrong number of actions retrieved")
 
 				actualAction := actualActions[0]
 
-				assert.ElementsMatch(t, test.projectIDs, actualAction.Projects)
-
-				suite.DeleteAllDocuments()
+				require.ElementsMatch(t, test.projectIDs, actualAction.Projects)
 			})
 	}
 }
