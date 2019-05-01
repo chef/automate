@@ -46,7 +46,7 @@ type aggregateConfig struct {
 
 // NewManager - create a new config. There should only be one config for the service.
 func NewManager(configFile string) *Manager {
-	config := readinConfig(configFile, defaultConfig())
+	config := readConfigFromFile(configFile, defaultConfig())
 	return &Manager{
 		baseConfigManager: base_config.NewManager(configFile, config),
 	}
@@ -83,7 +83,7 @@ func (manager *Manager) updateConfig(updateFunc func(aggregateConfig) (aggregate
 }
 
 // If there is an error in reading the file return the default file.
-func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} {
+func readConfigFromFile(configFile string, defaultConfig aggregateConfig) interface{} {
 	config := defaultConfig
 
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
