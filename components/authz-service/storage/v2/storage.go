@@ -24,6 +24,13 @@ type Storage interface {
 	MigrationStatusProvider
 }
 
+type PolicyChangeNotification struct{}
+
+type PolicyChangeNotifier interface {
+	C() <-chan PolicyChangeNotification
+	Close() error
+}
+
 type policyStorage interface {
 	ReplacePolicyMembers(context.Context, string, []Member) ([]Member, error)
 	RemovePolicyMembers(context.Context, string, []Member) ([]Member, error)
@@ -41,6 +48,7 @@ type policyStorage interface {
 	PurgeSubjectFromPolicies(ctx context.Context, subject string) ([]string, error)
 
 	GetPolicyChangeID(context.Context) (string, error)
+	GetPolicyChangeNotifier(context.Context) (PolicyChangeNotifier, error)
 }
 
 type roleStorage interface {

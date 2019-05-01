@@ -78,7 +78,10 @@ func NewPoliciesServer(
 	pl storage_v1.PoliciesLister,
 	vChan chan api.Version) (PolicyServer, error) {
 
-	policyRefresher := NewPolicyRefresher(ctx, l, s, e)
+	policyRefresher, err := NewPolicyRefresher(ctx, l, s, e)
+	if err != nil {
+		return nil, errors.Wrap(err, "start policy refresher")
+	}
 
 	srv := &policyServer{
 		log:             l,
