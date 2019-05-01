@@ -147,13 +147,14 @@ func NewManager(configFile string) *Manager {
 	}
 }
 
+// Close - close channels
 func (manager *Manager) Close() {
 	manager.baseConfigManager.Close()
 }
 
 // GetJobSchedulerConfig get the job scheduler config
 func (manager *Manager) GetJobSchedulerConfig() JobSchedulerConfig {
-	return manager.baseConfigManager.Config.(aggregateConfig).JobSchedulerConfig
+	return manager.getConfig().JobSchedulerConfig
 }
 
 // UpdateJobSchedulerConfig - update the job scheduler config
@@ -164,9 +165,9 @@ func (manager *Manager) UpdateJobSchedulerConfig(jobSchedulerConfig JobScheduler
 	})
 }
 
-// GetProjectUpdateConfig
+// GetProjectUpdateConfig - get the project update config data
 func (manager *Manager) GetProjectUpdateConfig() ProjectUpdateConfig {
-	return manager.baseConfigManager.Config.(aggregateConfig).ProjectUpdateConfig
+	return manager.getConfig().ProjectUpdateConfig
 }
 
 // UpdateProjectUpdateConfig - update the project update config
@@ -179,8 +180,8 @@ func (manager *Manager) UpdateProjectUpdateConfig(projectUpdateConfig ProjectUpd
 
 // GetJobsID returns a list of job ids loaded in the manager config
 func (manager *Manager) GetJobsID() []int {
-	ids := make([]int, len(manager.baseConfigManager.Config.(aggregateConfig).JobsConfig))
-	for i, j := range manager.baseConfigManager.Config.(aggregateConfig).JobsConfig {
+	ids := make([]int, len(manager.getConfig().JobsConfig))
+	for i, j := range manager.getConfig().JobsConfig {
 		ids[i] = j.ID
 	}
 
@@ -190,7 +191,7 @@ func (manager *Manager) GetJobsID() []int {
 // GetJobConfig returns the configuration of the provided job.
 // if the job doesn't exist, it returns an empty config
 func (manager *Manager) GetJobConfig(jID int) JobConfig {
-	for _, j := range manager.baseConfigManager.Config.(aggregateConfig).JobsConfig {
+	for _, j := range manager.getConfig().JobsConfig {
 		if j.ID == jID {
 			return j
 		}
@@ -243,19 +244,29 @@ func (manager *Manager) updateConfig(updateFunc func(aggregateConfig) (aggregate
 	})
 }
 
-func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} {
-	config := defaultConfig
-
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		// config file does not exists
-		return config
+func (manager *Manager) getConfig() aggregateConfig {
+	aggregateConfig, ok := manager.baseConfigManager.Config.(aggregateConfig)
+	if ok {
+		log.Error("baseConfigManager.Config is not of type 'aggregateConfig'")
+		os.Exit(1)
 	}
 
+	return aggregateConfig
+}
+
+func readConfigFromFile(configFile string, defaultConfig aggregateConfig) interface{} {
+	config := defaultConfig
+
 	tomlData, err := ioutil.ReadFile(configFile)
-	if err != nil {
+	if os.IsNotExist(err) {
+		// config file does not exists
+		return config
+	} else if err != nil {
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to read config file")
+
+		return defaultConfig
 	}
 
 	err = toml.Unmarshal(tomlData, &config)
@@ -263,6 +274,8 @@ func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} 
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to load manager configuration")
+
+		return defaultConfig
 	}
 
 	return config

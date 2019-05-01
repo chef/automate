@@ -47,7 +47,12 @@ func (manager *ConfigManager) Close() {
 
 // GetProjectUpdateConfig - get project update config
 func (manager *ConfigManager) GetProjectUpdateConfig() ProjectUpdateConfig {
-	return manager.baseConfigManager.Config.(aggregateConfig).ProjectUpdateConfig
+	aggregateConfig, ok := manager.baseConfigManager.Config.(aggregateConfig)
+	if ok {
+		log.Error("baseConfigManager.Config is not of type 'aggregateConfig'")
+		os.Exit(1)
+	}
+	return aggregateConfig.ProjectUpdateConfig
 }
 
 // UpdateProjectUpdateConfig - update the project update config
@@ -77,6 +82,8 @@ func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} 
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to read config file")
+
+		return defaultConfig
 	}
 
 	err = toml.Unmarshal(tomlData, &config)
@@ -84,6 +91,8 @@ func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} 
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to load manager configuration")
+
+		return defaultConfig
 	}
 
 	return config

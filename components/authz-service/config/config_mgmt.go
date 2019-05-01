@@ -60,7 +60,12 @@ func (manager *Manager) Close() {
 
 // GetProjectUpdateStage - get the project update stage
 func (manager *Manager) GetProjectUpdateStage() ProjectUpdateStage {
-	return manager.baseConfigManager.Config.(aggregateConfig).ProjectUpdateStage
+	aggregateConfig, ok := manager.baseConfigManager.Config.(aggregateConfig)
+	if ok {
+		log.Error("baseConfigManager.Config is not of type 'aggregateConfig'")
+		os.Exit(1)
+	}
+	return aggregateConfig.ProjectUpdateStage
 }
 
 // UpdateProjectUpdateStage - update the project update stage
@@ -77,6 +82,7 @@ func (manager *Manager) updateConfig(updateFunc func(aggregateConfig) (aggregate
 	})
 }
 
+// If there is an error in reading the file return the default file.
 func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} {
 	config := defaultConfig
 
@@ -90,6 +96,8 @@ func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} 
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to read config file")
+
+		return defaultConfig
 	}
 
 	err = toml.Unmarshal(tomlData, &config)
@@ -97,6 +105,8 @@ func readinConfig(configFile string, defaultConfig aggregateConfig) interface{} 
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to load manager configuration")
+
+		return defaultConfig
 	}
 
 	return config
