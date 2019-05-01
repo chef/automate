@@ -153,22 +153,22 @@ var nodesSortFields = map[string]string{
 }
 
 type dbNode struct {
-	ConnectionError string          `db:"connection_error"`
-	ID              string          `db:"id"`
-	LastContact     time.Time       `db:"last_contact"`
-	LastJob         string          `db:"last_job"`
-	Manager         string          `db:"manager"`
-	ManagerIDs      json.RawMessage `db:"manager_ids"`
-	Name            string          `db:"name"`
-	Platform        string          `db:"platform"`
-	PlatformVersion string          `db:"platform_version"`
-	Projects        json.RawMessage `db:"projects"`
-	ReportID        string          `db:"report_id"`
-	State           string          `db:"source_state"`
-	Status          string          `db:"status"`
-	Tags            json.RawMessage `db:"tags"`
-	TargetConfig    json.RawMessage `db:"target_config"`
-	TotalCount      int64           `db:"total_count"`
+	ConnectionError string           `db:"connection_error"`
+	ID              string           `db:"id"`
+	LastContact     time.Time        `db:"last_contact"`
+	LastJob         string           `db:"last_job"`
+	Manager         string           `db:"manager"`
+	ManagerIDs      json.RawMessage  `db:"manager_ids"`
+	Name            string           `db:"name"`
+	Platform        string           `db:"platform"`
+	PlatformVersion string           `db:"platform_version"`
+	Projects        json.RawMessage  `db:"projects"`
+	ReportID        string           `db:"report_id"`
+	State           string           `db:"source_state"`
+	Status          string           `db:"status"`
+	Tags            json.RawMessage  `db:"tags"`
+	TargetConfig    *json.RawMessage `db:"target_config"`
+	TotalCount      int64            `db:"total_count"`
 }
 
 type nodeCounts struct {
@@ -268,12 +268,13 @@ func (db *DB) fromDBNodeWithTargetConfig(inNode *dbNode) (*nodes.Node, error) {
 	}
 
 	tc := nodes.TargetConfig{}
-	err = json.Unmarshal(inNode.TargetConfig, &tc)
-	if err != nil {
-		return nil, errors.Wrap(err, "fromDBNodeWithTargetConfig unable to unmarshal target config")
+	if inNode.TargetConfig != nil {
+		err = json.Unmarshal(*inNode.TargetConfig, &tc)
+		if err != nil {
+			return nil, errors.Wrap(err, "fromDBNodeWithTargetConfig unable to unmarshal target config")
+		}
+		newNode.TargetConfig = &tc
 	}
-	newNode.TargetConfig = &tc
-
 	return newNode, nil
 }
 
