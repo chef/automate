@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -82,7 +81,6 @@ func init() {
 	devCmd.AddCommand(newVerifyPackagesCmd())
 	devCmd.AddCommand(newEnablePrometheusCmd())
 	devCmd.AddCommand(newDisablePrometheusCmd())
-	devCmd.AddCommand(newPGListenCmd())
 	RootCmd.AddCommand(devCmd)
 }
 
@@ -973,49 +971,5 @@ func runDisablePrometheusCmd(*cobra.Command, []string) error {
 	if err := client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
 		return err
 	}
-	return nil
-}
-
-func newPGListenCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:  "pg-listen",
-		RunE: runPGListen,
-		Args: cobra.NoArgs,
-		Annotations: map[string]string{
-			NoRequireRootAnnotation: NoRequireRootAnnotation,
-		},
-	}
-}
-
-func runPGListen(cmd *cobra.Command, args []string) error {
-	var conninfo string = "postgresql://dbuser:thisisapassword@172.17.0.2:7432/chef_authz_service?sslmode=disable"
-
-	minReconn := 10 * time.Second
-	maxReconn := time.Minute
-	reportProblem := func(ev pq.ListenerEventType, err error) {
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}
-	listener := pq.NewListener(conninfo, minReconn, maxReconn, reportProblem)
-	err := listener.Listen("policychange")
-	if err != nil {
-		panic(err)
-	}
-
-	for {
-		select {
-		case n := <-listener.Notify:
-			if n == nil {
-				continue
-			}
-			fmt.Printf("got notification from %d with payload %q\n", n.BePid, n.Extra)
-		case <-time.After(10 * time.Second):
-			listener.Ping()
-
-		}
-
-	}
-
 	return nil
 }
