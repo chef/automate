@@ -83,7 +83,7 @@ func TestV2IsAuthorized(t *testing.T) {
 func TestV2ProjectsAuthorized(t *testing.T) {
 	ctx, engines := setup(t)
 	sub, act, res := "user:local:admin", "iam:users:create", "iam:users"
-	proj1, proj2, proj3, proj4, unassigned := "proj-1", "proj-2", "proj-3", "proj-4", "(unassigned)"
+	proj1, proj2, proj3, proj4, unassigned := "proj-1", "proj-2", "proj-3", "proj-4", constants.UnassignedProjectID
 	allProjects := []string{proj1, proj2, proj3, proj4, unassigned}
 
 	// We're always passing the same arguments to ProjectsAuthorized(). This allows for
@@ -359,7 +359,6 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 			})
 
 			t.Run("policy that allows all projects returns all when all projects requested", func(t *testing.T) {
-				proj3, proj4, unassigned := "proj-3", "proj-4", "(unassigned)"
 				pol := map[string]interface{}{
 					"members": engine.Subject(sub),
 					"statements": map[string]interface{}{
