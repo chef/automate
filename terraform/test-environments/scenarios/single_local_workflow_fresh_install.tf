@@ -51,10 +51,9 @@ module "single_local_workflow_fresh_install_deploy" {
   chef_environment  = "${var.chef_environment}"
 
   # Automate Install
-  channel              = "${var.channel}"
-  deployment_type      = "local"
-  enable_chef_server   = "true"
-  enable_workflow      = "true"
-  enable_eas_dashboard = "true"
-  workflow_enterprise  = "demo"
+  channel             = "${var.channel}"
+  deployment_type     = "local"
+  enable_chef_server  = "true"
+  enable_workflow     = "true"
+  workflow_enterprise = "demo"
 }
