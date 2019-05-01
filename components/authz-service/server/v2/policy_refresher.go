@@ -20,7 +20,7 @@ type PolicyRefresher interface {
 	RefreshAsync() error
 }
 
-type policyRefersher struct {
+type policyRefresher struct {
 	log                      logger.Logger
 	store                    storage.Storage
 	engine                   engine.V2Writer
@@ -49,7 +49,7 @@ func (m *policyRefresherMessageRefresh) Err() error {
 
 func NewPolicyRefresher(ctx context.Context, log logger.Logger, store storage.Storage,
 	engine engine.V2Writer) PolicyRefresher {
-	refresher := &policyRefersher{
+	refresher := &policyRefresher{
 		log:                      log,
 		store:                    store,
 		engine:                   engine,
@@ -60,7 +60,7 @@ func NewPolicyRefresher(ctx context.Context, log logger.Logger, store storage.St
 	return refresher
 }
 
-func (refresher *policyRefersher) run(ctx context.Context) {
+func (refresher *policyRefresher) run(ctx context.Context) {
 	lastPolicyID := ""
 	antiEntropyTimer := time.NewTimer(refresher.antiEntropyTimerDuration)
 RUNLOOP:
@@ -89,7 +89,7 @@ RUNLOOP:
 	close(refresher.refreshRequests)
 }
 
-func (refresher *policyRefersher) refresh(ctx context.Context, lastPolicyID string) (string, error) {
+func (refresher *policyRefresher) refresh(ctx context.Context, lastPolicyID string) (string, error) {
 	curPolicyID, err := refresher.store.GetPolicyChangeID(ctx)
 	if err != nil {
 		refresher.log.WithError(err).Warn("Failed to get current policy change ID")
@@ -109,7 +109,7 @@ func (refresher *policyRefersher) refresh(ctx context.Context, lastPolicyID stri
 	return curPolicyID, nil
 }
 
-func (refresher *policyRefersher) Refresh(ctx context.Context) error {
+func (refresher *policyRefresher) Refresh(ctx context.Context) error {
 	m := policyRefresherMessageRefresh{
 		ctx:    ctx,
 		status: make(chan error, 1),
@@ -118,7 +118,7 @@ func (refresher *policyRefersher) Refresh(ctx context.Context) error {
 	return m.Err()
 }
 
-func (refresher *policyRefersher) RefreshAsync() error {
+func (refresher *policyRefresher) RefreshAsync() error {
 	m := policyRefresherMessageRefresh{
 		ctx: context.Background(),
 	}
@@ -133,7 +133,7 @@ func (refresher *policyRefersher) RefreshAsync() error {
 }
 
 // updates OPA engine store with policy
-func (refresher *policyRefersher) updateEngineStore(ctx context.Context) error {
+func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	// We need to remove project filters from the request context
 	// otherwise they will be applied for store updates.
 	// This will fail on service start context, so only remove projects if ok.
@@ -159,7 +159,7 @@ func (refresher *policyRefersher) updateEngineStore(ctx context.Context) error {
 	return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap, ruleMap)
 }
 
-func (refresher *policyRefersher) getPolicyMap(ctx context.Context) (map[string]interface{}, error) {
+func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]interface{}, error) {
 	var policies []*storage.Policy
 	var err error
 
@@ -198,7 +198,7 @@ func (refresher *policyRefersher) getPolicyMap(ctx context.Context) (map[string]
 	return data, nil
 }
 
-func (refresher *policyRefersher) getRoleMap(ctx context.Context) (map[string]interface{}, error) {
+func (refresher *policyRefresher) getRoleMap(ctx context.Context) (map[string]interface{}, error) {
 	var roles []*storage.Role
 	var err error
 	if roles, err = refresher.store.ListRoles(ctx); err != nil {
@@ -226,7 +226,7 @@ type rule struct {
 
 // TODO: nolint can go away when connected to the database
 // nolint: unparam
-func (refresher *policyRefersher) getRuleMap(_ context.Context) (map[string][]interface{}, error) {
+func (refresher *policyRefresher) getRuleMap(_ context.Context) (map[string][]interface{}, error) {
 	// Mocked rule data
 	// notlint: gofmt
 	// rules := [5]*rule{
