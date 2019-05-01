@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	base_config "github.com/chef/automate/lib/config"
 	event_ids "github.com/chef/automate/lib/event"
+	toml "github.com/pelletier/go-toml"
 	log "github.com/sirupsen/logrus"
 )
 

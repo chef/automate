@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/chef/automate/api/interservice/ingest"
-	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 	base_config "github.com/chef/automate/lib/config"
+	toml "github.com/pelletier/go-toml"
 	log "github.com/sirupsen/logrus"
 )
 
