@@ -97,7 +97,6 @@ habitat_packages:
         - api/interservice/authz/*
         - api/interservice/event/*
         - api/interservice/ingest/*
-        - components/automate-deployment/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*
@@ -241,7 +240,6 @@ habitat_packages:
         - api/interservice/event/*
         - api/interservice/ingest/*
         - components/authz-service/*
-        - components/automate-deployment/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*
@@ -567,7 +565,6 @@ habitat_packages:
         - api/interservice/event/*
         - api/interservice/ingest/*
         - components/authz-service/*
-        - components/automate-deployment/*
         - components/automate-gateway/api/authz/*
         - components/automate-gateway/authz/policy_v2/*
         - components/automate-grpc/*
