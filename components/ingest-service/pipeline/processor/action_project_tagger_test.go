@@ -275,15 +275,12 @@ func TestActionProjectRulesMatching(t *testing.T) {
 	}
 }
 
+// When a single message is in the inbox the `ListProjectRules` should be called once
 func TestActionBundlerSingleMessage(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
-	listProjectRulesCount := 0
 	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx interface{}, in interface{}) (*iam_v2.ProjectCollectionRulesResp, error) {
-			listProjectRulesCount++
-			return &iam_v2.ProjectCollectionRulesResp{}, nil
-		})
+	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Times(1).Return(
+		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	errc := make(chan error)
 
 	inbox <- message.NewChefAction(context.Background(), &chef.Action{}, errc)
@@ -291,11 +288,11 @@ func TestActionBundlerSingleMessage(t *testing.T) {
 	out := actionBundleProjectTagger(inbox, authzClient)
 
 	<-out
-
-	assert.Equal(t, 1, listProjectRulesCount)
 }
 
-// When 5 messages are in the inbox the ListProjectRules function is only called once.
+// When 5 messages are in the inbox the `ListProjectRules` function is only called once.
+// This is showing that the bundling of messages is working.
+// Where before the authz call to `ListProjectRules` was called for each message.
 func TestActionBundler5Messages(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
 	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
@@ -319,13 +316,15 @@ func TestActionBundler5Messages(t *testing.T) {
 	<-out
 }
 
-// A simple run through of the bundle project tagger processor.
+// A simple run through of the bundler project tagger processor.
 // Two messages are sent through with only one matching a project.
 func TestActionBundlerMatchProjectRule(t *testing.T) {
-	inbox := make(chan message.ChefAction, 100)
 	testProjectName := "Test"
 	orgName := "org_1"
 	projectRules := map[string]*iam_v2.ProjectRules{}
+
+	// Project 'Test' has an ingest rule for events of orgs matching 'org_1'
+	// This will be returned in the `ListProjectRules` request
 	projectRules[testProjectName] = &iam_v2.ProjectRules{
 		Rules: []*iam_v2.ProjectRule{
 			{
@@ -344,67 +343,30 @@ func TestActionBundlerMatchProjectRule(t *testing.T) {
 		&iam_v2.ProjectCollectionRulesResp{ProjectRules: projectRules}, nil)
 	errc := make(chan error)
 
+	// Creating an ingest Chef Action that matches the project 'Test' rules
 	action1 := message.NewChefAction(context.Background(), &chef.Action{
 		OrganizationName: orgName,
 	}, errc)
 
+	// Creating an ingest Chef Action that does not matche the project 'Test' rules
 	action2 := message.NewChefAction(context.Background(), &chef.Action{
 		OrganizationName: "no_match",
 	}, errc)
 
+	// Creating the inbox to the 'actionBundleProjectTagger'
+	inbox := make(chan message.ChefAction, 100)
 	inbox <- action1
 	inbox <- action2
 	close(inbox)
 
+	// creating the ActionProjectTagger with will tag both the actions in the inbox
 	out := BuildActionProjectTagger(authzClient)(inbox)
 
+	// Getting the tagged 'action1`
 	processMsg1 := <-out
 	assert.Equal(t, []string{testProjectName}, processMsg1.InternalChefAction.Projects)
 
-	processMsg2 := <-out
-	assert.Equal(t, []string{}, processMsg2.InternalChefAction.Projects)
-}
-
-func TestActionBundlerMatchProjectRuleNodeRuleType(t *testing.T) {
-	inbox := make(chan message.ChefAction, 100)
-	testProjectName := "Test"
-	orgName := "org_1"
-	projectRules := map[string]*iam_v2.ProjectRules{}
-	projectRules[testProjectName] = &iam_v2.ProjectRules{
-		Rules: []*iam_v2.ProjectRule{
-			{
-				Type: iam_v2.ProjectRuleTypes_NODE,
-				Conditions: []*iam_v2.Condition{
-					{
-						Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-						Values: []string{orgName},
-					},
-				},
-			},
-		},
-	}
-	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Return(
-		&iam_v2.ProjectCollectionRulesResp{ProjectRules: projectRules}, nil)
-	errc := make(chan error)
-
-	action1 := message.NewChefAction(context.Background(), &chef.Action{
-		OrganizationName: orgName,
-	}, errc)
-
-	action2 := message.NewChefAction(context.Background(), &chef.Action{
-		OrganizationName: "no_match",
-	}, errc)
-
-	inbox <- action1
-	inbox <- action2
-	close(inbox)
-
-	out := BuildActionProjectTagger(authzClient)(inbox)
-
-	processMsg1 := <-out
-	assert.Equal(t, []string{}, processMsg1.InternalChefAction.Projects)
-
+	// Getting the tagged 'action2`
 	processMsg2 := <-out
 	assert.Equal(t, []string{}, processMsg2.InternalChefAction.Projects)
 }
