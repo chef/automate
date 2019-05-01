@@ -398,9 +398,7 @@ func (p *pg) notifyPolicyChange(ctx context.Context, q Querier) error {
 	if err != nil {
 		return err
 	}
-	_, err = q.ExecContext(ctx,
-		"NOTIFY policychange;",
-	)
+
 	return err
 }
 

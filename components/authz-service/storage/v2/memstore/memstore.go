@@ -13,11 +13,11 @@ import (
 )
 
 type State struct {
+	policyChangeID int64 // DO NOT MOVE, must be 64-bit aligned for atomic increment
 	policies       *cache.Cache
 	roles          *cache.Cache
 	projects       *cache.Cache
 	ms             storage.MigrationStatus
-	policyChangeID int64
 }
 
 var ErrTypeAssertionFailed = errors.New("type assertion failed: could not convert interface{} to *storage.Policy")

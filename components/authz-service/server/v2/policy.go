@@ -30,7 +30,7 @@ type policyServer struct {
 	engine          engine.V2Writer
 	v1              storage_v1.PoliciesLister
 	vChan           chan api.Version
-	policyRefersher PolicyRefresher
+	policyRefresher PolicyRefresher
 }
 
 // PolicyServer is the server interface for policies: what we defined via
@@ -78,7 +78,7 @@ func NewPoliciesServer(
 	pl storage_v1.PoliciesLister,
 	vChan chan api.Version) (PolicyServer, error) {
 
-	policyRefersher := NewPolicyRefresher(ctx, l, s, e)
+	policyRefresher := NewPolicyRefresher(ctx, l, s, e)
 
 	srv := &policyServer{
 		log:             l,
@@ -86,7 +86,7 @@ func NewPoliciesServer(
 		engine:          e,
 		v1:              pl,
 		vChan:           vChan,
-		policyRefersher: policyRefersher,
+		policyRefresher: policyRefresher,
 	}
 
 	// If we *could* transition to failure, it means we had an in-progress state
@@ -686,7 +686,7 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 }
 
 func (s *policyServer) updateEngineStore(ctx context.Context) error {
-	return s.policyRefersher.Refresh(ctx)
+	return s.policyRefresher.Refresh(ctx)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
