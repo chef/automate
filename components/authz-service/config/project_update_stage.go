@@ -78,14 +78,13 @@ func (stage ProjectUpdateStage) AreDomainServicesComplete() bool {
 }
 
 func (stage ProjectUpdateStage) HasFailedDomainService() bool {
-	failure := false
 	for _, domainService := range stage.DomainServices {
 		if domainService.Failed {
-			failure = true
+			return true
 		}
 	}
 
-	return failure
+	return false
 }
 
 func (stage ProjectUpdateStage) OldestDomainServiceUpdateTime() time.Time {
