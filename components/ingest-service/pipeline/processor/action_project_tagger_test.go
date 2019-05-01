@@ -298,13 +298,9 @@ func TestActionBundlerSingleMessage(t *testing.T) {
 // When 5 messages are in the inbox the ListProjectRules function is only called once.
 func TestActionBundler5Messages(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
-	listProjectRulesCount := 0
 	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx interface{}, in interface{}) (*iam_v2.ProjectCollectionRulesResp, error) {
-			listProjectRulesCount++
-			return &iam_v2.ProjectCollectionRulesResp{}, nil
-		})
+	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Times(1).Return(
+		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	errc := make(chan error)
 
 	inbox <- message.NewChefAction(context.Background(), &chef.Action{}, errc)
@@ -321,8 +317,6 @@ func TestActionBundler5Messages(t *testing.T) {
 	<-out
 	<-out
 	<-out
-
-	assert.Equal(t, 1, listProjectRulesCount)
 }
 
 // A simple run through of the bundle project tagger processor.
