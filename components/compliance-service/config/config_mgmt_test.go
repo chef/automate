@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const cFile = "/tmp/.compliance-service.toml"
+const cFile = "/tmp/.compliance-service-test-delete-me.toml"
 
 func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	// Writing config file

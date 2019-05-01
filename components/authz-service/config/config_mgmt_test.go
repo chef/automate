@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const cFile = "/tmp/.authz-service.toml"
+const cFile = "/tmp/.authz-service-test-delete-me.toml"
 
 func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	// Writing config file

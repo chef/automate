@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const cFile = "/tmp/.ingest-service.toml"
+const cFile = "/tmp/.ingest-service-test-delete-me.toml"
 
 func TestManagerNewDefaultConfig(t *testing.T) {
 	config := subject.NewManager(cFile)
