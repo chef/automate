@@ -139,6 +139,77 @@ func TestNodesWithSorting(t *testing.T) {
 		})
 }
 
+func TestNodesProjectFilter(t *testing.T) {
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Nodes
+		ctx         context.Context
+		expected    []string
+	}{
+		{
+			description: "Two nodes matching on the same project tag",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "one",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"one"},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "two",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"two", "one"},
+					Exists:   true,
+				},
+			},
+			ctx:      contextWithProjects([]string{"one"}),
+			request:  request.Nodes{},
+			expected: []string{"one", "two"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodes
+			res, err := cfgmgmt.GetNodes(test.ctx, &test.request)
+			assert.NoError(t, err)
+
+			t.Logf("res.GetValues() %v", res.Values)
+
+			// Test what nodes are returned.
+			assert.Equal(t, test.expected, res)
+
+		})
+	}
+}
+
+func getName(values []gp.Value) string {
+	for _, value := range values {
+		// value.GetStructValue().GetFields()
+	}
+
+	return ""
+}
+
 func TestNodesWithTableDriven(t *testing.T) {
 	dataNodes := []struct {
 		number int
@@ -310,7 +381,7 @@ func TestNodesWithTableDriven(t *testing.T) {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
 				res, err := cfgmgmt.GetNodes(ctx, &test.request)
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, test.expected, res)
 			})
 	}
