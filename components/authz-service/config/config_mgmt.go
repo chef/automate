@@ -61,7 +61,7 @@ func (manager *Manager) Close() {
 // GetProjectUpdateStage - get the project update stage
 func (manager *Manager) GetProjectUpdateStage() ProjectUpdateStage {
 	aggregateConfig, ok := manager.baseConfigManager.Config.(aggregateConfig)
-	if ok {
+	if !ok {
 		log.Error("baseConfigManager.Config is not of type 'aggregateConfig'")
 		os.Exit(1)
 	}

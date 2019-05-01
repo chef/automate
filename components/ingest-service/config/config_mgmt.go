@@ -246,7 +246,7 @@ func (manager *Manager) updateConfig(updateFunc func(aggregateConfig) (aggregate
 
 func (manager *Manager) getConfig() aggregateConfig {
 	aggregateConfig, ok := manager.baseConfigManager.Config.(aggregateConfig)
-	if ok {
+	if !ok {
 		log.Error("baseConfigManager.Config is not of type 'aggregateConfig'")
 		os.Exit(1)
 	}

@@ -1397,15 +1397,14 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 	_, err := localSuite.ComplianceIngestServer.HandleEvent(context.Background(), event)
 	assert.NoError(t, err)
 
-	complete := false
 	// Wait for job to complete
-	for !complete {
+	for {
 		time.Sleep(time.Millisecond * 100)
 
 		for _, event := range eventsSent {
 			assert.Equal(t, event.Type.Name, automate_event_type.ProjectRulesUpdateStatus)
 			if event.Data.Fields["Completed"].GetBoolValue() {
-				complete = true
+				return
 			}
 		}
 	}

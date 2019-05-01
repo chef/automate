@@ -48,7 +48,7 @@ func (manager *ConfigManager) Close() {
 // GetProjectUpdateConfig - get project update config
 func (manager *ConfigManager) GetProjectUpdateConfig() ProjectUpdateConfig {
 	aggregateConfig, ok := manager.baseConfigManager.Config.(aggregateConfig)
-	if ok {
+	if !ok {
 		log.Error("baseConfigManager.Config is not of type 'aggregateConfig'")
 		os.Exit(1)
 	}
