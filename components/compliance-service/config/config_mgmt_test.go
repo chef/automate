@@ -5,12 +5,20 @@ import (
 	"os"
 	"testing"
 
+	"github.com/chef/automate/components/compliance-service/config"
 	subject "github.com/chef/automate/components/compliance-service/config"
 	"github.com/stretchr/testify/assert"
 )
 
 const cFile = "/tmp/.compliance-service-test-delete-me.toml"
 
+func TestManagerNewDefaultConfig(t *testing.T) {
+	configMgr := subject.NewConfigManager("")
+	defer configMgr.Close()
+
+	// Only three jobs configured
+	assert.Equal(t, subject.NotRunningState, configMgr.GetProjectUpdateConfig().State)
+}
 func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	// Writing config file
 	data := []byte(`
@@ -25,17 +33,17 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	assert.Nil(t, err)
 
 	// New config should load the file
-	config := subject.NewConfigManager(cFile)
-	defer config.Close()
-	projectUpdateConfig := config.GetProjectUpdateConfig()
-	assert.Equal(t, "not_running", projectUpdateConfig.State)
+	configMgr := subject.NewConfigManager(cFile)
+	defer configMgr.Close()
+	projectUpdateConfig := configMgr.GetProjectUpdateConfig()
+	assert.Equal(t, config.NotRunningState, projectUpdateConfig.State)
 	assert.Equal(t, "4256e26e-92b1-4b1d-8679-44ec74b5299a", projectUpdateConfig.ProjectUpdateID)
 	assert.Equal(t, 2, len(projectUpdateConfig.EsJobIDs))
 
 	projectUpdateConfig.State = "running"
-	err = config.UpdateProjectUpdateConfig(projectUpdateConfig)
+	err = configMgr.UpdateProjectUpdateConfig(projectUpdateConfig)
 	assert.NoError(t, err)
 
-	projectUpdateConfig = config.GetProjectUpdateConfig()
+	projectUpdateConfig = configMgr.GetProjectUpdateConfig()
 	assert.Equal(t, "running", projectUpdateConfig.State)
 }

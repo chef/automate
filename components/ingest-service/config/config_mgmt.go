@@ -29,6 +29,11 @@ const (
 	MissingNodesForDeletion
 )
 
+const (
+	RunningState    = "running"
+	NotRunningState = "not_running"
+)
+
 // List of jobs
 var JobList = map[int]string{
 	DeleteNodes:             "delete_nodes",
@@ -122,7 +127,7 @@ func defaultConfig() aggregateConfig {
 			},
 		},
 		ProjectUpdateConfig: ProjectUpdateConfig{
-			State: "not_running",
+			State: NotRunningState,
 		},
 	}
 }

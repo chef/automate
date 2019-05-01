@@ -9,6 +9,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	RunningState    = "running"
+	NotRunningState = "not_running"
+)
+
 // ProjectUpdateConfig - the config for project updating
 type ProjectUpdateConfig struct {
 	State           string   `toml:"state"`
@@ -18,7 +23,9 @@ type ProjectUpdateConfig struct {
 
 func defaultConfig() aggregateConfig {
 	return aggregateConfig{
-		ProjectUpdateConfig: ProjectUpdateConfig{},
+		ProjectUpdateConfig: ProjectUpdateConfig{
+			State: NotRunningState,
+		},
 	}
 }
 

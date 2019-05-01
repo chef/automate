@@ -45,18 +45,18 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	assert.Nil(t, err)
 
 	// New config should load the file
-	config := config.NewManager(cFile)
-	defer config.Close()
-	projectUpdateStage := config.GetProjectUpdateStage()
-	assert.Equal(t, "not_running", projectUpdateStage.State)
+	configMgr := config.NewManager(cFile)
+	defer configMgr.Close()
+	projectUpdateStage := configMgr.GetProjectUpdateStage()
+	assert.Equal(t, config.NotRunningState, projectUpdateStage.State)
 	assert.Equal(t, "4256e26e-92b1-4b1d-8679-44ec74b5299a", projectUpdateStage.ProjectUpdateID)
 	assert.Equal(t, 2, len(projectUpdateStage.DomainServices))
 
 	projectUpdateStage.State = "running"
-	err = config.UpdateProjectUpdateStage(projectUpdateStage)
+	err = configMgr.UpdateProjectUpdateStage(projectUpdateStage)
 	assert.NoError(t, err)
 
-	projectUpdateStage = config.GetProjectUpdateStage()
+	projectUpdateStage = configMgr.GetProjectUpdateStage()
 	assert.Equal(t, "running", projectUpdateStage.State)
 }
 

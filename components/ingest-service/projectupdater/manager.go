@@ -20,8 +20,6 @@ import (
 )
 
 const (
-	runningState                         = "running"
-	notRunningState                      = "not_running"
 	sleepTimeBetweenStatusChecksMilliSec = 1000
 	maxNumberOfConsecutiveFails          = 10
 )
@@ -52,7 +50,7 @@ func NewManager(client backend.Client, authzProjectsClient iam_v2.ProjectsClient
 	updateQueue := make(chan func(stage) stage, 100)
 	manager := &Manager{
 		stage: stage{
-			state: notRunningState,
+			state: config.NotRunningState,
 		},
 		client:              client,
 		authzProjectsClient: authzProjectsClient,
@@ -73,9 +71,9 @@ func NewManager(client backend.Client, authzProjectsClient iam_v2.ProjectsClient
 func (manager *Manager) Cancel(projectUpdateID string) {
 	manager.updateStage(func(stage stage) stage {
 		switch manager.stage.state {
-		case notRunningState:
+		case config.NotRunningState:
 			// do nothing job is not running
-		case runningState:
+		case config.RunningState:
 			if manager.stage.projectUpdateID != projectUpdateID {
 				// do nothing because the requested project update job is not running
 				return stage
@@ -99,7 +97,7 @@ func (manager *Manager) Cancel(projectUpdateID string) {
 func (manager *Manager) Start(projectUpdateID string) {
 	manager.updateStage(func(stage stage) stage {
 		switch stage.state {
-		case notRunningState:
+		case config.NotRunningState:
 			// TODO store and run through past projectUpdateIDs to check for a match
 			if stage.projectUpdateID == projectUpdateID {
 				// Update has already completed with this project update ID
@@ -121,11 +119,11 @@ func (manager *Manager) Start(projectUpdateID string) {
 				} else {
 					stage.esJobID = esJobID
 					stage.projectUpdateID = projectUpdateID
-					stage.state = runningState
+					stage.state = config.RunningState
 					go manager.waitingForJobToComplete()
 				}
 			}
-		case runningState:
+		case config.RunningState:
 			if stage.projectUpdateID == projectUpdateID {
 				//	Do nothing. The job has ready started
 			} else {
@@ -146,8 +144,8 @@ func (manager *Manager) Start(projectUpdateID string) {
 // PercentageComplete - percentage of the job complete
 func (manager *Manager) PercentageComplete() float32 {
 	switch manager.stage.state {
-	case notRunningState:
-	case runningState:
+	case config.NotRunningState:
+	case config.RunningState:
 		return manager.percentageComplete
 	default:
 	}
@@ -158,8 +156,8 @@ func (manager *Manager) PercentageComplete() float32 {
 // EstimatedTimeCompelete - the estimated date and time of compeletion.
 func (manager *Manager) EstimatedTimeCompelete() time.Time {
 	switch manager.stage.state {
-	case notRunningState:
-	case runningState:
+	case config.NotRunningState:
+	case config.RunningState:
 		return time.Unix(int64(manager.estimatedEndTimeInSec), 0)
 	default:
 	}
@@ -244,8 +242,8 @@ func (manager *Manager) resumePreviousState() {
 	manager.stage.projectUpdateID = projectUpdateConfig.ProjectUpdateID
 	manager.stage.esJobID = projectUpdateConfig.EsJobID
 
-	if projectUpdateConfig.State == runningState {
-		manager.stage.state = runningState
+	if projectUpdateConfig.State == config.RunningState {
+		manager.stage.state = config.RunningState
 		go manager.waitingForJobToComplete()
 	}
 }
@@ -272,7 +270,7 @@ func (manager *Manager) failedJob(errMsg string) {
 		manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times; error message %q",
 			manager.stage.esJobID, maxNumberOfConsecutiveFails, errMsg), stage.projectUpdateID)
 
-		stage.state = notRunningState
+		stage.state = config.NotRunningState
 
 		return stage
 	})
@@ -282,7 +280,7 @@ func (manager *Manager) completeJob() {
 	manager.updateStage(func(stage stage) stage {
 		manager.percentageComplete = 1.0
 		manager.estimatedEndTimeInSec = 0
-		stage.state = notRunningState
+		stage.state = config.NotRunningState
 
 		return stage
 	})

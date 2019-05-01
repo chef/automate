@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/chef/automate/components/ingest-service/config"
 	subject "github.com/chef/automate/components/ingest-service/config"
 	"github.com/stretchr/testify/assert"
 )
@@ -97,13 +98,13 @@ threshold = "1d"
 	assert.Nil(t, err)
 
 	// When the file is corrupt, we log out the failure and use the default config
-	config := subject.NewManager(cFile)
-	defer config.Close()
-	schedulerConfig := config.GetJobSchedulerConfig()
+	configMgr := subject.NewManager(cFile)
+	defer configMgr.Close()
+	schedulerConfig := configMgr.GetJobSchedulerConfig()
 	assert.Equal(t, true, schedulerConfig.Running, "the scheduler should be running by default")
 
-	projectUpdateConfig := config.GetProjectUpdateConfig()
-	assert.Equal(t, "not_running", projectUpdateConfig.State, "the scheduler should be running by default")
+	projectUpdateConfig := configMgr.GetProjectUpdateConfig()
+	assert.Equal(t, config.NotRunningState, projectUpdateConfig.State, "the scheduler should be running by default")
 }
 
 func TestManagerWriteConfigOnUpdatesAndLoadChanges(t *testing.T) {
@@ -218,17 +219,17 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	assert.Nil(t, err)
 
 	// New config should load the file
-	config := subject.NewManager(cFile)
-	defer config.Close()
-	projectUpdateConfig := config.GetProjectUpdateConfig()
-	assert.Equal(t, "not_running", projectUpdateConfig.State)
+	configMgr := subject.NewManager(cFile)
+	defer configMgr.Close()
+	projectUpdateConfig := configMgr.GetProjectUpdateConfig()
+	assert.Equal(t, config.NotRunningState, projectUpdateConfig.State)
 	assert.Equal(t, "4256e26e-92b1-4b1d-8679-44ec74b5299a", projectUpdateConfig.ProjectUpdateID)
 	assert.Equal(t, "Cmv2zbcVT4KSEz3b98IsmQ:57143", projectUpdateConfig.EsJobID)
 
 	projectUpdateConfig.State = "running"
-	err = config.UpdateProjectUpdateConfig(projectUpdateConfig)
+	err = configMgr.UpdateProjectUpdateConfig(projectUpdateConfig)
 	assert.NoError(t, err)
 
-	projectUpdateConfig = config.GetProjectUpdateConfig()
+	projectUpdateConfig = configMgr.GetProjectUpdateConfig()
 	assert.Equal(t, "running", projectUpdateConfig.State)
 }
