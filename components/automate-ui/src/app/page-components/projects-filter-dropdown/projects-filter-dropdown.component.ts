@@ -18,6 +18,8 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
 
   @Input() selectionCountActive = false;
 
+  @Input() dropdownCaretVisible = false;
+
   @Output() onSelection = new EventEmitter<ProjectsFilterOption[]>();
 
   editableOptions: ProjectsFilterOption[] = [];

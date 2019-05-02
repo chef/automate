@@ -8,7 +8,7 @@
     [ngClass]="{'active': selectionCountActive }">
     {{ selectionCount }}
   </span>
-  <chef-icon *ngIf="this.editableOptions.length > 1" aria-hidden>keyboard_arrow_down</chef-icon>
+  <chef-icon *ngIf="dropdownCaretVisible" aria-hidden>keyboard_arrow_down</chef-icon>
 </button>
 <chef-dropdown class="dropdown" *ngIf="dropdownActive" (keydown.esc)="handleEscape()">
   <chef-click-outside class="dropdown-body" omit="dropdown-label" (clickOutside)="handleEscape()">

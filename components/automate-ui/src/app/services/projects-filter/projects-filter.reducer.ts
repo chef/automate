@@ -18,6 +18,7 @@ export interface ProjectsFilterState {
   selectionCount: number;
   selectionCountVisible: boolean;
   selectionCountActive: boolean;
+  dropdownCaretVisible: boolean;
 }
 
 export const projectsFilterInitialState: ProjectsFilterState = {
@@ -26,7 +27,8 @@ export const projectsFilterInitialState: ProjectsFilterState = {
   selectionLabel: 'All resources',
   selectionCount: 0,
   selectionCountVisible: false,
-  selectionCountActive: false
+  selectionCountActive: false,
+  dropdownCaretVisible: false
 };
 
 export function projectsFilterReducer(
@@ -57,7 +59,8 @@ export function projectsFilterReducer(
         set('selectionLabel', selectionLabel(action.payload)),
         set('selectionCount', selectionCount(action.payload)),
         set('selectionCountVisible', selectionCountVisible(action.payload)),
-        set('selectionCountActive', selectionCountActive(action.payload))
+        set('selectionCountActive', selectionCountActive(action.payload)),
+        set('dropdownCaretVisible', dropdownCaretVisible(action.payload))
       )(state) as ProjectsFilterState;
     }
 
@@ -71,7 +74,8 @@ export function projectsFilterReducer(
         set('selectionLabel', selectionLabel(action.payload)),
         set('selectionCount', selectionCount(action.payload)),
         set('selectionCountVisible', selectionCountVisible(action.payload)),
-        set('selectionCountActive', selectionCountActive(action.payload))
+        set('selectionCountActive', selectionCountActive(action.payload)),
+        set('dropdownCaretVisible', dropdownCaretVisible(action.payload))
       )(state) as ProjectsFilterState;
     }
   }
@@ -146,4 +150,9 @@ function selectionCountVisible(options: ProjectsFilterOption[]): boolean {
 function selectionCountActive(options: ProjectsFilterOption[]): boolean {
   const checkedOptions = options.filter(o => o.checked);
   return checkedOptions.length > 0;
+}
+
+function dropdownCaretVisible(options: ProjectsFilterOption[]): boolean {
+  const hasOnlyOneOption = options.length === 1;
+  return !hasOnlyOneOption;
 }

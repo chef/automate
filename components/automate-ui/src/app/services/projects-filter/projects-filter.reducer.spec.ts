@@ -89,8 +89,9 @@ describe('projectsFilterReducer', () => {
         expect(selectionCountVisible).toBe(false);
       });
 
-      // TODO
       it('does not display caret to open dropdown', () => {
+        const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+        expect(dropdownCaretVisible).toBe(false);
       });
     });
 
@@ -110,14 +111,13 @@ describe('projectsFilterReducer', () => {
         expect(selectionCountVisible).toBe(false);
       });
 
-      // TODO
       it('does not display caret to open dropdown', () => {
+        const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+        expect(dropdownCaretVisible).toBe(false);
       });
     });
 
     describe('with exactly one project plus unassigned allowed', () => {
-
-      // TODO: Also check that every case displays the caret to open dropdown
 
       describe('when nothing is selected', () => {
         const payload: ProjectsFilterOption[] = [
@@ -134,6 +134,11 @@ describe('projectsFilterReducer', () => {
         it('displays no count badge', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
+        });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
         });
       });
 
@@ -153,6 +158,11 @@ describe('projectsFilterReducer', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
         });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
+        });
       });
 
       describe('when only unassigned is selected', () => {
@@ -170,6 +180,11 @@ describe('projectsFilterReducer', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
         });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
+        });
       });
 
       describe('selecting project and selecting unassigned', () => {
@@ -186,6 +201,11 @@ describe('projectsFilterReducer', () => {
         it('displays no count badge', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
+        });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
         });
       });
     });
@@ -213,6 +233,11 @@ describe('projectsFilterReducer', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
         });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
+        });
       });
 
       describe('when single project is selected', () => {
@@ -234,6 +259,11 @@ describe('projectsFilterReducer', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
         });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
+        });
       });
 
       describe('when only unassigned is selected', () => {
@@ -254,6 +284,11 @@ describe('projectsFilterReducer', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
         });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
+        });
       });
 
       describe('selecting single project and selecting unassigned', () => {
@@ -273,6 +308,11 @@ describe('projectsFilterReducer', () => {
         it('displays no count badge', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
+        });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
         });
       });
 
@@ -297,6 +337,11 @@ describe('projectsFilterReducer', () => {
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
           expect(selectionCount).toEqual(payload.filter(p => p.checked).length);
         });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
+        });
       });
 
       describe('selecting multiple but not all projects and selecting unassigned', () => {
@@ -319,6 +364,11 @@ describe('projectsFilterReducer', () => {
           expect(selectionCountVisible).toBe(true);
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
           expect(selectionCount).toEqual(payload.filter(p => p.checked).length - 1);
+        });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
         });
       });
 
@@ -343,6 +393,11 @@ describe('projectsFilterReducer', () => {
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
           expect(selectionCount).toEqual(payload.filter(p => p.checked).length);
         });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
+        });
       });
 
       describe('selecting all projects and selecting unassigned', () => {
@@ -362,6 +417,11 @@ describe('projectsFilterReducer', () => {
         it('displays no count badge', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
+        });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
         });
       });
     });
@@ -391,6 +451,11 @@ describe('projectsFilterReducer', () => {
           expect(selectionCountActive).toBe(BADGE_GREY_STATE);
           expect(selectionCount).toEqual(payload.length);
         });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
+        });
       });
 
       describe('when single project is selected', () => {
@@ -410,6 +475,11 @@ describe('projectsFilterReducer', () => {
         it('displays no count badge', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(false);
+        });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
         });
       });
 
@@ -433,6 +503,11 @@ describe('projectsFilterReducer', () => {
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
           expect(selectionCount).toEqual(payload.filter(p => p.checked).length);
         });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
+        });
       });
 
       describe('selecting all projects', () => {
@@ -454,6 +529,11 @@ describe('projectsFilterReducer', () => {
           expect(selectionCountVisible).toBe(true);
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
           expect(selectionCount).toEqual(payload.filter(p => p.checked).length);
+        });
+
+        it('displays caret to open dropdown', () => {
+          const { dropdownCaretVisible } = projectsFilterReducer(initialState, action);
+          expect(dropdownCaretVisible).toBe(true);
         });
       });
     });
