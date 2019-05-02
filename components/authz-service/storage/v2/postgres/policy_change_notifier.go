@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/chef/automate/components/authz-service/storage/v2"
+	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 )

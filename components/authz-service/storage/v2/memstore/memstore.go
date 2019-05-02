@@ -9,8 +9,8 @@ import (
 
 	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	"github.com/chef/automate/components/authz-service/storage/v2"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 type State struct {

@@ -3,7 +3,7 @@ package memstore
 import (
 	"sync"
 
-	"github.com/chef/automate/components/authz-service/storage/v2"
+	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 type policyChangeNotifierManager struct {
