@@ -146,8 +146,8 @@ func TestServiceGroupsFilterStatusWrongParameter(t *testing.T) {
 		request = &applications.ServiceGroupsReq{
 			Filter: []string{"status:not-valid-status"},
 		}
-		expected    = new(applications.ServiceGroups)
-		expectedErr = "invalid status filter 'not-valid-status'"
+		expected    *applications.ServiceGroups = nil
+		expectedErr                             = "invalid status filter 'not-valid-status'"
 	)
 
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
@@ -165,8 +165,8 @@ func TestServiceGroupsFilterWrongType(t *testing.T) {
 		request = &applications.ServiceGroupsReq{
 			Filter: []string{"foo:bar"},
 		}
-		expected    = new(applications.ServiceGroups)
-		expectedErr = "invalid filter. (foo:[bar])"
+		expected    *applications.ServiceGroups = nil
+		expectedErr                             = "invalid filter. (foo:[bar])"
 	)
 
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)

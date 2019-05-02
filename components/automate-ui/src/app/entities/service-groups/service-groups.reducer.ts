@@ -35,7 +35,10 @@ export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
   filters: { },
   servicesStatus: EntityStatus.notLoaded,
   errorResp: null,
-  servicesFilters: { },
+  servicesFilters: {
+    page: 1,
+    health: 'total'
+  },
   servicesList: [],
   servicesHealthSummary: {
     total: 0,

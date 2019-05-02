@@ -209,5 +209,20 @@ describe('ServiceGroupsComponent', () => {
           pageSize: 25
         }}));
     }));
+
+    it('when a user navigates to a negative page use the default page number', fakeAsync(() => {
+      spyOn(component.store, 'dispatch');
+
+      component.updateAllFilters([{type: 'page', text: '-2'}]);
+
+      expect(component.store.dispatch).toHaveBeenCalledWith(
+        new UpdateServiceGroupFilters({filters: {
+          status: undefined,
+          sortField: 'name',
+          sortDirection: 'ASC',
+          page: 1,
+          pageSize: 25
+        }}));
+    }));
   });
 });
