@@ -2,6 +2,7 @@
   aria-label="User Menu"
   class="dropdown-toggle"
   (click)="toggleDropdown($event)"
+  (keydown.shift.tab)="closeDropdown()"
   data-cy="user-profile-button">
   <chef-icon aria-hidden="true" class="dropdown-toggle-user-icon">person</chef-icon>
   <chef-icon aria-hidden="true">keyboard_arrow_down</chef-icon>
@@ -25,19 +26,19 @@
             <button (click)="showWelcomeModal()" data-cy="welcome-modal-button" class="welcome-modal-button">About</button>
           </li>
           <li>
-            <a href="https://www.chef.io/online-master-agreement/" target="_blank">
+            <a href="https://www.chef.io/online-master-agreement/" target="_blank" (click)="closeDropdown()">
               License <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
             </a>
           </li>
           <li>
-            <a href="https://automate.chef.io/release-notes/?v={{ buildVersion }}" target="_blank" class="release-notes">
+            <a href="https://automate.chef.io/release-notes/?v={{ buildVersion }}" target="_blank" class="release-notes" (click)="closeDropdown()">
               Release Notes <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
             </a>
           </li>
         </ul>
       </li>
       <li class="dropdown-list-item">
-        <button (click)="logout()" data-cy="sign-out-button" class="logout">Sign Out</button>
+        <button (click)="logout()" data-cy="sign-out-button" class="logout" (keydown.tab)="closeDropdown()">Sign Out</button>
       </li>
     </ul>
   </chef-dropdown>

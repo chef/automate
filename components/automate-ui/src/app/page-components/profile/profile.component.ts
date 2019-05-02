@@ -43,6 +43,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   showWelcomeModal() {
     this.welcomeModalComponent.showModal();
+    this.closeDropdown();
   }
 
   toggleDropdown(event) {
