@@ -6,7 +6,7 @@
     <chef-page-header>
       <chef-heading>Projects</chef-heading>
       <chef-subheading>
-        Projects group resources together. Max of 6 projects allowed.
+        Projects group resources together. Max of {{ MAX_PROJECTS }} projects allowed.
       </chef-subheading>
     </chef-page-header>
     <section *ngIf="(iamMajorVersion$ | async) === 'v1' || (iamMinorVersion$ | async) === 'v0'" class="page-body">
@@ -17,7 +17,7 @@
       <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
         <chef-toolbar>
           <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
-            <chef-button [disabled]="(sortedProjects$ | async)?.length >= 6" id="create-button" primary (click)="openCreateModal()">Create Project</chef-button>
+            <chef-button [disabled]="(sortedProjects$ | async)?.length >= MAX_PROJECTS" id="create-button" primary (click)="openCreateModal()">Create Project</chef-button>
           </app-authorized>
         </chef-toolbar>
         <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">

@@ -1608,7 +1608,7 @@ describe('Admin pages', () => {
       ['project-3', true],
       ['project-4', true],
       ['project-5', true],
-      ['project-6', true],
+      ['project-6', true]
     ].forEach(([id, deletable]) => {
       const path = `/iam/v2beta/projects/${id}`;
       const endpoints = {
