@@ -20,7 +20,6 @@ export class ProjectsFilterEffects {
     private actions$: Actions,
     private projectsFilter: ProjectsFilterService,
     private requests: ProjectsFilterRequests
-
   ) { }
 
   @Effect()
@@ -47,14 +46,14 @@ export class ProjectsFilterEffects {
 }
 
 export function convertResponse(authorizedProjects: string[]): ProjectsFilterOption[] {
-  let convertedProjects: ProjectsFilterOption[];
+  const convertedProjects: ProjectsFilterOption[] = [];
   authorizedProjects.forEach(project => {
-      let option = <ProjectsFilterOption>{
+      const option = <ProjectsFilterOption>{
           label: project,
           value: project,
-          checked: false,
-      }
-      convertedProjects.push(option)
+          checked: false
+      };
+      convertedProjects.push(option);
   });
-  return convertedProjects
+  return convertedProjects;
 }
