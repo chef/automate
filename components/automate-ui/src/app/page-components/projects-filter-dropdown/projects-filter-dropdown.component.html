@@ -12,18 +12,20 @@
   </span>
   <chef-icon *ngIf="dropdownCaretVisible" aria-hidden>keyboard_arrow_down</chef-icon>
 </button>
-<chef-dropdown class="dropdown" data-cy="projects-filter-dropdown" *ngIf="dropdownActive" (keydown.esc)="handleEscape()">
-  <chef-click-outside class="dropdown-body" omit="dropdown-label" (clickOutside)="handleEscape()">
-    <span class="optgroup-label">Projects</span>
-    <chef-checkbox
-      *ngFor="let option of editableOptions; index as i"
-      [attr.title]="option.label"
-      [checked]="option.checked"
-      (change)="handleOptionChange($event, i)"
-      (keydown.arrowup)="handleArrowUp($event)"
-      (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}</chef-checkbox>
-    <div class="dropdown-footer">
-      <chef-button primary [attr.disabled]="!optionsEdited" (click)="handleApplyClick($event)">Apply Changes</chef-button>
+<chef-click-outside omit="dropdown-label" (clickOutside)="handleEscape()">
+  <chef-dropdown class="dropdown" data-cy="projects-filter-dropdown" [attr.visible]="dropdownActive" (keydown.esc)="handleEscape()">
+    <div class="dropdown-body">
+      <span class="optgroup-label">Projects</span>
+      <chef-checkbox
+        *ngFor="let option of editableOptions; index as i"
+        [attr.title]="option.label"
+        [checked]="option.checked"
+        (change)="handleOptionChange($event, i)"
+        (keydown.arrowup)="handleArrowUp($event)"
+        (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}</chef-checkbox>
+      <div class="dropdown-footer">
+        <chef-button primary [attr.disabled]="!optionsEdited" (click)="handleApplyClick($event)">Apply Changes</chef-button>
+      </div>
     </div>
-  </chef-click-outside>
-</chef-dropdown>
+  </chef-dropdown>
+</chef-click-outside>
