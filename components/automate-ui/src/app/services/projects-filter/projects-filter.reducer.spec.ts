@@ -9,7 +9,14 @@ import {
 } from './projects-filter.reducer';
 import { LoadOptions, LoadOptionsSuccess } from './projects-filter.actions';
 
+// TODO Get these from reducer.ts
 const UNASSIGNED_PROJECT = '(unassigned)';
+const UNASSIGNED_PROJECT_LABEL = 'Unassigned resources';
+const ALL_RESOURCES_LABEL = 'All resources';
+const ALL_PROJECTS_LABEL = 'All projects';
+const MULTIPLE_PROJECTS_LABEL = 'Multiple projects';
+const BADGE_GREY_STATE = false;
+const BADGE_BLUE_STATE = true;
 
 describe('projectsFilterReducer', () => {
   const initialState: ProjectsFilterState = projectsFilterInitialState;
@@ -30,7 +37,9 @@ describe('projectsFilterReducer', () => {
         genProject('p1', false)
       ];
       const action = new LoadOptionsSuccess(payload);
+
       const { optionsLoadingStatus } = projectsFilterReducer(initialState, action);
+
       expect(optionsLoadingStatus).toEqual(EntityStatus.loadingSuccess);
     });
 
@@ -42,65 +51,142 @@ describe('projectsFilterReducer', () => {
         genProject('a-proj', false)
       ];
       const action = new LoadOptionsSuccess(payload);
+
       const { options } = projectsFilterReducer(initialState, action);
+
       expect(map('label', options)).toEqual(['a-proj', 'b-proj', 'c-proj', 'd-proj']);
     });
 
     it('with unassigned, sorts projects except unassigned at bottom when storing them', () => {
       const payload: ProjectsFilterOption[] = [
         genProject('d-proj', false),
-        <ProjectsFilterOption>{
-          label: 'Unassigned resources',
-          checked: true,
-          value: UNASSIGNED_PROJECT
-        },
+        genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
         genProject('b-proj', false),
         genProject('zz-proj', false),
         genProject('a-proj', false)
       ];
       const action = new LoadOptionsSuccess(payload);
+
       const { options } = projectsFilterReducer(initialState, action);
+
       expect(map('value', options))
         .toEqual(['a-proj', 'b-proj', 'd-proj', 'zz-proj', UNASSIGNED_PROJECT]);
     });
 
     describe('with exactly one allowed project', () => {
+      const payload: ProjectsFilterOption[] = [
+        genProject('zz-proj', false)
+      ];
+      const action = new LoadOptionsSuccess(payload);
 
       it('displays project name', () => {
+        const { selectionLabel } = projectsFilterReducer(initialState, action);
+        expect(selectionLabel).toEqual('zz-proj');
       });
 
+      it('displays no count badge', () => {
+        const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+        expect(selectionCountVisible).toBe(false);
+      });
+
+      // TODO
       it('does not display caret to open dropdown', () => {
       });
     });
 
     describe('with only unassigned resources allowed', () => {
+      const payload: ProjectsFilterOption[] = [
+        genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT)
+      ];
+      const action = new LoadOptionsSuccess(payload);
 
       it('displays "Unassigned resources"', () => {
+        const { selectionLabel } = projectsFilterReducer(initialState, action);
+        expect(selectionLabel).toEqual(UNASSIGNED_PROJECT_LABEL);
       });
 
+      it('displays no count badge', () => {
+        const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+        expect(selectionCountVisible).toBe(false);
+      });
+
+      // TODO
       it('does not display caret to open dropdown', () => {
       });
     });
 
     describe('with exactly one project plus unassigned allowed', () => {
 
-      // Also check that every case displays the caret to open dropdown
+      // TODO: Also check that every case displays the caret to open dropdown
 
-      it('when nothing is selected displays "All resources"', () => {
+      describe('when nothing is selected', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject('zz-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "All resources"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(ALL_RESOURCES_LABEL);
+        });
+
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
+        });
       });
-      it('when nothing is selected displays no count badge', () => {
+
+      describe('when project is selected', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject('zz-proj', true)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays that project', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual('zz-proj');
+        });
+
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
+        });
       });
-      it('when project selected displays that project', () => {
+
+      describe('when only unassigned is selected', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject('zz-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "Unassigned resources"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(UNASSIGNED_PROJECT_LABEL);
+        });
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
+        });
       });
-      it('when project selected displays no count badge', () => {
-      });
-      it('when only unassigned selected displays "Unassigned resources"', () => {
-      });
-      it('when only unassigned selected displays no count badge', () => {
-      });
-      it('selecting project and selecting unassigned displays "All resources"', () => {
-      });
-      it('selecting project and selecting unassigned displays no count badge', () => {
+
+      describe('selecting project and selecting unassigned', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject('zz-proj', true)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "All resources"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(ALL_RESOURCES_LABEL);
+        });
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
+        });
       });
     });
 
@@ -108,70 +194,269 @@ describe('projectsFilterReducer', () => {
 
       // Also check that every case displays the caret to open dropdown
 
-      it('when nothing is selected displays "All resources"', () => {
-      });
-      it('when nothing is selected displays no count badge', () => {
-      });
-      it('when single project selected displays that project', () => {
-      });
-      it('when single project selected displays no count badge', () => {
-      });
-      it('when only unassigned selected displays "Unassigned resources"', () => {
-      });
-      it('when only unassigned selected displays no count badge', () => {
-      });
-      it('when single project plus unassigned selected displays that project', () => {
-      });
-      it('when single project plus unassigned selected displays no count badge', () => {
-      });
-      it('selecting multiple but not all projects and not selecting unassigned'
-        + ' displays "Multiple projects"', () => {
+      describe('when nothing is selected', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', false),
+          genProject('c-proj', false),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject('b-proj', false),
+          genProject('c-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "All resources"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(ALL_RESOURCES_LABEL);
         });
-      it('selecting multiple but not all projects and not selecting unassigned'
-        + ' displays blue count badge', () => {
+
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
         });
-      it('selecting multiple but not all projects and selecting unassigned'
-        + ' displays "Multiple projects"', () => {
+      });
+
+      describe('when single project is selected', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', false),
+          genProject('c-proj', false),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject('b-proj', true),
+          genProject('c-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays that project', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual('b-proj');
         });
-      it('selecting multiple but not all projects and selecting unassigned'
-        + ' displays blue count badge excluding unassigned', () => {
+
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
         });
-      it('selecting all projects and not selecting unassigned'
-        + ' displays "All projects"', () => {
+      });
+
+      describe('when only unassigned is selected', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', false),
+          genProject('c-proj', false),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject('b-proj', false),
+          genProject('c-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "Unassigned resources"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(UNASSIGNED_PROJECT_LABEL);
         });
-      it('selecting all projects and not selecting unassigned'
-        + ' displays blue count badge', () => {
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
         });
-      it('selecting all projects and selecting unassigned'
-        + ' displays "All resources"', () => {
+      });
+
+      describe('selecting single project and selecting unassigned', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', true),
+          genProject('c-proj', false),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject('b-proj', false),
+          genProject('c-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays selected project', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual('zz-proj');
         });
-      it('selecting all projects and selecting unassigned'
-        + ' displays no count badge', () => {
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
         });
+      });
+
+      describe('selecting multiple but not all projects and not selecting unassigned', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', true),
+          genProject('c-proj', true),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject('b-proj', true),
+          genProject('c-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "Multiple projects"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(MULTIPLE_PROJECTS_LABEL);
+        });
+        it('displays blue count badge with count of checked projects', () => {
+          const { selectionCount, selectionCountActive, selectionCountVisible }
+            = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(true);
+          expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
+          expect(selectionCount).toEqual(payload.filter(p => p.checked).length);
+        });
+      });
+
+      describe('selecting multiple but not all projects and selecting unassigned', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', true),
+          genProject('c-proj', true),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject('b-proj', true),
+          genProject('c-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "Multiple projects"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(MULTIPLE_PROJECTS_LABEL);
+        });
+        it('displays blue count badge excluding unassigned in count', () => {
+          const { selectionCount, selectionCountActive, selectionCountVisible }
+            = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(true);
+          expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
+          expect(selectionCount).toEqual(payload.filter(p => p.checked).length - 1);
+        });
+      });
+
+      describe('selecting all projects and not selecting unassigned', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', true),
+          genProject('c-proj', true),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject('b-proj', true),
+          genProject('c-proj', true)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "All projects"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
+        });
+        it('displays blue count badge with count of checked projects', () => {
+          const { selectionCount, selectionCountActive, selectionCountVisible }
+            = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(true);
+          expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
+          expect(selectionCount).toEqual(payload.filter(p => p.checked).length);
+        });
+      });
+
+      describe('selecting all projects and selecting unassigned', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', true),
+          genProject('c-proj', true),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject('b-proj', true),
+          genProject('c-proj', true)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "All resources"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(ALL_RESOURCES_LABEL);
+        });
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
+        });
+      });
     });
 
     describe('with at least 2 projects allowed but not unassigned', () => {
 
       // Also check that every case displays the caret to open dropdown
 
-      it('when nothing is selected displays "All projects"', () => {
+      describe('when nothing is selected', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', false),
+          genProject('c-proj', false),
+          genProject('b-proj', false),
+          genProject('c-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "All projects"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
+        });
+
+        it('displays grey count badge with count of ALL projects', () => {
+          const { selectionCount, selectionCountActive, selectionCountVisible }
+            = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(true);
+          expect(selectionCountActive).toBe(BADGE_GREY_STATE);
+          expect(selectionCount).toEqual(payload.length);
+        });
       });
-      it('when nothing is selected displays grey count badge', () => {
+
+      describe('when single project is selected', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', false),
+          genProject('c-proj', false),
+          genProject('b-proj', true),
+          genProject('c-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays that project', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual('b-proj');
+        });
+
+        it('displays no count badge', () => {
+          const { selectionCountVisible } = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(false);
+        });
       });
-      it('when single project selected displays that project', () => {
+
+      describe('selecting multiple but not all projects', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', true),
+          genProject('c-proj', true),
+          genProject('b-proj', true),
+          genProject('c-proj', false)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "Multiple projects"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(MULTIPLE_PROJECTS_LABEL);
+        });
+        it('displays blue count badge with count of checked projects', () => {
+          const { selectionCount, selectionCountActive, selectionCountVisible }
+            = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(true);
+          expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
+          expect(selectionCount).toEqual(payload.filter(p => p.checked).length);
+        });
       });
-      it('when single project selected displays no count badge', () => {
-      });
-      it('selecting multiple but not all projects displays "Multiple projects"', () => {
-      });
-      it('selecting multiple but not all projects displays blue count badge', () => {
-      });
-      it('selecting all projects displays "All projects"', () => {
-      });
-      it('selecting all projects displays blue count badge', () => {
+
+      describe('selecting all projects', () => {
+        const payload: ProjectsFilterOption[] = [
+          genProject('zz-proj', true),
+          genProject('c-proj', true),
+          genProject('b-proj', true),
+          genProject('c-proj', true)
+        ];
+        const action = new LoadOptionsSuccess(payload);
+
+        it('displays "All projects"', () => {
+          const { selectionLabel } = projectsFilterReducer(initialState, action);
+          expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
+        });
+        it('displays blue count badge with count of checked projects', () => {
+          const { selectionCount, selectionCountActive, selectionCountVisible }
+            = projectsFilterReducer(initialState, action);
+          expect(selectionCountVisible).toBe(true);
+          expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
+          expect(selectionCount).toEqual(payload.filter(p => p.checked).length);
+        });
       });
     });
-
   });
 
   function genProject(label: string, checked: boolean, value?: string): ProjectsFilterOption {
