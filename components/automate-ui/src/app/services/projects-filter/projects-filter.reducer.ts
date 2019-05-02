@@ -95,32 +95,31 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
   const hasNoProjectsChecked = checkedProjects.length === 0;
   const hasAllProjectsChecked = checkedProjects.length === projectOptions.length;
   const hasSomeProjectsChecked = checkedProjects.length > 1 && !hasAllProjectsChecked;
+  const hasUnassigned = options.filter(o => o.value === UNASSIGNED_PROJECT).length === 1;
   const hasUnassignedChecked =
     options.filter(o => o.value === UNASSIGNED_PROJECT && o.checked).length === 1;
-  const unassignedAvailable = options.filter(o => o.value === UNASSIGNED_PROJECT).length === 1;
 
   if (hasOneOption) {
     return options[0].label;
   }
 
-  if (hasOneChecked) {
+  if (hasAllProjectsChecked && hasUnassignedChecked) {
+    return 'All resources';
+  }
+
+  if (hasNoProjectsChecked && hasUnassigned && !hasUnassignedChecked) {
+    return 'All resources';
+  }
+
+  if (hasOneChecked || hasOneProjectChecked) {
     return checkedOptions[0].label;
-  }
-
-  if (hasOneProjectChecked) {
-    return checkedProjects[0].label;
-  }
-
-  if ((hasAllProjectsChecked && (!hasUnassignedChecked || !unassignedAvailable))
-    || (hasNoProjectsChecked && !unassignedAvailable)) {
-      return 'All projects';
   }
 
   if (hasSomeProjectsChecked) {
     return 'Multiple projects';
   }
 
-  return 'All resources';
+  return 'All projects';
 }
 
 function selectionCount(options: ProjectsFilterOption[]): number {
