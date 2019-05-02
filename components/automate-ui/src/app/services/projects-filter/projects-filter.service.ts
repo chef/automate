@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of as observableOf } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from './projects-filter.reducer';
 import * as selectors from './projects-filter.selectors';
 import { LoadOptions, SaveOptions } from './projects-filter.actions';
@@ -54,7 +55,7 @@ export class ProjectsFilterService {
         checked: false
       },
       {
-        value: '(unassigned)',
+        value: ProjectConstants.UNASSIGNED_PROJECT_ID,
         label: 'Unassigned Resources',
         checked: false
       },

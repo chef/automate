@@ -4,9 +4,9 @@ import {
 
 import { orderBy } from 'lodash/fp';
 
-import { Project } from 'app/entities/projects/project.model';
+import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 
-const UNASSIGNED_LABEL = '(unassigned)';
+const UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
 @Component({
   selector: 'app-projects-dropdown',
@@ -31,7 +31,7 @@ export class ProjectsDropdownComponent implements OnInit {
 
   active = false;
   showError = false;
-  label = UNASSIGNED_LABEL;
+  label = UNASSIGNED_PROJECT_ID;
 
   // Map of projects currently selected
   selectedProjects = {};
@@ -109,7 +109,7 @@ export class ProjectsDropdownComponent implements OnInit {
         break;
       }
       case 0: {
-        this.label = UNASSIGNED_LABEL;
+        this.label = UNASSIGNED_PROJECT_ID;
         break;
       }
       default: {

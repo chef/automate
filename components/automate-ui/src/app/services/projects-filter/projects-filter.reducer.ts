@@ -1,9 +1,16 @@
 import { set, pipe, find } from 'lodash/fp';
+
 import { EntityStatus } from 'app/entities/entities';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import {
   ProjectsFilterActions,
   ProjectsFilterActionTypes
 } from './projects-filter.actions';
+
+const UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
+const ALL_RESOURCES_LABEL = ProjectConstants.ALL_RESOURCES_LABEL;
+const ALL_PROJECTS_LABEL = ProjectConstants.ALL_PROJECTS_LABEL;
+const MULTIPLE_PROJECTS_LABEL = ProjectConstants.MULTIPLE_PROJECTS_LABEL;
 
 export interface ProjectsFilterOption {
   label: string;
@@ -24,7 +31,7 @@ export interface ProjectsFilterState {
 export const projectsFilterInitialState: ProjectsFilterState = {
   options: [],
   optionsLoadingStatus: EntityStatus.notLoaded,
-  selectionLabel: 'All resources',
+  selectionLabel: ALL_RESOURCES_LABEL,
   selectionCount: 0,
   selectionCountVisible: false,
   selectionCountActive: false,
@@ -42,14 +49,15 @@ export function projectsFilterReducer(
     }
 
     case ProjectsFilterActionTypes.LOAD_OPTIONS_SUCCESS: {
-      const sortedOptions = action.payload.filter(o => o.value !== UNASSIGNED_PROJECT).sort(
-          (a, b) => {
-            const opts = { numeric: true, sensitivity: 'base' };
-            return a.label.localeCompare(b.label, undefined, opts)
-              || a.label.localeCompare(b.label, undefined, { numeric: true });
-          }
+      const sortedOptions = action.payload
+        .filter(o => o.value !== UNASSIGNED_PROJECT_ID)
+        .sort((a, b) => {
+          const opts = { numeric: true, sensitivity: 'base' };
+          return a.label.localeCompare(b.label, undefined, opts)
+            || a.label.localeCompare(b.label, undefined, { numeric: true });
+        }
         );
-      const unassignedProject = find(['value', UNASSIGNED_PROJECT], action.payload);
+      const unassignedProject = find(['value', UNASSIGNED_PROJECT_ID], action.payload);
       if (unassignedProject) {
         sortedOptions.push(unassignedProject);
       }
@@ -83,11 +91,9 @@ export function projectsFilterReducer(
   return state;
 }
 
-const UNASSIGNED_PROJECT = '(unassigned)';
-
 function selectionLabel(options: ProjectsFilterOption[]): string {
   const checkedOptions = options.filter(o => o.checked);
-  const projectOptions = options.filter(o => o.value !== UNASSIGNED_PROJECT);
+  const projectOptions = options.filter(o => o.value !== UNASSIGNED_PROJECT_ID);
   const checkedProjects = projectOptions.filter(o => o.checked);
   const hasOneOption = options.length === 1;
   const hasOneChecked = checkedOptions.length === 1;
@@ -95,20 +101,20 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
   const hasNoProjectsChecked = checkedProjects.length === 0;
   const hasAllProjectsChecked = checkedProjects.length === projectOptions.length;
   const hasSomeProjectsChecked = checkedProjects.length > 1 && !hasAllProjectsChecked;
-  const hasUnassigned = options.filter(o => o.value === UNASSIGNED_PROJECT).length === 1;
+  const hasUnassigned = options.filter(o => o.value === UNASSIGNED_PROJECT_ID).length === 1;
   const hasUnassignedChecked =
-    options.filter(o => o.value === UNASSIGNED_PROJECT && o.checked).length === 1;
+    options.filter(o => o.value === UNASSIGNED_PROJECT_ID && o.checked).length === 1;
 
   if (hasOneOption) {
     return options[0].label;
   }
 
   if (hasAllProjectsChecked && hasUnassignedChecked) {
-    return 'All resources';
+    return ALL_RESOURCES_LABEL;
   }
 
   if (hasNoProjectsChecked && hasUnassigned && !hasUnassignedChecked) {
-    return 'All resources';
+    return ALL_RESOURCES_LABEL;
   }
 
   if (hasOneChecked || hasOneProjectChecked) {
@@ -116,14 +122,14 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
   }
 
   if (hasSomeProjectsChecked) {
-    return 'Multiple projects';
+    return MULTIPLE_PROJECTS_LABEL;
   }
 
-  return 'All projects';
+  return ALL_PROJECTS_LABEL;
 }
 
 function selectionCount(options: ProjectsFilterOption[]): number {
-  const checkedProjects = options.filter(o => o.checked && o.value !== UNASSIGNED_PROJECT);
+  const checkedProjects = options.filter(o => o.checked && o.value !== UNASSIGNED_PROJECT_ID);
   return checkedProjects.length > 0 ? checkedProjects.length : options.length;
 }
 
@@ -134,7 +140,7 @@ function selectionCountVisible(options: ProjectsFilterOption[]): boolean {
   }
 
   const checkedOptions = options.filter(o => o.checked);
-  const projectOptions = options.filter(o => o.value !== UNASSIGNED_PROJECT);
+  const projectOptions = options.filter(o => o.value !== UNASSIGNED_PROJECT_ID);
   const checkedProjects = projectOptions.filter(o => o.checked);
   const hasOnlyProjects = projectOptions.length === options.length;
   const hasNoneChecked = checkedOptions.length === 0;
