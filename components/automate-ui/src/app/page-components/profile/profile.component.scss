@@ -19,11 +19,11 @@ ul, li {
 }
 
 a, button:not(.dropdown-toggle) {
-  position: relative;
   display: block;
-  width: $dropdown-width;
   margin: 0 -16px;
   padding: 0 16px;
+  position: relative;
+  width: $dropdown-width;
   font-size: 16px;
   line-height: 32px;
   text-decoration: none;
@@ -32,7 +32,7 @@ a, button:not(.dropdown-toggle) {
   &:hover,
   &:focus,
   &:active {
-    background: #dee5fd;
+    background: #DEE5FD;
   }
 }
 
