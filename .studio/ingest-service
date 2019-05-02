@@ -14,6 +14,7 @@ function ingest_integration() {
   local rc
 
   # Go based integration tests
+  export PG_URL="postgresql://ingest@127.0.0.1:10145/chef_ingest_service?sslmode=verify-ca&sslcert=/hab/svc/ingest-service/config/service.crt&sslkey=/hab/svc/ingest-service/config/service.key&sslrootcert=/hab/svc/ingest-service/config/root_ca.crt"
   go_test "github.com/chef/automate/components/ingest-service/integration_test"
   rc=$?
   if [[ $rc != 0 ]]; then

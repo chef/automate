@@ -303,6 +303,12 @@ func DefaultSpecs(serviceNames []string) []Spec {
 					SrcPath: "/hab/svc/ingest-service/data",
 				},
 			},
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "chef_ingest_service",
+					User: "ingest",
+				},
+			},
 			SyncEsIndices: []ElasticsearchOperation{
 				{
 					ServiceName:    "ingest-service",

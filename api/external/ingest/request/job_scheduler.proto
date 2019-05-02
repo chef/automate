@@ -12,8 +12,6 @@ message SchedulerConfig {
   bool running = 3;
 }
 message GetStatusJobScheduler { }
-message StartJobScheduler { }
-message StopJobScheduler { }
 
 // DeleteNodesScheduler
 message DeleteMarkedNodes { }

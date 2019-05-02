@@ -6,14 +6,6 @@ option go_package = "github.com/chef/automate/api/interservice/ingest";
 import "google/api/annotations.proto";
 
 service JobScheduler {
-	rpc StartJobScheduler (StartJobSchedulerRequest) returns (StartJobSchedulerResponse) {
-		option (google.api.http).post = "/job/job-scheduler/start";
-	};
-
-	rpc StopJobScheduler (StopJobSchedulerRequest) returns (StopJobSchedulerResponse) {
-		option (google.api.http).post = "/job/job-scheduler/stop";
-	};
-
 	rpc GetStatusJobScheduler (JobSchedulerStatusRequest) returns (JobSchedulerStatus) {
 		option (google.api.http).get = "/job/job-scheduler/status";
 	};

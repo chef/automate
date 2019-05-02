@@ -16,6 +16,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/olivere/elastic"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
@@ -29,6 +30,8 @@ import (
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
 )
 
 var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
@@ -42,7 +45,6 @@ var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 // multiple tests, consider putting it here so that we have them available globally
 //
 // This struct holds:
-// * A JobScheduler, properly the internal job scheduler for the ingest service, required for the JobSchedulerServer
 // * A ConfigManager, the configuration manager for the service, required for the JobSchedulerServer
 // * A ChefIngestServer, the exposed GRPC Server that ingest Chef Data
 // * A JobSchedulerServer, the exposed GRPC Server to start, stop, configure and run jobs
@@ -55,10 +57,10 @@ var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 // * An Elasticsearch client, that you can use to throw ES queries.
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 type Suite struct {
-	JobScheduler             *server.JobScheduler
 	ConfigManager            *config.Manager
 	ChefIngestServer         *server.ChefIngestServer
 	JobSchedulerServer       *server.JobSchedulerServer
+	JobManager               *cereal.Manager
 	EventHandlerServer       *server.AutomateEventHandlerServer
 	cfgmgmt                  cfgBackend.Client
 	ingest                   iBackend.Client
@@ -104,6 +106,9 @@ func (s *Suite) GlobalSetup() {
 // executing all our test suite
 func (s *Suite) GlobalTeardown() {
 	os.Remove(cFile)
+	if s.JobManager != nil {
+		s.JobManager.Stop()
+	}
 }
 
 // GetNode retrives a Chef Node
@@ -327,7 +332,6 @@ func createServices(s *Suite) {
 	s.ingest = iClient
 
 	// TODO @afiune Modify the time of the jobs
-	s.JobScheduler = server.NewJobScheduler()
 	configFile := "/tmp/.ingest-service.toml"
 	os.Remove(configFile)
 	s.ConfigManager, err = config.NewManager(configFile)
@@ -336,7 +340,6 @@ func createServices(s *Suite) {
 		os.Exit(3)
 	}
 	// TODO Handle the Close() functions
-	//defer JobScheduler.Close()
 	//defer ConfigManager.Close()
 
 	chefIngestServerConfig := serveropts.ChefIngestServerConfig{
@@ -368,7 +371,28 @@ func createServices(s *Suite) {
 	// // To test the 'mark missing nodes for deletion' job
 	// res, err := suite.JobSchedulerServer.MarkMissingNodesForDeletion(ctx, &req)
 	// ```
-	s.JobSchedulerServer = server.NewJobSchedulerServer(s.ingest, s.JobScheduler, s.ConfigManager)
+	jobManager, err := cereal.NewManager(postgres.NewPostgresBackend(postgresUrl))
+	if err != nil {
+		logrus.WithError(err).Fatal("could not create job manager")
+	}
+	s.JobManager = jobManager
+
+	err = server.InitializeJobManager(jobManager, s.ingest)
+	if err != nil {
+		logrus.WithError(err).Fatal("could not initialze job manager")
+	}
+
+	err = server.MigrateJobsSchedule(jobManager, viper.ConfigFileUsed())
+	if err != nil {
+		logrus.WithError(err).Fatal("could not migrate old job schedules")
+	}
+
+	err = jobManager.Start(context.Background())
+	if err != nil {
+		logrus.WithError(err).Fatal("could not start job manager")
+	}
+
+	s.JobSchedulerServer = server.NewJobSchedulerServer(s.ingest, jobManager)
 }
 
 func createMocksWithDefaultFunctions(s *Suite) {

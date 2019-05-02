@@ -981,14 +981,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9dfe20a82800ffcf0a2bde15beba44cc6d6f6cf1d003420ecc8ad0ac78300d70"
-  name = "github.com/robfig/cron"
-  packages = ["."]
-  pruneopts = "NUT"
-  revision = "2315d5715e36303a941d907f038da7f7c44c773b"
-
-[[projects]]
-  branch = "master"
   digest = "1:56e4d5896fd7fb1f7c3776235726a5d884c45512fb98a6400811d8d76ff59e88"
   name = "github.com/russellhaering/goxmldsig"
   packages = [
@@ -1574,7 +1566,6 @@
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promauto",
     "github.com/prometheus/client_golang/prometheus/promhttp",
-    "github.com/robfig/cron",
     "github.com/schollz/closestmatch",
     "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",

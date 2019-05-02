@@ -3,10 +3,11 @@ package handler
 import (
 	"context"
 
+	log "github.com/sirupsen/logrus"
+
 	req "github.com/chef/automate/api/external/ingest/request"
 	res "github.com/chef/automate/api/external/ingest/response"
 	"github.com/chef/automate/api/interservice/ingest"
-	log "github.com/sirupsen/logrus"
 )
 
 type ChefIngestJobSchedulerServer struct {
@@ -15,26 +16,6 @@ type ChefIngestJobSchedulerServer struct {
 
 func NewChefIngestJobSchedulerServer(jobSchedulerClient ingest.JobSchedulerClient) *ChefIngestJobSchedulerServer {
 	return &ChefIngestJobSchedulerServer{jobSchedulerClient: jobSchedulerClient}
-}
-
-// StartJobScheduler - Start the Job Scheduler
-func (server *ChefIngestJobSchedulerServer) StartJobScheduler(ctx context.Context, empty *req.StartJobScheduler) (*res.StartJobScheduler, error) {
-	log.WithFields(log.Fields{
-		"func": nameOfFunc(),
-	}).Debug("rpc call")
-	_, err := server.jobSchedulerClient.StartJobScheduler(ctx, &ingest.StartJobSchedulerRequest{})
-
-	return &res.StartJobScheduler{}, err
-}
-
-// StopJobScheduler - Stop the Job Scheduler
-func (server *ChefIngestJobSchedulerServer) StopJobScheduler(ctx context.Context, empty *req.StopJobScheduler) (*res.StopJobScheduler, error) {
-	log.WithFields(log.Fields{
-		"func": nameOfFunc(),
-	}).Debug("rpc call")
-	_, err := server.jobSchedulerClient.StopJobScheduler(ctx, &ingest.StopJobSchedulerRequest{})
-
-	return &res.StopJobScheduler{}, err
 }
 
 // GetStatusJobScheduler - collect and return the status of all the jobs in the Job Scheduler
