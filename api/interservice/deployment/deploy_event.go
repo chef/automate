@@ -106,7 +106,7 @@ next time the deployment-service converges Chef Automate's state.
 		case Running:
 			m := make([]string, len(e.Backup.Operations))
 			for i, o := range e.Backup.Operations {
-				m[i] = fmt.Sprintf("%s (sync %.2f%%) (async %.2f%%)", o.Name, o.SyncProgress, o.AsyncProgress)
+				m[i] = fmt.Sprintf("%s (sync %.2f%%)", o.Name, o.SyncProgress)
 			}
 
 			ret = strings.Join(m, "\n")
