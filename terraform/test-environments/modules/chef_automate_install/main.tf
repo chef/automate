@@ -209,6 +209,7 @@ EOF
   [gateway.v1.sys]
     [gateway.v1.sys.service]
       trial_license_url = "https://licensing-${var.channel}.chef.io/create-trial"
+      enable_apps_feature = ${var.enable_eas_dashboard}
 
 [event_gateway.v1]
   [event_gateway.v1.sys]
