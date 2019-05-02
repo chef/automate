@@ -1,6 +1,7 @@
 ---
 origin: chef
-smart_build: true
+# Disabling smart build until multi-bldr channel issues can be addressed
+smart_build: false
 studio_secrets:
   GITHUB_TOKEN:
     account: github/chef-ci
