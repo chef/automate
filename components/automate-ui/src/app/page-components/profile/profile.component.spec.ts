@@ -9,7 +9,6 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { MetadataService } from 'app/services/metadata/metadata.service';
 
-import { using } from 'app/testing/spec-helpers';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { ProfileComponent } from './profile.component';
 
@@ -128,7 +127,7 @@ describe('ProfileComponent', () => {
     it('toggles dropdown visibility', () => {
       fixture.detectChanges();
       const event = { stopPropagation: () => '' };
-      const userInfo = element.query(By.css('.profile'));
+      const userInfo = element.query(By.css('.dropdown-toggle'));
 
       expect(component.dropdownVisible).toEqual(false);
 
@@ -140,23 +139,6 @@ describe('ProfileComponent', () => {
     });
   });
 
-  using([
-    ['Your Profile', 1],
-    ['About Chef Automate', 2],
-    ['License Information', 3],
-    ['Sign Out', 5]
-  ], function (label: string, position: number) {
-    it(`displays the '${label}' navigation link`, () => {
-
-      component.dropdownVisible = true;
-      fixture.detectChanges();
-      const link = element.nativeElement
-        .querySelector(`li:nth-child(${position}) *`);
-
-      expect(link.innerText).toBe(label);
-    });
-  });
-
   describe('sign out link', () => {
 
     it('logs out', () => {
@@ -165,7 +147,7 @@ describe('ProfileComponent', () => {
       component.dropdownVisible = true;
       fixture.detectChanges();
 
-      const link = element.query(By.css('li:nth-child(5) chef-button'));
+      const link = element.query(By.css('button.logout'));
       link.triggerEventHandler('click', {});
       expect(chefSessionService.logout).toHaveBeenCalled();
     });
@@ -182,11 +164,13 @@ describe('ProfileComponent', () => {
       component.dropdownVisible = true;
       fixture.detectChanges();
 
-      const expected = `Chef Automate ${version}`;
-      const actual = element.nativeElement.querySelector('.version-link').innerText;
+      const expected = `Version: ${version}`;
+      const actual = element.nativeElement.querySelector('.version').innerText;
       expect(actual).toEqual(expected);
     });
+  });
 
+  describe('release notes link', () => {
     it('links to the full version text in a new tab', () => {
 
       const version = '20180416135645';
@@ -196,7 +180,7 @@ describe('ProfileComponent', () => {
       component.dropdownVisible = true;
       fixture.detectChanges();
 
-      const link = element.nativeElement.querySelector('.version-link');
+      const link = element.nativeElement.querySelector('.release-notes');
       const href = link.getAttribute('href');
       const target = link.getAttribute('target');
       expect(href).toEqual(`https://automate.chef.io/release-notes/?v=${version}`);
@@ -212,20 +196,20 @@ describe('ProfileComponent', () => {
 
       spyOn(component, 'showWelcomeModal');
 
-      const link = element.query(By.css('li:nth-child(2) button'));
+      const link = element.query(By.css('.welcome-modal-button'));
       link.triggerEventHandler('click', {});
 
       expect(component.showWelcomeModal).toHaveBeenCalled();
     });
   });
 
-  describe('view profile link', () => {
+  describe('profile link', () => {
 
     it('links to user profile', () => {
       component.dropdownVisible = true;
       fixture.detectChanges();
 
-      const link = element.nativeElement.querySelector('li:nth-child(1) a');
+      const link = element.nativeElement.querySelector('a.profile');
       const href = link.getAttribute('href');
       expect(href).toEqual(`/user-details/${component.userName}`);
     });

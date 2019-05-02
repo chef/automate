@@ -141,8 +141,8 @@ describe('User Dropdown', () => {
 
     element(by.css('app-profile')).click();
 
-    const versionLink = $('.version-link');
-    expect(versionLink.getText()).toBe(`Chef Automate ${expectedVersion}`);
+    const versionLink = $('.version');
+    expect(versionLink.getText()).toBe(`Version: ${expectedVersion}`);
   });
 
   it('shows the welcome modal when "About Chef Automate" clicked', () => {
@@ -155,7 +155,7 @@ describe('User Dropdown', () => {
 
     element(by.css('app-profile')).click();
 
-    const aboutChefAutomate = $('.logout-dropdown li:nth-child(2) button');
+    const aboutChefAutomate = $('app-profile button.logout');
     aboutChefAutomate.click();
 
     const welcomeModalHeader = $('.welcome-modal .display2');
