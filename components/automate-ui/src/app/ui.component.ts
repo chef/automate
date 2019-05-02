@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Feature } from 'app/services/feature-flags/types';
 
+import { GetIamVersion } from 'app/entities/policies/policy.actions';
 import { notificationState } from 'app/entities/notifications/notification.selectors';
 import { routeURL } from './route.selectors';
 import { Notification } from 'app/entities/notifications/notification.model';
@@ -61,6 +62,7 @@ export class UIComponent implements OnInit {
     this.store.select(routeURL).subscribe((url: string) => {
       this.renderNavbar = url.split('/').pop() !== 'add-members';
     });
+    this.store.dispatch(new GetIamVersion());
   }
 
   onTriggerApplyLicense(reason: LicenseApplyReason): void {
