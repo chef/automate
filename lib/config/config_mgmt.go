@@ -1,9 +1,9 @@
 package config
 
 import (
-	"io/ioutil"
-	"os"
+	"bytes"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	toml "github.com/pelletier/go-toml"
 	log "github.com/sirupsen/logrus"
 )
@@ -87,8 +87,8 @@ func (manager *Manager) saveToFile(config interface{}) error {
 	}
 
 	// create a file with the permissions of the running user can read/write other can only read.
-	var permissions os.FileMode = 0644
-	err = ioutil.WriteFile(manager.configFile, tomlData, permissions)
+	err = fileutils.AtomicWrite(manager.configFile, bytes.NewReader(tomlData),
+		fileutils.WithAtomicWriteFileMode(0644))
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error":       err,
