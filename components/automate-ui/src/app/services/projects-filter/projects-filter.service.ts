@@ -20,6 +20,8 @@ export class ProjectsFilterService {
 
   selectionCountActive$ = this.store.select(selectors.selectionCountActive);
 
+  dropdownCaretVisible$ = this.store.select(selectors.dropdownCaretVisible);
+
   constructor(private store: Store<NgrxStateAtom>) {}
 
   loadOptions() {

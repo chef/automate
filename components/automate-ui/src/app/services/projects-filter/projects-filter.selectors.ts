@@ -16,3 +16,6 @@ export const selectionCountVisible = createSelector(projectsFilterState,
 
 export const selectionCountActive = createSelector(projectsFilterState,
   state => state.selectionCountActive);
+
+export const dropdownCaretVisible = createSelector(projectsFilterState,
+  state => state.dropdownCaretVisible);
