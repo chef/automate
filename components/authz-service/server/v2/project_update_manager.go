@@ -375,11 +375,13 @@ func (manager *ProjectUpdateManager) stageUpdater(updateQueue <-chan update) {
 			continue
 		}
 
-		oldStage := manager.stage
+		oldStage := manager.stage.Copy()
 		if !updatedStage.Equal(oldStage) {
 			err := manager.configManager.UpdateProjectUpdateStage(updatedStage)
 			if err != nil {
 				log.Errorf("Failure updating project update state %v", err)
+				update.errc <- err
+				continue
 			}
 
 			manager.stage = updatedStage

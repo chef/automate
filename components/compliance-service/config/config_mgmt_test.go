@@ -23,7 +23,7 @@ func TestManagerNewDefaultConfig(t *testing.T) {
 }
 
 func TestManagerBadFile(t *testing.T) {
-	_, err := subject.NewConfigManager("/$%89834")
+	_, err := subject.NewConfigManager("")
 	assert.Error(t, err)
 }
 

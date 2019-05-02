@@ -82,7 +82,10 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not create event service client")
 	}
 
-	configManager := config.NewManager(configFile)
+	configManager, err := config.NewManager(configFile)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not create config manager")
+	}
 
 	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, migrationsConfig,
 		dataMigrationsConfig, e, eventServiceClient, configManager)
