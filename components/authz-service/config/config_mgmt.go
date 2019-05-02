@@ -45,11 +45,24 @@ type aggregateConfig struct {
 }
 
 // NewManager - create a new config. There should only be one config for the service.
-func NewManager(configFile string) *Manager {
-	config := readConfigFromFile(configFile, defaultConfig())
-	return &Manager{
-		baseConfigManager: base_config.NewManager(configFile, config),
+func NewManager(configFile string) (*Manager, error) {
+	storedConfig, err := readConfigFromFile(configFile, defaultConfig())
+	if err != nil {
+		return &Manager{}, err
 	}
+
+	// Testing Updating
+	baseManager := base_config.NewManager(configFile, storedConfig)
+	err = baseManager.UpdateConfig(func(config interface{}) (interface{}, error) {
+		return storedConfig, nil
+	})
+	if err != nil {
+		return &Manager{}, err
+	}
+
+	return &Manager{
+		baseConfigManager: baseManager,
+	}, err
 }
 
 // Close - to close out the channel for this object.
@@ -83,21 +96,19 @@ func (manager *Manager) updateConfig(updateFunc func(aggregateConfig) (aggregate
 }
 
 // If there is an error in reading the file return the default file.
-func readConfigFromFile(configFile string, defaultConfig aggregateConfig) interface{} {
+func readConfigFromFile(configFile string, defaultConfig aggregateConfig) (interface{}, error) {
 	config := defaultConfig
 
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		// config file does not exists
-		return config
-	}
-
 	tomlData, err := ioutil.ReadFile(configFile)
-	if err != nil {
+	if os.IsNotExist(err) {
+		// config file does not exists use the default config
+		return config, nil
+	} else if err != nil {
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to read config file")
 
-		return defaultConfig
+		return defaultConfig, err
 	}
 
 	err = toml.Unmarshal(tomlData, &config)
@@ -106,8 +117,8 @@ func readConfigFromFile(configFile string, defaultConfig aggregateConfig) interf
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to load manager configuration")
 
-		return defaultConfig
+		return defaultConfig, nil
 	}
 
-	return config
+	return config, nil
 }

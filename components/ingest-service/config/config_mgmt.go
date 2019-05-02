@@ -145,11 +145,24 @@ type aggregateConfig struct {
 }
 
 // NewManager - create a new config. There should only be one config for the service.
-func NewManager(configFile string) *Manager {
-	config := readConfigFromFile(configFile, defaultConfig())
-	return &Manager{
-		baseConfigManager: base_config.NewManager(configFile, config),
+func NewManager(configFile string) (*Manager, error) {
+	storedConfig, err := readConfigFromFile(configFile, defaultConfig())
+	if err != nil {
+		return &Manager{}, err
 	}
+
+	// Testing Updating
+	baseManager := base_config.NewManager(configFile, storedConfig)
+	err = baseManager.UpdateConfig(func(config interface{}) (interface{}, error) {
+		return storedConfig, nil
+	})
+	if err != nil {
+		return &Manager{}, err
+	}
+
+	return &Manager{
+		baseConfigManager: baseManager,
+	}, err
 }
 
 // Close - close channels
@@ -259,19 +272,19 @@ func (manager *Manager) getConfig() aggregateConfig {
 	return aggregateConfig
 }
 
-func readConfigFromFile(configFile string, defaultConfig aggregateConfig) interface{} {
+func readConfigFromFile(configFile string, defaultConfig aggregateConfig) (interface{}, error) {
 	config := defaultConfig
 
 	tomlData, err := ioutil.ReadFile(configFile)
 	if os.IsNotExist(err) {
-		// config file does not exists
-		return config
+		// config file does not exists use the default config
+		return config, nil
 	} else if err != nil {
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to read config file")
 
-		return defaultConfig
+		return defaultConfig, err
 	}
 
 	err = toml.Unmarshal(tomlData, &config)
@@ -280,8 +293,9 @@ func readConfigFromFile(configFile string, defaultConfig aggregateConfig) interf
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to load manager configuration")
 
-		return defaultConfig
+		// Could not load data from config file using the default config.
+		return defaultConfig, nil
 	}
 
-	return config
+	return config, nil
 }

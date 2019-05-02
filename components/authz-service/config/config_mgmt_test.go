@@ -45,8 +45,10 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	assert.Nil(t, err)
 
 	// New config should load the file
-	configMgr := config.NewManager(cFile)
+	configMgr, err := config.NewManager(cFile)
 	defer configMgr.Close()
+	assert.NoError(t, err)
+
 	projectUpdateStage := configMgr.GetProjectUpdateStage()
 	assert.Equal(t, config.NotRunningState, projectUpdateStage.State)
 	assert.Equal(t, "4256e26e-92b1-4b1d-8679-44ec74b5299a", projectUpdateStage.ProjectUpdateID)
@@ -60,9 +62,16 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	assert.Equal(t, "running", projectUpdateStage.State)
 }
 
+func TestManagerBadFile(t *testing.T) {
+	_, err := config.NewManager("/$%89834")
+	assert.Error(t, err)
+}
+
 func TestManagerConfigProjectUpdateConfigDefault(t *testing.T) {
-	configManager := config.NewManager("")
+	os.Remove(cFile)
+	configManager, err := config.NewManager(cFile)
 	defer configManager.Close()
+	assert.NoError(t, err)
 
 	projectUpdateStage := configManager.GetProjectUpdateStage()
 	assert.Equal(t, config.NotRunningState, projectUpdateStage.State)

@@ -40,11 +40,24 @@ type aggregateConfig struct {
 }
 
 // NewConfigManager - create a new config. There should only be one config for the service.
-func NewConfigManager(configFile string) *ConfigManager {
-	config := readConfigFromFile(configFile, defaultConfig())
-	return &ConfigManager{
-		baseConfigManager: base_config.NewManager(configFile, config),
+func NewConfigManager(configFile string) (*ConfigManager, error) {
+	storedConfig, err := readConfigFromFile(configFile, defaultConfig())
+	if err != nil {
+		return &ConfigManager{}, err
 	}
+
+	// Testing Updating
+	baseConfigManager := base_config.NewManager(configFile, storedConfig)
+	err = baseConfigManager.UpdateConfig(func(config interface{}) (interface{}, error) {
+		return storedConfig, nil
+	})
+	if err != nil {
+		return &ConfigManager{}, err
+	}
+
+	return &ConfigManager{
+		baseConfigManager: baseConfigManager,
+	}, err
 }
 
 // Close - to close out the channel for this object. This should only be called when the service is being shutdown
@@ -76,21 +89,19 @@ func (manager *ConfigManager) updateConfig(updateFunc func(aggregateConfig) (agg
 	})
 }
 
-func readConfigFromFile(configFile string, defaultConfig aggregateConfig) interface{} {
+func readConfigFromFile(configFile string, defaultConfig aggregateConfig) (interface{}, error) {
 	config := defaultConfig
 
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		// config file does not exists
-		return config
-	}
-
 	tomlData, err := ioutil.ReadFile(configFile)
-	if err != nil {
+	if os.IsNotExist(err) {
+		// config file does not exists use the default config
+		return config, nil
+	} else if err != nil {
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to read config file")
 
-		return defaultConfig
+		return defaultConfig, err
 	}
 
 	err = toml.Unmarshal(tomlData, &config)
@@ -99,8 +110,8 @@ func readConfigFromFile(configFile string, defaultConfig aggregateConfig) interf
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to load manager configuration")
 
-		return defaultConfig
+		return defaultConfig, nil
 	}
 
-	return config
+	return config, nil
 }

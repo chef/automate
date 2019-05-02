@@ -111,7 +111,10 @@ func Spawn(opts *serveropts.Opts) error {
 	jobScheduler := server.NewJobScheduler()
 	defer jobScheduler.Close()
 
-	configManager := config.NewManager(viper.ConfigFileUsed())
+	configManager, err := config.NewManager(viper.ConfigFileUsed())
+	if err != nil {
+		return err
+	}
 	defer configManager.Close()
 
 	// JobSchedulerServer

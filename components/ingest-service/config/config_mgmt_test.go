@@ -13,8 +13,9 @@ import (
 const cFile = "/tmp/.ingest-service-test-delete-me.toml"
 
 func TestManagerNewDefaultConfig(t *testing.T) {
-	config := subject.NewManager(cFile)
+	config, err := subject.NewManager(cFile)
 	defer config.Close()
+	assert.NoError(t, err)
 
 	// Only three jobs configured
 	assert.Equal(t, 3, len(config.GetJobsID()))
@@ -23,9 +24,15 @@ func TestManagerNewDefaultConfig(t *testing.T) {
 	assert.Equal(t, true, schedulerConfig.Running, "the scheduler should be running by default")
 }
 
+func TestManagerBadFile(t *testing.T) {
+	_, err := subject.NewManager("/$%89834")
+	assert.Error(t, err)
+}
+
 func TestManagerGetJobConfigThatExists(t *testing.T) {
-	config := subject.NewManager(cFile)
+	config, err := subject.NewManager(cFile)
 	defer config.Close()
+	assert.NoError(t, err)
 
 	jConfig := config.GetJobConfig(subject.DeleteNodes)
 	assert.Equal(t, config.GetDeleteNodesSchedulerConfig(), jConfig, "should return the 'delete_nodes' job config")
@@ -65,8 +72,9 @@ func TestManagerConfigFileExists(t *testing.T) {
 	assert.Nil(t, err)
 
 	// New config should load the file
-	config := subject.NewManager(cFile)
+	config, err := subject.NewManager(cFile)
 	defer config.Close()
+	assert.NoError(t, err)
 	schedulerConfig := config.GetJobSchedulerConfig()
 	assert.Equal(t, false, schedulerConfig.Running, "the scheduler should not be running")
 
@@ -98,8 +106,10 @@ threshold = "1d"
 	assert.Nil(t, err)
 
 	// When the file is corrupt, we log out the failure and use the default config
-	configMgr := subject.NewManager(cFile)
+	configMgr, err := subject.NewManager(cFile)
 	defer configMgr.Close()
+	assert.NoError(t, err)
+
 	schedulerConfig := configMgr.GetJobSchedulerConfig()
 	assert.Equal(t, true, schedulerConfig.Running, "the scheduler should be running by default")
 
@@ -113,12 +123,13 @@ func TestManagerWriteConfigOnUpdatesAndLoadChanges(t *testing.T) {
 
 	// Default config
 	var (
-		config                 = subject.NewManager(cFile)
+		config, err            = subject.NewManager(cFile)
 		deleteNodesConfig      = config.GetDeleteNodesSchedulerConfig()
 		nodesMissingConfig     = config.GetNodesMissingSchedulerConfig()
 		missingNodes4DelConfig = config.GetMissingNodesForDeletionSchedulerConfig()
 	)
 	defer config.Close()
+	assert.NoError(t, err)
 
 	assert.Equal(t, true, nodesMissingConfig.Running, "'nodes_missing' job should be enabled")
 	assert.Equal(t, false, deleteNodesConfig.Running, "'delete_nodes' job should be disabled")
@@ -129,12 +140,13 @@ func TestManagerWriteConfigOnUpdatesAndLoadChanges(t *testing.T) {
 	missingNodes4DelConfig.Running = false
 	config.UpdateMissingNodesForDeletionSchedulerConfig(missingNodes4DelConfig)
 	// Check that we saved the config on disk
-	_, err := os.Stat(cFile)
+	_, err = os.Stat(cFile)
 	assert.Nil(t, err, "config file should exist")
 
 	// Create a new Manager config that should load the config automatically
-	newConfig := subject.NewManager(cFile)
+	newConfig, err := subject.NewManager(cFile)
 	defer newConfig.Close()
+	assert.NoError(t, err)
 	assertEqualManagerConfigs(t, newConfig, config)
 
 	// Finally check that the object was updated
@@ -150,8 +162,9 @@ func TestManagerWriteConfigOnUpdatesAndLoadChanges(t *testing.T) {
 
 func TestManagerWriteConfigThreadSafe(t *testing.T) {
 	// default config
-	config := subject.NewManager(cFile)
+	config, err := subject.NewManager(cFile)
 	defer config.Close()
+	assert.NoError(t, err)
 
 	// Lets use this job to send multiple updates
 	jConfig := config.GetDeleteNodesSchedulerConfig()
@@ -171,8 +184,10 @@ func TestManagerWriteConfigThreadSafe(t *testing.T) {
 	assert.Equal(t, jConfig, newJobConfig, "jobs should match")
 
 	// Create a new Manager config that should load the config automatically
-	newConfig := subject.NewManager(cFile)
+	newConfig, err := subject.NewManager(cFile)
 	defer newConfig.Close()
+	assert.NoError(t, err)
+
 	assertEqualManagerConfigs(t, newConfig, config)
 }
 
@@ -219,8 +234,10 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	assert.Nil(t, err)
 
 	// New config should load the file
-	configMgr := subject.NewManager(cFile)
+	configMgr, err := subject.NewManager(cFile)
 	defer configMgr.Close()
+	assert.NoError(t, err)
+
 	projectUpdateConfig := configMgr.GetProjectUpdateConfig()
 	assert.Equal(t, config.NotRunningState, projectUpdateConfig.State)
 	assert.Equal(t, "4256e26e-92b1-4b1d-8679-44ec74b5299a", projectUpdateConfig.ProjectUpdateID)

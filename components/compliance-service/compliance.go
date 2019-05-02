@@ -161,7 +161,10 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	if err != nil {
 		logrus.Fatalf("could not connect to elasticsearch: %v", err)
 	}
-	configManager := config.NewConfigManager(conf.Service.ConfigFilePath)
+	configManager, err := config.NewConfigManager(conf.Service.ConfigFilePath)
+	if err != nil {
+		logrus.Fatalf("could not create config manager: %v", err)
+	}
 
 	eventClient := getEventConnection(connFactory, conf.EventConfig.Endpoint)
 	notifier := getNotificationsConnection(connFactory, conf.Notifications.Target)

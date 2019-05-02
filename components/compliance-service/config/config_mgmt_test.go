@@ -13,12 +13,20 @@ import (
 const cFile = "/tmp/.compliance-service-test-delete-me.toml"
 
 func TestManagerNewDefaultConfig(t *testing.T) {
-	configMgr := subject.NewConfigManager("")
+	os.Remove(cFile)
+	configMgr, err := subject.NewConfigManager(cFile)
 	defer configMgr.Close()
+	assert.NoError(t, err)
 
 	// Only three jobs configured
 	assert.Equal(t, subject.NotRunningState, configMgr.GetProjectUpdateConfig().State)
 }
+
+func TestManagerBadFile(t *testing.T) {
+	_, err := subject.NewConfigManager("/$%89834")
+	assert.Error(t, err)
+}
+
 func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	// Writing config file
 	data := []byte(`
@@ -33,8 +41,9 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	assert.Nil(t, err)
 
 	// New config should load the file
-	configMgr := subject.NewConfigManager(cFile)
+	configMgr, err := subject.NewConfigManager(cFile)
 	defer configMgr.Close()
+	assert.NoError(t, err)
 	projectUpdateConfig := configMgr.GetProjectUpdateConfig()
 	assert.Equal(t, config.NotRunningState, projectUpdateConfig.State)
 	assert.Equal(t, "4256e26e-92b1-4b1d-8679-44ec74b5299a", projectUpdateConfig.ProjectUpdateID)
