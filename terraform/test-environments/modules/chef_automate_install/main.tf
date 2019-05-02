@@ -209,6 +209,10 @@ EOF
   [gateway.v1.sys]
     [gateway.v1.sys.service]
       trial_license_url = "https://licensing-${var.channel}.chef.io/create-trial"
+
+[event_gateway.v1]
+  [event_gateway.v1.sys]
+    [event_gateway.v1.sys.service]
       enable_nats_feature = ${var.enable_eas_dashboard}
 
 [event_service.v1]
