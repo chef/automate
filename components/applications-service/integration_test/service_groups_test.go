@@ -48,7 +48,7 @@ func TestGetServiceGroupsOneOk(t *testing.T) {
 			},
 		}
 		mockHabService = NewHabServiceMsg("sup2", a, e, "default", "core",
-			"postgres", "0.1.0", "20190101121212", "OK")
+			"postgres", "0.1.0", "20190101121212", "OK", "", "")
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -80,7 +80,7 @@ func TestGetServiceGroupsOneCritical(t *testing.T) {
 			},
 		}
 		mockHabService = NewHabServiceMsg("sup2", a, e, "default", "core",
-			"postgres", "0.1.0", "20190101121212", "CRITICAL")
+			"postgres", "0.1.0", "20190101121212", "CRITICAL", "", "")
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -175,7 +175,7 @@ func TestGetServiceGroupsOneWarning(t *testing.T) {
 			},
 		}
 		mockHabService = NewHabServiceMsg("sup2", a, e, "default", "core",
-			"postgres", "0.1.0", "20190101121212", "WARNING")
+			"postgres", "0.1.0", "20190101121212", "WARNING", "", "")
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -208,7 +208,7 @@ func TestGetServiceGroupsOneUnknown(t *testing.T) {
 			},
 		}
 		mockHabService = NewHabServiceMsg("sup2", a, e, "default", "core",
-			"postgres", "0.1.0", "20190101121212", "UNKNOWN")
+			"postgres", "0.1.0", "20190101121212", "UNKNOWN", "", "")
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -241,13 +241,13 @@ func TestGetServiceGroupsOneEach(t *testing.T) {
 		}
 		mockHabServices = []*applications.HabService{
 			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"postgres", "0.1.0", "20190101121212", "UNKNOWN"),
+				"postgres", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
 			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"postgres", "0.1.0", "20190101121212", "OK"),
+				"postgres", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"postgres", "0.1.0", "20190101121212", "WARNING"),
+				"postgres", "0.1.0", "20190101121212", "WARNING", "", ""),
 			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"postgres", "0.1.0", "20190101121212", "CRITICAL"),
+				"postgres", "0.1.0", "20190101121212", "CRITICAL", "", ""),
 		}
 	)
 	suite.IngestServices(mockHabServices)
@@ -270,13 +270,13 @@ func TestGetServiceGroupsSortedDesc(t *testing.T) {
 		}
 		mockHabServices = []*applications.HabService{
 			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN"),
+				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
 			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK"),
+				"b", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING"),
+				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
 			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL"),
+				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
 		}
 	)
 	suite.IngestServices(mockHabServices)
@@ -302,13 +302,13 @@ func TestGetServiceGroupsSortedAsc(t *testing.T) {
 		}
 		mockHabServices = []*applications.HabService{
 			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN"),
+				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
 			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK"),
+				"b", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING"),
+				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
 			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL"),
+				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
 		}
 	)
 	suite.IngestServices(mockHabServices)
@@ -334,13 +334,13 @@ func TestGetServiceGroupsSortedPercent(t *testing.T) {
 		}
 		mockHabServices = []*applications.HabService{
 			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN"),
+				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
 			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK"),
+				"b", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING"),
+				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
 			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "OK"),
+				"c", "0.1.0", "20190101121212", "OK", "", ""),
 		}
 	)
 	suite.IngestServices(mockHabServices)
@@ -365,21 +365,21 @@ func TestGetServiceGroupsSortedPercentAsc(t *testing.T) {
 		}
 		mockHabServices = []*applications.HabService{
 			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN"),
+				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
 			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK"),
+				"b", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING"),
+				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
 			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "OK"),
+				"c", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup6", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "OK"),
+				"d", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup7", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "UNKNOWN"),
+				"d", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
 			NewHabServiceMsg("sup8", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "WARNING"),
+				"d", "0.1.0", "20190101121212", "WARNING", "", ""),
 			NewHabServiceMsg("sup9", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL"),
+				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
 		}
 	)
 	suite.IngestServices(mockHabServices)
@@ -405,13 +405,13 @@ func TestGetServiceGroupsInvalidPageNumberReturnsDefaultPageValues(t *testing.T)
 		}
 		mockHabServices = []*applications.HabService{
 			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN"),
+				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
 			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK"),
+				"b", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING"),
+				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
 			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL"),
+				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
 		}
 	)
 	suite.IngestServices(mockHabServices)
@@ -435,13 +435,13 @@ func TestGetServiceGroupsPage(t *testing.T) {
 		}
 		mockHabServices = []*applications.HabService{
 			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN"),
+				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
 			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK"),
+				"b", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING"),
+				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
 			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL"),
+				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
 		}
 	)
 	suite.IngestServices(mockHabServices)
@@ -465,17 +465,17 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 		//  * 1 CRITICAL service-groups
 		mockHabServices = []*applications.HabService{
 			NewHabServiceMsg("sup1", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "OK"),
+				"a", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "UNKNOWN"),
+				"b", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
 			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "OK"),
+				"c", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "WARNING"),
+				"d", "0.1.0", "20190101121212", "WARNING", "", ""),
 			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"e", "0.1.0", "20190101121212", "OK"),
+				"e", "0.1.0", "20190101121212", "OK", "", ""),
 			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"f", "0.1.0", "20190101121212", "CRITICAL"),
+				"f", "0.1.0", "20190101121212", "CRITICAL", "", ""),
 		}
 		// This request is asking only for service groups that have an OK status
 		// plus, showing only the page two with a page size of one and they are all

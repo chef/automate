@@ -41,13 +41,11 @@
         <div class="header">
           <div class ="service-line"><chef-icon>storage</chef-icon><b>{{ service.fqdn }}</b></div>
           <div class ="supervisor-line"><b>Supervisor:</b> {{ service.supervisor_id }}</div>
-          <div class ="supervisor-line" *ngIf="service.channel"><b>Site:</b> {{ service.site }}</div>
-          <div class ="supervisor-line" *ngIf="service.channel == ''"><b>Site:</b> --</div>
+          <div class ="supervisor-line"><b>Site:</b> {{ service.site  || "- -"}}</div>
         </div>
         <div class="body">
           <div class ="service-line"><chef-icon>grain</chef-icon>{{ service.release }}</div>
-          <div class ="service-line" *ngIf="service.channel"><chef-pill>{{ service.channel }}</chef-pill></div>
-          <div class ="channel-line" *ngIf="service.channel == ''"><chef-pill> - - </chef-pill></div>
+          <div class ="service-line"><chef-pill>{{ service.channel || "- -"}}</chef-pill></div>
           <div class ="service-line">
             <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
             {{ healthCheckStatus(service) }}

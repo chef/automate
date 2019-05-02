@@ -26,7 +26,7 @@ func TestStorageGetServiceGroupEmptyID(t *testing.T) {
 
 func TestStorageGetServiceGroupExist(t *testing.T) {
 	suite.IngestService(
-		NewHabServiceChannelMsg("1q2w3e4r", a, e, "default",
+		NewHabServiceMsg("1q2w3e4r", a, e, "default",
 			"core", "postgres", "0.1.0", "20190101121212", "OK", "stable", "testsite"),
 	)
 	defer suite.DeleteDataFromStorage()
