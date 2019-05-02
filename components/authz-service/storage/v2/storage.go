@@ -39,6 +39,8 @@ type policyStorage interface {
 	// Removes passed subject from all 'members' fields, returning affected
 	// policies
 	PurgeSubjectFromPolicies(ctx context.Context, subject string) ([]string, error)
+
+	GetPolicyChangeID(context.Context) (string, error)
 }
 
 type roleStorage interface {

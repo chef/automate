@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/lib/logger"
@@ -26,11 +25,12 @@ import (
 
 // policyServer is the server state for policies
 type policyServer struct {
-	log    logger.Logger
-	store  storage.Storage
-	engine engine.V2Writer
-	v1     storage_v1.PoliciesLister
-	vChan  chan api.Version
+	log             logger.Logger
+	store           storage.Storage
+	engine          engine.V2Writer
+	v1              storage_v1.PoliciesLister
+	vChan           chan api.Version
+	policyRefresher PolicyRefresher
 }
 
 // PolicyServer is the server interface for policies: what we defined via
@@ -78,12 +78,15 @@ func NewPoliciesServer(
 	pl storage_v1.PoliciesLister,
 	vChan chan api.Version) (PolicyServer, error) {
 
+	policyRefresher := NewPolicyRefresher(ctx, l, s, e)
+
 	srv := &policyServer{
-		log:    l,
-		store:  s,
-		engine: e,
-		v1:     pl,
-		vChan:  vChan,
+		log:             l,
+		store:           s,
+		engine:          e,
+		v1:              pl,
+		vChan:           vChan,
+		policyRefresher: policyRefresher,
 	}
 
 	// If we *could* transition to failure, it means we had an in-progress state
@@ -645,153 +648,6 @@ func (s *policyServer) GetPolicyVersion(ctx context.Context,
 	}, nil
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-/* * * * * * * * * * * * * * * * * *   ENGINE UPDATING   * * * * * * * * * * * * * * * */
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-// updates OPA engine store with policy
-func (s *policyServer) updateEngineStore(ctx context.Context) error {
-	// We need to remove project filters from the request context
-	// otherwise they will be applied for store updates.
-	// This will fail on service start context, so only remove projects if ok.
-	md, ok := metadata.FromIncomingContext(ctx)
-	if ok {
-		delete(md, "projects")
-		ctx = metadata.NewOutgoingContext(ctx, md)
-	}
-
-	policyMap, err := s.getPolicyMap(ctx)
-	if err != nil {
-		return err
-	}
-	roleMap, err := s.getRoleMap(ctx)
-	if err != nil {
-		return err
-	}
-	ruleMap, err := s.getRuleMap(ctx)
-	if err != nil {
-		return err
-	}
-
-	return s.engine.V2SetPolicies(ctx, policyMap, roleMap, ruleMap)
-}
-
-func (s *policyServer) getPolicyMap(ctx context.Context) (map[string]interface{}, error) {
-	var policies []*storage.Policy
-	var err error
-
-	if policies, err = s.store.ListPolicies(ctx); err != nil {
-		return nil, err
-	}
-	s.log.Infof("initializing OPA store with %d V2 policies", len(policies))
-
-	policies = append(policies, SystemPolicies()...)
-
-	// OPA requires this format
-	data := make(map[string]interface{})
-	for _, p := range policies {
-
-		statements := make(map[string]interface{})
-		for _, st := range p.Statements {
-			statements[st.ID.String()] = map[string]interface{}{
-				"effect":    st.Effect.String(),
-				"role":      st.Role,
-				"projects":  st.Projects,
-				"actions":   st.Actions,
-				"resources": st.Resources,
-			}
-		}
-
-		members := make([]string, len(p.Members))
-		for i, member := range p.Members {
-			members[i] = member.Name
-		}
-
-		data[p.ID] = map[string]interface{}{
-			"members":    members,
-			"statements": statements,
-		}
-	}
-	return data, nil
-}
-
-func (s *policyServer) getRoleMap(ctx context.Context) (map[string]interface{}, error) {
-	var roles []*storage.Role
-	var err error
-	if roles, err = s.store.ListRoles(ctx); err != nil {
-		return nil, err
-	}
-	s.log.Infof("initializing OPA store with %d V2 roles", len(roles))
-
-	// OPA requires this format
-	data := make(map[string]interface{})
-	for _, r := range roles {
-		data[r.ID] = map[string]interface{}{
-			"actions": r.Actions,
-		}
-	}
-	return data, nil
-}
-
-// TODO: mocked struct that will eventually be
-// the storage struct.
-type rule struct {
-	ID     string
-	Type   string
-	Values []string
-}
-
-// TODO: nolint can go away when connected to the database
-// nolint: unparam
-func (s *policyServer) getRuleMap(_ context.Context) (map[string][]interface{}, error) {
-	// Mocked rule data
-	// notlint: gofmt
-	// rules := [5]*rule{
-	// 	{
-	// 		ID:     "project1",
-	// 		Type:   "ChefServers",
-	// 		Values: []string{"chef-server-1", "chef-server-2", "chef-server-3"},
-	// 	},
-	// 	{
-	// 		ID:     "project2",
-	// 		Type:   "ChefOrgs",
-	// 		Values: []string{"Org1", "Org2"},
-	// 	},
-	// 	{
-	// 		ID:     "project2",
-	// 		Type:   "ChefServers",
-	// 		Values: []string{"chef-server-3", "chef-server-4", "chef-server-5"},
-	// 	},
-	// 	{
-	// 		ID:     "project3",
-	// 		Type:   "ChefEnvironment",
-	// 		Values: []string{"env-1", "env-2", "env-3"},
-	// 	},
-	// 	{
-	// 		ID:     "project4",
-	// 		Type:   "ChefEnvironment",
-	// 		Values: []string{"env-4", "env-5", "env-6"},
-	// 	},
-	// }
-	rules := []*rule{}
-
-	s.log.Infof("initializing OPA store with %d V2 project rule mappings", len(rules))
-
-	// OPA requires this format
-	data := make(map[string][]interface{})
-	for _, r := range rules {
-		if _, ok := data[r.ID]; !ok {
-			data[r.ID] = make([]interface{}, 0)
-		}
-		data[r.ID] = append(data[r.ID],
-			map[string]interface{}{
-				"type":   r.Type,
-				"values": r.Values,
-			})
-	}
-	return data, nil
-}
-
 // EngineUpdateInterceptor is a middleware for updating the V2 engine when a
 // certain set of methods has been executed successfully.
 func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
@@ -827,6 +683,10 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 		}
 		return resp, nil
 	}
+}
+
+func (s *policyServer) updateEngineStore(ctx context.Context) error {
+	return s.policyRefresher.Refresh(ctx)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
