@@ -318,12 +318,12 @@ message DeployEvent {
 
 		message Operation {
 			reserved 3;
+			reserved 6;
 
 			Status status = 1;
 			string name = 2;
 			string error = 4;
 			double sync_progress = 5;
-			double async_progress = 6;
 			Type type = 7;
 
 			enum Type {

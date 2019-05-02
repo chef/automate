@@ -113,7 +113,7 @@ func (eh *EventHandler) formatMessage(ops []*api.DeployEvent_Backup_Operation) s
 		}
 	}
 	padding := maxOpLen + maxOpTypeLen
-	fmtStr := fmt.Sprintf("%%-%ds %%s %%-%ds \n", padding, padding+16)
+	fmtStr := fmt.Sprintf("%%-%ds %%s\n", padding)
 
 	m := strings.Builder{}
 	m.WriteString(fmt.Sprintf("%s in progress\n\n", strings.Title(eh.opTypeToString(ops[0].Type))))
@@ -121,7 +121,6 @@ func (eh *EventHandler) formatMessage(ops []*api.DeployEvent_Backup_Operation) s
 		m.WriteString(fmt.Sprintf(fmtStr,
 			o.Name,
 			fmt.Sprintf("(sync %.2f%%)", o.SyncProgress),
-			fmt.Sprintf("(async %.2f%%)", o.AsyncProgress),
 		))
 	}
 

@@ -27,16 +27,6 @@ func TestBackup(t *testing.T) {
 		assert.Contains(t, "test operation failed", err.Error())
 	})
 
-	t.Run("with async failure", func(t *testing.T) {
-		exec, bctx, _, cleanup := testBackupExecutor(testFailAsyncSpec)
-		defer cleanup()
-
-		err := exec.Backup(bctx)
-
-		require.Error(t, err, "returns an error of a sync operation fails")
-		assert.Contains(t, "test operation failed", err.Error())
-	})
-
 	t.Run("with successful operations", func(t *testing.T) {
 		exec, bctx, _, cleanup := testBackupExecutor(testSuccessSpec)
 		defer cleanup()
@@ -125,28 +115,6 @@ var testSuccessSpec = Spec{
 		{name: "sync-op-2"},
 		{name: "sync-op-3"},
 	},
-	testAsyncOps: []testOperation{
-		{name: "async-op-1"},
-		{name: "async-op-2"},
-		{name: "async-op-3"},
-	},
-}
-
-var testFailAsyncSpec = Spec{
-	Name: "service-a",
-	testSyncOps: []testOperation{
-		{name: "sync-op-1"},
-		{name: "sync-op-2"},
-		{name: "sync-op-3"},
-	},
-	testAsyncOps: []testOperation{
-		{name: "async-op-1"},
-		{
-			name: "async-op-2-fail",
-			fail: true,
-		},
-		{name: "async-op-3"},
-	},
 }
 
 var testFailSyncSpec = Spec{
@@ -158,10 +126,5 @@ var testFailSyncSpec = Spec{
 			fail: true,
 		},
 		{name: "sync-op-3"},
-	},
-	testAsyncOps: []testOperation{
-		{name: "async-op-1"},
-		{name: "async-op-2"},
-		{name: "async-op-3"},
 	},
 }

@@ -730,8 +730,6 @@ func (r *Runner) restoreServices(desiredServices []*deployment.Service, restoreC
 			r.failf(err, "Timed out waiting for service %s to start", svc.Name())
 			return err
 		}
-
-		// TODO: Restore async operations
 	}
 
 	return nil

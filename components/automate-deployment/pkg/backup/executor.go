@@ -11,8 +11,6 @@ import (
 // Executor executes synchronous and asynchronous backup operations. It
 // listens for the operation events, annotates them, and publishes them to the
 // status and publishing the backup status to event sender.
-// It breaks backup execution into two phases: sync and async. All synchronous
-// operations will be executed first, followed by asynchronous operations.
 type Executor struct {
 	// BackupTask event operations channel to publish backup events to
 	opEventChan chan api.DeployEvent_Backup_Operation
@@ -27,16 +25,15 @@ type Executor struct {
 	// an operation failure.
 	cancel func()
 
-	// Operation progress calculators. These are used to aggregate the overall
-	// progress of all operation that are to be executed.
-	syncProgress  *ProgressCalculator
-	asyncProgress *ProgressCalculator
+	// Operation progress calculator. These are used to aggregate
+	// the overall progress of all operation that are to be
+	// executed.
+	syncProgress *ProgressCalculator
 
 	// Operation progress channel. This is a channel for each operation to
 	// publish progress events.
-	syncProgressChan  chan OperationProgress
-	asyncProgressChan chan OperationProgress
-	progressExitChan  chan struct{}
+	syncProgressChan chan OperationProgress
+	progressExitChan chan struct{}
 
 	// What backup operation type were executing
 	execType api.DeployEvent_Backup_Operation_Type
@@ -57,14 +54,12 @@ type ExecutorOpt func(*Executor)
 // NewExecutor returns a new instance of a backup job executor
 func NewExecutor(opts ...ExecutorOpt) *Executor {
 	executor := &Executor{
-		// Operation progress calculators
-		syncProgress:  NewProgressCalculator(),
-		asyncProgress: NewProgressCalculator(),
+		// Operation progress calculator
+		syncProgress: NewProgressCalculator(),
 
 		// Operation progress channel
-		syncProgressChan:  make(chan OperationProgress),
-		asyncProgressChan: make(chan OperationProgress),
-		progressExitChan:  make(chan struct{}),
+		syncProgressChan: make(chan OperationProgress),
+		progressExitChan: make(chan struct{}),
 
 		// TODO(jaym) 05-07-2018: Remove the lock
 		// The purpose of the lock is to make sure only 1 backup executor runs at a time.
@@ -120,8 +115,8 @@ func WithLock(lock *sync.Mutex) ExecutorOpt {
 	}
 }
 
-// Backup runs the sync and async operations and waits for them to complete.
-// When completed or failed it publishes notifications to the event channel
+// Backup runs the operations and waits for them to complete. When
+// completed or failed it publishes notifications to the event channel
 // and notifies that runner that the operations have completed.
 func (b *Executor) Backup(backupCtx Context) error {
 	defer b.stopProgressCalculator()
@@ -132,11 +127,7 @@ func (b *Executor) Backup(backupCtx Context) error {
 	b.locky.Lock()
 	defer b.locky.Unlock()
 
-	if err := b.runSyncBackupOperations(backupCtx); err != nil {
-		return err
-	}
-
-	if err := b.runAsyncBackupOperations(backupCtx); err != nil {
+	if err := b.runBackupOperations(backupCtx); err != nil {
 		return err
 	}
 
@@ -145,11 +136,10 @@ func (b *Executor) Backup(backupCtx Context) error {
 	}
 
 	b.opEventChan <- api.DeployEvent_Backup_Operation{
-		Status:        api.DeployEvent_COMPLETE_OK,
-		Type:          b.execType,
-		Name:          b.spec.Name,
-		AsyncProgress: 100,
-		SyncProgress:  100,
+		Status:       api.DeployEvent_COMPLETE_OK,
+		Type:         b.execType,
+		Name:         b.spec.Name,
+		SyncProgress: 100,
 	}
 
 	return nil
@@ -165,12 +155,6 @@ func (b *Executor) DeleteBackup(backupCtx Context) error {
 		}
 	}
 
-	for _, op := range b.spec.AsyncOps() {
-		if err := op.Delete(backupCtx); err != nil {
-			b.cancel()
-			return err
-		}
-	}
 	for _, op := range b.spec.FinalizingOps() {
 		if _, ok := op.(*MetadataWriterOperation); ok {
 			// our metadata operations should be the last that are
@@ -204,11 +188,10 @@ func (b *Executor) Restore(backupCtx Context, metadata *Metadata) error {
 	b.startProgressCalculator()
 
 	b.opEventChan <- api.DeployEvent_Backup_Operation{
-		Status:        api.DeployEvent_RUNNING,
-		Type:          b.execType,
-		Name:          b.spec.Name,
-		AsyncProgress: 0,
-		SyncProgress:  0,
+		Status:       api.DeployEvent_RUNNING,
+		Type:         b.execType,
+		Name:         b.spec.Name,
+		SyncProgress: 0,
 	}
 
 	if err := b.runRestoreSync(backupCtx, metadata, b.spec.SyncOps()); err != nil {
@@ -217,14 +200,11 @@ func (b *Executor) Restore(backupCtx Context, metadata *Metadata) error {
 
 	b.syncProgress.Done()
 
-	b.asyncProgress.Done()
-
 	b.opEventChan <- api.DeployEvent_Backup_Operation{
-		Status:        api.DeployEvent_COMPLETE_OK,
-		Type:          b.execType,
-		Name:          b.spec.Name,
-		AsyncProgress: 100,
-		SyncProgress:  100,
+		Status:       api.DeployEvent_COMPLETE_OK,
+		Type:         b.execType,
+		Name:         b.spec.Name,
+		SyncProgress: 100,
 	}
 
 	return nil
@@ -246,11 +226,10 @@ func (b *Executor) runRestoreSync(backupCtx Context, metadata *Metadata, ops []O
 
 		if err := op.Restore(backupCtx, b.spec.Name, verifier, b.syncProgressChan); err != nil {
 			b.opEventChan <- api.DeployEvent_Backup_Operation{
-				Status:        api.DeployEvent_COMPLETE_FAIL,
-				Type:          b.execType,
-				Name:          b.spec.Name,
-				AsyncProgress: b.asyncProgress.Percent(),
-				SyncProgress:  b.syncProgress.Percent(),
+				Status:       api.DeployEvent_COMPLETE_FAIL,
+				Type:         b.execType,
+				Name:         b.spec.Name,
+				SyncProgress: b.syncProgress.Percent(),
 			}
 
 			// Do a non-blocking publish to the error channel
@@ -310,23 +289,11 @@ func (b *Executor) startProgressCalculator() {
 			select {
 			case u := <-b.syncProgressChan:
 				b.syncProgress.Update(u)
-
 				b.opEventChan <- api.DeployEvent_Backup_Operation{
-					Status:        api.DeployEvent_RUNNING,
-					Type:          b.execType,
-					Name:          b.spec.Name,
-					SyncProgress:  b.syncProgress.Percent(),
-					AsyncProgress: b.asyncProgress.Percent(),
-				}
-			case u := <-b.asyncProgressChan:
-				b.asyncProgress.Update(u)
-
-				b.opEventChan <- api.DeployEvent_Backup_Operation{
-					Status:        api.DeployEvent_RUNNING,
-					Type:          b.execType,
-					Name:          b.spec.Name,
-					SyncProgress:  b.syncProgress.Percent(),
-					AsyncProgress: b.asyncProgress.Percent(),
+					Status:       api.DeployEvent_RUNNING,
+					Type:         b.execType,
+					Name:         b.spec.Name,
+					SyncProgress: b.syncProgress.Percent(),
 				}
 			case <-b.progressExitChan:
 				return
@@ -344,20 +311,14 @@ func (b *Executor) stopProgressCalculator() {
 func (b *Executor) resetProgress() {
 	b.progressExitChan = make(chan struct{})
 	b.syncProgress = NewProgressCalculator()
-	b.asyncProgress = NewProgressCalculator()
 
 	for _, o := range b.spec.SyncOps() {
 		op := o
 		b.syncProgress.Update(OperationProgress{Name: op.String(), Progress: 0})
 	}
-	for _, o := range b.spec.AsyncOps() {
-		op := o
-		b.asyncProgress.Update(OperationProgress{Name: op.String(), Progress: 0})
-	}
 }
 
-// runSyncBackupOperations runs synchronous operations
-func (b *Executor) runSyncBackupOperations(backupCtx Context) error {
+func (b *Executor) runBackupOperations(backupCtx Context) error {
 	for _, o := range b.spec.SyncOps() {
 		op := o
 		// Make sure another op hasn't already failed before we start more.
@@ -375,11 +336,10 @@ func (b *Executor) runSyncBackupOperations(backupCtx Context) error {
 
 		if err := op.Backup(backupCtx, b.objectManifest, b.syncProgressChan); err != nil {
 			b.opEventChan <- api.DeployEvent_Backup_Operation{
-				Status:        api.DeployEvent_COMPLETE_FAIL,
-				Type:          b.execType,
-				Name:          b.spec.Name,
-				AsyncProgress: b.asyncProgress.Percent(),
-				SyncProgress:  b.syncProgress.Percent(),
+				Status:       api.DeployEvent_COMPLETE_FAIL,
+				Type:         b.execType,
+				Name:         b.spec.Name,
+				SyncProgress: b.syncProgress.Percent(),
 			}
 
 			// Do a non-blocking publish to the error channel
@@ -397,90 +357,10 @@ func (b *Executor) runSyncBackupOperations(backupCtx Context) error {
 
 	b.syncProgress.Done()
 	b.opEventChan <- api.DeployEvent_Backup_Operation{
-		Status:        api.DeployEvent_COMPLETE_OK,
-		Type:          b.execType,
-		Name:          b.spec.Name,
-		AsyncProgress: b.asyncProgress.Percent(),
-		SyncProgress:  b.syncProgress.Percent(),
-	}
-
-	return nil
-}
-
-// runAsyncBackupOperations runs asynchronous operations
-func (b *Executor) runAsyncBackupOperations(backupCtx Context) error {
-	wg := sync.WaitGroup{}
-	// If an operation fails it should publish it's error message to the asyncErrChan
-	// We only care about the first error we'll buffer the first write only.
-	asyncErrChan := make(chan error, 1)
-
-	// Start all async operations in their own goroutines
-	for _, aop := range b.spec.AsyncOps() {
-		wg.Add(1)
-		op := aop // copy because golang range
-
-		go func() {
-			defer wg.Done()
-
-			logrus.WithFields(logrus.Fields{
-				"task_id": backupCtx.backupTask.TaskID(),
-				"mode":    "async",
-				"op_name": op.String(),
-			}).Debug("Starting backup operation")
-
-			if err := op.Backup(backupCtx, b.objectManifest, b.asyncProgressChan); err != nil {
-				b.opEventChan <- api.DeployEvent_Backup_Operation{
-					Status:        api.DeployEvent_COMPLETE_FAIL,
-					Type:          b.execType,
-					Name:          b.spec.Name,
-					AsyncProgress: b.asyncProgress.Percent(),
-					SyncProgress:  b.syncProgress.Percent(),
-				}
-
-				// Do a non-blocking publish to the error channels. These channels
-				// are buffered to a single message because the first error
-				// is the only one we care about. This helps us to avoid
-				// publishing cascading errors because the context has been
-				// cancelled.
-				select {
-				case b.opErrChan <- err:
-				default:
-				}
-				select {
-				case asyncErrChan <- err:
-				default:
-				}
-
-				// Cancel our context to signal other operations and specification
-				// to terminate.
-				b.cancel()
-			}
-		}()
-	}
-
-	// wait for them to finish
-	wg.Wait()
-
-	select {
-	case err := <-asyncErrChan:
-		b.opEventChan <- api.DeployEvent_Backup_Operation{
-			Status:        api.DeployEvent_COMPLETE_FAIL,
-			Type:          b.execType,
-			Name:          b.spec.Name,
-			AsyncProgress: b.asyncProgress.Percent(),
-			SyncProgress:  b.syncProgress.Percent(),
-		}
-		return err
-	default:
-	}
-
-	b.asyncProgress.Done()
-	b.opEventChan <- api.DeployEvent_Backup_Operation{
-		Status:        api.DeployEvent_COMPLETE_OK,
-		Type:          b.execType,
-		Name:          b.spec.Name,
-		AsyncProgress: b.asyncProgress.Percent(),
-		SyncProgress:  b.syncProgress.Percent(),
+		Status:       api.DeployEvent_COMPLETE_OK,
+		Type:         b.execType,
+		Name:         b.spec.Name,
+		SyncProgress: b.syncProgress.Percent(),
 	}
 
 	return nil
@@ -504,11 +384,10 @@ func (b *Executor) runFinalizingOperations(backupCtx Context) error {
 
 		if err := op.Backup(backupCtx, b.objectManifest, b.syncProgressChan); err != nil {
 			b.opEventChan <- api.DeployEvent_Backup_Operation{
-				Status:        api.DeployEvent_COMPLETE_FAIL,
-				Type:          b.execType,
-				Name:          b.spec.Name,
-				AsyncProgress: b.asyncProgress.Percent(),
-				SyncProgress:  b.syncProgress.Percent(),
+				Status:       api.DeployEvent_COMPLETE_FAIL,
+				Type:         b.execType,
+				Name:         b.spec.Name,
+				SyncProgress: b.syncProgress.Percent(),
 			}
 
 			// Do a non-blocking publish to the error channel

@@ -20,29 +20,23 @@ type Spec struct {
 
 	// Paths to back up. Broken down into which phase of the backup they
 	// should run.
-	SyncPaths  []PathCopyOperation `json:"sync_paths"`
-	AsyncPaths []PathCopyOperation `json:"async_paths"`
+	SyncPaths []PathCopyOperation `json:"sync_paths"`
 
 	// Backup commands to run. Broken down into which phase of the backup they
 	// should run.
-	SyncCmds  []CommandExecuteOperation `json:"sync_cmds"`
-	AsyncCmds []CommandExecuteOperation `json:"async_cmds"`
+	SyncCmds []CommandExecuteOperation `json:"sync_cmds"`
 
 	// Databases to dump. Broken down into which phase the database dumps should
 	// occur. When DB operations have been implemented they should be used here.
-	SyncDbsV2  []DatabaseDumpOperationV2 `json:"sync_dbs_v2"`
-	AsyncDbsV2 []DatabaseDumpOperationV2 `json:"async_dbs_v2"`
+	SyncDbsV2 []DatabaseDumpOperationV2 `json:"sync_dbs_v2"`
 
-	SyncEsIndices  []ElasticsearchOperation `json:"sync_es"`
-	AsyncEsIndices []ElasticsearchOperation `json:"async_es"`
+	SyncEsIndices []ElasticsearchOperation `json:"sync_es"`
 
 	// Test operations
-	testSyncOps  []testOperation
-	testAsyncOps []testOperation
+	testSyncOps []testOperation
 
 	// DEPRECATED
-	SyncDbs  []DatabaseDumpOperation `json:"sync_dbs"`
-	AsyncDbs []DatabaseDumpOperation `json:"async_dbs"`
+	SyncDbs []DatabaseDumpOperation `json:"sync_dbs"`
 }
 
 // SyncOps returns a slice of Operations that should be run synchronously
@@ -75,43 +69,6 @@ func (s *Spec) SyncOps() []Operation {
 	}
 
 	for _, ts := range s.testSyncOps {
-		t := ts
-		ops = append(ops, &t)
-	}
-
-	return ops
-}
-
-// AsyncOps returns a slice of Operations that should be run asynchronously
-func (s *Spec) AsyncOps() []Operation {
-	ops := []Operation{}
-
-	for _, ap := range s.AsyncPaths {
-		p := ap
-		ops = append(ops, &p)
-	}
-
-	for _, ac := range s.AsyncCmds {
-		c := ac
-		ops = append(ops, &c)
-	}
-
-	for _, sc := range s.AsyncDbs {
-		c := sc
-		ops = append(ops, &c)
-	}
-
-	for _, sc := range s.AsyncDbsV2 {
-		c := sc
-		ops = append(ops, &c)
-	}
-
-	for _, ae := range s.AsyncEsIndices {
-		c := ae
-		ops = append(ops, &c)
-	}
-
-	for _, ts := range s.testAsyncOps {
 		t := ts
 		ops = append(ops, &t)
 	}
@@ -527,35 +484,19 @@ func setDefaults(spec Spec) {
 	for i := range spec.SyncPaths {
 		spec.SyncPaths[i].ObjectName = []string{spec.Name, spec.SyncPaths[i].Name}
 	}
-	for i := range spec.AsyncPaths {
-		spec.AsyncPaths[i].ObjectName = []string{spec.Name, spec.AsyncPaths[i].Name}
-	}
+
 	for i := range spec.SyncCmds {
 		spec.SyncCmds[i].ObjectName = []string{spec.Name, spec.SyncCmds[i].Name}
 		spec.SyncCmds[i].PkgOrigin = "chef"
 		spec.SyncCmds[i].PkgName = spec.Name
 	}
 
-	for i := range spec.AsyncCmds {
-		spec.AsyncCmds[i].ObjectName = []string{spec.Name, spec.AsyncCmds[i].Name}
-		spec.AsyncCmds[i].PkgOrigin = "chef"
-		spec.AsyncCmds[i].PkgName = spec.Name
-	}
-
 	for i := range spec.SyncDbs {
 		spec.SyncDbs[i].ObjectName = []string{spec.Name, "pg_data"}
 	}
 
-	for i := range spec.AsyncDbs {
-		spec.AsyncDbs[i].ObjectName = []string{spec.Name, "pg_data"}
-	}
-
 	for i := range spec.SyncDbsV2 {
 		spec.SyncDbsV2[i].ObjectName = []string{spec.Name, "pg_data"}
-	}
-
-	for i := range spec.AsyncDbsV2 {
-		spec.AsyncDbsV2[i].ObjectName = []string{spec.Name, "pg_data"}
 	}
 }
 
@@ -564,30 +505,13 @@ func SetCommandExecutor(spec Spec, exec command.Executor) {
 	for i := range spec.SyncPaths {
 		spec.SyncPaths[i].cmdExecutor = exec
 	}
-	for i := range spec.AsyncPaths {
-		spec.AsyncPaths[i].cmdExecutor = exec
-	}
 	for i := range spec.SyncCmds {
 		spec.SyncCmds[i].cmdExecutor = exec
 	}
-
-	for i := range spec.AsyncCmds {
-		spec.AsyncCmds[i].cmdExecutor = exec
-	}
-
 	for i := range spec.SyncDbs {
 		spec.SyncDbs[i].cmdExecutor = exec
 	}
-
-	for i := range spec.AsyncDbs {
-		spec.AsyncDbs[i].cmdExecutor = exec
-	}
-
 	for i := range spec.SyncDbsV2 {
 		spec.SyncDbsV2[i].cmdExecutor = exec
-	}
-
-	for i := range spec.AsyncDbsV2 {
-		spec.AsyncDbsV2[i].cmdExecutor = exec
 	}
 }

@@ -20,17 +20,17 @@ func TestDefaultSpecs(t *testing.T) {
 	t.Run("authn-service", func(t *testing.T) {
 		spec := testSpecFor(t, "authn-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "chef_authn_service", "authn")
+		testRequireDb(t, spec, "chef_authn_service", "authn")
 	})
 	t.Run("authz-service", func(t *testing.T) {
 		spec := testSpecFor(t, "authz-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "chef_authz_service", "authz")
+		testRequireDb(t, spec, "chef_authz_service", "authz")
 	})
 	t.Run("automate-dex", func(t *testing.T) {
 		spec := testSpecFor(t, "automate-dex", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "dex", "dex")
+		testRequireDb(t, spec, "dex", "dex")
 	})
 	t.Run("automate-elasticsearch", func(t *testing.T) {
 		testSpecFor(t, "automate-elasticsearch", chefServerEnabled, workflowEnabled)
@@ -50,8 +50,8 @@ func TestDefaultSpecs(t *testing.T) {
 	t.Run("compliance-service", func(t *testing.T) {
 		spec := testSpecFor(t, "compliance-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "chef_compliance_service", "compliance")
-		testRequireEs(t, spec, "sync", "compliance-service", "comp-*")
+		testRequireDb(t, spec, "chef_compliance_service", "compliance")
+		testRequireEs(t, spec, "compliance-service", "comp-*")
 	})
 	t.Run("config-mgmt-service", func(t *testing.T) {
 		testSpecFor(t, "config-mgmt-service", chefServerEnabled, workflowEnabled)
@@ -62,9 +62,9 @@ func TestDefaultSpecs(t *testing.T) {
 	t.Run("deployment-service", func(t *testing.T) {
 		spec := testSpecFor(t, "deployment-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequirePath(t, spec, "sync", "/hab/user/deployment-service/config")
-		testRequirePath(t, spec, "sync", "/hab/svc/deployment-service/data", Exclude("bolt.db"))
-		testRequireCmd(t, spec, "sync", "deployment-service dumpdb", "deployment-service restoredb")
+		testRequirePath(t, spec, "/hab/user/deployment-service/config")
+		testRequirePath(t, spec, "/hab/svc/deployment-service/data", Exclude("bolt.db"))
+		testRequireCmd(t, spec, "deployment-service dumpdb", "deployment-service restoredb")
 	})
 	t.Run("es-sidecar-service", func(t *testing.T) {
 		testSpecFor(t, "es-sidecar-service", chefServerEnabled, workflowEnabled)
@@ -72,14 +72,14 @@ func TestDefaultSpecs(t *testing.T) {
 	t.Run("ingest-service", func(t *testing.T) {
 		spec := testSpecFor(t, "ingest-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequirePath(t, spec, "sync", "/hab/svc/ingest-service/data")
-		testRequireEs(t, spec, "sync", "ingest-service", "node-state-5,node-attribute,converge-history-*,actions-*")
+		testRequirePath(t, spec, "/hab/svc/ingest-service/data")
+		testRequireEs(t, spec, "ingest-service", "node-state-5,node-attribute,converge-history-*,actions-*")
 	})
 	t.Run("license-control-service", func(t *testing.T) {
 		spec := testSpecFor(t, "license-control-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequirePath(t, spec, "sync", "/hab/svc/license-control-service/data")
-		testRequirePath(t, spec, "sync", "/hab/svc/license-control-service/config", Include("opt_out"), Exclude("*"))
+		testRequirePath(t, spec, "/hab/svc/license-control-service/data")
+		testRequirePath(t, spec, "/hab/svc/license-control-service/config", Include("opt_out"), Exclude("*"))
 	})
 	t.Run("local-user-service", func(t *testing.T) {
 		testSpecFor(t, "local-user-service", chefServerEnabled, workflowEnabled)
@@ -87,54 +87,43 @@ func TestDefaultSpecs(t *testing.T) {
 	t.Run("notifications-service", func(t *testing.T) {
 		spec := testSpecFor(t, "notifications-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "notifications_service", "notifications")
+		testRequireDb(t, spec, "notifications_service", "notifications")
 	})
 	t.Run("teams-service", func(t *testing.T) {
 		spec := testSpecFor(t, "teams-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "chef_teams_service", "teams")
+		testRequireDb(t, spec, "chef_teams_service", "teams")
 	})
 	t.Run("session-service", func(t *testing.T) {
 		spec := testSpecFor(t, "session-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "chef_session_service", "session")
+		testRequireDb(t, spec, "chef_session_service", "session")
 	})
 	t.Run("automate-cs-bookshelf", func(t *testing.T) {
 		spec := testSpecFor(t, "automate-cs-bookshelf", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "automate-cs-bookshelf", "automate-cs-bookshelf")
+		testRequireDb(t, spec, "automate-cs-bookshelf", "automate-cs-bookshelf")
 	})
 	t.Run("automate-cs-oc-bifrost", func(t *testing.T) {
 		spec := testSpecFor(t, "automate-cs-oc-bifrost", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "automate-cs-oc-bifrost", "automate-cs-oc-bifrost")
+		testRequireDb(t, spec, "automate-cs-oc-bifrost", "automate-cs-oc-bifrost")
 	})
 	t.Run("automate-cs-oc-erchef", func(t *testing.T) {
 		spec := testSpecFor(t, "automate-cs-oc-erchef", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "automate-cs-oc-erchef", "automate-cs-oc-erchef")
-		testRequireEs(t, spec, "sync", "automate-cs-oc-erchef", "chef")
+		testRequireDb(t, spec, "automate-cs-oc-erchef", "automate-cs-oc-erchef")
+		testRequireEs(t, spec, "automate-cs-oc-erchef", "chef")
 	})
 	t.Run("nodemanager-service", func(t *testing.T) {
 		spec := testSpecFor(t, "nodemanager-service", chefServerEnabled, workflowEnabled)
 		testRequireMetadata(t, spec)
-		testRequireDb(t, spec, "sync", "nodemanager_service", "nodemanager")
+		testRequireDb(t, spec, "nodemanager_service", "nodemanager")
 	})
 }
 
 func TestSetCommandExecutor(t *testing.T) {
 	testCmdExec := command.NewMockExecutor(t)
-
-	t.Run("sets async path defaults", func(t *testing.T) {
-		s := Spec{Name: "test",
-			AsyncPaths: []PathCopyOperation{
-				{Name: "sync", SrcPath: "/tmp/test"},
-			},
-		}
-		SetCommandExecutor(s, testCmdExec)
-
-		require.Equal(t, testCmdExec, s.AsyncPaths[0].cmdExecutor, "command executor must match")
-	})
 	t.Run("sets sync path defaults", func(t *testing.T) {
 		s := Spec{Name: "test",
 			SyncPaths: []PathCopyOperation{
@@ -144,16 +133,6 @@ func TestSetCommandExecutor(t *testing.T) {
 		SetCommandExecutor(s, testCmdExec)
 
 		require.Equal(t, testCmdExec, s.SyncPaths[0].cmdExecutor, "command executor must match")
-	})
-	t.Run("sets async cmd defaults", func(t *testing.T) {
-		s := Spec{Name: "postgres", AsyncCmds: []CommandExecuteOperation{
-			{Name: "async-pgdump", Cmd: Cmd{
-				Name: "async", Dump: []string{"pgdump"},
-			}},
-		}}
-		SetCommandExecutor(s, testCmdExec)
-
-		require.Equal(t, testCmdExec, s.AsyncCmds[0].cmdExecutor, "command executor must match")
 	})
 	t.Run("sets sync cmd defaults", func(t *testing.T) {
 		s := Spec{Name: "postgres", SyncCmds: []CommandExecuteOperation{
@@ -168,16 +147,6 @@ func TestSetCommandExecutor(t *testing.T) {
 }
 
 func TestSetDefaults(t *testing.T) {
-	t.Run("sets async path defaults", func(t *testing.T) {
-		s := Spec{Name: "test",
-			AsyncPaths: []PathCopyOperation{
-				{Name: "sync", SrcPath: "/tmp/test"},
-			},
-		}
-		setDefaults(s)
-
-		require.Equal(t, []string{"test", "sync"}, s.AsyncPaths[0].ObjectName)
-	})
 	t.Run("sets sync path defaults", func(t *testing.T) {
 		s := Spec{Name: "test",
 			SyncPaths: []PathCopyOperation{
@@ -187,18 +156,6 @@ func TestSetDefaults(t *testing.T) {
 		setDefaults(s)
 
 		require.Equal(t, []string{"test", "foo"}, s.SyncPaths[0].ObjectName)
-	})
-	t.Run("sets async cmd defaults", func(t *testing.T) {
-		s := Spec{Name: "postgres", AsyncCmds: []CommandExecuteOperation{
-			{Name: "async-pgdump", Cmd: Cmd{
-				Name: "async", Dump: []string{"pgdump"},
-			}},
-		}}
-		setDefaults(s)
-
-		require.Equal(t, []string{"postgres", "async-pgdump"}, s.AsyncCmds[0].ObjectName)
-		require.Equal(t, "chef", s.AsyncCmds[0].PkgOrigin)
-		require.Equal(t, "postgres", s.AsyncCmds[0].PkgName)
 	})
 	t.Run("sets sync cmd defaults", func(t *testing.T) {
 		s := Spec{Name: "postgres", SyncCmds: []CommandExecuteOperation{
@@ -260,29 +217,11 @@ func TestWorkflowDisabled(t *testing.T) {
 	}
 }
 
-func testRequirePath(t *testing.T, spec Spec, mode, path string, matchers ...RsyncMatcher) {
-	validMode := false
-	if mode == "sync" || mode == "async" {
-		validMode = true
-	}
-	require.Truef(t, validMode,
-		"%s in not a valid mode for path %s. must be one of 'sync' or 'async'",
-		mode, path,
-	)
-
+func testRequirePath(t *testing.T, spec Spec, path string, matchers ...RsyncMatcher) {
 	var p PathCopyOperation
-	if mode == "sync" {
-		for _, sp := range spec.SyncPaths {
-			if sp.SrcPath == path {
-				p = sp
-			}
-		}
-	}
-	if mode == "async" {
-		for _, asp := range spec.AsyncPaths {
-			if asp.SrcPath == path {
-				p = asp
-			}
+	for _, sp := range spec.SyncPaths {
+		if sp.SrcPath == path {
+			p = sp
 		}
 	}
 	require.Equal(t, path, p.SrcPath, "could not find path matching %s", path)
@@ -312,51 +251,20 @@ func findDbByName(name string, dbs []DatabaseDumpOperationV2) DatabaseDumpOperat
 	return DatabaseDumpOperationV2{}
 }
 
-func testRequireDb(t *testing.T, spec Spec, mode, name string, user string) {
-	validMode := mode == "sync" || mode == "async"
-	require.Truef(t, validMode,
-		"%s in not a valid mode for DB %s. must be one of 'sync' or 'async'",
-		mode, name,
-	)
-
-	var p DatabaseDumpOperationV2
-	if mode == "sync" {
-		p = findDbByName(name, spec.SyncDbsV2)
-	}
-	if mode == "async" {
-		p = findDbByName(name, spec.AsyncDbsV2)
-	}
-
+func testRequireDb(t *testing.T, spec Spec, name string, user string) {
+	p := findDbByName(name, spec.SyncDbsV2)
 	assert.Equal(t, name, p.Name, "could not find database matching %s", name)
 	assert.Equal(t, user, p.User, "username for database %s doesn't match %s", name, user)
 }
 
-func testRequireCmd(t *testing.T, spec Spec, mode, dumpCmd, restoreCmd string) {
-	validMode := false
-	if mode == "sync" || mode == "async" {
-		validMode = true
-	}
-	require.Truef(t, validMode,
-		"%s in not a valid mode for dumpcmd %s. must be one of 'sync' or 'async'",
-		mode, dumpCmd,
-	)
-
+func testRequireCmd(t *testing.T, spec Spec, dumpCmd, restoreCmd string) {
 	dc := strings.Split(dumpCmd, " ")
 	rc := strings.Split(restoreCmd, " ")
 
 	var c CommandExecuteOperation
-	if mode == "sync" {
-		for _, sc := range spec.SyncCmds {
-			if reflect.DeepEqual(sc.Cmd.Dump, dc) && reflect.DeepEqual(sc.Cmd.Restore, rc) {
-				c = sc
-			}
-		}
-	}
-	if mode == "async" {
-		for _, ac := range spec.AsyncCmds {
-			if reflect.DeepEqual(ac.Cmd.Dump, dc) && reflect.DeepEqual(ac.Cmd.Restore, rc) {
-				c = ac
-			}
+	for _, sc := range spec.SyncCmds {
+		if reflect.DeepEqual(sc.Cmd.Dump, dc) && reflect.DeepEqual(sc.Cmd.Restore, rc) {
+			c = sc
 		}
 	}
 	require.Truef(t, reflect.DeepEqual(dc, c.Cmd.Dump),
@@ -379,21 +287,8 @@ func findEsByName(name string, esops []ElasticsearchOperation) ElasticsearchOper
 	return ElasticsearchOperation{}
 }
 
-func testRequireEs(t *testing.T, spec Spec, mode, serviceName string, multiIndexSpec string) {
-	validMode := mode == "sync" || mode == "async"
-	require.Truef(t, validMode,
-		"%s in not a valid mode for DB %s. must be one of 'sync' or 'async'",
-		mode, serviceName,
-	)
-
-	var op ElasticsearchOperation
-	if mode == "sync" {
-		op = findEsByName(serviceName, spec.SyncEsIndices)
-	}
-	if mode == "async" {
-		op = findEsByName(serviceName, spec.AsyncEsIndices)
-	}
-
+func testRequireEs(t *testing.T, spec Spec, serviceName string, multiIndexSpec string) {
+	op := findEsByName(serviceName, spec.SyncEsIndices)
 	assert.Equal(t, serviceName, op.ServiceName, "could not find es operation for %s", serviceName)
 	assert.Equal(t, multiIndexSpec, op.MultiIndexSpec, "incorrect index spec for %s", serviceName)
 }

@@ -58,16 +58,14 @@ func TestCreateBackupEvent(t *testing.T) {
 
 		// Add some running operations
 		r.updateOperationStatus(task.TaskID(), api.DeployEvent_Backup_Operation{
-			Status:        api.DeployEvent_RUNNING,
-			Name:          "service-a",
-			SyncProgress:  float64(100),
-			AsyncProgress: 76,
+			Status:       api.DeployEvent_RUNNING,
+			Name:         "service-a",
+			SyncProgress: float64(100),
 		})
 		r.updateOperationStatus(task.TaskID(), api.DeployEvent_Backup_Operation{
-			Status:        api.DeployEvent_COMPLETE_OK,
-			Name:          "service-b",
-			SyncProgress:  100,
-			AsyncProgress: 100,
+			Status:       api.DeployEvent_COMPLETE_OK,
+			Name:         "service-b",
+			SyncProgress: 100,
 		})
 
 		e := r.createBackupEvent(task.TaskID(), api.DeployEvent_RUNNING)
@@ -80,14 +78,12 @@ func TestCreateBackupEvent(t *testing.T) {
 		assert.Equal(t, "service-a", op.Name)
 		assert.Equal(t, api.DeployEvent_RUNNING, op.Status)
 		assert.Equal(t, float64(100), op.SyncProgress)
-		assert.Equal(t, float64(76), op.AsyncProgress)
 
 		op = operationByName("service-b", e.Operations)
 		assert.NotNil(t, op)
 		assert.Equal(t, "service-b", op.Name)
 		assert.Equal(t, api.DeployEvent_COMPLETE_OK, op.Status)
 		assert.Equal(t, float64(100), op.SyncProgress)
-		assert.Equal(t, float64(100), op.AsyncProgress)
 	})
 }
 
@@ -236,13 +232,11 @@ func testDefaultSpecs() []Spec {
 			Name:          "config-mgmt",
 			WriteMetadata: true,
 			testSyncOps:   []testOperation{{name: "cfg-mgmt-sync"}},
-			testAsyncOps:  []testOperation{{name: "cfg-mgmt-async"}},
 		},
 		{
 			Name:          "deployment-service",
 			WriteMetadata: true,
 			testSyncOps:   []testOperation{{name: "deployment-sync"}},
-			testAsyncOps:  []testOperation{{name: "deployment-async"}},
 		},
 	}
 }
