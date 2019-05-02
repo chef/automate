@@ -1,6 +1,7 @@
 import { map } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import {
   ProjectsFilterState,
   projectsFilterInitialState,
@@ -9,12 +10,11 @@ import {
 } from './projects-filter.reducer';
 import { LoadOptions, LoadOptionsSuccess } from './projects-filter.actions';
 
-// TODO Get these from reducer.ts
-const UNASSIGNED_PROJECT = '(unassigned)';
-const UNASSIGNED_PROJECT_LABEL = 'Unassigned resources';
-const ALL_RESOURCES_LABEL = 'All resources';
-const ALL_PROJECTS_LABEL = 'All projects';
-const MULTIPLE_PROJECTS_LABEL = 'Multiple projects';
+const UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
+const UNASSIGNED_PROJECT_LABEL = ProjectConstants.UNASSIGNED_PROJECT_LABEL;
+const ALL_RESOURCES_LABEL = ProjectConstants.ALL_RESOURCES_LABEL;
+const ALL_PROJECTS_LABEL = ProjectConstants.ALL_PROJECTS_LABEL;
+const MULTIPLE_PROJECTS_LABEL = ProjectConstants.MULTIPLE_PROJECTS_LABEL;
 const BADGE_GREY_STATE = false;
 const BADGE_BLUE_STATE = true;
 
@@ -60,7 +60,7 @@ describe('projectsFilterReducer', () => {
     it('with unassigned, sorts projects except unassigned at bottom when storing them', () => {
       const payload: ProjectsFilterOption[] = [
         genProject('d-proj', false),
-        genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+        genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT_ID),
         genProject('b-proj', false),
         genProject('zz-proj', false),
         genProject('a-proj', false)
@@ -70,7 +70,7 @@ describe('projectsFilterReducer', () => {
       const { options } = projectsFilterReducer(initialState, action);
 
       expect(map('value', options))
-        .toEqual(['a-proj', 'b-proj', 'd-proj', 'zz-proj', UNASSIGNED_PROJECT]);
+        .toEqual(['a-proj', 'b-proj', 'd-proj', 'zz-proj', UNASSIGNED_PROJECT_ID]);
     });
 
     describe('with exactly one allowed project', () => {
@@ -97,7 +97,7 @@ describe('projectsFilterReducer', () => {
 
     describe('with only unassigned resources allowed', () => {
       const payload: ProjectsFilterOption[] = [
-        genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT)
+        genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT_ID)
       ];
       const action = new LoadOptionsSuccess(payload);
 
@@ -121,7 +121,7 @@ describe('projectsFilterReducer', () => {
 
       describe('when nothing is selected', () => {
         const payload: ProjectsFilterOption[] = [
-          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT_ID),
           genProject('zz-proj', false)
         ];
         const action = new LoadOptionsSuccess(payload);
@@ -144,7 +144,7 @@ describe('projectsFilterReducer', () => {
 
       describe('when project is selected', () => {
         const payload: ProjectsFilterOption[] = [
-          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT_ID),
           genProject('zz-proj', true)
         ];
         const action = new LoadOptionsSuccess(payload);
@@ -167,7 +167,7 @@ describe('projectsFilterReducer', () => {
 
       describe('when only unassigned is selected', () => {
         const payload: ProjectsFilterOption[] = [
-          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT_ID),
           genProject('zz-proj', false)
         ];
         const action = new LoadOptionsSuccess(payload);
@@ -189,7 +189,7 @@ describe('projectsFilterReducer', () => {
 
       describe('selecting project and selecting unassigned', () => {
         const payload: ProjectsFilterOption[] = [
-          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT_ID),
           genProject('zz-proj', true)
         ];
         const action = new LoadOptionsSuccess(payload);
@@ -218,7 +218,7 @@ describe('projectsFilterReducer', () => {
         const payload: ProjectsFilterOption[] = [
           genProject('zz-proj', false),
           genProject('c-proj', false),
-          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT_ID),
           genProject('b-proj', false),
           genProject('c-proj', false)
         ];
@@ -244,7 +244,7 @@ describe('projectsFilterReducer', () => {
         const payload: ProjectsFilterOption[] = [
           genProject('zz-proj', false),
           genProject('c-proj', false),
-          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT_ID),
           genProject('b-proj', true),
           genProject('c-proj', false)
         ];
@@ -270,7 +270,7 @@ describe('projectsFilterReducer', () => {
         const payload: ProjectsFilterOption[] = [
           genProject('zz-proj', false),
           genProject('c-proj', false),
-          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT_ID),
           genProject('b-proj', false),
           genProject('c-proj', false)
         ];
@@ -295,7 +295,7 @@ describe('projectsFilterReducer', () => {
         const payload: ProjectsFilterOption[] = [
           genProject('zz-proj', true),
           genProject('c-proj', false),
-          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT_ID),
           genProject('b-proj', false),
           genProject('c-proj', false)
         ];
@@ -320,7 +320,7 @@ describe('projectsFilterReducer', () => {
         const payload: ProjectsFilterOption[] = [
           genProject('zz-proj', true),
           genProject('c-proj', true),
-          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT_ID),
           genProject('b-proj', true),
           genProject('c-proj', false)
         ];
@@ -348,7 +348,7 @@ describe('projectsFilterReducer', () => {
         const payload: ProjectsFilterOption[] = [
           genProject('zz-proj', true),
           genProject('c-proj', true),
-          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT_ID),
           genProject('b-proj', true),
           genProject('c-proj', false)
         ];
@@ -376,7 +376,7 @@ describe('projectsFilterReducer', () => {
         const payload: ProjectsFilterOption[] = [
           genProject('zz-proj', true),
           genProject('c-proj', true),
-          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, false, UNASSIGNED_PROJECT_ID),
           genProject('b-proj', true),
           genProject('c-proj', true)
         ];
@@ -404,7 +404,7 @@ describe('projectsFilterReducer', () => {
         const payload: ProjectsFilterOption[] = [
           genProject('zz-proj', true),
           genProject('c-proj', true),
-          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT),
+          genProject(UNASSIGNED_PROJECT_LABEL, true, UNASSIGNED_PROJECT_ID),
           genProject('b-proj', true),
           genProject('c-proj', true)
         ];
