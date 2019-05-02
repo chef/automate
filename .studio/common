@@ -355,6 +355,8 @@ function build_all_changed_components() {
 
   install_if_missing core/git git
   install_if_missing core/ruby ruby
+  hab pkg binlink core/ruby gem
+  gem install toml
   hab pkg install core/coreutils >/dev/null
   mkdir -p /usr/bin
   ln -sv "$(hab pkg path core/coreutils)/bin/env" /usr/bin/env 2>/dev/null

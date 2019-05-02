@@ -1,0 +1,11 @@
+steps:
+  - label: ":books:"
+    command: .expeditor/buildkite/deploy-ui-library.sh
+    concurrency: 1
+    concurrency_group: chef-automate-master/deploy-ui-library
+    expeditor:
+      accounts:
+        - aws/chef-cd
+        - github
+      executor:
+        docker:
