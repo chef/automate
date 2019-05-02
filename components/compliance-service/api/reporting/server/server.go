@@ -285,7 +285,13 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 
 // ReadNode returns a node based on id
 func (srv *Server) ReadNode(ctx context.Context, in *reporting.Id) (*reporting.Node, error) {
-	node, err := srv.es.GetNode(in.Id)
+	formattedFilters := formatFilters([]*reporting.ListFilter{})
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, in.Id)
+	}
+
+	node, err := srv.es.GetNode(in.Id, formattedFilters)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, in.Id)
 	}
