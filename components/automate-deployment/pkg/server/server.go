@@ -2073,6 +2073,7 @@ func (s *server) reloadBackupRunner() error {
 		backup.WithConnFactory(s.connFactory),
 		backup.WithTarget(target),
 		backup.WithReleaseManifest(s.deployment.CurrentReleaseManifest),
+		backup.WithDeploymentStore(s.deploymentStore),
 	)
 
 	return nil

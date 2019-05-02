@@ -12,7 +12,7 @@ import (
 
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/components/applications-service/pkg/grpc"
-	"github.com/chef/automate/components/applications-service/pkg/nats"
+	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/platform"
@@ -50,8 +50,13 @@ var serveCmd = &cobra.Command{
 		conf.SetStorage(dbClient)
 
 		if conf.Service.Enabled {
-			// Ingestion of messages (NAT Subscriber)
-			go StartIngestion(conf)
+			ingester := server.NewIngester(conf, dbClient)
+			err = ingester.Connect()
+			if err != nil {
+				return err
+			}
+
+			go ingester.Run()
 		}
 
 		// Metrics Server
@@ -85,36 +90,6 @@ func configFromViper() (*config.Applications, error) {
 
 func init() {
 	RootCmd.AddCommand(serveCmd)
-}
-
-// TODO (afiune): this is getting long and should move out of this file
-func StartIngestion(conf *config.Applications) {
-	natsClient := nats.NewDefaults(
-		fmt.Sprintf("nats://%s:%d", conf.Events.Host, conf.Events.Port),
-		conf.Events.ClusterID,
-		*conf.TLSConfig,
-	)
-
-	// Trigger NATS Subscription
-	err := natsClient.ConnectAndSubscribe()
-	if err != nil {
-		log.WithError(err).Fatal("could not connect to nats-streaming")
-	}
-
-	// Receive digested messages from the event channel and
-	// send them to the datastore for processing
-	// TODO @afiune Move this logic into an ingestion pipeline
-	for {
-		select {
-		case event := <-natsClient.HabServiceEventCh:
-			err := conf.GetStorage().IngestHabEvent(event)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"error": err.Error(),
-				}).Error("Unable to ingest habitat event")
-			}
-		}
-	}
 }
 
 // TODO (dan): this is getting long and should move out of this file

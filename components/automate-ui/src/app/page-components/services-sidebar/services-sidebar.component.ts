@@ -4,8 +4,11 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable } from 'rxjs';
 import { serviceGroupState } from '../../entities/service-groups/service-groups.selector';
 import { createSelector } from '@ngrx/store';
-import { Service, ServicesFilters } from '../../entities/service-groups/service-groups.model';
+import {
+  Service, ServicesFilters, HealthSummary
+} from '../../entities/service-groups/service-groups.model';
 import { UpdateSelectedSG } from '../../entities/service-groups/service-groups.actions';
+import { get } from 'lodash/fp';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -21,6 +24,10 @@ export class ServicesSidebarComponent implements OnInit {
   public selectedHealth: string;
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
+  public currentPage = 1;
+  public pageSize = 25;
+  public totalServices = 0;
+  public servicesHealthSummary$: Observable<HealthSummary>;
 
   constructor(private store: Store<NgrxStateAtom>) { }
 
@@ -30,6 +37,15 @@ export class ServicesSidebarComponent implements OnInit {
 
     this.serviceGroupName$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.selectedServiceGroupName));
+
+    this.servicesHealthSummary$ = this.store.select(createSelector(serviceGroupState,
+      (state) => state.servicesHealthSummary));
+
+    this.currentPage = 1;
+
+    this.servicesHealthSummary$.subscribe((healthSummary) => {
+      this.totalServices = get('total', healthSummary);
+    });
   }
 
   public closeServicesSidebar() {
@@ -40,9 +56,16 @@ export class ServicesSidebarComponent implements OnInit {
     this.selectedHealth = health;
     const servicesFilters: ServicesFilters = {
       service_group_id: this.serviceGroupId,
-      health: health
+      health: health,
+      page: this.currentPage,
+      pageSize: this.pageSize
     };
     this.store.dispatch(new UpdateSelectedSG(servicesFilters));
+  }
+
+  updatePageNumber(pageNumber: number) {
+    this.currentPage = pageNumber;
+    this.updateServicesFilters(this.selectedHealth);
   }
 
   // healthCheckStatus returns the formated health_check status from the provided service

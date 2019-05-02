@@ -2943,7 +2943,7 @@ func setupV2(t *testing.T,
 	require.NoError(t, err)
 
 	vSwitch := v2.NewSwitch(vChan)
-	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch)
+	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch, projectsSrv)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")

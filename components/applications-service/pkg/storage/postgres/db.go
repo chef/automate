@@ -11,19 +11,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// postgres is a wrapping struct that will hold the database mapping object
+// Postgres is a wrapping struct that will hold the database mapping object
 // from the underlying db/sql implementation (gorp) plus our service config
 // specifically for storage.
 //
 // Additionally this struct implements our storage.Client interface
-type postgres struct {
+type Postgres struct {
 	*gorp.DbMap
 	*config.Postgres
 }
 
-// New creates a new postgres client
-func New(dbConf *config.Postgres) (*postgres, error) {
-	pg := &postgres{Postgres: dbConf}
+// New creates a new Postgres client
+func New(dbConf *config.Postgres) (*Postgres, error) {
+	pg := &Postgres{Postgres: dbConf}
 
 	log.WithFields(log.Fields{
 		"uri": pg.URI,
@@ -42,12 +42,12 @@ func New(dbConf *config.Postgres) (*postgres, error) {
 }
 
 // ping will verify if the database mapped with gorp is available
-func (db *postgres) ping() error {
+func (db *Postgres) ping() error {
 	return db.Db.Ping()
 }
 
 // connect opens a connection to the database
-func (db *postgres) connect() error {
+func (db *Postgres) connect() error {
 	dbMap, err := gosql.Open("postgres", db.URI)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to open database with uri: %s", db.URI)
@@ -66,7 +66,7 @@ func (db *postgres) connect() error {
 }
 
 // initDB initializes the database
-func (db *postgres) initDB() error {
+func (db *Postgres) initDB() error {
 	// Create the schema
 	// @afiune Can we rename this library?
 	if err := migrator.Migrate(db.URI, db.SchemaPath); err != nil {

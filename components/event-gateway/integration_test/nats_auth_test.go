@@ -9,7 +9,7 @@ import (
 	"time"
 
 	natsc "github.com/nats-io/go-nats"
-	stan "github.com/nats-io/go-nats-streaming"
+	"github.com/nats-io/go-nats-streaming"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 
@@ -140,6 +140,27 @@ func TestEventGatewayAuth(t *testing.T) {
 		// to make the code simpler.
 		_, err = conn.Subscribe("habitat", func(m *stan.Msg) {
 		})
+		require.Error(t, err)
+
+		// Habitat client authz tests
+		habClientId := "hab_client"
+		habRawNATSconn, err := natsc.Connect(natsURLForAdmin, natsc.Secure(tlsConf))
+		require.NoError(t, err)
+		defer habRawNATSconn.Close()
+
+		habConn, err := stan.Connect(clusterID,
+			habClientId,
+			stan.NatsConn(habRawNATSconn),
+		)
+		require.NoError(t, err)
+		defer conn.Close()
+
+		// hab_client can publish to habitat subject
+		err = habConn.Publish(natsStreamingSubject, message)
+		require.NoError(t, err)
+
+		// hab_client can't publish to another subject
+		err = habConn.Publish(invalidSubject, message)
 		require.Error(t, err)
 	})
 

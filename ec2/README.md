@@ -36,6 +36,11 @@ vagrant box add aws https://github.com/mitchellh/vagrant-aws/raw/master/dummy.bo
 
 5. `VERSION` in format 'channel[/build]' (default: 'dev/latest') can be used to specify which versions to use when pulling the Automate components. Valid examples: 'dev/20190328132226', 'current', 'acceptance'. The latest build will be pulled from channel if the build timestamp is not specified.
 
+6. `EBS_SNAPSHOT` can be used to specify a volume snapshot to restore for the ElasticSearch data directory. Beneficial to load large data sets previously generated for performance or data migration testing. Here are a few public EBS snapshots that can be used:
+ * snap-09008b989ac450bf1 : 75GB volume empty, partitioned and ext4 formatted
+ * snap-01c2a3639d3146721 : 75GB volume with comp-2 indices for 50k nodes scanned on 2019.03.29
+ * snap-08726019113625ec7 : 75GB volume with comp-2 indices for 50k nodes scanned on 2019.03.29, 2019.04.08, 2019.04.09
+
 Pick previous build timestamps from the three supported channels from here:
  * [dev versions](https://packages.chef.io/manifests/dev/automate/versions.json)
  * [acceptance versions](https://packages.chef.io/manifests/acceptance/automate/versions.json)

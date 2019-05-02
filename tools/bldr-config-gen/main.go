@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	habPkgPath       = "HABITAT_PACKAGES"
-	expeditorCfgPath = ".expeditor/config.yml"
+	habPkgPath  = "HABITAT_PACKAGES"
+	bldrCfgPath = ".bldr.toml"
 )
 
 type PackageSpec struct {
@@ -39,8 +39,8 @@ var opts = struct {
 
 func main() {
 	cmd := &cobra.Command{
-		Use:           "expeditor-config-gen",
-		Short:         "Config file generator for .expeditor/config.yml",
+		Use:           "bldr-config-gen",
+		Short:         "Config file generator for .bldr.toml",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
@@ -77,7 +77,7 @@ func main() {
 func run(*cobra.Command, []string) error {
 	expectFile(habPkgPath)
 	if !opts.PrintOnly {
-		expectFile(expeditorCfgPath)
+		expectFile(bldrCfgPath)
 	}
 
 	habPackages, err := parseHabPackageFile(habPkgPath)
@@ -101,7 +101,7 @@ func run(*cobra.Command, []string) error {
 		return nil
 	}
 
-	return writeExpeditorConfig(outBuf.(*bytes.Buffer).Bytes(), expeditorCfgPath)
+	return writeBldrConfig(outBuf.(*bytes.Buffer).Bytes(), bldrCfgPath)
 }
 
 // parseHabPackageFile parses HABITAT_PACKAGES which is a custom text
@@ -152,23 +152,26 @@ func parseHabPackageFile(path string) ([]PackageSpec, error) {
 }
 
 func generateHabPackageConfig(outBuf io.Writer, habPackages []PackageSpec) error {
-	for _, p := range habPackages {
+	for i, p := range habPackages {
 		depInfo, err := getGoDepInfo(p.path)
 		if err != nil {
 			return err
 		}
-
-		fmt.Fprintf(outBuf, "  - %s:\n", p.name)
-		fmt.Fprintf(outBuf, "      source: %s\n", p.path)
-		fmt.Fprintf(outBuf, "      bldr_paths:\n")
-		fmt.Fprintf(outBuf, "        - %s/*\n", p.path)
+		if i != 0 {
+			fmt.Fprintf(outBuf, "\n")
+		}
+		fmt.Fprintf(outBuf, "[%s]\n", p.name)
+		fmt.Fprintf(outBuf, "plan_path = \"%s\"\n", p.path)
+		fmt.Fprintf(outBuf, "paths = [\n")
+		fmt.Fprintf(outBuf, "  \"%s/*\"", p.path)
 		for _, dep := range depInfo.deps {
-			fmt.Fprintf(outBuf, "        - %s/*\n", dep)
+			fmt.Fprintf(outBuf, ",\n  \"%s/*\"", dep)
 		}
 
 		if depInfo.usesVendor {
-			fmt.Fprintf(outBuf, "        - Gopkg.lock\n")
+			fmt.Fprintf(outBuf, ",\n  \"Gopkg.lock\"")
 		}
+		fmt.Fprintf(outBuf, "\n]\n")
 	}
 	return nil
 }
@@ -177,7 +180,10 @@ func getGoDepInfo(path string) (GoDepInfo, error) {
 	info := GoDepInfo{}
 	path = strings.TrimLeft(path, "/")
 	goPkgPath := fmt.Sprintf("./%s/...", path)
-	output, err := command.Output("go", command.Args("list", "-f", "{{join .Deps \"\\n\"}}", goPkgPath))
+	output, err := command.Output("go",
+		command.Args("list", "-f", "{{join .Deps \"\\n\"}}", goPkgPath),
+		command.Envvar("GOOS", "linux"),
+	)
 	if err != nil {
 		return info, errors.Wrapf(err, "could not query go dependencies: %s", command.StderrFromError(err))
 	}
@@ -259,14 +265,14 @@ func min(a, b int) int {
 }
 
 const (
-	startGenMarker = "  # GENERATED_HAB_PACKAGE_CONFIG_START"
-	endGenMarker   = "  # GENERATED_HAB_PACKAGE_CONFIG_END"
-	genComment     = `  # The following habitat package configuration is auto-generated
-  # To update this content run:
-  #     go run ./tools/expeditor-config-gen`
+	startGenMarker = "# GENERATED_HAB_PACKAGE_CONFIG_START"
+	endGenMarker   = "# GENERATED_HAB_PACKAGE_CONFIG_END"
+	genComment     = `# The following habitat package configuration is auto-generated
+# To update this content run:
+#     go run ./tools/bldr-config-gen`
 )
 
-func writeExpeditorConfig(data []byte, path string) error {
+func writeBldrConfig(data []byte, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return errors.Wrap(err, "open")

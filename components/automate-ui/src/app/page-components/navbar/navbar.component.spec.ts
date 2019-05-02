@@ -1,21 +1,35 @@
 import { RouterTestingModule } from '@angular/router/testing';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { StoreModule } from '@ngrx/store';
+import { of as observableOf } from 'rxjs';
 import { NavbarComponent } from './navbar.component';
 import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
-import { FeatureFlagsService } from '../../../app/services/feature-flags/feature-flags.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import {
+  PolicyEntityInitialState,
+  policyEntityReducer
+} from 'app/entities/policies/policy.reducer';
 
 describe('NavbarComponent', () => {
-  let fixture, element;
+  let component: NavbarComponent;
+  let element: HTMLElement;
+  let fixture: ComponentFixture<NavbarComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        StoreModule.forRoot({
+          policies: policyEntityReducer
+        }, {
+          initialState: { policies: PolicyEntityInitialState }
+        })
       ],
       declarations: [
         NavbarComponent,
         MockComponent({ selector: 'app-profile' }),
+        MockComponent({ selector: 'app-projects-filter' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-tooltip' }),
         MockComponent({ selector: 'app-authorized',
@@ -28,13 +42,13 @@ describe('NavbarComponent', () => {
     });
 
     fixture = TestBed.createComponent(NavbarComponent);
-    element = fixture.debugElement;
+    fixture.detectChanges();
+    component = fixture.componentInstance;
+    element = fixture.nativeElement;
   });
 
   it('displays the logo navigation link', () => {
-    const logo = element.nativeElement.querySelector('.logo');
-    fixture.detectChanges();
-
+    const logo = element.querySelector('.logo');
     expect(logo).not.toBeNull();
     expect(logo.getAttribute('href')).toBe('/');
   });
@@ -48,19 +62,25 @@ describe('NavbarComponent', () => {
     ['Settings',    '/settings',             6]
   ], function (label: string, path: string, position: number) {
     it(`displays the ${label} navigation link`, () => {
-      const link = element.nativeElement
-        .querySelector(`.navigation-menu > *:nth-child(${position}) a`);
-      fixture.detectChanges();
-
-      expect(link.innerText).toBe(label);
+      const link = element.querySelector(`.navigation-menu > *:nth-child(${position}) a`);
+      expect(link.textContent).toBe(label);
       expect(link.getAttribute('href')).toBe(path);
     });
   });
 
-  it('should display the profile dropdown', () => {
-    element = fixture.nativeElement;
-    fixture.detectChanges();
-
+  it('displays the profile dropdown', () => {
     expect(element.querySelector('app-profile')).not.toBeNull();
+  });
+
+  describe('when IAM v2.1 is enabled', () => {
+    beforeEach(() => {
+      component.iamMajorVersion$ = observableOf('v2');
+      component.iamMinorVersion$ = observableOf('v1');
+      fixture.detectChanges();
+    });
+
+    it('displays the projects filter', () => {
+      expect(element.querySelector('app-projects-filter')).not.toBeNull();
+    });
   });
 });

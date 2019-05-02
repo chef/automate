@@ -2,12 +2,14 @@ package pg
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/lib/pq"
 	"go.uber.org/zap"
 
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -72,46 +74,78 @@ func (a *adapter) insertToken(ctx context.Context,
 
 func (a *adapter) UpdateToken(ctx context.Context,
 	id, description string, active bool, projects []string) (*tokens.Token, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return nil, processSQLError(err, "get projects filter for tokens")
+	}
 	t := tokens.Token{}
 
 	// ensure we do not pass null projects to db
 	if projects == nil {
 		projects = []string{}
 	}
+	var row *sql.Row
 	if description != "" {
-		if err := a.db.QueryRowContext(ctx,
-			`UPDATE chef_authn_tokens SET active=$2, description=$3, project_ids=$4, updated=NOW() WHERE id=$1
+		row = a.db.QueryRowContext(ctx,
+			`UPDATE chef_authn_tokens cat
+			SET active=$2, description=$3, project_ids=$4, updated=NOW() 
+			WHERE id=$1 AND projects_match(cat.project_ids, $5::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, description, pq.Array(projects)).
-			Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
-			return nil, processSQLError(err, "update token")
-		}
+			id, active, description, pq.Array(projects), pq.Array(projectsFilter))
 	} else {
-		if err := a.db.QueryRowContext(ctx,
-			`UPDATE chef_authn_tokens SET active=$2, project_ids=$3, updated=NOW() WHERE id=$1
+		row = a.db.QueryRowContext(ctx,
+			`UPDATE chef_authn_tokens cat
+			SET active=$2, project_ids=$3, updated=NOW()
+			WHERE id=$1 AND projects_match(cat.project_ids, $4::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, pq.Array(projects)).
-			Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
-			return nil, processSQLError(err, "update token")
-		}
+			id, active, pq.Array(projects), pq.Array(projectsFilter))
+	}
+	err = row.Scan(
+		&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated)
+	if err != nil {
+		return nil, processSQLError(err, "update token")
 	}
 	return &t, nil
 }
 
 func (a *adapter) DeleteToken(ctx context.Context, id string) error {
-	if _, err := a.db.ExecContext(ctx,
-		`DELETE FROM chef_authn_tokens WHERE id=$1`,
-		id); err != nil {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return processSQLError(err, "get projects filter for tokens")
+	}
+
+	res, err := a.db.ExecContext(ctx,
+		`DELETE FROM chef_authn_tokens cat
+		WHERE cat.id=$1
+		AND projects_match(cat.project_ids, $2::TEXT[])`,
+		id, pq.Array(projectsFilter))
+	if err != nil {
 		return processSQLError(err, "delete token by id")
-	} // TODO: check rows affected?
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return processSQLError(err, "delete token by id")
+	} else if count != 1 {
+		return &tokens.NotFoundError{}
+	}
+
 	return nil
 }
 
 func (a *adapter) GetToken(ctx context.Context, id string) (*tokens.Token, error) {
 	t := tokens.Token{}
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return &t, processSQLError(err, "get projects filter for tokens")
+	}
+
 	if err := a.db.QueryRowContext(ctx,
-		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens WHERE id=$1`,
-		id).
+		`SELECT id, description, value, active, project_ids, created, updated
+		FROM chef_authn_tokens cat
+		WHERE cat.id=$1
+		AND projects_match(cat.project_ids, $2::TEXT[])`,
+		id, pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated); err != nil {
 		return nil, processSQLError(err, "select token by id")
 	}
@@ -131,9 +165,17 @@ func (a *adapter) GetTokenIDWithValue(ctx context.Context, value string) (string
 }
 
 func (a *adapter) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return []*tokens.Token{}, processSQLError(err, "get projects filter for tokens")
+	}
+
 	ts := []*tokens.Token{}
 	rows, err := a.db.QueryContext(ctx,
-		`SELECT id, description, value, active, project_ids, created, updated FROM chef_authn_tokens`)
+		`SELECT id, description, value, active, project_ids, created, updated
+		FROM chef_authn_tokens cat
+		WHERE projects_match(cat.project_ids, $1::TEXT[])`,
+		pq.Array(projectsFilter))
 	if err != nil {
 		return nil, err
 	}
@@ -152,6 +194,20 @@ func (a *adapter) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
 		ts = append(ts, &t)
 	}
 	return ts, nil
+}
+
+// ProjectsListFromContext returns the project list from the context.
+// In the case that the project list was ["*"], we return an empty list,
+// since we do not wish to filter on projects.
+func ProjectsListFromContext(ctx context.Context) ([]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		projectsFilter = []string{}
+	}
+	return projectsFilter, nil
 }
 
 // Reset deletes all tokens from the database /!\

@@ -86,9 +86,10 @@ module "performance_test_single_local_inplace_upgrade_deploy" {
   chef_environment  = "${var.chef_environment}"
 
   # Automate Install
-  channel         = "${var.channel}"
-  deployment_type = "local"
-  upgrade         = "true"
+  channel              = "${var.channel}"
+  deployment_type      = "local"
+  enable_eas_dashboard = "true"
+  upgrade              = "true"
 
   # Create admin-token
   create_admin_token = "true"

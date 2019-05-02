@@ -93,6 +93,10 @@ func (srv *Server) ListSuggestions(ctx context.Context, in *reporting.Suggestion
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("Parameter 'type' not specified"))
 	}
 	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, "")
+	}
 	suggestionsList, err := srv.es.GetSuggestions(in.Type, formattedFilters, in.Text, in.Size)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, "")
@@ -262,8 +266,8 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 		"status":                                 "status",
 		"latest_report.status":                   "status",
 		"latest_report.end_time":                 "end_time",
-		"latest_report.controls.failed.total":    "controls.failed.total",
-		"latest_report.controls.failed.critical": "controls.failed.critical",
+		"latest_report.controls.failed.total":    "controls_sums.failed.total",
+		"latest_report.controls.failed.critical": "controls_sums.failed.critical",
 	}
 	from, perPage, sort, asc, err := validatePaginationAndSorting(in, SORT_FIELDS, "latest_report.end_time")
 	if err != nil {

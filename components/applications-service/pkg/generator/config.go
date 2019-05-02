@@ -31,7 +31,7 @@ func (l *LoadProfileCfg) BuildRunner() (*LoadGenRunner, error) {
 	return &LoadGenRunner{SupervisorGroups: groups}, nil
 }
 
-func (l *LoadProfileCfg) BuildSupervisorGroups() ([]*SupervisorGroup, error) {
+func (l *LoadProfileCfg) BuildSupervisorGroups() (SupervisorGroupCollection, error) {
 	groups := []*SupervisorGroup{}
 
 	for _, supCfg := range l.GeneratorCfg.Supervisors {
@@ -53,7 +53,7 @@ func (l *LoadProfileCfg) BuildSupervisorGroups() ([]*SupervisorGroup, error) {
 
 		groups = append(groups, &group)
 	}
-	return groups, nil
+	return SupervisorGroupCollection(groups), nil
 }
 
 // [templates]

@@ -3,6 +3,7 @@ package nats
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"math/rand"
 	"time"
 
 	"github.com/chef/automate/api/external/applications"
@@ -40,6 +41,7 @@ type NatsClient struct {
 	retries            int
 	HabServiceEventCh  chan *applications.HabService // TODO: @afiune make a pipeline instead
 	InsecureSkipVerify bool
+	DisableTLS         bool
 }
 
 func NewExternalClient(url, cluster, client, durable, subject string) *NatsClient {
@@ -50,7 +52,7 @@ func NewExternalClient(url, cluster, client, durable, subject string) *NatsClien
 		durableID:         durable,
 		subject:           subject,
 		HabServiceEventCh: make(chan *applications.HabService), // buffered channel?
-		retries:           10,
+		retries:           5,
 	}
 }
 
@@ -63,7 +65,7 @@ func New(url, cluster, client, durable, subject string, tlsConfig certs.TLSConfi
 		durableID:         durable,
 		subject:           subject,
 		HabServiceEventCh: make(chan *applications.HabService), // buffered channel?
-		retries:           10,
+		retries:           5,
 		TLSConfig:         tlsConfig,
 	}
 }
@@ -96,7 +98,7 @@ func (nc *NatsClient) Connect() error {
 	var (
 		conn  stan.Conn
 		err   error
-		tries = 0
+		tries = uint64(0)
 	)
 
 	tlsConf, err := nc.natsTLSConfig()
@@ -115,7 +117,7 @@ func (nc *NatsClient) Connect() error {
 		"mtls_enabled": mTLSEnabled,
 	}).Info("Connecting to NATS Server")
 
-	for tries < nc.retries {
+	for tries < uint64(nc.retries) {
 		conn, err = nc.tryConnect(tlsConf)
 		if err == nil {
 			nc.conn = conn
@@ -130,7 +132,10 @@ func (nc *NatsClient) Connect() error {
 			"max_retries": nc.retries,
 		}).Error("Unable to connect to server")
 
-		time.Sleep(5 * time.Second)
+		baseSleep := int64(uint32(1) << tries)
+		randomization := rand.Int63n(baseSleep)
+		totalSleep := baseSleep + randomization
+		time.Sleep(time.Duration(totalSleep) * time.Second)
 
 		tries++
 	}
@@ -209,6 +214,10 @@ func (nc *NatsClient) Close() {
 }
 
 func (nc *NatsClient) natsTLSConfig() (*tls.Config, error) {
+	if nc.DisableTLS {
+		return nil, nil
+	}
+
 	t := &tls.Config{
 		MinVersion:         tls.VersionTLS12,
 		InsecureSkipVerify: nc.InsecureSkipVerify,

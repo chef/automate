@@ -1,0 +1,8 @@
+<app-projects-filter-dropdown
+  [options]="projectsFilter.options$ | async"
+  [selectionLabel]="projectsFilter.selectionLabel$ | async"
+  [selectionCount]="projectsFilter.selectionCount$ | async"
+  [selectionCountVisible]="projectsFilter.selectionCountVisible$ | async"
+  [selectionCountActive]="projectsFilter.selectionCountActive$ | async"
+  (onSelection)="projectsFilter.saveOptions($event)">
+</app-projects-filter-dropdown>

@@ -106,4 +106,4 @@ e2e/cypress/videos
 e2e/cypress/fixtures
 components/automate-grpc/protoc-gen-a2-config/protoc-gen-a2-config
 components/event-gateway/cmd/event-gateway/event-gateway
-tools/expeditor-config-gen/expeditor-config-gen
+tools/bldr-config-gen/bldr-config-gen

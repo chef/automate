@@ -10,10 +10,10 @@ import {
   UpdateServiceGroupFilters, UpdateSelectedSG
 } from 'app/entities/service-groups/service-groups.actions';
 import {
-  ServiceGroup, ServiceGroupFilters, FieldDirection, ServicesFilters
+  ServiceGroup, ServiceGroupFilters, FieldDirection, HealthSummary, ServicesFilters
 } from '../../entities/service-groups/service-groups.model';
 import {
-  serviceGroupStatus, allServiceGroups, serviceGroupState
+  serviceGroupStatus, allServiceGroups, serviceGroupState, allServiceGroupHealth
 } from '../../entities/service-groups/service-groups.selector';
 import { find, includes } from 'lodash/fp';
 
@@ -26,6 +26,7 @@ import { find, includes } from 'lodash/fp';
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
+  public HealthSummary$: Observable<HealthSummary>;
 
   // The selected service-group id that will be sent to the services-sidebar
   public selectedServiceGroupId: number;
@@ -33,32 +34,36 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   // Weather or not the the services sidebar is visible
   public servicesSidebarVisible = false;
 
+  // The current page the user is visualizing
+  public currentPage = 1;
+
+  // The number of service groups to display per page
+  public pageSize = 25;
+
+  // Total number of service groups
+  public totalServiceGroups = 0;
+
   // The collection of allowable status
   private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
 
   // The currently selected health status filter
-  selectedStatus$: Observable<string>;
+  public selectedStatus$: Observable<string>;
 
   // Has this component been destroyed
   private isDestroyed: Subject<boolean> = new Subject();
 
-  selectedFieldDirection$: Observable<SortDirection>;
-  selectedSortField$: Observable<string>;
-  currentPage$: Observable<number>;
+  private selectedFieldDirection$: Observable<SortDirection>;
+  private selectedSortField$: Observable<string>;
+  private currentPage$: Observable<number>;
 
-  currentFieldDirection: SortDirection;
-  currentSortField: string;
+  private currentFieldDirection: SortDirection;
+  private currentSortField: string;
 
-  defaultFieldDirection: FieldDirection = {
+  private defaultFieldDirection: FieldDirection = {
     name: 'ASC',
     percent_ok: 'ASC'
   };
 
-  currentPage = 1;
-  // The number of service groups to display per page
-  pageSize = 25;
-  // TODO: Wire this up with real data
-  totalServiceGroups = 50;
   // The collection of allowable sort directions
   private allowedSortDirections = ['asc', 'desc', 'ASC', 'DESC'];
 
@@ -76,6 +81,11 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
     this.serviceGroups$ = this.store.select(allServiceGroups);
+
+    this.HealthSummary$ = this.store.select(allServiceGroupHealth);
+    this.HealthSummary$.subscribe((sgHealthSummary) => {
+      this.totalServiceGroups = sgHealthSummary['total'];
+    });
 
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.status));
@@ -96,7 +106,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       (state) => state.filters.page));
 
     this.currentPage$.subscribe(currentPage => this.currentPage = currentPage);
-
   }
 
   ngOnDestroy() {

@@ -421,6 +421,19 @@ steps:
         linux:
           privileged: true
 
+  - label: "[integration] iam v2 (v2.1 only)"
+    command:
+      - integration/run_test integration/tests/iam_v2p1_only.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
   - label: "[integration] data-lifecycle-service"
     command:
       - integration/run_test integration/tests/data_lifecycle.sh

@@ -32,6 +32,8 @@ message Statement {
 
     // Note: these are for display only, not to be set in CreatePolicy/UpdatePolicy
     repeated string resources = 5;
+
+    repeated string projects = 6;
 }
 
 message Role {

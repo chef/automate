@@ -18,6 +18,10 @@ pushd ./automate.wiki
 
   # Reset "Current Release Notes" wiki page
   cat >./Current-Release-Notes.md <<EOH
+## Upgrade Impact
+
+If you are upgrading from a version prior to 20190410001346, please read our [Important Compliance Outage Announcement](https://discourse.chef.io/t/important-compliance-outage-information-on-automate-2-april-15th-upgrade/14909).
+
 ## New Features
 -
 

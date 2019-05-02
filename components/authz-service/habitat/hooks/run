@@ -8,6 +8,7 @@ exec 2>&1
 pg-helper ensure-service-database "{{cfg.storage.database}}"
 
 pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
+pg-helper create-extension "{{cfg.storage.database}}" "uuid-ossp"
 
 cp -r {{pkg.path}}/migrations {{pkg.svc_static_path}}
 cp -r {{pkg.path}}/data-migrations {{pkg.svc_static_path}}

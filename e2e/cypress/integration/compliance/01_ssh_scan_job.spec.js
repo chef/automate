@@ -230,10 +230,20 @@ describe('create a manual node ssh scan job and cleanup after', () => {
       .click().then(() => {
         cy.get('chef-page-header').find('#uninstall-btn').click().then(() => {
           cy.get('chef-modal').find('chef-button').contains('Delete').click()
+        })
       })
+
+    // ensure that the profile is deleted
+    cy.url().should('include', '/profiles')
+    cy.get('chef-tbody').should(($b) => {
+      expect($b).not.to.contain('CIS Amazon Linux 2 Benchmark Level 1')
     })
   })
   it('can delete the created scan job', () => {
+    // save the route for the delete request so that we can ensure the
+    // response is returned
+    cy.route('DELETE', '/api/v0/compliance/scanner/jobs/id/**').as('deleteScanJob')
+
     // navigate to scan create page:
     // click on scan jobs
     cy.get('.nav-link').contains('Scan Jobs').click()
@@ -244,5 +254,21 @@ describe('create a manual node ssh scan job and cleanup after', () => {
       .parent().parent().find('chef-button[label="delete"]').click().then(() => {
         cy.get('chef-modal').find('chef-button').contains('Delete').click()
       })
+
+    // wait for the delete to finish:
+
+    // this line, along with the expect below are here to make sure
+    // that we're actually deleting the scan jobs at the end of this
+    // test. we've run into scenarios in our long-lived test
+    // environments where the scan job doesn't end up getting deleted
+    // and jobs start failing once we accumulate more than 100 jobs
+    // and the results are paginated
+    cy.wait('@deleteScanJob')
+
+    // ensure that the job is deleted
+    cy.url().should('include','/compliance/scanner/jobs')
+    cy.get('chef-tbody').should(($b) => {
+      expect($b).not.to.contain(jobName)
+    })
   })
 })

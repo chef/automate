@@ -24,7 +24,7 @@
         <chef-td class="title-cell">
           <chef-icon class="status-icon" [ngClass]="profile.status">
             {{ statusIcon(profile.status) }}
-          </chef-icon> 
+          </chef-icon>
           <a [routerLink]="['/compliance/reporting/profiles', profile.id]">{{ profile.title }}</a>
         </chef-td>
         <chef-td class="version-cell">{{ profile.version }}</chef-td>
@@ -82,6 +82,7 @@
                   <p class="node-name">
                     <strong>{{ node.name }}</strong>
                   </p>
+                  <p>{{formatDaysAgo(node.latest_report.end_time)}}</p>
                 </div>
                 <chef-button secondary (click)="getControls(node)">
                   <chef-icon>chevron_right</chef-icon>

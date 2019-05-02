@@ -9,6 +9,8 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/chef/automate/components/authn-service/constants"
+	pg "github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
 	"github.com/chef/automate/lib/tls/certs"
@@ -30,12 +32,18 @@ func (cfg *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger) (tokens.Stora
 }
 
 func (m *mock) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
-	return m.tokens, nil
+	tokensToRet := []*tokens.Token{}
+	for _, tok := range m.tokens {
+		if projectsIntersect(ctx, tok) {
+			tokensToRet = append(tokensToRet, tok)
+		}
+	}
+	return tokensToRet, nil
 }
 
 func (m *mock) GetTokenIDWithValue(ctx context.Context, value string) (string, error) {
 	for i, t := range m.tokens {
-		if (t.Value == value) && t.Active {
+		if (t.Value == value) && t.Active && projectsIntersect(ctx, t) {
 			return m.tokens[i].ID, nil
 		}
 	}
@@ -44,7 +52,7 @@ func (m *mock) GetTokenIDWithValue(ctx context.Context, value string) (string, e
 
 func (m *mock) GetToken(ctx context.Context, id string) (*tokens.Token, error) {
 	for i, t := range m.tokens {
-		if t.ID == id {
+		if t.ID == id && projectsIntersect(ctx, t) {
 			return m.tokens[i], nil
 		}
 	}
@@ -106,7 +114,7 @@ func (m *mock) DeleteToken(ctx context.Context, id string) error {
 	found := false
 	newTokens := []*tokens.Token{}
 	for i, t := range m.tokens {
-		if t.ID == id {
+		if t.ID == id && projectsIntersect(ctx, t) {
 			found = true
 			continue
 		}
@@ -129,7 +137,7 @@ func (m *mock) UpdateToken(ctx context.Context,
 		return nil, err
 	}
 	if t == nil {
-		return nil, nil // not deleted, because not found
+		return nil, &tokens.NotFoundError{} // not deleted, because not found
 	}
 
 	now := time.Now().UTC()
@@ -158,4 +166,33 @@ func (m *mock) UpdateToken(ctx context.Context,
 
 func mockToken(id string) string {
 	return fmt.Sprintf("%v-token", id)
+}
+
+func projectsIntersect(ctx context.Context, token *tokens.Token) bool {
+	projectsFilter, err := pg.ProjectsListFromContext(ctx)
+	if err != nil {
+		return false
+	}
+
+	if len(projectsFilter) == 0 {
+		return true
+	}
+
+	tokenProjects := token.Projects
+	if len(tokenProjects) == 0 {
+		tokenProjects = []string{constants.UnassignedProjectID}
+	}
+
+	for _, projectFilter := range projectsFilter {
+		for _, project := range tokenProjects {
+			if projectFilter == project {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (m *mock) Reset() {
+	m.tokens = []*tokens.Token{}
 }

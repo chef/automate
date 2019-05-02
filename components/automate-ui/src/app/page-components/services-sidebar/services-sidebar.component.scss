@@ -1,8 +1,18 @@
 @import "~styles/variables";
 @import "~styles/mixins";
 
+ul {
+  margin-top: 5px;
+}
+
 .services-panel {
   background-color: #FFFFFF;
+}
+
+app-page-picker {
+  margin-left: auto;
+  margin-right: auto;
+  width: 225px;
 }
 
 .service-item {
@@ -10,8 +20,8 @@
   display: block;
   background-color: #F2F5F7;
   margin-bottom: 1em;
-  margin-right: 2em;
-  margin-left: -.5em;
+  margin-right: 35px;
+  margin-left: -5px;
   padding: 0em;
   position: relative;
   border-radius: 0;
@@ -74,6 +84,6 @@
 }
 
 .status-filter-bar {
-  padding-left: 1.8em;
-  padding-right: 1.5em;
+  padding-left: 35px;
+  padding-right: 35px;
 }

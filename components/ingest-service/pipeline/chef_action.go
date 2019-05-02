@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	chef "github.com/chef/automate/api/external/ingest/request"
+	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
@@ -18,7 +19,7 @@ type ChefActionPipeline struct {
 }
 
 // NewChefActionPipeline Create a new chef action pipeline
-func NewChefActionPipeline(client backend.Client) ChefActionPipeline {
+func NewChefActionPipeline(client backend.Client, authzClient iam_v2.ProjectsClient) ChefActionPipeline {
 	var (
 		in            = make(chan message.ChefAction, 100)
 		counter int64 = 0
@@ -27,6 +28,7 @@ func NewChefActionPipeline(client backend.Client) ChefActionPipeline {
 	chefActionPipeline(in,
 		processor.BuildChefActionPerform(client),
 		processor.ChefActionTransmogrify,
+		processor.BuildActionProjectTagger(authzClient),
 		processor.BuildActionMsgToBulkRequestTransformer(client),
 		publisher.BuildBulkActionPublisher(client),
 		processor.CountActions(&counter),
