@@ -1,7 +1,8 @@
 export interface User {
   id: string;
   name: string;
-  username: string;
+  membership_id: string;
+  projects: Array<string>;
   password?: string; // only used for updating, never returned by the API
 }
 

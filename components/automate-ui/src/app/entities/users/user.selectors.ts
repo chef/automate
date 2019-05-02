@@ -24,5 +24,5 @@ export const updateStatus = createSelector(
 export const userFromRoute = createSelector(
   userEntities,
   routeParams,
-  (state, {username}) => find({username}, state)
+  (state, {id}) => find({id}, state)
 );

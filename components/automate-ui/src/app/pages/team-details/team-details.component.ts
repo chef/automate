@@ -97,7 +97,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
           }
           // Map UUID membership to user records and remove any entries that don't
           // map to user records.
-          return at(tUsers, keyBy('id', users))
+          return at(tUsers, keyBy('membership_id', users))
             .filter(userRecord => userRecord !== undefined);
         }),
         map((users: User[]) => users.sort(
@@ -107,8 +107,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
             // sort by name then by username
             return a.name.localeCompare(b.name, undefined, opts) ||
               a.name.localeCompare(b.name, undefined, { numeric: true }) ||
-              a.username.localeCompare(b.username, undefined, opts);
-          }))
+              a.id.localeCompare(b.id, undefined, opts);
+          })),
+        takeUntil(this.isDestroyed)
       );
 
     // If, however, the user browses directly to /settings/teams/ID, the store
@@ -155,7 +156,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   addUsers(users: HashMapOfUsers): void {
     this.toggleUserMembershipView();
 
-    const userIDs = Object.values(users).map((user: User) => user.id);
+    const userIDs = Object.values(users).map((user: User) => user.membership_id);
 
     this.store.dispatch(new AddTeamUsers(<TeamUserMgmtPayload>{
       id: this.teamId,
@@ -166,7 +167,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   removeUser(user: User): void {
     this.store.dispatch(new RemoveTeamUsers(<TeamUserMgmtPayload>{
       id: this.teamId,
-      user_ids: [user.id]
+      user_ids: [user.membership_id]
     }));
   }
 

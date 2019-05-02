@@ -19,10 +19,10 @@
     <chef-tbody>
       <chef-tr *ngFor="let user of users$ | async">
         <chef-td class="name-column">
-          <a [routerLink]="['/settings', 'users', user.username]">{{ user.name }}</a>
+          <a [routerLink]="['/settings', 'users', user.id]">{{ user.name }}</a>
         </chef-td>
         <chef-td class="username-column">
-          {{ user.username }}
+          {{ user.id }}
         </chef-td>
         <chef-td class="garbage-column">
           <!-- TODO (tc) We do not yet have a way of checking permissions on a specific object.

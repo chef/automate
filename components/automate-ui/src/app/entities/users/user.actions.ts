@@ -42,9 +42,10 @@ export class GetUsersFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+// TODO rename
 export class GetUserByUsername implements Action {
   readonly type = UserActionTypes.GET_BY_USERNAME;
-  constructor(public payload: {username: string}) { }
+  constructor(public payload: {id: string}) { }
 }
 
 export class GetUserByUsernameSuccess implements Action {
@@ -98,8 +99,8 @@ export class DeleteUserFailure implements Action {
 }
 
 export interface CreateUserPayload {
+  id: string;
   name: string;
-  username: string;
   password: string;
 }
 
