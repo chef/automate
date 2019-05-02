@@ -93,15 +93,15 @@ function get_release_diff_url()
     echo "https://github.com/chef/automate/compare/$current...$acceptance"
 }
 
-document "generate_expeditor_config" <<DOC
-  Generate an updated expeditor config.
+document "generate_bldr_config" <<DOC
+  Generate an updated bldr config.
 DOC
-function generate_expeditor_config()
+function generate_bldr_config()
 {
   (
     setup_go_workspace
     enter_go_workspace
-    echo "Generating updated expeditor config. It takes a couple of minutes."
-    go run ./tools/expeditor-config-gen/main.go
+    echo "Generating updated bldr config. It takes a couple of minutes. It is very slow on Docker for Mac"
+    go run ./tools/bldr-config-gen/main.go
   )
 }

@@ -127,14 +127,15 @@ Every service needs to inform the deployment service how it wishes to be backed 
 
 ## Teaching Deployment Service How to Deploy Your Service
 
-### Expeditor Config
+### Expeditor Bldr Config
 
 Expeditor is part of the build system, not deployment service, but you
 will need to configure it anyway to make the build system build and
-publish your package. Add your package to the `HABITAT_PACKAGES` file
-in the root directory an run:
+publish your package. It reads the bldr configuration file when
+determining what packages to build. Add your package to the
+`HABITAT_PACKAGES` file in the root directory an run:
 
-    go run ./tools/expeditor-config-gen
+    go run ./tools/bldr-config-gen
 
 
 ### Manifest Chicken and Egg Issue

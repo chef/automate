@@ -13,6 +13,15 @@ control 'iam-v2-projects-1' do
   CUSTOM_ROLE_ID_1 = "inspec-custom-role-1-#{TIMESTAMP}"
   CUSTOM_ROLE_ID_2 = "inspec-custom-role-2-#{TIMESTAMP}"
   CUSTOM_ROLE_ID_3 = "inspec-custom-role-3-#{TIMESTAMP}"
+    
+  DEFAULT_ROLE_IDS = [
+    "owner",
+    "editor",
+    "viewer",
+    "ingest",
+    "project-admin",
+    "iam-members-viewer"
+  ]
 
   CUSTOM_ROLE_1 = {
           id: CUSTOM_ROLE_ID_1,
@@ -36,7 +45,7 @@ control 'iam-v2-projects-1' do
           type: "CUSTOM"
   }
 
-  Roles = [ CUSTOM_ROLE_1, CUSTOM_ROLE_2, CUSTOM_ROLE_3 ]
+  CUSTOM_ROLES = [ CUSTOM_ROLE_1, CUSTOM_ROLE_2, CUSTOM_ROLE_3 ]
 
   CUSTOM_PROJECT_1 = {
           id: CUSTOM_PROJECT_ID_1,
@@ -60,7 +69,7 @@ control 'iam-v2-projects-1' do
         expect(resp.http_status).to eq 200
       end
  
-      Roles.each do|role|
+      CUSTOM_ROLES.each do|role|
         resp = automate_api_request("/apis/iam/v2beta/roles",
           http_method: 'POST',
           request_body: role.to_json
@@ -70,7 +79,7 @@ control 'iam-v2-projects-1' do
     end
 
     after(:all) do
-      Roles.each do|role|
+      CUSTOM_ROLES.each do|role|
         resp = automate_api_request("/apis/iam/v2beta/roles/#{role[:id]}", http_method: 'delete')
         expect(resp.http_status).to eq 200
       end
@@ -140,8 +149,10 @@ control 'iam-v2-projects-1' do
         "/apis/iam/v2beta/roles"
         )
       expect(resp.http_status).to eq 200
-      # expect(resp.parsed_response_body[:roles].map{|r| r[:id] }).to match_array(["a","b"])
-      expect(resp.parsed_response_body[:roles].length).to be > 3
+      expected_roles = CUSTOM_ROLES.map { |r| r[:id] } + DEFAULT_ROLE_IDS
+      expected_roles.each do |role| 
+        expect(resp.parsed_response_body[:roles].map{|r| r[:id] }).to include(role)
+      end
     end
   end
 
@@ -159,7 +170,7 @@ control 'iam-v2-projects-1' do
         expect(resp.http_status).to eq 200
       end
  
-      Roles.each do|role|
+      CUSTOM_ROLES.each do|role|
         resp = automate_api_request("/apis/iam/v2beta/roles",
           http_method: 'POST',
           request_body: role.to_json
@@ -205,7 +216,7 @@ control 'iam-v2-projects-1' do
       expect(resp.http_status).to eq 200
       resp = automate_api_request("/apis/iam/v2beta/roles/#{POLICY_ROLE_ID}", http_method: 'delete')
       expect(resp.http_status).to eq 200
-      Roles.each do|role|
+      CUSTOM_ROLES.each do|role|
         if role[:id] != CUSTOM_ROLE_ID_1
           resp = automate_api_request("/apis/iam/v2beta/roles/#{role[:id]}", http_method: 'delete')
           expect(resp.http_status).to eq 200

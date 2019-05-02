@@ -32,13 +32,13 @@ for d in $(yml2json .license_scout.yml | jq -r '(.fallbacks, .exceptions).golang
     fi
 done
 
-echo "Checking for up-to-date expeditor config"
-go run ./tools/expeditor-config-gen
+echo "Checking for up-to-date bldr config"
+go run ./tools/bldr-config-gen
 if ! git diff --exit-code --ignore-submodules=all; then
-    echo "The expeditor config appears to be out of date!"
+    echo "The blr config appears to be out of date!"
     echo "To fix this, run:"
     echo ""
-    echo "   hab studio run \"source .studiorc && generate_expeditor_config\""
+    echo "   hab studio run \"source .studiorc && generate_bldr_config\""
     echo ""
     echo "Inspect and commit the resulting changes if they look reasonable"
     exit 1

@@ -11,7 +11,7 @@ import {
 
 export interface ServiceGroupEntityState {
   serviceGroups: ServiceGroup[];
-  serviceGroupHealthCounts: HealthSummary[];
+  serviceGroupHealthCounts: HealthSummary;
   status: EntityStatus;
   filters: ServiceGroupFilters;
   servicesStatus: EntityStatus;
@@ -24,14 +24,26 @@ export interface ServiceGroupEntityState {
 
 export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
   serviceGroups: [],
-  serviceGroupHealthCounts: [],
+  serviceGroupHealthCounts: {
+    total: 0,
+    ok: 0,
+    warning: 0,
+    critical: 0,
+    unknown: 0
+  },
   status: EntityStatus.notLoaded,
   filters: { },
   servicesStatus: EntityStatus.notLoaded,
   errorResp: null,
   servicesFilters: { },
   servicesList: [],
-  servicesHealthSummary: undefined,
+  servicesHealthSummary: {
+    total: 0,
+    ok: 0,
+    warning: 0,
+    critical: 0,
+    unknown: 0
+  },
   selectedServiceGroupName: undefined
 };
 

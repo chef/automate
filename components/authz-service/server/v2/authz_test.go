@@ -66,18 +66,17 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 				[]string{},    // no projects
 				[]string(nil), // well, almost verbatim
 			},
-			"when engine response is ALL projects and another project, returns external ALL projects": {
-				[]string{constants.AllProjectsID, "p3"},
-				[]string{constants.AllProjectsExternalID},
-			},
-			"when engine response is ALL projects, returns external ALL projects": {
-				[]string{constants.AllProjectsID},
+			"when engine response is list of all projects + unassigned, returns external ALL projects": {
+				[]string{"p1", "p2", "p3", "(unassigned)"},
 				[]string{constants.AllProjectsExternalID},
 			},
 		}
 		for name, tc := range cases {
 			t.Run(name, func(t *testing.T) {
 				eng.projects = tc.allowedProjects
+				addProjectToStore(t, ts.projectCache, "p1", "Numero 1", storage.Custom)
+				addProjectToStore(t, ts.projectCache, "p2", "Numero 2", storage.Custom)
+				addProjectToStore(t, ts.projectCache, "p3", "Numero 3", storage.Custom)
 				resp, err := ts.authz.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{
 					Subjects:       []string{"user:local:admin"},
 					Resource:       "some:thing",
@@ -166,7 +165,6 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 		ctx, ts := setupV2AuthTests(t, &eng)
 		addProjectToStore(t, ts.projectCache, "project-1", "Numero 1", storage.Custom)
 		addProjectToStore(t, ts.projectCache, "project-2", "Numero 2", storage.Custom)
-		ts.projectCache.Add("project-1", "project-2", 0)
 		allProjects := []string{"project-1", "project-2", "(unassigned)"}
 
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,

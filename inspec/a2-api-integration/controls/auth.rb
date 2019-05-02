@@ -100,5 +100,12 @@ control 'auth-1' do
                    http_method: 'DELETE')
       expect(response.http_status).to eq 200
     end
+
+    it "returns 404 Not Found" do
+      response = automate_api_request("/api/v0/auth/tokens/not-real-token",
+                   http_method: 'DELETE')
+      expect(response.http_status).to eq 404
+      expect(response.parsed_response_body[:error]).to eq "No token record found"
+    end
   end
 end
