@@ -1,4 +1,4 @@
-import { set, pipe, find } from 'lodash/fp';
+import { set, pipe } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
 import { ProjectConstants } from 'app/entities/projects/project.model';
@@ -49,20 +49,8 @@ export function projectsFilterReducer(
     }
 
     case ProjectsFilterActionTypes.LOAD_OPTIONS_SUCCESS: {
-      const sortedOptions = action.payload
-        .filter(o => o.value !== UNASSIGNED_PROJECT_ID)
-        .sort((a, b) => {
-          const opts = { numeric: true, sensitivity: 'base' };
-          return a.label.localeCompare(b.label, undefined, opts)
-            || a.label.localeCompare(b.label, undefined, { numeric: true });
-        }
-        );
-      const unassignedProject = find(['value', UNASSIGNED_PROJECT_ID], action.payload);
-      if (unassignedProject) {
-        sortedOptions.push(unassignedProject);
-      }
       return pipe(
-        set('options', sortedOptions),
+        set('options', action.payload),
         set('optionsLoadingStatus', EntityStatus.loadingSuccess),
         set('selectionLabel', selectionLabel(action.payload)),
         set('selectionCount', selectionCount(action.payload)),
