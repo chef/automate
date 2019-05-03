@@ -22,11 +22,12 @@ NATS Flags:
 	--uniq-client-id     Generate a unique client-id to connect to server
 	--infinite-stream    Publish message every second intinitely
 	--internal-nats      Connect to the Automate Internal NATS Server
+	--disable-tls        Disables TLS when connecting to the server (only applies for event-gateway/external NATS)
 
 NATS Options:
-	--auth-token <token>   Automate auth token (must have ingest permissions)
-	--port       <port>    NATS port to connect (default:4222)
-	--disable-tls          Disables TLS when connecting to the server (only applies for event-gateway/external NATS)
+	--auth-token  <token>   Automate auth token (must have ingest permissions)
+	--port        <port>    NATS port to connect (default:4222)
+	--raw-message <message> Sends a raw message to the NATS Server instead of the Habitat Event message
 
 Options to build a Habitat Event message:
 	--sup-id      <id>     The Supervisor ID
@@ -76,6 +77,7 @@ func main() {
 		client       *nats.NatsClient
 		authToken    string
 		port         string
+		rawMessage   string
 		t            = time.Now()
 		clientID     = "applications-publisher"
 		event        = applications.HabService{
@@ -83,6 +85,7 @@ func main() {
 		}
 	)
 
+	flag.StringVar(&rawMessage, "raw-message", "", "Sends a raw message to the NATS Server instead of the Habitat Event message")
 	flag.StringVar(&port, "port", "4222", "NATS port to connect (default:4222)")
 	flag.StringVar(&authToken, "auth-token", "", "Automate auth token (must have ingest permissions)")
 	flag.StringVar(&event.SupervisorId, "sup-id", "1234567890", "The Supervisor ID")
@@ -135,6 +138,20 @@ func main() {
 	// Convert proto enums
 	event.HealthCheck = applications.HealthStatus(health)
 	event.Status = applications.ServiceStatus(status)
+
+	// Publish a single raw message
+	if len(rawMessage) > 0 {
+		err := client.Connect()
+		if err != nil {
+			exit(err)
+		}
+
+		err = client.PublishBytes([]byte(rawMessage))
+		if err != nil {
+			exit(err)
+		}
+		os.Exit(0)
+	}
 
 	if infiniteLoop {
 		err := client.Connect()
