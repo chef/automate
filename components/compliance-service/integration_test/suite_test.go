@@ -139,7 +139,7 @@ func (s *Suite) GetAllReportsESInSpecReport() ([]*relaxting.ESInSpecReport, erro
 			if hit.Source != nil {
 				err := json.Unmarshal(*hit.Source, &esInSpecReport)
 				if err != nil {
-					logrus.Errorf("GetReport unmarshal error: %s", err.Error())
+					logrus.Errorf("GetAllReportsESInSpecReport unmarshal error: %s", err.Error())
 					return reports, err
 				}
 			}
@@ -170,7 +170,7 @@ func (s *Suite) GetAllSummaryESInSpecSummary() ([]*relaxting.ESInSpecSummary, er
 			if hit.Source != nil {
 				err := json.Unmarshal(*hit.Source, &esInSpecSummary)
 				if err != nil {
-					logrus.Errorf("GetSummary unmarshal error: %s", err.Error())
+					logrus.Errorf("GetAllSummaryESInSpecSummary unmarshal error: %s", err.Error())
 					return summaries, err
 				}
 			}
