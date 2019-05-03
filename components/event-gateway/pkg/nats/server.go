@@ -90,7 +90,7 @@ func WithNATSGateway(c *config.EventGatewayConfig) NATSdConfigurator {
 			return errors.Wrapf(err, "generated invalid URL %q for event-service NATS service", internalURLstr)
 		}
 		nopts.Gateway.Gateways = []*natsd.RemoteGatewayOpts{
-			&natsd.RemoteGatewayOpts{Name: "event-service", TLSConfig: mTLSConfig, URLs: []*url.URL{internalNATSURL}},
+			{Name: "event-service", TLSConfig: mTLSConfig, URLs: []*url.URL{internalNATSURL}},
 		}
 		return nil
 	}
