@@ -65,7 +65,6 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 
 // ReadReport returns a reports based on id
 func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*reporting.Report, error) {
-	var report *reporting.Report
 	formattedFilters := formatFilters(in.Filters)
 	//todo - deep filtering - should we open this up to more than just one?  only for ReadReport?
 	if len(formattedFilters["profile_id"]) > 1 {
@@ -76,7 +75,7 @@ func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*report
 		return nil, utils.FormatErrorMsg(err, in.Id)
 	}
 	// Using ComplianceTwenty as the report might not be in the latest index
-	report, err = srv.es.GetReport(relaxting.ComplianceDailyRepTwenty, in.Id, formattedFilters)
+	report, err := srv.es.GetReport(relaxting.ComplianceDailyRepTwenty, in.Id, formattedFilters)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, in.Id)
 	}
@@ -153,24 +152,13 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 		return err
 	}
 
-	err = exportReports(formattedFilters, srv.es, exporter)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func exportReports(filters map[string][]string, esr *relaxting.ES2Backend, sendResult exportHandler) error {
 	// Step 1: Retrieving the latest report ID for each node based on the provided filters
-	esIndex, err := relaxting.GetEsIndex(filters, false, false)
+	esIndex, err := relaxting.GetEsIndex(formattedFilters, false, false)
 	if err != nil {
 		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
 
-	if len(filters["profile_name"]) > 1 {
-		return status.Error(codes.InvalidArgument, "Only one 'profile_name' filter is allowed")
-	}
-	reportIDs, err := esr.GetReportIds(esIndex, filters)
+	reportIDs, err := srv.es.GetReportIds(esIndex, formattedFilters)
 	if err != nil {
 		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
@@ -178,11 +166,11 @@ func exportReports(filters map[string][]string, esr *relaxting.ES2Backend, sendR
 	total := len(reportIDs)
 	// Step 2: get all reports one by one in reverse order to be sorted asc by end_time
 	for idx := total - 1; idx >= 0; idx-- {
-		cur, err := esr.GetReport(esIndex, reportIDs[idx], filters)
+		cur, err := srv.es.GetReport(esIndex, reportIDs[idx], formattedFilters)
 		if err != nil {
 			return status.Error(codes.NotFound, fmt.Sprintf("Failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs[idx], err))
 		}
-		err = sendResult(cur)
+		err = exporter(cur)
 		if err != nil {
 			return status.Error(codes.Internal, fmt.Sprintf("Failed to stream report %d/%d with ID %s . Error: %s", idx, total, reportIDs[idx], err))
 		}
