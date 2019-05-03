@@ -175,7 +175,7 @@ func convertToRSControlSummary(summ reporting.NodeControlSummary) *reportingapi.
 	return &controlSummary
 }
 
-func (backend *ES2Backend) GetNode(nodeUuid string) (*reportingapi.Node, error) {
+func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string) (*reportingapi.Node, error) {
 	node := new(reportingapi.Node)
 
 	client, err := backend.ES2Client()
@@ -185,7 +185,6 @@ func (backend *ES2Backend) GetNode(nodeUuid string) (*reportingapi.Node, error) 
 	}
 
 	esIndex := ComplianceDailyRepTwenty
-	idQuery := elastic.NewTermQuery("node_uuid", nodeUuid)
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"node_uuid",
 		"node_name",
@@ -200,9 +199,12 @@ func (backend *ES2Backend) GetNode(nodeUuid string) (*reportingapi.Node, error) 
 		"status",
 		"controls_sums")
 
+	filters["node_id"] = []string{nodeUuid}
+	query := backend.getFiltersQuery(filters, false)
+
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
-		Query(idQuery).
+		Query(query).
 		Sort("end_time", false). // Needed to pick up the most recent report
 		Size(1)
 
