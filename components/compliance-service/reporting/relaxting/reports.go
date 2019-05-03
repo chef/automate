@@ -112,57 +112,56 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 		return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
 	}
 
-	// we should only receive one value
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
-		outermostAgg, _ := searchResult.Aggregations.Terms("nodes")
-		if outermostAgg != nil {
-			for _, nodeBucket := range outermostAgg.Buckets {
-				topHits, _ := nodeBucket.Aggregations.TopHits("distinct")
-				nodeID := fmt.Sprintf("%s", nodeBucket.Key)
-				for _, hit := range topHits.Hits.Hits {
-					nodeReport[nodeID] = hit.Id
-				}
-			}
-		}
-
-		//When filtering by controls, we are reducing the array of report ids based on
-		// another query on inspec_report documents where we have control ids
-		if len(filters["control"]) > 0 {
-			esIndex, err := GetEsIndex(filters, false, false)
-			if err != nil {
-				return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to GetEsIndex")
-			}
-			filteredReportIds, err := backend.filterIdsByControl(esIndex, MapValues(nodeReport), filters["control"])
-			if err != nil {
-				return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by "+
-					"control")
-			}
-			logrus.Debugf("getNodeReportIdsFromTimeseries control filtering, len(nodeReport)=%d, "+
-				"len(filteredNodeIds)=%d\n", len(nodeReport), len(filteredReportIds))
-
-			//flipping map[nodeid][reportid] to map[reportid][nodeid] for quicker lookups, to avoid an expensive O(n^2)
-			// Contains(filteredReportIds, reportId) call
-			reportNode := make(map[string]string, len(nodeReport))
-			for nodeID, reportID := range nodeReport {
-				reportNode[reportID] = nodeID
-			}
-
-			// filtering out the nodes for which the report id is no longer in filteredReportIds
-			filteredNodeReport := make(map[string]string, len(filteredReportIds))
-			for _, reportID := range filteredReportIds {
-				filteredNodeReport[reportNode[reportID]] = reportID
-			}
-			nodeReport = filteredNodeReport
-		}
-
-		logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
-			len(nodeReport), searchResult.TookInMillis)
-
+	if searchResult.TotalHits() == 0 || searchResult.Hits.TotalHits == 0 {
+		logrus.Debugf("getNodeReportIdsFromTimeseries: No report ids for the given filters: %+v\n", filters)
+		// no matching report IDs is not an error, just return an empty array
 		return nodeReport, nil
 	}
 
-	logrus.Debugf("getNodeReportIdsFromTimeseries: No report ids for the given filters: %+v\n", filters)
-	// no matching report IDs is not an error, just return an empty array
+	outermostAgg, _ := searchResult.Aggregations.Terms("nodes")
+	if outermostAgg != nil {
+		for _, nodeBucket := range outermostAgg.Buckets {
+			topHits, _ := nodeBucket.Aggregations.TopHits("distinct")
+			nodeID := fmt.Sprintf("%s", nodeBucket.Key)
+			for _, hit := range topHits.Hits.Hits {
+				nodeReport[nodeID] = hit.Id
+			}
+		}
+	}
+
+	//When filtering by controls, we are reducing the array of report ids based on
+	// another query on inspec_report documents where we have control ids
+	if len(filters["control"]) > 0 {
+		esIndex, err := GetEsIndex(filters, false, false)
+		if err != nil {
+			return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to GetEsIndex")
+		}
+		filteredReportIds, err := backend.filterIdsByControl(esIndex, MapValues(nodeReport), filters["control"])
+		if err != nil {
+			return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by "+
+				"control")
+		}
+		logrus.Debugf("getNodeReportIdsFromTimeseries control filtering, len(nodeReport)=%d, "+
+			"len(filteredNodeIds)=%d\n", len(nodeReport), len(filteredReportIds))
+
+		//flipping map[nodeid][reportid] to map[reportid][nodeid] for quicker lookups, to avoid an expensive O(n^2)
+		// Contains(filteredReportIds, reportId) call
+		reportNode := make(map[string]string, len(nodeReport))
+		for nodeID, reportID := range nodeReport {
+			reportNode[reportID] = nodeID
+		}
+
+		// filtering out the nodes for which the report id is no longer in filteredReportIds
+		filteredNodeReport := make(map[string]string, len(filteredReportIds))
+		for _, reportID := range filteredReportIds {
+			filteredNodeReport[reportNode[reportID]] = reportID
+		}
+		nodeReport = filteredNodeReport
+	}
+
+	logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
+		len(nodeReport), searchResult.TookInMillis)
+
 	return nodeReport, nil
 }
 
