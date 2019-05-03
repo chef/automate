@@ -71,7 +71,7 @@ func (backend ES2Backend) getDocIdHits(esIndex string,
 
 func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	filters map[string][]string,
-	latestOnly bool) (map[string]string, error) {
+	latestOnly bool) ([]string, error) {
 	nodeReport := make(map[string]string, 0)
 	boolQuery := backend.getFiltersQuery(filters, latestOnly)
 
@@ -83,7 +83,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	client, err := backend.ES2Client()
 	if err != nil {
-		return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries cannot connect to elasticsearch")
+		return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries cannot connect to elasticsearch")
 	}
 
 	searchSource := elastic.NewSearchSource().
@@ -93,7 +93,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to get Source")
+		return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to get Source")
 	}
 	LogQueryPartMin(esIndex, source, "getNodeReportIdsFromTimeseries query searchSource")
 
@@ -109,13 +109,13 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	if err != nil {
 		logrus.Errorf("unable to getNodeReportIdsFromTimeseries %v", err)
-		return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
+		return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
 	}
 
 	if searchResult.TotalHits() == 0 || searchResult.Hits.TotalHits == 0 {
 		logrus.Debugf("getNodeReportIdsFromTimeseries: No report ids for the given filters: %+v\n", filters)
 		// no matching report IDs is not an error, just return an empty array
-		return nodeReport, nil
+		return []string{}, nil
 	}
 
 	outermostAgg, _ := searchResult.Aggregations.Terms("nodes")
@@ -138,7 +138,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 		}
 		filteredReportIds, err := backend.filterIdsByControl(esIndex, MapValues(nodeReport), filters["control"])
 		if err != nil {
-			return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by "+
+			return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by "+
 				"control")
 		}
 		logrus.Debugf("getNodeReportIdsFromTimeseries control filtering, len(nodeReport)=%d, "+
@@ -159,24 +159,20 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 		nodeReport = filteredNodeReport
 	}
 
-	logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
-		len(nodeReport), searchResult.TookInMillis)
+	reportIds := MapValues(nodeReport)
 
-	return nodeReport, nil
+	logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
+		len(reportIds), searchResult.TookInMillis)
+
+	return reportIds, nil
 }
 
 func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string) ([]string, error) {
-	nodeReport, err := backend.getNodeReportIdsFromTimeseries(esIndex, filters, true)
+	reportIds, err := backend.getNodeReportIdsFromTimeseries(esIndex, filters, true)
 	if err != nil {
 		return []string{}, errors.Wrap(err, "GetReportIds unable to get node report ids")
 	}
 
-	reportIds := make([]string, len(nodeReport))
-	i := 0
-	for _, reportID := range nodeReport {
-		reportIds[i] = reportID
-		i++
-	}
 	return reportIds, nil
 }
 

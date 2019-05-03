@@ -423,16 +423,11 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 
 func (backend ES2Backend) getLatestReportIds(sumDailyToday string) ([]string, error) {
 	myName := "getLatestReportIds"
-	var nodeReports map[string]string
-	var reportIds []string
-	nodeReports, err = backend.getNodeReportIdsFromTimeseries(sumDailyToday, make(map[string][]string, 0), false)
+	reportIds, err := backend.getNodeReportIdsFromTimeseries(sumDailyToday, make(map[string][]string, 0), false)
 	if err != nil {
 		logrus.Errorf("%s no report ids for this day: %s. Will still reindex yesterday's latest though", myName, sumDailyToday)
 	}
 
-	if len(nodeReports) > 0 {
-		reportIds = MapValues(nodeReports)
-	}
 	return reportIds, nil
 }
 
