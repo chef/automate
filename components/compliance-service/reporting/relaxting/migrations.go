@@ -381,28 +381,12 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 	reindexSource := elastic.NewReindexSource().
 		Index(strings.Split(src, ",")...).
 		Type(srcDocType)
-	//source, err := reindexSource.Source()
-	//if err != nil {
-	//	return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get reindexSource Source", myName))
-	//}
-	//LogQueryPartMin(src, source, fmt.Sprintf("%s query reindexSource", myName))
 
 	reindexDestination := elastic.NewReindexDestination().
 		Index(dest).
 		Type(mappings.DocType)
-	//source, err = reindexDestination.Source()
-	//if err != nil {
-	//	return nil, indexToMigrateExists, errors.Wrap(err, fmt.Sprintf("%s unable to get reindexDest Source", myName))
-	//}
-	//LogQueryPartMin(dest, source, fmt.Sprintf("%s query reindexDest", myName))
 
 	script := elastic.NewScript(reindexScript)
-
-	//source, err = script.Source()
-	//if err != nil {
-	//	return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get script Source", myName))
-	//}
-	//LogQueryPartMin(dest, source, fmt.Sprintf("%s query reindexDest", myName))
 
 	reindexCall := elastic.NewReindexService(client).
 		Source(reindexSource).
