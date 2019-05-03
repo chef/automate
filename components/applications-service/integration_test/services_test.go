@@ -58,7 +58,7 @@ func TestGetServicesSingleService(t *testing.T) {
 			request  = &applications.ServicesReq{}
 			expected = &applications.ServicesRes{
 				Services: []*applications.Service{
-					&applications.Service{
+					{
 						SupervisorId: "sup1234",
 						Group:        "postgres.default",
 						Release:      "core/postgres/0.1.0/20190101121212",
@@ -87,7 +87,7 @@ func TestGetServicesMultiService(t *testing.T) {
 		// health status order.  ["CRITICAL", "UNKNOWN", "WARNING", "OK"]
 		expected = &applications.ServicesRes{
 			Services: []*applications.Service{
-				&applications.Service{
+				{
 					SupervisorId: "sup1",
 					Group:        "postgres.default",
 					Release:      "core/postgres/0.1.0/20190101121212",
@@ -95,7 +95,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_CRITICAL,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup2",
 					Group:        "test.default",
 					Release:      "core/test/0.1.0/20190101121212",
@@ -103,7 +103,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup3",
 					Group:        "test.default",
 					Release:      "core/test/0.1.0/20190101121212",
@@ -111,7 +111,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup1",
 					Group:        "myapp.default",
 					Release:      "core/myapp/0.1.0/20190101121212",
@@ -119,7 +119,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup1",
 					Group:        "redis.default",
 					Release:      "core/redis/0.1.0/20190101121212",
@@ -127,7 +127,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup4",
 					Group:        "test.default",
 					Release:      "core/test/0.1.0/20190101121212",
@@ -160,7 +160,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 		// health status in descending order ["OK", "WARN", "UNKNOWN", "CRITICAL"]
 		expected = &applications.ServicesRes{
 			Services: []*applications.Service{
-				&applications.Service{
+				{
 					SupervisorId: "sup1",
 					Group:        "redis.default",
 					Release:      "core/redis/0.1.0/20190101121212",
@@ -168,7 +168,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup4",
 					Group:        "test.default",
 					Release:      "core/test/0.1.0/20190101121212",
@@ -176,7 +176,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup1",
 					Group:        "myapp.default",
 					Release:      "core/myapp/0.1.0/20190101121212",
@@ -184,7 +184,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup2",
 					Group:        "test.default",
 					Release:      "core/test/0.1.0/20190101121212",
@@ -192,7 +192,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup3",
 					Group:        "test.default",
 					Release:      "core/test/0.1.0/20190101121212",
@@ -200,7 +200,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
 				},
-				&applications.Service{
+				{
 					SupervisorId: "sup1",
 					Group:        "postgres.default",
 					Release:      "core/postgres/0.1.0/20190101121212",
@@ -231,7 +231,7 @@ func TestGetServicesMultiServicaPagination(t *testing.T) {
 		}
 		expected = &applications.ServicesRes{
 			Services: []*applications.Service{
-				&applications.Service{
+				{
 					SupervisorId: "sup2",
 					Group:        "test.default",
 					Release:      "core/test/0.1.0/20190101121212",
@@ -290,7 +290,7 @@ func TestGetServicesMultiServicaPaginationAndSorting(t *testing.T) {
 		}
 		expected = &applications.ServicesRes{
 			Services: []*applications.Service{
-				&applications.Service{
+				{
 					SupervisorId: "sup1",
 					Group:        "redis.default",
 					Release:      "core/redis/0.1.0/20190101121212",
@@ -323,7 +323,7 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 			}
 			expected = &applications.ServicesRes{
 				Services: []*applications.Service{
-					&applications.Service{
+					{
 						SupervisorId: "sup1",
 						Group:        "myapp.default",
 						Release:      "core/myapp/0.1.0/20190101121212",
@@ -355,7 +355,7 @@ func TestGetServicesMultiServiceWithHealthFilter(t *testing.T) {
 			}
 			expected = &applications.ServicesRes{
 				Services: []*applications.Service{
-					&applications.Service{
+					{
 						SupervisorId: "sup1",
 						Group:        "myapp.default",
 						Release:      "core/myapp/0.1.0/20190101121212",
@@ -391,7 +391,7 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 			}
 			expected = &applications.ServicesRes{
 				Services: []*applications.Service{
-					&applications.Service{
+					{
 						SupervisorId: "sup2",
 						Group:        "test.default",
 						Release:      "core/test/0.1.0/20190101121212",
@@ -399,7 +399,7 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 						HealthCheck:  applications.HealthStatus_UNKNOWN,
 						Application:  a, Environment: e, Fqdn: "",
 					},
-					&applications.Service{
+					{
 						SupervisorId: "sup3",
 						Group:        "test.default",
 						Release:      "core/test/0.1.0/20190101121212",
