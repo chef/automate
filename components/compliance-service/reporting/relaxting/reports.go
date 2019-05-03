@@ -30,11 +30,6 @@ import (
 
 const MaxScrollRecordSize = 10000
 
-type Filter struct {
-	Type   string
-	Values []string
-}
-
 func (backend ES2Backend) GetNodeReportIds(esIndex string, filters map[string][]string) (map[string]string, error) {
 	var nodeReport map[string]string
 	var err error
