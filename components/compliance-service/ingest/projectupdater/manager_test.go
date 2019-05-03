@@ -26,12 +26,12 @@ func TestManagerMergeJobStatus(t *testing.T) {
 		{
 			description: "Two complete Jobs",
 			jobStatuses: []ingestic.JobStatus{
-				ingestic.JobStatus{
+				{
 					Completed:             true,
 					PercentageComplete:    1.0,
 					EstimatedEndTimeInSec: 0,
 				},
-				ingestic.JobStatus{
+				{
 					Completed:             true,
 					PercentageComplete:    1.0,
 					EstimatedEndTimeInSec: 0,
@@ -46,7 +46,7 @@ func TestManagerMergeJobStatus(t *testing.T) {
 		{
 			description: "One complete Job",
 			jobStatuses: []ingestic.JobStatus{
-				ingestic.JobStatus{
+				{
 					Completed:             true,
 					PercentageComplete:    1.0,
 					EstimatedEndTimeInSec: 0,
@@ -61,12 +61,12 @@ func TestManagerMergeJobStatus(t *testing.T) {
 		{
 			description: "First complete and second incomplete",
 			jobStatuses: []ingestic.JobStatus{
-				ingestic.JobStatus{
+				{
 					Completed:             true,
 					PercentageComplete:    1.0,
 					EstimatedEndTimeInSec: 0,
 				},
-				ingestic.JobStatus{
+				{
 					Completed:             false,
 					PercentageComplete:    0.5,
 					EstimatedEndTimeInSec: 1555520534,
@@ -81,12 +81,12 @@ func TestManagerMergeJobStatus(t *testing.T) {
 		{
 			description: "First incomplete and second complete",
 			jobStatuses: []ingestic.JobStatus{
-				ingestic.JobStatus{
+				{
 					Completed:             false,
 					PercentageComplete:    0.5,
 					EstimatedEndTimeInSec: 1555520534,
 				},
-				ingestic.JobStatus{
+				{
 					Completed:             true,
 					PercentageComplete:    1.0,
 					EstimatedEndTimeInSec: 0,
@@ -101,12 +101,12 @@ func TestManagerMergeJobStatus(t *testing.T) {
 		{
 			description: "Two incomplete Jobs",
 			jobStatuses: []ingestic.JobStatus{
-				ingestic.JobStatus{
+				{
 					Completed:             false,
 					PercentageComplete:    0.7,
 					EstimatedEndTimeInSec: 1555520534,
 				},
-				ingestic.JobStatus{
+				{
 					Completed:             false,
 					PercentageComplete:    0.3,
 					EstimatedEndTimeInSec: 1555520534 + 20,
@@ -121,12 +121,12 @@ func TestManagerMergeJobStatus(t *testing.T) {
 		{
 			description: "Two incomplete Jobs; use the job with the latest estimated complete date",
 			jobStatuses: []ingestic.JobStatus{
-				ingestic.JobStatus{
+				{
 					Completed:             false,
 					PercentageComplete:    0.7,
 					EstimatedEndTimeInSec: 1555520534,
 				},
-				ingestic.JobStatus{
+				{
 					Completed:             false,
 					PercentageComplete:    0.8,
 					EstimatedEndTimeInSec: 1555520534 + 20,
@@ -141,12 +141,12 @@ func TestManagerMergeJobStatus(t *testing.T) {
 		{
 			description: "Two incomplete Jobs; use the job with the latest estimated complete date; opposite order",
 			jobStatuses: []ingestic.JobStatus{
-				ingestic.JobStatus{
+				{
 					Completed:             false,
 					PercentageComplete:    0.8,
 					EstimatedEndTimeInSec: 1555520534 + 20,
 				},
-				ingestic.JobStatus{
+				{
 					Completed:             false,
 					PercentageComplete:    0.7,
 					EstimatedEndTimeInSec: 1555520534,
