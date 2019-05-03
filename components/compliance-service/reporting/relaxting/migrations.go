@@ -333,7 +333,7 @@ func (backend ES2Backend) getScanDateRange(indexPrefix string) (*time.Time, *tim
 		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to Unmarshal min_date", myName))
 	}
 
-	logrus.Debugf("GetMinScanDate: earliest scan date for range = %s", minDateAsString)
+	logrus.Debugf("earliest scan date for range = %s", minDateAsString)
 
 	formatOfDate := "2006-01-02"
 	earliestScanDate, err := time.Parse(formatOfDate, minDateAsString)
@@ -347,7 +347,7 @@ func (backend ES2Backend) getScanDateRange(indexPrefix string) (*time.Time, *tim
 		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to Unmarshal max_date", myName))
 	}
 
-	logrus.Debugf("GetMinScanDate: most recent scan date for range = %s", maxDateAsString)
+	logrus.Debugf(" most recent scan date for range = %s", maxDateAsString)
 
 	mostRecentScanDate, err := time.Parse(formatOfDate, maxDateAsString)
 	if err != nil {
