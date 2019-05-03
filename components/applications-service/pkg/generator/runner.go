@@ -287,6 +287,8 @@ func (m *MessagePrototype) CreateMessage(uuid string) *applications.HabService {
 			Version: "0.1.0",
 			Release: m.Release,
 		},
+		Site:    "test",
+		Channel: "stable",
 	}
 }
 
