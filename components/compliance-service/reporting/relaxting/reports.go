@@ -30,17 +30,6 @@ import (
 
 const MaxScrollRecordSize = 10000
 
-func (backend ES2Backend) GetNodeReportIds(esIndex string, filters map[string][]string) (map[string]string, error) {
-	var nodeReport map[string]string
-	var err error
-
-	nodeReport, err = backend.getNodeReportIdsFromTimeseries(esIndex, filters, true)
-	if err != nil {
-		return nodeReport, errors.Wrap(err, "GetNodeReportIds unable to retrieve report ids")
-	}
-	return nodeReport, nil
-}
-
 func (backend ES2Backend) getDocIdHits(esIndex string,
 	searchSource *elastic.SearchSource) ([]*elastic.SearchHit, time.Duration, error) {
 	defer util.TimeTrack(time.Now(), "getDocIdHits")
@@ -178,11 +167,12 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 }
 
 func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string) ([]string, error) {
-	nodeReport, err := backend.GetNodeReportIds(esIndex, filters)
-	reportIds := make([]string, len(nodeReport))
+	nodeReport, err := backend.getNodeReportIdsFromTimeseries(esIndex, filters, true)
 	if err != nil {
-		return reportIds, errors.Wrap(err, "GetReportIds unable to get node report ids")
+		return []string{}, errors.Wrap(err, "GetReportIds unable to get node report ids")
 	}
+
+	reportIds := make([]string, len(nodeReport))
 	i := 0
 	for _, reportID := range nodeReport {
 		reportIds[i] = reportID
