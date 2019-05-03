@@ -175,7 +175,7 @@ message HabService {
 
   // @afiune We need to figure out how the fqdn will be provided
   string fqdn = 9;
-  string channel = 11;
+  string channel = 10;
   // site may not be provided by habitat so let's not use a reserved number for it.
   string site = 17;
 }
