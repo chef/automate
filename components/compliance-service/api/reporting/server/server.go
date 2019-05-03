@@ -166,9 +166,6 @@ func exportReports(filters map[string][]string, esr *relaxting.ES2Backend, sendR
 		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
 
-	if len(filters["profile_name"]) > 1 {
-		return status.Error(codes.InvalidArgument, "Only one 'profile_name' filter is allowed")
-	}
 	reportIDs, err := esr.GetReportIds(esIndex, filters)
 	if err != nil {
 		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
