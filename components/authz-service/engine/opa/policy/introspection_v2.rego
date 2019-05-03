@@ -45,6 +45,7 @@ authorized_pair[pair] {
 allowed_project[project] {
 	project := policies[pol_id].statements[statement_id].projects[_]
 	match_pair[["allow", pair, pol_id, statement_id]]
+	# not type "system"
 }
 
 authorized_project[project] {

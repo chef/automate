@@ -28,6 +28,8 @@ const (
 	Custom Type = iota
 	// ChefManaged represents a policy created by Chef Software.
 	ChefManaged
+	// System represents an underlying policy that allows Automate to function correctly.
+	// System
 )
 
 const (
