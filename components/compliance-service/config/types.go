@@ -71,7 +71,6 @@ type Manager struct {
 
 // InspecAgent service specific config options
 type InspecAgent struct {
-	Service
 	JobBufferSize int
 	JobWorkers    int
 	SocketPath    string
