@@ -53,6 +53,31 @@ func TestSystemPolicies(t *testing.T) {
 	}
 }
 
+func TestFilterAuthorizedProjectsWithSystemPolicies(t *Testing.T) {
+	ctx := context.Background()
+	ts := setupWithOPA(t)
+	authz := ts.authz
+
+	t.Run("user should only get projects they have non-system level access to", func(t *testing.T) {
+		// TODO
+		// project1Resp, err := ts.projects.CreateProject("project1")
+		// project2Resp, err := ts.projects.CreateProject("project2")
+		// project3Resp, err := ts.projects.CreateProject("project3")
+
+		// policyResp, err := ts.policies.CreatePolicy("policy subjects user:local:test and some actions, project1)
+
+		// 	resp, err := ts.authz.FilterAuthorizedProjects(ctx,
+		// 								&api_v2.FilterAuthorizedPairsReq{
+		// 										Subjects: []string{"user:local:test"},
+		// 										Pairs:    // TODO get all pairs,
+		// 								})
+
+		// 	require.NoError(t, err)
+		// 	// TODO This should fail with project2 and project3 as well
+		// 	assert.ElementsMatch(t, "project1", resp.Projects)
+	})
+}
+
 func setupWithOPA(t *testing.T) testSetup {
 	t.Helper()
 	ctx := context.Background()
