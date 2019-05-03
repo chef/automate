@@ -815,14 +815,14 @@ paths = [
 ]
 
 [automate-workflow-server]
-plan_path = "automate-workflow-server"
+plan_path = "components/automate-workflow-server"
 paths = [
   "components/automate-workflow-ctl/*",
   "components/automate-workflow-server/*"
 ]
 
 [automate-ui]
-plan_path = ": components/automate-ui"
+plan_path = "components/automate-ui"
 paths = [
   "components/automate-ui/*",
   "components/chef-ui-library/*"
