@@ -39,17 +39,6 @@ func (backend ES2Backend) GetNodeReportIds(esIndex string, filters map[string][]
 	var nodeReport map[string]string
 	var err error
 
-	//switch esIndex {
-	//case CompSumLatestIndexAccumulated:
-	//	nodeReport, err = backend.getNodeReportIdsFromLatest(esIndex, filters)
-	//default:
-	//	nodeReport, err = backend.getNodeReportIdsFromTimeseries(esIndex, filters)
-	//}
-	//
-	//if err != nil {
-	//	return nodeReport, errors.Wrap(err, "GetNodeReportIds unable to retrieve report ids")
-	//}
-
 	nodeReport, err = backend.getNodeReportIdsFromTimeseries(esIndex, filters, true)
 	if err != nil {
 		return nodeReport, errors.Wrap(err, "GetNodeReportIds unable to retrieve report ids")
