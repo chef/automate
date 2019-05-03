@@ -3719,13 +3719,13 @@ func TestListProjects(t *testing.T) {
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
-				&storage.Project{
+				{
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
 					Projects: []string{"foo"},
 				},
-				&storage.Project{
+				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
@@ -3746,13 +3746,13 @@ func TestListProjects(t *testing.T) {
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
-				&storage.Project{
+				{
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
 					Projects: []string{"foo"},
 				},
-				&storage.Project{
+				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
@@ -3771,13 +3771,13 @@ func TestListProjects(t *testing.T) {
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
-				&storage.Project{
+				{
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
 					Projects: []string{"foo"},
 				},
-				&storage.Project{
+				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
@@ -3798,13 +3798,13 @@ func TestListProjects(t *testing.T) {
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
-				&storage.Project{
+				{
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
 					Projects: []string{"foo"},
 				},
-				&storage.Project{
+				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
@@ -3826,19 +3826,19 @@ func TestListProjects(t *testing.T) {
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
-				&storage.Project{
+				{
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
 					Projects: []string{"foo"},
 				},
-				&storage.Project{
+				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
 					Projects: []string{"bar"},
 				},
-				&storage.Project{
+				{
 					ID:       "baz",
 					Name:     "my baz project",
 					Type:     storage.Custom,
@@ -3859,19 +3859,19 @@ func TestListProjects(t *testing.T) {
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
-				&storage.Project{
+				{
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
 					Projects: []string{"foo"},
 				},
-				&storage.Project{
+				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
 					Projects: []string{"bar"},
 				},
-				&storage.Project{
+				{
 					ID:       "baz",
 					Name:     "my baz project",
 					Type:     storage.Custom,

@@ -226,10 +226,10 @@ func TestCreatePolicy(t *testing.T) {
 		t.Run(desc, func(t *testing.T) {
 			t.Run("successfully creates policy", func(t *testing.T) {
 				subjTests := map[string][]string{
-					"single subject":                  []string{"user:local:subject1"},
-					"multiple subjects":               []string{"user:local:subject1", "user:local:subject2", "user:local:subject3"},
-					"subject with long name":          []string{"user:local:long-long-long-long-long-long-long-long-long-name-here"},
-					"one-character long subject name": []string{"user:local:a"},
+					"single subject":                  {"user:local:subject1"},
+					"multiple subjects":               {"user:local:subject1", "user:local:subject2", "user:local:subject3"},
+					"subject with long name":          {"user:local:long-long-long-long-long-long-long-long-long-name-here"},
+					"one-character long subject name": {"user:local:a"},
 				}
 				for desc, tc := range subjTests {
 					t.Run("with valid action and "+desc, expectSuccess(cl, authz.CreatePolicyReq{
@@ -273,17 +273,17 @@ func TestCreatePolicy(t *testing.T) {
 
 			t.Run("returns InvalidArgument", func(t *testing.T) {
 				tests := map[string]authz.CreatePolicyReq{
-					"no subject submitted": authz.CreatePolicyReq{
+					"no subject submitted": {
 						Action:   "action",
 						Subjects: []string{},
 						Resource: "resource:1",
 					},
-					"no action submitted": authz.CreatePolicyReq{
+					"no action submitted": {
 						Action:   "",
 						Subjects: []string{"user:local:subject1", "user:local:subject2", "user:local:subject3"},
 						Resource: "resource:1",
 					},
-					"no resource submitted": authz.CreatePolicyReq{
+					"no resource submitted": {
 						Action:   "someaction",
 						Subjects: []string{"user:local:subject1", "user:local:subject2", "user:local:subject3"},
 						Resource: "",
@@ -439,8 +439,8 @@ func TestDeletePolicy(t *testing.T) {
 
 			t.Run("returns InvalidArgument", func(t *testing.T) {
 				tests := map[string]authz.DeletePolicyReq{
-					"no ID submitted":           authz.DeletePolicyReq{},
-					"submitted ID is no UUIDv4": authz.DeletePolicyReq{Id: "35bffbab-3a49-dd8a-94a1-9ea87ec5c3cc"},
+					"no ID submitted":           {},
+					"submitted ID is no UUIDv4": {Id: "35bffbab-3a49-dd8a-94a1-9ea87ec5c3cc"},
 				}
 				for desc, tc := range tests {
 					t.Run(desc, func(t *testing.T) {
@@ -467,12 +467,12 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 			assertPolicyStoreLength(ctx, t, cl, len(testPolicies))
 
 			subjTests := map[string][][]string{
-				"single subject":                      [][]string{{"user:local:purge"}},
-				"multiple subjects (first)":           [][]string{{"user:local:purge", "user:local:subject2", "user:local:subject3"}},
-				"multiple subjects (last)":            [][]string{{"user:local:subject0", "user:local:purge"}},
-				"single subjects (multiple)":          [][]string{{"user:local:purge"}, {"user:local:purge"}},
-				"multiple subjects (first, multiple)": [][]string{{"user:local:purge"}, {"user:local:purge", "user:local:subject0"}},
-				"multiple subjects (last, multiple)":  [][]string{{"user:local:purge"}, {"user:local:subject0", "user:local:purge"}},
+				"single subject":                      {{"user:local:purge"}},
+				"multiple subjects (first)":           {{"user:local:purge", "user:local:subject2", "user:local:subject3"}},
+				"multiple subjects (last)":            {{"user:local:subject0", "user:local:purge"}},
+				"single subjects (multiple)":          {{"user:local:purge"}, {"user:local:purge"}},
+				"multiple subjects (first, multiple)": {{"user:local:purge"}, {"user:local:purge", "user:local:subject0"}},
+				"multiple subjects (last, multiple)":  {{"user:local:purge"}, {"user:local:subject0", "user:local:purge"}},
 			}
 			for desc, tc := range subjTests {
 				t.Run("with existing matching policy having "+desc, func(t *testing.T) {
@@ -639,9 +639,9 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 
 	t.Run("CreatePolicy updates the engine", func(t *testing.T) {
 		tests := map[string][]*authz.CreatePolicyReq{
-			"multiple policies": []*authz.CreatePolicyReq{req1, req2, req3},
-			"a single policy":   []*authz.CreatePolicyReq{req3},
-			"no policies":       []*authz.CreatePolicyReq{},
+			"multiple policies": {req1, req2, req3},
+			"a single policy":   {req3},
+			"no policies":       {},
 		}
 		for desc, testPolicies := range tests {
 			t.Run(desc, func(t *testing.T) {

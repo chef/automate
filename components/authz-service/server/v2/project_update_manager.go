@@ -273,7 +273,7 @@ func (manager *ProjectUpdateManager) startProjectUpdateForDomainResources(
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: projectUpdateID,
 					},
@@ -297,7 +297,7 @@ func (manager *ProjectUpdateManager) cancelProjectUpdateForDomainResources() err
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesCancelUpdate},
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: manager.projectUpdateID,
 					},
@@ -351,11 +351,11 @@ func (manager *ProjectUpdateManager) checkIfComplete() {
 
 func (manager *ProjectUpdateManager) resetDomainServicesData() {
 	manager.domainServices = []*domainService{
-		&domainService{
+		{
 			name:     event_ids.ComplianceInspecReportProducerID,
 			complete: false,
 		},
-		&domainService{
+		{
 			name:     event_ids.InfraClientRunsProducerID,
 			complete: false,
 		},

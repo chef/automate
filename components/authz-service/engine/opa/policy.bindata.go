@@ -339,13 +339,13 @@ type bintree struct {
 }
 
 var _bintree = &bintree{nil, map[string]*bintree{
-	"policy": &bintree{nil, map[string]*bintree{
-		"authz.rego":            &bintree{policyAuthzRego, map[string]*bintree{}},
-		"authz_v2.rego":         &bintree{policyAuthz_v2Rego, map[string]*bintree{}},
-		"common.rego":           &bintree{policyCommonRego, map[string]*bintree{}},
-		"introspection.rego":    &bintree{policyIntrospectionRego, map[string]*bintree{}},
-		"introspection_v2.rego": &bintree{policyIntrospection_v2Rego, map[string]*bintree{}},
-		"rule_mappings.rego":    &bintree{policyRule_mappingsRego, map[string]*bintree{}},
+	"policy": {nil, map[string]*bintree{
+		"authz.rego":            {policyAuthzRego, map[string]*bintree{}},
+		"authz_v2.rego":         {policyAuthz_v2Rego, map[string]*bintree{}},
+		"common.rego":           {policyCommonRego, map[string]*bintree{}},
+		"introspection.rego":    {policyIntrospectionRego, map[string]*bintree{}},
+		"introspection_v2.rego": {policyIntrospection_v2Rego, map[string]*bintree{}},
+		"rule_mappings.rego":    {policyRule_mappingsRego, map[string]*bintree{}},
 	}},
 }}
 
