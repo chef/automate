@@ -2940,8 +2940,10 @@ func setupV2(t *testing.T,
 	require.NoError(t, err)
 
 	eventServiceClient := &mockEventServiceClient{}
+	configMgr, err := config.NewManager("/tmp/.authz-delet-me")
+	require.NoError(t, err)
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
-		&testProjectRulesRetriever{}, eventServiceClient, config.NewManager(""))
+		&testProjectRulesRetriever{}, eventServiceClient, configMgr)
 	require.NoError(t, err)
 
 	vSwitch := v2.NewSwitch(vChan)

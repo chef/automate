@@ -3,6 +3,7 @@ package v2_test
 import (
 	"context"
 	"math/rand"
+	"os"
 	"strconv"
 	"testing"
 
@@ -379,8 +380,12 @@ func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventSe
 
 	mem_v2 := memstore_v2.New()
 	eventServiceClient := &mockEventServiceClient{}
+	configFile := "/tmp/.authz-delet-me"
+	err = os.Remove(configFile)
+	configMgr, err := config.NewManager(configFile)
+	require.NoError(t, err)
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testProjectRulesRetriever{},
-		eventServiceClient, config.NewManager(""))
+		eventServiceClient, configMgr)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")

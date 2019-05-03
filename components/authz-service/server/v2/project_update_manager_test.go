@@ -1,8 +1,11 @@
 package v2_test
 
 import (
+	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
@@ -26,13 +29,19 @@ func TestProjectUpdateManagerOneUpdateRunningAtATime(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	configFile := "/tmp/.authz-delet-me"
+	err := os.Remove(configFile)
+	configMgr, err := config.NewManager(configFile)
+	require.NoError(t, err)
+	defer os.Remove(configFile)
+
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, configMgr)
 
 	assert.Equal(t, config.NotRunningState, manager.State())
 
 	originalNumberOfPublishedEvents := numberOfPublishedEvents
 
-	err := manager.Start()
+	err = manager.Start()
 	assert.NoError(t, err)
 
 	assert.Equal(t, originalNumberOfPublishedEvents+1, numberOfPublishedEvents)
@@ -57,10 +66,16 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	configFile := "/tmp/.authz-delet-me"
+	err := os.Remove(configFile)
+	configMgr, err := config.NewManager(configFile)
+	require.NoError(t, err)
+	defer os.Remove(configFile)
+
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, configMgr)
 	assert.Equal(t, config.NotRunningState, manager.State())
 
-	err := manager.Start()
+	err = manager.Start()
 	assert.NoError(t, err)
 
 	waitForWithTimeout(t, func() bool {
@@ -105,10 +120,15 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	configFile := "/tmp/.authz-delet-me"
+	err := os.Remove(configFile)
+	configMgr, err := config.NewManager(configFile)
+	require.NoError(t, err)
+	defer os.Remove(configFile)
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, configMgr)
 	assert.Equal(t, config.NotRunningState, manager.State())
 
-	err := manager.Start()
+	err = manager.Start()
 	assert.NoError(t, err)
 	waitForWithTimeout(t, func() bool {
 		return config.RunningState == manager.State()
@@ -166,10 +186,15 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	configFile := "/tmp/.authz-delet-me"
+	err := os.Remove(configFile)
+	configMgr, err := config.NewManager(configFile)
+	require.NoError(t, err)
+	defer os.Remove(configFile)
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, configMgr)
 	assert.Equal(t, config.NotRunningState, manager.State())
 
-	err := manager.Start()
+	err = manager.Start()
 	assert.NoError(t, err)
 	waitForWithTimeout(t, func() bool {
 		return config.RunningState == manager.State()
@@ -219,10 +244,15 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	configFile := "/tmp/.authz-delet-me"
+	err := os.Remove(configFile)
+	configMgr, err := config.NewManager(configFile)
+	require.NoError(t, err)
+	defer os.Remove(configFile)
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, configMgr)
 	assert.Equal(t, config.NotRunningState, manager.State())
 
-	err := manager.Start()
+	err = manager.Start()
 	assert.NoError(t, err)
 	assert.Equal(t, config.RunningState, manager.State())
 
@@ -260,10 +290,15 @@ func TestProjectUpdateManagerPercentageComplete(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	configFile := "/tmp/.authz-delet-me"
+	err := os.Remove(configFile)
+	configMgr, err := config.NewManager(configFile)
+	require.NoError(t, err)
+	defer os.Remove(configFile)
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, configMgr)
 	assert.Equal(t, config.NotRunningState, manager.State())
 
-	err := manager.Start()
+	err = manager.Start()
 	assert.NoError(t, err)
 	assert.Equal(t, config.RunningState, manager.State())
 
@@ -299,10 +334,15 @@ func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	configFile := "/tmp/.authz-delet-me"
+	err := os.Remove(configFile)
+	configMgr, err := config.NewManager(configFile)
+	require.NoError(t, err)
+	defer os.Remove(configFile)
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, configMgr)
 	assert.Equal(t, config.NotRunningState, manager.State())
 
-	err := manager.Start()
+	err = manager.Start()
 	assert.NoError(t, err)
 	assert.Equal(t, config.RunningState, manager.State())
 
@@ -338,10 +378,15 @@ func TestProjectUpdateManagerFailureMessagesOldUpdate(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	manager := v2.NewProjectUpdateManager(mockEventServiceClient, config.NewManager(""))
+	configFile := "/tmp/.authz-delet-me"
+	err := os.Remove(configFile)
+	configMgr, err := config.NewManager(configFile)
+	require.NoError(t, err)
+	defer os.Remove(configFile)
+	manager := v2.NewProjectUpdateManager(mockEventServiceClient, configMgr)
 	assert.Equal(t, config.NotRunningState, manager.State())
 
-	err := manager.Start()
+	err = manager.Start()
 	assert.NoError(t, err)
 	assert.Equal(t, config.RunningState, manager.State())
 
