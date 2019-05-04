@@ -20,6 +20,11 @@ export interface ProjectsFilterOption {
   checked: boolean;
 }
 
+export interface ProjectsFilterOptionTuple {
+  fetched: ProjectsFilterOption[];
+  restored: ProjectsFilterOption[];
+}
+
 export interface ProjectsFilterState {
   options: ProjectsFilterOption[];
   optionsLoadingStatus: EntityStatus;
@@ -51,26 +56,16 @@ export function projectsFilterReducer(
     }
 
     case ProjectsFilterActionTypes.LOAD_OPTIONS_SUCCESS: {
-      const sortedOptions = action.payload
-        .filter(o => o.value !== UNASSIGNED_PROJECT_ID)
-        .sort((a, b) => {
-          const opts = { numeric: true, sensitivity: 'base' };
-          return a.label.localeCompare(b.label, undefined, opts)
-            || a.label.localeCompare(b.label, undefined, { numeric: true });
-        }
-        );
-      const unassignedProject = find(['value', UNASSIGNED_PROJECT_ID], action.payload);
-      if (unassignedProject) {
-        sortedOptions.push(unassignedProject);
-      }
+      const merged = mergeOptions(action.payload.fetched, action.payload.restored);
+      const sortedOptions = sortOptions(merged);
       return pipe(
         set('options', sortedOptions),
         set('optionsLoadingStatus', EntityStatus.loadingSuccess),
-        set('selectionLabel', selectionLabel(action.payload)),
-        set('selectionCount', selectionCount(action.payload)),
-        set('selectionCountVisible', selectionCountVisible(action.payload)),
-        set('selectionCountActive', selectionCountActive(action.payload)),
-        set('dropdownCaretVisible', dropdownCaretVisible(action.payload))
+        set('selectionLabel', selectionLabel(sortedOptions)),
+        set('selectionCount', selectionCount(sortedOptions)),
+        set('selectionCountVisible', selectionCountVisible(sortedOptions)),
+        set('selectionCountActive', selectionCountActive(sortedOptions)),
+        set('dropdownCaretVisible', dropdownCaretVisible(sortedOptions))
       )(state) as ProjectsFilterState;
     }
 
@@ -162,4 +157,34 @@ function selectionCountActive(options: ProjectsFilterOption[]): boolean {
 function dropdownCaretVisible(options: ProjectsFilterOption[]): boolean {
   const hasOnlyOneOption = options.length === 1;
   return !hasOnlyOneOption;
+}
+
+function mergeOptions(
+  // Grab previously saved options from localstorage (restored) and,
+  // if any has the same value as one of the newly fetched options (fetched),
+  // merge its current checked status with the fetched option
+  // to create the final list of available options.
+  fetched: ProjectsFilterOption[], restored: ProjectsFilterOption[]): ProjectsFilterOption[] {
+  return fetched.map(fetchedOpt => {
+    const restoredOpt = find(['value', fetchedOpt.value], restored);
+    return restoredOpt ? { ...fetchedOpt, checked: restoredOpt.checked } : fetchedOpt;
+  });
+}
+
+function sortOptions(options: ProjectsFilterOption[]): ProjectsFilterOption[] {
+  // Sort all except unassigned, which should always be last
+  const sorted = options
+    .filter(o => o.value !== UNASSIGNED_PROJECT_ID)
+    .sort((a, b) => {
+      const opts = { numeric: true, sensitivity: 'base' };
+      return a.label.localeCompare(b.label, undefined, opts)
+        || a.label.localeCompare(b.label, undefined, { numeric: true });
+    });
+
+  const unassignedProject = find(['value', UNASSIGNED_PROJECT_ID], options);
+  if (unassignedProject) {
+    sorted.push(unassignedProject);
+  }
+
+  return sorted;
 }
