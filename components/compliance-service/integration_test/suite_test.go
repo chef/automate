@@ -73,7 +73,13 @@ func NewGlobalSuite() *Suite {
 	s.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&event.PublishResponse{}, nil)
 
-	s.ConfigManager = config.NewConfigManager("")
+	configFile := "/tmp/.compliance-service.toml"
+	os.Remove(configFile)
+	s.ConfigManager, err = config.NewConfigManager(configFile)
+	if err != nil {
+		fmt.Printf("Could not create config manager with file %q. %v\n", configFile, err)
+		os.Exit(3)
+	}
 
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, "", s.NotifierMock,
@@ -103,7 +109,13 @@ func NewLocalSuite(t *testing.T) *Suite {
 	s.NodeManagerMock = &NodeManagerMock{}
 	s.NotifierMock = &NotifierMock{}
 	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
-	s.ConfigManager = config.NewConfigManager("")
+	configFile := "/tmp/.compliance-service.toml"
+	os.Remove(configFile)
+	s.ConfigManager, err = config.NewConfigManager(configFile)
+	if err != nil {
+		fmt.Printf("Could not create config manager with file %q. %v\n", configFile, err)
+		os.Exit(3)
+	}
 
 	s.ComplianceIngestServer = server.NewComplianceIngestServer(s.ingesticESClient,
 		s.NodeManagerMock, "", s.NotifierMock,

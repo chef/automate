@@ -308,7 +308,13 @@ func createServices(s *Suite) {
 
 	// TODO @afiune Modify the time of the jobs
 	s.JobScheduler = server.NewJobScheduler()
-	s.ConfigManager = config.NewManager("/tmp/.ingest-service.toml")
+	configFile := "/tmp/.ingest-service.toml"
+	os.Remove(configFile)
+	s.ConfigManager, err = config.NewManager(configFile)
+	if err != nil {
+		fmt.Printf("Could not create ingest config manager with file %q. %v\n", configFile, err)
+		os.Exit(3)
+	}
 	// TODO Handle the Close() functions
 	//defer JobScheduler.Close()
 	//defer ConfigManager.Close()

@@ -140,9 +140,10 @@ func (manager *Manager) Start(projectUpdateID string) {
 					return stage, err
 				}
 			} else {
-				// we don't want to send a failure event
-				logrus.Warnf(
-					"Can not start another project update, project update %q is running", projectUpdateID)
+				// send a failure event for the new project ID requested
+				return stage, errors.Errorf(
+					"Can not start another project update, project update %q is running",
+					stage.projectUpdateID)
 			}
 		default:
 			// error state not found
@@ -153,7 +154,7 @@ func (manager *Manager) Start(projectUpdateID string) {
 	})
 
 	if err != nil {
-		logrus.Errorf("Canceling %v", err)
+		logrus.Errorf("Start %v", err)
 		manager.sendFailedEvent(err.Error(), projectUpdateID)
 	}
 }
