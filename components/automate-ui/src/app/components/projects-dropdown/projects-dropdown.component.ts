@@ -6,7 +6,7 @@ import { orderBy } from 'lodash/fp';
 
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 
-const UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
+const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 
 @Component({
   selector: 'app-projects-dropdown',

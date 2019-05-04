@@ -56,7 +56,7 @@ export class ProjectsFilterService {
       },
       {
         value: ProjectConstants.UNASSIGNED_PROJECT_ID,
-        label: 'Unassigned Resources',
+        label: ProjectConstants.UNASSIGNED_PROJECT_LABEL,
         checked: false
       },
       {

@@ -7,10 +7,12 @@ import {
   ProjectsFilterActionTypes
 } from './projects-filter.actions';
 
-const UNASSIGNED_PROJECT_ID = ProjectConstants.UNASSIGNED_PROJECT_ID;
-const ALL_RESOURCES_LABEL = ProjectConstants.ALL_RESOURCES_LABEL;
-const ALL_PROJECTS_LABEL = ProjectConstants.ALL_PROJECTS_LABEL;
-const MULTIPLE_PROJECTS_LABEL = ProjectConstants.MULTIPLE_PROJECTS_LABEL;
+const {
+  UNASSIGNED_PROJECT_ID,
+  ALL_RESOURCES_LABEL,
+  ALL_PROJECTS_LABEL,
+  MULTIPLE_PROJECTS_LABEL
+} = ProjectConstants;
 
 export interface ProjectsFilterOption {
   label: string;
