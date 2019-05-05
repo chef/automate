@@ -60,7 +60,7 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	// 2) it is already registered in our db with diff uuid, same source_id: update the node by source_id
 	// 3) it is not in our db, we must add it
 
-	if len(node.GetSourceId()) == 0 {
+	if len(node.GetSourceId()) == 0 || len(node.GetSourceAccountId()) == 0 || len(node.GetSourceRegion()) == 0 {
 		_, err = db.Exec(sqlUpsertByID, node.GetUuid(),
 			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
 			nodeState, lastContact, node.GetSourceRegion(), node.GetSourceAccountId(),
