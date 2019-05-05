@@ -20,6 +20,11 @@
   background: transparent;
   font-weight: 600;
 
+  // seems to be needed only for Safari
+  &:active {
+    color: $chef-primary-dark;
+  }
+
   > chef-icon {
     font-size: 16px;
     color: $chef-primary-dark;
