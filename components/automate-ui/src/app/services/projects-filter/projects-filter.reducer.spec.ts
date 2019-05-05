@@ -55,32 +55,174 @@ describe('projectsFilterReducer', () => {
       expect(optionsLoadingStatus).toEqual(EntityStatus.loadingSuccess);
     });
 
-    it('without unassigned, sorts projects when storing them', () => {
-      const action = genAction(
-        genProject('d-proj'),
-        genProject('b-proj'),
-        genProject('c-proj'),
-        genProject('a-proj')
-      );
+    describe('sorting options', () => {
+      it('sorts projects when unassigned is not included', () => {
+        const action = genAction(
+          genProject('d-proj'),
+          genProject('b-proj'),
+          genProject('c-proj'),
+          genProject('a-proj')
+        );
 
-      const { options } = projectsFilterReducer(initialState, action);
+        const { options } = projectsFilterReducer(initialState, action);
 
-      expect(map('label', options)).toEqual(['a-proj', 'b-proj', 'c-proj', 'd-proj']);
+        expect(map('label', options)).toEqual(['a-proj', 'b-proj', 'c-proj', 'd-proj']);
+      });
+
+      it('sorts projects except unassigned is put last', () => {
+        const action = genAction(
+          genProject('d-proj'),
+          genUnassignedProject(),
+          genProject('b-proj'),
+          genProject('zz-proj'),
+          genProject('a-proj')
+        );
+
+        const { options } = projectsFilterReducer(initialState, action);
+
+        expect(map('value', options))
+          .toEqual(['a-proj', 'b-proj', 'd-proj', 'zz-proj', UNASSIGNED_PROJECT_ID]);
+      });
+
+      it('sorts embedded numbers smartly', () => {
+        const action = genAction(
+          genProject('a-proj1'),
+          genProject('a-proj10'),
+          genProject('a-proj2')
+        );
+
+        const { options } = projectsFilterReducer(initialState, action);
+
+        expect(map('value', options))
+          .toEqual(['a-proj1', 'a-proj2', 'a-proj10']);
+      });
+
+      it('sorts first by case-independence then with lowercase before uppercase', () => {
+        const action = genAction(
+          genProject('a-proj'),
+          genProject('b-proj'),
+          genProject('A-proj')
+        );
+
+        const { options } = projectsFilterReducer(initialState, action);
+
+        expect(map('value', options))
+          .toEqual(['a-proj', 'A-proj', 'b-proj']);
+      });
     });
 
-    it('with unassigned, sorts projects except unassigned at bottom when storing them', () => {
-      const action = genAction(
-        genProject('d-proj'),
-        genUnassignedProject(),
-        genProject('b-proj'),
-        genProject('zz-proj'),
-        genProject('a-proj')
-      );
+    describe('merging fetched and stored options', () => {
 
-      const { options } = projectsFilterReducer(initialState, action);
+      it('returns no values when no fetched values and no restored values', () => {
+        const action = new LoadOptionsSuccess(
+          <ProjectsFilterOptionTuple>{
+            fetched: [],
+            restored: []
+          });
 
-      expect(map('value', options))
-        .toEqual(['a-proj', 'b-proj', 'd-proj', 'zz-proj', UNASSIGNED_PROJECT_ID]);
+        const { options } = projectsFilterReducer(initialState, action);
+
+        expect(options).toEqual([]);
+      });
+
+      it('returns no values when restored values but no fetched values', () => {
+        const action = new LoadOptionsSuccess(
+          <ProjectsFilterOptionTuple>{
+            fetched: [],
+            restored: [
+              genProject('a-proj', false),
+              genProject('b-proj', true),
+              genProject('c-proj', false)
+            ]
+          });
+
+        const { options } = projectsFilterReducer(initialState, action);
+
+        expect(options).toEqual([]);
+      });
+
+      it('returns all fetched values when no restored values', () => {
+        const action = genAction(
+          genProject('zz-proj'),
+          genProject('c-proj', true),
+          genUnassignedProject(),
+          genProject('a-proj', true),
+          genProject('b-proj')
+        );
+
+        const { options } = projectsFilterReducer(initialState, action);
+
+        expect(options).toEqual([ // matching in sorted order
+          action.payload.fetched[3],
+          action.payload.fetched[4],
+          action.payload.fetched[1],
+          action.payload.fetched[0],
+          action.payload.fetched[2]
+        ]);
+      });
+
+
+      it('includes all fetched options even if not in restored', () => {
+        const action = new LoadOptionsSuccess(
+          <ProjectsFilterOptionTuple>{
+            fetched: [
+              genProject('a-proj'),
+              genProject('b-proj'),
+              genProject('c-proj')
+            ],
+            restored: [
+              genProject('a-proj', false),
+              genProject('b-proj', true)
+            ]
+          });
+
+        const { options } = projectsFilterReducer(initialState, action);
+
+        expect(map('value', options)).toEqual(map('value', action.payload.fetched));
+      });
+
+      it('skips restored options that are not included in fetched', () => {
+        const action = new LoadOptionsSuccess(
+          <ProjectsFilterOptionTuple>{
+            fetched: [
+              genProject('a-proj'),
+              genProject('b-proj')
+            ],
+            restored: [
+              genProject('a-proj', false),
+              genProject('b-proj', true),
+              genProject('c-proj', false)
+            ]
+          });
+
+        const { options } = projectsFilterReducer(initialState, action);
+
+        expect(map('value', options)).toEqual(['a-proj', 'b-proj']);
+      });
+
+      it('uses stored checked values when present', () => {
+        const action = new LoadOptionsSuccess(
+          <ProjectsFilterOptionTuple>{
+            fetched: [
+              genProject('a-proj', true),
+              genProject('b-proj'),
+              genProject('d-proj', true)
+            ],
+            restored: [
+              genProject('a-proj', false), // overrides true above
+              genProject('c-proj', false), // unused
+              genProject('b-proj', true)   // overrides false above
+            ]
+          });
+
+        const { options } = projectsFilterReducer(initialState, action);
+
+        expect(options).toEqual([
+          action.payload.restored[0],
+          action.payload.restored[2],
+          action.payload.fetched[2]
+        ]);
+      });
     });
 
     describe('with exactly one allowed project', () => {
