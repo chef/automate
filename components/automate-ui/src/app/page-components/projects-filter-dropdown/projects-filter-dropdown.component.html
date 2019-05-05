@@ -1,7 +1,7 @@
 <button class="dropdown-label"
   aria-label="Projects filter"
   [attr.title]="selectionLabel"
-  [attr.tabindex]="dropdownCaretVisible? 0 : -1"
+  [disabled]="!dropdownCaretVisible"
   (click)="handleLabelClick()">
   <span class="selection-label">{{ selectionLabel }}</span>
   <span class="selection-count"
