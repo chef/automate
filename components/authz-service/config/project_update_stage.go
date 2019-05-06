@@ -35,11 +35,11 @@ func (stage ProjectUpdateStage) Copy() ProjectUpdateStage {
 
 func (stage ProjectUpdateStage) StopRunning() ProjectUpdateStage {
 	stage.DomainServices = []ProjectUpdateDomainService{
-		ProjectUpdateDomainService{
+		{
 			Name:       event_ids.ComplianceInspecReportProducerID,
 			LastUpdate: time.Now(),
 		},
-		ProjectUpdateDomainService{
+		{
 			Name:       event_ids.InfraClientRunsProducerID,
 			LastUpdate: time.Now(),
 		},
