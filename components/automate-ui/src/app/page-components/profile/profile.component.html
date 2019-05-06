@@ -1,14 +1,14 @@
 <button
   aria-label="User Menu"
   class="dropdown-toggle"
-  (click)="toggleDropdown($event)"
+  (click)="toggleDropdown()"
   (keydown.shift.tab)="closeDropdown()"
   data-cy="user-profile-button">
   <chef-icon aria-hidden="true" class="dropdown-toggle-user-icon">person</chef-icon>
   <chef-icon aria-hidden="true">keyboard_arrow_down</chef-icon>
 </button>
 
-<chef-click-outside omit="profile-dropdown-toggle" (clickOutside)="closeDropdown()">
+<chef-click-outside omit="dropdown-toggle" (clickOutside)="closeDropdown()">
   <chef-dropdown class="dropdown" [attr.visible]="dropdownVisible" (keydown.esc)="closeDropdown()">
     <ul class="dropdown-list">
       <li class="dropdown-list-item">
