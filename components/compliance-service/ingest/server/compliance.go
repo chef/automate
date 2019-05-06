@@ -163,6 +163,7 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 		SourceId:        in.SourceId,
 		SourceRegion:    in.SourceRegion,
 		SourceAccountId: in.SourceAccountId,
+		Tags:            in.Tags,
 	})
 	if err != nil {
 		logrus.Errorf("ProcessComplianceReport unable to send node info to manager: %s", err.Error())

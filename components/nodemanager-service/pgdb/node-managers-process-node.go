@@ -60,16 +60,31 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	// 2) it is already registered in our db with diff uuid, same source_id: update the node by source_id
 	// 3) it is not in our db, we must add it
 
-	if len(node.GetSourceId()) == 0 || len(node.GetSourceAccountId()) == 0 || len(node.GetSourceRegion()) == 0 {
-		_, err = db.Exec(sqlUpsertByID, node.GetUuid(),
-			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
-			nodeState, lastContact, node.GetSourceRegion(), node.GetSourceAccountId(),
-			node.GetJobUuid())
-	} else {
-		_, err = db.Exec(sqlUpsertBySourceID, node.GetUuid(),
-			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
-			nodeState, lastContact, node.GetSourceId(), node.GetSourceRegion(),
-			node.GetSourceAccountId(), node.GetJobUuid())
+	err = Transact(db, func(tx *DBTrans) error {
+		if len(node.GetSourceId()) == 0 || len(node.GetSourceAccountId()) == 0 || len(node.GetSourceRegion()) == 0 {
+			_, err = tx.Exec(sqlUpsertByID, node.GetUuid(),
+				node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
+				nodeState, lastContact, node.GetSourceRegion(), node.GetSourceAccountId(),
+				node.GetJobUuid())
+		} else {
+			_, err = db.Exec(sqlUpsertBySourceID, node.GetUuid(),
+				node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
+				nodeState, lastContact, node.GetSourceId(), node.GetSourceRegion(),
+				node.GetSourceAccountId(), node.GetJobUuid())
+		}
+
+		if err != nil {
+			return errors.Wrap(err, "ProcessIncomingNode unable to process node")
+		}
+		tags, err := tx.addTags(node.GetTags())
+		if err != nil {
+			return errors.Wrap(err, "ProcessIncomingNode unable to add tags")
+		}
+		return tx.tagNode(node.GetUuid(), tags)
+	})
+	if err != nil {
+		return err
 	}
+
 	return err
 }

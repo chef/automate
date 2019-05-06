@@ -40,6 +40,7 @@ func (r *Runner) reportIt(ctx context.Context, job *types.InspecJob, content []b
 	} else {
 		report.Fqdn = job.TargetConfig.TargetBaseConfig.Hostname
 	}
+	report.Tags = job.Tags
 	logrus.Debugf("hand-over report to ingest service")
 
 	_, err := r.ingestClient.ProcessComplianceReport(ctx, &report)
