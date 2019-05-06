@@ -377,3 +377,71 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeTerminatedNode(
 	suite.Equal(1, len(terminatedNodes))
 	_, err = suite.Database.DeleteNode(terminatedNodes[0].Id)
 }
+
+func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithTags() {
+	// test that a new node with uuid, no source_id makes it into the db
+	// with the right info and is readable
+	nowTime := ptypes.TimestampNow()
+	node := &manager.NodeMetadata{
+		Uuid:            "1223-4254-2424-1322",
+		Name:            "my really cool node",
+		PlatformName:    "debian",
+		PlatformRelease: "8.6",
+		JobUuid:         "12345-389244-2433",
+		LastContact:     nowTime,
+		SourceId:        "",
+		SourceRegion:    "",
+		SourceAccountId: "",
+		Tags: []*common.Kv{
+			{Key: "my test", Value: "my val"},
+			{Key: "environment", Value: "dev"},
+		},
+	}
+	err := suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+
+	readNode, err := suite.Database.GetNode(ctx, listNodes[0].Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("my really cool node", readNode.Name)
+	suite.Equal([]*common.Kv{
+		{Key: "my test", Value: "my val"},
+		{Key: "environment", Value: "dev"},
+	}, readNode.Tags)
+
+	// send node in again with more tags
+	node.Tags = []*common.Kv{
+		{Key: "birds", Value: "are fun"},
+		{Key: "archer", Value: "detective"},
+	}
+	err = suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	listNodes, _, err = suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+
+	readNode, err = suite.Database.GetNode(ctx, listNodes[0].Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	suite.Equal([]*common.Kv{
+		{Key: "my test", Value: "my val"},
+		{Key: "environment", Value: "dev"},
+		{Key: "birds", Value: "are fun"},
+		{Key: "archer", Value: "detective"},
+	}, readNode.Tags)
+	_, err = suite.Database.DeleteNode(listNodes[0].Id)
+}

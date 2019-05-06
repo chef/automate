@@ -511,6 +511,7 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 					SourceID:          node.Id,
 					SourceAccountID:   m.AccountId,
 					MachineIdentifier: node.MachineIdentifier,
+					Tags:              node.Tags,
 				}
 				jobArray = append(jobArray, &fullJob)
 			}
@@ -650,6 +651,7 @@ func (r *Resolver) resolveStaticJobInfo(job *jobs.Job, node *nodes.Node, tc insp
 		Retries:      job.Retries,
 		TargetConfig: tc,
 		Profiles:     job.Profiles,
+		Tags:         node.Tags,
 	}
 	return agentJob
 }
