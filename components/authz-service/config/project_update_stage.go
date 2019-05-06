@@ -54,11 +54,11 @@ func (stage ProjectUpdateStage) StartRunning(projectUpdateID string) ProjectUpda
 	stage.FailureMessage = ""
 	stage.ProjectUpdateID = projectUpdateID
 	stage.DomainServices = []ProjectUpdateDomainService{
-		ProjectUpdateDomainService{
+		{
 			Name:       event_ids.ComplianceInspecReportProducerID,
 			LastUpdate: time.Now(),
 		},
-		ProjectUpdateDomainService{
+		{
 			Name:       event_ids.InfraClientRunsProducerID,
 			LastUpdate: time.Now(),
 		},

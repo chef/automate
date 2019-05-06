@@ -422,7 +422,7 @@ func sendProjectUpdateEvent(projectUpdateID string, eventType string,
 		Type:      &automate_event.EventType{Name: eventType},
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: projectUpdateID,
 					},
