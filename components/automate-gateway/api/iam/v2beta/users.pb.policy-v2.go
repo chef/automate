@@ -72,4 +72,23 @@ func init() {
 		}
 		return ""
 	})
+	policyv2.MapMethodTo("/chef.automate.api.iam.v2beta.Users/UpdateSelf", "iam:usersSelf:{id}", "iam:usersSelf:update", "PUT", "/iam/v2beta/self/{id}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.UpdateSelfReq); ok {
+			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				case "name":
+					return m.Name
+				case "password":
+					return m.Password
+				case "previous_password":
+					return m.PreviousPassword
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }

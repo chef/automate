@@ -51,4 +51,14 @@ service Users {
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
     option (chef.automate.api.iam.policy).action = "iam:users:update";
   };
+  rpc UpdateSelf (UpdateSelfReq) returns (UpdateSelfResp) {
+    option (google.api.http).put = "/iam/v2beta/self/{id}";
+    option (google.api.http).body = "*";
+    // The users namespace, as opposed for auth:users, is for actions users
+    // are allowed to perform on themselves by default without admin permissions.
+    option (chef.automate.api.policy).resource = "users:{id}";
+    option (chef.automate.api.policy).action = "update";
+    option (chef.automate.api.iam.policy).resource = "iam:usersSelf:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:usersSelf:update";
+  };
 };
