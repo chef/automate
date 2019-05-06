@@ -142,13 +142,17 @@ describe('projectsFilterReducer', () => {
       });
 
       it('returns all fetched values when no restored values', () => {
-        const action = genAction(
-          genProject('zz-proj'),
-          genProject('c-proj', true),
-          genUnassignedProject(),
-          genProject('a-proj', true),
-          genProject('b-proj')
-        );
+        const action = new LoadOptionsSuccess(
+          <ProjectsFilterOptionTuple>{
+            fetched: [
+              genProject('zz-proj'),
+              genProject('c-proj', true),
+              genUnassignedProject(),
+              genProject('a-proj', true),
+              genProject('b-proj')
+            ],
+            restored: {}
+          });
 
         const { options } = projectsFilterReducer(initialState, action);
 
@@ -160,7 +164,6 @@ describe('projectsFilterReducer', () => {
           action.payload.fetched[2]
         ]);
       });
-
 
       it('includes all fetched options even if not in restored', () => {
         const action = new LoadOptionsSuccess(
@@ -476,7 +479,7 @@ describe('projectsFilterReducer', () => {
             = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(true);
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
-          expect(selectionCount).toEqual(action.payload.fetched.filter(p => p.checked).length);
+          expect(selectionCount).toEqual(action.payload.restored.filter(p => p.checked).length);
         });
 
         it('displays caret to open dropdown', () => {
@@ -503,7 +506,7 @@ describe('projectsFilterReducer', () => {
             = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(true);
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
-          expect(selectionCount).toEqual(action.payload.fetched.filter(p => p.checked).length - 1);
+          expect(selectionCount).toEqual(action.payload.restored.filter(p => p.checked).length - 1);
         });
 
         it('displays caret to open dropdown', () => {
@@ -530,7 +533,7 @@ describe('projectsFilterReducer', () => {
             = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(true);
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
-          expect(selectionCount).toEqual(action.payload.fetched.filter(p => p.checked).length);
+          expect(selectionCount).toEqual(action.payload.restored.filter(p => p.checked).length);
         });
 
         it('displays caret to open dropdown', () => {
@@ -586,7 +589,7 @@ describe('projectsFilterReducer', () => {
             = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(true);
           expect(selectionCountActive).toBe(BADGE_GREY_STATE);
-          expect(selectionCount).toEqual(action.payload.fetched.length);
+          expect(selectionCount).toEqual(action.payload.restored.length);
         });
 
         it('displays caret to open dropdown', () => {
@@ -636,7 +639,7 @@ describe('projectsFilterReducer', () => {
             = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(true);
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
-          expect(selectionCount).toEqual(action.payload.fetched.filter(p => p.checked).length);
+          expect(selectionCount).toEqual(action.payload.restored.filter(p => p.checked).length);
         });
 
         it('displays caret to open dropdown', () => {
@@ -662,7 +665,7 @@ describe('projectsFilterReducer', () => {
             = projectsFilterReducer(initialState, action);
           expect(selectionCountVisible).toBe(true);
           expect(selectionCountActive).toBe(BADGE_BLUE_STATE);
-          expect(selectionCount).toEqual(action.payload.fetched.filter(p => p.checked).length);
+          expect(selectionCount).toEqual(action.payload.restored.filter(p => p.checked).length);
         });
 
         it('displays caret to open dropdown', () => {
@@ -686,6 +689,17 @@ describe('projectsFilterReducer', () => {
   }
 
   function genAction(...projects: ProjectsFilterOption[]): LoadOptionsSuccess {
+    // If any checked projects supplied, use that more correctly as the restored list;
+    // the fetched list should really have no notion of checked or not.
+    // Then generate the fetched list as the same thing with checked false for all projects.
+    if (projects.filter(p => p.checked === true)) {
+      return new LoadOptionsSuccess(
+        <ProjectsFilterOptionTuple>{
+          fetched: projects.map(p => Object.assign({}, p, { checked: false })),
+          restored: projects
+        });
+    }
+    // Otherwise, we don't care about the restored list.
     return new LoadOptionsSuccess(
       <ProjectsFilterOptionTuple>{ fetched: projects, restored: {} });
   }
