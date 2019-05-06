@@ -23,6 +23,3 @@ disable = [
   "unparam",
   "lll",
 ]
-
-[linters-settings.gofmt]
-  simplify = false

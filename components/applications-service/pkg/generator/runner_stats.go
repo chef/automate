@@ -43,7 +43,7 @@ const statsPrintPerMinute = 2
 func (r *RunnerStatsKeeper) RunCollectAndPrintLoop() {
 	r.Report()
 	ticker := time.NewTicker(r.Interval())
-	for _ = range ticker.C {
+	for range ticker.C {
 		r.Report()
 		r.ResetCycleStats()
 	}

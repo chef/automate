@@ -84,7 +84,7 @@ func (srv *Server) getComplianceAndSecretsConnection(connectionFactory *secureco
 	}
 	// get node client with manager conn
 	nodesClient := nodes.NewNodesServiceClient(mgrConn)
-	if mgrClient == nil {
+	if nodesClient == nil {
 		logrus.Errorf("getComplianceAndSecretsConnection got nil for NewNodesServiceClient")
 		return
 	}

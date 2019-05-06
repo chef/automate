@@ -193,7 +193,7 @@ func (s *SupSim) Run() {
 	s.PublishAll() // nolint: errcheck
 
 	ticker := time.NewTicker(time.Duration(s.Cfg.Tick) * time.Second)
-	for _ = range ticker.C {
+	for range ticker.C {
 		s.PublishAll() // nolint: errcheck
 	}
 }

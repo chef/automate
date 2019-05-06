@@ -77,10 +77,26 @@ func TestPaginationMatrix(t *testing.T) {
 		},
 		{
 			pagination: &query.Pagination{
+				Page: -1,
+				Size: 2,
+			},
+			expectedPage: 1,
+			expectedSize: 2,
+		},
+		{
+			pagination: &query.Pagination{
 				Page: 0,
 				Size: 0,
 			},
 			expectedPage: 1,
+			expectedSize: 25,
+		},
+		{
+			pagination: &query.Pagination{
+				Page: 9,
+				Size: -10,
+			},
+			expectedPage: 9,
 			expectedSize: 25,
 		},
 	}

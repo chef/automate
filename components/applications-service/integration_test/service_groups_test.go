@@ -25,13 +25,13 @@ func TestServiceGroupsBasic(t *testing.T) {
 	assert.Equal(t, expected, response)
 }
 
-func TestServiceGroupsHealthOneOk(t *testing.T) {
+func TestGetServiceGroupsOneOk(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Id:               "number",
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
@@ -58,13 +58,13 @@ func TestServiceGroupsHealthOneOk(t *testing.T) {
 	assertServiceGroupsEqual(t, expected, response)
 }
 
-func TestServiceGroupsHealthOneCritical(t *testing.T) {
+func TestGetServiceGroupsOneCritical(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
@@ -96,7 +96,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Name:             "myapp.default",
 					Release:          "core/myapp/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
@@ -107,7 +107,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Warning: 1,
 					},
 				},
-				&applications.ServiceGroup{
+				{
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
@@ -119,7 +119,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Unknown:  1,
 					},
 				},
-				&applications.ServiceGroup{
+				{
 					Name:             "redis.default",
 					Release:          "core/redis/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
@@ -129,7 +129,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Ok:    3,
 					},
 				},
-				&applications.ServiceGroup{
+				{
 					Name:             "test.default",
 					Release:          "core/test/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
@@ -152,13 +152,13 @@ func TestServiceGroupsMultiService(t *testing.T) {
 	assertServiceGroupsEqual(t, expected, response)
 }
 
-func TestServiceGroupsHealthOneWarning(t *testing.T) {
+func TestGetServiceGroupsOneWarning(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Id:               "number",
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
@@ -185,13 +185,13 @@ func TestServiceGroupsHealthOneWarning(t *testing.T) {
 	assertServiceGroupsEqual(t, expected, response)
 }
 
-func TestServiceGroupsHealthOneUnknown(t *testing.T) {
+func TestGetServiceGroupsOneUnknown(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Id:               "number",
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
@@ -217,13 +217,13 @@ func TestServiceGroupsHealthOneUnknown(t *testing.T) {
 	assert.Nil(t, err)
 	assertServiceGroupsEqual(t, expected, response)
 }
-func TestServiceGroupsHealthOneEach(t *testing.T) {
+func TestGetServiceGroupsOneEach(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsReq)
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Id:               "number",
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
@@ -259,7 +259,7 @@ func TestServiceGroupsHealthOneEach(t *testing.T) {
 	assertServiceGroupsEqual(t, expected, response)
 }
 
-func TestServiceGroupsHealthSortedDesc(t *testing.T) {
+func TestGetServiceGroupsSortedDesc(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
@@ -291,7 +291,7 @@ func TestServiceGroupsHealthSortedDesc(t *testing.T) {
 	assert.Equal(t, "a.default", response.ServiceGroups[3].Name)
 }
 
-func TestServiceGroupsHealthSortedAsc(t *testing.T) {
+func TestGetServiceGroupsSortedAsc(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
@@ -323,7 +323,7 @@ func TestServiceGroupsHealthSortedAsc(t *testing.T) {
 	assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
 }
 
-func TestServiceGroupsHealthSortedPercent(t *testing.T) {
+func TestGetServiceGroupsSortedPercent(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
@@ -354,7 +354,7 @@ func TestServiceGroupsHealthSortedPercent(t *testing.T) {
 	assert.Equal(t, int32(0), response.ServiceGroups[2].HealthPercentage)
 }
 
-func TestServiceGroupsHealthSortedPercentAsc(t *testing.T) {
+func TestGetServiceGroupsSortedPercentAsc(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
@@ -394,7 +394,37 @@ func TestServiceGroupsHealthSortedPercentAsc(t *testing.T) {
 	assert.Equal(t, int32(100), response.ServiceGroups[3].HealthPercentage)
 }
 
-func TestServiceGroupsHealthPage(t *testing.T) {
+func TestGetServiceGroupsInvalidPageNumberReturnsDefaultPageValues(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Pagination: &query.Pagination{
+				Page: -2,
+				Size: 1,
+			},
+		}
+		mockHabServices = []*applications.HabService{
+			NewHabServiceMsg("sup2", a, e, "default", "core",
+				"a", "0.1.0", "20190101121212", "UNKNOWN"),
+			NewHabServiceMsg("sup3", a, e, "default", "core",
+				"b", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup4", a, e, "default", "core",
+				"c", "0.1.0", "20190101121212", "WARNING"),
+			NewHabServiceMsg("sup5", a, e, "default", "core",
+				"d", "0.1.0", "20190101121212", "CRITICAL"),
+		}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+
+	// a.default should be returned since we default to page number one
+	assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
+}
+
+func TestGetServiceGroupsPage(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServiceGroupsReq{
@@ -424,27 +454,57 @@ func TestServiceGroupsHealthPage(t *testing.T) {
 	assert.Equal(t, "b.default", response.ServiceGroups[0].Name)
 }
 
-func assertServiceGroupsEqual(t *testing.T, expected, actual *applications.ServiceGroups) {
-	for i := range expected.ServiceGroups {
-		assert.Equal(t,
-			expected.ServiceGroups[i].Name,
-			actual.ServiceGroups[i].Name,
-			"The service_group name is not the expected one")
-		assert.Equal(t,
-			expected.ServiceGroups[i].Release,
-			actual.ServiceGroups[i].Release,
-			"The service_group release is not the expected one")
-		assert.Equal(t,
-			expected.ServiceGroups[i].HealthPercentage,
-			actual.ServiceGroups[i].HealthPercentage,
-			"The service_group health percentage is not the expected one")
-		assert.Equal(t,
-			expected.ServiceGroups[i].Status,
-			actual.ServiceGroups[i].Status,
-			"The service_group status is not the expected one")
-		assert.Equal(t,
-			expected.ServiceGroups[i].ServicesHealthCounts,
-			actual.ServiceGroups[i].ServicesHealthCounts,
-			"The services health counts from the service_group is not the expected one")
-	}
+// This test is verifying that when users specify a filter the paginator works as expected
+func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
+	var (
+		ctx = context.Background()
+		// For this test we are adding:
+		//  * 3 OK       service-groups
+		//  * 1 UNKNOWN  service-groups
+		//  * 1 WARNING  service-groups
+		//  * 1 CRITICAL service-groups
+		mockHabServices = []*applications.HabService{
+			NewHabServiceMsg("sup1", a, e, "default", "core",
+				"a", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup2", a, e, "default", "core",
+				"b", "0.1.0", "20190101121212", "UNKNOWN"),
+			NewHabServiceMsg("sup3", a, e, "default", "core",
+				"c", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup4", a, e, "default", "core",
+				"d", "0.1.0", "20190101121212", "WARNING"),
+			NewHabServiceMsg("sup5", a, e, "default", "core",
+				"e", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup5", a, e, "default", "core",
+				"f", "0.1.0", "20190101121212", "CRITICAL"),
+		}
+		// This request is asking only for service groups that have an OK status
+		// plus, showing only the page two with a page size of one and they are all
+		// ordered by name, therefor this test should return only the following service:
+		//
+		// => name:"c.default" release:"core/c/0.1.0/20190101121212" status:OK
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"STATUS:OK"},
+			Pagination: &query.Pagination{
+				Page: 2,
+				Size: 1,
+			},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:                 "c.default",
+					Release:              "core/c/0.1.0/20190101121212",
+					Status:               applications.HealthStatus_OK,
+					HealthPercentage:     100,
+					ServicesHealthCounts: &applications.HealthCounts{Total: 1, Ok: 1},
+				},
+			},
+		}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
 }

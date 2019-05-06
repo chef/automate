@@ -87,22 +87,22 @@ func TestAuthorizedWithStatements(t *testing.T) {
 }`
 
 	cases := map[string]map[string]interface{}{
-		"exact match": map[string]interface{}{
+		"exact match": {
 			"subjects": []string{"team:local:admins"},
 			"action":   "iam:teams:create",
 			"resource": "iam:teams",
 		},
-		"subject wildcard": map[string]interface{}{
+		"subject wildcard": {
 			"subjects": []string{"user:local:alice"},
 			"action":   "iam:teams:create",
 			"resource": "iam:teams",
 		},
-		"one of multiple actions": map[string]interface{}{
+		"one of multiple actions": {
 			"subjects": []string{"team:local:admins"},
 			"action":   "infra:nodes:delete",
 			"resource": "infra:nodes",
 		},
-		"one of multiple resources (wildcard)": map[string]interface{}{
+		"one of multiple resources (wildcard)": {
 			"subjects": []string{"team:local:admins"},
 			"action":   "compliance:profiles:create",
 			"resource": "compliance:profiles:yadda",
@@ -230,7 +230,7 @@ func TestAuthorizedProjects(t *testing.T) {
 }`
 
 	cases := map[string]map[string]interface{}{
-		"exact match": map[string]interface{}{
+		"exact match": {
 			"subjects": []string{"team:local:admins"},
 			"projects": []string{"p1", "p3", "p4"},
 			"action":   "iam:teams:create",
@@ -287,23 +287,23 @@ func TestIntrospectionV2(t *testing.T) {
 }`
 
 	cases := map[string]map[string]interface{}{
-		"exact match": map[string]interface{}{
+		"exact match": {
 			"subjects": []string{"team:local:admins"},
 			"pairs":    []map[string]string{{"action": "admin:create", "resource": "auth:teams"}},
 		},
-		"subject wildcard": map[string]interface{}{
+		"subject wildcard": {
 			"subjects": []string{"user:local:alice"},
 			"pairs":    []map[string]string{{"action": "admin:create", "resource": "auth:teams"}},
 		},
-		"one of multiple actions": map[string]interface{}{
+		"one of multiple actions": {
 			"subjects": []string{"team:local:admins"},
 			"pairs":    []map[string]string{{"action": "cfgmgmt:delete", "resource": "cfgmgmt:nodes"}},
 		},
-		"one of multiple resources (wildcard)": map[string]interface{}{
+		"one of multiple resources (wildcard)": {
 			"subjects": []string{"team:local:admins"},
 			"pairs":    []map[string]string{{"action": "compliance:upload", "resource": "compliance:profiles:yadda"}},
 		},
-		"multiple matches (all of the above)": map[string]interface{}{
+		"multiple matches (all of the above)": {
 			"subjects": []string{"team:local:admins"},
 			"pairs": []map[string]string{
 				{"action": "cfgmgmt:delete", "resource": "cfgmgmt:nodes"},

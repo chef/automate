@@ -21,7 +21,7 @@ func TestServiceGroupsMultiServiceFilterStatusOk(t *testing.T) {
 		}
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Name:             "redis.default",
 					Release:          "core/redis/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
@@ -52,7 +52,7 @@ func TestServiceGroupsMultiServiceFilterStatusCritical(t *testing.T) {
 		}
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Name:             "postgres.default",
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
@@ -85,7 +85,7 @@ func TestServiceGroupsMultiServiceFilterStatusWarning(t *testing.T) {
 		}
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Name:             "myapp.default",
 					Release:          "core/myapp/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
@@ -117,7 +117,7 @@ func TestServiceGroupsMultiServiceFilterStatusUnknown(t *testing.T) {
 		}
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
-				&applications.ServiceGroup{
+				{
 					Name:             "test.default",
 					Release:          "core/test/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
@@ -146,8 +146,8 @@ func TestServiceGroupsFilterStatusWrongParameter(t *testing.T) {
 		request = &applications.ServiceGroupsReq{
 			Filter: []string{"status:not-valid-status"},
 		}
-		expected    = new(applications.ServiceGroups)
-		expectedErr = "invalid status filter 'not-valid-status'"
+		expected    *applications.ServiceGroups = nil
+		expectedErr                             = "invalid status filter 'not-valid-status'"
 	)
 
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
@@ -165,8 +165,8 @@ func TestServiceGroupsFilterWrongType(t *testing.T) {
 		request = &applications.ServiceGroupsReq{
 			Filter: []string{"foo:bar"},
 		}
-		expected    = new(applications.ServiceGroups)
-		expectedErr = "invalid filter. (foo:[bar])"
+		expected    *applications.ServiceGroups = nil
+		expectedErr                             = "invalid filter. (foo:[bar])"
 	)
 
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)

@@ -1535,6 +1535,122 @@ describe('Admin pages', () => {
     });
   });
 
+  // TODO (tc): This whole block can go away once the 6 project limit is removed.
+  describe('projects list when the max of 6 projects is reached', () => {
+    beforeEach(() => {
+      fakeServer()
+      .post('/api/v0/auth/introspect_some', JSON.stringify(
+        {
+          paths: [
+            '/iam/v2beta/projects'
+          ]
+        }
+      ))
+      .many()
+      .reply(200, JSON.stringify(
+        {
+          endpoints: {
+            '/iam/v2beta/projects': {
+              get: true,
+              put: false,
+              post: true,
+              delete: false,
+              patch: false
+            }
+          }
+        }
+      ));
+
+    fakeServer()
+    .get('/apis/iam/v2beta/projects')
+    .many()
+    .reply(200, JSON.stringify(
+      {
+        projects: [
+          {
+            id: 'project-1',
+            name: 'project',
+            type: 'CUSTOM'
+          },
+          {
+            id: 'project-2',
+            name: 'project',
+            type: 'CUSTOM'
+          },
+          {
+            id: 'project-3',
+            name: 'project',
+            type: 'CUSTOM'
+          },
+          {
+            id: 'project-4',
+            name: 'project',
+            type: 'CUSTOM'
+          },
+          {
+            id: 'project-5',
+            name: 'project',
+            type: 'CUSTOM'
+          },
+          {
+            id: 'project-6',
+            name: 'project',
+            type: 'CUSTOM'
+          }
+        ]
+      }
+    ));
+
+    // mock up app-authorized responses
+    [
+      ['project-1', true],
+      ['project-2', true],
+      ['project-3', true],
+      ['project-4', true],
+      ['project-5', true],
+      ['project-6', true]
+    ].forEach(([id, deletable]) => {
+      const path = `/iam/v2beta/projects/${id}`;
+      const endpoints = {
+        [path]: {
+          get: true,
+          put: false,
+          post: true,
+          delete: deletable,
+          patch: false
+        }
+      };
+      fakeServer()
+        .post('/api/v0/auth/introspect', JSON.stringify(
+          {
+            path,
+            parameters: []
+          }
+        ))
+        .many()
+        .reply(200, JSON.stringify({ endpoints }));
+    });
+
+    fakeServer()
+      .get('/apis/iam/v2beta/policy_version')
+      .many()
+      .reply(200, JSON.stringify({
+        'version': {
+          'major': 'V2',
+          'minor': 'V1'
+        }
+      }));
+
+      browser.waitForAngularEnabled(false);
+      browser.get('/settings/projects');
+    });
+
+    it('disables the create project button', () => {
+      const createButton = $('app-project-list #create-button');
+      expect(createButton.getAttribute('disabled')).toBe('true');
+    });
+  });
+
   describe('Project details (Chef-managed)', () => {
     beforeEach(() => {
       fakeServer()

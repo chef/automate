@@ -149,7 +149,7 @@ func (app *ApplicationsServer) GetServicesBySG(
 		page, pageSize = params.GetPageParams(request.GetPagination())
 		sgStringID     = fmt.Sprint(request.GetServiceGroupId())
 		filters        = map[string][]string{
-			"service_group_id": []string{sgStringID},
+			"service_group_id": {sgStringID},
 		}
 	)
 

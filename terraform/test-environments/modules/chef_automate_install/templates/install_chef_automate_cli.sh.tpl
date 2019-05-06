@@ -48,6 +48,15 @@ install_automate_cmd() {
     popd
 }
 
+install_inspec() {
+    # install the latest inspec from omnitruck if it doesn't exist
+    # this currently only gets run on the hardened fresh install instances
+    # so we're always going to have the latest inspec
+    if ! [ -x "$(command -v inspec)" ]; then
+	curl -s https://omnitruck.chef.io/install.sh | bash -s -- -P inspec
+    fi
+}
+
 wait_for_upgrade() {
     # 60 tries, 10 seconds between tries.  Roughly 10 minutes + the
     # time of the commands
@@ -70,7 +79,8 @@ wait_for_upgrade() {
 }
 
 hardened_security_inspec_scan() {
-    CHEF_LICENSE="accept-no-persist" /opt/chef/embedded/bin/inspec exec /tmp/a2-hardened-security || exit_status=$?
+    install_inspec
+    CHEF_LICENSE="accept-no-persist" inspec exec /tmp/a2-hardened-security || exit_status=$?
     if [[ $exit_status -ne 0 && $exit_status -ne 101 ]]; then
         exit $exit_status
     fi

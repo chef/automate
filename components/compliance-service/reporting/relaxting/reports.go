@@ -30,33 +30,6 @@ import (
 
 const MaxScrollRecordSize = 10000
 
-type Filter struct {
-	Type   string
-	Values []string
-}
-
-func (backend ES2Backend) GetNodeReportIds(esIndex string, filters map[string][]string) (map[string]string, error) {
-	var nodeReport map[string]string
-	var err error
-
-	//switch esIndex {
-	//case CompSumLatestIndexAccumulated:
-	//	nodeReport, err = backend.getNodeReportIdsFromLatest(esIndex, filters)
-	//default:
-	//	nodeReport, err = backend.getNodeReportIdsFromTimeseries(esIndex, filters)
-	//}
-	//
-	//if err != nil {
-	//	return nodeReport, errors.Wrap(err, "GetNodeReportIds unable to retrieve report ids")
-	//}
-
-	nodeReport, err = backend.getNodeReportIdsFromTimeseries(esIndex, filters, true)
-	if err != nil {
-		return nodeReport, errors.Wrap(err, "GetNodeReportIds unable to retrieve report ids")
-	}
-	return nodeReport, nil
-}
-
 func (backend ES2Backend) getDocIdHits(esIndex string,
 	searchSource *elastic.SearchSource) ([]*elastic.SearchHit, time.Duration, error) {
 	defer util.TimeTrack(time.Now(), "getDocIdHits")
@@ -98,7 +71,7 @@ func (backend ES2Backend) getDocIdHits(esIndex string,
 
 func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	filters map[string][]string,
-	latestOnly bool) (map[string]string, error) {
+	latestOnly bool) ([]string, error) {
 	nodeReport := make(map[string]string, 0)
 	boolQuery := backend.getFiltersQuery(filters, latestOnly)
 
@@ -110,7 +83,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	client, err := backend.ES2Client()
 	if err != nil {
-		return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries cannot connect to elasticsearch")
+		return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries cannot connect to elasticsearch")
 	}
 
 	searchSource := elastic.NewSearchSource().
@@ -120,7 +93,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to get Source")
+		return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to get Source")
 	}
 	LogQueryPartMin(esIndex, source, "getNodeReportIdsFromTimeseries query searchSource")
 
@@ -136,178 +109,71 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	if err != nil {
 		logrus.Errorf("unable to getNodeReportIdsFromTimeseries %v", err)
-		return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
+		return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
 	}
 
-	// we should only receive one value
-	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
-		outermostAgg, _ := searchResult.Aggregations.Terms("nodes")
-		if outermostAgg != nil {
-			for _, nodeBucket := range outermostAgg.Buckets {
-				topHits, _ := nodeBucket.Aggregations.TopHits("distinct")
-				nodeID := fmt.Sprintf("%s", nodeBucket.Key)
-				for _, hit := range topHits.Hits.Hits {
-					nodeReport[nodeID] = hit.Id
-				}
+	if searchResult.TotalHits() == 0 || searchResult.Hits.TotalHits == 0 {
+		logrus.Debugf("getNodeReportIdsFromTimeseries: No report ids for the given filters: %+v\n", filters)
+		// no matching report IDs is not an error, just return an empty array
+		return []string{}, nil
+	}
+
+	outermostAgg, _ := searchResult.Aggregations.Terms("nodes")
+	if outermostAgg != nil {
+		for _, nodeBucket := range outermostAgg.Buckets {
+			topHits, _ := nodeBucket.Aggregations.TopHits("distinct")
+			nodeID := fmt.Sprintf("%s", nodeBucket.Key)
+			for _, hit := range topHits.Hits.Hits {
+				nodeReport[nodeID] = hit.Id
 			}
 		}
+	}
 
-		//When filtering by controls, we are reducing the array of report ids based on
-		// another query on inspec_report documents where we have control ids
-		if len(filters["control"]) > 0 {
-			esIndex, err := GetEsIndex(filters, false, false)
-			if err != nil {
-				return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to GetEsIndex")
-			}
-			filteredReportIds, err := backend.filterIdsByControl(esIndex, MapValues(nodeReport), filters["control"])
-			if err != nil {
-				return nodeReport, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by "+
-					"control")
-			}
-			logrus.Debugf("getNodeReportIdsFromTimeseries control filtering, len(nodeReport)=%d, "+
-				"len(filteredNodeIds)=%d\n", len(nodeReport), len(filteredReportIds))
+	//When filtering by controls, we are reducing the array of report ids based on
+	// another query on inspec_report documents where we have control ids
+	if len(filters["control"]) > 0 {
+		esIndex, err := GetEsIndex(filters, false, false)
+		if err != nil {
+			return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to GetEsIndex")
+		}
+		filteredReportIds, err := backend.filterIdsByControl(esIndex, MapValues(nodeReport), filters["control"])
+		if err != nil {
+			return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by "+
+				"control")
+		}
+		logrus.Debugf("getNodeReportIdsFromTimeseries control filtering, len(nodeReport)=%d, "+
+			"len(filteredNodeIds)=%d\n", len(nodeReport), len(filteredReportIds))
 
-			//flipping map[nodeid][reportid] to map[reportid][nodeid] for quicker lookups, to avoid an expensive O(n^2)
-			// Contains(filteredReportIds, reportId) call
-			reportNode := make(map[string]string, len(nodeReport))
-			for nodeID, reportID := range nodeReport {
-				reportNode[reportID] = nodeID
-			}
-
-			// filtering out the nodes for which the report id is no longer in filteredReportIds
-			filteredNodeReport := make(map[string]string, len(filteredReportIds))
-			for _, reportID := range filteredReportIds {
-				filteredNodeReport[reportNode[reportID]] = reportID
-			}
-			nodeReport = filteredNodeReport
+		//flipping map[nodeid][reportid] to map[reportid][nodeid] for quicker lookups, to avoid an expensive O(n^2)
+		// Contains(filteredReportIds, reportId) call
+		reportNode := make(map[string]string, len(nodeReport))
+		for nodeID, reportID := range nodeReport {
+			reportNode[reportID] = nodeID
 		}
 
-		logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
-			len(nodeReport), searchResult.TookInMillis)
-
-		return nodeReport, nil
+		// filtering out the nodes for which the report id is no longer in filteredReportIds
+		filteredNodeReport := make(map[string]string, len(filteredReportIds))
+		for _, reportID := range filteredReportIds {
+			filteredNodeReport[reportNode[reportID]] = reportID
+		}
+		nodeReport = filteredNodeReport
 	}
 
-	logrus.Debugf("getNodeReportIdsFromTimeseries: No report ids for the given filters: %+v\n", filters)
-	// no matching report IDs is not an error, just return an empty array
-	return nodeReport, nil
-}
+	reportIds := MapValues(nodeReport)
 
-func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string) ([]string, error) {
-	nodeReport, err := backend.GetNodeReportIds(esIndex, filters)
-	reportIds := make([]string, len(nodeReport))
-	if err != nil {
-		return reportIds, errors.Wrap(err, "GetReportIds unable to get node report ids")
-	}
-	i := 0
-	for _, reportID := range nodeReport {
-		reportIds[i] = reportID
-		i++
-	}
+	logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
+		len(reportIds), searchResult.TookInMillis)
+
 	return reportIds, nil
 }
 
-//GetMinScanDate gets the date of the oldest scan in ES
-func (backend ES2Backend) GetMinScanDate() (*time.Time, error) {
-	complianceBirthday := time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)
-	aggs := elastic.NewMinAggregation().Field("end_time").Format("yyyy-MM-dd")
-	searchSource := elastic.NewSearchSource().
-		Aggregation("min_date", aggs).
-		Size(0)
-	esIndex := ComplianceDailySumTwenty
-	source, err := searchSource.Source()
+func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string) ([]string, error) {
+	reportIds, err := backend.getNodeReportIdsFromTimeseries(esIndex, filters, true)
 	if err != nil {
-		return &complianceBirthday, errors.Wrap(err, "GetMinScanDate unable to get Source")
-	}
-	LogQueryPartMin(esIndex, source, "GetMinScanDate query searchSource")
-
-	client, err := backend.ES2Client()
-	if err != nil {
-		return &complianceBirthday, errors.Wrap(err, "GetMinScanDate cannot connect to ElasticSearch")
+		return []string{}, errors.Wrap(err, "GetReportIds unable to get node report ids")
 	}
 
-	searchResult, err := client.Search().SearchSource(searchSource).
-		Index(ComplianceDailySumTwenty).
-		FilterPath("aggregations.min_date").
-		Do(context.Background())
-
-	if err != nil {
-		logrus.Errorf("could not get early scan date %s", err)
-		return &complianceBirthday, errors.Wrap(err, "GetMinScanDate unable to complete search")
-	}
-
-	LogQueryPartMin(esIndex, searchResult.Aggregations, "GetMinScanDate - search results aggs")
-
-	minDate, found := searchResult.Aggregations.Min("min_date")
-	if !found {
-		return &complianceBirthday, errors.Wrap(err, "GetMinScanDate unable to read min_date")
-	}
-
-	var dateAsString string
-	err = json.Unmarshal(*minDate.Aggregations["value_as_string"], &dateAsString)
-	if err != nil {
-		return &complianceBirthday, errors.Wrap(err, "GetMinScanDate unable to Unmarshal min_date")
-	}
-
-	logrus.Debugf("GetMinScanDate: earliest scan date = %s", dateAsString)
-
-	formatOfDate := "2006-01-02"
-	earliestScanDate, err := time.Parse(formatOfDate, dateAsString)
-	if err != nil {
-		return &complianceBirthday, errors.Wrap(err, "GetMinScanDate unable to Parse min_date")
-	}
-	return &earliestScanDate, nil
-}
-
-//GetMaxScanDate gets the date of the newest scan in ES
-func (backend ES2Backend) GetMaxScanDate() (*time.Time, error) {
-	complianceBirthday := time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)
-	aggs := elastic.NewMaxAggregation().Field("end_time").Format("yyyy-MM-dd")
-	searchSource := elastic.NewSearchSource().
-		Aggregation("max_date", aggs).
-		Size(0)
-
-	esIndex := ComplianceDailySumTwenty
-	source, err := searchSource.Source()
-	if err != nil {
-		return &complianceBirthday, errors.Wrap(err, "GetMaxScanDate unable to get Source")
-	}
-	LogQueryPartMin(esIndex, source, "GetMaxScanDate query searchSource")
-
-	client, err := backend.ES2Client()
-	if err != nil {
-		return &complianceBirthday, errors.Wrap(err, "GetMaxScanDate cannot connect to ElasticSearch")
-	}
-
-	searchResult, err := client.Search().SearchSource(searchSource).
-		Index(ComplianceDailySumTwenty).
-		FilterPath("aggregations.max_date").
-		Do(context.Background())
-
-	if err != nil {
-		return &complianceBirthday, errors.Wrap(err, "GetMaxScanDate unable to complete search")
-	}
-
-	LogQueryPartMin(esIndex, searchResult.Aggregations, "GetMaxScanDate - search results aggs")
-
-	maxDate, found := searchResult.Aggregations.Min("max_date")
-	if !found {
-		return &complianceBirthday, errors.Wrap(err, "GetMaxScanDate unable to read max_date")
-	}
-
-	var dateAsString string
-	err = json.Unmarshal(*maxDate.Aggregations["value_as_string"], &dateAsString)
-	if err != nil {
-		return &complianceBirthday, errors.Wrap(err, "GetMaxScanDate unable to Unmarshal max_date")
-	}
-
-	logrus.Debugf("newest scan date = %s", dateAsString)
-
-	newestScanDate, err := time.Parse("2006-01-02", dateAsString)
-	if err != nil {
-		return &complianceBirthday, errors.Wrap(err, "GetMaxScanDate unable to Parse max_date")
-	}
-	return &newestScanDate, nil
+	return reportIds, nil
 }
 
 func (backend ES2Backend) filterIdsByControl(esIndex string, ids, controls []string) ([]string, error) {
@@ -621,11 +487,11 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 								}
 								var jsonTags map[string]string
 								tags, _ := json.Marshal(profileControl.Tags)
-								json.Unmarshal(tags, jsonTags) // nolint: errcheck
+								json.Unmarshal(tags, &jsonTags) // nolint: errcheck
 								convertedControl.Tags = jsonTags
 								var jsonRefs []*reportingapi.Ref
 								refs, _ := json.Marshal(profileControl.Refs)
-								json.Unmarshal(refs, jsonRefs) // nolint: errcheck
+								json.Unmarshal(refs, &jsonRefs) // nolint: errcheck
 								convertedControl.Refs = jsonRefs
 								// store controls to returned report
 								convertedControls = append(convertedControls, &convertedControl)

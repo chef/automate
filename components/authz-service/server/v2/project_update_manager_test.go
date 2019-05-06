@@ -421,7 +421,7 @@ func createFailureEventMsg(projectUpdateIDTag string, producer string) *automate
 		},
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: projectUpdateIDTag,
 					},
@@ -442,22 +442,22 @@ func createStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompeleteInSec
 		},
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				"Completed": &_struct.Value{
+				"Completed": {
 					Kind: &_struct.Value_BoolValue{
 						BoolValue: completed,
 					},
 				},
-				"PercentageComplete": &_struct.Value{
+				"PercentageComplete": {
 					Kind: &_struct.Value_NumberValue{
 						NumberValue: percentageComplete,
 					},
 				},
-				"EstimatedTimeCompeleteInSec": &_struct.Value{
+				"EstimatedTimeCompeleteInSec": {
 					Kind: &_struct.Value_NumberValue{
 						NumberValue: estimatedTimeCompeleteInSec,
 					},
 				},
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
+				project_update_tags.ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: projectUpdateIDTag,
 					},
