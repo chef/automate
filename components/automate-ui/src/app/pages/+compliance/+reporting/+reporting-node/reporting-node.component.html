@@ -25,6 +25,10 @@
                 <chef-icon>schedule</chef-icon> Last Scan
               </chef-th>
               <chef-td>{{ formatDate(activeReport.end_time) }}</chef-td>
+              <chef-th>
+                <chef-icon>storage</chef-icon> Platform
+              </chef-th>
+              <chef-td>{{ activeReport.platform.name }} {{ activeReport.platform.release }}</chef-td>
             </chef-tr>
             <chef-tr>
               <chef-th>
@@ -44,18 +48,18 @@
                   </span>
                 </ng-container>
               </chef-td>
-            </chef-tr>
-            <chef-tr>
-              <chef-th>
-                <chef-icon>storage</chef-icon> Platform
-              </chef-th>
-              <chef-td>{{ activeReport.platform.name }} {{ activeReport.platform.release }}</chef-td>
-            </chef-tr>
-            <chef-tr>
               <chef-th>
                 <chef-icon>public</chef-icon> Environment
               </chef-th>
               <chef-td>{{ activeReport.environment }}</chef-td>
+            </chef-tr>
+            <chef-tr>
+              <chef-th>
+                <chef-icon>public</chef-icon> Inspec Version
+              </chef-th>
+              <chef-td>{{ activeReport.version }}</chef-td>
+              <chef-th></chef-th>
+              <chef-td></chef-td>
             </chef-tr>
           </chef-table>
         </chef-card>

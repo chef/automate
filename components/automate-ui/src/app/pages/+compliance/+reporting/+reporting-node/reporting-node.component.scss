@@ -13,7 +13,7 @@ chef-loading-spinner {
   justify-content: space-between;
 
   chef-card {
-    width: 50%;
+    width: 75%;
   }
 
   chef-table {
@@ -25,10 +25,11 @@ chef-loading-spinner {
         padding: 0.25em 0;
         border: none;
         background-color: transparent;
+        flex-grow: 1;
       }
 
       chef-td {
-        flex-grow: 3;
+        flex-grow: 2;
       }
 
       chef-icon {
