@@ -56,8 +56,8 @@ export function projectsFilterReducer(
     }
 
     case ProjectsFilterActionTypes.LOAD_OPTIONS_SUCCESS: {
-      const merged = mergeOptions(action.payload.fetched, action.payload.restored);
-      const sortedOptions = sortOptions(merged);
+      const mergedOptions = mergeOptions(action.payload.fetched, action.payload.restored);
+      const sortedOptions = sortOptions(mergedOptions);
       return pipe(
         set('options', sortedOptions),
         set('optionsLoadingStatus', EntityStatus.loadingSuccess),
