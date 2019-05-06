@@ -196,16 +196,18 @@ func secretInfoExists(tc *inspec.TargetConfig) bool {
 }
 
 func cloudEnvVars(tc *inspec.TargetConfig) (map[string]string, error) {
+	envsMap := map[string]string{
+		"CHEF_LICENSE": "accept-no-persist",
+	}
 	switch tc.Backend {
 	case "aws":
 		if tc.AwsUser == "" || tc.AwsPassword == "" {
 			logrus.Debugf("no aws creds found in env vars, no aws creds found for node; attempting to use aws credential chain via inspec/train")
-			return map[string]string{}, nil
+			return envsMap, nil
 		}
-		envsMap := map[string]string{
-			"AWS_ACCESS_KEY_ID":     tc.AwsUser,
-			"AWS_SECRET_ACCESS_KEY": tc.AwsPassword,
-		}
+		envsMap["AWS_ACCESS_KEY_ID"] = tc.AwsUser
+		envsMap["AWS_SECRET_ACCESS_KEY"] = tc.AwsPassword
+
 		// Only set a TOKEN ENV variable when one is needed.
 		// Otherwise it prevents the TOKEN-less account credentials from working
 		if tc.AwsSessionToken != "" {
@@ -215,38 +217,35 @@ func cloudEnvVars(tc *inspec.TargetConfig) (map[string]string, error) {
 	case "azure":
 		if tc.AzureClientID == "" || tc.AzureClientSecret == "" || tc.AzureTenantID == "" {
 			logrus.Debugf("no azure creds found in environment, no azure creds found for node; attempting to use azure credential chain via inspec/train")
-			return map[string]string{}, nil
+			return envsMap, nil
 		}
-		return map[string]string{
-			"AZURE_CLIENT_ID":     tc.AzureClientID,
-			"AZURE_CLIENT_SECRET": tc.AzureClientSecret,
-			"AZURE_TENANT_ID":     tc.AzureTenantID,
-		}, nil
+		envsMap["AZURE_CLIENT_ID"] = tc.AzureClientID
+		envsMap["AZURE_CLIENT_SECRET"] = tc.AzureClientSecret
+		envsMap["AZURE_TENANT_ID"] = tc.AzureTenantID
+		return envsMap, nil
 	case "gcp":
 		if tc.GcpCredsJson != "" {
 			// Specify "" for the temp dir as ioutil will pick TMPDIR or OS default
 			tmpFile, err := ioutil.TempFile("", ".gcp-project-cred.json")
 			if err != nil {
-				return map[string]string{}, err
+				return envsMap, err
 			}
 
 			err = ioutil.WriteFile(tmpFile.Name(), []byte(tc.GcpCredsJson), 0400)
 			if err != nil {
-				return map[string]string{}, err
+				return envsMap, err
 			}
 
 			// Not consumed by InSpec via the json config stdin but via file on disk
 			tc.GcpCredsJson = ""
-
-			return map[string]string{
-				"GOOGLE_APPLICATION_CREDENTIALS": tmpFile.Name(),
-			}, nil
+			envsMap["GOOGLE_APPLICATION_CREDENTIALS"] = tmpFile.Name()
+			return envsMap, nil
 		} else {
-			return map[string]string{}, fmt.Errorf("cloudEnvVars: GcpCredsJson can't be empty, job will fail execution")
+			return envsMap, fmt.Errorf("cloudEnvVars: GcpCredsJson can't be empty, job will fail execution")
 		}
 	}
 
-	return map[string]string{}, nil
+	return envsMap, nil
 }
 
 // doDetect executes a detect job and returns error type for retrying purposes
