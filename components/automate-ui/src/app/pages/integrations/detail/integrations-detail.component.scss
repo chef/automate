@@ -17,3 +17,12 @@ chef-page-header {
     }
   }
 }
+
+.page-body {
+  chef-table#manager-nodes-list {
+    chef-th:first-child,
+    chef-td:first-child {
+      flex-grow: 0.05;
+    }
+  }
+}
