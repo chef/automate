@@ -261,7 +261,13 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
+
 	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err = filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, "")
+	}
+
 	nodesList, total, err := srv.es.GetNodes(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, "")
