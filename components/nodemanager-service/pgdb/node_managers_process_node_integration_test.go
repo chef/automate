@@ -79,6 +79,68 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithNoUUID() {
 	_, err = suite.Database.DeleteNode(listNodes[0].Id)
 }
 
+func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeThatExistsAndHasSourceID() {
+	// test that a new node with no uuid, yes source_id makes it into the db
+	// with the right info and is readable
+	nowTime := ptypes.TimestampNow()
+	node := &manager.NodeMetadata{
+		Uuid:            "1223-4254-2424-1322",
+		Name:            "123.798.324.32",
+		PlatformName:    "ubuntu",
+		PlatformRelease: "16.04",
+		JobUuid:         "12345-389244-2433",
+		LastContact:     nowTime,
+	}
+	err := suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+
+	readNode, err := suite.Database.GetNode(ctx, listNodes[0].Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("123.798.324.32", readNode.Name)
+	suite.Equal("ubuntu", readNode.Platform)
+	suite.InDelta(nowTime.GetSeconds(), readNode.LastContact.GetSeconds(), 1)
+
+	// now send the same node info through again, with a source id
+	node.SourceId = "i-078973"
+	err = suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	listNodes, _, err = suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+
+	readNode, err = suite.Database.GetNode(ctx, listNodes[0].Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("1223-4254-2424-1322", readNode.Id)
+	// suite.Equal("i-078973", readNode.GetTargetConfig().SourceId)
+	suite.Equal("ubuntu", readNode.Platform)
+
+	filter := &common.Filter{
+		Key:    "state",
+		Values: []string{"RUNNING"},
+	}
+	runningNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(runningNodes))
+	_, err = suite.Database.DeleteNode(listNodes[0].Id)
+}
+
 func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUID() {
 	// test that a new node with uuid, no source_id makes it into the db
 	// with the right info and is readable
