@@ -155,7 +155,7 @@ describe('User Dropdown', () => {
 
     element(by.css('app-profile')).click();
 
-    const aboutChefAutomate = $('app-profile button.logout');
+    const aboutChefAutomate = $('app-profile button.welcome-modal-button');
     aboutChefAutomate.click();
 
     const welcomeModalHeader = $('.welcome-modal .display2');
