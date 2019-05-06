@@ -30,7 +30,8 @@ const (
 // These should not be visible to the enduser and therefore exist outside of the database.
 func SystemPolicies() []*storage.Policy {
 	universalAccess := storage.Policy{
-		ID: constants.UniversalAccessPolicyID,
+		ID:   constants.UniversalAccessPolicyID,
+		Type: storage.System,
 		// used by automate-cli for API requests through the gateway
 		Name: "deployment-service universal access",
 		Members: []storage.Member{
@@ -50,6 +51,7 @@ func SystemPolicies() []*storage.Policy {
 
 	system := storage.Policy{
 		ID:   constants.SystemPolicyID,
+		Type: storage.System,
 		Name: "System",
 		Members: []storage.Member{
 			{
@@ -91,6 +93,7 @@ func SystemPolicies() []*storage.Policy {
 
 	systemLocalUsers := storage.Policy{
 		ID:   constants.SystemLocalUsersPolicyID,
+		Type: storage.System,
 		Name: "System Local Users",
 		Members: []storage.Member{
 			{
@@ -118,6 +121,7 @@ func SystemPolicies() []*storage.Policy {
 
 	systemIngestProviders := storage.Policy{
 		ID:   constants.IngestProviderPolicyID,
+		Type: storage.System,
 		Name: "System Ingest Providers",
 		Members: []storage.Member{
 			{
@@ -142,6 +146,7 @@ func SystemPolicies() []*storage.Policy {
 
 	systemChefManaged := storage.Policy{
 		ID:   constants.ChefManagedPolicyID,
+		Type: storage.System,
 		Name: "System policy to protect Chef-managed entities",
 		Members: []storage.Member{
 			{

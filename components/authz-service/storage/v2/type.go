@@ -29,21 +29,24 @@ const (
 	// ChefManaged represents a policy created by Chef Software.
 	ChefManaged
 	// System represents an underlying policy that allows Automate to function correctly.
-	// System
+	// Only used here (not in API or database)
+	System
 )
 
 const (
 	customTypeString  = "custom"
 	managedTypeString = "chef-managed"
+	systemTypeString  = "system"
 )
 
 var strValues = [...]string{
 	customTypeString,
 	managedTypeString,
+	systemTypeString,
 }
 
 func (t Type) String() string {
-	if t < Custom || t > ChefManaged {
+	if t < Custom || t > System {
 		panic(fmt.Sprintf("unknown value from iota Type on String() conversion: %d", t))
 	}
 
@@ -57,6 +60,8 @@ func NewType(in string) (Type, error) {
 		return Custom, nil
 	case managedTypeString:
 		return ChefManaged, nil
+	case systemTypeString:
+		return System, nil
 	default:
 		return Custom, fmt.Errorf("policy type must be one of %q, you passed %q", strValues, in)
 	}

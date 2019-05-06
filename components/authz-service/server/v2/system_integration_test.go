@@ -68,18 +68,18 @@ func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 			Name: "name2",
 		})
 		require.NoError(t, err)
-		// project3Resp, err := ts.projects.CreateProject("project3")
+
 		statement := api_v2.Statement{
 			Effect:    api_v2.Statement_ALLOW,
-			Resources: []string{"cfgmgmt:get", "cfgmgmt:list"},
-			Actions:   []string{"cfgmgmt:nodes:*"},
+			Resources: []string{"cfgmgmt:nodes:*"},
+			Actions:   []string{"cfgmgmt:infranodes:get", "cfgmgmt:infranodes:list"},
+			Projects:  []string{"project-1"},
 		}
 		req := api_v2.CreatePolicyReq{
 			Id:         "policy1",
 			Name:       "my favorite policy",
 			Members:    []string{"user:local:alice"},
 			Statements: []*api_v2.Statement{&statement},
-			Projects:   []string{"project-1"},
 		}
 		_, err = ts.policy.CreatePolicy(ctx, &req)
 		require.NoError(t, err)
@@ -87,7 +87,9 @@ func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
 			&api_v2.FilterAuthorizedPairsReq{
 				Subjects: []string{"user:local:alice"},
-				Pairs:    []*api_v2.Pair{}, // get all resource/actions (??)
+				Pairs: []*api_v2.Pair{
+					&api_v2.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
+					&api_v2.Pair{Resource: "cfgmgmt:nodes:foo", Action: "cfgmgmt:infranodes:get"}},
 			})
 		require.NoError(t, err)
 		// TODO This should fail with project2 and project3 as well
@@ -109,7 +111,7 @@ func setupWithOPA(t *testing.T) testSetup {
 	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
 	ts := setupV2(t, o, o, &emptyV1List, vChan)
-	_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
+	_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
 	require.NoError(t, err)
 	return ts
 }

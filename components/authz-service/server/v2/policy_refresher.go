@@ -209,7 +209,7 @@ func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]
 		}
 
 		data[p.ID] = map[string]interface{}{
-			// "type":       p.Type,
+			"type":       p.Type,
 			"members":    members,
 			"statements": statements,
 		}
