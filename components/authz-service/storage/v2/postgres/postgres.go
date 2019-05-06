@@ -23,7 +23,7 @@ type pg struct {
 	db          *sql.DB
 	logger      logger.Logger
 	dataMigConf datamigration.Config
-	connInfo    string
+	conninfo    string
 }
 
 // New instantiates the postgres storage backend.
@@ -37,7 +37,7 @@ func New(ctx context.Context, l logger.Logger, migConf migration.Config,
 		return nil, err
 	}
 
-	return &pg{db: db, logger: l, dataMigConf: dataMigConf, connInfo: migConf.PGURL.String()}, nil
+	return &pg{db: db, logger: l, dataMigConf: dataMigConf, conninfo: migConf.PGURL.String()}, nil
 }
 
 type Querier interface {
@@ -322,7 +322,7 @@ func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {
 }
 
 func (p *pg) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNotifier, error) {
-	return newPolicyChangeNotifier(ctx, p.connInfo)
+	return newPolicyChangeNotifier(ctx, p.conninfo)
 }
 
 // insertPolicyWithQuerier inserts a new custom policy. It does not return the
