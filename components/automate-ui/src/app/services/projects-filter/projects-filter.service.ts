@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of as observableOf } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from './projects-filter.reducer';
 import * as selectors from './projects-filter.selectors';
 import { LoadOptions, SaveOptions } from './projects-filter.actions';
@@ -19,6 +20,8 @@ export class ProjectsFilterService {
   selectionCountVisible$ = this.store.select(selectors.selectionCountVisible);
 
   selectionCountActive$ = this.store.select(selectors.selectionCountActive);
+
+  dropdownCaretVisible$ = this.store.select(selectors.dropdownCaretVisible);
 
   constructor(private store: Store<NgrxStateAtom>) {}
 
@@ -52,8 +55,13 @@ export class ProjectsFilterService {
         checked: false
       },
       {
-        value: 'project-5',
-        label: 'Project 5',
+        value: ProjectConstants.UNASSIGNED_PROJECT_ID,
+        label: ProjectConstants.UNASSIGNED_PROJECT_LABEL,
+        checked: false
+      },
+      {
+        value: 'ze end of the alpha project',
+        label: 'ZETA PROJ',
         checked: false
       },
       {
@@ -64,11 +72,6 @@ export class ProjectsFilterService {
       {
         value: 'super-project',
         label: 'Super Duper Project',
-        checked: false
-      },
-      {
-        value: 'unassigned-resources',
-        label: 'Unassigned Resources',
         checked: false
       }
     ]);

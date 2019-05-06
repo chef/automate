@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { of as observableOf } from 'rxjs';
+import { interval as observableInterval,  of as observableOf, Observable } from 'rxjs';
 import { catchError, mergeMap, map } from 'rxjs/operators';
 
 import { memberListToStringList, policyFromPayload } from './policy.model';
@@ -50,12 +50,17 @@ export class PolicyEffects {
   //
   // [1]: https://github.com/ngrx/platform/commit/8d56a6f7e9a0158d30c6a0f335f9805cc7d5a555
 
+  private POLLING_INTERVAL_IN_SECONDS = 300; // 5 minutes
+
   @Effect()
-  getiamMajorVersion$ = this.actions$.pipe(
+  newIamVersionStatus$ = observableInterval(1000 * this.POLLING_INTERVAL_IN_SECONDS)
+    .pipe(mergeMap(this.getIamVersionAction$()));
+
+
+  @Effect()
+  getIamVersion$ = this.actions$.pipe(
     ofType<GetIamVersion>(PolicyActionTypes.GET_IAM_VERSION),
-    mergeMap(() => this.requests.getIamVersion().pipe(
-      map(resp => new GetIamVersionSuccess(resp)),
-      catchError((error: HttpErrorResponse) => observableOf(new GetIamVersionFailure(error))))));
+    mergeMap(this.getIamVersionAction$()));
 
   @Effect()
   getIamVersionFailure$ = this.actions$.pipe(
@@ -174,5 +179,10 @@ export class PolicyEffects {
       type: Type.error,
       message: `Could not delete policy: ${error.error || error}`
     })));
-}
 
+  private getIamVersionAction$(): () => Observable<PolicyActions> {
+    return () => this.requests.getIamVersion().pipe(
+      map(resp => new GetIamVersionSuccess(resp)),
+      catchError((error: HttpErrorResponse) => observableOf(new GetIamVersionFailure(error))));
+  }
+}
