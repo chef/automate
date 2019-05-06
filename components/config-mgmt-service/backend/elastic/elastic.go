@@ -14,7 +14,10 @@ import (
 
 	"github.com/olivere/elastic"
 
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 const (
@@ -92,6 +95,25 @@ func Default() Backend {
 func newBoolQueryFromFilters(filters map[string][]string) *elastic.BoolQuery {
 	boolQuery := elastic.NewBoolQuery()
 	for field, values := range filters {
+		if field == backend.Project {
+			projectsQuery := elastic.NewBoolQuery()
+			if stringutils.SliceContains(values, authzConstants.UnassignedProjectID) {
+				emptyProjectQuery := elastic.NewBoolQuery()
+				emptyProjectQuery.MustNot(elastic.NewExistsQuery(field))
+				projectsQuery.Should(emptyProjectQuery)
+			}
+
+			assignedProjectIds := stringutils.SliceFilter(values, func(projectId string) bool {
+				return projectId != authzConstants.UnassignedProjectID
+			})
+
+			if len(assignedProjectIds) > 0 {
+				projectMatchQuery := elastic.NewTermsQuery(field, stringArrayToInterfaceArray(assignedProjectIds)...)
+				projectsQuery.Should(projectMatchQuery)
+			}
+			boolQuery = boolQuery.Filter(projectsQuery)
+			continue
+		}
 		// We don't know how many values will end up here
 		// Decided appending values might be faster than removing them.
 		refinedValues := make([]string, 0, 0)

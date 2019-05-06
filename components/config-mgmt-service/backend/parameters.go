@@ -37,6 +37,7 @@ var (
 	Platform           string = NodeFieldToJson("Platform")
 	ChefVersion        string = "chef_version"
 	ChefTags           string = "chef_tags"
+	Project            string = "projects"
 )
 
 // NodeFieldToJson returns the value associated with key in the tag

@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
@@ -48,6 +49,6 @@ func filterByProjects(ctx context.Context, filters map[string][]string) (map[str
 		return filters, nil
 	}
 
-	filters["projects"] = projectsFilter
+	filters[backend.Project] = projectsFilter
 	return filters, nil
 }

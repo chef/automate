@@ -9,6 +9,7 @@ import (
 
 	external_response "github.com/chef/automate/api/external/cfgmgmt/response"
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -180,6 +181,311 @@ func TestNodesProjectFilter(t *testing.T) {
 			request:  request.Nodes{},
 			expected: []string{"one", "two"},
 		},
+		{
+			description: "Two nodes matching with two project tags",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "1",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"one"},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "2",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"one"},
+					Exists:   true,
+				},
+			},
+			ctx:      contextWithProjects([]string{"one", "two"}),
+			request:  request.Nodes{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Two nodes, one matching",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "1",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"three"},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "2",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"two", "one"},
+					Exists:   true,
+				},
+			},
+			ctx:      contextWithProjects([]string{"one"}),
+			request:  request.Nodes{},
+			expected: []string{"2"},
+		},
+		{
+			description: "Matching all",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "1",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"three"},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "2",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"two", "one"},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "3",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Exists: true,
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			request:  request.Nodes{},
+			expected: []string{"1", "2", "3"},
+		},
+		{
+			description: "Match one unassigned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "1",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "2",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"two", "one"},
+					Exists:   true,
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request:  request.Nodes{},
+			expected: []string{"1"},
+		},
+		{
+			description: "No unassigned; no matches",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "1",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"one"},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "2",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"two", "one"},
+					Exists:   true,
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request:  request.Nodes{},
+			expected: []string{},
+		},
+		{
+			description: "Match one unassigned and one assigned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "1",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "2",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"two"},
+					Exists:   true,
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID, "two"}),
+			request:  request.Nodes{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Match all projects with status filter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "1",
+						EntityUuid:       newUUID(),
+						Status:           "failure",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "2",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"two"},
+					Exists:   true,
+				},
+			},
+			ctx: contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			request: request.Nodes{
+				Filter: []string{"status:success"},
+			},
+			expected: []string{"2"},
+		},
+		{
+			description: "Match 'one' project with status filter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "1",
+						EntityUuid:       newUUID(),
+						Status:           "failure",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"one"},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "2",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{"two"},
+					Exists:   true,
+				},
+			},
+			ctx: contextWithProjects([]string{"one"}),
+			request: request.Nodes{
+				Filter: []string{"status:success"},
+			},
+			expected: []string{},
+		},
+		{
+			description: "Match unassigned projects with status filter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "1",
+						EntityUuid:       newUUID(),
+						Status:           "failure",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{},
+					Exists:   true,
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "2",
+						EntityUuid:       newUUID(),
+						Status:           "success",
+						Platform:         "centos",
+						Environment:      "prod",
+						OrganizationName: "org1",
+					},
+					Projects: []string{},
+					Exists:   true,
+				},
+			},
+			ctx: contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request: request.Nodes{
+				Filter: []string{"status:success"},
+			},
+			expected: []string{"2"},
+		},
 	}
 
 	for _, test := range cases {
@@ -193,21 +499,12 @@ func TestNodesProjectFilter(t *testing.T) {
 			res, err := cfgmgmt.GetNodes(test.ctx, &test.request)
 			assert.NoError(t, err)
 
-			t.Logf("res.GetValues() %v", res.Values)
+			names := getNames(res)
 
 			// Test what nodes are returned.
-			assert.Equal(t, test.expected, res)
-
+			assert.ElementsMatch(t, test.expected, names)
 		})
 	}
-}
-
-func getName(values []gp.Value) string {
-	for _, value := range values {
-		// value.GetStructValue().GetFields()
-	}
-
-	return ""
 }
 
 func TestNodesWithTableDriven(t *testing.T) {
@@ -841,4 +1138,14 @@ func protoFromJSON(content string, pb proto.Message) error {
 
 func getMessageRawJSON(message proto.Message) (string, error) {
 	return (&jsonpb.Marshaler{OrigName: true}).MarshalToString(message)
+}
+
+func getNames(listValue *gp.ListValue) []string {
+	names := make([]string, 0)
+	for _, value := range listValue.GetValues() {
+		m := value.GetStructValue().GetFields()
+		names = append(names, m["name"].GetStringValue())
+	}
+
+	return names
 }
