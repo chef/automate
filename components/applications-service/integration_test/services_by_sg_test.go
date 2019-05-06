@@ -67,7 +67,7 @@ func TestGetServicesBySGSortParameterError(t *testing.T) {
 
 func TestGetServicesBySGSingleService(t *testing.T) {
 	mockHabService := NewHabServiceMsg("sup1234", a, e, "default", "core",
-		"postgres", "0.1.0", "20190101121212", "OK", "", "")
+		"postgres", "0.1.0", "20190101121212", "OK", "stable", "test")
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
 
@@ -262,7 +262,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: "", Site: "",
 				},
 			},
 		},
@@ -477,7 +477,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_UNKNOWN,
 						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: "", Site: "",
 					},
 				},
 			},

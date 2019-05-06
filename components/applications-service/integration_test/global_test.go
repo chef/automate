@@ -132,19 +132,19 @@ func assertServiceGroupsEqual(t *testing.T, expected, actual *applications.Servi
 func habServicesMatrix() []*applications.HabService {
 	return []*applications.HabService{
 		// service_group 1 <-> With a Health Status = 'OK'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "", ""),
-		NewHabServiceMsg("sup2", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "", ""),
-		NewHabServiceMsg("sup3", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "", ""),
+		NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "stable", "test"),
+		NewHabServiceMsg("sup2", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "stable", "test"),
+		NewHabServiceMsg("sup3", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "stable", "test"),
 
 		// service_group 2 <-> With a Health Status = 'WARNING'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "WARNING", "", ""),
-		NewHabServiceMsg("sup2", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "OK", "", ""),
-		NewHabServiceMsg("sup3", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "OK", "", ""),
+		NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "WARNING", "stable", "test"),
+		NewHabServiceMsg("sup2", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "OK", "stable", "test"),
+		NewHabServiceMsg("sup3", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "OK", "stable", "test"),
 
 		// service_group 3 <-> With a Health Status = 'CRITICAL'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK", "", ""),
-		NewHabServiceMsg("sup2", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-		NewHabServiceMsg("sup3", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "CRITICAL", "", ""),
+		NewHabServiceMsg("sup1", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK", "stable", "test"),
+		NewHabServiceMsg("sup2", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "UNKNOWN", "stable", "test"),
+		NewHabServiceMsg("sup3", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "CRITICAL", "stable", "test"),
 
 		// service_group 4 <-> With a Health Status = 'UNKNOWN'
 		NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "UNKNOWN", "", ""),

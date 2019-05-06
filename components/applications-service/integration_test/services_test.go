@@ -98,6 +98,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_CRITICAL,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup2",
@@ -106,14 +107,16 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup3",
-					Group:        "test.default",
-					Release:      "core/test/0.1.0/20190101121212",
+					Group:        "temp.default",
+					Release:      "core/temp/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup1",
@@ -122,6 +125,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup1",
@@ -130,6 +134,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup4",
@@ -171,6 +176,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup4",
@@ -187,6 +193,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup2",
@@ -195,14 +202,16 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup3",
-					Group:        "test.default",
-					Release:      "core/test/0.1.0/20190101121212",
+					Group:        "temp.default",
+					Release:      "core/temp/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup1",
@@ -211,6 +220,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_CRITICAL,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 			},
 		}
@@ -242,6 +252,7 @@ func TestGetServicesMultiServicaPagination(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 			},
 		}
@@ -301,6 +312,7 @@ func TestGetServicesMultiServicaPaginationAndSorting(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 			},
 		}
@@ -317,7 +329,7 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 
 	// Get the ID from the service group
 	sgList := suite.GetServiceGroups()
-	if assert.Equal(t, 4, len(sgList), "There should be four service_groups in the db") {
+	if assert.Equal(t, 5, len(sgList), "There should be five service_groups in the db") {
 
 		var (
 			ctx     = context.Background()
@@ -334,6 +346,7 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_WARNING,
 						Application:  a, Environment: e, Fqdn: "",
+						Channel: "stable", Site: "test",
 					},
 				},
 			}
@@ -350,7 +363,7 @@ func TestGetServicesMultiServiceWithHealthFilter(t *testing.T) {
 
 	// Get the ID from the service group
 	sgList := suite.GetServiceGroups()
-	if assert.Equal(t, 4, len(sgList), "There should be four service_groups in the db") {
+	if assert.Equal(t, 5, len(sgList), "There should be five service_groups in the db") {
 
 		var (
 			ctx     = context.Background()
@@ -366,6 +379,7 @@ func TestGetServicesMultiServiceWithHealthFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_WARNING,
 						Application:  a, Environment: e, Fqdn: "",
+						Channel: "stable", Site: "test",
 					},
 				},
 			}
@@ -382,7 +396,7 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 
 	// Get the ID from the service group
 	sgList := suite.GetServiceGroups()
-	if assert.Equal(t, 4, len(sgList), "There should be four service_groups in the db") {
+	if assert.Equal(t, 5, len(sgList), "There should be five service_groups in the db") {
 
 		var (
 			ctx     = context.Background()
@@ -396,20 +410,13 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 			expected = &applications.ServicesRes{
 				Services: []*applications.Service{
 					{
-						SupervisorId: "sup2",
-						Group:        "test.default",
-						Release:      "core/test/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_UNKNOWN,
-						Application:  a, Environment: e, Fqdn: "",
-					},
-					{
 						SupervisorId: "sup3",
-						Group:        "test.default",
-						Release:      "core/test/0.1.0/20190101121212",
+						Group:        "temp.default",
+						Release:      "core/temp/0.1.0/20190101121212",
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_UNKNOWN,
 						Application:  a, Environment: e, Fqdn: "",
+						Channel: "stable", Site: "test",
 					},
 				},
 			}
@@ -461,6 +468,14 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 				svc.Fqdn,
 				actual[i].Fqdn,
 				"The fqdn of a service is not the expected one")
+			assert.Equal(t,
+				svc.Channel,
+				actual[i].Channel,
+				"The channel of a service is not the expected one")
+			assert.Equal(t,
+				svc.Site,
+				actual[i].Site,
+				"The site of a service is not the expected one")
 		}
 	}
 }
@@ -468,17 +483,17 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 func habServicesMatrixAllHealthStatusDifferent() []*applications.HabService {
 	return []*applications.HabService{
 		// service_group 1 <-> With a Health Status = 'OK'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "", ""),
+		NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "stable", "test"),
 
 		// service_group 2 <-> With a Health Status = 'WARNING'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "WARNING", "", ""),
+		NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "WARNING", "stable", "test"),
 
 		// service_group 3 <-> With a Health Status = 'CRITICAL'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "CRITICAL", "", ""),
+		NewHabServiceMsg("sup1", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "CRITICAL", "stable", "test"),
 
 		// service_group 4 <-> With a Health Status = 'UNKNOWN'
-		NewHabServiceMsg("sup2", a, e, "default", "core", "test", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-		NewHabServiceMsg("sup3", a, e, "default", "core", "test", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
+		NewHabServiceMsg("sup2", a, e, "default", "core", "test", "0.1.0", "20190101121212", "UNKNOWN", "stable", "test"),
+		NewHabServiceMsg("sup3", a, e, "default", "core", "temp", "0.1.0", "20190101121212", "UNKNOWN", "stable", "test"),
 		NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "OK", "", ""),
 	}
 }
