@@ -34,11 +34,13 @@
     </chef-page-header>
 
     <div class="page-body">
-      <chef-button primary caution 
-        [disabled]="!hasSelectedNodes()" 
-        (click)="deleteNodes()">
-        Remove Nodes
-      </chef-button>
+      <chef-toolbar>
+        <chef-button primary caution 
+          [disabled]="!hasSelectedNodes()" 
+          (click)="deleteNodes()">
+          Remove Nodes
+        </chef-button>
+      </chef-toolbar>
       <chef-table id="manager-nodes-list">
         <chef-thead>
           <chef-tr>
