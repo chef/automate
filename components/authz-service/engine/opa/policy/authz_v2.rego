@@ -6,8 +6,6 @@ import data.roles
 
 default authorized = false
 
-const_all_projects = "~~ALL-PROJECTS~~"
-
 has_member[pol_id] {
 	pol_sub := policies[pol_id].members[_]
 	input_sub := input.subjects[_]
@@ -68,12 +66,12 @@ has_project[[project, pol_id, statement_id]] {
 }
 
 project_matches(proj) = projects {
-	proj == const_all_projects
+	proj == common.const_all_projects
 	projects := input.projects
 }
 
 project_matches(proj) = projects {
-	proj != const_all_projects
+	proj != common.const_all_projects
 	proj = input.projects[_]
 	projects := [proj]
 }
@@ -107,7 +105,7 @@ denied_project[project] {
 # when no input is provided, this rule short-circuits checking any other allowed projects
 denied_all_projects {
 	match[["deny", pol_id, statement_id]]
-	const_all_projects == policies[pol_id].statements[statement_id].projects[_]
+	common.const_all_projects == policies[pol_id].statements[statement_id].projects[_]
 }
 
 authorized_project[project] {

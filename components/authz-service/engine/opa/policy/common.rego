@@ -2,6 +2,7 @@
 # of our rego logic
 package common
 
+const_all_projects = "~~ALL-PROJECTS~~"
 #
 # Variable expansion
 #
