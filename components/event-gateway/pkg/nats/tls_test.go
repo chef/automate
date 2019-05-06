@@ -31,11 +31,11 @@ func TestNATSWithSNI(t *testing.T) {
 		FrontendTLS: []certs.TLSConfig{
 			// Two certs with different CNs. Later in the test we connect to the
 			// server and use SNI to pick which cert we expect to get
-			certs.TLSConfig{
+			{
 				CertPath: "../../../../dev/certs/event-gateway-sni-one.crt",
 				KeyPath:  "../../../../dev/certs/event-gateway-sni-one.key",
 			},
-			certs.TLSConfig{
+			{
 				CertPath: "../../../../dev/certs/event-gateway-sni-two.crt",
 				KeyPath:  "../../../../dev/certs/event-gateway-sni-two.key",
 			},

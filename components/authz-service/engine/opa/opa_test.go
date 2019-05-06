@@ -118,7 +118,7 @@ func (tc *subjectsTestcase) name() string {
 
 func TestActionMatching(t *testing.T) {
 	tests := map[string][]testcase{
-		"positive": []testcase{
+		"positive": {
 			{"read", map[string]string{"match": "read"}, defaultCheck1},
 			{"read", map[string]string{"match": "*"}, defaultCheck1},
 			{"read", map[string]string{"match": "*", "nomatch": "foo"}, defaultCheck1},
@@ -126,7 +126,7 @@ func TestActionMatching(t *testing.T) {
 			{"read", map[string]string{"anothermatch": "*", "match": "read"}, defaultCheck2},
 			{"read", map[string]string{"nomatch": "write", "match": "read", "nomatch2": "execute"}, defaultCheck1},
 		},
-		"negative": []testcase{
+		"negative": {
 			{"read", map[string]string{}, noMatch},
 			{"read", map[string]string{"simple_different": "write"}, noMatch},
 			{"read", map[string]string{"simple_different": "write", "also_different": "execute"}, noMatch},
@@ -149,7 +149,7 @@ func TestActionMatching(t *testing.T) {
 
 func TestResourceMatching(t *testing.T) {
 	tests := map[string][]testcase{
-		"positive": []testcase{
+		"positive": {
 			// exact matching cases
 			{"compliance", map[string]string{"match": "compliance"}, defaultCheck1},
 			{"compliance:profiles:foobee", map[string]string{"match": "compliance:profiles:foobee"}, defaultCheck1},
@@ -175,7 +175,7 @@ func TestResourceMatching(t *testing.T) {
 				map[string]string{"nomatch": "cfgmgmt", "match": "compliance:profiles:*", "nomatch2": "auth"},
 				defaultCheck1},
 		},
-		"negative": []testcase{
+		"negative": {
 			// exact matching cases
 			{"compliance:scans", map[string]string{}, noMatch},
 			{"compliance:scans", map[string]string{"nomatch": "compliance:scans:123"}, noMatch},
@@ -219,7 +219,7 @@ func TestSubjectsMatching(t *testing.T) {
 		// keeping the input close to our actual formats makes the test cases
 		// more interesting. Also, we _could_ start to care about the format,
 		// and then it doesn't all have to be redone.
-		"positive": []subjectsTestcase{
+		"positive": {
 			// 1:1 matches
 			{[]string{"user:local:someid"}, map[string][]string{"match": {"user:local:someid"}}, defaultCheck1},
 			{[]string{"user:local:someid"},
@@ -309,7 +309,7 @@ func TestSubjectsMatching(t *testing.T) {
 			// token:*
 			{[]string{"token:5d29c419-cd6e-4f23-b57a-20c253dcaab1"}, map[string][]string{"match": {"token:*"}}, defaultCheck1},
 		},
-		"negative": []subjectsTestcase{
+		"negative": {
 			{[]string{"user:local:someid"}, map[string][]string{}, noMatch},
 			{[]string{"user:local:someid"}, map[string][]string{"nomatch": {"user:local:SOMEID"}}, noMatch},
 			{[]string{"user:local:someid"}, map[string][]string{"nomatch": {"user:local:someid "}}, noMatch},
@@ -353,7 +353,7 @@ func TestPolicyVariablesResourceMatching(t *testing.T) {
 		checks     []checkFunc
 	}
 	tests := map[string][]testcase{
-		"positive": []testcase{
+		"positive": {
 			{map[string]interface{}{
 				"subjects": []string{"user:local:alice"},
 				"resource": "auth:users:alice",
@@ -373,7 +373,7 @@ func TestPolicyVariablesResourceMatching(t *testing.T) {
 				"resource": "auth:users:alice",
 			}, map[string]string{"match": "auth:users:${a2:username}"}, defaultCheck1},
 		},
-		"negative": []testcase{
+		"negative": {
 			{map[string]interface{}{
 				"subjects": []string{"user:local:alice"},
 				"resource": "auth:users:bob",
@@ -424,7 +424,7 @@ type policy struct {
 
 func TestAuthorizedPairs(t *testing.T) {
 	tests := map[string]map[string]authorizedPairsTestcase{
-		"positive": map[string]authorizedPairsTestcase{
+		"positive": {
 			"one of two input pairs is allowed (single subjects input)": {
 				[]string{"user:local:someid"},
 				[]pair{
@@ -514,7 +514,7 @@ func TestAuthorizedPairs(t *testing.T) {
 					containsPair("cfgmgmt:nodes:101:runs:999", "read")),
 			},
 		},
-		"negative": map[string]authorizedPairsTestcase{
+		"negative": {
 			"no pair returned when no policies match their resources": {
 				[]string{"user:local:someid", "team:local:admins"},
 				[]pair{

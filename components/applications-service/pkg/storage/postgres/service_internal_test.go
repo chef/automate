@@ -26,7 +26,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "with service_group_id filter with single value returns built WHERE statement",
 			filters: map[string][]string{
-				"service_group_id": []string{"123"},
+				"service_group_id": {"123"},
 			},
 			expected:          "WHERE group_id = '123'",
 			shouldReturnError: false,
@@ -34,7 +34,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "with service_group_id filter with multiple values returns built WHERE statement",
 			filters: map[string][]string{
-				"service_group_id": []string{"123", "456"},
+				"service_group_id": {"123", "456"},
 			},
 			expected:          "WHERE group_id = '123' OR group_id = '456'",
 			shouldReturnError: false,
@@ -42,7 +42,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "with health filter with single value returns built WHERE statement",
 			filters: map[string][]string{
-				"health": []string{"UNKNOWN"},
+				"health": {"UNKNOWN"},
 			},
 			expected:          "WHERE health = 'UNKNOWN'",
 			shouldReturnError: false,
@@ -50,8 +50,8 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "with multiple valid filters and multiple values returns built WHERE statement",
 			filters: map[string][]string{
-				"service_group_id": []string{"123", "456"},
-				"health":           []string{"WARNING", "OK"},
+				"service_group_id": {"123", "456"},
+				"health":           {"WARNING", "OK"},
 			},
 			expected:          "WHERE group_id = '123' OR group_id = '456' AND health = 'WARNING' OR health = 'OK'",
 			shouldReturnError: false,
@@ -59,7 +59,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "valid filter with no value returns empty where constraints",
 			filters: map[string][]string{
-				"not-valid-filter": []string{},
+				"not-valid-filter": {},
 			},
 			expected:          noWhereConstraints,
 			shouldReturnError: false,
@@ -67,7 +67,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "invalid filter with no value returns empty where constraints",
 			filters: map[string][]string{
-				"not-valid-filter": []string{},
+				"not-valid-filter": {},
 			},
 			expected:          noWhereConstraints,
 			shouldReturnError: false,
@@ -75,7 +75,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "with invalid filters and a single value returns an error",
 			filters: map[string][]string{
-				"not-valid-filter": []string{"value"},
+				"not-valid-filter": {"value"},
 			},
 			expected:          noWhereConstraints,
 			shouldReturnError: true,
@@ -84,9 +84,9 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "with invalid filters with multiple values returns an error",
 			filters: map[string][]string{
-				"not-valid-filter": []string{"value"},
-				"not-awesome":      []string{"c", "o", "o", "l"},
-				"more":             []string{"not", "valid", "filters"},
+				"not-valid-filter": {"value"},
+				"not-awesome":      {"c", "o", "o", "l"},
+				"more":             {"not", "valid", "filters"},
 			},
 			expected:          noWhereConstraints,
 			shouldReturnError: true,
@@ -95,8 +95,8 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "with valid and invalid filters returns an error",
 			filters: map[string][]string{
-				"service_group_id": []string{"1234"},
-				"not-awesome":      []string{"c", "o", "o", "l"},
+				"service_group_id": {"1234"},
+				"not-awesome":      {"c", "o", "o", "l"},
 			},
 			expected:          noWhereConstraints,
 			shouldReturnError: true,

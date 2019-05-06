@@ -28,7 +28,7 @@ func TestFormatFiltersMatrixOfFilters(t *testing.T) {
 			message: "with a single unique filter (1:1)",
 			filters: []string{"platform:centos"},
 			expected: map[string][]string{
-				"platform": []string{"centos"},
+				"platform": {"centos"},
 			},
 		},
 		{
@@ -39,7 +39,7 @@ func TestFormatFiltersMatrixOfFilters(t *testing.T) {
 				"platform:redhat",
 			},
 			expected: map[string][]string{
-				"platform": []string{"centos", "ubuntu", "redhat"},
+				"platform": {"centos", "ubuntu", "redhat"},
 			},
 		},
 		{
@@ -51,10 +51,10 @@ func TestFormatFiltersMatrixOfFilters(t *testing.T) {
 				"environment:prod",
 			},
 			expected: map[string][]string{
-				"status":       []string{"critical"},
-				"service_name": []string{"redis"},
-				"application":  []string{"cafe"},
-				"environment":  []string{"prod"},
+				"status":       {"critical"},
+				"service_name": {"redis"},
+				"application":  {"cafe"},
+				"environment":  {"prod"},
 			},
 		},
 		{
@@ -71,10 +71,10 @@ func TestFormatFiltersMatrixOfFilters(t *testing.T) {
 				"service_name:myapp",
 			},
 			expected: map[string][]string{
-				"status":       []string{"critical", "warning"},
-				"service_name": []string{"redis", "postgres", "myapp"},
-				"application":  []string{"cafe-us", "cafe-europe", "cafe-asia"},
-				"environment":  []string{"prod"},
+				"status":       {"critical", "warning"},
+				"service_name": {"redis", "postgres", "myapp"},
+				"application":  {"cafe-us", "cafe-europe", "cafe-asia"},
+				"environment":  {"prod"},
 			},
 		},
 	}
