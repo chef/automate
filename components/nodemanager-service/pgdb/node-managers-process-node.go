@@ -52,7 +52,11 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	lastContact := ptypes.TimestampString(node.LastContact)
 
 	if len(node.GetUuid()) == 0 {
-		node.Uuid = uuid.Must(uuid.NewV4()).String()
+		id, err := uuid.NewV4()
+		if err != nil {
+			return err
+		}
+		node.Uuid = id.String()
 	}
 
 	// the incoming node may hit any of these cases:
