@@ -96,6 +96,7 @@ func init() {
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.KeyPath, "key", "", "Service certificate key")
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.RootCACertPath, "root-cert", "", "Root CA Cert to use to verify clients")
 	runCmd.Flags().Int32Var(&conf.DataRetention.ComplianceReportDays, "reports-retention-days", -1, "Number of days to keep compliance reports")
+	runCmd.Flags().StringVar(&conf.Service.ConfigFilePath, "config", "", "config file")
 
 	// Postgres Config Flags
 	runCmd.Flags().StringVar(&conf.Postgres.ConnectionString, "postgres-uri", conf.Postgres.ConnectionString, "PostgreSQL connection string to use")
@@ -144,5 +145,4 @@ func init() {
 
 	// Event Service Flags
 	runCmd.Flags().StringVar(&conf.EventConfig.Endpoint, "event-endpoint", conf.EventConfig.Endpoint, "Event Service Endpoint")
-
 }

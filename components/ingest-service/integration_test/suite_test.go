@@ -308,7 +308,13 @@ func createServices(s *Suite) {
 
 	// TODO @afiune Modify the time of the jobs
 	s.JobScheduler = server.NewJobScheduler()
-	s.ConfigManager = config.NewManager()
+	configFile := "/tmp/.ingest-service.toml"
+	os.Remove(configFile)
+	s.ConfigManager, err = config.NewManager(configFile)
+	if err != nil {
+		fmt.Printf("Could not create ingest config manager with file %q. %v\n", configFile, err)
+		os.Exit(3)
+	}
 	// TODO Handle the Close() functions
 	//defer JobScheduler.Close()
 	//defer ConfigManager.Close()
@@ -321,7 +327,7 @@ func createServices(s *Suite) {
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient)
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
-		s.projectsClient, s.eventServiceClientMock)
+		s.projectsClient, s.eventServiceClientMock, s.ConfigManager)
 
 	// A global JobSchedulerServer instance to call any rpc function
 	//

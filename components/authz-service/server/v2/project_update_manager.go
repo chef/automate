@@ -6,9 +6,9 @@ import (
 	"time"
 
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/authz-service/config"
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	project_update_tags "github.com/chef/automate/lib/authz"
-	event_ids "github.com/chef/automate/lib/event"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	_struct "github.com/golang/protobuf/ptypes/struct"
@@ -17,74 +17,233 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// TODO
-// Add a partial update state - when an update is canceled or failed
+// Failure cases
+// * No status event for 5 minutes
+// * Domain service sends failure message
+
+// Recovery
+// * Domain service was down during start
+// * Authz service restarts
+
 const (
-	RunningState    = "running"
-	NotRunningState = "not_running"
+	minutesWithoutCheckingInFailure = 5
+	sleepTimeBetweenStatusChecksSec = 5
 )
 
-type domainService struct {
-	name                   string
-	percentageComplete     float64
-	estimatedTimeCompelete time.Time
-	lastUpdate             time.Time
-	complete               bool
-	failed                 bool
+type update struct {
+	fun  func(config.ProjectUpdateStage) (config.ProjectUpdateStage, error)
+	errc chan error
 }
 
 // ProjectUpdateManager - project update manager
 type ProjectUpdateManager struct {
-	state              string
-	projectUpdateID    string
+	stage              config.ProjectUpdateStage
 	eventServiceClient automate_event.EventServiceClient
-	domainServices     []*domainService
+	configManager      *config.Manager
+	updateQueue        chan<- update
 }
-
-// TODO
-// * Store running job IDs so if service restart it can pick up where it left off
-// * Add a cancel function
 
 // NewProjectUpdateManager - create a new project update manager
 func NewProjectUpdateManager(
-	eventServiceClient automate_event.EventServiceClient) ProjectUpdateManager {
-	return ProjectUpdateManager{
-		state:              NotRunningState,
+	eventServiceClient automate_event.EventServiceClient,
+	configManager *config.Manager) *ProjectUpdateManager {
+	updateQueue := make(chan update, 100)
+	manager := &ProjectUpdateManager{
+		stage:              configManager.GetProjectUpdateStage(),
 		eventServiceClient: eventServiceClient,
+		configManager:      configManager,
+		updateQueue:        updateQueue,
 	}
+
+	go manager.stageUpdater(updateQueue)
+
+	manager.resumePreviousState()
+
+	return manager
 }
 
-// Complete - is the current update process complete
-func (manager *ProjectUpdateManager) Complete() bool {
-	switch manager.state {
-	case NotRunningState:
-	case RunningState:
-		for _, ds := range manager.domainServices {
-			if !ds.complete {
-				return false
+// Cancel - stop or cancel domain service project update processes
+// Action
+func (manager *ProjectUpdateManager) Cancel() error {
+	return manager.updateStage(func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
+		switch stage.State {
+		case config.NotRunningState:
+			// do nothing job is not running
+		case config.RunningState:
+			logrus.Debugf("Cancelling project update for ID %q", manager.stage.ProjectUpdateID)
+			err := manager.sendCancelProjectUpdateEvent()
+			if err != nil {
+				return stage, err
 			}
+		default:
+			// error state not found
+			return stage, errors.New(fmt.Sprintf(
+				"Internal error state %q eventID %q", manager.stage.State, manager.stage.ProjectUpdateID))
 		}
-	default:
-	}
 
-	return true
+		return stage, nil
+	})
 }
 
-// PercentageComplete - percentage of the job complete
+// Start - start the domain services project update processes
+// Action
+func (manager *ProjectUpdateManager) Start() error {
+	return manager.updateStage(func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
+		switch stage.State {
+		case config.NotRunningState:
+			projectUpdateID, err := createProjectUpdateID()
+			if err != nil {
+				return stage, err
+			}
+
+			err = manager.sendProjectUpdateStartEvent(projectUpdateID)
+			if err != nil {
+				return stage, err
+			}
+
+			return stage.StartRunning(projectUpdateID), nil
+		case config.RunningState:
+			return stage, errors.New(fmt.Sprintf(
+				"Can not start another project update %q is running", stage.ProjectUpdateID))
+		default:
+			// error state not found
+			return stage, errors.New(fmt.Sprintf(
+				"Internal error state %q eventID %q", stage.State, stage.ProjectUpdateID))
+		}
+	})
+}
+
+// ProcessFailEvent - react to a domain service failed event
+// Action
+func (manager *ProjectUpdateManager) ProcessFailEvent(eventMessage *automate_event.EventMsg) error {
+	return manager.updateStage(func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
+		switch stage.State {
+		case config.NotRunningState:
+		case config.RunningState:
+			if eventMessage.Producer == nil || eventMessage.Producer.ID == "" {
+				return stage, errors.New("Producer ID was not provided in status message")
+			}
+			fromProducer := eventMessage.Producer.ID
+			projectUpdateID, err := getProjectUpdateID(eventMessage)
+			if err != nil {
+				return stage, err
+			}
+			if stage.ProjectUpdateID != projectUpdateID {
+				// projectUpdateID does not match currently running update; ignore
+				return stage, nil
+			}
+
+			domainServiceIndex, err := stage.FindDomainServiceIndex(fromProducer)
+			if err != nil {
+				return stage, err
+			}
+
+			failureMessage := getFailureMessage(eventMessage)
+
+			log.Infof("Fail message from producer %q projectUpdateID %q failureMessage: %s",
+				fromProducer, projectUpdateID, failureMessage)
+
+			stage.DomainServices[domainServiceIndex].FailureMessage = failureMessage
+			stage.DomainServices[domainServiceIndex].Failed = true
+			stage.DomainServices[domainServiceIndex].LastUpdate = time.Now()
+			err = manager.sendCancelProjectUpdateEvent()
+			if err != nil {
+				return stage, err
+			}
+		default:
+		}
+
+		return manager.checkedDomainServices(stage)
+	})
+}
+
+// ProcessStatusEvent - record the status update from the domain service.
+// Action
+func (manager *ProjectUpdateManager) ProcessStatusEvent(
+	eventMessage *automate_event.EventMsg) error {
+	return manager.updateStage(func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
+		switch stage.State {
+		case config.NotRunningState:
+		case config.RunningState:
+			if eventMessage.Producer == nil || eventMessage.Producer.ID == "" {
+				return stage, errors.New("Producer was not provided in status message")
+			}
+			fromProducer := eventMessage.Producer.ID
+			projectUpdateID, err := getProjectUpdateID(eventMessage)
+			if err != nil {
+				return stage, err
+			}
+
+			if stage.ProjectUpdateID != projectUpdateID {
+				// projectUpdateID does not match currently running update; ignore
+				return stage, nil
+			}
+
+			percentageComplete, err := getPercentageComplete(eventMessage)
+			if err != nil {
+				return stage, err
+			}
+
+			estimatedTimeCompelete, err := getEstimatedTimeCompeleteInSec(eventMessage)
+			if err != nil {
+				return stage, err
+			}
+
+			completed, err := getCompleted(eventMessage)
+			if err != nil {
+				return stage, err
+			}
+
+			log.Debugf("Status message from producer: %q projectUpdateID: %q percentageComplete: %f "+
+				"estimatedTimeCompelete: %v completed: %t",
+				fromProducer, projectUpdateID, percentageComplete, estimatedTimeCompelete, completed)
+
+			domainServiceIndex, err := stage.FindDomainServiceIndex(fromProducer)
+			if err != nil {
+				return stage, err
+			}
+
+			stage.DomainServices[domainServiceIndex].Complete = completed
+			stage.DomainServices[domainServiceIndex].EstimatedTimeCompelete = estimatedTimeCompelete
+			stage.DomainServices[domainServiceIndex].PercentageComplete = percentageComplete
+			stage.DomainServices[domainServiceIndex].LastUpdate = time.Now()
+		default:
+		}
+
+		return manager.checkedDomainServices(stage)
+	})
+}
+
+// Failed - did the last update attempt fail
+// Read State
+func (manager *ProjectUpdateManager) Failed() bool {
+	return manager.stage.Failed
+}
+
+// FailureMessage - detailed descriptions of the failure
+// Read State
+func (manager *ProjectUpdateManager) FailureMessage() string {
+	return manager.stage.FailureMessage
+}
+
+// PercentageComplete - percentage of the job that is complete
+// The percentage complete of the job that is going to run the longest is returned
+// Read State
 func (manager *ProjectUpdateManager) PercentageComplete() float64 {
-	switch manager.state {
-	case NotRunningState:
-	case RunningState:
-		latestEstimatedTimeCompelete := time.Time{}
-		var latestDomainService *domainService
-		for _, ds := range manager.domainServices {
-			if !ds.complete && ds.estimatedTimeCompelete.After(latestEstimatedTimeCompelete) {
-				latestEstimatedTimeCompelete = ds.estimatedTimeCompelete
-				latestDomainService = ds
+	switch manager.stage.State {
+	case config.NotRunningState:
+	case config.RunningState:
+		if !manager.Failed() {
+			longestDomainService := config.ProjectUpdateDomainService{
+				PercentageComplete:     1.0,
+				EstimatedTimeCompelete: time.Time{},
 			}
-		}
-		if latestDomainService != nil {
-			return latestDomainService.percentageComplete
+			for _, ds := range manager.stage.DomainServices {
+				if !ds.Complete && ds.EstimatedTimeCompelete.After(longestDomainService.EstimatedTimeCompelete) {
+					longestDomainService = ds
+				}
+			}
+			return longestDomainService.PercentageComplete
 		}
 	default:
 	}
@@ -92,185 +251,175 @@ func (manager *ProjectUpdateManager) PercentageComplete() float64 {
 	return 1.0
 }
 
-// EstimatedTimeCompelete - the estimated date and time of compeletion.
+// EstimatedTimeCompelete - the estimated date and time of compeletion of the longest running job
+// Read State
 func (manager *ProjectUpdateManager) EstimatedTimeCompelete() time.Time {
-	switch manager.state {
-	case NotRunningState:
-	case RunningState:
-		latestEstimatedTimeCompelete := time.Time{}
-		for _, ds := range manager.domainServices {
-			if !ds.complete && ds.estimatedTimeCompelete.After(latestEstimatedTimeCompelete) {
-				latestEstimatedTimeCompelete = ds.estimatedTimeCompelete
+	switch manager.stage.State {
+	case config.NotRunningState:
+	case config.RunningState:
+		longestEstimatedTimeCompelete := time.Time{}
+		if !manager.Failed() {
+			for _, ds := range manager.stage.DomainServices {
+				if !ds.Complete && ds.EstimatedTimeCompelete.After(longestEstimatedTimeCompelete) {
+					longestEstimatedTimeCompelete = ds.EstimatedTimeCompelete
+				}
 			}
 		}
-		return latestEstimatedTimeCompelete
+		return longestEstimatedTimeCompelete
 	default:
 	}
 
 	return time.Time{}
 }
 
-// State - The current state of the manager
+// State - The current state of the manager. either running or not running
+// Read State
 func (manager *ProjectUpdateManager) State() string {
-	return manager.state
+	return manager.stage.State
 }
 
-func (manager *ProjectUpdateManager) Cancel() error {
-	switch manager.state {
-	case NotRunningState:
-		// do nothing job is not running
-	case RunningState:
-		logrus.Debugf("Cancelling project update for ID %q", manager.projectUpdateID)
-		err := manager.cancelProjectUpdateForDomainResources()
+// Watching the domain services complete the update process.
+// A domain service is complete when:
+// * send a failure event
+// * sends a complete status event
+// * does not send status for 5 minutes
+func (manager *ProjectUpdateManager) waitingForJobToComplete() {
+	for manager.stage.State == config.RunningState {
+		time.Sleep(time.Second * sleepTimeBetweenStatusChecksSec)
+		err := manager.updateStage(
+			func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
+				return manager.checkedDomainServices(stage)
+			})
 		if err != nil {
-			return err
+			log.Errorf("checked Domain Services. %v", err)
 		}
-	default:
-		// error state not found
-		return errors.New(fmt.Sprintf(
-			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID))
+	}
+}
+
+func (manager *ProjectUpdateManager) checkedDomainServices(
+	stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
+	oldestDomainServiceUpdateTime := stage.OldestDomainServiceUpdateTime()
+	if stage.AreDomainServicesComplete() {
+		stage = stage.StopRunning()
+	} else if stage.HasFailedDomainService() {
+		failureMessage := ""
+		for _, ds := range stage.DomainServices {
+			if ds.Failed {
+				if failureMessage != "" {
+					failureMessage = fmt.Sprintf("%s; %s: %s",
+						failureMessage, ds.Name, ds.FailureMessage)
+				} else {
+					failureMessage = fmt.Sprintf("%s: %s", ds.Name, ds.FailureMessage)
+				}
+			}
+		}
+		stage.Failed = true
+		stage.FailureMessage = failureMessage
+		stage = stage.StopRunning()
+	} else if oldestDomainServiceUpdateTime.Before(
+		time.Now().Add((-1) * time.Minute * minutesWithoutCheckingInFailure)) {
+		stage.Failed = true
+		stage.FailureMessage = fmt.Sprintf("A domain service has not check in for over %d minutes",
+			minutesWithoutCheckingInFailure)
+
+		stage = stage.StopRunning()
+	} else if oldestDomainServiceUpdateTime.Before(time.Now().Add((-1) * time.Minute)) {
+		// This domain service as not checked in within a minute
+		// Send another start event
+		log.Debug("Resending project update start event")
+		err := manager.sendProjectUpdateStartEvent(stage.ProjectUpdateID)
+		if err != nil {
+			log.Errorf("Starting Project Update for domain resources. %v", err)
+		}
 	}
 
-	return nil
+	return stage, nil
 }
 
-// Start - start a project update
-func (manager *ProjectUpdateManager) Start() error {
-	switch manager.state {
-	case NotRunningState:
-		projectUpdateID, err := createProjectUpdateID()
-		if err != nil {
-			return err
-		}
-		err = manager.startProjectUpdateForDomainResources(projectUpdateID)
-		if err != nil {
-			return err
-		}
+func (manager *ProjectUpdateManager) resumePreviousState() {
+	// The LastUpdate field is stale and could have missed recent updates, updating it gives the
+	// domain services time to send status updates
+	for _, ds := range manager.stage.DomainServices {
+		ds.LastUpdate = time.Now()
+	}
 
-		manager.resetDomainServicesData()
-		manager.projectUpdateID = projectUpdateID
-		manager.state = RunningState
+	if manager.stage.State == config.RunningState {
 		go manager.waitingForJobToComplete()
-		return nil
-	case RunningState:
-		return errors.New(fmt.Sprintf(
-			"Can not start another project update %q is running", manager.projectUpdateID))
-	default:
-		// error state not found
-		return errors.New(fmt.Sprintf(
-			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID))
 	}
 }
 
-func (manager *ProjectUpdateManager) ProcessFailMessage(
-	eventMessage *automate_event.EventMsg) error {
-	switch manager.state {
-	case NotRunningState:
-	case RunningState:
-		if eventMessage.Producer == nil || eventMessage.Producer.ID == "" {
-			return errors.New("Producer was not provided in status message")
-		}
-		fromProducer := eventMessage.Producer.ID
-		projectUpdateID, err := getProjectUpdateID(eventMessage)
-		if err != nil {
-			return err
-		}
-		if manager.projectUpdateID != projectUpdateID {
-			// projectUpdateID does not match currently running update; ignore
-			return nil
-		}
-		log.Infof("Fail message from producer %q projectUpdateID %q", fromProducer, projectUpdateID)
+// This function and the stageUpdater function allow the stage data to be accessed by a single thread. This
+// prevents race conditions.
+// The updateFunc function is placed in the updateQueue channel and ran in the order they are added.
+// This allows only one thread to change the stage data.
+// This also allows the code in the updateFunc function to be ran fully without any of the stage data
+// changing.
+func (manager *ProjectUpdateManager) updateStage(
+	updateFunc func(config.ProjectUpdateStage) (config.ProjectUpdateStage, error)) error {
+	errc := make(chan error)
+	manager.updateQueue <- update{fun: updateFunc, errc: errc}
 
-		domainService, err := manager.findDomainService(fromProducer)
-		if err != nil {
-			return err
-		}
-
-		domainService.failed = true
-		domainService.lastUpdate = time.Now()
-	default:
-	}
-
-	return nil
+	// Wait for the function to run
+	err := <-errc
+	close(errc)
+	return err
 }
 
-func (manager *ProjectUpdateManager) ProcessStatusMessage(
-	eventMessage *automate_event.EventMsg) error {
-	switch manager.state {
-	case NotRunningState:
-	case RunningState:
-		if eventMessage.Producer == nil || eventMessage.Producer.ID == "" {
-			return errors.New("Producer was not provided in status message")
-		}
-		fromProducer := eventMessage.Producer.ID
-		projectUpdateID, err := getProjectUpdateID(eventMessage)
+// stageUpdater - runs one update function at a time with the current stage data.
+// creating a copy of the stage data to prevent the data in slices from being updated.
+func (manager *ProjectUpdateManager) stageUpdater(updateQueue <-chan update) {
+	for update := range updateQueue {
+		updatedStage, err := update.fun(manager.stage.Copy())
 		if err != nil {
-			return err
+			update.errc <- err
+			continue
 		}
 
-		if manager.projectUpdateID != projectUpdateID {
-			// projectUpdateID does not match currently running update; ignore
-			return nil
+		oldStage := manager.stage.Copy()
+		if !updatedStage.Equal(oldStage) {
+			err := manager.configManager.UpdateProjectUpdateStage(updatedStage)
+			if err != nil {
+				log.Errorf("Failure updating project update state %v", err)
+				update.errc <- err
+				continue
+			}
+
+			manager.stage = updatedStage
+			manager.stageUpdateEvent(oldStage, updatedStage)
 		}
 
-		percentageComplete, err := getPercentageComplete(eventMessage)
-		if err != nil {
-			return err
-		}
-
-		estimatedTimeCompelete, err := getEstimatedTimeCompeleteInSec(eventMessage)
-		if err != nil {
-			return err
-		}
-
-		completed, err := getCompleted(eventMessage)
-		if err != nil {
-			return err
-		}
-
-		log.Infof("Status message from producer: %q projectUpdateID: %q percentageComplete: %f "+
-			"estimatedTimeCompelete: %v completed: %t",
-			fromProducer, projectUpdateID, percentageComplete, estimatedTimeCompelete, completed)
-
-		domainService, err := manager.findDomainService(fromProducer)
-		if err != nil {
-			return err
-		}
-
-		domainService.complete = completed
-		domainService.estimatedTimeCompelete = estimatedTimeCompelete
-		domainService.percentageComplete = percentageComplete
-		domainService.lastUpdate = time.Now()
-		// A domain service can recover from a failure
-		domainService.failed = false
-
-		manager.checkIfComplete()
-	default:
+		update.errc <- nil
 	}
-
-	return nil
 }
 
-func (manager *ProjectUpdateManager) findDomainService(
-	producerID string) (*domainService, error) {
-	for _, domainService := range manager.domainServices {
-		if domainService.name == producerID {
-			return domainService, nil
-		}
+// When the stage state is updated to running start the waitingForJobToComplete function
+func (manager *ProjectUpdateManager) stageUpdateEvent(oldStage config.ProjectUpdateStage,
+	newStage config.ProjectUpdateStage) {
+	if oldStage.State == config.NotRunningState && newStage.State == config.RunningState {
+		go manager.waitingForJobToComplete()
 	}
-
-	return &domainService{}, errors.New(fmt.Sprintf(
-		"Domain service not found with producerID %q", producerID))
 }
 
-func (manager *ProjectUpdateManager) startProjectUpdateForDomainResources(
-	projectUpdateID string) error {
+// Publish a project update event with the event-service
+func (manager *ProjectUpdateManager) sendProjectUpdateStartEvent(projectUpdateID string) error {
+	return sendProjectUpdateEvent(projectUpdateID,
+		automate_event_type.ProjectRulesUpdate, manager.eventServiceClient)
+}
+
+// Publish a canel project update event with the event service
+func (manager *ProjectUpdateManager) sendCancelProjectUpdateEvent() error {
+	return sendProjectUpdateEvent(manager.stage.ProjectUpdateID,
+		automate_event_type.ProjectRulesCancelUpdate, manager.eventServiceClient)
+}
+
+func sendProjectUpdateEvent(projectUpdateID string, eventType string,
+	eventServiceClient automate_event.EventServiceClient) error {
 	eventUUID := createEventUUID()
 
 	event := &automate_event.EventMsg{
 		EventID:   eventUUID,
 		Published: ptypes.TimestampNow(),
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
+		Type:      &automate_event.EventType{Name: eventType},
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
 				project_update_tags.ProjectUpdateIDTag: {
@@ -283,83 +432,9 @@ func (manager *ProjectUpdateManager) startProjectUpdateForDomainResources(
 	}
 
 	pubReq := automate_event.PublishRequest{Msg: event}
-	_, err := manager.eventServiceClient.Publish(context.Background(), &pubReq)
+	_, err := eventServiceClient.Publish(context.Background(), &pubReq)
 
 	return err
-}
-
-func (manager *ProjectUpdateManager) cancelProjectUpdateForDomainResources() error {
-	eventUUID := createEventUUID()
-
-	event := &automate_event.EventMsg{
-		EventID:   eventUUID,
-		Published: ptypes.TimestampNow(),
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesCancelUpdate},
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: {
-					Kind: &_struct.Value_StringValue{
-						StringValue: manager.projectUpdateID,
-					},
-				},
-			},
-		},
-	}
-
-	pubReq := automate_event.PublishRequest{Msg: event}
-	_, err := manager.eventServiceClient.Publish(context.Background(), &pubReq)
-
-	return err
-}
-
-// Watching the domain services complete the update process.
-// A domain service is complete if it fails or sends a complete status.
-//
-// TODO
-// * Allow a failed domain service some extra time to resolve its self
-// * Act when a domain service has not send a status for over a minute
-func (manager *ProjectUpdateManager) waitingForJobToComplete() {
-	for manager.state == RunningState {
-		manager.checkIfComplete()
-		time.Sleep(time.Second * 5)
-	}
-}
-
-func (manager *ProjectUpdateManager) checkIfComplete() {
-	complete := true
-	failure := false
-	for _, domainService := range manager.domainServices {
-		if !domainService.complete && !domainService.failed {
-			complete = false
-
-			if domainService.failed {
-				failure = true
-			}
-			break
-		}
-	}
-
-	if complete {
-		if failure {
-			log.Info("Finished domain services project update with a failure")
-		} else {
-			log.Info("Finished domain services project update with success")
-		}
-		manager.state = NotRunningState
-	}
-}
-
-func (manager *ProjectUpdateManager) resetDomainServicesData() {
-	manager.domainServices = []*domainService{
-		{
-			name:     event_ids.ComplianceInspecReportProducerID,
-			complete: false,
-		},
-		{
-			name:     event_ids.InfraClientRunsProducerID,
-			complete: false,
-		},
-	}
 }
 
 func createProjectUpdateID() (string, error) {
@@ -371,6 +446,7 @@ func createProjectUpdateID() (string, error) {
 	return uuid.String(), nil
 }
 
+// TODO move the creation of Event ID to the event service
 func createEventUUID() string {
 	uuid, err := uuid.NewV4()
 	if err != nil {
@@ -382,6 +458,7 @@ func createEventUUID() string {
 	return uuid.String()
 }
 
+// Get the Project Update ID out of the event Data fields
 func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {
 	fieldName := project_update_tags.ProjectUpdateIDTag
 	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil &&
@@ -391,6 +468,16 @@ func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {
 
 	return "", fmt.Errorf("Event message sent without a %s field eventID: %q",
 		fieldName, event.EventID)
+}
+
+func getFailureMessage(event *automate_event.EventMsg) string {
+	fieldName := "message"
+	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil &&
+		event.Data.Fields[fieldName].GetStringValue() != "" {
+		return event.Data.Fields[fieldName].GetStringValue()
+	}
+
+	return ""
 }
 
 func getCompleted(event *automate_event.EventMsg) (bool, error) {
@@ -409,7 +496,8 @@ func getPercentageComplete(event *automate_event.EventMsg) (float64, error) {
 		return event.Data.Fields[fieldName].GetNumberValue(), nil
 	}
 
-	return 0.0, fmt.Errorf("Event message sent without a %s field eventID: %q", fieldName, event.EventID)
+	return 0.0, fmt.Errorf("Event message sent without a %s field eventID: %q",
+		fieldName, event.EventID)
 }
 
 func getEstimatedTimeCompeleteInSec(event *automate_event.EventMsg) (time.Time, error) {

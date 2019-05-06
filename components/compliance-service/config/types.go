@@ -13,6 +13,7 @@ type Service struct {
 	LogLevel   string
 	ServerBind string
 	certs.TLSConfig
+	ConfigFilePath string
 }
 
 // Compliance service specific config options

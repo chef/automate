@@ -6,6 +6,7 @@ import (
 	"net"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc/reflection"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
@@ -110,7 +111,10 @@ func Spawn(opts *serveropts.Opts) error {
 	jobScheduler := server.NewJobScheduler()
 	defer jobScheduler.Close()
 
-	configManager := config.NewManager()
+	configManager, err := config.NewManager(viper.ConfigFileUsed())
+	if err != nil {
+		return err
+	}
 	defer configManager.Close()
 
 	// JobSchedulerServer
@@ -119,7 +123,7 @@ func Spawn(opts *serveropts.Opts) error {
 
 	// EventHandler
 	eventHandlerServer := server.NewAutomateEventHandlerServer(client, *chefIngest,
-		authzProjectsClient, eventServiceClient)
+		authzProjectsClient, eventServiceClient, configManager)
 	ingest.RegisterEventHandlerServer(grpcServer, eventHandlerServer)
 
 	// Data Lifecycle Interface

@@ -47,6 +47,12 @@ func (es *Backend) JobStatus(ctx context.Context, jobID string) (backend.JobStat
 		return backend.JobStatus{}, err
 	}
 
+	if tasksGetTaskResponse.Task == nil {
+		return backend.JobStatus{
+			Completed: tasksGetTaskResponse.Completed,
+		}, nil
+	}
+
 	var estimatedEndTimeInSec int64
 
 	percentageComplete := getPercentageComplete(tasksGetTaskResponse.Task.Status)

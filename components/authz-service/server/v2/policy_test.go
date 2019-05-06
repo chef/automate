@@ -21,6 +21,7 @@ import (
 	uuid "github.com/chef/automate/lib/uuid4"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/components/authz-service/config"
 	constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
@@ -2939,7 +2940,10 @@ func setupV2(t *testing.T,
 	require.NoError(t, err)
 
 	eventServiceClient := &mockEventServiceClient{}
-	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testProjectRulesRetriever{}, eventServiceClient)
+	configMgr, err := config.NewManager("/tmp/.authz-delet-me")
+	require.NoError(t, err)
+	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
+		&testProjectRulesRetriever{}, eventServiceClient, configMgr)
 	require.NoError(t, err)
 
 	vSwitch := v2.NewSwitch(vChan)
