@@ -21,11 +21,13 @@ import (
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+	ingest_inspec "github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	ingest_api "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
 	event "github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -167,7 +169,11 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 		SourceRegion:    in.SourceRegion,
 		SourceAccountId: in.SourceAccountId,
 		Tags:            in.Tags,
-	})
+		ScanData: &nodes.LastContactData{
+			Id:      in.ReportUuid,
+			EndTime: endTime.String(),
+		},
+	}, in.Profiles)
 	if err != nil {
 		logrus.Errorf("ProcessComplianceReport unable to send node info to manager: %s", err.Error())
 	}
@@ -197,14 +203,39 @@ func (s *ComplianceIngestServer) handleNotifications(ctx context.Context, report
 	return nil
 }
 
-func (s *ComplianceIngestServer) sendNodeInfoToManager(ctx context.Context, node manager.NodeMetadata) error {
+func (s *ComplianceIngestServer) sendNodeInfoToManager(ctx context.Context, node manager.NodeMetadata, profiles []*ingest_inspec.Profile) error {
 	if s.mgrClient == nil {
 		return fmt.Errorf("no manager client found")
 	}
+	node.ScanData.Status = getReportStatus(profiles)
 	logrus.Debugf("sendNodeInfoToManager handing-over node to manager %+v", s)
 	_, err := s.mgrClient.ProcessNode(ctx, &node)
 	if err != nil {
 		return errors.Wrap(err, "sendNodeInfoToManager error calling ProcessNode")
 	}
 	return nil
+}
+
+func getReportStatus(profiles []*ingest_inspec.Profile) (status string) {
+	// start with a status of passed as the default status
+	status = "passed"
+	skippedCounter := 0
+	for _, profile := range profiles {
+		// if any profile is failed, report is failed
+		if profile.Status == "failed" {
+			status = "failed"
+			break
+		}
+		// if all profiles are skipped, the report is skipped
+		// so we keep a count of skipped profiles and later
+		// check if the amount of profiles matches the skipped counter,
+		// setting the status to skipped if they match.
+		if profile.Status == "skipped" {
+			skippedCounter++
+		}
+	}
+	if skippedCounter == len(profiles) {
+		status = "skipped"
+	}
+	return
 }

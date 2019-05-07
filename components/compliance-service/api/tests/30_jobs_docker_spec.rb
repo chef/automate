@@ -374,6 +374,8 @@ describe File.basename(__FILE__) do
     actual_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new()
     actual_nodes['nodes'].each {|n|
       assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, n, 'last_contact'))
+      n.scan_data.end_time = ""
+      n.scan_data.id = "some-id"
     }
     expected_nodes = {
       "nodes": [
@@ -412,6 +414,12 @@ describe File.basename(__FILE__) do
           ],
           "state": "RUNNING",
           "projects": [],
+          "runData": {},
+          "scanData": {
+            "id": "some-id",
+            "status": "passed",
+            "penultimateStatus": "passed"
+          }
         },
         {
           "id": @docker_node_id2,
@@ -434,6 +442,10 @@ describe File.basename(__FILE__) do
           ],
           "connectionError": "unknown error",
           "projects": [],
+          "runData": {},
+          "scanData": {
+            "id": "some-id"
+          }
         }
       ],
       "total": 2,

@@ -20,6 +20,12 @@ describe File.basename(__FILE__) do
     nodes_list = MANAGER_GRPC nodes, :list, Nodes::Query.new()
     assert_equal(nodes_list.total, 9)
 
+    nodes_list['nodes'].each { |node|
+      assert_equal(node['scan_data'].id.length > 0, true)
+      assert_equal(node['scan_data'].status.length > 0, true)
+      assert_equal(node['scan_data'].end_time.length > 0, true)
+    }
+
     state_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new(filters:[Common::Filter.new(key: "state", values: ["RUNNING", "STOPPED", ""])])
     assert_equal(state_nodes.total, 9)
 

@@ -110,6 +110,15 @@ message Node {
 	string state = 26;
 	string name_prefix = 27;
 	repeated string projects = 28;
+	LastContactData run_data = 29;
+	LastContactData scan_data = 30;
+}
+
+message LastContactData {
+	string id = 1; // run id or report id
+	string status = 2;
+	string penultimate_status = 3;
+	string end_time = 4;
 }
 
 message Nodes {

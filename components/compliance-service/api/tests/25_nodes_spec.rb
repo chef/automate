@@ -166,7 +166,10 @@ describe File.basename(__FILE__) do
         status: "unknown",
         tags: [
           Common::Kv.new(key: "environment", value: "Pro duc tion")
-        ]
+        ],
+        run_data: Nodes::LastContactData.new(),
+        scan_data: Nodes::LastContactData.new()
+
       ),
       Nodes::Node.new(
         id: node_id2,
@@ -178,7 +181,9 @@ describe File.basename(__FILE__) do
         tags: [
           Common::Kv.new(key: "department", value: "marketing"),
           Common::Kv.new(key: "boss", value: "John")
-        ]
+        ],
+        run_data: Nodes::LastContactData.new(),
+        scan_data: Nodes::LastContactData.new()
       ),
       Nodes::Node.new(
         id: node_id1,
@@ -186,7 +191,9 @@ describe File.basename(__FILE__) do
         last_contact: nil,
         manager: "automate",
         manager_ids: ["e69dc612-7e67-43f2-9b19-256afd385820"],
-        status: "unknown"
+        status: "unknown",
+        run_data: Nodes::LastContactData.new(),
+        scan_data: Nodes::LastContactData.new()
       )
     ]
     assert_equal(expected_nodes, actual_nodes)
@@ -239,7 +246,9 @@ describe File.basename(__FILE__) do
         port: 5985,
         user: "administrator",
         password: "123456"
-      )
+      ),
+      run_data: Nodes::LastContactData.new(),
+      scan_data: Nodes::LastContactData.new()
     )
     assert_equal(expected_node1, node1)
 
@@ -260,7 +269,9 @@ describe File.basename(__FILE__) do
       target_config: Nodes::TargetConfig.new(
         backend: "aws",
         secrets: [secret_id]
-      )
+      ),
+      run_data: Nodes::LastContactData.new(),
+      scan_data: Nodes::LastContactData.new()
     )
     assert_equal(expected_node2, node2)
 
@@ -285,7 +296,9 @@ describe File.basename(__FILE__) do
         sudo: true,
         user: "administrator",
         password: "123456"
-      )
+      ),
+      run_data: Nodes::LastContactData.new(),
+      scan_data: Nodes::LastContactData.new()
     )
     assert_equal(expected_node3, node3)
 
@@ -327,7 +340,9 @@ describe File.basename(__FILE__) do
       tags: [
         Common::Kv.new(key: "environment", value: "Yo yo duckies"),
         Common::Kv.new(key: "something", value: "as cute as red pandas")
-      ]
+      ],
+      run_data: Nodes::LastContactData.new(),
+      scan_data: Nodes::LastContactData.new()
     )
     assert_equal(expected_node3, updated_node3)
 
@@ -376,7 +391,9 @@ describe File.basename(__FILE__) do
           secrets: [ssh_secret_id],
           port: 22
         ),
-        tags: []
+        tags: [],
+        run_data: Nodes::LastContactData.new(),
+        scan_data: Nodes::LastContactData.new()
     )
 
     # Add a second secret to reference
@@ -437,7 +454,9 @@ describe File.basename(__FILE__) do
       ),
       tags: [
         Common::Kv.new(key: "department", value: "engineering")
-      ]
+      ],
+      run_data: Nodes::LastContactData.new(),
+      scan_data: Nodes::LastContactData.new()
     )
     assert_equal(expected_node3, super_duper_updated_node_3)
 
