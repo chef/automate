@@ -88,12 +88,13 @@ func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 			&api_v2.FilterAuthorizedPairsReq{
 				Subjects: []string{"user:local:alice"},
 				Pairs: []*api_v2.Pair{
+					// normally all resources/actions are passed, but we only need a few to
+					// test this functionality
 					&api_v2.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
 					&api_v2.Pair{Resource: "cfgmgmt:nodes:foo", Action: "cfgmgmt:infranodes:get"}},
 			})
 		require.NoError(t, err)
-		// TODO This should fail with project2 and project3 as well
-		// bs: I think we actually expect to get one project instead of all
+
 		assert.ElementsMatch(t, []string{"project-1"}, resp.Projects)
 	})
 }
