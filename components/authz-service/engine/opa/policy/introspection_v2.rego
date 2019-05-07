@@ -5,6 +5,8 @@ import data.common
 import data.policies
 import data.roles
 
+const_system_type = "system"
+
 pair_matches_resource[[pol_id, statement_id, pair]] {
 	policies[pol_id].statements[statement_id].resources[_] = statement_resource
 	input.pairs[_] = pair
@@ -45,7 +47,7 @@ authorized_pair[pair] {
 allowed_project[project] {
 	project := policies[pol_id].statements[statement_id].projects[_]
 	match_pair[["allow", _, pol_id, statement_id]]
-	not policies[pol_id].type == "system"
+	not policies[pol_id].type == const_system_type
 }
 
 authorized_project[project] {
