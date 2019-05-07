@@ -48,14 +48,6 @@ func isTimeoutSane(timeout time.Duration, max time.Duration) error {
 	return nil
 }
 
-func AcceptInspecLicense() error {
-	err := os.Setenv("CHEF_LICENSE", "accept-no-persist")
-	if err != nil {
-		return errors.Wrap(err, "Unable to set CHEF_LICENSE env variable")
-	}
-	return nil
-}
-
 // Scan a target node with all specified profiles
 func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[string]string) ([]byte, []byte, *Error) {
 	if err := isTimeoutSane(timeout, 12*time.Hour); err != nil {

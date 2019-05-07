@@ -58,3 +58,7 @@ func TestControlStatus(t *testing.T) {
 	assert.Equal(t, ResultStatusFailed, control.Status(), "if one result fails, the control is failed")
 
 }
+
+func TestLogSensitiveData(t *testing.T) {
+	assert.Equal(t, false, logSensitiveData, "Sensitive data logging should only be for troubleshooting")
+}

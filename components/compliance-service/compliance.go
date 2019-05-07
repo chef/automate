@@ -99,11 +99,6 @@ func runHungJobs(ctx context.Context, scheduledJobsIds []string, schedulerServer
 func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFactory *secureconn.Factory, esr relaxting.ES2Backend, statusSrv *statusserver.Server, err error) {
 	statusSrv = statusserver.New()
 
-	err = inspec.AcceptInspecLicense()
-	if err != nil {
-		return db, connFactory, esr, statusSrv, err
-	}
-
 	statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPG, "Initializing DB connection and schema migration...")
 	// start pg backend
 	db, err = createPGBackend(&conf.Postgres)
