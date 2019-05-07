@@ -83,7 +83,7 @@ defmodule Notifications.Config do
     cond do
       sqerl_no_ssl?() -> 
         [ssl: false]
-      sqerl_no_ssl_auth()? ->
+      sqerl_no_ssl_auth?() ->
         [ssl: true, ssl_opts: Keyword.get(ssl_options_no_auth(), :ssl)]
       true ->
         [ssl: true, ssl_opts: Keyword.get(ssl_options(), :ssl)]
@@ -104,7 +104,7 @@ defmodule Notifications.Config do
   def ssl_options_no_auth do
     [ssl: [
       cacertfile: get_value("EXTERNAL_PG_ROOT_CA_CERT", nil),
-      verify: :verify_peer,
+      verify: :verify_none,
       versions: [:'tlsv1.2'],
     ]]
   end
