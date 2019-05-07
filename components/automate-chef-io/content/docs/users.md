@@ -105,7 +105,7 @@ curl -X DELETE -H "api-token: $TOK" -H "Content-Type: application/json" https://
 ### User Self-Maintenance
 
 Local Automate users can manage their own name and password through the Chef Automate user interface.
-Click the user icon in the top navigation bar,
+Select the user icon in the top navigation bar,
 then select **Profile** from the drop-down.
 
 ![Navigate to user profile](/images/docs/user-profile-navigation.png)
