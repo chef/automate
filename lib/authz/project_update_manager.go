@@ -424,22 +424,22 @@ func (manager *DomainProjectUpdateManager) updateStatus(jobStatus JobStatus, pro
 		},
 		Data: &_struct.Struct{
 			Fields: map[string]*_struct.Value{
-				"Completed": &_struct.Value{
+				"Completed": {
 					Kind: &_struct.Value_BoolValue{
 						BoolValue: jobStatus.Completed,
 					},
 				},
-				"PercentageComplete": &_struct.Value{
+				"PercentageComplete": {
 					Kind: &_struct.Value_NumberValue{
 						NumberValue: float64(jobStatus.PercentageComplete),
 					},
 				},
-				"EstimatedTimeCompeleteInSec": &_struct.Value{
+				"EstimatedTimeCompeleteInSec": {
 					Kind: &_struct.Value_NumberValue{
 						NumberValue: float64(jobStatus.EstimatedEndTimeInSec),
 					},
 				},
-				ProjectUpdateIDTag: &_struct.Value{
+				ProjectUpdateIDTag: {
 					Kind: &_struct.Value_StringValue{
 						StringValue: projectUpdateID,
 					},
