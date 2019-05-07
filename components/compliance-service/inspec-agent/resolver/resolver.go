@@ -451,20 +451,11 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 				// if the user has specified ssh/winrm secrets to be associated with the node
 				// then let's prioritize that -- otherwise try ssm
 				if len(credsArr) == 0 {
-					switch node.Ssm {
-					case "Online":
-						// if the ping status is online, we want this to be a ssm job (aws)
-						ssmJob = true
-						backend = inspec.BackendSSM
-						if node.Platform == "windows" {
-							backend = inspec.BackendSSMWindows
-						}
-					case "Online:Azure":
-						ssmJob = true
-						backend = inspec.BackendAZ
-						if node.Platform == "windows" {
-							backend = inspec.BackendAZWindows
-						}
+					var skip bool
+					skip, ssmJob = handleSSMNodes(node, job, &backend)
+					if skip {
+						logrus.Warnf("action not supported: cannot run a detect job on ssm node %s", node.Name)
+						continue
 					}
 				}
 				baseJob = types.InspecBaseJob{
@@ -518,6 +509,29 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 		}
 	}
 	return jobArray, nil
+}
+
+func handleSSMNodes(node *manager.ManagerNode, job *jobs.Job, backend *string) (ssmJob bool, skip bool) {
+	skip = false
+	switch node.Ssm {
+	case "Online":
+		// if the ping status is online, we want this to be a ssm job (aws)
+		ssmJob = true
+		*backend = inspec.BackendSSM
+		if node.Platform == "windows" {
+			*backend = inspec.BackendSSMWindows
+		}
+	case "Online:Azure":
+		ssmJob = true
+		*backend = inspec.BackendAZ
+		if node.Platform == "windows" {
+			*backend = inspec.BackendAZWindows
+		}
+	}
+	if ssmJob == true && job.Type == "detect" {
+		skip = true
+	}
+	return
 }
 
 type FiltersByManager struct {
@@ -582,6 +596,10 @@ func (r *Resolver) resolveStaticJob(ctx context.Context, job *jobs.Job) ([]*type
 		resolvedTC, err := convertNodeTcToInspecTc(node.TargetConfig)
 		if err != nil {
 			logrus.Errorf("Could not resolve target config for node %s, due to: %s", id, err.Error())
+			continue
+		}
+		if resolvedTC.Backend == "ssm" && job.Type == "detect" {
+			logrus.Warnf("action not supported: cannot run a detect job on ssm node %s", node.Name)
 			continue
 		}
 		agentJob := r.resolveStaticJobInfo(job, node, resolvedTC, id)
