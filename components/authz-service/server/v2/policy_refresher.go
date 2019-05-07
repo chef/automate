@@ -26,6 +26,7 @@ type policyRefresher struct {
 	engine                   engine.V2Writer
 	refreshRequests          chan policyRefresherMessageRefresh
 	antiEntropyTimerDuration time.Duration
+	changeNotifier           storage.PolicyChangeNotifier
 }
 
 type policyRefresherMessageRefresh struct {
@@ -48,16 +49,21 @@ func (m *policyRefresherMessageRefresh) Err() error {
 }
 
 func NewPolicyRefresher(ctx context.Context, log logger.Logger, store storage.Storage,
-	engine engine.V2Writer) PolicyRefresher {
+	engine engine.V2Writer) (PolicyRefresher, error) {
+	changeNotifier, err := store.GetPolicyChangeNotifier(ctx)
+	if err != nil {
+		return nil, err
+	}
 	refresher := &policyRefresher{
 		log:                      log,
 		store:                    store,
 		engine:                   engine,
 		refreshRequests:          make(chan policyRefresherMessageRefresh, 1),
 		antiEntropyTimerDuration: 10 * time.Second,
+		changeNotifier:           changeNotifier,
 	}
 	go refresher.run(ctx)
-	return refresher
+	return refresher, nil
 }
 
 func (refresher *policyRefresher) run(ctx context.Context) {
@@ -69,7 +75,18 @@ RUNLOOP:
 		case <-ctx.Done():
 			refresher.log.WithError(ctx.Err()).Info("Policy refresher exiting")
 			break RUNLOOP
+		case <-refresher.changeNotifier.C():
+			refresher.log.Info("Received policy change notification")
+			var err error
+			lastPolicyID, err = refresher.refresh(context.Background(), lastPolicyID)
+			if err != nil {
+				refresher.log.WithError(err).Warn("Failed to refresh policies")
+			}
+			if !antiEntropyTimer.Stop() {
+				<-antiEntropyTimer.C
+			}
 		case m := <-refresher.refreshRequests:
+			refresher.log.Info("Received local policy refresh request")
 			var err error
 			lastPolicyID, err = refresher.refresh(m.ctx, lastPolicyID)
 			m.Respond(err)
@@ -86,6 +103,7 @@ RUNLOOP:
 
 		antiEntropyTimer.Reset(refresher.antiEntropyTimerDuration)
 	}
+	refresher.log.Info("Shutting down policy refresh loop")
 	close(refresher.refreshRequests)
 }
 
