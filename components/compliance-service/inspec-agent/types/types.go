@@ -3,6 +3,7 @@ package types
 import (
 	"time"
 
+	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/inspec"
 )
 
@@ -67,6 +68,7 @@ type InspecJob struct {
 	ProfilesOwner     string              `json:"profiles_owner,omitempty"`
 	InternalProfiles  []string            `json:"internal_profiles,omitempty"`
 	MachineIdentifier string              `json:"machine_identifier,omitempty"`
+	Tags              []*common.Kv        `json:"kv,omitempty"`
 }
 
 // WorkerStats describe the state of all inspec job workers to be used for analysis purposes

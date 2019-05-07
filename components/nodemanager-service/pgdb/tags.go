@@ -7,39 +7,53 @@ import (
 	"github.com/pkg/errors"
 )
 
+const sqlInsertNodeTag = `
+INSERT INTO nodes_tags
+(node_id, tag_id)
+VALUES ($1, $2)
+ON CONFLICT (node_id, tag_id)
+DO NOTHING;
+`
+
+const sqlInsertTag = `
+INSERT INTO tags
+(id, key, value)
+VALUES ($1, $2, $3)
+ON CONFLICT (key, value)
+DO UPDATE SET value=$3 RETURNING id;
+`
+
+// Note: ^^ this is silly. apparently you can't do an ON CONFLICT
+// DO NOTHING and still return the id, and we need to know the id b/c we still
+// need it to do the nodes_tags association. So we do a silly update so we can get
+// the id back from postgres :/ (vj)
+
 func (trans *DBTrans) addTags(tags []*common.Kv) ([]string, error) {
 	tagIDs := make([]string, 0, len(tags))
-	tagArr := make([]interface{}, 0, len(tags))
 
 	for _, keyValue := range tags {
-		tag := tag{
-			ID:    createUUID(),
-			Key:   keyValue.Key,
-			Value: keyValue.Value,
+		id := createUUID()
+		dbID, err := trans.SelectStr(sqlInsertTag, id, keyValue.Key, keyValue.Value)
+		if err != nil {
+			return tagIDs, errors.Wrap(err, "addTags unable to add tag")
 		}
-		tagArr = append(tagArr, &tag)
-		tagIDs = append(tagIDs, tag.ID)
-	}
-
-	err := trans.Insert(tagArr...)
-	if err != nil {
-		return tagIDs, errors.Wrap(err, "addTags unable to add tags in db")
+		if len(dbID) > 0 {
+			id = dbID
+		}
+		tagIDs = append(tagIDs, id)
 	}
 
 	return tagIDs, nil
 }
 
 func (trans *DBTrans) tagNode(nodeID string, tagIDs []string) error {
-	links := make([]interface{}, 0, len(tagIDs))
-
 	for _, tagID := range tagIDs {
-		link := NodeTag{
-			NodeID: nodeID,
-			TagID:  tagID,
+		_, err := trans.Exec(sqlInsertNodeTag, nodeID, tagID)
+		if err != nil {
+			return errors.Wrap(err, "tagNode unable to add insert node tag")
 		}
-		links = append(links, &link)
 	}
-	return trans.Insert(links...)
+	return nil
 }
 
 // FindKeyValue finds a Tag object in the array based on key match

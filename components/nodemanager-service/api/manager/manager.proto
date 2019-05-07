@@ -73,6 +73,7 @@ message NodeMetadata {
 	string source_id = 7;
 	string source_region = 8;
 	string source_account_id = 9;
+	repeated chef.automate.domain.compliance.api.common.Kv tags = 10;
 }
 
 message Fields {

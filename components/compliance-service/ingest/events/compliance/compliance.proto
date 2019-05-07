@@ -4,6 +4,7 @@ package chef.automate.domain.compliance.ingest.events.compliance;
 option go_package = "github.com/chef/automate/components/compliance-service/ingest/events/compliance";
 
 import "components/compliance-service/ingest/events/inspec/inspec.proto";
+import "components/compliance-service/api/common/common.proto";
 
 message Report {
 	// inspec full json report fields
@@ -33,4 +34,5 @@ message Report {
 	repeated string chef_tags = 36;
 	string ipaddress = 37;
 	string fqdn = 38;
+	repeated chef.automate.domain.compliance.api.common.Kv tags = 39;
 }
