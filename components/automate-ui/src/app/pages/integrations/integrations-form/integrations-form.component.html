@@ -33,8 +33,7 @@
 
     <header>
       <h3 class="display5">Specify which credentials to be used with tag key value (optional)</h3>
-      <span class="help-text">Should you wish to run a scan job on these instances, you can associate ssh and winrm
-        creds with instances by tags. Wild card match(*) allowed in value.</span>
+      <span class="help-text">Should you wish to run a scan job on these instances, you can associate ssh and winrm creds with instances by tags. Wild card match(*) allowed in value.</span>
     </header>
 
     <div *ngFor="let cred of instance_credentials.controls; let i=index" [formGroupName]="i" class="cred">
