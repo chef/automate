@@ -144,6 +144,11 @@ func (s *CfgMgmtServer) GetNodes(
 		return nodes, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return nodes, status.Errorf(codes.Internal, err.Error())
+	}
+
 	// Pagination
 	page, pageSize := request.GetPagination().GetParameters()
 

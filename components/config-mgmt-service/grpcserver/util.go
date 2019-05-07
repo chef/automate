@@ -1,8 +1,11 @@
 package grpcserver
 
 import (
+	"context"
 	"time"
 
+	"github.com/chef/automate/components/config-mgmt-service/backend"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	gp "github.com/golang/protobuf/ptypes/struct"
@@ -35,4 +38,17 @@ func ToTime(timestamp *google_protobuf1.Timestamp) (time.Time, error) {
 		return time.Time{}, nil
 	}
 	return ptypes.Timestamp(timestamp)
+}
+
+func filterByProjects(ctx context.Context, filters map[string][]string) (map[string][]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		return filters, nil
+	}
+
+	filters[backend.Project] = projectsFilter
+	return filters, nil
 }

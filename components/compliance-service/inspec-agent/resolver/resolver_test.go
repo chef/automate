@@ -5,10 +5,58 @@ import (
 
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/api/common"
+	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/inspec"
+	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestHandleSSMNodes(t *testing.T) {
+	ssmJob, skip := false, false
+	node := &manager.ManagerNode{
+		Ssm: "Online",
+	}
+	job := &jobs.Job{
+		Type: "detect",
+	}
+	backend := "ssh"
+
+	ssmJob, skip = handleSSMNodes(node, job, &backend)
+	assert.Equal(t, true, ssmJob)
+	assert.Equal(t, true, skip)
+	assert.Equal(t, inspec.BackendSSM, backend)
+
+	backend = "ssh"
+	node.Ssm = "Online:Azure"
+	ssmJob, skip = handleSSMNodes(node, job, &backend)
+	assert.Equal(t, true, ssmJob)
+	assert.Equal(t, true, skip)
+	assert.Equal(t, inspec.BackendAZ, backend)
+
+	backend = "ssh"
+	job.Type = "exec"
+	node.Ssm = "Online"
+	ssmJob, skip = handleSSMNodes(node, job, &backend)
+	assert.Equal(t, true, ssmJob)
+	assert.Equal(t, false, skip)
+	assert.Equal(t, inspec.BackendSSM, backend)
+
+	backend = "ssh"
+	node.Ssm = ""
+	ssmJob, skip = handleSSMNodes(node, job, &backend)
+	assert.Equal(t, false, ssmJob)
+	assert.Equal(t, false, skip)
+	assert.Equal(t, "ssh", backend)
+
+	backend = "ssh"
+	job.Type = "exec"
+	ssmJob, skip = handleSSMNodes(node, job, &backend)
+	assert.Equal(t, false, ssmJob)
+	assert.Equal(t, false, skip)
+	assert.Equal(t, "ssh", backend)
+
+}
 
 func TestGetNodeCredentials(t *testing.T) {
 	secret := &secrets.Secret{

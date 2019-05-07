@@ -26,14 +26,6 @@ export class UIComponent implements OnInit {
 
   betaFeatures: Array<Feature> = [
     {
-      key: 'azure_manager',
-      name: 'Azure Node Manager'
-    },
-    {
-      key: 'gcp_manager',
-      name: 'Google Cloud Node Manager'
-    },
-    {
       key: 'applications',
       name: 'EAS Applications'
     },
