@@ -17,8 +17,6 @@ import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
-import { ProfileDetailsComponent } from './pages/profile-details/profile-details.component';
-import { ProfilesOverviewComponent } from './pages/profiles-overview/profiles-overview.component';
 import { SigninComponent } from './pages/signin/signin.component';
 import { TeamCreateComponent } from './pages/team-create/team-create.component';
 import { TeamDetailsComponent } from './pages/team-details/team-details.component';
@@ -226,16 +224,13 @@ const routes: Routes = [
     },
     {
       path: 'profiles',
-      children: [
-        {
-          path: '',
-          component: ProfilesOverviewComponent
-        },
-        {
-          path: 'profile-details',
-          component: ProfileDetailsComponent
-        }
-      ]
+      redirectTo: '/compliance/profiles',
+      pathMatch: 'full'
+    },
+    {
+      path: 'profiles/profile-details',
+      redirectTo: '/compliance/profiles/profile-details',
+      pathMatch: 'full'
     },
     {
       path: 'jobs',
@@ -244,7 +239,7 @@ const routes: Routes = [
           path: '',
           // For now we are redirecting to the old jobs list. When we get the UX
           // worked out we can stop redirecting and use the new JobListComponent.
-          redirectTo: '/compliance/scanner/jobs',
+          redirectTo: '/compliance/scan-jobs/jobs',
           pathMatch: 'full'
         },
         {

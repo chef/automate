@@ -9,7 +9,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'reporting',
+        redirectTo: 'reports',
         pathMatch: 'full'
       },
       {
@@ -17,8 +17,20 @@ const routes: Routes = [
         loadChildren: './+reporting/reporting.module#ReportingModule'
       },
       {
+        path: 'reports',
+        loadChildren: './+reporting/reporting.module#ReportingModule'
+      },
+      {
         path: 'scanner',
         loadChildren: './+scanner/scanner.module#ScannerModule'
+      },
+      {
+        path: 'scan-jobs',
+        loadChildren: './+scanner/scanner.module#ScannerModule'
+      },
+      {
+        path: 'profiles',
+        loadChildren: './+profile/profile.module#ProfileModule'
       }
     ]
   }

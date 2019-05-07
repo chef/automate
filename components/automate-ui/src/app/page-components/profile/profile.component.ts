@@ -4,7 +4,9 @@ import {
 import { Subscription } from 'rxjs';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { MetadataService } from '../../services/metadata/metadata.service';
-import { WelcomeModalComponent } from '../welcome-modal/welcome-modal.component';
+import {
+  WelcomeModalComponent
+ } from '../welcome-modal/welcome-modal.component';
 
 @Component({
   selector: 'app-profile',

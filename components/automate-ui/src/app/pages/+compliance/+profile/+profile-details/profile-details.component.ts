@@ -2,8 +2,8 @@ import { takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { ProfilesService } from '../../services/profiles/profiles.service';
-import { AvailableProfilesService } from '../../services/profiles/available-profiles.service';
+import { ProfilesService } from '../../../../services/profiles/profiles.service';
+import { AvailableProfilesService } from '../../../../services/profiles/available-profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 
 import { saveAs } from 'file-saver';

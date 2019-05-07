@@ -155,11 +155,6 @@ import {
   ProjectsFilterDropdownComponent
 } from './page-components/projects-filter-dropdown/projects-filter-dropdown.component';
 import { ProfileComponent } from './page-components/profile/profile.component';
-import { ProfileDetailsComponent } from './pages/profile-details/profile-details.component';
-import {
-  ProfileSidebarComponent
-} from './page-components/profile-sidebar/profile-sidebar.component';
-import { ProfilesOverviewComponent } from './pages/profiles-overview/profiles-overview.component';
 import { ResourceItemComponent } from './page-components/resource-item/resource-item.component';
 import { ResourcesComponent } from './page-components/resources/resources.component';
 import { RunHistoryComponent } from './page-components/run-history/run-history.component';
@@ -242,9 +237,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ProjectsFilterComponent,
     ProjectsFilterDropdownComponent,
     ProfileComponent,
-    ProfileDetailsComponent,
-    ProfileSidebarComponent,
-    ProfilesOverviewComponent,
     ResourceItemComponent,
     ResourcesComponent,
     RunHistoryComponent,

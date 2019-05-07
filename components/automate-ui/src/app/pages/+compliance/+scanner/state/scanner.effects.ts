@@ -24,8 +24,8 @@ export class ScannerEffects {
     map((action: RouterNavigationAction) => action.payload.routerState),
     filter(routerState => {
       const path = routerState.url.split('?')[0];
-      return path === '/compliance/scanner/jobs' ||
-             path === '/compliance/scanner/nodes';
+      return path === '/compliance/scan-jobs/jobs' ||
+             path === '/compliance/scan-jobs/nodes';
     }),
     map((routerState: any) => {
       const params = Object.assign({}, routerState.queryParams);
@@ -39,7 +39,7 @@ export class ScannerEffects {
       return [routerState.url, params];
     }),
     mergeMap(([path, params]) => {
-      const nodesQueryParams = path.startsWith('/compliance/scanner/nodes') ? params : {};
+      const nodesQueryParams = path.startsWith('/compliance/scan-jobs/nodes') ? params : {};
       const nodesStatusFilter = { key: 'status', values: ['reachable', 'unreachable', 'unknown'] };
       // ensures that we only collect nodes that belong to a manager
       // (Automate (manually managed) nodes + nodes from cloud integrations)
@@ -57,7 +57,7 @@ export class ScannerEffects {
         nodesStatusFilter.values = [nodesQueryParams.status];
       }
 
-      const jobsQueryParams = path.startsWith('/compliance/scanner/jobs') ? params : {};
+      const jobsQueryParams = path.startsWith('/compliance/scan-jobs/jobs') ? params : {};
       const defaultJobsParams = {
         filters: [
           {key: 'job_type', values: ['exec']},

@@ -12,9 +12,9 @@ import {
   ElementRef,
   ViewChild
 } from '@angular/core';
-import { ProfilesService } from '../../services/profiles/profiles.service';
-import { UploadService } from '../../services/profiles/upload.service';
-import { AvailableProfilesService } from '../../services/profiles/available-profiles.service';
+import { ProfilesService } from '../../../../services/profiles/profiles.service';
+import { UploadService } from '../../../../services/profiles/upload.service';
+import { AvailableProfilesService } from '../../../../services/profiles/available-profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { find } from 'lodash';
 
@@ -27,12 +27,12 @@ interface Profile {
 
 @Component({
   selector: 'app-profiles-overview',
-  templateUrl: './profiles-overview.component.html',
-  styleUrls: ['./profiles-overview.component.scss'],
+  templateUrl: './profile-overview.component.html',
+  styleUrls: ['./profile-overview.component.scss'],
   providers: [AvailableProfilesService, ProfilesService, UploadService]
 })
 
-export class ProfilesOverviewComponent implements OnInit, OnDestroy {
+export class ProfileOverviewComponent implements OnInit, OnDestroy {
   // installed and available profiles
   installedProfiles: Array<Profile> = [];
   availableProfiles: Array<Profile> = [];

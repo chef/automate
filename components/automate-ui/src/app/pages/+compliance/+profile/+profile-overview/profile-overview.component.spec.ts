@@ -2,11 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ProfilesOverviewComponent } from './profiles-overview.component';
+import { ProfileOverviewComponent } from './profile-overview.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
-import { ProfilesService } from '../../services/profiles/profiles.service';
-import { UploadService } from '../../services/profiles/upload.service';
+import { ProfilesService } from '../../../../services/profiles/profiles.service';
+import { UploadService } from '../../../../services/profiles/upload.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 
 class MockProfilesService {
@@ -38,7 +38,7 @@ describe('ProfilesOverviewComponent', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        ProfilesOverviewComponent
+        ProfileOverviewComponent
       ],
       providers: [
         {provide: ProfilesService, useClass: MockProfilesService},
@@ -48,7 +48,7 @@ describe('ProfilesOverviewComponent', () => {
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
 
-    fixture = TestBed.createComponent(ProfilesOverviewComponent);
+    fixture = TestBed.createComponent(ProfileOverviewComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement;
   });

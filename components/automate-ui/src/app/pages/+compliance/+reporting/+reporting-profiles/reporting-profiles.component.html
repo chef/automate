@@ -25,7 +25,7 @@
           <chef-icon class="status-icon" [ngClass]="profile.status">
             {{ statusIcon(profile.status) }}
           </chef-icon>
-          <a [routerLink]="['/compliance/reporting/profiles', profile.id]">{{ profile.title }}</a>
+          <a [routerLink]="['/compliance/reports/profiles', profile.id]">{{ profile.title }}</a>
         </chef-td>
         <chef-td class="version-cell">{{ profile.version }}</chef-td>
         <chef-td class="identifier-cell">{{ user }}/{{ profile.name }}</chef-td>

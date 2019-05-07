@@ -56,10 +56,8 @@ describe('NavbarComponent', () => {
   using([
     ['Event Feed',  '/event-feed',           1],
     ['Client Runs', '/client-runs',          2],
-    ['Compliance',  '/compliance/reporting', 3],
-    ['Scan Jobs',   '/compliance/scanner',   4],
-    ['Asset Store', '/profiles',             5],
-    ['Settings',    '/settings',             6]
+    ['Compliance',  '/compliance/reports', 3],
+    ['Settings',    '/settings',             4]
   ], function (label: string, path: string, position: number) {
     it(`displays the ${label} navigation link`, () => {
       const link = element.querySelector(`.navigation-menu > *:nth-child(${position}) a`);

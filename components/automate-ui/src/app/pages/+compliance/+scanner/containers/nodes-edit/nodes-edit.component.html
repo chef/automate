@@ -1,13 +1,21 @@
 <chef-sidebar>
   <div class="nav-items">
-    <chef-sidebar-entry route="/compliance/scanner" icon="wifi_tethering">Current jobs</chef-sidebar-entry>
+    <app-authorized [allOf]="[['/compliance/scanner/jobs', 'post'], ['/compliance/scanner/jobs/search', 'post']]">
+      <chef-sidebar-entry route="/compliance/reports" icon="bar_chart">Reports</chef-sidebar-entry>
+    </app-authorized>
+    <app-authorized [allOf]="[['/compliance/scanner/jobs', 'post'], ['/compliance/scanner/jobs/search', 'post']]">
+      <chef-sidebar-entry route="/compliance/scan-jobs" icon="wifi_tethering">Scan Jobs</chef-sidebar-entry>
+    </app-authorized>
+    <app-authorized [allOf]="[['/compliance/profiles/search', 'post']]">
+      <chef-sidebar-entry route="/compliance/profiles" icon="library_books">Profiles</chef-sidebar-entry>
+    </app-authorized>
   </div>
 </chef-sidebar>
 
 <div class="container">
   <main>
     <chef-breadcrumbs>
-      <chef-breadcrumb [link]="['/compliance/scanner/nodes']">Scan jobs</chef-breadcrumb>
+      <chef-breadcrumb [link]="['/compliance/scan-jobs/nodes']">Scan jobs</chef-breadcrumb>
       Edit node
     </chef-breadcrumbs>
 
@@ -16,7 +24,7 @@
       <chef-subheading>Edit your node details</chef-subheading>
       <div slot="header-buttons">
         <chef-button primary type="submit" [disabled]="!form.valid" (click)="submit(form.value)" *ngIf="node">Save Node</chef-button>
-        <chef-button tertiary routerLink="/compliance/scanner/nodes">Cancel</chef-button>
+        <chef-button tertiary routerLink="/compliance/scan-jobs/nodes">Cancel</chef-button>
       </div>
     </chef-page-header>
     <div class="page-body">
