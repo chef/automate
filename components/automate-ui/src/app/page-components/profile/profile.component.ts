@@ -1,4 +1,6 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component, OnInit, ViewChild, ViewChildren, OnDestroy
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { MetadataService } from '../../services/metadata/metadata.service';
@@ -20,6 +22,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   @ViewChild(WelcomeModalComponent)
   private welcomeModalComponent: WelcomeModalComponent;
+
+  @ViewChildren('focusElement') focusElements;
 
   constructor(
     private chefSessionService: ChefSessionService,
@@ -61,6 +65,38 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   closeLicenseModal(): void {
     this.licenseModalVisible = false;
+  }
+
+  handleArrowUp(event) {
+    event.preventDefault();
+    const index = this.getCurrentIndex(event.currentTarget);
+    const nextElement = this.focusElements.toArray()[index - 1];
+
+    if (nextElement) {
+      nextElement.nativeElement.focus();
+    }
+  }
+
+  handleArrowDown(event) {
+    event.preventDefault();
+    const index = this.getCurrentIndex(event.currentTarget);
+    const nextElement = this.focusElements.toArray()[index + 1];
+
+    if (nextElement) {
+      nextElement.nativeElement.focus();
+    }
+  }
+
+  getCurrentIndex(currentTarget) {
+    let currentIndex;
+
+    this.focusElements.toArray().forEach((element, i) => {
+      if (element.nativeElement === currentTarget) {
+        currentIndex = i;
+      }
+    });
+
+    return currentIndex;
   }
 
   get displayName(): string {
