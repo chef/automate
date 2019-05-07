@@ -9,6 +9,7 @@ import (
 
 	external_response "github.com/chef/automate/api/external/cfgmgmt/response"
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -137,6 +138,258 @@ func TestNodesWithSorting(t *testing.T) {
 			assert.Nil(t, err)
 			assert.Equal(t, expected, res)
 		})
+}
+
+func TestNodesProjectFilter(t *testing.T) {
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Nodes
+		ctx         context.Context
+		expected    []string
+	}{
+		{
+			description: "Two nodes matching on the same project tag",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{"one"}),
+			request:  request.Nodes{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Two nodes matching with two project tags",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+					Projects: []string{"one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{"one", "two"}),
+			request:  request.Nodes{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Two nodes, one matching",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+					Projects: []string{"three"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{"one"}),
+			request:  request.Nodes{},
+			expected: []string{"2"},
+		},
+		{
+			description: "Matching all",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+					Projects: []string{"three"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+					Projects: []string{"two", "one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "3",
+					},
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			request:  request.Nodes{},
+			expected: []string{"1", "2", "3"},
+		},
+		{
+			description: "Match one unassigned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+					Projects: []string{},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request:  request.Nodes{},
+			expected: []string{"1"},
+		},
+		{
+			description: "No unassigned; no matches",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request:  request.Nodes{},
+			expected: []string{},
+		},
+		{
+			description: "Match one unassigned and one assigned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+					Projects: []string{},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+					Projects: []string{"two"},
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID, "two"}),
+			request:  request.Nodes{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Match all projects with status filter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+						Status:   "failure",
+					},
+					Projects: []string{},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+						Status:   "success",
+					},
+					Projects: []string{"two"},
+				},
+			},
+			ctx: contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			request: request.Nodes{
+				Filter: []string{"status:success"},
+			},
+			expected: []string{"2"},
+		},
+		{
+			description: "Match 'one' project with status filter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+						Status:   "failure",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+						Status:   "success",
+					},
+					Projects: []string{"two"},
+				},
+			},
+			ctx: contextWithProjects([]string{"one"}),
+			request: request.Nodes{
+				Filter: []string{"status:success"},
+			},
+			expected: []string{},
+		},
+		{
+			description: "Match unassigned projects with status filter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+						Status:   "failure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+						Status:   "success",
+					},
+					Projects: []string{},
+				},
+			},
+			ctx: contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request: request.Nodes{
+				Filter: []string{"status:success"},
+			},
+			expected: []string{"2"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index, _ := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodes
+			res, err := cfgmgmt.GetNodes(test.ctx, &test.request)
+			assert.NoError(t, err)
+
+			names := getNames(res)
+
+			// Test what nodes are returned.
+			assert.ElementsMatch(t, test.expected, names)
+		})
+	}
 }
 
 func TestNodesWithTableDriven(t *testing.T) {
@@ -310,7 +563,7 @@ func TestNodesWithTableDriven(t *testing.T) {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
 				res, err := cfgmgmt.GetNodes(ctx, &test.request)
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, test.expected, res)
 			})
 	}
@@ -770,4 +1023,14 @@ func protoFromJSON(content string, pb proto.Message) error {
 
 func getMessageRawJSON(message proto.Message) (string, error) {
 	return (&jsonpb.Marshaler{OrigName: true}).MarshalToString(message)
+}
+
+func getNames(listValue *gp.ListValue) []string {
+	names := make([]string, 0)
+	for _, value := range listValue.GetValues() {
+		m := value.GetStructValue().GetFields()
+		names = append(names, m["name"].GetStringValue())
+	}
+
+	return names
 }

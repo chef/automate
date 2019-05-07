@@ -14,6 +14,7 @@ import (
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	iElastic "github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/olivere/elastic"
 	log "github.com/sirupsen/logrus"
 )
@@ -243,4 +244,9 @@ func (s *Suite) IngestActions(actions []iBackend.InternalChefAction) {
 
 	// Refresh Indices
 	s.RefreshIndices(mappings.Actions.Index + "-*")
+}
+
+func contextWithProjects(projects []string) context.Context {
+	ctx := context.Background()
+	return auth_context.NewContext(ctx, []string{}, projects, "", "", "")
 }
