@@ -447,26 +447,12 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 				if len(nodeName) == 0 {
 					nodeName = node.Host
 				}
-				ssmJob := false
+				ssmJob, skip := false, false
 				// if the user has specified ssh/winrm secrets to be associated with the node
 				// then let's prioritize that -- otherwise try ssm
 				if len(credsArr) == 0 {
-					switch node.Ssm {
-					case "Online":
-						// if the ping status is online, we want this to be a ssm job (aws)
-						ssmJob = true
-						backend = inspec.BackendSSM
-						if node.Platform == "windows" {
-							backend = inspec.BackendSSMWindows
-						}
-					case "Online:Azure":
-						ssmJob = true
-						backend = inspec.BackendAZ
-						if node.Platform == "windows" {
-							backend = inspec.BackendAZWindows
-						}
-					}
-					if ssmJob == true && job.Type == "detect" {
+					skip, ssmJob = handleSSMNodes(node, job, &backend)
+					if skip {
 						logrus.Warnf("action not supported: cannot run a detect job on ssm node %s", node.Name)
 						continue
 					}
@@ -522,6 +508,29 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 		}
 	}
 	return jobArray, nil
+}
+
+func handleSSMNodes(node *manager.ManagerNode, job *jobs.Job, backend *string) (ssmJob bool, skip bool) {
+	skip = false
+	switch node.Ssm {
+	case "Online":
+		// if the ping status is online, we want this to be a ssm job (aws)
+		ssmJob = true
+		*backend = inspec.BackendSSM
+		if node.Platform == "windows" {
+			*backend = inspec.BackendSSMWindows
+		}
+	case "Online:Azure":
+		ssmJob = true
+		*backend = inspec.BackendAZ
+		if node.Platform == "windows" {
+			*backend = inspec.BackendAZWindows
+		}
+	}
+	if ssmJob == true && job.Type == "detect" {
+		skip = true
+	}
+	return
 }
 
 type FiltersByManager struct {
