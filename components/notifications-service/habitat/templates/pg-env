@@ -5,7 +5,8 @@ export SQERL_DBUSER="{{pg_svc_user}}"
     {{- if eq "password" .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetScheme.GetValue }}
 export SQERL_DBPASSWORD="{{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetPassword.GetValue }}"
       {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetEnable.GetValue }}
-        {{ fail "unsupported ssl mode" }}
+export SQERL_NO_SSL_AUTH="true"
+export EXTERNAL_PG_ROOT_CA_CERT="{{pg_root_ca_cert_path}}"
       {{- else }}
 export SQERL_NO_SSL="true"
       {{- end }}

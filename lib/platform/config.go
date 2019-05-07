@@ -71,6 +71,10 @@ func (c *Config) IsExternalPG() bool {
 	return c.GetPlatform().GetExternalPostgresql().GetEnable().GetValue()
 }
 
+func (c *Config) ExternalPGRootCertPath() string {
+	return path.Join(c.GetService().GetPath(), "config", "_a2_platform_external_pg_root_ca.crt")
+}
+
 func (c *Config) PGServiceUser() (string, error) {
 	if c.IsExternalPG() {
 		auth := c.GetPlatform().GetExternalPostgresql().GetAuth()
@@ -193,11 +197,10 @@ func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInf
 
 		if ssl := c.GetPlatform().GetExternalPostgresql().GetSsl(); ssl != nil {
 			if ssl.GetEnable().GetValue() {
-				opts = append(opts, "sslmode=verify-ca")
+				opts = append(opts, "sslmode=verify-ca", "sslrootcert="+c.ExternalPGRootCertPath())
 			} else {
 				opts = append(opts, "sslmode=disable")
 			}
-			// TODO: certs
 		}
 
 		if auth := c.GetPlatform().GetExternalPostgresql().GetAuth(); auth != nil {

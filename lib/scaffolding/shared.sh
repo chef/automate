@@ -111,6 +111,10 @@ EOF
 }
 EOF
 
+cat << EOF > "${pkg_prefix}/config/_a2_platform_external_pg_root_ca.crt"
+{{~ cfg._a2_platform.external_postgresql.ssl.root_cert ~}}
+EOF
+
     cat << EOF > "${pkg_prefix}/config/root_ca.crt"
 {{~ cfg.tls.root_cert_contents ~}}
 EOF
@@ -120,4 +124,5 @@ EOF
     cat << EOF > "${pkg_prefix}/config/service.key"
 {{~ cfg.tls.key_contents ~}}
 EOF
+
 }
