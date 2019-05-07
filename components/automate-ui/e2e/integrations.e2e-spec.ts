@@ -5,11 +5,6 @@ describe('Integrations', () => {
 
   beforeAll(() => {
     browser.waitForAngularEnabled(false);
-
-    // Enable beta node managers
-    $('body').sendKeys('feat');
-    element(by.cssContainingText('.feature-flags .title', 'Azure Node Manager')).click();
-    element(by.cssContainingText('.feature-flags .title', 'Google Cloud Node Manager')).click();
   });
 
   describe('integrations view', () => {
