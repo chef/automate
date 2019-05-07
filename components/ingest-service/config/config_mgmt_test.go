@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/chef/automate/components/ingest-service/config"
 	subject "github.com/chef/automate/components/ingest-service/config"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -114,7 +114,8 @@ threshold = "1d"
 	assert.Equal(t, true, schedulerConfig.Running, "the scheduler should be running by default")
 
 	projectUpdateConfig := configMgr.GetProjectUpdateConfig()
-	assert.Equal(t, config.NotRunningState, projectUpdateConfig.State, "the scheduler should be running by default")
+	assert.Equal(t, project_update_lib.NotRunningState,
+		projectUpdateConfig.State, "the scheduler should be running by default")
 }
 
 func TestManagerWriteConfigOnUpdatesAndLoadChanges(t *testing.T) {
@@ -225,7 +226,7 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	threshold = "1d"
 	
 [project_update_config]
-	es_job_id = "Cmv2zbcVT4KSEz3b98IsmQ:57143"
+	es_job_ids = ["Cmv2zbcVT4KSEz3b98IsmQ:94389","Cmv2zbcVT4KSEz3b98IsmQ:94429"]
 	project_update_id = "4256e26e-92b1-4b1d-8679-44ec74b5299a"
 	state = "not_running"
   `)
@@ -239,9 +240,10 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	projectUpdateConfig := configMgr.GetProjectUpdateConfig()
-	assert.Equal(t, config.NotRunningState, projectUpdateConfig.State)
+	assert.Equal(t, project_update_lib.NotRunningState, projectUpdateConfig.State)
 	assert.Equal(t, "4256e26e-92b1-4b1d-8679-44ec74b5299a", projectUpdateConfig.ProjectUpdateID)
-	assert.Equal(t, "Cmv2zbcVT4KSEz3b98IsmQ:57143", projectUpdateConfig.EsJobID)
+	assert.Equal(t,
+		[]string{"Cmv2zbcVT4KSEz3b98IsmQ:94389", "Cmv2zbcVT4KSEz3b98IsmQ:94429"}, projectUpdateConfig.EsJobIDs)
 
 	projectUpdateConfig.State = "running"
 	err = configMgr.UpdateProjectUpdateConfig(projectUpdateConfig)

@@ -2,15 +2,10 @@ package backend
 
 import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/olivere/elastic"
 	"golang.org/x/net/context"
 )
-
-type JobStatus struct {
-	Completed             bool
-	PercentageComplete    float32
-	EstimatedEndTimeInSec int64
-}
 
 type Client interface {
 	// @param None
@@ -72,9 +67,11 @@ type Client interface {
 	// @param (context, projectRules)
 	UpdateActionProjectTags(context.Context, map[string]*iam_v2.ProjectRules) (string, error)
 	// @param (context, jobID)
-	JobStatus(context.Context, string) (JobStatus, error)
+	JobStatus(context.Context, string) (project_update_lib.JobStatus, error)
 	// @param (context, jobID)
 	JobCancel(context.Context, string) error
+
+	UpdateProjectTags(context.Context, map[string]*iam_v2.ProjectRules) ([]string, error)
 
 	// Migration contracts
 	ReindexInsightstoConvergeHistory(context.Context, string, string) error

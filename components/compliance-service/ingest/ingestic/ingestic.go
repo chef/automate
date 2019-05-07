@@ -8,6 +8,7 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	elastic "github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -17,12 +18,6 @@ import (
 type ESClient struct {
 	client      *elastic.Client
 	initialized bool
-}
-
-type JobStatus struct {
-	Completed             bool
-	PercentageComplete    float32
-	EstimatedEndTimeInSec int64
 }
 
 func NewESClient(client *elastic.Client) *ESClient {
@@ -196,6 +191,25 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 		Do(ctx)
 
 	return err
+}
+
+func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
+	logrus.Debug("starting project updater")
+
+	esReportJobID, err := backend.UpdateReportProjectsTags(ctx, projectTaggingRules)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch report project tags update")
+	}
+
+	esSummaryJobID, err := backend.UpdateSummaryProjectsTags(ctx, projectTaggingRules)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch summary project tags update")
+	}
+
+	logrus.Debugf("Started Project rule updates with report job ID: %q and summary job ID %q",
+		esReportJobID, esSummaryJobID)
+
+	return []string{esReportJobID, esSummaryJobID}, nil
 }
 
 func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
@@ -469,17 +483,17 @@ func (backend *ESClient) JobCancel(ctx context.Context, jobID string) error {
 	return err
 }
 
-func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (JobStatus, error) {
+func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
 	tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(backend.client).
 		TaskId(jobID).
 		WaitForCompletion(false).
 		Do(ctx)
 	if err != nil {
-		return JobStatus{}, err
+		return project_update_lib.JobStatus{}, err
 	}
 
 	if tasksGetTaskResponse.Task == nil {
-		return JobStatus{
+		return project_update_lib.JobStatus{
 			Completed: tasksGetTaskResponse.Completed,
 		}, nil
 	}
@@ -494,7 +508,7 @@ func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (JobStatus
 		estimatedEndTimeInSec = tasksGetTaskResponse.Task.StartTimeInMillis/1000 + timeLeftSec
 	}
 
-	return JobStatus{
+	return project_update_lib.JobStatus{
 		Completed:             tasksGetTaskResponse.Completed,
 		PercentageComplete:    float32(percentageComplete),
 		EstimatedEndTimeInSec: estimatedEndTimeInSec,

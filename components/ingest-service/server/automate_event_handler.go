@@ -15,21 +15,22 @@ import (
 	"github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/config"
-	"github.com/chef/automate/components/ingest-service/projectupdater"
+	project_update_lib "github.com/chef/automate/lib/authz"
+	event_ids "github.com/chef/automate/lib/event"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type AutomateEventHandlerServer struct {
 	client           backend.Client
 	chefIngestServer ChefIngestServer
-	updateManager    *projectupdater.Manager
+	updateManager    *project_update_lib.DomainProjectUpdateManager
 }
 
 func NewAutomateEventHandlerServer(client backend.Client, chefIngestServer ChefIngestServer,
 	authzProjectsClient iam_v2.ProjectsClient, eventServiceClient automate_event.EventServiceClient,
 	configManager *config.Manager) *AutomateEventHandlerServer {
-	updateManager := projectupdater.NewManager(client, authzProjectsClient,
-		eventServiceClient, configManager)
+	updateManager := project_update_lib.NewDomainProjectUpdateManager(client, authzProjectsClient,
+		eventServiceClient, configManager, event_ids.InfraClientRunsProducerID)
 	server := &AutomateEventHandlerServer{
 		client:           client,
 		chefIngestServer: chefIngestServer,
@@ -46,18 +47,18 @@ func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 		instanceID := req.Object.ID
 		// It is very likely that there is only one instanceId to nodeId
 		// just in case this is not true we will handle it
-		nodeIds, err := s.client.FindNodeIDByInstanceId(ctx, instanceID)
+		nodeIDs, err := s.client.FindNodeIDByInstanceId(ctx, instanceID)
 		if err != nil {
 			logrus.Warnf("Error finding node by instance Id %s: %s", instanceID, err)
 			return response, err
 		}
-		if len(nodeIds) == 0 {
+		if len(nodeIDs) == 0 {
 			logrus.Infof("No nodes found in client runs for terminated instance %s", instanceID)
 		}
-		for _, nodeId := range nodeIds {
+		for _, nodeID := range nodeIDs {
 			nodeDelete := &chef.Delete{
 				Id:              req.EventID,
-				NodeId:          nodeId,
+				NodeId:          nodeID,
 				ServiceHostname: "Node Manager",
 			}
 			logrus.Infof("ingest-service is deleting node with instance ID %s", instanceID)

@@ -24,11 +24,12 @@ import (
 	ingest_api "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
-	"github.com/chef/automate/components/compliance-service/ingest/projectupdater"
 	event "github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
+	project_update_lib "github.com/chef/automate/lib/authz"
+	event_ids "github.com/chef/automate/lib/event"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -38,7 +39,7 @@ type ComplianceIngestServer struct {
 	mgrClient          manager.NodeManagerServiceClient
 	automateURL        string
 	notifierClient     notifier.Notifier
-	updateManager      *projectupdater.Manager
+	updateManager      *project_update_lib.DomainProjectUpdateManager
 }
 
 var MinimumSupportedInspecVersion = semver.MustParse("2.0.0")
@@ -49,7 +50,8 @@ func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.No
 
 	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient)
 
-	updateManager := projectupdater.NewManager(esClient, authzProjectsClient, eventServiceClient, configManager)
+	updateManager := project_update_lib.NewDomainProjectUpdateManager(esClient, authzProjectsClient, eventServiceClient,
+		configManager, event_ids.ComplianceInspecReportProducerID)
 
 	return &ComplianceIngestServer{
 		compliancePipeline: compliancePipeline,

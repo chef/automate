@@ -5,9 +5,13 @@ import (
 
 	"context"
 
+	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -38,17 +42,36 @@ func (es *Backend) Initializing() bool {
 	return !es.initialized
 }
 
-func (es *Backend) JobStatus(ctx context.Context, jobID string) (backend.JobStatus, error) {
+func (es *Backend) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
+	logrus.Debug("starting project updater")
+
+	esNodeJobID, err := es.UpdateNodeProjectTags(ctx, projectTaggingRules)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Node project tags update")
+	}
+
+	esActionJobID, err := es.UpdateActionProjectTags(ctx, projectTaggingRules)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch action project tags update")
+	}
+
+	logrus.Debugf("Started Project rule updates with report job ID: %q and summary job ID %q",
+		esNodeJobID, esActionJobID)
+
+	return []string{esNodeJobID, esActionJobID}, nil
+}
+
+func (es *Backend) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
 	tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(es.client).
 		TaskId(jobID).
 		WaitForCompletion(false).
 		Do(ctx)
 	if err != nil {
-		return backend.JobStatus{}, err
+		return project_update_lib.JobStatus{}, err
 	}
 
 	if tasksGetTaskResponse.Task == nil {
-		return backend.JobStatus{
+		return project_update_lib.JobStatus{
 			Completed: tasksGetTaskResponse.Completed,
 		}, nil
 	}
@@ -63,7 +86,7 @@ func (es *Backend) JobStatus(ctx context.Context, jobID string) (backend.JobStat
 		estimatedEndTimeInSec = tasksGetTaskResponse.Task.StartTimeInMillis/1000 + timeLeftSec
 	}
 
-	return backend.JobStatus{
+	return project_update_lib.JobStatus{
 		Completed:             tasksGetTaskResponse.Completed,
 		PercentageComplete:    float32(percentageComplete),
 		EstimatedEndTimeInSec: estimatedEndTimeInSec,

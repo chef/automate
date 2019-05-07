@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/chef/automate/components/compliance-service/config"
 	subject "github.com/chef/automate/components/compliance-service/config"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +19,7 @@ func TestManagerNewDefaultConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Only three jobs configured
-	assert.Equal(t, subject.NotRunningState, configMgr.GetProjectUpdateConfig().State)
+	assert.Equal(t, project_update_lib.NotRunningState, configMgr.GetProjectUpdateConfig().State)
 }
 
 func TestManagerBadFile(t *testing.T) {
@@ -45,7 +45,7 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 	defer configMgr.Close()
 	assert.NoError(t, err)
 	projectUpdateConfig := configMgr.GetProjectUpdateConfig()
-	assert.Equal(t, config.NotRunningState, projectUpdateConfig.State)
+	assert.Equal(t, project_update_lib.NotRunningState, projectUpdateConfig.State)
 	assert.Equal(t, "4256e26e-92b1-4b1d-8679-44ec74b5299a", projectUpdateConfig.ProjectUpdateID)
 	assert.Equal(t, 2, len(projectUpdateConfig.EsJobIDs))
 
