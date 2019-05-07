@@ -466,6 +466,10 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 							backend = inspec.BackendAZWindows
 						}
 					}
+					if ssmJob == true && job.Type == "detect" {
+						logrus.Warnf("action not supported: cannot run a detect job on ssm node %s", node.Name)
+						continue
+					}
 				}
 				baseJob = types.InspecBaseJob{
 					JobID:    job.Id,
@@ -582,6 +586,10 @@ func (r *Resolver) resolveStaticJob(ctx context.Context, job *jobs.Job) ([]*type
 		resolvedTC, err := convertNodeTcToInspecTc(node.TargetConfig)
 		if err != nil {
 			logrus.Errorf("Could not resolve target config for node %s, due to: %s", id, err.Error())
+			continue
+		}
+		if resolvedTC.Backend == "ssm" && job.Type == "detect" {
+			logrus.Warnf("action not supported: cannot run a detect job on ssm node %s", node.Name)
 			continue
 		}
 		agentJob := r.resolveStaticJobInfo(job, node, resolvedTC, id)
