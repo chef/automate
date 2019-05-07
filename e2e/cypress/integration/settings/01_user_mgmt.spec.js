@@ -1,6 +1,6 @@
 describe('user management', () => {
   before(() => {
-    cy.login('/settings/users').then(() => {
+    cy.adminLogin('/settings/users').then(() => {
 
       // clean up leftover users in case of previous test failures
       let admin = JSON.parse(localStorage.getItem('chef-automate-user'))

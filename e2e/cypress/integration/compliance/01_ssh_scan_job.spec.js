@@ -1,6 +1,6 @@
 describe('create a manual node ssh scan job and cleanup after', () => {
   before(() => {
-    cy.login('/')
+    cy.adminLogin('/')
   })
   beforeEach(() => {
     // cypress clears local storage between tests
