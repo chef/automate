@@ -5,7 +5,6 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 const sqlInsertNodeTag = `
@@ -34,21 +33,12 @@ func (trans *DBTrans) addTags(tags []*common.Kv) ([]string, error) {
 
 	for _, keyValue := range tags {
 		id := createUUID()
-		rows, err := trans.Query(sqlInsertTag, id, keyValue.Key, keyValue.Value)
+		dbID, err := trans.SelectStr(sqlInsertTag, id, keyValue.Key, keyValue.Value)
 		if err != nil {
 			return tagIDs, errors.Wrap(err, "addTags unable to add tag")
 		}
-		defer rows.Close() // nolint: errcheck
-		for rows.Next() {
-			err := rows.Scan(&id)
-			if err != nil {
-				logrus.Error(err)
-				continue
-			}
-		}
-		err = rows.Err()
-		if err != nil {
-			return tagIDs, errors.Wrap(err, "addTags rows error")
+		if len(dbID) > 0 {
+			id = dbID
 		}
 		tagIDs = append(tagIDs, id)
 	}
@@ -60,7 +50,7 @@ func (trans *DBTrans) tagNode(nodeID string, tagIDs []string) error {
 	for _, tagID := range tagIDs {
 		_, err := trans.Exec(sqlInsertNodeTag, nodeID, tagID)
 		if err != nil {
-			return errors.Wrap(err, "addTags unable to add tag")
+			return errors.Wrap(err, "tagNode unable to add insert node tag")
 		}
 	}
 	return nil
