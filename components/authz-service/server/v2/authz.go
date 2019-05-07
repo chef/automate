@@ -146,13 +146,6 @@ func (s *authzServer) FilterAuthorizedProjects(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// TODO drop this, sjust need this for testing
-	s.log.WithFields(logger.KV{
-		"subjects":        req.Subjects,
-		"pairs":           req.Pairs,
-		"engine response": resp,
-	}).Info("HEY! look here")
-
 	var projectIDs []string
 	if stringutils.SliceContains(resp, constants.AllProjectsID) {
 		list, err := s.projects.ListProjects(ctx, &api.ListProjectsReq{})
