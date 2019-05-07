@@ -3,6 +3,7 @@
 package common
 
 const_all_projects = "~~ALL-PROJECTS~~"
+
 #
 # Variable expansion
 #

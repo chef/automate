@@ -106,10 +106,8 @@ test_authorized_project_ignores_system_policies {
 		"policy_id2": {
 			"type": "system",
 			"members": ["user:local:*"],
-			"statements": {
-				"sid1": {"effect": "allow", "actions": ["x1"], "resources": ["y1"], "projects": [common.const_all_projects]},
-			},
-		}
+			"statements": {"sid1": {"effect": "allow", "actions": ["x1"], "resources": ["y1"], "projects": [common.const_all_projects]}},
+		},
 	}
 		 with input as {
 			"subjects": ["user:local:bob"],
