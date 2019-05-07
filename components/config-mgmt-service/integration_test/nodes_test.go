@@ -154,59 +154,35 @@ func TestNodesProjectFilter(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "one",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
 					},
 					Projects: []string{"one"},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "two",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
 					},
 					Projects: []string{"two", "one"},
-					Exists:   true,
 				},
 			},
 			ctx:      contextWithProjects([]string{"one"}),
 			request:  request.Nodes{},
-			expected: []string{"one", "two"},
+			expected: []string{"1", "2"},
 		},
 		{
 			description: "Two nodes matching with two project tags",
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "1",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
 					},
 					Projects: []string{"one"},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "2",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
 					},
 					Projects: []string{"one"},
-					Exists:   true,
 				},
 			},
 			ctx:      contextWithProjects([]string{"one", "two"}),
@@ -218,27 +194,15 @@ func TestNodesProjectFilter(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "1",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
 					},
 					Projects: []string{"three"},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "2",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
 					},
 					Projects: []string{"two", "one"},
-					Exists:   true,
 				},
 			},
 			ctx:      contextWithProjects([]string{"one"}),
@@ -250,38 +214,20 @@ func TestNodesProjectFilter(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "1",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
 					},
 					Projects: []string{"three"},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "2",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
 					},
 					Projects: []string{"two", "one"},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "3",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "3",
 					},
-					Exists: true,
 				},
 			},
 			ctx:      contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
@@ -293,27 +239,15 @@ func TestNodesProjectFilter(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "1",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
 					},
 					Projects: []string{},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "2",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
 					},
 					Projects: []string{"two", "one"},
-					Exists:   true,
 				},
 			},
 			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
@@ -325,27 +259,15 @@ func TestNodesProjectFilter(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "1",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
 					},
 					Projects: []string{"one"},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "2",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
 					},
 					Projects: []string{"two", "one"},
-					Exists:   true,
 				},
 			},
 			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
@@ -357,27 +279,15 @@ func TestNodesProjectFilter(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "1",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
 					},
 					Projects: []string{},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "2",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
 					},
 					Projects: []string{"two"},
-					Exists:   true,
 				},
 			},
 			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID, "two"}),
@@ -389,27 +299,17 @@ func TestNodesProjectFilter(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "1",
-						EntityUuid:       newUUID(),
-						Status:           "failure",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
+						Status:   "failure",
 					},
 					Projects: []string{},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "2",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
+						Status:   "success",
 					},
 					Projects: []string{"two"},
-					Exists:   true,
 				},
 			},
 			ctx: contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
@@ -423,27 +323,17 @@ func TestNodesProjectFilter(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "1",
-						EntityUuid:       newUUID(),
-						Status:           "failure",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
+						Status:   "failure",
 					},
 					Projects: []string{"one"},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "2",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
+						Status:   "success",
 					},
 					Projects: []string{"two"},
-					Exists:   true,
 				},
 			},
 			ctx: contextWithProjects([]string{"one"}),
@@ -457,27 +347,16 @@ func TestNodesProjectFilter(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "1",
-						EntityUuid:       newUUID(),
-						Status:           "failure",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "1",
+						Status:   "failure",
 					},
-					Projects: []string{},
-					Exists:   true,
 				},
 				{
 					NodeInfo: iBackend.NodeInfo{
-						NodeName:         "2",
-						EntityUuid:       newUUID(),
-						Status:           "success",
-						Platform:         "centos",
-						Environment:      "prod",
-						OrganizationName: "org1",
+						NodeName: "2",
+						Status:   "success",
 					},
 					Projects: []string{},
-					Exists:   true,
 				},
 			},
 			ctx: contextWithProjects([]string{authzConstants.UnassignedProjectID}),
@@ -490,6 +369,12 @@ func TestNodesProjectFilter(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index, _ := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
 
 			// Add node with project
 			suite.IngestNodes(test.nodes)
