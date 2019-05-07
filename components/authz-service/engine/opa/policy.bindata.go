@@ -110,7 +110,7 @@ func policyAuthz_v2Rego() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "policy/authz_v2.rego", size: 2766, mode: os.FileMode(420), modTime: time.Unix(1557197657, 0)}
+	info := bindataFileInfo{name: "policy/authz_v2.rego", size: 2766, mode: os.FileMode(420), modTime: time.Unix(1557245386, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -130,7 +130,7 @@ func policyCommonRego() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "policy/common.rego", size: 2173, mode: os.FileMode(420), modTime: time.Unix(1557197985, 0)}
+	info := bindataFileInfo{name: "policy/common.rego", size: 2173, mode: os.FileMode(420), modTime: time.Unix(1557245386, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -190,7 +190,7 @@ func policyIntrospection_v2Rego() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "policy/introspection_v2.rego", size: 1590, mode: os.FileMode(420), modTime: time.Unix(1557197997, 0)}
+	info := bindataFileInfo{name: "policy/introspection_v2.rego", size: 1590, mode: os.FileMode(420), modTime: time.Unix(1557245386, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
