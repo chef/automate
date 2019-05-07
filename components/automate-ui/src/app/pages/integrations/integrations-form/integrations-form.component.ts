@@ -8,7 +8,6 @@ import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { Credential } from '../../../entities/credentials/credential.model';
 import { instanceCredentials } from '../../../entities/credentials/credential.selectors';
 import { SearchCredentials } from '../../../entities/credentials/credential.actions';
-import { FeatureFlagsService } from '../../../services/feature-flags/feature-flags.service';
 
 @Component({
   selector: 'app-integrations-form',
@@ -20,17 +19,10 @@ export class IntegrationsFormComponent {
 
   @Input() integrationsForm: FormGroup;
 
-  showAzure: boolean;
-
-  showGcp: boolean;
-
   constructor(store: Store<NgrxStateAtom>,
-              private featureFlags: FeatureFlagsService,
-              private fb: FormBuilder) {
+    private fb: FormBuilder) {
     this.instanceCredentials$ = store.select(instanceCredentials);
     store.dispatch(new SearchCredentials({}));
-    this.showAzure = this.featureFlags.getFeatureStatus('azure_manager');
-    this.showGcp = this.featureFlags.getFeatureStatus('gcp_manager');
   }
 
   get instance_credentials(): FormArray {

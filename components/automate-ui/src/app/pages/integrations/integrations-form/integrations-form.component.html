@@ -2,9 +2,12 @@
   <div class="integration-services form-field">
     <span class="label">Select a node management service</span>
     <chef-phat-radio ngDefaultControl formControlName="type">
-      <chef-option value="aws"><img src="assets/img/logo-aws.svg" alt="Amazon Web Services" class="logo aws" /></chef-option>
-      <chef-option *ngIf="showAzure" value="azure"><img src="assets/img/logo-azure.svg" alt="Microsoft Azure" class="logo azure" /></chef-option>
-      <chef-option *ngIf="showGcp" value="gcp"><img src="assets/img/logo-gcp.svg" alt="Google Cloud Platform" class="logo gcp" /></chef-option>
+      <chef-option value="aws"><img src="assets/img/logo-aws.svg" alt="Amazon Web Services" class="logo aws" />
+      </chef-option>
+      <chef-option value="azure"><img src="assets/img/logo-azure.svg" alt="Microsoft Azure" class="logo azure" />
+      </chef-option>
+      <chef-option value="gcp"><img src="assets/img/logo-gcp.svg" alt="Google Cloud Platform" class="logo gcp" />
+      </chef-option>
     </chef-phat-radio>
   </div>
 
@@ -16,15 +19,12 @@
     </label>
 
     <ng-container [ngSwitch]="integrationsForm.controls.type.value">
-      <app-aws-integration-form
-        *ngSwitchCase="'aws'"
-        [formGroup]="integrationsForm.controls.aws"></app-aws-integration-form>
-      <app-azure-integration-form
-        *ngSwitchCase="'azure'"
-        [formGroup]="integrationsForm.controls.azure"></app-azure-integration-form>
-      <app-gcp-integration-form
-        *ngSwitchCase="'gcp'"
-        [formGroup]="integrationsForm.controls.gcp"></app-gcp-integration-form>
+      <app-aws-integration-form *ngSwitchCase="'aws'" [formGroup]="integrationsForm.controls.aws">
+      </app-aws-integration-form>
+      <app-azure-integration-form *ngSwitchCase="'azure'" [formGroup]="integrationsForm.controls.azure">
+      </app-azure-integration-form>
+      <app-gcp-integration-form *ngSwitchCase="'gcp'" [formGroup]="integrationsForm.controls.gcp">
+      </app-gcp-integration-form>
     </ng-container>
 
   </div>
@@ -43,14 +43,14 @@
       <span>use</span>
 
       <select multiple formControlName="credential_ids" class="credential-ids">
-        <option
-          *ngFor="let credential of instanceCredentials$ | async"
-          [value]="credential.id">
+        <option *ngFor="let credential of instanceCredentials$ | async" [value]="credential.id">
           {{ credential.name }}
         </option>
       </select>
 
-      <chef-button secondary caution (click)="handleRemoveCred(i)"><chef-icon>delete</chef-icon></chef-button>
+      <chef-button secondary caution (click)="handleRemoveCred(i)">
+        <chef-icon>delete</chef-icon>
+      </chef-button>
     </div>
 
     <div class="empty new-cred">
