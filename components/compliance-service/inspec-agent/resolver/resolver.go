@@ -447,10 +447,11 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 				if len(nodeName) == 0 {
 					nodeName = node.Host
 				}
-				ssmJob, skip := false, false
+				ssmJob := false
 				// if the user has specified ssh/winrm secrets to be associated with the node
 				// then let's prioritize that -- otherwise try ssm
 				if len(credsArr) == 0 {
+					var skip bool
 					skip, ssmJob = handleSSMNodes(node, job, &backend)
 					if skip {
 						logrus.Warnf("action not supported: cannot run a detect job on ssm node %s", node.Name)
