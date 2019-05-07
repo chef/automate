@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
-import { clamp } from 'lodash';
+import { clamp, compact } from 'lodash';
 import { Chicklet } from '../../types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
@@ -70,7 +70,7 @@ export class ClientRunsSearchBarComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.filterValues) {
-      this.suggestions = List<string>(changes.filterValues.currentValue);
+      this.suggestions = List<string>(compact(changes.filterValues.currentValue));
       this.isLoadingSuggestions = false;
     }
 

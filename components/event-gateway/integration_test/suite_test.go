@@ -70,7 +70,7 @@ func TestMain(m *testing.M) {
 	// Global Setup hook: initialize anything required for the test
 	// run, e.g., initializing ES indices, inserting test data, etc.
 	if err := suite.GlobalSetup(); err != nil {
-		fmt.Println("Test failed global setup. exiting.")
+		fmt.Printf("Test failed global setup with err %v. Exiting.", err)
 		os.Exit(1)
 	}
 

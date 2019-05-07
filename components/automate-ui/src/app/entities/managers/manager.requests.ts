@@ -57,6 +57,12 @@ export class ManagerRequests {
       return this.http.post(url, body);
   }
 
+  public deleteNodes(nodeIds: string[]): Observable<boolean> {
+    const url = `${env.nodes_url}/delete/ids`;
+    const body = { ids: nodeIds };
+    return this.http.post<any>(url, body);
+  }
+
   public searchFields(payload: ManagerSearchFieldsPayload):
     Observable<ManagerSearchFieldsResponse> {
       const url = `${env.nodemgrs_url}/id/${payload.managerId}/search-fields`;

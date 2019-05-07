@@ -21,6 +21,7 @@ import (
 	uuid "github.com/chef/automate/lib/uuid4"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/components/authz-service/config"
 	constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
@@ -2492,7 +2493,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 		Name:    "singleStatementAllow",
 		Members: []string{},
 		Statements: []*api_v2.Statement{
-			&api_v2.Statement{
+			{
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"some-resource", "some-other-resource"},
 				Actions:   []string{"infra:some:action", "infra:some:other"},
@@ -2505,19 +2506,19 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 		Name:    "multiStatementAllow",
 		Members: []string{},
 		Statements: []*api_v2.Statement{
-			&api_v2.Statement{
+			{
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"someResource", "someOtherResource"},
 				Actions:   []string{"infra:some:action", "infra:some:other"},
 			},
-			&api_v2.Statement{
+			{
 				Effect:    api_v2.Statement_DENY,
 				Resources: []string{"someResource2", "someOtherResource"},
 				Actions:   []string{"infra:some:action"},
 				Role:      "",
 				Projects:  []string{},
 			},
-			&api_v2.Statement{
+			{
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"someResource3"},
 				Actions:   []string{"infra:some:action"},
@@ -2533,8 +2534,8 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 
 	t.Run("CreatePolicy updates the engine", func(t *testing.T) {
 		tests := map[string][]*api_v2.CreatePolicyReq{
-			"add multiple policies": []*api_v2.CreatePolicyReq{singleStatementAllow, multiStatementAllow},
-			"add a single policy":   []*api_v2.CreatePolicyReq{multiStatementAllow},
+			"add multiple policies": {singleStatementAllow, multiStatementAllow},
+			"add a single policy":   {multiStatementAllow},
 		}
 		for desc, testPolicies := range tests {
 			t.Run(desc, func(t *testing.T) {
@@ -2577,7 +2578,7 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 			Name:    "updatedSingleStatementAllow",
 			Members: []string{},
 			Statements: []*api_v2.Statement{
-				&api_v2.Statement{
+				{
 					Effect:    api_v2.Statement_ALLOW,
 					Resources: []string{"update-some-resource", "updated-some-other-resource"},
 					Actions:   []string{"infra:some:updatedAction", "infra:some:updatedOther"},
@@ -2599,8 +2600,8 @@ func TestAuthzGRPCInteractionWithTestEngineStore(t *testing.T) {
 
 	t.Run("DeletePolicy updates the engine", func(t *testing.T) {
 		tests := map[string][]*api_v2.CreatePolicyReq{
-			"delete multiple policies": []*api_v2.CreatePolicyReq{singleStatementAllow, multiStatementAllow},
-			"delete a single policy":   []*api_v2.CreatePolicyReq{multiStatementAllow},
+			"delete multiple policies": {singleStatementAllow, multiStatementAllow},
+			"delete a single policy":   {multiStatementAllow},
 		}
 		for desc, testPolicies := range tests {
 			t.Run(desc, func(t *testing.T) {
@@ -2939,7 +2940,10 @@ func setupV2(t *testing.T,
 	require.NoError(t, err)
 
 	eventServiceClient := &mockEventServiceClient{}
-	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testProjectRulesRetriever{}, eventServiceClient)
+	configMgr, err := config.NewManager("/tmp/.authz-delet-me")
+	require.NoError(t, err)
+	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
+		&testProjectRulesRetriever{}, eventServiceClient, configMgr)
 	require.NoError(t, err)
 
 	vSwitch := v2.NewSwitch(vChan)
@@ -3016,25 +3020,25 @@ func genPolicy(t *testing.T, id string, p *prng.Prng) storage.Policy {
 
 	statementCount := 1 + rand.Intn(maxStatements)
 	statements := make([]storage.Statement, statementCount)
-	for i, _ := range statements {
+	for i := range statements {
 
 		actionCount := 1 + rand.Intn(maxActions-1) // store will have [1, 5] actions
 		actions := make([]string, actionCount)
-		for i, _ := range actions {
+		for i := range actions {
 			actions[i] = fmt.Sprintf("%s:%s:%s-%d",
 				faker.Lorem().Word(), faker.Lorem().Word(), faker.Lorem().Word(), i)
 		}
 
 		resourceCount := rand.Intn(maxResources)
 		resources := make([]string, resourceCount)
-		for i, _ := range resources {
+		for i := range resources {
 			resources[i] = fmt.Sprintf("%s:%s:%s-%d",
 				faker.Lorem().Word(), faker.Lorem().Word(), faker.Lorem().Word(), i)
 		}
 
 		projectCount := 1 + rand.Intn(maxProjects)
 		projects := make([]string, projectCount)
-		for i, _ := range projects {
+		for i := range projects {
 			projects[i] = fmt.Sprintf("%s-%d",
 				faker.Lorem().Word(), i)
 		}

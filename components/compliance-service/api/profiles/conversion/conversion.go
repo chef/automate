@@ -47,7 +47,7 @@ func ConvertToPSProfile(profile inspec.Profile, namespace string) (profiles.Prof
 	if err != nil {
 		return convertedProfile, err
 	}
-	err = json.Unmarshal(jsonDepends, convertedDepends)
+	err = json.Unmarshal(jsonDepends, &convertedDepends)
 	if err == nil {
 		convertedProfile.Depends = convertedDepends
 	}
@@ -57,7 +57,7 @@ func ConvertToPSProfile(profile inspec.Profile, namespace string) (profiles.Prof
 	if err != nil {
 		return convertedProfile, err
 	}
-	err = json.Unmarshal(jsonGroups, convertedGroups)
+	err = json.Unmarshal(jsonGroups, &convertedGroups)
 	if err == nil {
 		convertedProfile.Groups = convertedGroups
 	}
@@ -67,7 +67,7 @@ func ConvertToPSProfile(profile inspec.Profile, namespace string) (profiles.Prof
 	if err != nil {
 		return convertedProfile, err
 	}
-	err = json.Unmarshal(jsonAttributes, convertedAttributes)
+	err = json.Unmarshal(jsonAttributes, &convertedAttributes)
 	if err == nil {
 		convertedProfile.Attributes = convertedAttributes
 	}
@@ -97,7 +97,7 @@ func ConvertToPSProfile(profile inspec.Profile, namespace string) (profiles.Prof
 		if err != nil {
 			return convertedProfile, err
 		}
-		err = json.Unmarshal(jsonTags, convertedTags)
+		err = json.Unmarshal(jsonTags, &convertedTags)
 		if err == nil {
 			convertedControl.Tags = convertedTags
 		}
@@ -107,7 +107,7 @@ func ConvertToPSProfile(profile inspec.Profile, namespace string) (profiles.Prof
 		if err != nil {
 			return convertedProfile, err
 		}
-		err = json.Unmarshal(jsonRefs, convertedRefs)
+		err = json.Unmarshal(jsonRefs, &convertedRefs)
 		if err != nil {
 			convertedControl.Refs = convertedRefs
 		}

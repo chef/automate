@@ -150,6 +150,7 @@ func habNatsUser() *natsd.User {
 			Publish: &natsd.SubjectPermission{
 				Allow: []string{
 					"_INBOX.>",
+					"_HB.>",
 					"_STAN.discover.event-service",
 					"_STAN.discover.event-service.*",
 					"_STAN.pub.*.habitat",
@@ -160,6 +161,9 @@ func habNatsUser() *natsd.User {
 				Allow: []string{
 					"_INBOX.>",
 					"_STAN.acks.>",
+					"_HB.>",
+					"_STAN.discover.event-service.*",
+					">",
 				},
 			},
 		},

@@ -33,6 +33,7 @@ export class ProjectListComponent implements OnInit {
   public createProjectForm: FormGroup;
   public creatingProject = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
+  public MAX_PROJECTS = 6;
 
   constructor(
     private store: Store<NgrxStateAtom>,

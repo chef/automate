@@ -124,6 +124,9 @@ CONFIG="$CONFIG --event-endpoint {{event.sys.ip}}:{{event.cfg.port}}"
  {{~/if}}
  {{~/eachAlive}}
 
+ # Create the compliance config file
+CONFIG="$CONFIG --config {{pkg.svc_data_path}}/.compliance-service.toml"
+
 # Listen to what our gossip protocol whispers
 #
 # We have modified our plan to have a hard dependency to

@@ -17,6 +17,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/authz-service/config"
 	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
@@ -33,7 +34,7 @@ type state struct {
 	log                  logger.Logger
 	store                storage.Storage
 	engine               engine.ProjectRulesRetriever
-	projectUpdateManager ProjectUpdateManager
+	projectUpdateManager *ProjectUpdateManager
 }
 
 // NewMemstoreProjectsServer returns an instance of api.ProjectsServer
@@ -42,9 +43,10 @@ func NewMemstoreProjectsServer(
 	l logger.Logger,
 	e engine.ProjectRulesRetriever,
 	eventServiceClient automate_event.EventServiceClient,
+	configManager *config.Manager,
 ) (api.ProjectsServer, error) {
 
-	return NewProjectsServer(ctx, l, memstore.New(), e, eventServiceClient)
+	return NewProjectsServer(ctx, l, memstore.New(), e, eventServiceClient, configManager)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
@@ -55,13 +57,14 @@ func NewPostgresProjectsServer(
 	dataMigrationsConfig datamigration.Config,
 	e engine.ProjectRulesRetriever,
 	eventServiceClient automate_event.EventServiceClient,
+	configManager *config.Manager,
 ) (api.ProjectsServer, error) {
 
 	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	return NewProjectsServer(ctx, l, s, e, eventServiceClient)
+	return NewProjectsServer(ctx, l, s, e, eventServiceClient, configManager)
 }
 
 func NewProjectsServer(
@@ -70,13 +73,14 @@ func NewProjectsServer(
 	s storage.Storage,
 	e engine.ProjectRulesRetriever,
 	eventServiceClient automate_event.EventServiceClient,
+	configManager *config.Manager,
 ) (api.ProjectsServer, error) {
 
 	return &state{
 		log:                  l,
 		store:                s,
 		engine:               e,
-		projectUpdateManager: NewProjectUpdateManager(eventServiceClient),
+		projectUpdateManager: NewProjectUpdateManager(eventServiceClient, configManager),
 	}, nil
 }
 
@@ -169,6 +173,8 @@ func (s *state) ProjectUpdateStatus(ctx context.Context,
 		State:                  s.projectUpdateManager.State(),
 		PercentageComplete:     float32(s.projectUpdateManager.PercentageComplete()),
 		EstimatedTimeCompelete: time,
+		Failed:                 s.projectUpdateManager.Failed(),
+		FailureMessage:         s.projectUpdateManager.FailureMessage(),
 	}, nil
 }
 
@@ -279,12 +285,12 @@ func (s *state) HandleEvent(ctx context.Context,
 
 	response := &automate_event.EventResponse{}
 	if req.Type.Name == event.ProjectRulesUpdateStatus {
-		err := s.projectUpdateManager.ProcessStatusMessage(req)
+		err := s.projectUpdateManager.ProcessStatusEvent(req)
 		if err != nil {
 			return response, err
 		}
 	} else if req.Type.Name == event.ProjectRulesUpdateFailed {
-		err := s.projectUpdateManager.ProcessFailMessage(req)
+		err := s.projectUpdateManager.ProcessFailEvent(req)
 		if err != nil {
 			return response, err
 		}

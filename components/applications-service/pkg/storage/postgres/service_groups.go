@@ -20,6 +20,8 @@ import (
 // OK        | Else if all services are 'Ok'
 // ---------------------------------------------------------------------
 const (
+	// This query has NO pagination and sorting since it is reused for the HealthCounts
+	// maybe in the future we could create a sql view so we don't have it
 	selectServiceGroupHealth = `
 SELECT sg.id
   , sg.deployment_id
@@ -38,12 +40,8 @@ SELECT sg.id
 FROM service_group AS sg
 JOIN service AS s
 ON s.group_id = sg.id
-GROUP BY sg.id, sg.deployment_id`
-
-	serviceGroupPageSort = `
-ORDER BY %s %s
-LIMIT $1
-OFFSET $2`
+GROUP BY sg.id, sg.deployment_id
+`
 
 	// TODO: Update this query once we understand better the deploying status
 	selectServiceGroupsHealthCounts = `
@@ -68,27 +66,46 @@ SELECT COUNT(*) AS total
     ) AS ok
 FROM (` + selectServiceGroupHealth + `) AS service_groups_health_counts
 `
+
+	selectServiceGroupHealthWithPageSort = `
+SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
+ORDER BY %s %s
+LIMIT $1
+OFFSET $2
+`
 	selectServiceGroupHealthFilterCRITICAL = `
-SELECT * FROM (` + selectServiceGroupHealth + serviceGroupPageSort + `) AS service_groups_health
+SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
 WHERE health_critical > 0
+ORDER BY %s %s
+LIMIT $1
+OFFSET $2
 `
 	selectServiceGroupHealthFilterUNKNOWN = `
-SELECT * FROM (` + selectServiceGroupHealth + serviceGroupPageSort + `) AS service_groups_health
+SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
 WHERE health_unknown  > 0
   AND health_critical = 0
+ORDER BY %s %s
+LIMIT $1
+OFFSET $2
 `
 	selectServiceGroupHealthFilterWARNING = `
-SELECT * FROM (` + selectServiceGroupHealth + serviceGroupPageSort + `) AS service_groups_health
+SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
 WHERE health_warning  > 0
   AND health_critical = 0
   AND health_unknown  = 0
+ORDER BY %s %s
+LIMIT $1
+OFFSET $2
 `
 	selectServiceGroupHealthFilterOK = `
-SELECT * FROM (` + selectServiceGroupHealth + serviceGroupPageSort + `) AS service_groups_health
+SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
 WHERE health_ok > 0
   AND health_critical = 0
   AND health_warning  = 0
   AND health_unknown  = 0
+ORDER BY %s %s
+LIMIT $1
+OFFSET $2
 `
 )
 
@@ -135,8 +152,8 @@ func (db *Postgres) GetServiceGroups(
 	offset := pageSize * page
 	var (
 		sgHealth    []*serviceGroupHealth
+		selectQuery string = selectServiceGroupHealthWithPageSort
 		sortOrder   string
-		selectQuery string = selectServiceGroupHealth + serviceGroupPageSort
 		err         error
 	)
 

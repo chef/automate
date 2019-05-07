@@ -24,4 +24,5 @@ type InternalChefAction struct {
 	ServiceHostname  string    `json:"service_hostname,omitempty"`
 	UserAgent        string    `json:"user_agent,omitempty"`
 	Data             string    `json:"data,omitempty"`
+	Projects         []string  `json:"projects"`
 }

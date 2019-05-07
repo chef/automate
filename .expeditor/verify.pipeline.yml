@@ -121,6 +121,7 @@ steps:
       - sed -i 's|^host.*127.0.0.1.*|host   all   all   127.0.0.1/32   trust|' /etc/postgresql/9.6/main/pg_hba.conf
       - service postgresql start
       - psql -c 'create database authz_test;' -U postgres
+      - psql -c 'create extension "uuid-ossp";' -d "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
       - cd components/authz-service
       - make static unit
     timeout_in_minutes: 10

@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ProjectsFilterOption } from './projects-filter.reducer';
+import { ProjectsFilterOption, ProjectsFilterOptionTuple } from './projects-filter.reducer';
 
 export enum ProjectsFilterActionTypes {
   LOAD_OPTIONS         = 'PROJECTS_FILTER::LOAD_OPTIONS',
@@ -15,7 +15,7 @@ export class LoadOptions implements Action {
 
 export class LoadOptionsSuccess implements Action {
   readonly type = ProjectsFilterActionTypes.LOAD_OPTIONS_SUCCESS;
-  constructor(public payload: ProjectsFilterOption[]) { }
+  constructor(public payload: ProjectsFilterOptionTuple) { }
 }
 
 export class LoadOptionsFailure implements Action {

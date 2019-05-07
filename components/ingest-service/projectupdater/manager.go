@@ -9,6 +9,7 @@ import (
 	automate_event "github.com/chef/automate/api/interservice/event"
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/ingest-service/backend"
+	"github.com/chef/automate/components/ingest-service/config"
 	project_update_tags "github.com/chef/automate/lib/authz"
 	event_ids "github.com/chef/automate/lib/event"
 	"github.com/gofrs/uuid"
@@ -19,96 +20,150 @@ import (
 )
 
 const (
-	runningState                         = "running"
-	notRunningState                      = "not_running"
 	sleepTimeBetweenStatusChecksMilliSec = 1000
 	maxNumberOfConsecutiveFails          = 10
 )
 
+type stage struct {
+	state           string
+	projectUpdateID string
+	esJobID         string
+}
+
+type stageUpdate struct {
+	fun  func(stage) (stage, error)
+	errc chan error
+}
+
 // Manager - project update manager
 type Manager struct {
-	state                 string
-	projectUpdateID       string
-	esJobID               string
+	// stage should only be updated by using the 'updateStage' function
+	stage                 stage
 	percentageComplete    float32
 	estimatedEndTimeInSec int64
 	client                backend.Client
 	authzProjectsClient   iam_v2.ProjectsClient
 	eventServiceClient    automate_event.EventServiceClient
+	configManager         *config.Manager
+	updateQueue           chan<- stageUpdate
 }
-
-// TODO
-// * Store running job IDs so if service restart it can pick up where it left off
 
 // NewManager - create a new project update manager
 func NewManager(client backend.Client, authzProjectsClient iam_v2.ProjectsClient,
-	eventServiceClient automate_event.EventServiceClient) Manager {
-	return Manager{
-		state:               notRunningState,
+	eventServiceClient automate_event.EventServiceClient, configManager *config.Manager) *Manager {
+
+	updateQueue := make(chan stageUpdate, 100)
+	manager := &Manager{
+		stage: stage{
+			state: config.NotRunningState,
+		},
 		client:              client,
 		authzProjectsClient: authzProjectsClient,
 		eventServiceClient:  eventServiceClient,
+		configManager:       configManager,
+		updateQueue:         updateQueue,
 	}
+
+	// Single goroutine that updates the stage data
+	go manager.stageUpdater(updateQueue)
+
+	manager.resumePreviousState()
+	return manager
 }
 
+// Cancel - stop any running job
+// Action
 func (manager *Manager) Cancel(projectUpdateID string) {
-	switch manager.state {
-	case notRunningState:
-		// do nothing job is not running
-	case runningState:
-		if manager.projectUpdateID == projectUpdateID {
+	err := manager.updateStage(func(stage stage) (stage, error) {
+		switch manager.stage.state {
+		case config.NotRunningState:
+			// do nothing job is not running
+		case config.RunningState:
+			if manager.stage.projectUpdateID != projectUpdateID {
+				// do nothing because the requested project update job is not running
+				return stage, nil
+			}
 			logrus.Debugf("Cancelling project tag update for ID %q elasticsearch task ID %q",
-				manager.projectUpdateID, manager.esJobID)
-			manager.client.JobCancel(context.Background(), manager.esJobID)
-		} else {
-			// do nothing because the requested project update job is not running
+				manager.stage.projectUpdateID, manager.stage.esJobID)
+			err := manager.client.JobCancel(context.Background(), manager.stage.esJobID)
+			if err != nil {
+				return stage, errors.Errorf("Failed to cancel Elasticsearch task. "+
+					" Elasticsearch Task ID %q; projectUpdateID: %q", manager.stage.esJobID,
+					manager.stage.projectUpdateID)
+			}
+		default:
+			// error state not found
+			return stage, errors.Errorf(
+				"Internal error state %q eventID %q", stage.state, projectUpdateID)
 		}
-	default:
-		// error state not found
-		manager.sendFailedEvent(fmt.Sprintf(
-			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID),
-			projectUpdateID)
+
+		return stage, nil
+	})
+
+	if err != nil {
+		logrus.Errorf("Canceling %v", err)
+		manager.sendFailedEvent(err.Error(), projectUpdateID)
 	}
 }
 
 // Start - start a project update
+// Action
 func (manager *Manager) Start(projectUpdateID string) {
-	switch manager.state {
-	case notRunningState:
-		// Start elasticsearch update job async and return the job ID
-		esJobID, err := manager.startProjectTagUpdater()
-		if err != nil {
-			logrus.Errorf("Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID)
-			manager.sendFailedEvent(fmt.Sprintf(
-				"Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID),
-				projectUpdateID)
-			return
+	err := manager.updateStage(func(stage stage) (stage, error) {
+		switch stage.state {
+		case config.NotRunningState:
+			// TODO store and run through past projectUpdateIDs to check for a match
+			if stage.projectUpdateID == projectUpdateID {
+				// Update has already completed with this project update ID
+				// Send a complete status
+				status := backend.JobStatus{
+					Completed:          true,
+					PercentageComplete: 1.0,
+				}
+				manager.updateStatus(status, projectUpdateID)
+			} else {
+				// Start elasticsearch update job async and return the job ID
+				esJobID, err := manager.startProjectTagUpdater()
+				if err != nil {
+					return stage, errors.Errorf(
+						"Failed to start Elasticsearch Project rule update job projectUpdateID: %q", projectUpdateID)
+				}
+				stage.esJobID = esJobID
+				stage.projectUpdateID = projectUpdateID
+				stage.state = config.RunningState
+			}
+		case config.RunningState:
+			if stage.projectUpdateID == projectUpdateID {
+				// The update job has ready started. Send an status update
+				err := manager.checkJobStatus()
+				if err != nil {
+					return stage, err
+				}
+			} else {
+				// send a failure event for the new project ID requested
+				return stage, errors.Errorf(
+					"Can not start another project update, project update %q is running",
+					stage.projectUpdateID)
+			}
+		default:
+			// error state not found
+			return stage, errors.Errorf(
+				"Internal error state %q eventID %q", stage.state, projectUpdateID)
 		}
-		manager.esJobID = esJobID // Store the job ID and event ID
-		manager.projectUpdateID = projectUpdateID
-		manager.state = runningState
-		go manager.waitingForJobToComplete()
-	case runningState:
-		if manager.projectUpdateID == projectUpdateID {
-			//	Do nothing. The job has ready started
-		} else {
-			manager.sendFailedEvent(fmt.Sprintf(
-				"Can not start another project update %q is running", manager.projectUpdateID),
-				projectUpdateID)
-		}
-	default:
-		// error state not found
-		manager.sendFailedEvent(fmt.Sprintf(
-			"Internal error state %q eventID %q", manager.state, manager.projectUpdateID),
-			projectUpdateID)
+		return stage, nil
+	})
+
+	if err != nil {
+		logrus.Errorf("Start %v", err)
+		manager.sendFailedEvent(err.Error(), projectUpdateID)
 	}
 }
 
 // PercentageComplete - percentage of the job complete
 func (manager *Manager) PercentageComplete() float32 {
-	switch manager.state {
-	case notRunningState:
-	case runningState:
+	switch manager.stage.state {
+	case config.NotRunningState:
+	case config.RunningState:
 		return manager.percentageComplete
 	default:
 	}
@@ -118,9 +173,9 @@ func (manager *Manager) PercentageComplete() float32 {
 
 // EstimatedTimeCompelete - the estimated date and time of compeletion.
 func (manager *Manager) EstimatedTimeCompelete() time.Time {
-	switch manager.state {
-	case notRunningState:
-	case runningState:
+	switch manager.stage.state {
+	case config.NotRunningState:
+	case config.RunningState:
 		return time.Unix(int64(manager.estimatedEndTimeInSec), 0)
 	default:
 	}
@@ -130,7 +185,7 @@ func (manager *Manager) EstimatedTimeCompelete() time.Time {
 
 // State - The current state of the manager
 func (manager *Manager) State() string {
-	return manager.state
+	return manager.stage.state
 }
 
 // This is grabbing the latest project rules from the authz-service and kicking off the update
@@ -156,57 +211,162 @@ func (manager *Manager) startProjectTagUpdater() (string, error) {
 }
 
 func (manager *Manager) waitingForJobToComplete() {
-	var (
-		isJobComplete            = false
-		numberOfConsecutiveFails = 0
-	)
-
-	// initial status
-	manager.updateStatus(backend.JobStatus{})
-
-	jobStatus, err := manager.client.JobStatus(context.Background(), manager.esJobID)
-	if err != nil {
-		logrus.Errorf("Failed to check the running job: %v", err)
-		numberOfConsecutiveFails++
-	} else {
-		manager.updateStatus(jobStatus)
-		isJobComplete = jobStatus.Completed
-	}
-
-	for !isJobComplete {
+	numberOfConsecutiveFails := 0
+	manager.updateStatus(backend.JobStatus{}, manager.stage.projectUpdateID)
+	for manager.stage.state == config.RunningState {
 		time.Sleep(time.Millisecond * sleepTimeBetweenStatusChecksMilliSec)
-		jobStatus, err = manager.client.JobStatus(context.Background(), manager.esJobID)
+		err := manager.checkJobStatus()
 		if err != nil {
 			logrus.Errorf("Failed to check the running job: %v", err)
 			numberOfConsecutiveFails++
 			if numberOfConsecutiveFails > maxNumberOfConsecutiveFails {
-				logrus.Errorf("Failed to check Elasticsearch job %q %d times",
-					manager.esJobID, numberOfConsecutiveFails)
-				manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times",
-					manager.esJobID, numberOfConsecutiveFails), manager.projectUpdateID)
-				return
+				manager.failedJob(err.Error())
+				break
 			}
 		} else {
-			manager.updateStatus(jobStatus)
 			numberOfConsecutiveFails = 0
-			isJobComplete = jobStatus.Completed
+		}
+	}
+}
+
+func (manager *Manager) checkJobStatus() error {
+	jobStatus, err := manager.client.JobStatus(context.Background(), manager.stage.esJobID)
+	if err != nil {
+		return errors.Errorf("Failed to check the running job: %v", err)
+	}
+
+	manager.updateStatus(jobStatus, manager.stage.projectUpdateID)
+
+	if jobStatus.Completed {
+		err := manager.completeJob()
+		if err != nil {
+			logrus.Errorf("Update Job Complete %v", err)
+			manager.sendFailedEvent(err.Error(), manager.stage.projectUpdateID)
 		}
 	}
 
-	logrus.Debugf("Finished Project rule update with Elasticsearch job ID: %q and projectUpdate ID %q",
-		manager.esJobID, manager.projectUpdateID)
-
-	manager.completeJob()
+	return nil
 }
 
-func (manager *Manager) completeJob() {
-	manager.percentageComplete = 1.0
-	manager.estimatedEndTimeInSec = 0
-	manager.state = notRunningState
+func (manager *Manager) failedJob(errMsg string) {
+	err := manager.updateStage(func(stage stage) (stage, error) {
+		manager.percentageComplete = 1.0
+		manager.estimatedEndTimeInSec = 0
+		manager.sendFailedEvent(fmt.Sprintf("Failed to check Elasticsearch job %q %d times; error message %q",
+			manager.stage.esJobID, maxNumberOfConsecutiveFails, errMsg), stage.projectUpdateID)
+
+		stage.state = config.NotRunningState
+
+		return stage, nil
+	})
+
+	if err != nil {
+		logrus.Errorf("Sending Failed %v", err)
+		manager.sendFailedEvent(err.Error(), manager.stage.projectUpdateID)
+	}
+}
+
+func (manager *Manager) completeJob() error {
+	return manager.updateStage(func(stage stage) (stage, error) {
+		manager.percentageComplete = 1.0
+		manager.estimatedEndTimeInSec = 0
+		stage.state = config.NotRunningState
+
+		return stage, nil
+	})
+}
+
+func (manager *Manager) resumePreviousState() {
+	projectUpdateConfig := manager.configManager.GetProjectUpdateConfig()
+
+	manager.stage.projectUpdateID = projectUpdateConfig.ProjectUpdateID
+	manager.stage.esJobID = projectUpdateConfig.EsJobID
+
+	if projectUpdateConfig.State == config.RunningState {
+		manager.stage.state = config.RunningState
+		go manager.waitingForJobToComplete()
+	}
+}
+
+func (manager *Manager) saveState(stage stage) error {
+	projectUpdateConfig := config.ProjectUpdateConfig{
+		State:           stage.state,
+		ProjectUpdateID: stage.projectUpdateID,
+		EsJobID:         stage.esJobID,
+	}
+
+	return manager.configManager.UpdateProjectUpdateConfig(projectUpdateConfig)
+}
+
+func (manager *Manager) stageUpdater(updateQueue <-chan stageUpdate) {
+	for stageUpdate := range updateQueue {
+		updatedStage, err := stageUpdate.fun(manager.stage.copy())
+		if err != nil {
+			stageUpdate.errc <- err
+			continue
+		}
+
+		oldStage := manager.stage.copy()
+		if !updatedStage.equal(oldStage) {
+			err = manager.saveState(updatedStage)
+			if err != nil {
+				logrus.Errorf("Failure updating project update state %v", err)
+				stageUpdate.errc <- err
+				continue
+			}
+
+			manager.stage = updatedStage
+			manager.stageUpdateEvent(oldStage, updatedStage)
+		}
+
+		stageUpdate.errc <- nil
+	}
+}
+
+// When the stage state is updated to running start the waitingForJobToComplete function
+func (manager *Manager) stageUpdateEvent(oldStage stage, newStage stage) {
+	if oldStage.state == config.NotRunningState && newStage.state == config.RunningState {
+		go manager.waitingForJobToComplete()
+	}
+}
+
+func (manager *Manager) updateStage(updateFunc func(stage) (stage, error)) error {
+	errc := make(chan error)
+	manager.updateQueue <- stageUpdate{fun: updateFunc, errc: errc}
+
+	// Wait for the function to run
+	err := <-errc
+	close(errc)
+	return err
+}
+
+func (s stage) equal(stage2 stage) bool {
+	if s.state != stage2.state {
+		return false
+	}
+
+	if s.projectUpdateID != stage2.projectUpdateID {
+		return false
+	}
+
+	if s.esJobID != stage2.esJobID {
+		return false
+	}
+
+	return true
+}
+
+func (s stage) copy() stage {
+	return stage{
+		state:           s.state,
+		projectUpdateID: s.projectUpdateID,
+		esJobID:         s.esJobID,
+	}
 }
 
 // publish a project update failed event
 func (manager *Manager) sendFailedEvent(msg string, projectUpdateID string) {
+	logrus.Infof("Sending Failed Event message: %s", msg)
 	event := &automate_event.EventMsg{
 		EventID:   createEventUUID(),
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateFailed},
@@ -238,7 +398,7 @@ func (manager *Manager) sendFailedEvent(msg string, projectUpdateID string) {
 }
 
 // publish a project update status event
-func (manager *Manager) updateStatus(jobStatus backend.JobStatus) {
+func (manager *Manager) updateStatus(jobStatus backend.JobStatus, projectUpdateID string) {
 	manager.estimatedEndTimeInSec = jobStatus.EstimatedEndTimeInSec
 	manager.percentageComplete = jobStatus.PercentageComplete
 
@@ -268,7 +428,7 @@ func (manager *Manager) updateStatus(jobStatus backend.JobStatus) {
 				},
 				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
 					Kind: &_struct.Value_StringValue{
-						StringValue: manager.projectUpdateID,
+						StringValue: projectUpdateID,
 					},
 				},
 			},

@@ -202,12 +202,16 @@ func cloudEnvVars(tc *inspec.TargetConfig) (map[string]string, error) {
 			logrus.Debugf("no aws creds found in env vars, no aws creds found for node; attempting to use aws credential chain via inspec/train")
 			return map[string]string{}, nil
 		}
-
-		return map[string]string{
+		envsMap := map[string]string{
 			"AWS_ACCESS_KEY_ID":     tc.AwsUser,
 			"AWS_SECRET_ACCESS_KEY": tc.AwsPassword,
-			"AWS_SESSION_TOKEN":     tc.AwsSessionToken,
-		}, nil
+		}
+		// Only set a TOKEN ENV variable when one is needed.
+		// Otherwise it prevents the TOKEN-less account credentials from working
+		if tc.AwsSessionToken != "" {
+			envsMap["AWS_SESSION_TOKEN"] = tc.AwsSessionToken
+		}
+		return envsMap, nil
 	case "azure":
 		if tc.AzureClientID == "" || tc.AzureClientSecret == "" || tc.AzureTenantID == "" {
 			logrus.Debugf("no azure creds found in environment, no azure creds found for node; attempting to use azure credential chain via inspec/train")

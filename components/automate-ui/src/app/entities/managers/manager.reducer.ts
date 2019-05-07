@@ -65,6 +65,14 @@ export function managerEntityReducer(state: ManagerEntityState = ManagerEntityIn
         set(`nodesByManager.${managerId}.loading`, false, state));
     }
 
+    case ManagerActionTypes.DELETE_NODES: {
+      return set('status', EntityStatus.loading, state);
+    }
+
+    case ManagerActionTypes.DELETE_NODES_SUCCESS: {
+      return set('status', EntityStatus.loadingSuccess, state);
+    }
+
     case ManagerActionTypes.SEARCH_NODES: {
       const {managerId} = action.payload;
       return set(`nodesByManager.${managerId}.loading`, true, state);

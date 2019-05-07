@@ -69,6 +69,8 @@ type Client interface {
 	SendBulkRequest(context.Context, []elastic.BulkableRequest) error
 	// @param (context, projectRules)
 	UpdateNodeProjectTags(context.Context, map[string]*iam_v2.ProjectRules) (string, error)
+	// @param (context, projectRules)
+	UpdateActionProjectTags(context.Context, map[string]*iam_v2.ProjectRules) (string, error)
 	// @param (context, jobID)
 	JobStatus(context.Context, string) (JobStatus, error)
 	// @param (context, jobID)

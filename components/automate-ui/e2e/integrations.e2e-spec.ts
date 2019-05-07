@@ -385,7 +385,7 @@ describe('Integrations', () => {
     it('displays a list of nodes belonging to the nodemanager', () => {
       const list = $('#manager-nodes-list');
       const nameColumn = list.$$('chef-tbody chef-tr').map(row => {
-        return row.$('chef-td:first-child').getText();
+        return row.$('chef-td:nth-child(2)').getText();
       });
 
       expect(list.isDisplayed()).toEqual(true);

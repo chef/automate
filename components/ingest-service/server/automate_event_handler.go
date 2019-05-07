@@ -14,6 +14,7 @@ import (
 	ingest_api "github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/ingest-service/backend"
+	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/projectupdater"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 )
@@ -21,13 +22,14 @@ import (
 type AutomateEventHandlerServer struct {
 	client           backend.Client
 	chefIngestServer ChefIngestServer
-	updateManager    projectupdater.Manager
+	updateManager    *projectupdater.Manager
 }
 
 func NewAutomateEventHandlerServer(client backend.Client, chefIngestServer ChefIngestServer,
-	authzProjectsClient iam_v2.ProjectsClient,
-	eventServiceClient automate_event.EventServiceClient) *AutomateEventHandlerServer {
-	updateManager := projectupdater.NewManager(client, authzProjectsClient, eventServiceClient)
+	authzProjectsClient iam_v2.ProjectsClient, eventServiceClient automate_event.EventServiceClient,
+	configManager *config.Manager) *AutomateEventHandlerServer {
+	updateManager := projectupdater.NewManager(client, authzProjectsClient,
+		eventServiceClient, configManager)
 	server := &AutomateEventHandlerServer{
 		client:           client,
 		chefIngestServer: chefIngestServer,

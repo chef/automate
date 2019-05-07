@@ -15,11 +15,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
+	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/tokens/mock"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
 	"github.com/chef/automate/components/authn-service/tokens/pg/testconstants"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -41,7 +43,7 @@ func TestToken(t *testing.T) {
 
 	// Note: this matches CI
 	pgCfg := pg.Config{
-		PGURL: "postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable",
+		PGURL: constants.TestPgURL,
 	}
 	if v, found := os.LookupEnv("PG_URL"); found {
 		pgCfg.PGURL = v
@@ -63,12 +65,13 @@ func TestToken(t *testing.T) {
 		testGetTokenIDWithValue,
 		testGetTokenIDWithValueNotFound,
 		testCreateToken,
+		testCreateTokenWithInvalidValueFails,
 		testCreateTokenWithValue,
+		testCreateLegacyTokenWithInvalidValueFails,
 		testCreateLegacyTokenWithValue,
 		testDeleteToken,
 		testDeleteTokenNotFound,
 		testUpdateTokenActiveOnly,
-		testUpdateTokenUpdatesUpdatedField,
 		testUpdateTokenNotFound,
 	} // Note: if a "not found" case is last, we'll leave a tidy test database
 
@@ -116,38 +119,32 @@ func TestToken(t *testing.T) {
 	}
 }
 
+// TODO (bs): we should insert these w/ sql
 func testGetTokens(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	_, err := ta.CreateToken(ctx, "id0", "node1", true, []string{"project-1"})
+	tok, err := ta.CreateToken(ctx, "id0", "node1", true, []string{"project-1"})
 	require.Nil(t, err, "expected no error, got err=%v", err)
 
-	_, err = ta.CreateToken(ctx, "id1", "node2", true, []string{"project-1"})
+	tok2, err := ta.CreateToken(ctx, "id1", "node2", true, []string{"project-1"})
 	require.Nil(t, err, "expected no error, got err=%v", err)
 
-	toks, err := ta.GetTokens(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(toks) != 2 {
-		t.Errorf("expected two tokens, got %d", len(toks))
-	}
+	actualToks, err := ta.GetTokens(ctx)
+	assert.NoError(t, err)
+	assert.ElementsMatch(t, []*tokens.Token{tok, tok2}, actualToks)
 }
 
 func testGetToken(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	tok0, err := ta.CreateToken(ctx, "id0", "node1", true, []string{"project-1"})
-	require.Nil(t, err, "expected no error, got err=%v", err)
+	id := "id0"
+	expectedTok, err := ta.CreateToken(ctx, id, "node1", true, []string{"project-1"})
+	require.NoError(t, err)
 
-	tok, err := ta.GetToken(ctx, tok0.ID)
-	require.Nil(t, err, "expected no error, got err=%v", err)
-	require.NotNil(t, tok, "expected token 'node1', got token=%v", tok)
-
-	if tok.Value != tok0.Value {
-		t.Errorf("expected token 'node1' to have a token %v, got %v", tok0.Value, tok.Value)
-	}
+	actualTok, err := ta.GetToken(ctx, id)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedTok, actualTok)
 }
 
 func testGetTokenIDWithValueNotFound(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	_, err := ta.GetTokenIDWithValue(ctx, "token1")
+	_, err := ta.GetTokenIDWithValue(ctx, "not-found")
+	assert.Error(t, err)
 	if err != nil {
 		if _, ok := errors.Cause(err).(*tokens.NotFoundError); !ok {
 			t.Errorf("expected token.NotFoundError, got %s", err)
@@ -156,87 +153,65 @@ func testGetTokenIDWithValueNotFound(ctx context.Context, t *testing.T, ta token
 }
 
 func testGetTokenIDWithValue(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	tok, err := ta.CreateToken(ctx, "id0", "node3", true, []string{"project-1"})
-	require.Nilf(t, err, "expected no error, got err=%v", err)
-	require.NotNilf(t, tok, "expected token 'node3', got token=%v", tok)
+	expectedID := "id0"
+	expectedTok, err := ta.CreateToken(ctx, expectedID, "description", true, []string{"project-1"})
+	require.NoError(t, err)
 
-	if tok.Value == "" {
-		t.Error("expected returned token to have a value, got ''")
-	}
-
-	tokID, err := ta.GetTokenIDWithValue(ctx, tok.Value)
-	require.Nilf(t, err, "expected no error, got err=%v", err)
-	assert.Equalf(t, tokID, tok.ID, "expected token ID to match %q", tok.ID)
+	tokID, err := ta.GetTokenIDWithValue(ctx, expectedTok.Value)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedID, tokID)
 }
 
 func testCreateToken(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	before := time.Now().Add(-(time.Second * 20)).UTC()
-	tok, err := ta.CreateToken(ctx, "id0", "node3", true, []string{"project-1"})
+	id := "id0"
+	expectedTok, err := ta.CreateToken(ctx, id, "node1", true, []string{"project-1"})
 	require.Nil(t, err, "expected no error, got err=%v", err)
-	require.NotNil(t, tok, "expected token 'node3', got token=%v", tok)
 
-	if tok.Value == "" {
-		t.Error("expected returned token to have value, got ''")
-	}
-
-	tok2, err := ta.GetToken(ctx, tok.ID)
-	require.Nil(t, err, "expected no error, got err=%v", err)
-	require.NotNil(t, tok2, "expected token 'node3', got token=%v", tok2)
-
-	if tok2.Value != tok.Value {
-		t.Errorf("expected token 'node3' to have a value %v, got %v", tok.Value, tok2.Value)
-	}
-	if tok2.Description != tok.Description {
-		t.Errorf("expected token 'node3' to have a description %v, got %v", tok.Description, tok2.Description)
-	}
-	if !tok2.Created.After(before) {
-		t.Errorf("expected token 'node3' creation time to be after %s, got %s", before, tok2.Created)
-	}
-	assert.ElementsMatch(t, tok.Projects, tok2.Projects)
+	// TODO use SQL or this is the same as GetToken
+	actualTok, err := ta.GetToken(ctx, id)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedTok, actualTok)
 }
 
 func testCreateTokenWithValue(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	before := time.Now().Add(-time.Second * 20).UTC()
-
+	id := "id0"
+	value := generateRandomTokenString(tutil.MinimumTokenLength())
 	tok, err := ta.CreateTokenWithValue(ctx,
-		"id0", generateRandomTokenString(tutil.MinimumTokenLength()), "node3", true, []string{"project-1"})
-	require.NoError(t, err)
-	require.NotNilf(t, tok, "expected token 'node3', got token=%v", tok)
-	require.NotZero(t, tok.Value, "expected returned token to have a value")
-
+		id, value, "node3", true, []string{"project-1"})
+	assert.NoError(t, err)
+	assert.Equal(t, value, tok.Value)
 	tok2, err := ta.GetToken(ctx, tok.ID)
-	require.Nil(t, err, "expected no error, got err=%v", err)
-	require.NotNil(t, tok2, "expected token 'node3', got token=%v", tok2)
+	require.NoError(t, err)
 
-	assert.Equal(t, tok.Value, tok2.Value)
-	assert.Equal(t, tok.Description, tok2.Description)
-	if !tok2.Created.After(before) {
-		t.Errorf("expected token 'node3' creation time to be after %s, got %s", before, tok2.Created)
-	}
+	assert.Equal(t, tok, tok2)
+}
+
+func testCreateTokenWithInvalidValueFails(ctx context.Context, t *testing.T, ta tokens.Storage) {
+	badValue := generateRandomTokenString(tutil.MinimumTokenLength() - 1)
+	tok, err := ta.CreateTokenWithValue(ctx,
+		"id0", badValue, "node3", true, []string{"project-1"})
+	assert.Error(t, err)
+	assert.Nil(t, tok)
 }
 
 func testCreateLegacyTokenWithValue(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	before := time.Now().Add(-time.Second * 20).UTC()
-
-	tok, err := ta.CreateLegacyTokenWithValue(ctx, generateRandomTokenString(tutil.MinimumLegacyTokenLength-1))
-	if err == nil {
-		t.Errorf("expected token validation error")
-	}
-
-	tok, err = ta.CreateLegacyTokenWithValue(ctx, generateRandomTokenString(tutil.MinimumLegacyTokenLength))
-	require.NoError(t, err)
-	require.NotNil(t, tok, "expected token got token=%v", tok)
-	require.NotZero(t, tok.Value, "expected returned token to have a value")
+	value := generateRandomTokenString(tutil.MinimumTokenLength())
+	tok, err := ta.CreateLegacyTokenWithValue(ctx, value)
+	assert.NoError(t, err)
+	assert.NotNil(t, tok)
+	assert.Equal(t, value, tok.Value)
 
 	tok2, err := ta.GetToken(ctx, tok.ID)
-	require.Nil(t, err, "expected no error, got err=%v", err)
-	require.NotNil(t, tok2, "expected token got token=%v", tok2)
-	assert.Equal(t, tok.Value, tok2.Value)
-	assert.Equal(t, tokens.LegacyTokenDescription, tok2.Description)
-	assert.ElementsMatch(t, tok.Projects, tok2.Projects)
-	if !tok2.Created.After(before) {
-		t.Errorf("expected token creation time to be after %s, got %s", before, tok2.Created)
-	}
+	require.NoError(t, err)
+
+	assert.Equal(t, tok, tok2)
+}
+
+func testCreateLegacyTokenWithInvalidValueFails(ctx context.Context, t *testing.T, ta tokens.Storage) {
+	badValue := generateRandomTokenString(tutil.MinimumLegacyTokenLength - 1)
+	tok, err := ta.CreateLegacyTokenWithValue(ctx, badValue)
+	assert.Error(t, err)
+	assert.Nil(t, tok)
 }
 
 func generateRandomTokenString(length int) string {
@@ -249,16 +224,15 @@ func generateRandomTokenString(length int) string {
 }
 
 func testDeleteToken(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	tok0, err := ta.CreateToken(ctx, "id0", "node1", true, []string{"project-1"})
-	require.Nil(t, err, "expected no error, got err=%v", err)
+	id := "id0"
+	_, err := ta.CreateToken(ctx, id, "node1", true, []string{"project-1"})
+	require.NoError(t, err)
 
-	err = ta.DeleteToken(ctx, tok0.ID)
-	require.Nil(t, err, "expected deleted token 'node1', got err=%v", err)
+	err = ta.DeleteToken(ctx, id)
+	assert.NoError(t, err)
 
-	tok1, err := ta.GetToken(ctx, tok0.ID)
-	require.NotNil(t, err, "expected no error, got err=%v", err)
-	require.Nil(t, tok1, "expected token not to be found, got token=%v", tok1)
-
+	_, err = ta.GetToken(ctx, id)
+	assert.Error(t, err)
 	if _, ok := errors.Cause(err).(*tokens.NotFoundError); !ok {
 		t.Errorf("expected not found token error, got err=%v", err)
 	}
@@ -274,35 +248,43 @@ func testDeleteTokenNotFound(ctx context.Context, t *testing.T, ta tokens.Storag
 }
 
 func testUpdateTokenActiveOnly(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	tok0, err := ta.CreateToken(ctx, "id0", "node1", true, []string{"project-1"})
-	if err != nil {
-		t.Fatalf("expected no error, got err=%v", err)
-	}
-	tok, err := ta.UpdateToken(ctx, tok0.ID, "", false, []string{"project-1"})
+	id := "id0"
+	desc := "node1"
+	projs := []string{"project-1"}
+	tok0, err := ta.CreateToken(ctx, id, desc, true, projs)
 	require.NoError(t, err)
-	require.NotNil(t, tok)
+
+	tok, err := ta.UpdateToken(ctx, id, desc, false, projs)
+	assert.NoError(t, err)
+	assert.NotNil(t, tok)
 	assert.Equal(t, tok0.Description, tok.Description)
 	assert.Equal(t, false, tok.Active)
+	assert.Equal(t, tok0.Created, tok.Created)
+	assert.True(t, tok.Updated.After(tok.Created))
 	assert.ElementsMatch(t, tok0.Projects, tok.Projects)
 }
 
 func testUpdateTokenUpdatesAll(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	tok0, err := ta.CreateToken(ctx, "id0", "node1", true, []string{"project-1"})
-	if err != nil {
-		t.Fatalf("expected no error, got err=%v", err)
-	}
+	id := "id0"
+	tok, err := ta.CreateToken(ctx, id, "node1", true, []string{"project-1"})
+	require.NoError(t, err)
+
 	newDesc := "newDesc"
 	newProj := []string{"project-2"}
-	tok, err := ta.UpdateToken(ctx, tok0.ID, newDesc, false, newProj)
+	_, err = ta.UpdateToken(ctx, id, newDesc, false, newProj)
 	require.NoError(t, err)
-	require.NotNil(t, tok)
-	assert.Equal(t, newDesc, tok.Description)
-	assert.Equal(t, false, tok.Active)
-	assert.ElementsMatch(t, newProj, tok.Projects)
+
+	updatedTok, err := ta.GetToken(ctx, id)
+	assert.Equal(t, newDesc, updatedTok.Description)
+	assert.Equal(t, false, updatedTok.Active)
+	assert.Equal(t, tok.Created, updatedTok.Created)
+	assert.True(t, tok.Updated.After(tok.Created))
+	assert.ElementsMatch(t, newProj, updatedTok.Projects)
 }
 
 func testUpdateTokenNotFound(ctx context.Context, t *testing.T, ta tokens.Storage) {
 	_, err := ta.UpdateToken(ctx, uuid.Must(uuid.NewV4()).String(), "desc", true, []string{"project-1"})
+	assert.Error(t, err)
 	if err != nil {
 		if _, ok := errors.Cause(err).(*tokens.NotFoundError); !ok {
 			t.Errorf("expected not found token 'node1', got err=%v", err)
@@ -310,15 +292,7 @@ func testUpdateTokenNotFound(ctx context.Context, t *testing.T, ta tokens.Storag
 	}
 }
 
-func testUpdateTokenUpdatesUpdatedField(ctx context.Context, t *testing.T, ta tokens.Storage) {
-	tok0, err := ta.CreateToken(ctx, "id0", "node1", true, []string{"project-1"})
-	require.Nil(t, err, "expected no error, got err=%v", err)
-
-	tok, err := ta.UpdateToken(ctx, tok0.ID, "", false, []string{"project-1"})
-	require.Nil(t, err, "expected no error, got err=%v", err)
-	require.NotNil(t, tok, "expected token 'node1', got token=%v", tok)
-
-	if tok.Created != tok0.Created {
-		t.Errorf("expected token 'node1' to have created=%v, got %v", tok0.Created, tok.Created)
-	}
+func insertProjectsIntoNewContext(projects []string) context.Context {
+	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
+		[]string{}, projects, "resource", "action", "pol"))
 }

@@ -4,7 +4,6 @@
 # prealloc: slices that could be preallocated
 LINTERARGS=-v -D lll -D unparam -D nakedret -D prealloc --deadline 1m ./...
 # govet in 1.16 is very confused by some of the code in this component
-GOLANGCILINTVERSION?=1.15.0
 include ../../Makefile.common_go
 
 .PHONY: test
@@ -45,9 +44,9 @@ SS_SSL_KEY="$(PWD)/../../dev/certs/secrets-service.key"
 SSL_ROOT_CERT="$(PWD)/../../dev/certs/Chef_Automate_FAKE_Dev.crt"
 DEV_CERT_PATHS=--cert $(SSL_CERT) --key $(SSL_KEY) --root-cert $(SSL_ROOT_CERT)
 # RUN_MODE=test is used to disable some bits of the code not used during testing now
-DEBUG_COMMAND = RUN_MODE="test" dlv debug --headless --listen=:59408 --api-version=2 cmd/compliance-service/main.go -- run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT) --manager-port $(MANAGER_PORT) --event-endpoint $(EVENT_ENDPOINT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) --log-level "debug"
-RUN_COMMAND = RUN_MODE="test" go run -ldflags $(LDFLAGS) cmd/compliance-service/main.go run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT)  --event-endpoint $(EVENT_ENDPOINT)  --manager-port $(MANAGER_PORT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS)
-RUN_COMMAND_RACECHECK = RUN_MODE="test" go run --race -ldflags $(LDFLAGS) cmd/compliance-service/main.go run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT)  --manager-port $(MANAGER_PORT) --event-endpoint $(EVENT_ENDPOINT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) -- log-level "debug"
+DEBUG_COMMAND = RUN_MODE="test" dlv debug --headless --listen=:59408 --api-version=2 cmd/compliance-service/main.go -- run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT) --manager-port $(MANAGER_PORT) --event-endpoint $(EVENT_ENDPOINT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) --log-level "debug" --config /tmp/.compliance-service.toml
+RUN_COMMAND = RUN_MODE="test" go run -ldflags $(LDFLAGS) cmd/compliance-service/main.go run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT)  --event-endpoint $(EVENT_ENDPOINT)  --manager-port $(MANAGER_PORT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) --config /tmp/.compliance-service.toml
+RUN_COMMAND_RACECHECK = RUN_MODE="test" go run --race -ldflags $(LDFLAGS) cmd/compliance-service/main.go run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT)  --manager-port $(MANAGER_PORT) --event-endpoint $(EVENT_ENDPOINT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) -- log-level "debug" --config /tmp/.compliance-service.toml
 RUN_COMMAND_INFO = $(RUN_COMMAND) --log-level "info"
 RUN_COMMAND_DEBUG = $(RUN_COMMAND) --log-level "debug"
 TEST_PATH = "$(PWD)/api/tests"

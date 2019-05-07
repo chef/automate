@@ -13,6 +13,7 @@ type Service struct {
 	LogLevel   string
 	ServerBind string
 	certs.TLSConfig
+	ConfigFilePath string
 }
 
 // Compliance service specific config options
@@ -71,7 +72,6 @@ type Manager struct {
 
 // InspecAgent service specific config options
 type InspecAgent struct {
-	Service
 	JobBufferSize int
 	JobWorkers    int
 	SocketPath    string

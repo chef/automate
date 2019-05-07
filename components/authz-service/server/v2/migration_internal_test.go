@@ -2294,43 +2294,43 @@ func TestV1PolicyMigration(t *testing.T) {
 
 func TestCheckForAdminTokenPolicyConfirmsNotAnAdminPolicy(t *testing.T) {
 	testCases := map[string]*storage_v1.Policy{
-		"policy with multiple subjects": &storage_v1.Policy{
+		"policy with multiple subjects": {
 			ID:       id(t),
 			Subjects: []string{"user:local:albertine", "team:local:admins"},
 			Action:   "update",
 			Resource: "telemetry:config",
 		},
-		"policy with two tokens as subjects": &storage_v1.Policy{
+		"policy with two tokens as subjects": {
 			ID:       id(t),
 			Subjects: []string{"token:282f41f1-e763-4094-9c59-c4eec1b71532", "token:282f41f1-e763-4094-9c59-c4eec1b71532"},
 			Action:   "*",
 			Resource: "*",
 		},
-		"policy with two subjects but only one token": &storage_v1.Policy{
+		"policy with two subjects but only one token": {
 			ID:       id(t),
 			Subjects: []string{"token:282f41f1-e763-4094-9c59-c4eec1b71532", "team:local:admins"},
 			Action:   "*",
 			Resource: "*",
 		},
-		"policy where action is not '*'": &storage_v1.Policy{
+		"policy where action is not '*'": {
 			ID:       id(t),
 			Subjects: []string{"token:282f41f1-e763-4094-9c59-c4eec1b71532"},
 			Action:   "update",
 			Resource: "*",
 		},
-		"policy where resource is not '*'": &storage_v1.Policy{
+		"policy where resource is not '*'": {
 			ID:       id(t),
 			Subjects: []string{"token:282f41f1-e763-4094-9c59-c4eec1b71532"},
 			Action:   "*",
 			Resource: "telemetry:config",
 		},
-		"policy where subject is not a token": &storage_v1.Policy{
+		"policy where subject is not a token": {
 			ID:       id(t),
 			Subjects: []string{"user:local:marie"},
 			Action:   "*",
 			Resource: "*",
 		},
-		"policy with empty subjects": &storage_v1.Policy{
+		"policy with empty subjects": {
 			ID:       id(t),
 			Subjects: []string{},
 			Action:   "*",

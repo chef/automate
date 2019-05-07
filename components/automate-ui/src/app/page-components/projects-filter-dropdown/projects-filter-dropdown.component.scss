@@ -20,6 +20,15 @@
   background: transparent;
   font-weight: 600;
 
+  &:disabled {
+    color: $chef-primary-dark;
+  }
+
+  // seems to be needed only for Safari
+  &:active {
+    color: $chef-primary-dark;
+  }
+
   > chef-icon {
     font-size: 16px;
     color: $chef-primary-dark;
@@ -32,6 +41,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: normal; // solves descender clipping due to overflow: hidden
   }
 
   .selection-count {

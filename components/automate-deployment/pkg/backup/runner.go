@@ -479,13 +479,13 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 		// Make sure that the event publisher always exits, we unlock the deployment,
 		// and that any listeners on the event stream will get the task complete
 		// signal.
-		r.unlockDeployment()
 		if r.eventSender != nil {
 			r.eventSender.TaskComplete()
 		}
 		close(r.errChan)
 		close(r.eventTerm)
 		r.clearRunningTask()
+		r.unlockDeployment()
 	}()
 
 	r.runningTask, err = newCancellableTask(api.BackupStatusResponse_RESTORE, []string{r.restoreTask.TaskID()}, cancel)
@@ -922,10 +922,10 @@ func (r *Runner) startBackupOperations(ctx context.Context) {
 	// Make sure that the event publisher always exits and that any listeners
 	// on the event stream will get the task complete signal.
 	defer func() {
-		r.unlockDeployment()
 		r.eventSender.TaskComplete()
 		close(r.eventTerm)
 		r.clearRunningTask()
+		r.unlockDeployment()
 	}()
 
 	backupCtx := NewContext(

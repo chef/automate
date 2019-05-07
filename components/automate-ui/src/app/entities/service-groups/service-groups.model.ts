@@ -38,8 +38,8 @@ export interface ServiceGroupFilters {
 
 export interface ServicesFilters {
   service_group_id?: number;
-  health?: string;
-  page?: number;
+  health: string;
+  page: number;
   pageSize?: number;
 }
 

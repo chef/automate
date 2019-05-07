@@ -8,6 +8,7 @@ import {
   Service, ServicesFilters, HealthSummary
 } from '../../entities/service-groups/service-groups.model';
 import { UpdateSelectedSG } from '../../entities/service-groups/service-groups.actions';
+import { includes, getOr } from 'lodash/fp';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -20,13 +21,18 @@ export class ServicesSidebarComponent implements OnInit {
   @Input() visible: boolean;
   @Output() closeServicesSidebarEvent: EventEmitter<any> = new EventEmitter();
 
-  public selectedHealth: string;
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
+  public selectedHealth = 'total';
   public currentPage = 1;
   public pageSize = 25;
   public totalServices = 0;
-  public servicesHealthSummary$: Observable<HealthSummary>;
+  public servicesHealthSummary: HealthSummary;
+
+  // The collection of allowable status
+  private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
+  private svcHealthSummary$: Observable<HealthSummary>;
+  private currentServicesFilters$: Observable<ServicesFilters>;
 
   constructor(private store: Store<NgrxStateAtom>) { }
 
@@ -37,33 +43,40 @@ export class ServicesSidebarComponent implements OnInit {
     this.serviceGroupName$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.selectedServiceGroupName));
 
-    this.servicesHealthSummary$ = this.store.select(createSelector(serviceGroupState,
+    this.svcHealthSummary$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.servicesHealthSummary));
+    this.svcHealthSummary$.subscribe((servicesHealthSummary) => {
+      this.servicesHealthSummary = servicesHealthSummary;
+      this.totalServices = getOr(0, this.selectedHealth, this.servicesHealthSummary);
+    });
 
-    this.currentPage = 1;
-
-    // this.servicesHealthSummary$.subscribe(healthSummary =>
-    // this.totalServices = healthSummary.total);
+    this.currentServicesFilters$ = this.store.select(createSelector(serviceGroupState,
+      (state) => state.servicesFilters));
+    this.currentServicesFilters$.subscribe((servicesFilters) => {
+      this.selectedHealth = getOr('total', 'health', servicesFilters);
+      this.currentPage    = getOr(1, 'page', servicesFilters);
+      this.totalServices  = getOr(0, this.selectedHealth, this.servicesHealthSummary);
+    });
   }
 
   public closeServicesSidebar() {
     this.closeServicesSidebarEvent.emit(null);
   }
 
-  public updateServicesFilters(health: string): void {
-    this.selectedHealth = health;
-    const servicesFilters: ServicesFilters = {
-      service_group_id: this.serviceGroupId,
-      health: health,
-      page: this.currentPage,
-      pageSize: this.pageSize
-    };
-    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
+  public updateHealthFilter(health: string): void {
+    if ( includes(health, this.allowedStatus) ) {
+      this.selectedHealth = health;
+    } else {
+      this.selectedHealth = 'total';
+    }
+
+    this.currentPage = 1;
+    this.updateServicesFilters();
   }
 
-  updatePageNumber(pageNumber: number) {
+  public updatePageNumber(pageNumber: number) {
     this.currentPage = pageNumber;
-    this.updateServicesFilters(this.selectedHealth);
+    this.updateServicesFilters();
   }
 
   // healthCheckStatus returns the formated health_check status from the provided service
@@ -81,5 +94,15 @@ export class ServicesSidebarComponent implements OnInit {
       default:
         return service.health_check;
     }
+  }
+
+  private updateServicesFilters(): void {
+    const servicesFilters: ServicesFilters = {
+      service_group_id: this.serviceGroupId,
+      health: this.selectedHealth,
+      page: this.currentPage,
+      pageSize: this.pageSize
+    };
+    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
   }
 }

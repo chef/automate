@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/chef/automate/api/interservice/ingest"
+	base_config "github.com/chef/automate/lib/config"
 	toml "github.com/pelletier/go-toml"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 // TODO @afiune We are unable to use this custom type because the underlying go-toml
@@ -27,6 +27,11 @@ const (
 	DeleteNodes int = iota
 	NodesMissing
 	MissingNodesForDeletion
+)
+
+const (
+	RunningState    = "running"
+	NotRunningState = "not_running"
 )
 
 // List of jobs
@@ -89,6 +94,13 @@ type JobSchedulerConfig struct {
 	Running bool `toml:"running"`
 }
 
+// ProjectUpdateConfig - the config for project updating
+type ProjectUpdateConfig struct {
+	State           string `toml:"state"`
+	ProjectUpdateID string `toml:"project_update_id"`
+	EsJobID         string `toml:"es_job_id"`
+}
+
 func defaultConfig() aggregateConfig {
 	return aggregateConfig{
 		JobSchedulerConfig: JobSchedulerConfig{
@@ -114,84 +126,80 @@ func defaultConfig() aggregateConfig {
 				Running:   true,
 			},
 		},
+		ProjectUpdateConfig: ProjectUpdateConfig{
+			State: NotRunningState,
+		},
 	}
 }
 
 // Manager - configuration manager for the service
-//
-// This manager is multiple goroutines safe. Multiple goroutines can use one of these objects,
-// and data updates are performed asynchronously. When an update function is pushed onto a channel, a
-// single goroutine handles the update. When an update occurs the data is written to the config file.
-// Read access is synchronous, where there is some time between seeing updates to the data.
-// So if you did a config.UpdateDeleteNodesSchedulerConfig() and config.GetDeleteNodesSchedulerConfig()
-// right after each other, the data that is returned from the Get would not be the data that was updated.
-// This is patterned after Akka's Agents (https://doc.akka.io/docs/akka/2.5.6/java/agents.html)
 type Manager struct {
-	config      aggregateConfig
-	updateQueue chan<- func(aggregateConfig) aggregateConfig
+	baseConfigManager *base_config.Manager
 }
 
 // Config - stores the configuration for the service
 type aggregateConfig struct {
-	JobsConfig         []JobConfig        `toml:"jobs_config"`
-	JobSchedulerConfig JobSchedulerConfig `toml:"job_scheduler_config"`
+	JobsConfig          []JobConfig         `toml:"jobs_config"`
+	JobSchedulerConfig  JobSchedulerConfig  `toml:"job_scheduler_config"`
+	ProjectUpdateConfig ProjectUpdateConfig `toml:"project_update_config"`
 }
 
 // NewManager - create a new config. There should only be one config for the service.
-func NewManager() *Manager {
-	config := readinConfig()
-
-	updateQueue := make(chan func(aggregateConfig) aggregateConfig, 100)
-	manager := &Manager{
-		config:      config,
-		updateQueue: updateQueue,
+func NewManager(configFile string) (*Manager, error) {
+	storedConfig, err := readConfigFromFile(configFile, defaultConfig())
+	if err != nil {
+		return &Manager{}, err
 	}
 
-	// Single goroutine that updates the Config data and saves the data to the config file.
-	go func() {
-		for update := range updateQueue {
-			// Update the config object
-			c := update(manager.config)
+	// Testing Updating
+	baseManager := base_config.NewManager(configFile, storedConfig)
+	err = baseManager.UpdateConfig(func(config interface{}) (interface{}, error) {
+		return storedConfig, nil
+	})
+	if err != nil {
+		return &Manager{}, err
+	}
 
-			// Once the config object is updated and save to the file,
-			// Update the manager's config object so 'Get' requests will
-			// see the change.
-			manager.config = c
-		}
-	}()
-
-	return manager
+	return &Manager{
+		baseConfigManager: baseManager,
+	}, err
 }
 
-// Close - to close out the channel for this object. This should only be called when the service is being shutdown
+// Close - close channels
 func (manager *Manager) Close() {
-	// closes the updateQueue channel and ends that update goroutine
-	close(manager.updateQueue)
+	manager.baseConfigManager.Close()
 }
 
 // GetJobSchedulerConfig get the job scheduler config
 func (manager *Manager) GetJobSchedulerConfig() JobSchedulerConfig {
-	return manager.config.JobSchedulerConfig
+	return manager.getConfig().JobSchedulerConfig
 }
 
 // UpdateJobSchedulerConfig - update the job scheduler config
 func (manager *Manager) UpdateJobSchedulerConfig(jobSchedulerConfig JobSchedulerConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.JobSchedulerConfig = jobSchedulerConfig
-		errc <- saveToFile(config)
-		return config
-	}
+		return config, nil
+	})
+}
 
-	manager.send(updateFunc)
-	return <-errc
+// GetProjectUpdateConfig - get the project update config data
+func (manager *Manager) GetProjectUpdateConfig() ProjectUpdateConfig {
+	return manager.getConfig().ProjectUpdateConfig
+}
+
+// UpdateProjectUpdateConfig - update the project update config
+func (manager *Manager) UpdateProjectUpdateConfig(projectUpdateConfig ProjectUpdateConfig) error {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
+		config.ProjectUpdateConfig = projectUpdateConfig
+		return config, nil
+	})
 }
 
 // GetJobsID returns a list of job ids loaded in the manager config
 func (manager *Manager) GetJobsID() []int {
-	ids := make([]int, len(manager.config.JobsConfig))
-	for i, j := range manager.config.JobsConfig {
+	ids := make([]int, len(manager.getConfig().JobsConfig))
+	for i, j := range manager.getConfig().JobsConfig {
 		ids[i] = j.ID
 	}
 
@@ -201,7 +209,7 @@ func (manager *Manager) GetJobsID() []int {
 // GetJobConfig returns the configuration of the provided job.
 // if the job doesn't exist, it returns an empty config
 func (manager *Manager) GetJobConfig(jID int) JobConfig {
-	for _, j := range manager.config.JobsConfig {
+	for _, j := range manager.getConfig().JobsConfig {
 		if j.ID == jID {
 			return j
 		}
@@ -226,95 +234,57 @@ func (manager *Manager) GetMissingNodesForDeletionSchedulerConfig() JobConfig {
 
 // UpdateDeleteNodesSchedulerConfig - update the delete node config
 func (manager *Manager) UpdateDeleteNodesSchedulerConfig(jConfig JobConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.JobsConfig[DeleteNodes] = jConfig
-		errc <- saveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
 // UpdateNodesMissingSchedulerConfig update the missing nodes for deletion task
 func (manager *Manager) UpdateNodesMissingSchedulerConfig(jConfig JobConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.JobsConfig[NodesMissing] = jConfig
-		errc <- saveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
 // UpdateMissingNodesForDeletionSchedulerConfig update the missing nodes for deletion config
 func (manager *Manager) UpdateMissingNodesForDeletionSchedulerConfig(jConfig JobConfig) error {
-	errc := make(chan error)
-
-	updateFunc := func(config aggregateConfig) aggregateConfig {
+	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.JobsConfig[MissingNodesForDeletion] = jConfig
-		errc <- saveToFile(config)
-		return config
-	}
-
-	manager.send(updateFunc)
-	return <-errc
+		return config, nil
+	})
 }
 
-func (manager *Manager) send(updateFunc func(aggregateConfig) aggregateConfig) {
-	manager.updateQueue <- updateFunc
+func (manager *Manager) updateConfig(updateFunc func(aggregateConfig) (aggregateConfig, error)) error {
+	return manager.baseConfigManager.UpdateConfig(func(config interface{}) (interface{}, error) {
+		return updateFunc(config.(aggregateConfig))
+	})
 }
 
-func saveToFile(config aggregateConfig) error {
-
-	configFile := viper.ConfigFileUsed()
-
-	log.WithFields(log.Fields{
-		"config_file": configFile,
-	}).Info("Saving Config File")
-
-	tomlData, err := toml.Marshal(config)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err,
-		}).Error("Error Marshaling Config struct")
-		return err
+func (manager *Manager) getConfig() aggregateConfig {
+	aggregateConfig, ok := manager.baseConfigManager.Config.(aggregateConfig)
+	if !ok {
+		log.Error("baseConfigManager.Config is not of type 'aggregateConfig'")
+		os.Exit(1)
 	}
 
-	// create a file with the permissions of the running user can read/write other can only read.
-	var permissions os.FileMode = 0644
-	err = ioutil.WriteFile(configFile, tomlData, permissions)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error":       err,
-			"config_file": configFile,
-		}).Error("Error writing config file")
-		return err
-	}
-
-	return err
+	return aggregateConfig
 }
 
-func readinConfig() aggregateConfig {
-	var (
-		config     = defaultConfig()
-		configFile = viper.ConfigFileUsed()
-	)
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		// config file does not exists
-		return config
-	}
+func readConfigFromFile(configFile string, defaultConfig aggregateConfig) (interface{}, error) {
+	config := defaultConfig
 
 	tomlData, err := ioutil.ReadFile(configFile)
-	if err != nil {
+	if os.IsNotExist(err) {
+		// config file does not exists use the default config
+		return config, nil
+	} else if err != nil {
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to read config file")
+
+		return defaultConfig, err
 	}
 
 	err = toml.Unmarshal(tomlData, &config)
@@ -322,7 +292,10 @@ func readinConfig() aggregateConfig {
 		log.WithFields(log.Fields{
 			"config_file": configFile,
 		}).WithError(err).Error("Unable to load manager configuration")
+
+		// Could not load data from config file using the default config.
+		return defaultConfig, nil
 	}
 
-	return config
+	return config, nil
 }

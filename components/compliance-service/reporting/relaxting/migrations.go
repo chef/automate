@@ -333,7 +333,7 @@ func (backend ES2Backend) getScanDateRange(indexPrefix string) (*time.Time, *tim
 		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to Unmarshal min_date", myName))
 	}
 
-	logrus.Debugf("GetMinScanDate: earliest scan date for range = %s", minDateAsString)
+	logrus.Debugf("earliest scan date for range = %s", minDateAsString)
 
 	formatOfDate := "2006-01-02"
 	earliestScanDate, err := time.Parse(formatOfDate, minDateAsString)
@@ -347,7 +347,7 @@ func (backend ES2Backend) getScanDateRange(indexPrefix string) (*time.Time, *tim
 		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to Unmarshal max_date", myName))
 	}
 
-	logrus.Debugf("GetMinScanDate: most recent scan date for range = %s", maxDateAsString)
+	logrus.Debugf(" most recent scan date for range = %s", maxDateAsString)
 
 	mostRecentScanDate, err := time.Parse(formatOfDate, maxDateAsString)
 	if err != nil {
@@ -381,28 +381,12 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 	reindexSource := elastic.NewReindexSource().
 		Index(strings.Split(src, ",")...).
 		Type(srcDocType)
-	//source, err := reindexSource.Source()
-	//if err != nil {
-	//	return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get reindexSource Source", myName))
-	//}
-	//LogQueryPartMin(src, source, fmt.Sprintf("%s query reindexSource", myName))
 
 	reindexDestination := elastic.NewReindexDestination().
 		Index(dest).
 		Type(mappings.DocType)
-	//source, err = reindexDestination.Source()
-	if err != nil {
-		return nil, indexToMigrateExists, errors.Wrap(err, fmt.Sprintf("%s unable to get reindexDest Source", myName))
-	}
-	//LogQueryPartMin(dest, source, fmt.Sprintf("%s query reindexDest", myName))
 
 	script := elastic.NewScript(reindexScript)
-
-	//source, err = script.Source()
-	//if err != nil {
-	//	return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get script Source", myName))
-	//}
-	//LogQueryPartMin(dest, source, fmt.Sprintf("%s query reindexDest", myName))
 
 	reindexCall := elastic.NewReindexService(client).
 		Source(reindexSource).
@@ -423,16 +407,11 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 
 func (backend ES2Backend) getLatestReportIds(sumDailyToday string) ([]string, error) {
 	myName := "getLatestReportIds"
-	var nodeReports map[string]string
-	var reportIds []string
-	nodeReports, err = backend.getNodeReportIdsFromTimeseries(sumDailyToday, make(map[string][]string, 0), false)
+	reportIds, err := backend.getNodeReportIdsFromTimeseries(sumDailyToday, make(map[string][]string, 0), false)
 	if err != nil {
 		logrus.Errorf("%s no report ids for this day: %s. Will still reindex yesterday's latest though", myName, sumDailyToday)
 	}
 
-	if len(nodeReports) > 0 {
-		reportIds = MapValues(nodeReports)
-	}
 	return reportIds, nil
 }
 
@@ -554,7 +533,7 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 				reportIds[i] = hit.Id
 			}
 
-			esInSpecReports, _ := getReportsA2v2(esClient, ctx, srcRepIndex, srcRepType, reportIds)
+			esInSpecReports, err := getReportsA2v2(esClient, ctx, srcRepIndex, srcRepType, reportIds)
 			if err != nil {
 				return errors.Wrapf(err, "migrateTimeSeries unable to get reports from index %s", srcRepIndex)
 			}

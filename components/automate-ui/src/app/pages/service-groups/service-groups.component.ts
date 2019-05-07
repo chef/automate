@@ -15,7 +15,7 @@ import {
 import {
   serviceGroupStatus, allServiceGroups, serviceGroupState, allServiceGroupHealth
 } from '../../entities/service-groups/service-groups.selector';
-import { find, includes } from 'lodash/fp';
+import { find, includes, get } from 'lodash/fp';
 
 @Component({
   selector: 'app-service-groups',
@@ -26,7 +26,7 @@ import { find, includes } from 'lodash/fp';
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
-  public HealthSummary$: Observable<HealthSummary[]>;
+  public sgHealthSummary: HealthSummary;
 
   // The selected service-group id that will be sent to the services-sidebar
   public selectedServiceGroupId: number;
@@ -34,34 +34,37 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   // Weather or not the the services sidebar is visible
   public servicesSidebarVisible = false;
 
-  // The collection of allowable status
-  private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
+  // The current page the user is visualizing
+  public currentPage = 1;
+
+  // The number of service groups to display per page
+  public pageSize = 25;
+
+  // Total number of service groups
+  public totalServiceGroups = 0;
 
   // The currently selected health status filter
-  selectedStatus$: Observable<string>;
+  public selectedStatus$: Observable<string>;
+
+  // The collection of allowable status
+  private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
 
   // Has this component been destroyed
   private isDestroyed: Subject<boolean> = new Subject();
 
-  selectedFieldDirection$: Observable<SortDirection>;
-  selectedSortField$: Observable<string>;
-  currentPage$: Observable<number>;
+  // The collection of allowable sort directions
+  private allowedSortDirections = ['asc', 'desc', 'ASC', 'DESC'];
 
-  currentFieldDirection: SortDirection;
-  currentSortField: string;
-
-  defaultFieldDirection: FieldDirection = {
+  private selectedFieldDirection$: Observable<SortDirection>;
+  private selectedSortField$: Observable<string>;
+  private healthSummary$: Observable<HealthSummary>;
+  private currentPage$: Observable<number>;
+  private currentFieldDirection: SortDirection;
+  private currentSortField: string;
+  private defaultFieldDirection: FieldDirection = {
     name: 'ASC',
     percent_ok: 'ASC'
   };
-
-  currentPage = 1;
-  // The number of service groups to display per page
-  pageSize = 25;
-  // TODO: Wire this up with real data
-  totalServiceGroups = 50;
-  // The collection of allowable sort directions
-  private allowedSortDirections = ['asc', 'desc', 'ASC', 'DESC'];
 
   constructor(
     private route: ActivatedRoute,
@@ -77,12 +80,21 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
     this.serviceGroups$ = this.store.select(allServiceGroups);
-    this.HealthSummary$ = this.store.select(allServiceGroupHealth);
-    this.HealthSummary$.subscribe((sgHealthSummary) => {
-      this.totalServiceGroups = sgHealthSummary['total'];
-    });
+
+    this.healthSummary$ = this.store.select(allServiceGroupHealth);
+    this.healthSummary$.subscribe(sgHealthSummary => this.sgHealthSummary = sgHealthSummary);
+
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.status));
+    this.selectedStatus$.subscribe((status) => {
+      // This code enables the pagination of service groups correctly, when the user selects
+      // a Health Filter, we adjust the total number of service groups
+      if ( includes(status, this.allowedStatus) ) {
+          this.totalServiceGroups = get(status, this.sgHealthSummary);
+      } else {
+          this.totalServiceGroups = get('total', this.sgHealthSummary);
+      }
+    });
 
     this.selectedFieldDirection$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.sortDirection));
@@ -100,7 +112,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       (state) => state.filters.page));
 
     this.currentPage$.subscribe(currentPage => this.currentPage = currentPage);
-
   }
 
   ngOnDestroy() {
@@ -140,6 +151,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public openServicesSidebar(id: number) {
     const servicesFilters: ServicesFilters = {
       service_group_id: id,
+      page: 1,
       health: 'total'
     };
     this.selectedServiceGroupId = id;
@@ -215,6 +227,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }
     return 'sort';
   }
+
   private getSelectedPageNumber(allUrlParameters: Chicklet[]): number {
     const pageChicklet = find((chicklet) => {
       return chicklet.type === 'page';
