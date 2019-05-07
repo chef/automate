@@ -8,100 +8,62 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const sqlFindTagID = `
-SELECT id  
-FROM tags
-WHERE key = $1 AND value = $2;
+const sqlInsertNodeTag = `
+INSERT INTO nodes_tags
+(node_id, tag_id)
+VALUES ($1, $2)
+ON CONFLICT (node_id, tag_id)
+DO NOTHING;
 `
 
-const sqlFindNodeTag = `
-SELECT exists(select 1 from nodes_tags where node_id = $1 AND tag_id = $2);
+const sqlInsertTag = `
+INSERT INTO tags
+(id, key, value)
+VALUES ($1, $2, $3)
+ON CONFLICT (key, value)
+DO UPDATE SET value=$3 RETURNING id;
 `
+
+// Note: ^^ this is silly. apparently you can't do an ON CONFLICT
+// DO NOTHING and still return the id, and we need to know the id b/c we still
+// need it to do the nodes_tags association. So we do a silly update so we can get
+// the id back from postgres :/ (vj)
 
 func (trans *DBTrans) addTags(tags []*common.Kv) ([]string, error) {
 	tagIDs := make([]string, 0, len(tags))
-	tagArr := make([]interface{}, 0, len(tags))
 
 	for _, keyValue := range tags {
-		// check if tag exists
-		id, err := trans.tagExists(keyValue)
+		id := createUUID()
+		rows, err := trans.Query(sqlInsertTag, id, keyValue.Key, keyValue.Value)
 		if err != nil {
-			return tagIDs, errors.Wrap(err, "addTags unable to check for tag existence in db")
+			return tagIDs, errors.Wrap(err, "addTags unable to add tag")
 		}
-		if len(id) == 0 {
-			// create tag and add to tag array if not exists
-			tag := tag{
-				ID:    createUUID(),
-				Key:   keyValue.Key,
-				Value: keyValue.Value,
+		defer rows.Close() // nolint: errcheck
+		for rows.Next() {
+			err := rows.Scan(&id)
+			if err != nil {
+				logrus.Error(err)
+				continue
 			}
-			tagArr = append(tagArr, &tag)
-			id = tag.ID
 		}
-		// add id of tag to tagIDs
+		err = rows.Err()
+		if err != nil {
+			return tagIDs, errors.Wrap(err, "addTags rows error")
+		}
 		tagIDs = append(tagIDs, id)
-	}
-
-	err := trans.Insert(tagArr...)
-	if err != nil {
-		return tagIDs, errors.Wrap(err, "addTags unable to add tags in db")
 	}
 
 	return tagIDs, nil
 }
 
-func (trans *DBTrans) tagExists(tag *common.Kv) (string, error) {
-	var id string
-	rows, err := trans.Query(sqlFindTagID, tag.GetKey(), tag.GetValue())
-	if err != nil {
-		return id, errors.Wrap(err, "tagExists unable to query for tag")
-	}
-	defer rows.Close() // nolint: errcheck
-	for rows.Next() {
-		err := rows.Scan(&id)
-		if err != nil {
-			logrus.Error(err)
-			continue
-		}
-	}
-	return id, rows.Err()
-}
-
-func (trans *DBTrans) nodeTagExists(nodeID string, tagID string) (bool, error) {
-	var exists bool
-	rows, err := trans.Query(sqlFindNodeTag, nodeID, tagID)
-	if err != nil {
-		return false, err
-	}
-	defer rows.Close() // nolint: errcheck
-	for rows.Next() {
-		err := rows.Scan(&exists)
-		if err != nil {
-			logrus.Error(err)
-			continue
-		}
-	}
-	return exists, rows.Err()
-}
-
 func (trans *DBTrans) tagNode(nodeID string, tagIDs []string) error {
-	links := make([]interface{}, 0, len(tagIDs))
-
 	for _, tagID := range tagIDs {
-		// check if node_tag association already exists
-		exists, err := trans.nodeTagExists(nodeID, tagID)
+		_, err := trans.Exec(sqlInsertNodeTag, nodeID, tagID)
 		if err != nil {
-			return err
-		}
-		if !exists {
-			link := NodeTag{
-				NodeID: nodeID,
-				TagID:  tagID,
-			}
-			links = append(links, &link)
+			return errors.Wrap(err, "addTags unable to add tag")
 		}
 	}
-	return trans.Insert(links...)
+	return nil
 }
 
 // FindKeyValue finds a Tag object in the array based on key match
