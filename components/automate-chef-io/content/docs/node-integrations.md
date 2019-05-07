@@ -137,9 +137,9 @@ The service makes these API calls:
 * `SSM-SendCommand`
 * `SSM-ListCommands`
 
-## Azure VM Scanning with Chef Automate (BETA)
+## Azure VM Scanning with Chef Automate
 
-Set up Chef Automate to detect and scan the nodes in your Azure account by providing your Azure Credentials and creating an _Azure VM Node Manager_. To access the Azure Node Manager, select anywhere on the Automate screen and type 'beta'. After toggling the Azure Node Manager to the "ON" position, close the helper window and then refresh your browser. Now, when you open the [_Node Integrations_]({{< relref "node-integrations.md" >}}) page in the Settings tab, you should see _Azure_ as one of your node management service options.
+Set up Chef Automate to detect and scan the nodes in your Azure account by providing your Azure Credentials and creating an _Azure VM Node Manager_. To add an Azure VM Node Manager, navigate to the [_Node Integrations_]({{< relref "node-integrations.md" >}}) page in the Settings tab, click on `Create Integration`, and you should see _Azure_ as one of your node management service options.
 
 ### Adding an Azure VM Node Manager
 
@@ -175,7 +175,7 @@ Filter the regions for the scan job by specifying regions to include or exclude.
 
 Filter instances for scanning by specifying either regions or tags by their keys and values.
 
-## Use Case: Azure Account Scanning with Chef Automate (BETA)
+## Use Case: Azure Account Scanning with Chef Automate
 
 Inspec 2+ supports running scan jobs against your Azure account configuration, such as network security groups and ad users. See [Azure resources](https://www.inspec.io/docs/reference/resources/#azure-resources) for more information.
 Set up Chef Automate to run these scan jobs by providing your Azure credentials and creating an _Azure API Node Manager_.
@@ -199,9 +199,9 @@ Filter the regions for the scan job by specifying regions to include or exclude.
 
 ![Chef Automate Create Azure-API Scan Job](/images/docs/create-azure-api-scanjob.png)
 
-## Google Cloud Platform Account Scanning with Chef Automate (BETA - as of 20181020020209)
+## Google Cloud Platform Account Scanning with Chef Automate
 
-Run scans against your GCP account infrastructure using Chef Automate. Set up Chef Automate to detect and scan the nodes in your Google Cloud Platform (GCP) account by providing your GCP Credentials and creating a _GCP VM Node Manager_. To access the GCP Node Manager, select anywhere on the Automate screen and type 'beta'. After toggling the Google Cloud Node Manager to the "ON" position, close the helper window and then refresh your browser. Now, when you open _Node Integrations_, you should see _Google Cloud_ as one of your node management service options. See the Chef InSpec documentation for more infomation about [resources](https://www.inspec.io/docs/reference/resources/#gcp-resources).
+Run scans against your GCP account infrastructure using Chef Automate. Set up Chef Automate to detect and scan the nodes in your Google Cloud Platform (GCP) account by providing your GCP Credentials and creating a _GCP VM Node Manager_. To create a GCP Node Manager, navigate to _Node Integrations_, click on `Create Integration`, and you should see _Google Cloud_ as one of your node management service options. See the Chef InSpec documentation for more infomation about [resources](https://www.inspec.io/docs/reference/resources/#gcp-resources).
 
 To run a GCP scan in Chef Automate:
 
