@@ -54,16 +54,12 @@ export class ProjectsFilterEffects {
   }
 
   private convertResponse(authorizedProjects: string[]): ProjectsFilterOption[] {
-    const convertedProjects: ProjectsFilterOption[] = [];
-    authorizedProjects.forEach(project => {
-        const option = <ProjectsFilterOption>{
-            label: project,
-            value: project,
-            checked: false
-        };
-        convertedProjects.push(option);
-    });
-    return convertedProjects;
+    return authorizedProjects.map(
+      project => <ProjectsFilterOption>{
+        label: project,
+        value: project,
+        checked: false
+      });
   }
 }
 

@@ -39,14 +39,14 @@ control 'iam-v2-global-projects-filter-1' do
     
     after(:all) do
       PROJECTS.each do|project|
-        resp = automate_api_request("/apis/iam/v2beta/projects/#{project[:id]}", http_method: 'delete')
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{project[:id]}", http_method: 'DELETE')
         expect(resp.http_status).to eq 200
       end
     end
 
     describe 'allowed projects for admin' do
       it 'returns list of all projects and unassigned' do
-        resp = automate_api_request("/api/v0/auth/introspect_projects", http_method: 'get')
+        resp = automate_api_request("/api/v0/auth/introspect_projects", http_method: 'GET')
 
         expect(resp.http_status).to eq 200
         # always returns complete list of projects + (unassigned)
@@ -81,7 +81,7 @@ control 'iam-v2-global-projects-filter-1' do
             statements: [
               {
                 effect: "ALLOW",
-                # TODO this test will fail if there is only one parameterized action (i.e. just iam:teams:get)
+                # TODO this test will fail if there is a lone parameterized action (i.e. just iam:teams:get)
                 actions: ["iam:teams:list", "iam:teams:get"],
                 projects: [PROJECT_ID_1, PROJECT_ID_2]
               }
@@ -108,7 +108,7 @@ control 'iam-v2-global-projects-filter-1' do
       end
 
       it 'returns list of allowed projects' do
-        resp = automate_api_request("/api/v0/auth/introspect_projects", http_method: 'get', user: non_admin_username)
+        resp = automate_api_request("/api/v0/auth/introspect_projects", http_method: 'GET', user: non_admin_username)
 
         expect(resp.http_status).to eq 200
         expected_projects = [PROJECT_ID_1, PROJECT_ID_2]

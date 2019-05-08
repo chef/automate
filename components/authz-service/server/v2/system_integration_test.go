@@ -63,16 +63,11 @@ func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 			Name: "name1",
 		})
 		require.NoError(t, err)
-		_, err = ts.projects.CreateProject(ctx, &api_v2.CreateProjectReq{
-			Id:   "project-2",
-			Name: "name2",
-		})
-		require.NoError(t, err)
 
 		statement := api_v2.Statement{
 			Effect:    api_v2.Statement_ALLOW,
-			Resources: []string{"cfgmgmt:nodes:*"},
-			Actions:   []string{"cfgmgmt:infranodes:get", "cfgmgmt:infranodes:list"},
+			Resources: []string{"infra:nodes:*"},
+			Actions:   []string{"infra:nodes:get", "infra:nodes:list"},
 			Projects:  []string{"project-1"},
 		}
 		req := api_v2.CreatePolicyReq{
@@ -88,10 +83,11 @@ func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 			&api_v2.FilterAuthorizedPairsReq{
 				Subjects: []string{"user:local:alice"},
 				Pairs: []*api_v2.Pair{
-					// normally all resources/actions are passed, but we only need a few to
-					// test this functionality
+					// normally all resources/actions are passed, but here we only need 
+					// at least one system policy pair
 					&api_v2.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
-					&api_v2.Pair{Resource: "cfgmgmt:nodes:foo", Action: "cfgmgmt:infranodes:get"}},
+					// and at least one non-system policy pair
+					&api_v2.Pair{Resource: "infra:nodes:foo", Action: "infra:nodes:get"}},
 			})
 		require.NoError(t, err)
 
