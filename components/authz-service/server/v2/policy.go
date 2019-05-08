@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -663,26 +664,23 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
-		// ignore anything not for this service
-		if !strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Policies/") {
+		// ignore anything not related to the OPA store.
+		if !strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Policies/") &&
+			!strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Projects/") {
 			return resp, nil
 		}
 
 		// Note: the set of methods we _do not want to update_ our engine store
 		// is the smaller one. Also, updating too often is not as bad as
 		// updating too little.
-		switch info.FullMethod {
-		case "/chef.automate.domain.authz.v2.Policies/ListPolicies",
-			"/chef.automate.domain.authz.v2.Policies/ListRoles",
-			"/chef.automate.domain.authz.v2.Policies/GetPolicy",
-			"/chef.automate.domain.authz.v2.Policies/GetRole",
-			"/chef.automate.domain.authz.v2.Policies/ListPolicyMembers",
-			"/chef.automate.domain.authz.v2.Policies/GetPolicyVersion":
-			// do nothing
-		default:
-			if err := s.updateEngineStore(ctx); err != nil {
-				return nil, status.Errorf(codes.Internal, "error updating engine store: %s", err.Error())
-			}
+		if regexp.MustCompile(`^/chef.automate.domain.authz.v2.\w+/(Get|List|\w+Project$)`).
+			MatchString(info.FullMethod) {
+			return resp, nil
+		}
+
+		s.log.Infof("Initiating store update for %s", info.FullMethod)
+		if err := s.updateEngineStore(ctx); err != nil {
+			return nil, status.Errorf(codes.Internal, "error updating engine store: %s", err.Error())
 		}
 		return resp, nil
 	}
