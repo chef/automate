@@ -1,24 +1,41 @@
 BEGIN;
 
-CREATE TABLE workflows (
+CREATE TABLE recurring_workflow_schedules (
     id BIGSERIAL PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL,
-    is_singleton BOOLEAN,
+
+    name TEXT NOT NULL
+    workflow_name TEXT NOT NULL,
+
     recurrence TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     next_due TIMESTAMP NOT NULL DEFAULT NOW(),
-    default_parameters JSON
+    parameters JSON
+
+    CONSTRAINT say_my_name UNIQUE(name, workflow_name)
 );
 
 CREATE TABLE workflow_instances (
     id BIGSERIAL PRIMARY KEY,
-    workflow_id BIGINT NOT NULL REFERENCES workflows(id),
+    name TEXT UNIQUE,
+    workflow_name TEXT NOT NULL,
     parameters JSON,
     payload JSON,
 
     enqueued_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+
+
+/* CREATE TABLE workflow_events (
+    -- TaskComplete()
+    event_type
+    workflow_instance_id
+    task_result_id
+);
+ */
+
+CREATE TYPE task_status AS ENUM('success', 'failed', 'abandoned');
 
 CREATE TABLE tasks (
     id BIGSERIAL PRIMARY KEY,
@@ -30,16 +47,6 @@ CREATE TABLE tasks (
     task_name     TEXT NOT NULL,
     parameters    JSON
 );
-
-/* CREATE TABLE workflow_events (
-    -- TaskComplete()
-    event_type
-    workflow_instance_id
-    task_result_id
-);
- */
-
-CREATE TYPE task_status AS ENUM('success', 'failed', 'abandoned');
 
 CREATE TABLE tasks_results (
     id BIGSERIAL PRIMARY KEY,

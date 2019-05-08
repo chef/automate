@@ -9,8 +9,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database/postgres"
-	_ "github.com/mattes/migrate/database/postgres" // make driver available
-	_ "github.com/mattes/migrate/source/file"       // make source available
+	_ "github.com/mattes/migrate/source/file" // make source available
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
