@@ -91,10 +91,10 @@ describe('UserManagementComponent', () => {
 
     it('intermixes capitals and lowercase with lowercase first', () => {
       store.dispatch(new GetUsersSuccess({ users: [
-        { id: 'uuid-1', name: 'Alice', username: 'alice' },
-        { id: 'uuid-2', name: 'alice', username: 'alice' },
-        { id: 'uuid-3', name: 'bob', username: 'builder2000' },
-        { id: 'uuid-4', name: 'Bob', username: 'builder2000' }
+        { membership_id: 'uuid-1', name: 'Alice', id: 'alice2', projects: [] },
+        { membership_id: 'uuid-2', name: 'alice', id: 'alice1', projects: [] },
+        { membership_id: 'uuid-3', name: 'bob', id: 'builder2001', projects: [] },
+        { membership_id: 'uuid-4', name: 'Bob', id: 'builder2000', projects: [] }
       ]}));
       component.sortedUsers$.subscribe(users => {
         expect(users.length).toBe(4);
@@ -107,9 +107,9 @@ describe('UserManagementComponent', () => {
 
     it('sorts by whole string before case', () => {
       store.dispatch(new GetUsersSuccess({ users: [
-        { id: 'uuid-1', name: 'alice in wonderland', username: 'same' },
-        { id: 'uuid-20', name: 'alice', username: 'same' },
-        { id: 'uuid-2', name: 'Alice', username: 'same' }
+        { membership_id: 'uuid-1', name: 'alice in wonderland', id: 'alice1', projects: [] },
+        { membership_id: 'uuid-20', name: 'alice', id: 'alice2', projects: [] },
+        { membership_id: 'uuid-2', name: 'Alice', id: 'alice3', projects: [] }
       ]}));
       component.sortedUsers$.subscribe(users => {
         expect(users.length).toBe(3);
@@ -121,29 +121,29 @@ describe('UserManagementComponent', () => {
 
     it('sorts by name then by username', () => {
       store.dispatch(new GetUsersSuccess({ users: [
-       { id: 'uuid-22', name: 'Bob', username: 'builder2001' },
-       { id: 'uuid-2', name: 'Bob', username: 'builder2000' },
-       { id: 'uuid-1', name: 'Alice in Wonderland', username: 'alice' },
-       { id: 'uuid-20', name: 'alice', username: 'the-other-alice' }
+       { membership_id: 'uuid-22', name: 'Bob', id: 'builder2001', projects: []  },
+       { membership_id: 'uuid-2', name: 'Bob', id: 'builder2000', projects: []  },
+       { membership_id: 'uuid-1', name: 'Alice in Wonderland', id: 'alice', projects: []  },
+       { membership_id: 'uuid-20', name: 'alice', id: 'the-other-alice', projects: []  }
      ]}));
      component.sortedUsers$.subscribe(users => {
        expect(users.length).toBe(4);
        expect(users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
        expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice in Wonderland' }));
        expect(users[2]).toEqual(
-         jasmine.objectContaining({ name: 'Bob', username: 'builder2000' }));
+         jasmine.objectContaining({ name: 'Bob', id: 'builder2000' }));
        expect(users[3]).toEqual(
-         jasmine.objectContaining({ name: 'Bob', username: 'builder2001' }));
+         jasmine.objectContaining({ name: 'Bob', id: 'builder2001' }));
      });
     });
 
     it('uses natural ordering in name', () => {
       store.dispatch(new GetUsersSuccess({ users: [
-        { id: 'uuid-1', name: 'Alice01', username: 'alice' },
-        { id: 'uuid-2', name: 'Alice300', username: 'alice' },
-        { id: 'uuid-3', name: 'Alice3', username: 'alice' },
-        { id: 'uuid-4', name: 'Alice-2', username: 'alice' },
-        { id: 'uuid-5', name: 'alice', username: 'alice' }
+        { membership_id: 'uuid-1', name: 'Alice01', id: 'alice1', projects: [] },
+        { membership_id: 'uuid-2', name: 'Alice300', id: 'alice2', projects: [] },
+        { membership_id: 'uuid-3', name: 'Alice3', id: 'alice3', projects: [] },
+        { membership_id: 'uuid-4', name: 'Alice-2', id: 'alice4', projects: [] },
+        { membership_id: 'uuid-5', name: 'alice', id: 'alice5', projects: [] }
       ]}));
       component.sortedUsers$.subscribe(users => {
         expect(users.length).toBe(5);
@@ -157,19 +157,19 @@ describe('UserManagementComponent', () => {
 
     it('uses natural ordering in username', () => {
       store.dispatch(new GetUsersSuccess({ users: [
-        { id: 'uuid-1', name: 'Alice', username: 'Alice01' },
-        { id: 'uuid-2', name: 'Alice', username: 'Alice300' },
-        { id: 'uuid-3', name: 'Alice', username: 'Alice3' },
-        { id: 'uuid-4', name: 'Alice', username: 'Alice-2' },
-        { id: 'uuid-5', name: 'Alice', username: 'alice' }
+        { membership_id: 'uuid-1', name: 'Alice', id: 'Alice01', projects: [] },
+        { membership_id: 'uuid-2', name: 'Alice', id: 'Alice300', projects: [] },
+        { membership_id: 'uuid-3', name: 'Alice', id: 'Alice3', projects: [] },
+        { membership_id: 'uuid-4', name: 'Alice', id: 'Alice-2', projects: [] },
+        { membership_id: 'uuid-5', name: 'Alice', id: 'alice', projects: [] }
       ]}));
       component.sortedUsers$.subscribe(users => {
         expect(users.length).toBe(5);
-        expect(users[0]).toEqual(jasmine.objectContaining({ username: 'alice' }));
-        expect(users[1]).toEqual(jasmine.objectContaining({ username: 'Alice-2' }));
-        expect(users[2]).toEqual(jasmine.objectContaining({ username: 'Alice01' }));
-        expect(users[3]).toEqual(jasmine.objectContaining({ username: 'Alice3' }));
-        expect(users[4]).toEqual(jasmine.objectContaining({ username: 'Alice300' }));
+        expect(users[0]).toEqual(jasmine.objectContaining({ id: 'alice' }));
+        expect(users[1]).toEqual(jasmine.objectContaining({ id: 'Alice-2' }));
+        expect(users[2]).toEqual(jasmine.objectContaining({ id: 'Alice01' }));
+        expect(users[3]).toEqual(jasmine.objectContaining({ id: 'Alice3' }));
+        expect(users[4]).toEqual(jasmine.objectContaining({ id: 'Alice300' }));
       });
     });
 

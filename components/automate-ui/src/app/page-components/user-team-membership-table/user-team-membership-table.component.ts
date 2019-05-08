@@ -80,7 +80,7 @@ export class UserTeamMembershipTableComponent implements OnInit, OnDestroy {
   }
 
   public userNotFiltered(user: User): boolean {
-    return !(user.id in this.mapOfUsersToFilter);
+    return !(user.membership_id in this.mapOfUsersToFilter);
   }
 
   public usersNotFiltered(): User[] {
