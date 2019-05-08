@@ -90,8 +90,8 @@ describe('ReportingComponent', () => {
         {
           'name': 'control',
           'title': 'Control',
-          'description': 'Add the ID to filter this report against a control',
-          'placeholder': 'ID'
+          'description': 'Add the title to filter this report against a control',
+          'placeholder': 'Title'
         },
         {
           'name': 'role',
