@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserTeamMembershipTableComponent } from './user-team-membership-table.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
-import { User, userHashToArray } from 'app/entities/users/user.model';
+import { User, userHashToArray, userArrayToHash } from 'app/entities/users/user.model';
 import { StoreModule } from '@ngrx/store';
 import { userEntityReducer } from 'app/entities/users/user.reducer';
 import * as faker from 'faker';
@@ -114,15 +114,14 @@ describe('UserTeamMembershipTableComponent', () => {
 
     describe('when usersToFilter is not empty', () => {
       const kuzkoID = faker.random.uuid();
+      const kuzko = <User>{
+        membership_id: kuzkoID,
+        name: 'Brock Samson',
+        id: 'kuzko'
+      };
 
       beforeEach(() => {
-        component.mapOfUsersToFilter = {};
-        component.mapOfUsersToFilter[userAlreadyInList.membership_id] = userAlreadyInList;
-        component.mapOfUsersToFilter[kuzkoID] = {
-          membership_id: kuzkoID,
-          name: 'Brock Samson',
-          id: 'kuzko'
-        };
+        component.mapOfUsersToFilter = userArrayToHash([userAlreadyInList, kuzko]);
       });
 
       describe('when user is in the list to filter', () => {

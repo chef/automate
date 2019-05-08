@@ -39,8 +39,7 @@ function convertUserV1ToUser(user: UserV1): User {
   return {
     id: user.username,
     name: user.name,
-    membership_id: user.id,
-    projects: [] // TODO add real projects
+    membership_id: user.id
   };
 }
 
