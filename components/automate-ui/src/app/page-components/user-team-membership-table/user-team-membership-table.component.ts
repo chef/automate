@@ -39,7 +39,7 @@ export class UserTeamMembershipTableComponent implements OnInit, OnDestroy {
         (a, b) => {
           // See https://stackoverflow.com/a/38641281 for these options
           const opts = { numeric: true, sensitivity: 'base' };
-          // sort by name then by username
+          // sort by name then by id
           return a.name.localeCompare(b.name, undefined, opts) ||
             a.name.localeCompare(b.name, undefined, { numeric: true}) ||
             a.id.localeCompare(b.id, undefined, opts);

@@ -96,8 +96,8 @@ describe('TeamDetailsComponent', () => {
     it('intermixes capitals and lowercase with lowercase first', () => {
       store.dispatch(new GetTeamUsersSuccess({ user_ids: ['user-id-1', 'user-id-2'] }));
       store.dispatch(new GetUsersSuccess({ users: [
-        { membership_id: 'user-id-1', name: 'Alice', id: 'alice1', projects: [] },
-        { membership_id: 'user-id-2', name: 'alice', id: 'alice2', projects: [] }
+        { membership_id: 'user-id-1', name: 'Alice', id: 'alice1' },
+        { membership_id: 'user-id-2', name: 'alice', id: 'alice2' }
       ]}));
       component.sortedUsers$.subscribe(users => {
         expect(users.length).toBe(2);
@@ -111,9 +111,9 @@ describe('TeamDetailsComponent', () => {
         user_ids: ['user-id-1', 'user-id-20', 'user-id-2']
       }));
       store.dispatch(new GetUsersSuccess({ users: [
-        { membership_id: 'user-id-1', name: 'alice in wonderland', id: 'alice1', projects: [] },
-        { membership_id: 'user-id-20', name: 'alice', id: 'alice2', projects: [] },
-        { membership_id: 'user-id-2', name: 'Alice', id: 'alice3', projects: [] }
+        { membership_id: 'user-id-1', name: 'alice in wonderland', id: 'alice1' },
+        { membership_id: 'user-id-20', name: 'alice', id: 'alice2' },
+        { membership_id: 'user-id-2', name: 'Alice', id: 'alice3' }
       ]}));
       component.sortedUsers$.subscribe(users => {
         expect(users.length).toBe(3);
@@ -127,10 +127,10 @@ describe('TeamDetailsComponent', () => {
       store.dispatch(new GetTeamUsersSuccess({
         user_ids: ['user-id-22', 'user-id-1', 'user-id-20', 'user-id-2'] }));
       store.dispatch(new GetUsersSuccess({ users: [
-       { membership_id: 'user-id-22', name: 'Bob', id: 'builder2001', projects: [] },
-       { membership_id: 'user-id-2', name: 'Bob', id: 'builder2000', projects: [] },
-       { membership_id: 'user-id-1', name: 'Alice in Wonderland', id: 'alice', projects: [] },
-       { membership_id: 'user-id-20', name: 'alice', id: 'the-other-alice', projects: [] }
+       { membership_id: 'user-id-22', name: 'Bob', id: 'builder2001' },
+       { membership_id: 'user-id-2', name: 'Bob', id: 'builder2000' },
+       { membership_id: 'user-id-1', name: 'Alice in Wonderland', id: 'alice' },
+       { membership_id: 'user-id-20', name: 'alice', id: 'the-other-alice' }
      ]}));
      component.sortedUsers$.subscribe(users => {
        expect(users.length).toBe(4);
@@ -147,11 +147,11 @@ describe('TeamDetailsComponent', () => {
       store.dispatch(new GetTeamUsersSuccess({
         user_ids: ['user-id-1', 'user-id-2', 'user-id-3', 'user-id-4', 'user-id-5'] }));
       store.dispatch(new GetUsersSuccess({ users: [
-        { membership_id: 'user-id-1', name: 'Alice01', id: 'alice1', projects: [] },
-        { membership_id: 'user-id-2', name: 'Alice300', id: 'alice2', projects: [] },
-        { membership_id: 'user-id-3', name: 'Alice3', id: 'alice3', projects: [] },
-        { membership_id: 'user-id-4', name: 'Alice-2', id: 'alice4', projects: [] },
-        { membership_id: 'user-id-5', name: 'alice', id: 'alice5', projects: [] }
+        { membership_id: 'user-id-1', name: 'Alice01', id: 'alice1' },
+        { membership_id: 'user-id-2', name: 'Alice300', id: 'alice2' },
+        { membership_id: 'user-id-3', name: 'Alice3', id: 'alice3' },
+        { membership_id: 'user-id-4', name: 'Alice-2', id: 'alice4' },
+        { membership_id: 'user-id-5', name: 'alice', id: 'alice5' }
       ]}));
       component.sortedUsers$.subscribe(users => {
         expect(users.length).toBe(5);
@@ -167,11 +167,11 @@ describe('TeamDetailsComponent', () => {
       store.dispatch(new GetTeamUsersSuccess({
         user_ids: ['user-id-1', 'user-id-2', 'user-id-3', 'user-id-4', 'user-id-5'] }));
       store.dispatch(new GetUsersSuccess({ users: [
-        { membership_id: 'user-id-1', name: 'Alice', id: 'Alice01', projects: [] },
-        { membership_id: 'user-id-2', name: 'Alice', id: 'Alice300', projects: [] },
-        { membership_id: 'user-id-3', name: 'Alice', id: 'Alice3', projects: [] },
-        { membership_id: 'user-id-4', name: 'Alice', id: 'Alice-2', projects: [] },
-        { membership_id: 'user-id-5', name: 'Alice', id: 'alice', projects: [] }
+        { membership_id: 'user-id-1', name: 'Alice', id: 'Alice01' },
+        { membership_id: 'user-id-2', name: 'Alice', id: 'Alice300' },
+        { membership_id: 'user-id-3', name: 'Alice', id: 'Alice3' },
+        { membership_id: 'user-id-4', name: 'Alice', id: 'Alice-2' },
+        { membership_id: 'user-id-5', name: 'Alice', id: 'alice' }
       ]}));
       component.sortedUsers$.subscribe(users => {
         expect(users.length).toBe(5);

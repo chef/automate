@@ -1,10 +1,9 @@
-import { catchError, mergeMap, map, filter } from 'rxjs/operators';
+import { catchError, mergeMap, map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of, combineLatest } from 'rxjs';
-import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { CreateNotification } from '../notifications/notification.actions';
@@ -47,7 +46,7 @@ export class UserEffects {
   @Effect()
   getUsers$ = combineLatest(
     this.actions$.pipe(ofType<GetUsers>(UserActionTypes.GET_ALL)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion))
     .pipe(
       mergeMap(([_action, version]) =>
         this.requests.getUsers(version).pipe(
@@ -69,7 +68,7 @@ export class UserEffects {
   @Effect()
   getUser$ = combineLatest(
     this.actions$.pipe(ofType<GetUser>(UserActionTypes.GET)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion))
     .pipe(
       mergeMap(([action, version]) =>
         this.requests.getUser(action.payload.id, version).pipe(
@@ -90,7 +89,7 @@ export class UserEffects {
   @Effect()
   updateUser$ = combineLatest(
     this.actions$.pipe(ofType<UpdateUser>(UserActionTypes.UPDATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion))
     .pipe(
       mergeMap(([action, version]) =>
       this.requests.updateUser(action.payload, version).pipe(
@@ -119,7 +118,7 @@ export class UserEffects {
   @Effect()
   updateSelf$ = combineLatest(
     this.actions$.pipe(ofType<UpdateSelf>(UserActionTypes.UPDATE_SELF)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion))
     .pipe(
       mergeMap(([action, version]) =>
       this.requests.updateSelf(action.payload, version).pipe(
@@ -137,7 +136,7 @@ export class UserEffects {
   @Effect()
   deleteUser$ = combineLatest(
     this.actions$.pipe(ofType<DeleteUser>(UserActionTypes.DELETE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion))
     .pipe(
       mergeMap(([action, version]) =>
       this.requests.deleteUser(action.payload, version).pipe(
@@ -166,7 +165,7 @@ export class UserEffects {
   @Effect()
   createUser$ = combineLatest(
     this.actions$.pipe(ofType<CreateUser>(UserActionTypes.CREATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion))
     .pipe(
       mergeMap(([action, version]) =>
       this.requests.createUser(action.payload, version).pipe(

@@ -74,11 +74,9 @@ export class UserRequests {
       }
       default: {
         return this.http.get(`${env.auth_url}/users`).pipe(map((usersResponse: UsersResponseV1) => {
-          const list: Array<User> = [];
-          usersResponse.users.forEach((user: UserV1) => list.push(convertUserV1ToUser(user)));
-            return <UsersResponse>{
-              users: list
-            };
+          return <UsersResponse>{
+            users: usersResponse.users.map((user: UserV1) => convertUserV1ToUser(user))
+          };
         }));
       }
     }

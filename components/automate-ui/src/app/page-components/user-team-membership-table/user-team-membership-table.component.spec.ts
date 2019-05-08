@@ -13,8 +13,7 @@ describe('UserTeamMembershipTableComponent', () => {
   const userAlreadyInList = <User>{
     membership_id: faker.random.uuid(),
     name: 'Hank Venture',
-    id: 'enrico_matasa',
-    projects: []
+    id: 'enrico_matasa'
   };
 
   beforeEach(() => {
@@ -48,8 +47,7 @@ describe('UserTeamMembershipTableComponent', () => {
     const testUserToAddOrRemove = <User>{
       membership_id: 'c39d5157-4198-478b-b75c-c2a77ac0ffa8',
       name: 'Dean Venture',
-      id: 'deanie',
-      projects: []
+      id: 'deanie'
     };
 
     describe('when usersToAdd is empty', () => {
@@ -70,8 +68,7 @@ describe('UserTeamMembershipTableComponent', () => {
           'kuzko': {
             membership_id: 'c39d5157-4198-478b-b75c-c2a77ac0ffa8',
             name: 'Brock Samson',
-            id: 'kuzko',
-            projects: []
+            id: 'kuzko'
           }
         };
       });
@@ -101,8 +98,7 @@ describe('UserTeamMembershipTableComponent', () => {
     const testUserToFilter = <User>{
       membership_id: faker.random.uuid(),
       name: 'Dean Venture',
-      id: 'deanie',
-      projects: []
+      id: 'deanie'
     };
 
     describe('when usersToFilter is empty', () => {
@@ -125,8 +121,7 @@ describe('UserTeamMembershipTableComponent', () => {
         component.mapOfUsersToFilter[kuzkoID] = {
           membership_id: kuzkoID,
           name: 'Brock Samson',
-          id: 'kuzko',
-          projects: []
+          id: 'kuzko'
         };
       });
 
@@ -143,8 +138,7 @@ describe('UserTeamMembershipTableComponent', () => {
           otherUser = {
             membership_id: '119d5157-4198-478b-b75c-c2a77ac0ff11',
             name: 'Montag the Dog',
-            id: 'taggerbot9000',
-            projects: []
+            id: 'taggerbot9000'
           };
         });
 
@@ -163,8 +157,7 @@ describe('UserTeamMembershipTableComponent', () => {
     const kuzko = {
       membership_id: kuzkoID,
       name: 'Brock Samson',
-      id: 'kuzko',
-      projects: []
+      id: 'kuzko'
     };
 
     describe('when both mapOfUsersToFilter and input users are empty', () => {
@@ -210,8 +203,7 @@ describe('UserTeamMembershipTableComponent', () => {
         const otherUser = {
           membership_id: faker.random.uuid(),
           name: 'Montag the Dog',
-          id: 'taggerbot9000',
-          projects: []
+          id: 'taggerbot9000'
         };
 
         component.mapOfUsersToFilter = {};

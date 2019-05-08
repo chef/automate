@@ -34,14 +34,12 @@ describe('userStatusEntityReducer', () => {
   const user: User = {
     id: 'test',
     name: 'test user',
-    membership_id: 'a953c5bb-82a5-41be-b7dd-a5de1ea53ada',
-    projects: []
+    membership_id: 'a953c5bb-82a5-41be-b7dd-a5de1ea53ada'
   };
   const user2: User = {
     id: 'test2',
     name: 'test user2',
-    membership_id: 'b953c5bb-82a5-41be-b7dd-a5de1ea53ada',
-    projects: []
+    membership_id: 'b953c5bb-82a5-41be-b7dd-a5de1ea53ada'
   };
   const users: GetUsersSuccessPayload = {
     users: [ user, user2 ]
@@ -111,7 +109,7 @@ describe('userStatusEntityReducer', () => {
       });
     });
 
-    describe('GET_BY_USERNAME', () => {
+    describe('GET', () => {
       const payload = { id: 'test' };
       const action = new GetUser(payload);
 

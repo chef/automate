@@ -33,8 +33,7 @@ describe('UserDetailsComponent', () => {
   const user: User = {
     name: 'Alice Schmidt',
     id: 'alice',
-    membership_id: '6e98f609-586d-4816-a6de-e841e659b11d',
-    projects: []
+    membership_id: '6e98f609-586d-4816-a6de-e841e659b11d'
   };
 
   const initialState = {
