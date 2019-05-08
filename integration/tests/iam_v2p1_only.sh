@@ -41,5 +41,27 @@ do_deploy() {
 do_test_deploy() {
     log_info "run chef-automate iam upgrade-to-v2 --beta2.1"
     chef-automate iam upgrade-to-v2 --beta2.1 || return 1
+
+    remove_legacy_policies
+
     do_test_deploy_default
+}
+
+remove_legacy_policies() {
+    local token=$(chef-automate iam token create ADMIN_TEST --admin)
+    local legacy_policies=(secrets-access-legacy
+            events-access-legacy
+            infrastructure-automation-access-legacy
+            compliance-access-legacy
+            nodes-access-legacy
+            compliance-profile-access-legacy
+            ingest-access-legacy
+            node-managers-access-legacy
+            telemetry-access-legacy)
+
+    for id in "${legacy_policies[@]}"
+    do
+        echo "Deleting legacy policy $id..."
+        curl -sSkH "api-token: $TOK" -X DELETE https://localhost/apis/iam/v2beta/policies/$id
+    done
 }
