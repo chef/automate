@@ -16,24 +16,15 @@ CREATE TABLE recurring_workflow_schedules (
 
 CREATE TABLE workflow_instances (
     id BIGSERIAL PRIMARY KEY,
-    name TEXT UNIQUE,
+    name TEXT NOT NULL,
     workflow_name TEXT NOT NULL,
     parameters JSON,
     payload JSON,
 
-    enqueued_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT say_my_name1 UNIQUE(name, workflow_name)
 );
-
-
-
-/* CREATE TABLE workflow_events (
-    -- TaskComplete()
-    event_type
-    workflow_instance_id
-    task_result_id
-);
- */
 
 CREATE TYPE task_status AS ENUM('success', 'failed', 'abandoned');
 
@@ -59,6 +50,64 @@ CREATE TABLE tasks_results (
     error        TEXT,
     result       JSON
 );
+
+CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete');
+
+CREATE TABLE workflow_events (
+    id BIGSERIAL PRIMARY KEY,
+    event_type workflow_event_type NOT NULL,
+    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id),
+    enqueued_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    -- task_complete members
+    task_result_id BIGINT REFERENCES tasks_results(id)
+);
+
+-- 
+
+CREATE OR REPLACE FUNCTION enqueue_workflow(
+    name TEXT,
+    workflow_name TEXT,
+    parameters JSON)
+RETURNS VOID
+AS $$
+    WITH winst AS (
+        INSERT INTO workflow_instances(name, workflow_name, parameters)
+            VALUES(name, workflow_name, parameters)
+            RETURNING id
+        )
+    INSERT INTO workflow_events(event_type, workflow_instance_id) 
+        VALUES('start', (select id from winst));
+    SELECT pg_notify('workflow_instance_new', workflow_name);
+$$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION dequeue_workflow(workflow_names TEXT)
+RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT, 
+    parameters JSON, payload JSON, event_id BIGINT, event_type workflow_event_type,
+    task_result_id BIGINT)
+AS $$
+    WITH nextwinst AS (
+        SELECT 
+            a.id id,
+            a.name instance_name,
+            a.workflow_name workflow_name, 
+            a.parameters parameters, 
+            a.payload payload, 
+            b.id event_id, 
+            b.event_type event_type, 
+            b.task_result_id task_result_id
+        FROM workflow_instances a 
+        INNER JOIN workflow_events b ON a.id = b.workflow_instance_id 
+        WHERE a.workflow_name = workflow_names
+        ORDER BY b.enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
+    ),
+    updated AS (
+        UPDATE workflow_instances w1 SET updated_at = NOW()
+        WHERE w1.id = (
+            SELECT id FROM nextwinst
+        )
+    )
+    SELECT * from nextwinst
+$$ LANGUAGE SQL;
 
 
 -- Notification channels
