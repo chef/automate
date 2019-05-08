@@ -6,7 +6,7 @@ import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
+import { routeParams, routeURL } from 'app/route.selectors';
 import { EntityStatus } from 'app/entities/entities';
 import { User, HashMapOfUsers } from 'app/entities/users/user.model';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
@@ -31,6 +31,7 @@ import {
 
 // NB: neither \S nor ^\s work inside the brackets in this regex language.
 const NON_BLANK = '.*[^ ].*';
+const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
 @Component({
   selector: 'app-team-details',
@@ -122,7 +123,17 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed))
       .subscribe((id: string) => {
-        this.store.dispatch(new GetTeam({ id }));
+        this.store.select(routeURL).pipe(
+          filter(identity),
+          takeUntil(this.isDestroyed))
+          .subscribe((url: string) => {
+            // Only fetch if we are on the team details route, otherwise
+            // we'll trigger GetTeam with the wrong input on any route
+            // away to a page that also uses the :id param.
+            if (TEAM_DETAILS_ROUTE.test(url)) {
+              this.store.dispatch(new GetTeam({ id }));
+            }
+          });
       });
 
     this.store.select(updateStatus).pipe(

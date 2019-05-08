@@ -21,9 +21,9 @@ import {
   GetUsersSuccess,
   GetUsersSuccessPayload,
   GetUsersFailure,
-  GetUserByUsername,
-  GetUserByUsernameSuccess,
-  GetUserByUsernameFailure,
+  GetUser,
+  GetUserSuccess,
+  GetUserFailure,
   UpdateUser,
   UpdateUserSuccess,
   UpdateUserFailure,
@@ -67,19 +67,19 @@ export class UserEffects {
 
   // TODO rename
   @Effect()
-  getUserByUsername$ = combineLatest(
-    this.actions$.pipe(ofType<GetUserByUsername>(UserActionTypes.GET_BY_USERNAME)),
+  getUser$ = combineLatest(
+    this.actions$.pipe(ofType<GetUser>(UserActionTypes.GET)),
     this.store$.select(iamMajorVersion).pipe(filter(identity)))
     .pipe(
       mergeMap(([action, version]) =>
         this.requests.getUser(action.payload.id, version).pipe(
-          map((resp: User) => new GetUserByUsernameSuccess(resp)),
-          catchError((error: HttpErrorResponse) => of(new GetUserByUsernameFailure(error))))));
+          map((resp: User) => new GetUserSuccess(resp)),
+          catchError((error: HttpErrorResponse) => of(new GetUserFailure(error))))));
 
   @Effect()
-  getUserByUsernameFailure$ = this.actions$.pipe(
-    ofType(UserActionTypes.GET_BY_USERNAME_FAILURE),
-    map(({ payload: { error } }: GetUserByUsernameFailure) => {
+  getUserFailure$ = this.actions$.pipe(
+    ofType(UserActionTypes.GET),
+    map(({ payload: { error } }: GetUserFailure) => {
       const msg = error.error;
       return new CreateNotification({
         type: Type.error,

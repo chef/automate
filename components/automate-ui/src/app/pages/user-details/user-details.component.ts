@@ -12,7 +12,7 @@ import { routeParams } from 'app/route.selectors';
 import { EntityStatus } from 'app/entities/entities';
 import {
   DeleteUser,
-  GetUserByUsername,
+  GetUser,
   UpdateUser,
   UpdateSelf
  } from 'app/entities/users/user.actions';
@@ -98,7 +98,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         pluck('id'),
         filter(identity))
         .subscribe((id: string) => {
-          store.dispatch(new GetUserByUsername({id}));
+          store.dispatch(new GetUser({id}));
         }),
 
       // if the user is gone, go back to list

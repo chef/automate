@@ -32,14 +32,14 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
     case UserActionTypes.GET_ALL_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);
 
-    case UserActionTypes.GET_BY_USERNAME:
+    case UserActionTypes.GET:
       return set('status', EntityStatus.loading, state);
 
-    case UserActionTypes.GET_BY_USERNAME_SUCCESS:
+    case UserActionTypes.GET_SUCCESS:
       return set('status', EntityStatus.loadingSuccess,
         userEntityAdapter.addOne(action.payload, state));
 
-    case UserActionTypes.GET_BY_USERNAME_FAILURE:
+    case UserActionTypes.GET_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);
 
     case UserActionTypes.UPDATE:
