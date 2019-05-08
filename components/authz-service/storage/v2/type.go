@@ -28,8 +28,9 @@ const (
 	Custom Type = iota
 	// ChefManaged represents a policy created by Chef Software.
 	ChefManaged
-	// System represents a policy that is only loaded directly into OPA to allow Automate to function correctly 
-	// without revealing Automate's internal policies to the customer
+	// System represents a policy that is only loaded directly into OPA
+	// to allow Automate to function correctly without revealing Automate's
+	// internal policies to the customer
 	// This type is only used in the OPA cache (not in API or database)
 	System
 )

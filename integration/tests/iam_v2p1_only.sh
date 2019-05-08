@@ -62,6 +62,6 @@ remove_legacy_policies() {
     for id in "${legacy_policies[@]}"
     do
         echo "Deleting legacy policy $id..."
-        curl -sSkH "api-token: $TOK" -X DELETE https://localhost/apis/iam/v2beta/policies/$id
+        curl -sSkH "api-token: $token" -X DELETE https://localhost/apis/iam/v2beta/policies/$id
     done
 }
