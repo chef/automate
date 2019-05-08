@@ -6,7 +6,7 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "scan_jobs"
+    parent = "compliance"
     weight = 10
 +++
 

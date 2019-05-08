@@ -76,11 +76,6 @@ identifier = "compliance"
 url = "/docs/compliance"
 
 [[menu.docs]]
-name = "Scan Jobs"
-weight = 70
-identifier = "scan_jobs"
-
-[[menu.docs]]
 name = "Asset Store"
 weight = 80
 identifier = "asset-store"

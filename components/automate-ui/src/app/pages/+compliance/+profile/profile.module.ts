@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 import { ChefComponentsModule } from '../../../components/chef-components.module';
 import { ComplianceSharedModule } from '../shared/shared.module';
 import { ProfileDetailsComponent } from './+profile-details/profile-details.component';
-import { ProfileSidebarComponent } from './+profile-sidebar/profile-sidebar.component';
 import { ProfileOverviewComponent } from './+profile-overview/profile-overview.component';
 import { ProfileRoutingModule } from './profile.routing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
@@ -19,12 +18,10 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
   ],
   declarations: [
     ProfileDetailsComponent,
-    ProfileSidebarComponent,
     ProfileOverviewComponent
   ],
   exports: [
     ProfileDetailsComponent,
-    ProfileSidebarComponent,
     ProfileOverviewComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

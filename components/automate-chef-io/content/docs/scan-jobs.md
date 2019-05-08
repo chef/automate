@@ -1,5 +1,5 @@
 +++
-title = "Chef Automate Scan Jobs"
+title = "Scan Jobs"
 description = "Add a new compliance scan job or modify and existing one"
 date = 2018-03-26T16:02:35-07:00
 draft = false
@@ -7,11 +7,11 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "scan_jobs"
+    parent = "compliance"
     weight = 10
 +++
 
-## About Scan Jobs in Chef Automate
+## Overview
 
 A scan job is the equivalent of running `inspec exec` against a given set of targets.  The results of a scan job are sent to compliance reporting. Any profiles installed to the user's namespace may be used in a scan job.
 
