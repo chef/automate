@@ -50,15 +50,9 @@ func (es *Backend) UpdateProjectTags(ctx context.Context, projectTaggingRules ma
 		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Node project tags update")
 	}
 
-	esActionJobID, err := es.UpdateActionProjectTags(ctx, projectTaggingRules)
-	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch action project tags update")
-	}
+	logrus.Debugf("Started Project rule updates with node job ID: %q", esNodeJobID)
 
-	logrus.Debugf("Started Project rule updates with report job ID: %q and summary job ID %q",
-		esNodeJobID, esActionJobID)
-
-	return []string{esNodeJobID, esActionJobID}, nil
+	return []string{esNodeJobID}, nil
 }
 
 func (es *Backend) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
