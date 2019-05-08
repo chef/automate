@@ -22,17 +22,17 @@
           <chef-table>
             <chef-tr>
               <chef-th>
-                <chef-icon>schedule</chef-icon> Last Scan
+                Last Scan
               </chef-th>
               <chef-td>{{ formatDate(activeReport.end_time) }}</chef-td>
               <chef-th>
-                <chef-icon>storage</chef-icon> Platform
+                Platform
               </chef-th>
               <chef-td>{{ activeReport.platform.name }} {{ activeReport.platform.release }}</chef-td>
             </chef-tr>
             <chef-tr>
               <chef-th>
-                <chef-icon>description</chef-icon> Profiles
+                Profiles
               </chef-th>
               <chef-td>
                 {{ activeReport.profiles.length | number }} Profiles
@@ -49,13 +49,13 @@
                 </ng-container>
               </chef-td>
               <chef-th>
-                <chef-icon>public</chef-icon> Environment
+                Environment
               </chef-th>
               <chef-td>{{ activeReport.environment }}</chef-td>
             </chef-tr>
             <chef-tr>
               <chef-th>
-                <chef-icon>public</chef-icon> Inspec Version
+                Inspec Version
               </chef-th>
               <chef-td>{{ activeReport.version }}</chef-td>
               <chef-th></chef-th>
