@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/chef/automate/api/interservice/ingest"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	base_config "github.com/chef/automate/lib/config"
 	toml "github.com/pelletier/go-toml"
 	log "github.com/sirupsen/logrus"
@@ -27,11 +28,6 @@ const (
 	DeleteNodes int = iota
 	NodesMissing
 	MissingNodesForDeletion
-)
-
-const (
-	RunningState    = "running"
-	NotRunningState = "not_running"
 )
 
 // List of jobs
@@ -94,13 +90,6 @@ type JobSchedulerConfig struct {
 	Running bool `toml:"running"`
 }
 
-// ProjectUpdateConfig - the config for project updating
-type ProjectUpdateConfig struct {
-	State           string `toml:"state"`
-	ProjectUpdateID string `toml:"project_update_id"`
-	EsJobID         string `toml:"es_job_id"`
-}
-
 func defaultConfig() aggregateConfig {
 	return aggregateConfig{
 		JobSchedulerConfig: JobSchedulerConfig{
@@ -126,8 +115,8 @@ func defaultConfig() aggregateConfig {
 				Running:   true,
 			},
 		},
-		ProjectUpdateConfig: ProjectUpdateConfig{
-			State: NotRunningState,
+		ProjectUpdateConfig: project_update_lib.ProjectUpdateConfig{
+			State: project_update_lib.NotRunningState,
 		},
 	}
 }
@@ -139,9 +128,9 @@ type Manager struct {
 
 // Config - stores the configuration for the service
 type aggregateConfig struct {
-	JobsConfig          []JobConfig         `toml:"jobs_config"`
-	JobSchedulerConfig  JobSchedulerConfig  `toml:"job_scheduler_config"`
-	ProjectUpdateConfig ProjectUpdateConfig `toml:"project_update_config"`
+	JobsConfig          []JobConfig                            `toml:"jobs_config"`
+	JobSchedulerConfig  JobSchedulerConfig                     `toml:"job_scheduler_config"`
+	ProjectUpdateConfig project_update_lib.ProjectUpdateConfig `toml:"project_update_config"`
 }
 
 // NewManager - create a new config. There should only be one config for the service.
@@ -184,12 +173,12 @@ func (manager *Manager) UpdateJobSchedulerConfig(jobSchedulerConfig JobScheduler
 }
 
 // GetProjectUpdateConfig - get the project update config data
-func (manager *Manager) GetProjectUpdateConfig() ProjectUpdateConfig {
+func (manager *Manager) GetProjectUpdateConfig() project_update_lib.ProjectUpdateConfig {
 	return manager.getConfig().ProjectUpdateConfig
 }
 
 // UpdateProjectUpdateConfig - update the project update config
-func (manager *Manager) UpdateProjectUpdateConfig(projectUpdateConfig ProjectUpdateConfig) error {
+func (manager *Manager) UpdateProjectUpdateConfig(projectUpdateConfig project_update_lib.ProjectUpdateConfig) error {
 	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.ProjectUpdateConfig = projectUpdateConfig
 		return config, nil

@@ -4,27 +4,16 @@ import (
 	"io/ioutil"
 	"os"
 
+	project_update_lib "github.com/chef/automate/lib/authz"
 	base_config "github.com/chef/automate/lib/config"
 	toml "github.com/pelletier/go-toml"
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	RunningState    = "running"
-	NotRunningState = "not_running"
-)
-
-// ProjectUpdateConfig - the config for project updating
-type ProjectUpdateConfig struct {
-	State           string   `toml:"state"`
-	ProjectUpdateID string   `toml:"project_update_id"`
-	EsJobIDs        []string `toml:"es_job_ids"`
-}
-
 func defaultConfig() aggregateConfig {
 	return aggregateConfig{
-		ProjectUpdateConfig: ProjectUpdateConfig{
-			State: NotRunningState,
+		ProjectUpdateConfig: project_update_lib.ProjectUpdateConfig{
+			State: project_update_lib.NotRunningState,
 		},
 	}
 }
@@ -36,7 +25,7 @@ type ConfigManager struct {
 
 // Config - stores the configuration for the service
 type aggregateConfig struct {
-	ProjectUpdateConfig ProjectUpdateConfig `toml:"project_update_config"`
+	ProjectUpdateConfig project_update_lib.ProjectUpdateConfig `toml:"project_update_config"`
 }
 
 // NewConfigManager - create a new config. There should only be one config for the service.
@@ -66,7 +55,7 @@ func (manager *ConfigManager) Close() {
 }
 
 // GetProjectUpdateConfig - get project update config
-func (manager *ConfigManager) GetProjectUpdateConfig() ProjectUpdateConfig {
+func (manager *ConfigManager) GetProjectUpdateConfig() project_update_lib.ProjectUpdateConfig {
 	aggregateConfig, ok := manager.baseConfigManager.Config.(aggregateConfig)
 	if !ok {
 		log.Error("baseConfigManager.Config is not of type 'aggregateConfig'")
@@ -76,7 +65,7 @@ func (manager *ConfigManager) GetProjectUpdateConfig() ProjectUpdateConfig {
 }
 
 // UpdateProjectUpdateConfig - update the project update config
-func (manager *ConfigManager) UpdateProjectUpdateConfig(projectUpdateConfig ProjectUpdateConfig) error {
+func (manager *ConfigManager) UpdateProjectUpdateConfig(projectUpdateConfig project_update_lib.ProjectUpdateConfig) error {
 	return manager.updateConfig(func(config aggregateConfig) (aggregateConfig, error) {
 		config.ProjectUpdateConfig = projectUpdateConfig
 		return config, nil
