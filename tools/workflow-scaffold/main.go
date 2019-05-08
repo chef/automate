@@ -18,6 +18,8 @@ var opts = struct {
 }{}
 
 var perfTestOpts struct {
+	EnqueueOnly        bool
+	DequeueOnly        bool
 	EnqueueWorkerCount int
 	DequeueWorkerCount int
 	TaskCount          int
@@ -62,6 +64,18 @@ func main() {
 		"dequeue-worker-count",
 		10,
 		"Number of workers to dequeue tasks")
+
+	perfTestCmd.PersistentFlags().BoolVar(
+		&perfTestOpts.EnqueueOnly,
+		"enqueue-only",
+		false,
+		"Whether to only run the enqueing test")
+
+	perfTestCmd.PersistentFlags().BoolVar(
+		&perfTestOpts.DequeueOnly,
+		"dequeue-only",
+		false,
+		"Whether to only run the de-enqueing test (requests a full queue)")
 
 	perfTestCmd.PersistentFlags().IntVar(
 		&perfTestOpts.TaskCount,
@@ -143,13 +157,17 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 	dequeueResultChan := make(chan error, 100)
 	doneChan := make(chan struct{})
 
-	perWorkerTaskCount := perfTestOpts.TaskCount / perfTestOpts.EnqueueWorkerCount
-	for i := 0; i < perfTestOpts.EnqueueWorkerCount; i++ {
-		go enqueueWorker(w, i, perWorkerTaskCount, enqueueResultChan)
+	if !perfTestOpts.DequeueOnly {
+		perWorkerTaskCount := perfTestOpts.TaskCount / perfTestOpts.EnqueueWorkerCount
+		for i := 0; i < perfTestOpts.EnqueueWorkerCount; i++ {
+			go enqueueWorker(w, i, perWorkerTaskCount, enqueueResultChan)
+		}
 	}
 
-	for i := 0; i < perfTestOpts.DequeueWorkerCount; i++ {
-		go dequeueWorker(w, i, dequeueResultChan, doneChan)
+	if !perfTestOpts.EnqueueOnly {
+		for i := 0; i < perfTestOpts.DequeueWorkerCount; i++ {
+			go dequeueWorker(w, i, dequeueResultChan, doneChan)
+		}
 	}
 
 	startTime := time.Now()
@@ -162,6 +180,7 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 		dequeueSuccesses int
 		dequeueErrors    int
 	}{}
+	doneClosed := false
 	for {
 		select {
 		case enRes := <-enqueueResultChan:
@@ -175,9 +194,6 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 				logrus.Infof("enqueue status -- %d attempts (%d success, %d failures) in %f seconds",
 					stats.enqueueTotal, stats.enqueueSuccesses, stats.enqueueErrors, time.Since(startTime).Seconds())
 			}
-			if (stats.enqueueSuccesses) == perfTestOpts.TaskCount {
-				close(doneChan)
-			}
 		case deRes := <-dequeueResultChan:
 			stats.dequeueTotal++
 			if deRes == nil {
@@ -189,10 +205,18 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 				logrus.Infof("dequeue status -- %d attempts (%d success, %d failures) in %f seconds",
 					stats.dequeueTotal, stats.dequeueSuccesses, stats.dequeueErrors, time.Since(startTime).Seconds())
 			}
-			if (stats.dequeueSuccesses) == perfTestOpts.TaskCount {
-				logrus.Infof("All %d tasks enqueued and dequeued in %f seconds, exiting", perfTestOpts.TaskCount, time.Since(startTime).Seconds())
-				return nil
+		}
+
+		if stats.enqueueSuccesses == perfTestOpts.TaskCount || stats.dequeueSuccesses == perfTestOpts.TaskCount {
+			if !doneClosed {
+				close(doneChan)
+				doneClosed = true
 			}
+		}
+
+		if (stats.dequeueSuccesses == perfTestOpts.TaskCount) || (perfTestOpts.EnqueueOnly && stats.enqueueSuccesses == perfTestOpts.TaskCount) {
+			logrus.Infof("All %d tasks enqueued/dequeued in %f seconds, exiting", perfTestOpts.TaskCount, time.Since(startTime).Seconds())
+			return nil
 		}
 	}
 
@@ -229,7 +253,9 @@ func dequeueWorker(w workflow.Backend, workerID int, dequeueResultChan chan erro
 	})
 	logctx.Info("starting dequeue worker")
 	for {
+		dequeueStart := time.Now()
 		_, taskCompleter, err := w.DequeueTask(context.TODO(), "test task")
+		logctx.WithField("duration", time.Since(dequeueStart)).Debug("DequeueTask")
 		if err != nil {
 			if err == workflow.ErrNoTasks {
 				select {
@@ -246,7 +272,9 @@ func dequeueWorker(w workflow.Backend, workerID int, dequeueResultChan chan erro
 			}
 			continue
 		}
+		completerStart := time.Now()
 		err = taskCompleter.Succeed("")
+		logctx.WithField("duration", time.Since(completerStart)).Debug("Succeed")
 		if err != nil {
 			logctx.WithError(err).Error("failed to complete task")
 			dequeueResultChan <- err
