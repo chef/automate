@@ -104,7 +104,11 @@ defmodule Notifications.Config do
   def ssl_options_no_auth do
     [ssl: [
       cacertfile: get_value("EXTERNAL_PG_ROOT_CA_CERT", nil),
-      verify: :verify_none,
+      # server_name_indication is set to disable to match the verify-ca
+      # option that we use in the go code to connect to postgres. It both
+      # disables sni and hostname verification
+      server_name_indication: :disable,
+      verify: :verify_peer,
       versions: [:'tlsv1.2'],
     ]]
   end
