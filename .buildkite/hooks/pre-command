@@ -8,6 +8,9 @@ set -eu
 echo "Fetching origin/master"
 git fetch origin master
 
+# DEBUGGING FOR RELENG
+# Fetch the git tags to see if that addresses the weird smart build behavior for Habitat
+git fetch --tags --force
 
 # By default, Buildkite pulls down HEAD. If we're on a pull-request, pull down
 # the merged head: https://github.com/buildkite/agent/blob/master/bootstrap/bootstrap.go#L698
