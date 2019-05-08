@@ -56,6 +56,8 @@ func TestDefaultProfileIsViable(t *testing.T) {
 			Version: "0.1.0",
 			Release: expectedRelease,
 		},
+		Site:    "test",
+		Channel: "stable",
 	}
 
 	assert.Equal(t, expected, msg)

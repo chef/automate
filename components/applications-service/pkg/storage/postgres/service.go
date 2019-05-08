@@ -31,6 +31,8 @@ SELECT s.id
   , d.environment AS environment
   , sup.member_id AS sup_member_id
   , sup.fqdn AS fqdn
+  , s.channel as channel
+  , sup.site as site
 FROM service AS s
 LEFT JOIN service_group AS sg
   ON s.group_id = sg.id

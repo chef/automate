@@ -39,7 +39,7 @@ func TestServiceGroupsHealthCountsSingleOkService(t *testing.T) {
 			Ok:    int32(1),
 		}
 		mockHabService = NewHabServiceMsg("1234", "test", "test", "test",
-			"core", "redis", "0.1.0", "20190101121212", "OK")
+			"core", "redis", "0.1.0", "20190101121212", "OK", "", "")
 	)
 
 	suite.IngestService(mockHabService)
@@ -96,10 +96,10 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllOk(t *testing.T) {
 	// Update all services to be reported as OK
 	var (
 		updateHabServicesMatrix = []*applications.HabService{
-			NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "OK"),
-			NewHabServiceMsg("sup2", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK"),
-			NewHabServiceMsg("sup3", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK"),
-			NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "OK"),
+			NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "OK", "", ""),
+			NewHabServiceMsg("sup2", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK", "", ""),
+			NewHabServiceMsg("sup3", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK", "", ""),
+			NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "OK", "", ""),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
 			Total:    int32(4),
@@ -141,10 +141,10 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllWarning(t *testing.T) {
 	// Update all services to be reported as WARNING
 	var (
 		updateHabServicesMatrix = []*applications.HabService{
-			NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "WARNING"),
-			NewHabServiceMsg("sup2", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK"),
-			NewHabServiceMsg("sup3", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "WARNING"),
-			NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "WARNING"),
+			NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "WARNING", "", ""),
+			NewHabServiceMsg("sup2", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK", "", ""),
+			NewHabServiceMsg("sup3", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "WARNING", "", ""),
+			NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "WARNING", "", ""),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
 			Total:    int32(4),
@@ -186,9 +186,9 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllCritical(t *testing.T) {
 	// Update all services to be reported as CRITICAL
 	var (
 		updateHabServicesMatrix = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "CRITICAL"),
-			NewHabServiceMsg("sup3", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "CRITICAL"),
-			NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "CRITICAL"),
+			NewHabServiceMsg("sup2", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "CRITICAL", "", ""),
+			NewHabServiceMsg("sup3", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "CRITICAL", "", ""),
+			NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "CRITICAL", "", ""),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
 			Total:    int32(4),

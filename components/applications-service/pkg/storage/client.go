@@ -43,6 +43,8 @@ type Service struct {
 	Fqdn        string
 	Application string
 	Environment string
+	Channel     string
+	Site        string
 }
 
 func (s *Service) FullReleaseString() string {

@@ -237,6 +237,8 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			Application:  svc.Application,
 			Environment:  svc.Environment,
 			Fqdn:         svc.Fqdn,
+			Channel:      svc.Channel,
+			Site:         svc.Site,
 		}
 	}
 	return services

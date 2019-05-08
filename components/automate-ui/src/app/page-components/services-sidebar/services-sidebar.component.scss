@@ -50,7 +50,10 @@ app-page-picker {
   }
 
   .supervisor-line {
-    font-size: .8em;
+    b {
+      font-size: .8em;
+    }
+
   }
 
   chef-icon {

@@ -294,6 +294,12 @@ func init() {
         },
         "fqdn": {
           "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "site": {
+          "type": "string"
         }
       }
     },
