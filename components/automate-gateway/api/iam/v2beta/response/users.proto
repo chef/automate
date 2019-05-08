@@ -22,3 +22,8 @@ message GetUserResp {
 message UpdateUserResp {
   User user = 1;
 }
+
+message UpdateSelfResp {
+  User user = 1;
+}
+

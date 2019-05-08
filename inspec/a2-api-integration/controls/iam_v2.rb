@@ -17,6 +17,7 @@ control 'iam-v2-1' do
   CUSTOM_PROJECT_ID = 'inspec-custom-project'
   CUSTOM_TOKEN_ID = 'inspec-token'
   CUSTOM_TEAM_ID = 'inspec-team'
+  CUSTOM_USER_ID = 'inspec-user'
 
   describe 'v2beta policy API' do
     before(:all) do
@@ -422,6 +423,66 @@ control 'iam-v2-1' do
         }.to_json
       )
       expect(resp.http_status).to eq 200
+    end
+  end
+
+  describe "v2beta users API" do
+    before(:all) do
+       resp = automate_api_request("/apis/iam/v2beta/users",
+        http_method: 'POST',
+        request_body: {
+          id: CUSTOM_USER_ID,
+          name: "display name !#$#",
+          password: "chefautomate"
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+    end
+
+    after(:all) do
+      resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}", http_method: 'DELETE')
+      expect(resp.http_status).to eq 200
+    end
+
+    # TODO more inspec tests coming very soon in A2-655
+
+    it "user can update their own display name" do
+      updatedName =  "i updated my own name"
+      resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
+        http_method: 'PUT',
+        request_body: {
+          name: updatedName
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:user][:name]).to eq updatedName
+    end
+
+    it "user gets a 400 if their password is wrong" do
+      updatedName =  "i updated my own name"
+      resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
+        http_method: 'PUT',
+        request_body: {
+          name: updatedName,
+          password: "newpassword",
+          previous_password: "wrongagain"
+        }.to_json
+      )
+      expect(resp.http_status).to eq 400
+    end
+
+    it "user can update their own display name and password" do
+      updatedName =  "i updated my own name"
+      resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
+        http_method: 'PUT',
+        request_body: {
+          name: updatedName,
+          password: "newpassword",
+          previous_password: "chefautomate"
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:user][:name]).to eq updatedName
     end
   end
 

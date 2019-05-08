@@ -81,7 +81,7 @@ func (p *Server) UpdateUser(
 	ctx context.Context, req *pb_req.UpdateUserReq) (*pb_resp.UpdateUserResp, error) {
 	resp, err := p.users.UpdateUser(ctx, &local_user.UpdateUserReq{
 		Id:       req.Id, // this is required but ignored
-		Email:    req.Id,
+		Email:    req.Id, // this is required but ignored
 		Name:     req.Name,
 		Password: req.Password,
 	})
@@ -90,6 +90,30 @@ func (p *Server) UpdateUser(
 	}
 
 	return &pb_resp.UpdateUserResp{User: convert(resp)}, nil
+}
+
+// UpdateSelf allows a user to update their own info,
+// requiring the previous password if they want to change password.
+func (p *Server) UpdateSelf(
+	ctx context.Context, req *pb_req.UpdateSelfReq) (*pb_resp.UpdateSelfResp, error) {
+	resp, err := p.users.UpdateSelf(ctx, &local_user.UpdateSelfReq{
+		Id:               req.Id, // this is required but ignored
+		Email:            req.Id, // this is required but ignored
+		Name:             req.Name,
+		Password:         req.Password,
+		PreviousPassword: req.PreviousPassword,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb_resp.UpdateSelfResp{
+		User: &pb_common.User{
+			Id:           resp.Email,
+			Name:         resp.Name,
+			MembershipId: resp.Id,
+		},
+	}, nil
 }
 
 func convert(in *local_user.User) *pb_common.User {

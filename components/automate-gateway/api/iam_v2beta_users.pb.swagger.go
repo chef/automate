@@ -18,6 +18,39 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/iam/v2beta/self/{id}": {
+      "put": {
+        "operationId": "UpdateSelf",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateSelfResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The id cannot be changed, it's for determining which user this is supposed\nto update",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateSelfReq"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/iam/v2beta/users": {
       "get": {
         "operationId": "GetUsers",
@@ -178,6 +211,33 @@ func init() {
           "items": {
             "$ref": "#/definitions/v2betaUser"
           }
+        }
+      }
+    },
+    "v2betaUpdateSelfReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "The id cannot be changed, it's for determining which user this is supposed\nto update"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string",
+          "description": "Note: for UpdateSelfReq, the password and previous_password are optional,\nbut if passed, they must both be passed."
+        },
+        "previous_password": {
+          "type": "string"
+        }
+      }
+    },
+    "v2betaUpdateSelfResp": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v2betaUser"
         }
       }
     },

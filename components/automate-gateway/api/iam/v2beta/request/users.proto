@@ -27,3 +27,15 @@ message UpdateUserReq {
   string name = 2;
   string password = 3;
 }
+
+message UpdateSelfReq {
+  // The id cannot be changed, it's for determining which user this is supposed
+  // to update
+  string id = 1;
+  string name = 2;
+  // Note: for UpdateSelfReq, the password and previous_password are optional,
+  // but if passed, they must both be passed.
+  string password = 3;
+  string previous_password = 4;
+}
+

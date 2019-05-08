@@ -36,6 +36,7 @@ type UsersServerMock struct {
 	GetUserFunc      func(context.Context, *request.GetUserReq) (*response.GetUserResp, error)
 	DeleteUserFunc   func(context.Context, *request.DeleteUserReq) (*response.DeleteUserResp, error)
 	UpdateUserFunc   func(context.Context, *request.UpdateUserReq) (*response.UpdateUserResp, error)
+	UpdateSelfFunc   func(context.Context, *request.UpdateSelfReq) (*response.UpdateSelfResp, error)
 }
 
 func (m *UsersServerMock) CreateUser(ctx context.Context, req *request.CreateUserReq) (*response.CreateUserResp, error) {
@@ -98,6 +99,18 @@ func (m *UsersServerMock) UpdateUser(ctx context.Context, req *request.UpdateUse
 	return nil, status.Error(codes.Internal, "mock: 'UpdateUser' not implemented")
 }
 
+func (m *UsersServerMock) UpdateSelf(ctx context.Context, req *request.UpdateSelfReq) (*response.UpdateSelfResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.UpdateSelfFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'UpdateSelf' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *UsersServerMock) Reset() {
 	m.CreateUserFunc = nil
@@ -105,4 +118,5 @@ func (m *UsersServerMock) Reset() {
 	m.GetUserFunc = nil
 	m.DeleteUserFunc = nil
 	m.UpdateUserFunc = nil
+	m.UpdateSelfFunc = nil
 }
