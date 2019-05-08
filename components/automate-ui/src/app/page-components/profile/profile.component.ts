@@ -1,5 +1,5 @@
 import {
-  Component, OnInit, ViewChild, ViewChildren, OnDestroy
+  Component, ElementRef, OnInit, ViewChild, ViewChildren, OnDestroy
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
@@ -87,16 +87,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  getCurrentIndex(currentTarget) {
-    let currentIndex;
-
-    this.focusElements.toArray().forEach((element, i) => {
-      if (element.nativeElement === currentTarget) {
-        currentIndex = i;
-      }
-    });
-
-    return currentIndex;
+  getCurrentIndex(currentTarget: HTMLElement) {
+    return this.focusElements.toArray()
+      .map((e: ElementRef) => e.nativeElement)
+      .indexOf(currentTarget);
   }
 
   get displayName(): string {
