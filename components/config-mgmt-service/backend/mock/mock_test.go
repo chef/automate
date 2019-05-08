@@ -24,7 +24,7 @@ func TestNew(t *testing.T) {
 	subject.New()
 }
 
-func TestGetNode(t *testing.T) {
+func TestNodeExists(t *testing.T) {
 	expected := "999"
 	exists, err := subject.New().NodeExists(expected, map[string][]string{})
 	assert.Nil(t, err)

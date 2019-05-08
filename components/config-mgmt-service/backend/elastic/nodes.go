@@ -38,11 +38,7 @@ func (es Backend) NodeExists(nodeID string, filters map[string][]string) (bool, 
 		return false, err
 	}
 
-	if searchResult.Hits.TotalHits == 0 {
-		return false, nil
-	}
-
-	return true, err
+	return searchResult.Hits.TotalHits > 0, nil
 }
 
 // GetInventoryNodes - Collect inventory nodes from elasticsearch. This function allows

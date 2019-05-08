@@ -8,6 +8,7 @@ package integration_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -103,7 +104,22 @@ func (s *Suite) GlobalTeardown() {
 
 // GetNode retrives a Chef Node
 func (s *Suite) GetNode(id string) (cfgBackend.Node, error) {
-	return s.cfgmgmt.GetNode(id)
+	filterMap := make(map[string][]string, 0)
+	filterMap["entity_uuid"] = []string{id}
+	nodes, err := s.cfgmgmt.GetNodes(1, 1, "node_name", true, filterMap)
+	if err != nil {
+		return cfgBackend.Node{}, err
+	}
+
+	if len(nodes) > 1 {
+		return cfgBackend.Node{}, errors.New("More than one node returned")
+	}
+
+	if len(nodes) == 0 {
+		return cfgBackend.Node{}, errors.New("type=NodeNotFound")
+	}
+
+	return nodes[0], nil
 }
 
 // GetNodes retrives X Chef Nodes
