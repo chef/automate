@@ -140,7 +140,237 @@ func TestNodesWithSorting(t *testing.T) {
 		})
 }
 
-func TestNodesProjectFilter(t *testing.T) {
+func TestGetRunsProjectFilter(t *testing.T) {
+	cases := []struct {
+		description string
+		node        iBackend.Node
+		runs        []iBackend.Run
+		request     request.Runs
+		ctx         context.Context
+		expected    []string
+	}{
+		{
+			description: "Getting runs with node matching projects",
+			node: iBackend.Node{
+				Projects: []string{"project9"},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+				},
+				{
+					RunID: "2",
+				},
+			},
+			ctx:      contextWithProjects([]string{"project9"}),
+			request:  request.Runs{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Getting runs with node matching one of two projects",
+			node: iBackend.Node{
+				Projects: []string{"project9"},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+				},
+				{
+					RunID: "2",
+				},
+			},
+			ctx:      contextWithProjects([]string{"project9", "project3"}),
+			request:  request.Runs{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Getting runs with node not matching projects error",
+			node: iBackend.Node{
+				Projects: []string{"project9"},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+				},
+				{
+					RunID: "2",
+				},
+			},
+			ctx:      contextWithProjects([]string{"project3"}),
+			request:  request.Runs{},
+			expected: []string{},
+		},
+		{
+			description: "Getting runs with node matching projects with filters",
+			node: iBackend.Node{
+				Projects: []string{"project9"},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+				{
+					RunID: "2",
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			request: request.Runs{
+				Filter: []string{"status:success"},
+			},
+			expected: []string{"2"},
+		},
+		{
+			description: "Getting no runs with node matching projects with filters",
+			node: iBackend.Node{
+				Projects: []string{"project9"},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+				{
+					RunID: "2",
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			request: request.Runs{
+				Filter: []string{"status:success"},
+			},
+			expected: []string{},
+		},
+		{
+			description: "Getting runs with matching node all projects allowed",
+			node: iBackend.Node{
+				Projects: []string{"project9"},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+				},
+				{
+					RunID: "2",
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			request:  request.Runs{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Getting runs with matching node with no projects with all projects allowed",
+			node: iBackend.Node{
+				Projects: []string{},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+				},
+				{
+					RunID: "2",
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			request:  request.Runs{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Getting runs with matching node with no projects with unassigned project only",
+			node: iBackend.Node{
+				Projects: []string{},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+				},
+				{
+					RunID: "2",
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request:  request.Runs{},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Getting runs with matching node with no projects with unassigned project only",
+			node: iBackend.Node{
+				Projects: []string{"project9"},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+				},
+				{
+					RunID: "2",
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request:  request.Runs{},
+			expected: []string{},
+		},
+		{
+			description: "Getting runs with matching node with unassigned and normal project",
+			node: iBackend.Node{
+				Projects: []string{"project9"},
+			},
+			runs: []iBackend.Run{
+				{
+					RunID: "1",
+				},
+				{
+					RunID: "2",
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
+			request:  request.Runs{},
+			expected: []string{"1", "2"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+			test.node.Exists = true
+			test.node.NodeInfo = iBackend.NodeInfo{
+				EntityUuid: newUUID(),
+			}
+
+			test.request.NodeId = test.node.NodeInfo.EntityUuid
+
+			for index := range test.runs {
+				test.runs[index].NodeInfo.EntityUuid = test.node.NodeInfo.EntityUuid
+				test.runs[index].StartTime = time.Now()
+				test.runs[index].EndTime = time.Now()
+			}
+
+			// Add node with project
+			suite.IngestNodes([]iBackend.Node{test.node})
+			suite.IngestRuns(test.runs)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodes
+			res, err := cfgmgmt.GetRuns(test.ctx, &test.request)
+
+			assert.NoError(t, err)
+
+			ids := getFieldValues(res, "id")
+
+			// Test what nodes are returned.
+			assert.ElementsMatch(t, test.expected, ids)
+		})
+	}
+}
+
+func TestGetNodesProjectFilter(t *testing.T) {
 
 	cases := []struct {
 		description string
@@ -371,7 +601,7 @@ func TestNodesProjectFilter(t *testing.T) {
 		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
 
 			// Adding required node data
-			for index, _ := range test.nodes {
+			for index := range test.nodes {
 				test.nodes[index].Exists = true
 				test.nodes[index].NodeInfo.EntityUuid = newUUID()
 			}
@@ -384,7 +614,7 @@ func TestNodesProjectFilter(t *testing.T) {
 			res, err := cfgmgmt.GetNodes(test.ctx, &test.request)
 			assert.NoError(t, err)
 
-			names := getNames(res)
+			names := getFieldValues(res, "name")
 
 			// Test what nodes are returned.
 			assert.ElementsMatch(t, test.expected, names)
@@ -959,7 +1189,7 @@ func nodeFieldEqualToValue(node iBackend.Node, key string, value string) bool {
 // twoNodeArray returns an Array of 2 Nodes
 func twoNodeArray() []iBackend.Node {
 	return []iBackend.Node{
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "success",
@@ -969,7 +1199,7 @@ func twoNodeArray() []iBackend.Node {
 			},
 			Exists: true,
 		},
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "missing",
@@ -1025,11 +1255,12 @@ func getMessageRawJSON(message proto.Message) (string, error) {
 	return (&jsonpb.Marshaler{OrigName: true}).MarshalToString(message)
 }
 
-func getNames(listValue *gp.ListValue) []string {
+//fieldName == name
+func getFieldValues(listValue *gp.ListValue, fieldName string) []string {
 	names := make([]string, 0)
 	for _, value := range listValue.GetValues() {
 		m := value.GetStructValue().GetFields()
-		names = append(names, m["name"].GetStringValue())
+		names = append(names, m[fieldName].GetStringValue())
 	}
 
 	return names

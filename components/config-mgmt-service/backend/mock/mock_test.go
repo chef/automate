@@ -26,9 +26,9 @@ func TestNew(t *testing.T) {
 
 func TestGetNode(t *testing.T) {
 	expected := "999"
-	node, err := subject.New().GetNode(expected)
+	exists, err := subject.New().NodeExists(expected, map[string][]string{})
 	assert.Nil(t, err)
-	assert.Equal(t, node.EntityUuid, expected)
+	assert.False(t, exists)
 }
 
 func TestGetNodesCounts(t *testing.T) {
