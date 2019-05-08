@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ProjectsFilterOption } from './projects-filter.reducer';
 import * as selectors from './projects-filter.selectors';
@@ -11,17 +13,17 @@ const STORE_OPTIONS_KEY = 'projectsFilter.options';
 
 @Injectable()
 export class ProjectsFilterService {
-  options$ = this.store.select(selectors.options);
+  options$ = <Observable<ProjectsFilterOption[]>>this.store.select(selectors.options);
 
-  selectionLabel$ = this.store.select(selectors.selectionLabel);
+  selectionLabel$ = <Observable<string>>this.store.select(selectors.selectionLabel);
 
-  selectionCount$ = this.store.select(selectors.selectionCount);
+  selectionCount$ = <Observable<number>>this.store.select(selectors.selectionCount);
 
-  selectionCountVisible$ = this.store.select(selectors.selectionCountVisible);
+  selectionCountVisible$ = <Observable<boolean>>this.store.select(selectors.selectionCountVisible);
 
-  selectionCountActive$ = this.store.select(selectors.selectionCountActive);
+  selectionCountActive$ = <Observable<boolean>>this.store.select(selectors.selectionCountActive);
 
-  dropdownCaretVisible$ = this.store.select(selectors.dropdownCaretVisible);
+  dropdownCaretVisible$ = <Observable<boolean>>this.store.select(selectors.dropdownCaretVisible);
 
   constructor(private store: Store<NgrxStateAtom>, private router: Router) {}
 
