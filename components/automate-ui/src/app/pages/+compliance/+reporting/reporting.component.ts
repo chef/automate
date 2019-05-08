@@ -26,7 +26,7 @@ import { saveAs } from 'file-saver';
 
 @Component({
   templateUrl: './reporting.component.html',
-  styleUrls: [ './reporting.component.scss' ],
+  styleUrls: ['./reporting.component.scss'],
   providers: [SuggestionsService]
 })
 export class ReportingComponent implements OnInit, OnDestroy {
@@ -42,7 +42,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'name': 'node',
       'title': 'Node',
       'description':
-      'Add the name, ID, or hostname to filter this report against a specific node',
+        'Add the name, ID, or hostname to filter this report against a specific node',
       'placeholder': 'Name, ID, or hostname'
     },
     {
@@ -60,8 +60,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     {
       'name': 'control',
       'title': 'Control',
-      'description': 'Add the ID to filter this report against a control',
-      'placeholder': 'ID'
+      'description': 'Add the title to filter this report against a control',
+      'placeholder': 'Title'
     },
     {
       'name': 'role',
@@ -90,7 +90,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   showSummary = false;
 
-  private suggestionSearchTerms = new Subject<{'type': string, 'text': string}>();
+  private suggestionSearchTerms = new Subject<{ 'type': string, 'text': string }>();
 
   // Used to notify all subscriptions to unsubscribe
   // http://stackoverflow.com/a/41177163/319074
@@ -109,7 +109,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       filter(params => params['filters']))
       .subscribe(params => {
         this.applyParamFilters(params['filters']);
-    });
+      });
   }
 
   ngOnInit() {
@@ -130,7 +130,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       withLatestFrom(this.reportQuery.filters),
       // switch to new search observable each time the term changes
       switchMap(([terms, filters]) => {
-        const {type, text} = terms;
+        const { type, text } = terms;
         if (text && text.length > 0) {
           return this.getSuggestions(type, text, filters);
         }
@@ -138,7 +138,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       }),
       takeUntil(this.isDestroyed)
     )
-    .subscribe(suggestions => this.availableFilterValues = suggestions);
+      .subscribe(suggestions => this.availableFilterValues = suggestions);
   }
 
   ngOnDestroy() {
@@ -171,7 +171,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     filterSets.forEach(element => {
       const arrayFilters = element.split(':');
       this.reportQuery.addFilter(
-        {type: {name: arrayFilters[0]}, value: {text: arrayFilters[1]} }
+        { type: { name: arrayFilters[0] }, value: { text: arrayFilters[1] } }
       );
     });
   }
@@ -192,10 +192,10 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
-    const types = {'json': 'application/json', 'csv': 'text/csv'};
+    const types = { 'json': 'application/json', 'csv': 'text/csv' };
     const onNext = data => {
       const type = types[format];
-      const blob = new Blob([data], {type});
+      const blob = new Blob([data], { type });
       saveAs(blob, filename);
       this.hideDownloadStatus();
     };
@@ -220,15 +220,15 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   onEndDateChanged(event) {
-    const {intervals, interval} = this.reportQuery;
+    const { intervals, interval } = this.reportQuery;
     const endDate = event.detail;
     const startDate = intervals[interval][1](endDate);
     this.reportQuery.setDateRange(startDate, endDate);
   }
 
   onSuggestValues(event) {
-    const {type, text} = event.detail;
-    this.suggestionSearchTerms.next({'type': type, 'text': text});
+    const { type, text } = event.detail;
+    this.suggestionSearchTerms.next({ 'type': type, 'text': text });
   }
 
   onFilterAdded(event) {
@@ -236,13 +236,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   onFilterRemoved(event) {
-    this.router.navigate([], {queryParams: {}});
+    this.router.navigate([], { queryParams: {} });
     this.reportQuery.removeFilter(event.detail);
   }
 
   onFiltersClear(_event) {
     this.reportQuery.clearFilters();
-    this.router.navigate([], { queryParams: { filters: undefined }});
+    this.router.navigate([], { queryParams: { filters: undefined } });
   }
 
   getData(filters) {
