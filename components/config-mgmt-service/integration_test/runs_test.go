@@ -41,21 +41,21 @@ func TestRunsReturnErrorWithWrongParameters(t *testing.T) {
 	)
 
 	cases := []request.Runs{
-		request.Runs{NodeId: "fake", Filter: []string{"platform=centos"}},
-		request.Runs{NodeId: "fake", Filter: []string{"wrong"}},
-		request.Runs{NodeId: "fake", Filter: []string{":success"}},
-		request.Runs{NodeId: "fake", Filter: []string{"platform:"}},
-		request.Runs{NodeId: "fake", Filter: []string{"platform:foo:bar"}},
-		request.Runs{NodeId: "fake", Start: "2000-00-00"},
-		request.Runs{NodeId: "fake", Start: "00-00-00"},
-		request.Runs{NodeId: "fake", Start: "18-10-10"},
-		request.Runs{NodeId: "fake", Start: "20-01-01"},
-		request.Runs{NodeId: "fake", Start: "17:01:01"},
-		request.Runs{NodeId: "fake", End: "01-01-1800"},
-		request.Runs{NodeId: "fake", End: "3000-12"},
-		request.Runs{NodeId: "fake", End: "2019"},
-		request.Runs{NodeId: "fake", End: "1888:01:01"},
-		request.Runs{NodeId: "fake", End: "2027/01/01"},
+		{NodeId: "fake", Filter: []string{"platform=centos"}},
+		{NodeId: "fake", Filter: []string{"wrong"}},
+		{NodeId: "fake", Filter: []string{":success"}},
+		{NodeId: "fake", Filter: []string{"platform:"}},
+		{NodeId: "fake", Filter: []string{"platform:foo:bar"}},
+		{NodeId: "fake", Start: "2000-00-00"},
+		{NodeId: "fake", Start: "00-00-00"},
+		{NodeId: "fake", Start: "18-10-10"},
+		{NodeId: "fake", Start: "20-01-01"},
+		{NodeId: "fake", Start: "17:01:01"},
+		{NodeId: "fake", End: "01-01-1800"},
+		{NodeId: "fake", End: "3000-12"},
+		{NodeId: "fake", End: "2019"},
+		{NodeId: "fake", End: "1888:01:01"},
+		{NodeId: "fake", End: "2027/01/01"},
 	}
 
 	for _, test := range cases {
@@ -74,7 +74,7 @@ func TestRunsWithANodeNotFoundReturnsError(t *testing.T) {
 
 	expected := new(gp.ListValue)
 	res, err := cfgmgmt.GetRuns(ctx, &req)
-	grpctest.AssertCode(t, codes.NotFound, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, res)
 }
 func TestRunsWithFilterReturnsListWithOneNode(t *testing.T) {
@@ -83,7 +83,15 @@ func TestRunsWithFilterReturnsListWithOneNode(t *testing.T) {
 		runs   = twoRunsArray(nodeID)
 		req    = request.Runs{NodeId: nodeID}
 		ctx    = context.Background()
+		node   = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID,
+			},
+		}
 	)
+
+	suite.IngestNodes([]iBackend.Node{node})
 	suite.IngestRuns(runs)
 	defer suite.DeleteAllDocuments()
 
@@ -120,8 +128,15 @@ func TestRunsWithPagination(t *testing.T) {
 		runs   = twoRunsArray(nodeID)
 		req    = request.Runs{NodeId: nodeID}
 		ctx    = context.Background()
+		node   = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID,
+			},
+		}
 	)
 
+	suite.IngestNodes([]iBackend.Node{node})
 	suite.IngestRuns(runs)
 	defer suite.DeleteAllDocuments()
 
@@ -173,7 +188,7 @@ func TestRunsWithTableDriven(t *testing.T) {
 		}
 		nodeArray = func(id string) []iBackend.Node {
 			return []iBackend.Node{
-				iBackend.Node{
+				{
 					NodeInfo: iBackend.NodeInfo{EntityUuid: id},
 					Exists:   true},
 			}

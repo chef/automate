@@ -48,6 +48,13 @@ func (s *CfgMgmtServer) GetRuns(
 		return runs, status.Errorf(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
 	}
 
+	projectFilters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return runs, status.Errorf(codes.Internal, err.Error())
+	}
+
+	nodeExistsChan := s.nodeExistsAsync(request.GetNodeId(), projectFilters)
+
 	bRuns, err := s.client.GetRuns(
 		request.GetNodeId(),
 		int(page),
@@ -60,24 +67,24 @@ func (s *CfgMgmtServer) GetRuns(
 		return runs, status.Errorf(codes.Internal, err.Error())
 	}
 
-	if len(bRuns) > 0 {
-		// (@afiune) Should we rename the AbridgedConverge to AbridgedRun or something else?
-		msgArray := backendRunArrayToMessageArray(bRuns)
-		err = messageArrayToListValue(msgArray, runs)
-		if err != nil {
-			return runs, err
-		}
-	} else {
-		// Check if node exists in node-state
-		log.WithFields(log.Fields{
-			"node_id": request.GetNodeId(),
-			"func":    nameOfFunc(),
-		}).Debug("No Runs found: Verifying node")
-		node, err := s.client.GetNode(request.GetNodeId())
-		if node.EntityUuid == "" || err != nil {
-			// Node Not Found
-			return runs, errors.GrpcErrorFromErr(codes.NotFound, err)
-		}
+	if len(bRuns) == 0 {
+		return runs, nil
+	}
+
+	nodeExists := <-nodeExistsChan
+	if nodeExists.err != nil {
+		return runs, nodeExists.err
+	}
+
+	// Either the user does not have permissions or the node does not exist
+	if !nodeExists.exists {
+		return runs, nil
+	}
+
+	msgArray := backendRunArrayToMessageArray(bRuns)
+	err = messageArrayToListValue(msgArray, runs)
+	if err != nil {
+		return runs, err
 	}
 
 	return runs, nil
@@ -346,4 +353,22 @@ func backendRunArrayToMessageArray(runs []backend.AbridgedConverge) []proto.Mess
 		}
 	}
 	return messages
+}
+
+type nodeExists struct {
+	exists bool
+	err    error
+}
+
+func (s *CfgMgmtServer) nodeExistsAsync(nodeID string, projectFilters map[string][]string) chan nodeExists {
+	nodeExistsChan := make(chan nodeExists)
+	go func() {
+		exists, err := s.client.NodeExists(nodeID, projectFilters)
+		nodeExistsChan <- nodeExists{
+			exists: exists,
+			err:    err,
+		}
+	}()
+
+	return nodeExistsChan
 }

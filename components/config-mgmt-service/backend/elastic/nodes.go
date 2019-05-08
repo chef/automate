@@ -24,13 +24,10 @@ func init() {
 	}
 }
 
-// GetNode Returns a single Node
-func (es Backend) GetNode(id string) (backend.Node, error) {
-	var node backend.Node
-	filters := map[string][]string{
-		"exists":      []string{"true"},
-		"entity_uuid": []string{id},
-	}
+// NodeExists - Does a node with entity_uuid == 'nodeID' exists
+func (es Backend) NodeExists(nodeID string, filters map[string][]string) (bool, error) {
+	filters["exists"] = []string{"true"}
+	filters["entity_uuid"] = []string{nodeID}
 	filtersQuery := newBoolQueryFromFilters(filters)
 
 	searchResult, err := es.client.Search().
@@ -38,24 +35,10 @@ func (es Backend) GetNode(id string) (backend.Node, error) {
 		Index(IndexNodeState).
 		Do(context.Background())
 	if err != nil {
-		return node, err
+		return false, err
 	}
 
-	if searchResult.Hits.TotalHits > 0 {
-		// We will expect a single hit to come back from the ES query
-		// and then unmarshal the Source into a backend.Node
-		hit := searchResult.Hits.Hits[0]
-		err = json.Unmarshal(*hit.Source, &node)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"object": hit.Source,
-			}).WithError(err).Debug("Unable to unmarshal the node object")
-		}
-	} else {
-		err = errors.New(errors.NodeNotFound, "Invalid ID")
-	}
-
-	return node, err
+	return searchResult.Hits.TotalHits > 0, nil
 }
 
 // GetInventoryNodes - Collect inventory nodes from elasticsearch. This function allows
@@ -253,7 +236,7 @@ func (es Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCoun
 
 	searchTerm := "status"
 
-	statusNodesBuckets, err := es.getAggregationBucket(boolQuery, "node-state", searchTerm)
+	statusNodesBuckets, err := es.getAggregationBucket(boolQuery, IndexNodeState, searchTerm)
 	if err != nil {
 		return ns, err
 	}

@@ -33,11 +33,8 @@ func New() Backend {
 // In order to be a proper backend you have to implement all the contracts that
 // the Client interface has setup, this will ensure that the endpoints we have
 // defined will always be able to get the data from any backend we configure
-func (m Backend) GetNode(id string) (backend.Node, error) {
-	n := new(backend.Node)
-	n.EntityUuid = id
-	n.NodeName = "mock"
-	return *n, nil
+func (m Backend) NodeExists(id string, filters map[string][]string) (bool, error) {
+	return false, nil
 }
 
 func (m Backend) GetNodesCounts(filters map[string][]string) (backend.NodesCounts, error) {
@@ -91,11 +88,11 @@ func (m Backend) GetListForField(searchTerm string) ([]string, error) {
 
 func (m Backend) GetSuggestions(term string, text string) ([]backend.Suggestion, error) {
 	suggestions := []backend.Suggestion{
-		backend.Suggestion{
+		{
 			Text:  "Node 1",
 			Score: 4.4892697,
 		},
-		backend.Suggestion{
+		{
 			Text:  "ubuntu",
 			Score: 3.9768348,
 		},
@@ -107,11 +104,11 @@ func (m Backend) GetPolicyCookbooks(revisionID string) (backend.PolicyCookbooks,
 	return backend.PolicyCookbooks{
 		PolicyName: "infra_base",
 		CookbookLocks: []backend.PolicyCookbookLock{
-			backend.PolicyCookbookLock{
+			{
 				CookbookName: "apt",
 				PolicyID:     "any",
 			},
-			backend.PolicyCookbookLock{
+			{
 				CookbookName: "cookbook",
 				PolicyID:     "paula_smith",
 			},

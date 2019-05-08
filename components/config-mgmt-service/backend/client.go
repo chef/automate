@@ -17,8 +17,8 @@ import (
 // use in the future. Think about it as a set of contracts that the API
 // requires to fulfill the requests
 type Client interface {
-	// @params (nodeid)
-	GetNode(string) (Node, error)
+	// @params (nodeid, filters)
+	NodeExists(nodeID string, projectFilters map[string][]string) (bool, error)
 	// @params (page, perPage, sortField, ascending, filters)
 	GetNodes(int, int, string, bool, map[string][]string) ([]Node, error)
 	// @params (filters)
