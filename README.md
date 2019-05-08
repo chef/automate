@@ -19,9 +19,9 @@ For more information see:
 
 **Project State**: [Active](https://github.com/chef/chef-oss-practices/blob/master/repo-management/repo-states.md#active)
 
-**Issues Response SLA**: 5 business days
+**Issues Response Time Maximum**: 5 business days
 
-**Pull Request Response SLA**: 5 business days
+**Pull Request Response Time Maximum**: 5 business days
 
 ## Components
 
