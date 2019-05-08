@@ -3,13 +3,13 @@ BEGIN;
 CREATE TABLE recurring_workflow_schedules (
     id BIGSERIAL PRIMARY KEY,
 
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
     workflow_name TEXT NOT NULL,
 
     recurrence TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     next_due TIMESTAMP NOT NULL DEFAULT NOW(),
-    parameters JSON
+    parameters JSON,
 
     CONSTRAINT say_my_name UNIQUE(name, workflow_name)
 );

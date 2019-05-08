@@ -109,8 +109,11 @@ func (pg *PostgresBackend) Init() error {
 	}
 
 	// FIX ME
-	pg.db.Exec("INSERT INTO workflows(name) VALUES ('test_workflow')")
-	pg.db.Exec("INSERT INTO workflow_instances(workflow_id) VALUES (1) ON CONFLICT DO NOTHING")
+	_, err = pg.db.Exec("INSERT INTO workflow_instances(workflow_name, name) VALUES ('workflow_name', 'bob') ON CONFLICT DO NOTHING")
+	if err != nil {
+		logrus.WithError(err).Error("could not insert fake workflow")
+		return err
+	}
 	return nil
 }
 
