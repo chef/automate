@@ -82,11 +82,12 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.serviceGroups$ = this.store.select(allServiceGroups);
 
     this.healthSummary$ = this.store.select(allServiceGroupHealth);
-    this.healthSummary$.subscribe(sgHealthSummary => this.sgHealthSummary = sgHealthSummary);
+    this.healthSummary$.pipe(takeUntil(this.isDestroyed))
+      .subscribe(sgHealthSummary => this.sgHealthSummary = sgHealthSummary);
 
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.status));
-    this.selectedStatus$.subscribe((status) => {
+    this.selectedStatus$.pipe(takeUntil(this.isDestroyed)).subscribe((status) => {
       // This code enables the pagination of service groups correctly, when the user selects
       // a Health Filter, we adjust the total number of service groups
       if ( includes(status, this.allowedStatus) ) {
@@ -99,19 +100,20 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.selectedFieldDirection$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.sortDirection));
 
-    this.selectedFieldDirection$.subscribe(currentFieldDirection =>
-      this.currentFieldDirection = currentFieldDirection);
+    this.selectedFieldDirection$.pipe(takeUntil(this.isDestroyed))
+      .subscribe(currentFieldDirection => this.currentFieldDirection = currentFieldDirection);
 
     this.selectedSortField$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.sortField));
 
-    this.selectedSortField$.subscribe(currentSortField =>
+    this.selectedSortField$.pipe(takeUntil(this.isDestroyed)).subscribe(currentSortField =>
       this.currentSortField = currentSortField);
 
     this.currentPage$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.page));
 
-    this.currentPage$.subscribe(currentPage => this.currentPage = currentPage);
+    this.currentPage$.pipe(takeUntil(this.isDestroyed))
+      .subscribe(currentPage => this.currentPage = currentPage);
   }
 
   ngOnDestroy() {
