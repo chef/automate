@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 
@@ -139,6 +140,10 @@ func (s *authzServer) FilterAuthorizedPairs(
 func (s *authzServer) FilterAuthorizedProjects(
 	ctx context.Context,
 	req *api.FilterAuthorizedPairsReq) (*api.FilterAuthorizedProjectsResp, error) {
+
+	// Introspection needs unfiltered access.
+	ctx = auth_context.ContextWithoutProjects(ctx)
+
 	resp, err := s.engine.V2FilterAuthorizedProjects(ctx,
 		engine.Subjects(req.Subjects),
 		toEnginePairs(req.Pairs))
@@ -172,6 +177,9 @@ func isBeta2p1(version api.Version) bool {
 }
 
 func (s *authzServer) getAllProjects(ctx context.Context) ([]string, error) {
+	// Need unfiltered access to the projects list.
+	ctx = auth_context.ContextWithoutProjects(ctx)
+
 	// we make this extra call to cover the case when the following are true:
 	// - no project filter has been provided
 	// - one statement allows All Projects for the given resource/action
