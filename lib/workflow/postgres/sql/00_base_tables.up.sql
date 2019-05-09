@@ -80,7 +80,7 @@ AS $$
     SELECT pg_notify('workflow_instance_new', workflow_name);
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION dequeue_workflow(workflow_names TEXT)
+CREATE OR REPLACE FUNCTION dequeue_workflow(VARIADIC workflow_names TEXT[])
 RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT, 
     parameters JSON, payload JSON, event_id BIGINT, event_type workflow_event_type,
     task_result_id BIGINT)
@@ -97,7 +97,7 @@ AS $$
             b.task_result_id task_result_id
         FROM workflow_instances a 
         INNER JOIN workflow_events b ON a.id = b.workflow_instance_id 
-        WHERE a.workflow_name = workflow_names
+        WHERE a.workflow_name = ANY(workflow_names)
         ORDER BY b.enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
     ),
     updated AS (
