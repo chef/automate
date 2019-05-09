@@ -30,7 +30,7 @@ CREATE TYPE task_status AS ENUM('success', 'failed', 'abandoned');
 
 CREATE TABLE tasks (
     id BIGSERIAL PRIMARY KEY,
-    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id),
+    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     try_remaining INT NOT NULL DEFAULT 1,
     enqueued_at   TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at    TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -41,7 +41,7 @@ CREATE TABLE tasks (
 
 CREATE TABLE tasks_results (
     id BIGSERIAL PRIMARY KEY,
-    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id),
+    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     parameters   JSON,
     task_name    TEXT NOT NULL,
     enqueued_at  TIMESTAMP NOT NULL,
@@ -56,7 +56,7 @@ CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete');
 CREATE TABLE workflow_events (
     id BIGSERIAL PRIMARY KEY,
     event_type workflow_event_type NOT NULL,
-    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id),
+    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     enqueued_at TIMESTAMP NOT NULL DEFAULT NOW(),
     -- task_complete members
     task_result_id BIGINT REFERENCES tasks_results(id)
@@ -109,6 +109,11 @@ AS $$
     SELECT * from nextwinst
 $$ LANGUAGE SQL;
 
+CREATE OR REPLACE FUNCTION complete_workflow(workflow_instance_id BIGINT)
+RETURNS VOID
+AS $$
+    DELETE FROM workflow_instances WHERE id=workflow_instance_id;
+$$ LANGUAGE SQL;
 
 -- Notification channels
 --
