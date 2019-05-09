@@ -113,7 +113,7 @@ func (s *Suite) GetNodes(x int) ([]cfgBackend.Node, error) {
 }
 
 // GetActions retrives X Chef Actions
-func (s *Suite) GeActions(x int) ([]cfgBackend.Action, error) {
+func (s *Suite) GetActions(x int) ([]cfgBackend.Action, error) {
 	filterMap := make(map[string][]string, 0)
 	actions, _, err := s.cfgmgmt.GetActions(filterMap,
 		time.Time{}, time.Now().Add(time.Hour*24*365), x, time.Time{}, "", true)

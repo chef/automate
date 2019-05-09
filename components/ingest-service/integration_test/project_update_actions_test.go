@@ -334,7 +334,7 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 				suite.RefreshIndices(fmt.Sprintf("%s-%s", mappings.Actions.Index, "*"))
 
 				// assert the node's project IDs
-				actualActions, err := suite.GeActions(100)
+				actualActions, err := suite.GetActions(100)
 				require.Nil(t, err)
 				require.Equal(t, 1, len(actualActions), "wrong number of actions retrieved")
 
@@ -428,7 +428,7 @@ func TestProjectUpdateRunsOnActions(t *testing.T) {
 	suite.RefreshIndices(suite.Indices()...)
 
 	// Test if the action was updated
-	actualActions, err := suite.GeActions(100)
+	actualActions, err := suite.GetActions(100)
 	require.Nil(t, err)
 	require.Equal(t, 1, len(actualActions), "wrong number of actions retrieved")
 
