@@ -1,5 +1,14 @@
 BEGIN;
 
+-- Workflows
+--
+-- Workflows coordinate a set of tasks. For example, a scan job is a
+-- workflow that create and then waits for the completion of a number
+-- of inspec scan tasks.
+--
+-- The schedule for recurring workflows are stored in SQL and (TODO)
+-- go-level code will push on new workflow_instances and the appointed
+-- time.
 CREATE TABLE recurring_workflow_schedules (
     id BIGSERIAL PRIMARY KEY,
 
@@ -26,11 +35,22 @@ CREATE TABLE workflow_instances (
     CONSTRAINT say_my_name1 UNIQUE(name, workflow_name)
 );
 
+-- Tasks
+--
+-- Tasks are units of descrete work that need to be done.
+--
+-- Workers dequeue tasks from the task table, do the work related to
+-- that task, and then post their results back.
+--
+-- New and Completed tasks also notify a channel that can be
+-- subscribed to by the workflows for more timely notification of new
+-- task events related to their workflow.
 CREATE TYPE task_status AS ENUM('success', 'failed', 'abandoned');
 
 CREATE TABLE tasks (
     id BIGSERIAL PRIMARY KEY,
-    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id),
+    -- TODO(ssd) 2019-05-09: Do we want the ON DELETE CASCADE here?
+    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     try_remaining INT NOT NULL DEFAULT 1,
     enqueued_at   TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at    TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -41,7 +61,8 @@ CREATE TABLE tasks (
 
 CREATE TABLE tasks_results (
     id BIGSERIAL PRIMARY KEY,
-    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id),
+    -- TODO(ssd) 2019-05-09: Do we want the ON DELETE CASCADE here?
+    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     parameters   JSON,
     task_name    TEXT NOT NULL,
     enqueued_at  TIMESTAMP NOT NULL,
@@ -51,19 +72,21 @@ CREATE TABLE tasks_results (
     result       JSON
 );
 
+
 CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete');
 
+-- NOTE(ssd) 2019-05-09: Workflow events are defined here because they
+-- may reference task_restuls
 CREATE TABLE workflow_events (
     id BIGSERIAL PRIMARY KEY,
     event_type workflow_event_type NOT NULL,
-    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id),
+    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     enqueued_at TIMESTAMP NOT NULL DEFAULT NOW(),
     -- task_complete members
     task_result_id BIGINT REFERENCES tasks_results(id)
 );
 
--- 
-
+-- Workflow Functions
 CREATE OR REPLACE FUNCTION enqueue_workflow(
     name TEXT,
     workflow_name TEXT,
@@ -75,28 +98,28 @@ AS $$
             VALUES(name, workflow_name, parameters)
             RETURNING id
         )
-    INSERT INTO workflow_events(event_type, workflow_instance_id) 
+    INSERT INTO workflow_events(event_type, workflow_instance_id)
         VALUES('start', (select id from winst));
     SELECT pg_notify('workflow_instance_new', workflow_name);
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION dequeue_workflow(workflow_names TEXT)
-RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT, 
+RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT,
     parameters JSON, payload JSON, event_id BIGINT, event_type workflow_event_type,
     task_result_id BIGINT)
 AS $$
     WITH nextwinst AS (
-        SELECT 
+        SELECT
             a.id id,
             a.name instance_name,
-            a.workflow_name workflow_name, 
-            a.parameters parameters, 
-            a.payload payload, 
-            b.id event_id, 
-            b.event_type event_type, 
+            a.workflow_name workflow_name,
+            a.parameters parameters,
+            a.payload payload,
+            b.id event_id,
+            b.event_type event_type,
             b.task_result_id task_result_id
-        FROM workflow_instances a 
-        INNER JOIN workflow_events b ON a.id = b.workflow_instance_id 
+        FROM workflow_instances a
+        INNER JOIN workflow_events b ON a.id = b.workflow_instance_id
         WHERE a.workflow_name = workflow_names
         ORDER BY b.enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
     ),
@@ -109,14 +132,32 @@ AS $$
     SELECT * from nextwinst
 $$ LANGUAGE SQL;
 
-
--- Notification channels
+-- We currently expect that the overall results from workflows will be
+-- stored by the workflow itself.
 --
--- workflow_task_new
--- workflow_task_complete
---
+-- TODO(ssd) 2019-05-09: For scheduled tasks we might want to record
+-- the completion time, but where would that live, do we want a
+-- workflow_results table as well?
+CREATE OR REPLACE FUNCTION complete_workflow(wid BIGINT)
+RETURNS VOID
+LANGUAGE SQL
+AS $$
+    WITH done_workflows AS (SELECT id FROM workflow_instances where id = wid)
+    SELECT pg_notify('workflow_instance_complete', id::text) FROM done_workflows;
+    DELETE FROM workflow_instances WHERE id = wid
+$$;
 
--- https://www.postgresql.org/docs/current/xfunc-sql.html
+CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, payload JSON)
+RETURNS VOID
+LANGUAGE SQL
+AS $$
+    UPDATE workflow_instances SET updated_at = NOW(), payload = payload WHERE id = wid;
+    -- We've decided there is more to do but are done processing this event.
+    DELETE FROM workflow_events WHERE id = eid
+$$;
+
+
+-- Task Functions
 CREATE OR REPLACE FUNCTION enqueue_task(
     workflow_instance_id BIGINT,
     try_remaining INT,
@@ -130,20 +171,17 @@ AS $$
     SELECT pg_notify('workflow_task_new', task_name);
 $$ LANGUAGE SQL;
 
---https://stackoverflow.com/questions/16609724/using-current-time-in-utc-as-default-value-in-postgresql
 CREATE OR REPLACE FUNCTION dequeue_task(task_name TEXT)
 RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, parameters JSON)
 AS $$
     UPDATE tasks t1 SET try_remaining = try_remaining - 1, updated_at = NOW()
     WHERE t1.id = (
         SELECT t2.id FROM tasks t2
-        WHERE t2.try_remaining > 0 AND start_after < NOW()
+        WHERE t2.task_name = task_name AND t2.try_remaining > 0 AND start_after < NOW()
         ORDER BY t2.enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
     ) RETURNING t1.id, t1.workflow_instance_id, t1.parameters
 $$ LANGUAGE SQL;
 
--- https://www.postgresql.org/docs/9.1/queries-with.html
--- https://stackoverflow.com/questions/6560447/can-i-use-return-value-of-insert-returning-in-another-insert#6561437
 CREATE OR REPLACE FUNCTION complete_task(tid BIGINT, status task_status, error text, result JSON)
 RETURNS VOID
 LANGUAGE SQL

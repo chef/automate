@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -153,15 +154,47 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 		return errors.Wrap(err, "could not initialize database schema")
 	}
 
-	enqueueResultChan := make(chan error, 100)
+	w.EnqueueWorkflow(context.TODO(), &workflow.WorkflowInstance{
+		WorkflowName: "perf-test",
+		InstanceName: fmt.Sprintf("perf-test-%s", time.Now()),
+	})
+
+	event, workflowCompleter, err := w.DequeueWorkflow(context.TODO(), "perf-test")
+	if err != nil {
+		return errors.Wrap(err, "could not dequeue workflow")
+	}
+	logrus.Infof("Got event: %v", event)
+	defer workflowCompleter.Done()
+
 	dequeueResultChan := make(chan error, 100)
 	doneChan := make(chan struct{})
 
 	if !perfTestOpts.DequeueOnly {
-		perWorkerTaskCount := perfTestOpts.TaskCount / perfTestOpts.EnqueueWorkerCount
-		for i := 0; i < perfTestOpts.EnqueueWorkerCount; i++ {
-			go enqueueWorker(w, i, perWorkerTaskCount, enqueueResultChan)
+		for i := 0; i < perfTestOpts.TaskCount; {
+			logrus.Debugf("Enqueueing task %d", i)
+			err := workflowCompleter.EnqueueTask(&workflow.Task{
+				Name:               "test task",
+				WorkflowInstanceID: event.InstanceID,
+				Parameters:         "",
+			})
+			if err == nil {
+				logrus.Debugf("Enqueued task %d", i)
+				i++
+			} else {
+				logrus.Error(err)
+			}
+
 		}
+	}
+
+	err = workflowCompleter.Continue("")
+	if err != nil {
+		return err
+	}
+
+	logrus.Info("All tasks enqueued")
+	if perfTestOpts.EnqueueOnly {
+		return nil
 	}
 
 	if !perfTestOpts.EnqueueOnly {
@@ -172,49 +205,29 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 
 	startTime := time.Now()
 	stats := struct {
-		enqueueTotal     int
-		enqueueSuccesses int
-		enqueueErrors    int
-
 		dequeueTotal     int
 		dequeueSuccesses int
 		dequeueErrors    int
 	}{}
 	doneClosed := false
 	for {
-		select {
-		case enRes := <-enqueueResultChan:
-			stats.enqueueTotal++
-			if enRes == nil {
-				stats.enqueueSuccesses++
-			} else {
-				stats.enqueueErrors++
-			}
-			if ((stats.enqueueSuccesses + stats.enqueueErrors) % 1000) == 0 {
-				logrus.Infof("enqueue status -- %d attempts (%d success, %d failures) in %f seconds",
-					stats.enqueueTotal, stats.enqueueSuccesses, stats.enqueueErrors, time.Since(startTime).Seconds())
-			}
-		case deRes := <-dequeueResultChan:
-			stats.dequeueTotal++
-			if deRes == nil {
-				stats.dequeueSuccesses++
-			} else {
-				stats.dequeueErrors++
-			}
-			if ((stats.dequeueTotal) % 1000) == 0 {
-				logrus.Infof("dequeue status -- %d attempts (%d success, %d failures) in %f seconds",
-					stats.dequeueTotal, stats.dequeueSuccesses, stats.dequeueErrors, time.Since(startTime).Seconds())
-			}
+		deRes := <-dequeueResultChan
+		stats.dequeueTotal++
+		if deRes == nil {
+			stats.dequeueSuccesses++
+		} else {
+			stats.dequeueErrors++
+		}
+		if ((stats.dequeueTotal) % 1000) == 0 {
+			logrus.Infof("dequeue status -- %d attempts (%d success, %d failures) in %f seconds",
+				stats.dequeueTotal, stats.dequeueSuccesses, stats.dequeueErrors, time.Since(startTime).Seconds())
 		}
 
-		if stats.enqueueSuccesses == perfTestOpts.TaskCount || stats.dequeueSuccesses == perfTestOpts.TaskCount {
+		if stats.dequeueSuccesses == perfTestOpts.TaskCount {
 			if !doneClosed {
 				close(doneChan)
 				doneClosed = true
 			}
-		}
-
-		if (stats.dequeueSuccesses == perfTestOpts.TaskCount) || (perfTestOpts.EnqueueOnly && stats.enqueueSuccesses == perfTestOpts.TaskCount) {
 			logrus.Infof("All %d tasks enqueued/dequeued in %f seconds, exiting", perfTestOpts.TaskCount, time.Since(startTime).Seconds())
 			return nil
 		}
@@ -223,26 +236,13 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-func enqueueWorker(w workflow.Backend, workerID int, count int, enqueueResultChan chan error) {
+func enqueueWorker(w workflow.Backend, workerID int, workflowInstanceID int64, count int, enqueueResultChan chan error) {
 	logctx := logrus.WithFields(logrus.Fields{
 		"total_count": count,
 		"worker_id":   workerID,
 	})
 	logctx.Info("starting enqueue worker")
 	for enqueued := 0; enqueued < count; {
-		logctx.Debugf("Enqueueing task %d", enqueued)
-		err := w.EnqueueTask(context.TODO(), &workflow.Task{
-			Name:               "test task",
-			WorkflowInstanceID: 1,
-			Parameters:         "",
-		})
-		enqueueResultChan <- err
-		if err == nil {
-			logctx.Debugf("Enqueued task %d", enqueued)
-			enqueued++
-		} else {
-			logctx.Error(err)
-		}
 	}
 	logctx.Info("enqueue worker done")
 }

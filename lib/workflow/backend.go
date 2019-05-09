@@ -19,10 +19,37 @@ const (
 	dequeueTaskQuery  = `SELECT * FROM dequeue_task($1)`
 	completeTaskQuery = `SELECT complete_task($1::bigint, $2::task_status, $3::text, $4::JSON)`
 
+	enqueueWorkflowQuery  = `SELECT enqueue_workflow($1, $2, $3)`
+	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow($1)`
+	completeWorkflowQuery = `SELECT complete_workflow($1)`
+	continueWorkflowQuery = `SELECT continue_workflow($1, $2, $3)`
+
 	taskStatusSuccess   = "success"
 	taskStatusFailed    = "failed"
 	taskStatusAbandoned = "abanonded"
 )
+
+type WorkflowEventType string
+
+var (
+	WorkflowStart WorkflowEventType = "start"
+	TaskComplete  WorkflowEventType = "task_complete"
+)
+
+type WorkflowInstance struct {
+	InstanceName string
+	WorkflowName string
+	Parameters   interface{}
+	Payload      interface{}
+}
+
+type WorkflowEvent struct {
+	InstanceID int64
+	Instance   WorkflowInstance
+	Type       WorkflowEventType
+
+	TaskID sql.NullInt64
+}
 
 type Task struct {
 	Name               string
@@ -54,14 +81,48 @@ type TaskCompleter interface {
 	Succeed(result interface{}) error
 }
 
+type WorkflowCompleter interface {
+	EnqueueTask(task *Task, opts ...EnqueueOpts) error
+
+	Continue(payload interface{}) error
+	Done() error
+}
+
 type Backend interface {
-	EnqueueTask(ctx context.Context, task *Task, opts ...EnqueueOpts) error
+	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstance) error
+	DequeueWorkflow(ctx context.Context, workflowName string) (*WorkflowEvent, WorkflowCompleter, error)
+
 	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
+
 	Init() error
 }
 
 type PostgresBackend struct {
 	db *sql.DB
+}
+
+type PostgresTaskCompleter struct {
+	// tid is the Task's id in our postgresql database.  We need
+	// this to complete the correct task.
+	tid int64
+
+	// tx is the transaction that is holding our dequeued task.
+	tx *sql.Tx
+	// ctx is the context that the transaction was started with.
+	ctx context.Context
+}
+
+type PostgresWorkflowCompleter struct {
+	// wid is the WorkflowInstance id in our postgresql database.  We need
+	// this to complete the correct workflow
+	wid int64
+	// eid is the WorkflowEvent id
+	eid int64
+
+	// tx is the transaction that is holding our dequeued workflow.
+	tx *sql.Tx
+	// ctx is the context that the transaction was started with.
+	ctx context.Context
 }
 
 var _ Backend = &PostgresBackend{}
@@ -108,16 +169,90 @@ func (pg *PostgresBackend) Init() error {
 		return errors.Wrap(err, "migration failed")
 	}
 
-	// FIX ME
-	_, err = pg.db.Exec("INSERT INTO workflow_instances(workflow_name, name) VALUES ('workflow_name', 'bob') ON CONFLICT DO NOTHING")
+	return nil
+}
+
+var (
+	ErrNoTasks             = errors.New("no tasks in queue")
+	ErrNoWorkflowInstances = errors.New("no workflow instances in queue")
+)
+
+func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *WorkflowInstance) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	tx, err := pg.db.BeginTx(ctx, nil)
 	if err != nil {
-		logrus.WithError(err).Error("could not insert fake workflow")
+		return errors.Wrap(err, "failed to begin enqueue workflow transaction")
+	}
+
+	js, err := jsonify(w.Parameters)
+	if err != nil {
 		return err
+	}
+	_, err = tx.ExecContext(ctx, enqueueWorkflowQuery, w.InstanceName, w.WorkflowName, js)
+	if err != nil {
+		return errors.Wrap(err, "failed to enqueue workflow")
+	}
+
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "failed to commit enqueue workflow")
 	}
 	return nil
 }
 
-var ErrNoTasks = errors.New("no tasks in queue")
+func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowName string) (*WorkflowEvent, WorkflowCompleter, error) {
+	ctx, cancel := context.WithCancel(ctx)
+
+	tx, err := pg.db.BeginTx(ctx, nil)
+	if err != nil {
+		cancel()
+		return nil, nil, errors.Wrap(err, "failed to dequeue task")
+	}
+
+	row := tx.QueryRowContext(ctx, dequeueWorkflowQuery, workflowName)
+	event := &WorkflowEvent{}
+	workc := &PostgresWorkflowCompleter{
+		ctx: ctx,
+		tx:  tx,
+	}
+	err = row.Scan(
+		&workc.wid,
+		&event.Instance.InstanceName,
+		&event.Instance.WorkflowName,
+		&event.Instance.Parameters,
+		&event.Instance.Payload,
+		&workc.eid,
+		&event.Type,
+		&event.TaskID)
+	if err == sql.ErrNoRows {
+		cancel()
+		return nil, nil, ErrNoWorkflowInstances
+
+	} else if err != nil {
+		cancel()
+		return nil, nil, errors.Wrap(err, "failed to dequeue workflow")
+	}
+
+	event.InstanceID = workc.wid
+
+	return event, workc, nil
+}
+
+func (workc *PostgresWorkflowCompleter) EnqueueTask(task *Task, opts ...EnqueueOpts) error {
+	o := mergeEnqueueOpts(opts)
+
+	js, err := jsonify(task.Parameters)
+	if err != nil {
+		return err
+	}
+	_, err = workc.tx.ExecContext(workc.ctx, enqueueTaskQuery,
+		task.WorkflowInstanceID, o.TryRemaining, o.StartAfter, task.Name, js)
+	if err != nil {
+		return errors.Wrap(err, "failed to enqueue task")
+	}
+
+	return nil
+}
 
 func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
@@ -149,43 +284,6 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*T
 	return task, taskc, nil
 }
 
-func (pg *PostgresBackend) EnqueueTask(ctx context.Context, task *Task, opts ...EnqueueOpts) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	tx, err := pg.db.BeginTx(ctx, nil)
-	if err != nil {
-		return errors.Wrap(err, "failed to begin enqueue task transaction")
-	}
-
-	o := mergeEnqueueOpts(opts)
-
-	js, err := jsonify(task.Parameters)
-	if err != nil {
-		return err
-	}
-	_, err = tx.ExecContext(ctx, enqueueTaskQuery,
-		task.WorkflowInstanceID, o.TryRemaining, o.StartAfter, task.Name, js)
-	if err != nil {
-		return errors.Wrap(err, "failed to enqueue task")
-	}
-
-	if err := tx.Commit(); err != nil {
-		return errors.Wrap(err, "failed to commit enqueue task")
-	}
-	return nil
-}
-
-type PostgresTaskCompleter struct {
-	// tid is the Task's id in our postgresql database.  We need
-	// this to complete the correct task.
-	tid int
-
-	// tx is the transaction that is holding our dequeued task.
-	tx *sql.Tx
-	// ctx is the context that the transaction was started with.
-	ctx context.Context
-}
-
 func (taskc PostgresTaskCompleter) Fail(errMsg string) error {
 	ctx, cancel := context.WithCancel(taskc.ctx)
 	defer cancel()
@@ -215,6 +313,34 @@ func (taskc PostgresTaskCompleter) Succeed(results interface{}) error {
 	}
 
 	return errors.Wrapf(taskc.tx.Commit(), "failed to mark task %d as successful", taskc.tid)
+}
+
+func (workc PostgresWorkflowCompleter) Done() error {
+	ctx, cancel := context.WithCancel(workc.ctx)
+	defer cancel()
+
+	_, err := workc.tx.ExecContext(ctx, completeWorkflowQuery, workc.wid)
+	if err != nil {
+		return errors.Wrapf(err, "failed to mark workflow %d as complete", workc.wid)
+	}
+
+	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow %d as complete", workc.wid)
+}
+
+func (workc PostgresWorkflowCompleter) Continue(payload interface{}) error {
+	ctx, cancel := context.WithCancel(workc.ctx)
+	defer cancel()
+
+	jsonPayload, err := jsonify(payload)
+	if err != nil {
+		return errors.Wrap(err, "could not convert payload to JSON")
+	}
+	_, err = workc.tx.ExecContext(ctx, continueWorkflowQuery, workc.wid, workc.eid, jsonPayload)
+	if err != nil {
+		return errors.Wrapf(err, "failed to mark workflow event %d as processed", workc.eid)
+	}
+
+	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow event %d as processed", workc.eid)
 }
 
 func jsonify(data interface{}) (string, error) {
