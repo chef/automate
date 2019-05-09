@@ -53,6 +53,7 @@
       <chef-tr
         tabindex="0"
         class="{{serviceGroup.status}} sg-row"
+        [ngClass]="{'selected': (selectedServiceGroupId === serviceGroup.id)}"
         (click)="openServicesSidebar(serviceGroup.id)"
         *ngFor="let serviceGroup of serviceGroups$ | async">
         <chef-td class="{{serviceGroup.status}} health">
