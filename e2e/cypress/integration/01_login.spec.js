@@ -83,18 +83,20 @@ describe('login and logout', () => {
 
     it('has expected profile menu choices', () => {
       const menuChoices = [
-        /Your Profile/,
+        'Signed in as Local Administrator',
 
-        /About Chef Automate/,
-        /License Information/,
-        /Chef Automate \d{8,}/,
-        /Sign Out/
+        'Profile',
+        'Version',
+        'About',
+        'License',
+        'Release Notes',
+        'Sign Out'
       ]
       cy.get('[data-cy=user-profile-button]').click().then(() => {
-        cy.get('.logout-dropdown li')
+        cy.get('ul.dropdown-list li')
           .should('have.length', menuChoices.length)
           .each(($li, index) => {
-            expect($li.text()).to.match(menuChoices[index])
+            expect($li.text()).to.contains(menuChoices[index])
           })
         cy.get('[data-cy=user-profile-button]').click() // close profile menu
       })

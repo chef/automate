@@ -63,8 +63,6 @@
 }
 
 .dropdown {
-  display: block;
-  position: absolute;
   right: -10px;
   max-width: 250px;
   border: 1px solid $chef-grey;
@@ -86,8 +84,6 @@
   }
 
   .dropdown-body {
-    display: block;
-
     > span {
       display: block;
       color: $chef-dark-grey;

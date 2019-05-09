@@ -1,39 +1,74 @@
-<button class="profile profile-dropdown-toggle" (click)="toggleDropdown($event)" data-cy="user-profile-button">
-  <div class="user">
-    <div class="account-icon-container">
-      <chef-icon id="account-icon">person</chef-icon>
-    </div>
-    <div class="user-name profile-dropdown-toggle">{{ displayName }}</div>
-  </div>
+<button
+  aria-label="User Menu"
+  class="dropdown-toggle"
+  (click)="toggleDropdown()"
+  (keydown.shift.tab)="closeDropdown()"
+  (keydown.arrowdown)="handleArrowDown($event)"
+  data-cy="user-profile-button"
+  #focusElement>
+  <chef-icon aria-hidden="true" class="dropdown-toggle-user-icon">person</chef-icon>
+  <chef-icon aria-hidden="true">keyboard_arrow_down</chef-icon>
 </button>
 
-<chef-click-outside omit="profile-dropdown-toggle" (clickOutside)="closeDropdown()">
-  <ul class="logout-dropdown" *ngIf="dropdownVisible">
-    <app-authorized [allOf]="['/auth/users/{username}', 'get', userName]">
-      <li>
-        <a [routerLink]="['/user-details', userName]" (click)="closeDropdown()">Your Profile</a>
+<chef-click-outside omit="dropdown-toggle" (clickOutside)="closeDropdown()">
+  <chef-dropdown class="dropdown" [attr.visible]="dropdownVisible" (keydown.esc)="closeDropdown()">
+    <ul class="dropdown-list">
+      <li class="dropdown-list-item">
+        Signed in as <strong class="dropdown-display-name">{{ displayName }}</strong>
       </li>
-    </app-authorized>
-    <li>
-      <button (click)="showWelcomeModal()" data-cy="welcome-modal-button">About Chef Automate</button>
-    </li>
-    <li>
-      <button class="license-link" (click)="openLicenseModal()">License Information</button>
-    </li>
-    <li>
-      <a href="https://automate.chef.io/release-notes/?v={{ buildVersion }}" class="version-link" target="_blank">Chef Automate {{ buildVersion }}</a>
-    </li>
-    <li><chef-button primary (click)="logout()" data-cy="sign-out-button">Sign Out</chef-button></li>
-  </ul>
+      <app-authorized [allOf]="['/auth/users/{username}', 'get', userName]">
+        <li class="dropdown-list-item">
+          <a [routerLink]="['/user-details', userName]"
+            (click)="closeDropdown()"
+            (keydown.arrowup)="handleArrowUp($event)"
+            (keydown.arrowdown)="handleArrowDown($event)"
+            class="profile"
+            #focusElement>Profile</a>
+        </li>
+      </app-authorized>
+      <li class="dropdown-list-item">
+        <span class="version">Version: {{ buildVersion }}</span>
+        <ul class="dropdown-sub-list">
+          <li>
+            <button (click)="showWelcomeModal()"
+              (keydown.arrowup)="handleArrowUp($event)"
+              (keydown.arrowdown)="handleArrowDown($event)"
+              data-cy="welcome-modal-button"
+              class="welcome-modal-button"
+              #focusElement>About</button>
+          </li>
+          <li>
+            <a href="https://www.chef.io/online-master-agreement/" target="_blank"
+              (click)="closeDropdown()"
+              (keydown.arrowup)="handleArrowUp($event)"
+              (keydown.arrowdown)="handleArrowDown($event)"
+              #focusElement>
+              License <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
+            </a>
+          </li>
+          <li>
+            <a href="https://automate.chef.io/release-notes/?v={{ buildVersion }}" target="_blank" class="release-notes"
+              (click)="closeDropdown()"
+              (keydown.arrowup)="handleArrowUp($event)"
+              (keydown.arrowdown)="handleArrowDown($event)"
+              #focusElement>
+              Release Notes <chef-icon aria-hidden="true" class="dropdown-link-icon">launch</chef-icon>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="dropdown-list-item">
+        <button data-cy="sign-out-button" class="logout"
+          (click)="logout()"
+          (keydown.tab)="closeDropdown()"
+          (keydown.arrowup)="handleArrowUp($event)"
+          (keydown.arrowdown)="handleArrowDown($event)"
+          #focusElement>
+          Sign Out
+        </button>
+      </li>
+    </ul>
+  </chef-dropdown>
 </chef-click-outside>
 
-<chef-modal label="license-info-label" [visible]="licenseModalVisible" (close)="closeLicenseModal()">
-  <h2 id="license-info-label" slot="title">Chef Automate License Information</h2>
-  <p>Use of Chef Automate is subject to the terms of the Master License and Services Agreement.</p>
-  <p>View the current agreement here:
-    <a href="https://www.chef.io/online-master-agreement/" target="_blank">https://www.chef.io/online-master-agreement/</a>
-  </p>
-  <chef-button primary (click)="closeLicenseModal()">Done</chef-button>
-</chef-modal>
 <app-welcome-modal></app-welcome-modal>
-

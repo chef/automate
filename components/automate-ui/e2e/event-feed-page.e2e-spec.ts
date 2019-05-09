@@ -8,10 +8,10 @@ describe('Event Feed: Guitar String Graph Interaction', () => {
   });
 
   it('should have a working dropdown filter', () => {
-    element(by.css('app-event-feed-select chef-select')).click();
+    const select = element(by.css('app-event-feed-select chef-select'));
+    select.click();
 
-    const dropdown = element(by.css('chef-dropdown'));
-    expect(dropdown.getAttribute('visible')).toEqual('true');
+    expect(select.getAttribute('class')).toContain('active');
   });
 
   xit('Event Feed page is accessible', (done) => {

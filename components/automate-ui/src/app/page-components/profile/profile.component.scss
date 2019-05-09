@@ -1,7 +1,8 @@
 @import "~styles/variables";
 @import "~styles/mixins";
 
-.profile,
+$dropdown-width: 196px;
+
 button {
   -webkit-appearance: none;
   background: transparent;
@@ -9,99 +10,91 @@ button {
   font-family: inherit;
   line-height: inherit;
   cursor: pointer;
+  text-align: left;
 }
 
-.user {
-  display: flex;
+ul, li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a, button:not(.dropdown-toggle) {
+  display: block;
+  margin: 0 -16px;
   padding: 0 16px;
-  opacity: 1;
-  pointer-events: none;
-  color: $chef-primary-dark;
-}
+  position: relative;
+  width: $dropdown-width;
+  font-size: 16px;
+  line-height: 32px;
+  text-decoration: none;
+  color: inherit;
 
-.account-icon-container {
-  margin-right: 16px;
-  pointer-events: none;
-  overflow: hidden;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  padding: 0.18em 0;
-  border: 1px solid $chef-dark-grey;
-  background-color: $chef-dark-grey;
-
-  #account-icon {
-    color: $chef-white;
-    font-size: 24px;
+  &:hover,
+  &:focus,
+  &:active {
+    background: #DEE5FD;
   }
 }
 
-.user ::ng-deep .user-image {
-  pointer-events: none;
+.dropdown-toggle {
+  margin-left: 35px;
+  padding: 10px 0;
 }
 
-.user-name {
-  margin-top: 5px;
-  white-space: nowrap;
+.dropdown-toggle-user-icon {
+  position: relative;
+  top: 6px;
+  margin-right: -5px;
+  font-size: 30px;
+  line-height: 10px;
+}
+
+.dropdown {
+  top: 54px;
+  right: 16px;
+  width: $dropdown-width;
+  border: 1px solid $chef-grey;
+
+  &::before {
+    display: block;
+    position: absolute;
+    top: -6px;
+    right: 12px;
+    width: 10px;
+    height: 10px;
+    background: $chef-white;
+    transform: rotate(45deg);
+    border-left: 1px solid $chef-grey;
+    border-top: 1px solid $chef-grey;
+    content: '';
+  }
+}
+
+.dropdown-list-item {
+  display: block;
+  margin: 6px 0 0;
+  padding: 0 16px 6px;
+  font-size: 12px;
+  line-height: 24px;
+
+  &:not(:last-child),
+  &:first-child {
+    border-bottom: 1px solid $chef-grey;
+  }
+}
+
+.dropdown-display-name {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 112px;
-  font-size: 12px;
-
-  @media (max-width: 740px) {
-    display: none;
-  }
+  white-space: nowrap;
 }
 
-.logout-dropdown {
-  @include modal-box();
+.dropdown-link-icon {
   position: absolute;
-  top: 50px;
-  right: 10px;
-  min-width: 200px;
-  margin-top: 5px;
-  list-style: none;
-  z-index: 1;
-
-  a, button {
-    display: block;
-    width: 100%;
-    padding: 0 5px;
-    border-radius: $global-radius;
-    color: $chef-primary-dark;
-    text-decoration: none;
-    line-height: 30px;
-    text-align: left;
-
-    &:hover {
-      cursor: pointer;
-      background-color: $gray-highlight;
-    }
-
-    &.version-link,
-    &.license-link {
-      font-size: 11px;
-      color: #AAA;
-
-      &:hover {
-        background: none;
-        color: #222;
-        text-decoration: none;
-      }
-    }
-  }
-}
-
-chef-modal {
-  text-align: center;
-
-  h2 {
-    margin: 12px 0 20px 0;
-  }
-
-  .button {
-    display: flex;
-    justify-content: center;
-    height: 32px;
-  }
+  right: 16px;
+  top: 8px;
 }
