@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+// import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
@@ -7,7 +7,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ProjectsFilterOption } from './projects-filter.reducer';
 import * as selectors from './projects-filter.selectors';
 import { LoadOptions, SaveOptions } from './projects-filter.actions';
-import { routeURL } from 'app/route.selectors';
+// import { routeURL } from 'app/route.selectors';
 
 const STORE_OPTIONS_KEY = 'projectsFilter.options';
 
@@ -25,7 +25,8 @@ export class ProjectsFilterService {
 
   dropdownCaretVisible$ = <Observable<boolean>>this.store.select(selectors.dropdownCaretVisible);
 
-  constructor(private store: Store<NgrxStateAtom>, private router: Router) {}
+  constructor(private store: Store<NgrxStateAtom>) {}
+  // constructor(private store: Store<NgrxStateAtom>, private router: Router) { }
 
   loadOptions() {
     this.store.dispatch(new LoadOptions());
@@ -45,8 +46,11 @@ export class ProjectsFilterService {
   }
 
   refresh() {
-    this.store.select(routeURL).subscribe((route) => {
-      this.router.navigate([route]);
-    });
+    location.reload();
+    // individual page component reload approach:
+    // https://medium.com/engineering-on-the-incline/reloading-current-route-on-click-angular-5-1a1bfc740ab2
+    // this.store.select(routeURL).subscribe((route) => {
+    //   this.router.navigate([route]);
+    // });
   }
 }
