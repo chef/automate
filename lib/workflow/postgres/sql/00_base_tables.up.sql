@@ -154,10 +154,15 @@ AS $$
         tid as id,
         status as status,
         error as error,
-        result as result)
-    INSERT INTO tasks_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
-        (SELECT workflow_instance_id, parameters, task_name, enqueued_at, in_vals.status, in_vals.error, in_vals.result
-         FROM tasks JOIN in_vals ON in_vals.id = tasks.id WHERE tasks.id = tid);
+        result as result),
+    tres AS (
+        INSERT INTO tasks_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
+            (SELECT workflow_instance_id, parameters, task_name, enqueued_at, in_vals.status, in_vals.error, in_vals.result
+            FROM tasks JOIN in_vals ON in_vals.id = tasks.id WHERE tasks.id = tid) RETURNING id, workflow_instance_id
+    )
+    INSERT INTO workflow_events(event_type, task_result_id, workflow_instance_id) 
+        VALUES('task_complete', (select id from tres), (select workflow_instance_id from tres));
+    ;
     DELETE FROM tasks WHERE id = tid
 $$;
 
