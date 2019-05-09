@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -115,7 +116,11 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 				assert.Nil(t, err)
 			}
 
-			assert.Equal(t, test.expected, actual)
+			assert.ElementsMatch(t, clauses(test.expected), clauses(actual))
 		})
 	}
+}
+
+func clauses(predicate string) []string {
+	return regexp.MustCompile("WHERE | AND ").Split(predicate, -1)
 }
