@@ -1,7 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Store  } from '@ngrx/store';
+import { Component, OnDestroy, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { serviceGroupState } from '../../entities/service-groups/service-groups.selector';
 import { createSelector } from '@ngrx/store';
 import {
@@ -16,7 +17,7 @@ import { includes, getOr } from 'lodash/fp';
   styleUrls: ['./services-sidebar.component.scss']
 })
 
-export class ServicesSidebarComponent implements OnInit {
+export class ServicesSidebarComponent implements OnInit, OnDestroy {
   @Input() serviceGroupId: number;
   @Input() visible: boolean;
   @Output() closeServicesSidebarEvent: EventEmitter<any> = new EventEmitter();
@@ -34,6 +35,9 @@ export class ServicesSidebarComponent implements OnInit {
   private svcHealthSummary$: Observable<HealthSummary>;
   private currentServicesFilters$: Observable<ServicesFilters>;
 
+  // Has this component been destroyed
+  private isDestroyed: Subject<boolean> = new Subject();
+
   constructor(private store: Store<NgrxStateAtom>) { }
 
   ngOnInit() {
@@ -45,18 +49,23 @@ export class ServicesSidebarComponent implements OnInit {
 
     this.svcHealthSummary$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.servicesHealthSummary));
-    this.svcHealthSummary$.subscribe((servicesHealthSummary) => {
+    this.svcHealthSummary$.pipe(takeUntil(this.isDestroyed)).subscribe((servicesHealthSummary) => {
       this.servicesHealthSummary = servicesHealthSummary;
       this.totalServices = getOr(0, this.selectedHealth, this.servicesHealthSummary);
     });
 
     this.currentServicesFilters$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.servicesFilters));
-    this.currentServicesFilters$.subscribe((servicesFilters) => {
+    this.currentServicesFilters$.pipe(takeUntil(this.isDestroyed)).subscribe((servicesFilters) => {
       this.selectedHealth = getOr('total', 'health', servicesFilters);
       this.currentPage    = getOr(1, 'page', servicesFilters);
       this.totalServices  = getOr(0, this.selectedHealth, this.servicesHealthSummary);
     });
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   public closeServicesSidebar() {
