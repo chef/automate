@@ -1,4 +1,5 @@
 <button class="dropdown-label"
+  data-cy="projects-filter-button"
   aria-label="Projects filter"
   [attr.title]="selectionLabel"
   [disabled]="!dropdownCaretVisible"
@@ -11,7 +12,7 @@
   </span>
   <chef-icon *ngIf="dropdownCaretVisible" aria-hidden>keyboard_arrow_down</chef-icon>
 </button>
-<chef-dropdown class="dropdown" *ngIf="dropdownActive" (keydown.esc)="handleEscape()">
+<chef-dropdown class="dropdown" data-cy="projects-filter-dropdown" *ngIf="dropdownActive" (keydown.esc)="handleEscape()">
   <chef-click-outside class="dropdown-body" omit="dropdown-label" (clickOutside)="handleEscape()">
     <span class="optgroup-label">Projects</span>
     <chef-checkbox

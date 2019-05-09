@@ -53,6 +53,48 @@ func TestSystemPolicies(t *testing.T) {
 	}
 }
 
+func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
+	ctx := context.Background()
+	ts := setupWithOPA(t)
+
+	t.Run("user should only get projects they have non-system level access to", func(t *testing.T) {
+		_, err := ts.projects.CreateProject(ctx, &api_v2.CreateProjectReq{
+			Id:   "project-1",
+			Name: "name1",
+		})
+		require.NoError(t, err)
+
+		statement := api_v2.Statement{
+			Effect:    api_v2.Statement_ALLOW,
+			Resources: []string{"infra:nodes:*"},
+			Actions:   []string{"infra:nodes:get", "infra:nodes:list"},
+			Projects:  []string{"project-1"},
+		}
+		req := api_v2.CreatePolicyReq{
+			Id:         "policy1",
+			Name:       "my favorite policy",
+			Members:    []string{"user:local:alice"},
+			Statements: []*api_v2.Statement{&statement},
+		}
+		_, err = ts.policy.CreatePolicy(ctx, &req)
+		require.NoError(t, err)
+
+		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
+			&api_v2.FilterAuthorizedPairsReq{
+				Subjects: []string{"user:local:alice"},
+				Pairs: []*api_v2.Pair{
+					// normally all resources/actions are passed, but here we only need 
+					// at least one system policy pair
+					&api_v2.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
+					// and at least one non-system policy pair
+					&api_v2.Pair{Resource: "infra:nodes:foo", Action: "infra:nodes:get"}},
+			})
+		require.NoError(t, err)
+
+		assert.ElementsMatch(t, []string{"project-1"}, resp.Projects)
+	})
+}
+
 func setupWithOPA(t *testing.T) testSetup {
 	t.Helper()
 	ctx := context.Background()
@@ -66,7 +108,7 @@ func setupWithOPA(t *testing.T) testSetup {
 	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
 	ts := setupV2(t, o, o, &emptyV1List, vChan)
-	_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
+	_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
 	require.NoError(t, err)
 	return ts
 }

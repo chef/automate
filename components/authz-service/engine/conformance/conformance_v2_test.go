@@ -571,6 +571,70 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 				assert.ElementsMatch(t, expectedProjects, filtered)
 			})
 
+			t.Run("does not return projects permitted by system policies when projects do not overlap", func(t *testing.T) {
+				policy0 := map[string]interface{}{
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-0": map[string]interface{}{
+							"actions":   []string{act0},
+							"resources": []string{res0},
+							"effect":    "allow",
+							"projects":  engine.ProjectList(proj0, proj1),
+						},
+					},
+				}
+				policy1 := map[string]interface{}{
+					"type":    "system",
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-1": map[string]interface{}{
+							"actions":   []string{"*"},
+							"resources": []string{"*"},
+							"effect":    "allow",
+							"projects":  engine.ProjectList(constants.AllProjectsExternalID),
+						},
+					},
+				}
+				setPoliciesV2(t, e, policy0, policy1)
+				expectedProjects := []string{proj0, proj1}
+
+				filtered, err := e.V2FilterAuthorizedProjects(args())
+				require.NoError(t, err)
+				assert.ElementsMatch(t, expectedProjects, filtered)
+			})
+
+			t.Run("does return a project permitted by system policies when that project overlaps with custom policy", func(t *testing.T) {
+				policy0 := map[string]interface{}{
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-0": map[string]interface{}{
+							"actions":   []string{act0},
+							"resources": []string{res0},
+							"effect":    "allow",
+							"projects":  engine.ProjectList(proj0, proj1),
+						},
+					},
+				}
+				policy1 := map[string]interface{}{
+					"type":    "system",
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-1": map[string]interface{}{
+							"actions":   []string{"*"},
+							"resources": []string{"*"},
+							"effect":    "allow",
+							"projects":  engine.ProjectList(constants.AllProjectsExternalID, proj0, proj3),
+						},
+					},
+				}
+				setPoliciesV2(t, e, policy0, policy1)
+				expectedProjects := []string{proj0, proj1}
+
+				filtered, err := e.V2FilterAuthorizedProjects(args())
+				require.NoError(t, err)
+				assert.ElementsMatch(t, expectedProjects, filtered)
+			})
+
 			t.Run("projects on denied policies do not reduce nor add to the result set", func(t *testing.T) {
 				policy0 := map[string]interface{}{
 					"members": engine.Subject(sub),

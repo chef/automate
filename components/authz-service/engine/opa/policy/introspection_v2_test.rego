@@ -1,5 +1,7 @@
 package authz_v2.introspection
 
+import data.common
+
 test_pair_matches_action_picks_up_INLINE_action {
 	pair_matches_action[["polid", "statementid", {"action": "x"}]] with data.policies.polid.statements.statementid.actions as ["x"]
 		 with input.pairs as [{"action": "x"}]
@@ -82,6 +84,33 @@ test_authorized_project_returns_multiple_projects {
 	}
 		 with input as {
 			"subjects": ["bob"],
+			"pairs": [
+				{"action": "x1", "resource": "y1"},
+				{"action": "x2", "resource": "y2"},
+			],
+		}
+
+	actual_projects == {"proj1", "proj2", "proj3"}
+}
+
+test_authorized_project_ignores_system_policies {
+	actual_projects = authorized_project with data.policies as {
+		"policy_id": {
+			"members": ["user:local:bob"],
+			"statements": {
+				"sid1": {"effect": "allow", "actions": ["x1"], "resources": ["y1"], "projects": ["proj1", "proj2"]},
+				"sid2": {"effect": "allow", "actions": ["x2"], "resources": ["y2"], "projects": ["proj1", "proj3"]},
+				"sid3": {"effect": "allow", "actions": ["x3"], "resources": ["y3"], "projects": ["proj2"]},
+			},
+		},
+		"policy_id2": {
+			"type": "system",
+			"members": ["user:local:*"],
+			"statements": {"sid1": {"effect": "allow", "actions": ["x1"], "resources": ["y1"], "projects": [common.const_all_projects]}},
+		},
+	}
+		 with input as {
+			"subjects": ["user:local:bob"],
 			"pairs": [
 				{"action": "x1", "resource": "y1"},
 				{"action": "x2", "resource": "y2"},
