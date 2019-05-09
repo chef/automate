@@ -360,6 +360,9 @@ func init() {
             "type": "string"
           }
         },
+        "connection_error": {
+          "type": "string"
+        },
         "state": {
           "type": "string"
         },

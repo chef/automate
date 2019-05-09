@@ -22,6 +22,8 @@ func init() {
 					return m.Manager
 				case "status":
 					return m.Status
+				case "connection_error":
+					return m.ConnectionError
 				case "state":
 					return m.State
 				case "name_prefix":
@@ -62,6 +64,8 @@ func init() {
 					return m.Manager
 				case "status":
 					return m.Status
+				case "connection_error":
+					return m.ConnectionError
 				case "state":
 					return m.State
 				case "name_prefix":

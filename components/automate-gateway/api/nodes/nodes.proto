@@ -193,6 +193,7 @@ message Node {
 	ResultsRow last_job = 23;
 	TargetConfig target_config = 99;
 	repeated string manager_ids = 24;
+	string connection_error = 25;
 	string state = 26;
 	string name_prefix = 27;
 	repeated string projects = 28;
