@@ -21,7 +21,6 @@ var opts = struct {
 var perfTestOpts struct {
 	EnqueueOnly        bool
 	DequeueOnly        bool
-	EnqueueWorkerCount int
 	DequeueWorkerCount int
 	TaskCount          int
 }
@@ -53,12 +52,6 @@ func main() {
 		SilenceErrors: true,
 		RunE:          runPerfTest,
 	}
-
-	perfTestCmd.PersistentFlags().IntVar(
-		&perfTestOpts.EnqueueWorkerCount,
-		"enqueue-worker-count",
-		10,
-		"Number of workers to enqueue tasks")
 
 	perfTestCmd.PersistentFlags().IntVar(
 		&perfTestOpts.DequeueWorkerCount,
@@ -229,8 +222,20 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 				doneClosed = true
 			}
 			logrus.Infof("All %d tasks enqueued/dequeued in %f seconds, exiting", perfTestOpts.TaskCount, time.Since(startTime).Seconds())
-			return nil
+			break
 		}
+	}
+
+	event, workflowCompleter, err = w.DequeueWorkflow(context.TODO(), "perf-test")
+	if err != nil {
+		return errors.Wrap(err, "could not dequeue workflow")
+	}
+
+	logrus.Infof("Event: %#+v", event)
+
+	err = workflowCompleter.Done()
+	if err != nil {
+		return errors.Wrap(err, "could not complete workflow")
 	}
 
 	return nil
