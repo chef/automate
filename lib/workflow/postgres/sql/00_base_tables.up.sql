@@ -51,7 +51,7 @@ CREATE TABLE tasks_results (
     result       JSON
 );
 
-CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete');
+CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete', 'cancel');
 
 CREATE TABLE workflow_events (
     id BIGSERIAL PRIMARY KEY,
@@ -109,6 +109,14 @@ AS $$
     SELECT * from nextwinst
 $$ LANGUAGE SQL;
 
+CREATE OR REPLACE FUNCTION cancel_workflow(workflow_instance_id BIGINT)
+RETURNS VOID
+AS $$
+    INSERT INTO workflow_events(event_type, workflow_instance_id) 
+        VALUES('cancel', workflow_instance_id);
+    -- TODO: notify
+$$ LANGUAGE SQL;
+
 CREATE OR REPLACE FUNCTION complete_workflow(workflow_instance_id BIGINT)
 RETURNS VOID
 AS $$
@@ -120,6 +128,7 @@ $$ LANGUAGE SQL;
 -- workflow_task_new
 -- workflow_task_complete
 --
+-- (jaym): I think we can just have 1 notification channel for workflow events
 
 -- https://www.postgresql.org/docs/current/xfunc-sql.html
 CREATE OR REPLACE FUNCTION enqueue_task(
