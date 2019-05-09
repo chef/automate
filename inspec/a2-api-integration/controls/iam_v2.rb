@@ -18,6 +18,7 @@ control 'iam-v2-1' do
   CUSTOM_TOKEN_ID = 'inspec-token'
   CUSTOM_TEAM_ID = 'inspec-team'
   CUSTOM_USER_ID = 'inspec-user'
+  ADMIN_USER_ID = 'admin'
 
   describe 'v2beta policy API' do
     before(:all) do
@@ -427,63 +428,207 @@ control 'iam-v2-1' do
   end
 
   describe "v2beta users API" do
-    before(:all) do
-       resp = automate_api_request("/apis/iam/v2beta/users",
-        http_method: 'POST',
-        request_body: {
-          id: CUSTOM_USER_ID,
-          name: "display name !#$#",
-          password: "chefautomate"
-        }.to_json
-      )
-      expect(resp.http_status).to eq 200
+    TEST_USER = {
+        id: CUSTOM_USER_ID,
+        name: "display name !#$#",
+        password: "chefautomate"
+    }
+
+    describe "when the user is not yet created" do
+      CREATED_ID = "unique-user-id"
+
+      after(:each) do
+        resp = automate_api_request("/apis/iam/v2beta/users/#{CREATED_ID}", http_method: 'DELETE')
+        expect(resp.http_status.to_s).to match(/200|404/)
+      end
+
+      describe "POST /iam/v2beta/users/:id" do
+        it "creates the user" do
+          createdName =  "i created my own name"
+          resp = automate_api_request("/apis/iam/v2beta/users",
+            http_method: 'POST',
+            request_body: {
+              id: CREATED_ID,
+              name: createdName,
+              password: 'something-new'
+            }.to_json
+          )
+          expect(resp.http_status).to eq 200
+          expect(resp.parsed_response_body[:user][:name]).to eq createdName
+          expect(resp.parsed_response_body[:user][:id]).to eq CREATED_ID
+        end
+      end
     end
 
-    after(:all) do
-      resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}", http_method: 'DELETE')
-      expect(resp.http_status).to eq 200
+    describe "when multiple users exists" do
+      TEST_USER_ID_2 = 'inspec-user-2'
+      TEST_USER_2 = {
+        id: TEST_USER_ID_2,
+        name: "display name 2",
+        password: "chefautomate"
+      }
+
+      before(:each) do
+        resp = automate_api_request("/apis/iam/v2beta/users",
+          http_method: 'POST',
+          request_body: TEST_USER.to_json
+        )
+        expect(resp.http_status).to eq 200
+
+        resp = automate_api_request("/apis/iam/v2beta/users",
+          http_method: 'POST',
+          request_body: TEST_USER_2.to_json
+        )
+        expect(resp.http_status).to eq 200
+      end
+
+      after(:each) do
+        resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}", http_method: 'DELETE')
+        expect(resp.http_status.to_s).to match(/200|404/)
+
+        resp = automate_api_request("/apis/iam/v2beta/users/#{TEST_USER_ID_2}", http_method: 'DELETE')
+        expect(resp.http_status.to_s).to match(/200|404/)
+      end
+
+      describe "GET /iam/v2beta/users/" do
+        it "returns the list of users" do
+          resp = automate_api_request("/apis/iam/v2beta/users")
+          expect(resp.http_status).to eq 200
+          expect(resp.parsed_response_body[:users].length).to eq 3
+          expect(resp.parsed_response_body[:users][0][:id]).to match(/#{TEST_USER_ID_2}|#{CUSTOM_USER_ID}|#{ADMIN_USER_ID}/)
+          expect(resp.parsed_response_body[:users][1][:id]).to match(/#{TEST_USER_ID_2}|#{CUSTOM_USER_ID}|#{ADMIN_USER_ID}/)
+          expect(resp.parsed_response_body[:users][2][:id]).to match(/#{TEST_USER_ID_2}|#{CUSTOM_USER_ID}|#{ADMIN_USER_ID}/)
+        end
+      end
     end
 
-    # TODO more inspec tests coming very soon in A2-655
+    describe "when a user exists" do
+      before(:each) do
+        resp = automate_api_request("/apis/iam/v2beta/users",
+         http_method: 'POST',
+         request_body: TEST_USER.to_json
+       )
+       expect(resp.http_status).to eq 200
+     end
 
-    it "user can update their own display name" do
-      updatedName =  "i updated my own name"
-      resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
-        http_method: 'PUT',
-        request_body: {
-          name: updatedName
-        }.to_json
-      )
-      expect(resp.http_status).to eq 200
-      expect(resp.parsed_response_body[:user][:name]).to eq updatedName
+     after(:each) do
+       resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}", http_method: 'DELETE')
+       expect(resp.http_status.to_s).to match(/200|404/)
+     end
+
+    describe "GET /iam/v2beta/users/:id" do
+      it "returns the user if it exists" do
+        resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}")
+        expect(resp.http_status).to eq 200
+        expect(resp.parsed_response_body[:user][:name]).to eq TEST_USER[:name]
+        expect(resp.parsed_response_body[:user][:id]).to eq TEST_USER[:id]
+      end
+
+      it "user gets a 404 when the user does not exist" do
+        resp = automate_api_request("/apis/iam/v2beta/users/some_wrong_id")
+        expect(resp.http_status).to eq 404
+      end
     end
 
-    it "user gets a 400 if their password is wrong" do
-      updatedName =  "i updated my own name"
-      resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
-        http_method: 'PUT',
-        request_body: {
-          name: updatedName,
-          password: "newpassword",
-          previous_password: "wrongagain"
-        }.to_json
-      )
-      expect(resp.http_status).to eq 400
+    describe "PUT /apis/iam/v2beta/self/:id" do
+      it "user can update their own display name" do
+          updatedName =  "i updated my own name"
+          resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
+            http_method: 'PUT',
+            request_body: {
+              name: updatedName
+            }.to_json
+          )
+          expect(resp.http_status).to eq 200
+          expect(resp.parsed_response_body[:user][:name]).to eq updatedName
+        end
+
+        it "user gets a 400 if their password is wrong" do
+          updatedName =  "i updated my own name"
+          resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
+            http_method: 'PUT',
+            request_body: {
+              name: updatedName,
+              password: "newpassword",
+              previous_password: "wrongagain"
+            }.to_json
+          )
+          expect(resp.http_status).to eq 400
+        end
+
+        # TODO (tc): right now, it returns 400 for a non-existent user because
+        # it checks for the password first, and if it doesn't match for a user
+        # that doesn't exist (always the case), it returns a 400.
+        it "returns 400 for a non-existent user" do
+          updatedName =  "i updated my own name"
+          resp = automate_api_request("/apis/iam/v2beta/self/some_wrong_id",
+            http_method: 'PUT',
+            request_body: {
+              name: updatedName,
+              password: "newpassword",
+              previous_password: "chefautomate"
+            }.to_json
+          )
+          expect(resp.http_status).to eq 400
+        end
+
+        it "user can update their own display name and password" do
+          updatedName =  "i updated my own name"
+          resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
+            http_method: 'PUT',
+            request_body: {
+              name: updatedName,
+              password: "newpassword",
+              previous_password: "chefautomate"
+            }.to_json
+          )
+          expect(resp.http_status).to eq 200
+          expect(resp.parsed_response_body[:user][:name]).to eq updatedName
+        end
+      end
+
+      describe "DELETE /iam/v2beta/users/:id" do
+        it "deletes the user if it exists" do
+          resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}", http_method: 'DELETE')
+          expect(resp.http_status).to eq 200
+        end
+
+        it "user gets a 404 when the user does not exist" do
+          resp = automate_api_request("/apis/iam/v2beta/users/some_wrong_id", http_method: 'DELETE')
+          expect(resp.http_status).to eq 404
+        end
+      end
+
+      describe "PUT /iam/v2beta/users/:id" do
+        it "updates the user if it exists" do
+          updatedName =  "i updated my own name"
+          resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}",
+            http_method: 'PUT',
+            request_body: {
+              name: updatedName,
+              password: 'something-new'
+            }.to_json
+          )
+          expect(resp.http_status).to eq 200
+          expect(resp.parsed_response_body[:user][:name]).to eq updatedName
+        end
+
+
+        it "returns 404 if the user does not exist" do
+          updatedName =  "i updated my own name"
+          resp = automate_api_request("/apis/iam/v2beta/users/some_wrong_id",
+            http_method: 'PUT',
+            request_body: {
+              name: updatedName,
+              password: "newpassword",
+              previous_password: "wrongagain"
+            }.to_json
+          )
+          expect(resp.http_status).to eq 404
+        end
+      end
     end
 
-    it "user can update their own display name and password" do
-      updatedName =  "i updated my own name"
-      resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
-        http_method: 'PUT',
-        request_body: {
-          name: updatedName,
-          password: "newpassword",
-          previous_password: "chefautomate"
-        }.to_json
-      )
-      expect(resp.http_status).to eq 200
-      expect(resp.parsed_response_body[:user][:name]).to eq updatedName
-    end
   end
 
   describe "v2beta team API" do
