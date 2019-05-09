@@ -79,6 +79,10 @@ func TestGetProjectsFromMetadata(t *testing.T) {
 		input    []string
 		expected []string
 	}{
+		"no projects": {
+			input:    []string{""},
+			expected: []string{""},
+		},
 		"a single project": {
 			input:    []string{"pikachu"},
 			expected: []string{"pikachu"},
