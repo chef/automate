@@ -1,7 +1,7 @@
 export interface User {
   id: string;
   name: string;
-  username: string;
+  membership_id: string;
   password?: string; // only used for updating, never returned by the API
 }
 
@@ -20,7 +20,7 @@ export function userHashToArray(userHash: HashMapOfUsers): User[] {
 export function userArrayToHash(userArray: User[]): HashMapOfUsers {
   const userHash: HashMapOfUsers = {};
   userArray.forEach((user: User) => {
-    userHash[user.id] = user;
+    userHash[user.membership_id] = user;
   });
   return userHash;
 }

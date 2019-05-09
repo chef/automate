@@ -16,12 +16,12 @@ import {
   GetUsersFailure,
   GetUsersSuccess,
   GetUsersSuccessPayload,
-  GetUserByUsernameSuccess,
-  GetUserByUsername,
+  GetUserSuccess,
+  GetUser,
   UpdateUser,
   UpdateUserSuccess,
   DeleteUserSuccess,
-  GetUserByUsernameFailure,
+  GetUserFailure,
   UpdateUserFailure,
   DeleteUser,
   DeleteUserFailure
@@ -32,14 +32,14 @@ describe('userStatusEntityReducer', () => {
   const initialState: UserEntityState = UserEntityInitialState;
   const httpErrorResponse = new HttpErrorResponse({ status: 400 });
   const user: User = {
-    id: 'a953c5bb-82a5-41be-b7dd-a5de1ea53ada',
-    username: 'test',
-    name: 'test user'
+    id: 'test',
+    name: 'test user',
+    membership_id: 'a953c5bb-82a5-41be-b7dd-a5de1ea53ada'
   };
   const user2: User = {
-    id: 'b953c5bb-82a5-41be-b7dd-a5de1ea53ada',
-    username: 'test2',
-    name: 'test user2'
+    id: 'test2',
+    name: 'test user2',
+    membership_id: 'b953c5bb-82a5-41be-b7dd-a5de1ea53ada'
   };
   const users: GetUsersSuccessPayload = {
     users: [ user, user2 ]
@@ -77,8 +77,8 @@ describe('userStatusEntityReducer', () => {
 
     describe('CREATE', () => {
       const payload: CreateUserPayload = {
+        id: 'test',
         name: 'test user',
-        username: 'test',
         password: 'testing123!'
       };
       const action = new CreateUser(payload);
@@ -109,9 +109,9 @@ describe('userStatusEntityReducer', () => {
       });
     });
 
-    describe('GET_BY_USERNAME', () => {
-      const payload = { username: 'test' };
-      const action = new GetUserByUsername(payload);
+    describe('GET', () => {
+      const payload = { id: 'test' };
+      const action = new GetUser(payload);
 
       it('sets status to loading', () => {
         const { status } = userEntityReducer(initialState, action);
@@ -119,9 +119,9 @@ describe('userStatusEntityReducer', () => {
       });
     });
 
-    describe('GET_BY_USERNAME_SUCCESS', () => {
+    describe('GET_SUCCESS', () => {
       const payload = user;
-      const action = new GetUserByUsernameSuccess(payload);
+      const action = new GetUserSuccess(payload);
 
       it('sets status to loadingSuccess', () => {
         const prevState = { ...initialState, state: EntityStatus.loading };
@@ -131,14 +131,14 @@ describe('userStatusEntityReducer', () => {
 
       it('loads the one user into the users state', () => {
         const { entities } = userEntityReducer(initialState, action);
-        expect(Object.keys(entities)).toEqual(['a953c5bb-82a5-41be-b7dd-a5de1ea53ada']);
-        expect(entities['a953c5bb-82a5-41be-b7dd-a5de1ea53ada']).toEqual(user);
+        expect(Object.keys(entities)).toEqual([user.id]);
+        expect(entities[user.id]).toEqual(user);
       });
     });
 
-    describe('GET_BY_USERNAME_FAILURE', () => {
+    describe('GET_FAILURE', () => {
       const payload = httpErrorResponse;
-      const action = new GetUserByUsernameFailure(payload);
+      const action = new GetUserFailure(payload);
 
       it('sets status to loadingSuccess', () => {
         const prevState = { ...initialState, state: EntityStatus.loading };

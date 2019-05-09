@@ -39,10 +39,10 @@ export class UserTeamMembershipTableComponent implements OnInit, OnDestroy {
         (a, b) => {
           // See https://stackoverflow.com/a/38641281 for these options
           const opts = { numeric: true, sensitivity: 'base' };
-          // sort by name then by username
+          // sort by name then by id
           return a.name.localeCompare(b.name, undefined, opts) ||
             a.name.localeCompare(b.name, undefined, { numeric: true}) ||
-            a.username.localeCompare(b.username, undefined, opts);
+            a.id.localeCompare(b.id, undefined, opts);
         }
       )),
       takeUntil(this.isDestroyed))
@@ -65,9 +65,9 @@ export class UserTeamMembershipTableComponent implements OnInit, OnDestroy {
 
   addOrRemoveUser(checked: boolean, user: User): void {
     if (checked) {
-      this.usersToAdd[user.username] = user;
+      this.usersToAdd[user.id] = user;
     } else {
-      delete this.usersToAdd[user.username];
+      delete this.usersToAdd[user.id];
     }
   }
 
@@ -80,7 +80,7 @@ export class UserTeamMembershipTableComponent implements OnInit, OnDestroy {
   }
 
   public userNotFiltered(user: User): boolean {
-    return !(user.id in this.mapOfUsersToFilter);
+    return !(user.membership_id in this.mapOfUsersToFilter);
   }
 
   public usersNotFiltered(): User[] {
@@ -100,7 +100,7 @@ export class UserTeamMembershipTableComponent implements OnInit, OnDestroy {
   }
 
   public userLink(user: User): string {
-    return `/settings/users/${user.username}`;
+    return `/settings/users/${user.id}`;
   }
 
   public subscribeToUsersToFilter(): void {

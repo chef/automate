@@ -3,9 +3,18 @@ import { fakeServer } from './helpers/fake_server';
 import { DatetimePipe } from '../src/app/pipes/datetime.pipe';
 
 describe('Admin pages', () => {
-
   describe('User Management', () => {
     beforeEach(() => {
+      fakeServer()
+        .get('/apis/iam/v2beta/policy_version')
+        .many()
+        .reply(200, JSON.stringify({
+          'version': {
+            'major': 'V1',
+            'minor': 'V0'
+          }
+        }));
+
       fakeServer()
         .post('/api/v0/auth/introspect_some', JSON.stringify(
           {

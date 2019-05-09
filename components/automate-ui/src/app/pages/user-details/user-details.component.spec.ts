@@ -15,8 +15,8 @@ import {
 } from 'app/entities/users/user.reducer';
 import { User } from 'app/entities/users/user.model';
 import {
-  GetUserByUsername,
-  GetUserByUsernameSuccess,
+  GetUser,
+  GetUserSuccess,
   DeleteUser,
   DeleteUserSuccess
 } from 'app/entities/users/user.actions';
@@ -32,15 +32,15 @@ describe('UserDetailsComponent', () => {
 
   const user: User = {
     name: 'Alice Schmidt',
-    username: 'alice',
-    id: '6e98f609-586d-4816-a6de-e841e659b11d'
+    id: 'alice',
+    membership_id: '6e98f609-586d-4816-a6de-e841e659b11d'
   };
 
   const initialState = {
     router: {
       state: {
         url: '/settings/users/alice',
-        params: { username: 'alice' },
+        params: { id: 'alice' },
         queryParams: {},
         fragment: ''
       },
@@ -104,7 +104,7 @@ describe('UserDetailsComponent', () => {
       // Note: this is the happy end of a "fetch user data" exchange with the
       // backend -- so, for setting the stage for testing, it is exactly what
       // we need
-      store.dispatch(new GetUserByUsernameSuccess(user));
+      store.dispatch(new GetUserSuccess(user));
     });
 
     it('exists', () => {
@@ -117,7 +117,7 @@ describe('UserDetailsComponent', () => {
 
     it('dispatches an action to get its user data', () => {
       expect(store.dispatch).toHaveBeenCalledWith(
-        new GetUserByUsername({ username: user.username}));
+        new GetUser({ id: user.id }));
     });
   });
 
@@ -134,13 +134,13 @@ describe('UserDetailsComponent', () => {
 
     it('dispatches an action to get its user data', () => {
       expect(store.dispatch).toHaveBeenCalledWith(
-        new GetUserByUsername({ username: user.username}));
+        new GetUser({ id: user.id }));
     });
   });
 
   describe('when deleting the user', () => {
     beforeEach(() => {
-      store.dispatch(new GetUserByUsernameSuccess(user));
+      store.dispatch(new GetUserSuccess(user));
       component.deleteUser();
     });
 

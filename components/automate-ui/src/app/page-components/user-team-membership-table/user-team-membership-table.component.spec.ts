@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserTeamMembershipTableComponent } from './user-team-membership-table.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
-import { User, userHashToArray } from 'app/entities/users/user.model';
+import { User, userHashToArray, userArrayToHash } from 'app/entities/users/user.model';
 import { StoreModule } from '@ngrx/store';
 import { userEntityReducer } from 'app/entities/users/user.reducer';
 import * as faker from 'faker';
@@ -11,9 +11,9 @@ describe('UserTeamMembershipTableComponent', () => {
   let component: UserTeamMembershipTableComponent;
   let fixture: ComponentFixture<UserTeamMembershipTableComponent>;
   const userAlreadyInList = <User>{
-    id: faker.random.uuid(),
+    membership_id: faker.random.uuid(),
     name: 'Hank Venture',
-    username: 'enrico_matasa'
+    id: 'enrico_matasa'
   };
 
   beforeEach(() => {
@@ -45,9 +45,9 @@ describe('UserTeamMembershipTableComponent', () => {
 
   describe('addOrRemoveUser', () => {
     const testUserToAddOrRemove = <User>{
-      id: 'c39d5157-4198-478b-b75c-c2a77ac0ffa8',
+      membership_id: 'c39d5157-4198-478b-b75c-c2a77ac0ffa8',
       name: 'Dean Venture',
-      username: 'deanie'
+      id: 'deanie'
     };
 
     describe('when usersToAdd is empty', () => {
@@ -66,9 +66,9 @@ describe('UserTeamMembershipTableComponent', () => {
         component.usersToAdd = {
           'enrico_matasa': userAlreadyInList,
           'kuzko': {
-            id: 'c39d5157-4198-478b-b75c-c2a77ac0ffa8',
+            membership_id: 'c39d5157-4198-478b-b75c-c2a77ac0ffa8',
             name: 'Brock Samson',
-            username: 'kuzko'
+            id: 'kuzko'
           }
         };
       });
@@ -88,7 +88,7 @@ describe('UserTeamMembershipTableComponent', () => {
           expect(userHashToArray(component.usersToAdd).length).toBe(2);
           component.addOrRemoveUser(false, userAlreadyInList);
           expect(userHashToArray(component.usersToAdd).length).toBe(1);
-          expect(Object.keys(component.usersToAdd)).not.toContain(testUserToAddOrRemove.username);
+          expect(Object.keys(component.usersToAdd)).not.toContain(testUserToAddOrRemove.id);
         });
       });
     });
@@ -96,9 +96,9 @@ describe('UserTeamMembershipTableComponent', () => {
 
   describe('userNotFiltered', () => {
     const testUserToFilter = <User>{
-      id: faker.random.uuid(),
+      membership_id: faker.random.uuid(),
       name: 'Dean Venture',
-      username: 'deanie'
+      id: 'deanie'
     };
 
     describe('when usersToFilter is empty', () => {
@@ -114,15 +114,14 @@ describe('UserTeamMembershipTableComponent', () => {
 
     describe('when usersToFilter is not empty', () => {
       const kuzkoID = faker.random.uuid();
+      const kuzko = <User>{
+        membership_id: kuzkoID,
+        name: 'Brock Samson',
+        id: 'kuzko'
+      };
 
       beforeEach(() => {
-        component.mapOfUsersToFilter = {};
-        component.mapOfUsersToFilter[userAlreadyInList.id] = userAlreadyInList;
-        component.mapOfUsersToFilter[kuzkoID] = {
-          id: kuzkoID,
-          name: 'Brock Samson',
-          username: 'kuzko'
-        };
+        component.mapOfUsersToFilter = userArrayToHash([userAlreadyInList, kuzko]);
       });
 
       describe('when user is in the list to filter', () => {
@@ -136,9 +135,9 @@ describe('UserTeamMembershipTableComponent', () => {
         let otherUser: User;
         beforeEach(() => {
           otherUser = {
-            id: '119d5157-4198-478b-b75c-c2a77ac0ff11',
+            membership_id: '119d5157-4198-478b-b75c-c2a77ac0ff11',
             name: 'Montag the Dog',
-            username: 'taggerbot9000'
+            id: 'taggerbot9000'
           };
         });
 
@@ -155,9 +154,9 @@ describe('UserTeamMembershipTableComponent', () => {
     let users: User[];
     const kuzkoID = faker.random.uuid();
     const kuzko = {
-      id: kuzkoID,
+      membership_id: kuzkoID,
       name: 'Brock Samson',
-      username: 'kuzko'
+      id: 'kuzko'
     };
 
     describe('when both mapOfUsersToFilter and input users are empty', () => {
@@ -175,7 +174,7 @@ describe('UserTeamMembershipTableComponent', () => {
     describe('when both mapOfUsersToFilter and input match exactly', () => {
       beforeEach(() => {
         component.mapOfUsersToFilter = {};
-        component.mapOfUsersToFilter[userAlreadyInList.id] = userAlreadyInList;
+        component.mapOfUsersToFilter[userAlreadyInList.membership_id] = userAlreadyInList;
         component.mapOfUsersToFilter[kuzkoID] = kuzko;
         users = [userAlreadyInList, kuzko];
       });
@@ -201,14 +200,14 @@ describe('UserTeamMembershipTableComponent', () => {
     describe('when mapOfUsersToFilter is not a superset of input', () => {
       beforeEach(() => {
         const otherUser = {
-          id: faker.random.uuid(),
+          membership_id: faker.random.uuid(),
           name: 'Montag the Dog',
-          username: 'taggerbot9000'
+          id: 'taggerbot9000'
         };
 
         component.mapOfUsersToFilter = {};
-        component.mapOfUsersToFilter[userAlreadyInList.id] = userAlreadyInList;
-        component.mapOfUsersToFilter[kuzko.id] = kuzko;
+        component.mapOfUsersToFilter[userAlreadyInList.membership_id] = userAlreadyInList;
+        component.mapOfUsersToFilter[kuzko.membership_id] = kuzko;
         users = [userAlreadyInList, kuzko, otherUser];
       });
 

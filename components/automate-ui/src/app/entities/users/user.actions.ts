@@ -11,9 +11,9 @@ export enum UserActionTypes {
   GET_ALL                 = 'USER::GET_ALL',
   GET_ALL_SUCCESS         = 'USER::GET_ALL::SUCCESS',
   GET_ALL_FAILURE         = 'USER::GET_ALL::FAILURE',
-  GET_BY_USERNAME         = 'USER::GET_BY_USERNAME',
-  GET_BY_USERNAME_SUCCESS = 'USER::GET_BY_USERNAME::SUCCESS',
-  GET_BY_USERNAME_FAILURE = 'USER::GET_BY_USERNAME::FAILURE',
+  GET                     = 'USER::GET',
+  GET_SUCCESS             = 'USER::GET::SUCCESS',
+  GET_FAILURE             = 'USER::GET::FAILURE',
   UPDATE                  = 'USER::UPDATE',
   UPDATE_SUCCESS          = 'USER::UPDATE::SUCCESS',
   UPDATE_FAILURE          = 'USER::UPDATE::FAILURE',
@@ -42,18 +42,18 @@ export class GetUsersFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class GetUserByUsername implements Action {
-  readonly type = UserActionTypes.GET_BY_USERNAME;
-  constructor(public payload: {username: string}) { }
+export class GetUser implements Action {
+  readonly type = UserActionTypes.GET;
+  constructor(public payload: {id: string}) { }
 }
 
-export class GetUserByUsernameSuccess implements Action {
-  readonly type = UserActionTypes.GET_BY_USERNAME_SUCCESS;
+export class GetUserSuccess implements Action {
+  readonly type = UserActionTypes.GET_SUCCESS;
   constructor(public payload: User) { }
 }
 
-export class GetUserByUsernameFailure implements Action {
-  readonly type = UserActionTypes.GET_BY_USERNAME_FAILURE;
+export class GetUserFailure implements Action {
+  readonly type = UserActionTypes.GET_FAILURE;
   constructor(public payload: HttpErrorResponse) { }
 }
 
@@ -98,8 +98,8 @@ export class DeleteUserFailure implements Action {
 }
 
 export interface CreateUserPayload {
+  id: string;
   name: string;
-  username: string;
   password: string;
 }
 
@@ -127,9 +127,9 @@ export type UserActions =
   | GetUsers
   | GetUsersSuccess
   | GetUsersFailure
-  | GetUserByUsername
-  | GetUserByUsernameSuccess
-  | GetUserByUsernameFailure
+  | GetUser
+  | GetUserSuccess
+  | GetUserFailure
   | UpdateUser
   | UpdateUserSuccess
   | UpdateUserFailure

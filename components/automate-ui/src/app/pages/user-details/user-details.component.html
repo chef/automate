@@ -2,7 +2,7 @@
 <app-profile-sidebar *ngIf="!isAdminView"> </app-profile-sidebar>
 
 <div class="container">
-  <main *ngIf="isAdminView || user?.username">
+  <main *ngIf="isAdminView || user?.id">
     <app-delete-object-modal
       [visible]="modalVisible"
       objectNoun="user"
@@ -33,7 +33,7 @@
             </form>
           </ng-container>
           <div class="container-big-header inline-container">
-            <span class="text"> {{ user?.username }}</span>
+            <span class="text"> {{ user?.id }}</span>
           </div>
         </div>
         <div class="button-column">

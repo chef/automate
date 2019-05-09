@@ -6,7 +6,7 @@ import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
+import { routeParams, routeURL } from 'app/route.selectors';
 import { EntityStatus } from 'app/entities/entities';
 import { User, HashMapOfUsers } from 'app/entities/users/user.model';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
@@ -31,6 +31,7 @@ import {
 
 // NB: neither \S nor ^\s work inside the brackets in this regex language.
 const NON_BLANK = '.*[^ ].*';
+const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
 @Component({
   selector: 'app-team-details',
@@ -97,18 +98,19 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
           }
           // Map UUID membership to user records and remove any entries that don't
           // map to user records.
-          return at(tUsers, keyBy('id', users))
+          return at(tUsers, keyBy('membership_id', users))
             .filter(userRecord => userRecord !== undefined);
         }),
         map((users: User[]) => users.sort(
           (a, b) => {
             // See https://stackoverflow.com/a/38641281 for these options
             const opts = { numeric: true, sensitivity: 'base' };
-            // sort by name then by username
+            // sort by name then by id
             return a.name.localeCompare(b.name, undefined, opts) ||
               a.name.localeCompare(b.name, undefined, { numeric: true }) ||
-              a.username.localeCompare(b.username, undefined, opts);
-          }))
+              a.id.localeCompare(b.id, undefined, opts);
+            })),
+        takeUntil(this.isDestroyed)
       );
 
     // If, however, the user browses directly to /settings/teams/ID, the store
@@ -121,7 +123,17 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed))
       .subscribe((id: string) => {
-        this.store.dispatch(new GetTeam({ id }));
+        this.store.select(routeURL).pipe(
+          filter(identity),
+          takeUntil(this.isDestroyed))
+          .subscribe((url: string) => {
+            // Only fetch if we are on the team details route, otherwise
+            // we'll trigger GetTeam with the wrong input on any route
+            // away to a page that also uses the :id param.
+            if (TEAM_DETAILS_ROUTE.test(url)) {
+              this.store.dispatch(new GetTeam({ id }));
+            }
+          });
       });
 
     this.store.select(updateStatus).pipe(
@@ -155,7 +167,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   addUsers(users: HashMapOfUsers): void {
     this.toggleUserMembershipView();
 
-    const userIDs = Object.values(users).map((user: User) => user.id);
+    const userIDs = Object.values(users).map((user: User) => user.membership_id);
 
     this.store.dispatch(new AddTeamUsers(<TeamUserMgmtPayload>{
       id: this.teamId,
@@ -166,7 +178,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   removeUser(user: User): void {
     this.store.dispatch(new RemoveTeamUsers(<TeamUserMgmtPayload>{
       id: this.teamId,
-      user_ids: [user.id]
+      user_ids: [user.membership_id]
     }));
   }
 

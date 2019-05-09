@@ -12,7 +12,7 @@ import { routeParams } from 'app/route.selectors';
 import { EntityStatus } from 'app/entities/entities';
 import {
   DeleteUser,
-  GetUserByUsername,
+  GetUser,
   UpdateUser,
   UpdateSelf
  } from 'app/entities/users/user.actions';
@@ -82,8 +82,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       store.select(userStatus))
       .pipe(
         map(([state, status]) => {
-          const username = this.user.username;
-          return status === EntityStatus.loadingSuccess && !find({ username }, state);
+          const id = this.user.id;
+          return status === EntityStatus.loadingSuccess && !find({ id }, state);
         }));
 
     this.subscriptions = [
@@ -95,10 +95,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       // Note: if the user browses directly to /settings/users/USERNAME, the state
       // will not contain any user data -- so we need to fetch it.
       store.select(routeParams).pipe(
-        pluck('username'),
+        pluck('id'),
         filter(identity))
-        .subscribe((username: string) => {
-          store.dispatch(new GetUserByUsername({username}));
+        .subscribe((id: string) => {
+          store.dispatch(new GetUser({id}));
         }),
 
       // if the user is gone, go back to list
@@ -163,7 +163,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private updatePasswordForSelf(): void {
     const password = this.passwordForm.get('newPassword').value;
     const previous_password = this.passwordForm.get('oldPassword').value;
-    this.store.dispatch(new UpdateSelf({ ...this.user, password, previous_password }));
+    this.store.dispatch(new UpdateSelf({
+      id: this.user.id,
+      name: this.user.name,
+      membership_id: this.user.membership_id,
+      password: password,
+      previous_password: previous_password
+    }));
   }
 
   public updateFullName(): void {
@@ -171,7 +177,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       this.isAdminView ?
         new UpdateUser({ ...this.user, name })
-        : new UpdateSelf({ ...this.user, name }));
+        : new UpdateSelf({
+          id: this.user.id,
+          name: name,
+          membership_id: this.user.membership_id
+        }));
   }
 
   public openDeleteConfirmationModal(): void {

@@ -72,7 +72,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           // sort by name then by username
           return a.name.localeCompare(b.name, undefined, opts) ||
             a.name.localeCompare(b.name, undefined, { numeric: true}) ||
-            a.username.localeCompare(b.username, undefined, opts);
+            a.id.localeCompare(b.id, undefined, opts);
         }
       )));
 
@@ -124,7 +124,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
     const userCreateReq = <CreateUserPayload>{
       name: formValues.fullname,
-      username: formValues.username,
+      id: formValues.username,
       password: formValues.password
     };
 

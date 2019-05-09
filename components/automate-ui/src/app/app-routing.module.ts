@@ -99,7 +99,7 @@ const routes: Routes = [
           component: UserManagementComponent
         },
         {
-          path: 'users/:username',
+          path: 'users/:id',
           component: UserDetailsComponent
         },
         {
@@ -175,7 +175,7 @@ const routes: Routes = [
       ]
     },
     {
-      path: 'user-details/:username',
+      path: 'user-details/:id',
       component: UserDetailsComponent,
       resolve: { isNonAdmin: UserDetailsNonAdminResolve }
     },
