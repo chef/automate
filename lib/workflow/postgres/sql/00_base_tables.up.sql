@@ -49,7 +49,6 @@ CREATE TYPE task_status AS ENUM('success', 'failed', 'abandoned');
 
 CREATE TABLE tasks (
     id BIGSERIAL PRIMARY KEY,
-    -- TODO(ssd) 2019-05-09: Do we want the ON DELETE CASCADE here?
     workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     try_remaining INT NOT NULL DEFAULT 1,
     enqueued_at   TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -61,7 +60,6 @@ CREATE TABLE tasks (
 
 CREATE TABLE tasks_results (
     id BIGSERIAL PRIMARY KEY,
-    -- TODO(ssd) 2019-05-09: Do we want the ON DELETE CASCADE here?
     workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     parameters   JSON,
     task_name    TEXT NOT NULL,
@@ -73,7 +71,7 @@ CREATE TABLE tasks_results (
 );
 
 
-CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete');
+CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete', 'cancel');
 
 -- NOTE(ssd) 2019-05-09: Workflow events are defined here because they
 -- may reference task_restuls
@@ -103,7 +101,7 @@ AS $$
     SELECT pg_notify('workflow_instance_new', workflow_name);
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION dequeue_workflow(workflow_names TEXT)
+CREATE OR REPLACE FUNCTION dequeue_workflow(VARIADIC workflow_names TEXT[])
 RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT,
     parameters JSON, payload JSON, event_id BIGINT, event_type workflow_event_type,
     task_result_id BIGINT)
@@ -120,7 +118,7 @@ AS $$
             b.task_result_id task_result_id
         FROM workflow_instances a
         INNER JOIN workflow_events b ON a.id = b.workflow_instance_id
-        WHERE a.workflow_name = workflow_names
+        WHERE a.workflow_name = ANY(workflow_names)
         ORDER BY b.enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
     ),
     updated AS (
@@ -134,18 +132,20 @@ $$ LANGUAGE SQL;
 
 -- We currently expect that the overall results from workflows will be
 -- stored by the workflow itself.
---
--- TODO(ssd) 2019-05-09: For scheduled tasks we might want to record
--- the completion time, but where would that live, do we want a
--- workflow_results table as well?
-CREATE OR REPLACE FUNCTION complete_workflow(wid BIGINT)
+CREATE OR REPLACE FUNCTION complete_workflow(workflow_instance_id BIGINT)
 RETURNS VOID
-LANGUAGE SQL
 AS $$
-    WITH done_workflows AS (SELECT id FROM workflow_instances where id = wid)
-    SELECT pg_notify('workflow_instance_complete', id::text) FROM done_workflows;
-    DELETE FROM workflow_instances WHERE id = wid
-$$;
+    -- TODO(ssd) 2019-05-09: We might want to notify here to update the task scheduler thingy that doesn't exist
+    DELETE FROM workflow_instances WHERE id=workflow_instance_id;
+$$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION cancel_workflow(workflow_instance_id BIGINT)
+RETURNS VOID
+AS $$
+    INSERT INTO workflow_events(event_type, workflow_instance_id)
+        VALUES('cancel', workflow_instance_id);
+$$ LANGUAGE SQL;
+
 
 CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, payload JSON)
 RETURNS VOID
@@ -156,6 +156,12 @@ AS $$
     DELETE FROM workflow_events WHERE id = eid
 $$;
 
+-- Notification channels
+--
+-- workflow_task_new
+-- workflow_task_complete
+--
+-- (jaym): I think we can just have 1 notification channel for workflow events
 
 -- Task Functions
 CREATE OR REPLACE FUNCTION enqueue_task(
@@ -192,10 +198,15 @@ AS $$
         tid as id,
         status as status,
         error as error,
-        result as result)
-    INSERT INTO tasks_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
-        (SELECT workflow_instance_id, parameters, task_name, enqueued_at, in_vals.status, in_vals.error, in_vals.result
-         FROM tasks JOIN in_vals ON in_vals.id = tasks.id WHERE tasks.id = tid);
+        result as result),
+    tres AS (
+        INSERT INTO tasks_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
+            (SELECT workflow_instance_id, parameters, task_name, enqueued_at, in_vals.status, in_vals.error, in_vals.result
+            FROM tasks JOIN in_vals ON in_vals.id = tasks.id WHERE tasks.id = tid) RETURNING id, workflow_instance_id
+    )
+    INSERT INTO workflow_events(event_type, task_result_id, workflow_instance_id)
+        VALUES('task_complete', (select id from tres), (select workflow_instance_id from tres));
+    ;
     DELETE FROM tasks WHERE id = tid
 $$;
 

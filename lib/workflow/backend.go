@@ -34,6 +34,7 @@ type WorkflowEventType string
 var (
 	WorkflowStart WorkflowEventType = "start"
 	TaskComplete  WorkflowEventType = "task_complete"
+	Cancel        WorkflowEventType = "cancel"
 )
 
 type WorkflowInstance struct {
