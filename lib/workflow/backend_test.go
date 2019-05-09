@@ -1,17 +1,14 @@
 package workflow
 
 import (
-	"context"
-	"testing"
-
 	_ "github.com/lib/pq"
-	"github.com/stretchr/testify/require"
 )
 
 type TestStruct struct {
 	Thing string
 }
 
+/*
 func TestTasks(t *testing.T) {
 	connInfo := "postgresql://postgres@127.0.0.1:5432/workflow?sslmode=disable"
 	pg, err := NewPostgresBackend(connInfo)
@@ -25,3 +22,4 @@ func TestTasks(t *testing.T) {
 	})
 	require.NoError(t, err)
 }
+*/

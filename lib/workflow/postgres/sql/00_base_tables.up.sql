@@ -45,7 +45,7 @@ CREATE TABLE workflow_instances (
 -- New and Completed tasks also notify a channel that can be
 -- subscribed to by the workflows for more timely notification of new
 -- task events related to their workflow.
-CREATE TYPE task_status AS ENUM('success', 'failed', 'abandoned');
+CREATE TYPE task_status AS ENUM('success', 'failed');
 
 CREATE TABLE tasks (
     id BIGSERIAL PRIMARY KEY,

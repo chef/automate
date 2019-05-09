@@ -97,13 +97,15 @@ func main() {
 const defaultDatabaseName = "workflow"
 
 func defaultConnURIForDatabase(dbname string) string {
-	connInfo := pg.A2ConnInfo{
-		Host:  "localhost",
-		Port:  5432,
-		User:  "automate",
-		Certs: pg.A2SuperuserCerts,
-	}
-	return connInfo.ConnURI(dbname)
+	/*
+		connInfo := pg.A2ConnInfo{
+			Host:  "localhost",
+			Port:  5432,
+			User:  "automate",
+			Certs: pg.A2SuperuserCerts,
+		}
+		return connInfo.ConnURI(dbname)*/
+	return fmt.Sprintf("postgresql://docker:docker@127.0.0.1:5432/%s?sslmode=disable", dbname)
 }
 
 func runResetDB(_ *cobra.Command, args []string) error {
@@ -127,6 +129,40 @@ func runResetDB(_ *cobra.Command, args []string) error {
 	return nil
 }
 
+type PerfTestWorkflow struct{}
+
+func (PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
+	ev workflow.StartEvent) workflow.Decision {
+	logrus.Info("OnStart")
+	for i := 0; i < 10; i++ {
+		w.EnqueueTask("test task", fmt.Sprintf("asdf: %d", i))
+	}
+	enqueue_done = true
+	return w.Continue(0)
+}
+
+var count = 0
+var enqueue_done = false
+var done = false
+
+func (PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
+	ev workflow.TaskCompleteEvent) workflow.Decision {
+
+	logrus.WithField("task_name", ev.TaskName).Info("Task Completed")
+	count++
+	if count < 10 {
+		return w.Continue(count)
+	} else {
+		logrus.Info("SUPER DONE")
+		done = true
+		return w.Complete()
+	}
+}
+
+func (PerfTestWorkflow) OnCancel(w workflow.FWorkflowInstance,
+	ev workflow.CancelEvent) workflow.Decision {
+	return w.Complete()
+}
 func runPerfTest(_ *cobra.Command, args []string) error {
 	dbName := defaultDatabaseName
 	if len(args) > 0 {
@@ -147,46 +183,22 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 		return errors.Wrap(err, "could not initialize database schema")
 	}
 
+	workflowManager := workflow.NewManager(w)
+	workflowManager.RegisterWorkflowExecutor("perf-test", PerfTestWorkflow{})
+	workflowManager.Start(context.Background())
+
 	w.EnqueueWorkflow(context.TODO(), &workflow.WorkflowInstance{
 		WorkflowName: "perf-test",
 		InstanceName: fmt.Sprintf("perf-test-%s", time.Now()),
 	})
 
-	event, workflowCompleter, err := w.DequeueWorkflow(context.TODO(), "perf-test")
-	if err != nil {
-		return errors.Wrap(err, "could not dequeue workflow")
-	}
-	logrus.Infof("Got event: %v", event)
-	defer workflowCompleter.Done()
-
 	dequeueResultChan := make(chan error, 100)
 	doneChan := make(chan struct{})
 
-	if !perfTestOpts.DequeueOnly {
-		for i := 0; i < perfTestOpts.TaskCount; {
-			logrus.Debugf("Enqueueing task %d", i)
-			err := workflowCompleter.EnqueueTask(&workflow.Task{
-				Name:               "test task",
-				WorkflowInstanceID: event.InstanceID,
-				Parameters:         "",
-			})
-			if err == nil {
-				logrus.Debugf("Enqueued task %d", i)
-				i++
-			} else {
-				logrus.Error(err)
-			}
-
-		}
-	}
-
-	err = workflowCompleter.Continue("")
-	if err != nil {
-		return err
-	}
-
-	logrus.Info("All tasks enqueued")
 	if perfTestOpts.EnqueueOnly {
+		for !enqueue_done {
+			time.Sleep(1 * time.Second)
+		}
 		return nil
 	}
 
@@ -226,18 +238,9 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 		}
 	}
 
-	event, workflowCompleter, err = w.DequeueWorkflow(context.TODO(), "perf-test")
-	if err != nil {
-		return errors.Wrap(err, "could not dequeue workflow")
+	for !done {
+		time.Sleep(1 * time.Second)
 	}
-
-	logrus.Infof("Event: %#+v", event)
-
-	err = workflowCompleter.Done()
-	if err != nil {
-		return errors.Wrap(err, "could not complete workflow")
-	}
-
 	return nil
 }
 
