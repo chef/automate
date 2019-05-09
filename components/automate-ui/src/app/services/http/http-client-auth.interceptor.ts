@@ -21,7 +21,7 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
   ) {
     this.store.select(selectors.options)
       .subscribe((options: ProjectsFilterOption[]) => {
-        this.projects = options.map(p => p.value).join(', ');
+        this.projects = options.filter(p => p.checked).map(p => p.value).join(', ');
       });
   }
 

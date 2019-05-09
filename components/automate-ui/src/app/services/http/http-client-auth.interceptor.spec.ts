@@ -8,6 +8,7 @@ import {
   ProjectsFilterState, ProjectsFilterOption
 } from '../projects-filter/projects-filter.reducer';
 import { HttpClientAuthInterceptor } from './http-client-auth.interceptor';
+import { using } from 'app/testing/spec-helpers';
 
 describe('HttpClientAuthInterceptor', () => {
   let httpClient: HttpClient;
@@ -46,50 +47,83 @@ describe('HttpClientAuthInterceptor', () => {
 
   describe('project header', () => {
 
-    describe('with some projects', () => {
-      const projectsList = ['proj1', 'proj2', 'proj3'];
+    using([
+      ['with some projects and ALL checked',
+        [
+          { value: 'proj1', label: 'proj 1', checked: true },
+          { value: 'proj2', label: 'proj 2', checked: true },
+          { value: 'proj3', label: 'proj 3', checked: true }
+        ]],
+      ['with some projects and SOME checked',
+        [
+          { value: 'proj1', label: 'proj 1', checked: true },
+          { value: 'proj2', label: 'proj 2', checked: false },
+          { value: 'proj3', label: 'proj 3', checked: true },
+          { value: 'proj4', label: 'proj 4', checked: false }
+        ]],
+      ['with some projects and ONE checked',
+        [
+          { value: 'proj1', label: 'proj 1', checked: false },
+          { value: 'proj2', label: 'proj 2', checked: false },
+          { value: 'proj3', label: 'proj 3', checked: true }
+        ]]
+    ], function (description: string, projectList: ProjectsFilterOption[]) {
 
-      beforeEach(() => {
-        configure(projectsList.map(p => <ProjectsFilterOption>{ value: p }));
-        httpClient = TestBed.get(HttpClient);
-        httpMock = TestBed.get(HttpTestingController);
-        chefSession = TestBed.get(ChefSessionService);
-        spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
-      });
+      describe(description, () => {
+        beforeEach(() => {
+          configure(projectList);
+          httpClient = TestBed.get(HttpClient);
+          httpMock = TestBed.get(HttpTestingController);
+          chefSession = TestBed.get(ChefSessionService);
+          spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+        });
 
-      it('includes projects header in all requests', done => {
-        httpClient.get('/endpoint').subscribe(done);
+        it('includes checked projects', done => {
+          httpClient.get('/endpoint').subscribe(done);
 
-        const httpRequest = httpMock.expectOne('/endpoint');
-        httpRequest.flush('response');
+          const httpRequest = httpMock.expectOne('/endpoint');
+          httpRequest.flush('response');
 
-        expect(httpRequest.request.headers.keys()).toContain('projects');
-        expect(httpRequest.request.headers.get('projects')).toEqual(projectsList.join(', '));
+          expect(httpRequest.request.headers.keys()).toContain('projects');
+          expect(httpRequest.request.headers.get('projects'))
+            .toEqual(projectList.filter(p => p.checked).map(p => p.value).join(', '));
+        });
       });
     });
 
-    describe('with no projects', () => {
-        const projectsList = [];
+    using([
+      ['with some projects and NONE checked',
+        [
+          { value: 'proj1', label: 'proj 1', checked: false },
+          { value: 'proj2', label: 'proj 2', checked: false },
+          { value: 'proj3', label: 'proj 3', checked: false }
+        ]],
+      ['with NO projects',
+        [
+        ]]
+    ], function (description: string, projectList: ProjectsFilterOption[]) {
 
-      beforeEach(() => {
-        configure(projectsList.map(p => <ProjectsFilterOption>{ value: p }));
-        httpClient = TestBed.get(HttpClient);
-        httpMock = TestBed.get(HttpTestingController);
-        chefSession = TestBed.get(ChefSessionService);
-        spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
-      });
+      describe(description, () => {
 
-      it('does not include projects header', done => {
-        httpClient.get('/endpoint').subscribe(done);
+        beforeEach(() => {
+          configure(projectList);
+          httpClient = TestBed.get(HttpClient);
+          httpMock = TestBed.get(HttpTestingController);
+          chefSession = TestBed.get(ChefSessionService);
+          spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+        });
 
-        const httpRequest = httpMock.expectOne('/endpoint');
-        httpRequest.flush('response');
+        it('does not include projects header', done => {
+          httpClient.get('/endpoint').subscribe(done);
 
-        expect(httpRequest.request.headers.keys()).not.toContain('projects');
+          const httpRequest = httpMock.expectOne('/endpoint');
+          httpRequest.flush('response');
+
+          expect(httpRequest.request.headers.keys()).not.toContain('projects');
+        });
       });
     });
   });
-
 });
 
 function configure(projects?: ProjectsFilterOption[]): void {
