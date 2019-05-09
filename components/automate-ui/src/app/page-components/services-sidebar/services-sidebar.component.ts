@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, Subject } from 'rxjs';
@@ -20,7 +20,6 @@ import { includes, getOr } from 'lodash/fp';
 export class ServicesSidebarComponent implements OnInit, OnDestroy {
   @Input() serviceGroupId: number;
   @Input() visible: boolean;
-  @Output() closeServicesSidebarEvent: EventEmitter<any> = new EventEmitter();
 
   public services$: Observable<Service[]>;
   public serviceGroupName$: Observable<string>;
@@ -66,10 +65,6 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  public closeServicesSidebar() {
-    this.closeServicesSidebarEvent.emit(null);
   }
 
   public updateHealthFilter(health: string): void {

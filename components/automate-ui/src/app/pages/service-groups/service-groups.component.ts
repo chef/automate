@@ -31,9 +31,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   // The selected service-group id that will be sent to the services-sidebar
   public selectedServiceGroupId: number;
 
-  // Weather or not the the services sidebar is visible
-  public servicesSidebarVisible = false;
-
   // The current page the user is visualizing
   public currentPage = 1;
 
@@ -157,15 +154,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       health: 'total'
     };
     this.selectedServiceGroupId = id;
-    this.servicesSidebarVisible = true;
     this.store.dispatch(new UpdateSelectedSG(servicesFilters));
     document.getElementById('services-panel').focus();
-  }
-
-  public closeServicesSidebar() {
-    if (this.servicesSidebarVisible) {
-      this.servicesSidebarVisible = false;
-    }
   }
 
   private getSelectedStatus(allParameters: Chicklet[]): RollupServiceStatus {
