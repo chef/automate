@@ -6,7 +6,11 @@ ul {
 }
 
 .services-panel {
-  background-color: #FFFFFF;
+  background-color: $chef-white;
+  border-left: 1px solid $chef-grey;
+  box-shadow: none;
+  transition: none;
+  outline: none;
 }
 
 app-page-picker {

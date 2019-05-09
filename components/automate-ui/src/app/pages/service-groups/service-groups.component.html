@@ -87,10 +87,10 @@
       <chef-button primary>Learn More</chef-button>
     </div>
   </div>
-  <app-services-sidebar
-    [serviceGroupId]="selectedServiceGroupId"
-    [visible]="servicesSidebarVisible"
-    class="services-sidebar-container"
-    (closeServicesSidebarEvent)="closeServicesSidebar()">
-  </app-services-sidebar>
 </div>
+<app-services-sidebar
+  [serviceGroupId]="selectedServiceGroupId"
+  [visible]="servicesSidebarVisible"
+  class="services-sidebar-container"
+  (closeServicesSidebarEvent)="closeServicesSidebar()">
+</app-services-sidebar>
