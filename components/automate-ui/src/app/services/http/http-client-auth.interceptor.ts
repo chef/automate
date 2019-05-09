@@ -21,16 +21,18 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
   ) {
     this.store.select(selectors.options)
       .subscribe((options: ProjectsFilterOption[]) => {
-        this.projects = options.map(p => p.value).join(', ') || 'proj1'; // TODO: empty string causes 403 errors ?!?
+        this.projects = options.map(p => p.value).join(', ');
       });
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    let headers = request.headers.set('Authorization', `Bearer ${this.chefSession.id_token}`);
+    if (this.projects) {
+      headers = headers.set('projects', this.projects);
+    }
     return next
       .handle(request.clone({
-        headers: request.headers
-          .set('Authorization', `Bearer ${this.chefSession.id_token}`)
-          .set('projects', this.getProjects())
+        headers: headers
       })).pipe(
         catchError((response: HttpEvent<any>) => {
           if (get('status', response) === 401) {
@@ -38,9 +40,5 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
           }
           return observableThrowError(response);
         }));
-  }
-
-  private getProjects(): string {
-    return this.projects;
   }
 }
