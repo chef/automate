@@ -111,9 +111,13 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context, request *request.Nod
 	return nodesCounts, nil
 }
 
-// GetRunsCounts returns the runs counts
+// GetRunsCounts returns the runs counts for a node
 func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context, request *request.RunsCounts) (*response.RunsCounts, error) {
 	var runsCounts *response.RunsCounts
+	if request.GetNodeId() == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "Parameter 'node_id' not provided")
+	}
+
 	filters, err := params.FormatNodeFilters(request.Filter)
 	if err != nil {
 		return runsCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
@@ -122,9 +126,21 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context, request *request.Runs
 		return runsCounts, status.Errorf(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
 	}
 
-	state, err := s.client.GetRunsCounts(filters, request.GetStart(), request.GetEnd())
+	projectFilters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return runsCounts, status.Errorf(codes.Internal, err.Error())
+	}
+
+	nodeExistsChan := s.nodeExistsAsync(request.GetNodeId(), projectFilters)
+
+	state, err := s.client.GetRunsCounts(filters, request.GetNodeId(), request.GetStart(), request.GetEnd())
 	if err != nil {
 		return runsCounts, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
+	nodeExists := <-nodeExistsChan
+	if nodeExists.err != nil {
+		return runsCounts, nodeExists.err
 	}
 
 	runsCounts = &response.RunsCounts{

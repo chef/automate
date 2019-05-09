@@ -70,7 +70,7 @@ func (m Backend) GetRun(run_id string, lastCcr time.Time) (backend.Run, error) {
 	return *n, nil
 }
 
-func (m Backend) GetRunsCounts(filters map[string][]string, start string, end string) (backend.RunsCounts, error) {
+func (m Backend) GetRunsCounts(filters map[string][]string, nodeID string, start string, end string) (backend.RunsCounts, error) {
 	ns := backend.RunsCounts{}
 	return ns, nil
 }

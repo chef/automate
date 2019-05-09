@@ -41,6 +41,8 @@ func init() {
 					return m.Start
 				case "end":
 					return m.End
+				case "node_id":
+					return m.NodeId
 				default:
 					return ""
 				}

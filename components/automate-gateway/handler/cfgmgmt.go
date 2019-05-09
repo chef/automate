@@ -209,6 +209,7 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context, request *cfgReq.RunsC
 		Filter: request.Filter,
 		Start:  request.Start,
 		End:    request.End,
+		NodeId: request.NodeId,
 	}
 
 	cfgmgmtRunsCounts, err := s.cfgMgmtClient.GetRunsCounts(ctx, cfgMgmtRequest)

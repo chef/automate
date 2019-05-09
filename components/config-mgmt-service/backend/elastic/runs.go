@@ -69,8 +69,9 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 	return run, nil
 }
 
-// GetRunsCounts returns a RunsCounts object that contains the number of success, failure, total runs
-func (es Backend) GetRunsCounts(filters map[string][]string, start string, end string) (backend.RunsCounts, error) {
+// GetRunsCounts returns a RunsCounts object that contains the number of success, failure, total runs for a node
+func (es Backend) GetRunsCounts(filters map[string][]string, nodeID string, start string,
+	end string) (backend.RunsCounts, error) {
 	var ns = *new(backend.RunsCounts)
 
 	mainQuery := newBoolQueryFromFilters(filters)
@@ -80,6 +81,10 @@ func (es Backend) GetRunsCounts(filters map[string][]string, start string, end s
 	if ok {
 		mainQuery = mainQuery.Must(rangeQuery)
 	}
+
+	nodeIDQuery := elastic.NewBoolQuery()
+	nodeIDQuery = nodeIDQuery.Must(elastic.NewTermsQuery(backend.Id, nodeID))
+	mainQuery = mainQuery.Must(nodeIDQuery)
 
 	var searchTerm = "status"
 

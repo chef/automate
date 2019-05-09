@@ -316,6 +316,12 @@ func init() {
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "node_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
