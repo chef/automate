@@ -34,6 +34,8 @@ function compile_go_protobuf_component() {
   local path
   if [ "$1" == "api" ]; then
     path=api
+  elif [ "$1" == "habitat" ]; then
+    path=api/habitat
   elif [ "$1" == "config" ]; then
     path=api/config
   else
@@ -73,6 +75,12 @@ function compile_go_protobuf_component() {
 # Adding auto tab complete
 complete -F _component_auto_complete compile_go_protobuf_component
 
+# Pulls the latest protobuf from habitat for the habitat-> automate messages.
+function update_habitat_message() {
+  install_if_missing core/curl curl
+  ./api/scripts/download.sh
+  compile_go_protobuf_component habitat
+}
 
 function compile_client_mocks() {
   install_gomock
@@ -237,7 +245,7 @@ function build_all() {
 }
 
 function verify_component() {
-  if [[ "$1" == "deployment-service" || "$1" == "api" || "$1" == "config" ]]; then
+  if [[ "$1" == "deployment-service" || "$1" == "api" || "$1" == "config" || "$1" == "habitat" ]]; then
     return 0
   fi
   if [[ ! -d /src/components/$1 ]]; then
