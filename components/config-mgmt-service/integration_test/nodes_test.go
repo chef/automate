@@ -184,7 +184,7 @@ func TestGetRunsProjectFilter(t *testing.T) {
 			expected: []string{"1", "2"},
 		},
 		{
-			description: "Getting runs with node not matching projects error",
+			description: "Getting runs with node not matching projects",
 			node: iBackend.Node{
 				Projects: []string{"project9"},
 			},

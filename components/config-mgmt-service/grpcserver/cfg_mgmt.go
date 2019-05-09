@@ -143,6 +143,15 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context, request *request.Runs
 		return runsCounts, nodeExists.err
 	}
 
+	// Either the user does not have permissions or the node does not exist
+	if !nodeExists.exists {
+		return &response.RunsCounts{
+			Total:   0,
+			Success: 0,
+			Failure: 0,
+		}, nil
+	}
+
 	runsCounts = &response.RunsCounts{
 		Total:   int32(state.Total),
 		Success: int32(state.Success),

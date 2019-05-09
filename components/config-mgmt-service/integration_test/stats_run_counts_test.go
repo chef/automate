@@ -16,6 +16,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -441,6 +442,205 @@ func TestStatsRunsCountsWrongParameters(t *testing.T) {
 			assert.NotNil(t, err)
 			assert.Nil(t, res)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+	}
+}
+
+func TestStatsRunsCountsProjectFilter(t *testing.T) {
+	nodeID := newUUID()
+
+	cases := []struct {
+		description  string
+		runs         []iBackend.Run
+		ctx          context.Context
+		nodeProjects []string
+		expected     *response.RunsCounts
+	}{
+		{
+			description: "Node project matching request projects",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{"project9"}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+		{
+			description: "Node project not matching request projects",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{"project3"}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   0,
+				Failure: 0,
+				Success: 0,
+			},
+		},
+		{
+			description: "Node one project; request all projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+		{
+			description: "Node has no projects; request all projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			nodeProjects: []string{},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+		{
+			description: "Node has no projects; request unassigned projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			nodeProjects: []string{},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+		{
+			description: "Node has a projects; request unassigned projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   0,
+				Failure: 0,
+				Success: 0,
+			},
+		},
+		{
+			description: "Node has a projects; request unassigned projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+
+			for index := range test.runs {
+				test.runs[index].StartTime = time.Now()
+				test.runs[index].EndTime = time.Now().Add(10)
+				test.runs[index].NodeInfo.EntityUuid = nodeID
+			}
+
+			node := iBackend.Node{
+				Exists:   true,
+				Projects: test.nodeProjects,
+				NodeInfo: iBackend.NodeInfo{
+					EntityUuid: nodeID,
+				},
+			}
+
+			// Ingest the runs, this will automatically refresh the indexes
+			suite.IngestRuns(test.runs)
+			suite.IngestNodes([]iBackend.Node{node})
+			defer suite.DeleteAllDocuments()
+
+			req := request.RunsCounts{
+				NodeId: nodeID,
+			}
+
+			res, err := cfgmgmt.GetRunsCounts(test.ctx, &req)
+			assert.Nil(t, err)
+			assert.Equal(t, test.expected, res)
 		})
 	}
 }
