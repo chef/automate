@@ -246,21 +246,7 @@ func (s *state) ListProjectRules(ctx context.Context,
 		}
 	}
 	return &api.ProjectCollectionRulesResp{
-		ProjectRules: map[string]*api.ProjectRules{
-			"project9": {
-				Rules: []*api.ProjectRule{
-					{
-						Type: api.ProjectRuleTypes_EVENT,
-						Conditions: []*api.Condition{
-							{
-								Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
-								Values: []string{"The Great Lakes Avengers", "Howling Commandos", "X-Factor"},
-							},
-						},
-					},
-				},
-			},
-		},
+		ProjectRules: projects,
 	}, nil
 }
 
