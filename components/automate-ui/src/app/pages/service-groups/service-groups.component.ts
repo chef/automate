@@ -29,7 +29,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public sgHealthSummary: HealthSummary;
 
   // The selected service-group id that will be sent to the services-sidebar
-  public selectedServiceGroupId: number;
+  public selectedServiceGroupId: string;
 
   // The current page the user is visualizing
   public currentPage = 1;

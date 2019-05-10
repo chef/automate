@@ -18,7 +18,7 @@ import { includes, getOr } from 'lodash/fp';
 })
 
 export class ServicesSidebarComponent implements OnInit, OnDestroy {
-  @Input() serviceGroupId: number;
+  @Input() serviceGroupId: string;
   @Input() visible: boolean;
 
   public services$: Observable<Service[]>;
