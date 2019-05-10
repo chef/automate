@@ -35,10 +35,14 @@
 
     <div class="page-body">
       <chef-toolbar>
+        <chef-button primary
+          routerLink="/compliance/scanner/nodes/add">
+          Add nodes
+        </chef-button>
         <chef-button primary caution 
           [disabled]="!hasSelectedNodes()" 
           (click)="deleteNodes()">
-          Remove Nodes
+          Remove nodes
         </chef-button>
       </chef-toolbar>
       <chef-table id="manager-nodes-list">
