@@ -78,6 +78,18 @@ func NewOutgoingProjectsContext(ctx context.Context) context.Context {
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
+// ContextWithoutProjects removes previously added projects from the GRPC metadata
+// for those system operations that must not be filtered by projects.
+func ContextWithoutProjects(ctx context.Context) context.Context {
+	// This will fail on service start context, so only remove projects if ok.
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		delete(md, "projects")
+		ctx = metadata.NewOutgoingContext(ctx, md)
+	}
+	return ctx
+}
+
 // FromContext returns the auth data previously associated with `ctx`,
 // or `nil` or "" if a piece of the information could not be found.
 func FromContext(ctx context.Context) *Properties {
