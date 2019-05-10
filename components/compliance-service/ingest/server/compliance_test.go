@@ -9,22 +9,150 @@ import (
 
 func TestGetReportStatus(t *testing.T) {
 	profiles := []*ingest_inspec.Profile{
-		{Status: "passed"},
-		{Status: "skipped"},
-	}
+		{
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "test-1",
+					Results: []*ingest_inspec.Result{
+						{Status: "passed"},
+						{Status: "skipped"},
+					},
+				},
+				{
+					Id: "test-2",
+					Results: []*ingest_inspec.Result{
+						{Status: "skipped"},
+					},
+				},
+			}}}
 	assert.Equal(t, "passed", getReportStatus(profiles))
 
 	profiles = []*ingest_inspec.Profile{
-		{Status: "passed"},
-		{Status: "failed"},
-		{Status: "skipped"},
-	}
+		{
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "test-1",
+					Results: []*ingest_inspec.Result{
+						{Status: "passed"},
+						{Status: "skipped"},
+					},
+				},
+				{
+					Id: "test-2",
+					Results: []*ingest_inspec.Result{
+						{Status: "failed"},
+						{Status: "skipped"},
+					},
+				},
+				{
+					Id: "test-3",
+					Results: []*ingest_inspec.Result{
+						{Status: "skipped"},
+					},
+				},
+			}}}
 	assert.Equal(t, "failed", getReportStatus(profiles))
 
 	profiles = []*ingest_inspec.Profile{
 		{Status: "skipped"},
-		{Status: "skipped"},
 	}
 	assert.Equal(t, "skipped", getReportStatus(profiles))
 
+	profiles = []*ingest_inspec.Profile{
+		{Status: "skipped"},
+		{
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "test-1",
+					Results: []*ingest_inspec.Result{
+						{Status: "skipped"},
+						{Status: "skipped"},
+					},
+				},
+				{
+					Id: "test-2",
+					Results: []*ingest_inspec.Result{
+						{Status: "skipped"},
+					},
+				},
+			},
+		},
+	}
+	assert.Equal(t, "skipped", getReportStatus(profiles))
+
+	profiles = []*ingest_inspec.Profile{
+		{
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "test-1",
+					Results: []*ingest_inspec.Result{
+						{Status: "passed"},
+						{Status: "skipped"},
+					},
+				},
+				{
+					Id: "test-2",
+					Results: []*ingest_inspec.Result{
+						{Status: "skipped"},
+					},
+				},
+			},
+		},
+		{
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "test-1",
+					Results: []*ingest_inspec.Result{
+						{Status: "passed"},
+						{Status: "skipped"},
+					},
+				},
+				{
+					Id: "test-2",
+					Results: []*ingest_inspec.Result{
+						{Status: "passed"},
+					},
+				},
+			},
+		},
+	}
+	assert.Equal(t, "passed", getReportStatus(profiles))
+
+	profiles = []*ingest_inspec.Profile{
+		{
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "test-1",
+					Results: []*ingest_inspec.Result{
+						{Status: "passed"},
+						{Status: "skipped"},
+					},
+				},
+				{
+					Id: "test-2",
+					Results: []*ingest_inspec.Result{
+						{Status: "failed"},
+					},
+				},
+			},
+		},
+		{
+			Controls: []*ingest_inspec.Control{
+				{
+					Id: "test-1",
+					Results: []*ingest_inspec.Result{
+						{Status: "passed"},
+						{Status: "skipped"},
+					},
+				},
+				{
+					Id: "test-2",
+					Results: []*ingest_inspec.Result{
+						{Status: "passed"},
+					},
+				},
+			},
+		},
+	}
+	assert.Equal(t, "failed", getReportStatus(profiles))
 }
