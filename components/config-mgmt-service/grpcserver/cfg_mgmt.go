@@ -34,7 +34,8 @@ func NewCfgMgmtServer(cs *config.Service) *CfgMgmtServer {
 }
 
 // GetPolicyCookbooks returns a list of cookbook name, policy identifier and name of policy based on revision id
-func (s *CfgMgmtServer) GetPolicyCookbooks(ctx context.Context, request *request.PolicyRevision) (*response.PolicyCookbooks, error) {
+func (s *CfgMgmtServer) GetPolicyCookbooks(ctx context.Context,
+	request *request.PolicyRevision) (*response.PolicyCookbooks, error) {
 
 	log.WithFields(log.Fields{
 		"request": request.String(),
@@ -72,14 +73,16 @@ func (s *CfgMgmtServer) GetPolicyCookbooks(ctx context.Context, request *request
 }
 
 // GetHealth returns the service Health
-func (s *CfgMgmtServer) GetHealth(ctx context.Context, empty *request.Health) (*response.Health, error) {
+func (s *CfgMgmtServer) GetHealth(ctx context.Context,
+	empty *request.Health) (*response.Health, error) {
 	return &response.Health{
 		Status: "ok",
 	}, nil
 }
 
 // GetVersion returns the service version
-func (s *CfgMgmtServer) GetVersion(ctx context.Context, empty *request.VersionInfo) (*response.VersionInfo, error) {
+func (s *CfgMgmtServer) GetVersion(ctx context.Context,
+	empty *request.VersionInfo) (*response.VersionInfo, error) {
 	return &response.VersionInfo{
 		Version: s.cs.Version,
 		Built:   version.BuildTime,
@@ -89,7 +92,8 @@ func (s *CfgMgmtServer) GetVersion(ctx context.Context, empty *request.VersionIn
 }
 
 // GetNodesCounts returns the nodes counts
-func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context, request *request.NodesCounts) (*response.NodesCounts, error) {
+func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
+	request *request.NodesCounts) (*response.NodesCounts, error) {
 	var nodesCounts *response.NodesCounts
 
 	filters, err := params.FormatNodeFilters(request.Filter)
@@ -112,7 +116,8 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context, request *request.Nod
 }
 
 // GetRunsCounts returns the runs counts for a node
-func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context, request *request.RunsCounts) (*response.RunsCounts, error) {
+func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context,
+	request *request.RunsCounts) (*response.RunsCounts, error) {
 	var runsCounts *response.RunsCounts
 	if request.GetNodeId() == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "Parameter 'node_id' not provided")
@@ -133,7 +138,8 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context, request *request.Runs
 
 	nodeExistsChan := s.nodeExistsAsync(request.GetNodeId(), projectFilters)
 
-	state, err := s.client.GetRunsCounts(filters, request.GetNodeId(), request.GetStart(), request.GetEnd())
+	state, err := s.client.GetRunsCounts(filters, request.GetNodeId(),
+		request.GetStart(), request.GetEnd())
 	if err != nil {
 		return runsCounts, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
@@ -162,7 +168,8 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context, request *request.Runs
 }
 
 // GetNodeRun returns the requested run
-func (s *CfgMgmtServer) GetNodeRun(ctx context.Context, request *request.NodeRun) (*response.Run, error) {
+func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
+	request *request.NodeRun) (*response.Run, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),
 		"func":    nameOfFunc(),
@@ -193,7 +200,8 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context, request *request.NodeRun
 	return toResponseRun(run)
 }
 
-func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *request.Suggestion) (*gpStruct.ListValue, error) {
+func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,
+	request *request.Suggestion) (*gpStruct.ListValue, error) {
 	var (
 		pSuggestions = new(gpStruct.ListValue)
 		textParam    = request.GetText()
@@ -207,7 +215,13 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *request.Sug
 		return nil, errors.GrpcErrorf(codes.InvalidArgument, "Invalid type parameter '%v'", typeParam)
 	}
 
-	suggestions, err := s.client.GetSuggestions(params.ConvertParamToNodeRunBackend(typeParam), textParam)
+	filters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return nil, errors.GrpcErrorf(codes.Internal, err.Error())
+	}
+
+	suggestions, err := s.client.GetSuggestions(
+		params.ConvertParamToNodeRunBackend(typeParam), textParam, filters)
 	if err != nil {
 		return nil, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
@@ -231,7 +245,8 @@ func backendSuggestionsToProtoArray(suggestions []backend.Suggestion) []proto.Me
 }
 
 // GetOrganizations returns the a list of all organizations
-func (s *CfgMgmtServer) GetOrganizations(ctx context.Context, empty *request.Organizations) (*gpStruct.ListValue, error) {
+func (s *CfgMgmtServer) GetOrganizations(ctx context.Context,
+	empty *request.Organizations) (*gpStruct.ListValue, error) {
 	var organizations = new(gpStruct.ListValue)
 
 	orgs, err := s.client.GetListForField("organization_name")
@@ -250,7 +265,8 @@ func (s *CfgMgmtServer) GetOrganizations(ctx context.Context, empty *request.Org
 }
 
 // GetSourceFqdns returns a list of all source_fqdns
-func (s *CfgMgmtServer) GetSourceFqdns(ctx context.Context, empty *request.SourceFQDNS) (*gpStruct.ListValue, error) {
+func (s *CfgMgmtServer) GetSourceFqdns(ctx context.Context,
+	empty *request.SourceFQDNS) (*gpStruct.ListValue, error) {
 	var sourceFqdns = new(gpStruct.ListValue)
 
 	fqdns, err := s.client.GetListForField("source_fqdn")

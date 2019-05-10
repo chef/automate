@@ -86,7 +86,7 @@ func (m Backend) GetListForField(searchTerm string) ([]string, error) {
 	return fieldResults, nil
 }
 
-func (m Backend) GetSuggestions(term string, text string) ([]backend.Suggestion, error) {
+func (m Backend) GetSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
 	suggestions := []backend.Suggestion{
 		{
 			Text:  "Node 1",
