@@ -154,7 +154,10 @@ func (p *PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
 	for i := 0; i < p.total; i++ {
 		w.EnqueueTask("test task", fmt.Sprintf("asdf: %d", i))
 	}
-	enqueue_done = true
+	go func() {
+		time.Sleep(2 * time.Second)
+		enqueue_done = true
+	}()
 	return w.Continue(0)
 }
 
