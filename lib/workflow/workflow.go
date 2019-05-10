@@ -255,10 +255,36 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 		return
 	}
 	defer completer.Close()
+	logrus.WithFields(logrus.Fields{
+		"status": wevt.Instance.Status,
+	}).Info("Dequeued Workflow")
 	w := &workflowInstanceImpl{
 		instanceID: wevt.InstanceID,
 		instance:   wevt.Instance,
 		wevt:       wevt,
+	}
+	if wevt.Instance.Status == WorkflowInstanceStatusAbandoned {
+		logrus.Info("Got abandoned workflow")
+		if wevt.CompletedTaskCount > wevt.EnqueuedTaskCount {
+			// we should never get here.
+			// TODO: just delete the workflow instance
+			panic("Invalid task count")
+		}
+		if wevt.CompletedTaskCount == wevt.EnqueuedTaskCount {
+			logrus.Info("Completing abandoned workflow")
+			if err := completer.Done(); err != nil {
+				logrus.WithError(err).Error("failed to complete with abandoned workflow")
+			}
+		} else {
+			logrus.Info("Continuing abandoned workflow")
+			// jaym: Depending on how we support retries, this logic may still wait for
+			// an unlocked task to complete when we could have removed it
+			if err := completer.Continue(nil); err != nil {
+				logrus.WithError(err).Error("failed to continue with abandoned workflow")
+			}
+		}
+
+		return
 	}
 	executor, ok := m.workflowExecutors[wevt.Instance.WorkflowName]
 	if !ok {
@@ -282,9 +308,23 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 	}
 
 	if decision.complete {
-		err := completer.Done()
-		if err != nil {
-			logrus.WithError(err).Error("failed to complete workflow")
+		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
+			logrus.WithFields(logrus.Fields{
+				"enqueued":  wevt.EnqueuedTaskCount,
+				"completed": wevt.CompletedTaskCount,
+			}).Info("Abandoning workflow")
+			if err := completer.Abandon(); err != nil {
+				logrus.WithError(err).Error("failed to abandon workflow")
+			}
+		} else {
+			logrus.WithFields(logrus.Fields{
+				"enqueued":  wevt.EnqueuedTaskCount,
+				"completed": wevt.CompletedTaskCount,
+			}).Info("Completing workflow")
+			err := completer.Done()
+			if err != nil {
+				logrus.WithError(err).Error("failed to complete workflow")
+			}
 		}
 	} else if decision.continuing {
 		for _, t := range decision.tasks {

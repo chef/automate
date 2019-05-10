@@ -23,6 +23,8 @@ CREATE TABLE recurring_workflow_schedules (
     CONSTRAINT say_my_name UNIQUE(name, workflow_name)
 );
 
+CREATE TYPE workflow_instance_status AS ENUM('running', 'abandoned');
+
 CREATE TABLE workflow_instances (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -32,6 +34,7 @@ CREATE TABLE workflow_instances (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     enqueued_tasks INTEGER NOT NULL DEFAULT 0,
     completed_tasks INTEGER NOT NULL DEFAULT 0,
+    status workflow_instance_status NOT NULL DEFAULT 'running',
 
     CONSTRAINT say_my_name1 UNIQUE(name, workflow_name)
 );
@@ -72,7 +75,7 @@ CREATE TABLE tasks_results (
 );
 
 
-CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete', 'cancel');
+CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete', 'cancel', 'tasks_abandoned');
 
 -- NOTE(ssd) 2019-05-09: Workflow events are defined here because they
 -- may reference task_restuls
@@ -104,14 +107,16 @@ $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION dequeue_workflow(VARIADIC workflow_names TEXT[])
 RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT,
-    parameters JSON, payload JSON, event_id BIGINT, event_type workflow_event_type,
-    task_result_id BIGINT, enqueued_tasks INTEGER, completed_tasks INTEGER)
+    status workflow_instance_status, parameters JSON, payload JSON, event_id BIGINT, 
+    event_type workflow_event_type, task_result_id BIGINT, enqueued_tasks INTEGER, 
+    completed_tasks INTEGER)
 AS $$
     WITH nextwinst AS (
         SELECT
             a.id id,
             a.name instance_name,
             a.workflow_name workflow_name,
+            a.status status,
             a.parameters parameters,
             a.payload payload,
             b.id event_id,
@@ -141,6 +146,26 @@ AS $$
     -- TODO(ssd) 2019-05-09: We might want to notify here to update the task scheduler thingy that doesn't exist
     DELETE FROM workflow_instances WHERE id=workflow_instance_id;
 $$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION abandon_workflow(_workflow_instance_id BIGINT, eid BIGINT, _completed_tasks INTEGER)
+RETURNS VOID
+AS $$
+    WITH unclaimed_tasks AS (
+        SELECT id FROM tasks
+        WHERE workflow_instance_id = _workflow_instance_id
+        FOR UPDATE SKIP LOCKED
+    ), deleted_tasks AS (
+        DELETE FROM tasks WHERE id IN (SELECT id from unclaimed_tasks)
+    )
+    UPDATE workflow_instances w1 SET updated_at = NOW(), status = 'abandoned',
+        completed_tasks = _completed_tasks + (select count(*) from unclaimed_tasks);
+
+    DELETE FROM workflow_events WHERE id = eid;
+    
+    INSERT INTO workflow_events(event_type, workflow_instance_id)
+        VALUES('tasks_abandoned', _workflow_instance_id);
+$$ LANGUAGE SQL;
+
 
 CREATE OR REPLACE FUNCTION cancel_workflow(workflow_instance_id BIGINT)
 RETURNS VOID

@@ -24,14 +24,16 @@ const (
 	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow($1)`
 	completeWorkflowQuery = `SELECT complete_workflow($1)`
 	continueWorkflowQuery = `SELECT continue_workflow($1, $2, $3, $4, $5)`
+	abandonWorkflowQuery  = `SELECT abandon_workflow($1, $2, $3)`
 )
 
 type WorkflowEventType string
 
 const (
-	WorkflowStart WorkflowEventType = "start"
-	TaskComplete  WorkflowEventType = "task_complete"
-	Cancel        WorkflowEventType = "cancel"
+	WorkflowStart  WorkflowEventType = "start"
+	TaskComplete   WorkflowEventType = "task_complete"
+	Cancel         WorkflowEventType = "cancel"
+	TasksAbandoned WorkflowEventType = "tasks_abandoned"
 )
 
 type TaskStatusType string
@@ -41,9 +43,17 @@ const (
 	taskStatusFailed  TaskStatusType = "failed"
 )
 
+type WorkflowInstanceStatus string
+
+const (
+	WorkflowInstanceStatusRunning   WorkflowInstanceStatus = "running"
+	WorkflowInstanceStatusAbandoned WorkflowInstanceStatus = "abandoned"
+)
+
 type WorkflowInstance struct {
 	InstanceName string
 	WorkflowName string
+	Status       WorkflowInstanceStatus
 	Parameters   interface{}
 	Payload      interface{}
 }
@@ -92,6 +102,7 @@ type WorkflowCompleter interface {
 	EnqueueTask(task *Task, opts ...EnqueueOpts) error
 
 	Continue(payload interface{}) error
+	Abandon() error
 	Done() error
 	Close() error
 }
@@ -243,6 +254,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		&workc.wid,
 		&event.Instance.InstanceName,
 		&event.Instance.WorkflowName,
+		&event.Instance.Status,
 		&event.Instance.Parameters,
 		&event.Instance.Payload,
 		&workc.eid,
@@ -388,6 +400,18 @@ func (workc *PostgresWorkflowCompleter) Continue(payload interface{}) error {
 	}
 
 	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow event %d as processed", workc.eid)
+}
+
+func (workc *PostgresWorkflowCompleter) Abandon() error {
+	ctx := workc.ctx
+	defer workc.cancel()
+
+	_, err := workc.tx.ExecContext(ctx, abandonWorkflowQuery, workc.wid, workc.eid, workc.completedTaskCount)
+	if err != nil {
+		return errors.Wrapf(err, "failed to mark workflow %d as complete", workc.wid)
+	}
+
+	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow %d as complete", workc.wid)
 }
 
 func (workc *PostgresWorkflowCompleter) Close() error {
