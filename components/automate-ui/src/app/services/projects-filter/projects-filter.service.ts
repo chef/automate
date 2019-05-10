@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
@@ -23,7 +24,7 @@ export class ProjectsFilterService {
 
   dropdownCaretVisible$ = <Observable<boolean>>this.store.select(selectors.dropdownCaretVisible);
 
-  constructor(private store: Store<NgrxStateAtom>) {}
+  constructor(private store: Store<NgrxStateAtom>, private router: Router) { }
 
   loadOptions() {
     this.store.dispatch(new LoadOptions());
@@ -35,6 +36,18 @@ export class ProjectsFilterService {
 
   storeOptions(options: ProjectsFilterOption[]) {
     localStorage.setItem(STORE_OPTIONS_KEY, JSON.stringify(options));
+
+    // To get back to where we are
+    const currentUrl = location.pathname + location.search;
+
+    // This is a dummy URL but it must exist in the routing module.
+    const reloadUrl = '/reload';
+
+    // The router only routes if the route changes.
+    // This first switches to somewhere-that-is-not-here
+    // then back to here, so the router will do its thing.
+    this.router.navigateByUrl(reloadUrl, { skipLocationChange: true })
+      .then(() => this.router.navigateByUrl(currentUrl, { skipLocationChange: true }));
   }
 
   restoreOptions(): ProjectsFilterOption[] {
