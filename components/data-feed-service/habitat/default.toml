@@ -2,6 +2,8 @@
 host = "localhost"
 port = 14001
 feed_interval = "30m"
+asset_page_size = 100
+reports_page_size = 1000
 
 [tls]
 key_contents =""

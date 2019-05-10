@@ -43,7 +43,7 @@ compliance-service OPTIONAL authn-service es-sidecar-service notifications-servi
 compliance-service BINDING_MODE strict
 config-mgmt-service REQUIRED automate-es-gateway
 config-mgmt-service BINDING_MODE strict
-data-feed-service REQUIRED config-mgmt-service notifications-service secrets-service
+data-feed-service REQUIRED compliance-service config-mgmt-service notifications-service secrets-service
 data-feed-service BINDING_MODE strict
 es-sidecar-service REQUIRED automate-elasticsearch automate-es-gateway
 es-sidecar-service BINDING_MODE strict

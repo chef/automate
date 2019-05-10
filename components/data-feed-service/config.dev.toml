@@ -2,6 +2,8 @@
 host = "localhost"
 port = 14001
 feed_interval = "5m"
+asset_page_size = 10
+reports_page_size = 10
 
 [tls]
 cert_path = "../../dev/certs/data-feed-service.crt"
@@ -31,5 +33,12 @@ target = "{{secrets-service.cfg.host}}:{{secrets-service.cfg.port}}"
 {{~#eachAlive bind.config-mgmt-service.members as |config-mgmt-service|}}
 {{~#if @last}}
 target = "{{config-mgmt-service.cfg.host}}:{{config-mgmt-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
+
+[compliance]
+{{~#eachAlive bind.compliance-service.members as |compliance-service|}}
+{{~#if @last}}
+target = "{{compliance-service.cfg.host}}:{{compliance-service.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
