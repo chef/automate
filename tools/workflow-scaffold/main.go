@@ -164,7 +164,11 @@ var done = false
 func (p *PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
 
-	logrus.WithField("task_name", ev.TaskName).Info("PerfTestWorkflow got Task Completed")
+	logrus.WithFields(logrus.Fields{
+		"task_name": ev.TaskName,
+		"enqueued":  w.TotalEnqueuedTasks(),
+		"completed": w.TotalCompletedTasks(),
+	}).Info("PerfTestWorkflow got Task Completed")
 	p.count++
 	if p.count < p.total {
 		return w.Continue(p.count)

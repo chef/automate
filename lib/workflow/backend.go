@@ -23,7 +23,7 @@ const (
 	enqueueWorkflowQuery  = `SELECT enqueue_workflow($1, $2, $3)`
 	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow($1)`
 	completeWorkflowQuery = `SELECT complete_workflow($1)`
-	continueWorkflowQuery = `SELECT continue_workflow($1, $2, $3)`
+	continueWorkflowQuery = `SELECT continue_workflow($1, $2, $3, $4, $5)`
 )
 
 type WorkflowEventType string
@@ -49,9 +49,11 @@ type WorkflowInstance struct {
 }
 
 type WorkflowEvent struct {
-	InstanceID int64
-	Instance   WorkflowInstance
-	Type       WorkflowEventType
+	InstanceID         int64
+	Instance           WorkflowInstance
+	Type               WorkflowEventType
+	EnqueuedTaskCount  int
+	CompletedTaskCount int
 
 	TaskResult *TaskResult
 }
@@ -139,6 +141,9 @@ type PostgresWorkflowCompleter struct {
 	tx *sql.Tx
 	// ctx is the context that the transaction was started with.
 	ctx context.Context
+
+	enqueuedTaskCount  int
+	completedTaskCount int
 }
 
 var _ Backend = &PostgresBackend{}
@@ -242,7 +247,10 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		&event.Instance.Payload,
 		&workc.eid,
 		&event.Type,
-		&taskResultID)
+		&taskResultID,
+		&event.EnqueuedTaskCount,
+		&event.CompletedTaskCount,
+	)
 	if err == sql.ErrNoRows {
 		cancel()
 		return nil, nil, ErrNoWorkflowInstances
@@ -255,6 +263,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	event.InstanceID = workc.wid
 
 	if event.Type == TaskComplete {
+		event.CompletedTaskCount++
 		row := tx.QueryRowContext(ctx, getTaskResultQuery, taskResultID)
 		tr := TaskResult{}
 		err = row.Scan(
@@ -267,6 +276,9 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		}
 		event.TaskResult = &tr
 	}
+
+	workc.enqueuedTaskCount = event.EnqueuedTaskCount
+	workc.completedTaskCount = event.CompletedTaskCount
 
 	return event, workc, nil
 }
@@ -284,6 +296,7 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *Task, opts ...EnqueueO
 		return errors.Wrap(err, "failed to enqueue task")
 	}
 
+	workc.enqueuedTaskCount = workc.enqueuedTaskCount + 1
 	return nil
 }
 
@@ -368,7 +381,8 @@ func (workc *PostgresWorkflowCompleter) Continue(payload interface{}) error {
 	if err != nil {
 		return errors.Wrap(err, "could not convert payload to JSON")
 	}
-	_, err = workc.tx.ExecContext(ctx, continueWorkflowQuery, workc.wid, workc.eid, jsonPayload)
+	_, err = workc.tx.ExecContext(ctx, continueWorkflowQuery, workc.wid, workc.eid,
+		jsonPayload, workc.enqueuedTaskCount, workc.completedTaskCount)
 	if err != nil {
 		return errors.Wrapf(err, "failed to mark workflow event %d as processed", workc.eid)
 	}

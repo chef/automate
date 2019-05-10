@@ -29,8 +29,9 @@ CREATE TABLE workflow_instances (
     workflow_name TEXT NOT NULL,
     parameters JSON,
     payload JSON,
-
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    enqueued_tasks INTEGER NOT NULL DEFAULT 0,
+    completed_tasks INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT say_my_name1 UNIQUE(name, workflow_name)
 );
@@ -104,7 +105,7 @@ $$ LANGUAGE SQL;
 CREATE OR REPLACE FUNCTION dequeue_workflow(VARIADIC workflow_names TEXT[])
 RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT,
     parameters JSON, payload JSON, event_id BIGINT, event_type workflow_event_type,
-    task_result_id BIGINT)
+    task_result_id BIGINT, enqueued_tasks INTEGER, completed_tasks INTEGER)
 AS $$
     WITH nextwinst AS (
         SELECT
@@ -115,7 +116,9 @@ AS $$
             a.payload payload,
             b.id event_id,
             b.event_type event_type,
-            b.task_result_id task_result_id
+            b.task_result_id task_result_id,
+            a.enqueued_tasks,
+            a.completed_tasks
         FROM workflow_instances a
         INNER JOIN workflow_events b ON a.id = b.workflow_instance_id
         WHERE a.workflow_name = ANY(workflow_names)
@@ -147,11 +150,13 @@ AS $$
 $$ LANGUAGE SQL;
 
 
-CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, payload JSON)
+CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, _payload JSON, 
+    _enqueued_tasks INTEGER, _completed_tasks INTEGER)
 RETURNS VOID
 LANGUAGE SQL
 AS $$
-    UPDATE workflow_instances SET updated_at = NOW(), payload = payload WHERE id = wid;
+    UPDATE workflow_instances SET updated_at = NOW(), payload = _payload,
+        enqueued_tasks = _enqueued_tasks, completed_tasks = _completed_tasks WHERE id = wid;
     -- We've decided there is more to do but are done processing this event.
     DELETE FROM workflow_events WHERE id = eid
 $$;

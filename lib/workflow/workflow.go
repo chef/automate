@@ -19,12 +19,16 @@ type FWorkflowInstance interface {
 	EnqueueTask(taskName string, parameters interface{})
 	Complete() Decision
 	Continue(payload interface{}) Decision
+
+	TotalEnqueuedTasks() int
+	TotalCompletedTasks() int
 }
 
 type workflowInstanceImpl struct {
 	instanceID int64
 	instance   WorkflowInstance
 	tasks      []Task
+	wevt       *WorkflowEvent
 }
 
 func (w *workflowInstanceImpl) GetPayload(interface{}) error {
@@ -33,6 +37,14 @@ func (w *workflowInstanceImpl) GetPayload(interface{}) error {
 
 func (w *workflowInstanceImpl) GetParameters(interface{}) error {
 	return nil
+}
+
+func (w *workflowInstanceImpl) TotalEnqueuedTasks() int {
+	return len(w.tasks) + w.wevt.EnqueuedTaskCount
+}
+
+func (w *workflowInstanceImpl) TotalCompletedTasks() int {
+	return w.wevt.CompletedTaskCount
 }
 
 func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface{}) {
@@ -246,6 +258,7 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 	w := &workflowInstanceImpl{
 		instanceID: wevt.InstanceID,
 		instance:   wevt.Instance,
+		wevt:       wevt,
 	}
 	executor, ok := m.workflowExecutors[wevt.Instance.WorkflowName]
 	if !ok {
@@ -277,6 +290,9 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 		for _, t := range decision.tasks {
 			completer.EnqueueTask(&t)
 		}
-		completer.Continue(nil)
+		err := completer.Continue(nil)
+		if err != nil {
+			logrus.WithError(err).Error("failed to continue workflow")
+		}
 	}
 }
