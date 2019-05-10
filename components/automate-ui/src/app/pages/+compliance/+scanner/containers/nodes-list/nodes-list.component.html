@@ -118,7 +118,7 @@
       <p>Status: {{ (nodeDetail$ | async)?.status }}</p>
     </div>
     <div class="side-panel-body-detail">
-      <pre>{{ (nodeDetail$ | async)?.last_job?.result }}</pre>
+      <pre>{{ (nodeDetail$ | async)?.last_job?.result || (nodeDetail$ | async)?.connection_error }}</pre>
     </div>
   </div>
 </chef-side-panel>

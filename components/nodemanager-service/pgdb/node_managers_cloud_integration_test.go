@@ -122,6 +122,34 @@ func (suite *NodeManagersAndNodesDBSuite) TestUpdateOrInsertInstanceSourceStateI
 	suite.Equal(0, len(terminatedNodes))
 }
 
+func (suite *NodeManagersAndNodesDBSuite) TestUpdateOrInsertInstanceSourceStateInDbIngestingNewNodeIncludesNameAndMakesMgrConnection() {
+	mgr := manager.NodeManager{Name: "test", Type: "azure-vm"}
+	mgrID, err := suite.Database.AddNodeManager(&mgr, "12345678")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	instanceState := pgdb.InstanceState{ID: "i-079356", Name: "my-new-node", State: "running", Region: "eu-west-1"}
+	_, err = suite.Database.UpdateOrInsertInstanceSourceStateInDb(instanceState, mgrID, "12345678", "azure-vm")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	filter := &common.Filter{
+		Key:    "manager_id",
+		Values: []string{mgrID},
+	}
+	mgrNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Require().Equal(1, len(mgrNodes))
+
+	node := mgrNodes[0]
+	suite.Equal("my-new-node", node.Name)
+	_, err = suite.Database.DeleteNode(node.Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+}
 func (suite *NodeManagersAndNodesDBSuite) TestGetAwsEc2ManagersCollectsAllMgrs() {
 	// TODO @afiune Mock the secrets-service
 	secretId := "12345678901234567890123456789012"

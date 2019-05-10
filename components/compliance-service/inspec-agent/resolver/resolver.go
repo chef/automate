@@ -452,7 +452,7 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 				// then let's prioritize that -- otherwise try ssm
 				if len(credsArr) == 0 {
 					var skip bool
-					skip, ssmJob = handleSSMNodes(node, job, &backend)
+					ssmJob, skip = handleSSMNodes(node, job, &backend)
 					if skip {
 						logrus.Warnf("action not supported: cannot run a detect job on ssm node %s", node.Name)
 						continue
