@@ -156,13 +156,27 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context, request *request.NodeRun
 	}
 
 	run, err := s.client.GetRun(request.GetRunId(), endTime)
-
 	if err != nil {
 		if sErr, ok := err.(*errors.StandardError); ok && sErr.Type == errors.RunNotFound {
 			return nil, status.Errorf(codes.NotFound, err.Error())
-		} else {
-			return nil, status.Errorf(codes.Internal, err.Error())
 		}
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	projectFilters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	// Check if the user has access to the node of the run requested
+	exists, err := s.client.NodeExists(run.EntityUuid, projectFilters)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	// Either the user does not have permissions or the node does not exist
+	if !exists {
+		return nil, status.Errorf(codes.NotFound, "Invalid ID")
 	}
 
 	return toResponseRun(run)
