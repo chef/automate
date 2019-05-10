@@ -195,16 +195,36 @@ func (s *CfgMgmtServer) GetAttributes(
 	}).Debug("rpc call")
 
 	if request.GetNodeId() == "" {
-		return &interserviceResp.NodeAttribute{}, status.Errorf(codes.InvalidArgument, "Parameter 'node_id' not provided")
+		return &interserviceResp.NodeAttribute{}, status.Errorf(
+			codes.InvalidArgument, "Parameter 'node_id' not provided")
 	}
+
+	projectFilters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return &interserviceResp.NodeAttribute{}, status.Errorf(codes.Internal, err.Error())
+	}
+
+	// Async check if the node exits with project filters
+	nodeExistsChan := s.nodeExistsAsync(request.GetNodeId(), projectFilters)
 
 	attribute, err := s.client.GetAttribute(request.GetNodeId())
 	if err != nil {
 		if sErr, ok := err.(*errors.StandardError); ok && sErr.Type == errors.NodeAttributeNotFound {
-			return &interserviceResp.NodeAttribute{}, status.Errorf(codes.NotFound, "No node attributes for given Node ID")
+			return &interserviceResp.NodeAttribute{}, status.Errorf(codes.NotFound,
+				"No node attributes for given Node ID")
 		}
 
 		return &interserviceResp.NodeAttribute{}, status.Errorf(codes.Internal, err.Error())
+	}
+
+	nodeExists := <-nodeExistsChan
+	if nodeExists.err != nil {
+		return &interserviceResp.NodeAttribute{}, nodeExists.err
+	}
+
+	// Either the user does not have permissions or the node does not exist
+	if !nodeExists.exists {
+		return &interserviceResp.NodeAttribute{}, nil
 	}
 
 	return &interserviceResp.NodeAttribute{
