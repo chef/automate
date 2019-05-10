@@ -21,6 +21,7 @@ storage:
     ssl:
       {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetEnable.GetValue }}
       mode: verify-ca
+      caFile: {{pg_root_ca_cert_path}}
       {{- else }}
       mode: disable
       {{- end }}

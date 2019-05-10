@@ -80,10 +80,13 @@ defmodule Notifications.Config do
   end
 
   def db_options do
-    if sqerl_no_ssl?() do
-      [ssl: false]
-    else
-      [ssl: true, ssl_opts: Keyword.get(ssl_options(), :ssl)]
+    cond do
+      sqerl_no_ssl?() -> 
+        [ssl: false]
+      sqerl_no_ssl_auth?() ->
+        [ssl: true, ssl_opts: Keyword.get(ssl_options_no_auth(), :ssl)]
+      true ->
+        [ssl: true, ssl_opts: Keyword.get(ssl_options(), :ssl)]
     end
   end
 
@@ -98,8 +101,24 @@ defmodule Notifications.Config do
     ]]
   end
 
+  def ssl_options_no_auth do
+    [ssl: [
+      cacertfile: get_value("EXTERNAL_PG_ROOT_CA_CERT", nil),
+      # server_name_indication is set to disable to match the verify-ca
+      # option that we use in the go code to connect to postgres. It both
+      # disables sni and hostname verification
+      server_name_indication: :disable,
+      verify: :verify_peer,
+      versions: [:'tlsv1.2'],
+    ]]
+  end
+
   def sqerl_no_ssl? do
     get_value("SQERL_NO_SSL", "") == "true"
+  end
+
+  def sqerl_no_ssl_auth? do
+    get_value("SQERL_NO_SSL_AUTH", "") == "true"
   end
 
   def secrets_ssl_options do
