@@ -29,13 +29,19 @@
     <div class="page-body">
       <chef-toolbar>
         <app-authorized [anyOf]="[['/iam/v2beta/tokens', 'post'], ['/auth/tokens', 'post']]">
-          <chef-button id="create-button" primary (click)="openCreateModal()">Create Token</chef-button>
+          <div *ngIf="(sortedApiTokens$ | async)?.length === 0" class="token-empty-state">
+            <p>Create the first token to get started!</p>
+            <chef-button id="create-button" primary (click)="openCreateModal()">Create Token</chef-button>
+          </div>
+          <div *ngIf="(sortedApiTokens$ | async)?.length > 0">
+            <chef-button id="create-button" primary (click)="openCreateModal()">Create Token</chef-button>
+          </div>
         </app-authorized>
       </chef-toolbar>
       <app-authorized [anyOf]="[['/iam/v2beta/tokens', 'get'], ['/auth/tokens', 'get']]">
         <chef-table>
           <chef-thead>
-            <chef-tr>
+            <chef-tr *ngIf="(sortedApiTokens$ | async)?.length > 0">
               <chef-th>Name</chef-th>
               <chef-th>Created date</chef-th>
               <chef-th>Status</chef-th>
