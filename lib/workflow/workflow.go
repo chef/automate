@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -105,23 +106,116 @@ type FWorkflowExecutor interface {
 	OnCancel(w FWorkflowInstance, ev CancelEvent) Decision
 }
 
+// TODO(ssd) 2019-05-10: How do we want to handle cancellation?
+type TaskExecutor interface {
+	Run(context.Context, interface{}) (interface{}, error)
+}
+
 type FWorkflowManager struct {
 	workflowExecutors map[string]FWorkflowExecutor
+	taskExecutors     map[string]registeredExecutor
 	backend           Backend
 }
 
 func NewManager(backend Backend) *FWorkflowManager {
-	return &FWorkflowManager{backend: backend, workflowExecutors: make(map[string]FWorkflowExecutor)}
+	return &FWorkflowManager{
+		backend:           backend,
+		workflowExecutors: make(map[string]FWorkflowExecutor),
+		taskExecutors:     make(map[string]registeredExecutor),
+	}
 }
+
 func (m *FWorkflowManager) RegisterWorkflowExecutor(workflowName string,
 	workflowExecutor FWorkflowExecutor) error {
 	m.workflowExecutors[workflowName] = workflowExecutor
 	return nil
 }
+
+type TaskExecutorOpts struct {
+	Timeout time.Duration
+	Workers int
+}
+
+type registeredExecutor struct {
+	executor TaskExecutor
+	opts     TaskExecutorOpts
+}
+
+func (m *FWorkflowManager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
+	m.taskExecutors[taskName] = registeredExecutor{
+		executor: executor,
+		opts:     opts,
+	}
+	return nil
+}
+
 func (m *FWorkflowManager) Start(ctx context.Context) error {
+	go m.startTaskExecutors(ctx)
 	go m.run(ctx)
 	return nil
 }
+
+func (m *FWorkflowManager) startTaskExecutors(ctx context.Context) {
+	for taskName, exec := range m.taskExecutors {
+		workerCount := exec.opts.Workers
+		if workerCount == 0 {
+			workerCount = 1
+		}
+
+		for i := 0; i < workerCount; i++ {
+			go m.RunTaskExecutor(ctx, taskName, i, exec.opts.Timeout, exec.executor)
+		}
+	}
+}
+
+// TODO(ssd) 2019-05-10: Why does Task need the WorkflowInstanceID?
+func (m *FWorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, workerID int, timeout time.Duration, exec TaskExecutor) {
+	workerName := fmt.Sprintf("%s/%d", taskName, workerID)
+	logrus.Infof("starting task executor %s", workerName)
+
+	for {
+		select {
+		case <-ctx.Done():
+			logrus.Infof("exiting task executor %s", workerName)
+		default:
+		}
+
+		t, taskCompleter, err := m.backend.DequeueTask(ctx, taskName)
+		if err != nil {
+			if err == ErrNoTasks {
+				// TODO(ssd) 2019-05-10: Once we have notifications we can probably sleep longer
+				time.Sleep(1 * time.Second)
+			} else {
+				logrus.WithError(err).Error("failed to dequeue task")
+			}
+			continue
+		}
+
+		var runCtx context.Context
+		var cancel context.CancelFunc
+		if timeout > 0 {
+			runCtx, cancel = context.WithTimeout(ctx, timeout)
+		} else {
+			runCtx, cancel = context.WithCancel(ctx)
+		}
+
+		result, err := exec.Run(runCtx, t.Parameters)
+		if err != nil {
+			err := taskCompleter.Fail(err.Error())
+			if err != nil {
+				logrus.WithError(err).Error("failed to mark task as failed")
+			}
+		} else {
+			err := taskCompleter.Succeed(result)
+			if err != nil {
+				logrus.WithError(err).Error("failed to mark task as successful")
+			}
+		}
+
+		cancel()
+	}
+}
+
 func (m *FWorkflowManager) run(ctx context.Context) {
 	workflowNames := make([]string, 0, len(m.workflowExecutors))
 	for k := range m.workflowExecutors {
@@ -165,7 +259,8 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 		decision = executor.OnStart(w, StartEvent{})
 	case TaskComplete:
 		decision = executor.OnTaskComplete(w, TaskCompleteEvent{
-			Result: &taskResultImpl{r: wevt.TaskResult},
+			TaskName: wevt.TaskResult.taskName,
+			Result:   &taskResultImpl{r: wevt.TaskResult},
 		})
 	case Cancel:
 		decision = executor.OnCancel(w, CancelEvent{})

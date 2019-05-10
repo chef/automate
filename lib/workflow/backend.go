@@ -222,7 +222,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	tx, err := pg.db.BeginTx(ctx, nil)
 	if err != nil {
 		cancel()
-		return nil, nil, errors.Wrap(err, "failed to dequeue task")
+		return nil, nil, errors.Wrap(err, "failed to dequeue workflow")
 	}
 
 	// TODO: allow multiple workflow names
@@ -329,6 +329,7 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 	return errors.Wrapf(taskc.tx.Commit(), "failed to mark task %d as failed", taskc.tid)
 }
 
+// TODO(ssd) 2019-05-10: Should this and Fail also take a context from the caller? If so, we'll need to
 func (taskc *PostgresTaskCompleter) Succeed(results interface{}) error {
 	defer taskc.cancel()
 

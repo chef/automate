@@ -97,15 +97,14 @@ func main() {
 const defaultDatabaseName = "workflow"
 
 func defaultConnURIForDatabase(dbname string) string {
-	/*
-		connInfo := pg.A2ConnInfo{
-			Host:  "localhost",
-			Port:  5432,
-			User:  "automate",
-			Certs: pg.A2SuperuserCerts,
-		}
-		return connInfo.ConnURI(dbname)*/
-	return fmt.Sprintf("postgresql://docker:docker@127.0.0.1:5432/%s?sslmode=disable", dbname)
+	connInfo := pg.A2ConnInfo{
+		Host:  "localhost",
+		Port:  5432,
+		User:  "automate",
+		Certs: pg.A2SuperuserCerts,
+	}
+	return connInfo.ConnURI(dbname)
+	// return fmt.Sprintf("postgresql://docker:docker@127.0.0.1:5432/%s?sslmode=disable", dbname)
 }
 
 func runResetDB(_ *cobra.Command, args []string) error {
@@ -129,31 +128,45 @@ func runResetDB(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-type PerfTestWorkflow struct{}
+type PerfTestTask struct {
+	statusChan chan struct{}
+}
 
-func (PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
+func (t *PerfTestTask) Run(ctx context.Context, _ interface{}) (interface{}, error) {
+	t.statusChan <- struct{}{}
+	return nil, nil
+}
+
+type PerfTestWorkflow struct {
+	// NOTE(ssd) 2019-05-10: Storing state in this way is super
+	// not what users will do. We need to get payloads &
+	// parameters working to remove these.
+	total int
+	count int
+}
+
+func (p *PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
 	ev workflow.StartEvent) workflow.Decision {
-	logrus.Info("OnStart")
-	for i := 0; i < 10; i++ {
+	logrus.Info("PerfTestWorkflow got OnStart")
+	for i := 0; i < p.total; i++ {
 		w.EnqueueTask("test task", fmt.Sprintf("asdf: %d", i))
 	}
 	enqueue_done = true
 	return w.Continue(0)
 }
 
-var count = 0
 var enqueue_done = false
 var done = false
 
-func (PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
+func (p *PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
 
-	logrus.WithField("task_name", ev.TaskName).Info("Task Completed")
-	count++
-	if count < 10 {
-		return w.Continue(count)
+	logrus.WithField("task_name", ev.TaskName).Info("PerfTestWorkflow got Task Completed")
+	p.count++
+	if p.count < p.total {
+		return w.Continue(p.count)
 	} else {
-		logrus.Info("SUPER DONE")
+		logrus.Info("PerfTestWorkflow marking itself as complete")
 		done = true
 		return w.Complete()
 	}
@@ -184,16 +197,21 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 	}
 
 	workflowManager := workflow.NewManager(w)
-	workflowManager.RegisterWorkflowExecutor("perf-test", PerfTestWorkflow{})
-	workflowManager.Start(context.Background())
+	workflowManager.RegisterWorkflowExecutor("perf-test", &PerfTestWorkflow{
+		total: perfTestOpts.TaskCount,
+	})
+	statusChan := make(chan struct{})
+	if !perfTestOpts.EnqueueOnly {
+		workflowManager.RegisterTaskExecutor("test task", &PerfTestTask{statusChan}, workflow.TaskExecutorOpts{
+			Workers: perfTestOpts.DequeueWorkerCount,
+		})
+	}
 
+	workflowManager.Start(context.Background())
 	w.EnqueueWorkflow(context.TODO(), &workflow.WorkflowInstance{
 		WorkflowName: "perf-test",
 		InstanceName: fmt.Sprintf("perf-test-%s", time.Now()),
 	})
-
-	dequeueResultChan := make(chan error, 100)
-	doneChan := make(chan struct{})
 
 	if perfTestOpts.EnqueueOnly {
 		for !enqueue_done {
@@ -202,38 +220,18 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 		return nil
 	}
 
-	if !perfTestOpts.EnqueueOnly {
-		for i := 0; i < perfTestOpts.DequeueWorkerCount; i++ {
-			go dequeueWorker(w, i, dequeueResultChan, doneChan)
-		}
-	}
-
 	startTime := time.Now()
-	stats := struct {
-		dequeueTotal     int
-		dequeueSuccesses int
-		dequeueErrors    int
-	}{}
-	doneClosed := false
+	dequeueTotal := 0
 	for {
-		deRes := <-dequeueResultChan
-		stats.dequeueTotal++
-		if deRes == nil {
-			stats.dequeueSuccesses++
-		} else {
-			stats.dequeueErrors++
-		}
-		if ((stats.dequeueTotal) % 1000) == 0 {
-			logrus.Infof("dequeue status -- %d attempts (%d success, %d failures) in %f seconds",
-				stats.dequeueTotal, stats.dequeueSuccesses, stats.dequeueErrors, time.Since(startTime).Seconds())
+		<-statusChan
+		dequeueTotal++
+		if (dequeueTotal % 1000) == 0 {
+			logrus.Infof("dequeue status -- %d in %f seconds",
+				dequeueTotal, time.Since(startTime).Seconds())
 		}
 
-		if stats.dequeueSuccesses == perfTestOpts.TaskCount {
-			if !doneClosed {
-				close(doneChan)
-				doneClosed = true
-			}
-			logrus.Infof("All %d tasks enqueued/dequeued in %f seconds, exiting", perfTestOpts.TaskCount, time.Since(startTime).Seconds())
+		if dequeueTotal == perfTestOpts.TaskCount {
+			logrus.Infof("All %d tasks enqueued/dequeued in %f seconds, exiting", dequeueTotal, time.Since(startTime).Seconds())
 			break
 		}
 	}
@@ -242,52 +240,4 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 		time.Sleep(1 * time.Second)
 	}
 	return nil
-}
-
-func enqueueWorker(w workflow.Backend, workerID int, workflowInstanceID int64, count int, enqueueResultChan chan error) {
-	logctx := logrus.WithFields(logrus.Fields{
-		"total_count": count,
-		"worker_id":   workerID,
-	})
-	logctx.Info("starting enqueue worker")
-	for enqueued := 0; enqueued < count; {
-	}
-	logctx.Info("enqueue worker done")
-}
-
-func dequeueWorker(w workflow.Backend, workerID int, dequeueResultChan chan error, doneChan chan struct{}) {
-	logctx := logrus.WithFields(logrus.Fields{
-		"worker_id": workerID,
-	})
-	logctx.Info("starting dequeue worker")
-	for {
-		dequeueStart := time.Now()
-		_, taskCompleter, err := w.DequeueTask(context.TODO(), "test task")
-		logctx.WithField("duration", time.Since(dequeueStart)).Debug("DequeueTask")
-		if err != nil {
-			if err == workflow.ErrNoTasks {
-				select {
-				case <-doneChan:
-					logctx.Info("No tasks available and all tasks have been queued, exiting")
-					return
-				default:
-					logctx.Debug("No tasks available")
-				}
-
-			} else {
-				logctx.WithError(err).Error("Failed to dequeue task!")
-				dequeueResultChan <- err
-			}
-			continue
-		}
-		completerStart := time.Now()
-		err = taskCompleter.Succeed("")
-		logctx.WithField("duration", time.Since(completerStart)).Debug("Succeed")
-		if err != nil {
-			logctx.WithError(err).Error("failed to complete task")
-			dequeueResultChan <- err
-			continue
-		}
-		dequeueResultChan <- nil
-	}
 }
