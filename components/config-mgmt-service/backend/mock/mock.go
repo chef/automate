@@ -79,7 +79,7 @@ func (m Backend) GetAttribute(nodeID string) (backend.NodeAttribute, error) {
 	return backend.NodeAttribute{}, nil
 }
 
-func (m Backend) GetListForField(searchTerm string) ([]string, error) {
+func (m Backend) GetListForField(searchTerm string, filters map[string][]string) ([]string, error) {
 	var fieldResults []string
 	fieldResults = append(fieldResults, "field_result_1")
 	fieldResults = append(fieldResults, "field_result_2")

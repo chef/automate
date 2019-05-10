@@ -12,7 +12,9 @@ import (
 	"testing"
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
+	gp "github.com/golang/protobuf/ptypes/struct"
 	gpStruct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 )
@@ -31,7 +33,7 @@ func TestOrganizationsEmpty(t *testing.T) {
 
 func TestOrganizationsWithTwoNodes(t *testing.T) {
 	nodes := []iBackend.Node{
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "missing",
@@ -39,7 +41,7 @@ func TestOrganizationsWithTwoNodes(t *testing.T) {
 			},
 			Exists: true,
 		},
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "success",
@@ -56,8 +58,8 @@ func TestOrganizationsWithTwoNodes(t *testing.T) {
 	req := new(request.Organizations)
 	expected := &gpStruct.ListValue{
 		Values: []*gpStruct.Value{
-			&gpStruct.Value{Kind: &gpStruct.Value_StringValue{"awesome_org"}},
-			&gpStruct.Value{Kind: &gpStruct.Value_StringValue{"cool_org"}},
+			{Kind: &gpStruct.Value_StringValue{"awesome_org"}},
+			{Kind: &gpStruct.Value_StringValue{"cool_org"}},
 		},
 	}
 
@@ -66,6 +68,188 @@ func TestOrganizationsWithTwoNodes(t *testing.T) {
 	t.Log("\nwith two nodes should return both organizations")
 	assert.Nil(t, err)
 	assert.Equal(t, expected, res)
+}
+
+func TestOrganizationsProjectFilter(t *testing.T) {
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		ctx         context.Context
+		expected    []string
+	}{
+		{
+			description: "Two nodes matching on the same project tag",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org1",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org2",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{"one"}),
+			expected: []string{"org1", "org2"},
+		},
+		{
+			description: "Two nodes matching with two project tags",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org1",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org2",
+					},
+					Projects: []string{"one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{"one", "two"}),
+			expected: []string{"org1", "org2"},
+		},
+		{
+			description: "Two nodes, one matching",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org1",
+					},
+					Projects: []string{"three"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org2",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{"one"}),
+			expected: []string{"org2"},
+		},
+		{
+			description: "Matching all",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org1",
+					},
+					Projects: []string{"three"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org2",
+					},
+					Projects: []string{"two", "one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org3",
+					},
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			expected: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "Match one unassigned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org1",
+					},
+					Projects: []string{},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org2",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			expected: []string{"org1"},
+		},
+		{
+			description: "No unassigned; no matches",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org1",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org2",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			expected: []string{},
+		},
+		{
+			description: "Match one unassigned and one assigned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org1",
+					},
+					Projects: []string{},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "org2",
+					},
+					Projects: []string{"two"},
+				},
+			},
+			ctx:      contextWithProjects([]string{authzConstants.UnassignedProjectID, "two"}),
+			expected: []string{"org1", "org2"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetOrganizations
+			res, err := cfgmgmt.GetOrganizations(test.ctx, &request.Organizations{})
+			assert.NoError(t, err)
+
+			orgs := getValues(res)
+
+			// Test what nodes are returned.
+			assert.Equal(t, test.expected, orgs)
+		})
+	}
+}
+
+func getValues(listValue *gp.ListValue) []string {
+	values := make([]string, 0)
+	for _, value := range listValue.GetValues() {
+		m := value.GetStringValue()
+		values = append(values, m)
+	}
+
+	return values
 }
 
 func TestOrganizationsWithOverTenNodes(t *testing.T) {
