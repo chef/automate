@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/pkg/errors"
@@ -97,6 +98,9 @@ func main() {
 const defaultDatabaseName = "workflow"
 
 func defaultConnURIForDatabase(dbname string) string {
+	if os.Getenv("JAYM") != "" {
+		return fmt.Sprintf("postgresql://docker:docker@127.0.0.1:5432/%s?sslmode=disable", dbname)
+	}
 	connInfo := pg.A2ConnInfo{
 		Host:  "localhost",
 		Port:  5432,
@@ -104,7 +108,6 @@ func defaultConnURIForDatabase(dbname string) string {
 		Certs: pg.A2SuperuserCerts,
 	}
 	return connInfo.ConnURI(dbname)
-	// return fmt.Sprintf("postgresql://docker:docker@127.0.0.1:5432/%s?sslmode=disable", dbname)
 }
 
 func runResetDB(_ *cobra.Command, args []string) error {
@@ -167,7 +170,10 @@ func (p *PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
 		return w.Continue(p.count)
 	} else {
 		logrus.Info("PerfTestWorkflow marking itself as complete")
-		done = true
+		go run() {
+			time.Sleep(2)
+			done = true
+		}
 		return w.Complete()
 	}
 }
