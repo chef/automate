@@ -7,6 +7,7 @@ package integration_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -49,7 +51,7 @@ func TestStatsNodesCountsWithTwoNodes(t *testing.T) {
 	//
 	// Generate the objects you want to ingest
 	nodes := []iBackend.Node{
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "success",
@@ -59,7 +61,7 @@ func TestStatsNodesCountsWithTwoNodes(t *testing.T) {
 			},
 			Exists: true,
 		},
-		iBackend.Node{
+		{
 			NodeInfo: iBackend.NodeInfo{
 				EntityUuid:       newUUID(),
 				Status:           "missing",
@@ -98,6 +100,300 @@ func TestStatsNodesCountsWithTwoNodes(t *testing.T) {
 	// Assert the results
 	assert.Nil(t, err)
 	assert.Equal(t, expected, res)
+}
+
+// A more complex test that requires data ingestion
+func TestStatsNodesCountsProjectFilter(t *testing.T) {
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     *request.NodesCounts
+		ctx         context.Context
+		expected    *response.NodesCounts
+	}{
+		{
+			description: "Two nodes matching on the same project tag",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:     contextWithProjects([]string{"one"}),
+			request: &request.NodesCounts{},
+			expected: &response.NodesCounts{
+				Total:   2,
+				Success: 1,
+				Failure: 1,
+				Missing: 0,
+			},
+		},
+		{
+			description: "Two nodes matching with two project tags",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+					Projects: []string{"one"},
+				},
+			},
+			ctx:     contextWithProjects([]string{"one", "two"}),
+			request: &request.NodesCounts{},
+			expected: &response.NodesCounts{
+				Total:   2,
+				Success: 1,
+				Failure: 1,
+				Missing: 0,
+			},
+		},
+		{
+			description: "Two nodes, one matching",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{"three"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:     contextWithProjects([]string{"one"}),
+			request: &request.NodesCounts{},
+			expected: &response.NodesCounts{
+				Total:   1,
+				Success: 0,
+				Failure: 1,
+				Missing: 0,
+			},
+		},
+		{
+			description: "Matching all",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{"three"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+					Projects: []string{"two", "one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "missing",
+					},
+				},
+			},
+			ctx:     contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			request: &request.NodesCounts{},
+			expected: &response.NodesCounts{
+				Total:   3,
+				Success: 1,
+				Failure: 1,
+				Missing: 1,
+			},
+		},
+		{
+			description: "Match one unassigned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:     contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request: &request.NodesCounts{},
+			expected: &response.NodesCounts{
+				Total:   1,
+				Success: 1,
+				Failure: 0,
+				Missing: 0,
+			},
+		},
+		{
+			description: "No unassigned; no matches",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+					Projects: []string{"two", "one"},
+				},
+			},
+			ctx:     contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request: &request.NodesCounts{},
+			expected: &response.NodesCounts{
+				Total:   0,
+				Success: 0,
+				Failure: 0,
+				Missing: 0,
+			},
+		},
+		{
+			description: "Match one unassigned and one assigned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+					Projects: []string{"two"},
+				},
+			},
+			ctx:     contextWithProjects([]string{authzConstants.UnassignedProjectID, "two"}),
+			request: &request.NodesCounts{},
+			expected: &response.NodesCounts{
+				Total:   2,
+				Success: 1,
+				Failure: 1,
+				Missing: 0,
+			},
+		},
+		{
+			description: "Match all projects with status filter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+					Projects: []string{"two"},
+				},
+			},
+			ctx: contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			request: &request.NodesCounts{
+				Filter: []string{"status:success"},
+			},
+			expected: &response.NodesCounts{
+				Total:   1,
+				Success: 1,
+				Failure: 0,
+				Missing: 0,
+			},
+		},
+		{
+			description: "Match 'one' project with status filter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+					Projects: []string{"one"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{"two"},
+				},
+			},
+			ctx: contextWithProjects([]string{"one"}),
+			request: &request.NodesCounts{
+				Filter: []string{"status:success"},
+			},
+			expected: &response.NodesCounts{
+				Total:   0,
+				Success: 0,
+				Failure: 0,
+				Missing: 0,
+			},
+		},
+		{
+			description: "Match unassigned projects with status filter",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+					Projects: []string{},
+				},
+			},
+			ctx: contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			request: &request.NodesCounts{
+				Filter: []string{"status:success"},
+			},
+			expected: &response.NodesCounts{
+				Total:   1,
+				Success: 1,
+				Failure: 0,
+				Missing: 0,
+			},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodesCounts
+			res, err := cfgmgmt.GetNodesCounts(test.ctx, test.request)
+			assert.NoError(t, err)
+
+			// Test what nodes are returned.
+			assert.Equal(t, test.expected, res)
+		})
+	}
 }
 
 // A complete tests with data ingestion and request filtering/parameters
