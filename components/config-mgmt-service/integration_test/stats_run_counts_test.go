@@ -16,6 +16,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -24,27 +25,26 @@ import (
 func TestStatsRunsCountsEmpty(t *testing.T) {
 	ctx := context.Background()
 	req := request.RunsCounts{}
-	expected := &response.RunsCounts{}
 
-	res, err := cfgmgmt.GetRunsCounts(ctx, &req)
-	assert.Nil(t, err)
-	assert.Equal(t, expected, res)
+	_, err := cfgmgmt.GetRunsCounts(ctx, &req)
+	assert.Error(t, err)
 }
 
 func TestStatsRunsCountsWithTwoRuns(t *testing.T) {
+	nodeID := newUUID()
 	// Generate the objects you want to ingest
 	runs := []iBackend.Run{
-		iBackend.Run{
+		{
 			NodeInfo: iBackend.NodeInfo{
-				EntityUuid: newUUID(),
+				EntityUuid: nodeID,
 				Status:     "success",
 			},
 			StartTime: time.Now(),
 			EndTime:   time.Now().Add(10),
 		},
-		iBackend.Run{
+		{
 			NodeInfo: iBackend.NodeInfo{
-				EntityUuid: newUUID(),
+				EntityUuid: nodeID,
 				Status:     "failure",
 			},
 			StartTime: time.Now(),
@@ -52,12 +52,22 @@ func TestStatsRunsCountsWithTwoRuns(t *testing.T) {
 		},
 	}
 
+	node := iBackend.Node{
+		Exists: true,
+		NodeInfo: iBackend.NodeInfo{
+			EntityUuid: nodeID,
+		},
+	}
+
 	// Ingest the runs, this will automatically refresh the indexes
 	suite.IngestRuns(runs)
+	suite.IngestNodes([]iBackend.Node{node})
 	defer suite.DeleteAllDocuments()
 
 	ctx := context.Background()
-	req := request.RunsCounts{}
+	req := request.RunsCounts{
+		NodeId: nodeID,
+	}
 	expected := &response.RunsCounts{
 		Total:   2,
 		Failure: 1,
@@ -69,15 +79,150 @@ func TestStatsRunsCountsWithTwoRuns(t *testing.T) {
 	assert.Equal(t, expected, res)
 }
 
+func TestStatsRunsCountsWithTwoRunsAndTwoNodes(t *testing.T) {
+	nodeID1 := newUUID()
+	nodeID2 := newUUID()
+	// Generate the objects you want to ingest
+	runs := []iBackend.Run{
+		{
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID1,
+				Status:     "success",
+			},
+			StartTime: time.Now(),
+			EndTime:   time.Now().Add(10),
+		},
+		{
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID2,
+				Status:     "failure",
+			},
+			StartTime: time.Now(),
+			EndTime:   time.Now().Add(10),
+		},
+	}
+
+	nodes := []iBackend.Node{
+		{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID1,
+			},
+		},
+		{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID2,
+			},
+		},
+	}
+
+	// Ingest the runs, this will automatically refresh the indexes
+	suite.IngestRuns(runs)
+	suite.IngestNodes(nodes)
+	defer suite.DeleteAllDocuments()
+
+	ctx := context.Background()
+	req1 := request.RunsCounts{
+		NodeId: nodeID1,
+	}
+	expected1 := &response.RunsCounts{
+		Total:   1,
+		Failure: 0,
+		Success: 1,
+	}
+
+	res1, err := cfgmgmt.GetRunsCounts(ctx, &req1)
+	assert.Nil(t, err)
+	assert.Equal(t, expected1, res1)
+
+	req2 := request.RunsCounts{
+		NodeId: nodeID2,
+	}
+	expected2 := &response.RunsCounts{
+		Total:   1,
+		Failure: 1,
+		Success: 0,
+	}
+
+	res2, err := cfgmgmt.GetRunsCounts(ctx, &req2)
+	assert.Nil(t, err)
+	assert.Equal(t, expected2, res2)
+}
+
+// When adding a node ID in the filter it should always return zero runs
+// This is a permission issue. If the node ID added in the filter was an 'or' with the node ID
+// passed as a field then the user could see runs that they do not have permissions for. The user
+// can only see runs for the node ID requested.
+func TestStatsRunsCountsWithTwoRunsAndTwoNodesWithFilter(t *testing.T) {
+	nodeID1 := newUUID()
+	nodeID2 := newUUID()
+	// Generate the objects you want to ingest
+	runs := []iBackend.Run{
+		{
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID1,
+				Status:     "success",
+			},
+			StartTime: time.Now(),
+			EndTime:   time.Now().Add(10),
+		},
+		{
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID2,
+				Status:     "failure",
+			},
+			StartTime: time.Now(),
+			EndTime:   time.Now().Add(10),
+		},
+	}
+
+	nodes := []iBackend.Node{
+		{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID1,
+			},
+		},
+		{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID2,
+			},
+		},
+	}
+
+	// Ingest the runs, this will automatically refresh the indexes
+	suite.IngestRuns(runs)
+	suite.IngestNodes(nodes)
+	defer suite.DeleteAllDocuments()
+
+	ctx := context.Background()
+	req := request.RunsCounts{
+		NodeId: nodeID1,
+		Filter: []string{"node_id:" + nodeID2},
+	}
+	expected := &response.RunsCounts{
+		Total:   0,
+		Failure: 0,
+		Success: 0,
+	}
+
+	res, err := cfgmgmt.GetRunsCounts(ctx, &req)
+	assert.Nil(t, err)
+	assert.Equal(t, expected, res)
+}
+
 func TestStatsRunsCountsWith20Runs(t *testing.T) {
 	var nRuns = 20
 	var runs = make([]iBackend.Run, nRuns)
+	nodeID := newUUID()
 
 	// Generate 20[nRuns] run objects to ingest
 	for i := 0; i < nRuns; i++ {
 		runs[i] = iBackend.Run{
 			NodeInfo: iBackend.NodeInfo{
-				EntityUuid: newUUID(),
+				EntityUuid: nodeID,
 				Status:     "success",
 				Platform:   "ubuntu",
 			},
@@ -86,14 +231,24 @@ func TestStatsRunsCountsWith20Runs(t *testing.T) {
 		}
 	}
 
+	node := iBackend.Node{
+		Exists: true,
+		NodeInfo: iBackend.NodeInfo{
+			EntityUuid: nodeID,
+		},
+	}
+
 	// Ingest the runs
 	suite.IngestRuns(runs)
+	suite.IngestNodes([]iBackend.Node{node})
 
 	// Clean the documents
 	defer suite.DeleteAllDocuments()
 
 	ctx := context.Background()
-	req := request.RunsCounts{} // We will modify this request
+	req := request.RunsCounts{
+		NodeId: nodeID,
+	} // We will modify this request
 	expected := &response.RunsCounts{
 		Total:   int32(nRuns),
 		Success: int32(nRuns),
@@ -133,6 +288,8 @@ func TestStatsRunsCountsFilteringWithTableDriven(t *testing.T) {
 		{1, iBackend.NodeInfo{NodeName: "mock", Status: "success"}},     // day 15 [timePlus(5)]
 	}
 
+	nodeID := newUUID()
+
 	var (
 		totalRuns int32 = 0
 		runs            = make([]iBackend.Run, totalRuns)
@@ -159,7 +316,7 @@ func TestStatsRunsCountsFilteringWithTableDriven(t *testing.T) {
 
 	for _, data := range dataRuns {
 		for i := 0; i < data.number; i++ {
-			data.node.EntityUuid = newUUID()
+			data.node.EntityUuid = nodeID
 			run := iBackend.Run{
 				NodeInfo:  data.node,
 				StartTime: testTime,
@@ -172,7 +329,15 @@ func TestStatsRunsCountsFilteringWithTableDriven(t *testing.T) {
 		testTime = testTime.AddDate(0, 0, 1)
 	}
 
+	node := iBackend.Node{
+		Exists: true,
+		NodeInfo: iBackend.NodeInfo{
+			EntityUuid: nodeID,
+		},
+	}
+
 	suite.IngestRuns(runs)
+	suite.IngestNodes([]iBackend.Node{node})
 	defer suite.DeleteAllDocuments()
 
 	ctx := context.Background()
@@ -242,6 +407,7 @@ func TestStatsRunsCountsFilteringWithTableDriven(t *testing.T) {
 		t.Logf("\nwith parameter(s) filter=%v start=%v end=%v\n -> it %s",
 			test.request.GetFilter(), test.request.GetStart(),
 			test.request.GetEnd(), test.description)
+		test.request.NodeId = nodeID
 		res, err := cfgmgmt.GetRunsCounts(ctx, &test.request)
 		assert.Nil(t, err)
 		assert.Equal(t, test.expected, *res)
@@ -252,21 +418,21 @@ func TestStatsRunsCountsWrongParameters(t *testing.T) {
 	ctx := context.Background()
 
 	cases := []request.RunsCounts{
-		request.RunsCounts{Filter: []string{"platform=centos"}},
-		request.RunsCounts{Filter: []string{"wrong"}},
-		request.RunsCounts{Filter: []string{":success"}},
-		request.RunsCounts{Filter: []string{"platform:"}},
-		request.RunsCounts{Filter: []string{"platform:foo:bar"}},
-		request.RunsCounts{Start: "2000-00-00"},
-		request.RunsCounts{Start: "00-00-00"},
-		request.RunsCounts{Start: "18-10-10"},
-		request.RunsCounts{Start: "20-01-01"},
-		request.RunsCounts{Start: "17:01:01"},
-		request.RunsCounts{End: "01-01-1800"},
-		request.RunsCounts{End: "3000-12"},
-		request.RunsCounts{End: "2019"},
-		request.RunsCounts{End: "1888:01:01"},
-		request.RunsCounts{End: "2027/01/01"},
+		{Filter: []string{"platform=centos"}},
+		{Filter: []string{"wrong"}},
+		{Filter: []string{":success"}},
+		{Filter: []string{"platform:"}},
+		{Filter: []string{"platform:foo:bar"}},
+		{Start: "2000-00-00"},
+		{Start: "00-00-00"},
+		{Start: "18-10-10"},
+		{Start: "20-01-01"},
+		{Start: "17:01:01"},
+		{End: "01-01-1800"},
+		{End: "3000-12"},
+		{End: "2019"},
+		{End: "1888:01:01"},
+		{End: "2027/01/01"},
 	}
 
 	for _, test := range cases {
@@ -276,6 +442,205 @@ func TestStatsRunsCountsWrongParameters(t *testing.T) {
 			assert.NotNil(t, err)
 			assert.Nil(t, res)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+	}
+}
+
+func TestStatsRunsCountsProjectFilter(t *testing.T) {
+	nodeID := newUUID()
+
+	cases := []struct {
+		description  string
+		runs         []iBackend.Run
+		ctx          context.Context
+		nodeProjects []string
+		expected     *response.RunsCounts
+	}{
+		{
+			description: "Node project matching request projects",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{"project9"}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+		{
+			description: "Node project not matching request projects",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{"project3"}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   0,
+				Failure: 0,
+				Success: 0,
+			},
+		},
+		{
+			description: "Node one project; request all projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+		{
+			description: "Node has no projects; request all projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			nodeProjects: []string{},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+		{
+			description: "Node has no projects; request unassigned projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			nodeProjects: []string{},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+		{
+			description: "Node has a projects; request unassigned projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   0,
+				Failure: 0,
+				Success: 0,
+			},
+		},
+		{
+			description: "Node has a projects; request unassigned projects allowed",
+			runs: []iBackend.Run{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "success",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Status: "failure",
+					},
+				},
+			},
+			ctx:          contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
+			nodeProjects: []string{"project9"},
+			expected: &response.RunsCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+
+			for index := range test.runs {
+				test.runs[index].StartTime = time.Now()
+				test.runs[index].EndTime = time.Now().Add(10)
+				test.runs[index].NodeInfo.EntityUuid = nodeID
+			}
+
+			node := iBackend.Node{
+				Exists:   true,
+				Projects: test.nodeProjects,
+				NodeInfo: iBackend.NodeInfo{
+					EntityUuid: nodeID,
+				},
+			}
+
+			// Ingest the runs, this will automatically refresh the indexes
+			suite.IngestRuns(test.runs)
+			suite.IngestNodes([]iBackend.Node{node})
+			defer suite.DeleteAllDocuments()
+
+			req := request.RunsCounts{
+				NodeId: nodeID,
+			}
+
+			res, err := cfgmgmt.GetRunsCounts(test.ctx, &req)
+			assert.Nil(t, err)
+			assert.Equal(t, test.expected, res)
 		})
 	}
 }

@@ -11,4 +11,5 @@ message RunsCounts {
   repeated string filter = 1;
   string start = 2;
   string end = 3;
+  string node_id = 4;
 }

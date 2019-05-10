@@ -42,7 +42,7 @@ func TestGetNodesCounts(t *testing.T) {
 func TestGetRunsCounts(t *testing.T) {
 	expected := *new(backend.RunsCounts)
 	filterMap := make(map[string][]string)
-	runState, err := subject.New().GetRunsCounts(filterMap, "", "")
+	runState, err := subject.New().GetRunsCounts(filterMap, "", "", "")
 	assert.Nil(t, err)
 	assert.Equal(t, runState, expected)
 }

@@ -314,7 +314,7 @@ control 'authz-access-control-1' do
           nodes/82760210-4686-497e-b039-efca78dee64b/runs
           nodes/82760210-4686-497e-b039-efca78dee64b/runs/639844f4-2ce6-42ba-8c9d-853db69adff3
           stats/node_counts
-          stats/run_counts
+          stats/run_counts?node_id=82760210-4686-497e-b039-efca78dee64b
           organizations
           source_fqdns
           nodes/82760210-4686-497e-b039-efca78dee64b/attribute

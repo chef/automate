@@ -122,7 +122,7 @@ export class NodeRunsService {
 
   // /stats/run_counts?node_id=e4ad572b-30b7-4806-aebb-43e1598e3a08&start_time=2017-09-08T14:03:05Z
   private buildURLSearchParamsNodeCounts(filters: NodeHistoryCountsFilter): HttpParams {
-    let searchParam = new HttpParams().set('filter', `node_id:${filters.nodeId}`);
+    let searchParam = new HttpParams().set('node_id', filters.nodeId);
 
     if (filters.startDate) {
       searchParam = searchParam.set('start', filters.startDate);

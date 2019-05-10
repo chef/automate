@@ -33,7 +33,7 @@ func TestStatsRunsRoutes(t *testing.T) {
 	cfg.SetBackend(m.New())
 	server := grpcserver.NewCfgMgmtServer(cfg)
 
-	runsCounts, err := server.GetRunsCounts(context.Background(), &request.RunsCounts{})
+	runsCounts, err := server.GetRunsCounts(context.Background(), &request.RunsCounts{NodeId: "Fake"})
 
 	assert.Nil(t, err)
 	assert.Equal(t, int32(0), runsCounts.Success)
