@@ -141,12 +141,14 @@ func (suite *NodeManagersAndNodesDBSuite) TestUpdateOrInsertInstanceSourceStateI
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
-	suite.Equal(1, len(mgrNodes))
+	suite.Require().Equal(1, len(mgrNodes))
 
 	node := mgrNodes[0]
 	suite.Equal("my-new-node", node.Name)
 	_, err = suite.Database.DeleteNode(node.Id)
-
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
 }
 func (suite *NodeManagersAndNodesDBSuite) TestGetAwsEc2ManagersCollectsAllMgrs() {
 	// TODO @afiune Mock the secrets-service
