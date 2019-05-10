@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, Subject } from 'rxjs';
@@ -8,7 +9,6 @@ import { createSelector } from '@ngrx/store';
 import {
   Service, ServicesFilters, HealthSummary
 } from '../../entities/service-groups/service-groups.model';
-import { UpdateSelectedSG } from '../../entities/service-groups/service-groups.actions';
 import { includes, getOr } from 'lodash/fp';
 
 @Component({
@@ -37,7 +37,10 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   // Has this component been destroyed
   private isDestroyed: Subject<boolean> = new Subject();
 
-  constructor(private store: Store<NgrxStateAtom>) { }
+  constructor(
+    private store: Store<NgrxStateAtom>,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.services$ = this.store.select(createSelector(serviceGroupState,
@@ -101,12 +104,10 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   }
 
   private updateServicesFilters(): void {
-    const servicesFilters: ServicesFilters = {
-      service_group_id: this.serviceGroupId,
-      health: this.selectedHealth,
-      page: this.currentPage,
-      pageSize: this.pageSize
+    const queryParams = {
+      'sgStatus': this.selectedHealth,
+      'sgPage': this.currentPage
     };
-    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
+    this.router.navigate([], { queryParams, queryParamsHandling: 'merge' });
   }
 }

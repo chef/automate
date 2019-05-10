@@ -1,9 +1,9 @@
-import { map, takeUntil } from 'rxjs/operators';
+import { takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, combineLatest } from 'rxjs';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Chicklet, RollupServiceStatus, SortDirection } from '../../types/types';
 import { EntityStatus } from '../../entities/entities';
 import {
@@ -70,13 +70,42 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    const allUrlParameters$ = this.getAllUrlParameters();
-
-    allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
-      allUrlParameters => this.updateAllFilters(allUrlParameters));
+    combineLatest(
+      this.route.queryParamMap,
+      this.store.select(allServiceGroups)
+    )
+    .pipe(takeUntil(this.isDestroyed))
+    .subscribe(([queryParams, groups]) => {
+      const sgId = queryParams.get('sgId');
+      if (sgId && groups.length > 0) {
+        const servicesFilters: ServicesFilters = {
+          service_group_id: sgId,
+          page: parseInt(queryParams.get('sgPage'), 10) || 1,
+          pageSize: parseInt(queryParams.get('sgPageSize'), 10) || 25,
+          health: queryParams.get('sgStatus') || 'total'
+        };
+        this.updateServicesSidebar(servicesFilters);
+      } else {
+        const allParameters = queryParams.keys.reduce((list, key) => {
+          return list.concat(queryParams.getAll(key).map(value => ({ type: key, text: value })));
+        }, []);
+        this.updateAllFilters(allParameters);
+      }
+    });
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
     this.serviceGroups$ = this.store.select(allServiceGroups);
+    this.serviceGroups$.pipe(
+      withLatestFrom(this.route.queryParamMap),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([serviceGroups, queryParams]) => {
+      if (serviceGroups.length > 0) {
+        const sgId = queryParams.get('sgId') || serviceGroups[0]['id'];
+        this.router.navigate([], { queryParams: { sgId }, queryParamsHandling: 'merge' });
+      } else {
+        this.selectedServiceGroupId = null;
+      }
+    });
 
     this.healthSummary$ = this.store.select(allServiceGroupHealth);
     this.healthSummary$.pipe(takeUntil(this.isDestroyed))
@@ -143,17 +172,23 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }
 
     delete queryParams['page'];
+    delete queryParams['sgId'];
+    delete queryParams['sgPage'];
+    delete queryParams['sgStatus'];
 
     this.router.navigate([], {queryParams});
   }
 
-  public openServicesSidebar(id: number) {
-    const servicesFilters: ServicesFilters = {
-      service_group_id: id,
-      page: 1,
-      health: 'total'
-    };
-    this.selectedServiceGroupId = id;
+  public onServiceGroupClick(id: string) {
+    const queryParams = { ...this.route.snapshot.queryParams };
+    queryParams['sgId'] = id;
+    delete queryParams['sgPage'];
+    delete queryParams['sgStatus'];
+    this.router.navigate([], { queryParams });
+  }
+
+  public updateServicesSidebar(servicesFilters: ServicesFilters) {
+    this.selectedServiceGroupId = servicesFilters.service_group_id;
     this.store.dispatch(new UpdateSelectedSG(servicesFilters));
     document.getElementById('services-panel').focus();
   }
@@ -169,26 +204,18 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
-  private getAllUrlParameters(): Observable<Chicklet[]> {
-    return this.route.queryParamMap.pipe(map((params: ParamMap) => {
-      return params.keys.reduce((list, key) => {
-        const paramValues = params.getAll(key);
-        return list.concat(paramValues.map(value => ({type: key, text: value})));
-      }, []);
-    }));
-   }
-
   onPageChange(pageNumber: number) {
-    if (pageNumber > 1 ) {
-      const queryParams = {...this.route.snapshot.queryParams, page: [pageNumber]};
+    const queryParams = { ...this.route.snapshot.queryParams, page: pageNumber };
 
-      this.router.navigate([], {queryParams});
-    } else if ( pageNumber === 1 ) {
-      const queryParams = {...this.route.snapshot.queryParams};
+    if (pageNumber <= 1) {
       delete queryParams['page'];
-
-      this.router.navigate([], {queryParams});
     }
+
+    delete queryParams['sgId'];
+    delete queryParams['sgPage'];
+    delete queryParams['sgStatus'];
+
+    this.router.navigate([], { queryParams });
   }
 
   onToggleSort(field: string) {
@@ -208,6 +235,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         sortField: [field], sortDirection: [fieldDirection]};
 
       delete queryParams['page'];
+      delete queryParams['sgId'];
+      delete queryParams['sgPage'];
+      delete queryParams['sgStatus'];
 
       this.router.navigate([], {queryParams});
     }
