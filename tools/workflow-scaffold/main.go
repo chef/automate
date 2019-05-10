@@ -170,10 +170,10 @@ func (p *PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
 		return w.Continue(p.count)
 	} else {
 		logrus.Info("PerfTestWorkflow marking itself as complete")
-		go run() {
-			time.Sleep(2)
+		go func() {
+			time.Sleep(2 * time.Second)
 			done = true
-		}
+		}()
 		return w.Complete()
 	}
 }
