@@ -3,6 +3,8 @@ package server
 import (
 	"testing"
 
+	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+
 	ingest_inspec "github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,7 +27,7 @@ func TestGetReportStatus(t *testing.T) {
 					},
 				},
 			}}}
-	assert.Equal(t, "passed", getReportStatus(profiles))
+	assert.Equal(t, nodes.LastContactData_PASSED, getReportStatus(profiles))
 
 	profiles = []*ingest_inspec.Profile{
 		{
@@ -51,12 +53,12 @@ func TestGetReportStatus(t *testing.T) {
 					},
 				},
 			}}}
-	assert.Equal(t, "failed", getReportStatus(profiles))
+	assert.Equal(t, nodes.LastContactData_FAILED, getReportStatus(profiles))
 
 	profiles = []*ingest_inspec.Profile{
 		{Status: "skipped"},
 	}
-	assert.Equal(t, "skipped", getReportStatus(profiles))
+	assert.Equal(t, nodes.LastContactData_SKIPPED, getReportStatus(profiles))
 
 	profiles = []*ingest_inspec.Profile{
 		{Status: "skipped"},
@@ -78,7 +80,7 @@ func TestGetReportStatus(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, "skipped", getReportStatus(profiles))
+	assert.Equal(t, nodes.LastContactData_SKIPPED, getReportStatus(profiles))
 
 	profiles = []*ingest_inspec.Profile{
 		{
@@ -116,7 +118,7 @@ func TestGetReportStatus(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, "passed", getReportStatus(profiles))
+	assert.Equal(t, nodes.LastContactData_PASSED, getReportStatus(profiles))
 
 	profiles = []*ingest_inspec.Profile{
 		{
@@ -154,5 +156,5 @@ func TestGetReportStatus(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, "failed", getReportStatus(profiles))
+	assert.Equal(t, nodes.LastContactData_FAILED, getReportStatus(profiles))
 }
