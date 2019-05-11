@@ -374,7 +374,7 @@ describe File.basename(__FILE__) do
     actual_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new()
     actual_nodes['nodes'].each {|n|
       assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, n, 'last_contact'))
-      n.scan_data.end_time = ""
+      n.scan_data.end_time = Google::Protobuf::Timestamp.new()
       n.scan_data.id = "some-id"
     }
     expected_nodes = {
@@ -417,8 +417,8 @@ describe File.basename(__FILE__) do
           "runData": {},
           "scanData": {
             "id": "some-id",
-            "status": "passed",
-            "penultimateStatus": "passed"
+            "status": "SKIPPED",
+            "penultimateStatus": "SKIPPED"
           }
         },
         {
