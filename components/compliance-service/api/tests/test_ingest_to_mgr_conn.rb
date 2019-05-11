@@ -34,7 +34,7 @@ describe File.basename(__FILE__) do
     assert nodes_list["nodes"].all? { |node|
       node["scan_data"].id.length > 0 &&
         node["scan_data"].status.length > 0 &&
-        node["scan_data"].end_time.length > 0
+        node["scan_data"].end_time != nil
     }, "Nodes did not have necessary scan_data: #{nodes_list["nodes"]}"
   end
 end

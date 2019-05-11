@@ -94,8 +94,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeThatExistsAndHa
 		LastContact:     nowTime,
 		ScanData: &nodes.LastContactData{
 			Id:      "12345-9999-002323",
-			EndTime: nowTime.String(),
-			Status:  "passed",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
@@ -344,8 +344,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndScan
 		JobUuid:         "12343-232324-1231242",
 		ScanData: &nodes.LastContactData{
 			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime.String(),
-			Status:  "passed",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
@@ -365,7 +365,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndScan
 	suite.Equal("my really cool node", readNode.Name)
 	suite.Equal("debian", readNode.Platform)
 	suite.InDelta(nowTime.GetSeconds(), readNode.LastContact.GetSeconds(), 1)
-	suite.Equal("passed", readNode.GetScanData().Status)
+	suite.Equal(nodes.LastContactData_PASSED, readNode.GetScanData().Status)
 
 	// now send the same node info through again, expect the node to be updated,
 	// and have the updated last_contact time, and updated statuses
@@ -373,8 +373,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndScan
 	node.LastContact = nowTime2
 	node.ScanData = &nodes.LastContactData{
 		Id:      "1003-9254-2004-1322",
-		EndTime: nowTime2.String(),
-		Status:  "failed",
+		EndTime: nowTime2,
+		Status:  nodes.LastContactData_FAILED,
 	}
 	err = suite.Database.ProcessIncomingNode(node)
 	if err != nil {
@@ -394,8 +394,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndScan
 	suite.Equal("debian", readNode.Platform)
 	suite.InDelta(nowTime2.GetSeconds(), readNode.LastContact.GetSeconds(), 1)
 	suite.NotEqual(nil, readNode.GetScanData())
-	suite.Equal("failed", readNode.GetScanData().Status)
-	suite.Equal("passed", readNode.GetScanData().PenultimateStatus)
+	suite.Equal(nodes.LastContactData_FAILED, readNode.GetScanData().GetStatus())
+	suite.Equal(nodes.LastContactData_PASSED, readNode.GetScanData().GetPenultimateStatus())
 
 	filter := &common.Filter{
 		Key:    "state",
@@ -425,8 +425,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithDiffSourceI
 		JobUuid:         "12343-232324-1231242",
 		ScanData: &nodes.LastContactData{
 			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime.String(),
-			Status:  "passed",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
@@ -491,8 +491,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeUUIDWithTags() 
 		},
 		RunData: &nodes.LastContactData{
 			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime.String(),
-			Status:  "passed",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
@@ -564,8 +564,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeSourceInfoWithT
 		},
 		ScanData: &nodes.LastContactData{
 			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime.String(),
-			Status:  "passed",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
@@ -656,8 +656,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndRunD
 		JobUuid:         "12343-232324-1231242",
 		RunData: &nodes.LastContactData{
 			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime.String(),
-			Status:  "passed",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
@@ -677,7 +677,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndRunD
 	suite.Equal("my really client run node", readNode.Name)
 	suite.Equal("debian", readNode.Platform)
 	suite.InDelta(nowTime.GetSeconds(), readNode.LastContact.GetSeconds(), 1)
-	suite.Equal("passed", readNode.GetRunData().Status)
+	suite.Equal(nodes.LastContactData_PASSED, readNode.GetRunData().Status)
 
 	// now send the same node info through again, expect the node to be updated,
 	// and have the updated last_contact time, and updated statuses
@@ -685,8 +685,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndRunD
 	node.LastContact = nowTime2
 	node.RunData = &nodes.LastContactData{
 		Id:      "1003-9254-2004-1322",
-		EndTime: nowTime2.String(),
-		Status:  "failed",
+		EndTime: nowTime2,
+		Status:  nodes.LastContactData_FAILED,
 	}
 	err = suite.Database.ProcessIncomingNode(node)
 	if err != nil {
@@ -706,8 +706,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndRunD
 	suite.Equal("debian", readNode.Platform)
 	suite.InDelta(nowTime2.GetSeconds(), readNode.LastContact.GetSeconds(), 1)
 	suite.NotEqual(nil, readNode.GetRunData())
-	suite.Equal("failed", readNode.GetRunData().Status)
-	suite.Equal("passed", readNode.GetRunData().PenultimateStatus)
+	suite.Equal(nodes.LastContactData_FAILED, readNode.GetRunData().Status)
+	suite.Equal(nodes.LastContactData_PASSED, readNode.GetRunData().PenultimateStatus)
 
 	_, err = suite.Database.DeleteNode(listNodes[0].Id)
 }

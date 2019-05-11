@@ -243,23 +243,29 @@ func (db *DB) fromDBNode(inNode *dbNode) (*nodes.Node, error) {
 	}
 	newNode.Projects = projects
 
-	scanData := nodes.LastContactData{}
 	if inNode.LastScan != nil {
-		err = json.Unmarshal(inNode.LastScan, &scanData)
+		dbScanData := lastContactData{}
+		err = json.Unmarshal(inNode.LastScan, &dbScanData)
 		if err != nil {
 			return nil, errors.Wrap(err, "fromDBNode unable to unmarshal scan data")
 		}
+		newNode.ScanData, err = translateToProtoStruct(dbScanData)
+		if err != nil {
+			return nil, errors.Wrap(err, "fromDBNode unable to translate scan data")
+		}
 	}
-	newNode.ScanData = &scanData
 
-	runData := nodes.LastContactData{}
 	if inNode.LastRun != nil {
-		err = json.Unmarshal(inNode.LastRun, &runData)
+		dbRunData := lastContactData{}
+		err = json.Unmarshal(inNode.LastRun, &dbRunData)
 		if err != nil {
 			return nil, errors.Wrap(err, "fromDBNode unable to unmarshal run data")
 		}
+		newNode.RunData, err = translateToProtoStruct(dbRunData)
+		if err != nil {
+			return nil, errors.Wrap(err, "fromDBNode unable to translate scan data")
+		}
 	}
-	newNode.RunData = &runData
 
 	t := inNode.LastContact.Round(1 * time.Second)
 	newNode.LastContact, err = ptypes.TimestampProto(t)
@@ -281,6 +287,38 @@ func (db *DB) fromDBNode(inNode *dbNode) (*nodes.Node, error) {
 	}
 
 	return &newNode, nil
+}
+
+func translateToProtoStruct(nodeData lastContactData) (*nodes.LastContactData, error) {
+	lastContactData := &nodes.LastContactData{
+		Id:                nodeData.ID,
+		Status:            translateStatusToEnum(nodeData.Status),
+		PenultimateStatus: translateStatusToEnum(nodeData.PenultimateStatus),
+	}
+	if len(nodeData.EndTime) > 0 {
+		time, err := time.Parse(time.RFC3339, nodeData.EndTime)
+		if err != nil {
+			return &nodes.LastContactData{}, errors.Wrap(err, "unable to parse end time")
+		}
+		timestamp, err := ptypes.TimestampProto(time)
+		if err != nil {
+			return &nodes.LastContactData{}, errors.Wrap(err, "unable to parse end time")
+		}
+		lastContactData.EndTime = timestamp
+	}
+	return lastContactData, nil
+}
+
+func translateStatusToEnum(status string) nodes.LastContactData_Status {
+	switch status {
+	case "PASSED":
+		return nodes.LastContactData_PASSED
+	case "FAILED":
+		return nodes.LastContactData_FAILED
+	case "SKIPPED":
+		return nodes.LastContactData_SKIPPED
+	}
+	return nodes.LastContactData_UNKNOWN
 }
 
 func (db *DB) fromDBNodeWithTargetConfig(inNode *dbNode) (*nodes.Node, error) {

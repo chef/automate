@@ -1,10 +1,8 @@
 package pgdb
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 
 	uuid "github.com/gofrs/uuid"
@@ -13,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 )
 
 const sqlUpsertByIDRunData = `
@@ -64,19 +63,26 @@ WHERE nodes.source_state != 'TERMINATED' RETURNING id;
 `
 
 const sqlGetCurrentRunStatus = `
-SELECT last_run -> 'status' AS status
+SELECT coalesce(last_run ->> 'Status', '') AS status
 FROM nodes
 WHERE id = $1 OR source_id = $2 AND source_region = $3 AND source_account_id = $4;
 `
 
 const sqlGetCurrentScanStatus = `
-SELECT last_scan -> 'status' AS status
+SELECT coalesce(last_scan ->> 'Status', '') AS status
 FROM nodes
 WHERE id = $1 OR source_id = $2 AND source_region = $3 AND source_account_id = $4;
 `
 
+type lastContactData struct {
+	ID                string
+	Status            string
+	PenultimateStatus string
+	EndTime           string
+}
+
 func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
-	logrus.Debugf("processing node with uuid %s", node.Uuid)
+	logrus.Infof("processing node with uuid %s", node.Uuid)
 	// if node.LastContact is less than 10 min ago, we can assume node to be in "running" state.
 	// if it is more than 10 min ago, we don't know what the state is, so we set to empty string
 	tenMinAgo := time.Now().UTC().Add(time.Minute * -10)
@@ -106,20 +112,28 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 
 	lastContactDataByte := []byte{}
 	if node.GetScanData() != nil {
-		node.GetScanData().PenultimateStatus, err = db.getCurrentScanStatus(node)
+		scanData, err := translateToDBStruct(node.GetScanData())
+		if err != nil {
+			return errors.Wrap(err, "ProcessIncomingNode unable to translate struct to db struct")
+		}
+		scanData.PenultimateStatus, err = db.getCurrentScanStatus(node)
 		if err != nil {
 			return errors.Wrap(err, "ProcessIncomingNode unable to get current scan status")
 		}
-		lastContactDataByte, err = json.Marshal(node.GetScanData())
+		lastContactDataByte, err = json.Marshal(scanData)
 		if err != nil {
 			return errors.Wrap(err, "ProcessIncomingNode unable to parse node scan data")
 		}
 	} else if node.GetRunData() != nil {
-		node.GetRunData().PenultimateStatus, err = db.getCurrentRunStatus(node)
+		runData, err := translateToDBStruct(node.GetRunData())
+		if err != nil {
+			return errors.Wrap(err, "ProcessIncomingNode unable to translate struct to db struct")
+		}
+		runData.PenultimateStatus, err = db.getCurrentRunStatus(node)
 		if err != nil {
 			return errors.Wrap(err, "ProcessIncomingNode unable to get current scan status")
 		}
-		lastContactDataByte, err = json.Marshal(node.GetRunData())
+		lastContactDataByte, err = json.Marshal(runData)
 		if err != nil {
 			return errors.Wrap(err, "ProcessIncomingNode unable to parse node run data")
 		}
@@ -172,43 +186,33 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	return err
 }
 
+func translateToDBStruct(nodeData *nodes.LastContactData) (lastContactData, error) {
+	lastContactData := lastContactData{
+		ID:                nodeData.GetId(),
+		Status:            nodeData.GetStatus().String(),
+		PenultimateStatus: nodeData.GetPenultimateStatus().String(),
+	}
+	if nodeData.GetEndTime() != nil {
+		time := ptypes.TimestampString(nodeData.GetEndTime())
+		lastContactData.EndTime = time
+	}
+	return lastContactData, nil
+}
+
 func (db *DB) getCurrentScanStatus(node *manager.NodeMetadata) (string, error) {
-	var status sql.NullString
-	err := db.QueryRow(sqlGetCurrentScanStatus, node.GetUuid(),
-		node.GetSourceId(), node.GetSourceRegion(), node.GetSourceAccountId()).Scan(&status)
-	switch {
-	case err == sql.ErrNoRows:
-		return "", nil
-	case err != nil:
-		return "", errors.Wrap(err, "unable to query for current status")
-	}
-	if !status.Valid {
-		return "", nil
-	}
-	statusString, err := strconv.Unquote(status.String)
+	status, err := db.SelectStr(sqlGetCurrentScanStatus, node.GetUuid(),
+		node.GetSourceId(), node.GetSourceRegion(), node.GetSourceAccountId())
 	if err != nil {
 		return "", errors.Wrap(err, "unable to read status")
 	}
-	return statusString, nil
+	return status, nil
 }
 
 func (db *DB) getCurrentRunStatus(node *manager.NodeMetadata) (string, error) {
-	var status sql.NullString
-	err := db.QueryRow(sqlGetCurrentRunStatus, node.GetUuid(),
-		node.GetSourceId(), node.GetSourceRegion(), node.GetSourceAccountId()).Scan(&status)
-	switch {
-	case err == sql.ErrNoRows:
-		return "", nil
-	case err != nil:
-		return "", errors.Wrap(err, "unable to query for current status")
-
-	}
-	if !status.Valid {
-		return "", nil
-	}
-	statusString, err := strconv.Unquote(status.String)
+	status, err := db.SelectStr(sqlGetCurrentRunStatus, node.GetUuid(),
+		node.GetSourceId(), node.GetSourceRegion(), node.GetSourceAccountId())
 	if err != nil {
 		return "", errors.Wrap(err, "unable to read status")
 	}
-	return statusString, nil
+	return status, nil
 }

@@ -171,7 +171,7 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 		Tags:            in.Tags,
 		ScanData: &nodes.LastContactData{
 			Id:      in.ReportUuid,
-			EndTime: endTime.String(),
+			EndTime: endTimeTimestamp,
 		},
 	}, in.Profiles)
 	if err != nil {
@@ -216,15 +216,15 @@ func (s *ComplianceIngestServer) sendNodeInfoToManager(ctx context.Context, node
 	return nil
 }
 
-func getReportStatus(profiles []*ingest_inspec.Profile) string {
+func getReportStatus(profiles []*ingest_inspec.Profile) nodes.LastContactData_Status {
 	// start with a status of passed as the default status
-	status := "passed"
+	status := nodes.LastContactData_PASSED
 	skippedCounter := 0
 	for _, profile := range profiles {
 		profile.Status = getProfileStatus(profile)
 		// if any profile is failed, report is failed
 		if profile.Status == "failed" {
-			status = "failed"
+			status = nodes.LastContactData_FAILED
 			break
 		}
 		// if all profiles are skipped, the report is skipped
@@ -236,7 +236,7 @@ func getReportStatus(profiles []*ingest_inspec.Profile) string {
 		}
 	}
 	if skippedCounter == len(profiles) {
-		status = "skipped"
+		status = nodes.LastContactData_SKIPPED
 	}
 	return status
 }
