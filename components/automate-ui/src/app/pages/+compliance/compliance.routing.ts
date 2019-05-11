@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ComplianceComponent } from './compliance.component';
+import {
+  ComplianceLandingComponent
+} from 'app/pages/compliance-landing/compliance-landing.component';
 
 const routes: Routes = [
   {
@@ -9,8 +12,8 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'reports',
-        pathMatch: 'full'
+        pathMatch: 'full',
+        component: ComplianceLandingComponent
       },
       {
         path: 'reporting',

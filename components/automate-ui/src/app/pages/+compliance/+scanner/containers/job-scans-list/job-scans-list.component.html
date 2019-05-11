@@ -1,17 +1,4 @@
-<chef-sidebar>
-  <div class="nav-items">
-    <div class="group">Compliance</div>
-    <app-authorized [allOf]="[['/compliance/scanner/jobs', 'post'], ['/compliance/scanner/jobs/search', 'post']]">
-      <chef-sidebar-entry route="/compliance/reports" icon="equalizer">Reports</chef-sidebar-entry>
-    </app-authorized>
-    <app-authorized [allOf]="[['/compliance/scanner/jobs', 'post'], ['/compliance/scanner/jobs/search', 'post']]">
-      <chef-sidebar-entry route="/compliance/scan-jobs" icon="wifi_tethering">Scan Jobs</chef-sidebar-entry>
-    </app-authorized>
-    <app-authorized [allOf]="[['/compliance/profiles/search', 'post']]">
-      <chef-sidebar-entry route="/compliance/profiles" icon="library_books">Profiles</chef-sidebar-entry>
-    </app-authorized>
-  </div>
-</chef-sidebar>
+<app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
 
 <div class="container">
   <main>

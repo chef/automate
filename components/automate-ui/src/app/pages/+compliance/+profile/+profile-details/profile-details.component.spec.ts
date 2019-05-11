@@ -4,7 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ProfileDetailsComponent } from './profile-details.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
-import { ProfilesService } from '../../../../services/profiles/profiles.service';
+import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 
 class MockProfilesService {

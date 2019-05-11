@@ -8,7 +8,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "compliance"
-    weight = 10
+    weight = 20
 +++
 
 ## Overview

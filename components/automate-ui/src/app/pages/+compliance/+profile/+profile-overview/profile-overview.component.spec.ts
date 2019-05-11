@@ -5,8 +5,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ProfileOverviewComponent } from './profile-overview.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
-import { ProfilesService } from '../../../../services/profiles/profiles.service';
-import { UploadService } from '../../../../services/profiles/upload.service';
+import { ProfilesService } from 'app/services/profiles/profiles.service';
+import { UploadService } from 'app/services/profiles/upload.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 
 class MockProfilesService {

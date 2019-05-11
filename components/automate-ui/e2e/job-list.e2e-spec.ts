@@ -90,7 +90,7 @@ describe('Job List', () => {
     const subheading = header.$('chef-subheading');
 
     expect(heading.getText())
-      .toBe('Scan jobs');
+      .toBe('Scan Jobs');
     expect(subheading.getText())
       .toBe('Compliance scan jobs run inspec exec on a set of nodes.');
   });

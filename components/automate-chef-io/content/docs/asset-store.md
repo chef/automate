@@ -8,7 +8,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "compliance"
-    weight = 10
+    weight = 30
 +++
 
 ## Overview
@@ -127,13 +127,13 @@ In these examples, the owner is same value as first part of identifier, as discu
 #### Get All Installed Profiles
 
 ```bash
-curl --insecure -H "X-Data-Collector-Token: token-value" https://a2-dev.test/api/v0/compliance/profiles/search -d '{"owner": "test"}'
+curl --insecure -H "X-Data-Collector-Token: token-value" https://automate.example.com/api/v0/compliance/profiles/search -d '{"owner": "test"}'
 ```
 
 #### Get All Available Profiles
 
 ```bash
-curl --insecure -H "X-Data-Collector-Token: token-value" https://a2-dev.test/api/v0/compliance/profiles/search -d '{}'
+curl --insecure -H "X-Data-Collector-Token: token-value" https://automate.example.com/api/v0/compliance/profiles/search -d '{}'
 ```
 
 #### Download .tar

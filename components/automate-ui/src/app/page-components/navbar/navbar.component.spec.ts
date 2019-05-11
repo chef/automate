@@ -56,7 +56,7 @@ describe('NavbarComponent', () => {
   using([
     ['Event Feed',  '/event-feed',           1],
     ['Client Runs', '/client-runs',          2],
-    ['Compliance',  '/compliance/reports', 3],
+    ['Compliance',  '/compliance',           3],
     ['Settings',    '/settings',             4]
   ], function (label: string, path: string, position: number) {
     it(`displays the ${label} navigation link`, () => {

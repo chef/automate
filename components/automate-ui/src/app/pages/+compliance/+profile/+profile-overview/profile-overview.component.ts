@@ -12,9 +12,9 @@ import {
   ElementRef,
   ViewChild
 } from '@angular/core';
-import { ProfilesService } from '../../../../services/profiles/profiles.service';
-import { UploadService } from '../../../../services/profiles/upload.service';
-import { AvailableProfilesService } from '../../../../services/profiles/available-profiles.service';
+import { ProfilesService } from 'app/services/profiles/profiles.service';
+import { UploadService } from 'app/services/profiles/upload.service';
+import { AvailableProfilesService } from 'app/services/profiles/available-profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { find } from 'lodash';
 

@@ -76,12 +76,6 @@ identifier = "compliance"
 url = "/docs/compliance"
 
 [[menu.docs]]
-name = "Asset Store"
-weight = 80
-identifier = "asset-store"
-url = "/docs/asset-store"
-
-[[menu.docs]]
 name = "Settings"
 weight = 90
 identifier = "settings"
