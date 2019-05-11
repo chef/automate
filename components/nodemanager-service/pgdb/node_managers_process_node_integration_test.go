@@ -21,7 +21,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithNoUUID() {
 		LastContact:     nowTime,
 		SourceId:        "i-078973",
 		SourceRegion:    "eu-west-1",
-		SourceAccountId: "8799247840",
+		SourceAccountId: "999999999999",
 		ScanData: &nodes.LastContactData{
 			Id: "12345-9999-002323",
 		},
@@ -421,7 +421,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithDiffSourceI
 		LastContact:     nowTime,
 		SourceId:        "i-09837523",
 		SourceRegion:    "us-east-1",
-		SourceAccountId: "2398433048610242",
+		SourceAccountId: "999999999999",
 		JobUuid:         "12343-232324-1231242",
 		ScanData: &nodes.LastContactData{
 			Id:      "1003-9254-2004-1322",
@@ -557,7 +557,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeSourceInfoWithT
 		LastContact:     nowTime,
 		SourceId:        "i-078973",
 		SourceRegion:    "eu-west-1",
-		SourceAccountId: "8799247840",
+		SourceAccountId: "999999999999",
 		Tags: []*common.Kv{
 			{Key: "my test", Value: "my val"},
 			{Key: "environment", Value: "dev"},
@@ -630,7 +630,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeRejectsNodeWith
 		LastContact:     nowTime,
 		SourceId:        "i-078973",
 		SourceRegion:    "eu-west-1",
-		SourceAccountId: "8799247840",
+		SourceAccountId: "999999999999",
 		Tags: []*common.Kv{
 			{Key: "my test", Value: "my val"},
 			{Key: "environment", Value: "dev"},

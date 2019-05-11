@@ -199,6 +199,8 @@ func TestGatewayNodesClient(t *testing.T) {
 		ManagerIds:      []string{"e69dc612-7e67-43f2-9b19-256afd385820"},
 		Status:          "reachable",
 		State:           "RUNNING",
+		ScanData:        &nodes.LastContactData{},
+		RunData:         &nodes.LastContactData{},
 	}, node)
 
 	jobsList, err = jobsClient.List(ctx, &jobs.Query{})
