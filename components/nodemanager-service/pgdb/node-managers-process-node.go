@@ -110,37 +110,13 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	// 2) it is already registered in our db with diff uuid, same source_id: update the node by source_id
 	// 3) it is not in our db, we must add it
 
-	lastContactDataByte := []byte{}
-	if node.GetScanData() != nil {
-		scanData, err := translateToDBStruct(node.GetScanData())
-		if err != nil {
-			return errors.Wrap(err, "ProcessIncomingNode unable to translate struct to db struct")
-		}
-		scanData.PenultimateStatus, err = db.getCurrentScanStatus(node)
-		if err != nil {
-			return errors.Wrap(err, "ProcessIncomingNode unable to get current scan status")
-		}
-		lastContactDataByte, err = json.Marshal(scanData)
-		if err != nil {
-			return errors.Wrap(err, "ProcessIncomingNode unable to parse node scan data")
-		}
-	} else if node.GetRunData() != nil {
-		runData, err := translateToDBStruct(node.GetRunData())
-		if err != nil {
-			return errors.Wrap(err, "ProcessIncomingNode unable to translate struct to db struct")
-		}
-		runData.PenultimateStatus, err = db.getCurrentRunStatus(node)
-		if err != nil {
-			return errors.Wrap(err, "ProcessIncomingNode unable to get current scan status")
-		}
-		lastContactDataByte, err = json.Marshal(runData)
-		if err != nil {
-			return errors.Wrap(err, "ProcessIncomingNode unable to parse node run data")
-		}
-	} else {
-		msg := "ProcessIncomingNode: invalid request: scan_data or run_data must be provided"
-		logrus.Errorf(msg)
-		return fmt.Errorf(msg)
+	lastContactInfo, err := db.handleIncomingLastContactData(node)
+	if err != nil {
+		return errors.Wrap(err, "ProcessIncomingNode unable to parse node last contact data")
+	}
+	lastContactDataByte, err := json.Marshal(lastContactInfo)
+	if err != nil {
+		return errors.Wrap(err, "ProcessIncomingNode unable to marshal last contact data")
 	}
 
 	err = Transact(db, func(tx *DBTrans) error {
@@ -184,6 +160,38 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	})
 
 	return err
+}
+
+func (db *DB) handleIncomingLastContactData(node *manager.NodeMetadata) (lastContactData, error) {
+	var err error
+	var lastContactInfo lastContactData
+
+	if node.GetScanData() == nil && node.GetRunData() == nil {
+		msg := "invalid request: scan_data or run_data must be provided"
+		logrus.Errorf(msg)
+		return lastContactInfo, fmt.Errorf(msg)
+	}
+
+	if node.GetScanData() != nil {
+		lastContactInfo, err = translateToDBStruct(node.GetScanData())
+		if err != nil {
+			return lastContactInfo, errors.Wrap(err, "ProcessIncomingNode unable to translate struct to db struct")
+		}
+		lastContactInfo.PenultimateStatus, err = db.getCurrentScanStatus(node)
+		if err != nil {
+			return lastContactInfo, errors.Wrap(err, "ProcessIncomingNode unable to get current scan status")
+		}
+	} else if node.GetRunData() != nil {
+		lastContactInfo, err = translateToDBStruct(node.GetRunData())
+		if err != nil {
+			return lastContactInfo, errors.Wrap(err, "ProcessIncomingNode unable to translate struct to db struct")
+		}
+		lastContactInfo.PenultimateStatus, err = db.getCurrentRunStatus(node)
+		if err != nil {
+			return lastContactInfo, errors.Wrap(err, "ProcessIncomingNode unable to get current scan status")
+		}
+	}
+	return lastContactInfo, nil
 }
 
 func translateToDBStruct(nodeData *nodes.LastContactData) (lastContactData, error) {

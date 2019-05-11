@@ -637,7 +637,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeRejectsNodeWith
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
-	suite.Equal("ProcessIncomingNode: invalid request: scan_data or run_data must be provided", err.Error())
+	suite.Equal("ProcessIncomingNode unable to parse node last contact data: invalid request: scan_data or run_data must be provided", err.Error())
 }
 
 func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndRunData() {
