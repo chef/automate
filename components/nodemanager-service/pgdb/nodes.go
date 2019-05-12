@@ -593,8 +593,8 @@ var nodesFilterField = map[string]string{
 	"state":                 "source_state", // running, stopped, terminated
 	"statechange_timerange": "statechange_timestamp",
 	"status":                "status", // reachable, unreachable, unknown
-	// last check in range (run data end time) - last_run_end_time
-	// last scan time range (scan data end time) - last_scan_end_time
+	"last_run_timerange":    "last_run ->> 'EndTime'",
+	"last_scan_timerange":   "last_scan ->> 'EndTime'",
 	// run data status
 	// scan data status
 	// run data penultimate status

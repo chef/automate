@@ -53,7 +53,6 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 	for _, filter := range filters {
 		var newCondition string
 		var err error
-
 		if strings.HasPrefix(filter.Key, "tags:") {
 			tagKeyFilter := strings.TrimPrefix(filter.Key, "tags:")
 			newCondition, err = wherePatternMatchTags(tagKeyFilter, filter.Values, "t")
@@ -63,7 +62,7 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 				return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported filter field: %s", filter.Key)}
 			case "source_region", "name":
 				newCondition, err = wherePatternMatch(filterField[filter.Key], filter.Values, tableAbbrev)
-			case "statechange_timestamp", "last_contact":
+			case "statechange_timestamp", "last_contact", "last_run ->> 'EndTime'", "last_scan ->> 'EndTime'":
 				newCondition, err = whereFieldBetween(filterField[filter.Key], filter.Values, tableAbbrev)
 			case "manager_id":
 				newCondition, err = whereNodeManagerNodeExists(filterField[filter.Key], filter.Values, tableAbbrev)
@@ -109,9 +108,22 @@ func whereFieldIn(field string, arr []string, tableAbbrev string) (condition str
 	return condition + ")", nil
 }
 
+func acceptedJSONFilterFields(field string) bool {
+	switch field {
+	case "last_run ->> 'EndTime'":
+		return true
+	case "last_scan ->> 'EndTime'":
+		return true
+	default:
+		return false
+	}
+}
+
 func whereFieldBetween(field string, arr []string, tableAbbrev string) (condition string, err error) {
-	if !utils.IsSqlSafe(field) {
-		return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+	if !acceptedJSONFilterFields(field) {
+		if !utils.IsSqlSafe(field) {
+			return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+		}
 	}
 	if len(arr) != 2 {
 		return "", &utils.InvalidError{Msg: fmt.Sprintf("Two params requires for whereFieldBetween %d", len(arr))}

@@ -3,12 +3,14 @@ package pgdb_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/chef/automate/components/nodemanager-service/pgdb/dbtest"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -368,11 +370,71 @@ func (suite *NodesIntegrationSuite) TestProjectsAreRoundtrippedThroughNodeLifecy
 }
 
 func (suite *NodesIntegrationSuite) TestFilterByLastCheckInRange() {
+	nowTime := ptypes.TimestampNow()
+	node := &manager.NodeMetadata{
+		Uuid:            "1223-4254-2424-1322",
+		Name:            "my really cool client run node",
+		PlatformName:    "debian",
+		PlatformRelease: "8.6",
+		LastContact:     nowTime,
+		SourceId:        "",
+		SourceRegion:    "",
+		SourceAccountId: "",
+		JobUuid:         "12343-232324-1231242",
+		RunData: &nodes.LastContactData{
+			Id:      "1003-9254-2004-1322",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
+		},
+	}
+	err := suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
 
+	timeRangeMax := time.Now().Add(time.Hour * 24).Format(time.RFC3339)
+	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
+		{Key: "last_run_timerange", Values: []string{"2019-03-05T00:00:00Z", timeRangeMax}},
+	})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+	suite.Equal(nowTime, listNodes[0].GetRunData().GetEndTime())
 }
 
 func (suite *NodesIntegrationSuite) TestFilterByLastScanTimeRange() {
+	nowTime := ptypes.TimestampNow()
+	node := &manager.NodeMetadata{
+		Uuid:            "1223-4254-2424-1322",
+		Name:            "my really cool client run node",
+		PlatformName:    "debian",
+		PlatformRelease: "8.6",
+		LastContact:     nowTime,
+		SourceId:        "",
+		SourceRegion:    "",
+		SourceAccountId: "",
+		JobUuid:         "12343-232324-1231242",
+		ScanData: &nodes.LastContactData{
+			Id:      "1003-9254-2004-1322",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
+		},
+	}
+	err := suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
 
+	timeRangeMax := time.Now().Add(time.Hour * 24).Format(time.RFC3339)
+	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
+		{Key: "last_scan_timerange", Values: []string{"2019-03-05T00:00:00Z", timeRangeMax}},
+	})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+	suite.Equal(nowTime, listNodes[0].GetScanData().GetEndTime())
 }
 
 func (suite *NodesIntegrationSuite) TestFilterByRunDataStatus() {
