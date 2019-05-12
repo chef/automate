@@ -120,6 +120,10 @@ func acceptedJSONFilterFields(field string) bool {
 		return true
 	case "last_scan ->> 'Status'":
 		return true
+	case "last_run ->> 'PenultimateStatus'":
+		return true
+	case "last_scan ->> 'PenultimateStatus'":
+		return true
 	default:
 		return false
 	}
