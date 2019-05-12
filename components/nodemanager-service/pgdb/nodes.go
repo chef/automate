@@ -595,8 +595,8 @@ var nodesFilterField = map[string]string{
 	"status":                "status", // reachable, unreachable, unknown
 	"last_run_timerange":    "last_run ->> 'EndTime'",
 	"last_scan_timerange":   "last_scan ->> 'EndTime'",
-	// run data status
-	// scan data status
+	"last_run_status":       "last_run ->> 'Status'",
+	"last_scan_status":      "last_scan ->> 'Status'",
 	// run data penultimate status
 	// scan data penultimate status
 }

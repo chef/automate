@@ -91,8 +91,10 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 
 // Builds an IN where condition like: j.parent_id IN ('e57605ed-bb8a-49b8-606c-af0e2b31b139')
 func whereFieldIn(field string, arr []string, tableAbbrev string) (condition string, err error) {
-	if !utils.IsSqlSafe(field) {
-		return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+	if !acceptedJSONFilterFields(field) {
+		if !utils.IsSqlSafe(field) {
+			return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+		}
 	}
 	condition += fmt.Sprintf("%s.%s IN (", tableAbbrev, field)
 	if len(arr) > 0 {
@@ -113,6 +115,10 @@ func acceptedJSONFilterFields(field string) bool {
 	case "last_run ->> 'EndTime'":
 		return true
 	case "last_scan ->> 'EndTime'":
+		return true
+	case "last_run ->> 'Status'":
+		return true
+	case "last_scan ->> 'Status'":
 		return true
 	default:
 		return false
