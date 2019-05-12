@@ -366,3 +366,27 @@ func (suite *NodesIntegrationSuite) TestProjectsAreRoundtrippedThroughNodeLifecy
 	suite.Require().NoError(err)
 	suite.Equal([]string{"Mexican Restaurant Menu", "Best Soups"}, controlNode.Projects)
 }
+
+func (suite *NodesIntegrationSuite) TestFilterByLastCheckInRange() {
+
+}
+
+func (suite *NodesIntegrationSuite) TestFilterByLastScanTimeRange() {
+
+}
+
+func (suite *NodesIntegrationSuite) TestFilterByRunDataStatus() {
+
+}
+
+func (suite *NodesIntegrationSuite) TestFilterByScanDataStatus() {
+
+}
+
+func (suite *NodesIntegrationSuite) TestFilterByRunDataPenultStatus() {
+
+}
+
+func (suite *NodesIntegrationSuite) TestFilterByScanDataPenultStatus() {
+
+}
