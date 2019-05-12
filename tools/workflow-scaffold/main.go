@@ -24,6 +24,7 @@ var perfTestOpts struct {
 	DequeueOnly        bool
 	DequeueWorkerCount int
 	TaskCount          int
+	SlowTasks          bool
 }
 
 func main() {
@@ -72,6 +73,13 @@ func main() {
 		false,
 		"Whether to only run the de-enqueing test (requests a full queue)")
 
+	perfTestCmd.PersistentFlags().BoolVar(
+		&perfTestOpts.SlowTasks,
+		"slow-tasks",
+		false,
+		"If true, tasks sleep for 400 seconds",
+	)
+
 	perfTestCmd.PersistentFlags().IntVar(
 		&perfTestOpts.TaskCount,
 		"task-count",
@@ -99,7 +107,7 @@ const defaultDatabaseName = "workflow"
 
 func defaultConnURIForDatabase(dbname string) string {
 	if os.Getenv("JAYM") != "" {
-		return fmt.Sprintf("postgresql://docker:docker@127.0.0.1:5432/%s?sslmode=disable", dbname)
+		return fmt.Sprintf("postgresql://docker:docker@127.0.0.1:10145/%s?sslmode=disable", dbname)
 	}
 	connInfo := pg.A2ConnInfo{
 		Host:  "localhost",
@@ -136,6 +144,9 @@ type PerfTestTask struct {
 }
 
 func (t *PerfTestTask) Run(ctx context.Context, _ interface{}) (interface{}, error) {
+	if perfTestOpts.SlowTasks {
+		time.Sleep(400 * time.Second)
+	}
 	t.statusChan <- struct{}{}
 	return nil, nil
 }

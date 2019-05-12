@@ -202,6 +202,7 @@ func (m *FWorkflowManager) RunTaskExecutor(ctx context.Context, taskName string,
 			}
 			continue
 		}
+		logrus.Infof("Dequeued task %s", t.Name)
 
 		var runCtx context.Context
 		var cancel context.CancelFunc
@@ -240,19 +241,21 @@ func (m *FWorkflowManager) run(ctx context.Context) {
 			return
 		case <-time.After(2 * time.Second):
 			for {
-				m.processWorkflow(ctx, workflowNames)
+				if m.processWorkflow(ctx, workflowNames) {
+					break
+				}
 			}
 		}
 	}
 }
 
-func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []string) {
+func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []string) bool {
 	wevt, completer, err := m.backend.DequeueWorkflow(ctx, workflowNames)
 	if err != nil {
 		if err != ErrNoWorkflowInstances {
 			logrus.WithError(err).Error("failed to dequeue workflow!")
 		}
-		return
+		return true
 	}
 	defer completer.Close()
 	logrus.WithFields(logrus.Fields{
@@ -274,6 +277,7 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 			logrus.Info("Completing abandoned workflow")
 			if err := completer.Done(); err != nil {
 				logrus.WithError(err).Error("failed to complete with abandoned workflow")
+				return true
 			}
 		} else {
 			logrus.Info("Continuing abandoned workflow")
@@ -281,15 +285,16 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 			// an unlocked task to complete when we could have removed it
 			if err := completer.Continue(nil); err != nil {
 				logrus.WithError(err).Error("failed to continue with abandoned workflow")
+				return true
 			}
 		}
 
-		return
+		return false
 	}
 	executor, ok := m.workflowExecutors[wevt.Instance.WorkflowName]
 	if !ok {
 		logrus.Errorf("No workflow executor for %s", wevt.Instance.WorkflowName)
-		return
+		return true
 	}
 
 	decision := Decision{}
@@ -335,4 +340,5 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 			logrus.WithError(err).Error("failed to continue workflow")
 		}
 	}
+	return false
 }

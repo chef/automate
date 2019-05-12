@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"sync"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -132,8 +133,9 @@ type PostgresTaskCompleter struct {
 	// this to complete the correct task.
 	tid int64
 
-	// tx is the transaction that is holding our dequeued task.
-	tx *sql.Tx
+	_txLock sync.Mutex
+	// _tx is the transaction that is holding our dequeued task.
+	_tx *sql.Tx
 	// ctx is the context that the transaction was started with.
 	ctx context.Context
 	// canceling this will abort the transaction
@@ -327,9 +329,10 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*T
 	}
 	taskc := &PostgresTaskCompleter{
 		ctx:    ctx,
-		tx:     tx,
+		_tx:    tx,
 		cancel: cancel,
 	}
+
 	err = row.Scan(&taskc.tid, &task.WorkflowInstanceID, &task.Parameters)
 	if err == sql.ErrNoRows {
 		cancel()
@@ -340,18 +343,46 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*T
 		return nil, nil, errors.Wrap(err, "failed to dequeue task")
 	}
 
+	// pinger
+	go func() {
+		for {
+			select {
+			case <-taskc.ctx.Done():
+				return
+			case <-time.After(10 * time.Second):
+				err := taskc.useTx(func(tx *sql.Tx) error {
+					_, err := tx.ExecContext(taskc.ctx, "")
+					return err
+				})
+
+				if err != nil {
+					logrus.WithError(err).Error("Transaction pinger failed")
+					return
+				}
+			}
+		}
+	}()
+
 	return task, taskc, nil
+}
+
+func (taskc *PostgresTaskCompleter) useTx(f func(tx *sql.Tx) error) error {
+	taskc._txLock.Lock()
+	defer taskc._txLock.Unlock()
+	return f(taskc._tx)
 }
 
 func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 	defer taskc.cancel()
 
-	_, err := taskc.tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskStatusFailed, errMsg, "")
-	if err != nil {
-		return errors.Wrapf(err, "failed to mark task %d as failed", taskc.tid)
-	}
+	return taskc.useTx(func(tx *sql.Tx) error {
+		_, err := tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskStatusFailed, errMsg, "")
+		if err != nil {
+			return errors.Wrapf(err, "failed to mark task %d as failed", taskc.tid)
+		}
 
-	return errors.Wrapf(taskc.tx.Commit(), "failed to mark task %d as failed", taskc.tid)
+		return errors.Wrapf(tx.Commit(), "failed to mark task %d as failed", taskc.tid)
+	})
 }
 
 // TODO(ssd) 2019-05-10: Should this and Fail also take a context from the caller? If so, we'll need to
@@ -365,12 +396,14 @@ func (taskc *PostgresTaskCompleter) Succeed(results interface{}) error {
 		return errors.Wrap(err, "could not convert results to JSON")
 	}
 
-	_, err = taskc.tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskStatusSuccess, "", jsonResults)
-	if err != nil {
-		return errors.Wrapf(err, "failed to mark task %d as successful", taskc.tid)
-	}
+	return taskc.useTx(func(tx *sql.Tx) error {
+		_, err = tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskStatusSuccess, "", jsonResults)
+		if err != nil {
+			return errors.Wrapf(err, "failed to mark task %d as successful", taskc.tid)
+		}
 
-	return errors.Wrapf(taskc.tx.Commit(), "failed to mark task %d as successful", taskc.tid)
+		return errors.Wrapf(tx.Commit(), "failed to mark task %d as successful", taskc.tid)
+	})
 }
 
 func (workc *PostgresWorkflowCompleter) Done() error {
