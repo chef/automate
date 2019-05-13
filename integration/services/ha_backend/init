@@ -27,9 +27,9 @@ ha_backend_setup() {
     log_info "Launched $ha_backend_container2 with ip ${ha_backend_container2_ip}"
 
     echo "Generating elasticsearch ssl keys"
-    # ganked from a2-ha-backend
+
+    # copy-pasta'd from a2-ha-backend
     certdir="$HA_BACKEND_DIR/certificates"
-    echo "CERTDIR IS $certdir"
     mkdir -p $certdir
 
     RANDFILE=$certdir/.rnd
@@ -48,16 +48,13 @@ ha_backend_setup() {
     openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "$certdir/odfe-admin-pkcs12.key" -topk8 -out "$certdir/odfe-admin.key" -nocrypt
 
     #Create the CSR and enter the organization and server details for the node key
-    # Need to create a key per machine, this is where you specify the SAN.
-    # openssl req -new -key $certdir/odfe-node.key -out $certdir/odfe-node.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode'
     openssl req -new -key $certdir/odfe-node.key -out $certdir/odfe-${ha_backend_container1}.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container1_ip},DNS:${ha_backend_container1_ip}")
     openssl req -new -key $certdir/odfe-node.key -out $certdir/odfe-${ha_backend_container2}.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container2_ip},DNS:${ha_backend_container2_ip}")
 
     #Create the CSR and enter the organization and server details for the admin key
     openssl req -new -key $certdir/odfe-admin.key -out $certdir/odfe-admin.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
 
-    #Use the CSR to generate the signed node Certificate:
-    # openssl x509 -req -in $certdir/odfe-node.csr -CA $certdir/MyRootCA.pem -CAkey $certdir/MyRootCA.key -CAcreateserial -out $certdir/odfe-node.pem -sha256
+    #Use the CSR to generate the signed node Certificates:
     openssl x509 -req -in $certdir/odfe-${ha_backend_container1}.csr -CA $certdir/MyRootCA.pem -CAkey $certdir/MyRootCA.key -CAcreateserial -out $certdir/odfe-${ha_backend_container1}.pem -sha256
     openssl x509 -req -in $certdir/odfe-${ha_backend_container2}.csr -CA $certdir/MyRootCA.pem -CAkey $certdir/MyRootCA.key -CAcreateserial -out $certdir/odfe-${ha_backend_container2}.pem -sha256
 
@@ -85,7 +82,8 @@ ha_backend_setup() {
     for try in {1..60}; do
         echo "Trying to create dbuser"
         errcode="0"
-        output="$(docker exec --env PGPASSWORD="thisisapassword" $ha_backend_container1 hab pkg exec core/postgresql11 psql \
+        output="$(docker exec --env PGPASSWORD="thisisapassword" --env HAB_LICENSE=accept-no-persist $ha_backend_container1 \
+	hab pkg exec core/postgresql11 psql \
             -h 127.0.0.1 -p 7432 -U admin -d postgres -c \
             "CREATE USER dbuser WITH PASSWORD 'thisisapassword'")" || errcode="$?"
         if [ "$errcode" -eq "0" ]; then
