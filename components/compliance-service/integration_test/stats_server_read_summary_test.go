@@ -91,15 +91,9 @@ func TestReadSummary(t *testing.T) {
 
 	suite.RefreshComplianceReportIndex()
 
-	octoberTwentyFifthQuery := stats.Query{
-		Filters: []*stats.ListFilter{
-			{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
-		},
-	}
 	successCases := []struct {
 		description     string
 		allowedProjects []string
-		query           stats.Query
 
 		//report summary
 		expectedEnvironmentCnt int32
@@ -122,7 +116,6 @@ func TestReadSummary(t *testing.T) {
 		{
 			description:     "Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
-			query:           octoberTwentyFifthQuery,
 
 			//report summary
 			expectedEnvironmentCnt: 5,
@@ -140,7 +133,6 @@ func TestReadSummary(t *testing.T) {
 		{
 			description:     "Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
-			query:           octoberTwentyFifthQuery,
 
 			//report summary
 			expectedEnvironmentCnt: 2,
@@ -158,7 +150,6 @@ func TestReadSummary(t *testing.T) {
 		{
 			description:     "Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
-			query:           octoberTwentyFifthQuery,
 
 			//report summary
 			expectedEnvironmentCnt: 4,
@@ -177,7 +168,6 @@ func TestReadSummary(t *testing.T) {
 		{
 			description:     "Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
-			query:           octoberTwentyFifthQuery,
 
 			//report summary
 			expectedEnvironmentCnt: 0,
@@ -196,7 +186,6 @@ func TestReadSummary(t *testing.T) {
 		{
 			description:     "Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
-			query:           octoberTwentyFifthQuery,
 
 			//report summary
 			expectedEnvironmentCnt: 3,
@@ -215,7 +204,6 @@ func TestReadSummary(t *testing.T) {
 		{
 			description:     "Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
-			query:           octoberTwentyFifthQuery,
 
 			//report summary
 			expectedEnvironmentCnt: 5,
@@ -234,7 +222,6 @@ func TestReadSummary(t *testing.T) {
 		{
 			description:     "Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
-			query:           octoberTwentyFifthQuery,
 
 			//report summary
 			expectedEnvironmentCnt: 1,
@@ -253,7 +240,6 @@ func TestReadSummary(t *testing.T) {
 		{
 			description:     "Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
-			query:           octoberTwentyFifthQuery,
 
 			//report summary
 			expectedEnvironmentCnt: 1,
@@ -275,8 +261,13 @@ func TestReadSummary(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			ctx := contextWithProjects(test.allowedProjects)
 
+			octoberTwentyFifthQuery := &stats.Query{
+				Filters: []*stats.ListFilter{
+					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
+				},
+			}
 			//passing in no type gets us a Summary type that contains a hydrated ReportSummary
-			response, err := statsServer.ReadSummary(ctx, &test.query)
+			response, err := statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
@@ -291,8 +282,8 @@ func TestReadSummary(t *testing.T) {
 			assert.Equal(t, test.expectedStatus, reportSummary.Status, "status")
 
 			//passing in "nodes" type gets us a Summary type that contains a hydrated NodeSummary
-			test.query.Type = "nodes"
-			response, err = statsServer.ReadSummary(ctx, &test.query)
+			octoberTwentyFifthQuery.Type = "nodes"
+			response, err = statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
@@ -308,8 +299,8 @@ func TestReadSummary(t *testing.T) {
 			assert.Equal(t, test.expectedSkippedCnt, nodeSummary.Skipped, "Skipped count")
 
 			//passing in "controls" type gets us a Summary type that contains a hydrated ControlSummary
-			test.query.Type = "controls"
-			response, err = statsServer.ReadSummary(ctx, &test.query)
+			octoberTwentyFifthQuery.Type = "controls"
+			response, err = statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)

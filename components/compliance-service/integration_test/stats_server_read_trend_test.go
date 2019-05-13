@@ -72,6 +72,7 @@ func TestReadTrend(t *testing.T) {
 		projectRules[k] = &iam_v2.ProjectRules{
 			Rules: []*iam_v2.ProjectRule{
 				{
+					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
 							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
