@@ -4,6 +4,7 @@ chef-select {
   border-color: chef-hsl(var(--chef-grey));
   display: inline-block;
   background-color: chef-hsl(var(--chef-white));
+  cursor: pointer;
 
   .selected-value {
     display: block;
