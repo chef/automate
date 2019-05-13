@@ -600,3 +600,59 @@ func (suite *NodesIntegrationSuite) TestFilterByScanDataPenultStatus() {
 	}
 	suite.Equal(1, len(listNodes))
 }
+
+func (suite *NodesIntegrationSuite) TestFilterByScanDataAndRunDataStatus() {
+	nowTime := ptypes.TimestampNow()
+	node := &manager.NodeMetadata{
+		Uuid:            "1223-4254-2424-1322",
+		Name:            "my really cool client run node",
+		PlatformName:    "debian",
+		PlatformRelease: "8.6",
+		LastContact:     nowTime,
+		SourceId:        "",
+		SourceRegion:    "",
+		SourceAccountId: "",
+		JobUuid:         "12343-232324-1231242",
+		ScanData: &nodes.LastContactData{
+			Id:      "1003-9254-2004-1322",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_FAILED,
+		},
+	}
+	err := suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	node = &manager.NodeMetadata{
+		Uuid:            "1223-4254-2424-1322",
+		Name:            "my really cool client run node",
+		PlatformName:    "debian",
+		PlatformRelease: "8.6",
+		LastContact:     nowTime,
+		SourceId:        "",
+		SourceRegion:    "",
+		SourceAccountId: "",
+		JobUuid:         "12343-232324-1231242",
+		RunData: &nodes.LastContactData{
+			Id:      "1003-9254-2004-1322",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
+		},
+	}
+	err = suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
+		{Key: "last_scan_status", Values: []string{"FAILED"}},
+		{Key: "last_run_status", Values: []string{"PASSED"}},
+	})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+	suite.Equal(nodes.LastContactData_FAILED, listNodes[0].GetScanData().GetStatus())
+	suite.Equal(nodes.LastContactData_PASSED, listNodes[0].GetRunData().GetStatus())
+}
