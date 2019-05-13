@@ -14,7 +14,7 @@ CREATE TABLE recurring_workflow_schedules (
 
     name TEXT NOT NULL,
     workflow_name TEXT NOT NULL,
-    parameters JSON,
+    parameters BYTEA,
     recurrence TEXT,
     enabled BOOLEAN,
 
@@ -31,8 +31,8 @@ CREATE TABLE workflow_instances (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     workflow_name TEXT NOT NULL,
-    parameters JSON,
-    payload JSON,
+    parameters BYTEA,
+    payload BYTEA,
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     enqueued_tasks INTEGER NOT NULL DEFAULT 0,
     completed_tasks INTEGER NOT NULL DEFAULT 0,
@@ -61,19 +61,19 @@ CREATE TABLE tasks (
     updated_at    TIMESTAMP NOT NULL DEFAULT NOW(),
     start_after   TIMESTAMP NOT NULL DEFAULT NOW(),
     task_name     TEXT NOT NULL,
-    parameters    JSON
+    parameters    BYTEA
 );
 
 CREATE TABLE tasks_results (
     id BIGSERIAL PRIMARY KEY,
     workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
-    parameters   JSON,
+    parameters   BYTEA,
     task_name    TEXT NOT NULL,
     enqueued_at  TIMESTAMP NOT NULL,
     completed_at TIMESTAMP NOT NULL DEFAULT NOW(),
     status       task_status,
     error        TEXT,
-    result       JSON
+    result       BYTEA
 );
 
 
@@ -94,7 +94,7 @@ CREATE TABLE workflow_events (
 CREATE OR REPLACE FUNCTION enqueue_workflow(
     name TEXT,
     workflow_name TEXT,
-    parameters JSON)
+    parameters BYTEA)
 RETURNS VOID
 AS $$
     WITH winst AS (
@@ -109,7 +109,7 @@ $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION dequeue_workflow(VARIADIC workflow_names TEXT[])
 RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT,
-    status workflow_instance_status, parameters JSON, payload JSON, event_id BIGINT,
+    status workflow_instance_status, parameters BYTEA, payload BYTEA, event_id BIGINT,
     event_type workflow_event_type, task_result_id BIGINT, enqueued_tasks INTEGER,
     completed_tasks INTEGER)
 AS $$
@@ -177,7 +177,7 @@ AS $$
 $$ LANGUAGE SQL;
 
 
-CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, _payload JSON,
+CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, _payload BYTEA,
     _enqueued_tasks INTEGER, _completed_tasks INTEGER)
 RETURNS VOID
 LANGUAGE SQL
@@ -201,7 +201,7 @@ CREATE OR REPLACE FUNCTION enqueue_task(
     try_remaining INT,
     start_after TIMESTAMP,
     task_name TEXT,
-    parameters JSON)
+    parameters BYTEA)
 RETURNS VOID
 AS $$
     INSERT INTO tasks(workflow_instance_id, try_remaining, start_after, task_name, parameters)
@@ -210,7 +210,7 @@ AS $$
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION dequeue_task(task_name TEXT)
-RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, parameters JSON)
+RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, parameters BYTEA)
 AS $$
     UPDATE tasks t1 SET try_remaining = try_remaining - 1, updated_at = NOW()
     WHERE t1.id = (
@@ -220,7 +220,7 @@ AS $$
     ) RETURNING t1.id, t1.workflow_instance_id, t1.parameters
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION complete_task(tid BIGINT, status task_status, error text, result JSON)
+CREATE OR REPLACE FUNCTION complete_task(tid BIGINT, status task_status, error text, result BYTEA)
 RETURNS VOID
 LANGUAGE SQL
 AS $$

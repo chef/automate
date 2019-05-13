@@ -25,6 +25,7 @@ var perfTestOpts struct {
 	DequeueWorkerCount int
 	TaskCount          int
 	SlowTasks          bool
+	SkipEnqueue        bool
 }
 
 func main() {
@@ -78,6 +79,13 @@ func main() {
 		"slow-tasks",
 		false,
 		"If true, tasks sleep for 400 seconds",
+	)
+
+	perfTestCmd.PersistentFlags().BoolVar(
+		&perfTestOpts.SkipEnqueue,
+		"skip-enqueue",
+		false,
+		"if true, a workflow will not be enqueued",
 	)
 
 	perfTestCmd.PersistentFlags().IntVar(
@@ -153,10 +161,12 @@ type PerfTestTask struct {
 }
 
 func (t *PerfTestTask) Run(ctx context.Context, _ interface{}) (interface{}, error) {
+	logrus.Info("Running task")
 	if perfTestOpts.SlowTasks {
-		time.Sleep(400 * time.Second)
+		time.Sleep(23 * time.Second)
 	}
 	t.statusChan <- struct{}{}
+	logrus.Info("Finished Task")
 	return nil, nil
 }
 
@@ -170,15 +180,28 @@ type PerfTestWorkflow struct {
 
 func (p *PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
 	ev workflow.StartEvent) workflow.Decision {
+
 	logrus.Info("PerfTestWorkflow got OnStart")
-	for i := 0; i < p.total; i++ {
+
+	params := PerfTestWorkflowParams{}
+	err := w.GetParameters(&params)
+	if err != nil {
+		panic(err)
+	}
+	if params.NumTasks == 0 {
+		logrus.Error("Got no tasks to do")
+		return w.Complete()
+	}
+
+	for i := 0; i < params.NumTasks; i++ {
 		w.EnqueueTask("test task", fmt.Sprintf("asdf: %d", i))
 	}
 	go func() {
 		time.Sleep(2 * time.Second)
 		enqueue_done = true
 	}()
-	return w.Continue(0)
+	initialVal := 0
+	return w.Continue(&initialVal)
 }
 
 var enqueue_done = false
@@ -186,15 +209,27 @@ var done = false
 
 func (p *PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
+	var mycount int
 
+	if err := w.GetPayload(&mycount); err != nil {
+		logrus.WithError(err).Fatal("Could not decode payload")
+	}
+
+	params := PerfTestWorkflowParams{}
+	if err := w.GetParameters(&params); err != nil {
+		logrus.WithError(err).Fatal("Could not decode parameters")
+	}
 	logrus.WithFields(logrus.Fields{
 		"task_name": ev.TaskName,
 		"enqueued":  w.TotalEnqueuedTasks(),
 		"completed": w.TotalCompletedTasks(),
+		"payload":   mycount,
+		"params":    params,
 	}).Info("PerfTestWorkflow got Task Completed")
-	p.count++
-	if p.count < p.total {
-		return w.Continue(p.count)
+
+	completed := mycount + 1
+	if completed < params.NumTasks {
+		return w.Continue(&completed)
 	} else {
 		logrus.Info("PerfTestWorkflow marking itself as complete")
 		go func() {
@@ -208,6 +243,10 @@ func (p *PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
 func (PerfTestWorkflow) OnCancel(w workflow.FWorkflowInstance,
 	ev workflow.CancelEvent) workflow.Decision {
 	return w.Complete()
+}
+
+type PerfTestWorkflowParams struct {
+	NumTasks int
 }
 
 func runPerfTest(_ *cobra.Command, args []string) error {
@@ -241,11 +280,17 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 		})
 	}
 
+	params := PerfTestWorkflowParams{
+		perfTestOpts.TaskCount,
+	}
+
 	workflowManager.Start(context.Background())
-	w.EnqueueWorkflow(context.TODO(), &workflow.WorkflowInstance{
-		WorkflowName: "perf-test",
-		InstanceName: fmt.Sprintf("perf-test-%s", time.Now()),
-	})
+	if !perfTestOpts.SkipEnqueue {
+		workflowManager.EnqueueWorkflow(context.TODO(),
+			"perf-test", fmt.Sprintf("perf-test-%s", time.Now()),
+			&params,
+		)
+	}
 
 	if perfTestOpts.EnqueueOnly {
 		for !enqueue_done {

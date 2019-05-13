@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -32,11 +33,17 @@ type workflowInstanceImpl struct {
 	wevt       *WorkflowEvent
 }
 
-func (w *workflowInstanceImpl) GetPayload(interface{}) error {
+func (w *workflowInstanceImpl) GetPayload(obj interface{}) error {
+	if w.instance.Payload != nil && len(w.instance.Payload) > 0 {
+		return json.Unmarshal(w.instance.Payload, obj)
+	}
 	return nil
 }
 
-func (w *workflowInstanceImpl) GetParameters(interface{}) error {
+func (w *workflowInstanceImpl) GetParameters(obj interface{}) error {
+	if w.instance.Parameters != nil {
+		return json.Unmarshal(w.instance.Parameters, obj)
+	}
 	return nil
 }
 
@@ -176,6 +183,20 @@ func (m *FWorkflowManager) RegisterTaskExecutor(taskName string, executor TaskEx
 		opts:     opts,
 	}
 	return nil
+}
+
+func (m *FWorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName string,
+	instanceName string, parameters interface{}) error {
+	paramsData, err := jsonify(parameters)
+	if err != nil {
+		return err
+	}
+	err = m.backend.EnqueueWorkflow(ctx, &WorkflowInstance{
+		WorkflowName: workflowName,
+		InstanceName: instanceName,
+		Parameters:   paramsData,
+	})
+	return err
 }
 
 func (m *FWorkflowManager) Start(ctx context.Context) error {
@@ -352,7 +373,7 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 		for _, t := range decision.tasks {
 			completer.EnqueueTask(&t)
 		}
-		err := completer.Continue(nil)
+		err := completer.Continue(decision.payload)
 		if err != nil {
 			logrus.WithError(err).Error("failed to continue workflow")
 		}

@@ -18,7 +18,7 @@ import (
 const (
 	enqueueTaskQuery   = `SELECT enqueue_task($1, $2, $3, $4, $5)`
 	dequeueTaskQuery   = `SELECT * FROM dequeue_task($1)`
-	completeTaskQuery  = `SELECT complete_task($1::bigint, $2::task_status, $3::text, $4::JSON)`
+	completeTaskQuery  = `SELECT complete_task($1::bigint, $2::task_status, $3::text, $4)`
 	getTaskResultQuery = `SELECT task_name, parameters, status, error, result from tasks_results WHERE id = $1`
 
 	enqueueWorkflowQuery  = `SELECT enqueue_workflow($1, $2, $3)`
@@ -55,8 +55,8 @@ type WorkflowInstance struct {
 	InstanceName string
 	WorkflowName string
 	Status       WorkflowInstanceStatus
-	Parameters   interface{}
-	Payload      interface{}
+	Parameters   []byte
+	Payload      []byte
 }
 
 type WorkflowEvent struct {
@@ -249,11 +249,7 @@ func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *WorkflowInsta
 		return errors.Wrap(err, "failed to begin enqueue workflow transaction")
 	}
 
-	js, err := jsonify(w.Parameters)
-	if err != nil {
-		return err
-	}
-	_, err = tx.ExecContext(ctx, enqueueWorkflowQuery, w.InstanceName, w.WorkflowName, js)
+	_, err = tx.ExecContext(ctx, enqueueWorkflowQuery, w.InstanceName, w.WorkflowName, w.Parameters)
 	if err != nil {
 		return errors.Wrap(err, "failed to enqueue workflow")
 	}
@@ -482,12 +478,11 @@ func (workc *PostgresWorkflowCompleter) Close() error {
 	return nil
 }
 
-func jsonify(data interface{}) (string, error) {
-	b, err := json.Marshal(data)
-	if err != nil {
-		return "", err
+func jsonify(data interface{}) ([]byte, error) {
+	if data == nil {
+		return nil, nil
 	}
-	return string(b), nil
+	return json.Marshal(data)
 }
 
 func mergeEnqueueOpts(opts []EnqueueOpts) enqueueOptions {
