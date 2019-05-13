@@ -72,7 +72,7 @@ type WorkflowEvent struct {
 type Task struct {
 	Name               string
 	WorkflowInstanceID int64
-	Parameters         interface{}
+	Parameters         []byte
 }
 
 type enqueueOptions struct {
@@ -326,12 +326,8 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 func (workc *PostgresWorkflowCompleter) EnqueueTask(task *Task, opts ...EnqueueOpts) error {
 	o := mergeEnqueueOpts(opts)
 
-	js, err := jsonify(task.Parameters)
-	if err != nil {
-		return err
-	}
-	_, err = workc.tx.ExecContext(workc.ctx, enqueueTaskQuery,
-		task.WorkflowInstanceID, o.TryRemaining, o.StartAfter, task.Name, js)
+	_, err := workc.tx.ExecContext(workc.ctx, enqueueTaskQuery,
+		task.WorkflowInstanceID, o.TryRemaining, o.StartAfter, task.Name, task.Parameters)
 	if err != nil {
 		return errors.Wrap(err, "failed to enqueue task")
 	}

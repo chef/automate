@@ -11,14 +11,26 @@ import (
 	rrule "github.com/teambition/rrule-go"
 )
 
-type FTask struct {
+type FTask interface {
+	GetParameters(interface{}) error
+}
+
+type taskImpl struct {
+	task *Task
+}
+
+func (t *taskImpl) GetParameters(obj interface{}) error {
+	if t.task.Parameters != nil {
+		return json.Unmarshal(t.task.Parameters, obj)
+	}
+	return nil
 }
 
 type FWorkflowInstance interface {
 	GetPayload(interface{}) error
 	GetParameters(interface{}) error
 
-	EnqueueTask(taskName string, parameters interface{})
+	EnqueueTask(taskName string, parameters interface{}) error
 	Complete() Decision
 	Continue(payload interface{}) Decision
 
@@ -55,12 +67,17 @@ func (w *workflowInstanceImpl) TotalCompletedTasks() int {
 	return w.wevt.CompletedTaskCount
 }
 
-func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface{}) {
+func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface{}) error {
+	paramsData, err := jsonify(parameters)
+	if err != nil {
+		return err
+	}
 	w.tasks = append(w.tasks, Task{
 		WorkflowInstanceID: w.instanceID,
 		Name:               taskName,
-		Parameters:         parameters,
+		Parameters:         paramsData,
 	})
+	return nil
 }
 
 func (w *workflowInstanceImpl) Complete() Decision {
@@ -128,7 +145,7 @@ type FWorkflowExecutor interface {
 
 // TODO(ssd) 2019-05-10: How do we want to handle cancellation?
 type TaskExecutor interface {
-	Run(context.Context, interface{}) (interface{}, error)
+	Run(context.Context, FTask) (interface{}, error)
 }
 
 type FWorkflowManager struct {
@@ -250,7 +267,9 @@ func (m *FWorkflowManager) RunTaskExecutor(ctx context.Context, taskName string,
 			runCtx, cancel = context.WithCancel(ctx)
 		}
 
-		result, err := exec.Run(runCtx, t.Parameters)
+		result, err := exec.Run(runCtx, &taskImpl{
+			task: t,
+		})
 		if err != nil {
 			err := taskCompleter.Fail(err.Error())
 			if err != nil {

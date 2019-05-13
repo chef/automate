@@ -160,8 +160,16 @@ type PerfTestTask struct {
 	statusChan chan struct{}
 }
 
-func (t *PerfTestTask) Run(ctx context.Context, _ interface{}) (interface{}, error) {
-	logrus.Info("Running task")
+type PerfTestTaskParams struct {
+	ID string
+}
+
+func (t *PerfTestTask) Run(ctx context.Context, task workflow.FTask) (interface{}, error) {
+	params := PerfTestTaskParams{}
+	if err := task.GetParameters(&params); err != nil {
+		panic(err)
+	}
+	logrus.WithField("id", params.ID).Info("Running task")
 	if perfTestOpts.SlowTasks {
 		time.Sleep(23 * time.Second)
 	}
@@ -171,11 +179,6 @@ func (t *PerfTestTask) Run(ctx context.Context, _ interface{}) (interface{}, err
 }
 
 type PerfTestWorkflow struct {
-	// NOTE(ssd) 2019-05-10: Storing state in this way is super
-	// not what users will do. We need to get payloads &
-	// parameters working to remove these.
-	total int
-	count int
 }
 
 func (p *PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
@@ -194,7 +197,7 @@ func (p *PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
 	}
 
 	for i := 0; i < params.NumTasks; i++ {
-		w.EnqueueTask("test task", fmt.Sprintf("asdf: %d", i))
+		w.EnqueueTask("test task", &PerfTestTaskParams{ID: fmt.Sprintf("asdf: %d", i)})
 	}
 	go func() {
 		time.Sleep(2 * time.Second)
@@ -206,6 +209,10 @@ func (p *PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
 
 var enqueue_done = false
 var done = false
+
+type PerfTestWorkflowParams struct {
+	NumTasks int
+}
 
 func (p *PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
@@ -245,10 +252,6 @@ func (PerfTestWorkflow) OnCancel(w workflow.FWorkflowInstance,
 	return w.Complete()
 }
 
-type PerfTestWorkflowParams struct {
-	NumTasks int
-}
-
 func runPerfTest(_ *cobra.Command, args []string) error {
 	dbName := defaultDatabaseName
 	if len(args) > 0 {
@@ -270,9 +273,7 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 	}
 
 	workflowManager := workflow.NewManager(w)
-	workflowManager.RegisterWorkflowExecutor("perf-test", &PerfTestWorkflow{
-		total: perfTestOpts.TaskCount,
-	})
+	workflowManager.RegisterWorkflowExecutor("perf-test", &PerfTestWorkflow{})
 	statusChan := make(chan struct{})
 	if !perfTestOpts.EnqueueOnly {
 		workflowManager.RegisterTaskExecutor("test task", &PerfTestTask{statusChan}, workflow.TaskExecutorOpts{
@@ -323,7 +324,7 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 
 type ScheduleTestTask struct{}
 
-func (t *ScheduleTestTask) Run(ctx context.Context, _ interface{}) (interface{}, error) {
+func (t *ScheduleTestTask) Run(ctx context.Context, _ workflow.FTask) (interface{}, error) {
 	logrus.Info("Running schedule test task")
 	return nil, nil
 }
