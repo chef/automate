@@ -27,6 +27,11 @@ const (
 	completeWorkflowQuery = `SELECT complete_workflow($1)`
 	continueWorkflowQuery = `SELECT continue_workflow($1, $2, $3, $4, $5)`
 	abandonWorkflowQuery  = `SELECT abandon_workflow($1, $2, $3)`
+
+	listRecurringWorkflowsQuery = `
+	SELECT id, enabled, name, workflow_name, parameters, recurrence, next_run_at
+	FROM recurring_workflow_schedules
+	`
 )
 
 type WorkflowEventType string
@@ -117,6 +122,7 @@ type TaskResult struct {
 	errorText string
 	result    string
 }
+
 type Backend interface {
 	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstance) error
 	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
@@ -124,7 +130,7 @@ type Backend interface {
 	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 
 	CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string, parameters interface{}, enabled bool, recurrence string, nextRunAt time.Time) error
-
+	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
 	Init() error
 }
 
@@ -215,6 +221,39 @@ var (
 	ErrNoWorkflowInstances    = errors.New("no workflow instances in queue")
 	ErrWorkflowScheduleExists = errors.New("workflow schedule already exists")
 )
+
+func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
+	defer cancel()
+
+	rows, err := pg.db.QueryContext(ctx, listRecurringWorkflowsQuery)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not query recurring workflows")
+	}
+
+	defer rows.Close()
+
+	schedules := make([]*Schedule, 0)
+	for rows.Next() {
+		var scheduledWorkflow Schedule
+		err := rows.Scan(
+			&scheduledWorkflow.ID,
+			&scheduledWorkflow.Enabled,
+			&scheduledWorkflow.Name,
+			&scheduledWorkflow.WorkflowName,
+			&scheduledWorkflow.Parameters,
+			&scheduledWorkflow.Recurrence,
+			&scheduledWorkflow.NextDueAt,
+		)
+		if err != nil {
+			logrus.WithError(err).Error("could not scan workflow schedule from database, skipping")
+			// TODO(ssd) 2019-05-13: Should we return here?
+			continue
+		}
+		schedules = append(schedules, &scheduledWorkflow)
+	}
+	return schedules, nil
+}
 
 // TODO(ssd) 2019-05-13: We need to decide on what "update" will look like
 func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string,

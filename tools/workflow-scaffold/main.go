@@ -395,6 +395,14 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		}
 	}
 
+	schedules, err := w.ListWorkflowSchedules(context.Background())
+	if err != nil {
+		logrus.WithError(err).Error("Failed to list workflow schedules")
+	}
+	for _, s := range schedules {
+		logrus.WithField("sched", s).Info("Found schedule")
+	}
+
 	workflowManager.Start(context.Background())
 	workflowScheduler.Start(context.Background())
 
