@@ -181,7 +181,6 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 }
 
 //GetProfileListWithAggregatedComplianceSummaries - Report #6
-//todo - Where in A2 UI is this being called? It now works with deep filtering but not sure if we need it.
 func (backend ES2Backend) GetProfileListWithAggregatedComplianceSummaries(
 	filters map[string][]string, size int32) ([]*stats.ProfileList, error) {
 	myName := "GetProfileListWithAggregatedComplianceSummaries"
