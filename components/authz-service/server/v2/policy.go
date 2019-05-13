@@ -690,7 +690,7 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 			// do nothing
 		}
 
-		s.log.Infof("Initiating store update for %s", info.FullMethod)
+		s.log.Debugf("Initiating store update for %s", info.FullMethod)
 		if err := s.updateEngineStore(ctx); err != nil {
 			return nil, status.Errorf(codes.Internal, "error updating engine store: %s", err.Error())
 		}
