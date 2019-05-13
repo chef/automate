@@ -62,6 +62,7 @@ func (ds *DeploymentServiceCommand) DeployService(config *dc.ConfigRequest, m ma
 	return ds.CmdExecutor.Run("hab",
 		command.Args("pkg", "exec", habpkg.Ident(ds.dsPkg), "deployment-service",
 			"deploy-service", configFile, manifestFile),
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Envvar("CHEF_AUTOMATE_LOG_LEVEL", logrus.GetLevel().String()),
 		command.Stdout(os.Stdout),
 		command.Stderr(os.Stderr))
@@ -83,6 +84,7 @@ func (ds *DeploymentServiceCommand) SetupSupervisor(config *dc.ConfigRequest, m 
 	return ds.CmdExecutor.Run("hab",
 		command.Args("pkg", "exec", habpkg.Ident(ds.dsPkg), "deployment-service",
 			"setup-supervisor", configFile, manifestFile),
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Envvar("CHEF_AUTOMATE_LOG_LEVEL", logrus.GetLevel().String()),
 		command.Stdout(os.Stdout),
 		command.Stderr(os.Stderr))

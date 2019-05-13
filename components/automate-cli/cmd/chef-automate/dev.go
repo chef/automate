@@ -800,6 +800,7 @@ func runGRPCurl(cmd *cobra.Command, args []string) error {
 	cmdArgs = append(cmdArgs, grpcArgs...)
 
 	return command.Run("hab",
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Args(cmdArgs...),
 		command.Stderr(os.Stderr),
 		command.Stdout(os.Stdout),

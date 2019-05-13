@@ -265,5 +265,5 @@ func SendRemoteExecutionJob(ctx context.Context, job *types.InspecJob, script st
 		}
 		return creds.SendRunCommandJob(ctx, job, script, scriptType)
 	}
-	return nil
+	return fmt.Errorf("unsupported backend attempted remote execution job. job backend: %s", job.TargetConfig.Backend)
 }

@@ -37,6 +37,7 @@ func (c *Command) execute() error {
 
 	err = command.Run(c.Cmd,
 		command.Args(c.Args...),
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Stdout(out),
 		command.Stderr(out))
 	if err != nil {

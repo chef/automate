@@ -102,6 +102,11 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
 		return nodesCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
 	state, err := s.client.GetNodesCounts(filters)
 	if err != nil {
 		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
@@ -140,8 +145,8 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context,
 
 	nodeExistsChan := s.nodeExistsAsync(request.GetNodeId(), projectFilters)
 
-	state, err := s.client.GetRunsCounts(filters, request.GetNodeId(), request.GetStart(),
-		request.GetEnd())
+	state, err := s.client.GetRunsCounts(filters, request.GetNodeId(),
+		request.GetStart(), request.GetEnd())
 	if err != nil {
 		return runsCounts, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
@@ -217,8 +222,13 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,
 		return nil, errors.GrpcErrorf(codes.InvalidArgument, "Invalid type parameter '%v'", typeParam)
 	}
 
+	filters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return nil, errors.GrpcErrorf(codes.Internal, err.Error())
+	}
+
 	suggestions, err := s.client.GetSuggestions(
-		params.ConvertParamToNodeRunBackend(typeParam), textParam)
+		params.ConvertParamToNodeRunBackend(typeParam), textParam, filters)
 	if err != nil {
 		return nil, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}

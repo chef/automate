@@ -9,8 +9,8 @@ import (
 
 	"github.com/chef/automate/components/authz-service/engine"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
-	"google.golang.org/grpc/metadata"
 )
 
 var ErrMessageBoxFull = errors.New("Message box full")
@@ -152,14 +152,8 @@ func (refresher *policyRefresher) RefreshAsync() error {
 
 // updates OPA engine store with policy
 func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
-	// We need to remove project filters from the request context
-	// otherwise they will be applied for store updates.
-	// This will fail on service start context, so only remove projects if ok.
-	md, ok := metadata.FromIncomingContext(ctx)
-	if ok {
-		delete(md, "projects")
-		ctx = metadata.NewOutgoingContext(ctx, md)
-	}
+	// Engine updates need unfiltered access to all data.
+	ctx = auth_context.ContextWithoutProjects(ctx)
 
 	policyMap, err := refresher.getPolicyMap(ctx)
 	if err != nil {

@@ -355,8 +355,9 @@ func (creds *Creds) getVMStatePoolTasks(ctx context.Context, subs []*manager.Man
 					return pool.TaskResult(vtr), errors.Wrap(err, "ListVMInfo unable to list vm info")
 				}
 				for _, vm := range vms.Values() {
-					var vmID, vmLocation, state string
+					var vmID, vmName, vmLocation, state string
 					vmID = *vm.VMID
+					vmName = *vm.Name
 					vmLocation = *vm.Location
 					ref := strings.Split(*vm.ID, "/")
 					if len(ref) >= 8 {
@@ -371,6 +372,7 @@ func (creds *Creds) getVMStatePoolTasks(ctx context.Context, subs []*manager.Man
 					}
 					vmStateList = append(vmStateList, pgdb.InstanceState{
 						ID:     vmID,
+						Name:   vmName,
 						Region: vmLocation,
 						State:  state,
 					})
@@ -759,11 +761,10 @@ func (creds *Creds) SendRunCommandJob(ctx context.Context, job *types.InspecJob,
 	client.Authorizer = getAuthorizer(creds.Token)
 	future, err := sendCommand(ctx, job, script, scriptType, client)
 	if err != nil {
-		logrus.Errorf("unable to run scan: %s %s %s", job.NodeName, job.MachineIdentifier, err.Error())
 		*job.NodeStatus = types.StatusFailed
-		return err
+		return errors.Wrap(err, fmt.Sprintf("unable to run scan: %s %s", job.NodeName, job.MachineIdentifier))
 	}
-	err = future.WaitForCompletion(ctx, client.Client)
+	err = future.WaitForCompletionRef(ctx, client.Client)
 	if err != nil {
 		*job.NodeStatus = types.StatusFailed
 		return errors.Wrap(err, "unable to get command status")

@@ -1,7 +1,6 @@
 package pgdb
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -30,23 +29,26 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 ON CONFLICT (source_id, source_region, source_account_id)
 DO UPDATE
 SET source_state = $4, statechange_timestamp = $8
-WHERE nodes.source_state != 'TERMINATED';
+WHERE nodes.source_state != 'TERMINATED'
+RETURNING id;
 `
 
 const sqlUpsertInstanceSourceStateAndStatus = `
 INSERT INTO nodes
- (id, name, source_id, source_state, status, source_region, source_account_id, target_config, statechange_timestamp, manager)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+ (id, name, source_id, source_state, status, source_region, source_account_id, target_config, statechange_timestamp, manager, connection_error)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 ON CONFLICT (source_id, source_region, source_account_id)
 DO UPDATE
 SET source_state = $4, status = $5, statechange_timestamp = $9
-WHERE nodes.source_state != 'TERMINATED';
+WHERE nodes.source_state != 'TERMINATED'
+RETURNING id;
 `
 
 const sqlUpdateInstanceSourceStateAndStatus = `
 UPDATE nodes
-SET source_state = $4, status = $5, statechange_timestamp = $6
-WHERE nodes.source_id = $1 AND nodes.source_region = $2 AND nodes.source_account_id = $3 AND nodes.source_state != 'TERMINATED';
+SET source_state = $4, status = $5, statechange_timestamp = $6, connection_error = $7
+WHERE nodes.source_id = $1 AND nodes.source_region = $2 AND nodes.source_account_id = $3 AND nodes.source_state != 'TERMINATED'
+RETURNING id;
 `
 
 const sqlInsertManagerNode = `
@@ -304,6 +306,7 @@ func (db *DB) GetAllManagersByType(mgrType string) ([]string, error) {
 
 type InstanceState struct {
 	ID     string
+	Name   string
 	State  string
 	Region string
 }
@@ -314,45 +317,34 @@ type InstanceState struct {
 func (db *DB) UpdateOrInsertInstanceSourceStateInDb(instance InstanceState, mgrID string, sourceAcctID string, mgrType string) (bool, error) {
 	uuid := uuid.Must(uuid.NewV4()).String()
 	instanceState := convertInstanceStateToManagerInstanceState(instance.State)
-	name := instance.ID
 	nowTime := time.Now().UTC()
 	tcByte, err := json.Marshal(nodes.TargetConfig{})
 	if err != nil {
 		return false, errors.Wrap(err, "UpdateInstanceSourceState unable to marshal target config")
 	}
+	var id string
+	connectionErr := fmt.Sprintf("node state is %s", instanceState)
 	switch instance.State {
 	case "terminated":
 		// if the instance state we're getting is terminated, we only want to update the node if we already
 		// have it in the system. it's silly to *add* nodes that are already terminated here.
-		pgResult, err := db.Exec(sqlUpdateInstanceSourceStateAndStatus, instance.ID, instance.Region, sourceAcctID, instanceState, "unreachable", nowTime)
-		if err != nil {
-			return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to update instance %s", instance.ID)
-		}
-		return isRowsUpdated(pgResult)
+		id, err = db.SelectStr(sqlUpdateInstanceSourceStateAndStatus, instance.ID, instance.Region, sourceAcctID, instanceState, "unreachable", nowTime, connectionErr)
 	case "running":
-		pgResult, err := db.Exec(sqlUpsertInstanceSourceState, uuid, name, instance.ID, instanceState, instance.Region, sourceAcctID, tcByte, nowTime, mgrType)
-		if err != nil {
-			return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to update instance %s", instance.ID)
-		}
-		return isRowsUpdated(pgResult)
+		id, err = db.SelectStr(sqlUpsertInstanceSourceState, uuid, instance.Name, instance.ID, instanceState, instance.Region, sourceAcctID, tcByte, nowTime, mgrType)
 	default:
-		pgResult, err := db.Exec(sqlUpsertInstanceSourceStateAndStatus, uuid, name, instance.ID, instanceState, "unreachable", instance.Region, sourceAcctID, tcByte, nowTime, mgrType)
-		if err != nil {
-			return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to update instance %s", instance.ID)
-		}
-		return isRowsUpdated(pgResult)
+		id, err = db.SelectStr(sqlUpsertInstanceSourceStateAndStatus, uuid, instance.Name, instance.ID, instanceState, "unreachable", instance.Region, sourceAcctID, tcByte, nowTime, mgrType, connectionErr)
 	}
-}
-
-func isRowsUpdated(pgResult sql.Result) (bool, error) {
-	rows, err := pgResult.RowsAffected()
 	if err != nil {
-		return false, errors.Wrap(err, "Unable to determine rows updated")
+		return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to update instance %s %s", instance.ID, instance.Name)
 	}
-	if rows > 0 {
-		return true, nil
+	if len(id) == 0 {
+		return false, nil
 	}
-	return false, nil
+	err = db.AssociateNodeIDsWithManagerID([]string{id}, mgrID)
+	if err != nil {
+		return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to associate manager with node %s", instance.Name)
+	}
+	return true, nil
 }
 
 func convertInstanceStateToManagerInstanceState(state string) string {

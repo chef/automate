@@ -22,7 +22,7 @@ func TestInstallPackage(t *testing.T) {
 
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd: "hab",
-			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
 			Args: []string{
 				"pkg",
 				"install",
@@ -39,7 +39,7 @@ func TestInstallPackage(t *testing.T) {
 		installer := target.NewHabCmd(mockExecutor, true)
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd: "hab",
-			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_FEAT_OFFLINE_INSTALL=true"},
+			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist", "HAB_FEAT_OFFLINE_INSTALL=true"},
 			Args: []string{
 				"pkg",
 				"install",
@@ -58,7 +58,7 @@ func TestInstallPackage(t *testing.T) {
 		installer := target.NewHabCmd(mockExecutor, false)
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd: "hab",
-			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
 			Args: []string{
 				"pkg",
 				"install",
@@ -76,7 +76,7 @@ func TestInstallPackage(t *testing.T) {
 		installer := target.NewHabCmd(mockExecutor, false)
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd: "hab",
-			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
 			Args: []string{
 				"pkg",
 				"install",
@@ -102,7 +102,7 @@ func TestIsInstalled(t *testing.T) {
 
 		mockExecutor.Expect("Run", command.ExpectedCommand{
 			Cmd:  "hab",
-			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
 			Args: []string{"pkg", "path", pkgIdent},
 		}).Return(nil)
 
@@ -117,7 +117,7 @@ func TestIsInstalled(t *testing.T) {
 
 		mockExecutor.Expect("Run", command.ExpectedCommand{
 			Cmd:  "hab",
-			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
 			Args: []string{"pkg", "path", pkgIdent},
 		}).Return(nil)
 
@@ -133,7 +133,7 @@ func TestIsInstalled(t *testing.T) {
 
 		mockExecutor.Expect("Run", command.ExpectedCommand{
 			Cmd:  "hab",
-			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
 			Args: []string{"pkg", "path", pkgIdent},
 		}).Return(errors.New("no such package"))
 
@@ -155,7 +155,7 @@ func TestBinlinkPackage(t *testing.T) {
 
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd:  "hab",
-			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
 			Args: []string{"pkg", "binlink", "--force", pkgIdent, "some_exe"},
 		}).Return("test command output", nil)
 
@@ -170,7 +170,7 @@ func TestBinlinkPackage(t *testing.T) {
 
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd:  "hab",
-			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true"},
+			Env:  []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
 			Args: []string{"pkg", "binlink", "--force", pkgIdent, "some_exe"},
 		}).Return("test command output", errors.New("test command error"))
 
