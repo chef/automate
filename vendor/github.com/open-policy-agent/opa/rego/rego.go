@@ -17,7 +17,6 @@ import (
 	"github.com/open-policy-agent/opa/internal/ir"
 	"github.com/open-policy-agent/opa/internal/planner"
 	"github.com/open-policy-agent/opa/internal/wasm/encoding"
-	"github.com/open-policy-agent/opa/internal/wasm/module"
 	"github.com/open-policy-agent/opa/metrics"
 	"github.com/open-policy-agent/opa/storage"
 	"github.com/open-policy-agent/opa/storage/inmem"
@@ -379,7 +378,17 @@ func (r *Rego) Eval(ctx context.Context) (ResultSet, error) {
 		return nil, err
 	}
 
-	err = r.compileModules(parsed)
+	txn := r.txn
+
+	if txn == nil {
+		txn, err = r.store.NewTransaction(ctx)
+		if err != nil {
+			return nil, err
+		}
+		defer r.store.Abort(ctx, txn)
+	}
+
+	err = r.compileModules(ctx, txn, parsed)
 	if err != nil {
 		return nil, err
 	}
@@ -393,16 +402,6 @@ func (r *Rego) Eval(ctx context.Context) (ResultSet, error) {
 
 	if err != nil {
 		return nil, err
-	}
-
-	txn := r.txn
-
-	if txn == nil {
-		txn, err = r.store.NewTransaction(ctx)
-		if err != nil {
-			return nil, err
-		}
-		defer r.store.Abort(ctx, txn)
 	}
 
 	return r.eval(ctx, qc, compiled, txn)
@@ -425,7 +424,17 @@ func (r *Rego) PartialResult(ctx context.Context) (PartialResult, error) {
 		return PartialResult{}, err
 	}
 
-	err = r.compileModules(parsed)
+	txn := r.txn
+
+	if txn == nil {
+		txn, err = r.store.NewTransaction(ctx)
+		if err != nil {
+			return PartialResult{}, err
+		}
+		defer r.store.Abort(ctx, txn)
+	}
+
+	err = r.compileModules(ctx, txn, parsed)
 	if err != nil {
 		return PartialResult{}, err
 	}
@@ -439,16 +448,6 @@ func (r *Rego) PartialResult(ctx context.Context) (PartialResult, error) {
 
 	if err != nil {
 		return PartialResult{}, err
-	}
-
-	txn := r.txn
-
-	if txn == nil {
-		txn, err = r.store.NewTransaction(ctx)
-		if err != nil {
-			return PartialResult{}, err
-		}
-		defer r.store.Abort(ctx, txn)
 	}
 
 	partialNamespace := r.partialNamespace
@@ -471,16 +470,6 @@ func (r *Rego) Partial(ctx context.Context) (*PartialQueries, error) {
 		return nil, err
 	}
 
-	err = r.compileModules(parsed)
-	if err != nil {
-		return nil, err
-	}
-
-	_, compiled, err := r.compileQuery(nil, query)
-	if err != nil {
-		return nil, err
-	}
-
 	txn := r.txn
 
 	if txn == nil {
@@ -489,6 +478,16 @@ func (r *Rego) Partial(ctx context.Context) (*PartialQueries, error) {
 			return nil, err
 		}
 		defer r.store.Abort(ctx, txn)
+	}
+
+	err = r.compileModules(ctx, txn, parsed)
+	if err != nil {
+		return nil, err
+	}
+
+	_, compiled, err := r.compileQuery(nil, query)
+	if err != nil {
+		return nil, err
 	}
 
 	partialNamespace := r.partialNamespace
@@ -532,13 +531,6 @@ func (r *Rego) Compile(ctx context.Context) (*CompileResult, error) {
 
 	if err := encoding.WriteModule(&out, m); err != nil {
 		return nil, err
-	}
-
-	if r.dump != nil {
-		fmt.Fprintln(r.dump, "MODULE:")
-		fmt.Fprintln(r.dump, "-------")
-		module.Pretty(r.dump, m, module.PrettyOption{Contents: true})
-		fmt.Fprintln(r.dump)
 	}
 
 	result := &CompileResult{
@@ -585,13 +577,13 @@ func (r *Rego) parse() (map[string]*ast.Module, ast.Body, error) {
 	return parsed, query, nil
 }
 
-func (r *Rego) compileModules(modules map[string]*ast.Module) error {
+func (r *Rego) compileModules(ctx context.Context, txn storage.Transaction, modules map[string]*ast.Module) error {
 
 	r.metrics.Timer(metrics.RegoModuleCompile).Start()
 	defer r.metrics.Timer(metrics.RegoModuleCompile).Stop()
 
 	if len(modules) > 0 {
-		r.compiler.Compile(modules)
+		r.compiler.WithPathConflictsCheck(storage.NonEmpty(ctx, r.store, txn)).Compile(modules)
 		if r.compiler.Failed() {
 			var errs Errors
 			for _, err := range r.compiler.Errors {
