@@ -7,6 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/lib/grpc/auth_context"
+	"golang.org/x/net/context"
+
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -203,4 +206,17 @@ func computeIndexDate(endTime string) (string, error) {
 	}
 
 	return indexDate.Format(time.RFC3339), nil
+}
+
+func FilterByProjects(ctx context.Context, filters map[string][]string) (map[string][]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		return filters, nil
+	}
+
+	filters["projects"] = projectsFilter
+	return filters, nil
 }
