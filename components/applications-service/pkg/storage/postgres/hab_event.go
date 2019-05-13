@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	dblib "github.com/chef/automate/lib/db"
 	"github.com/go-gorp/gorp"
 	"github.com/pkg/errors"
@@ -44,19 +45,27 @@ var (
 	)
 )
 
+func (db *Postgres) IngestHealthCheckEvent(event *habitat.HealthCheckEvent) error {
+	log.WithFields(log.Fields{
+		"data":       event.String(),
+		"event_type": "HealthCheckEvent",
+	}).Error("We are ingesting HealthCheck events")
+
+	return nil
+}
+
 // IngestHabEvents process habitat events and store them into the database
 func (db *Postgres) IngestHabEvent(event *applications.HabService) error {
 	opsInFlight.Inc()
 	defer opsInFlight.Dec()
+
 	processingStart := time.Now()
 	timeLastEventSeen = float64(processingStart.Unix())
 	err := db.IngestHabEventWithoutMetrics(event)
 	duration := time.Since(processingStart)
 
-	var label string
-	if err == nil {
-		label = labelSuccess
-	} else {
+	label := labelSuccess
+	if err != nil {
 		label = labelFailure
 	}
 

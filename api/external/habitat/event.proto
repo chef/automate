@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+// This file is a copy/paste from the Habitat PR #6344 Initial protobufs for events
+
+package chef.habitat.supervisor.event;
+
+// This option does NOT exist in the original file, we could add it in its origin,
+// that is, in the habitat repo, or we could add it inside a file sync automation.
+option go_package = "github.com/chef/automate/api/external/habitat";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+message EventMetadata {
+  // The unique ID of this Supervisor.
+  string supervisor_id = 1;
+  // The IP address on which the Supervisor is listening for gossip.
+  string ip_address = 2;
+  // The time at which this event occurred.
+  google.protobuf.Timestamp timestamp = 3;
+  string application = 4;
+  string environment = 5;
+  map<string, string> meta = 6;
+  string fqdn = 7;
+}
+
+message ServiceMetadata {
+  // todo: make a FQPI type
+  string package_ident = 1;
+  // not necessarily FQPI
+  string spec_ident = 2;
+  // todo: make / reuse a real type?
+  string service_group = 3;
+  // The channel a service was initially downloaded from, and (if an
+  // update strategy is set) the channel from which updates will be
+  // pulled.
+  string update_channel = 4;
+  UpdateStrategy update_strategy = 5;
+}
+
+enum UpdateStrategy {
+  // The service will not update itself.
+  None = 0;
+  // Service updates are applied immediately as they are available,
+  // with no additional coordination.
+  AtOnce = 1;
+  // Updates are applied one-by-one throughout a service group to
+  // prevent everything from updating all at once.
+  Rolling = 2;
+}
+
+enum HealthCheck {
+  Ok = 0;
+  Warning = 1;
+  Critical = 2;
+  Unknown = 3;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Concrete Event Types
+////////////////////////////////////////////////////////////////////////
+
+message ServiceStartedEvent {
+  EventMetadata event_metadata = 1;
+  ServiceMetadata service_metadata = 2;
+}
+
+message ServiceStoppedEvent {
+  EventMetadata event_metadata = 1;
+  ServiceMetadata service_metadata = 2;
+}
+
+message HealthCheckEvent {
+  EventMetadata event_metadata = 1;
+  ServiceMetadata service_metadata = 2;
+  // The result of the health check execution
+  HealthCheck result = 3;
+  // How long the health check took to run
+  google.protobuf.Duration duration = 4;
+  // Whether or not the health check is defined in a hook
+  bool has_hook = 5;
+}

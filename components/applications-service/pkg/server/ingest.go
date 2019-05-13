@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
@@ -18,13 +18,13 @@ type Ingester struct {
 	Cfg              *config.Applications
 	DBClient         *postgres.Postgres
 	natsClient       *nats.NatsClient
-	workerInputQueue chan<- *applications.HabService
-	workerTaskQueue  <-chan *applications.HabService
+	workerInputQueue chan<- *habitat.HealthCheckEvent
+	workerTaskQueue  <-chan *habitat.HealthCheckEvent
 }
 
 func NewIngester(c *config.Applications, db *postgres.Postgres) *Ingester {
 
-	q := make(chan *applications.HabService)
+	q := make(chan *habitat.HealthCheckEvent)
 
 	return &Ingester{
 		Cfg:              c,
@@ -75,7 +75,7 @@ func (i *Ingester) runWorkerLoop() {
 	for {
 		select {
 		case event := <-i.workerTaskQueue:
-			err := i.DBClient.IngestHabEvent(event)
+			err := i.DBClient.IngestHealthCheckEvent(event)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error": err.Error(),

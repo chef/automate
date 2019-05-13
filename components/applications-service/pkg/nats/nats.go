@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/lib/tls/certs"
 
 	natsc "github.com/nats-io/go-nats"
@@ -39,7 +40,7 @@ type NatsClient struct {
 	certs.TLSConfig
 	conn               stan.Conn
 	retries            int
-	HabServiceEventCh  chan *applications.HabService // TODO: @afiune make a pipeline instead
+	HabServiceEventCh  chan *habitat.HealthCheckEvent // TODO: @afiune make a pipeline instead
 	InsecureSkipVerify bool
 	DisableTLS         bool
 }
@@ -51,7 +52,7 @@ func NewExternalClient(url, cluster, client, durable, subject string) *NatsClien
 		clientID:          client,
 		durableID:         durable,
 		subject:           subject,
-		HabServiceEventCh: make(chan *applications.HabService), // buffered channel?
+		HabServiceEventCh: make(chan *habitat.HealthCheckEvent), // buffered channel?
 		retries:           5,
 	}
 }
@@ -64,7 +65,7 @@ func New(url, cluster, client, durable, subject string, tlsConfig certs.TLSConfi
 		clientID:          client,
 		durableID:         durable,
 		subject:           subject,
-		HabServiceEventCh: make(chan *applications.HabService), // buffered channel?
+		HabServiceEventCh: make(chan *habitat.HealthCheckEvent), // buffered channel?
 		retries:           5,
 		TLSConfig:         tlsConfig,
 	}

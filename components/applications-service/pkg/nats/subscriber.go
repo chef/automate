@@ -1,7 +1,7 @@
 package nats
 
 import (
-	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/golang/protobuf/proto"
 
 	stan "github.com/nats-io/go-nats-streaming"
@@ -24,8 +24,9 @@ func (nc *NatsClient) Subscribe() (stan.Subscription, error) {
 			"subject":  nc.subject,
 		}).Debug("Message received")
 
+		// TODO: @afiune We should have a way to have multi-message-type ingestion
 		// Unmarshal the data and send the message to the channel
-		var habMsg applications.HabService
+		var habMsg habitat.HealthCheckEvent
 		err := proto.Unmarshal(msg.Data, &habMsg)
 
 		if err != nil {
