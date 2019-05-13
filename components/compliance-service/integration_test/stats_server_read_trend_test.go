@@ -92,91 +92,82 @@ func TestReadTrend(t *testing.T) {
 
 	suite.RefreshComplianceReportIndex()
 
-	octoberTwentyFifthQuery := stats.Query{
-		Filters: []*stats.ListFilter{
-			{Type: "start_time", Values: []string{"2018-10-24T23:59:59Z"}},
-			{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
-		},
-	}
 	successCases := []struct {
 		description     string
 		allowedProjects []string
-		query           stats.Query
 
 		expectedPassedCnt int32
 	}{
 		{
 			description:     "Projects: user has access to all projects",
 			allowedProjects: []string{authzConstants.AllProjectsExternalID},
-			query:           octoberTwentyFifthQuery,
 
 			expectedPassedCnt: 5,
 		},
 		{
 			description:     "Projects: user has access to one project with reports",
 			allowedProjects: []string{"project1"},
-			query:           octoberTwentyFifthQuery,
 
 			expectedPassedCnt: 2,
 		},
 		{
 			description:     "Projects: user has access to some projects with reports",
 			allowedProjects: []string{"project1", "project2"},
-			query:           octoberTwentyFifthQuery,
 
 			expectedPassedCnt: 4,
 		},
 		{
 			description:     "Projects: user has access to projects without reports",
 			allowedProjects: []string{"project4", "project5"},
-			query:           octoberTwentyFifthQuery,
 
 			expectedPassedCnt: 0,
 		},
 		{
 			description:     "Projects: user has access to one project with reports and unassigned reports",
 			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
-			query:           octoberTwentyFifthQuery,
 
 			expectedPassedCnt: 3,
 		},
 		{
 			description:     "Projects: user has access to some projects with reports and unassigned reports",
 			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
-			query:           octoberTwentyFifthQuery,
 
 			expectedPassedCnt: 5,
 		},
 		{
 			description:     "Projects: user has access to projects without reports and unassigned reports",
 			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
-			query:           octoberTwentyFifthQuery,
 
 			expectedPassedCnt: 1,
 		},
 		{
 			description:     "Projects: user has access to unassigned reports",
 			allowedProjects: []string{authzConstants.UnassignedProjectID},
-			query:           octoberTwentyFifthQuery,
 
 			expectedPassedCnt: 1,
 		},
 	}
 
+	octoberTwentyFifthQuery := &stats.Query{
+		Filters: []*stats.ListFilter{
+			{Type: "start_time", Values: []string{"2018-10-24T23:59:59Z"}},
+			{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
+		},
+	}
 	for _, test := range successCases {
 		t.Run(test.description, func(t *testing.T) {
 			ctx := contextWithProjects(test.allowedProjects)
 
-			test.query.Type = "nodes"
-			response, err := statsServer.ReadTrend(ctx, &test.query)
+			octoberTwentyFifthQuery.Type = "nodes"
+			response, err := statsServer.ReadTrend(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
 
 			assert.Equal(t, test.expectedPassedCnt, response.Trends[0].Passed, "Nodes Passed count")
 
-			test.query.Type = "controls"
-			response, err = statsServer.ReadTrend(ctx, &test.query)
+			octoberTwentyFifthQuery.Type = "controls"
+			response, err = statsServer.ReadTrend(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
