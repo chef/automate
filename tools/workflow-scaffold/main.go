@@ -387,8 +387,12 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 
 	err = workflowManager.CreateWorkflowSchedule("every minute", "schedule-test", "", true, "FREQ=MINUTELY")
 	if err != nil {
-		// TODO(ssd) 2019-05-13: FIXME FIXME we don't support updating yet so for now just ignore this error
-		logrus.WithError(err).Info("could not create workflow schedule")
+		if err == workflow.ErrWorkflowScheduleExists {
+			logrus.Info("workflow schedule exists...ignoring")
+		} else {
+			// TODO(ssd) 2019-05-13: FIXME FIXME we don't support updating yet so for now just ignore this error
+			logrus.WithError(err).Warn("could not create workflow schedule")
+		}
 	}
 
 	workflowManager.Start(context.Background())

@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database/postgres"
@@ -210,35 +211,46 @@ func (pg *PostgresBackend) Init() error {
 }
 
 var (
-	ErrNoTasks             = errors.New("no tasks in queue")
-	ErrNoWorkflowInstances = errors.New("no workflow instances in queue")
+	ErrNoTasks                = errors.New("no tasks in queue")
+	ErrNoWorkflowInstances    = errors.New("no workflow instances in queue")
+	ErrWorkflowScheduleExists = errors.New("workflow schedule already exists")
 )
 
 // TODO(ssd) 2019-05-13: We need to decide on what "update" will look like
 func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string,
 	parameters interface{}, enabled bool, recurrence string, nextRunAt time.Time) error {
 
+	wrapErr := func(err error, msg string) error {
+		if pqErr, ok := err.(*pq.Error); ok {
+			// unique violation
+			if pqErr.Code == "23505" {
+				return ErrWorkflowScheduleExists
+			}
+		}
+
+		return errors.Wrap(err, msg)
+	}
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	tx, err := pg.db.BeginTx(ctx, nil)
 	if err != nil {
-		return errors.Wrap(err, "failed to begin create workflow schedule transaction")
+		return wrapErr(err, "failed to begin create workflow schedule transaction")
 	}
 
 	js, err := jsonify(parameters)
 	if err != nil {
-		return errors.Wrap(err, "failed to convert parameters to JSON")
+		return wrapErr(err, "failed to convert parameters to JSON")
 	}
 	_, err = pg.db.ExecContext(context.TODO(), `
 INSERT INTO recurring_workflow_schedules(name, workflow_name, parameters, recurrence, enabled, next_run_at)
 VALUES ($1, $2, $3, $4, $5, $6)`,
 		scheduleName, workflowName, js, recurrence, enabled, nextRunAt)
 	if err != nil {
-		return errors.Wrap(err, "could not update workflow schedule")
+		return wrapErr(err, "could not update workflow schedule")
 	}
 
-	return errors.Wrap(tx.Commit(), "failed to commit workflow schedule update")
+	return wrapErr(tx.Commit(), "failed to commit workflow schedule update")
 }
 
 func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *WorkflowInstance) error {
