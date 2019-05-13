@@ -14,11 +14,13 @@ CREATE TABLE recurring_workflow_schedules (
 
     name TEXT NOT NULL,
     workflow_name TEXT NOT NULL,
-
-    recurrence TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    next_due TIMESTAMP NOT NULL DEFAULT NOW(),
     parameters JSON,
+    recurrence TEXT,
+    enabled BOOLEAN,
+
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_enqueued_at TIMESTAMP,
+    next_run_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
     CONSTRAINT say_my_name UNIQUE(name, workflow_name)
 );
@@ -107,8 +109,8 @@ $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION dequeue_workflow(VARIADIC workflow_names TEXT[])
 RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT,
-    status workflow_instance_status, parameters JSON, payload JSON, event_id BIGINT, 
-    event_type workflow_event_type, task_result_id BIGINT, enqueued_tasks INTEGER, 
+    status workflow_instance_status, parameters JSON, payload JSON, event_id BIGINT,
+    event_type workflow_event_type, task_result_id BIGINT, enqueued_tasks INTEGER,
     completed_tasks INTEGER)
 AS $$
     WITH nextwinst AS (
@@ -161,7 +163,7 @@ AS $$
         completed_tasks = _completed_tasks + (select count(*) from unclaimed_tasks);
 
     DELETE FROM workflow_events WHERE id = eid;
-    
+
     INSERT INTO workflow_events(event_type, workflow_instance_id)
         VALUES('tasks_abandoned', _workflow_instance_id);
 $$ LANGUAGE SQL;
@@ -175,7 +177,7 @@ AS $$
 $$ LANGUAGE SQL;
 
 
-CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, _payload JSON, 
+CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, _payload JSON,
     _enqueued_tasks INTEGER, _completed_tasks INTEGER)
 RETURNS VOID
 LANGUAGE SQL

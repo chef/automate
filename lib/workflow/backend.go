@@ -121,6 +121,9 @@ type Backend interface {
 	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
 
 	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
+
+	CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string, parameters interface{}, enabled bool, recurrence string, nextRunAt time.Time) error
+
 	Init() error
 }
 
@@ -210,6 +213,33 @@ var (
 	ErrNoTasks             = errors.New("no tasks in queue")
 	ErrNoWorkflowInstances = errors.New("no workflow instances in queue")
 )
+
+// TODO(ssd) 2019-05-13: We need to decide on what "update" will look like
+func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string,
+	parameters interface{}, enabled bool, recurrence string, nextRunAt time.Time) error {
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := pg.db.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.Wrap(err, "failed to begin create workflow schedule transaction")
+	}
+
+	js, err := jsonify(parameters)
+	if err != nil {
+		return errors.Wrap(err, "failed to convert parameters to JSON")
+	}
+	_, err = pg.db.ExecContext(context.TODO(), `
+INSERT INTO recurring_workflow_schedules(name, workflow_name, parameters, recurrence, enabled, next_run_at)
+VALUES ($1, $2, $3, $4, $5, $6)`,
+		scheduleName, workflowName, js, recurrence, enabled, nextRunAt)
+	if err != nil {
+		return errors.Wrap(err, "could not update workflow schedule")
+	}
+
+	return errors.Wrap(tx.Commit(), "failed to commit workflow schedule update")
+}
 
 func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *WorkflowInstance) error {
 	ctx, cancel := context.WithCancel(ctx)

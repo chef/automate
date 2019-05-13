@@ -94,8 +94,17 @@ func main() {
 		RunE:          runResetDB,
 	}
 
+	scheduleCmd := &cobra.Command{
+		Use:           "schedule-test",
+		Short:         "Add a few scheduled jobs",
+		SilenceUsage:  true,
+		SilenceErrors: true,
+		RunE:          runScheduleTest,
+	}
+
 	cmd.AddCommand(perfTestCmd)
 	cmd.AddCommand(resetDBCmd)
+	cmd.AddCommand(scheduleCmd)
 
 	err := cmd.Execute()
 	if err != nil {
@@ -200,6 +209,7 @@ func (PerfTestWorkflow) OnCancel(w workflow.FWorkflowInstance,
 	ev workflow.CancelEvent) workflow.Decision {
 	return w.Complete()
 }
+
 func runPerfTest(_ *cobra.Command, args []string) error {
 	dbName := defaultDatabaseName
 	if len(args) > 0 {
@@ -263,5 +273,84 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 	for !done {
 		time.Sleep(1 * time.Second)
 	}
+	return nil
+}
+
+type ScheduleTestTask struct{}
+
+func (t *ScheduleTestTask) Run(ctx context.Context, _ interface{}) (interface{}, error) {
+	logrus.Info("Running schedule test task")
+	return nil, nil
+}
+
+type ScheduleTestWorkflow struct{}
+
+func (p *ScheduleTestWorkflow) OnStart(w workflow.FWorkflowInstance,
+	ev workflow.StartEvent) workflow.Decision {
+	w.EnqueueTask("test task", "asdf")
+	return w.Continue(0)
+}
+
+func (p *ScheduleTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
+	ev workflow.TaskCompleteEvent) workflow.Decision {
+
+	logrus.WithFields(logrus.Fields{
+		"task_name": ev.TaskName,
+		"enqueued":  w.TotalEnqueuedTasks(),
+		"completed": w.TotalCompletedTasks(),
+	}).Info("ScheduleTestWorkflow got Task Completed")
+	return w.Complete()
+}
+
+func (p *ScheduleTestWorkflow) OnCancel(w workflow.FWorkflowInstance,
+	ev workflow.CancelEvent) workflow.Decision {
+	return w.Complete()
+}
+
+func runScheduleTest(_ *cobra.Command, args []string) error {
+	dbName := defaultDatabaseName
+	if len(args) > 0 {
+		dbName = args[0]
+	}
+
+	logrus.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+	})
+
+	w, err := workflow.NewPostgresBackend(defaultConnURIForDatabase(dbName))
+	if err != nil {
+		return errors.Wrap(err, "could not initialize database connection")
+	}
+
+	err = w.Init()
+	if err != nil {
+		return errors.Wrap(err, "could not initialize database schema")
+	}
+
+	workflowScheduler, err := workflow.NewWorkflowScheduler(defaultConnURIForDatabase(dbName))
+	if err != nil {
+		return errors.Wrap(err, "could not initialize database connection")
+	}
+
+	workflowManager := workflow.NewManager(w)
+
+	workflowManager.RegisterWorkflowExecutor("schedule-test", &ScheduleTestWorkflow{})
+	workflowManager.RegisterTaskExecutor("test task", &ScheduleTestTask{}, workflow.TaskExecutorOpts{
+		Workers: perfTestOpts.DequeueWorkerCount,
+	})
+
+	err = workflowManager.CreateWorkflowSchedule("every minute", "schedule-test", "", true, "FREQ=MINUTELY")
+	if err != nil {
+		// TODO(ssd) 2019-05-13: FIXME FIXME we don't support updating yet so for now just ignore this error
+		logrus.WithError(err).Info("could not create workflow schedule")
+	}
+
+	workflowManager.Start(context.Background())
+	workflowScheduler.Start(context.Background())
+
+	for {
+		time.Sleep(1 * time.Second)
+	}
+
 	return nil
 }
