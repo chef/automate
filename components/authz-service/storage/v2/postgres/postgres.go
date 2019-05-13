@@ -951,6 +951,46 @@ func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * *    Rules    * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	row := tx.QueryRowContext(ctx,
+		`INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
+	var ruleDbID string
+	if err := row.Scan(&ruleDbID); err != nil {
+		return nil, p.processError(err)
+	}
+
+	for _, condition := range rule.Conditions {
+		_, err := tx.ExecContext(ctx,
+			`INSERT INTO iam_rule_conditions (rule_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			ruleDbID, condition.Value, condition.Attribute.String(), condition.Operator.String(),
+		)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
+	}
+
+	// Currently, we don't change anything from what is passed in.
+	return rule, nil
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * *   PROJECTS  * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

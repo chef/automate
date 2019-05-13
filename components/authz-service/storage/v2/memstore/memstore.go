@@ -240,6 +240,11 @@ func (s *State) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNot
 	return notifier, nil
 }
 
+func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule, error) {
+	// TODO implement
+	return rule, nil
+}
+
 func (s *State) CreateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {
 	if project.Type == storage.Custom {
 		items := s.projects.Items()

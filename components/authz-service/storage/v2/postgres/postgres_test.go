@@ -3307,6 +3307,99 @@ func TestUpdatePolicy(t *testing.T) {
 	}
 }
 
+func TestCreateRule(t *testing.T) {
+	store, db, _ := setup(t)
+	defer db.close(t)
+	defer store.Close()
+	ctx := context.Background()
+
+	cases := map[string]func(*testing.T){
+		"when the project doesn't exist, return Err": func(t *testing.T) {
+			condition1, err := storage.NewCondition(storage.Node, "chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", "project-not-found", "name", storage.Node, []storage.Condition{condition1})
+			require.NoError(t, err)
+			resp, err := store.CreateRule(ctx, &rule)
+			assert.Nil(t, resp)
+			assert.Error(t, storage_errors.ErrForeignKey, err)
+		},
+		"cannot use improper condition attributes for events": func(t *testing.T) {
+			_, err := storage.NewCondition(storage.Event, "chef-server-1", storage.ChefTag, storage.Equals)
+			assert.Error(t, err)
+		},
+		"creating a rule with no conditions returns an error": func(t *testing.T) {
+			_, err := storage.NewRule("new-id-1", "project-1", "name", storage.Node, []storage.Condition{})
+			assert.Error(t, err)
+		},
+		"creating a rule with inconsistent child condition type returns an error": func(t *testing.T) {
+			ruleType := storage.Node
+			differentRuleType := storage.Event
+			condition1, err := storage.NewCondition(ruleType,
+				"chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(differentRuleType,
+				"org1,org2,org3", storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				"role1", storage.ChefRole, storage.Equals)
+			require.NoError(t, err)
+
+			_, err = storage.NewRule("new-id-1", "project-1", "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.Error(t, err)
+		},
+		"create node rule with multiple conditions": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				"chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				"org1,org2,org3", storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				"role1", storage.ChefRole, storage.Equals)
+			require.NoError(t, err)
+
+			rule, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+			resp, err := store.CreateRule(ctx, &rule)
+			require.NoError(t, err)
+			require.Equal(t, &rule, resp)
+		},
+		"create event rule with multiple conditions": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				"chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				"org1,org2,org3", storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				"chef-server-2,chef-server-3", storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+
+			rule, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+			resp, err := store.CreateRule(ctx, &rule)
+			require.NoError(t, err)
+			require.Equal(t, &rule, resp)
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		db.flush(t)
+	}
+}
+
 func TestCreateProject(t *testing.T) {
 	store, db, _ := setup(t)
 	defer db.close(t)
