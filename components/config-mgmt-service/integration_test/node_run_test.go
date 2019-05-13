@@ -141,7 +141,7 @@ func TestNodeRunProjectFilter(t *testing.T) {
 			expectedError: false,
 		},
 		{
-			description:   "Node has a projects; request unassigned projects allowed",
+			description:   "Node has a project; request only unassigned projects",
 			ctx:           contextWithProjects([]string{authzConstants.UnassignedProjectID}),
 			nodeProjects:  []string{"project9"},
 			expectedError: true,
@@ -150,6 +150,48 @@ func TestNodeRunProjectFilter(t *testing.T) {
 			description:   "Node has a projects; request unassigned and matching project allowed",
 			ctx:           contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
 			nodeProjects:  []string{"project9"},
+			expectedError: false,
+		},
+		{
+			description:   "Node has no projects; request a project not allowed",
+			ctx:           contextWithProjects([]string{}),
+			nodeProjects:  []string{},
+			expectedError: false,
+		},
+		{
+			description:   "Node with one project matching one of several requested projects allowed",
+			ctx:           contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			nodeProjects:  []string{"project9"},
+			expectedError: false,
+		},
+		{
+			description:   "Node with one project not matching any of several requested projects allowed",
+			ctx:           contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			nodeProjects:  []string{"project9"},
+			expectedError: true,
+		},
+		{
+			description:   "Node with several projects where one matches a single requested project allowed",
+			ctx:           contextWithProjects([]string{"project3"}),
+			nodeProjects:  []string{"project3", "project4", "project7", "project6"},
+			expectedError: false,
+		},
+		{
+			description:   "Node with several projects where one matches one of several requested project allowed",
+			ctx:           contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			nodeProjects:  []string{"project3", "project4", "project7", "project6"},
+			expectedError: false,
+		},
+		{
+			description:   "Node with several projects where none matches several requested project allowed",
+			ctx:           contextWithProjects([]string{"project14", "project10", "project12", "project13"}),
+			nodeProjects:  []string{"project3", "project4", "project7", "project6"},
+			expectedError: true,
+		},
+		{
+			description:   "Node with several projects where two matches two of several requested project allowed",
+			ctx:           contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			nodeProjects:  []string{"project3", "project10", "project7", "project6"},
 			expectedError: false,
 		},
 	}
