@@ -60,20 +60,20 @@
           <chef-table>
             <chef-tr>
               <chef-th>
-                <chef-icon>computer</chef-icon> Nodes
+                Nodes
               </chef-th>
               <chef-td>{{ reportData.reportingSummary.stats.nodes | number }}</chef-td>
             </chef-tr>
             <chef-tr>
               <chef-th id="report-date-label">
-                <chef-icon>date_range</chef-icon> Report Date
+                Report Date
                 <chef-tooltip for="report-date-label">Latest information available for everything at this date.</chef-tooltip>
               </chef-th>
               <chef-td>{{ reportQuery.endDate | date: 'longDate' }}</chef-td>
             </chef-tr>
             <chef-tr>
               <chef-th>
-                <chef-icon>equalizer</chef-icon> Status
+                Status
               </chef-th>
               <chef-td>{{ reportData.reportingSummary.status | titlecase }}</chef-td>
             </chef-tr>
@@ -81,7 +81,7 @@
           <chef-table>
             <chef-tr>
               <chef-th>
-                <chef-icon>storage</chef-icon> Platform
+                Platform
               </chef-th>
               <chef-td>
                 {{ reportData.reportingSummary.stats.platforms | number }}
@@ -90,7 +90,7 @@
             </chef-tr>
             <chef-tr>
               <chef-th>
-                <chef-icon>public</chef-icon> Environment
+                Environment
               </chef-th>
               <chef-td>
                 {{ reportData.reportingSummary.stats.environments | number }}
@@ -99,7 +99,7 @@
             </chef-tr>
             <chef-tr>
               <chef-th>
-                <chef-icon>description</chef-icon> Profiles
+                Profiles
               </chef-th>
               <chef-td>
                 {{ reportData.reportingSummary.stats.profiles | number }}
