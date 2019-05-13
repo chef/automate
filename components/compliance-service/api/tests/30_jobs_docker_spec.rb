@@ -418,7 +418,8 @@ describe File.basename(__FILE__) do
           "scanData": {
             "id": "some-id",
             "status": "SKIPPED",
-            "penultimateStatus": "SKIPPED"
+            "penultimateStatus": "SKIPPED",
+            "endTime": {}
           }
         },
         {
@@ -444,7 +445,8 @@ describe File.basename(__FILE__) do
           "projects": [],
           "runData": {},
           "scanData": {
-            "id": "some-id"
+            "id": "some-id",
+            "endTime": {}
           }
         }
       ],
