@@ -1,13 +1,9 @@
 package integration_test
 
 import (
-	"context"
 	"fmt"
-	"os"
 	"testing"
-	"time"
 
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -18,38 +14,6 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
-
-func ingestReport(fileName string, f func(*compliance.Report)) error {
-	fileData, err := os.Open(fileName)
-	if err != nil {
-		return err
-	}
-	defer fileData.Close()
-	var iReport compliance.Report
-	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
-	if err = unmarshaler.Unmarshal(fileData, &iReport); err != nil {
-		return err
-	}
-
-	f(&iReport)
-
-	ctx := context.Background()
-	_, err = suite.ComplianceIngestServer.ProcessComplianceReport(ctx, &iReport)
-
-	return err
-}
-
-func waitFor(f func() bool) {
-	period := time.Millisecond * 10
-
-	for {
-		if f() {
-			break
-		}
-
-		time.Sleep(period)
-	}
-}
 
 func TestReportingListSuggestions(t *testing.T) {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
@@ -62,7 +26,7 @@ func TestReportingListSuggestions(t *testing.T) {
 	reportIds := make([]string, n)
 
 	for i := 0; i < n; i++ {
-		err := ingestReport(reportFileName, func(r *compliance.Report) {
+		err := suite.ingestReport(reportFileName, func(r *compliance.Report) {
 			id := newUUID()
 
 			r.Environment = id
