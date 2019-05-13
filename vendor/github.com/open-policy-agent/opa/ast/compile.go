@@ -78,10 +78,18 @@ type Compiler struct {
 
 	moduleLoader ModuleLoader
 	ruleIndices  *util.HashMap
-	stages       []func()
-	maxErrs      int
-	sorted       []string // list of sorted module names
+	stages       []struct {
+		name string
+		f    func()
+	}
+	maxErrs    int
+	sorted     []string // list of sorted module names
+	pathExists func([]string) (bool, error)
+	after      map[string][]CompilerStage
 }
+
+// CompilerStage defines the interface for stages in the compiler.
+type CompilerStage func(*Compiler) *Error
 
 // QueryContext contains contextual information for running an ad-hoc query.
 //
@@ -187,6 +195,7 @@ func NewCompiler() *Compiler {
 			return x.(Ref).Hash()
 		}),
 		maxErrs: CompileErrorLimitDefault,
+		after:   map[string][]CompilerStage{},
 	}
 
 	c.ModuleTree = NewModuleTree(nil)
@@ -195,29 +204,30 @@ func NewCompiler() *Compiler {
 	checker := newTypeChecker()
 	c.TypeEnv = checker.checkLanguageBuiltins()
 
-	c.stages = []func(){
-
+	c.stages = []struct {
+		name string
+		f    func()
+	}{
 		// Reference resolution should run first as it may be used to lazily
 		// load additional modules. If any stages run before resolution, they
 		// need to be re-run after resolution.
-		c.resolveAllRefs,
-
-		c.rewriteLocalAssignments,
-		c.rewriteExprTerms,
-		c.setModuleTree,
-		c.setRuleTree,
-		c.setGraph,
-		c.rewriteComprehensionTerms,
-		c.rewriteRefsInHead,
-		c.rewriteWithModifiers,
-		c.checkRuleConflicts,
-		c.checkSafetyRuleHeads,
-		c.checkSafetyRuleBodies,
-		c.rewriteEquals,
-		c.rewriteDynamicTerms,
-		c.checkRecursion,
-		c.checkTypes,
-		c.buildRuleIndices,
+		{"ResolveRefs", c.resolveAllRefs},
+		{"RewriteAssignments", c.rewriteLocalAssignments},
+		{"RewriteExprTerms", c.rewriteExprTerms},
+		{"SetModuleTree", c.setModuleTree},
+		{"SetRuleTree", c.setRuleTree},
+		{"SetGraph", c.setGraph},
+		{"RewriteComprehensionTerms", c.rewriteComprehensionTerms},
+		{"RewriteRefsInHead", c.rewriteRefsInHead},
+		{"RewriteWithValues", c.rewriteWithModifiers},
+		{"CheckRuleConflicts", c.checkRuleConflicts},
+		{"CheckSafetyRuleHeads", c.checkSafetyRuleHeads},
+		{"CheckSafetyRuleBodies", c.checkSafetyRuleBodies},
+		{"RewriteEquals", c.rewriteEquals},
+		{"RewriteDynamicTerms", c.rewriteDynamicTerms},
+		{"CheckRecursion", c.checkRecursion},
+		{"CheckTypes", c.checkTypes},
+		{"BuildRuleIndices", c.buildRuleIndices},
 	}
 
 	return c
@@ -227,6 +237,21 @@ func NewCompiler() *Compiler {
 // quits. Zero or a negative number indicates no limit.
 func (c *Compiler) SetErrorLimit(limit int) *Compiler {
 	c.maxErrs = limit
+	return c
+}
+
+// WithPathConflictsCheck enables base-virtual document conflict
+// detection. The compiler will check that rules don't overlap with
+// paths that exist as determined by the provided callable.
+func (c *Compiler) WithPathConflictsCheck(fn func([]string) (bool, error)) *Compiler {
+	c.pathExists = fn
+	return c
+}
+
+// WithStageAfter registers a stage to run during compilation after
+// the named stage.
+func (c *Compiler) WithStageAfter(after string, stage CompilerStage) *Compiler {
+	c.after[after] = append(c.after[after], stage)
 	return c
 }
 
@@ -526,6 +551,12 @@ func (c *Compiler) checkRuleConflicts() {
 		return false
 	})
 
+	if c.pathExists != nil {
+		for _, err := range CheckPathConflicts(c, c.pathExists) {
+			c.err(err)
+		}
+	}
+
 	c.ModuleTree.DepthFirst(func(node *ModuleTreeNode) bool {
 		for _, mod := range node.Modules {
 			for _, rule := range mod.Rules {
@@ -612,9 +643,14 @@ func (c *Compiler) compile() {
 		}
 	}()
 
-	for _, fn := range c.stages {
-		if fn(); c.Failed() {
+	for _, s := range c.stages {
+		if s.f(); c.Failed() {
 			return
+		}
+		for _, s := range c.after[s.name] {
+			if err := s(c); err != nil {
+				c.err(err)
+			}
 		}
 	}
 }
@@ -841,15 +877,32 @@ func (c *Compiler) rewriteLocalAssignments() {
 
 			// Rewrite vars in head that refer to locally declared vars in the body.
 			vis := NewGenericVisitor(func(x interface{}) bool {
-				switch x := x.(type) {
-				case *Term:
-					if v, ok := x.Value.(Var); ok {
-						if gv, ok := declared[v]; ok {
-							x.Value = gv
-							return true
+
+				term, ok := x.(*Term)
+				if !ok {
+					return false
+				}
+
+				switch v := term.Value.(type) {
+				case Object:
+					// Make a copy of the object because the keys may be mutated.
+					cpy, _ := v.Map(func(k, v *Term) (*Term, *Term, error) {
+						if vark, ok := k.Value.(Var); ok {
+							if gv, ok := declared[vark]; ok {
+								k = k.Copy()
+								k.Value = gv
+							}
 						}
+						return k, v, nil
+					})
+					term.Value = cpy
+				case Var:
+					if gv, ok := declared[v]; ok {
+						term.Value = gv
+						return true
 					}
 				}
+
 				return false
 			})
 
@@ -1029,7 +1082,12 @@ func (qc *queryCompiler) rewriteLocalAssignments(_ *QueryContext, body Body) (Bo
 	}
 	qc.rewritten = make(map[Var]Var, len(declared))
 	for k, v := range declared {
-		qc.rewritten[v] = k
+		// The vars returned during the rewrite will include all seen vars,
+		// even if they're not declared with an assignment operation. We don't
+		// want to include these inside the rewritten set though.
+		if Compare(k, v) != 0 {
+			qc.rewritten[v] = k
+		}
 	}
 	return body, nil
 }
@@ -1834,7 +1892,7 @@ func resolveRef(globals map[Var]Ref, ignore *assignedVarStack, ref Ref) Ref {
 	for i, x := range ref {
 		switch v := x.Value.(type) {
 		case Var:
-			if g, ok := globals[v]; ok {
+			if g, ok := globals[v]; ok && !ignore.Assigned(v) {
 				cpy := g.Copy()
 				for i := range cpy {
 					cpy[i].SetLocation(x.Location)
@@ -2491,8 +2549,13 @@ func rewriteDeclaredAssignment(g *localVarGenerator, stack *localDeclaredVars, e
 	}
 
 	// Rewrite terms on right hand side capture seen vars and recursively
-	// process comprehensions before left hand side is processed.
-	rewriteDeclaredVarsInTermRecursive(g, stack, expr.Operand(1), errs)
+	// process comprehensions before left hand side is processed. Also
+	// rewrite with modifier.
+	errs = rewriteDeclaredVarsInTermRecursive(g, stack, expr.Operand(1), errs)
+
+	for _, w := range expr.With {
+		errs = rewriteDeclaredVarsInTermRecursive(g, stack, w.Value, errs)
+	}
 
 	// Rewrite vars on right hand side with unique names. Catch redeclaration
 	// and invalid term types here.
@@ -2554,6 +2617,14 @@ func rewriteDeclaredVarsInTerm(g *localVarGenerator, stack *localDeclaredVars, t
 			return true, errs
 		}
 		return false, errs
+	case Object:
+		cpy, _ := v.Map(func(k, v *Term) (*Term, *Term, error) {
+			kcpy := k.Copy()
+			_, errs = rewriteDeclaredVarsInTerm(g, stack, kcpy, errs)
+			_, errs = rewriteDeclaredVarsInTerm(g, stack, v, errs)
+			return kcpy, v, nil
+		})
+		term.Value = cpy
 	case *ArrayComprehension:
 		errs = rewriteDeclaredVarsInArrayComprehension(g, stack, v, errs)
 	case *SetComprehension:
@@ -2567,8 +2638,15 @@ func rewriteDeclaredVarsInTerm(g *localVarGenerator, stack *localDeclaredVars, t
 }
 
 func rewriteDeclaredVarsInTermRecursive(g *localVarGenerator, stack *localDeclaredVars, term *Term, errs Errors) Errors {
-	WalkTerms(term, func(term *Term) bool {
-		_, errs = rewriteDeclaredVarsInTerm(g, stack, term, errs)
+	WalkNodes(term, func(n Node) bool {
+		switch n := n.(type) {
+		case *With:
+			_, errs = rewriteDeclaredVarsInTerm(g, stack, n.Value, errs)
+			return true
+		case *Term:
+			_, errs = rewriteDeclaredVarsInTerm(g, stack, n, errs)
+			return false
+		}
 		return false
 	})
 	return errs
