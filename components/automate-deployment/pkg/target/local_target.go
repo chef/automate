@@ -74,6 +74,7 @@ Restart = on-failure
 LimitNOFILE = 65536
 LimitMEMLOCK=infinity
 UMask = 0022
+Environment = "HAB_LICENSE=accept-no-persist"
 Environment = "HAB_SUP_BINARY=%s"
 Environment = "HAB_LAUNCH_BINARY=%s"
 %s
@@ -351,6 +352,7 @@ func (t *LocalTarget) unloadServiceWithHabVersion(svc habpkg.VersionedPackage, b
 	output, err := t.Executor.CombinedOutput("hab",
 		command.Args("pkg", "exec", habpkg.Ident(&binPkg),
 			"hab", "svc", "unload", svcIdent),
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Envvar("HAB_SUP_BINARY", habSupBin))
 	if err != nil {
 		logrus.WithError(err).WithFields(logrus.Fields{
@@ -841,7 +843,7 @@ func (t *LocalTarget) SystemdReload() error {
 // Stop stops the A2 services
 func (t *LocalTarget) Stop() error {
 	logrus.Info("Calling hab sup term")
-	_, err := t.Executor.Start("hab", command.Args("sup", "term"))
+	err := t.SupTerm()
 	if err != nil {
 		return errors.Wrap(err, "failed to stop Chef Automate via hab sup term")
 	}
@@ -1126,7 +1128,10 @@ func (t *LocalTarget) getHabBin(releaseManifest manifest.ReleaseManifest) (strin
 // in the bin/ directory.
 func (t *LocalTarget) getBinPath(pkg habpkg.HabPkg, bin string) (string, error) {
 	pkgIdent := habpkg.Ident(&pkg)
-	output, err := t.Executor.Output("hab", command.Args("pkg", "path", pkgIdent))
+	output, err := t.Executor.Output("hab",
+		command.Args("pkg", "path", pkgIdent),
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
+	)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed looking up package path from %q", pkgIdent)
 	}
@@ -1223,7 +1228,10 @@ func (t *LocalTarget) waitForHabSupToStart(releaseManifest manifest.ReleaseManif
 			return errors.Wrap(lastErr, m)
 		}
 		tries++
-		output, err := t.Executor.CombinedOutput(habBin, command.Args("svc", "status"), command.Envvar("HAB_SUP_BINARY", habSupBin))
+		output, err := t.Executor.CombinedOutput(habBin,
+			command.Args("svc", "status"),
+			command.Envvar("HAB_LICENSE", "accept-no-persist"),
+			command.Envvar("HAB_SUP_BINARY", habSupBin))
 		if err != nil {
 			lastErr = errors.Wrapf(err, "hab svc status failed with output: %s", output)
 			time.Sleep(habStatusRetryWait)
