@@ -101,6 +101,11 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
 		return nodesCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
 	state, err := s.client.GetNodesCounts(filters)
 	if err != nil {
 		return nodesCounts, errors.GrpcErrorFromErr(codes.Internal, err)
