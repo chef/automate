@@ -25,7 +25,11 @@ func New(es *relaxting.ES2Backend) *Server {
 // ReadSummary returns summary, nodes-summary, or controls-summary information
 func (srv *Server) ReadSummary(ctx context.Context, in *stats.Query) (*stats.Summary, error) {
 	var summary stats.Summary
-	formattedFilters := formatFilters(in.Filters)
+
+	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, in.Id)
+	}
 
 	if in.Type == "" {
 		reportSummary, err := srv.es.GetStatsSummary(formattedFilters)
