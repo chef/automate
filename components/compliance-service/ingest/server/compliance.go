@@ -172,8 +172,9 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 		ScanData: &nodes.LastContactData{
 			Id:      in.ReportUuid,
 			EndTime: endTimeTimestamp,
+			Status:  getReportStatus(in.Profiles),
 		},
-	}, in.Profiles)
+	})
 	if err != nil {
 		logrus.Errorf("ProcessComplianceReport unable to send node info to manager: %s", err.Error())
 	}
@@ -203,11 +204,10 @@ func (s *ComplianceIngestServer) handleNotifications(ctx context.Context, report
 	return nil
 }
 
-func (s *ComplianceIngestServer) sendNodeInfoToManager(ctx context.Context, node manager.NodeMetadata, profiles []*ingest_inspec.Profile) error {
+func (s *ComplianceIngestServer) sendNodeInfoToManager(ctx context.Context, node manager.NodeMetadata) error {
 	if s.mgrClient == nil {
 		return fmt.Errorf("no manager client found")
 	}
-	node.ScanData.Status = getReportStatus(profiles)
 	logrus.Debugf("sendNodeInfoToManager handing-over node to manager %+v", s)
 	_, err := s.mgrClient.ProcessNode(ctx, &node)
 	if err != nil {
@@ -221,9 +221,9 @@ func getReportStatus(profiles []*ingest_inspec.Profile) nodes.LastContactData_St
 	status := nodes.LastContactData_PASSED
 	skippedCounter := 0
 	for _, profile := range profiles {
-		profile.Status = getProfileStatus(profile)
+		profileStatus := getProfileStatus(profile)
 		// if any profile is failed, report is failed
-		if profile.Status == "failed" {
+		if profileStatus == "failed" {
 			status = nodes.LastContactData_FAILED
 			break
 		}
@@ -231,7 +231,7 @@ func getReportStatus(profiles []*ingest_inspec.Profile) nodes.LastContactData_St
 		// so we keep a count of skipped profiles and later
 		// check if the amount of profiles matches the skipped counter,
 		// setting the status to skipped if they match.
-		if profile.Status == "skipped" {
+		if profileStatus == "skipped" {
 			skippedCounter++
 		}
 	}
