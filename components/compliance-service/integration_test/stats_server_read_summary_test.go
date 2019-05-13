@@ -18,78 +18,9 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
 
-func TestReadSummary(t *testing.T) {
-	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
-	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
-
-	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
-	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
-
-	n := 5
-
-	reportIds := make([]string, n)
-
-	for i := 0; i < n; i++ {
-		err := suite.ingestReport(reportFileName, func(r *compliance.Report) {
-			id := newUUID()
-
-			r.Environment = id
-			r.NodeName = id
-			r.NodeUuid = id
-			r.Platform.Name = id
-			r.Profiles[0].Controls = r.Profiles[0].Controls[:1]
-			r.Profiles[0].Controls[0].Id = id
-			r.Profiles[0].Controls[0].Title = id
-			r.Profiles = r.Profiles[:1]
-			r.Profiles[0].Sha256 = id
-			r.Profiles[0].Title = id
-			r.Recipes = []string{id}
-			r.ReportUuid = id
-			r.Roles = []string{id}
-
-			reportIds[i] = id
-		})
-
-		require.NoError(t, err)
-	}
-
+func TestReadReportSummary(t *testing.T) {
+	statsServer := setupReadSummary(t)
 	defer suite.DeleteAllDocuments()
-
-	waitFor(func() bool {
-		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{})
-
-		return response != nil && len(response.Reports) == n
-	})
-
-	reportsProjects := map[string][]string{
-		"project1": reportIds[1:3],
-		"project2": reportIds[2:5],
-		"project3": reportIds[3:],
-	}
-
-	projectRules := map[string]*iam_v2.ProjectRules{}
-	for k, v := range reportsProjects {
-		projectRules[k] = &iam_v2.ProjectRules{
-			Rules: []*iam_v2.ProjectRule{
-				{
-					Conditions: []*iam_v2.Condition{
-						{
-							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-							Values: v,
-						},
-					},
-				},
-			},
-		}
-	}
-
-	// Send a project rules update event
-	esJobID, err := suite.ingesticESClient.UpdateReportProjectsTags(everythingCtx, projectRules)
-	assert.Nil(t, err)
-
-	suite.WaitForESJobToComplete(esJobID)
-
-	suite.RefreshComplianceReportIndex()
 
 	successCases := []struct {
 		description     string
@@ -101,17 +32,6 @@ func TestReadSummary(t *testing.T) {
 		expectedProfileCnt     int32
 		expectedNodeCnt        int64
 		expectedStatus         string
-
-		//node summary
-		expectedCompliantCnt    int32
-		expectedNonCompliantCnt int32
-		expectedHighRiskCnt     int32
-		expectedLowRiskCnt      int32
-		expectedMediumRiskCnt   int32
-		expectedSkippedCnt      int32
-
-		//control summary
-		expectedPassedCnt int32
 	}{
 		{
 			description:     "Projects: user has access to all projects",
@@ -123,12 +43,6 @@ func TestReadSummary(t *testing.T) {
 			expectedProfileCnt:     5,
 			expectedNodeCnt:        5,
 			expectedStatus:         "passed",
-
-			//nodes summary
-			expectedCompliantCnt: 5,
-
-			//controls summary
-			expectedPassedCnt: 5,
 		},
 		{
 			description:     "Projects: user has access to one project with reports",
@@ -140,12 +54,6 @@ func TestReadSummary(t *testing.T) {
 			expectedProfileCnt:     2,
 			expectedNodeCnt:        2,
 			expectedStatus:         "passed",
-
-			//nodes summary
-			expectedCompliantCnt: 2,
-
-			//controls summary
-			expectedPassedCnt: 2,
 		},
 		{
 			description:     "Projects: user has access to some projects with reports",
@@ -157,13 +65,6 @@ func TestReadSummary(t *testing.T) {
 			expectedProfileCnt:     4,
 			expectedNodeCnt:        4,
 			expectedStatus:         "passed",
-
-			//nodes summary
-			expectedCompliantCnt:    4,
-			expectedNonCompliantCnt: 0,
-
-			//controls summary
-			expectedPassedCnt: 4,
 		},
 		{
 			description:     "Projects: user has access to projects without reports",
@@ -175,13 +76,6 @@ func TestReadSummary(t *testing.T) {
 			expectedProfileCnt:     0,
 			expectedNodeCnt:        0,
 			expectedStatus:         "unknown",
-
-			//nodes summary
-			expectedCompliantCnt:    0,
-			expectedNonCompliantCnt: 0,
-
-			//controls summary
-			expectedPassedCnt: 0,
 		},
 		{
 			description:     "Projects: user has access to one project with reports and unassigned reports",
@@ -193,13 +87,6 @@ func TestReadSummary(t *testing.T) {
 			expectedProfileCnt:     3,
 			expectedNodeCnt:        3,
 			expectedStatus:         "passed",
-
-			//nodes summary
-			expectedCompliantCnt:    3,
-			expectedNonCompliantCnt: 0,
-
-			//controls summary
-			expectedPassedCnt: 3,
 		},
 		{
 			description:     "Projects: user has access to some projects with reports and unassigned reports",
@@ -211,13 +98,6 @@ func TestReadSummary(t *testing.T) {
 			expectedProfileCnt:     5,
 			expectedNodeCnt:        5,
 			expectedStatus:         "passed",
-
-			//nodes summary
-			expectedCompliantCnt:    5,
-			expectedNonCompliantCnt: 0,
-
-			//controls summary
-			expectedPassedCnt: 5,
 		},
 		{
 			description:     "Projects: user has access to projects without reports and unassigned reports",
@@ -229,13 +109,6 @@ func TestReadSummary(t *testing.T) {
 			expectedProfileCnt:     1,
 			expectedNodeCnt:        1,
 			expectedStatus:         "passed",
-
-			//nodes summary
-			expectedCompliantCnt:    1,
-			expectedNonCompliantCnt: 0,
-
-			//controls summary
-			expectedPassedCnt: 1,
 		},
 		{
 			description:     "Projects: user has access to unassigned reports",
@@ -247,13 +120,6 @@ func TestReadSummary(t *testing.T) {
 			expectedProfileCnt:     1,
 			expectedNodeCnt:        1,
 			expectedStatus:         "passed",
-
-			//nodes summary
-			expectedCompliantCnt:    1,
-			expectedNonCompliantCnt: 0,
-
-			//controls summary
-			expectedPassedCnt: 1,
 		},
 	}
 
@@ -280,10 +146,103 @@ func TestReadSummary(t *testing.T) {
 			assert.Equal(t, test.expectedProfileCnt, reportSummary.Stats.Profiles, "Profiles count")
 			assert.Equal(t, test.expectedNodeCnt, reportSummary.Stats.Nodes, "Nodes count")
 			assert.Equal(t, test.expectedStatus, reportSummary.Status, "status")
+		})
+	}
+}
+
+func TestReadNodeSummary(t *testing.T) {
+	statsServer := setupReadSummary(t)
+	defer suite.DeleteAllDocuments()
+
+	successCases := []struct {
+		description     string
+		allowedProjects []string
+
+		//node summary
+		expectedCompliantCnt    int32
+		expectedNonCompliantCnt int32
+		expectedHighRiskCnt     int32
+		expectedLowRiskCnt      int32
+		expectedMediumRiskCnt   int32
+		expectedSkippedCnt      int32
+	}{
+		{
+			description:     "Projects: user has access to all projects",
+			allowedProjects: []string{authzConstants.AllProjectsExternalID},
+
+			//nodes summary
+			expectedCompliantCnt: 5,
+		},
+		{
+			description:     "Projects: user has access to one project with reports",
+			allowedProjects: []string{"project1"},
+
+			//nodes summary
+			expectedCompliantCnt: 2,
+		},
+		{
+			description:     "Projects: user has access to some projects with reports",
+			allowedProjects: []string{"project1", "project2"},
+
+			//nodes summary
+			expectedCompliantCnt:    4,
+			expectedNonCompliantCnt: 0,
+		},
+		{
+			description:     "Projects: user has access to projects without reports",
+			allowedProjects: []string{"project4", "project5"},
+
+			//nodes summary
+			expectedCompliantCnt:    0,
+			expectedNonCompliantCnt: 0,
+		},
+		{
+			description:     "Projects: user has access to one project with reports and unassigned reports",
+			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
+
+			//nodes summary
+			expectedCompliantCnt:    3,
+			expectedNonCompliantCnt: 0,
+		},
+		{
+			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
+
+			//nodes summary
+			expectedCompliantCnt:    5,
+			expectedNonCompliantCnt: 0,
+		},
+		{
+			description:     "Projects: user has access to projects without reports and unassigned reports",
+			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
+
+			//nodes summary
+			expectedCompliantCnt:    1,
+			expectedNonCompliantCnt: 0,
+		},
+		{
+			description:     "Projects: user has access to unassigned reports",
+			allowedProjects: []string{authzConstants.UnassignedProjectID},
+
+			//nodes summary
+			expectedCompliantCnt:    1,
+			expectedNonCompliantCnt: 0,
+		},
+	}
+
+	for _, test := range successCases {
+		t.Run(test.description, func(t *testing.T) {
+			ctx := contextWithProjects(test.allowedProjects)
+
+			octoberTwentyFifthQuery := &stats.Query{
+				Filters: []*stats.ListFilter{
+					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
+				},
+			}
 
 			//passing in "nodes" type gets us a Summary type that contains a hydrated NodeSummary
 			octoberTwentyFifthQuery.Type = "nodes"
-			response, err = statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
+			response, err := statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
@@ -297,10 +256,91 @@ func TestReadSummary(t *testing.T) {
 			assert.Equal(t, test.expectedLowRiskCnt, nodeSummary.LowRisk, "LowRisk count")
 			assert.Equal(t, test.expectedMediumRiskCnt, nodeSummary.MediumRisk, "MediumRisk count")
 			assert.Equal(t, test.expectedSkippedCnt, nodeSummary.Skipped, "Skipped count")
+		})
+	}
+}
 
+func TestReadControlSummary(t *testing.T) {
+	statsServer := setupReadSummary(t)
+	defer suite.DeleteAllDocuments()
+
+	successCases := []struct {
+		description     string
+		allowedProjects []string
+
+		//control summary
+		expectedPassedCnt int32
+	}{
+		{
+			description:     "Projects: user has access to all projects",
+			allowedProjects: []string{authzConstants.AllProjectsExternalID},
+
+			//controls summary
+			expectedPassedCnt: 5,
+		},
+		{
+			description:     "Projects: user has access to one project with reports",
+			allowedProjects: []string{"project1"},
+
+			//controls summary
+			expectedPassedCnt: 2,
+		},
+		{
+			description:     "Projects: user has access to some projects with reports",
+			allowedProjects: []string{"project1", "project2"},
+
+			//controls summary
+			expectedPassedCnt: 4,
+		},
+		{
+			description:     "Projects: user has access to projects without reports",
+			allowedProjects: []string{"project4", "project5"},
+
+			//controls summary
+			expectedPassedCnt: 0,
+		},
+		{
+			description:     "Projects: user has access to one project with reports and unassigned reports",
+			allowedProjects: []string{"project1", authzConstants.UnassignedProjectID},
+
+			//controls summary
+			expectedPassedCnt: 3,
+		},
+		{
+			description:     "Projects: user has access to some projects with reports and unassigned reports",
+			allowedProjects: []string{"project1", "project2", authzConstants.UnassignedProjectID},
+
+			//controls summary
+			expectedPassedCnt: 5,
+		},
+		{
+			description:     "Projects: user has access to projects without reports and unassigned reports",
+			allowedProjects: []string{"project4", "project5", authzConstants.UnassignedProjectID},
+
+			//controls summary
+			expectedPassedCnt: 1,
+		},
+		{
+			description:     "Projects: user has access to unassigned reports",
+			allowedProjects: []string{authzConstants.UnassignedProjectID},
+
+			//controls summary
+			expectedPassedCnt: 1,
+		},
+	}
+
+	for _, test := range successCases {
+		t.Run(test.description, func(t *testing.T) {
+			ctx := contextWithProjects(test.allowedProjects)
+
+			octoberTwentyFifthQuery := &stats.Query{
+				Filters: []*stats.ListFilter{
+					{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
+				},
+			}
 			//passing in "controls" type gets us a Summary type that contains a hydrated ControlSummary
 			octoberTwentyFifthQuery.Type = "controls"
-			response, err = statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
+			response, err := statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
@@ -311,4 +351,68 @@ func TestReadSummary(t *testing.T) {
 			assert.Equal(t, test.expectedPassedCnt, controlSummary.Passed, "Passed count")
 		})
 	}
+}
+
+func setupReadSummary(t *testing.T) *statsServer.Server {
+	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
+	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
+	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	n := 5
+	reportIds := make([]string, n)
+	for i := 0; i < n; i++ {
+		err := suite.ingestReport(reportFileName, func(r *compliance.Report) {
+			id := newUUID()
+
+			r.Environment = id
+			r.NodeName = id
+			r.NodeUuid = id
+			r.Platform.Name = id
+			r.Profiles[0].Controls = r.Profiles[0].Controls[:1]
+			r.Profiles[0].Controls[0].Id = id
+			r.Profiles[0].Controls[0].Title = id
+			r.Profiles = r.Profiles[:1]
+			r.Profiles[0].Sha256 = id
+			r.Profiles[0].Title = id
+			r.Recipes = []string{id}
+			r.ReportUuid = id
+			r.Roles = []string{id}
+
+			reportIds[i] = id
+		})
+
+		require.NoError(t, err)
+	}
+
+	waitFor(func() bool {
+		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{})
+
+		return response != nil && len(response.Reports) == n
+	})
+	reportsProjects := map[string][]string{
+		"project1": reportIds[1:3],
+		"project2": reportIds[2:5],
+		"project3": reportIds[3:],
+	}
+	projectRules := map[string]*iam_v2.ProjectRules{}
+	for k, v := range reportsProjects {
+		projectRules[k] = &iam_v2.ProjectRules{
+			Rules: []*iam_v2.ProjectRule{
+				{
+					Conditions: []*iam_v2.Condition{
+						{
+							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
+							Values: v,
+						},
+					},
+				},
+			},
+		}
+	}
+	// Send a project rules update event
+	esJobID, err := suite.ingesticESClient.UpdateReportProjectsTags(everythingCtx, projectRules)
+	assert.Nil(t, err)
+	suite.WaitForESJobToComplete(esJobID)
+	suite.RefreshComplianceReportIndex()
+	return statsServer
 }
