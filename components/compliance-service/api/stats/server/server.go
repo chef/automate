@@ -133,7 +133,10 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 
 // ReadFailures returns failures by platform, environment, etc
 func (srv *Server) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Failures, error) {
-	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, in.Id)
+	}
 	// i went back and forth on this one for a while. while i see
 	// the reason it could be its own field in the query message type,
 	// it also seems fitting to stick it in as a filter...and I don't
