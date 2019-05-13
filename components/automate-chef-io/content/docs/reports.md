@@ -72,7 +72,7 @@ The download button located to the right of the search bar allows the user to do
 
 ### Compliance Reports Results and Job ID Filters
 
-Chef Automate users can see the results of their scan jobs from https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs by selecting _Report_, which will redirect to the compliance tab. This reports view, uses the _job id_ filter as well as any additional filters, and ignores the _end time_ filter.
+Chef Automate users can see the results of their scan jobs from https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs by selecting _Report_, which will redirect to the compliance tab. This reports view uses the _job id_ filter as well as any additional filters, and ignores the _end time_ filter.
 
 ![Getting to Compliance from a Scan Job](/images/docs/compliance-jobid.png)
 
@@ -184,7 +184,7 @@ More Information
 
 ## Profiles
 
-Use the compliance reports **Profiles_ tab lets you examine the compliance profiles installed under your individual user account.
+Use the compliance reports **Profiles** tab lets you examine the compliance profiles installed under your individual user account.
 
 ![Compliance Profiles](/images/docs/compliance-profiles.png)
 

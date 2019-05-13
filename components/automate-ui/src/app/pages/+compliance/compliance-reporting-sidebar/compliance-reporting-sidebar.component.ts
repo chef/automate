@@ -5,4 +5,4 @@ import { Component } from '@angular/core';
   templateUrl: './compliance-reporting-sidebar.component.html',
   styleUrls: ['./compliance-reporting-sidebar.component.scss']
 })
-export class ComplianceReportingSidebarComponent { }
+export class ComplianceReportingSidebarComponent {}

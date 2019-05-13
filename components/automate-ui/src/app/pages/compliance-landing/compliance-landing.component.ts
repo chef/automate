@@ -8,7 +8,7 @@ import { RoutePerms } from 'app/components/landing/landing.component';
 })
 export class ComplianceLandingComponent {
 
-  // order determined by admin-sidebar template and is vetted by admin-sidebar unit tests
+  // order determined by compliance-reporting-sidebar template and is vetted by compliance-reporting-sidebar unit tests
   public routeList: RoutePerms[] = [
     {
       allOfCheck: [['/compliance/reporting/stats/summary', 'post', ''],

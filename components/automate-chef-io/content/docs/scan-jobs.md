@@ -44,7 +44,7 @@ curl -sSX POST "https://automate-url/api/v0/compliance/scanner/jobs" -d
   "type": "exec",
   "profiles": [
     "https://github.com/dev-sec/linux-baseline", # external url profile
-    "compliance://admin/linux-baseline#2.1.1"  # installed profile (see asset store)
+    "compliance://admin/linux-baseline#2.1.1"  # installed profile (see profile)
   ],
   "recurrence": "FREQ=HOURLY;INTERVAL=1",
   "nodes": ["6c0c7942-acb6-4ede-8a3a-bf8f6beee362"], # this field can be used to run a job on a specific (static) node
