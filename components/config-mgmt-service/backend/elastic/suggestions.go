@@ -13,20 +13,20 @@ import (
 )
 
 // GetSuggestions - get a collection of suggestions
-func (es Backend) GetSuggestions(term string, text string) ([]backend.Suggestion, error) {
+func (es Backend) GetSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
 	if backend.SuggestionFieldArray(term) {
-		return es.getArrayAggSuggestions(term, text)
+		return es.getArrayAggSuggestions(term, text, filters)
 	}
 
-	return es.getAggSuggestions(term, text)
+	return es.getAggSuggestions(term, text, filters)
 }
 
-func (es Backend) getAggSuggestions(term string, text string) ([]backend.Suggestion, error) {
+func (es Backend) getAggSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
 	myagg := "myagg"
+	filters["exists"] = []string{"true"}
+	boolQuery := newBoolQueryFromFilters(filters)
 	typeQuery := elastic.NewTypeQuery(IndexNodeState)
-	boolQuery := elastic.NewBoolQuery()
 	boolQuery = boolQuery.Must(typeQuery)
-	boolQuery = boolQuery.Must(elastic.NewTermsQuery("exists", "true"))
 	lowerText := strings.ToLower(text)
 
 	// return all unless text has at least 2 chars
@@ -86,11 +86,12 @@ func (es Backend) getAggSuggestions(term string, text string) ([]backend.Suggest
 	return suggs, nil
 }
 
-func (es Backend) getArrayAggSuggestions(term string, text string) ([]backend.Suggestion, error) {
+func (es Backend) getArrayAggSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
 	typeQuery := elastic.NewTypeQuery(IndexNodeState)
-	boolQuery := elastic.NewBoolQuery()
+	filters["exists"] = []string{"true"}
+	boolQuery := newBoolQueryFromFilters(filters)
+
 	boolQuery = boolQuery.Must(typeQuery)
-	boolQuery = boolQuery.Must(elastic.NewTermsQuery("exists", "true"))
 
 	// return all unless text has at least 2 chars
 	if len(text) >= 2 {
