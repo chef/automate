@@ -333,6 +333,13 @@ type ScheduleTestWorkflow struct{}
 
 func (p *ScheduleTestWorkflow) OnStart(w workflow.FWorkflowInstance,
 	ev workflow.StartEvent) workflow.Decision {
+	var params string
+	err := w.GetParameters(&params)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to get parameters")
+		w.Complete()
+	}
+	logrus.WithField("params", params).Info("Doing OnStart")
 	w.EnqueueTask("test task", "asdf")
 	return w.Continue(0)
 }
@@ -385,7 +392,8 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		Workers: perfTestOpts.DequeueWorkerCount,
 	})
 
-	err = workflowManager.CreateWorkflowSchedule("every minute", "schedule-test", "", true, "FREQ=MINUTELY")
+	err = workflowManager.CreateWorkflowSchedule(
+		"every minute", "schedule-test", "youfail", true, "FREQ=MINUTELY")
 	if err != nil {
 		if err == workflow.ErrWorkflowScheduleExists {
 			logrus.Info("workflow schedule exists...ignoring")
@@ -402,6 +410,9 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 	for _, s := range schedules {
 		logrus.WithField("sched", s).Info("Found schedule")
 	}
+
+	w.UpdateWorkflowScheduleByID(context.Background(),
+		schedules[0].ID, workflow.UpdateParameters("youwin"))
 
 	workflowManager.Start(context.Background())
 	workflowScheduler.Start(context.Background())

@@ -25,6 +25,43 @@ CREATE TABLE recurring_workflow_schedules (
     CONSTRAINT say_my_name UNIQUE(name, workflow_name)
 );
 
+CREATE OR REPLACE FUNCTION update_recurring_workflow_parameters(
+    _id BIGINT,
+    _parameters BYTEA)
+RETURNS VOID
+AS $$
+    WITH sched AS (
+        SELECT * FROM recurring_workflow_schedules WHERE id = _id FOR UPDATE
+    )
+    UPDATE recurring_workflow_schedules SET parameters = _parameters WHERE id = _id;
+$$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION update_recurring_workflow_recurrence(
+    _id BIGINT,
+    _recurrence TEXT,
+    _next_run_at TIMESTAMP)
+RETURNS VOID
+AS $$
+    WITH sched AS (
+        SELECT * FROM recurring_workflow_schedules WHERE id = _id FOR UPDATE
+    )
+    UPDATE recurring_workflow_schedules 
+    SET
+        recurrence = _recurrence, 
+        next_run_at = _next_run_at WHERE id = _id;
+$$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION update_recurring_workflow_enabled(
+    _id BIGINT,
+    _enabled BOOLEAN)
+RETURNS VOID
+AS $$
+    WITH sched AS (
+        SELECT * FROM recurring_workflow_schedules WHERE id = _id FOR UPDATE
+    )
+    UPDATE recurring_workflow_schedules SET enabled = _enabled WHERE id = _id;
+$$ LANGUAGE SQL;
+
 CREATE TYPE workflow_instance_status AS ENUM('running', 'abandoned');
 
 CREATE TABLE workflow_instances (

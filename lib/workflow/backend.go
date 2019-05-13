@@ -255,6 +255,100 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*Schedu
 	return schedules, nil
 }
 
+type workflowScheduleUpdateOpts struct {
+	updateEnabled bool
+	enabled       bool
+
+	updateParameters bool
+	parameters       []byte
+
+	updateRecurrence bool
+	recurrence       string
+	nextRunAt        time.Time
+}
+
+type WorkflowScheduleUpdateOpts func(*workflowScheduleUpdateOpts) error
+
+func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpts {
+	return func(o *workflowScheduleUpdateOpts) error {
+		o.enabled = enabled
+		o.updateEnabled = true
+		return nil
+	}
+}
+
+func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpts {
+	return func(o *workflowScheduleUpdateOpts) error {
+		paramsData, err := jsonify(parameters)
+		o.updateParameters = true
+		o.parameters = paramsData
+		return err
+	}
+}
+
+func UpdateRecurrence(recurrence string, nextRunAt time.Time) WorkflowScheduleUpdateOpts {
+	return func(o *workflowScheduleUpdateOpts) error {
+		o.updateRecurrence = true
+		o.recurrence = recurrence
+		o.nextRunAt = nextRunAt
+		return nil
+	}
+}
+
+func (pg *PostgresBackend) UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts ...WorkflowScheduleUpdateOpts) error {
+	o := workflowScheduleUpdateOpts{}
+	for _, opt := range opts {
+		err := opt(&o)
+		if err != nil {
+			return err
+		}
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	tx, err := pg.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	// Lock row to update
+	r := tx.QueryRow("SELECT id FROM recurring_workflow_schedules WHERE id = $1 FOR UPDATE", id)
+	var throwaway int64
+	if err := r.Scan(&throwaway); err != nil {
+		if err != sql.ErrNoRows {
+			// TODO(jaym) return not found
+		}
+		return err
+	}
+
+	if o.updateEnabled {
+		_, err := tx.Exec("SELECT update_recurring_workflow_enabled($1, $2)", id, o.enabled)
+		if err != nil {
+			return err
+		}
+	}
+
+	if o.updateParameters {
+		_, err := tx.Exec("SELECT update_recurring_workflow_parameters($1, $2)", id, o.parameters)
+		if err != nil {
+			return err
+		}
+	}
+
+	if o.updateRecurrence {
+		_, err := tx.Exec("SELECT update_recurring_workflow_recurrence($1, $2, $3)",
+			id, o.recurrence, o.nextRunAt)
+		if err != nil {
+			return err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // TODO(ssd) 2019-05-13: We need to decide on what "update" will look like
 func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string,
 	parameters interface{}, enabled bool, recurrence string, nextRunAt time.Time) error {
