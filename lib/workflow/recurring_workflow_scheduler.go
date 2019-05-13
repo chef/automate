@@ -154,7 +154,7 @@ func (w *WorkflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duratio
 			continue
 		}
 
-		if time.Until(nextDueAt) > sleepDuration {
+		if time.Until(nextDueAt) < sleepDuration {
 			sleepDuration = time.Until(nextDueAt)
 		}
 
