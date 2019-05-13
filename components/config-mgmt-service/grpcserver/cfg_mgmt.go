@@ -33,7 +33,8 @@ func NewCfgMgmtServer(cs *config.Service) *CfgMgmtServer {
 	}
 }
 
-// GetPolicyCookbooks returns a list of cookbook name, policy identifier and name of policy based on revision id
+// GetPolicyCookbooks returns a list of cookbook name, policy
+// identifier and name of policy based on revision id
 func (s *CfgMgmtServer) GetPolicyCookbooks(ctx context.Context,
 	request *request.PolicyRevision) (*response.PolicyCookbooks, error) {
 
@@ -133,7 +134,8 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context,
 		return runsCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 	if !params.ValidateDateRange(request.GetStart(), request.GetEnd()) {
-		return runsCounts, status.Errorf(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
+		return runsCounts, status.Errorf(codes.InvalidArgument,
+			"Invalid start/end time. (format: YYYY-MM-DD)")
 	}
 
 	projectFilters, err := filterByProjects(ctx, map[string][]string{})
@@ -254,7 +256,12 @@ func (s *CfgMgmtServer) GetOrganizations(ctx context.Context,
 	empty *request.Organizations) (*gpStruct.ListValue, error) {
 	var organizations = new(gpStruct.ListValue)
 
-	orgs, err := s.client.GetListForField("organization_name")
+	filters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return nil, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
+	orgs, err := s.client.GetListForField("organization_name", filters)
 	if err != nil {
 		return nil, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
@@ -274,7 +281,12 @@ func (s *CfgMgmtServer) GetSourceFqdns(ctx context.Context,
 	empty *request.SourceFQDNS) (*gpStruct.ListValue, error) {
 	var sourceFqdns = new(gpStruct.ListValue)
 
-	fqdns, err := s.client.GetListForField("source_fqdn")
+	filters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return nil, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
+	fqdns, err := s.client.GetListForField("source_fqdn", filters)
 	if err != nil {
 		return nil, errors.GrpcErrorFromErr(codes.Internal, err)
 	}

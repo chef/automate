@@ -292,24 +292,23 @@ func (es Backend) getAggregationBucket(boolQuery *elastic.BoolQuery, indexName s
 // 			}
 // 		}
 // 	}
-func (es Backend) GetListForField(searchTerm string) ([]string, error) {
-	orgs := make([]string, 0)
-	filters := make(map[string][]string)
+func (es Backend) GetListForField(searchTerm string, filters map[string][]string) ([]string, error) {
+	fieldValues := make([]string, 0)
 
 	filters["exists"] = []string{"true"}
 	mainQuery := newBoolQueryFromFilters(filters)
 
-	organizationBuckets, err := es.getAggregationBucket(mainQuery, IndexNodeState, searchTerm)
+	fieldValueBuckets, err := es.getAggregationBucket(mainQuery, IndexNodeState, searchTerm)
 	// Return an error if the search was not successful
 	if err != nil {
 		return nil, err
 	}
 
-	for _, bucket := range organizationBuckets {
-		orgs = append(orgs, bucket.Key.(string))
+	for _, bucket := range fieldValueBuckets {
+		fieldValues = append(fieldValues, bucket.Key.(string))
 	}
 
-	return orgs, nil
+	return fieldValues, nil
 }
 
 // EmptyStringIfNil asserts an interface as a string, and if that fails it returns empty string
