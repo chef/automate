@@ -90,8 +90,9 @@ func TestNodeRunWithRunsNonmatchingNode(t *testing.T) {
 	suite.IngestRuns([]iBackend.Run{run})
 	defer suite.DeleteAllDocuments()
 
-	_, err := cfgmgmt.GetNodeRun(ctx, &req)
+	response, err := cfgmgmt.GetNodeRun(ctx, &req)
 	assert.Error(t, err)
+	assert.Nil(t, response, "run should be nil")
 }
 
 func TestNodeRunProjectFilter(t *testing.T) {
@@ -212,6 +213,7 @@ func TestNodeRunProjectFilter(t *testing.T) {
 			res, err := cfgmgmt.GetNodeRun(test.ctx, &req)
 			if test.expectedError {
 				assert.Error(t, err)
+				assert.Nil(t, res, "response should be nil")
 				return
 			}
 			assert.Nil(t, err)
