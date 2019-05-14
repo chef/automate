@@ -21,11 +21,13 @@ import (
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+	ingest_inspec "github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	ingest_api "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
 	event "github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -167,6 +169,11 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 		SourceRegion:    in.SourceRegion,
 		SourceAccountId: in.SourceAccountId,
 		Tags:            in.Tags,
+		ScanData: &nodes.LastContactData{
+			Id:      in.ReportUuid,
+			EndTime: endTimeTimestamp,
+			Status:  getReportStatus(in.Profiles),
+		},
 	})
 	if err != nil {
 		logrus.Errorf("ProcessComplianceReport unable to send node info to manager: %s", err.Error())
@@ -207,4 +214,79 @@ func (s *ComplianceIngestServer) sendNodeInfoToManager(ctx context.Context, node
 		return errors.Wrap(err, "sendNodeInfoToManager error calling ProcessNode")
 	}
 	return nil
+}
+
+func getReportStatus(profiles []*ingest_inspec.Profile) nodes.LastContactData_Status {
+	// start with a status of passed as the default status
+	status := nodes.LastContactData_PASSED
+	skippedCounter := 0
+	for _, profile := range profiles {
+		profileStatus := getProfileStatus(profile)
+		// if any profile is failed, report is failed
+		if profileStatus == "failed" {
+			status = nodes.LastContactData_FAILED
+			break
+		}
+		// if all profiles are skipped, the report is skipped
+		// so we keep a count of skipped profiles and later
+		// check if the amount of profiles matches the skipped counter,
+		// setting the status to skipped if they match.
+		if profileStatus == "skipped" {
+			skippedCounter++
+		}
+	}
+	if skippedCounter == len(profiles) {
+		status = nodes.LastContactData_SKIPPED
+	}
+	return status
+}
+
+func getProfileStatus(profile *ingest_inspec.Profile) string {
+	// a profile skipped due to platform exceptions will have a status of skipped
+	if profile.Status == "skipped" {
+		return "skipped"
+	}
+	// set the defaults
+	status := "passed"
+	skippedCounter := 0
+	for _, control := range profile.Controls {
+		controlStatus := getControlStatus(control.Results)
+		// if any control is failed, report is failed
+		if controlStatus == "failed" {
+			status = "failed"
+			break
+		}
+		// if all controls are skipped, the profile is skipped
+		// so we keep a count of skipped profiles and later
+		// check if the amount of profiles matches the skipped counter,
+		// setting the status to skipped if they match.
+		if controlStatus == "skipped" {
+			skippedCounter++
+		}
+	}
+	if skippedCounter == len(profile.Controls) {
+		status = "skipped"
+	}
+	return status
+}
+
+func getControlStatus(results []*ingest_inspec.Result) string {
+	// set the defaults
+	status := "passed"
+	skippedCounter := 0
+	for _, result := range results {
+		// if any result is failed, control is failed
+		if result.Status == "failed" {
+			status = "failed"
+			break
+		}
+		// if all results are skipped, the control is skipped
+		if result.Status == "skipped" {
+			skippedCounter++
+		}
+	}
+	if skippedCounter == len(results) {
+		status = "skipped"
+	}
+	return status
 }

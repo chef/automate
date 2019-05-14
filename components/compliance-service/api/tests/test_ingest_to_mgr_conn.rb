@@ -27,4 +27,14 @@ describe File.basename(__FILE__) do
     manually_managed_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new(filters: [Common::Filter.new(key: "manager_id", values: ["e69dc612-7e67-43f2-9b19-256afd385820"])])
     assert_equal(manually_managed_nodes.total, original_manually_managed_nodes.total)
   end
+
+  it "nodes have scan data" do
+    nodes = Nodes::NodesService
+    nodes_list = MANAGER_GRPC nodes, :list, Nodes::Query.new()
+    assert nodes_list["nodes"].all? { |node|
+      node["scan_data"].id.length > 0 &&
+        node["scan_data"].status.length > 0 &&
+        node["scan_data"].end_time != nil
+    }, "Nodes did not have necessary scan_data: #{nodes_list["nodes"]}"
+  end
 end
