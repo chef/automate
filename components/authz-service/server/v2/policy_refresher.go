@@ -117,7 +117,7 @@ func (refresher *policyRefresher) refresh(ctx context.Context, lastPolicyID stri
 		refresher.log.WithFields(logrus.Fields{
 			"lastPolicyID": lastPolicyID,
 			"curPolicyID":  curPolicyID,
-		}).Info("Refreshing engine store")
+		}).Debug("Refreshing engine store")
 
 		if err := refresher.updateEngineStore(ctx); err != nil {
 			refresher.log.WithError(err).Warn("Failed to refresh engine store")
