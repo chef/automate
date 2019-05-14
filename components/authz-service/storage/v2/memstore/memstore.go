@@ -245,6 +245,16 @@ func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 	return rule, nil
 }
 
+func (s *State) GetRule(_ context.Context, id string) (*storage.Rule, error) {
+	// TODO implement
+	return nil, nil
+}
+
+func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
+	// TODO implement
+	return []*storage.Rule{}, nil
+}
+
 func (s *State) DeleteRule(_ context.Context, id string) error {
 	// TODO implement
 	return nil

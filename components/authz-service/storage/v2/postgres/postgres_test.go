@@ -3400,18 +3400,260 @@ func TestCreateRule(t *testing.T) {
 	}
 }
 
+func TestListRules(t *testing.T) {
+	store, db, _ := setup(t)
+	defer db.close(t)
+	defer store.Close()
+
+	cases := map[string]func(*testing.T){
+		"when no rules exist, returns an empty list": func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := store.ListRules(ctx)
+			assert.NoError(t, err)
+			assert.Nil(t, resp)
+			assert.Equal(t, 0, len(resp))
+		},
+		"when mutiple rules exist with no project fitler, returns the full list": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				"chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				"org1,org2,org3", storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				"chef-server-2,chef-server-3", storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule1, err := storage.NewRule("new-id-1", projID, "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule1)
+			require.NoError(t, err)
+
+			condition4, err := storage.NewCondition(ruleType,
+				"chef-server-2", storage.ChefServer, storage.Equals)
+			rule2, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+
+			resp, err := store.ListRules(ctx)
+			fmt.Println("wtf")
+			fmt.Printf("res: %v\n", resp)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []*storage.Rule{&rule1, &rule2}, resp)
+		},
+		"when mutiple rules exist with a project fitler, returns filtered list": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{"project-3", projID2})
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				"chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				"org1,org2,org3", storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				"chef-server-2,chef-server-3", storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule1, err := storage.NewRule("new-id-1", projID, "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule1)
+			require.NoError(t, err)
+
+			condition4, err := storage.NewCondition(ruleType,
+				"chef-server-2", storage.ChefServer, storage.Equals)
+			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+
+			resp, err := store.ListRules(ctx)
+			fmt.Println("wtf")
+			fmt.Printf("res: %v\n", resp)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []*storage.Rule{&rule2}, resp)
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		db.flush(t)
+	}
+}
+
+func TestGetRule(t *testing.T) {
+	store, db, _ := setup(t)
+	defer db.close(t)
+	defer store.Close()
+
+	cases := map[string]func(*testing.T){
+		"when no rules exist, returns NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := store.GetRule(ctx, "not-found")
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+		},
+		"when the wrong id requested, returns NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				"chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", projID, "name", ruleType, []storage.Condition{condition1})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule)
+			require.NoError(t, err)
+
+			resp, err := store.GetRule(ctx, "not-found")
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+		},
+		"when mulitple rules exists with no project filter, return correct rule": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				"chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				"org1,org2,org3", storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				"chef-server-2,chef-server-3", storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			ruleToGet, err := storage.NewRule("new-id-1", projID, "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &ruleToGet)
+			require.NoError(t, err)
+
+			condition4, err := storage.NewCondition(ruleType,
+				"chef-server-2", storage.ChefServer, storage.Equals)
+			otherRule, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &otherRule)
+			require.NoError(t, err)
+
+			resp, err := store.GetRule(ctx, ruleToGet.ID)
+			assert.NoError(t, err)
+			assert.Equal(t, &ruleToGet, resp)
+		},
+		"when mulitple rules exists with a matching project filter, return correct rule": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{projID, projID2, "some-other-project"})
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				"chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				"org1,org2,org3", storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				"chef-server-2,chef-server-3", storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			ruleToGet, err := storage.NewRule("new-id-1", projID, "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &ruleToGet)
+			require.NoError(t, err)
+
+			condition4, err := storage.NewCondition(ruleType,
+				"chef-server-2", storage.ChefServer, storage.Equals)
+			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+
+			resp, err := store.GetRule(ctx, ruleToGet.ID)
+			assert.NoError(t, err)
+			assert.Equal(t, &ruleToGet, resp)
+		},
+		"when mulitple rules exists with a non-matching project filter, return NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, "some-other-project"})
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				"chef-server-1", storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				"org1,org2,org3", storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				"chef-server-2,chef-server-3", storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			ruleToGet, err := storage.NewRule("new-id-1", projID, "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &ruleToGet)
+			require.NoError(t, err)
+
+			condition4, err := storage.NewCondition(ruleType,
+				"chef-server-2", storage.ChefServer, storage.Equals)
+			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+
+			resp, err := store.GetRule(ctx, ruleToGet.ID)
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		db.flush(t)
+	}
+}
+
 func TestDeleteRule(t *testing.T) {
 	store, db, _ := setup(t)
 	defer db.close(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
-		"when no rules exist, returns not found": func(t *testing.T) {
+		"when no rules exist, returns NotFoundErr": func(t *testing.T) {
 			ctx := context.Background()
 			err := store.DeleteRule(ctx, "not-found")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
-		"when the wrong id requested, returns not found": func(t *testing.T) {
+		"when the wrong id requested, returns NotFoundErr": func(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)

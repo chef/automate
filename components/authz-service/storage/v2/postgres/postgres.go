@@ -1005,9 +1005,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	}
 
 	res, err := tx.ExecContext(ctx,
-		`DELETE FROM iam_project_rules WHERE id=$1 AND (
-			array_length($2::TEXT[], 1) IS NULL OR project_id = ANY ($2::TEXT[])
-		);`,
+		`DELETE FROM iam_project_rules WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
 		id, pq.Array(projectsFilter),
 	)
 	if err != nil {
@@ -1027,6 +1025,80 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	}
 
 	return nil
+}
+
+func (p *pg) GetRule(ctx context.Context, id string) (*v2.Rule, error) {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var rule v2.Rule
+	row := tx.QueryRowContext(ctx, `SELECT query_rule from query_rule($1, $2);`,
+		id, pq.Array(projectsFilter),
+	)
+	err = row.Scan(&rule)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
+	}
+
+	return &rule, nil
+}
+
+func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var rules []*v2.Rule
+	rows, err := p.db.QueryContext(ctx, `SELECT query_rules from query_rules($1);`, pq.Array(projectsFilter))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	defer func() {
+		if err := rows.Close(); err != nil {
+			p.logger.Warnf("failed to close db rows: %s", err.Error())
+		}
+	}()
+
+	for rows.Next() {
+		var rule v2.Rule
+		err = rows.Scan(&rule)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+		rules = append(rules, &rule)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
+	}
+
+	return rules, nil
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

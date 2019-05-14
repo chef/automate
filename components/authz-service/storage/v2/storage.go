@@ -70,6 +70,8 @@ type projectStorage interface {
 
 type ruleStorage interface {
 	CreateRule(context.Context, *Rule) (*Rule, error)
+	GetRule(context.Context, string) (*Rule, error)
+	ListRules(context.Context) ([]*Rule, error)
 	DeleteRule(context.Context, string) error
 }
 
