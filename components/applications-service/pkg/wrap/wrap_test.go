@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/api/external/applications"
@@ -17,7 +16,7 @@ func TestWrap(t *testing.T) {
 		IntTwo: 42,
 	}
 
-	packedEx1, err := ptypes.MarshalAny(&ex1)
+	packedEx1, err := proto.Marshal(&ex1)
 	require.NoError(t, err)
 
 	wrap1 := applications.Wrapper{
@@ -43,7 +42,7 @@ func TestWrap(t *testing.T) {
 
 	var extractedEx1 applications.ExampleOne
 
-	err = ptypes.UnmarshalAny(wrap1rt.Message, &extractedEx1)
+	err = proto.Unmarshal(wrap1rt.Message, &extractedEx1)
 
 	require.NoError(t, err)
 
