@@ -136,6 +136,10 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.get('.nav-link').contains('Scan Jobs').click()
     cy.url().should('include', '/compliance/scanner/jobs')
 
+    // we save the route that will be called when we navigate to the next page
+    // in order to be able to wait for it later
+    cy.route('POST', '/api/v0/compliance/profiles/search').as('getProfiles')
+
     // open scan create form
     cy.contains('Create new job').click().then(() => {
       cy.url().should('include', '/jobs/add')
@@ -143,8 +147,12 @@ describe('create a manual node ssh scan job and cleanup after', () => {
       // select nodes
       cy.get('chef-job-nodes-form .manager-header').contains('Automate').as('manager-row')
       cy.get('@manager-row').parent().parent().find('input[type="checkbox"]').check()
+
       // click next
       cy.contains('Next').click().then(() => {
+        // wait for data to return
+        cy.wait('@getProfiles')
+
         // select profiles
         cy.get('chef-job-profiles-form').find('[data-cy=select-all-profiles]').check().then(() => {
           // click next
