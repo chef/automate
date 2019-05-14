@@ -990,6 +990,45 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	return rule, nil
 }
 
+func (p *pg) DeleteRule(ctx context.Context, id string) error {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	res, err := tx.ExecContext(ctx,
+		`DELETE FROM iam_project_rules WHERE id=$1 AND (
+			array_length($2::TEXT[], 1) IS NULL OR project_id = ANY ($2::TEXT[])
+		);`,
+		id, pq.Array(projectsFilter),
+	)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return p.processError(err)
+	} else if count == 0 {
+		return storage_errors.ErrNotFound
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewErrTxCommit(err)
+	}
+
+	return nil
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * *   PROJECTS  * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

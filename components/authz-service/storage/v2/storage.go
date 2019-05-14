@@ -70,6 +70,7 @@ type projectStorage interface {
 
 type ruleStorage interface {
 	CreateRule(context.Context, *Rule) (*Rule, error)
+	DeleteRule(context.Context, string) error
 }
 
 type MigrationStatusProvider interface {

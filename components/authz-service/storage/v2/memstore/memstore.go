@@ -245,6 +245,11 @@ func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 	return rule, nil
 }
 
+func (s *State) DeleteRule(_ context.Context, id string) error {
+	// TODO implement
+	return nil
+}
+
 func (s *State) CreateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {
 	if project.Type == storage.Custom {
 		items := s.projects.Items()
