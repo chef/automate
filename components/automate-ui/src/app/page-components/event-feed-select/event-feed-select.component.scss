@@ -4,6 +4,10 @@
   margin: 10px;
   line-height: 1;
   box-shadow: 0 0 20px rgba($gray-light, .20);
+
+  ::ng-deep .selected-value {
+    padding-top: 17px;
+  }
 }
 
 .event-type-name {
