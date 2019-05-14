@@ -179,7 +179,7 @@ func (t *PerfTestTask) Run(ctx context.Context, task workflow.TaskQuerier) (inte
 	}
 	t.statusChan <- struct{}{}
 	logrus.Info("Finished Task")
-	return nil, nil
+	return params.ID, nil
 }
 
 type PerfTestWorkflow struct {
@@ -230,12 +230,25 @@ func (p *PerfTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
 	if err := w.GetParameters(&params); err != nil {
 		logrus.WithError(err).Fatal("Could not decode parameters")
 	}
+
+	taskParams := PerfTestTaskParams{}
+	if err := ev.Result.GetParameters(&taskParams); err != nil {
+		logrus.WithError(err).Fatal("Could not decode task params in result")
+	}
+
+	taskResult := ""
+	if err := ev.Result.Get(&taskResult); err != nil {
+		logrus.WithError(err).Fatal("Could not decode task params in result")
+	}
+
 	logrus.WithFields(logrus.Fields{
-		"task_name": ev.TaskName,
-		"enqueued":  w.TotalEnqueuedTasks(),
-		"completed": w.TotalCompletedTasks(),
-		"payload":   mycount,
-		"params":    params,
+		"task_name":  ev.TaskName,
+		"enqueued":   w.TotalEnqueuedTasks(),
+		"completed":  w.TotalCompletedTasks(),
+		"payload":    mycount,
+		"params":     params,
+		"taskParams": taskParams,
+		"taskResult": taskResult,
 	}).Info("PerfTestWorkflow got Task Completed")
 
 	completed := mycount + 1

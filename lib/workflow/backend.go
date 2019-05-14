@@ -137,11 +137,11 @@ type RecurringWorkflowCompleter interface {
 
 type TaskResult struct {
 	taskName   string
-	parameters string
+	parameters []byte
 
 	status    TaskStatusType
 	errorText string
-	result    string
+	result    []byte
 }
 
 func (r *TaskResult) Err() error {
@@ -151,13 +151,17 @@ func (r *TaskResult) Err() error {
 	return nil
 }
 
-func (r *TaskResult) Get(interface{}) error {
-	// TODO(ssd) 2019-05-14: UNIMPLEMENTED
+func (r *TaskResult) Get(obj interface{}) error {
+	if r.result != nil {
+		return json.Unmarshal(r.result, obj)
+	}
 	return nil
 }
 
-func (r *TaskResult) GetParameters(interface{}) error {
-	// TODO(ssd) 2019-05-14: UNIMPLEMENTED
+func (r *TaskResult) GetParameters(obj interface{}) error {
+	if r.parameters != nil {
+		return json.Unmarshal(r.parameters, obj)
+	}
 	return nil
 }
 
