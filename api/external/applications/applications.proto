@@ -4,6 +4,7 @@ package chef.automate.api.applications;
 option go_package = "github.com/chef/automate/api/external/applications";
 
 import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
 
 // TODO @afiune Move or re-create the common messages inside the api/ folder
 import "api/external/common/version/version.proto";
@@ -211,4 +212,19 @@ enum HealthStatus {
   WARNING = 1;
   CRITICAL = 2;
   UNKNOWN = 3;
+}
+
+message Wrapper {
+  string type = 1;
+  google.protobuf.Any message = 2;
+}
+
+message ExampleOne {
+  int32 int_one = 1;
+  int32 int_two = 2;
+}
+
+message ExampleTwo {
+  string string_one = 1;
+  string string_two = 2;
 }
