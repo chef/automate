@@ -28,6 +28,10 @@ var (
 	// ErrMaxProjectsExceeded indicates that a new project cannot be created
 	// since the max allowed are already created.
 	ErrMaxProjectsExceeded = errors.New("max projects allowed")
+
+	// ErrChangeProjectForRule indicates that an updated attempted to change
+	// the project for a rule, which is not allowed.
+	ErrChangeProjectForRule = errors.New("cannot change rule")
 )
 
 // ErrTxCommit occurs when the database attempts to commit a transaction and
