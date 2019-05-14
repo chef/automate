@@ -69,12 +69,17 @@ remote_file hab_zip_path do
 end
 
 execute "tar --strip=1 -xvf #{hab_zip_path} -C #{Chef::Config[:file_cache_path]}"
-execute "#{Chef::Config[:file_cache_path]}/hab pkg install core/hab"
-execute "#{Chef::Config[:file_cache_path]}/hab pkg binlink core/hab hab"
+
+execute "#{Chef::Config[:file_cache_path]}/hab pkg install core/hab" do
+  environment({"HAB_LICENSE" => "accept-no-persist"})
+end
+
+execute "#{Chef::Config[:file_cache_path]}/hab pkg binlink core/hab hab" do
+  environment({"HAB_LICENSE" => "accept-no-persist"})
+end
 
 group 'hab'
 
 user 'hab' do
   group 'hab'
 end
-
