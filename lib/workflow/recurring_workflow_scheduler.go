@@ -78,6 +78,11 @@ func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duratio
 		nextDueAt := recurrence.After(nowUTC, true).UTC()
 		err = completer.EnqueueRecurringWorkflow(s, workflowInstanceName, nextDueAt, nowUTC)
 		if err != nil {
+			if err == ErrWorkflowInstanceExists {
+				// TODO(jaym): what do we want to do here? i think we're going to keep trying
+				//             until we succeed here? Maybe we want to skip this interval?
+				// It's also possible this happens on Commit instead of here
+			}
 			logrus.WithError(err).Error("could not update recurring workflow record")
 			continue
 		}

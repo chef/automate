@@ -733,14 +733,24 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
 	nextDueAt time.Time,
 	lastStartedAt time.Time,
 ) error {
+	wrapErr := func(err error, msg string) error {
+		if pqErr, ok := err.(*pq.Error); ok {
+			// unique violation
+			if pqErr.Code == "23505" {
+				return ErrWorkflowInstanceExists
+			}
+		}
+
+		return errors.Wrap(err, msg)
+	}
 	_, err := c.tx.ExecContext(c.ctx, enqueueWorkflowQuery, workflowInstanceName, s.WorkflowName, s.Parameters)
 	if err != nil {
-		return errors.Wrap(err, "failed to enqueue workflow")
+		return wrapErr(err, "failed to enqueue workflow")
 	}
 
 	_, err = c.tx.ExecContext(c.ctx, updateRecurringWorkflowQuery, s.ID, nextDueAt, lastStartedAt)
 	if err != nil {
-		return errors.Wrap(err, "failed to update workflow schedule")
+		return wrapErr(err, "failed to update workflow schedule")
 	}
 
 	return nil
@@ -751,7 +761,17 @@ func (c *PostgresRecurringWorkflowCompleter) Cancel() {
 }
 
 func (c *PostgresRecurringWorkflowCompleter) Commit() error {
-	return c.tx.Commit()
+	transformErr := func(err error) error {
+		if pqErr, ok := err.(*pq.Error); ok {
+			// unique violation
+			if pqErr.Code == "23505" {
+				return ErrWorkflowInstanceExists
+			}
+		}
+
+		return err
+	}
+	return transformErr(c.tx.Commit())
 }
 
 func jsonify(data interface{}) ([]byte, error) {
