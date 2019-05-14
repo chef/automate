@@ -13,7 +13,7 @@ toc = true
 
 ## Overview
 
-Navigate to compliance profiles by using the **Compliance** tab and then selecting the Profiles page.
+Navigate to compliance profiles by using the **Compliance** tab and then selecting the _Profiles_ page.
 Compliance profiles help you secure your infrastructure continuously.
 Chef Automate compliance profiles translate CIS Benchmarks and other security standards in easily readable policy.
 Chef Automate uses the InSpec language to turn compliance into code.
@@ -23,9 +23,9 @@ You can install and download one of our 100+ ready-to-use compliance profiles fr
 
 ## Using Profiles
 
-Navigate to the profiles page by selecting the **Profiles** tab at the top of the Chef Automate screen or by heading to `https://{{< example_fqdn "automate" >}}/profiles`.
+Navigate to the _Profiles_ page by selecting the **Profiles** tab at the top of the Chef Automate screen or by heading to `https://{{< example_fqdn "automate" >}}/profiles`.
 
-Profiles has a search bar and two views, the _Profiles_ page, which displays the profiles you've installed
+Profiles has a search bar and two views: the _Profiles_ page, which displays the profiles you've installed
 in your unique namespace within Chef Automate,
 and the _Available_ page, which displays all of the ready-to-use compliance profiles in Chef Automate.
 
