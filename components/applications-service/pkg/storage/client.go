@@ -3,15 +3,12 @@ package storage
 import (
 	"fmt"
 
-	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
 )
 
 type Client interface {
 	// @param (event)
 	IngestHealthCheckEvent(*habitat.HealthCheckEvent) error
-	// @param (event)
-	IngestHabEvent(*applications.HabService) error
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServices(string, bool, int32, int32, map[string][]string) ([]*Service, error)
 	// @param (sortField, sortAsc, page, pageSize, filters)
