@@ -1,31 +1,22 @@
 package nats
 
 import (
-	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/golang/protobuf/proto"
 
 	log "github.com/sirupsen/logrus"
 )
 
-// PublishHabService publishes a HabService message to the NATS server
+// PublishHabEvent publishes a Habitat event message to the NATS server
 //
 // Usage:
 // ```
-// msg := &applications.HabService{
-//   SupervisorId: "asdfg1234qwer5678",
-//   Group:        "default",
-//   PkgIdent:     &applications.PackageIdent{
-//     Origin:  "core",
-//     Name:    "redis",
-//     Version: "0.1.0",
-//     Release: "20190101121212",
-//   },
-// }
-// client.PublishHabService(msg)
+// msg := &habitat.HealthCheckEvent{}
+// client.PublishHabEvent(msg)
 // ```
-func (nc *NatsClient) PublishHabService(msg *applications.HabService) error {
+func (nc *NatsClient) PublishHabEvent(msg *habitat.HealthCheckEvent) error {
 	log.WithFields(log.Fields{
-		"type":    "HabService",
+		"type":    "HealthCheckEvent",
 		"message": msg,
 	}).Info("Publishing message")
 

@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/lib/tls/certs"
 
@@ -188,14 +187,14 @@ func (nc *NatsClient) ConnectAndSubscribe() error {
 
 // ConnectAndPublish will attempt to connect to the NATS Server and then
 // publish a message to the subject that the client was configured
-func (nc *NatsClient) ConnectAndPublish(msg *applications.HabService) error {
+func (nc *NatsClient) ConnectAndPublish(msg *habitat.HealthCheckEvent) error {
 
 	err := nc.Connect()
 	if err != nil {
 		return err
 	}
 
-	err = nc.PublishHabService(msg)
+	err = nc.PublishHabEvent(msg)
 	if err != nil {
 		return err
 	}
