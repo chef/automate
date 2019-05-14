@@ -31,6 +31,7 @@ func TestWrap(t *testing.T) {
 	require.NoError(t, err)
 
 	fmt.Printf("data: %+v\n", data)
+	fmt.Printf("data len: %d\n", len(data))
 
 	var wrap1rt applications.Wrapper
 
