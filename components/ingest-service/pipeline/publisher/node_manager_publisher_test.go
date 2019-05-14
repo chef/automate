@@ -1,13 +1,17 @@
 package publisher
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/ingest-service/backend"
+	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 )
@@ -54,4 +58,24 @@ func TestGatherInfoForNode(t *testing.T) {
 			Status:  nodes.LastContactData_PASSED,
 		},
 	}, nodeMetadata)
+}
+
+func TestBundlerSingleMessage(t *testing.T) {
+	inbox := make(chan message.ChefRun, 100)
+	processNodeCount := 0
+	nodeMgrClient := manager.NewMockNodeManagerServiceClient(gomock.NewController(t))
+	nodeMgrClient.EXPECT().ProcessNode(gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx interface{}, in interface{}) (*manager.ProcessNodeResponse, error) {
+			processNodeCount++
+			return &manager.ProcessNodeResponse{}, nil
+		})
+	errc := make(chan error)
+
+	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
+	close(inbox)
+	out := nodeManagerPublisher(inbox, nodeMgrClient)
+
+	<-out
+
+	assert.Equal(t, 1, processNodeCount)
 }
