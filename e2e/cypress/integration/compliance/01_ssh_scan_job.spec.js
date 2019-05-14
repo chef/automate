@@ -146,7 +146,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
       // click next
       cy.contains('Next').click().then(() => {
         // select profiles
-        cy.get('chef-job-profiles-form input[type="checkbox"]').check().then(() => {
+        cy.get('chef-job-profiles-form').find('[data-cy=select-all-profiles]').check().then(() => {
           // click next
           cy.contains('Next').click().then(() => {
 
