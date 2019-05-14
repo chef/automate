@@ -16,10 +16,15 @@
 
       <chef-toolbar>
         <app-authorized [anyOf]="['/notifications/rules', 'post']">
-          <chef-button primary [routerLink]="['/settings/notifications/form']">Create Notification</chef-button>
+          <div *ngIf="(rules$ | async)?.length === 0" class="notifications-empty-state">
+            <p>Create the first notification to get started!</p>
+          </div>
+          <div [ngClass]="(rules$ | async)?.length === 0 ? 'notifications-empty-state' : ''">
+            <chef-button primary [routerLink]="['/settings/notifications/form']">Create Notification</chef-button>
+          </div>
         </app-authorized>
       </chef-toolbar>
-      <chef-table id="notifications-list">
+      <chef-table *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
         <chef-tr>
           <chef-th class="sort" (click)="toggleSort('node_name')">
             <div class="text-and-sort-icons">
