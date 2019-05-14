@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/migration"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
+	"github.com/chef/automate/components/nodemanager-service/api/manager"
 )
 
 // Spawn starts a gRPC Server listening on the provided host and port,
@@ -79,7 +80,7 @@ func Spawn(opts *serveropts.Opts) error {
 	// Authz Interface
 	authzConn, err := opts.ConnFactory.Dial("authz-service", opts.AuthzAddress)
 	if err != nil {
-		// This should never happend
+		// This should never happen
 		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create Authz connection")
 		return err
 	}
@@ -90,7 +91,7 @@ func Spawn(opts *serveropts.Opts) error {
 	// event Interface
 	eventConn, err := opts.ConnFactory.Dial("event-service", opts.EventAddress)
 	if err != nil {
-		// This should never happend
+		// This should never happen
 		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create Event connection")
 		return err
 	}
@@ -98,8 +99,19 @@ func Spawn(opts *serveropts.Opts) error {
 
 	eventServiceClient := automate_event.NewEventServiceClient(eventConn)
 
+	// nodemanager Interface
+	nodeMgrConn, err := opts.ConnFactory.Dial("nodemanager-service", opts.NodeManagerAddress)
+	if err != nil {
+		// This should never happen
+		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create NodeManager connection")
+		return err
+	}
+	defer nodeMgrConn.Close()
+
+	nodeMgrServiceClient := manager.NewNodeManagerServiceClient(nodeMgrConn)
+
 	// ChefRuns
-	chefIngest := server.NewChefIngestServer(client, authzProjectsClient)
+	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient)
 	ingest.RegisterChefIngesterServer(grpcServer, chefIngest)
 
 	// Pass the chef ingest server to give status about the pipelines

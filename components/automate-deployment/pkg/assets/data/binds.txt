@@ -49,7 +49,7 @@ es-sidecar-service BINDING_MODE strict
 event-gateway REQUIRED authn-service authz-service event-service
 event-gateway BINDING_MODE strict
 event-service BINDING_MODE strict
-ingest-service REQUIRED authz-service automate-es-gateway event-service
+ingest-service REQUIRED authz-service automate-es-gateway event-service nodemanager-service
 ingest-service OPTIONAL es-sidecar-service
 ingest-service BINDING_MODE strict
 license-control-service BINDING_MODE strict
