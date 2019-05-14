@@ -50,53 +50,62 @@ func (w *workflowScheduler) run(ctx context.Context) {
 }
 
 func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duration, error) {
-	toEnqueue, completer, err := w.backend.GetDueRecurringWorkflows(ctx)
+	sleepTime := maxWakeupInterval
+
+	for {
+		s, err := w.scheduleWorkflow(ctx)
+		if err == ErrNoDueWorkflows {
+			return sleepTime, nil
+		}
+		if err != nil {
+			return sleepTime, err
+		}
+		if sleepTime > s {
+			sleepTime = s
+		}
+
+	}
+}
+
+func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration, error) {
+	s, completer, err := w.backend.GetDueRecurringWorkflow(ctx)
 	if err != nil {
+		if err == ErrNoDueWorkflows {
+			return maxWakeupInterval, err
+		}
 		return maxWakeupInterval, errors.Wrap(err, "could not fetch recurring workflows")
 	}
-	defer completer.Cancel()
+	defer completer.Close()
 
-	sleepDuration := maxWakeupInterval
-	for _, s := range toEnqueue {
-		workflowInstanceName := fmt.Sprintf("%s/%s/%d", s.WorkflowName, s.Name, s.ID)
+	workflowInstanceName := fmt.Sprintf("%s/%s/%d", s.WorkflowName, s.Name, s.ID)
 
-		// TODO(ssd) 2019-05-13: We might need two different
-		// rule types here to suppor the different use cases.
-		recurrence, err := rrule.StrToRRule(s.Recurrence)
-		if err != nil {
-			// TODO(ssd) 2019-05-13: Perhaps we should disable this rule so that it doesn't keep producing errors
-			logrus.WithError(err).Error("could not parse recurrence rule for workflow, skipping")
-			continue
-		}
-
-		nowUTC := time.Now().UTC()
-		// NOTE(ssd) 2019-05-13: compliance looks 5 seconds in
-		// the past to make sure that a job with a count of 1
-		// actually gets run. However, I'm currently thinking
-		// that we can push those kind of jobs onto the
-		// workflow-instances queue immediately.
-		nextDueAt := recurrence.After(nowUTC, true).UTC()
-		err = completer.EnqueueRecurringWorkflow(s, workflowInstanceName, nextDueAt, nowUTC)
-		if err != nil {
-			if err == ErrWorkflowInstanceExists {
-				// TODO(jaym): what do we want to do here? i think we're going to keep trying
-				//             until we succeed here? Maybe we want to skip this interval?
-				// It's also possible this happens on Commit instead of here
-			}
-			logrus.WithError(err).Error("could not update recurring workflow record")
-			// TODO BUG (jaym): We cannot continue an errored transaction. We'll have to modify
-			// the query to tell us when there is a conflict.
-			// It seems the expected behavior when we try to commit this is to roll back.
-			// What actually happens is we deadlock:
-			// https://github.com/lib/pq/issues/731
-			continue
-		}
-
-		if time.Until(nextDueAt) < sleepDuration {
-			sleepDuration = time.Until(nextDueAt)
-		}
-
+	// TODO(ssd) 2019-05-13: We might need two different
+	// rule types here to suppor the different use cases.
+	recurrence, err := rrule.StrToRRule(s.Recurrence)
+	if err != nil {
+		// TODO(ssd) 2019-05-13: Perhaps we should disable this rule so that it doesn't keep producing errors
+		// We need to do this otherwise we'll just keep trying to enqueue this and nothing else
+		return maxWakeupInterval, errors.Wrap(err, "could not parse recurrence rule for workflow, skipping")
 	}
 
-	return sleepDuration, completer.Commit()
+	nowUTC := time.Now().UTC()
+	// NOTE(ssd) 2019-05-13: compliance looks 5 seconds in
+	// the past to make sure that a job with a count of 1
+	// actually gets run. However, I'm currently thinking
+	// that we can push those kind of jobs onto the
+	// workflow-instances queue immediately.
+	nextDueAt := recurrence.After(nowUTC, true).UTC()
+	sleepTime := time.Until(nextDueAt)
+	err = completer.EnqueueRecurringWorkflow(s, workflowInstanceName, nextDueAt, nowUTC)
+	if err != nil {
+		if err == ErrWorkflowInstanceExists {
+			// TODO(jaym): what do we want to do here? i think we're going to keep trying
+			//             until we succeed here? Maybe we want to skip this interval?
+			return maxWakeupInterval, nil
+		}
+		logrus.WithError(err).Error("could not update recurring workflow record")
+		return sleepTime, err
+	}
+
+	return sleepTime, nil
 }
