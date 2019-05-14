@@ -15,8 +15,7 @@
           ],
           "resources": [
             "iam:users:${a2:username}"
-          ],
-          "role": ""
+          ]
         },
         "e9faa7a9-d458-4009-8192-edee6024b5d9": {
           "actions": [
@@ -32,8 +31,7 @@
           "resources": [
             "iam:users:${a2:username}",
             "iam:usersSelf:${a2:username}"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "system"
@@ -53,8 +51,7 @@
           ],
           "resources": [
             "iam:policyVersion"
-          ],
-          "role": ""
+          ]
         },
         "4cc6e7cd-5e32-43e5-af04-d32b15796590": {
           "actions": [
@@ -66,8 +63,7 @@
           ],
           "resources": [
             "iam:introspect"
-          ],
-          "role": ""
+          ]
         },
         "d7ed1d1f-1f6a-4055-a07e-23430c267e42": {
           "actions": [
@@ -80,8 +76,7 @@
           ],
           "resources": [
             "system:service:version"
-          ],
-          "role": ""
+          ]
         },
         "e5e1da2d-bbda-4211-adf5-c83e13f1891a": {
           "actions": [
@@ -93,8 +88,7 @@
           ],
           "resources": [
             "system:status"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "system"
@@ -114,8 +108,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         },
         "e7db4f3c-80aa-491b-9842-4194c9326a2c": {
           "actions": [
@@ -128,8 +121,7 @@
           ],
           "resources": [
             "iam:policies:administrator-access"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "chef-managed"
@@ -149,8 +141,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "custom"
@@ -170,8 +161,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "custom"
@@ -194,8 +184,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "system"
@@ -221,8 +210,7 @@
             "iam:roles:ingest",
             "iam:roles:project-admin",
             "iam:roles:iam-members-viewer"
-          ],
-          "role": ""
+          ]
         },
         "2b5a3f1d-9d25-46f3-b1dd-8f46c7d323a3": {
           "actions": [
@@ -238,8 +226,7 @@
             "iam:policies:editor-access",
             "iam:policies:viewer-access",
             "iam:policies:ingest-access"
-          ],
-          "role": ""
+          ]
         },
         "d49181d1-37b7-459d-8935-f11a9fa6b9e1": {
           "actions": [
@@ -252,8 +239,7 @@
           ],
           "resources": [
             "iam:projects:~~ALL-PROJECTS~~"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "system"
@@ -273,8 +259,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "system"
@@ -285,7 +270,6 @@
       ],
       "statements": {
         "b7efc19b-3a66-4839-9810-e3bb16824858": {
-          "actions": [],
           "effect": "allow",
           "projects": [
             "~~ALL-PROJECTS~~"
@@ -313,8 +297,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "custom"
@@ -334,8 +317,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "custom"
@@ -344,7 +326,6 @@
       "members": [],
       "statements": {
         "f8f5438b-d5f9-4c51-a665-e26cd456032f": {
-          "actions": [],
           "effect": "allow",
           "projects": [
             "~~ALL-PROJECTS~~"
@@ -372,8 +353,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "custom"
@@ -393,8 +373,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "custom"
@@ -414,8 +393,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "custom"
@@ -435,8 +413,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "custom"
@@ -456,8 +433,7 @@
           ],
           "resources": [
             "*"
-          ],
-          "role": ""
+          ]
         }
       },
       "type": "custom"
@@ -468,7 +444,6 @@
       ],
       "statements": {
         "a8110054-c889-46e1-ae2b-415c505a6b47": {
-          "actions": [],
           "effect": "allow",
           "projects": [
             "~~ALL-PROJECTS~~"
