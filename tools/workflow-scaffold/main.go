@@ -335,7 +335,6 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 type ScheduleTestTask struct{}
 
 func (t *ScheduleTestTask) Run(ctx context.Context, _ workflow.TaskQuerier) (interface{}, error) {
-	time.Sleep(90 * time.Second)
 	logrus.Info("Running schedule test task")
 	return nil, nil
 }

@@ -84,6 +84,11 @@ func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duratio
 				// It's also possible this happens on Commit instead of here
 			}
 			logrus.WithError(err).Error("could not update recurring workflow record")
+			// TODO BUG (jaym): We cannot continue an errored transaction. We'll have to modify
+			// the query to tell us when there is a conflict.
+			// It seems the expected behavior when we try to commit this is to roll back.
+			// What actually happens is we deadlock:
+			// https://github.com/lib/pq/issues/731
 			continue
 		}
 
