@@ -220,6 +220,7 @@ var (
 	ErrNoTasks                = errors.New("no tasks in queue")
 	ErrNoWorkflowInstances    = errors.New("no workflow instances in queue")
 	ErrWorkflowScheduleExists = errors.New("workflow schedule already exists")
+	ErrWorkflowInstanceExists = errors.New("workflow instance already exists")
 )
 
 func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
@@ -387,20 +388,30 @@ VALUES ($1, $2, $3, $4, $5, $6)`,
 }
 
 func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *WorkflowInstance) error {
+	wrapErr := func(err error, msg string) error {
+		if pqErr, ok := err.(*pq.Error); ok {
+			// unique violation
+			if pqErr.Code == "23505" {
+				return ErrWorkflowInstanceExists
+			}
+		}
+
+		return errors.Wrap(err, msg)
+	}
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	tx, err := pg.db.BeginTx(ctx, nil)
 	if err != nil {
-		return errors.Wrap(err, "failed to begin enqueue workflow transaction")
+		return wrapErr(err, "failed to begin enqueue workflow transaction")
 	}
 
 	_, err = tx.ExecContext(ctx, enqueueWorkflowQuery, w.InstanceName, w.WorkflowName, w.Parameters)
 	if err != nil {
-		return errors.Wrap(err, "failed to enqueue workflow")
+		return wrapErr(err, "failed to enqueue workflow")
 	}
 
 	if err := tx.Commit(); err != nil {
-		return errors.Wrap(err, "failed to commit enqueue workflow")
+		return wrapErr(err, "failed to commit enqueue workflow")
 	}
 	return nil
 }

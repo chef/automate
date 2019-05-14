@@ -161,7 +161,8 @@ type PerfTestTask struct {
 }
 
 type PerfTestTaskParams struct {
-	ID string
+	ID     string
+	Sleepy int
 }
 
 func (t *PerfTestTask) Run(ctx context.Context, task workflow.FTask) (interface{}, error) {
@@ -171,7 +172,7 @@ func (t *PerfTestTask) Run(ctx context.Context, task workflow.FTask) (interface{
 	}
 	logrus.WithField("id", params.ID).Info("Running task")
 	if perfTestOpts.SlowTasks {
-		time.Sleep(23 * time.Second)
+		time.Sleep(time.Duration(23+params.Sleepy) * time.Second)
 	}
 	t.statusChan <- struct{}{}
 	logrus.Info("Finished Task")
@@ -197,7 +198,7 @@ func (p *PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
 	}
 
 	for i := 0; i < params.NumTasks; i++ {
-		w.EnqueueTask("test task", &PerfTestTaskParams{ID: fmt.Sprintf("asdf: %d", i)})
+		w.EnqueueTask("test task", &PerfTestTaskParams{ID: fmt.Sprintf("asdf: %d", i), Sleepy: i * 2})
 	}
 	go func() {
 		time.Sleep(2 * time.Second)
@@ -287,10 +288,20 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 
 	workflowManager.Start(context.Background())
 	if !perfTestOpts.SkipEnqueue {
+		instanceName := fmt.Sprintf("perf-test-%s", time.Now())
 		workflowManager.EnqueueWorkflow(context.TODO(),
-			"perf-test", fmt.Sprintf("perf-test-%s", time.Now()),
+			"perf-test", instanceName,
 			&params,
 		)
+		err := workflowManager.EnqueueWorkflow(context.TODO(),
+			"perf-test", instanceName,
+			&params,
+		)
+		if err == workflow.ErrWorkflowInstanceExists {
+			logrus.Info("Successfully can't add multiple workflows with the same name")
+		} else {
+			logrus.WithError(err).Error("Unspected error")
+		}
 	}
 
 	if perfTestOpts.EnqueueOnly {
