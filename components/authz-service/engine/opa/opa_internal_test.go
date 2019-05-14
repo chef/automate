@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"os"
 	"testing"
 	"time"
 
@@ -297,7 +298,36 @@ func BenchmarkFilterAuthorizedPairsWithPolicies(b *testing.B) {
 	}
 }
 
+// BenchmarkInitPartialResultV2 is initializing a partial result object using
+// what currently (as of this commit) is a pretty default store content.
+// The JSON is taken from the store-pretty.json file in engine/opa/example_v2/.
+func BenchmarkInitPartialResultV2(b *testing.B) {
+	var r error
+	ctx := context.Background()
+
+	f, err := os.Open("example_v2/store-pretty.json")
+	require.NoError(b, err, "read example store JSON file")
+	defer f.Close()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	store := inmem.NewFromReader(f)
+
+	for n := 0; n < b.N; n++ {
+		s, err := New(ctx, l)
+		require.NoError(b, err, "init state")
+		s.store = store
+
+		r = s.initPartialResultV2(ctx)
+		if r != nil {
+			b.Error(r)
+		}
+	}
+	errResult = r
+}
+
 // helpers
+
 func randomTeams(c int) []string {
 	ret := make([]string, c)
 	for i := 0; i < c; i++ {
