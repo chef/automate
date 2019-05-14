@@ -11,22 +11,17 @@ import (
 	rrule "github.com/teambition/rrule-go"
 )
 
-type FTask interface {
+type TaskQuerier interface {
 	GetParameters(interface{}) error
 }
 
-type taskImpl struct {
-	task *Task
+type TaskResultQuerier interface {
+	GetParameters(interface{}) error
+	Get(interface{}) error
+	Err() error
 }
 
-func (t *taskImpl) GetParameters(obj interface{}) error {
-	if t.task.Parameters != nil {
-		return json.Unmarshal(t.task.Parameters, obj)
-	}
-	return nil
-}
-
-type FWorkflowInstance interface {
+type WorkflowInstanceHandler interface {
 	GetPayload(interface{}) error
 	GetParameters(interface{}) error
 
@@ -97,32 +92,6 @@ func (w *workflowInstanceImpl) Continue(payload interface{}) Decision {
 	}
 }
 
-type FTaskResult interface {
-	GetParameters(interface{}) error
-	Get(interface{}) error
-	Err() error
-}
-
-type taskResultImpl struct {
-	r *TaskResult
-}
-
-func (r *taskResultImpl) Err() error {
-	if r.r.status == taskStatusFailed {
-		return errors.New(r.r.errorText)
-	}
-	return nil
-
-}
-
-func (r *taskResultImpl) Get(interface{}) error {
-	return nil
-}
-
-func (r *taskResultImpl) GetParameters(interface{}) error {
-	return nil
-}
-
 type Decision struct {
 	complete   bool
 	continuing bool
@@ -133,38 +102,38 @@ type Decision struct {
 type StartEvent struct{}
 type TaskCompleteEvent struct {
 	TaskName string
-	Result   FTaskResult
+	Result   TaskResultQuerier
 }
 type CancelEvent struct{}
 
-type FWorkflowExecutor interface {
-	OnStart(w FWorkflowInstance, ev StartEvent) Decision
-	OnTaskComplete(w FWorkflowInstance, ev TaskCompleteEvent) Decision
-	OnCancel(w FWorkflowInstance, ev CancelEvent) Decision
+type WorkflowExecutor interface {
+	OnStart(w WorkflowInstanceHandler, ev StartEvent) Decision
+	OnTaskComplete(w WorkflowInstanceHandler, ev TaskCompleteEvent) Decision
+	OnCancel(w WorkflowInstanceHandler, ev CancelEvent) Decision
 }
 
 // TODO(ssd) 2019-05-10: How do we want to handle cancellation?
 type TaskExecutor interface {
-	Run(context.Context, FTask) (interface{}, error)
+	Run(context.Context, TaskQuerier) (interface{}, error)
 }
 
-type FWorkflowManager struct {
-	workflowExecutors map[string]FWorkflowExecutor
+type WorkflowManager struct {
+	workflowExecutors map[string]WorkflowExecutor
 	taskExecutors     map[string]registeredExecutor
 	workflowScheduler *workflowScheduler
 	backend           Backend
 }
 
-func NewManager(backend Backend) *FWorkflowManager {
-	return &FWorkflowManager{
+func NewManager(backend Backend) *WorkflowManager {
+	return &WorkflowManager{
 		backend:           backend,
-		workflowExecutors: make(map[string]FWorkflowExecutor),
+		workflowExecutors: make(map[string]WorkflowExecutor),
 		taskExecutors:     make(map[string]registeredExecutor),
 		workflowScheduler: &workflowScheduler{backend},
 	}
 }
 
-func (m *FWorkflowManager) CreateWorkflowSchedule(
+func (m *WorkflowManager) CreateWorkflowSchedule(
 	scheduleName string,
 	workflowName string,
 	parameters interface{},
@@ -180,8 +149,8 @@ func (m *FWorkflowManager) CreateWorkflowSchedule(
 	return m.backend.CreateWorkflowSchedule(context.TODO(), scheduleName, workflowName, parameters, enabled, recurrence, nextRunAt)
 }
 
-func (m *FWorkflowManager) RegisterWorkflowExecutor(workflowName string,
-	workflowExecutor FWorkflowExecutor) error {
+func (m *WorkflowManager) RegisterWorkflowExecutor(workflowName string,
+	workflowExecutor WorkflowExecutor) error {
 	m.workflowExecutors[workflowName] = workflowExecutor
 	return nil
 }
@@ -196,7 +165,7 @@ type registeredExecutor struct {
 	opts     TaskExecutorOpts
 }
 
-func (m *FWorkflowManager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
+func (m *WorkflowManager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
 	m.taskExecutors[taskName] = registeredExecutor{
 		executor: executor,
 		opts:     opts,
@@ -204,7 +173,7 @@ func (m *FWorkflowManager) RegisterTaskExecutor(taskName string, executor TaskEx
 	return nil
 }
 
-func (m *FWorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName string,
+func (m *WorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName string,
 	instanceName string, parameters interface{}) error {
 	paramsData, err := jsonify(parameters)
 	if err != nil {
@@ -218,14 +187,14 @@ func (m *FWorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName str
 	return err
 }
 
-func (m *FWorkflowManager) Start(ctx context.Context) error {
+func (m *WorkflowManager) Start(ctx context.Context) error {
 	go m.startTaskExecutors(ctx)
 	go m.workflowScheduler.run(ctx)
 	go m.run(ctx)
 	return nil
 }
 
-func (m *FWorkflowManager) startTaskExecutors(ctx context.Context) {
+func (m *WorkflowManager) startTaskExecutors(ctx context.Context) {
 	for taskName, exec := range m.taskExecutors {
 		workerCount := exec.opts.Workers
 		if workerCount == 0 {
@@ -239,7 +208,7 @@ func (m *FWorkflowManager) startTaskExecutors(ctx context.Context) {
 }
 
 // TODO(ssd) 2019-05-10: Why does Task need the WorkflowInstanceID?
-func (m *FWorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, workerID int, timeout time.Duration, exec TaskExecutor) {
+func (m *WorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, workerID int, timeout time.Duration, exec TaskExecutor) {
 	workerName := fmt.Sprintf("%s/%d", taskName, workerID)
 	logrus.Infof("starting task executor %s", workerName)
 
@@ -270,9 +239,7 @@ func (m *FWorkflowManager) RunTaskExecutor(ctx context.Context, taskName string,
 			runCtx, cancel = context.WithCancel(ctx)
 		}
 
-		result, err := exec.Run(runCtx, &taskImpl{
-			task: t,
-		})
+		result, err := exec.Run(runCtx, t)
 		if err != nil {
 			err := taskCompleter.Fail(err.Error())
 			if err != nil {
@@ -289,7 +256,7 @@ func (m *FWorkflowManager) RunTaskExecutor(ctx context.Context, taskName string,
 	}
 }
 
-func (m *FWorkflowManager) run(ctx context.Context) {
+func (m *WorkflowManager) run(ctx context.Context) {
 	workflowNames := make([]string, 0, len(m.workflowExecutors))
 	for k := range m.workflowExecutors {
 		workflowNames = append(workflowNames, k)
@@ -309,7 +276,7 @@ func (m *FWorkflowManager) run(ctx context.Context) {
 	}
 }
 
-func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []string) bool {
+func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []string) bool {
 	wevt, completer, err := m.backend.DequeueWorkflow(ctx, workflowNames)
 	if err != nil {
 		if err != ErrNoWorkflowInstances {
@@ -364,7 +331,7 @@ func (m *FWorkflowManager) processWorkflow(ctx context.Context, workflowNames []
 	case TaskComplete:
 		decision = executor.OnTaskComplete(w, TaskCompleteEvent{
 			TaskName: wevt.TaskResult.taskName,
-			Result:   &taskResultImpl{r: wevt.TaskResult},
+			Result:   wevt.TaskResult,
 		})
 	case Cancel:
 		decision = executor.OnCancel(w, CancelEvent{})

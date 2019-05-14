@@ -90,6 +90,13 @@ type Task struct {
 	Parameters         []byte
 }
 
+func (t *Task) GetParameters(obj interface{}) error {
+	if t.Parameters != nil {
+		return json.Unmarshal(t.Parameters, obj)
+	}
+	return nil
+}
+
 type enqueueOptions struct {
 	TryRemaining int
 	StartAfter   time.Time
@@ -136,6 +143,23 @@ type TaskResult struct {
 	status    TaskStatusType
 	errorText string
 	result    string
+}
+
+func (r *TaskResult) Err() error {
+	if r.status == taskStatusFailed {
+		return errors.New(r.errorText)
+	}
+	return nil
+}
+
+func (r *TaskResult) Get(interface{}) error {
+	// TODO(ssd) 2019-05-14: UNIMPLEMENTED
+	return nil
+}
+
+func (r *TaskResult) GetParameters(interface{}) error {
+	// TODO(ssd) 2019-05-14: UNIMPLEMENTED
+	return nil
 }
 
 type Backend interface {
