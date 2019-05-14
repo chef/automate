@@ -151,6 +151,7 @@ type TaskExecutor interface {
 type FWorkflowManager struct {
 	workflowExecutors map[string]FWorkflowExecutor
 	taskExecutors     map[string]registeredExecutor
+	workflowScheduler *workflowScheduler
 	backend           Backend
 }
 
@@ -159,6 +160,7 @@ func NewManager(backend Backend) *FWorkflowManager {
 		backend:           backend,
 		workflowExecutors: make(map[string]FWorkflowExecutor),
 		taskExecutors:     make(map[string]registeredExecutor),
+		workflowScheduler: &workflowScheduler{backend},
 	}
 }
 
@@ -218,6 +220,7 @@ func (m *FWorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName str
 
 func (m *FWorkflowManager) Start(ctx context.Context) error {
 	go m.startTaskExecutors(ctx)
+	go m.workflowScheduler.run(ctx)
 	go m.run(ctx)
 	return nil
 }

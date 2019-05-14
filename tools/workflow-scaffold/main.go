@@ -36,6 +36,9 @@ func main() {
 		SilenceErrors: true,
 		Args:          cobra.ExactArgs(1),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			logrus.SetFormatter(&logrus.TextFormatter{
+				FullTimestamp: true,
+			})
 			if opts.Debug {
 				logrus.SetLevel(logrus.DebugLevel)
 			}
@@ -258,10 +261,6 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-	})
-
 	w, err := workflow.NewPostgresBackend(defaultConnURIForDatabase(dbName))
 	if err != nil {
 		return errors.Wrap(err, "could not initialize database connection")
@@ -366,10 +365,6 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-	})
-
 	w, err := workflow.NewPostgresBackend(defaultConnURIForDatabase(dbName))
 	if err != nil {
 		return errors.Wrap(err, "could not initialize database connection")
@@ -380,13 +375,7 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		return errors.Wrap(err, "could not initialize database schema")
 	}
 
-	workflowScheduler, err := workflow.NewWorkflowScheduler(defaultConnURIForDatabase(dbName))
-	if err != nil {
-		return errors.Wrap(err, "could not initialize database connection")
-	}
-
 	workflowManager := workflow.NewManager(w)
-
 	workflowManager.RegisterWorkflowExecutor("schedule-test", &ScheduleTestWorkflow{})
 	workflowManager.RegisterTaskExecutor("test task", &ScheduleTestTask{}, workflow.TaskExecutorOpts{
 		Workers: perfTestOpts.DequeueWorkerCount,
@@ -398,7 +387,6 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		if err == workflow.ErrWorkflowScheduleExists {
 			logrus.Info("workflow schedule exists...ignoring")
 		} else {
-			// TODO(ssd) 2019-05-13: FIXME FIXME we don't support updating yet so for now just ignore this error
 			logrus.WithError(err).Warn("could not create workflow schedule")
 		}
 	}
@@ -415,7 +403,6 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		schedules[0].ID, workflow.UpdateParameters("youwin"))
 
 	workflowManager.Start(context.Background())
-	workflowScheduler.Start(context.Background())
 
 	for {
 		time.Sleep(1 * time.Second)

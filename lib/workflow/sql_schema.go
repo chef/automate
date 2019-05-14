@@ -1,3 +1,9 @@
+package workflow
+
+var sqlMigrations = []sqlMigration{
+	{
+		desc: "base_tables",
+		upSQL: `
 BEGIN;
 
 -- Workflows
@@ -45,9 +51,9 @@ AS $$
     WITH sched AS (
         SELECT * FROM recurring_workflow_schedules WHERE id = _id FOR UPDATE
     )
-    UPDATE recurring_workflow_schedules 
+    UPDATE recurring_workflow_schedules
     SET
-        recurrence = _recurrence, 
+        recurrence = _recurrence,
         next_run_at = _next_run_at WHERE id = _id;
 $$ LANGUAGE SQL;
 
@@ -280,3 +286,6 @@ AS $$
 $$;
 
 COMMIT;
+`,
+	},
+}
