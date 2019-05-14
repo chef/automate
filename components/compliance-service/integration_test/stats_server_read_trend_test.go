@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"fmt"
 	"testing"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
@@ -154,26 +155,26 @@ func TestReadTrend(t *testing.T) {
 			{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}},
 		},
 	}
-	for _, test := range successCases {
-		t.Run(test.description, func(t *testing.T) {
-			ctx := contextWithProjects(test.allowedProjects)
 
-			octoberTwentyFifthQuery.Type = "nodes"
-			response, err := statsServer.ReadTrend(ctx, octoberTwentyFifthQuery)
+	trendTypes := []string{
+		"nodes",
+		"controls",
+	}
 
-			assert.NoError(t, err)
-			require.NotNil(t, response)
+	for _, trendType := range trendTypes {
+		octoberTwentyFifthQuery.Type = trendType
+		for _, test := range successCases {
+			t.Run(test.description, func(t *testing.T) {
+				ctx := contextWithProjects(test.allowedProjects)
 
-			assert.Equal(t, test.expectedPassedCnt, response.Trends[0].Passed, "Nodes Passed count")
+				response, err := statsServer.ReadTrend(ctx, octoberTwentyFifthQuery)
 
-			octoberTwentyFifthQuery.Type = "controls"
-			response, err = statsServer.ReadTrend(ctx, octoberTwentyFifthQuery)
+				assert.NoError(t, err)
+				require.NotNil(t, response)
 
-			assert.NoError(t, err)
-			require.NotNil(t, response)
-
-			//controls trends
-			assert.Equal(t, test.expectedPassedCnt, response.Trends[0].Passed, "Controls Passed count")
-		})
+				assert.Equal(t, test.expectedPassedCnt, response.Trends[0].Passed,
+					fmt.Sprintf("%s - Passed count", trendType))
+			})
+		}
 	}
 }
