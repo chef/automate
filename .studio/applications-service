@@ -218,7 +218,7 @@ function applications_populate_database() {
 
   # Acceptance Unknown
   applications_publish_supervisor_message --name "sample-app" --group "acceptance"\
-    --origin custom --version "0.0.1" --health 3 --status 2 --sup-id "$(uuidgen)"
+    --origin custom --version "0.0.1" --health 3 --sup-id "$(uuidgen)"
 
   # postgres.japan-prod
   for i in $(seq 1 120); do

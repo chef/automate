@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	"github.com/chef/automate/lib/tls/certs"
 )
@@ -36,7 +36,6 @@ Options to build a Habitat Event message:
 	--application <name>   The application name that this service is part of
 	--environment <name>   The environment name of the current deployment
 	--health      <code>   The health check code of a service
-	--status      <code>   The status code of a service
 
 	Package Indentifier
 	--origin   <origin>  The origin of a package
@@ -49,11 +48,6 @@ Options to build a Habitat Event message:
 		1:WARN
 		2:CRITICAL
 		3:UNKNOWN
-	Service Status Codes:
-		0:RUNNING
-		1:INITIALIZING
-		2:DEPLOYING
-		3:DOWN
 `
 
 func usage() {
@@ -73,34 +67,47 @@ func main() {
 		internalNats bool
 		disableTLS   bool
 		health       int
-		status       int
 		client       *nats.NatsClient
 		authToken    string
 		port         string
 		rawMessage   string
+		origin       string
+		name         string
+		version      string
+		release      string
 		t            = time.Now()
 		clientID     = "applications-publisher"
-		event        = applications.HabService{
-			PkgIdent: &applications.PackageIdent{},
+		// TODO @afiune in the future we will have multiple events, we could make the
+		// applications-publisher binary to have multiple commands/sub-commands to send
+		// and do multiple things/messages
+		event = habitat.HealthCheckEvent{
+			EventMetadata:   &habitat.EventMetadata{},
+			ServiceMetadata: &habitat.ServiceMetadata{},
 		}
 	)
 
 	flag.StringVar(&rawMessage, "raw-message", "", "Sends a raw message to the NATS Server instead of the Habitat Event message")
 	flag.StringVar(&port, "port", "4222", "NATS port to connect (default:4222)")
 	flag.StringVar(&authToken, "auth-token", "", "Automate auth token (must have ingest permissions)")
-	flag.StringVar(&event.SupervisorId, "sup-id", "1234567890", "The Supervisor ID")
-	flag.StringVar(&event.Group, "group", "default", "The group name of a service (part of the service_group)")
-	flag.StringVar(&event.Application, "application", "demo", "The application name that this service is part of")
-	flag.StringVar(&event.Environment, "environment", "demo", "The environment name of the current deployment")
-	flag.StringVar(&event.Fqdn, "fqdn", "localhost", "The fqdn of the server where the service is running")
-	flag.StringVar(&event.PkgIdent.Origin, "origin", "core", "The origin of a package")
-	flag.StringVar(&event.PkgIdent.Name, "name", "redis", "The name of a package")
-	flag.StringVar(&event.PkgIdent.Version, "version", "0.1.0", "The version of a package")
-	flag.StringVar(&event.PkgIdent.Release, "release", t.Format("20060102150405"), "The release of a package")
-	flag.StringVar(&event.Site, "site", "", "The site of the server where the service is running")
-	flag.StringVar(&event.Channel, "channel", "", "The channel that the supervisor is subscribed to")
+	flag.StringVar(&event.EventMetadata.SupervisorId,
+		"sup-id", "1234567890", "The Supervisor ID")
+	// @afiune is this full name or partial?
+	flag.StringVar(&event.ServiceMetadata.ServiceGroup,
+		"group", "default", "The group name of a service (part of the service_group)")
+	flag.StringVar(&event.EventMetadata.Application,
+		"application", "demo", "The application name that this service is part of")
+	flag.StringVar(&event.EventMetadata.Environment,
+		"environment", "demo", "The environment name of the current deployment")
+	flag.StringVar(&event.EventMetadata.Fqdn,
+		"fqdn", "localhost", "The fqdn of the server where the service is running")
+	flag.StringVar(&origin, "origin", "core", "The origin of a package")
+	flag.StringVar(&name, "name", "redis", "The name of a package")
+	flag.StringVar(&version, "version", "0.1.0", "The version of a package")
+	flag.StringVar(&release, "release", t.Format("20060102150405"), "The release of a package")
+	// TODO: @afiune update these fields from new proto in habitat
+	//flag.StringVar(&event.Site, "site", "", "The site of the server where the service is running")
+	//flag.StringVar(&event.Channel, "channel", "", "The channel that the supervisor is subscribed to")
 	flag.IntVar(&health, "health", 0, "The health check code of a service")
-	flag.IntVar(&status, "status", 0, "The status code of a service")
 	flag.BoolVar(&uniqID, "uniq-client-id", false, "Generate a unique client-id to connect to server")
 	flag.BoolVar(&infiniteLoop, "infinite-stream", false, "Publish message every second infinitely")
 	flag.BoolVar(&internalNats, "internal-nats", false, "Connect to the Automate Internal NATS Server")
@@ -138,8 +145,8 @@ func main() {
 	}
 
 	// Convert proto enums
-	event.HealthCheck = applications.HealthStatus(health)
-	event.Status = applications.ServiceStatus(status)
+	event.Result = habitat.HealthCheck(health)
+	event.ServiceMetadata.PackageIdent = fmt.Sprintf("%s/%s/%s/%s", origin, name, version, release)
 
 	// Publish a single raw message
 	if len(rawMessage) > 0 {
@@ -162,7 +169,7 @@ func main() {
 		}
 
 		for {
-			err = client.PublishHabService(&event)
+			err = client.PublishHabEvent(&event)
 			if err != nil {
 				exit(err)
 			}
@@ -170,7 +177,8 @@ func main() {
 			time.Sleep(1 * time.Second)
 
 			// Generate a new release
-			event.PkgIdent.Release = time.Now().Format("20060102150405")
+			release = time.Now().Format("20060102150405")
+			event.ServiceMetadata.PackageIdent = fmt.Sprintf("%s/%s/%s/%s", origin, name, version, release)
 		}
 	} else {
 
