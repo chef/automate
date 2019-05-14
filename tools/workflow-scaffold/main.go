@@ -36,6 +36,9 @@ func main() {
 		SilenceErrors: true,
 		Args:          cobra.ExactArgs(1),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			logrus.SetFormatter(&logrus.TextFormatter{
+				FullTimestamp: true,
+			})
 			if opts.Debug {
 				logrus.SetLevel(logrus.DebugLevel)
 			}
@@ -165,7 +168,7 @@ type PerfTestTaskParams struct {
 	Sleepy int
 }
 
-func (t *PerfTestTask) Run(ctx context.Context, task workflow.FTask) (interface{}, error) {
+func (t *PerfTestTask) Run(ctx context.Context, task workflow.TaskQuerier) (interface{}, error) {
 	params := PerfTestTaskParams{}
 	if err := task.GetParameters(&params); err != nil {
 		panic(err)
@@ -182,7 +185,7 @@ func (t *PerfTestTask) Run(ctx context.Context, task workflow.FTask) (interface{
 type PerfTestWorkflow struct {
 }
 
-func (p *PerfTestWorkflow) OnStart(w workflow.FWorkflowInstance,
+func (p *PerfTestWorkflow) OnStart(w workflow.WorkflowInstanceHandler,
 	ev workflow.StartEvent) workflow.Decision {
 
 	logrus.Info("PerfTestWorkflow got OnStart")
@@ -215,7 +218,7 @@ type PerfTestWorkflowParams struct {
 	NumTasks int
 }
 
-func (p *PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
+func (p *PerfTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
 	var mycount int
 
@@ -248,7 +251,7 @@ func (p *PerfTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
 	}
 }
 
-func (PerfTestWorkflow) OnCancel(w workflow.FWorkflowInstance,
+func (PerfTestWorkflow) OnCancel(w workflow.WorkflowInstanceHandler,
 	ev workflow.CancelEvent) workflow.Decision {
 	return w.Complete()
 }
@@ -258,10 +261,6 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		dbName = args[0]
 	}
-
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-	})
 
 	w, err := workflow.NewPostgresBackend(defaultConnURIForDatabase(dbName))
 	if err != nil {
@@ -335,14 +334,14 @@ func runPerfTest(_ *cobra.Command, args []string) error {
 
 type ScheduleTestTask struct{}
 
-func (t *ScheduleTestTask) Run(ctx context.Context, _ workflow.FTask) (interface{}, error) {
+func (t *ScheduleTestTask) Run(ctx context.Context, _ workflow.TaskQuerier) (interface{}, error) {
 	logrus.Info("Running schedule test task")
 	return nil, nil
 }
 
 type ScheduleTestWorkflow struct{}
 
-func (p *ScheduleTestWorkflow) OnStart(w workflow.FWorkflowInstance,
+func (p *ScheduleTestWorkflow) OnStart(w workflow.WorkflowInstanceHandler,
 	ev workflow.StartEvent) workflow.Decision {
 	var params string
 	err := w.GetParameters(&params)
@@ -355,7 +354,7 @@ func (p *ScheduleTestWorkflow) OnStart(w workflow.FWorkflowInstance,
 	return w.Continue(0)
 }
 
-func (p *ScheduleTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
+func (p *ScheduleTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
 
 	logrus.WithFields(logrus.Fields{
@@ -366,7 +365,7 @@ func (p *ScheduleTestWorkflow) OnTaskComplete(w workflow.FWorkflowInstance,
 	return w.Complete()
 }
 
-func (p *ScheduleTestWorkflow) OnCancel(w workflow.FWorkflowInstance,
+func (p *ScheduleTestWorkflow) OnCancel(w workflow.WorkflowInstanceHandler,
 	ev workflow.CancelEvent) workflow.Decision {
 	return w.Complete()
 }
@@ -376,10 +375,6 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		dbName = args[0]
 	}
-
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-	})
 
 	w, err := workflow.NewPostgresBackend(defaultConnURIForDatabase(dbName))
 	if err != nil {
@@ -391,13 +386,7 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		return errors.Wrap(err, "could not initialize database schema")
 	}
 
-	workflowScheduler, err := workflow.NewWorkflowScheduler(defaultConnURIForDatabase(dbName))
-	if err != nil {
-		return errors.Wrap(err, "could not initialize database connection")
-	}
-
 	workflowManager := workflow.NewManager(w)
-
 	workflowManager.RegisterWorkflowExecutor("schedule-test", &ScheduleTestWorkflow{})
 	workflowManager.RegisterTaskExecutor("test task", &ScheduleTestTask{}, workflow.TaskExecutorOpts{
 		Workers: perfTestOpts.DequeueWorkerCount,
@@ -409,7 +398,6 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		if err == workflow.ErrWorkflowScheduleExists {
 			logrus.Info("workflow schedule exists...ignoring")
 		} else {
-			// TODO(ssd) 2019-05-13: FIXME FIXME we don't support updating yet so for now just ignore this error
 			logrus.WithError(err).Warn("could not create workflow schedule")
 		}
 	}
@@ -426,7 +414,6 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		schedules[0].ID, workflow.UpdateParameters("youwin"))
 
 	workflowManager.Start(context.Background())
-	workflowScheduler.Start(context.Background())
 
 	for {
 		time.Sleep(1 * time.Second)
