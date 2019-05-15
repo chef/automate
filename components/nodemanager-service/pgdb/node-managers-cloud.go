@@ -324,6 +324,9 @@ func (db *DB) UpdateOrInsertInstanceSourceStateInDb(instance InstanceState, mgrI
 		id, err = db.SelectStr(sqlUpdateInstanceSourceStateAndStatus, instance.ID, instance.Region, sourceAcctID, instanceState, "unreachable", nowTime, connectionErr)
 	case "RUNNING":
 		id, err = db.SelectStr(sqlUpsertInstanceSourceState, uuid, name, instance.ID, instanceState, instance.Region, sourceAcctID, tcByte, nowTime, mgrType)
+	default:
+		logrus.Errorf("unknown instance state reported %s", instanceState)
+		return false, nil
 	}
 	if err != nil {
 		return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to update instance %s %s", instance.ID, name)
