@@ -278,7 +278,8 @@ func TestActionProjectRulesMatching(t *testing.T) {
 // When a single message is in the inbox the `ListProjectRules` should be called once
 func TestActionBundlerSingleMessage(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
-	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	ctrl := gomock.NewController(t)
+	authzClient := iam_v2.NewMockProjectsClient(ctrl)
 	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Times(1).Return(
 		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	errc := make(chan error)
@@ -288,6 +289,8 @@ func TestActionBundlerSingleMessage(t *testing.T) {
 	out := actionBundleProjectTagger(inbox, authzClient)
 
 	<-out
+
+	ctrl.Finish()
 }
 
 // When 5 messages are in the inbox the `ListProjectRules` function is only called once.
@@ -295,7 +298,8 @@ func TestActionBundlerSingleMessage(t *testing.T) {
 // Where before the authz call to `ListProjectRules` was called for each message.
 func TestActionBundler5Messages(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
-	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
+	ctrl := gomock.NewController(t)
+	authzClient := iam_v2.NewMockProjectsClient(ctrl)
 	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Times(1).Return(
 		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	errc := make(chan error)
@@ -314,6 +318,8 @@ func TestActionBundler5Messages(t *testing.T) {
 	<-out
 	<-out
 	<-out
+
+	ctrl.Finish()
 }
 
 // A simple run through of the bundler project tagger processor.
