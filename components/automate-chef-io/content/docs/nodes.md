@@ -18,7 +18,7 @@ When a user creates a node, that node is added to the `/nodes` endpoint.
 
 When a user adds a node integration, like aws or azure, nodes are added to the `/nodes` endpoint.
 
-When an inspec report or chef client run is ingested, a node is added to the `/nodes` endpoint. If it already exists, the last contact time is updated, along with run data and scan data, that stores the latest run id or report id and status (as well as the penultimate status).
+When a Chef InSpec report or a Chef Infra Client run is ingested, a node is added to the `/nodes` endpoint. If the node already exists, its last contact time, run data, and scan data are updated. When run data and scan data are updated, the latest information is stored for the run id or report id, the status, and the penultimate status.
 
 ### Node Status
 
