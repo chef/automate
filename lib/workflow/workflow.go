@@ -229,7 +229,7 @@ func (m *WorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, 
 			}
 			continue
 		}
-		logrus.Infof("Dequeued task %s", t.Name)
+		logrus.Debug("Dequeued task %s", t.Name)
 
 		var runCtx context.Context
 		var cancel context.CancelFunc
@@ -287,7 +287,7 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 
 	logrus.WithFields(logrus.Fields{
 		"status": wevt.Instance.Status,
-	}).Info("Dequeued Workflow")
+	}).Debug("Dequeued Workflow")
 
 	w := &workflowInstanceImpl{
 		instanceID: wevt.InstanceID,

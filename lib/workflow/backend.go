@@ -209,6 +209,8 @@ type PostgresWorkflowCompleter struct {
 	// ctx is the context that the transaction was started with.
 	ctx context.Context
 
+	enqueueTaskStmt *sql.Stmt
+
 	enqueuedTaskCount  int
 	completedTaskCount int
 }
@@ -518,13 +520,19 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		return nil, nil, errors.Wrap(err, "failed to dequeue workflow")
 	}
 
+	stmt, err := tx.Prepare(enqueueTaskQuery)
+	if err != nil {
+		cancel()
+		return nil, nil, err
+	}
 	// TODO: allow multiple workflow names
 	row := tx.QueryRowContext(ctx, dequeueWorkflowQuery, workflowNames[0])
 	event := &WorkflowEvent{}
 	workc := &PostgresWorkflowCompleter{
-		ctx:    ctx,
-		tx:     tx,
-		cancel: cancel,
+		ctx:             ctx,
+		enqueueTaskStmt: stmt,
+		tx:              tx,
+		cancel:          cancel,
 	}
 	var taskResultID sql.NullInt64
 	err = row.Scan(
@@ -575,7 +583,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 func (workc *PostgresWorkflowCompleter) EnqueueTask(task *Task, opts ...EnqueueOpts) error {
 	o := mergeEnqueueOpts(opts)
 
-	_, err := workc.tx.ExecContext(workc.ctx, enqueueTaskQuery,
+	_, err := workc.enqueueTaskStmt.ExecContext(workc.ctx,
 		task.WorkflowInstanceID, o.TryRemaining, o.StartAfter, task.Name, task.Parameters)
 	if err != nil {
 		return errors.Wrap(err, "failed to enqueue task")
@@ -606,6 +614,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*T
 
 	err = row.Scan(&taskc.tid, &task.WorkflowInstanceID, &task.Parameters)
 	if err == sql.ErrNoRows {
+		tx.Commit()
 		cancel()
 		return nil, nil, ErrNoTasks
 

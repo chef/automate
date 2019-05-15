@@ -173,12 +173,12 @@ func (t *PerfTestTask) Run(ctx context.Context, task workflow.TaskQuerier) (inte
 	if err := task.GetParameters(&params); err != nil {
 		panic(err)
 	}
-	logrus.WithField("id", params.ID).Info("Running task")
+	logrus.WithField("id", params.ID).Debug("Running task")
 	if perfTestOpts.SlowTasks {
 		time.Sleep(time.Duration(23+params.Sleepy) * time.Second)
 	}
 	t.statusChan <- struct{}{}
-	logrus.Info("Finished Task")
+	logrus.Debug("Finished Task")
 	return params.ID, nil
 }
 
@@ -249,7 +249,7 @@ func (p *PerfTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
 		"params":     params,
 		"taskParams": taskParams,
 		"taskResult": taskResult,
-	}).Info("PerfTestWorkflow got Task Completed")
+	}).Debug("PerfTestWorkflow got Task Completed")
 
 	completed := mycount + 1
 	if completed < params.NumTasks {
