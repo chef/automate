@@ -133,53 +133,6 @@ message HealthCounts {
   int32 unknown = 5;
 }
 
-// A HabService message is the representation of one single service in habitat
-message HabService {
-  // We currently don't know if habitat has a unique identifier so for now
-  // we will generate this id internally inside our service
-  //
-  // UPDATE: @afiune a service itself doesn't have an ID but instead it composed
-  // by something called "full qualified identifier" (FQID) that is the combination
-  // of the package origin, name, version and timestamp (and in the future also the
-  // target, which is not yet part of the FQID in habitat). Though, for us to
-  // distinguish a service that is running in multiple instances, we will need the
-  // Supervisor ID plus the origin and package name.
-  //
-  // That means that for us a unique Service is identified by:
-  //
-  // * supervisor_id
-  // * pkg_origin
-  // * pkg_name
-  //
-  // Not these two fields since they can change on every pkg release
-  // * pkg_version
-  // * pkg_release
-  //
-  // Potential considerations:
-  // * package target (package built for linux/windows/etc)
-  // * Do NOT use FQID to describe this message
-  string supervisor_id = 1;
-  string group = 2;
-  PackageIdent pkg_ident = 3;
-  HealthStatus health_check = 4;
-  ServiceStatus status = 5;
-
-  // @afiune Proposal to start receiving information about the hab-ring
-  /*repeated string members = 6;*/
-
-  // @afiune These information will come as tags, once we have the data structure
-  // we will have to redo these fields, for now we will assume they will be provided
-  // as follows
-  string application = 7;
-  string environment = 8;
-
-  // @afiune We need to figure out how the fqdn will be provided
-  string fqdn = 9;
-  string channel = 10;
-  // site may not be provided by habitat so let's not use a reserved number for it.
-  string site = 17;
-}
-
 // The package indentifier of a service is unique and is the combination
 // of origin/name/version/release
 //
