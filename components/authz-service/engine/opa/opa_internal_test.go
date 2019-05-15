@@ -316,11 +316,11 @@ func BenchmarkInitPartialResultV2(b *testing.B) {
 
 	for d := 0; d < 5; d++ {
 		b.Run(fmt.Sprintf("default policies, run %d times", d), func(b *testing.B) {
-			for n := 0; n < b.N; n++ {
-				s, err := New(ctx, l)
-				require.NoError(b, err, "init state")
-				s.v2Store = store
+			s, err := New(ctx, l)
+			require.NoError(b, err, "init state")
+			s.v2Store = store
 
+			for n := 0; n < b.N; n++ {
 				for e := 0; e <= d; e++ {
 					r = s.initPartialResultV2(ctx)
 					if r != nil {
