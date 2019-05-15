@@ -1,6 +1,6 @@
 import { takeUntil } from 'rxjs/operators';
 import { Component, Input, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
-import { getOr, endsWith, replace } from 'lodash/fp';
+import { capitalize, getOr, endsWith, replace } from 'lodash/fp';
 import { Subject, Subscription } from 'rxjs';
 import { ChefEvent, ChefEventCollection, EventFeedFilter } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
@@ -154,7 +154,7 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
   }
 
   getEventDescription(event: ChefEvent): string {
-    let text = `The ${this.getEventTypeLabel(event)} `;
+    let text = `${capitalize(this.getEventTypeLabel(event))} `;
     switch (event.eventType) {
       case 'version':
         text += `<b>${event.parentName}</b>, version <b>${event.entityName}</b>`;
@@ -165,7 +165,7 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
         text += `<b>${event.entityName}</b>`;
     }
 
-    text += ` was ${this.getFormattedEventType(event)}`;
+    text += ` ${this.getFormattedEventType(event)}`;
 
     if (this.displayRequestor(event.requestorName)) {
       text += ` by <b>${event.requestorName}</b>`;
