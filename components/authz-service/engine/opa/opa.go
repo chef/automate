@@ -28,7 +28,6 @@ type State struct {
 	queries           map[string]ast.Body
 	compiler          *ast.Compiler
 	modules           map[string]*ast.Module
-	overrideModules   map[string]*ast.Module
 	partialAuth       rego.PartialResult
 	v2PartialAuth     rego.PartialResult
 	v2PartialProjects rego.PartialResult
@@ -122,31 +121,32 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 // initialization.
 func WithModules(mods map[string]*ast.Module) OptFunc {
 	return func(s *State) {
-		s.overrideModules = mods
+		s.modules = mods
 	}
 }
 
 // initModules parses the rego files that have been compiled-in and stores the
 // result, to be used in initPartialResult.
 func (s *State) initModules() error {
-	if s.overrideModules != nil {
-		s.modules = s.overrideModules
-		return nil
-	}
-
-	mods := map[string]*ast.Module{}
-	for _, name := range AssetNames() {
-		if !strings.HasSuffix(name, ".rego") {
-			continue // skip this, whatever has been compiled-in here
+	if len(s.modules) == 0 {
+		mods := map[string]*ast.Module{}
+		for _, name := range AssetNames() {
+			if !strings.HasSuffix(name, ".rego") {
+				continue // skip this, whatever has been compiled-in here
+			}
+			parsed, err := ast.ParseModule(name, string(MustAsset(name)))
+			if err != nil {
+				return errors.Wrapf(err, "parse policy file %q", name)
+			}
+			mods[name] = parsed
 		}
-		parsed, err := ast.ParseModule(name, string(MustAsset(name)))
-		if err != nil {
-			return errors.Wrapf(err, "parse policy file %q", name)
-		}
-		mods[name] = parsed
+		s.modules = mods
 	}
-
-	s.modules = mods
+	compiler, err := s.newCompiler()
+	if err != nil {
+		return errors.Wrap(err, "init compiler")
+	}
+	s.compiler = compiler
 	return nil
 }
 
@@ -158,8 +158,7 @@ func (s *State) initPartialResult(ctx context.Context) error {
 	// Note: PartialResult will _compile_ the passed module; so when the engine is
 	// initialized, everything will also be ready to serve the other, non-partial
 	// queries
-	compiler, err := s.initCompiler()
-
+	compiler, err := s.newCompiler()
 	if err != nil {
 		return err
 	}
@@ -174,21 +173,15 @@ func (s *State) initPartialResult(ctx context.Context) error {
 		return errors.Wrap(err, "partial eval")
 	}
 	s.partialAuth = pr
-	s.compiler = compiler
 	return nil
 }
 
 func (s *State) initPartialResultV2(ctx context.Context) error {
 	// Reset compiler to avoid state issues
-	// Note: PartialResult will _compile_ the passed module; so when the engine is
-	// initialized, everything will also be ready to serve the other, non-partial
-	// queries
-	compiler, err := s.initCompiler()
+	compiler, err := s.newCompiler()
 	if err != nil {
 		return err
 	}
-	// Need a compiler for use by regular queries, too, so store it here.
-	s.compiler = compiler
 
 	// Partial eval for authzV2Query.
 	r := rego.New(
@@ -204,7 +197,7 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 
 	// Partial eval for authzProjectsV2Query.
 	// Each partial eval needs a separate compiler.
-	compiler, err = s.initCompiler()
+	compiler, err = s.newCompiler()
 	if err != nil {
 		return err
 	}
@@ -213,16 +206,16 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 		rego.Compiler(compiler),
 		rego.Store(s.v2Store),
 	)
-	v2Partial, err = r.PartialResult(ctx)
+	v2PartialProjects, err := r.PartialResult(ctx)
 	if err != nil {
 		return errors.Wrap(err, "partial eval (authorized_project)")
 	}
-	s.v2PartialProjects = v2Partial
+	s.v2PartialProjects = v2PartialProjects
 
 	return nil
 }
 
-func (s *State) initCompiler() (*ast.Compiler, error) {
+func (s *State) newCompiler() (*ast.Compiler, error) {
 	compiler := ast.NewCompiler()
 	compiler.Compile(s.modules)
 	if compiler.Failed() {
