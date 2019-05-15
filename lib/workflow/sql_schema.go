@@ -119,12 +119,7 @@ CREATE TABLE tasks_results (
     result       BYTEA
 );
 
-<<<<<<< HEAD
-CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete', 'cancel');
-=======
-
 CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete', 'cancel', 'tasks_abandoned');
->>>>>>> 5c6fd6d9... take abandoned tasks to completion
 
 -- NOTE(ssd) 2019-05-09: Workflow events are defined here because they
 -- may reference task_restuls
