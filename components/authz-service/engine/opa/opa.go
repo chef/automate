@@ -85,8 +85,9 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 		return nil, errors.Wrapf(err, "parse query %q", listProjectMapQuery)
 	}
 	s := State{
-		log:   l,
-		store: inmem.New(),
+		log:     l,
+		store:   inmem.New(),
+		v2Store: inmem.New(),
 		queries: map[string]ast.Body{
 			authzQuery:              authzQueryParsed,
 			filteredPairsQuery:      filteredPairsQueryParsed,

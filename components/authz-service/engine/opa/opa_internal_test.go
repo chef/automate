@@ -10,6 +10,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/open-policy-agent/opa/ast"
+	"github.com/open-policy-agent/opa/storage"
 	"github.com/open-policy-agent/opa/storage/inmem"
 	"github.com/stretchr/testify/require"
 
@@ -313,20 +314,69 @@ func BenchmarkInitPartialResultV2(b *testing.B) {
 	require.NoError(b, err, "init logger")
 	store := inmem.NewFromReader(f)
 
-	for n := 0; n < b.N; n++ {
-		s, err := New(ctx, l)
-		require.NoError(b, err, "init state")
-		s.store = store
+	for d := 0; d < 5; d++ {
+		b.Run(fmt.Sprintf("default policies, run %d times", d), func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				s, err := New(ctx, l)
+				require.NoError(b, err, "init state")
+				s.v2Store = store
 
-		r = s.initPartialResultV2(ctx)
-		if r != nil {
-			b.Error(r)
-		}
+				for e := 0; e <= d; e++ {
+					r = s.initPartialResultV2(ctx)
+					if r != nil {
+						b.Error(r)
+					}
+				}
+			}
+			errResult = r
+		})
 	}
-	errResult = r
+
+	for k := 0; k < 5; k++ {
+		m := k * 25
+		store = storeWithDummyPolicies(b, m)
+		b.Run(fmt.Sprintf("%d dummy policies", m), func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				s, err := New(ctx, l)
+				require.NoError(b, err, "init state")
+				s.v2Store = store
+
+				r = s.initPartialResultV2(ctx)
+				if r != nil {
+					b.Error(r)
+				}
+			}
+			errResult = r
+		})
+	}
 }
 
 // helpers
+
+func storeWithDummyPolicies(b *testing.B, k int) storage.Store {
+	data := map[string]interface{}{
+		"roles": map[string]interface{}{},
+		"rules": map[string][]interface{}{},
+	}
+	policies := map[string]interface{}{}
+	for i := 0; i <= k; i++ {
+		policies[fmt.Sprintf("pol_id%d", i)] = map[string]interface{}{
+			"members": []string{"user:local:alice"},
+			"statements": map[string]interface{}{
+				fmt.Sprintf("sid%d", i): map[string]interface{}{
+					"actions":   []string{"iam:project:delete"},
+					"resources": []string{"*"},
+					"effect":    "allow",
+					"projects":  []string{"~~ALL-PROJECTS~~"},
+				},
+			},
+			"type": "custom",
+		}
+	}
+	data["policies"] = policies
+	// b.Log(data)
+	return inmem.NewFromObject(data)
+}
 
 func randomTeams(c int) []string {
 	ret := make([]string, c)
