@@ -1,6 +1,6 @@
 <ul class="event-feed-table">
   <caption class="visually-hidden">Event Feed Table</caption>
-  <li *ngFor="let event of events; index as i" tabindex="0" class="event-row">
+  <li *ngFor="let event of events; index as i" class="event-row">
     <div class="event-date-time">
       <div class="event-time">{{event.startTime | date:'h:mm a' }}</div>
       <div class="event-day">{{event.startTime | date:'EEEE' }},</div>
