@@ -33,6 +33,7 @@ Description=Habitat-Supervisor
 After=network-online.target
 
 [Service]
+Environment=HAB_LICENSE=accept-no-persist
 Type=simple
 ExecStartPre=-/bin/rm -f /hab/sup/default/LOCK
 ExecStart=/bin/hab sup run --peer-watch-file /services/ha_backend_peers
@@ -46,6 +47,12 @@ WantedBy=multi-user.target
 EOF
 chmod 664 /etc/systemd/system/hab-sup.service
 
+# Needs to be at least 0.75 to get nested config support
+# for automate-ha-backend
+echo "Installing latest hab"
+HAB_LICENSE="accept-no-persist" hab pkg install core/hab
+HAB_LICENSE="accept-no-persist" hab pkg binlink core/hab --force
+
 echo "Starting Habitat"
 systemctl daemon-reload
 systemctl enable hab-sup.service
@@ -54,20 +61,23 @@ systemctl start hab-sup.service
 echo "Installing HA Backend Habitat packages"
 channel="unstable"
 PG_PKG_NAME="automate-backend-postgresql"
-postgresql_pkg_ident="chef/$PG_PKG_NAME/0.1.80/20190424185119"
+postgresql_pkg_ident="chef/$PG_PKG_NAME"
 PGLEADERCHK_PKG_NAME="automate-backend-pgleaderchk"
-pgleaderchk_pkg_ident="chef/$PGLEADERCHK_PKG_NAME/0.1.80/20190424185119"
-proxy_pkg_ident="chef/automate-backend-haproxy/0.1.80/20190424185049"
+pgleaderchk_pkg_ident="chef/$PGLEADERCHK_PKG_NAME"
+proxy_pkg_ident="chef/automate-backend-haproxy"
 ELASTICSEARCH_PKG_NAME="automate-backend-elasticsearch"
-elasticsearch_pkg_ident="chef/automate-backend-elasticsearch/0.1.80/20190424185049"
-NGINX_PKG_NAME="automate-backend-nginx"
-nginx_pkg_ident="chef/$NGINX_PKG_NAME/0.1.80/20190424185119"
+elasticsearch_pkg_ident="chef/automate-backend-elasticsearch"
 
-hab pkg install --channel ${channel} "${elasticsearch_pkg_ident}"
-hab pkg install --channel ${channel} "${proxy_pkg_ident}"
-hab pkg install --channel ${channel} "${pgleaderchk_pkg_ident}"
-hab pkg install --channel ${channel} "${postgresql_pkg_ident}"
-hab pkg install --channel ${channel} "${nginx_pkg_ident}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${elasticsearch_pkg_ident}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${proxy_pkg_ident}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${pgleaderchk_pkg_ident}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${postgresql_pkg_ident}"
+
+echo "Copying certs into place"
+hostname=`hostname`
+
+# copy the certs to the correct names
+mv /certificates/odfe-$hostname.pem /certificates/odfe-node.pem
 
 echo "Configuring HA Backend Services"
 mkdir -p "/hab/user/${ELASTICSEARCH_PKG_NAME}/config/"
@@ -76,7 +86,7 @@ cat > "/hab/user/${ELASTICSEARCH_PKG_NAME}/config/user.toml" <<EOF
 es_java_opts = "-Xms1024m -Xmx1024m"
 
 [es_yaml.network]
-host = "_local_"
+host = "0.0.0.0"
 
 [es_yaml.transport]
 host = "_site_"
@@ -90,17 +100,20 @@ hosts = ["$(cat /services/ha_backend_peers | head -n 1)"]
 low = "95%"
 high = "98%"
 flood_stage = "99%"
-EOF
 
-mkdir -p "/hab/user/${NGINX_PKG_NAME}/config/"
-cat > "/hab/user/${NGINX_PKG_NAME}/config/user.toml" <<EOF
-listen_ip = "$1"
-system_fqdn = "elasticsearch"
-client_max_body_size = 250
-EOF
+[opendistro_ssl]
 
-cp /services/ha_backend_private/htpasswd /hab/user/"$NGINX_PKG_NAME"/config/.elasticsearch_htpasswd
-cp /services/ha_backend_private/nginx-selfsigned* /hab/user/"$NGINX_PKG_NAME"/config/
+# root pem cert that signed the two cert/key pairs below
+rootCA = """$(cat /certificates/MyRootCA.pem)"""
+
+# Certificate used for admin actions against https://9200
+admin_cert   = """$(cat /certificates/odfe-admin.pem)"""
+admin_key    = """$(cat /certificates/odfe-admin.key)"""
+
+# Certificate used for intracluster ssl on port 9300
+ssl_cert    = """$(cat /certificates/odfe-node.pem)"""
+ssl_key     = """$(cat /certificates/odfe-node.key)"""
+EOF
 
 mkdir -p "/hab/user/${PG_PKG_NAME}/config/"
 cat > "/hab/user/${PG_PKG_NAME}/config/user.toml" <<EOF
@@ -108,11 +121,9 @@ cat > "/hab/user/${PG_PKG_NAME}/config/user.toml" <<EOF
 password = 'thisisapassword'
 EOF
 
-
-
 echo "Starting HA Backend Habitat services"
-hab svc load ${postgresql_pkg_ident} --topology leader --channel ${channel}
-hab svc load ${pgleaderchk_pkg_ident} --topology leader --bind database:"$PG_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
-hab svc load ${proxy_pkg_ident} --topology leader --bind database:"$PG_PKG_NAME".default --bind pgleaderchk:"$PGLEADERCHK_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
-hab svc load ${elasticsearch_pkg_ident} --topology leader --bind elasticsearch:"$ELASTICSEARCH_PKG_NAME".default --binding-mode=relaxed --channel ${channel} 
-hab svc load ${nginx_pkg_ident} --channel ${channel}
+HAB_LICENSE="accept-no-persist" hab svc load ${postgresql_pkg_ident} --topology leader --channel ${channel}
+HAB_LICENSE="accept-no-persist" hab svc load ${pgleaderchk_pkg_ident} --topology leader --bind database:"$PG_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
+HAB_LICENSE="accept-no-persist" hab svc load ${proxy_pkg_ident} --topology leader --bind database:"$PG_PKG_NAME".default --bind pgleaderchk:"$PGLEADERCHK_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
+HAB_LICENSE="accept-no-persist" hab svc load ${elasticsearch_pkg_ident} --topology leader --bind elasticsearch:"$ELASTICSEARCH_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
+

@@ -2,14 +2,14 @@
 
 HA_BACKEND_DIR=$(dirname ${BASH_SOURCE[0]})
 HA_BACKEND_USER="admin"
-HA_BACKEND_PASSWORD="chefautomate"
+# changing to match the default in automate-ha-backend
+HA_BACKEND_PASSWORD="admin"
 
 ha_backend_container1=$(service_container_name "ha_backend_1")
 ha_backend_container2=$(service_container_name "ha_backend_2")
 
 ha_backend_private=$(service_config_path "ha_backend_private")
 ha_backend_config=$(service_config_path "ha_backend.toml")
-
 
 ha_backend_setup() {
     mkdir -p $ha_backend_private
@@ -26,6 +26,41 @@ ha_backend_setup() {
     local ha_backend_container2_ip=$(container_ip $ha_backend_container2)
     log_info "Launched $ha_backend_container2 with ip ${ha_backend_container2_ip}"
 
+    echo "Generating elasticsearch ssl keys"
+
+    # copy-pasta'd from a2-ha-backend
+    certdir="$HA_BACKEND_DIR/certificates"
+    mkdir -p $certdir
+
+    RANDFILE=$certdir/.rnd
+    #First, create a private key for the CA:
+    openssl genrsa -out $certdir/MyRootCA.key 2048
+
+    #Create the CA and enter the Organization details:
+    openssl req -x509 -new -key $certdir/MyRootCA.key -sha256 -out $certdir/MyRootCA.pem -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefrootca'
+
+    #the rsa keys
+    openssl genrsa -out $certdir/odfe-node-pkcs12.key 2048
+    openssl genrsa -out $certdir/odfe-admin-pkcs12.key 2048
+
+    #IMPORTANT: Convert these to PKCS#5 v1.5 to work correctly with the JDK.
+    openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "$certdir/odfe-node-pkcs12.key" -topk8 -out "$certdir/odfe-node.key" -nocrypt
+    openssl pkcs8 -v1 "PBE-SHA1-3DES" -in "$certdir/odfe-admin-pkcs12.key" -topk8 -out "$certdir/odfe-admin.key" -nocrypt
+
+    #Create the CSR and enter the organization and server details for the node key
+    openssl req -new -key $certdir/odfe-node.key -out $certdir/odfe-${ha_backend_container1}.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container1_ip},DNS:${ha_backend_container1_ip}")
+    openssl req -new -key $certdir/odfe-node.key -out $certdir/odfe-${ha_backend_container2}.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefnode' -extensions san -reqexts san -config <(echo '[req]'; echo 'distinguished_name=req'; echo '[san]'; echo "subjectAltName=IP:${ha_backend_container2_ip},DNS:${ha_backend_container2_ip}")
+
+    #Create the CSR and enter the organization and server details for the admin key
+    openssl req -new -key $certdir/odfe-admin.key -out $certdir/odfe-admin.csr -subj '/C=US/ST=Washington/L=Seattle/O=Chef Software Inc/CN=chefadmin'
+
+    #Use the CSR to generate the signed node Certificates:
+    openssl x509 -req -in $certdir/odfe-${ha_backend_container1}.csr -CA $certdir/MyRootCA.pem -CAkey $certdir/MyRootCA.key -CAcreateserial -out $certdir/odfe-${ha_backend_container1}.pem -sha256
+    openssl x509 -req -in $certdir/odfe-${ha_backend_container2}.csr -CA $certdir/MyRootCA.pem -CAkey $certdir/MyRootCA.key -CAcreateserial -out $certdir/odfe-${ha_backend_container2}.pem -sha256
+
+    #Use the CSR to generate the signed admin Certificate:
+    openssl x509 -req -in $certdir/odfe-admin.csr -CA $certdir/MyRootCA.pem -CAkey $certdir/MyRootCA.key -CAcreateserial -out $certdir/odfe-admin.pem -sha256
+
     local openssl_cnf
     openssl_cnf="$(hab pkg path core/openssl)/ssl/openssl.cnf"
     if [ ! -f "$openssl_cnf" ]; then
@@ -33,18 +68,11 @@ ha_backend_setup() {
         return 1
     fi
 
-    hab pkg exec core/openssl openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-        -keyout $ha_backend_private/nginx-selfsigned.pem \
-        -out $ha_backend_private/nginx-selfsigned.crt \
-        -reqexts SAN -extensions SAN -subj '/CN=elasticsearch' \
-        -config \
-        <(cat "$openssl_cnf" \
-        <(printf "\n[SAN]\nsubjectAltName=IP.1:${ha_backend_container1_ip},IP.2:${ha_backend_container2_ip}"))
-
-    cp $HA_BACKEND_DIR/htpasswd $ha_backend_private
-
     docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container1}:/setup.sh"
     docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container2}:/setup.sh"
+    docker cp "$certdir" "${ha_backend_container1}:/certificates"
+    docker cp "$certdir" "${ha_backend_container2}:/certificates"
+
 
     docker exec -t $ha_backend_container1 /setup.sh "$ha_backend_container1_ip"
     docker exec -t $ha_backend_container2 /setup.sh "$ha_backend_container2_ip"
@@ -54,7 +82,8 @@ ha_backend_setup() {
     for try in {1..60}; do
         echo "Trying to create dbuser"
         errcode="0"
-        output="$(docker exec --env PGPASSWORD="thisisapassword" $ha_backend_container1 hab pkg exec core/postgresql11 psql \
+        output="$(docker exec --env PGPASSWORD="thisisapassword" --env HAB_LICENSE=accept-no-persist $ha_backend_container1 \
+	hab pkg exec core/postgresql11 psql \
             -h 127.0.0.1 -p 7432 -U admin -d postgres -c \
             "CREATE USER dbuser WITH PASSWORD 'thisisapassword'")" || errcode="$?"
         if [ "$errcode" -eq "0" ]; then
@@ -70,21 +99,22 @@ ha_backend_setup() {
         return 1
     fi
 
-    # This config is for ES SSL & Basic Auth.
-    # We can use it again once ha backend adds back support
-    # nodes = ["https://${ha_backend_container1_ip}:9200", "https://${ha_backend_container2_ip}:9200"]
-    # [global.v1.external.elasticsearch.auth]
-    # scheme = "basic_auth"
-    # [global.v1.external.elasticsearch.auth.basic_auth]
-    # username = "${HA_BACKEND_USER}"
-    # password = "${HA_BACKEND_PASSWORD}"
-    # [global.v1.external.elasticsearch.ssl]
-    # server_name = "elasticsearch"
-    # root_cert = """$(cat $ha_backend_private/nginx-selfsigned.crt)"""
     cat <<DOC > $ha_backend_config
 [global.v1.external.elasticsearch]
 enable = true
-nodes = ["http://${ha_backend_container1_ip}:9200", "http://${ha_backend_container2_ip}:9200"]
+nodes = ["https://${ha_backend_container1_ip}:9200", "https://${ha_backend_container2_ip}:9200"]
+
+[global.v1.external.elasticsearch.auth]
+scheme = "basic_auth"
+
+[global.v1.external.elasticsearch.auth.basic_auth]
+username = "${HA_BACKEND_USER}"
+password = "${HA_BACKEND_PASSWORD}"
+
+[global.v1.external.elasticsearch.ssl]
+# defaults from automate-ha-backend
+server_name = "chefnode"
+root_cert = """$(cat ${certdir}/MyRootCA.pem)"""
 
 [global.v1.external.postgresql]
 enable = true
@@ -109,8 +139,8 @@ enable = true
 DOC
 
     sleep 45
-    curl -k "http://${ha_backend_container1_ip}:9200"
-    curl -k "http://${ha_backend_container2_ip}:9200"
+    curl -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin.key" --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container1_ip}" "https://chefnode:9200"
+    curl -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin.key" --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container2_ip}" "https://chefnode:9200"
 }
 
 ha_backend_dump_logs() {
@@ -131,3 +161,4 @@ ha_backend_teardown() {
     docker stop "$ha_backend_container1"
     docker stop "$ha_backend_container2"
 }
+
