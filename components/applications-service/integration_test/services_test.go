@@ -12,6 +12,7 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/common/query"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -44,8 +45,14 @@ func TestGetServicesSortParameterError(t *testing.T) {
 }
 
 func TestGetServicesSingleService(t *testing.T) {
-	mockHabService := NewHabServiceMsg("sup1234", a, e, "default", "core",
-		"postgres", "0.1.0", "20190101121212", "OK", "stable", "testsite")
+	mockHabService := NewHabitatEvent([]MessageOverrides{
+		withSupervisorId("sup1234"),
+		withServiceGroup("postgres.default"),
+		withPackageIdent("core/postgres/0.1.0/20190101121212"),
+		withFqdn("mytest.example.com"),
+		withStrategyAtOnce("testchannel"),
+		withSite("testsite"),
+	}...)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
 
@@ -66,8 +73,8 @@ func TestGetServicesSingleService(t *testing.T) {
 						HealthCheck:  applications.HealthStatus_OK,
 						Application:  a,
 						Environment:  e,
-						Fqdn:         "",
-						Channel:      "stable",
+						Fqdn:         "mytest.example.com",
+						Channel:      "testchannel",
 						Site:         "testsite",
 					},
 				},
@@ -143,6 +150,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 			},
 		}
@@ -185,6 +193,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
+					Channel: "stable", Site: "test",
 				},
 				{
 					SupervisorId: "sup1",
@@ -480,20 +489,49 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 	}
 }
 
-func habServicesMatrixAllHealthStatusDifferent() []*applications.HabService {
-	return []*applications.HabService{
+func habServicesMatrixAllHealthStatusDifferent() []*habitat.HealthCheckEvent {
+	return []*habitat.HealthCheckEvent{
 		// service_group 1 <-> With a Health Status = 'OK'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "stable", "test"),
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup1"),
+			withServiceGroup("redis.default"),
+			withPackageIdent("core/redis/0.1.0/20190101121212"),
+			withHealth("OK"),
+		}...),
 
 		// service_group 2 <-> With a Health Status = 'WARNING'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "WARNING", "stable", "test"),
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup1"),
+			withServiceGroup("myapp.default"),
+			withPackageIdent("core/myapp/0.1.0/20190101121212"),
+			withHealth("WARNING"),
+		}...),
 
 		// service_group 3 <-> With a Health Status = 'CRITICAL'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "CRITICAL", "stable", "test"),
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup1"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			withHealth("CRITICAL"),
+		}...),
 
 		// service_group 4 <-> With a Health Status = 'UNKNOWN'
-		NewHabServiceMsg("sup2", a, e, "default", "core", "test", "0.1.0", "20190101121212", "UNKNOWN", "stable", "test"),
-		NewHabServiceMsg("sup3", a, e, "default", "core", "temp", "0.1.0", "20190101121212", "UNKNOWN", "stable", "test"),
-		NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "OK", "", ""),
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup2"),
+			withServiceGroup("test.default"),
+			withPackageIdent("core/test/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+		}...),
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup3"),
+			withServiceGroup("temp.default"),
+			withPackageIdent("core/temp/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+		}...),
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup4"),
+			withServiceGroup("test.default"),
+			withPackageIdent("core/test/0.1.0/20190101121212"),
+		}...),
 	}
 }

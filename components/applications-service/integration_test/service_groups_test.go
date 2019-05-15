@@ -11,6 +11,7 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/common/query"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,8 +48,11 @@ func TestGetServiceGroupsOneOk(t *testing.T) {
 				},
 			},
 		}
-		mockHabService = NewHabServiceMsg("sup2", a, e, "default", "core",
-			"postgres", "0.1.0", "20190101121212", "OK", "", "")
+		mockHabService = NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup2"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+		}...)
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -79,8 +83,12 @@ func TestGetServiceGroupsOneCritical(t *testing.T) {
 				},
 			},
 		}
-		mockHabService = NewHabServiceMsg("sup2", a, e, "default", "core",
-			"postgres", "0.1.0", "20190101121212", "CRITICAL", "", "")
+		mockHabService = NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup2"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			withHealth("CRITICAL"),
+		}...)
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -174,8 +182,12 @@ func TestGetServiceGroupsOneWarning(t *testing.T) {
 				},
 			},
 		}
-		mockHabService = NewHabServiceMsg("sup2", a, e, "default", "core",
-			"postgres", "0.1.0", "20190101121212", "WARNING", "", "")
+		mockHabService = NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup2"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			withHealth("WARNING"),
+		}...)
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -207,8 +219,12 @@ func TestGetServiceGroupsOneUnknown(t *testing.T) {
 				},
 			},
 		}
-		mockHabService = NewHabServiceMsg("sup2", a, e, "default", "core",
-			"postgres", "0.1.0", "20190101121212", "UNKNOWN", "", "")
+		mockHabService = NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup2"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+		}...)
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -239,15 +255,30 @@ func TestGetServiceGroupsOneEach(t *testing.T) {
 				},
 			},
 		}
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"postgres", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"postgres", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"postgres", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"postgres", "0.1.0", "20190101121212", "CRITICAL", "", ""),
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup2"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup3"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup4"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/0.1.0/20190101121212"),
+				withHealth("WARNING"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup5"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/0.1.0/20190101121212"),
+				withHealth("CRITICAL"),
+			}...),
 		}
 	)
 	suite.IngestServices(mockHabServices)
@@ -268,16 +299,7 @@ func TestGetServiceGroupsSortedDesc(t *testing.T) {
 				Order: query.SortOrder_DESC,
 			},
 		}
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-		}
+		mockHabServices = habServicesABCD()
 	)
 	suite.IngestServices(mockHabServices)
 	defer suite.DeleteDataFromStorage()
@@ -285,10 +307,12 @@ func TestGetServiceGroupsSortedDesc(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	assert.Equal(t, "d.default", response.ServiceGroups[0].Name)
-	assert.Equal(t, "c.default", response.ServiceGroups[1].Name)
-	assert.Equal(t, "b.default", response.ServiceGroups[2].Name)
-	assert.Equal(t, "a.default", response.ServiceGroups[3].Name)
+	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+		assert.Equal(t, "d.default", response.ServiceGroups[0].Name)
+		assert.Equal(t, "c.default", response.ServiceGroups[1].Name)
+		assert.Equal(t, "b.default", response.ServiceGroups[2].Name)
+		assert.Equal(t, "a.default", response.ServiceGroups[3].Name)
+	}
 }
 
 func TestGetServiceGroupsSortedAsc(t *testing.T) {
@@ -300,16 +324,7 @@ func TestGetServiceGroupsSortedAsc(t *testing.T) {
 				Order: query.SortOrder_ASC,
 			},
 		}
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-		}
+		mockHabServices = habServicesABCD()
 	)
 	suite.IngestServices(mockHabServices)
 	defer suite.DeleteDataFromStorage()
@@ -317,10 +332,12 @@ func TestGetServiceGroupsSortedAsc(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
-	assert.Equal(t, "b.default", response.ServiceGroups[1].Name)
-	assert.Equal(t, "c.default", response.ServiceGroups[2].Name)
-	assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
+	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+		assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
+		assert.Equal(t, "b.default", response.ServiceGroups[1].Name)
+		assert.Equal(t, "c.default", response.ServiceGroups[2].Name)
+		assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
+	}
 }
 
 func TestGetServiceGroupsSortedPercent(t *testing.T) {
@@ -332,16 +349,30 @@ func TestGetServiceGroupsSortedPercent(t *testing.T) {
 				Order: query.SortOrder_DESC,
 			},
 		}
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "OK", "", ""),
-		}
+		mockHabServices = append(habServicesABCD(),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup5"),
+				withServiceGroup("c.default"),
+				withPackageIdent("core/c/0.1.0/20190101121212"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup6"),
+				withServiceGroup("d.default"),
+				withPackageIdent("core/d/0.1.0/20190101121212"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup7"),
+				withServiceGroup("d.default"),
+				withPackageIdent("core/d/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup8"),
+				withServiceGroup("d.default"),
+				withPackageIdent("core/d/0.1.0/20190101121212"),
+				withHealth("WARNING"),
+			}...),
+		)
 	)
 	suite.IngestServices(mockHabServices)
 	defer suite.DeleteDataFromStorage()
@@ -349,9 +380,12 @@ func TestGetServiceGroupsSortedPercent(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	assert.Equal(t, int32(100), response.ServiceGroups[0].HealthPercentage)
-	assert.Equal(t, int32(50), response.ServiceGroups[1].HealthPercentage)
-	assert.Equal(t, int32(0), response.ServiceGroups[2].HealthPercentage)
+	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+		assert.Equal(t, int32(100), response.ServiceGroups[0].HealthPercentage)
+		assert.Equal(t, int32(50), response.ServiceGroups[1].HealthPercentage)
+		assert.Equal(t, int32(25), response.ServiceGroups[2].HealthPercentage)
+		assert.Equal(t, int32(0), response.ServiceGroups[3].HealthPercentage)
+	}
 }
 
 func TestGetServiceGroupsSortedPercentAsc(t *testing.T) {
@@ -363,24 +397,30 @@ func TestGetServiceGroupsSortedPercentAsc(t *testing.T) {
 				Order: query.SortOrder_ASC,
 			},
 		}
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup6", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup7", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup8", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup9", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-		}
+		mockHabServices = append(habServicesABCD(),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup5"),
+				withServiceGroup("c.default"),
+				withPackageIdent("core/c/0.1.0/20190101121212"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup6"),
+				withServiceGroup("d.default"),
+				withPackageIdent("core/d/0.1.0/20190101121212"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup7"),
+				withServiceGroup("d.default"),
+				withPackageIdent("core/d/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup8"),
+				withServiceGroup("d.default"),
+				withPackageIdent("core/d/0.1.0/20190101121212"),
+				withHealth("WARNING"),
+			}...),
+		)
 	)
 	suite.IngestServices(mockHabServices)
 	defer suite.DeleteDataFromStorage()
@@ -388,10 +428,12 @@ func TestGetServiceGroupsSortedPercentAsc(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	assert.Equal(t, int32(0), response.ServiceGroups[0].HealthPercentage)
-	assert.Equal(t, int32(25), response.ServiceGroups[1].HealthPercentage)
-	assert.Equal(t, int32(50), response.ServiceGroups[2].HealthPercentage)
-	assert.Equal(t, int32(100), response.ServiceGroups[3].HealthPercentage)
+	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+		assert.Equal(t, int32(0), response.ServiceGroups[0].HealthPercentage)
+		assert.Equal(t, int32(25), response.ServiceGroups[1].HealthPercentage)
+		assert.Equal(t, int32(50), response.ServiceGroups[2].HealthPercentage)
+		assert.Equal(t, int32(100), response.ServiceGroups[3].HealthPercentage)
+	}
 }
 
 func TestGetServiceGroupsInvalidPageNumberReturnsDefaultPageValues(t *testing.T) {
@@ -403,16 +445,7 @@ func TestGetServiceGroupsInvalidPageNumberReturnsDefaultPageValues(t *testing.T)
 				Size: 1,
 			},
 		}
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-		}
+		mockHabServices = habServicesABCD()
 	)
 	suite.IngestServices(mockHabServices)
 	defer suite.DeleteDataFromStorage()
@@ -421,7 +454,9 @@ func TestGetServiceGroupsInvalidPageNumberReturnsDefaultPageValues(t *testing.T)
 	assert.Nil(t, err)
 
 	// a.default should be returned since we default to page number one
-	assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
+	if assert.Equal(t, 1, len(response.ServiceGroups)) {
+		assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
+	}
 }
 
 func TestGetServiceGroupsPage(t *testing.T) {
@@ -433,16 +468,7 @@ func TestGetServiceGroupsPage(t *testing.T) {
 				Size: 1,
 			},
 		}
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-		}
+		mockHabServices = habServicesABCD()
 	)
 	suite.IngestServices(mockHabServices)
 	defer suite.DeleteDataFromStorage()
@@ -451,7 +477,9 @@ func TestGetServiceGroupsPage(t *testing.T) {
 	assert.Nil(t, err)
 
 	// b.default should be on the second page with default sorting
-	assert.Equal(t, "b.default", response.ServiceGroups[0].Name)
+	if assert.Equal(t, 1, len(response.ServiceGroups)) {
+		assert.Equal(t, "b.default", response.ServiceGroups[0].Name)
+	}
 }
 
 // This test is verifying that when users specify a filter the paginator works as expected
@@ -463,20 +491,19 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 		//  * 1 UNKNOWN  service-groups
 		//  * 1 WARNING  service-groups
 		//  * 1 CRITICAL service-groups
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup1", a, e, "default", "core",
-				"a", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup2", a, e, "default", "core",
-				"b", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core",
-				"c", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core",
-				"d", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"e", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup5", a, e, "default", "core",
-				"f", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-		}
+		mockHabServices = append(habServicesABCD(),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup5"),
+				withServiceGroup("e.default"),
+				withPackageIdent("core/e/0.1.0/20190101121212"),
+			}...),
+			NewHabitatEvent([]MessageOverrides{
+				withSupervisorId("sup5"),
+				withServiceGroup("f.default"),
+				withPackageIdent("core/f/0.1.0/20190101121212"),
+				withHealth("CRITICAL"),
+			}...),
+		)
 		// This request is asking only for service groups that have an OK status
 		// plus, showing only the page two with a page size of one and they are all
 		// ordered by name, therefor this test should return only the following service:
@@ -492,8 +519,8 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
 				{
-					Name:                 "c.default",
-					Release:              "core/c/0.1.0/20190101121212",
+					Name:                 "e.default",
+					Release:              "core/e/0.1.0/20190101121212",
 					Status:               applications.HealthStatus_OK,
 					HealthPercentage:     100,
 					ServicesHealthCounts: &applications.HealthCounts{Total: 1, Ok: 1},
@@ -507,4 +534,33 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 	assertServiceGroupsEqual(t, expected, response)
+}
+
+func habServicesABCD() []*habitat.HealthCheckEvent {
+	return []*habitat.HealthCheckEvent{
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup2"),
+			withServiceGroup("a.default"),
+			withPackageIdent("core/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+		}...),
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup3"),
+			withServiceGroup("b.default"),
+			withPackageIdent("core/b/0.1.0/20190101121212"),
+			withHealth("OK"),
+		}...),
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup4"),
+			withServiceGroup("c.default"),
+			withPackageIdent("core/c/0.1.0/20190101121212"),
+			withHealth("WARNING"),
+		}...),
+		NewHabitatEvent([]MessageOverrides{
+			withSupervisorId("sup5"),
+			withServiceGroup("d.default"),
+			withPackageIdent("core/d/0.1.0/20190101121212"),
+			withHealth("CRITICAL"),
+		}...),
+	}
 }
