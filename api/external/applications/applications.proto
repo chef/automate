@@ -213,8 +213,20 @@ enum HealthStatus {
   UNKNOWN = 3;
 }
 
+
 message Wrapper {
-  string type = 1;
+	// From the proto compiler:
+	// Note that enum values use C++ scoping rules, meaning that enum values are
+	// siblings of their type, not children of it.
+	//
+	// So we need to nest this one extra level
+	enum WrappedMessageType {
+		UNKNOWN = 0;
+		EXAMPLE_ONE = 1;
+		EXAMPLE_TWO = 2;
+	}
+
+  WrappedMessageType type = 1;
   bytes message = 2;
 }
 

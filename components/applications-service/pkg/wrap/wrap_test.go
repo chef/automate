@@ -19,8 +19,11 @@ func TestWrap(t *testing.T) {
 	packedEx1, err := proto.Marshal(&ex1)
 	require.NoError(t, err)
 
+	fmt.Printf("inner msg: %+v\n", packedEx1)
+	fmt.Printf("inner msg len: %d\n", len(packedEx1))
+
 	wrap1 := applications.Wrapper{
-		Type:    "ExampleOne",
+		Type:    applications.Wrapper_EXAMPLE_ONE,
 		Message: packedEx1,
 	}
 
