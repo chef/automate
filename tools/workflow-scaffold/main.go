@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/teambition/rrule-go"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -405,8 +407,16 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		Workers: perfTestOpts.DequeueWorkerCount,
 	})
 
+	recRule, err := rrule.NewRRule(rrule.ROption{
+		Freq:    rrule.MINUTELY,
+		Dtstart: time.Now().AddDate(0, 0, -1).Add(-55 * time.Second), // This will be due in 5 seconds
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	err = workflowManager.CreateWorkflowSchedule(
-		"every minute", "schedule-test", "youfail", true, "FREQ=MINUTELY")
+		"every minute", "schedule-test", "youfail", true, recRule)
 	if err != nil {
 		if err == workflow.ErrWorkflowScheduleExists {
 			logrus.Info("workflow schedule exists...ignoring")

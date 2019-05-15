@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 )
@@ -138,15 +137,11 @@ func (m *WorkflowManager) CreateWorkflowSchedule(
 	workflowName string,
 	parameters interface{},
 	enabled bool,
-	recurrence string,
+	recurRule *rrule.RRule,
 ) error {
-	recurRule, err := rrule.StrToRRule(recurrence)
-	if err != nil {
-		return errors.Wrap(err, "invalid recurrence rule")
-	}
-
 	nextRunAt := recurRule.After(time.Now().UTC(), true).UTC()
-	return m.backend.CreateWorkflowSchedule(context.TODO(), scheduleName, workflowName, parameters, enabled, recurrence, nextRunAt)
+	return m.backend.CreateWorkflowSchedule(context.TODO(), scheduleName, workflowName,
+		parameters, enabled, recurRule.String(), nextRunAt)
 }
 
 func (m *WorkflowManager) RegisterWorkflowExecutor(workflowName string,
