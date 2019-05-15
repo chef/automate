@@ -36,6 +36,8 @@ Options to build a Habitat Event message:
 	--application <name>   The application name that this service is part of
 	--environment <name>   The environment name of the current deployment
 	--health      <code>   The health check code of a service
+	--site        <site>   The site of the server where the service is running
+	--channel     <name>   The habitat channel name that the service is subscribed to
 
 	Package Indentifier
 	--origin   <origin>  The origin of a package
@@ -72,6 +74,7 @@ func main() {
 		port         string
 		rawMessage   string
 		group        string
+		channel      string
 		origin       string
 		name         string
 		version      string
@@ -99,13 +102,13 @@ func main() {
 		"environment", "demo", "The environment name of the current deployment")
 	flag.StringVar(&event.EventMetadata.Fqdn,
 		"fqdn", "localhost", "The fqdn of the server where the service is running")
+	flag.StringVar(&event.EventMetadata.Site,
+		"site", "", "The site of the server where the service is running")
 	flag.StringVar(&origin, "origin", "core", "The origin of a package")
 	flag.StringVar(&name, "name", "redis", "The name of a package")
 	flag.StringVar(&version, "version", "0.1.0", "The version of a package")
 	flag.StringVar(&release, "release", t.Format("20060102150405"), "The release of a package")
-	// TODO: @afiune update these fields from new proto in habitat
-	//flag.StringVar(&event.Site, "site", "", "The site of the server where the service is running")
-	//flag.StringVar(&event.Channel, "channel", "", "The channel that the supervisor is subscribed to")
+	flag.StringVar(&channel, "channel", "", "The habitat channel name that the service is subscribed to")
 	flag.IntVar(&health, "health", 0, "The health check code of a service")
 	flag.BoolVar(&uniqID, "uniq-client-id", false, "Generate a unique client-id to connect to server")
 	flag.BoolVar(&infiniteLoop, "infinite-stream", false, "Publish message every second infinitely")
@@ -143,10 +146,15 @@ func main() {
 		client.DisableTLS = disableTLS
 	}
 
-	// Convert proto enums
+	// Convert the health check
 	event.Result = habitat.HealthCheck(health)
 	event.ServiceMetadata.ServiceGroup = fmt.Sprintf("%s.%s", name, group)
 	event.ServiceMetadata.PackageIdent = fmt.Sprintf("%s/%s/%s/%s", origin, name, version, release)
+
+	// If the channel was specified, add the update config
+	if len(channel) > 0 {
+		event.ServiceMetadata.UpdateConfig = &habitat.UpdateConfig{Channel: channel}
+	}
 
 	// Publish a single raw message
 	if len(rawMessage) > 0 {
