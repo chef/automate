@@ -124,10 +124,13 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	if exist {
 		svc.Version = pkgIdent.Version
 		svc.Release = pkgIdent.Release
-		svc.Health = event.GetResult().String()
-		// Channel
-		// Site
-		//svc.Status = event.GetStatus().String()
+		// @afiune all our backend was designed for the health check to be all uppercases
+		// but habitat is actually sending case sensitive strings
+		svc.Health = strings.ToUpper(event.GetResult().String())
+		// Update Channel if the update config exist
+		if svcMetadata.GetUpdateConfig() != nil {
+			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
+		}
 
 		if _, err := db.DbMap.Update(svc); err != nil {
 			return errors.Wrap(err, "unable to update service")
@@ -140,7 +143,7 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 		eventMetadata,
 		svcMetadata,
 		pkgIdent,
-		event.GetResult().String(),
+		strings.ToUpper(event.GetResult().String()),
 	)
 }
 
@@ -188,7 +191,7 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 			sup := &supervisor{
 				MemberID: eventMetadata.GetSupervisorId(),
 				Fqdn:     eventMetadata.GetFqdn(),
-				//Site:     "", // @afiune How was this added before?
+				Site:     eventMetadata.GetSite(),
 			}
 
 			if err := tx.Insert(sup); err != nil {
@@ -199,6 +202,10 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 
 		// 4) Service
 		svc := newService(pkgIdent, health, did, sid, gid)
+		if svcMetadata.GetUpdateConfig() != nil {
+			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
+		}
+
 		if err := tx.Insert(svc); err != nil {
 			return errors.Wrap(err, "Unable to insert service")
 		}
@@ -210,13 +217,11 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 
 func newService(pkgIdent *packageIdent, health string, did, sid, gid int32) *service {
 	return &service{
-		Origin:  pkgIdent.Origin,
-		Name:    pkgIdent.Name,
-		Version: pkgIdent.Version,
-		Release: pkgIdent.Release,
-		Health:  health,
-		//Status:       event.GetStatus().String(),
-		//Channel:      "", // @afiune Same, where was this?
+		Origin:       pkgIdent.Origin,
+		Name:         pkgIdent.Name,
+		Version:      pkgIdent.Version,
+		Release:      pkgIdent.Release,
+		Health:       health,
 		GroupID:      gid,
 		DeploymentID: did,
 		SupID:        sid,

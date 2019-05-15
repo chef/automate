@@ -16,37 +16,48 @@ message EventMetadata {
   string supervisor_id = 1;
   // The IP address on which the Supervisor is listening for gossip.
   string ip_address = 2;
-  // The time at which this event occurred.
-  google.protobuf.Timestamp timestamp = 3;
+  google.protobuf.Timestamp occurred_at = 3;
   string application = 4;
   string environment = 5;
   map<string, string> meta = 6;
   string fqdn = 7;
+  // Proposal for the site field
+  // NOTE: This is new and does not yet exist in habitat
+  string site = 8;
 }
 
 message ServiceMetadata {
-  // todo: make a FQPI type
+  // The fully-qualified identifier of the package that is currently
+  // running.
   string package_ident = 1;
-  // not necessarily FQPI
+  // This is the identifier the service was loaded with (e.g., the
+  // `core/redis` in `hab svc load core/redis`). While it _can_ be a
+  // fully-qualified package identifier, it is more commonly a 2- or
+  // 3-part identifier variant.
   string spec_ident = 2;
-  // todo: make / reuse a real type?
   string service_group = 3;
-  // The channel a service was initially downloaded from, and (if an
-  // update strategy is set) the channel from which updates will be
-  // pulled.
-  string update_channel = 4;
-  UpdateStrategy update_strategy = 5;
+  UpdateConfig update_config = 4;
 }
 
+// Note that there is no `None` value, as currently exists in the Rust
+// code for the Supervisor. Here we are only going to deal with the
+// actual update strategies (because `None` isn't really a strategy!)
 enum UpdateStrategy {
-  // The service will not update itself.
-  None = 0;
   // Service updates are applied immediately as they are available,
   // with no additional coordination.
-  AtOnce = 1;
+  AtOnce = 0;
   // Updates are applied one-by-one throughout a service group to
   // prevent everything from updating all at once.
-  Rolling = 2;
+  Rolling = 1;
+}
+
+// Encapsulates an update strategy with the channel that is checked
+// for updates. Both must be present for either to be meaningful.a
+message UpdateConfig {
+  UpdateStrategy strategy = 1;
+  // The channel the Supervisor will monitor for updates to this
+  // service.
+  string channel = 2;
 }
 
 enum HealthCheck {
@@ -73,10 +84,8 @@ message ServiceStoppedEvent {
 message HealthCheckEvent {
   EventMetadata event_metadata = 1;
   ServiceMetadata service_metadata = 2;
-  // The result of the health check execution
   HealthCheck result = 3;
-  // How long the health check took to run
-  google.protobuf.Duration duration = 4;
-  // Whether or not the health check is defined in a hook
-  bool has_hook = 5;
+  // If the service has a health check hook script, how long it took
+  // to execute.
+  google.protobuf.Duration execution = 4;
 }

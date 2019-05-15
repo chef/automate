@@ -71,6 +71,7 @@ func main() {
 		authToken    string
 		port         string
 		rawMessage   string
+		group        string
 		origin       string
 		name         string
 		version      string
@@ -91,9 +92,7 @@ func main() {
 	flag.StringVar(&authToken, "auth-token", "", "Automate auth token (must have ingest permissions)")
 	flag.StringVar(&event.EventMetadata.SupervisorId,
 		"sup-id", "1234567890", "The Supervisor ID")
-	// @afiune is this full name or partial?
-	flag.StringVar(&event.ServiceMetadata.ServiceGroup,
-		"group", "default", "The group name of a service (part of the service_group)")
+	flag.StringVar(&group, "group", "default", "The group name of a service (part of the service_group)")
 	flag.StringVar(&event.EventMetadata.Application,
 		"application", "demo", "The application name that this service is part of")
 	flag.StringVar(&event.EventMetadata.Environment,
@@ -146,6 +145,7 @@ func main() {
 
 	// Convert proto enums
 	event.Result = habitat.HealthCheck(health)
+	event.ServiceMetadata.ServiceGroup = fmt.Sprintf("%s.%s", name, group)
 	event.ServiceMetadata.PackageIdent = fmt.Sprintf("%s/%s/%s/%s", origin, name, version, release)
 
 	// Publish a single raw message
