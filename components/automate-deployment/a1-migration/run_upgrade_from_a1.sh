@@ -20,12 +20,12 @@ function install_from_results_or_depot() {
     results_artifact=$(find "$hart_dir" -name "*$package*" -exec ls -1t \{\} \+ | head -1)
     if [ ! -z "$results_artifact" ]; then
       echo "Installing package '$package' from local source ('$results_artifact')."
-      hab pkg install -b "$results_artifact"
+      HAB_LICENSE=accept-no-persist hab pkg install -b "$results_artifact"
       return 0
     fi
   fi
 
-  hab pkg install -b "chef/$package" --channel "$channel"
+  HAB_LICENSE=accept-no-persist hab pkg install -b "chef/$package" --channel "$channel"
 }
 
 install_from_results_or_depot automate-cli dev "$HARTIFACT_DIR"
