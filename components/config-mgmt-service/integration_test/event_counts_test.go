@@ -3,6 +3,7 @@ package integration_test
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -104,7 +106,8 @@ func TestEventCountsReturnCountOverAThousandActions(t *testing.T) {
 				assert.Equal(t, int64(1001), res.Total)
 
 				assert.Equal(t, len(expectedCounts.Counts), len(res.Counts),
-					"Expected number of Counts does not match results %d != %d", len(expectedCounts.Counts), len(res.Counts))
+					"Expected number of Counts does not match results %d != %d",
+					len(expectedCounts.Counts), len(res.Counts))
 
 				for _, count := range expectedCounts.Counts {
 					foundCount, found := findCount(res.Counts, count)
@@ -116,6 +119,561 @@ func TestEventCountsReturnCountOverAThousandActions(t *testing.T) {
 				}
 			}
 		})
+}
+
+func TestEventTypeCountsProjectFilter(t *testing.T) {
+	cases := []struct {
+		description string
+		actions     []iBackend.InternalChefAction
+		ctx         context.Context
+		expected    *response.EventCounts
+	}{
+		{
+			description: "No Actions with requesting projects",
+			actions:     []iBackend.InternalChefAction{},
+			ctx:         contextWithProjects([]string{"project9"}),
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "One Action with a project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with a project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{"project9"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+					{
+						Name:  "node",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with only one's project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{"project3"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action project not matching request projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project3"}),
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "One Action has one project; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Three Actions; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{"project12"},
+				},
+				{
+					EntityType: "bag",
+					Projects:   []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 3,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+					{
+						Name:  "node",
+						Count: 1,
+					},
+					{
+						Name:  "bag",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has no projects; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has no projects; request unassigned projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has a project; request only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "Two Actions have and don't have projects; request only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "node",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has a project; request unassigned and matching project allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has no projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions have and don't have projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "node",
+						Count: 1,
+					},
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action with one project matching one of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two actions with one project matching different one of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{"project3"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "node",
+						Count: 1,
+					},
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action with one project not matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "Two Actions with neither project not matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{"project10"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "Action with several projects where one matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with several projects where one matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{"project12", "project10", "project11", "project3"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "node",
+						Count: 1,
+					},
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with several projects where only one action's project matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{"project12", "project10", "project11", "project13"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action with several projects where one matches one of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with several projects where one matches one of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					EntityType: "node",
+					Projects:   []string{"project13", "project14", "project17", "project16"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "node",
+						Count: 1,
+					},
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action with several projects where none matches several requested project allowed",
+			ctx:         contextWithProjects([]string{"project14", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expected: &response.EventCounts{},
+		},
+		{
+			description: "Action with several projects where two matches two of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "cookbook",
+					Projects:   []string{"project3", "project10", "project7", "project6"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "cookbook",
+						Count: 1,
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+			for index := range test.actions {
+				test.actions[index].RecordedAt = time.Now()
+				test.actions[index].Id = newUUID()
+			}
+
+			suite.IngestActions(test.actions)
+			defer suite.DeleteAllDocuments()
+
+			res, err := cfgmgmt.GetEventTypeCounts(test.ctx, &request.EventCountsFilter{})
+			assert.NoError(t, err)
+
+			// test response
+			assert.Equal(t, test.expected.Total, res.Total)
+
+			for _, expectedCount := range test.expected.Counts {
+				matchingResCount, err := findEventCountByName(expectedCount.Name, res.Counts)
+				assert.NoError(t, err)
+
+				assert.Equal(t, expectedCount.Count, matchingResCount.Count)
+			}
+		})
+	}
+}
+
+func findEventCountByName(eventName string,
+	eventCounts []*response.EventCount) (*response.EventCount, error) {
+	for _, eventCount := range eventCounts {
+		if eventCount.Name == eventName {
+			return eventCount, nil
+		}
+	}
+
+	return nil, errors.New(fmt.Sprintf("EventCount %q was not found", eventName))
 }
 
 func TestEventCountsCountOnlyFilteredOrgs(t *testing.T) {
@@ -218,7 +776,8 @@ func runCases(t *testing.T, cases []testCase) {
 					assert.Equal(t, test.expectedCounts.Total, res.Total)
 
 					assert.Equal(t, len(test.expectedCounts.Counts), len(res.Counts),
-						"Expected number of Counts does not match results %d != %d", len(test.expectedCounts.Counts), len(res.Counts))
+						"Expected number of Counts does not match results %d != %d",
+						len(test.expectedCounts.Counts), len(res.Counts))
 
 					for _, count := range test.expectedCounts.Counts {
 						foundCount, found := findCount(res.Counts, count)
@@ -236,7 +795,8 @@ func runCases(t *testing.T, cases []testCase) {
 	}
 }
 
-func filter(actions []iBackend.InternalChefAction, f func(iBackend.InternalChefAction) bool) []iBackend.InternalChefAction {
+func filter(actions []iBackend.InternalChefAction,
+	f func(iBackend.InternalChefAction) bool) []iBackend.InternalChefAction {
 	filteredActions := make([]iBackend.InternalChefAction, 0)
 	for _, action := range actions {
 		if f(action) {

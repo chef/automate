@@ -124,6 +124,11 @@ func (s *CfgMgmtServer) GetEventTypeCounts(ctx context.Context,
 		return &response.EventCounts{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return &response.EventCounts{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
 	// Date Range
 	startTime, endTime, err := params.ValidateMillsecondDateRange(request.Start, request.End)
 	if err != nil {
