@@ -17,7 +17,8 @@ import (
 )
 
 // GetEventFeed returns a list of all Events
-func (s *CfgMgmtServer) GetEventFeed(ctx context.Context, request *request.EventFilter) (*response.Events, error) {
+func (s *CfgMgmtServer) GetEventFeed(ctx context.Context,
+	request *request.EventFilter) (*response.Events, error) {
 	eventCollection := &response.Events{}
 
 	log.WithFields(log.Fields{
@@ -30,6 +31,11 @@ func (s *CfgMgmtServer) GetEventFeed(ctx context.Context, request *request.Event
 		return eventCollection, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return eventCollection, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
 	// Date Range
 	startTime, endTime, err := params.ValidateMillsecondDateRange(request.Start, request.End)
 	if err != nil {
@@ -37,7 +43,8 @@ func (s *CfgMgmtServer) GetEventFeed(ctx context.Context, request *request.Event
 	}
 
 	// Paging Parameters
-	cursorTime, ascending, err := params.ValidatePagingCursorTime(request.Before, request.After, request.Cursor, request.End)
+	cursorTime, ascending, err := params.ValidatePagingCursorTime(request.Before, request.After,
+		request.Cursor, request.End)
 	if err != nil {
 		return eventCollection, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}

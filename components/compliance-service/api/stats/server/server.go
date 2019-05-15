@@ -25,7 +25,11 @@ func New(es *relaxting.ES2Backend) *Server {
 // ReadSummary returns summary, nodes-summary, or controls-summary information
 func (srv *Server) ReadSummary(ctx context.Context, in *stats.Query) (*stats.Summary, error) {
 	var summary stats.Summary
-	formattedFilters := formatFilters(in.Filters)
+
+	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, in.Id)
+	}
 
 	if in.Type == "" {
 		reportSummary, err := srv.es.GetStatsSummary(formattedFilters)
@@ -58,7 +62,10 @@ func (srv *Server) ReadSummary(ctx context.Context, in *stats.Query) (*stats.Sum
 func (srv *Server) ReadTrend(ctx context.Context, in *stats.Query) (*stats.Trends, error) {
 	var trends stats.Trends
 	var trend []*stats.Trend
-	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, in.Id)
+	}
 	// set a default interval here if it is 0. This is done here instead
 	// of in the validateTrendData function b/c it is a nicety that modifies
 	// the value of the query sent in. The rest of the validateTrendData checks
@@ -66,7 +73,7 @@ func (srv *Server) ReadTrend(ctx context.Context, in *stats.Query) (*stats.Trend
 	if in.Interval == 0 {
 		in.Interval = 86400
 	}
-	err := validateTrendData(in, formattedFilters)
+	err = validateTrendData(in, formattedFilters)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -126,7 +133,10 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 
 // ReadFailures returns failures by platform, environment, etc
 func (srv *Server) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Failures, error) {
-	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, in.Id)
+	}
 	// i went back and forth on this one for a while. while i see
 	// the reason it could be its own field in the query message type,
 	// it also seems fitting to stick it in as a filter...and I don't

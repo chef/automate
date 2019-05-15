@@ -129,7 +129,7 @@ type exportHandler func(*reporting.Report) error
 
 // Export streams a json or csv export
 func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService_ExportServer) error {
-	formattedFilters := formatFilters(in.Filters)
+	formattedFilters := filterByProjectsFilter(formatFilters(in.Filters))
 
 	if len(formattedFilters["profile_name"]) > 0 && len(formattedFilters["profile_id"]) > 0 {
 		return status.Error(codes.InvalidArgument, "Invalid: Cannot specify both 'profile_name' and 'profile_id' filters")
@@ -346,4 +346,12 @@ func filterByProjects(ctx context.Context, filters map[string][]string) (map[str
 
 	filters["projects"] = projectsFilter
 	return filters, nil
+}
+
+func filterByProjectsFilter(filters map[string][]string) map[string][]string {
+	if auth_context.AllProjectsRequested(filters["projects"]) {
+		delete(filters, "projects")
+	}
+
+	return filters
 }

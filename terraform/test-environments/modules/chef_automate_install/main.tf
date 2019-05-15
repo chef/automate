@@ -177,14 +177,19 @@ EOF
   }
 
   provisioner "file" {
-    source      = "${path.module}/files/a2-sysctl.conf"
-    destination = "/tmp/a2-sysctl.conf"
+    destination = "/tmp/60-chef-automate.conf"
+
+    content = <<EOF
+# Kernel parameters required by A2 preflight check
+vm.max_map_count=262144
+vm.dirty_expire_centisecs=20000
+EOF
   }
 
   provisioner "remote-exec" {
     inline = [
       "set -evx",
-      "sudo mv /tmp/a2-sysctl.conf /etc/sysctl.d/a2-sysctl.conf",
+      "sudo mv /tmp/60-chef-automate.conf /etc/sysctl.d/60-chef-automate.conf",
       "sudo --login sysctl --system",
     ]
   }

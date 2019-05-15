@@ -16,6 +16,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -263,6 +264,356 @@ func TestEventFeedFilterOrgs(t *testing.T) {
 					assert.Equal(t, expectedEvents, res)
 				}
 			})
+	}
+}
+
+func TestEventFeedProjectFilter(t *testing.T) {
+	request := &request.EventFilter{
+		PageSize: 100,
+	}
+	cases := []struct {
+		description string
+		actions     []iBackend.InternalChefAction
+		ctx         context.Context
+		expectedIDs []string
+	}{
+		{
+			description: "No Actions with requesting projects",
+			actions:     []iBackend.InternalChefAction{},
+			ctx:         contextWithProjects([]string{"project9"}),
+			expectedIDs: []string{},
+		},
+		{
+			description: "One Action with a project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+			},
+			ctx:         contextWithProjects([]string{"project9"}),
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Two Actions with a project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+				{
+					Id:       "2",
+					Projects: []string{"project9"},
+				},
+			},
+			ctx:         contextWithProjects([]string{"project9"}),
+			expectedIDs: []string{"1", "2"},
+		},
+		{
+			description: "Two Actions with only one's project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+				{
+					Id:       "2",
+					Projects: []string{"project3"},
+				},
+			},
+			ctx:         contextWithProjects([]string{"project9"}),
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Action project not matching request projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+			},
+			ctx:         contextWithProjects([]string{"project3"}),
+			expectedIDs: []string{},
+		},
+		{
+			description: "One Action has one project; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Three Actions; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+				{
+					Id:       "2",
+					Projects: []string{"project12"},
+				},
+				{
+					Id:       "3",
+					Projects: []string{},
+				},
+			},
+			expectedIDs: []string{"1", "2", "3"},
+		},
+		{
+			description: "Action has no projects; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Action has no projects; request unassigned projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Action has a project; request only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+			},
+			expectedIDs: []string{},
+		},
+		{
+			description: "Two Actions have and don't have projects; request only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+				{
+					Id:       "2",
+					Projects: []string{},
+				},
+			},
+			expectedIDs: []string{"2"},
+		},
+		{
+			description: "Action has a project; request unassigned and matching project allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Action has no projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Two Actions have and don't have projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{},
+				},
+				{
+					Id:       "2",
+					Projects: []string{"project9"},
+				},
+			},
+			expectedIDs: []string{"1", "2"},
+		},
+		{
+			description: "Action with one project matching one of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Two actions with one project matching different one of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+				{
+					Id:       "2",
+					Projects: []string{"project3"},
+				},
+			},
+			expectedIDs: []string{"1", "2"},
+		},
+		{
+			description: "Action with one project not matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+			},
+			expectedIDs: []string{},
+		},
+		{
+			description: "Two Actions with one project not matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project9"},
+				},
+				{
+					Id:       "2",
+					Projects: []string{"project10"},
+				},
+			},
+			expectedIDs: []string{},
+		},
+		{
+			description: "Action with several projects where one matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Two Actions with several projects where one matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					Id:       "2",
+					Projects: []string{"project12", "project10", "project11", "project3"},
+				},
+			},
+			expectedIDs: []string{"1", "2"},
+		},
+		{
+			description: "Two Actions with several projects where only one action's project matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					Id:       "2",
+					Projects: []string{"project12", "project10", "project11", "project13"},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Action with several projects where one matches one of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+		{
+			description: "Two Actions with several projects where one matches one of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					Id:       "2",
+					Projects: []string{"project13", "project14", "project17", "project16"},
+				},
+			},
+			expectedIDs: []string{"1", "2"},
+		},
+		{
+			description: "Action with several projects where none matches several requested project allowed",
+			ctx:         contextWithProjects([]string{"project14", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expectedIDs: []string{},
+		},
+		{
+			description: "Action with several projects where two matches two of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Id:       "1",
+					Projects: []string{"project3", "project10", "project7", "project6"},
+				},
+			},
+			expectedIDs: []string{"1"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+			for index := range test.actions {
+				test.actions[index].RecordedAt = time.Now()
+			}
+
+			suite.IngestActions(test.actions)
+			defer suite.DeleteAllDocuments()
+
+			res, err := cfgmgmt.GetEventFeed(test.ctx, request)
+			assert.NoError(t, err)
+
+			// collect IDs from events response
+			eventIDs := make([]string, len(res.Events))
+			for index, event := range res.Events {
+				eventIDs[index] = event.Id
+			}
+
+			// test response
+			assert.ElementsMatch(t, test.expectedIDs, eventIDs)
+		})
 	}
 }
 

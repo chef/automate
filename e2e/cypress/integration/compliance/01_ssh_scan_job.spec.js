@@ -136,6 +136,10 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.get('.nav-link').contains('Scan Jobs').click()
     cy.url().should('include', '/compliance/scanner/jobs')
 
+    // we save the route that will be called when we navigate to the next page
+    // in order to be able to wait for it later
+    cy.route('POST', '/api/v0/compliance/profiles/search').as('getProfiles')
+
     // open scan create form
     cy.contains('Create new job').click().then(() => {
       cy.url().should('include', '/jobs/add')
@@ -143,33 +147,38 @@ describe('create a manual node ssh scan job and cleanup after', () => {
       // select nodes
       cy.get('chef-job-nodes-form .manager-header').contains('Automate').as('manager-row')
       cy.get('@manager-row').parent().parent().find('input[type="checkbox"]').check()
+
       // click next
       cy.contains('Next').click().then(() => {
+        // wait for data to return
+        cy.wait('@getProfiles')
+
         // select profiles
-        cy.get('chef-job-profiles-form input[type="checkbox"]').check()
-        // click next
-        cy.contains('Next').click().then(() => {
+        cy.get('chef-job-profiles-form').find('[data-cy=select-all-profiles]').check().then(() => {
+          // click next
+          cy.contains('Next').click().then(() => {
 
-          // give the scan job a name
-          cy.get('form input[formcontrolname="name"]').type('a ' + jobName)
+            // give the scan job a name
+            cy.get('form input[formcontrolname="name"]').type('a ' + jobName)
 
-          // expand the recurrence schedule and schedule job to repeat every 1 day
-          cy.get('chef-job-schedule-form input[type="checkbox"]').check()
-          cy.get('.schedule-body input[type="checkbox"]').check()
-          cy.get('fieldset[formgroupname="repeat"]').get('select').last().select('Days')
+            // expand the recurrence schedule and schedule job to repeat every 1 day
+            cy.get('chef-job-schedule-form input[type="checkbox"]').check()
+            cy.get('.schedule-body input[type="checkbox"]').check()
+            cy.get('fieldset[formgroupname="repeat"]').get('select').last().select('Days')
 
-          // click save
-          cy.contains('Save').click().then(() => {
-            cy.url().should('include', '/compliance/scanner/jobs')
+            // click save
+            cy.contains('Save').click().then(() => {
+              cy.url().should('include', '/compliance/scanner/jobs')
 
-            // assert table has scan job
-            cy.contains(jobName).should('exist')
+              // assert table has scan job
+              cy.contains(jobName).should('exist')
 
-            // click into the scan job to view runs page
-            cy.contains(jobName)
-              .click().then(() => {
-                cy.url().should('include', '/scans')
-              })
+              // click into the scan job to view runs page
+              cy.contains(jobName)
+                .click().then(() => {
+                  cy.url().should('include', '/scans')
+                })
+            })
           })
         })
       })
@@ -266,7 +275,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.wait('@deleteScanJob')
 
     // ensure that the job is deleted
-    cy.url().should('include','/compliance/scanner/jobs')
+    cy.url().should('include', '/compliance/scanner/jobs')
     cy.get('chef-tbody').should(($b) => {
       expect($b).not.to.contain(jobName)
     })

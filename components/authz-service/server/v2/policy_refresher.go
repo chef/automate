@@ -117,7 +117,7 @@ func (refresher *policyRefresher) refresh(ctx context.Context, lastPolicyID stri
 		refresher.log.WithFields(logrus.Fields{
 			"lastPolicyID": lastPolicyID,
 			"curPolicyID":  curPolicyID,
-		}).Info("Refreshing engine store")
+		}).Debug("Refreshing engine store")
 
 		if err := refresher.updateEngineStore(ctx); err != nil {
 			refresher.log.WithError(err).Warn("Failed to refresh engine store")
@@ -188,13 +188,21 @@ func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]
 
 		statements := make(map[string]interface{})
 		for _, st := range p.Statements {
-			statements[st.ID.String()] = map[string]interface{}{
-				"effect":    st.Effect.String(),
-				"role":      st.Role,
-				"projects":  st.Projects,
-				"actions":   st.Actions,
-				"resources": st.Resources,
+			stmt := map[string]interface{}{
+				"effect":   st.Effect.String(),
+				"projects": st.Projects,
 			}
+			// Only set these if provided
+			if st.Role != "" {
+				stmt["role"] = st.Role
+			}
+			if len(st.Actions) != 0 {
+				stmt["actions"] = st.Actions
+			}
+			if len(st.Resources) != 0 {
+				stmt["resources"] = st.Resources
+			}
+			statements[st.ID.String()] = stmt
 		}
 
 		members := make([]string, len(p.Members))

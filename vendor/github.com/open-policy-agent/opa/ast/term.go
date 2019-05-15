@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"regexp"
 	"sort"
 	"strconv"
@@ -805,6 +806,27 @@ func EmptyRef() Ref {
 	return Ref([]*Term{})
 }
 
+// PtrRef returns a new reference against the head for the pointer
+// s. Path components in the pointer are unescaped.
+func PtrRef(head *Term, s string) (Ref, error) {
+	s = strings.Trim(s, "/")
+	if s == "" {
+		return Ref{head}, nil
+	}
+	parts := strings.Split(s, "/")
+	ref := make(Ref, len(parts)+1)
+	ref[0] = head
+	for i := 0; i < len(parts); i++ {
+		var err error
+		parts[i], err = url.PathUnescape(parts[i])
+		if err != nil {
+			return nil, err
+		}
+		ref[i+1] = StringTerm(parts[i])
+	}
+	return ref, nil
+}
+
 // RefTerm creates a new Term with a Ref value.
 func RefTerm(r ...*Term) *Term {
 	return &Term{Value: Ref(r)}
@@ -965,6 +987,21 @@ func (ref Ref) IsNested() bool {
 		}
 	}
 	return false
+}
+
+// Ptr returns a slash-separated path string for this ref. If the ref
+// contains non-string terms this function returns an error. Path
+// components are escaped.
+func (ref Ref) Ptr() (string, error) {
+	parts := make([]string, 0, len(ref)-1)
+	for _, term := range ref[1:] {
+		if str, ok := term.Value.(String); ok {
+			parts = append(parts, url.PathEscape(string(str)))
+		} else {
+			return "", fmt.Errorf("invalid path value type")
+		}
+	}
+	return strings.Join(parts, "/"), nil
 }
 
 var varRegexp = regexp.MustCompile("^[[:alpha:]_][[:alpha:][:digit:]_]*$")
@@ -1135,8 +1172,13 @@ func NewSet(t ...*Term) Set {
 }
 
 func newset(n int) *set {
+	var keys []*Term
+	if n > 0 {
+		keys = make([]*Term, 0, n)
+	}
 	return &set{
 		elems: make(map[int]*Term, n),
+		keys:  keys,
 	}
 }
 
@@ -1205,12 +1247,15 @@ func (s *set) Compare(other Value) int {
 	return termSliceCompare(s.keys, t.keys)
 }
 
-// Find returns the current value or a not found error.
+// Find returns the set or dereferences the element itself.
 func (s *set) Find(path Ref) (Value, error) {
 	if len(path) == 0 {
 		return s, nil
 	}
-	return nil, fmt.Errorf("find: not found")
+	if !s.Contains(path[0]) {
+		return nil, fmt.Errorf("find: not found")
+	}
+	return path[0].Value.Find(path[1:])
 }
 
 // Diff returns elements in s that are not in other.
@@ -1420,8 +1465,13 @@ type object struct {
 }
 
 func newobject(n int) *object {
+	var keys []*Term
+	if n > 0 {
+		keys = make([]*Term, 0, n)
+	}
 	return &object{
 		elems:  make(map[int]*objectElem, n),
+		keys:   keys,
 		ground: true,
 	}
 }
@@ -1510,7 +1560,7 @@ func (obj *object) Get(k *Term) *Term {
 func (obj *object) Hash() int {
 	var hash int
 	obj.Foreach(func(k, v *Term) {
-		hash += v.Value.Hash()
+		hash += k.Value.Hash()
 		hash += v.Value.Hash()
 	})
 	return hash

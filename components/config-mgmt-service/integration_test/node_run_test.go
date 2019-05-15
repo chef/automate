@@ -19,6 +19,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -43,13 +44,21 @@ func TestNodeRunWithANodeNotFoundReturnsError(t *testing.T) {
 
 func TestNodeRunWithRuns(t *testing.T) {
 	var (
-		run = newIngestRun(newUUID(), "success",
+		nodeID = newUUID()
+		run    = newIngestRun(nodeID, "success",
 			time.Now().Format(time.RFC3339),
 			time.Now().Add(time.Minute).Format(time.RFC3339))
-		req = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
-		ctx = context.Background()
+		req  = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID,
+			},
+		}
 	)
 
+	suite.IngestNodes([]iBackend.Node{node})
 	suite.IngestRuns([]iBackend.Run{run})
 	defer suite.DeleteAllDocuments()
 
@@ -61,13 +70,172 @@ func TestNodeRunWithRuns(t *testing.T) {
 		})
 }
 
-func TestNodeRunWithCookbookRunlist(t *testing.T) {
+func TestNodeRunWithRunsNonmatchingNode(t *testing.T) {
 	var (
-		run = newIngestRun(newUUID(), "success",
+		nodeID = newUUID()
+		run    = newIngestRun(nodeID, "success",
 			time.Now().Format(time.RFC3339),
 			time.Now().Add(time.Minute).Format(time.RFC3339))
-		req = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
-		ctx = context.Background()
+		req  = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: "not-matching-run",
+			},
+		}
+	)
+
+	suite.IngestNodes([]iBackend.Node{node})
+	suite.IngestRuns([]iBackend.Run{run})
+	defer suite.DeleteAllDocuments()
+
+	response, err := cfgmgmt.GetNodeRun(ctx, &req)
+	assert.Error(t, err)
+	assert.Nil(t, response, "run should be nil")
+}
+
+func TestNodeRunProjectFilter(t *testing.T) {
+	var (
+		nodeID = newUUID()
+		run    = newIngestRun(nodeID, "success",
+			time.Now().Format(time.RFC3339),
+			time.Now().Add(time.Minute).Format(time.RFC3339))
+		req                = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
+		successfulResponse = ingestRunToMessage(run)
+	)
+
+	cases := []struct {
+		description   string
+		ctx           context.Context
+		nodeProjects  []string
+		expectedError bool
+	}{
+		{
+			description:   "Node project matching request projects",
+			ctx:           contextWithProjects([]string{"project9"}),
+			nodeProjects:  []string{"project9"},
+			expectedError: false,
+		},
+		{
+			description:   "Node project not matching request projects",
+			ctx:           contextWithProjects([]string{"project3"}),
+			nodeProjects:  []string{"project9"},
+			expectedError: true,
+		},
+		{
+			description:   "Node one project; request all projects allowed",
+			ctx:           contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			nodeProjects:  []string{"project9"},
+			expectedError: false,
+		},
+		{
+			description:   "Node has no projects; request all projects allowed",
+			ctx:           contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			nodeProjects:  []string{},
+			expectedError: false,
+		},
+		{
+			description:   "Node has no projects; request unassigned projects allowed",
+			ctx:           contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			nodeProjects:  []string{},
+			expectedError: false,
+		},
+		{
+			description:   "Node has a project; request only unassigned projects",
+			ctx:           contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			nodeProjects:  []string{"project9"},
+			expectedError: true,
+		},
+		{
+			description:   "Node has a projects; request unassigned and matching project allowed",
+			ctx:           contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
+			nodeProjects:  []string{"project9"},
+			expectedError: false,
+		},
+		{
+			description:   "Node has no projects; request a project not allowed",
+			ctx:           contextWithProjects([]string{}),
+			nodeProjects:  []string{},
+			expectedError: false,
+		},
+		{
+			description:   "Node with one project matching one of several requested projects allowed",
+			ctx:           contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			nodeProjects:  []string{"project9"},
+			expectedError: false,
+		},
+		{
+			description:   "Node with one project not matching any of several requested projects allowed",
+			ctx:           contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			nodeProjects:  []string{"project9"},
+			expectedError: true,
+		},
+		{
+			description:   "Node with several projects where one matches a single requested project allowed",
+			ctx:           contextWithProjects([]string{"project3"}),
+			nodeProjects:  []string{"project3", "project4", "project7", "project6"},
+			expectedError: false,
+		},
+		{
+			description:   "Node with several projects where one matches one of several requested project allowed",
+			ctx:           contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			nodeProjects:  []string{"project3", "project4", "project7", "project6"},
+			expectedError: false,
+		},
+		{
+			description:   "Node with several projects where none matches several requested project allowed",
+			ctx:           contextWithProjects([]string{"project14", "project10", "project12", "project13"}),
+			nodeProjects:  []string{"project3", "project4", "project7", "project6"},
+			expectedError: true,
+		},
+		{
+			description:   "Node with several projects where two matches two of several requested project allowed",
+			ctx:           contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			nodeProjects:  []string{"project3", "project10", "project7", "project6"},
+			expectedError: false,
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+			node := iBackend.Node{
+				Exists:   true,
+				Projects: test.nodeProjects,
+				NodeInfo: iBackend.NodeInfo{
+					EntityUuid: nodeID,
+				},
+			}
+			suite.IngestNodes([]iBackend.Node{node})
+			suite.IngestRuns([]iBackend.Run{run})
+			defer suite.DeleteAllDocuments()
+
+			res, err := cfgmgmt.GetNodeRun(test.ctx, &req)
+			if test.expectedError {
+				assert.Error(t, err)
+				assert.Nil(t, res, "response should be nil")
+				return
+			}
+			assert.Nil(t, err)
+			assert.Equal(t, successfulResponse, res)
+		})
+	}
+}
+
+func TestNodeRunWithCookbookRunlist(t *testing.T) {
+	var (
+		nodeID = newUUID()
+		run    = newIngestRun(nodeID, "success",
+			time.Now().Format(time.RFC3339),
+			time.Now().Add(time.Minute).Format(time.RFC3339))
+		req  = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID,
+			},
+		}
 	)
 	expandedRunListRunList := make([]iBackend.ExpandedRunListRunList, 1)
 	expandedRunListRunList[0] = iBackend.ExpandedRunListRunList{
@@ -78,6 +246,7 @@ func TestNodeRunWithCookbookRunlist(t *testing.T) {
 	run.ExpandedRunList.ID = "_default"
 	run.ExpandedRunList.RunList = expandedRunListRunList
 
+	suite.IngestNodes([]iBackend.Node{node})
 	suite.IngestRuns([]iBackend.Run{run})
 	defer suite.DeleteAllDocuments()
 
@@ -91,11 +260,18 @@ func TestNodeRunWithCookbookRunlist(t *testing.T) {
 
 func TestNodeRunWithOneRoleRunlist(t *testing.T) {
 	var (
-		run = newIngestRun(newUUID(), "success",
+		nodeID = newUUID()
+		run    = newIngestRun(nodeID, "success",
 			time.Now().Format(time.RFC3339),
 			time.Now().Add(time.Minute).Format(time.RFC3339))
-		req = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
-		ctx = context.Background()
+		req  = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID,
+			},
+		}
 	)
 	expandedRunListRunList := make([]iBackend.ExpandedRunListRunList, 1)
 	expandedRunListRunList[0] = iBackend.ExpandedRunListRunList{
@@ -103,17 +279,17 @@ func TestNodeRunWithOneRoleRunlist(t *testing.T) {
 		Name:    "web",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::default",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::delete_validation",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "lamp2::default",
 				Skipped: false,
@@ -123,6 +299,7 @@ func TestNodeRunWithOneRoleRunlist(t *testing.T) {
 	run.ExpandedRunList.ID = "_default"
 	run.ExpandedRunList.RunList = expandedRunListRunList
 
+	suite.IngestNodes([]iBackend.Node{node})
 	suite.IngestRuns([]iBackend.Run{run})
 	defer suite.DeleteAllDocuments()
 
@@ -136,11 +313,18 @@ func TestNodeRunWithOneRoleRunlist(t *testing.T) {
 
 func TestNodeRunWithTwoRolesInRunlist(t *testing.T) {
 	var (
-		run = newIngestRun(newUUID(), "success",
+		nodeID = newUUID()
+		run    = newIngestRun(nodeID, "success",
 			time.Now().Format(time.RFC3339),
 			time.Now().Add(time.Minute).Format(time.RFC3339))
-		req = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
-		ctx = context.Background()
+		req  = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID,
+			},
+		}
 	)
 	expandedRunListRunList := make([]iBackend.ExpandedRunListRunList, 2)
 	expandedRunListRunList[0] = iBackend.ExpandedRunListRunList{
@@ -148,7 +332,7 @@ func TestNodeRunWithTwoRolesInRunlist(t *testing.T) {
 		Name:    "none",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "test::default",
 				Skipped: false,
@@ -160,17 +344,17 @@ func TestNodeRunWithTwoRolesInRunlist(t *testing.T) {
 		Name:    "web",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::default",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::delete_validation",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "lamp2::default",
 				Skipped: false,
@@ -180,6 +364,7 @@ func TestNodeRunWithTwoRolesInRunlist(t *testing.T) {
 	run.ExpandedRunList.ID = "_default"
 	run.ExpandedRunList.RunList = expandedRunListRunList
 
+	suite.IngestNodes([]iBackend.Node{node})
 	suite.IngestRuns([]iBackend.Run{run})
 	defer suite.DeleteAllDocuments()
 
@@ -193,11 +378,18 @@ func TestNodeRunWithTwoRolesInRunlist(t *testing.T) {
 
 func TestNodeRunWithLoopRolesInRunlist(t *testing.T) {
 	var (
-		run = newIngestRun(newUUID(), "success",
+		nodeID = newUUID()
+		run    = newIngestRun(nodeID, "success",
 			time.Now().Format(time.RFC3339),
 			time.Now().Add(time.Minute).Format(time.RFC3339))
-		req = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
-		ctx = context.Background()
+		req  = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID,
+			},
+		}
 	)
 	expandedRunListRunList := make([]iBackend.ExpandedRunListRunList, 2)
 	expandedRunListRunList[0] = iBackend.ExpandedRunListRunList{
@@ -205,7 +397,7 @@ func TestNodeRunWithLoopRolesInRunlist(t *testing.T) {
 		Name:    "none",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "test::default",
 				Skipped: false,
@@ -217,32 +409,32 @@ func TestNodeRunWithLoopRolesInRunlist(t *testing.T) {
 		Name:    "web3",
 		Skipped: false,
 		Children: []iBackend.ExpandedRunListRunList{
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::default",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "chef-client::delete_validation",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "recipe",
 				Name:    "lamp2::default",
 				Skipped: false,
 			},
-			iBackend.ExpandedRunListRunList{
+			{
 				Type:    "role",
 				Name:    "none",
 				Skipped: false,
 				Children: []iBackend.ExpandedRunListRunList{
-					iBackend.ExpandedRunListRunList{
+					{
 						Type:    "recipe",
 						Name:    "test::default",
 						Skipped: false,
 					},
-					iBackend.ExpandedRunListRunList{
+					{
 						Type:    "role",
 						Name:    "web3",
 						Skipped: true,
@@ -254,6 +446,7 @@ func TestNodeRunWithLoopRolesInRunlist(t *testing.T) {
 	run.ExpandedRunList.ID = "_default"
 	run.ExpandedRunList.RunList = expandedRunListRunList
 
+	suite.IngestNodes([]iBackend.Node{node})
 	suite.IngestRuns([]iBackend.Run{run})
 	defer suite.DeleteAllDocuments()
 

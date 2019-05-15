@@ -444,7 +444,7 @@ func (depth *ControlDepth) getStatsSummaryNodesResult(searchResult *elastic.Sear
 	summary := &stats.NodeSummary{}
 
 	if aggRoot, found := depth.unwrap(&searchResult.Aggregations); found {
-		if impactBuckets, found := aggRoot.Aggregations.Terms("impact"); found {
+		if impactBuckets, found := aggRoot.Aggregations.Terms("impact"); found && len(impactBuckets.Buckets) > 0 {
 			//there can only be one
 			impact := impactBuckets.Buckets[0]
 			if failedResult, found := impact.Aggregations.Filter("noncompliant"); found {

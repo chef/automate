@@ -484,7 +484,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:d26054aef028b782f9b65c29f17b8b6a5c75e302b6656f370b9c0788b1e35a00"
+  digest = "1:a03c2550a5b136df65f0179ba0be2ff30926dcd01315b046f64447619f0884ae"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "codegenerator",
@@ -501,8 +501,8 @@
     "utilities",
   ]
   pruneopts = "T"
-  revision = "20f268a412e5b342ebfb1a0eef7c3b7bd6c260ea"
-  version = "v1.8.5"
+  revision = "8fd5fd9d19ce68183a6b0934519dfe7fe6269612"
+  version = "v1.9.0"
 
 [[projects]]
   branch = "master"
@@ -845,7 +845,7 @@
   version = "v6.2.16"
 
 [[projects]]
-  digest = "1:a7cc362065043a18da74e58dc6f054944e7cda53606b4a1904c30152b30e0c66"
+  digest = "1:4dbda3a99681a2fd853368c557699c900231beafafd714fc34f93c0207038b3d"
   name = "github.com/open-policy-agent/opa"
   packages = [
     "ast",
@@ -871,8 +871,8 @@
     "util",
   ]
   pruneopts = "NUT"
-  revision = "6af8da83ad7d5170715ece38d0034ec3984c2786"
-  version = "v0.10.2"
+  revision = "0f39c27e2069be20c4a2ec0c8751b6132a681ac1"
+  version = "v0.10.7"
 
 [[projects]]
   digest = "1:7da29c22bcc5c2ffb308324377dc00b5084650348c2799e573ed226d8cc9faf0"
@@ -1369,7 +1369,7 @@
   revision = "67d6565462c5a0d99b88193d59fefa10ca7e3010"
 
 [[projects]]
-  digest = "1:a47041c36370cbbd7f99427748514c4691b5db7822287112aa809784b6da82ef"
+  digest = "1:b1a4f30a5884a325f07d2c650f6df1a9de80554e647372bd1422bf641cffe37f"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -1408,6 +1408,7 @@
     "stats",
     "status",
     "tap",
+    "test/bufconn",
   ]
   pruneopts = "NUT"
   revision = "2fdaae294f38ed9a121193c51ec99fecd3b13eb7"
@@ -1618,6 +1619,7 @@
     "google.golang.org/grpc/peer",
     "google.golang.org/grpc/reflection",
     "google.golang.org/grpc/status",
+    "google.golang.org/grpc/test/bufconn",
     "gopkg.in/cheggaaa/pb.v1",
     "gopkg.in/segmentio/analytics-go.v3",
     "gopkg.in/square/go-jose.v2",
