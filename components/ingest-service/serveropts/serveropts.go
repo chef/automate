@@ -22,6 +22,7 @@ type Opts struct {
 	PurgeActionsAfterDays         int32
 	ConnFactory                   *secureconn.Factory
 	projectUpdateStateFilePath    string
+	NodeManagerAddress            string
 }
 
 // SetLogLevel sets the log level for the service

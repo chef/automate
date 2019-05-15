@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/components/ingest-service/pipeline/processor"
 	"github.com/chef/automate/components/ingest-service/pipeline/publisher"
+	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -20,7 +21,7 @@ type ChefRunPipeline struct {
 }
 
 // NewChefRunPipeline Create a new chef run pipeline
-func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient) ChefRunPipeline {
+func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient, nodeMgrClient manager.NodeManagerServiceClient) ChefRunPipeline {
 	var (
 		in            = make(chan message.ChefRun, 100)
 		counter int64 = 0
@@ -30,6 +31,7 @@ func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient
 		processor.BuildTransmogrify(9),
 		processor.ChefRunCorrections,
 		processor.BuildRunProjectTagger(authzClient),
+		publisher.BuildNodeManagerPublisher(nodeMgrClient),
 		processor.BuildRunMsgToBulkRequestTransformer(client),
 		publisher.BuildBulkRunPublisher(client),
 		processor.CountRuns(&counter),
