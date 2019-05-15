@@ -560,6 +560,7 @@ paths = [
   "api/config/shared/*",
   "api/external/applications/*",
   "api/external/common/*",
+  "api/external/habitat/*",
   "components/automate-gateway/api/authz/*",
   "components/automate-gateway/authz/policy_v2/*",
   "components/automate-grpc/*",
