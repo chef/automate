@@ -60,12 +60,12 @@ The `/nodes` endpoint supports filtering by:
 - statechange_timerange (supports two timestamps of type "2019-03-05T00:00:00Z")
 - status
 - tags
-- last_run_timerange (last time reported on ingested ccr: supports two timestamps of type "2019-03-05T00:00:00Z")
-- last_scan_timerange (last time reported on ingested scan: supports two timestamps of type "2019-03-05T00:00:00Z")
+- last_run_timerange (last time reported on ingested ccr: supports two timestamps of type "2019-03-05T00:00:00Z" (RFC3339)) 
+- last_scan_timerange (last time reported on ingested scan: supports two timestamps of type "2019-03-05T00:00:00Z" (RFC3339))
 - last_run_status (status on last ingested ccr)
 - last_scan_status (status on last ingested scan)
-- last_run_penultimate_status
-- last_scan_penultimate_status
+- last_run_penultimate_status (status on second to last ingested ccr)
+- last_scan_penultimate_status (status on second to last ingested scan)
 
 ## Examples
 
