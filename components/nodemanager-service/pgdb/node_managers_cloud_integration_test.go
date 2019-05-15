@@ -53,7 +53,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestUpdateOrInsertInstanceSourceStateI
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
-	suite.Equal(1, len(stoppedNodes))
+	suite.Equal(0, len(stoppedNodes))
 
 	// instance state: running
 	runningInstanceState := pgdb.InstanceState{ID: "i-079356", State: "running", Region: "eu-west-1"}

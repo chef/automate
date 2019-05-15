@@ -33,17 +33,6 @@ WHERE nodes.source_state != 'TERMINATED'
 RETURNING id;
 `
 
-const sqlUpsertInstanceSourceStateAndStatus = `
-INSERT INTO nodes
- (id, name, source_id, source_state, status, source_region, source_account_id, target_config, statechange_timestamp, manager, connection_error)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-ON CONFLICT (source_id, source_region, source_account_id)
-DO UPDATE
-SET source_state = $4, status = $5, statechange_timestamp = $9
-WHERE nodes.source_state != 'TERMINATED'
-RETURNING id;
-`
-
 const sqlUpdateInstanceSourceStateAndStatus = `
 UPDATE nodes
 SET source_state = $4, status = $5, statechange_timestamp = $6, connection_error = $7
@@ -328,15 +317,13 @@ func (db *DB) UpdateOrInsertInstanceSourceStateInDb(instance InstanceState, mgrI
 	if len(name) == 0 {
 		name = instance.ID
 	}
-	switch instance.State {
-	case "terminated":
-		// if the instance state we're getting is terminated, we only want to update the node if we already
-		// have it in the system. it's silly to *add* nodes that are already terminated here.
+	switch instanceState {
+	case "TERMINATED", "STOPPED":
+		// if the instance state we're getting is terminated or stopped, we only want to update the node if we already
+		// have it in the system. it's silly to *add* nodes that are already terminated/stopped here.
 		id, err = db.SelectStr(sqlUpdateInstanceSourceStateAndStatus, instance.ID, instance.Region, sourceAcctID, instanceState, "unreachable", nowTime, connectionErr)
-	case "running":
+	case "RUNNING":
 		id, err = db.SelectStr(sqlUpsertInstanceSourceState, uuid, name, instance.ID, instanceState, instance.Region, sourceAcctID, tcByte, nowTime, mgrType)
-	default:
-		id, err = db.SelectStr(sqlUpsertInstanceSourceStateAndStatus, uuid, name, instance.ID, instanceState, "unreachable", instance.Region, sourceAcctID, tcByte, nowTime, mgrType, connectionErr)
 	}
 	if err != nil {
 		return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to update instance %s %s", instance.ID, name)
