@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	uuid "github.com/chef/automate/lib/uuid4"
+	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
@@ -276,19 +277,21 @@ func (m *MessagePrototype) CreateMessage(uuid string) *habitat.HealthCheckEvent 
 	return &habitat.HealthCheckEvent{
 		ServiceMetadata: &habitat.ServiceMetadata{
 			PackageIdent: m.PkgFQID(),
-			// @afiune is this full name or partial?
-			ServiceGroup: m.PkgName + ".default",
-			// @afiune add channel
-			//Channel: "stable",
+			ServiceGroup: fmt.Sprintf("%s.default", m.PkgName),
+			UpdateConfig: &habitat.UpdateConfig{
+				Strategy: habitat.UpdateStrategy_AtOnce,
+				Channel:  "stable",
+			},
 		},
 		EventMetadata: &habitat.EventMetadata{
 			SupervisorId: uuid,
 			Application:  m.Application,
 			Environment:  m.Environment,
 			Fqdn:         fmt.Sprintf("%s.example", uuid),
+			Site:         "test",
 		},
-		Result: habitat.HealthCheck_Ok,
-		//Site:    "test",
+		Result:    habitat.HealthCheck_Warning,
+		Execution: &duration.Duration{},
 	}
 }
 
