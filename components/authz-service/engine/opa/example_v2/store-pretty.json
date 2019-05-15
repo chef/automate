@@ -1,0 +1,539 @@
+{
+  "policies": {
+    "00a38187-7557-4105-92a0-48db63af4103": {
+      "members": [
+        "user:local:*"
+      ],
+      "statements": {
+        "55754dbe-8aec-4346-aadb-90116bc0d867": {
+          "actions": [
+            "iam:users:delete"
+          ],
+          "effect": "deny",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "iam:users:${a2:username}"
+          ]
+        },
+        "e9faa7a9-d458-4009-8192-edee6024b5d9": {
+          "actions": [
+            "iam:users:get",
+            "iam:users:list",
+            "iam:users:update",
+            "iam:usersSelf:update"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "iam:users:${a2:username}",
+            "iam:usersSelf:${a2:username}"
+          ]
+        }
+      },
+      "type": "system"
+    },
+    "1074e13b-a918-4892-98be-47a5a8b2d2b6": {
+      "members": [
+        "*"
+      ],
+      "statements": {
+        "173a18a6-c102-4e45-a0d0-dfec68c2eee5": {
+          "actions": [
+            "iam:policies:get"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "iam:policyVersion"
+          ]
+        },
+        "4cc6e7cd-5e32-43e5-af04-d32b15796590": {
+          "actions": [
+            "iam:introspect:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "iam:introspect"
+          ]
+        },
+        "d7ed1d1f-1f6a-4055-a07e-23430c267e42": {
+          "actions": [
+            "system:serviceVersion:get",
+            "system:serviceVersion:list"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "system:service:version"
+          ]
+        },
+        "e5e1da2d-bbda-4211-adf5-c83e13f1891a": {
+          "actions": [
+            "system:license:get"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "system:status"
+          ]
+        }
+      },
+      "type": "system"
+    },
+    "administrator-access": {
+      "members": [
+        "team:local:admins"
+      ],
+      "statements": {
+        "d31a8c6f-a6f0-42f3-a7fe-afb6b0f41cc8": {
+          "actions": [
+            "*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        },
+        "e7db4f3c-80aa-491b-9842-4194c9326a2c": {
+          "actions": [
+            "iam:policies:delete",
+            "iam:policies:update"
+          ],
+          "effect": "deny",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "iam:policies:administrator-access"
+          ]
+        }
+      },
+      "type": "chef-managed"
+    },
+    "compliance-access-legacy": {
+      "members": [
+        "user:*"
+      ],
+      "statements": {
+        "19eb8584-0f81-4229-9287-0e4cf08911f8": {
+          "actions": [
+            "compliance:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "custom"
+    },
+    "compliance-profile-access-legacy": {
+      "members": [
+        "token:*"
+      ],
+      "statements": {
+        "8b02e442-a8d8-41ca-aa89-fb3121221f78": {
+          "actions": [
+            "compliance:profiles:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "custom"
+    },
+    "e166f6f9-860d-464a-a91f-be3509369f92": {
+      "members": [
+        "tls:service:automate-cs-nginx:*",
+        "tls:service:automate-cs-oc-erchef:*"
+      ],
+      "statements": {
+        "f777e560-663f-45b0-93a5-f955843be34c": {
+          "actions": [
+            "infra:ingest:*",
+            "compliance:profiles:get",
+            "compliance:profiles:list"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "system"
+    },
+    "e62bc524-d903-4708-92de-a4435ce0252e": {
+      "members": [
+        "*"
+      ],
+      "statements": {
+        "0d516454-7a0c-4922-86f9-8b93d035e869": {
+          "actions": [
+            "iam:roles:update",
+            "iam:roles:delete"
+          ],
+          "effect": "deny",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "iam:roles:owner",
+            "iam:roles:editor",
+            "iam:roles:viewer",
+            "iam:roles:ingest",
+            "iam:roles:project-admin",
+            "iam:roles:iam-members-viewer"
+          ]
+        },
+        "2b5a3f1d-9d25-46f3-b1dd-8f46c7d323a3": {
+          "actions": [
+            "iam:policies:update",
+            "iam:policies:delete"
+          ],
+          "effect": "deny",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "iam:policies:administrator-access",
+            "iam:policies:editor-access",
+            "iam:policies:viewer-access",
+            "iam:policies:ingest-access"
+          ]
+        },
+        "d49181d1-37b7-459d-8935-f11a9fa6b9e1": {
+          "actions": [
+            "iam:projects:update",
+            "iam:projects:delete"
+          ],
+          "effect": "deny",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "iam:projects:~~ALL-PROJECTS~~"
+          ]
+        }
+      },
+      "type": "system"
+    },
+    "e729c61f-c40a-4bfa-affe-2a541368169f": {
+      "members": [
+        "tls:service:deployment-service:*"
+      ],
+      "statements": {
+        "9edf285c-fc96-4363-a0b9-59e5b46f2a76": {
+          "actions": [
+            "*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "system"
+    },
+    "editor-access": {
+      "members": [
+        "team:local:editors"
+      ],
+      "statements": {
+        "b7efc19b-3a66-4839-9810-e3bb16824858": {
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ],
+          "role": "editor"
+        }
+      },
+      "type": "chef-managed"
+    },
+    "events-access-legacy": {
+      "members": [
+        "user:*"
+      ],
+      "statements": {
+        "948de26f-7257-4abf-a7ac-917fd9243ca6": {
+          "actions": [
+            "event:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "custom"
+    },
+    "infrastructure-automation-access-legacy": {
+      "members": [
+        "user:*"
+      ],
+      "statements": {
+        "f22dd8b5-da81-4159-bc56-4a6b6ca85540": {
+          "actions": [
+            "infra:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "custom"
+    },
+    "ingest-access": {
+      "members": [],
+      "statements": {
+        "f8f5438b-d5f9-4c51-a665-e26cd456032f": {
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ],
+          "role": "ingest"
+        }
+      },
+      "type": "chef-managed"
+    },
+    "ingest-access-legacy": {
+      "members": [
+        "token:*"
+      ],
+      "statements": {
+        "9873c446-5d9a-463a-9c0b-1015f878a9e8": {
+          "actions": [
+            "infra:ingest:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "custom"
+    },
+    "node-managers-access-legacy": {
+      "members": [
+        "user:*"
+      ],
+      "statements": {
+        "d103b266-a016-4b7b-909a-ad9a36d0d286": {
+          "actions": [
+            "infra:nodeManagers:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "custom"
+    },
+    "nodes-access-legacy": {
+      "members": [
+        "user:*"
+      ],
+      "statements": {
+        "4d5adbb0-c52e-485f-9fb2-503c6a8ee706": {
+          "actions": [
+            "infra:nodes:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "custom"
+    },
+    "secrets-access-legacy": {
+      "members": [
+        "user:*"
+      ],
+      "statements": {
+        "869519d3-b5f8-4ad1-9b15-74cd4fb09fe6": {
+          "actions": [
+            "secrets:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "custom"
+    },
+    "telemetry-access-legacy": {
+      "members": [
+        "user:*"
+      ],
+      "statements": {
+        "f98f7015-697e-4c56-99af-b3ab59d98319": {
+          "actions": [
+            "system:telemetryConfig:*"
+          ],
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ]
+        }
+      },
+      "type": "custom"
+    },
+    "viewer-access": {
+      "members": [
+        "team:local:viewers"
+      ],
+      "statements": {
+        "a8110054-c889-46e1-ae2b-415c505a6b47": {
+          "effect": "allow",
+          "projects": [
+            "~~ALL-PROJECTS~~"
+          ],
+          "resources": [
+            "*"
+          ],
+          "role": "viewer"
+        }
+      },
+      "type": "chef-managed"
+    }
+  },
+  "roles": {
+    "editor": {
+      "actions": [
+        "infra:*",
+        "compliance:*",
+        "system:*",
+        "event:*",
+        "ingest:*",
+        "secrets:*",
+        "telemetry:*",
+        "iam:projects:list",
+        "iam:projects:get",
+        "iam:projects:assign"
+      ]
+    },
+    "iam-members-viewer": {
+      "actions": [
+        "iam:users:get",
+        "iam:users:list",
+        "iam:teams:get",
+        "iam:teams:list",
+        "iam:tokens:get",
+        "iam:tokens:list"
+      ]
+    },
+    "ingest": {
+      "actions": [
+        "infra:ingest:*",
+        "compliance:profiles:get",
+        "compliance:profiles:list"
+      ]
+    },
+    "owner": {
+      "actions": [
+        "*"
+      ]
+    },
+    "project-admin": {
+      "actions": [
+        "infra:*",
+        "compliance:*",
+        "system:*",
+        "event:*",
+        "ingest:*",
+        "secrets:*",
+        "telemetry:*",
+        "iam:projects:list",
+        "iam:projects:get",
+        "iam:projects:assign",
+        "iam:policies:list",
+        "iam:policies:get",
+        "iam:policyMembers:*",
+        "iam:teams:list",
+        "iam:teams:get",
+        "iam:teamUsers:*"
+      ]
+    },
+    "viewer": {
+      "actions": [
+        "secrets:*:get",
+        "secrets:*:list",
+        "infra:*:get",
+        "infra:*:list",
+        "compliance:*:get",
+        "compliance:*:list",
+        "system:*:get",
+        "system:*:list",
+        "event:*:get",
+        "event:*:list",
+        "ingest:*:get",
+        "ingest:*:list",
+        "secrets:*:get",
+        "secrets:*:list",
+        "iam:projects:list",
+        "iam:projects:get"
+      ]
+    }
+  },
+  "rules": {}
+}

@@ -20,18 +20,8 @@ variables(a) {
 # 'expanded'.
 # Note: currently, only expands the one variable we know: ${a2:username}.
 expand(orig) = expanded {
-	# username is not defined => nothing to expand
-	not username
-	expanded := orig
-}
-
-expand(orig) = expanded {
+	split(input.subjects[_], ":", ["user", _, username])
 	expanded := replace(orig, "${a2:username}", username)
-}
-
-username = u {
-	input.subjects[_] = input_sub
-	split(input_sub, ":", ["user", _, u])
 }
 
 wildcard(a) {
@@ -81,8 +71,7 @@ resource_matches(in, stored) {
 resource_matches(in, stored) {
 	variables(stored)
 	wildcard(stored)
-	expanded = expand(stored)
-	wildcard_match(in, expanded)
+	wildcard_match(in, expand(stored))
 }
 
 resource_matches(_, "*") = true

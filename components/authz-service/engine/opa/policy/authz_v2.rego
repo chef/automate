@@ -55,16 +55,6 @@ has_project[[project, pol_id, statement_id]] {
 	project := projects[_]
 }
 
-has_project[[project, pol_id, statement_id]] {
-	project := policies[pol_id].statements[statement_id].projects[_]
-	count(input.projects) == 0
-}
-
-has_project[[project, pol_id, statement_id]] {
-	project := policies[pol_id].statements[statement_id].projects[_]
-	not input.projects
-}
-
 project_matches(proj) = projects {
 	proj == common.const_all_projects
 	projects := input.projects
@@ -102,14 +92,7 @@ denied_project[project] {
 	has_project[[project, pol_id, statement_id]]
 }
 
-# when no input is provided, this rule short-circuits checking any other allowed projects
-denied_all_projects {
-	match[["deny", pol_id, statement_id]]
-	common.const_all_projects == policies[pol_id].statements[statement_id].projects[_]
-}
-
 authorized_project[project] {
-	not denied_all_projects
 	allowed_project[project]
 	not denied_project[project]
 }

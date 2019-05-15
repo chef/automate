@@ -85,8 +85,9 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 		return nil, errors.Wrapf(err, "parse query %q", listProjectMapQuery)
 	}
 	s := State{
-		log:   l,
-		store: inmem.New(),
+		log:     l,
+		store:   inmem.New(),
+		v2Store: inmem.New(),
 		queries: map[string]ast.Body{
 			authzQuery:              authzQueryParsed,
 			filteredPairsQuery:      filteredPairsQueryParsed,
@@ -321,9 +322,9 @@ func (s *State) V2IsAuthorized(
 	}
 }
 
-// V2ProjectsAuthorized evaluates whether a given [subject, resource, action] tuple
-// is authorized and returns the list of associated allowed projects
-// from the set of requested projects passed in.
+// V2ProjectsAuthorized evaluates whether a given [subject, resource, action,
+// projects] tuple is authorized and returns the list of associated allowed
+// projects from the set of requested projects passed in.
 func (s *State) V2ProjectsAuthorized(
 	ctx context.Context,
 	subjects engine.Subjects,
