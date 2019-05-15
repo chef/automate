@@ -21,12 +21,12 @@ function install_from_results_or_depot() {
     results_artifact=$(find /a1-migration/results -name "*$1*" -exec ls -1t \{\} \+ | head -1)
     if [ ! -z "$results_artifact" ]; then
       echo "Installing package '$1' from local source. ('/a1-migration/results') "
-      HAB_LICENSE=accept-no-persist hab pkg install -b "$results_artifact"
+      HAB_LICENSE=accept-no-persist hab pkg install -b /bin "$results_artifact"
       return 0
     fi
   fi
 
-  HAB_LICENSE=accept-no-persist hab pkg install -b "chef/$1" --channel "$channel"
+  HAB_LICENSE=accept-no-persist hab pkg install -b /bin "chef/$1" --channel "$channel"
 }
 
 if find /a1-migration/hab_keys/ -name devchef*sig.key | grep -c devchef
