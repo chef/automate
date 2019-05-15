@@ -173,6 +173,11 @@ func (s *CfgMgmtServer) GetEventStringBuckets(ctx context.Context, request *requ
 		return &response.EventStrings{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return &response.EventStrings{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
 	// Create the three strings
 	for i, task := range tasksMap {
 		eventString, err := s.client.GetEventString(

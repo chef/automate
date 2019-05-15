@@ -9,10 +9,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -64,13 +66,13 @@ func TestEventStringsIncorrectHoursBetween(t *testing.T) {
 func TestEventStringsIncorrectTimezone(t *testing.T) {
 	var ctx = context.Background()
 	cases := []request.EventStrings{
-		request.EventStrings{
+		{
 			Start:        "2018-01-01",
 			End:          "2018-01-06",
 			HoursBetween: 3,
 			Timezone:     "",
 		},
-		request.EventStrings{
+		{
 			Start:        "2018-01-01",
 			End:          "2018-01-06",
 			HoursBetween: 3,
@@ -92,68 +94,68 @@ func TestEventStringsIncorrectTimezone(t *testing.T) {
 func TestEventStringsIncorrectTimes(t *testing.T) {
 	var ctx = context.Background()
 	cases := []request.EventStrings{
-		request.EventStrings{
+		{
 			Start:        "2018-01-06",
 			End:          "2018-01-01",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "2000-00-00",
 			End:          "2000-00-06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "00-00-00",
 			End:          "00-00-06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "18-10-10",
 			End:          "18-10-16",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "20-01-01",
 			End:          "20-01-06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "17:01:01",
 			End:          "17:01:06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "01-01-2000",
 			End:          "06-01-2000",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "3000-12",
 			End:          "3006-12",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
 
-		request.EventStrings{
+		{
 			Start:        "2019",
 			End:          "2018",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "1888:01:01",
 			End:          "1888:01:06",
 			HoursBetween: 3,
 			Timezone:     "UTC",
 		},
-		request.EventStrings{
+		{
 			Start:        "2027/01/01",
 			End:          "2027/01/08",
 			HoursBetween: 3,
@@ -168,6 +170,463 @@ func TestEventStringsIncorrectTimes(t *testing.T) {
 			_, err := cfgmgmt.GetEventStringBuckets(ctx, &test)
 
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+	}
+}
+
+func TestEventStringsProjectFilter(t *testing.T) {
+	var (
+		timezone  = "UTC"
+		startDate = time.Now().AddDate(0, 0, -3)
+		endDate   = time.Now()
+		request   = request.EventStrings{
+			HoursBetween: 1,
+			Start:        startDate.Format("2006-01-02"),
+			End:          endDate.Format("2006-01-02"),
+			Timezone:     timezone,
+		}
+	)
+
+	cases := []struct {
+		description string
+		actions     []iBackend.InternalChefAction
+		ctx         context.Context
+		expected    map[string]int
+	}{
+		{
+			description: "No Actions with requesting projects",
+			actions:     []iBackend.InternalChefAction{},
+			ctx:         contextWithProjects([]string{"project9"}),
+			expected:    map[string]int{},
+		},
+		{
+			description: "One Action with a project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Two Actions with a project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "delete",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: map[string]int{
+				"policyfile": 1,
+				"cookbook":   1,
+			},
+		},
+		{
+			description: "Two Actions with only one's project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "delete",
+					Projects:   []string{"project3"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Action project not matching request projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+			},
+			ctx:      contextWithProjects([]string{"project3"}),
+			expected: map[string]int{},
+		},
+		{
+			description: "One Action has one project; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Three Actions; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "delete",
+					Projects:   []string{"project3"},
+				},
+				{
+					EntityType: "node",
+					Task:       "create",
+					Projects:   []string{},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+				"node":       1,
+				"cookbook":   1,
+			},
+		},
+		{
+			description: "Action has no projects; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Action has no projects; request unassigned projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Action has a project; request only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: map[string]int{},
+		},
+		{
+			description: "Two Actions have and don't have projects; request only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "delete",
+					Projects:   []string{},
+				},
+			},
+			expected: map[string]int{
+				"cookbook": 1,
+			},
+		},
+		{
+			description: "Action has a project; request unassigned and matching project allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Action has no projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Two Actions have and don't have projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "delete",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+				"cookbook":   1,
+			},
+		},
+		{
+			description: "Action with one project matching one of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Two actions with one project matching different one of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "delete",
+					Projects:   []string{"project3"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+				"cookbook":   1,
+			},
+		},
+		{
+			description: "Action with one project not matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+			},
+			expected: map[string]int{},
+		},
+		{
+			description: "Two Actions with one project not matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project9"},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "delete",
+					Projects:   []string{"project10"},
+				},
+			},
+			expected: map[string]int{},
+		},
+		{
+			description: "Action with several projects where one matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Two Actions with several projects where one matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "delete",
+					Projects:   []string{"project12", "project10", "project11", "project3"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+				"cookbook":   1,
+			},
+		},
+		{
+			description: "Two Actions with several projects where only one action's project matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "delete",
+					Projects:   []string{"project12", "project10", "project11", "project13"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Action with several projects where one matches one of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+		{
+			description: "Two Actions with several projects where one matches one of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					EntityType: "cookbook",
+					Task:       "delete",
+					Projects:   []string{"project13", "project14", "project17", "project16"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+				"cookbook":   1,
+			},
+		},
+		{
+			description: "Action with several projects where none matches several requested project allowed",
+			ctx:         contextWithProjects([]string{"project14", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expected: map[string]int{},
+		},
+		{
+			description: "Action with several projects where two matches two of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					EntityType: "policyfile",
+					Task:       "update",
+					Projects:   []string{"project3", "project10", "project7", "project6"},
+				},
+			},
+			expected: map[string]int{
+				"policyfile": 1,
+			},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+			for index := range test.actions {
+				test.actions[index].RecordedAt = time.Now()
+				test.actions[index].Id = newUUID()
+				// test.actions[index].Task = task
+			}
+
+			suite.IngestActions(test.actions)
+			defer suite.DeleteAllDocuments()
+
+			res, err := cfgmgmt.GetEventStringBuckets(test.ctx, &request)
+			require.NoError(t, err)
+
+			itemsCount := map[string]int{}
+			// test response
+			for _, eventString := range res.Strings {
+
+				for _, item := range eventString.Collection {
+					if len(item.EventsCount) > 0 {
+						itemsCount[item.EventsCount[0].Name]++
+					}
+				}
+			}
+			for key, expectedValue := range test.expected {
+				value, ok := itemsCount[key]
+
+				assert.True(t, ok, "Event type '%s' was not found on string", key)
+				assert.Equal(t, expectedValue, value,
+					"Number of '%s' on string was %v should be %v", key, value, expectedValue)
+			}
+
+			for key := range itemsCount {
+				if key != "" {
+					_, ok := test.expected[key]
+					assert.True(t, ok, "Event type '%s' should not be on the string", key)
+				}
+			}
 		})
 	}
 }
@@ -341,7 +800,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 									"Number of '%s' on string was %v should be %v", key, value, expectedValue)
 							}
 
-							for key, _ := range itemsCount {
+							for key := range itemsCount {
 								if key != "" {
 									_, ok := test.expected[key]
 									assert.True(t, ok, "Event type '%s' should not be on the string", key)
@@ -576,21 +1035,21 @@ func testEventStringsThreeDayThreeActionsRequest(t *testing.T, date time.Time) {
 	action3Time := endDate
 
 	actions := []iBackend.InternalChefAction{
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action3Time,
 			EntityName: "action_3",
 			EntityType: "item",
 			Task:       "delete",
 		},
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action2Time,
 			EntityName: "action_2",
 			EntityType: "cookbook",
 			Task:       "update",
 		},
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action1Time,
 			EntityName: "action_1",
@@ -696,21 +1155,21 @@ func testEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T, date tim
 	action3Time := endDate
 
 	actions := []iBackend.InternalChefAction{
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action3Time,
 			EntityName: "action_3",
 			EntityType: "item",
 			Task:       "delete",
 		},
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action2Time,
 			EntityName: "action_2",
 			EntityType: "cookbook",
 			Task:       "update",
 		},
-		iBackend.InternalChefAction{
+		{
 			Id:         newUUID(),
 			RecordedAt: action1Time,
 			EntityName: "action_1",
@@ -895,48 +1354,48 @@ func testEventStringsMultipleEventTypesAndCounts(t *testing.T, date time.Time) {
 
 	actions := []iBackend.InternalChefAction{
 		// Delete - Five different Events
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item1", Task: "delete"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item2", Task: "delete"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item3", Task: "delete"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item4", Task: "delete"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action3Time, EntityName: "mock_action",
 			EntityType: "item5", Task: "delete"},
 		// Update - Five Events same type (Count)
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action2Time, EntityName: "mock_action",
 			EntityType: "cookbook", Task: "update"},
 		// Create - (Mix) Two different Events twice each
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action1Time, EntityName: "mock_action",
 			EntityType: "bag", Task: "create"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action1Time, EntityName: "mock_action",
 			EntityType: "bag", Task: "create"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action1Time, EntityName: "mock_action",
 			EntityType: "role", Task: "create"},
-		iBackend.InternalChefAction{
+		{
 			Id: newUUID(), RecordedAt: action1Time, EntityName: "mock_action",
 			EntityType: "role", Task: "create"},
 	}
