@@ -90,9 +90,9 @@ describe('Job List', () => {
     const subheading = header.$('chef-subheading');
 
     expect(heading.getText())
-      .toBe('Current scan jobs');
+      .toBe('Scan Jobs');
     expect(subheading.getText())
-      .toBe('Add a new job to be scanned for compliance or modify an existing job');
+      .toBe('Compliance scan jobs run inspec exec on a set of nodes.');
   });
 
   it('has a list of jobs', () => {

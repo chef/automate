@@ -9,7 +9,7 @@ import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { SettingsLandingComponent } from 'app/pages/settings-landing/settings-landing.component';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
-import { Check } from 'app/components/authorized/authorized.component';
+import { checkFirstPerm } from 'app/testing/spec-helpers';
 import { AdminSidebarComponent } from './admin-sidebar.component';
 
 describe('AdminSidebarComponent', () => {
@@ -134,30 +134,4 @@ describe('AdminSidebarComponent', () => {
       });
     });
   });
-
-  function checkFirstPerm(label: string, permsFromTemplate: string, permsFromLandingComp: Check[]) {
-    // This issue (https://github.com/angular/angular/issues/28786)
-    // limits `permsFromTemplate` to a max 30 chars, sufficient
-    // only to check the first path and verb, hence the name of this function.
-    // No way to guarantee a full check of all paths in one routeList element here. Sigh.
-
-    // The flow and text of these expectations is designed to give meaningful information
-    // when you edit either the template or the component but forget to do the other.
-    // To see this, go into the sidebar template and either:
-    // (1) change an 'anyOf' to an 'allOf' in an entry;
-    // (2) change the path or verb inside an anyOf/allOf in an entry.
-    if (!permsFromLandingComp) {
-      expect(permsFromTemplate).toBeNull(
-        label + ': is empty in SettingsLanding but not in admin-sidebar template');
-      return;
-    } else if (!permsFromTemplate) {
-      expect(permsFromLandingComp).toBeNull(
-        label + ': is not empty in SettingsLanding but is in admin-sidebar template');
-      return;
-    }
-    const firstCheckItem = permsFromLandingComp[0];
-    const [ path, verb ] = permsFromTemplate.split(',');
-    expect(path).toBe(firstCheckItem[0]);
-    expect(verb).toBe(firstCheckItem[1]);
-  }
 });

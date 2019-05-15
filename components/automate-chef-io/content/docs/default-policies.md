@@ -81,7 +81,7 @@ JobScheduler | ConfigureMissingNodesForDeletionScheduler | /retention/nodes/miss
 ### Compliance Pages
 
 > Corresponds to "Compliance" tab (`/compliance/reporting/overview`), "Scan Jobs" tab
-(`/compliance/scanner/jobs`) & "Asset Store" tab (`/profiles`)
+(`/compliance/scanner/jobs`) & "Profiles" tab (`/profiles`)
 
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---

@@ -54,7 +54,7 @@
           <chef-icon class="status-icon" [ngClass]="node.latest_report.status">
             {{ statusIcon(node.latest_report.status) }}
           </chef-icon>
-          <a [routerLink]="['/compliance/reporting/nodes', node.id]">{{ node.name }}</a>
+          <a [routerLink]="['/compliance/reports/nodes', node.id]">{{ node.name }}</a>
         </chef-td>
         <chef-td>{{ node.platform.name }} {{ node.platform.release }}</chef-td>
         <chef-td>{{ node.environment }}</chef-td>

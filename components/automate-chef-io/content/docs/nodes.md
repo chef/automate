@@ -6,8 +6,8 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "scan_jobs"
-    weight = 10
+    parent = "compliance"
+    weight = 40
 +++
 
 ### Nodes

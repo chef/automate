@@ -3,7 +3,7 @@
 <div class="container">
   <main>
     <chef-page-header>
-      <chef-heading>Compliance Reporting</chef-heading>
+      <chef-heading>Reports</chef-heading>
       <chef-subheading>Compliance reports describe the status of scanned infrastructure. Filtering by a profile, or a profile and one associated control, will enable deep filtering, which will also reflect on the status of the node.</chef-subheading>
     </chef-page-header>
 
@@ -114,15 +114,15 @@
     <!--Tabs (Overview, Nodes, Profiles)-->
     <ul class="nav-tabs-list">
       <li class="nav-tabs-item">
-        <a class="nav-tab" routerLink="/compliance/reporting/overview" routerLinkActive="active" queryParamsHandling="preserve">Overview</a>
+        <a class="nav-tab" routerLink="/compliance/reports/overview" routerLinkActive="active" queryParamsHandling="preserve">Overview</a>
       </li>
       <li class="nav-tabs-item">
-        <a class="nav-tab" routerLink="/compliance/reporting/nodes" routerLinkActive="active" queryParamsHandling="preserve">
+        <a class="nav-tab" routerLink="/compliance/reports/nodes" routerLinkActive="active" queryParamsHandling="preserve">
           {{reportData.reportingSummary?.stats.nodes | number }} Nodes
         </a>
       </li>
       <li class="nav-tabs-item">
-        <a class="nav-tab" routerLink="/compliance/reporting/profiles" routerLinkActive="active" queryParamsHandling="preserve">
+        <a class="nav-tab" routerLink="/compliance/reports/profiles" routerLinkActive="active" queryParamsHandling="preserve">
           {{reportData.reportingSummary?.stats.profiles | number }} Profiles
         </a>
       </li>

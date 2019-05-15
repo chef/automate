@@ -34,7 +34,7 @@
         {{ job.name }}
       </chef-td>
       <chef-td *ngIf="!isJobReport(job)">
-        <a [routerLink]="['/compliance', 'scanner', 'jobs', job.id, 'scans']">{{ job.name }}</a>
+        <a [routerLink]="['/compliance', 'scan-jobs', 'jobs', job.id, 'scans']">{{ job.name }}</a>
       </chef-td>
       <chef-td>{{ displayNodeCount(job.node_count | number, job.recurrence) }}</chef-td>
       <chef-td>{{ timeFromNow(job.end_time) }}</chef-td>

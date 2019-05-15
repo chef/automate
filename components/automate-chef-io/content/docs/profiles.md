@@ -1,33 +1,37 @@
 +++
-title = "Asset Store"
+title = "Profiles"
 description = "Select and Install Compliance Profiles"
 date = 2018-03-26T16:02:53-07:00
 draft = false
 bref = ""
 toc = true
+[menu]
+  [menu.docs]
+    parent = "compliance"
+    weight = 30
 +++
 
-## About the Asset Store
+## Overview
 
-Find Chef Automate compliance profiles under the **Asset Store** tab.
+Navigate to compliance profiles by using the **Compliance** tab and then selecting the _Profiles_ page.
 Compliance profiles help you secure your infrastructure continuously.
 Chef Automate compliance profiles translate CIS Benchmarks and other security standards in easily readable policy.
 Chef Automate uses the InSpec language to turn compliance into code.
-You can install and download one of our 100+ ready-to-use compliance profiles from the Asset Store--or upload your own custom profiles.
+You can install and download one of our 100+ ready-to-use compliance profiles from Profiles--or upload your own custom profiles.
 
-![Chef Automate Asset Store](/images/docs/asset-store-installed.png)
+![Chef Automate Profiles](/images/docs/asset-store-installed.png)
 
-## Using the Asset Store
+## Using Profiles
 
-Navigate to the profiles page by selecting the **Asset Store** tab at the top of the Chef Automate screen or by heading to `https://{{< example_fqdn "automate" >}}/profiles`.
+Navigate to the _Profiles_ page by selecting the **Profiles** tab at the top of the Chef Automate screen or by heading to `https://{{< example_fqdn "automate" >}}/profiles`.
 
-The Asset Store has a search bar and two views, the _Profiles_ page, which displays the profiles you've installed
+Profiles has a search bar and two views: the _Profiles_ page, which displays the profiles you've installed
 in your unique namespace within Chef Automate,
 and the _Available_ page, which displays all of the ready-to-use compliance profiles in Chef Automate.
 
 ### Installing Profiles
 
-![Asset Store Available Profiles](/images/docs/asset-store-profiles.png)
+![Available Profiles](/images/docs/asset-store-profiles.png)
 
 Locate profiles by browsing the list, or by using the search bar.
 To install a compliance profile into your namespace, simply select **Get** on the right side of the profile name.
@@ -56,7 +60,7 @@ You can keep multiple versions of a profile and it is up to you to curate your i
 The _Profile Details_ page appearance varies, depending on if a profile is installed or not.
 You can **Get** or **Download** uninstalled profiles from the details page of an uninstalled profile.
 You can **Download** or **Delete** a profile from the page of an installed profile.
-Deleting a profile removes it from the profiles collection in your namespace, but it remains available in the Asset store.
+Deleting a profile removes it from the profiles collection in your namespace, but it remains available in Profiles.
 Installed or uninstalled, a profile's header and body contains important information.
 
 ### Profile Header
@@ -79,7 +83,7 @@ License
 
 Installed profiles display a cURL command for an ad-hoc profile run.
 
-![Asset Store Installed Profile Details](/images/docs/asset-store-details-installed.png)
+![Installed Profile Details](/images/docs/asset-store-details-installed.png)
 
 ### Profile Body
 
@@ -97,7 +101,7 @@ Severity
 Selecting the shaded area next to the control name or the `+` on the right side expands the control to show a more detailed description.
 Selecting **View Code** displays the control's InSpec code.
 
-![Asset Store Profile Body](/images/docs/profile-detail-body.png)
+![Profiles Body](/images/docs/profile-detail-body.png)
 
 ### About the Profile Identifier
 
@@ -123,23 +127,23 @@ In these examples, the owner is same value as first part of identifier, as discu
 #### Get All Installed Profiles
 
 ```bash
-curl --insecure -H "X-Data-Collector-Token: token-value" https://a2-dev.test/api/v0/compliance/profiles/search -d '{"owner": "test"}'
+curl --insecure -H "X-Data-Collector-Token: token-value" https://automate.example.com/api/v0/compliance/profiles/search -d '{"owner": "test"}'
 ```
 
 #### Get All Available Profiles
 
 ```bash
-curl --insecure -H "X-Data-Collector-Token: token-value" https://a2-dev.test/api/v0/compliance/profiles/search -d '{}'
+curl --insecure -H "X-Data-Collector-Token: token-value" https://automate.example.com/api/v0/compliance/profiles/search -d '{}'
 ```
 
 #### Download .tar
 
 ```bash
-curl --insecure -H "x-data-collector-token: token-val" https://a2-local-inplace-upgrade-dev.cd.chef.co/api/v0/compliance/profiles/tar -d '{"name":"cis-aix-5.3-6.1-level1","owner":"admin","version":"1.1.0-3"}'
+curl --insecure -H "x-data-collector-token: token-val" https://automate.example.com/api/v0/compliance/profiles/tar -d '{"name":"cis-aix-5.3-6.1-level1","owner":"admin","version":"1.1.0-3"}'
 ```
 
 #### Upload tar
 
 ```bash
-curl --insecure -F file=@cis-ubuntu12_04lts-level1-1.1.0-2.tar.gz -H "x-data-collector-token: token-val"  https://a2-local-inplace-upgrade-dev.cd.chef.co/api/v0/compliance/profiles?owner=admin
+curl --insecure -F file=@cis-ubuntu12_04lts-level1-1.1.0-2.tar.gz -H "x-data-collector-token: token-val"  https://automate.example.com/api/v0/compliance/profiles?owner=admin
 ```

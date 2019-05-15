@@ -2,9 +2,11 @@ import {
   Component, ElementRef, OnInit, ViewChild, ViewChildren, OnDestroy
 } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ChefSessionService } from '../../services/chef-session/chef-session.service';
-import { MetadataService } from '../../services/metadata/metadata.service';
-import { WelcomeModalComponent } from '../welcome-modal/welcome-modal.component';
+import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import { MetadataService } from 'app/services/metadata/metadata.service';
+import {
+  WelcomeModalComponent
+ } from 'app/page-components/welcome-modal/welcome-modal.component';
 
 @Component({
   selector: 'app-profile',

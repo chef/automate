@@ -1,13 +1,9 @@
-<chef-sidebar>
-  <div class="nav-items">
-    <chef-sidebar-entry route="/compliance/scanner" icon="wifi_tethering">Current jobs</chef-sidebar-entry>
-  </div>
-</chef-sidebar>
+<app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
 
 <div class="container">
   <main>
     <chef-breadcrumbs>
-      <chef-breadcrumb [link]="['/compliance/scanner/nodes']">Scan jobs</chef-breadcrumb>
+      <chef-breadcrumb [link]="['/compliance/scan-jobs/nodes']">Scan jobs</chef-breadcrumb>
       Add nodes
     </chef-breadcrumbs>
 
@@ -25,7 +21,7 @@
           </ng-container>
           <span *ngIf="!isLoading">Add {{(nodesToAdd$ | async)?.length}} Node(s)</span>
         </chef-button>
-        <chef-button tertiary [routerLink]="['/compliance/scanner/nodes']">Cancel</chef-button>
+        <chef-button tertiary [routerLink]="['/compliance/scan-jobs/nodes']">Cancel</chef-button>
       </div>
     </chef-page-header>
     <div class="page-body">

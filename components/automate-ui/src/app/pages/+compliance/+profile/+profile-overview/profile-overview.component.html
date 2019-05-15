@@ -1,8 +1,4 @@
-<chef-sidebar>
-  <div class="nav-items">
-    <chef-sidebar-entry route="/profiles" icon="library_books">Profiles</chef-sidebar-entry>
-  </div>
-</chef-sidebar>
+<app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
 
 <div class="container">
   <main>
@@ -16,8 +12,8 @@
     </chef-notification>
 
     <chef-page-header class="profiles-header">
-      <chef-heading>Asset Store</chef-heading>
-      <chef-subheading>Compliance profiles.</chef-subheading>
+      <chef-heading>Profiles</chef-heading>
+      <chef-subheading>Compliance profiles manage security and compliance scans.</chef-subheading>
 
       <div class="profiles-search">
         <chef-input
@@ -126,7 +122,7 @@
             <chef-tr *ngFor="let profile of filteredProfiles">
               <chef-td>
                 <a
-                  [routerLink]="['/profiles/profile-details']"
+                  [routerLink]="['/compliance/profiles/profile-details']"
                   [queryParams]="{name: profile.name, version: profile.version, owner: user}">
                   {{ profile.title }}
                 </a>
@@ -165,7 +161,7 @@
             <chef-tr *ngFor="let profile of profileUpdatesAvailable">
               <chef-td>
                 <a
-                  [routerLink]="['/profiles/profile-details']"
+                  [routerLink]="['/compliance/profiles/profile-details']"
                   [queryParams]="{name: profile.name, version: profile.version}">
                   {{ profile.title }}
                 </a>
@@ -195,7 +191,7 @@
             <chef-tr *ngFor="let profile of filteredAvailableProfiles">
               <chef-td>
                 <a
-                  [routerLink]="['/profiles/profile-details']"
+                  [routerLink]="['/compliance/profiles/profile-details']"
                   [queryParams]="{name: profile.name, version: profile.version}">
                   {{ profile.title }}
                 </a>
