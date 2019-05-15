@@ -324,25 +324,29 @@ func (db *DB) UpdateOrInsertInstanceSourceStateInDb(instance InstanceState, mgrI
 	}
 	var id string
 	connectionErr := fmt.Sprintf("node state is %s", instanceState)
+	name := instance.Name
+	if len(name) == 0 {
+		name = instance.ID
+	}
 	switch instance.State {
 	case "terminated":
 		// if the instance state we're getting is terminated, we only want to update the node if we already
 		// have it in the system. it's silly to *add* nodes that are already terminated here.
 		id, err = db.SelectStr(sqlUpdateInstanceSourceStateAndStatus, instance.ID, instance.Region, sourceAcctID, instanceState, "unreachable", nowTime, connectionErr)
 	case "running":
-		id, err = db.SelectStr(sqlUpsertInstanceSourceState, uuid, instance.Name, instance.ID, instanceState, instance.Region, sourceAcctID, tcByte, nowTime, mgrType)
+		id, err = db.SelectStr(sqlUpsertInstanceSourceState, uuid, name, instance.ID, instanceState, instance.Region, sourceAcctID, tcByte, nowTime, mgrType)
 	default:
-		id, err = db.SelectStr(sqlUpsertInstanceSourceStateAndStatus, uuid, instance.Name, instance.ID, instanceState, "unreachable", instance.Region, sourceAcctID, tcByte, nowTime, mgrType, connectionErr)
+		id, err = db.SelectStr(sqlUpsertInstanceSourceStateAndStatus, uuid, name, instance.ID, instanceState, "unreachable", instance.Region, sourceAcctID, tcByte, nowTime, mgrType, connectionErr)
 	}
 	if err != nil {
-		return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to update instance %s %s", instance.ID, instance.Name)
+		return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to update instance %s %s", instance.ID, name)
 	}
 	if len(id) == 0 {
 		return false, nil
 	}
 	err = db.AssociateNodeIDsWithManagerID([]string{id}, mgrID)
 	if err != nil {
-		return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to associate manager with node %s", instance.Name)
+		return false, errors.Wrapf(err, "UpdateInstanceSourceState unable to associate manager with node %s", name)
 	}
 	return true, nil
 }
