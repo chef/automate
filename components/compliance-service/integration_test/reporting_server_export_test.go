@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/api/reporting"
 	reportingServer "github.com/chef/automate/components/compliance-service/api/reporting/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
 func TestReportingServerExport(t *testing.T) {
@@ -45,8 +46,7 @@ func TestReportingServerExport(t *testing.T) {
 
 	dialer := func(string, time.Duration) (net.Conn, error) { return lis.Dial() }
 
-	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithDialer(dialer), grpc.WithInsecure())
+	conn, err := grpc.DialContext(context.Background(), "bufnet", grpc.WithDialer(dialer), grpc.WithInsecure())
 	defer conn.Close()
 	require.NoError(t, err)
 
@@ -136,10 +136,8 @@ func TestReportingServerExport(t *testing.T) {
 
 	for _, test := range successCases {
 		t.Run(test.description, func(t *testing.T) {
-			response, err := client.Export(ctx, &reporting.Query{
-				Filters: []*reporting.ListFilter{{Type: "projects", Values: test.allowedProjects}},
-				Type:    "json",
-			})
+			ctx := auth_context.NewOutgoingContext(contextWithProjects(test.allowedProjects))
+			response, err := client.Export(ctx, &reporting.Query{Type: "json"})
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
