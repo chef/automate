@@ -371,7 +371,7 @@ control 'iam-v2-1' do
       expect(resp.parsed_response_body[:tokens].length).to eq init_token_count + 1
       expect(resp.parsed_response_body[:tokens].map {|t| t[:id]}).to include(id)
 
-      resp = automate_api_request("/apis/iam/v2beta/tokens/#{id}", http_method: 'DELETE') 
+      resp = automate_api_request("/apis/iam/v2beta/tokens/#{id}", http_method: 'DELETE')
       expect(resp.http_status).to eq 200
 
       resp = automate_api_request("/apis/iam/v2beta/tokens")
@@ -461,12 +461,14 @@ control 'iam-v2-1' do
     end
 
     describe "when multiple users exists" do
-      TEST_USER_ID_2 = 'inspec-user-2'
-      TEST_USER_2 = {
-        id: TEST_USER_ID_2,
-        name: "display name 2",
-        password: "chefautomate"
-      }
+      let (:custom_user_id_2) { 'inspec-user-2' }
+      let (:custom_user_2) do
+        {
+          id: custom_user_id_2,
+          name: "display name 2",
+          password: "chefautomate"
+        }
+      end
 
       before(:each) do
         resp = automate_api_request("/apis/iam/v2beta/users",
@@ -477,7 +479,7 @@ control 'iam-v2-1' do
 
         resp = automate_api_request("/apis/iam/v2beta/users",
           http_method: 'POST',
-          request_body: TEST_USER_2.to_json
+          request_body: custom_user_2.to_json
         )
         expect(resp.http_status).to eq 200
       end
@@ -486,7 +488,7 @@ control 'iam-v2-1' do
         resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}", http_method: 'DELETE')
         expect(resp.http_status.to_s).to match(/200|404/)
 
-        resp = automate_api_request("/apis/iam/v2beta/users/#{TEST_USER_ID_2}", http_method: 'DELETE')
+        resp = automate_api_request("/apis/iam/v2beta/users/#{custom_user_id_2}", http_method: 'DELETE')
         expect(resp.http_status.to_s).to match(/200|404/)
       end
 
@@ -495,43 +497,13 @@ control 'iam-v2-1' do
           resp = automate_api_request("/apis/iam/v2beta/users")
           expect(resp.http_status).to eq 200
           expect(resp.parsed_response_body[:users].length).to eq 3
-          expect(resp.parsed_response_body[:users][0][:id]).to match(/#{TEST_USER_ID_2}|#{CUSTOM_USER_ID}|#{ADMIN_USER_ID}/)
-          expect(resp.parsed_response_body[:users][1][:id]).to match(/#{TEST_USER_ID_2}|#{CUSTOM_USER_ID}|#{ADMIN_USER_ID}/)
-          expect(resp.parsed_response_body[:users][2][:id]).to match(/#{TEST_USER_ID_2}|#{CUSTOM_USER_ID}|#{ADMIN_USER_ID}/)
+          expect(resp.parsed_response_body[:users].map { |u| u[:id] })
+            .to match_array([custom_user_id_2, CUSTOM_USER_ID, ADMIN_USER_ID])
         end
       end
-    end
 
-    describe "when a user exists" do
-      before(:each) do
-        resp = automate_api_request("/apis/iam/v2beta/users",
-         http_method: 'POST',
-         request_body: TEST_USER.to_json
-       )
-       expect(resp.http_status).to eq 200
-     end
-
-     after(:each) do
-       resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}", http_method: 'DELETE')
-       expect(resp.http_status.to_s).to match(/200|404/)
-     end
-
-    describe "GET /iam/v2beta/users/:id" do
-      it "returns the user if it exists" do
-        resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}")
-        expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:user][:name]).to eq TEST_USER[:name]
-        expect(resp.parsed_response_body[:user][:id]).to eq TEST_USER[:id]
-      end
-
-      it "user gets a 404 when the user does not exist" do
-        resp = automate_api_request("/apis/iam/v2beta/users/some_wrong_id")
-        expect(resp.http_status).to eq 404
-      end
-    end
-
-    describe "PUT /apis/iam/v2beta/self/:id" do
-      it "user can update their own display name" do
+      describe "PUT /apis/iam/v2beta/self/:id" do
+        it "user can update their own display name" do
           updatedName =  "i updated my own name"
           resp = automate_api_request("/apis/iam/v2beta/self/#{CUSTOM_USER_ID}",
             http_method: 'PUT',
@@ -589,6 +561,9 @@ control 'iam-v2-1' do
 
       describe "DELETE /iam/v2beta/users/:id" do
         it "deletes the user if it exists" do
+          resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}")
+          expect(resp.http_status).to eq 200
+
           resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}", http_method: 'DELETE')
           expect(resp.http_status).to eq 200
         end
@@ -613,7 +588,6 @@ control 'iam-v2-1' do
           expect(resp.parsed_response_body[:user][:name]).to eq updatedName
         end
 
-
         it "returns 404 if the user does not exist" do
           updatedName =  "i updated my own name"
           resp = automate_api_request("/apis/iam/v2beta/users/some_wrong_id",
@@ -628,7 +602,6 @@ control 'iam-v2-1' do
         end
       end
     end
-
   end
 
   describe "v2beta team API" do
