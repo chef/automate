@@ -306,7 +306,7 @@ func BenchmarkInitPartialResultV2(b *testing.B) {
 	var r error
 	ctx := context.Background()
 
-	f, err := os.Open("example_v2/store-pretty.json")
+	f, err := os.Open("example_v2/store-flat.json")
 	require.NoError(b, err, "read example store JSON file")
 	defer f.Close()
 
@@ -358,22 +358,19 @@ func storeWithDummyPolicies(b *testing.B, k int) storage.Store {
 		"roles": map[string]interface{}{},
 		"rules": map[string][]interface{}{},
 	}
-	policies := map[string]interface{}{}
+	statements := map[string]interface{}{}
 	for i := 0; i <= k; i++ {
-		policies[fmt.Sprintf("pol_id%d", i)] = map[string]interface{}{
-			"members": []string{"user:local:alice"},
-			"statements": map[string]interface{}{
-				fmt.Sprintf("sid%d", i): map[string]interface{}{
-					"actions":   []string{"iam:project:delete"},
-					"resources": []string{"*"},
-					"effect":    "allow",
-					"projects":  []string{"~~ALL-PROJECTS~~"},
-				},
-			},
-			"type": "custom",
+		statements[fmt.Sprintf("s_id%d", i)] = map[string]interface{}{
+			"members":   []string{"user:local:alice"},
+			"pol_id":    "doesnt-really-matter",
+			"actions":   []string{"iam:project:delete"},
+			"resources": []string{"*"},
+			"effect":    "allow",
+			"projects":  []string{"~~ALL-PROJECTS~~"},
+			"type":      "custom",
 		}
 	}
-	data["policies"] = policies
+	data["statements"] = statements
 	// b.Log(data)
 	return inmem.NewFromObject(data)
 }

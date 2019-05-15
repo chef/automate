@@ -623,10 +623,30 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
+
+	// here, we flatten the policy structure: let's see if it buys us something in
+	// opa performance
+	stmts := map[string]interface{}{}
+	for _, pol := range policyMap {
+		pol := pol.(map[string]interface{}) // trust me, it's fine.
+		for sid, stmt := range pol["statements"].(map[string]interface{}) {
+			stmt := stmt.(map[string]interface{})
+		pol, ok := pol.(map[string]interface{})
+		if !ok {
+			return errors.New("unexpected policyMap")
+		}
+			stmt["members"] = pol["members"]
+			stmts[sid] = stmt
+
+			// Note: these aren't currently made use of, so we don't copy them into the
+			// statements
+			// stmt["pol_id"] = id // policy id, key of policyMap above
+		}
+	}
 	s.v2Store = inmem.NewFromObject(map[string]interface{}{
-		"policies": policyMap,
-		"roles":    roleMap,
-		"rules":    ruleMap,
+		"statements": stmts,
+		"roles":      roleMap,
+		"rules":      ruleMap,
 	})
 
 	return s.initPartialResultV2(ctx)

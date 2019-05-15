@@ -1,0 +1,920 @@
+{
+  "01da18fc-afa9-41f6-b6d2-dd28880bbd97": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "0422b261-394f-4626-8754-55076656baed": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "0ac0f277-aeb8-473f-9622-cac875b36830": {
+    "effect": "allow",
+    "members": [],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "ingest",
+    "type": "chef-managed"
+  },
+  "0bb865f7-c3d5-4925-9c49-2902ccdcd051": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "0d516454-7a0c-4922-86f9-8b93d035e869": {
+    "actions": [
+      "iam:roles:update",
+      "iam:roles:delete"
+    ],
+    "effect": "deny",
+    "members": [
+      "*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "iam:roles:owner",
+      "iam:roles:editor",
+      "iam:roles:viewer",
+      "iam:roles:ingest",
+      "iam:roles:project-admin",
+      "iam:roles:iam-members-viewer"
+    ],
+    "type": "system"
+  },
+  "0db6971f-d1c2-4d2a-9da3-6dcf9ad6fb21": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "1283787c-1b10-4b4c-9b89-b871c5272036": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "16623514-3c57-47c6-9215-71cd43e6f7dd": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "173a18a6-c102-4e45-a0d0-dfec68c2eee5": {
+    "actions": [
+      "iam:policies:get"
+    ],
+    "effect": "allow",
+    "members": [
+      "*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "iam:policyVersion"
+    ],
+    "type": "system"
+  },
+  "19817547-e9a8-45f5-ba09-7d46d933998c": {
+    "actions": [
+      "compliance:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "user:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "custom"
+  },
+  "1b2ccc14-955b-41b8-8591-ff7d9aa0bd2a": {
+    "effect": "allow",
+    "members": [
+      "team:local:editors"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "editor",
+    "type": "chef-managed"
+  },
+  "2819b1d0-df88-4e90-b405-0d29c9427927": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "2b5a3f1d-9d25-46f3-b1dd-8f46c7d323a3": {
+    "actions": [
+      "iam:policies:update",
+      "iam:policies:delete"
+    ],
+    "effect": "deny",
+    "members": [
+      "*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "iam:policies:administrator-access",
+      "iam:policies:editor-access",
+      "iam:policies:viewer-access",
+      "iam:policies:ingest-access"
+    ],
+    "type": "system"
+  },
+  "32caa650-bee8-4d57-9a56-fd367c7b9425": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "37136195-f1c8-4e83-a323-2ba4e55efb32": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "3ec4979a-6e6c-4976-843b-9fde8c5c7e5c": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "434adf95-5557-47ff-83d4-d50de7160528": {
+    "actions": [
+      "iam:policies:delete",
+      "iam:policies:update"
+    ],
+    "effect": "deny",
+    "members": [
+      "team:local:admins",
+      "token:bar"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "iam:policies:administrator-access"
+    ],
+    "type": "chef-managed"
+  },
+  "438ae9d7-6a1e-41e2-bc27-dc69a68a62af": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "4b452f46-0dab-4dea-8c48-35358a1034c6": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "4cc6e7cd-5e32-43e5-af04-d32b15796590": {
+    "actions": [
+      "iam:introspect:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "iam:introspect"
+    ],
+    "type": "system"
+  },
+  "53ef76f1-462c-4a77-b36b-8e2ef95b898d": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "55754dbe-8aec-4346-aadb-90116bc0d867": {
+    "actions": [
+      "iam:users:delete"
+    ],
+    "effect": "deny",
+    "members": [
+      "user:local:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "iam:users:${a2:username}"
+    ],
+    "type": "system"
+  },
+  "5eec4313-74f5-4a83-b099-0b6bcc15d95b": {
+    "actions": [
+      "infra:nodeManagers:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "user:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "custom"
+  },
+  "5f200be9-fe63-48bd-9c75-879c150ce9fb": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "64bc0711-abd2-4354-ac07-ee7d9cf8ed1e": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "668ba039-8dbd-4efc-9eed-b27033698a6a": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "69f6189c-2741-4e3c-b6ec-c1d39abac2fc": {
+    "actions": [
+      "system:telemetryConfig:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "user:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "custom"
+  },
+  "6dc8e571-1c3f-4190-a2cf-d289a3da22f7": {
+    "actions": [
+      "event:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "user:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "custom"
+  },
+  "7ba1df6a-dfed-403e-94bb-75f7f2c3b8c9": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "7d97a142-8ff1-45b6-b085-119ab55ddce3": {
+    "actions": [
+      "infra:ingest:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "token:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "custom"
+  },
+  "83a00fc0-43f6-47f9-bed6-9f830278ac6d": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "84f6047e-3709-42d3-8c6e-17e7e1e5261c": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "8a013846-6571-4635-bb27-4b644b0458bb": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "8bde25a8-fad5-491f-8e0d-797ff4e71503": {
+    "actions": [
+      "*"
+    ],
+    "effect": "allow",
+    "members": [
+      "team:local:admins",
+      "token:bar"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "chef-managed"
+  },
+  "906ed671-8cf8-4a09-8aa6-477dd78d51e6": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "972cad43-7612-4b6a-bb82-f2e10c8560c1": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "9edf285c-fc96-4363-a0b9-59e5b46f2a76": {
+    "actions": [
+      "*"
+    ],
+    "effect": "allow",
+    "members": [
+      "tls:service:deployment-service:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "system"
+  },
+  "a41964c9-3312-4eef-acc9-be724203b585": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "a86898e7-0a15-4677-8521-4223b685b5e6": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "chef-managed"
+  },
+  "bd593f42-0c87-4099-8f07-6ef8e59a3a53": {
+    "actions": [
+      "secrets:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "user:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "custom"
+  },
+  "be8aaa1a-b12c-4014-9484-2c377cce4532": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "cadd0314-259d-4d3c-9333-aa2f04e5b40f": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "cb7d0852-d79e-45f2-a0b0-a6a4413ba1b3": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "ce174f55-f19b-4484-9e5f-a5c2da8abfa5": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "d49181d1-37b7-459d-8935-f11a9fa6b9e1": {
+    "actions": [
+      "iam:projects:update",
+      "iam:projects:delete"
+    ],
+    "effect": "deny",
+    "members": [
+      "*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "iam:projects:~~ALL-PROJECTS~~"
+    ],
+    "type": "system"
+  },
+  "d4e14b05-c341-4c9a-8278-2296c754cb56": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "d7ed1d1f-1f6a-4055-a07e-23430c267e42": {
+    "actions": [
+      "system:serviceVersion:get",
+      "system:serviceVersion:list"
+    ],
+    "effect": "allow",
+    "members": [
+      "*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "system:service:version"
+    ],
+    "type": "system"
+  },
+  "dbf90624-0469-4f00-9ac4-c20da5ab818d": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "dd8fc665-fa8b-49cc-b097-e689bcfff277": {
+    "actions": [
+      "infra:nodes:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "user:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "custom"
+  },
+  "dfc37fb8-db04-4283-90a5-944b62934a9c": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "e5e1da2d-bbda-4211-adf5-c83e13f1891a": {
+    "actions": [
+      "system:license:get"
+    ],
+    "effect": "allow",
+    "members": [
+      "*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "system:status"
+    ],
+    "type": "system"
+  },
+  "e6a3a22f-22fc-40fa-8190-e80cd38bd994": {
+    "actions": [
+      "infra:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "user:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "custom"
+  },
+  "e9faa7a9-d458-4009-8192-edee6024b5d9": {
+    "actions": [
+      "iam:users:get",
+      "iam:users:list",
+      "iam:users:update",
+      "iam:usersSelf:update"
+    ],
+    "effect": "allow",
+    "members": [
+      "user:local:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "iam:users:${a2:username}",
+      "iam:usersSelf:${a2:username}"
+    ],
+    "type": "system"
+  },
+  "f0cdd133-c3df-4d8b-b0b0-5f41fd33be8e": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "f1d868e0-d1a4-4aa9-aa1b-9e52f0a46a83": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "f5c0b44c-41a9-4fae-8ae3-210737aeb5ee": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "f777e560-663f-45b0-93a5-f955843be34c": {
+    "actions": [
+      "infra:ingest:*",
+      "compliance:profiles:get",
+      "compliance:profiles:list"
+    ],
+    "effect": "allow",
+    "members": [
+      "tls:service:automate-cs-nginx:*",
+      "tls:service:automate-cs-oc-erchef:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "system"
+  },
+  "fa70c4d0-513e-44a2-a227-309d1a6c131e": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "fb8486bc-3e12-4f68-9ee4-198eeb2319c8": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  },
+  "fc75baf2-5033-4678-ba22-bd1b694316b3": {
+    "actions": [
+      "compliance:profiles:*"
+    ],
+    "effect": "allow",
+    "members": [
+      "token:*"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "type": "custom"
+  },
+  "fe71813c-828d-436d-8906-8b7437cbe8e5": {
+    "effect": "allow",
+    "members": [
+      "team:local:viewers"
+    ],
+    "projects": [
+      "~~ALL-PROJECTS~~"
+    ],
+    "resources": [
+      "*"
+    ],
+    "role": "viewer",
+    "type": "custom"
+  }
+}

@@ -1,19 +1,19 @@
 package authz_v2
 
 import data.common
-import data.policies
 import data.roles
+import data.statements
 
 default authorized = false
 
-has_member[pol_id] {
-	pol_sub := policies[pol_id].members[_]
+has_member[statement_id] {
+	pol_sub := statements[statement_id].members[_]
 	input_sub := input.subjects[_]
 	common.subject_matches(input_sub, pol_sub)
 }
 
-has_resource[[pol_id, statement_id]] {
-	statement_resource := policies[pol_id].statements[statement_id].resources[_]
+has_resource[statement_id] {
+	statement_resource := statements[statement_id].resources[_]
 	common.resource_matches(input.resource, statement_resource)
 }
 
@@ -38,19 +38,19 @@ action_match(["*", verb], [_, _, verb]) = true
 
 action_match(["*"], _) = true
 
-has_action[[pol_id, statement_id]] {
-	statement_action := policies[pol_id].statements[statement_id].actions[_]
+has_action[statement_id] {
+	statement_action := statements[statement_id].actions[_]
 	action_matches(input.action, statement_action)
 }
 
-has_action[[pol_id, statement_id]] {
-	policies[pol_id].statements[statement_id].role = role_id
+has_action[statement_id] {
+	statements[statement_id].role = role_id
 	roles[role_id].actions[_] = role_action
 	action_matches(input.action, role_action)
 }
 
-has_project[[project, pol_id, statement_id]] {
-	proj := policies[pol_id].statements[statement_id].projects[_]
+has_project[[project, statement_id]] {
+	proj := statements[statement_id].projects[_]
 	projects := project_matches(proj)
 	project := projects[_]
 }
@@ -66,16 +66,16 @@ project_matches(proj) = projects {
 	projects := [proj]
 }
 
-match[[effect, pol_id, statement_id]] {
-	effect := policies[pol_id].statements[statement_id].effect
-	has_member[pol_id]
-	has_resource[[pol_id, statement_id]]
-	has_action[[pol_id, statement_id]]
+match[[effect, statement_id]] {
+	effect := statements[statement_id].effect
+	has_member[statement_id]
+	has_resource[statement_id]
+	has_action[statement_id]
 }
 
-allow = match[["allow", _, _]]
+allow = match[["allow", _]]
 
-deny = match[["deny", _, _]]
+deny = match[["deny", _]]
 
 authorized {
 	allow
@@ -83,13 +83,13 @@ authorized {
 }
 
 allowed_project[project] {
-	match[["allow", pol_id, statement_id]]
-	has_project[[project, pol_id, statement_id]]
+	match[["allow", statement_id]]
+	has_project[[project, statement_id]]
 }
 
 denied_project[project] {
-	match[["deny", pol_id, statement_id]]
-	has_project[[project, pol_id, statement_id]]
+	match[["deny", statement_id]]
+	has_project[[project, statement_id]]
 }
 
 authorized_project[project] {
