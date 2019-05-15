@@ -65,7 +65,7 @@ func (i *Ingester) Run() {
 	// TODO @afiune Move this logic into an ingestion pipeline
 	for {
 		select {
-		case event := <-i.natsClient.HabServiceEventCh:
+		case event := <-i.natsClient.EventsCh:
 			i.workerInputQueue <- event
 		}
 	}

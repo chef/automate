@@ -35,7 +35,7 @@ func (nc *NatsClient) Subscribe() (stan.Subscription, error) {
 				"subject": nc.subject,
 			}).Error("Unknown message, dropping")
 		} else {
-			nc.HabServiceEventCh <- &habMsg
+			nc.EventsCh <- &habMsg
 		}
 
 	}, stan.DurableName(nc.durableID))

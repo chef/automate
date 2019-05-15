@@ -39,34 +39,34 @@ type NatsClient struct {
 	certs.TLSConfig
 	conn               stan.Conn
 	retries            int
-	HabServiceEventCh  chan *habitat.HealthCheckEvent // TODO: @afiune make a pipeline instead
+	EventsCh           chan *habitat.HealthCheckEvent // TODO: @afiune make a pipeline instead
 	InsecureSkipVerify bool
 	DisableTLS         bool
 }
 
 func NewExternalClient(url, cluster, client, durable, subject string) *NatsClient {
 	return &NatsClient{
-		natsURL:           url,
-		clusterID:         cluster,
-		clientID:          client,
-		durableID:         durable,
-		subject:           subject,
-		HabServiceEventCh: make(chan *habitat.HealthCheckEvent), // buffered channel?
-		retries:           5,
+		natsURL:   url,
+		clusterID: cluster,
+		clientID:  client,
+		durableID: durable,
+		subject:   subject,
+		EventsCh:  make(chan *habitat.HealthCheckEvent), // buffered channel?
+		retries:   5,
 	}
 }
 
 // New creates a new client struct with some defaults
 func New(url, cluster, client, durable, subject string, tlsConfig certs.TLSConfig) *NatsClient {
 	return &NatsClient{
-		natsURL:           url,
-		clusterID:         cluster,
-		clientID:          client,
-		durableID:         durable,
-		subject:           subject,
-		HabServiceEventCh: make(chan *habitat.HealthCheckEvent), // buffered channel?
-		retries:           5,
-		TLSConfig:         tlsConfig,
+		natsURL:   url,
+		clusterID: cluster,
+		clientID:  client,
+		durableID: durable,
+		subject:   subject,
+		EventsCh:  make(chan *habitat.HealthCheckEvent), // buffered channel?
+		retries:   5,
+		TLSConfig: tlsConfig,
 	}
 }
 
