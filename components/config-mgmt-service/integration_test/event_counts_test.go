@@ -654,13 +654,7 @@ func TestEventTypeCountsProjectFilter(t *testing.T) {
 
 			// test response
 			assert.Equal(t, test.expected.Total, res.Total)
-
-			for _, expectedCount := range test.expected.Counts {
-				matchingResCount, err := findEventCountByName(expectedCount.Name, res.Counts)
-				assert.NoError(t, err)
-
-				assert.Equal(t, expectedCount.Count, matchingResCount.Count)
-			}
+			assert.ElementsMatch(t, test.expected.Counts, res.Counts)
 		})
 	}
 }
