@@ -52,8 +52,8 @@ Cypress.Commands.add("login", (url, username) => {
     cy.get('[type=submit]').click().then(() => {
       expect(localStorage.getItem('chef-automate-user')).to.contain(username)
     
-      // close welcome modal
-      cy.get('[data-cy=close-welcome]').first().click()
+      // close welcome modal if present
+      cy.get('app-welcome-modal').invoke('hide')
       cy.saveStorage()
     })
   })
@@ -126,7 +126,7 @@ Cypress.Commands.add("createUser", (id_token, username) => {
 Cypress.Commands.add("createPolicy", (id_token, id, username, projects) => {
   cy.request({
     auth: { bearer: id_token },
-    method: 'GET',
+    method: 'POST',
     url: '/apis/iam/v2beta/policies',
     failOnStatusCode: false,
     body: {
