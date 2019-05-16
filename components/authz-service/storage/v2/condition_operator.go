@@ -6,15 +6,15 @@ import (
 )
 
 // ConditionOperator is an enum of operators a project rule condition can have.
+// This is an enum because we are planning on adding more eventually.
 type ConditionOperator int
 
 const (
-	Equals ConditionOperator = iota
-	MemberOf
+	MemberOf ConditionOperator = iota
 )
 
 func (c ConditionOperator) String() string {
-	if c < Equals || c > MemberOf {
+	if c != MemberOf {
 		panic(fmt.Sprintf("unknown value from iota ConditionOperator on String() conversion: %d", c))
 	}
 
@@ -24,12 +24,10 @@ func (c ConditionOperator) String() string {
 // NewConditionOperator converts a string to a ConditionOperator or returns an error.
 func NewConditionOperator(in string) (ConditionOperator, error) {
 	switch in {
-	case "equals":
-		return Equals, nil
 	case "member-of":
 		return MemberOf, nil
 	default:
-		return Equals,
+		return MemberOf,
 			fmt.Errorf("condition operator type must be one of %q, you passed %s",
 				conditionOperatorStringValues(), in)
 	}
@@ -46,9 +44,8 @@ func (c *ConditionOperator) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func conditionOperatorStringValues() [2]string {
+func conditionOperatorStringValues() [1]string {
 	return [...]string{
-		"equals",
 		"member-of",
 	}
 }

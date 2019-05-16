@@ -974,7 +974,7 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	for _, condition := range rule.Conditions {
 		_, err := tx.ExecContext(ctx,
 			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
-			ruleDbID, condition.Value, condition.Attribute.String(), condition.Operator.String(),
+			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
 		)
 		if err != nil {
 			return nil, p.processError(err)
@@ -1028,7 +1028,7 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	for _, condition := range rule.Conditions {
 		_, err := tx.ExecContext(ctx,
 			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
-			ruleDbID, condition.Value, condition.Attribute.String(), condition.Operator.String(),
+			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
 		)
 		if err != nil {
 			return nil, p.processError(err)

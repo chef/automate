@@ -10,7 +10,7 @@ import (
 
 // Condition defines a condition for an ingest rule for a project.
 type Condition struct {
-	Value     string             `json:"value"`
+	Value     []string           `json:"value"`
 	Attribute ConditionAttribute `json:"attribute"`
 	Operator  ConditionOperator  `json:"operator"`
 	Type      RuleType           `json:"type"`
@@ -31,7 +31,7 @@ func (p *Condition) Scan(src interface{}) error {
 
 // NewCondition is a factory for creating a Condition storage object that also does
 // validation around what a valid condition is in terms of our storage layer.
-func NewCondition(ruleType RuleType, value string,
+func NewCondition(ruleType RuleType, value []string,
 	attribute ConditionAttribute, operator ConditionOperator) (Condition, error) {
 
 	err := validateConditionInputs(value, attribute, ruleType)
@@ -47,10 +47,10 @@ func NewCondition(ruleType RuleType, value string,
 	}, nil
 }
 
-func validateConditionInputs(value string, attribute ConditionAttribute, ruleType RuleType) error {
+func validateConditionInputs(value []string, attribute ConditionAttribute, ruleType RuleType) error {
 
-	if value == "" {
-		return errors.New("a condition must have a value")
+	if len(value) == 0 {
+		return errors.New("a condition must have a value list that is not empty")
 	}
 
 	if ruleType == Event {
