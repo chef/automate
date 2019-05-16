@@ -126,7 +126,7 @@ Cypress.Commands.add("createUser", (id_token, username) => {
 Cypress.Commands.add("createPolicy", (id_token, id, username, projects) => {
   cy.request({
     auth: { bearer: id_token },
-    method: 'GET',
+    method: 'POST',
     url: '/apis/iam/v2beta/policies',
     failOnStatusCode: false,
     body: {
