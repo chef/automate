@@ -3,7 +3,7 @@ package integration_test
 import (
 	"testing"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	iamV2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 
 	apiReporting "github.com/chef/automate/components/compliance-service/api/reporting"
@@ -22,8 +22,8 @@ func TestReadFailures(t *testing.T) {
 	reportFileName := "../ingest/examples/compliance-failure-big-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 
-	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
-	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	statsSvr := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	reportingSvr := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
 
 	n := 5
 
@@ -56,7 +56,7 @@ func TestReadFailures(t *testing.T) {
 	defer suite.DeleteAllDocuments()
 
 	waitFor(func() bool {
-		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{})
+		response, _ := reportingSvr.ListReports(everythingCtx, &apiReporting.Query{})
 
 		return response != nil && len(response.Reports) == n
 	})
@@ -67,14 +67,14 @@ func TestReadFailures(t *testing.T) {
 		"project3": reportIds[3:],
 	}
 
-	projectRules := map[string]*iam_v2.ProjectRules{}
+	projectRules := map[string]*iamV2.ProjectRules{}
 	for k, v := range reportsProjects {
-		projectRules[k] = &iam_v2.ProjectRules{
-			Rules: []*iam_v2.ProjectRule{
+		projectRules[k] = &iamV2.ProjectRules{
+			Rules: []*iamV2.ProjectRule{
 				{
-					Conditions: []*iam_v2.Condition{
+					Conditions: []*iamV2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
+							Type:   iamV2.ProjectRuleConditionTypes_ROLES,
 							Values: v,
 						},
 					},
@@ -164,7 +164,7 @@ func TestReadFailures(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			ctx := contextWithProjects(test.allowedProjects)
 
-			response, err := statsServer.ReadFailures(ctx, &aprilThirdQueryWithAllFailureTypesQuery)
+			response, err := statsSvr.ReadFailures(ctx, &aprilThirdQueryWithAllFailureTypesQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)

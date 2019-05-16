@@ -3,7 +3,7 @@ package integration_test
 import (
 	"testing"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	iamV2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 
 	apiReporting "github.com/chef/automate/components/compliance-service/api/reporting"
@@ -19,7 +19,7 @@ import (
 )
 
 func TestReadReportSummary(t *testing.T) {
-	statsServer := setupReadSummary(t)
+	statsSvr := setupReadSummary(t)
 	defer suite.DeleteAllDocuments()
 
 	successCases := []struct {
@@ -133,7 +133,7 @@ func TestReadReportSummary(t *testing.T) {
 				},
 			}
 			//passing in no type gets us a Summary type that contains a hydrated ReportSummary
-			response, err := statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
+			response, err := statsSvr.ReadSummary(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
@@ -151,7 +151,7 @@ func TestReadReportSummary(t *testing.T) {
 }
 
 func TestReadNodeSummary(t *testing.T) {
-	statsServer := setupReadSummary(t)
+	statsSvr := setupReadSummary(t)
 	defer suite.DeleteAllDocuments()
 
 	successCases := []struct {
@@ -242,7 +242,7 @@ func TestReadNodeSummary(t *testing.T) {
 
 			//passing in "nodes" type gets us a Summary type that contains a hydrated NodeSummary
 			octoberTwentyFifthQuery.Type = "nodes"
-			response, err := statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
+			response, err := statsSvr.ReadSummary(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
@@ -261,7 +261,7 @@ func TestReadNodeSummary(t *testing.T) {
 }
 
 func TestReadControlSummary(t *testing.T) {
-	statsServer := setupReadSummary(t)
+	statsSvr := setupReadSummary(t)
 	defer suite.DeleteAllDocuments()
 
 	successCases := []struct {
@@ -340,7 +340,7 @@ func TestReadControlSummary(t *testing.T) {
 			}
 			//passing in "controls" type gets us a Summary type that contains a hydrated ControlSummary
 			octoberTwentyFifthQuery.Type = "controls"
-			response, err := statsServer.ReadSummary(ctx, octoberTwentyFifthQuery)
+			response, err := statsSvr.ReadSummary(ctx, octoberTwentyFifthQuery)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
@@ -356,8 +356,8 @@ func TestReadControlSummary(t *testing.T) {
 func setupReadSummary(t *testing.T) *statsServer.Server {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
-	statsServer := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
-	reportingServer := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	statsSvr := statsServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	reportingSvr := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
 	n := 5
 	reportIds := make([]string, n)
 	for i := 0; i < n; i++ {
@@ -385,7 +385,7 @@ func setupReadSummary(t *testing.T) *statsServer.Server {
 	}
 
 	waitFor(func() bool {
-		response, _ := reportingServer.ListReports(everythingCtx, &apiReporting.Query{})
+		response, _ := reportingSvr.ListReports(everythingCtx, &apiReporting.Query{})
 
 		return response != nil && len(response.Reports) == n
 	})
@@ -394,14 +394,14 @@ func setupReadSummary(t *testing.T) *statsServer.Server {
 		"project2": reportIds[2:5],
 		"project3": reportIds[3:],
 	}
-	projectRules := map[string]*iam_v2.ProjectRules{}
+	projectRules := map[string]*iamV2.ProjectRules{}
 	for k, v := range reportsProjects {
-		projectRules[k] = &iam_v2.ProjectRules{
-			Rules: []*iam_v2.ProjectRule{
+		projectRules[k] = &iamV2.ProjectRules{
+			Rules: []*iamV2.ProjectRule{
 				{
-					Conditions: []*iam_v2.Condition{
+					Conditions: []*iamV2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
+							Type:   iamV2.ProjectRuleConditionTypes_ROLES,
 							Values: v,
 						},
 					},
@@ -414,5 +414,5 @@ func setupReadSummary(t *testing.T) *statsServer.Server {
 	assert.Nil(t, err)
 	suite.WaitForESJobToComplete(esJobID)
 	suite.RefreshComplianceReportIndex()
-	return statsServer
+	return statsSvr
 }
