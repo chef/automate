@@ -531,6 +531,7 @@ control 'iam-v2-1' do
         # TODO (tc): right now, it returns 400 for a non-existent user because
         # it checks for the password first, and if it doesn't match for a user
         # that doesn't exist (always the case), it returns a 400.
+        # It should return a 404.
         it "returns 400 for a non-existent user" do
           updatedName =  "i updated my own name"
           resp = automate_api_request("/apis/iam/v2beta/self/some_wrong_id",
@@ -566,6 +567,9 @@ control 'iam-v2-1' do
 
           resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}", http_method: 'DELETE')
           expect(resp.http_status).to eq 200
+
+          resp = automate_api_request("/apis/iam/v2beta/users/#{CUSTOM_USER_ID}")
+          expect(resp.http_status).to eq 404
         end
 
         it "user gets a 404 when the user does not exist" do
