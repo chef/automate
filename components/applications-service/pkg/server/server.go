@@ -80,6 +80,8 @@ func (a *ApplicationsServer) GetServiceGroups(c context.Context,
 			Release:          sg.Release,
 			Status:           convertHealthStatusToProto(sg.HealthStatus),
 			HealthPercentage: sg.HealthPercentage,
+			Application:      sg.Application,
+			Environment:      sg.Environment,
 			ServicesHealthCounts: &applications.HealthCounts{
 				Total:    sg.ServicesHealthCounts.Total,
 				Ok:       sg.ServicesHealthCounts.Ok,

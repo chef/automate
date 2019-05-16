@@ -123,6 +123,8 @@ message ServiceGroup {
 
   HealthCounts services_health_counts = 5;
   string id = 6;
+  string application = 7;
+  string environment = 8;
 }
 
 message HealthCounts {
