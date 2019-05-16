@@ -9,24 +9,24 @@ import (
 type ConditionAttribute int
 
 const (
-	Organization ConditionAttribute = iota
+	ChefRole ConditionAttribute = iota
 	ChefServer
-	Environment
-	ChefRole
 	ChefTag
-	PolicyName
+	Environment
+	Organization
 	PolicyGroup
+	PolicyName
 )
 
 func (c ConditionAttribute) String() string {
-	if c < Organization || c > PolicyGroup {
+	if c < ChefRole || c > PolicyName {
 		panic(fmt.Sprintf("unknown value from iota ConditionAttribute on String() conversion: %d", c))
 	}
 
 	return conditionAttributeStringValues()[c]
 }
 
-// NewConditionAttribute converts a string to an ConditionAttribute or returns an error.
+// NewConditionAttribute converts a string to a ConditionAttribute or returns an error.
 func NewConditionAttribute(in string) (ConditionAttribute, error) {
 	switch in {
 	case "organization":
@@ -50,7 +50,7 @@ func NewConditionAttribute(in string) (ConditionAttribute, error) {
 	}
 }
 
-// UnmarshalJSON implements json unmarshalling for an RuleType reference
+// UnmarshalJSON implements json unmarshalling for a ConditionAttribute reference
 // so we can pull them out of the database directly as the correct type.
 func (c *ConditionAttribute) UnmarshalJSON(b []byte) error {
 	// After byte conversion, things coming out of db as
@@ -65,12 +65,12 @@ func (c *ConditionAttribute) UnmarshalJSON(b []byte) error {
 
 func conditionAttributeStringValues() [7]string {
 	return [...]string{
-		"organization",
-		"chef-server",
-		"environment",
 		"role",
+		"chef-server",
 		"chef-tag",
-		"policy-name",
+		"environment",
+		"organization",
 		"policy-group",
+		"policy-name",
 	}
 }

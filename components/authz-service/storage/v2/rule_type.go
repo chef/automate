@@ -21,7 +21,7 @@ func (r RuleType) String() string {
 	return ruleTypeStringValues()[r]
 }
 
-// NewRuleType converts a string to an RuleType or returns an error.
+// NewRuleType converts a string to a RuleType or returns an error.
 func NewRuleType(in string) (RuleType, error) {
 	switch in {
 	case "node":

@@ -55,7 +55,7 @@ func validateConditionInputs(value string, attribute ConditionAttribute, ruleTyp
 
 	if ruleType == Event {
 		if attribute != Organization && attribute != ChefServer {
-			return errors.New("rules of type Event only accepts Conditions with attributes Organization or ChefServer")
+			return errors.New("rules of type Event only accept Conditions with attributes Organization or ChefServer")
 		}
 	}
 

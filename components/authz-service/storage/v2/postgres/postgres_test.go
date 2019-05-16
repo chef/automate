@@ -3328,7 +3328,9 @@ func TestCreateRule(t *testing.T) {
 			assert.Error(t, err)
 		},
 		"creating a rule with no conditions returns an error": func(t *testing.T) {
-			_, err := storage.NewRule("new-id-1", "project-1", "name", storage.Node, []storage.Condition{})
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			_, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{})
 			assert.Error(t, err)
 		},
 		"creating a rule with inconsistent child condition type returns an error": func(t *testing.T) {
@@ -3369,6 +3371,9 @@ func TestCreateRule(t *testing.T) {
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4`,
+				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 		},
 		"create event rule with multiple conditions": func(t *testing.T) {
 			projID := "project-1"
@@ -3391,6 +3396,9 @@ func TestCreateRule(t *testing.T) {
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4`,
+				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 		},
 	}
 
@@ -3444,8 +3452,6 @@ func TestListRules(t *testing.T) {
 			require.NoError(t, err)
 
 			resp, err := store.ListRules(ctx)
-			fmt.Println("wtf")
-			fmt.Printf("res: %v\n", resp)
 			assert.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{&rule1, &rule2}, resp)
 		},
@@ -3483,8 +3489,6 @@ func TestListRules(t *testing.T) {
 			require.NoError(t, err)
 
 			resp, err := store.ListRules(ctx)
-			fmt.Println("wtf")
-			fmt.Printf("res: %v\n", resp)
 			assert.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{&rule2}, resp)
 		},
@@ -3567,7 +3571,7 @@ func TestUpdateRule(t *testing.T) {
 				[]storage.Condition{condition1, condition2, condition3, condition4})
 			require.NoError(t, err)
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, resp, &ruleUpdated)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
@@ -3602,7 +3606,7 @@ func TestUpdateRule(t *testing.T) {
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, resp, &ruleUpdated)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3`,
 				ruleUpdated.ID, ruleUpdated.Name, ruleUpdated.Type.String()))
