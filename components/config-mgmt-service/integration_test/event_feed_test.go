@@ -488,7 +488,7 @@ func TestEventFeedProjectFilter(t *testing.T) {
 			expectedIDs: []string{},
 		},
 		{
-			description: "Two Actions with one project not matching any of several requested projects allowed",
+			description: "Two Actions with neither project matching any of several requested projects allowed",
 			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
 			actions: []iBackend.InternalChefAction{
 				{
