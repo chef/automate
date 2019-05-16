@@ -346,25 +346,27 @@ func (suite *NodesIntegrationSuite) TestProjectsAreRoundtrippedThroughNodeLifecy
 	suite.Equal([]string{"Mexican Restaurant Menu", "Best Soups"}, controlNode.Projects)
 }
 
+var nowTime = ptypes.TimestampNow()
+var baseNodeData = manager.NodeMetadata{
+	Uuid:            "1223-4254-2424-1322",
+	Name:            "my really cool client run node",
+	PlatformName:    "debian",
+	PlatformRelease: "8.6",
+	LastContact:     nowTime,
+	SourceId:        "",
+	SourceRegion:    "",
+	SourceAccountId: "",
+	JobUuid:         "12343-232324-1231242",
+}
+
 func (suite *NodesIntegrationSuite) TestFilterByLastCheckInRange() {
-	nowTime := ptypes.TimestampNow()
-	node := &manager.NodeMetadata{
-		Uuid:            "1223-4254-2424-1322",
-		Name:            "my really cool client run node",
-		PlatformName:    "debian",
-		PlatformRelease: "8.6",
-		LastContact:     nowTime,
-		SourceId:        "",
-		SourceRegion:    "",
-		SourceAccountId: "",
-		JobUuid:         "12343-232324-1231242",
-		RunData: &nodes.LastContactData{
-			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime,
-			Status:  nodes.LastContactData_PASSED,
-		},
+	node := baseNodeData
+	node.RunData = &nodes.LastContactData{
+		Id:      "1003-9254-2004-1322",
+		EndTime: nowTime,
+		Status:  nodes.LastContactData_PASSED,
 	}
-	err := suite.Database.ProcessIncomingNode(node)
+	err := suite.Database.ProcessIncomingNode(&node)
 	suite.Require().NoError(err)
 
 	timeRangeMax := time.Now().Add(time.Hour * 24).Format(time.RFC3339)
@@ -378,24 +380,13 @@ func (suite *NodesIntegrationSuite) TestFilterByLastCheckInRange() {
 }
 
 func (suite *NodesIntegrationSuite) TestFilterByLastScanTimeRange() {
-	nowTime := ptypes.TimestampNow()
-	node := &manager.NodeMetadata{
-		Uuid:            "1223-4254-2424-1322",
-		Name:            "my really cool client run node",
-		PlatformName:    "debian",
-		PlatformRelease: "8.6",
-		LastContact:     nowTime,
-		SourceId:        "",
-		SourceRegion:    "",
-		SourceAccountId: "",
-		JobUuid:         "12343-232324-1231242",
-		ScanData: &nodes.LastContactData{
-			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime,
-			Status:  nodes.LastContactData_PASSED,
-		},
+	node := baseNodeData
+	node.ScanData = &nodes.LastContactData{
+		Id:      "1003-9254-2004-1322",
+		EndTime: nowTime,
+		Status:  nodes.LastContactData_PASSED,
 	}
-	err := suite.Database.ProcessIncomingNode(node)
+	err := suite.Database.ProcessIncomingNode(&node)
 	suite.Require().NoError(err)
 
 	timeRangeMax := time.Now().Add(time.Hour * 24).Format(time.RFC3339)
@@ -409,24 +400,13 @@ func (suite *NodesIntegrationSuite) TestFilterByLastScanTimeRange() {
 }
 
 func (suite *NodesIntegrationSuite) TestFilterByRunDataStatus() {
-	nowTime := ptypes.TimestampNow()
-	node := &manager.NodeMetadata{
-		Uuid:            "1223-4254-2424-1322",
-		Name:            "my really cool client run node",
-		PlatformName:    "debian",
-		PlatformRelease: "8.6",
-		LastContact:     nowTime,
-		SourceId:        "",
-		SourceRegion:    "",
-		SourceAccountId: "",
-		JobUuid:         "12343-232324-1231242",
-		RunData: &nodes.LastContactData{
-			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime,
-			Status:  nodes.LastContactData_FAILED,
-		},
+	node := baseNodeData
+	node.RunData = &nodes.LastContactData{
+		Id:      "1003-9254-2004-1322",
+		EndTime: nowTime,
+		Status:  nodes.LastContactData_FAILED,
 	}
-	err := suite.Database.ProcessIncomingNode(node)
+	err := suite.Database.ProcessIncomingNode(&node)
 	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
@@ -439,24 +419,13 @@ func (suite *NodesIntegrationSuite) TestFilterByRunDataStatus() {
 }
 
 func (suite *NodesIntegrationSuite) TestFilterByScanDataStatus() {
-	nowTime := ptypes.TimestampNow()
-	node := &manager.NodeMetadata{
-		Uuid:            "1223-4254-2424-1322",
-		Name:            "my really cool client run node",
-		PlatformName:    "debian",
-		PlatformRelease: "8.6",
-		LastContact:     nowTime,
-		SourceId:        "",
-		SourceRegion:    "",
-		SourceAccountId: "",
-		JobUuid:         "12343-232324-1231242",
-		ScanData: &nodes.LastContactData{
-			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime,
-			Status:  nodes.LastContactData_FAILED,
-		},
+	node := baseNodeData
+	node.ScanData = &nodes.LastContactData{
+		Id:      "1003-9254-2004-1322",
+		EndTime: nowTime,
+		Status:  nodes.LastContactData_FAILED,
 	}
-	err := suite.Database.ProcessIncomingNode(node)
+	err := suite.Database.ProcessIncomingNode(&node)
 	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
@@ -469,28 +438,17 @@ func (suite *NodesIntegrationSuite) TestFilterByScanDataStatus() {
 }
 
 func (suite *NodesIntegrationSuite) TestFilterByRunDataPenultStatus() {
-	nowTime := ptypes.TimestampNow()
-	node := &manager.NodeMetadata{
-		Uuid:            "1223-4254-2424-1322",
-		Name:            "my really cool client run node",
-		PlatformName:    "debian",
-		PlatformRelease: "8.6",
-		LastContact:     nowTime,
-		SourceId:        "",
-		SourceRegion:    "",
-		SourceAccountId: "",
-		JobUuid:         "12343-232324-1231242",
-		RunData: &nodes.LastContactData{
-			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime,
-			Status:  nodes.LastContactData_FAILED,
-		},
+	node := baseNodeData
+	node.RunData = &nodes.LastContactData{
+		Id:      "1003-9254-2004-1322",
+		EndTime: nowTime,
+		Status:  nodes.LastContactData_FAILED,
 	}
-	err := suite.Database.ProcessIncomingNode(node)
+	err := suite.Database.ProcessIncomingNode(&node)
 	suite.Require().NoError(err)
 
 	node.RunData.Status = nodes.LastContactData_PASSED
-	err = suite.Database.ProcessIncomingNode(node)
+	err = suite.Database.ProcessIncomingNode(&node)
 	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
@@ -513,28 +471,17 @@ func (suite *NodesIntegrationSuite) TestFilterByRunDataPenultStatus() {
 }
 
 func (suite *NodesIntegrationSuite) TestFilterByScanDataPenultStatus() {
-	nowTime := ptypes.TimestampNow()
-	node := &manager.NodeMetadata{
-		Uuid:            "1223-4254-2424-1322",
-		Name:            "my really cool client run node",
-		PlatformName:    "debian",
-		PlatformRelease: "8.6",
-		LastContact:     nowTime,
-		SourceId:        "",
-		SourceRegion:    "",
-		SourceAccountId: "",
-		JobUuid:         "12343-232324-1231242",
-		ScanData: &nodes.LastContactData{
-			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime,
-			Status:  nodes.LastContactData_FAILED,
-		},
+	node := baseNodeData
+	node.ScanData = &nodes.LastContactData{
+		Id:      "1003-9254-2004-1322",
+		EndTime: nowTime,
+		Status:  nodes.LastContactData_FAILED,
 	}
-	err := suite.Database.ProcessIncomingNode(node)
+	err := suite.Database.ProcessIncomingNode(&node)
 	suite.Require().NoError(err)
 
 	node.ScanData.Status = nodes.LastContactData_SKIPPED
-	err = suite.Database.ProcessIncomingNode(node)
+	err = suite.Database.ProcessIncomingNode(&node)
 	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
@@ -556,43 +503,22 @@ func (suite *NodesIntegrationSuite) TestFilterByScanDataPenultStatus() {
 }
 
 func (suite *NodesIntegrationSuite) TestFilterByScanDataAndRunDataStatus() {
-	nowTime := ptypes.TimestampNow()
-	node := &manager.NodeMetadata{
-		Uuid:            "1223-4254-2424-1322",
-		Name:            "my really cool client run node",
-		PlatformName:    "debian",
-		PlatformRelease: "8.6",
-		LastContact:     nowTime,
-		SourceId:        "",
-		SourceRegion:    "",
-		SourceAccountId: "",
-		JobUuid:         "12343-232324-1231242",
-		ScanData: &nodes.LastContactData{
-			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime,
-			Status:  nodes.LastContactData_FAILED,
-		},
+	node := baseNodeData
+	node.ScanData = &nodes.LastContactData{
+		Id:      "1003-9254-2004-1322",
+		EndTime: nowTime,
+		Status:  nodes.LastContactData_FAILED,
 	}
-	err := suite.Database.ProcessIncomingNode(node)
+	err := suite.Database.ProcessIncomingNode(&node)
 	suite.Require().NoError(err)
 
-	node = &manager.NodeMetadata{
-		Uuid:            "1223-4254-2424-1322",
-		Name:            "my really cool client run node",
-		PlatformName:    "debian",
-		PlatformRelease: "8.6",
-		LastContact:     nowTime,
-		SourceId:        "",
-		SourceRegion:    "",
-		SourceAccountId: "",
-		JobUuid:         "12343-232324-1231242",
-		RunData: &nodes.LastContactData{
-			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime,
-			Status:  nodes.LastContactData_PASSED,
-		},
+	node2 := baseNodeData
+	node2.RunData = &nodes.LastContactData{
+		Id:      "0803-97654-2098-1322",
+		EndTime: nowTime,
+		Status:  nodes.LastContactData_PASSED,
 	}
-	err = suite.Database.ProcessIncomingNode(node)
+	err = suite.Database.ProcessIncomingNode(&node2)
 	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
