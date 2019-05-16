@@ -241,6 +241,20 @@ func (s *State) DumpData(ctx context.Context) error {
 	return s.store.Commit(ctx, txn)
 }
 
+func (s *State) DumpDataV2(ctx context.Context) error {
+	txn, err := s.v2Store.NewTransaction(ctx)
+	if err != nil {
+		return err
+	}
+	data, err := s.v2Store.Read(ctx, txn, storage.Path([]string{}))
+	if err != nil {
+		return err
+	}
+	// used to check activity in OPA v2Store
+	s.log.Debugf("data retrieved from OPA v2Store: %#v", data)
+	return s.v2Store.Commit(ctx, txn)
+}
+
 // IsAuthorized evaluates whether a given [subject, resource, action] tuple
 // is authorized given the service's state
 func (s *State) IsAuthorized(
@@ -614,12 +628,15 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 	return s.initPartialResult(ctx)
 }
 
-// Spike TODO: Can we have a separate method for just setting the rule mappings?
-// OR does the entire OPA store have to be re-evaluated at once. IF that's true,
-// should we have the same OPA instance in general for rules?
+// Q: Can we have a separate method for just setting the rule mappings?
+//    OR does the entire OPA store have to be re-evaluated at once. IF that's
+//    true, should we have the same OPA instance in general for rules?
+// A: This depends on whether it's used: If we imagine the rules-related queries
+//    to eventually check policies and their projects, it needs to be in the
+//    same store.
 //
-// V2SetPolicies replaces OPA's data with a new set of policies and roles,
-// and resets the partial evaluation cache for v2
+// V2SetPolicies replaces OPA's data with a new set of policies, rules, and
+// roles, and resets the partial evaluation cache for v2
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
@@ -628,13 +645,16 @@ func (s *State) V2SetPolicies(
 	// opa performance
 	stmts := map[string]interface{}{}
 	for _, pol := range policyMap {
-		pol := pol.(map[string]interface{}) // trust me, it's fine.
-		for sid, stmt := range pol["statements"].(map[string]interface{}) {
-			stmt := stmt.(map[string]interface{})
 		pol, ok := pol.(map[string]interface{})
 		if !ok {
 			return errors.New("unexpected policyMap")
 		}
+		for sid, stmt := range pol["statements"].(map[string]interface{}) {
+			if _, ok := stmts[sid]; ok {
+				return errors.New("statement id clash")
+			}
+			stmt := stmt.(map[string]interface{})
+			stmt["type"] = pol["type"]
 			stmt["members"] = pol["members"]
 			stmts[sid] = stmt
 
