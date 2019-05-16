@@ -1,9 +1,9 @@
 chef-select {
   outline: none;
   border-radius: var(--chef-border-radius);
-  border-color: chef-hsl(var(--chef-grey));
+  border-color: var(--chef-grey);
   display: inline-block;
-  background-color: chef-hsl(var(--chef-white));
+  background-color: var(--chef-white);
   cursor: pointer;
 
   .selected-value {
@@ -30,7 +30,7 @@ chef-select {
   }
 
   &.focused .selected-value {
-    border-color: chef-hsl(var(--chef-primary-bright));
+    border-color: var(--chef-primary-bright);
   }
 
   &.active .selected-value {
@@ -47,7 +47,7 @@ chef-select {
   chef-dropdown {
     width: 100%;
     border: 1px solid;
-    border-color: chef-hsl(var(--chef-primary-bright));
+    border-color: var(--chef-primary-bright);
     border-top: none;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
@@ -58,7 +58,7 @@ chef-select {
   chef-option {
     display: block;
     padding: 1em 3em 1em 1.5em;
-    border-bottom: 1px solid chef-hsl(var(--chef-grey));
+    border-bottom: 1px solid var(--chef-grey);
     cursor: pointer;
     color: inherit;
     position: relative;
@@ -69,8 +69,8 @@ chef-select {
     }
 
     &:hover {
-      background-color: chef-hsl(var(--chef-lightest-grey));
-      color: chef-hsl(var(--chef-primary-bright));
+      background-color: var(--chef-lightest-grey);
+      color: var(--chef-primary-bright);
       outline: none;
     }
 

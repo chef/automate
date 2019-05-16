@@ -5,7 +5,7 @@ chef-header-nav {
   top: 0;
   left: 0;
   right: 0;
-  background-color: chef-hsl(var(--chef-white));
+  background-color: var(--chef-white);
   box-shadow: var(--chef-box-shadow);
 
   .navigation-wrapper {
@@ -26,11 +26,11 @@ chef-header-nav {
       margin: 10px 1em;
 
       a {
-        color: chef-hsl(var(--chef-primary-dark));
+        color: var(--chef-primary-dark);
         text-decoration: none;
 
         &:hover {
-          color: chef-hsl(var(--chef-primary-bright));
+          color: var(--chef-primary-bright);
         }
       }
     }
@@ -62,8 +62,8 @@ chef-header-nav {
       &:hover,
       &:focus,
       &.active {
-        color: chef-hsl(var(--chef-primary-bright));
-        border-bottom: 2px solid chef-hsl(var(--chef-primary-bright));
+        color: var(--chef-primary-bright);
+        border-bottom: 2px solid var(--chef-primary-bright);
       }
     }
   }

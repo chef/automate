@@ -1,6 +1,6 @@
 chef-pill {
-  #{--background-color}: var(--pill-background-color, chef-hsl(var(--chef-light-grey)));
-  #{--text-color}: var(--pill-text-color, chef-hsl(var(--chef-dark-grey)));
+  #{--background-color}: var(--pill-background-color, var(--chef-light-grey));
+  #{--text-color}: var(--pill-text-color, var(--chef-dark-grey));
 
   display: inline-block;
   white-space: nowrap;

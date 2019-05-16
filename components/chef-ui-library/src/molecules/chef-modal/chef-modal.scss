@@ -21,13 +21,13 @@ chef-modal {
     left: 50%;
     transform: translateX(-50%) translateY(-50%);
     z-index: 1001;
-    background-color: chef-hsl(var(--chef-white));
-    color: chef-hsl(var(--chef-primary-dark));
+    background-color: var(--chef-white);
+    color: var(--chef-primary-dark);
     border-radius: var(--chef-border-radius);
     padding: 30px;
 
     #{--default-modal-width}: 700px;
-    width: var(--modal-width, var(--default-modal-width));
+    width: var(--modal-width), var(--default-modal-width);
 
     .close {
       position: absolute;
@@ -38,7 +38,7 @@ chef-modal {
 
     [slot=title] {
       #{--default-title-size}: 24px;
-      font-size: var(--title-size, var(--default-title-size));
+      font-size: var(--title-size), var(--default-title-size);
     }
   }
 }

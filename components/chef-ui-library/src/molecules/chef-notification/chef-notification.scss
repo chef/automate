@@ -1,6 +1,6 @@
 chef-notification {
-  color: chef-hsl(var(--chef-white));
-  background-color: chef-hsl(var(--chef-dark-grey));
+  color: var(--chef-white);
+  background-color: var(--chef-dark-grey);
   padding: 0.5em;
   padding-right: 1.5em;
   display: none;
@@ -11,7 +11,7 @@ chef-notification {
   }
 
   &.info {
-    background-color: chef-hsl(var(--chef-success));
+    background-color: var(--chef-success);
 
     &::before {
       font-family: "Material Icons";
@@ -22,7 +22,7 @@ chef-notification {
   }
 
   &.error {
-    background-color: chef-hsl(var(--chef-critical));
+    background-color: var(--chef-critical);
 
     &::before {
       font-family: "Material Icons";

@@ -11,7 +11,7 @@ chef-separator {
     margin-top: -1px;
     height: 2px;
     width: 100%;
-    background-color: chef-hsl(var(--chef-light-grey));
+    background-color: var(--chef-light-grey);
   }
 
   .wrap {

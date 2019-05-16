@@ -25,16 +25,16 @@ let UID = 0;
  * @example
  * <style>
  *   chef-radial-chart .failed, chef-radial-chart .critical {
- *     color: hsl(var(--chef-critical));
+ *     color: var(--chef-critical);
  *   }
  *   chef-radial-chart .warning, chef-radial-chart .warning {
- *     color: hsl(var(--chef-primary));
+ *     color: var(--chef-primary);
  *   }
  *   chef-radial-chart .success, chef-radial-chart .major {
- *     color: hsl(var(--chef-success));
+ *     color: var(--chef-success);
  *   }
  *   chef-radial-chart .skipped, chef-radial-chart .minor {
- *     color: hsl(var(--chef-grey));
+ *     color: var(--chef-grey);
  *   }
  * </style>
  * <chef-radial-chart style="width: 220px; height: 220px;">
@@ -54,16 +54,16 @@ let UID = 0;
  * @example
  * <style>
  *   chef-radial-chart .failed, chef-radial-chart .critical {
- *     color: hsl(var(--chef-critical));
+ *     color: var(--chef-critical);
  *   }
  *   chef-radial-chart .warning, chef-radial-chart .warning {
- *     color: hsl(var(--chef-primary));
+ *     color: var(--chef-primary);
  *   }
  *   chef-radial-chart .success, chef-radial-chart .major {
- *     color: hsl(var(--chef-success));
+ *     color: var(--chef-success);
  *   }
  *   chef-radial-chart .skipped, chef-radial-chart .minor {
- *     color: hsl(var(--chef-grey));
+ *     color: var(--chef-grey);
  *   }
  * </style>
  * <chef-radial-chart style="width: 220px; height: 220px;">

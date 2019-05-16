@@ -1,11 +1,11 @@
 chef-example {
-  #{--border-color}: chef-hsl(var(--chef-grey));
+  #{--border-color}: var(--chef-grey);
   display: block;
   margin: 1em 0;
   border: 1px solid var(--border-color);
 
   .example-code {
-    border-bottom: 1px solid chef-hsl(var(--chef-grey));
+    border-bottom: 1px solid var(--chef-grey);
   }
 
   .example-display {

@@ -13,7 +13,7 @@ chef-combobox > div {
     border-bottom-right-radius: 0px;
     border-top-right-radius: 0px;
     border-right-color: transparent;
-    background-color: chef-hsl(var(--chef-lightest-grey));
+    background-color: var(--chef-lightest-grey);
   }
 
   chef-input {

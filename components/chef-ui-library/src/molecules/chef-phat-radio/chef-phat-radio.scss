@@ -1,11 +1,11 @@
 chef-phat-radio {
-  --active-color: var(--toggle-active-color, chef-hsl(var(--chef-primary-bright)));
+  --active-color: var(--toggle-active-color, var(--chef-primary-bright));
   display: block;
 
   chef-option {
     display: inline-flex;
     align-items: center;
-    background-color: chef-hsl(var(--chef-white));
+    background-color: var(--chef-white);
     box-shadow: 0 0 16px 0 #E6EBEE;
     cursor: pointer;
     padding: 1em;
@@ -25,7 +25,7 @@ chef-phat-radio {
     &::before {
       font-family: "Material Icons";
       content: "\E836";
-      color: chef-hsl(var(--chef-grey));
+      color: var(--chef-grey);
       font-size: 20px;
     }
 

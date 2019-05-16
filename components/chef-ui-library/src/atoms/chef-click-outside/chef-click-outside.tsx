@@ -27,8 +27,8 @@ import { Component, Element, Event, EventEmitter, Listen, Prop } from '@stencil/
  * </script>
  *
  * <style>
- *   #wrapper { display: block; background: hsl(var(--chef-white)); }
- *   #content { padding: 1em; border: 1px solid; border-color: hsl(var(--chef-grey)); }
+ *   #wrapper { display: block; background: var(--chef-white); }
+ *   #content { padding: 1em; border: 1px solid; border-color: var(--chef-grey); }
  *   .omitted { margin: 1em 1em 0 0; }
  * </style>
  */

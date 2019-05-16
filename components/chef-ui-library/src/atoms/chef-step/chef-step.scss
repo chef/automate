@@ -5,10 +5,10 @@ chef-step {
   padding: 2px 12px 2px 2px;
   border: 1px solid transparent;
   border-radius: 30px;
-  background: chef-hsl(var(--chef-white));
+  background: var(--chef-white);
   box-shadow: var(--chef-box-shadow);
   font-size: 12px;
-  color: chef-hsl(var(--chef-primary-bright));
+  color: var(--chef-primary-bright);
   white-space: nowrap;
 
   // step number
@@ -20,8 +20,8 @@ chef-step {
     text-align: center;
     margin-right: 8px;
     border-radius: 100%;
-    background: chef-hsl(var(--chef-primary-bright));
-    color: chef-hsl(var(--chef-white));
+    background: var(--chef-primary-bright);
+    color: var(--chef-white);
   }
 
   // horizontal line between steps
@@ -33,30 +33,30 @@ chef-step {
     width: 20px;
     left: -21px;
     top: 50%;
-    background: chef-hsl(var(--chef-primary-bright));
+    background: var(--chef-primary-bright);
   }
 
   &[selected] {
-    #{--border-color}: chef-hsl(var(--chef-primary-bright));
+    #{--border-color}: var(--chef-primary-bright);
     border: 1px solid var(--border-color);
-    color: chef-hsl(var(--chef-primary-bright));
+    color: var(--chef-primary-bright);
 
     &::before {
-      background: chef-hsl(var(--chef-primary-bright));
-      color: chef-hsl(var(--chef-white));
+      background: var(--chef-primary-bright);
+      color: var(--chef-white);
     }
   }
 
   &[disabled] {
-    color: chef-hsl(var(--chef-dark-grey));
+    color: var(--chef-dark-grey);
 
     &::before {
-      background: chef-hsl(var(--chef-light-grey));
-      color: chef-hsl(var(--chef-dark-grey));
+      background: var(--chef-light-grey);
+      color: var(--chef-dark-grey);
     }
 
     &::after {
-      background: chef-hsl(var(--chef-grey));
+      background: var(--chef-grey);
     }
   }
 
