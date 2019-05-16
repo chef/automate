@@ -38,6 +38,18 @@ func mergeFilters(mergeableFilters []*common.Filter) ([]common.Filter, error) {
 	return filters, nil
 }
 
+func handleTagFilters(filter common.Filter) (string, error) {
+	tagKeyFilter := strings.TrimPrefix(filter.Key, "tags:")
+	newTagCondition, err := wherePatternMatchTags(tagKeyFilter, filter.Values, "t")
+	if err != nil {
+		return "", errors.Wrap(err, "buildWhereFilter error")
+	}
+	if filter.Exclude {
+		newTagCondition = fmt.Sprintf("NOT (%s)", newTagCondition)
+	}
+	return newTagCondition, nil
+}
+
 // Takes a filter map (should be validated for content) and table abbreviation and returns a wherefilter
 func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, filterField map[string]string) (whereFilter string, err error) {
 	if len(mergeableFilters) == 0 {
@@ -50,12 +62,17 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 	}
 
 	var conditions []string
+	var oRConditionsForTags []string
 	for _, filter := range filters {
 		var newCondition string
 		var err error
 		if strings.HasPrefix(filter.Key, "tags:") {
-			tagKeyFilter := strings.TrimPrefix(filter.Key, "tags:")
-			newCondition, err = wherePatternMatchTags(tagKeyFilter, filter.Values, "t")
+			newTagCondition, err := handleTagFilters(filter)
+			if err != nil {
+				return "", errors.Wrap(err, "buildWhereFilter error build tag filters")
+			}
+			oRConditionsForTags = append(oRConditionsForTags, newTagCondition)
+			continue
 		} else {
 			switch filterField[filter.Key] {
 			case "":
@@ -84,7 +101,15 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 		conditions = append(conditions, newCondition)
 	}
 
-	whereFilter = fmt.Sprintf("WHERE (%s)", strings.Join(conditions, " AND "))
+	if len(oRConditionsForTags) == 0 {
+		whereFilter = fmt.Sprintf("WHERE (%s)", strings.Join(conditions, " AND "))
+	} else {
+		if len(conditions) > 0 {
+			whereFilter = fmt.Sprintf("WHERE (%s AND %s)", strings.Join(conditions, " AND "), strings.Join(oRConditionsForTags, " OR "))
+		} else {
+			whereFilter = fmt.Sprintf("WHERE (%s)", strings.Join(oRConditionsForTags, " OR "))
+		}
+	}
 	logrus.Debugf("buildWhereFilter, whereFilter=%s", whereFilter)
 	return whereFilter, nil
 }
