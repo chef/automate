@@ -24,9 +24,9 @@ CREATE TABLE recurring_workflow_schedules (
     recurrence TEXT,
     enabled BOOLEAN,
 
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    last_enqueued_at TIMESTAMP,
-    next_run_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_enqueued_at TIMESTAMPTZ,
+    next_run_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CONSTRAINT say_my_name UNIQUE(name, workflow_name)
 );
@@ -45,7 +45,7 @@ $$ LANGUAGE SQL;
 CREATE OR REPLACE FUNCTION update_recurring_workflow_recurrence(
     _id BIGINT,
     _recurrence TEXT,
-    _next_run_at TIMESTAMP)
+    _next_run_at TIMESTAMPTZ)
 RETURNS VOID
 AS $$
     WITH sched AS (
@@ -76,7 +76,7 @@ CREATE TABLE workflow_instances (
     workflow_name TEXT NOT NULL,
     parameters BYTEA,
     payload BYTEA,
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     enqueued_tasks INTEGER NOT NULL DEFAULT 0,
     completed_tasks INTEGER NOT NULL DEFAULT 0,
     status workflow_instance_status NOT NULL DEFAULT 'running',
@@ -100,9 +100,9 @@ CREATE TABLE tasks (
     id BIGSERIAL PRIMARY KEY,
     workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     try_remaining INT NOT NULL DEFAULT 1,
-    enqueued_at   TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at    TIMESTAMP NOT NULL DEFAULT NOW(),
-    start_after   TIMESTAMP NOT NULL DEFAULT NOW(),
+    enqueued_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    start_after   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     task_name     TEXT NOT NULL,
     parameters    BYTEA
 );
@@ -112,8 +112,8 @@ CREATE TABLE tasks_results (
     workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
     parameters   BYTEA,
     task_name    TEXT NOT NULL,
-    enqueued_at  TIMESTAMP NOT NULL,
-    completed_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    enqueued_at  TIMESTAMPTZ NOT NULL,
+    completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     status       task_status,
     error        TEXT,
     result       BYTEA
@@ -127,7 +127,7 @@ CREATE TABLE workflow_events (
     id BIGSERIAL PRIMARY KEY,
     event_type workflow_event_type NOT NULL,
     workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
-    enqueued_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    enqueued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     -- task_complete members
     task_result_id BIGINT REFERENCES tasks_results(id)
 );
@@ -250,7 +250,7 @@ $$;
 CREATE OR REPLACE FUNCTION enqueue_task(
     workflow_instance_id BIGINT,
     try_remaining INT,
-    start_after TIMESTAMP,
+    start_after TIMESTAMPTZ,
     task_name TEXT,
     parameters BYTEA)
 RETURNS VOID
