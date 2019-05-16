@@ -46,8 +46,8 @@ describe('global projects filter', () => {
           cy.get('[data-cy=projects-filter-button]').click()
           
           const allowedProjects = [proj1, proj2, proj3, '(unassigned)'];
-          cy.get('[data-cy=projects-filter-dropdown] chef-checkbox')
-            .should(($elements) => { expect($elements).to.have.length(allowedProjects.length) })
+          // we don't check that projects in dropdown match *exactly* as
+          // we can't control creation of other projects in the test env
           allowedProjects.forEach(project => {
             cy.get('[data-cy=projects-filter-dropdown]').contains(project)
           })
