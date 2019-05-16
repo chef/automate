@@ -199,6 +199,33 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByTags() {
 	suite.Equal("Taco Node", fetchedNodes[0].Name)
 }
 
+func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
+	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "automate", Tags: []*common.Kv{{Key: "nachos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "No Nacho Node", Manager: "automate", Tags: []*common.Kv{{Key: "nachos", Value: "no"}}, TargetConfig: &nodes.TargetConfig{}})
+	suite.Require().NoError(err)
+
+	filter1 := &common.Filter{
+		Key:    "tacos",
+		Values: []string{"yes"},
+	}
+	filter2 := &common.Filter{
+		Key:    "nachos",
+		Values: []string{"yes"},
+	}
+	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1, filter2})
+	suite.Require().NoError(err)
+
+	suite.Equal(2, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 2, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	suite.Equal("Nacho Node", fetchedNodes[0].GetName())
+	suite.Equal("Taco Node", fetchedNodes[1].GetName())
+}
+
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByProjects() {
 	node1Id, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Projects: []string{"Favorite Food", "Taco Bell Menu"}})
 	suite.Require().NoError(err)
