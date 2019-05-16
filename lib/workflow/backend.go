@@ -23,7 +23,7 @@ const (
 	getTaskResultQuery = `SELECT task_name, parameters, status, error, result from tasks_results WHERE id = $1`
 
 	enqueueWorkflowQuery  = `SELECT enqueue_workflow($1, $2, $3)`
-	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow($1)`
+	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow(VARIADIC $1)`
 	completeWorkflowQuery = `SELECT complete_workflow($1)`
 	continueWorkflowQuery = `SELECT continue_workflow($1, $2, $3, $4, $5)`
 	abandonWorkflowQuery  = `SELECT abandon_workflow($1, $2, $3)`
@@ -566,7 +566,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		return nil, nil, err
 	}
 	// TODO: allow multiple workflow names
-	row := tx.QueryRowContext(ctx, dequeueWorkflowQuery, workflowNames[0])
+	row := tx.QueryRowContext(ctx, dequeueWorkflowQuery, pq.Array(workflowNames))
 	event := &WorkflowEvent{}
 	workc := &PostgresWorkflowCompleter{
 		ctx:             ctx,
