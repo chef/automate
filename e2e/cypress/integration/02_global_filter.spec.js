@@ -2,6 +2,7 @@ describe('global projects filter', () => {
   const nonAdminUsername = "nonadmin"
   const proj1  = "cypress-project-1"
   const proj2  = "cypress-project-2"
+  const proj3  = "cypress-project-3"
   const pol_id = "cypress-policy"
 
   before(() => {
@@ -10,6 +11,7 @@ describe('global projects filter', () => {
 
       cy.createProject(admin.id_token, proj1)
       cy.createProject(admin.id_token, proj2)
+      cy.createProject(admin.id_token, proj3)
       cy.createUser(admin.id_token, nonAdminUsername)
       cy.createPolicy(admin.id_token, pol_id, nonAdminUsername, [proj1, proj2])
       cy.logout()
@@ -43,7 +45,7 @@ describe('global projects filter', () => {
         if (version === 'v1') {
           cy.get('[data-cy=projects-filter-button]').click()
           
-          const allowedProjects = [proj1, proj2, '(unassigned)'];
+          const allowedProjects = [proj1, proj2, proj3, '(unassigned)'];
           cy.get('[data-cy=projects-filter-dropdown] chef-checkbox')
             .should(($elements) => { expect($elements).to.have.length(allowedProjects.length) })
           allowedProjects.forEach(project => {
