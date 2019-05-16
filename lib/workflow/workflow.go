@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 )
@@ -142,6 +143,78 @@ func (m *WorkflowManager) CreateWorkflowSchedule(
 	nextRunAt := recurRule.After(time.Now().UTC(), true).UTC()
 	return m.backend.CreateWorkflowSchedule(context.TODO(), scheduleName, workflowName,
 		parameters, enabled, recurRule.String(), nextRunAt)
+}
+
+type workflowScheduleUpdateOpts struct {
+	updateEnabled bool
+	enabled       bool
+
+	updateParameters bool
+	parameters       []byte
+
+	updateRecurrence bool
+	recurrence       string
+	nextRunAt        time.Time
+}
+
+type WorkflowScheduleUpdateOpts func(*workflowScheduleUpdateOpts) error
+
+func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpts {
+	return func(o *workflowScheduleUpdateOpts) error {
+		o.enabled = enabled
+		o.updateEnabled = true
+		return nil
+	}
+}
+
+func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpts {
+	return func(o *workflowScheduleUpdateOpts) error {
+		paramsData, err := jsonify(parameters)
+		o.updateParameters = true
+		o.parameters = paramsData
+		return err
+	}
+}
+
+func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
+	return func(o *workflowScheduleUpdateOpts) error {
+		o.updateRecurrence = true
+		o.recurrence = recurRule.String()
+		o.nextRunAt = recurRule.After(time.Now().UTC(), true).UTC()
+		return nil
+	}
+}
+
+func (m *WorkflowManager) UpdateWorkflowScheduleByName(ctx context.Context,
+	scheduleName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error {
+
+	return m.backend.UpdateWorkflowScheduleByName(ctx, scheduleName, workflowName, opts...)
+}
+
+func (m *WorkflowManager) GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string, out interface{}) error {
+	data, err := m.backend.GetScheduledWorkflowParameters(ctx, scheduleName, workflowName)
+	if err != nil {
+		return errors.Wrap(err, "could not retrieve parameters for workflow")
+	}
+
+	if data != nil {
+		return json.Unmarshal(data, out)
+	}
+
+	return nil
+}
+
+func (m *WorkflowManager) GetScheduledWorkflowRecurrence(ctx context.Context, scheduleName string, workflowName string) (*rrule.RRule, error) {
+	ruleStr, err := m.backend.GetScheduledWorkflowRecurrence(ctx, scheduleName, workflowName)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not retrieve parameters for workflow")
+	}
+
+	if ruleStr == "" {
+		return nil, errors.New("no recurrence data")
+	}
+
+	return rrule.StrToRRule(ruleStr)
 }
 
 func (m *WorkflowManager) RegisterWorkflowExecutor(workflowName string,
