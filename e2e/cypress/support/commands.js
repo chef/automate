@@ -52,8 +52,8 @@ Cypress.Commands.add("login", (url, username) => {
     cy.get('[type=submit]').click().then(() => {
       expect(localStorage.getItem('chef-automate-user')).to.contain(username)
     
-      // close welcome modal
-      cy.get('[data-cy=close-welcome]').first().click()
+      // close welcome modal if present
+      cy.get('app-welcome-modal').invoke('hide')
       cy.saveStorage()
     })
   })
