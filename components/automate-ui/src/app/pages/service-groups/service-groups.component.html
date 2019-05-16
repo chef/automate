@@ -54,7 +54,9 @@
         tabindex="0"
         class="{{serviceGroup.status}} sg-row"
         [ngClass]="{'selected': (selectedServiceGroupId === serviceGroup.id)}"
-        (click)="onServiceGroupClick(serviceGroup.id)"
+        (click)="onServiceGroupSelect($event, serviceGroup.id)"
+        (keydown.space)="onServiceGroupSelect($event, serviceGroup.id)"
+        (keydown.enter)="onServiceGroupSelect($event, serviceGroup.id)"
         *ngFor="let serviceGroup of serviceGroups$ | async">
         <chef-td class="{{serviceGroup.status}} health">
           <chef-icon class="{{serviceGroup.status}}">{{ serviceGroup.status | serviceStatusIcon }}</chef-icon>
@@ -89,6 +91,7 @@
   </div>
 </div>
 <app-services-sidebar
+  tabindex="0"
   [serviceGroupId]="selectedServiceGroupId"
   class="services-sidebar-container">
 </app-services-sidebar>

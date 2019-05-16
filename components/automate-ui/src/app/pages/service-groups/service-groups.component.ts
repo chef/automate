@@ -179,7 +179,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.router.navigate([], {queryParams});
   }
 
-  public onServiceGroupClick(id: string) {
+  public onServiceGroupSelect(event: Event, id: string) {
+    event.preventDefault();
+
     const queryParams = { ...this.route.snapshot.queryParams };
     queryParams['sgId'] = id;
     delete queryParams['sgPage'];
@@ -190,7 +192,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public updateServicesSidebar(servicesFilters: ServicesFilters) {
     this.selectedServiceGroupId = servicesFilters.service_group_id;
     this.store.dispatch(new UpdateSelectedSG(servicesFilters));
-    document.getElementById('services-panel').focus();
+    document.querySelector<HTMLElement>('app-services-sidebar').focus();
   }
 
   private getSelectedStatus(allParameters: Chicklet[]): RollupServiceStatus {
