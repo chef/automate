@@ -3,7 +3,6 @@ package integration_test
 import (
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -657,17 +656,6 @@ func TestEventTypeCountsProjectFilter(t *testing.T) {
 			assert.ElementsMatch(t, test.expected.Counts, res.Counts)
 		})
 	}
-}
-
-func findEventCountByName(eventName string,
-	eventCounts []*response.EventCount) (*response.EventCount, error) {
-	for _, eventCount := range eventCounts {
-		if eventCount.Name == eventName {
-			return eventCount, nil
-		}
-	}
-
-	return nil, errors.New(fmt.Sprintf("EventCount %q was not found", eventName))
 }
 
 func TestEventCountsCountOnlyFilteredOrgs(t *testing.T) {
