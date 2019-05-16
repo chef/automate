@@ -228,31 +228,24 @@ func (s *State) newCompiler() (*ast.Compiler, error) {
 // DumpData is a bit fast-and-loose when it comes to error checking; it's not meant
 // to be used in production
 func (s *State) DumpData(ctx context.Context) error {
-	txn, err := s.store.NewTransaction(ctx)
+	return dumpData(ctx, s.store, s.log)
+}
+
+func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
+	txn, err := store.NewTransaction(ctx)
 	if err != nil {
 		return err
 	}
-	data, err := s.store.Read(ctx, txn, storage.Path([]string{}))
+	data, err := store.Read(ctx, txn, storage.Path([]string{}))
 	if err != nil {
 		return err
 	}
-	// used to check activity in OPA store
-	s.log.Debugf("data retrieved from OPA store: %#v", data)
-	return s.store.Commit(ctx, txn)
+	l.Debugf("data: %#v", data)
+	return store.Commit(ctx, txn)
 }
 
 func (s *State) DumpDataV2(ctx context.Context) error {
-	txn, err := s.v2Store.NewTransaction(ctx)
-	if err != nil {
-		return err
-	}
-	data, err := s.v2Store.Read(ctx, txn, storage.Path([]string{}))
-	if err != nil {
-		return err
-	}
-	// used to check activity in OPA v2Store
-	s.log.Debugf("data retrieved from OPA v2Store: %#v", data)
-	return s.v2Store.Commit(ctx, txn)
+	return dumpData(ctx, s.v2Store, s.log)
 }
 
 // IsAuthorized evaluates whether a given [subject, resource, action] tuple
