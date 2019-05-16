@@ -1,6 +1,6 @@
 describe('team management', () => {
   before(() => {
-    cy.login('/settings/teams').then(() => {
+    cy.adminLogin('/settings/teams').then(() => {
       // clean up leftover teams in case of previous test failures
       // TODO...
     })
