@@ -94,7 +94,11 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 	if in.Size == 0 {
 		in.Size = 10000
 	}
-	formattedFilters := formatFilters(in.Filters)
+
+	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
+	if err != nil {
+		return nil, utils.FormatErrorMsg(err, in.Id)
+	}
 
 	if in.Id != "" {
 		if in.Type == "" {
@@ -113,7 +117,7 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 			if err != nil {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
-			controlStats, err := srv.es.GetControlListStatsByProfileId(in.Id, int(from), int(perPage), formattedFilters, sort, order)
+			controlStats, err := srv.es.GetControlListStatsByProfileID(in.Id, int(from), int(perPage), formattedFilters, sort, order)
 			if err != nil {
 				err = utils.FormatErrorMsg(err, "")
 				return nil, err
@@ -177,11 +181,11 @@ func validateTrendData(in *stats.Query, filters map[string][]string) (err error)
 	return nil
 }
 
-func validatePaginationAndSorting(in *stats.Query) (from int32, per_page int32, sort string, asc bool, err error) {
+func validatePaginationAndSorting(in *stats.Query) (from int32, perPage int32, sort string, asc bool, err error) {
 	if in.PerPage == 0 {
 		in.PerPage = 1000
 	}
-	per_page = in.PerPage
+	perPage = in.PerPage
 
 	if in.Page == 0 {
 		in.Page = 1

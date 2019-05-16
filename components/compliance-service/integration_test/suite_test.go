@@ -160,7 +160,6 @@ func (s *Suite) ingestReport(fileName string, f func(*compliance.Report)) error 
 
 func waitFor(f func() bool) {
 	period := time.Millisecond * 10
-
 	for {
 		if f() {
 			break
