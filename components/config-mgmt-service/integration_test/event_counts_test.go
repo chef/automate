@@ -659,17 +659,6 @@ func TestEventTypeCountsProjectFilter(t *testing.T) {
 	}
 }
 
-func findEventCountByName(eventName string,
-	eventCounts []*response.EventCount) (*response.EventCount, error) {
-	for _, eventCount := range eventCounts {
-		if eventCount.Name == eventName {
-			return eventCount, nil
-		}
-	}
-
-	return nil, errors.New(fmt.Sprintf("EventCount %q was not found", eventName))
-}
-
 func TestEventCountsCountOnlyFilteredOrgs(t *testing.T) {
 	var (
 		totalActions = 24
