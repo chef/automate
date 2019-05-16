@@ -114,7 +114,7 @@ export class JobsListComponent implements OnInit, OnDestroy {
 
   viewReport(jobID) {
     const filters = 'job_id:' + jobID;
-    this.router.navigate(['/compliance', 'reporting', 'overview'], {queryParams: {filters}});
+    this.router.navigate(['/compliance', 'reports', 'overview'], {queryParams: {filters}});
   }
 
   promptDeleteJob(job) {
