@@ -35,15 +35,12 @@ func TestRunNodesIntegrationSuite(t *testing.T) {
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByManagerIDAndReturnsAllManagerIDs() {
 	mgr1 := manager.NodeManager{Name: "mgr1", Type: "aws-ec2"}
 	mgrID1, err := suite.Database.AddNodeManager(&mgr1, "11111111")
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	// TODO: Is there another easy way to add a second node manager besides changing the type?
 	mgr2 := manager.NodeManager{Name: "mgr2", Type: "aws-api"}
 	mgrID2, err := suite.Database.AddNodeManager(&mgr2, "22222222")
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	// Host set here is Name after roundtripping to the DB with AddManagerNodesToDB/GetNodes
 	node1 := manager.ManagerNode{Id: "i-1111111", Region: "us-west-2", Host: "Node1"}
@@ -63,9 +60,8 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByManagerIDAndReturnsAl
 	}
 	// Get the nodes in the DB that belong to the first manager, ordered by their name.
 	newNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(2, len(newNodes))
 	suite.Equal(&pgdb.TotalCount{Total: 2, Unreachable: 0, Reachable: 0, Unknown: 2}, count)
 
@@ -79,9 +75,7 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByManagerIDAndReturnsAl
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByEmptyManagerIDList() {
 	mgr1 := manager.NodeManager{Name: "mgr1", Type: "aws-ec2"}
 	mgrID1, err := suite.Database.AddNodeManager(&mgr1, "11111111")
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	// Host set here is Name after roundtripping to the DB with AddManagerNodesToDB/GetNodes
 	node1 := manager.ManagerNode{Id: "i-1111111", Region: "us-west-2", Host: "Node1"}
@@ -90,9 +84,7 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByEmptyManagerIDList() 
 	suite.Equal(1, len(nodeIds))
 
 	node2Id, err := suite.Database.AddNode(&nodes.Node{Name: "Node2", Manager: "automate", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	filter := &common.Filter{
 		Key:    "manager_id",
@@ -100,9 +92,8 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByEmptyManagerIDList() 
 	}
 	// Get the nodes in the DB that belong to the first manager, ordered by their name.
 	newNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(newNodes))
 	suite.Equal(&pgdb.TotalCount{Total: 1, Unreachable: 0, Reachable: 0, Unknown: 2}, count)
 
@@ -113,17 +104,13 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByEmptyManagerIDList() 
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByNameWithWildcard() {
 	node1Id, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	node2Id, err := suite.Database.AddNode(&nodes.Node{Name: "Tostada Node", Manager: "automate", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "automate", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	filter := &common.Filter{
 		Key:    "name",
@@ -134,9 +121,8 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByNameWithWildcard() {
 		Values: []string{"Tostada"},
 	}
 	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter, filter2})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(2, len(fetchedNodes))
 	suite.Equal(&pgdb.TotalCount{Total: 2, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
 
@@ -148,17 +134,13 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByNameWithWildcard() {
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanExcludeByNameWithWildcard() {
 	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	_, err = suite.Database.AddNode(&nodes.Node{Name: "Tostada Node", Manager: "automate", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	node3Id, err := suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "automate", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	filter := &common.Filter{
 		Key:     "name",
@@ -171,9 +153,8 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanExcludeByNameWithWildcard() {
 		Exclude: true,
 	}
 	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter, filter2})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(fetchedNodes))
 	suite.Equal(&pgdb.TotalCount{Total: 1, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
 
@@ -199,22 +180,18 @@ func (suite *NodesIntegrationSuite) TestGetNodesReturnsErrorWithConflictingInclu
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByTags() {
 	node1Id, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "automate", Tags: []*common.Kv{{Key: "nachos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	filter := &common.Filter{
 		Key:    "tacos",
 		Values: []string{"yes"},
 	}
 	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(fetchedNodes))
 	suite.Equal(&pgdb.TotalCount{Total: 1, Unreachable: 0, Reachable: 0, Unknown: 2}, count)
 
@@ -388,17 +365,14 @@ func (suite *NodesIntegrationSuite) TestFilterByLastCheckInRange() {
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	timeRangeMax := time.Now().Add(time.Hour * 24).Format(time.RFC3339)
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
 		{Key: "last_run_timerange", Values: []string{"2019-03-05T00:00:00Z", timeRangeMax}},
 	})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(listNodes))
 	suite.Equal(nowTime, listNodes[0].GetRunData().GetEndTime())
 }
@@ -422,17 +396,14 @@ func (suite *NodesIntegrationSuite) TestFilterByLastScanTimeRange() {
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	timeRangeMax := time.Now().Add(time.Hour * 24).Format(time.RFC3339)
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
 		{Key: "last_scan_timerange", Values: []string{"2019-03-05T00:00:00Z", timeRangeMax}},
 	})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(listNodes))
 	suite.Equal(nowTime, listNodes[0].GetScanData().GetEndTime())
 }
@@ -456,16 +427,13 @@ func (suite *NodesIntegrationSuite) TestFilterByRunDataStatus() {
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
 		{Key: "last_run_status", Values: []string{"FAILED"}},
 	})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(listNodes))
 	suite.Equal(nodes.LastContactData_FAILED, listNodes[0].GetRunData().GetStatus())
 }
@@ -489,16 +457,13 @@ func (suite *NodesIntegrationSuite) TestFilterByScanDataStatus() {
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
 		{Key: "last_scan_status", Values: []string{"FAILED"}},
 	})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(listNodes))
 	suite.Equal(nodes.LastContactData_FAILED, listNodes[0].GetScanData().GetStatus())
 }
@@ -522,21 +487,17 @@ func (suite *NodesIntegrationSuite) TestFilterByRunDataPenultStatus() {
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	node.RunData.Status = nodes.LastContactData_PASSED
 	err = suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
 		{Key: "last_run_penultimate_status", Values: []string{"FAILED"}},
 	})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(listNodes))
 	suite.Equal(nodes.LastContactData_FAILED, listNodes[0].GetRunData().GetPenultimateStatus())
 	suite.Equal(nodes.LastContactData_PASSED, listNodes[0].GetRunData().GetStatus())
@@ -545,9 +506,8 @@ func (suite *NodesIntegrationSuite) TestFilterByRunDataPenultStatus() {
 		{Key: "last_run_penultimate_status", Values: []string{"FAILED"}},
 		{Key: "last_run_status", Values: []string{"PASSED"}},
 	})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(listNodes))
 
 }
@@ -571,22 +531,17 @@ func (suite *NodesIntegrationSuite) TestFilterByScanDataPenultStatus() {
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	node.ScanData.Status = nodes.LastContactData_SKIPPED
 	err = suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
 		{Key: "last_scan_penultimate_status", Values: []string{"FAILED"}},
 	})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(listNodes))
 	suite.Equal(nodes.LastContactData_FAILED, listNodes[0].GetScanData().GetPenultimateStatus())
 	suite.Equal(nodes.LastContactData_SKIPPED, listNodes[0].GetScanData().GetStatus())
@@ -595,9 +550,8 @@ func (suite *NodesIntegrationSuite) TestFilterByScanDataPenultStatus() {
 		{Key: "last_scan_penultimate_status", Values: []string{"FAILED"}},
 		{Key: "last_scan_status", Values: []string{"SKIPPED"}},
 	})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(listNodes))
 }
 
@@ -620,9 +574,7 @@ func (suite *NodesIntegrationSuite) TestFilterByScanDataAndRunDataStatus() {
 		},
 	}
 	err := suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	node = &manager.NodeMetadata{
 		Uuid:            "1223-4254-2424-1322",
@@ -641,17 +593,14 @@ func (suite *NodesIntegrationSuite) TestFilterByScanDataAndRunDataStatus() {
 		},
 	}
 	err = suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
 
 	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{
 		{Key: "last_scan_status", Values: []string{"FAILED"}},
 		{Key: "last_run_status", Values: []string{"PASSED"}},
 	})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
+	suite.Require().NoError(err)
+
 	suite.Equal(1, len(listNodes))
 	suite.Equal(nodes.LastContactData_FAILED, listNodes[0].GetScanData().GetStatus())
 	suite.Equal(nodes.LastContactData_PASSED, listNodes[0].GetRunData().GetStatus())
