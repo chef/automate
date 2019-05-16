@@ -63,7 +63,6 @@ func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duratio
 		if sleepTime > s {
 			sleepTime = s
 		}
-
 	}
 }
 
@@ -99,6 +98,9 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	err = completer.EnqueueRecurringWorkflow(s, workflowInstanceName, nextDueAt, nowUTC)
 	if err != nil {
 		if err == ErrWorkflowInstanceExists {
+			logrus.Warnf(
+				"Recurring workflow %q still running, consider increasing recurrence interval",
+				workflowInstanceName)
 			// TODO(jaym): what do we want to do here? i think we're going to keep trying
 			//             until we succeed here? Maybe we want to skip this interval?
 			return maxWakeupInterval, nil

@@ -137,16 +137,18 @@ CREATE OR REPLACE FUNCTION enqueue_workflow(
     name TEXT,
     workflow_name TEXT,
     parameters BYTEA)
-RETURNS VOID
+RETURNS INTEGER
 AS $$
+    SELECT pg_notify('workflow_instance_new', workflow_name);
     WITH winst AS (
         INSERT INTO workflow_instances(name, workflow_name, parameters)
             VALUES(name, workflow_name, parameters)
+            ON CONFLICT DO NOTHING
             RETURNING id
         )
     INSERT INTO workflow_events(event_type, workflow_instance_id)
-        VALUES('start', (select id from winst));
-    SELECT pg_notify('workflow_instance_new', workflow_name);
+    (SELECT 'start', id FROM winst WHERE id IS NOT NULL)
+    RETURNING 1
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION dequeue_workflow(VARIADIC workflow_names TEXT[])

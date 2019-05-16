@@ -185,6 +185,10 @@ func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
 	}
 }
 
+func (m *WorkflowManager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
+	return m.backend.ListWorkflowSchedules(ctx)
+}
+
 func (m *WorkflowManager) UpdateWorkflowScheduleByName(ctx context.Context,
 	scheduleName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error {
 

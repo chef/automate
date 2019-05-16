@@ -41,6 +41,10 @@ const (
 	updateRecurringWorkflowQuery = `
         UPDATE recurring_workflow_schedules SET next_run_at = $2, last_enqueued_at = $3 WHERE id = $1
         `
+
+	updateSlowRecurringWorkflowQuery = `
+        UPDATE recurring_workflow_schedules SET next_run_at = $2 WHERE id = $1
+        `
 )
 
 type WorkflowEventType string
@@ -540,13 +544,18 @@ func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *WorkflowInsta
 		return wrapErr(err, "failed to begin enqueue workflow transaction")
 	}
 
-	_, err = tx.ExecContext(ctx, enqueueWorkflowQuery, w.InstanceName, w.WorkflowName, w.Parameters)
+	row := tx.QueryRowContext(ctx, enqueueWorkflowQuery, w.InstanceName, w.WorkflowName, w.Parameters)
+
+	var count int
+	err = row.Scan(&count)
 	if err != nil {
 		return wrapErr(err, "failed to enqueue workflow")
 	}
-
 	if err := tx.Commit(); err != nil {
 		return wrapErr(err, "failed to commit enqueue workflow")
+	}
+	if count == 0 {
+		return ErrWorkflowInstanceExists
 	}
 	return nil
 }
@@ -589,6 +598,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		&event.CompletedTaskCount,
 	)
 	if err == sql.ErrNoRows {
+		tx.Commit() // nolint: errcheck
 		cancel()
 		return nil, nil, ErrNoWorkflowInstances
 
@@ -793,17 +803,34 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
 
 		return errors.Wrap(err, msg)
 	}
-	_, err := c.tx.ExecContext(c.ctx, enqueueWorkflowQuery, workflowInstanceName, s.WorkflowName, s.Parameters)
+
+	row := c.tx.QueryRowContext(c.ctx, enqueueWorkflowQuery, workflowInstanceName, s.WorkflowName, s.Parameters)
+
+	var count int
+	err := row.Scan(&count)
 	if err != nil {
 		return wrapErr(err, "failed to enqueue workflow")
 	}
 
-	_, err = c.tx.ExecContext(c.ctx, updateRecurringWorkflowQuery, s.ID, nextDueAt, lastStartedAt)
-	if err != nil {
-		return wrapErr(err, "failed to update workflow schedule")
-	}
+	if count == 0 {
+		_, err = c.tx.ExecContext(c.ctx, updateSlowRecurringWorkflowQuery, s.ID, nextDueAt)
+		if err != nil {
+			return wrapErr(err, "failed to update workflow schedule")
+		}
 
-	return wrapErr(c.tx.Commit(), "failed to commit workflow instance")
+		err := c.tx.Commit()
+		if err != nil {
+			return errors.Wrap(err, "failed to commit workflow instance")
+		}
+		return ErrWorkflowInstanceExists
+	} else {
+		_, err = c.tx.ExecContext(c.ctx, updateRecurringWorkflowQuery, s.ID, nextDueAt, lastStartedAt)
+		if err != nil {
+			return wrapErr(err, "failed to update workflow schedule")
+		}
+
+		return wrapErr(c.tx.Commit(), "failed to commit workflow instance")
+	}
 }
 
 func (c *PostgresRecurringWorkflowCompleter) Close() {
