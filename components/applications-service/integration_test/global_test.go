@@ -209,67 +209,67 @@ func assertServiceGroupsEqual(t *testing.T, expected, actual *applications.Servi
 func habServicesMatrix() []*habitat.HealthCheckEvent {
 	return []*habitat.HealthCheckEvent{
 		// service_group 1 <-> With a Health Status = 'OK'
-		NewHabitatEvent([]MessageOverrides{
+		NewHabitatEvent(
 			withSupervisorId("sup1"),
 			withServiceGroup("redis.default"),
 			withPackageIdent("core/redis/0.1.0/20190101121212"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("redis.default"),
 			withPackageIdent("core/redis/0.1.0/20190101121212"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup3"),
 			withServiceGroup("redis.default"),
 			withPackageIdent("core/redis/0.1.0/20190101121212"),
-		}...),
+		),
 
 		// service_group 2 <-> With a Health Status = 'WARNING'
-		NewHabitatEvent([]MessageOverrides{
+		NewHabitatEvent(
 			withSupervisorId("sup1"),
 			withServiceGroup("myapp.default"),
 			withPackageIdent("core/myapp/0.1.0/20190101121212"),
 			withHealth("WARNING"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("myapp.default"),
 			withPackageIdent("core/myapp/0.1.0/20190101121212"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup3"),
 			withServiceGroup("myapp.default"),
 			withPackageIdent("core/myapp/0.1.0/20190101121212"),
-		}...),
+		),
 
 		// service_group 3 <-> With a Health Status = 'CRITICAL'
-		NewHabitatEvent([]MessageOverrides{
+		NewHabitatEvent(
 			withSupervisorId("sup1"),
 			withServiceGroup("postgres.default"),
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("postgres.default"),
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup3"),
 			withServiceGroup("postgres.default"),
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
 			withHealth("CRITICAL"),
-		}...),
+		),
 
 		// service_group 4 <-> With a Health Status = 'UNKNOWN'
-		NewHabitatEvent([]MessageOverrides{
+		NewHabitatEvent(
 			withSupervisorId("sup4"),
 			withServiceGroup("test.default"),
 			withPackageIdent("core/test/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
 			withoutUpdateStrategy(),
 			withSite(""),
-		}...),
+		),
 	}
 }

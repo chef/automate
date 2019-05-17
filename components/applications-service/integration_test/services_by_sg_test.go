@@ -66,12 +66,12 @@ func TestGetServicesBySGSortParameterError(t *testing.T) {
 }
 
 func TestGetServicesBySGSingleService(t *testing.T) {
-	mockHabService := NewHabitatEvent([]MessageOverrides{
+	mockHabService := NewHabitatEvent(
 		withSupervisorId("sup1234"),
 		withServiceGroup("postgres.default"),
 		withPackageIdent("core/postgres/0.1.0/20190101121212"),
 		withFqdn("db.example.com"),
-	}...)
+	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
 

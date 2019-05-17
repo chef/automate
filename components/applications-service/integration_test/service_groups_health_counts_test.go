@@ -39,11 +39,11 @@ func TestServiceGroupsHealthCountsSingleOkService(t *testing.T) {
 			Total: int32(1),
 			Ok:    int32(1),
 		}
-		mockHabService = NewHabitatEvent([]MessageOverrides{
+		mockHabService = NewHabitatEvent(
 			withSupervisorId("1234"),
 			withServiceGroup("redis.test"),
 			withPackageIdent("core/redis/0.1.0/20190101121212"),
-		}...)
+		)
 	)
 
 	suite.IngestService(mockHabService)
@@ -100,26 +100,26 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllOk(t *testing.T) {
 	// Update all services to be reported as OK
 	var (
 		updateHabServicesMatrix = []*habitat.HealthCheckEvent{
-			NewHabitatEvent([]MessageOverrides{
+			NewHabitatEvent(
 				withSupervisorId("sup1"),
 				withServiceGroup("myapp.default"),
 				withPackageIdent("core/myapp/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup2"),
 				withServiceGroup("postgres.default"),
 				withPackageIdent("core/postgres/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup3"),
 				withServiceGroup("postgres.default"),
 				withPackageIdent("core/postgres/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup4"),
 				withServiceGroup("test.default"),
 				withPackageIdent("core/test/0.1.0/20190101121212"),
-			}...),
+			),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
 			Total:    int32(4),
@@ -161,29 +161,29 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllWarning(t *testing.T) {
 	// Update all services to be reported as WARNING
 	var (
 		updateHabServicesMatrix = []*habitat.HealthCheckEvent{
-			NewHabitatEvent([]MessageOverrides{
+			NewHabitatEvent(
 				withSupervisorId("sup1"),
 				withServiceGroup("redis.default"),
 				withPackageIdent("core/redis/0.1.0/20190101121212"),
 				withHealth("WARNING"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup2"),
 				withServiceGroup("postgres.default"),
 				withPackageIdent("core/postgres/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup3"),
 				withServiceGroup("postgres.default"),
 				withPackageIdent("core/postgres/0.1.0/20190101121212"),
 				withHealth("WARNING"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup4"),
 				withServiceGroup("test.default"),
 				withPackageIdent("core/test/0.1.0/20190101121212"),
 				withHealth("WARNING"),
-			}...),
+			),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
 			Total:    int32(4),
@@ -225,24 +225,24 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllCritical(t *testing.T) {
 	// Update all services to be reported as CRITICAL
 	var (
 		updateHabServicesMatrix = []*habitat.HealthCheckEvent{
-			NewHabitatEvent([]MessageOverrides{
+			NewHabitatEvent(
 				withSupervisorId("sup2"),
 				withServiceGroup("redis.default"),
 				withPackageIdent("core/redis/0.1.0/20190101121212"),
 				withHealth("CRITICAL"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup3"),
 				withServiceGroup("myapp.default"),
 				withPackageIdent("core/myapp/0.1.0/20190101121212"),
 				withHealth("CRITICAL"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup4"),
 				withServiceGroup("test.default"),
 				withPackageIdent("core/test/0.1.0/20190101121212"),
 				withHealth("CRITICAL"),
-			}...),
+			),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
 			Total:    int32(4),

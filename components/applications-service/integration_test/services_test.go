@@ -45,14 +45,14 @@ func TestGetServicesSortParameterError(t *testing.T) {
 }
 
 func TestGetServicesSingleService(t *testing.T) {
-	mockHabService := NewHabitatEvent([]MessageOverrides{
+	mockHabService := NewHabitatEvent(
 		withSupervisorId("sup1234"),
 		withServiceGroup("postgres.default"),
 		withPackageIdent("core/postgres/0.1.0/20190101121212"),
 		withFqdn("mytest.example.com"),
 		withStrategyAtOnce("testchannel"),
 		withSite("testsite"),
-	}...)
+	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
 
@@ -492,52 +492,52 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 func habServicesMatrixAllHealthStatusDifferent() []*habitat.HealthCheckEvent {
 	return []*habitat.HealthCheckEvent{
 		// service_group 1 <-> With a Health Status = 'OK'
-		NewHabitatEvent([]MessageOverrides{
+		NewHabitatEvent(
 			withSupervisorId("sup1"),
 			withServiceGroup("redis.default"),
 			withPackageIdent("core/redis/0.1.0/20190101121212"),
 			withHealth("OK"),
 			withFqdn("myapp-us.example.com"),
-		}...),
+		),
 
 		// service_group 2 <-> With a Health Status = 'WARNING'
-		NewHabitatEvent([]MessageOverrides{
+		NewHabitatEvent(
 			withSupervisorId("sup1"),
 			withServiceGroup("myapp.default"),
 			withPackageIdent("core/myapp/0.1.0/20190101121212"),
 			withHealth("WARNING"),
 			withFqdn("myapp-us.example.com"),
-		}...),
+		),
 
 		// service_group 3 <-> With a Health Status = 'CRITICAL'
-		NewHabitatEvent([]MessageOverrides{
+		NewHabitatEvent(
 			withSupervisorId("sup1"),
 			withServiceGroup("postgres.default"),
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
 			withHealth("CRITICAL"),
 			withFqdn("myapp-us.example.com"),
-		}...),
+		),
 
 		// service_group 4 <-> With a Health Status = 'UNKNOWN'
-		NewHabitatEvent([]MessageOverrides{
+		NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("test.default"),
 			withPackageIdent("core/test/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
 			withFqdn("test-1.example.com"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup3"),
 			withServiceGroup("temp.default"),
 			withPackageIdent("core/temp/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
 			withFqdn("temp.example.com"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup4"),
 			withServiceGroup("test.default"),
 			withPackageIdent("core/test/0.1.0/20190101121212"),
 			withFqdn("test-2.example.com"),
-		}...),
+		),
 	}
 }

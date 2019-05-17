@@ -48,11 +48,11 @@ func TestGetServiceGroupsOneOk(t *testing.T) {
 				},
 			},
 		}
-		mockHabService = NewHabitatEvent([]MessageOverrides{
+		mockHabService = NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("postgres.default"),
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
-		}...)
+		)
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -83,12 +83,12 @@ func TestGetServiceGroupsOneCritical(t *testing.T) {
 				},
 			},
 		}
-		mockHabService = NewHabitatEvent([]MessageOverrides{
+		mockHabService = NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("postgres.default"),
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
 			withHealth("CRITICAL"),
-		}...)
+		)
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -182,12 +182,12 @@ func TestGetServiceGroupsOneWarning(t *testing.T) {
 				},
 			},
 		}
-		mockHabService = NewHabitatEvent([]MessageOverrides{
+		mockHabService = NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("postgres.default"),
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
 			withHealth("WARNING"),
-		}...)
+		)
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -219,12 +219,12 @@ func TestGetServiceGroupsOneUnknown(t *testing.T) {
 				},
 			},
 		}
-		mockHabService = NewHabitatEvent([]MessageOverrides{
+		mockHabService = NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("postgres.default"),
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
-		}...)
+		)
 	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
@@ -256,29 +256,29 @@ func TestGetServiceGroupsOneEach(t *testing.T) {
 			},
 		}
 		mockHabServices = []*habitat.HealthCheckEvent{
-			NewHabitatEvent([]MessageOverrides{
+			NewHabitatEvent(
 				withSupervisorId("sup2"),
 				withServiceGroup("postgres.default"),
 				withPackageIdent("core/postgres/0.1.0/20190101121212"),
 				withHealth("UNKNOWN"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup3"),
 				withServiceGroup("postgres.default"),
 				withPackageIdent("core/postgres/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup4"),
 				withServiceGroup("postgres.default"),
 				withPackageIdent("core/postgres/0.1.0/20190101121212"),
 				withHealth("WARNING"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup5"),
 				withServiceGroup("postgres.default"),
 				withPackageIdent("core/postgres/0.1.0/20190101121212"),
 				withHealth("CRITICAL"),
-			}...),
+			),
 		}
 	)
 	suite.IngestServices(mockHabServices)
@@ -350,28 +350,28 @@ func TestGetServiceGroupsSortedPercent(t *testing.T) {
 			},
 		}
 		mockHabServices = append(habServicesABCD(),
-			NewHabitatEvent([]MessageOverrides{
+			NewHabitatEvent(
 				withSupervisorId("sup5"),
 				withServiceGroup("c.default"),
 				withPackageIdent("core/c/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup6"),
 				withServiceGroup("d.default"),
 				withPackageIdent("core/d/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup7"),
 				withServiceGroup("d.default"),
 				withPackageIdent("core/d/0.1.0/20190101121212"),
 				withHealth("UNKNOWN"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup8"),
 				withServiceGroup("d.default"),
 				withPackageIdent("core/d/0.1.0/20190101121212"),
 				withHealth("WARNING"),
-			}...),
+			),
 		)
 	)
 	suite.IngestServices(mockHabServices)
@@ -398,28 +398,28 @@ func TestGetServiceGroupsSortedPercentAsc(t *testing.T) {
 			},
 		}
 		mockHabServices = append(habServicesABCD(),
-			NewHabitatEvent([]MessageOverrides{
+			NewHabitatEvent(
 				withSupervisorId("sup5"),
 				withServiceGroup("c.default"),
 				withPackageIdent("core/c/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup6"),
 				withServiceGroup("d.default"),
 				withPackageIdent("core/d/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup7"),
 				withServiceGroup("d.default"),
 				withPackageIdent("core/d/0.1.0/20190101121212"),
 				withHealth("UNKNOWN"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup8"),
 				withServiceGroup("d.default"),
 				withPackageIdent("core/d/0.1.0/20190101121212"),
 				withHealth("WARNING"),
-			}...),
+			),
 		)
 	)
 	suite.IngestServices(mockHabServices)
@@ -492,17 +492,17 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 		//  * 1 WARNING  service-groups
 		//  * 1 CRITICAL service-groups
 		mockHabServices = append(habServicesABCD(),
-			NewHabitatEvent([]MessageOverrides{
+			NewHabitatEvent(
 				withSupervisorId("sup5"),
 				withServiceGroup("e.default"),
 				withPackageIdent("core/e/0.1.0/20190101121212"),
-			}...),
-			NewHabitatEvent([]MessageOverrides{
+			),
+			NewHabitatEvent(
 				withSupervisorId("sup5"),
 				withServiceGroup("f.default"),
 				withPackageIdent("core/f/0.1.0/20190101121212"),
 				withHealth("CRITICAL"),
-			}...),
+			),
 		)
 		// This request is asking only for service groups that have an OK status
 		// plus, showing only the page two with a page size of one and they are all
@@ -538,29 +538,29 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 
 func habServicesABCD() []*habitat.HealthCheckEvent {
 	return []*habitat.HealthCheckEvent{
-		NewHabitatEvent([]MessageOverrides{
+		NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("a.default"),
 			withPackageIdent("core/a/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup3"),
 			withServiceGroup("b.default"),
 			withPackageIdent("core/b/0.1.0/20190101121212"),
 			withHealth("OK"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup4"),
 			withServiceGroup("c.default"),
 			withPackageIdent("core/c/0.1.0/20190101121212"),
 			withHealth("WARNING"),
-		}...),
-		NewHabitatEvent([]MessageOverrides{
+		),
+		NewHabitatEvent(
 			withSupervisorId("sup5"),
 			withServiceGroup("d.default"),
 			withPackageIdent("core/d/0.1.0/20190101121212"),
 			withHealth("CRITICAL"),
-		}...),
+		),
 	}
 }
