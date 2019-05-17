@@ -2,8 +2,6 @@ package backend
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"time"
 )
 
@@ -13,7 +11,7 @@ type Driver interface {
 
 	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 
-	CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string, parameters interface{}, enabled bool, recurrence string, nextRunAt time.Time) error
+	CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
 	GetDueRecurringWorkflow(ctx context.Context) (*Schedule, RecurringWorkflowCompleter, error)
 	UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts WorkflowScheduleUpdateOpts) error
 	UpdateWorkflowScheduleByName(ctx context.Context, scheduleName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
@@ -82,37 +80,9 @@ type TaskResult struct {
 	Result    []byte
 }
 
-func (r *TaskResult) Err() error {
-	if r.Status == TaskStatusFailed {
-		return errors.New(r.ErrorText)
-	}
-	return nil
-}
-
-func (r *TaskResult) Get(obj interface{}) error {
-	if r.Result != nil {
-		return json.Unmarshal(r.Result, obj)
-	}
-	return nil
-}
-
-func (r *TaskResult) GetParameters(obj interface{}) error {
-	if r.Parameters != nil {
-		return json.Unmarshal(r.Parameters, obj)
-	}
-	return nil
-}
-
-func (t *Task) GetParameters(obj interface{}) error {
-	if t.Parameters != nil {
-		return json.Unmarshal(t.Parameters, obj)
-	}
-	return nil
-}
-
 type TaskCompleter interface {
 	Fail(err string) error
-	Succeed(result interface{}) error
+	Succeed(result []byte) error
 }
 
 type TaskEnqueueOpts struct {
@@ -123,7 +93,7 @@ type TaskEnqueueOpts struct {
 type WorkflowCompleter interface {
 	EnqueueTask(task *Task, opts TaskEnqueueOpts) error
 
-	Continue(payload interface{}) error
+	Continue(payload []byte) error
 	Abandon() error
 	Done() error
 	Close() error

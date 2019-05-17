@@ -24,17 +24,53 @@ var (
 
 type Schedule backend.Schedule
 
-type TaskQuerier interface {
+type Task interface {
 	GetParameters(interface{}) error
 }
 
-type TaskResultQuerier interface {
+type task struct {
+	backendTask *backend.Task
+}
+
+func (r *task) GetParameters(obj interface{}) error {
+	if r.backendTask.Parameters != nil {
+		return json.Unmarshal(r.backendTask.Parameters, obj)
+	}
+	return nil
+}
+
+type TaskResult interface {
 	GetParameters(interface{}) error
 	Get(interface{}) error
 	Err() error
 }
 
-type WorkflowInstanceHandler interface {
+type taskResult struct {
+	backendResult *backend.TaskResult
+}
+
+func (r *taskResult) Get(obj interface{}) error {
+	if r.backendResult.Result != nil {
+		return json.Unmarshal(r.backendResult.Result, obj)
+	}
+	return nil
+}
+
+func (r *taskResult) GetParameters(obj interface{}) error {
+	if r.backendResult.Parameters != nil {
+		return json.Unmarshal(r.backendResult.Parameters, obj)
+	}
+	return nil
+}
+
+func (r *taskResult) Err() error {
+	if r.backendResult.Status == backend.TaskStatusFailed {
+		return errors.New(r.backendResult.ErrorText)
+	}
+	return nil
+}
+
+type WorkflowInstance interface {
 	GetPayload(interface{}) error
 	GetParameters(interface{}) error
 
@@ -115,19 +151,19 @@ type Decision struct {
 type StartEvent struct{}
 type TaskCompleteEvent struct {
 	TaskName string
-	Result   TaskResultQuerier
+	Result   TaskResult
 }
 type CancelEvent struct{}
 
 type WorkflowExecutor interface {
-	OnStart(w WorkflowInstanceHandler, ev StartEvent) Decision
-	OnTaskComplete(w WorkflowInstanceHandler, ev TaskCompleteEvent) Decision
-	OnCancel(w WorkflowInstanceHandler, ev CancelEvent) Decision
+	OnStart(w WorkflowInstance, ev StartEvent) Decision
+	OnTaskComplete(w WorkflowInstance, ev TaskCompleteEvent) Decision
+	OnCancel(w WorkflowInstance, ev CancelEvent) Decision
 }
 
 // TODO(ssd) 2019-05-10: How do we want to handle cancellation?
 type TaskExecutor interface {
-	Run(context.Context, TaskQuerier) (interface{}, error)
+	Run(context.Context, Task) (interface{}, error)
 }
 
 type WorkflowManager struct {
@@ -172,8 +208,12 @@ func (m *WorkflowManager) CreateWorkflowSchedule(
 	recurRule *rrule.RRule,
 ) error {
 	nextRunAt := recurRule.After(time.Now().UTC(), true).UTC()
+	jsonData, err := jsonify(parameters)
+	if err != nil {
+		return err
+	}
 	return m.backend.CreateWorkflowSchedule(context.TODO(), scheduleName, workflowName,
-		parameters, enabled, recurRule.String(), nextRunAt)
+		jsonData, enabled, recurRule.String(), nextRunAt)
 }
 
 type WorkflowScheduleUpdateOpts func(*backend.WorkflowScheduleUpdateOpts) error
@@ -345,14 +385,19 @@ func (m *WorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, 
 			runCtx, cancel = context.WithCancel(ctx)
 		}
 
-		result, err := exec.Run(runCtx, t)
+		result, err := exec.Run(runCtx, &task{backendTask: t})
 		if err != nil {
 			err := taskCompleter.Fail(err.Error())
 			if err != nil {
 				logrus.WithError(err).Error("failed to mark task as failed")
 			}
 		} else {
-			err := taskCompleter.Succeed(result)
+			jsonResults, err := jsonify(result)
+			if err != nil {
+				logrus.WithError(err).Error("could not convert returned results to JSON")
+				taskCompleter.Fail(err.Error())
+			}
+			err = taskCompleter.Succeed(jsonResults)
 			if err != nil {
 				logrus.WithError(err).Error("failed to mark task as successful")
 			}
@@ -442,7 +487,9 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 	case backend.TaskComplete:
 		decision = executor.OnTaskComplete(w, TaskCompleteEvent{
 			TaskName: wevt.TaskResult.TaskName,
-			Result:   wevt.TaskResult,
+			Result: &taskResult{
+				backendResult: wevt.TaskResult,
+			},
 		})
 	case backend.Cancel:
 		decision = executor.OnCancel(w, CancelEvent{})
@@ -483,13 +530,22 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 				// again.
 				logrus.WithError(err).Error("failed to enqueue task!")
 			}
-
 		}
 		s.End("enqueue_task")
 		s.Begin("continue")
-		err := completer.Continue(decision.payload)
+		jsonPayload, err := jsonify(decision.payload)
 		if err != nil {
-			logrus.WithError(err).Error("failed to continue workflow")
+			logrus.WithError(err).Error("could not marshal payload to JSON, completing workflow")
+			// TODO: We need to fail workflows
+			err := completer.Done()
+			if err != nil {
+				logrus.WithError(err).Error("failed to complete workflow after JSON marshal failure")
+			}
+		} else {
+			err := completer.Continue(jsonPayload)
+			if err != nil {
+				logrus.WithError(err).Error("failed to continue workflow")
+			}
 		}
 		s.End("continue")
 	}

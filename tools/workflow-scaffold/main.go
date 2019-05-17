@@ -7,11 +7,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/teambition/rrule-go"
-
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/lib/platform/pg"
 	"github.com/chef/automate/lib/workflow"
@@ -147,7 +146,7 @@ type SimpleTaskParams struct {
 	Sleepy int
 }
 
-func (t *SimpleTask) Run(ctx context.Context, task workflow.TaskQuerier) (interface{}, error) {
+func (t *SimpleTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
 	params := SimpleTaskParams{}
 	if err := task.GetParameters(&params); err != nil {
 		panic(err)
@@ -166,7 +165,7 @@ type SimpleWorkflowParams struct {
 
 type SimpleWorkflow struct{}
 
-func (p *SimpleWorkflow) OnStart(w workflow.WorkflowInstanceHandler,
+func (p *SimpleWorkflow) OnStart(w workflow.WorkflowInstance,
 	ev workflow.StartEvent) workflow.Decision {
 
 	logrus.Info("SimpleWorkflow got OnStart")
@@ -191,7 +190,7 @@ func (p *SimpleWorkflow) OnStart(w workflow.WorkflowInstanceHandler,
 
 var done = false
 
-func (p *SimpleWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
+func (p *SimpleWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
 	var mycount int
 
@@ -239,8 +238,7 @@ func (p *SimpleWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
 	}
 }
 
-func (SimpleWorkflow) OnCancel(w workflow.WorkflowInstanceHandler,
-	ev workflow.CancelEvent) workflow.Decision {
+func (SimpleWorkflow) OnCancel(w workflow.WorkflowInstance, ev workflow.CancelEvent) workflow.Decision {
 	return w.Complete()
 }
 
@@ -283,14 +281,14 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 
 type ScheduleTestTask struct{}
 
-func (t *ScheduleTestTask) Run(ctx context.Context, _ workflow.TaskQuerier) (interface{}, error) {
+func (t *ScheduleTestTask) Run(ctx context.Context, _ workflow.Task) (interface{}, error) {
 	logrus.Info("Running schedule test task")
 	return nil, nil
 }
 
 type ScheduleTestWorkflow struct{}
 
-func (p *ScheduleTestWorkflow) OnStart(w workflow.WorkflowInstanceHandler,
+func (p *ScheduleTestWorkflow) OnStart(w workflow.WorkflowInstance,
 	ev workflow.StartEvent) workflow.Decision {
 	var params string
 	err := w.GetParameters(&params)
@@ -303,7 +301,7 @@ func (p *ScheduleTestWorkflow) OnStart(w workflow.WorkflowInstanceHandler,
 	return w.Continue(0)
 }
 
-func (p *ScheduleTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
+func (p *ScheduleTestWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
 
 	logrus.WithFields(logrus.Fields{
@@ -314,7 +312,7 @@ func (p *ScheduleTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler
 	return w.Complete()
 }
 
-func (p *ScheduleTestWorkflow) OnCancel(w workflow.WorkflowInstanceHandler,
+func (p *ScheduleTestWorkflow) OnCancel(w workflow.WorkflowInstance,
 	ev workflow.CancelEvent) workflow.Decision {
 	return w.Complete()
 }
