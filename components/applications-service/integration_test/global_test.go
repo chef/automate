@@ -142,6 +142,20 @@ func withStrategyAtOnce(channel string) MessageOverrides {
 	}
 }
 
+func withApplication(application string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.EventMetadata.Application = application
+		return nil
+	}
+}
+
+func withEnvironment(environment string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.EventMetadata.Environment = environment
+		return nil
+	}
+}
+
 // HealthCheckStringToInt32 converts a health check string to the respective int32 in proto land
 func HealthCheckStringToInt32(health string) int32 {
 	switch health {

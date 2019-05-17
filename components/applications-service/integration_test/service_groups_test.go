@@ -7,6 +7,7 @@ package integration_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
@@ -38,8 +39,8 @@ func TestGetServiceGroupsOneOk(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
 					HealthPercentage: 100,
-					Application:      "app",
-					Environment:      "test-env",
+					Application:      a,
+					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    1,
 						Ok:       1,
@@ -75,8 +76,8 @@ func TestGetServiceGroupsOneCritical(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 0,
-					Application:      "app",
-					Environment:      "test-env",
+					Application:      a,
+					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    1,
 						Ok:       0,
@@ -113,8 +114,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					Release:          "core/myapp/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
 					HealthPercentage: 67,
-					Application:      "app",
-					Environment:      "test-env",
+					Application:      a,
+					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:   3,
 						Ok:      2,
@@ -126,8 +127,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 33,
-					Application:      "app",
-					Environment:      "test-env",
+					Application:      a,
+					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    3,
 						Ok:       1,
@@ -140,8 +141,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					Release:          "core/redis/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
 					HealthPercentage: 100,
-					Application:      "app",
-					Environment:      "test-env",
+					Application:      a,
+					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total: 3,
 						Ok:    3,
@@ -152,8 +153,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					Release:          "core/test/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
 					HealthPercentage: 0,
-					Application:      "app",
-					Environment:      "test-env",
+					Application:      a,
+					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:   1,
 						Unknown: 1,
@@ -184,8 +185,8 @@ func TestGetServiceGroupsOneWarning(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
 					HealthPercentage: 0,
-					Application:      "app",
-					Environment:      "test-env",
+					Application:      a,
+					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    1,
 						Ok:       0,
@@ -223,8 +224,8 @@ func TestGetServiceGroupsOneUnknown(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
 					HealthPercentage: 0,
-					Application:      "app",
-					Environment:      "test-env",
+					Application:      a,
+					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    1,
 						Ok:       0,
@@ -261,8 +262,8 @@ func TestGetServiceGroupsOneEach(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 25,
-					Application:      "app",
-					Environment:      "test-env",
+					Application:      a,
+					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    4,
 						Ok:       1,
@@ -357,6 +358,7 @@ func TestGetServiceGroupsSortedAsc(t *testing.T) {
 		assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
 	}
 }
+
 func TestGetServiceGroupsSortedApplicationAsc(t *testing.T) {
 	var (
 		ctx     = context.Background()
@@ -366,16 +368,8 @@ func TestGetServiceGroupsSortedApplicationAsc(t *testing.T) {
 				Order: query.SortOrder_ASC,
 			},
 		}
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup2", "a", e, "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", "b", e, "default", "core",
-				"b", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", "c", e, "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", "d", e, "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-		}
+		mockHabServices = habServicesABCD()
+		expectedOrder   = []string{"a", "b", "c", "d"}
 	)
 	suite.IngestServices(mockHabServices)
 	defer suite.DeleteDataFromStorage()
@@ -383,10 +377,42 @@ func TestGetServiceGroupsSortedApplicationAsc(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
-	assert.Equal(t, "b.default", response.ServiceGroups[1].Name)
-	assert.Equal(t, "c.default", response.ServiceGroups[2].Name)
-	assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
+	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+		for i, sg := range response.ServiceGroups {
+			assert.Equal(t, fmt.Sprintf("%s.default", expectedOrder[i]), sg.Name,
+				"the service_group name is not the expected one")
+			assert.Equal(t, fmt.Sprintf("%s_app", expectedOrder[i]), sg.Application,
+				"the service_group application name is not the expected one")
+		}
+	}
+}
+
+func TestGetServiceGroupsSortedApplicationDesc(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Sorting: &query.Sorting{
+				Field: "app_name",
+				Order: query.SortOrder_DESC,
+			},
+		}
+		mockHabServices = habServicesABCD()
+		expectedOrder   = []string{"d", "c", "b", "a"}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+
+	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+		for i, sg := range response.ServiceGroups {
+			assert.Equal(t, fmt.Sprintf("%s.default", expectedOrder[i]), sg.Name,
+				"the service_group name is not the expected one")
+			assert.Equal(t, fmt.Sprintf("%s_app", expectedOrder[i]), sg.Application,
+				"the service_group application name is not the expected one")
+		}
+	}
 }
 
 func TestGetServiceGroupsSortedEnvironmentAsc(t *testing.T) {
@@ -398,16 +424,8 @@ func TestGetServiceGroupsSortedEnvironmentAsc(t *testing.T) {
 				Order: query.SortOrder_ASC,
 			},
 		}
-		mockHabServices = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, "a", "default", "core",
-				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
-			NewHabServiceMsg("sup3", a, "b", "default", "core",
-				"b", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, "c", "default", "core",
-				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup5", a, "d", "default", "core",
-				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-		}
+		mockHabServices = habServicesABCD()
+		expectedOrder   = []string{"a", "b", "c", "d"}
 	)
 	suite.IngestServices(mockHabServices)
 	defer suite.DeleteDataFromStorage()
@@ -415,10 +433,42 @@ func TestGetServiceGroupsSortedEnvironmentAsc(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
-	assert.Equal(t, "b.default", response.ServiceGroups[1].Name)
-	assert.Equal(t, "c.default", response.ServiceGroups[2].Name)
-	assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
+	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+		for i, sg := range response.ServiceGroups {
+			assert.Equal(t, fmt.Sprintf("%s.default", expectedOrder[i]), sg.Name,
+				"the service_group name is not the expected one")
+			assert.Equal(t, fmt.Sprintf("%s_env", expectedOrder[i]), sg.Environment,
+				"the service_group environment name is not the expected one")
+		}
+	}
+}
+
+func TestGetServiceGroupsSortedEnvironmentDesc(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Sorting: &query.Sorting{
+				Field: "environment",
+				Order: query.SortOrder_DESC,
+			},
+		}
+		mockHabServices = habServicesABCD()
+		expectedOrder   = []string{"d", "c", "b", "a"}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+
+	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+		for i, sg := range response.ServiceGroups {
+			assert.Equal(t, fmt.Sprintf("%s.default", expectedOrder[i]), sg.Name,
+				"the service_group name is not the expected one")
+			assert.Equal(t, fmt.Sprintf("%s_env", expectedOrder[i]), sg.Environment,
+				"the service_group environment name is not the expected one")
+		}
+	}
 }
 
 func TestGetServiceGroupsSortedPercent(t *testing.T) {
@@ -604,8 +654,8 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 					Release:              "core/e/0.1.0/20190101121212",
 					Status:               applications.HealthStatus_OK,
 					HealthPercentage:     100,
-					Application:          "app",
-					Environment:          "test-env",
+					Application:          a,
+					Environment:          e,
 					ServicesHealthCounts: &applications.HealthCounts{Total: 1, Ok: 1},
 				},
 			},
@@ -626,24 +676,32 @@ func habServicesABCD() []*habitat.HealthCheckEvent {
 			withServiceGroup("a.default"),
 			withPackageIdent("core/a/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
 		),
 		NewHabitatEvent(
 			withSupervisorId("sup3"),
 			withServiceGroup("b.default"),
 			withPackageIdent("core/b/0.1.0/20190101121212"),
 			withHealth("OK"),
+			withApplication("b_app"),
+			withEnvironment("b_env"),
 		),
 		NewHabitatEvent(
 			withSupervisorId("sup4"),
 			withServiceGroup("c.default"),
 			withPackageIdent("core/c/0.1.0/20190101121212"),
 			withHealth("WARNING"),
+			withApplication("c_app"),
+			withEnvironment("c_env"),
 		),
 		NewHabitatEvent(
 			withSupervisorId("sup5"),
 			withServiceGroup("d.default"),
 			withPackageIdent("core/d/0.1.0/20190101121212"),
 			withHealth("CRITICAL"),
+			withApplication("d_app"),
+			withEnvironment("d_env"),
 		),
 	}
 }
