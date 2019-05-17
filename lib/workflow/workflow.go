@@ -297,7 +297,7 @@ func (m *WorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, 
 			}
 			continue
 		}
-		logrus.Debug("Dequeued task %s", t.Name)
+		logrus.Debugf("Dequeued task %s", t.Name)
 
 		var runCtx context.Context
 		var cancel context.CancelFunc

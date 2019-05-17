@@ -654,7 +654,10 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*T
 
 	err = row.Scan(&taskc.tid, &task.WorkflowInstanceID, &task.Parameters)
 	if err == sql.ErrNoRows {
-		tx.Commit()
+		err := tx.Commit()
+		if err != nil {
+			logrus.WithError(err).Warn("failed to commit dequeue_task transaction after ErrNoRows")
+		}
 		cancel()
 		return nil, nil, ErrNoTasks
 
