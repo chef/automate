@@ -76,12 +76,23 @@ CREATE TABLE workflow_instances (
     workflow_name TEXT NOT NULL,
     parameters BYTEA,
     payload BYTEA,
+    start_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     enqueued_tasks INTEGER NOT NULL DEFAULT 0,
     completed_tasks INTEGER NOT NULL DEFAULT 0,
     status workflow_instance_status NOT NULL DEFAULT 'running',
 
     CONSTRAINT say_my_name1 UNIQUE(name, workflow_name)
+);
+
+CREATE TABLE workflow_results (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    workflow_name TEXT NOT NULL,
+    parameters BYTEA,
+    start_at TIMESTAMPTZ NOT NULL,
+    end_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    result BYTEA
 );
 
 -- Tasks
@@ -223,14 +234,19 @@ $$ LANGUAGE SQL;
 -- workflow_task_new
 -- workflow_task_complete
 --
--- TODO(ssd) 2019-05-09: For scheduled tasks we might want to record
--- the completion time, but where would that live, do we want a
--- workflow_results table as well?
 CREATE OR REPLACE FUNCTION complete_workflow(wid BIGINT)
 RETURNS VOID
 LANGUAGE SQL
 AS $$
-    WITH done_workflows AS (SELECT id FROM workflow_instances where id = wid)
+    WITH 
+    done_workflows AS (
+        SELECT id, name, workflow_name, parameters, start_at 
+        FROM workflow_instances where id = wid
+    ),
+    result_ins AS (
+        INSERT INTO workflow_results(name, workflow_name, parameters, start_at)
+            (SELECT name, workflow_name, parameters, start_at FROM done_workflows) 
+    )
     SELECT pg_notify('workflow_instance_complete', id::text) FROM done_workflows;
     DELETE FROM workflow_instances WHERE id = wid
 $$;
