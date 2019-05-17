@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chef/automate/lib/workflow/backend"
 	"github.com/pkg/errors"
 	rrule "github.com/teambition/rrule-go"
 
@@ -15,21 +16,8 @@ import (
 // between checking the recurrence table.
 var maxWakeupInterval = 1 * time.Minute
 
-type Schedule struct {
-	// NOTE(ssd) 2019-05-13: Since name and workflow-name are
-	// user-controlled in the case of many scheduled workflows, we
-	// need the ID to create unique workflow names.
-	ID           int64
-	Enabled      bool
-	Name         string
-	WorkflowName string
-	Parameters   []byte
-	Recurrence   string
-	NextDueAt    time.Time
-}
-
 type workflowScheduler struct {
-	backend Backend
+	backend backend.Driver
 }
 
 func (w *workflowScheduler) run(ctx context.Context) {

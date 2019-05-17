@@ -15,19 +15,17 @@ import (
 
 	"github.com/chef/automate/lib/platform/pg"
 	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/workflow/postgres"
 )
 
 var opts = struct {
 	Debug bool
 }{}
 
-var perfTestOpts struct {
-	EnqueueOnly        bool
-	DequeueOnly        bool
+var simpleWorkflowOpts struct {
 	DequeueWorkerCount int
 	TaskCount          int
 	SlowTasks          bool
-	SkipEnqueue        bool
 }
 
 func main() {
@@ -53,51 +51,32 @@ func main() {
 		false,
 		"Enabled debug output")
 
-	perfTestCmd := &cobra.Command{
-		Use:           "perf-test",
-		Short:         "Run a simple perfTest",
+	simpleWorkflowCmd := &cobra.Command{
+		Use:           "simple-workflow-test",
+		Short:         "Run a workflow that enqueue's no-op tasks",
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		RunE:          runPerfTest,
+		RunE:          runSimpleWorkflow,
 	}
 
-	perfTestCmd.PersistentFlags().IntVar(
-		&perfTestOpts.DequeueWorkerCount,
+	simpleWorkflowCmd.PersistentFlags().IntVar(
+		&simpleWorkflowOpts.DequeueWorkerCount,
 		"dequeue-worker-count",
 		10,
 		"Number of workers to dequeue tasks")
 
-	perfTestCmd.PersistentFlags().BoolVar(
-		&perfTestOpts.EnqueueOnly,
-		"enqueue-only",
-		false,
-		"Whether to only run the enqueing test")
-
-	perfTestCmd.PersistentFlags().BoolVar(
-		&perfTestOpts.DequeueOnly,
-		"dequeue-only",
-		false,
-		"Whether to only run the de-enqueing test (requests a full queue)")
-
-	perfTestCmd.PersistentFlags().BoolVar(
-		&perfTestOpts.SlowTasks,
+	simpleWorkflowCmd.PersistentFlags().BoolVar(
+		&simpleWorkflowOpts.SlowTasks,
 		"slow-tasks",
 		false,
 		"If true, tasks sleep for 400 seconds",
 	)
 
-	perfTestCmd.PersistentFlags().BoolVar(
-		&perfTestOpts.SkipEnqueue,
-		"skip-enqueue",
-		false,
-		"if true, a workflow will not be enqueued",
-	)
-
-	perfTestCmd.PersistentFlags().IntVar(
-		&perfTestOpts.TaskCount,
+	simpleWorkflowCmd.PersistentFlags().IntVar(
+		&simpleWorkflowOpts.TaskCount,
 		"task-count",
 		10000,
-		"Number of tasks to enqueue (split across workers)")
+		"Number of tasks to enqueue")
 
 	resetDBCmd := &cobra.Command{
 		Use:           "reset-db DATABASE",
@@ -115,7 +94,7 @@ func main() {
 		RunE:          runScheduleTest,
 	}
 
-	cmd.AddCommand(perfTestCmd)
+	cmd.AddCommand(simpleWorkflowCmd)
 	cmd.AddCommand(resetDBCmd)
 	cmd.AddCommand(scheduleCmd)
 
@@ -128,8 +107,8 @@ func main() {
 const defaultDatabaseName = "workflow"
 
 func defaultConnURIForDatabase(dbname string) string {
-	if os.Getenv("JAYM") != "" {
-		return fmt.Sprintf("postgresql://docker:docker@127.0.0.1:10145/%s?sslmode=disable", dbname)
+	if os.Getenv("PG_URI") != "" {
+		return os.Getenv("PG_URI")
 	}
 	connInfo := pg.A2ConnInfo{
 		Host:  "localhost",
@@ -161,38 +140,38 @@ func runResetDB(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-type PerfTestTask struct {
-	statusChan chan struct{}
-}
+type SimpleTask struct{}
 
-type PerfTestTaskParams struct {
+type SimpleTaskParams struct {
 	ID     string
 	Sleepy int
 }
 
-func (t *PerfTestTask) Run(ctx context.Context, task workflow.TaskQuerier) (interface{}, error) {
-	params := PerfTestTaskParams{}
+func (t *SimpleTask) Run(ctx context.Context, task workflow.TaskQuerier) (interface{}, error) {
+	params := SimpleTaskParams{}
 	if err := task.GetParameters(&params); err != nil {
 		panic(err)
 	}
 	logrus.WithField("id", params.ID).Debug("Running task")
-	if perfTestOpts.SlowTasks {
+	if simpleWorkflowOpts.SlowTasks {
 		time.Sleep(time.Duration(23+params.Sleepy) * time.Second)
 	}
-	t.statusChan <- struct{}{}
 	logrus.Debug("Finished Task")
 	return params.ID, nil
 }
 
-type PerfTestWorkflow struct {
+type SimpleWorkflowParams struct {
+	NumTasks int
 }
 
-func (p *PerfTestWorkflow) OnStart(w workflow.WorkflowInstanceHandler,
+type SimpleWorkflow struct{}
+
+func (p *SimpleWorkflow) OnStart(w workflow.WorkflowInstanceHandler,
 	ev workflow.StartEvent) workflow.Decision {
 
-	logrus.Info("PerfTestWorkflow got OnStart")
+	logrus.Info("SimpleWorkflow got OnStart")
 
-	params := PerfTestWorkflowParams{}
+	params := SimpleWorkflowParams{}
 	err := w.GetParameters(&params)
 	if err != nil {
 		panic(err)
@@ -203,24 +182,16 @@ func (p *PerfTestWorkflow) OnStart(w workflow.WorkflowInstanceHandler,
 	}
 
 	for i := 0; i < params.NumTasks; i++ {
-		w.EnqueueTask("test task", &PerfTestTaskParams{ID: fmt.Sprintf("asdf: %d", i), Sleepy: i * 2})
+		w.EnqueueTask("simple task", &SimpleTaskParams{ID: fmt.Sprintf("asdf: %d", i), Sleepy: i * 2})
 	}
-	go func() {
-		time.Sleep(2 * time.Second)
-		enqueue_done = true
-	}()
+
 	initialVal := 0
 	return w.Continue(&initialVal)
 }
 
-var enqueue_done = false
 var done = false
 
-type PerfTestWorkflowParams struct {
-	NumTasks int
-}
-
-func (p *PerfTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
+func (p *SimpleWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
 	var mycount int
 
@@ -228,12 +199,12 @@ func (p *PerfTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
 		logrus.WithError(err).Fatal("Could not decode payload")
 	}
 
-	params := PerfTestWorkflowParams{}
+	params := SimpleWorkflowParams{}
 	if err := w.GetParameters(&params); err != nil {
 		logrus.WithError(err).Fatal("Could not decode parameters")
 	}
 
-	taskParams := PerfTestTaskParams{}
+	taskParams := SimpleWorkflowParams{}
 	if err := ev.Result.GetParameters(&taskParams); err != nil {
 		logrus.WithError(err).Fatal("Could not decode task params in result")
 	}
@@ -251,14 +222,16 @@ func (p *PerfTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
 		"params":     params,
 		"taskParams": taskParams,
 		"taskResult": taskResult,
-	}).Debug("PerfTestWorkflow got Task Completed")
+	}).Debug("SimpleWorkflow got Task Completed")
 
 	completed := mycount + 1
 	if completed < params.NumTasks {
 		return w.Continue(&completed)
 	} else {
-		logrus.Info("PerfTestWorkflow marking itself as complete")
+		logrus.Info("SimpleWorkflow marking itself as complete")
 		go func() {
+			// TODO: This done field is a temporary hack until we have
+			// an API for polling the status of a workflow.
 			time.Sleep(2 * time.Second)
 			done = true
 		}()
@@ -266,84 +239,45 @@ func (p *PerfTestWorkflow) OnTaskComplete(w workflow.WorkflowInstanceHandler,
 	}
 }
 
-func (PerfTestWorkflow) OnCancel(w workflow.WorkflowInstanceHandler,
+func (SimpleWorkflow) OnCancel(w workflow.WorkflowInstanceHandler,
 	ev workflow.CancelEvent) workflow.Decision {
 	return w.Complete()
 }
 
-func runPerfTest(_ *cobra.Command, args []string) error {
+func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	dbName := defaultDatabaseName
 	if len(args) > 0 {
 		dbName = args[0]
 	}
 
-	w, err := workflow.NewPostgresBackend(defaultConnURIForDatabase(dbName))
+	workflowManager, err := workflow.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
 	if err != nil {
-		return errors.Wrap(err, "could not initialize database connection")
+		return err
 	}
 
-	err = w.Init()
-	if err != nil {
-		return errors.Wrap(err, "could not initialize database schema")
-	}
+	workflowManager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
+	workflowManager.RegisterTaskExecutor("test task", &SimpleTask{}, workflow.TaskExecutorOpts{
+		Workers: simpleWorkflowOpts.DequeueWorkerCount})
 
-	workflowManager := workflow.NewManager(w)
-	workflowManager.RegisterWorkflowExecutor("perf-test", &PerfTestWorkflow{})
-	statusChan := make(chan struct{})
-	if !perfTestOpts.EnqueueOnly {
-		workflowManager.RegisterTaskExecutor("test task", &PerfTestTask{statusChan}, workflow.TaskExecutorOpts{
-			Workers: perfTestOpts.DequeueWorkerCount,
-		})
-	}
-
-	params := PerfTestWorkflowParams{
-		perfTestOpts.TaskCount,
+	params := SimpleWorkflowParams{
+		simpleWorkflowOpts.TaskCount,
 	}
 
 	workflowManager.Start(context.Background())
-	if !perfTestOpts.SkipEnqueue {
-		instanceName := fmt.Sprintf("perf-test-%s", time.Now())
-		workflowManager.EnqueueWorkflow(context.TODO(),
-			"perf-test", instanceName,
-			&params,
-		)
-		err := workflowManager.EnqueueWorkflow(context.TODO(),
-			"perf-test", instanceName,
-			&params,
-		)
-		if err == workflow.ErrWorkflowInstanceExists {
-			logrus.Info("Successfully can't add multiple workflows with the same name")
-		} else {
-			logrus.WithError(err).Error("Unspected error")
-		}
-	}
-
-	if perfTestOpts.EnqueueOnly {
-		for !enqueue_done {
-			time.Sleep(1 * time.Second)
-		}
-		return nil
-	}
-
-	startTime := time.Now()
-	dequeueTotal := 0
-	for {
-		<-statusChan
-		dequeueTotal++
-		if (dequeueTotal % 1000) == 0 {
-			logrus.Infof("dequeue status -- %d in %f seconds",
-				dequeueTotal, time.Since(startTime).Seconds())
-		}
-
-		if dequeueTotal == perfTestOpts.TaskCount {
-			logrus.Infof("All %d tasks enqueued/dequeued in %f seconds, exiting", dequeueTotal, time.Since(startTime).Seconds())
-			break
-		}
+	instanceName := fmt.Sprintf("simple-workflow-%s", time.Now())
+	err = workflowManager.EnqueueWorkflow(context.TODO(),
+		"simple-workflow", instanceName,
+		&params,
+	)
+	if err != nil {
+		logrus.WithError(err).Error("Unexpected error enqueueing workflow")
+		return err
 	}
 
 	for !done {
-		time.Sleep(1 * time.Second)
+		time.Sleep(time.Second)
 	}
+
 	return nil
 }
 
@@ -391,20 +325,13 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	w, err := workflow.NewPostgresBackend(defaultConnURIForDatabase(dbName))
+	workflowManager, err := workflow.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
 	if err != nil {
-		return errors.Wrap(err, "could not initialize database connection")
+		return err
 	}
-
-	err = w.Init()
-	if err != nil {
-		return errors.Wrap(err, "could not initialize database schema")
-	}
-
-	workflowManager := workflow.NewManager(w)
 	workflowManager.RegisterWorkflowExecutor("schedule-test", &ScheduleTestWorkflow{})
 	workflowManager.RegisterTaskExecutor("test task", &ScheduleTestTask{}, workflow.TaskExecutorOpts{
-		Workers: perfTestOpts.DequeueWorkerCount,
+		Workers: simpleWorkflowOpts.DequeueWorkerCount,
 	})
 
 	recRule, err := rrule.NewRRule(rrule.ROption{
@@ -425,7 +352,7 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		}
 	}
 
-	schedules, err := w.ListWorkflowSchedules(context.Background())
+	schedules, err := workflowManager.ListWorkflowSchedules(context.Background())
 	if err != nil {
 		logrus.WithError(err).Error("Failed to list workflow schedules")
 	}
@@ -433,8 +360,8 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		logrus.WithField("sched", s).Info("Found schedule")
 	}
 
-	w.UpdateWorkflowScheduleByID(context.Background(),
-		schedules[0].ID, workflow.UpdateParameters("youwin"))
+	workflowManager.UpdateWorkflowScheduleByName(context.Background(),
+		schedules[0].Name, schedules[0].WorkflowName, workflow.UpdateParameters("youwin"))
 
 	workflowManager.Start(context.Background())
 

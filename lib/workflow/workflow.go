@@ -8,10 +8,21 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/lib/workflow/backend"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 )
+
+var (
+	ErrNoTasks                = errors.New("no tasks in queue")
+	ErrNoWorkflowInstances    = errors.New("no workflow instances in queue")
+	ErrWorkflowScheduleExists = errors.New("workflow schedule already exists")
+	ErrWorkflowInstanceExists = errors.New("workflow instance already exists")
+	ErrNoDueWorkflows         = errors.New("No due workflows")
+)
+
+type Schedule backend.Schedule
 
 type TaskQuerier interface {
 	GetParameters(interface{}) error
@@ -37,9 +48,9 @@ type WorkflowInstanceHandler interface {
 
 type workflowInstanceImpl struct {
 	instanceID int64
-	instance   WorkflowInstance
-	tasks      []Task
-	wevt       *WorkflowEvent
+	instance   backend.WorkflowInstance
+	tasks      []backend.Task
+	wevt       *backend.WorkflowEvent
 }
 
 func (w *workflowInstanceImpl) GetPayload(obj interface{}) error {
@@ -69,7 +80,7 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface
 	if err != nil {
 		return err
 	}
-	w.tasks = append(w.tasks, Task{
+	w.tasks = append(w.tasks, backend.Task{
 		WorkflowInstanceID: w.instanceID,
 		Name:               taskName,
 		Parameters:         paramsData,
@@ -98,7 +109,7 @@ type Decision struct {
 	complete   bool
 	continuing bool
 	payload    interface{}
-	tasks      []Task
+	tasks      []backend.Task
 }
 
 type StartEvent struct{}
@@ -123,16 +134,34 @@ type WorkflowManager struct {
 	workflowExecutors map[string]WorkflowExecutor
 	taskExecutors     map[string]registeredExecutor
 	workflowScheduler *workflowScheduler
-	backend           Backend
+	backend           backend.Driver
 }
 
-func NewManager(backend Backend) *WorkflowManager {
+func WithRetries(numRetries int) EnqueueOpts {
+	return func(o *backend.TaskEnqueueOpts) {
+		o.TryRemaining = numRetries + 1
+	}
+}
+
+func StartAfter(startAfter time.Time) EnqueueOpts {
+	return func(o *backend.TaskEnqueueOpts) {
+		o.StartAfter = startAfter
+	}
+}
+
+type EnqueueOpts func(*backend.TaskEnqueueOpts)
+
+func NewManager(backend backend.Driver) (*WorkflowManager, error) {
+	err := backend.Init()
+	if err != nil {
+		return nil, err
+	}
 	return &WorkflowManager{
 		backend:           backend,
 		workflowExecutors: make(map[string]WorkflowExecutor),
 		taskExecutors:     make(map[string]registeredExecutor),
 		workflowScheduler: &workflowScheduler{backend},
-	}
+	}, nil
 }
 
 func (m *WorkflowManager) CreateWorkflowSchedule(
@@ -147,54 +176,57 @@ func (m *WorkflowManager) CreateWorkflowSchedule(
 		parameters, enabled, recurRule.String(), nextRunAt)
 }
 
-type workflowScheduleUpdateOpts struct {
-	updateEnabled bool
-	enabled       bool
-
-	updateParameters bool
-	parameters       []byte
-
-	updateRecurrence bool
-	recurrence       string
-	nextRunAt        time.Time
-}
-
-type WorkflowScheduleUpdateOpts func(*workflowScheduleUpdateOpts) error
+type WorkflowScheduleUpdateOpts func(*backend.WorkflowScheduleUpdateOpts) error
 
 func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpts {
-	return func(o *workflowScheduleUpdateOpts) error {
-		o.enabled = enabled
-		o.updateEnabled = true
+	return func(o *backend.WorkflowScheduleUpdateOpts) error {
+		o.Enabled = enabled
+		o.UpdateEnabled = true
 		return nil
 	}
 }
 
 func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpts {
-	return func(o *workflowScheduleUpdateOpts) error {
+	return func(o *backend.WorkflowScheduleUpdateOpts) error {
 		paramsData, err := jsonify(parameters)
-		o.updateParameters = true
-		o.parameters = paramsData
+		o.UpdateParameters = true
+		o.Parameters = paramsData
 		return err
 	}
 }
 
 func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
-	return func(o *workflowScheduleUpdateOpts) error {
-		o.updateRecurrence = true
-		o.recurrence = recurRule.String()
-		o.nextRunAt = recurRule.After(time.Now().UTC(), true).UTC()
+	return func(o *backend.WorkflowScheduleUpdateOpts) error {
+		o.UpdateRecurrence = true
+		o.Recurrence = recurRule.String()
+		o.NextRunAt = recurRule.After(time.Now().UTC(), true).UTC()
 		return nil
 	}
 }
 
 func (m *WorkflowManager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
-	return m.backend.ListWorkflowSchedules(ctx)
+	backendScheds, err := m.backend.ListWorkflowSchedules(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ret := make([]*Schedule, len(backendScheds))
+	for i, s := range backendScheds {
+		ret[i] = (*Schedule)(s)
+	}
+	return ret, nil
 }
 
 func (m *WorkflowManager) UpdateWorkflowScheduleByName(ctx context.Context,
 	scheduleName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error {
 
-	return m.backend.UpdateWorkflowScheduleByName(ctx, scheduleName, workflowName, opts...)
+	o := backend.WorkflowScheduleUpdateOpts{}
+	for _, opt := range opts {
+		err := opt(&o)
+		if err != nil {
+			return err
+		}
+	}
+	return m.backend.UpdateWorkflowScheduleByName(ctx, scheduleName, workflowName, o)
 }
 
 func (m *WorkflowManager) GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string, out interface{}) error {
@@ -253,7 +285,7 @@ func (m *WorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName stri
 	if err != nil {
 		return err
 	}
-	err = m.backend.EnqueueWorkflow(ctx, &WorkflowInstance{
+	err = m.backend.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
 		WorkflowName: workflowName,
 		InstanceName: instanceName,
 		Parameters:   paramsData,
@@ -371,7 +403,7 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 		instance:   wevt.Instance,
 		wevt:       wevt,
 	}
-	if wevt.Instance.Status == WorkflowInstanceStatusAbandoned {
+	if wevt.Instance.Status == backend.WorkflowInstanceStatusAbandoned {
 		logrus.Info("Got abandoned workflow")
 		if wevt.CompletedTaskCount > wevt.EnqueuedTaskCount {
 			// we should never get here.
@@ -405,14 +437,14 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 
 	decision := Decision{}
 	switch wevt.Type {
-	case WorkflowStart:
+	case backend.WorkflowStart:
 		decision = executor.OnStart(w, StartEvent{})
-	case TaskComplete:
+	case backend.TaskComplete:
 		decision = executor.OnTaskComplete(w, TaskCompleteEvent{
-			TaskName: wevt.TaskResult.taskName,
+			TaskName: wevt.TaskResult.TaskName,
 			Result:   wevt.TaskResult,
 		})
-	case Cancel:
+	case backend.Cancel:
 		decision = executor.OnCancel(w, CancelEvent{})
 	default:
 		panic("WTF")
@@ -443,7 +475,7 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 	} else if decision.continuing {
 		s.Begin("enqueue_task")
 		for _, t := range decision.tasks {
-			err := completer.EnqueueTask(&t)
+			err := completer.EnqueueTask(&t, backend.TaskEnqueueOpts{})
 			if err != nil {
 				// TODO(ssd) 2019-05-15: What do we
 				// want to do here? I think we need to
@@ -516,4 +548,11 @@ func (s *statsInfo) String() string {
 		fmt.Fprintf(str, "%s: %f ms; ", label, s.totals[label].Seconds()*1000)
 	}
 	return str.String()
+}
+
+func jsonify(data interface{}) ([]byte, error) {
+	if data == nil {
+		return nil, nil
+	}
+	return json.Marshal(data)
 }

@@ -1,4 +1,4 @@
-package workflow
+package postgres
 
 import (
 	"io"
@@ -19,6 +19,8 @@ type sqlMigration struct {
 	downSQL string
 }
 
+// ArrayMigrationDriver implement the migratesource.Driver interface
+// so that we can use the migrate library without files on disk.
 type ArrayMigrationDriver struct {
 	migrations []sqlMigration
 }
