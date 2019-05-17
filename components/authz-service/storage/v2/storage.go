@@ -14,6 +14,7 @@ type Storage interface {
 	policyStorage
 	roleStorage
 	projectStorage
+	ruleStorage
 
 	// Reset allows "factory-resetting" IAM v2 policies
 	Reset(context.Context) error
@@ -65,6 +66,14 @@ type projectStorage interface {
 	GetProject(context.Context, string) (*Project, error)
 	DeleteProject(context.Context, string) error
 	ListProjects(context.Context) ([]*Project, error)
+}
+
+type ruleStorage interface {
+	CreateRule(context.Context, *Rule) (*Rule, error)
+	GetRule(context.Context, string) (*Rule, error)
+	UpdateRule(context.Context, *Rule) (*Rule, error)
+	ListRules(context.Context) ([]*Rule, error)
+	DeleteRule(context.Context, string) error
 }
 
 type MigrationStatusProvider interface {

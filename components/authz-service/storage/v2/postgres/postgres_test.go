@@ -3307,6 +3307,555 @@ func TestUpdatePolicy(t *testing.T) {
 	}
 }
 
+func TestCreateRule(t *testing.T) {
+	store, db, _ := setup(t)
+	defer db.close(t)
+	defer store.Close()
+	ctx := context.Background()
+
+	cases := map[string]func(*testing.T){
+		"when the project doesn't exist, return Err": func(t *testing.T) {
+			condition1, err := storage.NewCondition(storage.Node, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", "project-not-found", "name", storage.Node, []storage.Condition{condition1})
+			require.NoError(t, err)
+			resp, err := store.CreateRule(ctx, &rule)
+			assert.Nil(t, resp)
+			assert.Error(t, storage_errors.ErrForeignKey, err)
+		},
+		"cannot use improper condition attributes for events": func(t *testing.T) {
+			_, err := storage.NewCondition(storage.Event, []string{"chef-server-1"}, storage.ChefTag, storage.MemberOf)
+			assert.Error(t, err)
+		},
+		"creating a rule with no conditions returns an error": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			_, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{})
+			assert.Error(t, err)
+		},
+		"creating a rule with inconsistent child condition type returns an error": func(t *testing.T) {
+			ruleType := storage.Node
+			differentRuleType := storage.Event
+			condition1, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(differentRuleType,
+				[]string{"org1", "org2", "org3"}, storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				[]string{"role1"}, storage.ChefRole, storage.MemberOf)
+			require.NoError(t, err)
+
+			_, err = storage.NewRule("new-id-1", "project-1", "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.Error(t, err)
+		},
+		"create node rule with multiple conditions": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				[]string{"org1", "org2", "org3"}, storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				[]string{"role1"}, storage.ChefRole, storage.MemberOf)
+			require.NoError(t, err)
+
+			rule, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+			resp, err := store.CreateRule(ctx, &rule)
+			require.NoError(t, err)
+			require.Equal(t, &rule, resp)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4`,
+				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+		},
+		"create event rule with multiple conditions": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				[]string{"org1", "org2", "org3"}, storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2", "chef-server-3"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+
+			resp, err := store.CreateRule(ctx, &rule)
+			require.NoError(t, err)
+			require.Equal(t, &rule, resp)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4`,
+				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		db.flush(t)
+	}
+}
+
+func TestListRules(t *testing.T) {
+	store, db, _ := setup(t)
+	defer db.close(t)
+	defer store.Close()
+
+	cases := map[string]func(*testing.T){
+		"when no rules exist, returns an empty list": func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := store.ListRules(ctx)
+			assert.NoError(t, err)
+			assert.Nil(t, resp)
+			assert.Equal(t, 0, len(resp))
+		},
+		"when mutiple rules exist with no project fitler, returns the full list": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			rule2, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			resp, err := store.ListRules(ctx)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []*storage.Rule{rule1, &rule2}, resp)
+		},
+		"when mutiple rules exist with a project fitler, returns filtered list": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{"project-3", projID2})
+
+			ruleType := storage.Node
+			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			resp, err := store.ListRules(ctx)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []*storage.Rule{&rule2}, resp)
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		db.flush(t)
+	}
+}
+
+func TestUpdateRule(t *testing.T) {
+	store, db, _ := setup(t)
+	defer db.close(t)
+	defer store.Close()
+
+	cases := map[string]func(*testing.T){
+		"when the rule doesn't exist, return ErrNotFound": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			condition1, err := storage.NewCondition(storage.Node, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("not-found", projID, "name", storage.Node, []storage.Condition{condition1})
+			require.NoError(t, err)
+
+			resp, err := store.UpdateRule(ctx, &rule)
+			assert.Nil(t, resp)
+			assert.Error(t, storage_errors.ErrNotFound, err)
+		},
+		"when the update attempts to change the project, throw an error": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			ruleOriginal, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
+				[]storage.Condition{condition1})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &ruleOriginal)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+			ruleUpdated, err := storage.NewRule("new-id-1", projID2, "name", ruleType,
+				[]storage.Condition{condition1})
+			require.NoError(t, err)
+			resp, err := store.UpdateRule(ctx, &ruleUpdated)
+			assert.Nil(t, resp)
+			assert.Error(t, storage_errors.ErrChangeProjectForRule, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
+		},
+		"when there is no project filter, update node rule with multiple conditions to have more conditions": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			rule := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"new-chef-server"}, storage.ChefServer, storage.MemberOf)
+			conditions := []storage.Condition{condition4}
+			ruleUpdated, err := storage.NewRule("new-id-1", projID, "name", ruleType, append(conditions, rule.Conditions...))
+
+			require.NoError(t, err)
+			resp, err := store.UpdateRule(ctx, &ruleUpdated)
+			assert.NoError(t, err)
+			assert.Equal(t, resp, &ruleUpdated)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+		},
+		"when the project filter matches, update node rule with multiple conditions to have less conditions, different name and type": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{projID, "some-other-project"})
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			condition2, err := storage.NewCondition(ruleType,
+				[]string{"org1", "org2", "org3"}, storage.Organization, storage.MemberOf)
+			require.NoError(t, err)
+			condition3, err := storage.NewCondition(ruleType,
+				[]string{"role1"}, storage.ChefRole, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", projID, "name", ruleType,
+				[]storage.Condition{condition1, condition2, condition3})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule)
+			require.NoError(t, err)
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			newRuleType := storage.Event
+			condition4, err := storage.NewCondition(newRuleType,
+				[]string{"new-chef-server"}, storage.ChefServer, storage.MemberOf)
+			ruleUpdated, err := storage.NewRule("new-id-1", projID, "updated", newRuleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			resp, err := store.UpdateRule(ctx, &ruleUpdated)
+			assert.NoError(t, err)
+			assert.Equal(t, resp, &ruleUpdated)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3`,
+				ruleUpdated.ID, ruleUpdated.Name, ruleUpdated.Type.String()))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+		},
+		"when the project filter does not match, return ErrNotFound": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{"not-a-match", "some-other-project"})
+
+			ruleType := storage.Node
+			ruleOriginal := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"new-chef-server"}, storage.ChefServer, storage.MemberOf)
+			conditions := []storage.Condition{condition4}
+			ruleUpdated, err := storage.NewRule(ruleOriginal.ID, projID, "name", ruleType, append(conditions, ruleOriginal.Conditions...))
+			resp, err := store.UpdateRule(ctx, &ruleUpdated)
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		db.flush(t)
+	}
+}
+
+func TestGetRule(t *testing.T) {
+	store, db, _ := setup(t)
+	defer db.close(t)
+	defer store.Close()
+
+	cases := map[string]func(*testing.T){
+		"when no rules exist, returns NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := store.GetRule(ctx, "not-found")
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+		},
+		"when the wrong id requested, returns NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", projID, "name", ruleType, []storage.Condition{condition1})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			resp, err := store.GetRule(ctx, "not-found")
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+		},
+		"when mulitple rules exists with no project filter, return correct rule": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			ruleToGet := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			otherRule, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &otherRule)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToGet.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, otherRule.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			resp, err := store.GetRule(ctx, ruleToGet.ID)
+			assert.NoError(t, err)
+			assert.Equal(t, ruleToGet, resp)
+		},
+		"when mulitple rules exists with a matching project filter, return correct rule": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{projID, projID2, "some-other-project"})
+
+			ruleType := storage.Node
+			ruleToGet := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToGet.ID))
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			resp, err := store.GetRule(ctx, ruleToGet.ID)
+			assert.NoError(t, err)
+			assert.Equal(t, ruleToGet, resp)
+		},
+		"when mulitple rules exists with a non-matching project filter, return NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, "some-other-project"})
+
+			ruleType := storage.Node
+			ruleToGet := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToGet.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			resp, err := store.GetRule(ctx, ruleToGet.ID)
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		db.flush(t)
+	}
+}
+
+func TestDeleteRule(t *testing.T) {
+	store, db, _ := setup(t)
+	defer db.close(t)
+	defer store.Close()
+
+	cases := map[string]func(*testing.T){
+		"when no rules exist, returns NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+			err := store.DeleteRule(ctx, "not-found")
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+		},
+		"when the wrong id requested, returns NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", projID, "name", ruleType, []storage.Condition{condition1})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			err = store.DeleteRule(ctx, "not-found")
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+		},
+		"when mulitple rules exists with no project filter, delete rule and associated conditions": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			ruleToDelete := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &ruleToSave)
+			require.NoError(t, err)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			err = store.DeleteRule(ctx, ruleToDelete.ID)
+			assert.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+		},
+		"when mulitple rules exists with a matching project filter, delete rule and associated conditions": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{projID, "project-2"})
+
+			ruleType := storage.Node
+			ruleToDelete := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &ruleToSave)
+			require.NoError(t, err)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			err = store.DeleteRule(ctx, ruleToDelete.ID)
+			assert.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+		},
+		"when mulitple rules exists with a non-matching project filter, do not delete anything": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{"project-3", "project-2"})
+
+			ruleType := storage.Node
+			ruleToDelete := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &ruleToSave)
+			require.NoError(t, err)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			err = store.DeleteRule(ctx, ruleToDelete.ID)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		db.flush(t)
+	}
+}
+
 func TestCreateProject(t *testing.T) {
 	store, db, _ := setup(t)
 	defer db.close(t)
@@ -5434,6 +5983,26 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 		t.Run(test.desc, test.f)
 		db.flush(t)
 	}
+}
+
+func createRuleWithMultipleConditions(t *testing.T, store storage.Storage, projID string, ruleType storage.RuleType) *storage.Rule {
+	t.Helper()
+	ctx := context.Background()
+	condition1, err := storage.NewCondition(ruleType,
+		[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+	require.NoError(t, err)
+	condition2, err := storage.NewCondition(ruleType,
+		[]string{"org1", "org2", "org3"}, storage.Organization, storage.MemberOf)
+	require.NoError(t, err)
+	condition3, err := storage.NewCondition(ruleType,
+		[]string{"chef-server-2,chef-server-3"}, storage.ChefServer, storage.MemberOf)
+	require.NoError(t, err)
+	req, err := storage.NewRule("new-id-1", projID, "name", ruleType,
+		[]storage.Condition{condition1, condition2, condition3})
+	require.NoError(t, err)
+	resp, err := store.CreateRule(ctx, &req)
+	require.NoError(t, err)
+	return resp
 }
 
 func assertProjectsMatch(t *testing.T, db *testDB, project storage.Project) {

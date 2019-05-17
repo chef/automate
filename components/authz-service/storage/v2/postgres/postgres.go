@@ -951,6 +951,217 @@ func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * *    Rules    * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	row := tx.QueryRowContext(ctx,
+		`INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
+	var ruleDbID string
+	if err := row.Scan(&ruleDbID); err != nil {
+		return nil, p.processError(err)
+	}
+
+	for _, condition := range rule.Conditions {
+		_, err := tx.ExecContext(ctx,
+			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
+		)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
+	}
+
+	// Currently, we don't change anything from what is passed in.
+	return rule, nil
+}
+
+func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	row := tx.QueryRowContext(ctx,
+		`UPDATE iam_project_rules SET (name, type) = ($1, $2)
+			WHERE id = $3 AND projects_match_for_rule(project_id, $4) RETURNING db_id, project_id`,
+		rule.Name, rule.Type.String(), rule.ID, pq.Array(projectsFilter))
+	var ruleDbID string
+	var projectID string
+	if err := row.Scan(&ruleDbID, &projectID); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, storage_errors.ErrNotFound
+		}
+		return nil, p.processError(err)
+	}
+
+	// If they tried to change the project_id, abort the transaction with an error.
+	if projectID != rule.ProjectID {
+		return nil, storage_errors.ErrChangeProjectForRule
+	}
+
+	// Delete the existing conditions. Don't need to worry about not found case since a rule must have conditions.
+	_, err = tx.ExecContext(ctx, `DELETE FROM iam_rule_conditions WHERE rule_db_id=$1;`, ruleDbID)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	for _, condition := range rule.Conditions {
+		_, err := tx.ExecContext(ctx,
+			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
+		)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
+	}
+
+	// Currently, we don't change anything from what is passed in.
+	return rule, nil
+}
+
+func (p *pg) DeleteRule(ctx context.Context, id string) error {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	res, err := tx.ExecContext(ctx,
+		`DELETE FROM iam_project_rules WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+		id, pq.Array(projectsFilter),
+	)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return p.processError(err)
+	} else if count == 0 {
+		return storage_errors.ErrNotFound
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewErrTxCommit(err)
+	}
+
+	return nil
+}
+
+func (p *pg) GetRule(ctx context.Context, id string) (*v2.Rule, error) {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var rule v2.Rule
+	row := tx.QueryRowContext(ctx, `SELECT query_rule from query_rule($1, $2);`,
+		id, pq.Array(projectsFilter),
+	)
+	err = row.Scan(&rule)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, storage_errors.ErrNotFound
+		}
+		return nil, p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
+	}
+
+	return &rule, nil
+}
+
+func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var rules []*v2.Rule
+	rows, err := p.db.QueryContext(ctx, `SELECT query_rules from query_rules($1);`, pq.Array(projectsFilter))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	defer func() {
+		if err := rows.Close(); err != nil {
+			p.logger.Warnf("failed to close db rows: %s", err.Error())
+		}
+	}()
+
+	for rows.Next() {
+		var rule v2.Rule
+		err = rows.Scan(&rule)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+		rules = append(rules, &rule)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
+	}
+
+	return rules, nil
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * *   PROJECTS  * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
