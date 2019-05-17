@@ -64,13 +64,13 @@ func (depth *ReportDepth) getProfileMinsFromNodesResults(
 				var profileStatus string
 				if profileStatusHash["skipped"] > 0 && profileStatusHash["loaded"] == 0 && profileStatusHash[""] == 0 {
 					profileStatus = "skipped"
-					logrus.Debugf("getProfileMinsFromNodes profile_name=%q, status=%q", profileName, profileStatus)
+					logrus.Debugf("getProfileMinsFromNodesResults profile_name=%q, status=%q", profileName, profileStatus)
 				} else {
 					sumFailures, _ := bucket.Aggregations.Sum("failures")
 					sumPassed, _ := bucket.Aggregations.Sum("passed")
 					sumSkipped, _ := bucket.Aggregations.Sum("skipped")
 					profileStatus = computeStatus(int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value))
-					logrus.Debugf("getProfileMinsFromNodes profile_name=%s, status=%s (sumFailures=%d, sumPassed=%d, sumSkipped=%d)", profileName, profileStatus, int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value))
+					logrus.Debugf("getProfileMinsFromNodesResults profile_name=%s, status=%s (sumFailures=%d, sumPassed=%d, sumSkipped=%d)", profileName, profileStatus, int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value))
 				}
 
 				if len(statusFilters) > 0 && !stringutils.SliceContains(statusFilters, profileStatus) {
