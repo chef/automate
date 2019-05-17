@@ -140,7 +140,7 @@ export class NodesAddComponent implements OnInit {
     this.isLoading = true;
 
     this.createNodes(this.nodesToAdd$.getValue())
-      .subscribe(() => this.router.navigate(['/compliance', 'scanner', 'nodes']));
+      .subscribe(() => this.router.navigate(['/compliance', 'scan-jobs', 'nodes']));
   }
 
   serializeForm(data) {

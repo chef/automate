@@ -193,6 +193,14 @@ func assertServiceGroupsEqual(t *testing.T, expected, actual *applications.Servi
 				expected.ServiceGroups[i].ServicesHealthCounts,
 				actual.ServiceGroups[i].ServicesHealthCounts,
 				"The services health counts from the service_group is not the expected one")
+			assert.Equal(t,
+				expected.ServiceGroups[i].Application,
+				actual.ServiceGroups[i].Application,
+				"The service_group application is not the expected one")
+			assert.Equal(t,
+				expected.ServiceGroups[i].Environment,
+				actual.ServiceGroups[i].Environment,
+				"The service_group environment is not the expected one")
 		}
 	}
 }

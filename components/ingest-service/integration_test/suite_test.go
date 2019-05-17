@@ -23,6 +23,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/server"
+	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/golang/mock/gomock"
 	"github.com/olivere/elastic"
 	"github.com/spf13/viper"
@@ -52,16 +53,17 @@ var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 // * An Elasticsearch client, that you can use to throw ES queries.
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 type Suite struct {
-	JobScheduler           *server.JobScheduler
-	ConfigManager          *config.Manager
-	ChefIngestServer       *server.ChefIngestServer
-	JobSchedulerServer     *server.JobSchedulerServer
-	EventHandlerServer     *server.AutomateEventHandlerServer
-	cfgmgmt                cfgBackend.Client
-	ingest                 iBackend.Client
-	client                 *elastic.Client
-	projectsClient         *iam_v2.MockProjectsClient
-	eventServiceClientMock *event.MockEventServiceClient
+	JobScheduler             *server.JobScheduler
+	ConfigManager            *config.Manager
+	ChefIngestServer         *server.ChefIngestServer
+	JobSchedulerServer       *server.JobSchedulerServer
+	EventHandlerServer       *server.AutomateEventHandlerServer
+	cfgmgmt                  cfgBackend.Client
+	ingest                   iBackend.Client
+	client                   *elastic.Client
+	projectsClient           *iam_v2.MockProjectsClient
+	eventServiceClientMock   *event.MockEventServiceClient
+	managerServiceClientMock *manager.MockNodeManagerServiceClient
 }
 
 // Initialize the test suite
@@ -341,7 +343,7 @@ func createServices(s *Suite) {
 	// ```
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
-	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient)
+	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient, s.managerServiceClientMock)
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient, s.eventServiceClientMock, s.ConfigManager)
 
@@ -366,6 +368,10 @@ func createMocksWithDefaultFunctions(s *Suite) {
 	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
 	s.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&event.PublishResponse{}, nil)
+
+	s.managerServiceClientMock = manager.NewMockNodeManagerServiceClient(gomock.NewController(nil))
+	s.managerServiceClientMock.EXPECT().ProcessNode(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&manager.ProcessNodeResponse{}, nil)
 }
 
 func createMocksWithTestObject(s *Suite, t *testing.T) {

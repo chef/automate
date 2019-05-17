@@ -38,6 +38,8 @@ func TestGetServiceGroupsOneOk(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
 					HealthPercentage: 100,
+					Application:      "app",
+					Environment:      "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    1,
 						Ok:       1,
@@ -73,6 +75,8 @@ func TestGetServiceGroupsOneCritical(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 0,
+					Application:      "app",
+					Environment:      "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    1,
 						Ok:       0,
@@ -109,6 +113,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					Release:          "core/myapp/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
 					HealthPercentage: 67,
+					Application:      "app",
+					Environment:      "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:   3,
 						Ok:      2,
@@ -120,6 +126,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 33,
+					Application:      "app",
+					Environment:      "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    3,
 						Ok:       1,
@@ -132,6 +140,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					Release:          "core/redis/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
 					HealthPercentage: 100,
+					Application:      "app",
+					Environment:      "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total: 3,
 						Ok:    3,
@@ -142,6 +152,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					Release:          "core/test/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
 					HealthPercentage: 0,
+					Application:      "app",
+					Environment:      "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:   1,
 						Unknown: 1,
@@ -172,6 +184,8 @@ func TestGetServiceGroupsOneWarning(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
 					HealthPercentage: 0,
+					Application:      "app",
+					Environment:      "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    1,
 						Ok:       0,
@@ -209,6 +223,8 @@ func TestGetServiceGroupsOneUnknown(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
 					HealthPercentage: 0,
+					Application:      "app",
+					Environment:      "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    1,
 						Ok:       0,
@@ -245,6 +261,8 @@ func TestGetServiceGroupsOneEach(t *testing.T) {
 					Release:          "core/postgres/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 25,
+					Application:      "app",
+					Environment:      "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total:    4,
 						Ok:       1,
@@ -338,6 +356,69 @@ func TestGetServiceGroupsSortedAsc(t *testing.T) {
 		assert.Equal(t, "c.default", response.ServiceGroups[2].Name)
 		assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
 	}
+}
+func TestGetServiceGroupsSortedApplicationAsc(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Sorting: &query.Sorting{
+				Field: "app_name",
+				Order: query.SortOrder_ASC,
+			},
+		}
+		mockHabServices = []*applications.HabService{
+			NewHabServiceMsg("sup2", "a", e, "default", "core",
+				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
+			NewHabServiceMsg("sup3", "b", e, "default", "core",
+				"b", "0.1.0", "20190101121212", "OK", "", ""),
+			NewHabServiceMsg("sup4", "c", e, "default", "core",
+				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
+			NewHabServiceMsg("sup5", "d", e, "default", "core",
+				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
+		}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
+	assert.Equal(t, "b.default", response.ServiceGroups[1].Name)
+	assert.Equal(t, "c.default", response.ServiceGroups[2].Name)
+	assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
+}
+
+func TestGetServiceGroupsSortedEnvironmentAsc(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Sorting: &query.Sorting{
+				Field: "environment",
+				Order: query.SortOrder_ASC,
+			},
+		}
+		mockHabServices = []*applications.HabService{
+			NewHabServiceMsg("sup2", a, "a", "default", "core",
+				"a", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
+			NewHabServiceMsg("sup3", a, "b", "default", "core",
+				"b", "0.1.0", "20190101121212", "OK", "", ""),
+			NewHabServiceMsg("sup4", a, "c", "default", "core",
+				"c", "0.1.0", "20190101121212", "WARNING", "", ""),
+			NewHabServiceMsg("sup5", a, "d", "default", "core",
+				"d", "0.1.0", "20190101121212", "CRITICAL", "", ""),
+		}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+
+	assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
+	assert.Equal(t, "b.default", response.ServiceGroups[1].Name)
+	assert.Equal(t, "c.default", response.ServiceGroups[2].Name)
+	assert.Equal(t, "d.default", response.ServiceGroups[3].Name)
 }
 
 func TestGetServiceGroupsSortedPercent(t *testing.T) {
@@ -523,6 +604,8 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 					Release:              "core/e/0.1.0/20190101121212",
 					Status:               applications.HealthStatus_OK,
 					HealthPercentage:     100,
+					Application:          "app",
+					Environment:          "test-env",
 					ServicesHealthCounts: &applications.HealthCounts{Total: 1, Ok: 1},
 				},
 			},

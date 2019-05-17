@@ -79,6 +79,7 @@ func readCliParams() *serveropts.Opts {
 		EsSidecarAddress:              viper.GetString("es-sidecar-address"),
 		AuthzAddress:                  viper.GetString("authz-address"),
 		EventAddress:                  viper.GetString("event-address"),
+		NodeManagerAddress:            viper.GetString("nodemanager-address"),
 		LogLevel:                      viper.GetString("log-level"),
 		PurgeConvergeHistoryAfterDays: int32(viper.GetInt("converge-history-days")),
 		PurgeActionsAfterDays:         int32(viper.GetInt("actions-days")),
@@ -96,6 +97,7 @@ func init() {
 	serveCmd.Flags().String("es-sidecar-address", "localhost:10390", "address of es sidecar (domain:<port>)")
 	serveCmd.Flags().String("authz-address", "localhost:10130", "address of authz (domain:<port>)")
 	serveCmd.Flags().String("event-address", "localhost:10132", "address of event (domain:<port>)")
+	serveCmd.Flags().String("nodemanager-address", "localhost:10120", "address of nodemanager (domain:<port>)")
 	serveCmd.Flags().Int32("converge-history-days", -1, "Number of days to keep converge history for. A number less than or equal to 0 means data should never be deleted")
 	serveCmd.Flags().Int32("actions-days", -1, "Number of days to keep actions for. A number less than or equal to 0 means data should never be deleted")
 	serveCmd.Flags().String("key", "key.pem", "SSL Private key for gRPC server")

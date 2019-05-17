@@ -1,14 +1,14 @@
 chef-input {
-  #{--border-color}: chef-hsl(var(--chef-grey));
-  --default-focus-border: chef-hsl(var(--chef-primary-bright));
+  #{--border-color}: var(--chef-grey);
+  --default-focus-border: var(--chef-primary-bright);
   border: 1px solid var(--border-color);
   transition: border-color 0.5s ease;
-  background-color: chef-hsl(var(--chef-white));
+  background-color: var(--chef-white);
   border-radius: var(--chef-border-radius);
   display: inline-block;
 
   &.focused {
-    border-color: var(--focus-border-color, var(--default-focus-border));
+    border-color: var(--focus-border-color), var(--default-focus-border);
   }
 
   input {

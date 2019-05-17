@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ComplianceComponent } from './compliance.component';
+import {
+  ComplianceLandingComponent
+} from 'app/pages/compliance-landing/compliance-landing.component';
 
 const routes: Routes = [
   {
@@ -9,16 +12,28 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'reporting',
-        pathMatch: 'full'
+        pathMatch: 'full',
+        component: ComplianceLandingComponent
       },
       {
         path: 'reporting',
         loadChildren: './+reporting/reporting.module#ReportingModule'
       },
       {
+        path: 'reports',
+        loadChildren: './+reporting/reporting.module#ReportingModule'
+      },
+      {
         path: 'scanner',
         loadChildren: './+scanner/scanner.module#ScannerModule'
+      },
+      {
+        path: 'scan-jobs',
+        loadChildren: './+scanner/scanner.module#ScannerModule'
+      },
+      {
+        path: 'profiles',
+        loadChildren: './+profile/profile.module#ProfileModule'
       }
     ]
   }

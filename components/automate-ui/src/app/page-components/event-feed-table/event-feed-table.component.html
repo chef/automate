@@ -1,6 +1,6 @@
 <ul class="event-feed-table">
   <caption class="visually-hidden">Event Feed Table</caption>
-  <li *ngFor="let event of events; index as i" tabindex="0" class="event-row">
+  <li *ngFor="let event of events; index as i" class="event-row">
     <div class="event-date-time">
       <div class="event-time">{{event.startTime | date:'h:mm a' }}</div>
       <div class="event-day">{{event.startTime | date:'EEEE' }},</div>
@@ -25,7 +25,7 @@
 
           <ng-container *ngIf="isGroup(event)">
             <button class="event-group-button" (click)="getGroupedEvents(event, $event)" [attr.id]="'event-button-' + i">{{event.eventCount}} {{getEventTypeLabel(event)}}</button>
-            were {{getFormattedEventType(event)}} {{displayRequestorPreposition(event.requestorName)}} <b>{{displayRequestorName(event.requestorName)}}</b>
+            {{getFormattedEventType(event)}} {{displayRequestorPreposition(event.requestorName)}} <b>{{displayRequestorName(event.requestorName)}}</b>
           </ng-container>
         </div>
       </div>
@@ -38,7 +38,7 @@
     <chef-button secondary label="close" (click)="hideGroupedEvents()"><chef-icon>close</chef-icon></chef-button>
 
     <ul class="event-group-list" *ngIf="groupedEvent">
-      <li class="event-group-item" tabindex="0">
+      <li class="event-group-item">
         <div class="event-icon">
           <app-event-icon
             [group]="isGroup(groupedEvent)"
@@ -52,7 +52,7 @@
           {{getFormattedEventType(groupedEvent)}} {{displayRequestorPreposition(groupedEvent.requestorName)}} <em>{{displayRequestorName(groupedEvent.requestorName)}}</em>
         </p>
       </li>
-      <li *ngFor="let event of groupedEvents" class="event-group-item" tabindex="0">
+      <li *ngFor="let event of groupedEvents" class="event-group-item">
         <div class="event-icon">
           <app-event-icon
             [group]="isGroup(groupedEvent)"

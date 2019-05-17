@@ -6,8 +6,8 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "scan_jobs"
-    weight = 10
+    parent = "compliance"
+    weight = 40
 +++
 
 ### Nodes
@@ -18,7 +18,7 @@ When a user creates a node, that node is added to the `/nodes` endpoint.
 
 When a user adds a node integration, like aws or azure, nodes are added to the `/nodes` endpoint.
 
-When an inspec report is ingested, a node is added to the `/nodes` endpoint. If it already exists, the last contact time is updated.
+When a Chef InSpec report or a Chef Infra Client run is ingested, a node is added to the `/nodes` endpoint. If the node already exists, its last contact time, run data, and scan data are updated. When run data and scan data are updated, the latest information is stored for the run id or report id, the status, and the penultimate status.
 
 ### Node Status
 
@@ -57,9 +57,72 @@ The `/nodes` endpoint supports filtering by:
 - region
 - source_id (a reference to the primary provider's node)
 - state
-- statechange_timestamp
+- statechange_timerange (supports two timestamps of type "2019-03-05T00:00:00Z")
 - status
 - tags
+- last_run_timerange (last time reported on ingested ccr: supports two timestamps of type "2019-03-05T00:00:00Z" (RFC3339)) 
+- last_scan_timerange (last time reported on ingested scan: supports two timestamps of type "2019-03-05T00:00:00Z" (RFC3339))
+- last_run_status (status on last ingested ccr)
+- last_scan_status (status on last ingested scan)
+- last_run_penultimate_status (status on second to last ingested ccr)
+- last_scan_penultimate_status (status on second to last ingested scan)
+
+## Examples
+
+Show me all nodes whose last scan had a status of failed and a penultimate status of passed
+
+_or in other words, which nodes were previously passing their scans and just started failing?_
+
+sample request:
+```bash
+curl -s --insecure -H "api-token: $token_val"
+https://a2-dev.test/api/v0/nodes/search -d '{
+  "filters": [
+    {"key": "last_scan_status", "values": ["FAILED"]},
+    {"key": "last_scan_penultimate_status", "values": ["PASSED"]}
+  ]
+}'
+```
+
+
+sample truncated response:
+```
+{"nodes":[{"id":"0e05fcf2-2fab-36ee-bb84-5b7d5888c33a","name":"chef-load-blue-delladonna-indigo","platform":"debian","platform_version":"8.11","last_contact":"2019-05-14T18:08:43Z","run_data":{"id":"","status":"UNKNOWN","penultimate_status":"UNKNOWN","end_time":null},"scan_data":{"id":"5640fbb7-d1ba-4c67-b0cd-9db4fcfc2598","status":"FAILED","penultimate_status":"PASSED","end_time":"2019-05-14T18:08:43Z"}}]}
+```
+
+
+Show me all nodes whose last ccr passed and last scan failed, that had a penultimate ccr status of failed
+
+_or in other words, which nodes just started passing their ccrs but are failing their scans?_
+
+sample request:
+```bash
+curl -s --insecure -H "api-token: $token_val"
+https://a2-dev.test/api/v0/nodes/search -d '{
+  "filters": [
+    {"key": "last_run_status", "values": ["PASSED"]},
+    {"key": "last_scan_status", "values": ["FAILED"]},
+    {"key": "last_run_penultimate_status", "values": ["FAILED"]}
+  ]
+}'
+```
+
+
+Show me all nodes that had a last scan ingested sometime in the last 48 hours with a status of failed
+
+_or in other words, which nodes that were ingested in the last 48 hours failed their scans?_
+
+sample request:
+```bash
+curl -s --insecure -H "api-token: $token_val"
+https://a2-dev.test/api/v0/nodes/search -d '{
+  "filters": [
+    {"key": "last_scan_status", "values": ["FAILED"]},
+    {"key": "last_scan_timerange", "values": ["2019-05-12T00:00:00Z", "2019-05-16T00:00:00Z" ]}
+  ]
+}'
+```
+
 
 ### Bulk Node Add
 

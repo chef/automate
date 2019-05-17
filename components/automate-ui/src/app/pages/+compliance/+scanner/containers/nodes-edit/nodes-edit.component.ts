@@ -99,7 +99,7 @@ export class NodesEditComponent implements OnInit {
     node.tags = node.tags.filter(({key, value}) => key.length && value.length);
 
     this.updateNode(node)
-      .subscribe(() => this.router.navigate(['/compliance', 'scanner', 'nodes']));
+      .subscribe(() => this.router.navigate(['/compliance', 'scan-jobs', 'nodes']));
   }
 
   createForm(node): FormGroup {

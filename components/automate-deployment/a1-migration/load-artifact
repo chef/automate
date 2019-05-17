@@ -6,10 +6,10 @@ automate-ctl stop
 chef-server-ctl stop
 
 ## mitigate intermittent "Unable to spawn Supervisor, Text file busy (os error 26)" error
-(hab sup run || sleep 5; hab sup run || sleep 5; hab sup run) &
+(HAB_LICENSE=accept-no-persist hab sup run || sleep 5; HAB_LICENSE=accept-no-persist hab sup run || sleep 5; HAB_LICENSE=accept-no-persist hab sup run) &
 
 set +x
-until hab svc status &> /dev/null; do
+until HAB_LICENSE=accept-no-persist hab svc status &> /dev/null; do
   sleep 1
 done
 set -x
@@ -20,8 +20,8 @@ set -x
 ## and https://drive.google.com/open?id=1dtdt8kRXywDAE9G03WX7a3mWQoAWsYY1
 DATA_PACKAGE_RELEASE="20181210102316"
 # hab pkg install /a1-migration/results/devchef-a1-migration-data-full-0.0.1-${DATA_PACKAGE_RELEASE}-x86_64-linux.hart
-hab pkg install "devchef/a1-migration-data-full/0.0.1/$DATA_PACKAGE_RELEASE" --channel unstable
-hab svc load "devchef/a1-migration-data-full/0.0.1/$DATA_PACKAGE_RELEASE" &
+HAB_LICENSE=accept-no-persist hab pkg install "devchef/a1-migration-data-full/0.0.1/$DATA_PACKAGE_RELEASE" --channel unstable
+HAB_LICENSE=accept-no-persist hab svc load "devchef/a1-migration-data-full/0.0.1/$DATA_PACKAGE_RELEASE" &
 
 echo "waiting for migration data to sync..."
 
@@ -34,7 +34,7 @@ done
 echo "done!"
 
 # kill off the data package, lest it be resurrected and break things at a bad time
-hab svc unload devchef/a1-migration-data-full
+HAB_LICENSE=accept-no-persist hab svc unload devchef/a1-migration-data-full
 
 # Kill off our background job and the hab-launcher as well. This
 # appears necessary as of hab-launcher 8282/hab 0.62.1

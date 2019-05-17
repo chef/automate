@@ -1,11 +1,11 @@
 chef-status-filter-group {
-  --active-color: var(--toggle-active-color, chef-hsl(var(--chef-primary-bright)));
+  --active-color: var(--toggle-active-color), var(--chef-primary-bright);
   display: flex;
 
   .filter {
     padding: 8px 12px;
     cursor: pointer;
-    background-color: chef-hsl(var(--chef-white));
+    background-color: var(--chef-white);
     box-shadow: 0 0 0 1px #DAE1E6 inset;
     border-radius: 4px;
     font-size: 14px;
@@ -49,30 +49,30 @@ chef-status-filter-group {
 
     &.critical {
       chef-icon {
-        color: chef-hsl(var(--chef-critical));
+        color: var(--chef-critical);
       }
     }
 
     &.warning {
       chef-icon {
-        color: chef-hsl(var(--chef-primary));
+        color: var(--chef-primary);
       }
     }
 
     &.success {
       chef-icon {
-        color: chef-hsl(var(--chef-success));
+        color: var(--chef-success);
       }
     }
 
     &.unknown {
       chef-icon {
-        color: chef-hsl(var(--chef-dark-grey));
+        color: var(--chef-dark-grey);
       }
     }
 
     &.selected {
-      background: chef-hsl(var(--chef-white));
+      background: var(--chef-white);
 
       .filter-label,
       .lean-filter-label,
@@ -87,22 +87,22 @@ chef-status-filter-group {
 
       &.critical {
         background: #F9DBEA;
-        box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-critical)) inset;
+        box-shadow: 0px 0px 0px 1px var(--chef-critical) inset;
       }
 
       &.warning {
         background: #FFE5D4;
-        box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-primary)) inset;
+        box-shadow: 0px 0px 0px 1px var(--chef-primary) inset;
       }
 
       &.success {
         background: #CFE8FF;
-        box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-success)) inset;
+        box-shadow: 0px 0px 0px 1px var(--chef-success) inset;
       }
 
       &.unknown {
         background: #E7E9E9;
-        box-shadow: 0px 0px 0px 1px chef-hsl(var(--chef-dark-grey)) inset;
+        box-shadow: 0px 0px 0px 1px var(--chef-dark-grey) inset;
       }
     }
 

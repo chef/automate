@@ -9,7 +9,7 @@ chef-radial-chart {
   }
 
   .segment {
-    color: chef-hsl(var(--chef-dark-grey));
+    color: var(--chef-dark-grey);
     fill: currentColor;
     stroke-width: var(--base-stroke);
     stroke: currentColor;
@@ -20,7 +20,7 @@ chef-radial-chart {
   }
 
   .secondary .segment {
-    stroke: chef-hsl(var(--chef-white));
+    stroke: var(--chef-white);
   }
 
   .primary .segment:hover {

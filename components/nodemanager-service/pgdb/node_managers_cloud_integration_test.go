@@ -53,7 +53,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestUpdateOrInsertInstanceSourceStateI
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
-	suite.Equal(1, len(stoppedNodes))
+	suite.Equal(0, len(stoppedNodes))
 
 	// instance state: running
 	runningInstanceState := pgdb.InstanceState{ID: "i-079356", State: "running", Region: "eu-west-1"}
@@ -640,4 +640,32 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodesToDBDoesNotDuplicat
 	}
 	expected := []*common.Kv{{Key: "tacos", Value: "yes"}, {Key: "nachos", Value: "very yes"}}
 	suite.ElementsMatch(expected, n.Tags)
+}
+func (suite *NodeManagersAndNodesDBSuite) TestUpdateOrInsertInstanceSourceStateInDbIngestingNewNodeUsesIDIfNoName() {
+	mgr := manager.NodeManager{Name: "test", Type: "azure-vm"}
+	mgrID, err := suite.Database.AddNodeManager(&mgr, "12345678")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	instanceState := pgdb.InstanceState{ID: "i-079356", State: "running", Region: "eu-west-1"}
+	_, err = suite.Database.UpdateOrInsertInstanceSourceStateInDb(instanceState, mgrID, "12345678", "azure-vm")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	filter := &common.Filter{
+		Key:    "manager_id",
+		Values: []string{mgrID},
+	}
+	mgrNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Require().Equal(1, len(mgrNodes))
+
+	node := mgrNodes[0]
+	suite.Equal("i-079356", node.Name)
+	_, err = suite.Database.DeleteNode(node.Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
 }

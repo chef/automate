@@ -1,19 +1,23 @@
 +++
-title = "Compliance"
+title = "Reports"
 description = "The Compliance Dashboard"
 date = 2018-03-26T16:02:09-07:00
 draft = false
 bref = ""
 toc = true
+[menu]
+  [menu.docs]
+    parent = "compliance"
+    weight = 10
 +++
 
-## Compliance Reporting Overview
+## Overview
 
-The Reporting view under the Compliance tab provides comprehensive insight into the compliance status of all scanned infrastructure.
+The Reports view under the Compliance tab provides comprehensive insight into the compliance status of all scanned infrastructure.
 
 ![Compliance](/images/docs/compliance.png)
 
-### Dates in Compliance Reporting
+### Dates in Compliance Reports
 
 The dashboard shows the results of all scans with end times on the _currently selected day_. The selected day is highlighted in the search bar.
 
@@ -55,7 +59,7 @@ Recipe
 ### Deep Filtering
 
 Deep Filtering allows you to view the state of your infrastructure from the perspective of a single profile, or a single profile and one of its child controls.  
-Adding a profile filter will modify all compliance reporting screens to display the status of that profile across all nodes executing that profile. Adding a filter for a child control of that profile will modify all compliance reporting screens to display the status of that child control.
+Adding a profile filter will modify all compliance reports screens to display the status of that profile across all nodes executing that profile. Adding a filter for a child control of that profile will modify all compliance reports screens to display the status of that child control.
 
 Please note the only supported filters for deep filtering are:
 
@@ -66,9 +70,9 @@ Please note the only supported filters for deep filtering are:
 
 The download button located to the right of the search bar allows the user to download a JSON or CSV format of the reports, based on all currently applied filters (including end time selected in calendar).
 
-### Compliance Reporting Results and Job ID Filters
+### Compliance Reports Results and Job ID Filters
 
-Chef Automate users can see the results of their scan jobs from https://{{< example_fqdn "automate" >}}/compliance/scanner/jobs by selecting _Report_, which will redirect to the compliance tab. This reporting view, uses the _job id_ filter as well as any additional filters, and ignores the _end time_ filter.
+Chef Automate users can see the results of their scan jobs from https://{{< example_fqdn "automate" >}}/compliance/scan-jobs/jobs by selecting _Report_, which will redirect to the compliance tab. This reports view uses the _job id_ filter as well as any additional filters, and ignores the _end time_ filter.
 
 ![Getting to Compliance from a Scan Job](/images/docs/compliance-jobid.png)
 
@@ -122,7 +126,7 @@ Top Control Failures
 
 ## Switching views
 
-In addition to filtering your reporting data, you can also switch your views to see compliance report results from the perspective of _Nodes_ and _Profiles_.
+In addition to filtering your reports data, you can also switch your views to see compliance report results from the perspective of _Nodes_ and _Profiles_.
 
 ### Nodes
 
@@ -180,7 +184,7 @@ More Information
 
 ## Profiles
 
-Use the compliance reporting **Profiles_ tab lets you examine the compliance profiles installed under your individual user account.
+Use the compliance reports **Profiles** tab lets you examine the compliance profiles installed under your individual user account.
 
 ![Compliance Profiles](/images/docs/compliance-profiles.png)
 

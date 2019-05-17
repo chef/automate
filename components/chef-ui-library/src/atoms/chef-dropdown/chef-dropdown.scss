@@ -3,7 +3,7 @@ chef-dropdown {
   display: none;
   box-shadow: var(--chef-box-shadow);
   border-radius: var(--chef-border-radius);
-  background-color: chef-hsl(var(--chef-white));
+  background-color: var(--chef-white);
 
   &[visible] {
     display: block;

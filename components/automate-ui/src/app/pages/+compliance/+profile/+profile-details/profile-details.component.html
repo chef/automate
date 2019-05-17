@@ -1,13 +1,9 @@
-<chef-sidebar>
-  <div class="nav-items">
-    <chef-sidebar-entry route="/profiles" icon="library_books">Profiles</chef-sidebar-entry>
-  </div>
-</chef-sidebar>
+<app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
 
 <div class="container">
   <main>
     <chef-breadcrumbs>
-      <chef-breadcrumb [link]="['/profiles']">Profiles</chef-breadcrumb>
+      <chef-breadcrumb [link]="['/compliance/profiles']">Profiles</chef-breadcrumb>
       {{ profile?.title }}
     </chef-breadcrumbs>
 

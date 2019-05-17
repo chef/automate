@@ -14,18 +14,11 @@
         </app-authorized>
 
         <app-authorized
-          [allOf]="[['/compliance/reporting/stats/summary', 'post'], ['/compliance/reporting/stats/failures', 'post'], ['/compliance/reporting/stats/trend', 'post']]">
-          <div role="menuitem" class="nav-link"><a routerLink="/compliance/reporting" routerLinkActive="active" tabindex="0">Compliance</a></div>
+          [anyOf]="[['/compliance/reporting/stats/summary', 'post'], ['/compliance/reporting/stats/failures', 'post'], ['/compliance/reporting/stats/trend', 'post'],
+            ['/compliance/scanner/jobs', 'post'], ['/compliance/scanner/jobs/search', 'post'], ['/compliance/profiles/search', 'post']]">
+          <div role="menuitem" class="nav-link"><a routerLink="/compliance" routerLinkActive="active" tabindex="0">Compliance</a></div>
         </app-authorized>
-
-        <app-authorized [allOf]="[['/compliance/scanner/jobs', 'post'], ['/compliance/scanner/jobs/search', 'post']]">
-          <div role="menuitem" class="nav-link"><a routerLink="/compliance/scanner" routerLinkActive="active" tabindex="0">Scan Jobs</a></div>
-        </app-authorized>
-
-        <app-authorized [allOf]="[['/compliance/profiles/search', 'post']]">
-          <div role="menuitem" class="nav-link"><a routerLink="/profiles" routerLinkActive="active" tabindex="0">Asset Store</a></div>
-        </app-authorized>
-
+        
         <app-authorized
           [anyOf]="[['/notifications/rules', 'get'], ['/secrets/search', 'post'], ['/nodemanagers/search', 'post'], ['/retention/nodes/status', 'get'],
             ['/auth/users', 'get'], ['/auth/teams', 'get'], ['/auth/tokens', 'get'], ['/iam/v2beta/tokens', 'get'],

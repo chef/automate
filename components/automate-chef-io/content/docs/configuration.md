@@ -239,6 +239,12 @@ However, switching between either of those configurations and a SAML configurati
 require you to remake your policies, as the [subjects]({{< relref "authorization-overview.md#structure" >}}) of those
 policies will be incorrectly labelled as `ldap`.
 
+{{< info >}}
+Users who log in via SAML will have a session time of 24 hours before needing to log in again.
+Local, MSAD, and LDAP users will have their Chef Automate sessions refreshed while they maintain an active
+browsing session of the Chef Automate UI or until they log out directly.
+{{< /info >}}
+
 ##### Microsoft Active Directory
 
 Chef Automate comes with a default LDAP configuration for Microsoft Active Directory (MSAD).

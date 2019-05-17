@@ -1,5 +1,5 @@
 chef-radio {
-  --active-color: var(--toggle-active-color, chef-hsl(var(--chef-primary-bright)));
+  --active-color: var(--toggle-active-color, var(--chef-primary-bright));
 
   chef-option {
     display: block;
@@ -14,7 +14,7 @@ chef-radio {
     &::before {
       font-family: "Material Icons";
       content: "\E836";
-      color: chef-hsl(var(--chef-grey));
+      color: var(--chef-grey);
       vertical-align: -2px;
     }
 

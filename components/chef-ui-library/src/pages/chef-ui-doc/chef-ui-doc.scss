@@ -24,17 +24,17 @@ chef-ui-doc {
 
   .properties {
     table {
-      #{--border-color}: chef-hsl(var(--chef-grey));
+      #{--border-color}: var(--chef-grey);
       width: 100%;
       padding: 0 13px 13px;
-      background: chef-hsl(var(--chef-white));
+      background: var(--chef-white);
       margin: 1em 0;
       border: 1px solid var(--border-color);
     }
 
     th {
       text-align: left;
-      border-bottom: 1px solid chef-hsl(var(--chef-grey));
+      border-bottom: 1px solid var(--chef-grey);
     }
 
     th, td {

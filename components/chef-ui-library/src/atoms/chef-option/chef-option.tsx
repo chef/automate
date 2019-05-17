@@ -145,8 +145,8 @@ export class ChefOption {
     return [
       <style>
         { `[selected=${this.optionId}] [${this.optionId}], [highlighted=${this.optionId}] #${this.optionId} {
-             background-color: hsl(var(--chef-primary-bright));
-             color: hsl(var(--chef-white));
+             background-color: var(--chef-primary-bright);
+             color: var(--chef-white);
            }`
         }
       </style>,

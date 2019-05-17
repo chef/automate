@@ -580,19 +580,25 @@ func handleNodeTagFilters(filters []*common.Filter) []*common.Filter {
 }
 
 var nodesFilterField = map[string]string{
-	"account_id":            "source_account_id", // azure: uuid, aws: 10 digit #
-	"last_contact":          "last_contact",
-	"manager_id":            "manager_id",
-	"manager_type":          "manager", // aws-ec2, aws-api, azure-api, automate
-	"name":                  "name",
-	"platform_name":         "platform",
-	"platform_release":      "platform_version",
-	"project":               "project",
-	"region":                "source_region",
-	"source_id":             "source_id",
-	"state":                 "source_state", // running, stopped, terminated
-	"statechange_timerange": "statechange_timestamp",
-	"status":                "status", // reachable, unreachable, unknown
+	"account_id":                   "source_account_id", // azure: uuid, aws: 10 digit #
+	"last_contact":                 "last_contact",
+	"manager_id":                   "manager_id",
+	"manager_type":                 "manager", // aws-ec2, aws-api, azure-api, automate
+	"name":                         "name",
+	"platform_name":                "platform",
+	"platform_release":             "platform_version",
+	"project":                      "project",
+	"region":                       "source_region",
+	"source_id":                    "source_id",
+	"state":                        "source_state", // running, stopped, terminated
+	"statechange_timerange":        "statechange_timestamp",
+	"status":                       "status", // reachable, unreachable, unknown
+	"last_run_timerange":           "last_run ->> 'EndTime'",
+	"last_scan_timerange":          "last_scan ->> 'EndTime'",
+	"last_run_status":              "last_run ->> 'Status'",
+	"last_scan_status":             "last_scan ->> 'Status'",
+	"last_run_penultimate_status":  "last_run ->> 'PenultimateStatus'",
+	"last_scan_penultimate_status": "last_scan ->> 'PenultimateStatus'",
 }
 
 func validateNodeFilters(filters []*common.Filter) error {

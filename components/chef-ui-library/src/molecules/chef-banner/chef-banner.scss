@@ -1,7 +1,7 @@
 chef-banner {
   align-items: center;
-  background-color: chef-hsl(var(--black));
-  color: chef-hsl(var(--white));
+  background-color: var(--black);
+  color: var(--white);
   display: flex;
   justify-content: center;
   min-height: 50px;
@@ -12,8 +12,8 @@ chef-banner {
 
   chef-button {
     #{--background-color}: transparent;
-    #{--border-color}: chef-hsl(var(--white));
-    #{--color}: chef-hsl(var(--white));
+    #{--border-color}: var(--white);
+    #{--color}: var(--white);
     margin-left: 2em;
   }
 
@@ -21,20 +21,20 @@ chef-banner {
     chef-button {
       &:hover,
       &:active {
-        #{--background-color}: chef-hsl(var(--white));
-        #{--color}: chef-hsl(var(--black));
+        #{--background-color}: var(--white);
+        #{--color}: var(--black);
       }
     }
   }
 
   &.warn {
-    background-color: chef-hsl(var(--chef-critical));
+    background-color: var(--chef-critical);
 
     chef-button {
       &:hover,
       &:active {
-        #{--background-color}: chef-hsl(var(--white));
-        #{--color}: chef-hsl(var(--chef-critical));
+        #{--background-color}: var(--white);
+        #{--color}: var(--chef-critical);
       }
     }
   }

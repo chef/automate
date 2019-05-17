@@ -1,12 +1,12 @@
 chef-alert {
   #{--alert-color}: var(--chef-success);
-  background-color: chef-hsl(var(--alert-color));
+  background-color: var(--alert-color);
   display: -webkit-flex;
   display: flex;
   margin: 0;
   padding: 8px;
   width: 100%;
-  color: chef-hsl(var(--chef-white));
+  color: var(--chef-white);
   border-radius: 4px;
   -webkit-flex-direction: row;
   flex-direction: row;

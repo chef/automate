@@ -77,5 +77,13 @@ CONFIG="$CONFIG --event-address {{event-service.sys.ip}}:{{event-service.cfg.por
   {{~/if}}
 {{~/eachAlive}}
 
+# Bind to nodemanager if it's available
+{{~#eachAlive bind.nodemanager-service.members as |manager|}}
+  {{~#if @last}}
+addNoProxy {{manager.sys.ip}}
+CONFIG="$CONFIG --nodemanager-address {{manager.sys.ip}}:{{manager.cfg.port}}"
+  {{~/if}}
+{{~/eachAlive}}
+
 # Start Ingest Service
 exec ingest-service serve $CONFIG $BACKEND

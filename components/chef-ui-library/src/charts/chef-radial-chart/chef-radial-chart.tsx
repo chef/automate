@@ -25,23 +25,28 @@ let UID = 0;
  * @example
  * <style>
  *   chef-radial-chart .failed, chef-radial-chart .critical {
- *     color: hsl(var(--chef-critical));
+ *     color: var(--chef-critical);
+ *   }
+ *   chef-radial-chart .warning, chef-radial-chart .warning {
+ *     color: var(--chef-warning);
  *   }
  *   chef-radial-chart .success, chef-radial-chart .major {
- *     color: hsl(var(--chef-success));
+ *     color: var(--chef-ok);
  *   }
  *   chef-radial-chart .skipped, chef-radial-chart .minor {
- *     color: hsl(var(--chef-grey));
+ *     color: var(--chef-unknown);
  *   }
  * </style>
  * <chef-radial-chart style="width: 220px; height: 220px;">
  *   <span slot="innerText">Text for the center of the chart</span>
  *
  *   <chef-data-point value="4" class="failed">4 Failed</chef-data-point>
- *   <chef-data-point value="3" class="success">3 Successful</chef-data-point>
- *   <chef-data-point value="2" class="skipped">2 Skipped</chef-data-point>
+ *   <chef-data-point value="3" class="warning">3 Warning</chef-data-point>
+ *   <chef-data-point value="2" class="success">2 Successful</chef-data-point>
+ *   <chef-data-point value="1" class="skipped">1 Skipped</chef-data-point>
  *
- *   <chef-data-point value="3" secondary class="critical">Critical</chef-data-point>
+ *   <chef-data-point value="4" secondary class="critical">Critical</chef-data-point>
+ *   <chef-data-point value="3" secondary class="warning">Warning</chef-data-point>
  *   <chef-data-point value="2" secondary class="major">Major</chef-data-point>
  *   <chef-data-point value="1" secondary class="minor">Minor</chef-data-point>
  * </chef-radial-chart>
@@ -49,21 +54,25 @@ let UID = 0;
  * @example
  * <style>
  *   chef-radial-chart .failed, chef-radial-chart .critical {
- *     color: hsl(var(--chef-critical));
+ *     color: var(--chef-critical);
+ *   }
+ *   chef-radial-chart .warning, chef-radial-chart .warning {
+ *     color: var(--chef-warning);
  *   }
  *   chef-radial-chart .success, chef-radial-chart .major {
- *     color: hsl(var(--chef-success));
+ *     color: var(--chef-ok);
  *   }
  *   chef-radial-chart .skipped, chef-radial-chart .minor {
- *     color: hsl(var(--chef-grey));
+ *     color: var(--chef-unknown);
  *   }
  * </style>
  * <chef-radial-chart style="width: 220px; height: 220px;">
  *   <span slot="innerText">Text for the center of the chart</span>
  *
  *   <chef-data-point value="4" class="failed">4 Failed</chef-data-point>
- *   <chef-data-point value="3" class="success">3 Successful</chef-data-point>
- *   <chef-data-point value="2" class="skipped">2 Skipped</chef-data-point>
+ *   <chef-data-point value="3" class="warning">3 Warning</chef-data-point>
+ *   <chef-data-point value="2" class="success">2 Successful</chef-data-point>
+ *   <chef-data-point value="1" class="skipped">1 Skipped</chef-data-point>
  * </chef-radial-chart>
  */
 @Component({

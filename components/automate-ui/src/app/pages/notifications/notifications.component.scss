@@ -178,3 +178,13 @@ chef-icon#sort-asc {
     }
   }
 }
+
+.notifications-empty-state {
+  text-align: center;
+
+  p {
+    font-size: 18px;
+    font-weight: 400;
+    margin-top: 35px;
+  }
+}

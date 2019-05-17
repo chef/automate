@@ -60,6 +60,8 @@ type ServiceGroupDisplay struct {
 	HealthStatus         string
 	HealthPercentage     int32
 	ServicesHealthCounts HealthCounts
+	Application          string
+	Environment          string
 }
 
 type HealthCounts struct {

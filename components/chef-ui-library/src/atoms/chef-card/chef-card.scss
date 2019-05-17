@@ -5,7 +5,7 @@ chef-card {
   .content {
     display: block;
     padding: 1em;
-    background-color: chef-hsl(var(--chef-white));
+    background-color: var(--chef-white);
     box-shadow: var(--chef-box-shadow);
     border-radius: var(--chef-border-radius);
   }

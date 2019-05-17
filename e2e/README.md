@@ -14,11 +14,10 @@ dashboard](https://dashboard.cypress.io/#/projects/yvg8zo/runs).
 
 ## Running Cypress Locally
 
-First install cypress if you haven't before. Start at the root of
-`automate`.
+First install cypress if you haven't before.
 
 ```bash
-cd e2e
+cd automate/e2e
 npm install
 ```
 

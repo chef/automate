@@ -329,7 +329,7 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 	}
 
 	// We are not filtering by ProfileID, we are passing it in as a uri resource.
-	//filtQuery := backend.getFiltersQuery(filters)
+	filtQuery := backend.getFiltersQuery(filters, false)
 
 	profileIDQuery := elastic.NewTermQuery("profiles.sha256", profileId)
 
@@ -337,6 +337,7 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 	reportIdsAndProfileIDQuery = reportIdsAndProfileIDQuery.Must(profileIDQuery)
 
 	profilesMinQuery := elastic.NewNestedQuery("profiles", reportIdsAndProfileIDQuery)
+	filtQuery = filtQuery.Must(profilesMinQuery)
 
 	passedFilterAgg := elastic.NewFilterAggregation().Filter(
 		elastic.NewTermQuery("profiles.controls.status", "passed"))
@@ -358,7 +359,7 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 	profilesAgg.SubAggregation("profiles_filter", profilesFilter)
 
 	searchSource := elastic.NewSearchSource().
-		Query(profilesMinQuery).
+		Query(filtQuery).
 		Aggregation("profiles", profilesAgg).
 		Size(0)
 

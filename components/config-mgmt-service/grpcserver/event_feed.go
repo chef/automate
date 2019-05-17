@@ -92,6 +92,11 @@ func (s *CfgMgmtServer) GetEventTaskCounts(ctx context.Context,
 		return &response.EventCounts{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return &response.EventCounts{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
 	// Date Range
 	startTime, endTime, err := params.ValidateMillsecondDateRange(request.Start, request.End)
 	if err != nil {
@@ -122,6 +127,11 @@ func (s *CfgMgmtServer) GetEventTypeCounts(ctx context.Context,
 	filters, err := params.FormatActionFilters(request.Filter)
 	if err != nil {
 		return &response.EventCounts{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+	}
+
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return &response.EventCounts{}, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
 
 	// Date Range
@@ -171,6 +181,11 @@ func (s *CfgMgmtServer) GetEventStringBuckets(ctx context.Context, request *requ
 	filters, err := params.FormatActionFilters(request.Filter)
 	if err != nil {
 		return &response.EventStrings{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+	}
+
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return &response.EventStrings{}, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
 
 	// Create the three strings

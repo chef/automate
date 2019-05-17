@@ -35,9 +35,9 @@ chef-button {
 }
 
 chef-button {
-  #{--background-color}: chef-hsl(var(--chef-dark-grey));
-  #{--border-color}: chef-hsl(var(--chef-dark-grey));
-  #{--color}: chef-hsl(var(--chef-white));
+  #{--background-color}: var(--chef-dark-grey);
+  #{--border-color}: var(--chef-dark-grey);
+  #{--color}: var(--chef-white);
 }
 
 chef-button {
@@ -101,27 +101,27 @@ chef-button {
 chef-button[primary] {
   #{--background-color}: palette($primary-default, 5);
   #{--border-color}: palette($primary-default, 5);
-  #{--color}: chef-hsl(var(--chef-white));
+  #{--color}: var(--chef-white);
 
   &:hover {
     #{--background-color}: palette($primary-default, 4);
     #{--border-color}: palette($primary-default, 4);
-    #{--color}: chef-hsl(var(--chef-white));
+    #{--color}: var(--chef-white);
   }
 
   &:active {
     #{--background-color}: palette($primary-default, 3);
     #{--border-color}: palette($primary-default, 3);
-    #{--color}: chef-hsl(var(--chef-white));
+    #{--color}: var(--chef-white);
   }
 
   &[disabled] {
     #{--background-color}: palette($primary-default, 9);
     #{--border-color}: palette($primary-default, 9);
-    #{--color}: chef-hsl(var(--chef-white));
+    #{--color}: var(--chef-white);
 
     chef-loading-spinner {
-      #{--fill}: chef-hsl(var(--chef-white));
+      #{--fill}: var(--chef-white);
       #{--fill-alt}: palette($primary-default, 10);
     }
   }
@@ -134,27 +134,27 @@ chef-button[primary] {
   &[caution] {
     #{--background-color}: palette($primary-caution, 5);
     #{--border-color}: palette($primary-caution, 5);
-    #{--color}: chef-hsl(var(--chef-white));
+    #{--color}: var(--chef-white);
 
     &:hover {
       #{--background-color}: palette($primary-caution, 4);
       #{--border-color}: palette($primary-caution, 4);
-      #{--color}: chef-hsl(var(--chef-white));
+      #{--color}: var(--chef-white);
     }
 
     &:active {
       #{--background-color}: palette($primary-caution, 3);
       #{--border-color}: palette($primary-caution, 3);
-      #{--color}: chef-hsl(var(--chef-white));
+      #{--color}: var(--chef-white);
     }
 
     &[disabled] {
       #{--background-color}: palette($primary-caution, 9);
       #{--border-color}: palette($primary-caution, 9);
-      #{--color}: chef-hsl(var(--chef-white));
+      #{--color}: var(--chef-white);
 
       chef-loading-spinner {
-        #{--fill}: chef-hsl(var(--chef-white));
+        #{--fill}: var(--chef-white);
         #{--fill-alt}: palette($primary-caution, 10);
       }
     }
@@ -167,7 +167,7 @@ chef-button[primary] {
 }
 
 chef-button[secondary] {
-  #{--background-color}: chef-hsl(var(--chef-white));
+  #{--background-color}: var(--chef-white);
   #{--border-color}: palette($primary-default, 5);
   #{--color}: palette($primary-default, 5);
 
@@ -184,7 +184,7 @@ chef-button[secondary] {
   }
 
   &[disabled] {
-    #{--background-color}: chef-hsl(var(--chef-white));
+    #{--background-color}: var(--chef-white);
     #{--border-color}: palette($primary-default, 9);
     #{--color}: palette($primary-default, 9);
 
@@ -200,7 +200,7 @@ chef-button[secondary] {
   }
 
   &[caution] {
-    #{--background-color}: chef-hsl(var(--chef-white));
+    #{--background-color}: var(--chef-white);
     #{--border-color}: palette($primary-caution, 5);
     #{--color}: palette($primary-caution, 5);
 
@@ -217,7 +217,7 @@ chef-button[secondary] {
     }
 
     &[disabled] {
-      #{--background-color}: chef-hsl(var(--chef-white));
+      #{--background-color}: var(--chef-white);
       #{--border-color}: palette($primary-caution, 9);
       #{--color}: palette($primary-caution, 9);
 

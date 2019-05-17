@@ -1,5 +1,5 @@
 +++
-title = "Chef Automate Scan Jobs"
+title = "Scan Jobs"
 description = "Add a new compliance scan job or modify and existing one"
 date = 2018-03-26T16:02:35-07:00
 draft = false
@@ -7,11 +7,11 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "scan_jobs"
-    weight = 10
+    parent = "compliance"
+    weight = 20
 +++
 
-## About Scan Jobs in Chef Automate
+## Overview
 
 A scan job is the equivalent of running `inspec exec` against a given set of targets.  The results of a scan job are sent to compliance reporting. Any profiles installed to the user's namespace may be used in a scan job.
 
@@ -44,7 +44,7 @@ curl -sSX POST "https://automate-url/api/v0/compliance/scanner/jobs" -d
   "type": "exec",
   "profiles": [
     "https://github.com/dev-sec/linux-baseline", # external url profile
-    "compliance://admin/linux-baseline#2.1.1"  # installed profile (see asset store)
+    "compliance://admin/linux-baseline#2.1.1"  # installed profile (see profile)
   ],
   "recurrence": "FREQ=HOURLY;INTERVAL=1",
   "nodes": ["6c0c7942-acb6-4ede-8a3a-bf8f6beee362"], # this field can be used to run a job on a specific (static) node

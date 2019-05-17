@@ -3,7 +3,7 @@ chef-side-panel {
   top: 70px;
   right: -450px;
   bottom: 0;
-  background: chef-hsl(var(--chef-lightest-grey));
+  background: var(--chef-lightest-grey);
   width: 450px;
   overflow-x: scroll;
   box-shadow: 0 0 48px 0 rgba(63, 83, 100 , 0.2);

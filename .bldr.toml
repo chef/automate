@@ -625,6 +625,7 @@ paths = [
   "components/automate-grpc/*",
   "components/compliance-service/*",
   "components/event-service/*",
+  "components/nodemanager-service/*",
   "lib/authz/*",
   "lib/config/*",
   "lib/event/*",

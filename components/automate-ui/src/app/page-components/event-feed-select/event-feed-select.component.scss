@@ -4,11 +4,14 @@
   margin: 10px;
   line-height: 1;
   box-shadow: 0 0 20px rgba($gray-light, .20);
+
+  ::ng-deep .selected-value {
+    padding-top: 17px;
+  }
 }
 
 .event-type-name {
   font-size: 12px;
-  margin-bottom: 2px;
   font-weight: bold;
 }
 
@@ -16,6 +19,7 @@
   display: none;
   color: inherit;
   font-size: 9px;
+  margin-top: 2px;
 }
 
 chef-option .event-type-count {

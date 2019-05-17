@@ -67,17 +67,17 @@
 .event-type {
   display: inline-block;
   vertical-align: middle;
-  width: 125px;
-  font-size: .675em;
-  font-weight: bold;
+  width: 150px;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .event-description {
   display: inline-block;
   vertical-align: middle;
-  font-size: .675em;
+  font-size: 12px;
   line-height: 12pt;
-  max-width: calc(100% - 185px);
+  max-width: calc(100% - 210px);
 
   b {
     font-size: .975em;
@@ -123,7 +123,7 @@ chef-side-panel {
 
   & > .event-icon {
     position: absolute;
-    top: 23px;
+    top: 16px;
     left: 40px;
   }
 

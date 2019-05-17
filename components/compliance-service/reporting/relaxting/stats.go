@@ -50,6 +50,7 @@ func (backend ES2Backend) GetStatsSummary(filters map[string][]string) (*stats.R
 	return depth.getStatsSummaryResult(searchResult), nil
 }
 
+//GetStatsSummaryNodes - Gets summary stats, node centric, aggregate data for the given set of filters
 func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*stats.NodeSummary, error) {
 	myName := "GetStatsSummaryNodes"
 	depth, err := backend.NewDepth(filters, false, true)
@@ -88,6 +89,7 @@ func (backend ES2Backend) GetStatsSummaryNodes(filters map[string][]string) (*st
 	return depth.getStatsSummaryNodesResult(searchResult), nil
 }
 
+//GetStatsSummaryControls - Gets summary stats, control centric, aggregate data for the given set of filters
 func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (*stats.ControlsSummary, error) {
 	myName := "GetStatsSummaryControls"
 
@@ -127,6 +129,7 @@ func (backend ES2Backend) GetStatsSummaryControls(filters map[string][]string) (
 	return depth.getStatsSummaryControlsResult(searchResult), nil
 }
 
+//GetStatsFailures - Gets top failures, aggregate data for the given set of filters
 func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filters map[string][]string) (*stats.Failures, error) {
 	myName := "GetStatsFailures"
 	var failures *stats.Failures
@@ -222,17 +225,17 @@ func (backend ES2Backend) GetProfileListWithAggregatedComplianceSummaries(
 	return depth.getProfileListWithAggregatedComplianceSummariesResults(searchResult, filters), nil
 }
 
-//GetControlListStatsByProfileId returns the control list for a given profile or profile and a child control
+//GetControlListStatsByProfileID returns the control list for a given profile or profile and a child control
 // the data retrieved from this appears at the bottom of the a2 page when you select a profile from list
-func (backend ES2Backend) GetControlListStatsByProfileId(profileId string, from int, size int,
+func (backend ES2Backend) GetControlListStatsByProfileID(profileID string, from int, size int,
 	filters map[string][]string, sortField string, sortAsc bool) ([]*stats.ControlStats, error) {
-	myName := "GetControlListStatsByProfileId"
+	myName := "GetControlListStatsByProfileID"
 
 	//deep filtering uses the filter contents to determine which Depth will be retrieved from the factory
-	// in the case of this func, we may not have the profileId in the filters. We will add it now if not,
+	// in the case of this func, we may not have the profileID in the filters. We will add it now if not,
 	// which will allow the abstract factory to do the right thing.
-	// There should only be one profileId in the filters and it must be identical to the profileId being passed in.
-	filters["profile_id"] = []string{profileId}
+	// There should only be one profileID in the filters and it must be identical to the profileID being passed in.
+	filters["profile_id"] = []string{profileID}
 
 	depth, err := backend.NewDepth(filters, false, true)
 	if err != nil {
@@ -267,5 +270,5 @@ func (backend ES2Backend) GetControlListStatsByProfileId(profileId string, from 
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
-	return depth.getControlListStatsByProfileIdResults(&backend, searchResult, profileId)
+	return depth.getControlListStatsByProfileIdResults(&backend, searchResult, profileID)
 }

@@ -1,6 +1,6 @@
 describe('create a manual node ssh scan job and cleanup after', () => {
   before(() => {
-    cy.login('/')
+    cy.adminLogin('/')
   })
   beforeEach(() => {
     // cypress clears local storage between tests
@@ -60,8 +60,12 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   it('can create a node and attach a credential', () => {
     // navigate to node create page:
     // click on scan jobs
-    cy.get('.nav-link').contains('Scan Jobs').click()
-    cy.url().should('include', '/compliance/scanner/jobs')
+    cy.get('.nav-link').contains('Compliance').click()
+    cy.url().should('include', '/compliance/reports/overview')
+
+    // click into scan jobs
+    cy.get('chef-sidebar-entry').contains('Scan Jobs').click()
+    cy.url().should('include', '/compliance/scan-jobs/jobs')
 
     // we save the route that will be called when we navigate to the page
     // in order to be able to wait for it later
@@ -69,14 +73,14 @@ describe('create a manual node ssh scan job and cleanup after', () => {
 
     // click on nodes tab
     cy.get('.nav-tab').contains('Nodes added').click().then(() => {
-      cy.url().should('include', '/compliance/scanner/nodes')
+      cy.url().should('include', '/compliance/scan-jobs/nodes')
 
       // wait for data to return
       cy.wait('@getNodes')
 
       // click on add node button to open create form
       cy.contains('Add Nodes').parent().invoke('show').click().then(() => {
-        cy.url().should('include', '/compliance/scanner/nodes/add')
+        cy.url().should('include', '/compliance/scan-jobs/nodes/add')
 
         // fill in hostname and select a credential for the node
         cy.get('form input[formcontrolname="hosts"]').type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_HOST'))
@@ -91,7 +95,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
         // save the node
         cy.get('chef-button').contains('Add 1 Node(s)').click().then(() => {
 
-          cy.url().should('include', '/compliance/scanner/nodes')
+          cy.url().should('include', '/compliance/scan-jobs/nodes')
 
           // wait for data to return
           cy.wait('@createNode')
@@ -109,8 +113,9 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.route('POST', '/api/v0/compliance/profiles/search').as('getProfiles')
 
     // navigate to asset store
-    cy.get('.nav-link').contains('Asset Store').click()
-    cy.url().should('include', '/profiles')
+    cy.get('.nav-link').contains('Compliance').click()
+    cy.get('chef-sidebar-entry').contains('Profiles').click()
+    cy.url().should('include', '/compliance/profiles')
 
     // wait for data to return
     cy.wait('@getProfiles')
@@ -133,8 +138,9 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   it('can create a scan job with a reccurence schedule', () => {
     // navigate to scan create page:
     // click on scan jobs
-    cy.get('.nav-link').contains('Scan Jobs').click()
-    cy.url().should('include', '/compliance/scanner/jobs')
+    cy.get('.nav-link').contains('Compliance').click()
+    cy.get('chef-sidebar-entry').contains('Scan Jobs').click()
+    cy.url().should('include', '/compliance/scan-jobs/jobs')
 
     // we save the route that will be called when we navigate to the next page
     // in order to be able to wait for it later
@@ -168,7 +174,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
 
             // click save
             cy.contains('Save').click().then(() => {
-              cy.url().should('include', '/compliance/scanner/jobs')
+              cy.url().should('include', '/compliance/scan-jobs/jobs')
 
               // assert table has scan job
               cy.contains(jobName).should('exist')
@@ -210,8 +216,9 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   it('can delete the created node', () => {
     // navigate to node create page:
     // click on scan jobs
-    cy.get('.nav-link').contains('Scan Jobs').click()
-    cy.url().should('include', '/compliance/scanner/jobs')
+    cy.get('.nav-link').contains('Compliance').click()
+    cy.get('chef-sidebar-entry').contains('Scan Jobs').click()
+    cy.url().should('include', '/compliance/scan-jobs/jobs')
 
     // we save the route that will be called when we navigate to the page
     // in order to be able to wait for it later
@@ -219,7 +226,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
 
     // click on nodes tab
     cy.get('.nav-tab').contains('Nodes added').click().then(() => {
-      cy.url().should('include', '/compliance/scanner/nodes')
+      cy.url().should('include', '/compliance/scan-jobs/nodes')
 
       // wait for data to return
       cy.wait('@getNodes')
@@ -231,8 +238,9 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   })
   it('can delete the created profile', () => {
     // navigate to asset store
-    cy.get('.nav-link').contains('Asset Store').click()
-    cy.url().should('include', '/profiles')
+    cy.get('.nav-link').contains('Compliance').click()
+    cy.get('chef-sidebar-entry').contains('Profiles').click()
+    cy.url().should('include', '/compliance/profiles')
 
     // delete profile
     cy.contains('CIS Amazon Linux 2 Benchmark Level 1')
@@ -255,8 +263,9 @@ describe('create a manual node ssh scan job and cleanup after', () => {
 
     // navigate to scan create page:
     // click on scan jobs
-    cy.get('.nav-link').contains('Scan Jobs').click()
-    cy.url().should('include', '/compliance/scanner/jobs')
+    cy.get('.nav-link').contains('Compliance').click()
+    cy.get('chef-sidebar-entry').contains('Scan Jobs').click()
+    cy.url().should('include', '/compliance/scan-jobs/jobs')
 
     // delete scan job
     cy.contains(jobName)
@@ -275,7 +284,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.wait('@deleteScanJob')
 
     // ensure that the job is deleted
-    cy.url().should('include', '/compliance/scanner/jobs')
+    cy.url().should('include', '/compliance/scan-jobs/jobs')
     cy.get('chef-tbody').should(($b) => {
       expect($b).not.to.contain(jobName)
     })

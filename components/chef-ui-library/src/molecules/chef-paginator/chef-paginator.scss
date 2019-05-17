@@ -8,27 +8,27 @@ chef-paginator {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: chef-hsl(var(--chef-primary-bright));
+    background-color: var(--chef-primary-bright);
     padding: 0.5em;
     box-shadow: 0 0 48px 0 rgba(63, 83, 100, 0.2);
     border-radius: 0px 0px 0px 4px;
   }
 
   .text {
-    color: chef-hsl(var(--chef-white));
+    color: var(--chef-white);
     font-size: small;
     padding: 0.5em;
   }
 
   .controls {
     display: flex;
-    color: chef-hsl(var(--chef-white));
+    color: var(--chef-white);
     padding: 0.5em;
     align-items: center;
 
     a {
       text-decoration: none;
-      color: chef-hsl(var(--chef-white));
+      color: var(--chef-white);
     }
 
     .left {
@@ -52,13 +52,13 @@ chef-paginator {
       display: inline-block;
       box-sizing: content-box;
       text-decoration: none;
-      color: chef-hsl(var(--chef-white));
+      color: var(--chef-white);
       font-size: small;
       font-weight: bold;
       border-radius: 50%;
       border-width: 1px;
       border-style: dotted;
-      border-color: chef-hsl(var(--chef-primary-bright));
+      border-color: var(--chef-primary-bright);
       min-width: 2em;
       height: 2em;
       line-height: 2em;
@@ -66,14 +66,14 @@ chef-paginator {
     }
 
     & .active {
-      color: chef-hsl(var(--chef-primary-bright));
-      border-color: chef-hsl(var(--chef-white));
+      color: var(--chef-primary-bright);
+      border-color: var(--chef-white);
       border-style: solid;
-      background-color: chef-hsl(var(--chef-white));
+      background-color: var(--chef-white);
     }
 
     & a:hover, a:focus {
-      border-color: chef-hsl(var(--chef-white));
+      border-color: var(--chef-white);
     }
   }
 }

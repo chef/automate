@@ -250,6 +250,16 @@ func init() {
     }
   },
   "definitions": {
+    "LastContactDataStatus": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "PASSED",
+        "FAILED",
+        "SKIPPED"
+      ],
+      "default": "UNKNOWN"
+    },
     "QueryOrderType": {
       "type": "string",
       "enum": [
@@ -317,6 +327,24 @@ func init() {
         }
       }
     },
+    "v1LastContactData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/LastContactDataStatus"
+        },
+        "penultimate_status": {
+          "$ref": "#/definitions/LastContactDataStatus"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v1Node": {
       "type": "object",
       "properties": {
@@ -374,6 +402,12 @@ func init() {
           "items": {
             "type": "string"
           }
+        },
+        "run_data": {
+          "$ref": "#/definitions/v1LastContactData"
+        },
+        "scan_data": {
+          "$ref": "#/definitions/v1LastContactData"
         }
       }
     },

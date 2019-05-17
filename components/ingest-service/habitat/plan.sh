@@ -9,6 +9,7 @@ pkg_binds=(
   [automate-es-gateway]="http-port http-host"
   [authz-service]="port"
   [event-service]="port"
+  [nodemanager-service]="port"
 )
 pkg_binds_optional=(
   [es-sidecar-service]="port"

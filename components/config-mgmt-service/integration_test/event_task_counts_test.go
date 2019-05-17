@@ -6,11 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/response"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -162,6 +164,555 @@ func TestEventTaskCountsCountOnlyFilteredChefServers(t *testing.T) {
 
 	// Run all the cases!
 	runTaskCases(t, cases)
+}
+
+func TestEventTaskCountsProjectFilter(t *testing.T) {
+	cases := []struct {
+		description string
+		actions     []iBackend.InternalChefAction
+		ctx         context.Context
+		expected    *response.EventCounts
+	}{
+		{
+			description: "No Actions with requesting projects",
+			actions:     []iBackend.InternalChefAction{},
+			ctx:         contextWithProjects([]string{"project9"}),
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "One Action with a project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with a project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{"project9"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+					{
+						Name:  "delete",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with only one's project matching requested projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{"project3"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project9"}),
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action project not matching request projects",
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+			},
+			ctx: contextWithProjects([]string{"project3"}),
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "One Action has one project; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Three Actions; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{"project12"},
+				},
+				{
+					Task:     "update",
+					Projects: []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 3,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+					{
+						Name:  "delete",
+						Count: 1,
+					},
+					{
+						Name:  "update",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has no projects; request all projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has no projects; request unassigned projects allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has a project; request only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "Two Actions have and don't have projects; request only unassigned projects",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "delete",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has a project; request unassigned and matching project allowed",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID, "project9"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action has no projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions have and don't have projects; request has no projects",
+			ctx:         contextWithProjects([]string{}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "delete",
+						Count: 1,
+					},
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action with one project matching one of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two actions with one project matching different one of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project9", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{"project3"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "delete",
+						Count: 1,
+					},
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action with one project not matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "Two Actions with neither project not matching any of several requested projects allowed",
+			ctx:         contextWithProjects([]string{"project3", "project4", "project7", "project6"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project9"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{"project10"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total:  0,
+				Counts: []*response.EventCount{},
+			},
+		},
+		{
+			description: "Action with several projects where one matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with several projects where one matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{"project12", "project10", "project11", "project3"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "delete",
+						Count: 1,
+					},
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with several projects where only one action's project matches a single requested project allowed",
+			ctx:         contextWithProjects([]string{"project3"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{"project12", "project10", "project11", "project13"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action with several projects where one matches one of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Two Actions with several projects where one matches one of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+				{
+					Task:     "delete",
+					Projects: []string{"project13", "project14", "project17", "project16"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 2,
+				Counts: []*response.EventCount{
+					{
+						Name:  "delete",
+						Count: 1,
+					},
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+		{
+			description: "Action with several projects where none matches several requested project allowed",
+			ctx:         contextWithProjects([]string{"project14", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project3", "project4", "project7", "project6"},
+				},
+			},
+			expected: &response.EventCounts{},
+		},
+		{
+			description: "Action with several projects where two matches two of several requested project allowed",
+			ctx:         contextWithProjects([]string{"project3", "project10", "project12", "project13"}),
+			actions: []iBackend.InternalChefAction{
+				{
+					Task:     "create",
+					Projects: []string{"project3", "project10", "project7", "project6"},
+				},
+			},
+			expected: &response.EventCounts{
+				Total: 1,
+				Counts: []*response.EventCount{
+					{
+						Name:  "create",
+						Count: 1,
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description), func(t *testing.T) {
+			for index := range test.actions {
+				test.actions[index].RecordedAt = time.Now()
+				test.actions[index].Id = newUUID()
+			}
+
+			suite.IngestActions(test.actions)
+			defer suite.DeleteAllDocuments()
+
+			res, err := cfgmgmt.GetEventTaskCounts(test.ctx, &request.EventCountsFilter{})
+			assert.NoError(t, err)
+
+			// test response
+			assert.Equal(t, test.expected.Total, res.Total)
+			assert.ElementsMatch(t, test.expected.Counts, res.Counts)
+		})
+	}
+}
+
+func findEventCountByName(eventName string,
+	eventCounts []*response.EventCount) (*response.EventCount, error) {
+	for _, eventCount := range eventCounts {
+		if eventCount.Name == eventName {
+			return eventCount, nil
+		}
+	}
+
+	return nil, errors.New(fmt.Sprintf("EventCount %q was not found", eventName))
 }
 
 func runTaskCases(t *testing.T, cases []testCase) {
