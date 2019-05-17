@@ -26,7 +26,7 @@ export class ScannerComponent implements OnInit {
       .pipe(map(jobsList => jobsList.total));
     this.jobsCountLoading = false;
     this.jobsCountLoaded = true;
-    
+
     this.nodesCount$ = this.store.select(selectors.nodeTotals)
       .pipe(map(nodeTotals => nodeTotals.all));
     this.nodesCountLoading = false;

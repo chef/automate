@@ -59,7 +59,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
 
   // notification data
   downloadErrorVisible = false;
-  
+
   // show spinner befor loading data
   userProfileDataLoading = true;
   userProfileDataLoaded = false;
