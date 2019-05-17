@@ -1,4 +1,4 @@
-package workflow
+package postgres
 
 import (
 	"context"
@@ -7,8 +7,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/workflow/backend"
 	"github.com/lib/pq"
-	_ "github.com/lib/pq"
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database/postgres"
 	"github.com/mattes/migrate/source"
@@ -47,149 +48,9 @@ const (
         `
 )
 
-type WorkflowEventType string
-
-const (
-	WorkflowStart  WorkflowEventType = "start"
-	TaskComplete   WorkflowEventType = "task_complete"
-	Cancel         WorkflowEventType = "cancel"
-	TasksAbandoned WorkflowEventType = "tasks_abandoned"
-)
-
-type TaskStatusType string
-
-const (
-	taskStatusSuccess TaskStatusType = "success"
-	taskStatusFailed  TaskStatusType = "failed"
-)
-
-type WorkflowInstanceStatus string
-
-const (
-	WorkflowInstanceStatusRunning   WorkflowInstanceStatus = "running"
-	WorkflowInstanceStatusAbandoned WorkflowInstanceStatus = "abandoned"
-)
-
-type WorkflowInstance struct {
-	InstanceName string
-	WorkflowName string
-	Status       WorkflowInstanceStatus
-	Parameters   []byte
-	Payload      []byte
-}
-
-type WorkflowEvent struct {
-	InstanceID         int64
-	Instance           WorkflowInstance
-	Type               WorkflowEventType
-	EnqueuedTaskCount  int
-	CompletedTaskCount int
-
-	TaskResult *TaskResult
-}
-
-type Task struct {
-	Name               string
-	WorkflowInstanceID int64
-	Parameters         []byte
-}
-
-func (t *Task) GetParameters(obj interface{}) error {
-	if t.Parameters != nil {
-		return json.Unmarshal(t.Parameters, obj)
-	}
-	return nil
-}
-
-type enqueueOptions struct {
-	TryRemaining int
-	StartAfter   time.Time
-}
-
-func WithRetries(numRetries int) EnqueueOpts {
-	return func(o *enqueueOptions) {
-		o.TryRemaining = numRetries + 1
-	}
-}
-
-func StartAfter(startAfter time.Time) EnqueueOpts {
-	return func(o *enqueueOptions) {
-		o.StartAfter = startAfter
-	}
-}
-
-type EnqueueOpts func(*enqueueOptions)
-
-type TaskCompleter interface {
-	Fail(err string) error
-	Succeed(result interface{}) error
-}
-
-type WorkflowCompleter interface {
-	EnqueueTask(task *Task, opts ...EnqueueOpts) error
-
-	Continue(payload interface{}) error
-	Abandon() error
-	Done() error
-	Close() error
-}
-
-type RecurringWorkflowCompleter interface {
-	EnqueueRecurringWorkflow(s *Schedule, workflowInstanceName string, nextDueAt time.Time, lastStartedAt time.Time) error
-	Close()
-}
-
-type TaskResult struct {
-	taskName   string
-	parameters []byte
-
-	status    TaskStatusType
-	errorText string
-	result    []byte
-}
-
-func (r *TaskResult) Err() error {
-	if r.status == taskStatusFailed {
-		return errors.New(r.errorText)
-	}
-	return nil
-}
-
-func (r *TaskResult) Get(obj interface{}) error {
-	if r.result != nil {
-		return json.Unmarshal(r.result, obj)
-	}
-	return nil
-}
-
-func (r *TaskResult) GetParameters(obj interface{}) error {
-	if r.parameters != nil {
-		return json.Unmarshal(r.parameters, obj)
-	}
-	return nil
-}
-
-type Backend interface {
-	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstance) error
-	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
-
-	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
-
-	CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string, parameters interface{}, enabled bool, recurrence string, nextRunAt time.Time) error
-	GetDueRecurringWorkflow(ctx context.Context) (*Schedule, RecurringWorkflowCompleter, error)
-	UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts ...WorkflowScheduleUpdateOpts) error
-	UpdateWorkflowScheduleByName(ctx context.Context, scheduleName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error
-
-	GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string) ([]byte, error)
-	GetScheduledWorkflowRecurrence(ctx context.Context, scheduleName string, workflowName string) (string, error)
-
-	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
-
-	Init() error
-}
-
 type PostgresBackend struct {
-	db *sql.DB
+	connURI string
+	db      *sql.DB
 }
 
 type PostgresTaskCompleter struct {
@@ -231,24 +92,25 @@ type PostgresRecurringWorkflowCompleter struct {
 	cancel context.CancelFunc
 }
 
-var _ Backend = &PostgresBackend{}
-var _ TaskCompleter = &PostgresTaskCompleter{}
-var _ RecurringWorkflowCompleter = &PostgresRecurringWorkflowCompleter{}
+var _ backend.Driver = &PostgresBackend{}
+var _ backend.TaskCompleter = &PostgresTaskCompleter{}
+var _ backend.RecurringWorkflowCompleter = &PostgresRecurringWorkflowCompleter{}
 
-func NewPostgresBackend(connInfo string) (*PostgresBackend, error) {
-	db, err := sql.Open("postgres", connInfo)
-	if err != nil {
-		return nil, err
-	}
-
+func NewPostgresBackend(connURI string) *PostgresBackend {
 	return &PostgresBackend{
-		db: db,
-	}, nil
+		connURI: connURI,
+	}
 }
 
 func (pg *PostgresBackend) Init() error {
+	db, err := sql.Open("postgres", pg.connURI)
+	if err != nil {
+		return err
+	}
+	pg.db = db
+
 	var dbName string
-	err := pg.db.QueryRow("SELECT CURRENT_DATABASE()").Scan(&dbName)
+	err = pg.db.QueryRow("SELECT CURRENT_DATABASE()").Scan(&dbName)
 	if err != nil {
 		return errors.Wrap(err, "could not get database name")
 	}
@@ -281,14 +143,6 @@ func (pg *PostgresBackend) Init() error {
 	return nil
 }
 
-var (
-	ErrNoTasks                = errors.New("no tasks in queue")
-	ErrNoWorkflowInstances    = errors.New("no workflow instances in queue")
-	ErrWorkflowScheduleExists = errors.New("workflow schedule already exists")
-	ErrWorkflowInstanceExists = errors.New("workflow instance already exists")
-	ErrNoDueWorkflows         = errors.New("No due workflows")
-)
-
 func (pg *PostgresBackend) GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string) ([]byte, error) {
 	row := pg.db.QueryRowContext(ctx, "SELECT parameters FROM recurring_workflow_schedules WHERE name = $1 and workflow_name = $2",
 		scheduleName, workflowName)
@@ -315,7 +169,7 @@ func (pg *PostgresBackend) GetScheduledWorkflowRecurrence(ctx context.Context, s
 	return data, nil
 }
 
-func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
+func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
 	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
 	defer cancel()
 
@@ -326,9 +180,9 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*Schedu
 
 	defer rows.Close() // nolint: errcheck
 
-	schedules := make([]*Schedule, 0)
+	schedules := make([]*backend.Schedule, 0)
 	for rows.Next() {
-		var scheduledWorkflow Schedule
+		var scheduledWorkflow backend.Schedule
 		err := rows.Scan(
 			&scheduledWorkflow.ID,
 			&scheduledWorkflow.Enabled,
@@ -348,7 +202,7 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*Schedu
 	return schedules, nil
 }
 
-func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*Schedule, RecurringWorkflowCompleter, error) {
+func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*backend.Schedule, backend.RecurringWorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx) // nolint: govet
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -359,7 +213,7 @@ func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*Schedu
 
 	row := tx.QueryRowContext(ctx, getDueRecurringWorkflowQuery)
 
-	var scheduledWorkflow Schedule
+	var scheduledWorkflow backend.Schedule
 	err = row.Scan(
 		&scheduledWorkflow.ID,
 		&scheduledWorkflow.Enabled,
@@ -372,7 +226,7 @@ func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*Schedu
 	if err != nil {
 		cancel()
 		if err == sql.ErrNoRows {
-			return nil, nil, ErrNoDueWorkflows
+			return nil, nil, workflow.ErrNoDueWorkflows
 		}
 		return nil, nil, errors.Wrap(err, "error fetching due workflows")
 	}
@@ -388,15 +242,7 @@ func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*Schedu
 }
 
 func (pg *PostgresBackend) UpdateWorkflowScheduleByName(
-	ctx context.Context, scheduleName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error {
-
-	o := workflowScheduleUpdateOpts{}
-	for _, opt := range opts {
-		err := opt(&o)
-		if err != nil {
-			return err
-		}
-	}
+	ctx context.Context, scheduleName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -416,7 +262,7 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByName(
 		return err
 	}
 
-	err = pg.updateWorkflowScheduleByID(tx, id, &o)
+	err = pg.updateWorkflowScheduleByID(tx, id, &opts)
 	if err != nil {
 		return err
 	}
@@ -427,15 +273,7 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByName(
 	return nil
 }
 
-func (pg *PostgresBackend) UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts ...WorkflowScheduleUpdateOpts) error {
-	o := workflowScheduleUpdateOpts{}
-	for _, opt := range opts {
-		err := opt(&o)
-		if err != nil {
-			return err
-		}
-	}
-
+func (pg *PostgresBackend) UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts backend.WorkflowScheduleUpdateOpts) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -453,7 +291,7 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByID(ctx context.Context, id in
 		return err
 	}
 
-	err = pg.updateWorkflowScheduleByID(tx, id, &o)
+	err = pg.updateWorkflowScheduleByID(tx, id, &opts)
 	if err != nil {
 		return err
 	}
@@ -464,24 +302,24 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByID(ctx context.Context, id in
 	return nil
 }
 
-func (pg *PostgresBackend) updateWorkflowScheduleByID(tx *sql.Tx, id int64, o *workflowScheduleUpdateOpts) error {
-	if o.updateEnabled {
-		_, err := tx.Exec("SELECT update_recurring_workflow_enabled($1, $2)", id, o.enabled)
+func (pg *PostgresBackend) updateWorkflowScheduleByID(tx *sql.Tx, id int64, o *backend.WorkflowScheduleUpdateOpts) error {
+	if o.UpdateEnabled {
+		_, err := tx.Exec("SELECT update_recurring_workflow_enabled($1, $2)", id, o.Enabled)
 		if err != nil {
 			return err
 		}
 	}
 
-	if o.updateParameters {
-		_, err := tx.Exec("SELECT update_recurring_workflow_parameters($1, $2)", id, o.parameters)
+	if o.UpdateParameters {
+		_, err := tx.Exec("SELECT update_recurring_workflow_parameters($1, $2)", id, o.Parameters)
 		if err != nil {
 			return err
 		}
 	}
 
-	if o.updateRecurrence {
+	if o.UpdateRecurrence {
 		_, err := tx.Exec("SELECT update_recurring_workflow_recurrence($1, $2, $3)",
-			id, o.recurrence, o.nextRunAt)
+			id, o.Recurrence, o.NextRunAt)
 		if err != nil {
 			return err
 		}
@@ -497,7 +335,7 @@ func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleN
 		if pqErr, ok := err.(*pq.Error); ok {
 			// unique violation
 			if pqErr.Code == "23505" {
-				return ErrWorkflowScheduleExists
+				return workflow.ErrWorkflowScheduleExists
 			}
 		}
 
@@ -526,12 +364,12 @@ VALUES ($1, $2, $3, $4, $5, $6)`,
 	return wrapErr(tx.Commit(), "failed to commit workflow schedule update")
 }
 
-func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *WorkflowInstance) error {
+func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.WorkflowInstance) error {
 	wrapErr := func(err error, msg string) error {
 		if pqErr, ok := err.(*pq.Error); ok {
 			// unique violation
 			if pqErr.Code == "23505" {
-				return ErrWorkflowInstanceExists
+				return workflow.ErrWorkflowInstanceExists
 			}
 		}
 
@@ -554,12 +392,12 @@ func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *WorkflowInsta
 		return wrapErr(err, "failed to commit enqueue workflow")
 	}
 	if count.Int64 == 0 {
-		return ErrWorkflowInstanceExists
+		return workflow.ErrNoDueWorkflows
 	}
 	return nil
 }
 
-func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error) {
+func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*backend.WorkflowEvent, backend.WorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -575,7 +413,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	}
 	// TODO: allow multiple workflow names
 	row := tx.QueryRowContext(ctx, dequeueWorkflowQuery, pq.Array(workflowNames))
-	event := &WorkflowEvent{}
+	event := &backend.WorkflowEvent{}
 	workc := &PostgresWorkflowCompleter{
 		ctx:             ctx,
 		enqueueTaskStmt: stmt,
@@ -599,7 +437,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	if err == sql.ErrNoRows {
 		tx.Commit() // nolint: errcheck
 		cancel()
-		return nil, nil, ErrNoWorkflowInstances
+		return nil, nil, workflow.ErrNoWorkflowInstances
 
 	} else if err != nil {
 		cancel()
@@ -608,12 +446,12 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 
 	event.InstanceID = workc.wid
 
-	if event.Type == TaskComplete {
+	if event.Type == backend.TaskComplete {
 		event.CompletedTaskCount++
 		row := tx.QueryRowContext(ctx, getTaskResultQuery, taskResultID)
-		tr := TaskResult{}
+		tr := backend.TaskResult{}
 		err = row.Scan(
-			&tr.taskName, &tr.parameters, &tr.status, &tr.errorText, &tr.result)
+			&tr.TaskName, &tr.Parameters, &tr.Status, &tr.ErrorText, &tr.Result)
 		if err != nil {
 			cancel()
 			// FIXME FIXME FIXME
@@ -629,11 +467,16 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	return event, workc, nil
 }
 
-func (workc *PostgresWorkflowCompleter) EnqueueTask(task *Task, opts ...EnqueueOpts) error {
-	o := mergeEnqueueOpts(opts)
+func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnqueueOpts) error {
+	if opts.TryRemaining <= 0 {
+		opts.TryRemaining = 1
+	}
+	if opts.StartAfter.IsZero() {
+		opts.StartAfter = time.Now()
+	}
 
 	_, err := workc.enqueueTaskStmt.ExecContext(workc.ctx,
-		task.WorkflowInstanceID, o.TryRemaining, o.StartAfter, task.Name, task.Parameters)
+		task.WorkflowInstanceID, opts.TryRemaining, opts.StartAfter, task.Name, task.Parameters)
 	if err != nil {
 		return errors.Wrap(err, "failed to enqueue task")
 	}
@@ -642,7 +485,7 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *Task, opts ...EnqueueO
 	return nil
 }
 
-func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error) {
+func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -652,7 +495,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*T
 	}
 
 	row := tx.QueryRowContext(ctx, dequeueTaskQuery, taskName)
-	task := &Task{
+	task := &backend.Task{
 		Name: taskName,
 	}
 	taskc := &PostgresTaskCompleter{
@@ -668,7 +511,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*T
 			logrus.WithError(err).Warn("failed to commit dequeue_task transaction after ErrNoRows")
 		}
 		cancel()
-		return nil, nil, ErrNoTasks
+		return nil, nil, workflow.ErrNoTasks
 
 	} else if err != nil {
 		cancel()
@@ -708,7 +551,7 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 	defer taskc.cancel()
 
 	return taskc.useTx(func(tx *sql.Tx) error {
-		_, err := tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskStatusFailed, errMsg, "")
+		_, err := tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusFailed, errMsg, "")
 		if err != nil {
 			return errors.Wrapf(err, "failed to mark task %d as failed", taskc.tid)
 		}
@@ -729,7 +572,7 @@ func (taskc *PostgresTaskCompleter) Succeed(results interface{}) error {
 	}
 
 	return taskc.useTx(func(tx *sql.Tx) error {
-		_, err = tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskStatusSuccess, "", jsonResults)
+		_, err = tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusSuccess, "", jsonResults)
 		if err != nil {
 			return errors.Wrapf(err, "failed to mark task %d as successful", taskc.tid)
 		}
@@ -786,7 +629,7 @@ func (workc *PostgresWorkflowCompleter) Close() error {
 
 // TODO(ssd) 2019-05-14: We should probably allow bulk insertion of workflows and tasks
 func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
-	s *Schedule,
+	s *backend.Schedule,
 	workflowInstanceName string,
 	nextDueAt time.Time,
 	lastStartedAt time.Time,
@@ -796,7 +639,7 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
 		if pqErr, ok := err.(*pq.Error); ok {
 			// unique violation
 			if pqErr.Code == "23505" {
-				return ErrWorkflowInstanceExists
+				return workflow.ErrWorkflowInstanceExists
 			}
 		}
 
@@ -821,7 +664,7 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
 		if err != nil {
 			return errors.Wrap(err, "failed to commit workflow instance")
 		}
-		return ErrWorkflowInstanceExists
+		return workflow.ErrWorkflowInstanceExists
 	} else {
 		_, err = c.tx.ExecContext(c.ctx, updateRecurringWorkflowQuery, s.ID, nextDueAt, lastStartedAt)
 		if err != nil {
@@ -841,15 +684,4 @@ func jsonify(data interface{}) ([]byte, error) {
 		return nil, nil
 	}
 	return json.Marshal(data)
-}
-
-func mergeEnqueueOpts(opts []EnqueueOpts) enqueueOptions {
-	o := enqueueOptions{
-		TryRemaining: 1,
-		StartAfter:   time.Now(),
-	}
-	for _, f := range opts {
-		f(&o)
-	}
-	return o
 }
