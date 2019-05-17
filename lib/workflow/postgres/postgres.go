@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"sync"
 	"time"
 
@@ -329,7 +328,7 @@ func (pg *PostgresBackend) updateWorkflowScheduleByID(tx *sql.Tx, id int64, o *b
 
 // TODO(ssd) 2019-05-13: We need to decide on what "update" will look like
 func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string,
-	parameters interface{}, enabled bool, recurrence string, nextRunAt time.Time) error {
+	parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error {
 
 	wrapErr := func(err error, msg string) error {
 		if pqErr, ok := err.(*pq.Error); ok {
@@ -349,14 +348,10 @@ func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleN
 		return wrapErr(err, "failed to begin create workflow schedule transaction")
 	}
 
-	js, err := jsonify(parameters)
-	if err != nil {
-		return wrapErr(err, "failed to convert parameters to JSON")
-	}
 	_, err = pg.db.ExecContext(context.TODO(), `
 INSERT INTO recurring_workflow_schedules(name, workflow_name, parameters, recurrence, enabled, next_run_at)
 VALUES ($1, $2, $3, $4, $5, $6)`,
-		scheduleName, workflowName, js, recurrence, enabled, nextRunAt)
+		scheduleName, workflowName, parameters, recurrence, enabled, nextRunAt)
 	if err != nil {
 		return wrapErr(err, "could not update workflow schedule")
 	}
@@ -561,18 +556,11 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 }
 
 // TODO(ssd) 2019-05-10: Should this and Fail also take a context from the caller? If so, we'll need to
-func (taskc *PostgresTaskCompleter) Succeed(results interface{}) error {
+func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 	defer taskc.cancel()
 
-	jsonResults, err := jsonify(results)
-	if err != nil {
-		// NOTE(ssd) 2019-05-08: This kills the transacation,
-		// do we want that?
-		return errors.Wrap(err, "could not convert results to JSON")
-	}
-
 	return taskc.useTx(func(tx *sql.Tx) error {
-		_, err = tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusSuccess, "", jsonResults)
+		_, err := tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusSuccess, "", results)
 		if err != nil {
 			return errors.Wrapf(err, "failed to mark task %d as successful", taskc.tid)
 		}
@@ -593,16 +581,12 @@ func (workc *PostgresWorkflowCompleter) Done() error {
 	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow %d as complete", workc.wid)
 }
 
-func (workc *PostgresWorkflowCompleter) Continue(payload interface{}) error {
+func (workc *PostgresWorkflowCompleter) Continue(payload []byte) error {
 	ctx := workc.ctx
 	defer workc.cancel()
 
-	jsonPayload, err := jsonify(payload)
-	if err != nil {
-		return errors.Wrap(err, "could not convert payload to JSON")
-	}
-	_, err = workc.tx.ExecContext(ctx, continueWorkflowQuery, workc.wid, workc.eid,
-		jsonPayload, workc.enqueuedTaskCount, workc.completedTaskCount)
+	_, err := workc.tx.ExecContext(ctx, continueWorkflowQuery, workc.wid, workc.eid,
+		payload, workc.enqueuedTaskCount, workc.completedTaskCount)
 	if err != nil {
 		return errors.Wrapf(err, "failed to mark workflow event %d as processed", workc.eid)
 	}
@@ -677,11 +661,4 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
 
 func (c *PostgresRecurringWorkflowCompleter) Close() {
 	c.cancel()
-}
-
-func jsonify(data interface{}) ([]byte, error) {
-	if data == nil {
-		return nil, nil
-	}
-	return json.Marshal(data)
 }
