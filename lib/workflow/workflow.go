@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -348,6 +350,8 @@ func (m *WorkflowManager) run(ctx context.Context) {
 }
 
 func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []string) bool {
+	s := newStatsInfo()
+	s.Begin("dequeue")
 	wevt, completer, err := m.backend.DequeueWorkflow(ctx, workflowNames)
 	if err != nil {
 		if err != ErrNoWorkflowInstances {
@@ -355,6 +359,7 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 		}
 		return true
 	}
+	s.End("dequeue")
 	defer completer.Close() // nolint: errcheck
 
 	logrus.WithFields(logrus.Fields{
@@ -391,6 +396,7 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 
 		return false
 	}
+	s.Begin("user")
 	executor, ok := m.workflowExecutors[wevt.Instance.WorkflowName]
 	if !ok {
 		logrus.Errorf("No workflow executor for %s", wevt.Instance.WorkflowName)
@@ -411,8 +417,10 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 	default:
 		panic("WTF")
 	}
+	s.End("user")
 
 	if decision.complete {
+		s.Begin("complete")
 		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
 			logrus.WithFields(logrus.Fields{
 				"enqueued":  wevt.EnqueuedTaskCount,
@@ -431,7 +439,9 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 				logrus.WithError(err).Error("failed to complete workflow")
 			}
 		}
+		s.End("complete")
 	} else if decision.continuing {
+		s.Begin("enqueue_task")
 		for _, t := range decision.tasks {
 			err := completer.EnqueueTask(&t)
 			if err != nil {
@@ -443,10 +453,67 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 			}
 
 		}
+		s.End("enqueue_task")
+		s.Begin("continue")
 		err := completer.Continue(decision.payload)
 		if err != nil {
 			logrus.WithError(err).Error("failed to continue workflow")
 		}
+		s.End("continue")
 	}
+	logrus.Debugf("Processed Workflow: %s", s)
+
 	return false
+}
+
+// TODO(ssd) 2019-05-17: Replace me with prometheus
+func newStatsInfo() *statsInfo {
+	return &statsInfo{
+		start:  make(map[string]time.Time),
+		totals: make(map[string]time.Duration),
+	}
+}
+
+type statsInfo struct {
+	start  map[string]time.Time
+	totals map[string]time.Duration
+}
+
+func (s *statsInfo) Begin(label string) {
+	_, ok := s.start[label]
+	if ok {
+		logrus.Warn("statsInfo.Begin on currently running label, ignoring")
+		return
+	}
+
+	s.start[label] = time.Now()
+}
+
+func (s *statsInfo) End(label string) {
+	start, ok := s.start[label]
+	if !ok {
+		logrus.Warn("statsInfo.End on label with no start, ignoring")
+		return
+	}
+
+	delete(s.start, label)
+	t, ok := s.totals[label]
+	if ok {
+		s.totals[label] = t + time.Since(start)
+	} else {
+		s.totals[label] = time.Since(start)
+	}
+}
+
+func (s *statsInfo) String() string {
+	keys := make([]string, 0, len(s.totals))
+	for k := range s.totals {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	str := &strings.Builder{}
+	for _, label := range keys {
+		fmt.Fprintf(str, "%s: %f ms; ", label, s.totals[label].Seconds()*1000)
+	}
+	return str.String()
 }
