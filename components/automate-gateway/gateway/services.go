@@ -653,7 +653,10 @@ func (s *Server) authRequest(r *http.Request,
 		return errors.New("no policy subject detected in headers or verified certificates")
 	}
 
-	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2)
+	projectHeaderEntries := md.Get(runtime.MetadataPrefix + "projects")
+	projects := getProjectsFromMetadata(projectHeaderEntries)
+
+	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2, projects)
 	if err != nil {
 		return errors.Wrap(err, "authz-service error")
 	}
@@ -662,10 +665,21 @@ func (s *Server) authRequest(r *http.Request,
 	return authzResp.Err()
 }
 
-func logError(err error, resource, action string) {
-	log.WithFields(log.Fields{
-		"error":    err,
-		"resource": resource,
-		"action":   action,
-	}).Error("error authorizing request")
+// XXX needs headers, doesn't it?
+func getProjectsFromMetadata(projectHeaderEntries []string) []string {
+	if projectHeaderEntries == nil {
+		projectHeaderEntries = []string{}
+	}
+	projects := []string{}
+	keys := make(map[string]bool)
+	for _, entry := range projectHeaderEntries {
+		for _, project := range strings.Split(entry, ",") {
+			newProject := strings.TrimSpace(project)
+			if _, value := keys[newProject]; !value {
+				keys[newProject] = true
+				projects = append(projects, newProject)
+			}
+		}
+	}
+	return projects
 }

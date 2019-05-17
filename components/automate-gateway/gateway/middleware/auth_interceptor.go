@@ -42,7 +42,7 @@ type SwitchingAuthorizationHandler interface {
 	GRPCAuthorizationHandler
 	SwitchingFilterHandler
 	IsAuthorized(ctx context.Context, subjects []string,
-		resourceV1, actionV1, resourceV2, actionV2 string) (AnnotatedAuthorizationResponse, error)
+		resourceV1, actionV1, resourceV2, actionV2 string, projects []string) (AnnotatedAuthorizationResponse, error)
 }
 
 type SwitchingFilterHandler interface {
@@ -75,7 +75,7 @@ type GRPCAuthorizationHandler interface {
 }
 
 type HTTPAuthorizationHandler interface {
-	IsAuthorized(ctx context.Context, subjects []string, resource, action string) (AuthorizationResponse, error)
+	IsAuthorized(ctx context.Context, subjects []string, resource, action string, projects []string) (AuthorizationResponse, error)
 }
 
 type IntrospectionHandler interface {
@@ -90,10 +90,12 @@ type AuthorizationHandler interface {
 }
 
 type AuthorizationResponse interface {
+	Ctx() context.Context
 	GetAuthorized() bool
 }
 
 type AnnotatedAuthorizationResponse interface {
+	AuthorizationResponse
 	Err() error
 }
 
