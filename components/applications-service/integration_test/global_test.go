@@ -22,9 +22,66 @@ var (
 	// For now we will use only one application called 'app'
 	a = "app"
 	e = "test-env"
+	s = "us"
+	c = "stable"
 )
 
+// func type to override the HealthCheckEvent message
 type MessageOverrides func(*habitat.HealthCheckEvent) error
+
+// TestMain allow us to run a setup before running our tests and also
+// teardown everything after we have finished testing.
+//
+// (Check out 'suite_test.go')
+//
+// => Docs: https://golang.org/pkg/testing/#hdr-Main
+func TestMain(m *testing.M) {
+	// Global Setup hook: Here is where you can initialize anythings you need
+	// for your tests to run
+	suite.GlobalSetup()
+
+	// Execute the test suite and record the exit code
+	exitCode := m.Run()
+
+	// Teardown hook: It says it all
+	suite.GlobalTeardown()
+
+	// call with result of m.Run()
+	os.Exit(exitCode)
+}
+
+// A default habitat event
+func DefaultHabitatEvent() *habitat.HealthCheckEvent {
+	return &habitat.HealthCheckEvent{
+		EventMetadata: &habitat.EventMetadata{
+			Application: a,
+			Environment: e,
+			Site:        s,
+		},
+		ServiceMetadata: &habitat.ServiceMetadata{
+			UpdateConfig: &habitat.UpdateConfig{
+				Strategy: habitat.UpdateStrategy_AtOnce,
+				Channel:  c,
+			},
+		},
+		Result: habitat.HealthCheck_Ok,
+	}
+}
+
+// Creates a new HealthCheckEvent message with the provided overrides
+func NewHabitatEvent(overrides ...MessageOverrides) *habitat.HealthCheckEvent {
+	// Using the default event to be overwritten
+	event := DefaultHabitatEvent()
+
+	for _, f := range overrides {
+		err := f(event)
+		if err != nil {
+			fmt.Printf("Error trying to create habitat event message: %s\n", err)
+		}
+	}
+
+	return event
+}
 
 func withSupervisorId(id string) MessageOverrides {
 	return func(msg *habitat.HealthCheckEvent) error {
@@ -85,29 +142,6 @@ func withStrategyAtOnce(channel string) MessageOverrides {
 	}
 }
 
-func NewHabitatEvent(overrides ...MessageOverrides) *habitat.HealthCheckEvent {
-	// Our default event that will be overwritten
-	event := &habitat.HealthCheckEvent{
-		EventMetadata: &habitat.EventMetadata{Application: a, Environment: e, Site: "test"},
-		ServiceMetadata: &habitat.ServiceMetadata{
-			UpdateConfig: &habitat.UpdateConfig{
-				Strategy: habitat.UpdateStrategy_AtOnce,
-				Channel:  "stable",
-			},
-		},
-		Result: habitat.HealthCheck_Ok,
-	}
-
-	for _, f := range overrides {
-		err := f(event)
-		if err != nil {
-			fmt.Printf("Error trying to create habitat event message: %s\n", err)
-		}
-	}
-
-	return event
-}
-
 // HealthCheckStringToInt32 converts a health check string to the respective int32 in proto land
 func HealthCheckStringToInt32(health string) int32 {
 	switch health {
@@ -122,27 +156,6 @@ func HealthCheckStringToInt32(health string) int32 {
 	default:
 		return int32(4)
 	}
-}
-
-// TestMain allow us to run a setup before running our tests and also
-// teardown everything after we have finished testing.
-//
-// (Check out 'suite_test.go')
-//
-// => Docs: https://golang.org/pkg/testing/#hdr-Main
-func TestMain(m *testing.M) {
-	// Global Setup hook: Here is where you can initialize anythings you need
-	// for your tests to run
-	suite.GlobalSetup()
-
-	// Execute the test suite and record the exit code
-	exitCode := m.Run()
-
-	// Teardown hook: It says it all
-	suite.GlobalTeardown()
-
-	// call with result of m.Run()
-	os.Exit(exitCode)
 }
 
 // assertServiceGroupsEqual verifies that the two provided ServiceGroup Array are equal

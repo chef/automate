@@ -104,8 +104,8 @@ func TestGetServicesMultiService(t *testing.T) {
 					Release:      "core/postgres/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_CRITICAL,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup2",
@@ -113,8 +113,8 @@ func TestGetServicesMultiService(t *testing.T) {
 					Release:      "core/test/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "test-1.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup3",
@@ -122,8 +122,8 @@ func TestGetServicesMultiService(t *testing.T) {
 					Release:      "core/temp/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "temp.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup1",
@@ -131,8 +131,8 @@ func TestGetServicesMultiService(t *testing.T) {
 					Release:      "core/myapp/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_WARNING,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup1",
@@ -140,8 +140,8 @@ func TestGetServicesMultiService(t *testing.T) {
 					Release:      "core/redis/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup4",
@@ -149,8 +149,8 @@ func TestGetServicesMultiService(t *testing.T) {
 					Release:      "core/test/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "test-2.example.com",
+					Channel: c, Site: s,
 				},
 			},
 		}
@@ -183,8 +183,8 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Release:      "core/redis/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup4",
@@ -192,8 +192,8 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Release:      "core/test/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "test-2.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup1",
@@ -201,8 +201,8 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Release:      "core/myapp/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_WARNING,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup2",
@@ -210,8 +210,8 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Release:      "core/test/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "test-1.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup3",
@@ -219,8 +219,8 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Release:      "core/temp/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "temp.example.com",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup1",
@@ -228,8 +228,8 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Release:      "core/postgres/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_CRITICAL,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
+					Channel: c, Site: s,
 				},
 			},
 		}
@@ -260,8 +260,8 @@ func TestGetServicesMultiServicaPagination(t *testing.T) {
 					Release:      "core/test/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "test-1.example.com",
+					Channel: c, Site: s,
 				},
 			},
 		}
@@ -320,8 +320,8 @@ func TestGetServicesMultiServicaPaginationAndSorting(t *testing.T) {
 					Release:      "core/redis/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
+					Channel: c, Site: s,
 				},
 			},
 		}
@@ -354,8 +354,8 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 						Release:      "core/myapp/0.1.0/20190101121212",
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_WARNING,
-						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
+						Channel: c, Site: s,
 					},
 				},
 			}
@@ -387,8 +387,8 @@ func TestGetServicesMultiServiceWithHealthFilter(t *testing.T) {
 						Release:      "core/myapp/0.1.0/20190101121212",
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_WARNING,
-						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
+						Channel: c, Site: s,
 					},
 				},
 			}
@@ -424,8 +424,8 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 						Release:      "core/temp/0.1.0/20190101121212",
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_UNKNOWN,
-						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Application:  a, Environment: e, Fqdn: "temp.example.com",
+						Channel: c, Site: s,
 					},
 				},
 			}
@@ -497,6 +497,7 @@ func habServicesMatrixAllHealthStatusDifferent() []*habitat.HealthCheckEvent {
 			withServiceGroup("redis.default"),
 			withPackageIdent("core/redis/0.1.0/20190101121212"),
 			withHealth("OK"),
+			withFqdn("myapp-us.example.com"),
 		}...),
 
 		// service_group 2 <-> With a Health Status = 'WARNING'
@@ -505,6 +506,7 @@ func habServicesMatrixAllHealthStatusDifferent() []*habitat.HealthCheckEvent {
 			withServiceGroup("myapp.default"),
 			withPackageIdent("core/myapp/0.1.0/20190101121212"),
 			withHealth("WARNING"),
+			withFqdn("myapp-us.example.com"),
 		}...),
 
 		// service_group 3 <-> With a Health Status = 'CRITICAL'
@@ -513,6 +515,7 @@ func habServicesMatrixAllHealthStatusDifferent() []*habitat.HealthCheckEvent {
 			withServiceGroup("postgres.default"),
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
 			withHealth("CRITICAL"),
+			withFqdn("myapp-us.example.com"),
 		}...),
 
 		// service_group 4 <-> With a Health Status = 'UNKNOWN'
@@ -521,17 +524,20 @@ func habServicesMatrixAllHealthStatusDifferent() []*habitat.HealthCheckEvent {
 			withServiceGroup("test.default"),
 			withPackageIdent("core/test/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
+			withFqdn("test-1.example.com"),
 		}...),
 		NewHabitatEvent([]MessageOverrides{
 			withSupervisorId("sup3"),
 			withServiceGroup("temp.default"),
 			withPackageIdent("core/temp/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
+			withFqdn("temp.example.com"),
 		}...),
 		NewHabitatEvent([]MessageOverrides{
 			withSupervisorId("sup4"),
 			withServiceGroup("test.default"),
 			withPackageIdent("core/test/0.1.0/20190101121212"),
+			withFqdn("test-2.example.com"),
 		}...),
 	}
 }
