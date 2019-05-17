@@ -1011,6 +1011,9 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	var ruleDbID string
 	var projectID string
 	if err := row.Scan(&ruleDbID, &projectID); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, storage_errors.ErrNotFound
+		}
 		return nil, p.processError(err)
 	}
 
@@ -1101,6 +1104,9 @@ func (p *pg) GetRule(ctx context.Context, id string) (*v2.Rule, error) {
 	)
 	err = row.Scan(&rule)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, storage_errors.ErrNotFound
+		}
 		return nil, p.processError(err)
 	}
 

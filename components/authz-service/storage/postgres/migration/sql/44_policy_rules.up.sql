@@ -1,24 +1,19 @@
 BEGIN;
 
-CREATE TYPE iam_rule_type AS ENUM ('node', 'event');
-CREATE TYPE iam_attributes AS ENUM ('organization', 'chef-server',
-  'environment', 'role', 'chef-tag', 'policy-name', 'policy-group');
-CREATE TYPE iam_condition_operator AS ENUM ('member-of');
-
 CREATE TABLE iam_project_rules (
   db_id SERIAL PRIMARY KEY,
   id TEXT NOT NULL UNIQUE,
   project_id TEXT REFERENCES iam_projects ON DELETE CASCADE,
   name TEXT NOT NULL,
-  type iam_rule_type NOT NULL
+  type TEXT NOT NULL
 );
 
 CREATE TABLE iam_rule_conditions (
   db_id SERIAL PRIMARY KEY,
   rule_db_id INTEGER REFERENCES iam_project_rules ON DELETE CASCADE,
   value TEXT[] NOT NULL,
-  attribute iam_attributes NOT NULL,
-  operator iam_condition_operator NOT NULL
+  attribute TEXT NOT NULL,
+  operator TEXT NOT NULL
 );
 
 CREATE OR REPLACE FUNCTION
@@ -47,8 +42,8 @@ CREATE OR REPLACE FUNCTION
       json_agg(rc) AS conditions
     FROM iam_project_rules AS r
     LEFT OUTER JOIN iam_rule_conditions
-    AS rc ON rc.rule_db_id=r.db_id WHERE id=_rule_db_id
-    AND projects_match_for_rule(project_id, _project_filter)
+    AS rc ON rc.rule_db_id=r.db_id
+    WHERE id=_rule_db_id AND projects_match_for_rule(project_id, _project_filter)
     GROUP BY r.id, r.project_id, r.name, r.type
   )
   SELECT row_to_json(t) AS rule FROM t;
@@ -69,8 +64,8 @@ CREATE OR REPLACE FUNCTION
       -- about null case here.
       json_agg(rc) AS conditions
     FROM iam_project_rules AS r
-    LEFT OUTER JOIN iam_rule_conditions
-    AS rc ON rc.rule_db_id=r.db_id
+    LEFT OUTER JOIN iam_rule_conditions AS rc
+    ON rc.rule_db_id=r.db_id
     WHERE projects_match_for_rule(project_id, _project_filter)
     GROUP BY r.id, r.project_id, r.name, r.type
   )
