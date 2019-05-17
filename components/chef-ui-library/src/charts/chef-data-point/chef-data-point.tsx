@@ -13,10 +13,10 @@ import { Component, Event, EventEmitter, Prop } from '@stencil/core';
  *     color: var(--chef-primary);
  *   }
  *   chef-radial-chart .success, chef-radial-chart .major {
- *     color: var(--chef-success);
+ *     color: var(--chef-ok);
  *   }
  *   chef-radial-chart .skipped, chef-radial-chart .minor {
- *     color: var(--chef-grey);
+ *     color: var(--chef-unknown);
  *   }
  * </style>
  * <chef-radial-chart style="width: 220px; height: 220px;">

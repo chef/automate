@@ -28,13 +28,13 @@ let UID = 0;
  *     color: var(--chef-critical);
  *   }
  *   chef-radial-chart .warning, chef-radial-chart .warning {
- *     color: var(--chef-primary);
+ *     color: var(--chef-warning);
  *   }
  *   chef-radial-chart .success, chef-radial-chart .major {
- *     color: var(--chef-success);
+ *     color: var(--chef-ok);
  *   }
  *   chef-radial-chart .skipped, chef-radial-chart .minor {
- *     color: var(--chef-grey);
+ *     color: var(--chef-unknown);
  *   }
  * </style>
  * <chef-radial-chart style="width: 220px; height: 220px;">
@@ -57,13 +57,13 @@ let UID = 0;
  *     color: var(--chef-critical);
  *   }
  *   chef-radial-chart .warning, chef-radial-chart .warning {
- *     color: var(--chef-primary);
+ *     color: var(--chef-warning);
  *   }
  *   chef-radial-chart .success, chef-radial-chart .major {
- *     color: var(--chef-success);
+ *     color: var(--chef-ok);
  *   }
  *   chef-radial-chart .skipped, chef-radial-chart .minor {
- *     color: var(--chef-grey);
+ *     color: var(--chef-unknown);
  *   }
  * </style>
  * <chef-radial-chart style="width: 220px; height: 220px;">

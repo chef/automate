@@ -23,6 +23,9 @@
   --haze: #F3F6F8;
   --white: #FFFFFF;
   --black: #000000;
+  --atomic-tangerine: #FF9654;
+  --blue-de-france: #3DA5FF;
+  --gray: #B7BCBC;
 
   /* ** THESE SEMANTIC COLOR VARIABLES ARE FREE TO BE USED WITHIN AUTOMATE ** */
   /* primary */
@@ -32,6 +35,7 @@
   --chef-primary-light: var(--malibu);
   /* secondary */
   --chef-critical: var(--pink);
+  --chef-warning: var(--atomic-tangerine);
   --chef-major: var(--violet);
   --chef-minor: var(--indigo);
   --chef-success: var(--science-blue);
@@ -42,6 +46,9 @@
   --chef-lightest-grey: var(--haze);
   --chef-white: var(--white);
   --chef-black: var(--black);
+  /* charts */
+  --chef-ok: var(--blue-de-france);
+  --chef-unknown: var(--gray);
 
   /* misc */
   --chef-border-radius: 4px;
