@@ -184,7 +184,7 @@ func getProjectsFromMetadata(projectHeaderEntries []string) []string {
 	for _, entry := range projectHeaderEntries {
 		for _, project := range strings.Split(entry, ",") {
 			newProject := strings.TrimSpace(project)
-			if _, value := keys[newProject]; !value {
+			if !keys[newProject] {
 				keys[newProject] = true
 				projects = append(projects, newProject)
 			}
