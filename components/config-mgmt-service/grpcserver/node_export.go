@@ -72,7 +72,7 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 		return err
 	}
 
-	return s.exportNodes(context.Background(), request, exporter)
+	return s.exportNodes(stream.Context(), request, exporter)
 }
 
 func getExportHandler(outputType string, stream service.CfgMgmt_NodeExportServer) (exportHandler, error) {
@@ -97,6 +97,11 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 	nodeFilters, err := params.FormatNodeFilters(request.Filter)
 	if err != nil {
 		return status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	nodeFilters, err = filterByProjects(ctx, nodeFilters)
+	if err != nil {
+		return err
 	}
 
 	// Adding the exists = true filter to the list of filters, because nodes
