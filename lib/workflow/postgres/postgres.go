@@ -29,9 +29,14 @@ const (
 	abandonWorkflowQuery  = `SELECT abandon_workflow($1, $2, $3)`
 
 	listRecurringWorkflowsQuery = `
-	SELECT id, enabled, name, workflow_name, parameters, recurrence, next_run_at
-	FROM recurring_workflow_schedules
-	`
+		WITH res AS 
+			(SELECT DISTINCT ON (name, workflow_name) * from workflow_results 
+			ORDER BY name, workflow_name, end_at DESC) 
+		SELECT s.id, enabled, s.name, s.workflow_name, s.parameters, recurrence, 
+			next_run_at, start_at last_start, end_at last_end 
+			FROM recurring_workflow_schedules s LEFT JOIN res 
+			ON s.name = res.name AND s.workflow_name = res.workflow_name;
+		`
 	getDueRecurringWorkflowQuery = `
         SELECT id, enabled, name, workflow_name, parameters, recurrence
         FROM recurring_workflow_schedules
@@ -190,11 +195,11 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 			&scheduledWorkflow.Parameters,
 			&scheduledWorkflow.Recurrence,
 			&scheduledWorkflow.NextDueAt,
+			&scheduledWorkflow.LastStart,
+			&scheduledWorkflow.LastEnd,
 		)
 		if err != nil {
-			logrus.WithError(err).Error("could not scan workflow schedule from database, skipping")
-			// TODO(ssd) 2019-05-13: Should we return here?
-			continue
+			return nil, errors.Wrap(err, "could not read workflow schedules")
 		}
 		schedules = append(schedules, &scheduledWorkflow)
 	}

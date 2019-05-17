@@ -2,7 +2,6 @@ package workflow
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/chef/automate/lib/workflow/backend"
@@ -64,7 +63,7 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	}
 	defer completer.Close()
 
-	workflowInstanceName := fmt.Sprintf("%s/%s/%d", s.WorkflowName, s.Name, s.ID)
+	workflowInstanceName := s.Name
 
 	// TODO(ssd) 2019-05-13: We might need two different
 	// rule types here to suppor the different use cases.

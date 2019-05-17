@@ -115,6 +115,8 @@ type Schedule struct {
 	Parameters   []byte
 	Recurrence   string
 	NextDueAt    time.Time
+	LastStart    *time.Time
+	LastEnd      *time.Time
 }
 
 type WorkflowScheduleUpdateOpts struct {
