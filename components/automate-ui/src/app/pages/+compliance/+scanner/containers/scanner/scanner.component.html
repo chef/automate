@@ -9,10 +9,12 @@
 
     <ul class="nav-tabs">
       <li class="nav-tab" routerLink="/compliance/scan-jobs/jobs" routerLinkActive="active">
-        {{jobsCount$ | async | number}} Scan jobs
+        <img *ngIf="jobsCountLoading" src="assets/img/dataloader.gif" class="scanner-spinner" alt="show before loading profile" />
+        <span *ngIf="jobsCountLoaded">{{jobsCount$ | async | number}}</span> Scan jobs 
       </li>
       <li class="nav-tab" routerLink="/compliance/scan-jobs/nodes" routerLinkActive="active">
-        {{nodesCount$ | async | number}} Nodes added
+        <img *ngIf="nodesCountLoading" src="assets/img/dataloader.gif" class="scanner-spinner" alt="show before loading profile" />
+        <span *ngIf="nodesCountLoaded">{{nodesCount$ | async | number}}</span> Nodes added
       </li>
     </ul>
 

@@ -59,6 +59,12 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
 
   // notification data
   downloadErrorVisible = false;
+  
+  // show spinner befor loading data
+  userProfileDataLoading = true;
+  userProfileDataLoaded = false;
+  availableProfileDataLoading = true;
+  availableProfileDataLoaded = false;
 
   // Tabs
   selectedTab: 'installed' | 'available' = 'installed';
@@ -111,6 +117,8 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
         this.installedProfiles = profiles;
         this.filteredProfiles = profiles;
         this.profilesEmpty = this.installedProfiles.length === 0 ? true : false;
+        this.userProfileDataLoading = false;
+        this.userProfileDataLoaded = true;
         return profiles;
       }),
       catchError(resp => {
@@ -135,6 +143,8 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
         this.availableListLoading = false;
         this.availableProfiles = availableProfiles;
         this.filteredAvailableProfiles = availableProfiles;
+        this.availableProfileDataLoading = false;
+        this.availableProfileDataLoaded = true;
         return availableProfiles;
       }),
       catchError(resp => {

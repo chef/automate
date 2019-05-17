@@ -24,8 +24,14 @@
       </div>
 
       <chef-tab-selector class="profiles-tabs" [value]="selectedTab" (change)="onTabChange($event)">
-        <chef-option value='installed'>{{ filteredProfiles.length }} Profiles</chef-option>
-        <chef-option value='available'>{{ filteredAvailableProfiles.length }} Available</chef-option>
+        <chef-option value='installed'>
+          <img *ngIf="userProfileDataLoading" src="assets/img/dataloader.gif" class="profiles-spinner" alt="show before loading profile" />
+          <span *ngIf="userProfileDataLoaded">{{ filteredProfiles.length }}</span> Profiles
+        </chef-option>
+        <chef-option value='available'>
+          <img *ngIf="availableProfileDataLoading" src="assets/img/dataloader.gif" class="profiles-spinner" alt="show before loading profile" />
+          <span *ngIf="availableProfileDataLoaded">{{ filteredAvailableProfiles.length }}</span> Available
+        </chef-option>
       </chef-tab-selector>
     </chef-page-header>
 
