@@ -52,6 +52,11 @@
 
   /* misc */
   --chef-border-radius: 4px;
-  --chef-box-shadow: 0 0 12px 0 var(--chef-dark-grey);
+  --chef-box-shadow: 0 0 12px 0 rgba(110, 119, 119, 0.2);
+
+  /* based on chef-primary-dark 0.4 opacity. */
+  --chef-modal-bg-color: rgba(34, 36, 53, 0.4);
+    /* based on chef-gray 0.65 opacity. */
+  --chef-loading-bg-color: rgba(224, 228, 230, 0.65);
 }
 

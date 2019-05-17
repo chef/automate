@@ -2,8 +2,8 @@ chef-toggle {
   #{--default-active-color}: var(--chef-white);
   #{--default-active-background-color}: var(--chef-primary-bright);
 
-  #{--active-color}: var(--toggle-active-color), var(--default-active-color);
-  #{--active-background-color}: var(--toggle-active-background-color), var(--default-active-background-color);
+  #{--active-color}: var(--toggle-active-color, var(--default-active-color));
+  #{--active-background-color}: var(--toggle-active-background-color, var(--default-active-background-color));
 
   display: inline-flex;
   background-color: var(--chef-white);

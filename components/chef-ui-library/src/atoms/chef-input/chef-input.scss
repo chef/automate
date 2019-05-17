@@ -8,7 +8,7 @@ chef-input {
   display: inline-block;
 
   &.focused {
-    border-color: var(--focus-border-color), var(--default-focus-border);
+    border-color: var(--focus-border-color, var(--default-focus-border));
   }
 
   input {
