@@ -66,8 +66,12 @@ func TestGetServicesBySGSortParameterError(t *testing.T) {
 }
 
 func TestGetServicesBySGSingleService(t *testing.T) {
-	mockHabService := NewHabServiceMsg("sup1234", a, e, "default", "core",
-		"postgres", "0.1.0", "20190101121212", "OK", "stable", "test")
+	mockHabService := NewHabitatEvent(
+		withSupervisorId("sup1234"),
+		withServiceGroup("postgres.default"),
+		withPackageIdent("core/postgres/0.1.0/20190101121212"),
+		withFqdn("db.example.com"),
+	)
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
 
@@ -89,8 +93,8 @@ func TestGetServicesBySGSingleService(t *testing.T) {
 						Release:      "core/postgres/0.1.0/20190101121212",
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_OK,
-						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Application:  a, Environment: e, Fqdn: "db.example.com",
+						Channel: c, Site: s,
 					},
 				},
 				ServicesHealthCounts: &applications.HealthCounts{Total: 1, Ok: 1},
@@ -132,7 +136,7 @@ func TestGetServicesBySGWithPaginationParameter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_WARNING,
 						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 				},
 				ServicesHealthCounts: &applications.HealthCounts{Total: 3, Warning: 1, Ok: 2},
@@ -163,7 +167,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup2",
@@ -172,7 +176,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup3",
@@ -181,7 +185,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: c, Site: s,
 				},
 			},
 		},
@@ -196,7 +200,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_CRITICAL,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup2",
@@ -205,7 +209,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup1",
@@ -214,7 +218,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: c, Site: s,
 				},
 			},
 		},
@@ -229,7 +233,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup2",
@@ -238,7 +242,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: c, Site: s,
 				},
 				{
 					SupervisorId: "sup3",
@@ -247,7 +251,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "",
-					Channel: "stable", Site: "test",
+					Channel: c, Site: s,
 				},
 			},
 		},
@@ -309,7 +313,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_OK,
 						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 					{
 						SupervisorId: "sup3",
@@ -318,7 +322,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_OK,
 						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 				},
 			},
@@ -333,7 +337,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_OK,
 						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 				},
 			},
@@ -347,7 +351,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:      applications.ServiceStatus_RUNNING,
 						HealthCheck: applications.HealthStatus_OK,
 						Application: a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 					{
 						Group:       "redis.default",
@@ -355,7 +359,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:      applications.ServiceStatus_RUNNING,
 						HealthCheck: applications.HealthStatus_OK,
 						Application: a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 					{
 						Group:       "redis.default",
@@ -363,7 +367,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:      applications.ServiceStatus_RUNNING,
 						HealthCheck: applications.HealthStatus_OK,
 						Application: a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 				},
 			},
@@ -391,7 +395,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_CRITICAL,
 						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 				},
 			},
@@ -419,7 +423,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_WARNING,
 						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 				},
 			},
@@ -457,7 +461,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_UNKNOWN,
 						Application:  a, Environment: e, Fqdn: "",
-						Channel: "stable", Site: "test",
+						Channel: c, Site: s,
 					},
 				},
 			},

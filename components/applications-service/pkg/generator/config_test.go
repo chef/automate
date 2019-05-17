@@ -7,7 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
+	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -44,23 +45,27 @@ func TestDefaultProfileIsViable(t *testing.T) {
 
 	expectedRelease := now.Format("20060102150405")
 
-	expected := &applications.HabService{
-		SupervisorId: uuid,
-		Group:        "default",
-		Application:  "example-app",
-		Environment:  "qa",
-		Fqdn:         "00000000-0000-0000-0000-000000000000.example",
-		PkgIdent: &applications.PackageIdent{
-			Origin:  "example",
-			Name:    "service-1",
-			Version: "0.1.0",
-			Release: expectedRelease,
+	expected := &habitat.HealthCheckEvent{
+		EventMetadata: &habitat.EventMetadata{
+			SupervisorId: uuid,
+			Application:  "example-app",
+			Environment:  "qa",
+			Fqdn:         "00000000-0000-0000-0000-000000000000.example",
+			Site:         "test",
 		},
-		Site:    "test",
-		Channel: "stable",
+		ServiceMetadata: &habitat.ServiceMetadata{
+			ServiceGroup: "service-1.default",
+			PackageIdent: "example/service-1/0.1.0/" + expectedRelease,
+			UpdateConfig: &habitat.UpdateConfig{
+				Strategy: habitat.UpdateStrategy_AtOnce,
+				Channel:  "stable",
+			},
+		},
+		Result:    habitat.HealthCheckResult_Warning,
+		Execution: &duration.Duration{},
 	}
 
-	assert.Equal(t, expected, msg)
+	assert.EqualValues(t, expected, msg)
 
 	// Test to make sure that the generator is filling in all of the values in
 	// the messages. Use reflection to get an object we can interrogate about the
@@ -98,11 +103,11 @@ func TestDefaultProfileIsViable(t *testing.T) {
 
 				// If the value of the field is the zero value, and it's not in our
 				// exceptions list, then we probably added a new field to
-				// applications.HabService and forgot to update the load generator code
+				// habitat.HealthCheckEvent and forgot to update the load generator code
 				// to match it.
 				assert.NotEqualf(t,
 					zeroForType, fieldValue,
-					"Field %q of the HabService message was set to the zero value for its type (%T); MessagePrototype.CreateMessage() may need to be updated", fieldName, fieldValue)
+					"Field %q of the HealthCheckEvent message was set to the zero value for its type (%T); MessagePrototype.CreateMessage() may need to be updated", fieldName, fieldValue)
 			}
 		}
 	}

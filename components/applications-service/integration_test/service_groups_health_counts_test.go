@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,8 +39,11 @@ func TestServiceGroupsHealthCountsSingleOkService(t *testing.T) {
 			Total: int32(1),
 			Ok:    int32(1),
 		}
-		mockHabService = NewHabServiceMsg("1234", "test", "test", "test",
-			"core", "redis", "0.1.0", "20190101121212", "OK", "", "")
+		mockHabService = NewHabitatEvent(
+			withSupervisorId("1234"),
+			withServiceGroup("redis.test"),
+			withPackageIdent("core/redis/0.1.0/20190101121212"),
+		)
 	)
 
 	suite.IngestService(mockHabService)
@@ -95,11 +99,27 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllOk(t *testing.T) {
 
 	// Update all services to be reported as OK
 	var (
-		updateHabServicesMatrix = []*applications.HabService{
-			NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup2", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "OK", "", ""),
+		updateHabServicesMatrix = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup1"),
+				withServiceGroup("myapp.default"),
+				withPackageIdent("core/myapp/0.1.0/20190101121212"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup4"),
+				withServiceGroup("test.default"),
+				withPackageIdent("core/test/0.1.0/20190101121212"),
+			),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
 			Total:    int32(4),
@@ -140,11 +160,30 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllWarning(t *testing.T) {
 
 	// Update all services to be reported as WARNING
 	var (
-		updateHabServicesMatrix = []*applications.HabService{
-			NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup2", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "WARNING", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "WARNING", "", ""),
+		updateHabServicesMatrix = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup1"),
+				withServiceGroup("redis.default"),
+				withPackageIdent("core/redis/0.1.0/20190101121212"),
+				withHealth("WARNING"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/0.1.0/20190101121212"),
+				withHealth("WARNING"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup4"),
+				withServiceGroup("test.default"),
+				withPackageIdent("core/test/0.1.0/20190101121212"),
+				withHealth("WARNING"),
+			),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
 			Total:    int32(4),
@@ -185,10 +224,25 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllCritical(t *testing.T) {
 
 	// Update all services to be reported as CRITICAL
 	var (
-		updateHabServicesMatrix = []*applications.HabService{
-			NewHabServiceMsg("sup2", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-			NewHabServiceMsg("sup3", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "CRITICAL", "", ""),
-			NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "CRITICAL", "", ""),
+		updateHabServicesMatrix = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("redis.default"),
+				withPackageIdent("core/redis/0.1.0/20190101121212"),
+				withHealth("CRITICAL"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("myapp.default"),
+				withPackageIdent("core/myapp/0.1.0/20190101121212"),
+				withHealth("CRITICAL"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup4"),
+				withServiceGroup("test.default"),
+				withPackageIdent("core/test/0.1.0/20190101121212"),
+				withHealth("CRITICAL"),
+			),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
 			Total:    int32(4),

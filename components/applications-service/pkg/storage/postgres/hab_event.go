@@ -1,9 +1,10 @@
 package postgres
 
 import (
+	"strings"
 	"time"
 
-	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	dblib "github.com/chef/automate/lib/db"
 	"github.com/go-gorp/gorp"
 	"github.com/pkg/errors"
@@ -17,6 +18,26 @@ const (
 	labelSuccess = "succeeded"
 	labelFailure = "failed"
 )
+
+type packageIdent struct {
+	Origin  string
+	Name    string
+	Version string
+	Release string
+}
+
+func newPackageIdentFromString(ident string) (*packageIdent, error) {
+	fields := strings.Split(ident, "/")
+	if len(fields) != 4 {
+		// package_ident should always have 4 fields: {origin}/{name}/{version}/{release}
+		return nil, errors.Errorf(
+			"malformed package_ident. (expected: 'origin/name/version/release') (actual: '%s')",
+			ident,
+		)
+	}
+
+	return &packageIdent{fields[0], fields[1], fields[2], fields[3]}, nil
+}
 
 var (
 	opsInFlight = promauto.NewGauge(prometheus.GaugeOpts{
@@ -44,29 +65,31 @@ var (
 	)
 )
 
-// IngestHabEvents process habitat events and store them into the database
-func (db *Postgres) IngestHabEvent(event *applications.HabService) error {
+func (db *Postgres) IngestHealthCheckEvent(event *habitat.HealthCheckEvent) error {
 	opsInFlight.Inc()
 	defer opsInFlight.Dec()
+
 	processingStart := time.Now()
 	timeLastEventSeen = float64(processingStart.Unix())
-	err := db.IngestHabEventWithoutMetrics(event)
-	duration := time.Since(processingStart)
 
-	var label string
-	if err == nil {
-		label = labelSuccess
-	} else {
+	var (
+		err      = db.IngestHealthCheckEventWithoutMetrics(event)
+		duration = time.Since(processingStart)
+		label    = labelSuccess
+	)
+	if err != nil {
 		label = labelFailure
 	}
 
-	ingestDurations.With(prometheus.Labels{"result": label}).Observe(duration.Seconds())
+	ingestDurations.With(prometheus.Labels{
+		"result": label,
+	}).Observe(duration.Seconds())
 
 	return err
 }
 
 // IngestHabEvents process habitat events and store them into the database
-func (db *Postgres) IngestHabEventWithoutMetrics(event *applications.HabService) error {
+func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCheckEvent) error {
 	log.WithFields(log.Fields{
 		"storage": "postgres",
 		"message": event,
@@ -76,36 +99,73 @@ func (db *Postgres) IngestHabEventWithoutMetrics(event *applications.HabService)
 	// side but in the future we need to move all this logic into an ingestion
 	// pipeline. I'll try to create functions that can be easily moved.
 
+	eventMetadata := event.GetEventMetadata()
+	if eventMetadata == nil {
+		return errors.New("missing event metadata")
+	}
+
+	svcMetadata := event.GetServiceMetadata()
+	if svcMetadata == nil {
+		return errors.New("missing service metadata")
+	}
+
+	pkgIdent, err := newPackageIdentFromString(svcMetadata.GetPackageIdent())
+	if err != nil {
+		return err
+	}
+
 	svc, exist := db.getServiceFromUniqueFields(
-		event.GetPkgIdent().GetOrigin(),
-		event.GetPkgIdent().GetName(),
-		event.GetSupervisorId(),
+		pkgIdent.Origin,
+		pkgIdent.Name,
+		eventMetadata.GetSupervisorId(),
 	)
 
 	// If the service already exists, we just do a simple update
 	if exist {
-		updateServiceFromHabEvent(event, svc)
+		svc.Version = pkgIdent.Version
+		svc.Release = pkgIdent.Release
+		// @afiune all our backend was designed for the health check to be all uppercases
+		// but habitat is actually sending case sensitive strings
+		svc.Health = strings.ToUpper(event.GetResult().String())
+		// Update Channel if the update config exist
+		if svcMetadata.GetUpdateConfig() != nil {
+			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
+		}
+
 		if _, err := db.DbMap.Update(svc); err != nil {
-			return errors.Wrap(err, "Unable to insert service")
+			return errors.Wrap(err, "unable to update service")
 		}
 		return nil
 	}
 
 	// But if the service doesn't exist, we will handle it as a new service insertion
-	return db.insertNewService(event)
+	return db.insertNewServiceFromHealthCheckEvent(
+		eventMetadata,
+		svcMetadata,
+		pkgIdent,
+		strings.ToUpper(event.GetResult().String()),
+	)
 }
 
-// insertNewService assumes the service to be inserted doesn't exist already,
+// insertNewServiceFromHealthCheckEvent assumes the service to be inserted doesn't exist already,
 // this function is wrapped with a transaction func since it could do multiple things
 // like insert a supervisor, service_group, deployment and the service itself.
-func (db *Postgres) insertNewService(event *applications.HabService) error {
+func (db *Postgres) insertNewServiceFromHealthCheckEvent(
+	eventMetadata *habitat.EventMetadata,
+	svcMetadata *habitat.ServiceMetadata,
+	pkgIdent *packageIdent,
+	health string) error {
 
+	// TODO Update me!
 	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
 
 		// 1) Deployment
-		did, exist := db.getDeploymentID(event.GetApplication(), event.GetEnvironment())
+		did, exist := db.getDeploymentID(eventMetadata.GetApplication(), eventMetadata.GetEnvironment())
 		if !exist {
-			deploy := deploymentFromHabEvent(event)
+			deploy := &deployment{
+				AppName:     eventMetadata.GetApplication(),
+				Environment: eventMetadata.GetEnvironment(),
+			}
 			if err := tx.Insert(deploy); err != nil {
 				return errors.Wrap(err, "Unable to insert deployment")
 			}
@@ -113,9 +173,12 @@ func (db *Postgres) insertNewService(event *applications.HabService) error {
 		}
 
 		// 2) Service Group
-		gid, exist := db.getServiceGroupID(event.FullServiceGroupName())
+		gid, exist := db.getServiceGroupID(svcMetadata.GetServiceGroup())
 		if !exist {
-			svcGroup := serviceGroupFromHabEvent(event, did)
+			svcGroup := &serviceGroup{
+				Name:         svcMetadata.GetServiceGroup(),
+				DeploymentID: did,
+			}
 			if err := tx.Insert(svcGroup); err != nil {
 				return errors.Wrap(err, "Unable to insert service_group")
 			}
@@ -123,9 +186,14 @@ func (db *Postgres) insertNewService(event *applications.HabService) error {
 		}
 
 		// 3) Supervisor
-		sid, exist := db.getSupervisorID(event.GetSupervisorId())
+		sid, exist := db.getSupervisorID(eventMetadata.GetSupervisorId())
 		if !exist {
-			sup := supervisorFromHabEvent(event)
+			sup := &supervisor{
+				MemberID: eventMetadata.GetSupervisorId(),
+				Fqdn:     eventMetadata.GetFqdn(),
+				Site:     eventMetadata.GetSite(),
+			}
+
 			if err := tx.Insert(sup); err != nil {
 				return errors.Wrap(err, "Unable to insert supervisor")
 			}
@@ -133,7 +201,11 @@ func (db *Postgres) insertNewService(event *applications.HabService) error {
 		}
 
 		// 4) Service
-		svc := serviceFromHabEvent(event, did, sid, gid)
+		svc := newService(pkgIdent, health, did, sid, gid)
+		if svcMetadata.GetUpdateConfig() != nil {
+			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
+		}
+
 		if err := tx.Insert(svc); err != nil {
 			return errors.Wrap(err, "Unable to insert service")
 		}
@@ -143,51 +215,16 @@ func (db *Postgres) insertNewService(event *applications.HabService) error {
 
 }
 
-func deploymentFromHabEvent(event *applications.HabService) *deployment {
-	return &deployment{
-		AppName:     event.GetApplication(),
-		Environment: event.GetEnvironment(),
-	}
-}
-
-func supervisorFromHabEvent(event *applications.HabService) *supervisor {
-	return &supervisor{
-		MemberID: event.GetSupervisorId(),
-		// TODO: figure out how habitat will provide this information
-		Fqdn: event.GetFqdn(),
-		Site: event.GetSite(),
-	}
-}
-
-func serviceGroupFromHabEvent(event *applications.HabService, did int32) *serviceGroup {
-	return &serviceGroup{
-		Name:         event.FullServiceGroupName(),
-		DeploymentID: did,
-	}
-}
-
-func updateServiceFromHabEvent(event *applications.HabService, svc *service) {
-	svc.Origin = event.GetPkgIdent().GetOrigin()
-	svc.Name = event.GetPkgIdent().GetName()
-	svc.Version = event.GetPkgIdent().GetVersion()
-	svc.Release = event.GetPkgIdent().GetRelease()
-	svc.Health = event.GetHealthCheck().String()
-	svc.Status = event.GetStatus().String()
-	svc.Channel = event.GetChannel()
-}
-
-func serviceFromHabEvent(event *applications.HabService, did, sid, gid int32) *service {
+func newService(pkgIdent *packageIdent, health string, did, sid, gid int32) *service {
 	return &service{
-		Origin:       event.GetPkgIdent().GetOrigin(),
-		Name:         event.GetPkgIdent().GetName(),
-		Version:      event.GetPkgIdent().GetVersion(),
-		Release:      event.GetPkgIdent().GetRelease(),
-		Health:       event.GetHealthCheck().String(),
-		Status:       event.GetStatus().String(),
+		Origin:       pkgIdent.Origin,
+		Name:         pkgIdent.Name,
+		Version:      pkgIdent.Version,
+		Release:      pkgIdent.Release,
+		Health:       health,
 		GroupID:      gid,
 		DeploymentID: did,
 		SupID:        sid,
-		Channel:      event.GetChannel(),
 	}
 }
 

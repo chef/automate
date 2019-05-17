@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/lib/tls/certs"
 
 	natsc "github.com/nats-io/go-nats"
@@ -39,34 +39,34 @@ type NatsClient struct {
 	certs.TLSConfig
 	conn               stan.Conn
 	retries            int
-	HabServiceEventCh  chan *applications.HabService // TODO: @afiune make a pipeline instead
+	EventsCh           chan *habitat.HealthCheckEvent // TODO: @afiune make a pipeline instead
 	InsecureSkipVerify bool
 	DisableTLS         bool
 }
 
 func NewExternalClient(url, cluster, client, durable, subject string) *NatsClient {
 	return &NatsClient{
-		natsURL:           url,
-		clusterID:         cluster,
-		clientID:          client,
-		durableID:         durable,
-		subject:           subject,
-		HabServiceEventCh: make(chan *applications.HabService), // buffered channel?
-		retries:           5,
+		natsURL:   url,
+		clusterID: cluster,
+		clientID:  client,
+		durableID: durable,
+		subject:   subject,
+		EventsCh:  make(chan *habitat.HealthCheckEvent), // buffered channel?
+		retries:   5,
 	}
 }
 
 // New creates a new client struct with some defaults
 func New(url, cluster, client, durable, subject string, tlsConfig certs.TLSConfig) *NatsClient {
 	return &NatsClient{
-		natsURL:           url,
-		clusterID:         cluster,
-		clientID:          client,
-		durableID:         durable,
-		subject:           subject,
-		HabServiceEventCh: make(chan *applications.HabService), // buffered channel?
-		retries:           5,
-		TLSConfig:         tlsConfig,
+		natsURL:   url,
+		clusterID: cluster,
+		clientID:  client,
+		durableID: durable,
+		subject:   subject,
+		EventsCh:  make(chan *habitat.HealthCheckEvent), // buffered channel?
+		retries:   5,
+		TLSConfig: tlsConfig,
 	}
 }
 
@@ -187,14 +187,14 @@ func (nc *NatsClient) ConnectAndSubscribe() error {
 
 // ConnectAndPublish will attempt to connect to the NATS Server and then
 // publish a message to the subject that the client was configured
-func (nc *NatsClient) ConnectAndPublish(msg *applications.HabService) error {
+func (nc *NatsClient) ConnectAndPublish(msg *habitat.HealthCheckEvent) error {
 
 	err := nc.Connect()
 	if err != nil {
 		return err
 	}
 
-	err = nc.PublishHabService(msg)
+	err = nc.PublishHabEvent(msg)
 	if err != nil {
 		return err
 	}

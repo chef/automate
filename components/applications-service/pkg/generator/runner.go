@@ -6,9 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	uuid "github.com/chef/automate/lib/uuid4"
+	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
@@ -218,7 +219,7 @@ func (s *SupSim) PublishAll() error {
 			"pkg_fqid":      m.PkgFQID(),
 		}).Debug("publishing messages")
 
-		err := s.nc.PublishHabService(msg)
+		err := s.nc.PublishHabEvent(msg)
 		if err != nil {
 			s.Stats.FailedPublish()
 			return err
@@ -272,23 +273,25 @@ func (m *MessagePrototype) ApplySupCfg(s SupervisorCfg) {
 	m.Site = s.Site
 }
 
-func (m *MessagePrototype) CreateMessage(uuid string) *applications.HabService {
-	return &applications.HabService{
-		SupervisorId: uuid,
-		Group:        "default",
-		HealthCheck:  applications.HealthStatus_OK,
-		Status:       applications.ServiceStatus_RUNNING,
-		Application:  m.Application,
-		Environment:  m.Environment,
-		Fqdn:         fmt.Sprintf("%s.example", uuid),
-		PkgIdent: &applications.PackageIdent{
-			Origin:  m.Origin,
-			Name:    m.PkgName,
-			Version: "0.1.0",
-			Release: m.Release,
+func (m *MessagePrototype) CreateMessage(uuid string) *habitat.HealthCheckEvent {
+	return &habitat.HealthCheckEvent{
+		ServiceMetadata: &habitat.ServiceMetadata{
+			PackageIdent: m.PkgFQID(),
+			ServiceGroup: fmt.Sprintf("%s.default", m.PkgName),
+			UpdateConfig: &habitat.UpdateConfig{
+				Strategy: habitat.UpdateStrategy_AtOnce,
+				Channel:  "stable",
+			},
 		},
-		Site:    "test",
-		Channel: "stable",
+		EventMetadata: &habitat.EventMetadata{
+			SupervisorId: uuid,
+			Application:  m.Application,
+			Environment:  m.Environment,
+			Fqdn:         fmt.Sprintf("%s.example", uuid),
+			Site:         "test",
+		},
+		Result:    habitat.HealthCheckResult_Warning,
+		Execution: &duration.Duration{},
 	}
 }
 

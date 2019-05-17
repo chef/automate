@@ -26,8 +26,11 @@ func TestStorageGetServiceGroupEmptyID(t *testing.T) {
 
 func TestStorageGetServiceGroupExist(t *testing.T) {
 	suite.IngestService(
-		NewHabServiceMsg("1q2w3e4r", a, e, "default",
-			"core", "postgres", "0.1.0", "20190101121212", "OK", "stable", "testsite"),
+		NewHabitatEvent(
+			withSupervisorId("1q2w3e4r"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+		),
 	)
 	defer suite.DeleteDataFromStorage()
 

@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,44 +22,12 @@ var (
 	// For now we will use only one application called 'app'
 	a = "app"
 	e = "test-env"
+	s = "us"
+	c = "stable"
 )
 
-// NewHabServiceMsg returns a new hab service message with the provided args
-func NewHabServiceMsg(supID, app, env, group,
-	origin, name, version, release, health, channel, site string) *applications.HabService {
-	return &applications.HabService{
-		SupervisorId: supID,
-		Application:  app,
-		Environment:  env,
-		Group:        group,
-		PkgIdent: &applications.PackageIdent{
-			Origin:  origin,
-			Name:    name,
-			Version: version,
-			Release: release,
-		},
-		Status:      applications.ServiceStatus(int32(0)), // @afiune customize it when we use this
-		HealthCheck: applications.HealthStatus(HealthCheckStringToInt32(health)),
-		Channel:     channel,
-		Site:        site,
-	}
-}
-
-// HealthCheckStringToInt32 converts a health check string to the respective int32 in proto land
-func HealthCheckStringToInt32(health string) int32 {
-	switch health {
-	case "OK", "ok":
-		return int32(0)
-	case "WARNING", "warning":
-		return int32(1)
-	case "CRITICAL", "critical":
-		return int32(2)
-	case "UNKNOWN", "unknown":
-		return int32(3)
-	default:
-		return int32(4)
-	}
-}
+// func type to override the HealthCheckEvent message
+type MessageOverrides func(*habitat.HealthCheckEvent) error
 
 // TestMain allow us to run a setup before running our tests and also
 // teardown everything after we have finished testing.
@@ -79,6 +48,128 @@ func TestMain(m *testing.M) {
 
 	// call with result of m.Run()
 	os.Exit(exitCode)
+}
+
+// A default habitat event
+func DefaultHabitatEvent() *habitat.HealthCheckEvent {
+	return &habitat.HealthCheckEvent{
+		EventMetadata: &habitat.EventMetadata{
+			Application: a,
+			Environment: e,
+			Site:        s,
+		},
+		ServiceMetadata: &habitat.ServiceMetadata{
+			UpdateConfig: &habitat.UpdateConfig{
+				Strategy: habitat.UpdateStrategy_AtOnce,
+				Channel:  c,
+			},
+		},
+		Result: habitat.HealthCheckResult_Ok,
+	}
+}
+
+// Creates a new HealthCheckEvent message with the provided overrides
+func NewHabitatEvent(overrides ...MessageOverrides) *habitat.HealthCheckEvent {
+	// Using the default event to be overwritten
+	event := DefaultHabitatEvent()
+
+	for _, f := range overrides {
+		err := f(event)
+		if err != nil {
+			fmt.Printf("Error trying to create habitat event message: %s\n", err)
+		}
+	}
+
+	return event
+}
+
+func withSupervisorId(id string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.EventMetadata.SupervisorId = id
+		return nil
+	}
+}
+
+func withFqdn(fqdn string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.EventMetadata.Fqdn = fqdn
+		return nil
+	}
+}
+
+func withPackageIdent(ident string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.ServiceMetadata.PackageIdent = ident
+		return nil
+	}
+}
+
+func withServiceGroup(group string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.ServiceMetadata.ServiceGroup = group
+		return nil
+	}
+}
+
+func withHealth(health string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.Result = habitat.HealthCheckResult(HealthCheckStringToInt32(health))
+		return nil
+	}
+}
+
+func withSite(site string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.EventMetadata.Site = site
+		return nil
+	}
+}
+
+func withoutUpdateStrategy() MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.ServiceMetadata.UpdateConfig = nil
+		return nil
+	}
+}
+
+func withStrategyAtOnce(channel string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.ServiceMetadata.UpdateConfig = &habitat.UpdateConfig{
+			Strategy: habitat.UpdateStrategy_AtOnce,
+			Channel:  channel,
+		}
+		return nil
+	}
+}
+
+func withApplication(application string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.EventMetadata.Application = application
+		return nil
+	}
+}
+
+func withEnvironment(environment string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.EventMetadata.Environment = environment
+		return nil
+	}
+}
+
+// HealthCheckStringToInt32 converts a health check string to the respective int32 in proto land
+func HealthCheckStringToInt32(health string) int32 {
+	switch health {
+	case "OK", "ok":
+		return int32(0)
+	case "WARNING", "warning":
+		return int32(1)
+	case "CRITICAL", "critical":
+		return int32(2)
+	case "UNKNOWN", "unknown":
+		return int32(3)
+	default:
+		return int32(4)
+	}
 }
 
 // assertServiceGroupsEqual verifies that the two provided ServiceGroup Array are equal
@@ -137,24 +228,70 @@ func assertServiceGroupsEqual(t *testing.T, expected, actual *applications.Servi
 //   "unknown": 1
 // }
 // TODO @afiune add more apps & envs
-func habServicesMatrix() []*applications.HabService {
-	return []*applications.HabService{
+func habServicesMatrix() []*habitat.HealthCheckEvent {
+	return []*habitat.HealthCheckEvent{
 		// service_group 1 <-> With a Health Status = 'OK'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "stable", "test"),
-		NewHabServiceMsg("sup2", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "stable", "test"),
-		NewHabServiceMsg("sup3", a, e, "default", "core", "redis", "0.1.0", "20190101121212", "OK", "stable", "test"),
+		NewHabitatEvent(
+			withSupervisorId("sup1"),
+			withServiceGroup("redis.default"),
+			withPackageIdent("core/redis/0.1.0/20190101121212"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("redis.default"),
+			withPackageIdent("core/redis/0.1.0/20190101121212"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("redis.default"),
+			withPackageIdent("core/redis/0.1.0/20190101121212"),
+		),
 
 		// service_group 2 <-> With a Health Status = 'WARNING'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "WARNING", "stable", "test"),
-		NewHabServiceMsg("sup2", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "OK", "stable", "test"),
-		NewHabServiceMsg("sup3", a, e, "default", "core", "myapp", "0.1.0", "20190101121212", "OK", "stable", "test"),
+		NewHabitatEvent(
+			withSupervisorId("sup1"),
+			withServiceGroup("myapp.default"),
+			withPackageIdent("core/myapp/0.1.0/20190101121212"),
+			withHealth("WARNING"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("myapp.default"),
+			withPackageIdent("core/myapp/0.1.0/20190101121212"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("myapp.default"),
+			withPackageIdent("core/myapp/0.1.0/20190101121212"),
+		),
 
 		// service_group 3 <-> With a Health Status = 'CRITICAL'
-		NewHabServiceMsg("sup1", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "OK", "stable", "test"),
-		NewHabServiceMsg("sup2", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "UNKNOWN", "stable", "test"),
-		NewHabServiceMsg("sup3", a, e, "default", "core", "postgres", "0.1.0", "20190101121212", "CRITICAL", "stable", "test"),
+		NewHabitatEvent(
+			withSupervisorId("sup1"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			withHealth("CRITICAL"),
+		),
 
 		// service_group 4 <-> With a Health Status = 'UNKNOWN'
-		NewHabServiceMsg("sup4", a, e, "default", "core", "test", "0.1.0", "20190101121212", "UNKNOWN", "", ""),
+		NewHabitatEvent(
+			withSupervisorId("sup4"),
+			withServiceGroup("test.default"),
+			withPackageIdent("core/test/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withoutUpdateStrategy(),
+			withSite(""),
+		),
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
@@ -96,9 +96,9 @@ func (s *Suite) DeleteDataFromStorage() {
 	}
 }
 
-// IngestService ingests a single HabService message into the database
-func (s *Suite) IngestService(event *applications.HabService) {
-	err := s.StorageClient.IngestHabEvent(event)
+// IngestService ingests a single HealthCheckEvent message into the database
+func (s *Suite) IngestService(event *habitat.HealthCheckEvent) {
+	err := s.StorageClient.IngestHealthCheckEvent(event)
 	if err != nil {
 		fmt.Printf("Error trying to ingest hab service event: %s\n", err)
 	}
@@ -113,8 +113,8 @@ func (s *Suite) GetServiceGroups() []*storage.ServiceGroupDisplay {
 	return sgList
 }
 
-// IngestServices ingests multiple HabService messages into the database
-func (s *Suite) IngestServices(events []*applications.HabService) {
+// IngestServices ingests multiple HealthCheckEvent messages into the database
+func (s *Suite) IngestServices(events []*habitat.HealthCheckEvent) {
 	for _, e := range events {
 		s.IngestService(e)
 	}
