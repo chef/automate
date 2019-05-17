@@ -9,31 +9,14 @@ describe('global projects filter', () => {
   before(() => {
     cy.adminLogin('/').then(() => {
       let admin = JSON.parse(localStorage.getItem('chef-automate-user'))
-
+      cy.cleanupProjects(admin.id_token)
       cy.createProject(admin.id_token, proj1)
       cy.createProject(admin.id_token, proj2)
       cy.createProject(admin.id_token, proj3)
-      // TODO uncomment with non-admin test
+      // TODO uncomment with non-admin test/ move up project creation
       // cy.createUser(admin.id_token, nonAdminUsername)
       // cy.createPolicy(admin.id_token, pol_id, nonAdminUsername, [proj1, proj2])
       cy.logout()
-    })
-  })
-
-  after(() => {
-    cy.adminLogin('/').then(() => {
-      let admin = JSON.parse(localStorage.getItem('chef-automate-user'))
-      cy.cleanupProjects(admin.id_token)
-      // TODO uncomment with non-admin test
-      // cy.cleanupUsers(admin.id_token)
-      // cy.request({
-      //   auth: { bearer: admin.id_token },
-      //   method: 'DELETE',
-      //   url: `/apis/iam/v2beta/policies/${pol_id}`,
-      //   failOnStatusCode: false
-      // }).then((response) => {
-      //   expect([200, 404]).to.include(response.status)
-      // })
     })
   })
 
