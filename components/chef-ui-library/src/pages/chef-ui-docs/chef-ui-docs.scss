@@ -30,14 +30,14 @@ chef-design-docs {
       color: inherit;
 
       &.link-active {
-        background: chef-hsl(var(--chef-grey));
+        background: var(--chef-grey);
         box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
       }
 
       &:hover,
       &:focus {
-        color: chef-hsl(var(--chef-primary-bright));
-        border-right: 2px solid chef-hsl(var(--chef-primary-bright));
+        color: var(--chef-primary-bright);
+        border-right: 2px solid var(--chef-primary-bright);
       }
     }
   }

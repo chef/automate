@@ -2,7 +2,7 @@
 // Draws a box with a dashed line. Typically used to
 // convey that something can be added to a list.
 .empty {
-  #{--border-color}: chef-hsl(var(--chef-grey));
+  #{--border-color}: var(--chef-grey);
   border: 1px dashed var(--border-color);
   border-radius: var(--chef-border-radius);
 }
@@ -23,7 +23,7 @@
   .cta {
     flex: 1 0;
     padding: 1em;
-    color: chef-hsl(var(--chef-primary-bright));
+    color: var(--chef-primary-bright);
   }
 
   .action {
@@ -61,7 +61,7 @@
   display: block;
   padding-bottom: 0.75em;
   font-weight: bold;
-  color: chef-hsl(var(--chef-primary-dark));
+  color: var(--chef-primary-dark);
 }
 
 // Used to make sure groups of columns clear each other properly.

@@ -89,13 +89,13 @@ $light-weight: 300;
 $font-family: var(--chef-font-family, "Muli", Helvetica, Arial, sans-serif);
 
 // Typography Color Variables
-$default-type: chef-hsl(var(--chef-primary-dark));
-$disabled-type: chef-hsl(var(--chef-dark-grey));
-$contrast-type: chef-hsl(var(--chef-white));
-$header-color: chef-hsl(var(--chef-primary-dark));
+$default-type: var(--chef-primary-dark);
+$disabled-type: var(--chef-dark-grey);
+$contrast-type: var(--chef-white);
+$header-color: var(--chef-primary-dark);
 
 // Paragraph Styles <p>
-$paragraph-color: chef-hsl(var(--chef-primary-dark));
+$paragraph-color: var(--chef-primary-dark);
 $paragraph-size: 14px;
 $paragraph-line-height: 1.25em;
 $paragraph-margin: 1em;

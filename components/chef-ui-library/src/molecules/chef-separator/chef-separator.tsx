@@ -44,9 +44,9 @@ import { Component } from '@stencil/core';
  * </chef-expander>
  *
  * <style>
- *   #expand-pill { background: hsl(var(--chef-lightest-grey)); }
+ *   #expand-pill { background: var(--chef-lightest-grey); }
  *   #expand-btn {
- *     background: hsl(var(--chef-lightest-grey)); position: absolute; right: 0; margin: 0;
+ *     background: var(--chef-lightest-grey); position: absolute; right: 0; margin: 0;
  *   }
  * </style>
  *

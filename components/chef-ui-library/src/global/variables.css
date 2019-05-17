@@ -6,23 +6,26 @@
   --chef-base-font-size: 16px;
 
   /* ** Colors ** */
-  /* Colors are defined in hsl (hue, saturation, lightness/brightness) */
+  /* Colors are defined in hex */
 
   /* ** NAMED COLORS ARE FOR USE IN THIS FILE ONLY ** */
-  --chef-orange: 23, 100%, 50%;
-  --ebony-clay: 234, 22%, 17%;
-  --royal-blue: 226, 88%, 58%;
-  --malibu: 223, 100%, 70%;
-  --pink: 331, 72%, 51%;
-  --violet: 293, 67%, 51%;
-  --indigo: 251, 83%, 65%;
-  --science-blue: 208, 100%, 43%;
-  --sirocco: 180, 4%, 45%;
-  --iron: 200, 10%, 89%;
-  --mystic: 203, 19%, 92%;
-  --haze: 204, 26%, 96%;
-  --white: 0, 0%, 100%;
-  --black: 0, 0%, 0%;
+  --chef-orange: #FE6100;
+  --ebony-clay: #222435;
+  --royal-blue: #3864F2;
+  --malibu: #648FFF;
+  --pink: #DC267F;
+  --violet: #C22DD5;
+  --indigo: #785EF0;
+  --science-blue: #0075DB;
+  --sirocco: #6F7878;
+  --iron: #DFE3E5;
+  --mystic: #E6EBEE;
+  --haze: #F3F6F8;
+  --white: #FFFFFF;
+  --black: #000000;
+  --atomic-tangerine: #FF9654;
+  --blue-de-france: #3DA5FF;
+  --gray: #B7BCBC;
 
   /* ** THESE SEMANTIC COLOR VARIABLES ARE FREE TO BE USED WITHIN AUTOMATE ** */
   /* primary */
@@ -32,6 +35,7 @@
   --chef-primary-light: var(--malibu);
   /* secondary */
   --chef-critical: var(--pink);
+  --chef-warning: var(--atomic-tangerine);
   --chef-major: var(--violet);
   --chef-minor: var(--indigo);
   --chef-success: var(--science-blue);
@@ -42,9 +46,12 @@
   --chef-lightest-grey: var(--haze);
   --chef-white: var(--white);
   --chef-black: var(--black);
+  /* charts */
+  --chef-ok: var(--blue-de-france);
+  --chef-unknown: var(--gray);
 
   /* misc */
   --chef-border-radius: 4px;
-  --chef-box-shadow: 0 0 12px 0 hsla(var(--chef-dark-grey), 0.2);
+  --chef-box-shadow: 0 0 12px 0 var(--chef-dark-grey);
 }
 

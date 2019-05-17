@@ -1,5 +1,5 @@
 chef-tooltip {
-  #{--background-color}: var(--tooltip-color, chef-hsl(var(--chef-white)));
+  #{--background-color}: var(--tooltip-color, var(--chef-white));
   display: block;
   position: fixed;
   opacity: 0;
@@ -15,7 +15,7 @@ chef-tooltip {
   font-family: var(--chef-font-family);
   font-size: var(--chef-base-font-size);
   font-weight: normal;
-  color: chef-hsl(var(--chef-primary-dark));
+  color: var(--chef-primary-dark);
 
   &:after {
     content: '';
@@ -28,7 +28,7 @@ chef-tooltip {
   }
 
   &.top {
-    transform: translate(-50%, calc(-100% - 0.75em));
+    transform: translate(-50%), calc(-100% - 0.75em);
 
     &::after {
       left: 50%;

@@ -3,7 +3,7 @@ chef-tab-selector {
   chef-option {
     position: relative;
     display: inline-block;
-    color: chef-hsl(var(--chef-primary-dark));
+    color: var(--chef-primary-dark);
     font-size: 16px;
     line-height: 32px;
     min-width: 72px;
@@ -24,18 +24,18 @@ chef-tab-selector {
     }
 
     &.selected:before {
-      background: chef-hsl(var(--chef-primary-bright));
+      background: var(--chef-primary-bright);
     }
 
     &:hover,
     &:focus {
       background: blue;
-      background: chef-hsl(var(--chef-lightest-grey));
+      background: var(--chef-lightest-grey);
 
     }
 
     &:active {
-      background: chef-hsl(var(--chef-light-grey));
+      background: var(--chef-light-grey);
     }
   }
 }

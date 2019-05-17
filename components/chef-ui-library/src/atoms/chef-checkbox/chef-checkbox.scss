@@ -12,12 +12,12 @@ chef-checkbox {
     height: 20px;
     border: 2px solid;
     border-radius: var(--chef-border-radius);
-    color: chef-hsl(var(--chef-white));
+    color: var(--chef-white);
     align-items: center;
     justify-content: center;
 
     chef-icon {
-      color: chef-hsl(var(--chef-white));
+      color: var(--chef-white);
     }
   }
 
@@ -25,7 +25,7 @@ chef-checkbox {
     display: none;
     margin-left: 14px;
     font-size: 14px;
-    color: chef-hsl(var(--chef-primary-dark));
+    color: var(--chef-primary-dark);
   }
 
   &[aria-labelledby] .label-wrap {
@@ -33,18 +33,18 @@ chef-checkbox {
   }
 
   &[aria-checked='true'] .check-wrap {
-    border-color: chef-hsl(var(--chef-primary-bright));
-    background-color: chef-hsl(var(--chef-primary-bright));
+    border-color: var(--chef-primary-bright);
+    background-color: var(--chef-primary-bright);
   }
 
   &[aria-checked='false'] .check-wrap {
-    border-color: chef-hsl(var(--chef-dark-grey));
-    background-color: chef-hsl(var(--chef-white));
+    border-color: var(--chef-dark-grey);
+    background-color: var(--chef-white);
   }
 
   &[aria-checked='mixed'] .check-wrap {
-    border-color: chef-hsl(var(--chef-primary-bright));
-    background-color: chef-hsl(var(--chef-primary-bright));
+    border-color: var(--chef-primary-bright);
+    background-color: var(--chef-primary-bright);
   }
 
   &[aria-disabled] {

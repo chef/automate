@@ -19,16 +19,7 @@ exports.config = {
     { src: 'sandbox.html', dest: 'sandbox.html' }
   ],
   plugins: [
-    sass({
-      functions: {
-        'chef-hsl($hueSatLight)': function (hsl) {
-          return new sassLib.types.String(`hsl(${hsl.getValue()})`);
-        },
-        'chef-hsla($hueSatLight, $alpha: 1)': function (hsl, alpha) {
-          return new sassLib.types.String(`hsla(${hsl.getValue()}, ${alpha.getValue()})`);
-        }
-      }
-    })
+    sass()
   ],
   testing: {
     browserArgs: ['--no-sandbox', '--disable-setuid-sandbox']

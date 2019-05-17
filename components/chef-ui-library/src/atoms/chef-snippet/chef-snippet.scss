@@ -8,8 +8,8 @@ chef-snippet {
     overflow: auto;
     font-family: Consolas, Menlo, Monaco, Courier, monospace;
     font-size: 14px;
-    background: chef-hsl(var(--chef-white));
-    color: chef-hsl(var(--chef-dark-grey));
+    background: var(--chef-white);
+    color: var(--chef-dark-grey);
     line-height: 1.5em;
     direction: ltr;
     text-align: left;
