@@ -26,7 +26,7 @@
       <chef-sidebar-entry route="/settings/tokens" icon="vpn_key">API Tokens</chef-sidebar-entry>
     </app-authorized>
 
-    <div *ngIf="(iamMajorVersion$ | async) === 'v2'">
+    <div *ngIf="(iamMajorVersion$ | async) !== 'v1'">
       <div class="group" *ngIf="policies.visible || roles.visible || projects.visible && (iamMinorVersion$ | async) === 'v1'">Access Management</div>
       <app-authorized #policies [allOf]="['/iam/v2beta/policies', 'get']">
         <chef-sidebar-entry route="/settings/policies" icon="security">Policies</chef-sidebar-entry>
