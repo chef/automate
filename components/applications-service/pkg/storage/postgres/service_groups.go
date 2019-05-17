@@ -36,9 +36,9 @@ SELECT sg.id
       SELECT array_agg( DISTINCT CONCAT (s.origin, '/', s.name, '/', s.version, '/', s.release) )
       FROM service AS s
       WHERE s.group_id = sg.id
-		) AS releases
-	, d.app_name as app_name
-	, d.environment as environment
+    ) AS releases
+  , d.app_name as app_name
+  , d.environment as environment
 FROM service_group AS sg
 JOIN service AS s
 ON s.group_id = sg.id
