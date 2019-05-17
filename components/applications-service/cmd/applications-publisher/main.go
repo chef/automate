@@ -147,7 +147,7 @@ func main() {
 	}
 
 	// Convert the health check
-	event.Result = habitat.HealthCheck(health)
+	event.Result = habitat.HealthCheckResult(health)
 	event.ServiceMetadata.ServiceGroup = fmt.Sprintf("%s.%s", name, group)
 	event.ServiceMetadata.PackageIdent = fmt.Sprintf("%s/%s/%s/%s", origin, name, version, release)
 

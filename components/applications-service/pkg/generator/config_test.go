@@ -61,7 +61,7 @@ func TestDefaultProfileIsViable(t *testing.T) {
 				Channel:  "stable",
 			},
 		},
-		Result:    habitat.HealthCheck_Warning,
+		Result:    habitat.HealthCheckResult_Warning,
 		Execution: &duration.Duration{},
 	}
 

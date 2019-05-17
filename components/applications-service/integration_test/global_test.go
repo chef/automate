@@ -64,7 +64,7 @@ func DefaultHabitatEvent() *habitat.HealthCheckEvent {
 				Channel:  c,
 			},
 		},
-		Result: habitat.HealthCheck_Ok,
+		Result: habitat.HealthCheckResult_Ok,
 	}
 }
 
@@ -113,7 +113,7 @@ func withServiceGroup(group string) MessageOverrides {
 
 func withHealth(health string) MessageOverrides {
 	return func(msg *habitat.HealthCheckEvent) error {
-		msg.Result = habitat.HealthCheck(HealthCheckStringToInt32(health))
+		msg.Result = habitat.HealthCheckResult(HealthCheckStringToInt32(health))
 		return nil
 	}
 }

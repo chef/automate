@@ -290,7 +290,7 @@ func (m *MessagePrototype) CreateMessage(uuid string) *habitat.HealthCheckEvent 
 			Fqdn:         fmt.Sprintf("%s.example", uuid),
 			Site:         "test",
 		},
-		Result:    habitat.HealthCheck_Warning,
+		Result:    habitat.HealthCheckResult_Warning,
 		Execution: &duration.Duration{},
 	}
 }
