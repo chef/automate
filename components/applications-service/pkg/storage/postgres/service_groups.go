@@ -37,10 +37,14 @@ SELECT sg.id
       FROM service AS s
       WHERE s.group_id = sg.id
     ) AS releases
+  , d.app_name as app_name
+  , d.environment as environment
 FROM service_group AS sg
 JOIN service AS s
 ON s.group_id = sg.id
-GROUP BY sg.id, sg.deployment_id
+JOIN deployment as d
+ON sg.deployment_id = d.id
+GROUP BY sg.id, sg.deployment_id, sg.name, d.app_name, d.environment
 `
 
 	// TODO: Update this query once we understand better the deploying status
@@ -121,6 +125,8 @@ type serviceGroupHealth struct {
 	HealthUnknown  int32          `db:"health_unknown"`
 	HealthTotal    int32          `db:"health_total"`
 	PercentOk      int32          `db:"percent_ok"`
+	Application    string         `db:"app_name"`
+	Environment    string         `db:"environment"`
 }
 
 // OverallHealth is the logic that calculates the overall health of the service group
@@ -196,6 +202,8 @@ func (db *Postgres) GetServiceGroups(
 			DeploymentID:     sgh.DeploymentID,
 			HealthStatus:     sgh.OverallHealth(),
 			HealthPercentage: sgh.PercentOk,
+			Application:      sgh.Application,
+			Environment:      sgh.Environment,
 			ServicesHealthCounts: storage.HealthCounts{
 				Ok:       sgh.HealthOk,
 				Critical: sgh.HealthCritical,

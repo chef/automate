@@ -18,14 +18,18 @@ const (
 	PercentOkField
 	NameField
 	HealthField
+	AppField
+	EnvironmentField
 )
 
 var (
 	// Add the defined sort fields to the right mapping
 	validSortFieldsForServiceGroups = map[string]SortField{
-		"name":       NameField,
-		"percent_ok": PercentOkField,
-		"":           DefaultField,
+		"name":        NameField,
+		"percent_ok":  PercentOkField,
+		"app_name":    AppField,
+		"environment": EnvironmentField,
+		"":            DefaultField,
 	}
 	validSortFieldsForServices = map[string]SortField{
 		"health": HealthField,
