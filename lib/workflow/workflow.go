@@ -24,10 +24,15 @@ var (
 	ErrNoScheduledWorkflows   = errors.New("No workflows are scheduled")
 )
 
+// Schedule represents a recurring workflow.
 type Schedule backend.Schedule
 
+// Task is an interface to an object representing a running Task. This will be
+// provided to TaskExecutor implementations when the Run method is called.
 type Task interface {
-	GetParameters(interface{}) error
+	// GetParameters unmarshals the parameters the task was started with into
+	// the value pointed at by obj.
+	GetParameters(obj interface{}) error
 }
 
 type task struct {
@@ -41,9 +46,21 @@ func (r *task) GetParameters(obj interface{}) error {
 	return nil
 }
 
+// TaskResult is an interface to an object representing a completed Task. This
+// will be provided to the OnTaskComplete callback method of WorkflowExecutor
+// implementations.
 type TaskResult interface {
-	GetParameters(interface{}) error
-	Get(interface{}) error
+	// GetParameters unmarshals the parameters the task was started with into
+	// the value pointed at by obj.
+
+	GetParameters(obj interface{}) error
+
+	// Get unmarshals the result returned by the task into the value pointed at
+	// by obj.
+	Get(obj interface{}) error
+
+	// Err returns an error if the task returned an error upon completion,
+	// otherwise nil. The exact error types will not be preserved.
 	Err() error
 }
 
@@ -72,15 +89,64 @@ func (r *taskResult) Err() error {
 	return nil
 }
 
-type WorkflowInstance interface {
-	GetPayload(interface{}) error
-	GetParameters(interface{}) error
+// WithRetries sets the number of automatic retries allowed for a task
+func WithRetries(numRetries int) EnqueueOpts {
+	return func(o *backend.TaskEnqueueOpts) {
+		o.TryRemaining = numRetries + 1
+	}
+}
 
+// StartAfter indicates when the task should start running
+func StartAfter(startAfter time.Time) EnqueueOpts {
+	return func(o *backend.TaskEnqueueOpts) {
+		o.StartAfter = startAfter
+	}
+}
+
+// EnqueueOpts are optional parameters for enqueuing a task
+type EnqueueOpts func(*backend.TaskEnqueueOpts)
+
+// WorkflowInstance is an interface to an object representing a running
+// workflow instance. A workflow instance keeps state of a currently
+// running workflow, and decides what decisions need to be made
+// based and that state. This will be passed to the callback methods
+// of WorkflowExecutor. Only once instance of a WorkflowInstance can
+// execute at a time.
+type WorkflowInstance interface {
+	// GetPayload unmarshals the payload of the workflow instance into the
+	// value pointed at by obj. This payload is any state the user wishes
+	// to keep.
+	GetPayload(obj interface{}) error
+
+	// GetParameters unmarshals the parameters the workflow instance was
+	// started with into the value pointed at by obj.
+	GetParameters(obj interface{}) error
+
+	// EnqueueTask requests that a task of the type taskName be started
+	// with the given parameters. Any enqueued tasks will be started
+	// after the currently running callback of the WorkflowExecutor
+	// returns.
+	// TODO (jaym): Allow passing enqueue options
 	EnqueueTask(taskName string, parameters interface{}) error
+
+	// Complete returns a decision to end execution of the workflow for
+	// the running workflow instance. If there are any uncompleted tasks,
+	// the workflow instance will be considered abandoned. Abandoned
+	// workflows will not complete until all running tasks have been
+	// completed. All tasks which are queued will be dequeued.
 	Complete() Decision
+
+	// Continue returns a decision to continue execution of the workflow for
+	// the running workflow instance. The provided payload will available when
+	// this workflow instance is processed by a WorkflowExecutor next.
 	Continue(payload interface{}) Decision
 
+	// TotalEnqueuedTasks returns the total number of tasks that been enqueued
+	// for the lifetime of the running workflow instance.
 	TotalEnqueuedTasks() int
+
+	// TotalCompletedTasks returns the total number of tasks that have finished
+	// execution and been seen by the workflow instance.
 	TotalCompletedTasks() int
 }
 
@@ -143,6 +209,9 @@ func (w *workflowInstanceImpl) Continue(payload interface{}) Decision {
 	}
 }
 
+// Decision indicates how the execution of a workflow instance is to proceed.
+// This struct should not be created by the user. Instead, use the methods
+// that return Decision on the WorkflowInstance.
 type Decision struct {
 	complete   bool
 	continuing bool
@@ -150,24 +219,58 @@ type Decision struct {
 	tasks      []backend.Task
 }
 
+// StartEvent is passed to the OnStart callback of the WorkflowExecutor when
+// a workflow instance is signaled to be started.
 type StartEvent struct{}
+
+// TaskCompleteEvent is passed to the OnTaskComplete callback of the
+// WorkflowExecutor when a task for a workflow instance completes.
 type TaskCompleteEvent struct {
+	// TaskName is the type of the task that completed
 	TaskName string
-	Result   TaskResult
+
+	// Result contains information representing the completion of the
+	// task such as if it errored or returned a value.
+	Result TaskResult
 }
+
+// CancelEvent is passed to the OnCancel callback of the WorkflowExecutor
+// when the workflow is signaled for cancelation.
 type CancelEvent struct{}
 
+// WorkflowExecutor is the interface implemented by objects that can process
+// a workflow of a certain type.
 type WorkflowExecutor interface {
+	// OnStart is called when a StartEvent for this type of workflow is to
+	// be processed.
 	OnStart(w WorkflowInstance, ev StartEvent) Decision
+
+	// OnTaskComplete is called when a TaskCompleteEvent for this type of
+	// workflow is to be processed. This event will never be received before
+	// OnStart for the given WorkflowInstance.
 	OnTaskComplete(w WorkflowInstance, ev TaskCompleteEvent) Decision
+
+	// OnCancel is called when a workflow instance is to be canceled.
+	//
+	// BUG(jaym): It's currently possible to receive a CancelEvent before
+	// OnStart for the postgres implementation.
 	OnCancel(w WorkflowInstance, ev CancelEvent) Decision
 }
 
+// TaskExecutor is the interface implemented by objects that can run tasks
+// of a certain type.
 // TODO(ssd) 2019-05-10: How do we want to handle cancellation?
 type TaskExecutor interface {
-	Run(context.Context, Task) (interface{}, error)
+	// Run implements the logic for running the task. The returned result/err
+	// will be provided to the workflow instance that started this task on
+	// completion. This method should strive to be retryable / idempotent
+	// as there is a possiblility that it can run multiple times.
+	Run(ctx context.Context, task Task) (result interface{}, err error)
 }
 
+// WorkflowManager is responsible for for calling WorkflowExecutors and
+// TaskExecutors when they need to be processed, along with managing
+// the scheduling of workflows.
 type WorkflowManager struct {
 	workflowExecutors map[string]WorkflowExecutor
 	taskExecutors     map[string]registeredExecutor
@@ -175,20 +278,8 @@ type WorkflowManager struct {
 	backend           backend.Driver
 }
 
-func WithRetries(numRetries int) EnqueueOpts {
-	return func(o *backend.TaskEnqueueOpts) {
-		o.TryRemaining = numRetries + 1
-	}
-}
-
-func StartAfter(startAfter time.Time) EnqueueOpts {
-	return func(o *backend.TaskEnqueueOpts) {
-		o.StartAfter = startAfter
-	}
-}
-
-type EnqueueOpts func(*backend.TaskEnqueueOpts)
-
+// NewManager creates a new WorkflowManager with the given Driver. If
+// the driver fails to initialize, an error is returned.
 func NewManager(backend backend.Driver) (*WorkflowManager, error) {
 	err := backend.Init()
 	if err != nil {
@@ -202,6 +293,52 @@ func NewManager(backend backend.Driver) (*WorkflowManager, error) {
 	}, nil
 }
 
+// RegisterWorkflowExecutor registers a WorkflowExecutor to execute workflows
+// of type workflowName. This is not safe to call concurrently and should be
+// done from only one thread of the process. This must be called before Start.
+func (m *WorkflowManager) RegisterWorkflowExecutor(workflowName string,
+	workflowExecutor WorkflowExecutor) error {
+	m.workflowExecutors[workflowName] = workflowExecutor
+	return nil
+}
+
+// TaskExecutorOpts are options that describe how a TaskExecutor should run tasks.
+type TaskExecutorOpts struct {
+	// Timeout is how long to wait before canceling a running task.
+	Timeout time.Duration
+	// Workers specifies the max concurrently executing tasks the WorkflowManager
+	// will launch for the registered TaskExecutor.
+	Workers int
+}
+
+type registeredExecutor struct {
+	executor TaskExecutor
+	opts     TaskExecutorOpts
+}
+
+// RegisterTaskExecutor registers a TaskExecutor to execute tasks of type taskName.
+// This is not safe to call concurrently and should be done from only one thread
+// of the process. This must be called before Start.
+func (m *WorkflowManager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
+	m.taskExecutors[taskName] = registeredExecutor{
+		executor: executor,
+		opts:     opts,
+	}
+	return nil
+}
+
+// Start starts the WorkflowManager. No workflows, tasks, or schedules will be
+// processed before Start is called. This should only be called once.
+func (m *WorkflowManager) Start(ctx context.Context) error {
+	go m.startTaskExecutors(ctx)
+	go m.workflowScheduler.run(ctx)
+	go m.run(ctx)
+	return nil
+}
+
+// CreateWorkflowSchedule creates a recurring workflow based on the recurrence
+// rule provided. The first run will happen during when the recurrence is first
+// due from Now.
 func (m *WorkflowManager) CreateWorkflowSchedule(
 	scheduleName string,
 	workflowName string,
@@ -218,8 +355,11 @@ func (m *WorkflowManager) CreateWorkflowSchedule(
 		jsonData, enabled, recurRule.String(), nextRunAt)
 }
 
+// WorkflowScheduleUpdateOpts represents changes that can be made to a scheduled
+// workflow. The changes will be committed atomically.
 type WorkflowScheduleUpdateOpts func(*backend.WorkflowScheduleUpdateOpts) error
 
+// UpdateEnabled allows enabling or disabling a scheduled workflow.
 func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpts {
 	return func(o *backend.WorkflowScheduleUpdateOpts) error {
 		o.Enabled = enabled
@@ -228,6 +368,8 @@ func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpts {
 	}
 }
 
+// UpdateParameters allows changing the parameters a workflow will be started
+// with.
 func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpts {
 	return func(o *backend.WorkflowScheduleUpdateOpts) error {
 		paramsData, err := jsonify(parameters)
@@ -237,6 +379,8 @@ func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpts {
 	}
 }
 
+// UpdateRecurrence changes the recurrence rule for the scheduled workflow. The
+// next run will happen when the recurrence is first due from Now.
 func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
 	return func(o *backend.WorkflowScheduleUpdateOpts) error {
 		o.UpdateRecurrence = true
@@ -246,18 +390,8 @@ func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
 	}
 }
 
-func (m *WorkflowManager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
-	backendScheds, err := m.backend.ListWorkflowSchedules(ctx)
-	if err != nil {
-		return nil, err
-	}
-	ret := make([]*Schedule, len(backendScheds))
-	for i, s := range backendScheds {
-		ret[i] = (*Schedule)(s)
-	}
-	return ret, nil
-}
-
+// UpdateWorkflowScheduleByName updates the scheduled workflow identified by
+// (scheduleName, workflowName).
 func (m *WorkflowManager) UpdateWorkflowScheduleByName(ctx context.Context,
 	scheduleName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error {
 
@@ -271,6 +405,21 @@ func (m *WorkflowManager) UpdateWorkflowScheduleByName(ctx context.Context,
 	return m.backend.UpdateWorkflowScheduleByName(ctx, scheduleName, workflowName, o)
 }
 
+// ListWorkflowSchedules list all the scheduled workflows.
+func (m *WorkflowManager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
+	backendScheds, err := m.backend.ListWorkflowSchedules(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ret := make([]*Schedule, len(backendScheds))
+	for i, s := range backendScheds {
+		ret[i] = (*Schedule)(s)
+	}
+	return ret, nil
+}
+
+// GetScheduledWorkflowParameters returns the parameters that the scheduled workflow
+// identified by (scheduleName, workflowName) will be started with.
 func (m *WorkflowManager) GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string, out interface{}) error {
 	data, err := m.backend.GetScheduledWorkflowParameters(ctx, scheduleName, workflowName)
 	if err != nil {
@@ -284,6 +433,8 @@ func (m *WorkflowManager) GetScheduledWorkflowParameters(ctx context.Context, sc
 	return nil
 }
 
+// GetScheduledWorkflowRecurrence returns the recurrence rule for the scheduled workflow
+// identified by (scheduleName, workflowName)
 func (m *WorkflowManager) GetScheduledWorkflowRecurrence(ctx context.Context, scheduleName string, workflowName string) (*rrule.RRule, error) {
 	ruleStr, err := m.backend.GetScheduledWorkflowRecurrence(ctx, scheduleName, workflowName)
 	if err != nil {
@@ -297,30 +448,8 @@ func (m *WorkflowManager) GetScheduledWorkflowRecurrence(ctx context.Context, sc
 	return rrule.StrToRRule(ruleStr)
 }
 
-func (m *WorkflowManager) RegisterWorkflowExecutor(workflowName string,
-	workflowExecutor WorkflowExecutor) error {
-	m.workflowExecutors[workflowName] = workflowExecutor
-	return nil
-}
-
-type TaskExecutorOpts struct {
-	Timeout time.Duration
-	Workers int
-}
-
-type registeredExecutor struct {
-	executor TaskExecutor
-	opts     TaskExecutorOpts
-}
-
-func (m *WorkflowManager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
-	m.taskExecutors[taskName] = registeredExecutor{
-		executor: executor,
-		opts:     opts,
-	}
-	return nil
-}
-
+// EnqueueWorkflow enqueues a workflow of type workflowName. Only one instance of
+// (workflowName, instanceName) can be running at a time.
 func (m *WorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName string,
 	instanceName string, parameters interface{}) error {
 	paramsData, err := jsonify(parameters)
@@ -333,13 +462,6 @@ func (m *WorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName stri
 		Parameters:   paramsData,
 	})
 	return err
-}
-
-func (m *WorkflowManager) Start(ctx context.Context) error {
-	go m.startTaskExecutors(ctx)
-	go m.workflowScheduler.run(ctx)
-	go m.run(ctx)
-	return nil
 }
 
 func (m *WorkflowManager) startTaskExecutors(ctx context.Context) {
@@ -356,6 +478,7 @@ func (m *WorkflowManager) startTaskExecutors(ctx context.Context) {
 }
 
 // TODO(ssd) 2019-05-10: Why does Task need the WorkflowInstanceID?
+// TODO(jaym): should this be private?
 func (m *WorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, workerID int, timeout time.Duration, exec TaskExecutor) {
 	workerName := fmt.Sprintf("%s/%d", taskName, workerID)
 	logrus.Infof("starting task executor %s", workerName)
