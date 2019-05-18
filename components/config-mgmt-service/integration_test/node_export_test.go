@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-func TestNodeExport(t *testing.T) {
+func TestNodeExportProjectFilters(t *testing.T) {
 	esClient := elastic.New(elasticsearchUrl)
 	c := config.New(esClient)
 	server := grpcserver.NewCfgMgmtServer(c)
@@ -484,12 +484,10 @@ func TestNodeExport(t *testing.T) {
 
 			actualNodeNames := make([]string, 0)
 			jsonparser.ArrayEach(data, func(node []byte, _ jsonparser.ValueType, _ int, err error) {
-				if err == nil {
-					nodeName, err := jsonparser.GetString(node, "name")
-					if err == nil {
-						actualNodeNames = append(actualNodeNames, nodeName)
-					}
-				}
+				require.NoError(t, err)
+				nodeName, err := jsonparser.GetString(node, "name")
+				require.NoError(t, err)
+				actualNodeNames = append(actualNodeNames, nodeName)
 			})
 
 			assert.ElementsMatch(t, test.expectedNodeNames, actualNodeNames)
