@@ -376,7 +376,7 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 				"next_due_at":   s.NextDueAt,
 				"last_start":    s.LastStart,
 				"last_end":      s.LastEnd,
-			}).Info("Found schedule")
+			}).Debug("Found schedule")
 		}
 		time.Sleep(10 * time.Second)
 	}

@@ -13,6 +13,7 @@ type Driver interface {
 
 	CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
 	GetDueRecurringWorkflow(ctx context.Context) (*Schedule, RecurringWorkflowCompleter, error)
+	GetNextScheduledWorkflow(ctx context.Context) (*Schedule, error)
 	UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts WorkflowScheduleUpdateOpts) error
 	UpdateWorkflowScheduleByName(ctx context.Context, scheduleName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
 

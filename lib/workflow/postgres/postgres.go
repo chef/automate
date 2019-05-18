@@ -6,14 +6,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/lib/workflow"
-	"github.com/chef/automate/lib/workflow/backend"
 	"github.com/lib/pq"
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database/postgres"
 	"github.com/mattes/migrate/source"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/workflow/backend"
 )
 
 const (
@@ -29,18 +30,26 @@ const (
 	abandonWorkflowQuery  = `SELECT abandon_workflow($1, $2, $3)`
 
 	listRecurringWorkflowsQuery = `
-		WITH res AS 
-			(SELECT DISTINCT ON (name, workflow_name) * from workflow_results 
-			ORDER BY name, workflow_name, end_at DESC) 
-		SELECT s.id, enabled, s.name, s.workflow_name, s.parameters, recurrence, 
-			next_run_at, start_at last_start, end_at last_end 
-			FROM recurring_workflow_schedules s LEFT JOIN res 
+		WITH res AS
+			(SELECT DISTINCT ON (name, workflow_name) * from workflow_results
+			ORDER BY name, workflow_name, end_at DESC)
+		SELECT s.id, enabled, s.name, s.workflow_name, s.parameters, recurrence,
+			next_run_at, start_at last_start, end_at last_end
+			FROM recurring_workflow_schedules s LEFT JOIN res
 			ON s.name = res.name AND s.workflow_name = res.workflow_name;
 		`
+
+	getNextRecurringWorkflowQuery = `
+        SELECT id, enabled, name, workflow_name, parameters, recurrence, next_run_at
+        FROM recurring_workflow_schedules
+        WHERE enabled = TRUE
+        ORDER BY next_run_at LIMIT 1
+        `
 	getDueRecurringWorkflowQuery = `
-        SELECT id, enabled, name, workflow_name, parameters, recurrence
+        SELECT id, enabled, name, workflow_name, parameters, recurrence, next_run_at
         FROM recurring_workflow_schedules
         WHERE next_run_at < NOW() AND enabled = TRUE
+        ORDER BY next_run_at
         FOR UPDATE SKIP LOCKED LIMIT 1
         `
 	updateRecurringWorkflowQuery = `
@@ -206,6 +215,31 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 	return schedules, nil
 }
 
+func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*backend.Schedule, error) {
+	ctx, cancel := context.WithCancel(ctx) // nolint: govet
+	defer cancel()
+
+	row := pg.db.QueryRowContext(ctx, getNextRecurringWorkflowQuery)
+
+	var scheduledWorkflow backend.Schedule
+	err := row.Scan(
+		&scheduledWorkflow.ID,
+		&scheduledWorkflow.Enabled,
+		&scheduledWorkflow.Name,
+		&scheduledWorkflow.WorkflowName,
+		&scheduledWorkflow.Parameters,
+		&scheduledWorkflow.Recurrence,
+		&scheduledWorkflow.NextDueAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, workflow.ErrNoScheduledWorkflows
+		}
+		return nil, err
+	}
+	return &scheduledWorkflow, err
+}
+
 func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*backend.Schedule, backend.RecurringWorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx) // nolint: govet
 
@@ -225,6 +259,7 @@ func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*backen
 		&scheduledWorkflow.WorkflowName,
 		&scheduledWorkflow.Parameters,
 		&scheduledWorkflow.Recurrence,
+		&scheduledWorkflow.NextDueAt,
 	)
 
 	if err != nil {

@@ -8,10 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chef/automate/lib/workflow/backend"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
+
+	"github.com/chef/automate/lib/workflow/backend"
 )
 
 var (
@@ -20,6 +21,7 @@ var (
 	ErrWorkflowScheduleExists = errors.New("workflow schedule already exists")
 	ErrWorkflowInstanceExists = errors.New("workflow instance already exists")
 	ErrNoDueWorkflows         = errors.New("No due workflows")
+	ErrNoScheduledWorkflows   = errors.New("No workflows are scheduled")
 )
 
 type Schedule backend.Schedule
