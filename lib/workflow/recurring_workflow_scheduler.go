@@ -4,16 +4,22 @@ import (
 	"context"
 	"time"
 
-	"github.com/chef/automate/lib/workflow/backend"
 	"github.com/pkg/errors"
 	rrule "github.com/teambition/rrule-go"
+
+	"github.com/chef/automate/lib/workflow/backend"
 
 	"github.com/sirupsen/logrus"
 )
 
-// maxWakeupInterval is the maximum amount of time we will sleep
-// between checking the recurrence table.
-var maxWakeupInterval = 1 * time.Minute
+var (
+	// maxWakeupInterval is the maximum amount of time we will
+	// sleep between checking the recurrence table.
+	maxWakeupInterval = 60 * time.Second
+	// lateWarningThreshold is how late a job can be before we
+	// will log a warning.
+	lateWarningThreshold = 10 * time.Second
+)
 
 type workflowScheduler struct {
 	backend backend.Driver
@@ -32,6 +38,7 @@ func (w *workflowScheduler) run(ctx context.Context) {
 			if err != nil {
 				logrus.WithError(err).Error("failed to schedule workflows")
 			}
+			logrus.Debugf("Recurring workflow scheduler sleep for %fs", nextSleep.Seconds())
 		}
 	}
 }
@@ -41,14 +48,14 @@ func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duratio
 
 	for {
 		s, err := w.scheduleWorkflow(ctx)
+		if sleepTime > s && s > 0 {
+			sleepTime = s
+		}
 		if err == ErrNoDueWorkflows {
 			return sleepTime, nil
 		}
 		if err != nil {
 			return sleepTime, err
-		}
-		if sleepTime > s {
-			sleepTime = s
 		}
 	}
 }
@@ -57,11 +64,24 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	s, completer, err := w.backend.GetDueRecurringWorkflow(ctx)
 	if err != nil {
 		if err == ErrNoDueWorkflows {
-			return maxWakeupInterval, err
+			s, err2 := w.backend.GetNextScheduledWorkflow(ctx)
+			if err2 != nil {
+				if err2 == ErrNoScheduledWorkflows {
+					return maxWakeupInterval, err
+				}
+				logrus.WithError(err2).Error("failed to determine next scheduled workflow")
+				return maxWakeupInterval, err
+			}
+			logrus.Debugf("Woke up %fs early for task", time.Until(s.NextDueAt).Seconds())
+			return time.Until(s.NextDueAt), err
 		}
 		return maxWakeupInterval, errors.Wrap(err, "could not fetch recurring workflows")
 	}
 	defer completer.Close()
+
+	if time.Since(s.NextDueAt) > lateWarningThreshold {
+		logrus.Warnf("Recurring workflow %fs past due. (expected at %s)", time.Since(s.NextDueAt).Seconds(), s.NextDueAt)
+	}
 
 	workflowInstanceName := s.Name
 
@@ -75,13 +95,9 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	}
 
 	nowUTC := time.Now().UTC()
-	// NOTE(ssd) 2019-05-13: compliance looks 5 seconds in
-	// the past to make sure that a job with a count of 1
-	// actually gets run. However, I'm currently thinking
-	// that we can push those kind of jobs onto the
-	// workflow-instances queue immediately.
 	nextDueAt := recurrence.After(nowUTC, true).UTC()
 	sleepTime := time.Until(nextDueAt)
+	logrus.Infof("Starting scheduled workflow %q", workflowInstanceName)
 	err = completer.EnqueueRecurringWorkflow(s, workflowInstanceName, nextDueAt, nowUTC)
 	if err != nil {
 		if err == ErrWorkflowInstanceExists {
