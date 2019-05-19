@@ -104,7 +104,7 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 		return fmt.Sprintf(`#!/bin/bash
 
 			# make sure inspec is installed
-			curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
+			curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -s once -v '3.9.3' -P inspec
 
 			# inspec will return non-zero exit codes for control failures (e.g. 100, 101)
 			# we don't want to fail the scan job for failed controls, so we overwrite those
@@ -123,7 +123,7 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 		return fmt.Sprintf(`
 				$global:InspecBinaryLocation = "$env:systemdrive\opscode\inspec\bin\inspec"
 				Function Ensure-InspecInstalled {
-						. { Invoke-WebRequest -UseBasicParsing https://omnitruck.chef.io/install.ps1 } | iex; install -project inspec -channel stable;
+						. { Invoke-WebRequest -UseBasicParsing https://omnitruck.chef.io/install.ps1 } | iex; install -project inspec -channel stable -install_strategy once -version '3.9.3';
 				}
 				Function Invoke-InspecCommand {
 						param(

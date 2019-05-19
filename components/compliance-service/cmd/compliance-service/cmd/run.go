@@ -118,6 +118,7 @@ func init() {
 	runCmd.Flags().StringVar(&conf.InspecAgent.AuthnTarget, "authn-target", conf.InspecAgent.AuthnTarget, "Target grpc dial address for authn service, used to create token for reporting to automate")
 	runCmd.Flags().StringVar(&conf.InspecAgent.AutomateFQDN, "automate-fqdn", conf.InspecAgent.AutomateFQDN, "Target fqdn for inspec reporting to automate")
 	runCmd.Flags().StringVar(&conf.InspecAgent.TmpDir, "inspec-tmp-dir", conf.InspecAgent.TmpDir, "location of /tmp dir to be used by inspec for caching")
+	runCmd.Flags().StringVar(&conf.InspecAgent.RemoteInspecVersion, "remote-inspec-version", conf.InspecAgent.RemoteInspecVersion, "Option to specify the version of inspec to use for remote(e.g. AWS SSM) scan jobs")
 
 	// Legacy Automate Headers/User Info
 	runCmd.Flags().StringVar(&conf.Delivery.Enterprise, "delivery-ent", conf.Delivery.Enterprise, "Automate Enterprise")

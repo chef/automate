@@ -53,6 +53,8 @@ CONFIG="$CONFIG --manager-manual-poll {{cfg.nodemanager.manual_polling_interval}
 # Inspec agent configuration.
 CONFIG="$CONFIG --job-workers {{cfg.agent.workers}}"
 CONFIG="$CONFIG --job-buffer-size {{cfg.agent.buffer_size}}"
+CONFIG="$CONFIG --job-buffer-size {{cfg.agent.remote_inspec_version}}"
+CONFIG="$CONFIG --remote-inspec-version {{cfg.agent.remote_inspec_version}}"
 
 # Mutual TLS Configuration
 CONFIG="$CONFIG --cert {{pkg.svc_config_path}}/service.crt"
