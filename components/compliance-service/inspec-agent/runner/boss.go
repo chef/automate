@@ -27,17 +27,18 @@ var jobStatusMap jobStatusStore
 var ListenPort int = 2133
 
 type Runner struct {
-	managerClient manager.NodeManagerServiceClient
-	nodesClient   nodes.NodesServiceClient
-	db            *pgdb.DB
-	scannerServer *scanner.Scanner
-	ingestClient  ingest.ComplianceIngesterClient
+	managerClient       manager.NodeManagerServiceClient
+	nodesClient         nodes.NodesServiceClient
+	db                  *pgdb.DB
+	scannerServer       *scanner.Scanner
+	ingestClient        ingest.ComplianceIngesterClient
+	remoteInspecVersion string
 }
 
-func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB, ingestClient ingest.ComplianceIngesterClient) *Runner {
+func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB, ingestClient ingest.ComplianceIngesterClient, remoteInspecVersion string) *Runner {
 	scannerServer := scanner.New(managerClient, nodesClient, db)
 	go watchJobsNodesStatus(scannerServer)
-	return &Runner{managerClient, nodesClient, db, scannerServer, ingestClient}
+	return &Runner{managerClient, nodesClient, db, scannerServer, ingestClient, remoteInspecVersion}
 }
 
 type jobStatusStore struct {
@@ -121,6 +122,10 @@ func (r *Runner) Add(job *types.InspecJob) error {
 	}
 	job.Status = types.StatusScheduled
 
+	if job.SSM {
+		job.RemoteInspecVersion = r.remoteInspecVersion
+	}
+
 	// place most recent job in the channel to be processed by the workers and updated based on the outcome
 	jobsChan <- job
 
@@ -148,6 +153,10 @@ func (r *Runner) AddJobs(jobs []*types.InspecJob) error {
 		}
 		job.Status = types.StatusScheduled
 		job.NodeStatus = jobNodeStatusMap[job.NodeID]
+
+		if job.SSM {
+			job.RemoteInspecVersion = r.remoteInspecVersion
+		}
 
 		r.scannerServer.UpdateJobStatus(job.JobID, job.Status, nil, nil)
 

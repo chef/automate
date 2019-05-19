@@ -445,8 +445,8 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	// set up the scanner, scheduler, and runner servers with needed clients
 	// these are all inspec-agent packages
 	scannerServer := scanner.New(mgrClient, nodesClient, db)
-	schedulerServer := scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient)
-	runnerServer := runner.New(mgrClient, nodesClient, db, ingestClient)
+	schedulerServer := scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, conf.RemoteInspecVersion)
+	runnerServer := runner.New(mgrClient, nodesClient, db, ingestClient, conf.RemoteInspecVersion)
 
 	// start polling for jobs with a recurrence schedule that are due to run.
 	// this function will sleep for one minute, then query the db for all jobs
