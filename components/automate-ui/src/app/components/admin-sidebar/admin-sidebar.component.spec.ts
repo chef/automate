@@ -63,6 +63,7 @@ describe('AdminSidebarComponent', () => {
   describe('IAM v2', () => {
     beforeEach(() => {
       component.iamMajorVersion$ = observableOf('v2');
+      component.iamMinorVersion$ = observableOf('v1');
     });
 
     it('shows all links consistent with settings-landing', () => {

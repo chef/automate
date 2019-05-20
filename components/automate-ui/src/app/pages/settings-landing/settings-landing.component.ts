@@ -21,9 +21,8 @@ export class SettingsLandingComponent {
       route: '/settings/tokens'
     },
     { allOfCheck: [['/iam/v2beta/policies', 'get', '']], route: '/settings/policies' },
-    { allOfCheck: [['/iam/v2beta/roles', 'get', '']], route: '/settings/roles' }
-    // TODO: include when feature flag turned off:
-    // { allOfCheck: [['/iam/v2beta/projects', 'get', '']], route: '/settings/projects' }
+    { allOfCheck: [['/iam/v2beta/roles', 'get', '']], route: '/settings/roles' },
+    { allOfCheck: [['/iam/v2beta/projects', 'get', '']], route: '/settings/projects' }
   ];
 
 }
