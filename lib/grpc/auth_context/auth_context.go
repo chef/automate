@@ -3,7 +3,9 @@ package auth_context
 import (
 	"context"
 	"errors"
+	"strings"
 
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -76,6 +78,28 @@ func NewOutgoingProjectsContext(ctx context.Context) context.Context {
 		"projects": auth.Projects,
 	}
 	return metadata.NewOutgoingContext(ctx, md)
+}
+
+// ProjectsFromMetadata extracts the requested projects from (incoming) metadata
+// as provided by grpc-gateway (so, it's expecting, and removing,
+// grpc-gateway's key prefixes).
+func ProjectsFromMetadata(md metadata.MD) []string {
+	projectHeaderEntries := md.Get(runtime.MetadataPrefix + "projects")
+	if projectHeaderEntries == nil {
+		projectHeaderEntries = []string{}
+	}
+	ps := []string{}
+	keys := make(map[string]bool)
+	for _, entry := range projectHeaderEntries {
+		for _, project := range strings.Split(entry, ",") {
+			newProject := strings.TrimSpace(project)
+			if !keys[newProject] {
+				keys[newProject] = true
+				ps = append(ps, newProject)
+			}
+		}
+	}
+	return ps
 }
 
 // ContextWithoutProjects removes previously added projects from the GRPC metadata

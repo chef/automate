@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -150,8 +149,7 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			subs = append(authResponse.Teams, authResponse.Subject)
 		}
 
-		projectHeaderEntries := md.Get(runtime.MetadataPrefix + "projects")
-		projects := getProjectsFromMetadata(projectHeaderEntries)
+		projects := auth_context.ProjectsFromMetadata(md)
 
 		ctx, err = a.authz.Handle(authCtx, subs, projects, req)
 		if err != nil {

@@ -656,8 +656,7 @@ func (s *Server) authRequest(r *http.Request,
 		return nil, errors.New("no policy subject detected in headers or verified certificates")
 	}
 
-	projectHeaderEntries := md.Get(runtime.MetadataPrefix + "projects")
-	projects := getProjectsFromMetadata(projectHeaderEntries)
+	projects := auth_context.ProjectsFromMetadata(md)
 
 	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2, projects)
 	if err != nil {
@@ -667,23 +666,4 @@ func (s *Server) authRequest(r *http.Request,
 	// err is nil if authorization succeeded
 	// Note: if we need all the auth info, use auth_context.NewOutgoingContext
 	return auth_context.NewOutgoingProjectsContext(authzResp.Ctx()), authzResp.Err()
-}
-
-// Note: copied from auth_interceptor.go -- TODO: refactor
-func getProjectsFromMetadata(projectHeaderEntries []string) []string {
-	if projectHeaderEntries == nil {
-		projectHeaderEntries = []string{}
-	}
-	projects := []string{}
-	keys := make(map[string]bool)
-	for _, entry := range projectHeaderEntries {
-		for _, project := range strings.Split(entry, ",") {
-			newProject := strings.TrimSpace(project)
-			if !keys[newProject] {
-				keys[newProject] = true
-				projects = append(projects, newProject)
-			}
-		}
-	}
-	return projects
 }
