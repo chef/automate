@@ -31,6 +31,6 @@ chef-loading-spinner[fixed] {
   left: 0;
   right: 0;
   bottom: 0;
-  background: chef-hsla(var(--chef-grey), 0.65);
+  background: var(--chef-loading-bg-color);
   z-index: 200;
 }

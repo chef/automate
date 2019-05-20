@@ -1,5 +1,5 @@
 chef-status-filter-group {
-  --active-color: var(--toggle-active-color), var(--chef-primary-bright);
+  --active-color: var(--toggle-active-color, var(--chef-primary-bright));
   display: flex;
 
   .filter {

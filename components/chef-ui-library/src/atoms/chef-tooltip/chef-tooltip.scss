@@ -28,7 +28,7 @@ chef-tooltip {
   }
 
   &.top {
-    transform: translate(-50%), calc(-100% - 0.75em);
+    transform: translate(-50%, calc(-100% - 0.75em));
 
     &::after {
       left: 50%;
