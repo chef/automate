@@ -5,10 +5,12 @@ import (
 	"testing"
 	"time"
 
-	chef "github.com/chef/automate/api/external/ingest/request"
-	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/ingest-service/backend"
-	"github.com/chef/automate/components/ingest-service/pipeline/message"
+	inspec "github.com/chef/automate/components/compliance-service/ingest/events/inspec"
+
+	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
+	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/golang/mock/gomock"
@@ -17,46 +19,44 @@ import (
 )
 
 func TestGatherInfoForNode(t *testing.T) {
-	nowTime := time.Now().UTC()
-	timestampNow, err := ptypes.TimestampProto(nowTime)
+	nowTimeString := "2018-10-25T10:18:41Z"
+	time, err := time.Parse(time.RFC3339, nowTimeString)
 	assert.NoError(t, err)
 
-	backendNode := backend.Node{
-		NodeInfo: backend.NodeInfo{
-			EntityUuid:       "8dcca219-a730-3985-907b-e6b22f9f848d",
+	timestampNow, err := ptypes.TimestampProto(time)
+	assert.NoError(t, err)
+
+	nodeReport := message.Compliance{
+		Report: compliance.Report{
+			NodeUuid:         "8dcca219-a730-3985-907b-e6b22f9f848d",
 			NodeName:         "chef-load-44",
-			Platform:         "ubuntu",
-			PlatformVersion:  "16.04",
+			Platform:         &inspec.Platform{Name: "ubuntu", Release: "16.04"},
 			ChefTags:         []string{"application", "database"},
-			Status:           "success",
 			OrganizationName: "test-org",
 			SourceFqdn:       "chef-server-2",
 			Roles:            []string{"my-cool-role"},
+			EndTime:          nowTimeString,
+			SourceId:         "i-0aee75f0b4b0d9f22",
+			SourceRegion:     "us-west-2a",
+			ReportUuid:       "123353254545425",
 		},
-		Checkin: nowTime,
-		Ec2: backend.Ec2{
-			InstanceId:                "i-0aee75f0b4b0d9f22",
-			PlacementAvailabilityZone: "us-west-2a",
+		InspecReport: &relaxting.ESInSpecReport{
+			Projects: []string{"tomato", "cucumber"},
+			Status:   "passed",
 		},
-		LatestRunID: "123353254545425",
-		Projects:    []string{"tomato", "cucumber"},
 	}
 
-	nodeMetadata, err := gatherInfoForNode(backendNode)
+	nodeMetadata, err := gatherInfoForNode(nodeReport)
 	assert.NoError(t, err)
 	assert.Equal(t, &manager.NodeMetadata{
 		Uuid:            "8dcca219-a730-3985-907b-e6b22f9f848d",
 		Name:            "chef-load-44",
 		PlatformName:    "ubuntu",
 		PlatformRelease: "16.04",
-		Tags: []*common.Kv{
-			{Key: "chef-tag", Value: "application"},
-			{Key: "chef-tag", Value: "database"},
-		},
-		LastContact:  timestampNow,
-		SourceId:     "i-0aee75f0b4b0d9f22",
-		SourceRegion: "us-west-2a",
-		RunData: &nodes.LastContactData{
+		LastContact:     timestampNow,
+		SourceId:        "i-0aee75f0b4b0d9f22",
+		SourceRegion:    "us-west-2a",
+		ScanData: &nodes.LastContactData{
 			Id:      "123353254545425",
 			EndTime: timestampNow,
 			Status:  nodes.LastContactData_PASSED,
@@ -72,7 +72,7 @@ func TestGatherInfoForNode(t *testing.T) {
 }
 
 func TestBundlerSingleMessage(t *testing.T) {
-	inbox := make(chan message.ChefRun, 100)
+	inbox := make(chan message.Compliance, 100)
 	processNodeCount := 0
 	nodeMgrClient := manager.NewMockNodeManagerServiceClient(gomock.NewController(t))
 	nodeMgrClient.EXPECT().ProcessNode(gomock.Any(), gomock.Any()).DoAndReturn(
@@ -80,9 +80,16 @@ func TestBundlerSingleMessage(t *testing.T) {
 			processNodeCount++
 			return &manager.ProcessNodeResponse{}, nil
 		})
-	errc := make(chan error)
+	done := make(chan error)
+	ctx := context.Background()
 
-	inbox <- message.NewChefRun(context.Background(), &chef.Run{}, errc)
+	inbox <- message.Compliance{
+		QueueTime:     time.Now(),
+		InspecReport:  &relaxting.ESInSpecReport{Environment: "", Roles: []string{}},
+		InspecSummary: &relaxting.ESInSpecSummary{},
+		Ctx:           ctx,
+		Done:          done,
+	}
 	close(inbox)
 	out := nodeManagerPublisher(inbox, nodeMgrClient)
 
