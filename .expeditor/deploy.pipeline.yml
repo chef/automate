@@ -28,6 +28,9 @@ steps:
 
   - label: ":cypress:"
     command: .expeditor/buildkite/cypress.sh
+    retry:
+      automatic:
+        limit: 1
     concurrency: 1
     concurrency_group: chef-automate-master/deploy/$CHANNEL
     timeout_in_minutes: 30
