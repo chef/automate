@@ -69,6 +69,8 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 		status = nodes.LastContactData_PASSED
 	case "failed":
 		status = nodes.LastContactData_FAILED
+	case "skipped":
+		status = nodes.LastContactData_SKIPPED
 	}
 
 	return &manager.NodeMetadata{
