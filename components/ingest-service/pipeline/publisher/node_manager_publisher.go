@@ -80,8 +80,8 @@ func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
 		SourceId:        node.Ec2.InstanceId,
 		SourceRegion:    node.Ec2.PlacementAvailabilityZone,
 		Tags:            tags,
-		// ProjectsData:    gatherProjectsData(in),
-		// Projects: node.Projects,
+		ProjectsData:    gatherProjectsData(node),
+		Projects:        node.Projects,
 		RunData: &nodes.LastContactData{
 			Id:      node.LatestRunID,
 			EndTime: timestamp,
@@ -90,28 +90,28 @@ func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
 	}, nil
 }
 
-func gatherProjectsData(in backend.Node) map[string][]string {
-	projectsData := make(map[string][]string)
+func gatherProjectsData(in backend.Node) map[string]*manager.ProjectsValues {
+	projectsData := make(map[string]*manager.ProjectsValues)
 	if len(in.Environment) != 0 {
-		projectsData["environment"] = []string{in.Environment}
+		projectsData["environment"] = &manager.ProjectsValues{Values: []string{in.Environment}}
 	}
 	if len(in.Roles) != 0 {
-		projectsData["roles"] = in.Roles
+		projectsData["roles"] = &manager.ProjectsValues{Values: in.Roles}
 	}
 	if len(in.PolicyName) != 0 {
-		projectsData["policy_name"] = []string{in.PolicyName}
+		projectsData["policy_name"] = &manager.ProjectsValues{Values: []string{in.PolicyName}}
 	}
 	if len(in.PolicyGroup) != 0 {
-		projectsData["policy_group"] = []string{in.PolicyGroup}
+		projectsData["policy_group"] = &manager.ProjectsValues{Values: []string{in.PolicyGroup}}
 	}
 	if len(in.OrganizationName) != 0 {
-		projectsData["organization_name"] = []string{in.OrganizationName}
+		projectsData["organization_name"] = &manager.ProjectsValues{Values: []string{in.OrganizationName}}
 	}
 	if len(in.ChefTags) != 0 {
-		projectsData["chef_tags"] = in.ChefTags
+		projectsData["chef_tags"] = &manager.ProjectsValues{Values: in.ChefTags}
 	}
 	if len(in.SourceFqdn) != 0 {
-		projectsData["chef_server"] = []string{in.SourceFqdn}
+		projectsData["chef_server"] = &manager.ProjectsValues{Values: []string{in.SourceFqdn}}
 	}
 	return projectsData
 }

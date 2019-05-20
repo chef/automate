@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	ingest_inspec "github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
@@ -62,126 +61,59 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 		log.Errorf("ProcessComplianceReport unable to parse end_time as proto timestamp, setting end_time timestamp to beg of time")
 		endTimeTimestamp = &tspb.Timestamp{}
 	}
-	log.Debugf("Calling sendNodeInfoToManager for report id %s", in.Report.ReportUuid)
+
+	// translate status
+	status := nodes.LastContactData_UNKNOWN
+	switch in.InspecReport.Status {
+	case "passed":
+		status = nodes.LastContactData_PASSED
+	case "failed":
+		status = nodes.LastContactData_FAILED
+	}
 
 	return &manager.NodeMetadata{
-		Uuid:            in.Report.NodeUuid,
-		Name:            in.Report.NodeName,
-		PlatformName:    in.Report.Platform.GetName(),
-		PlatformRelease: in.Report.Platform.GetRelease(),
-		JobUuid:         in.Report.JobUuid,
+		Uuid:            in.Report.GetNodeUuid(),
+		Name:            in.Report.GetNodeName(),
+		PlatformName:    in.Report.GetPlatform().GetName(),
+		PlatformRelease: in.Report.GetPlatform().GetRelease(),
+		JobUuid:         in.Report.GetJobUuid(),
 		LastContact:     endTimeTimestamp,
-		SourceId:        in.Report.SourceId,
-		SourceRegion:    in.Report.SourceRegion,
-		SourceAccountId: in.Report.SourceAccountId,
-		Tags:            in.Report.Tags,
-		// ProjectsData:    gatherProjectsData(in),
-		// Projects: in.InspecReport.Projects,
+		SourceId:        in.Report.GetSourceId(),
+		SourceRegion:    in.Report.GetSourceRegion(),
+		SourceAccountId: in.Report.GetSourceAccountId(),
+		Tags:            in.Report.GetTags(),
+		ProjectsData:    gatherProjectsData(&in.Report),
+		Projects:        in.InspecReport.Projects,
 		ScanData: &nodes.LastContactData{
 			Id:      in.Report.ReportUuid,
 			EndTime: endTimeTimestamp,
-			Status:  getReportStatus(in.Report.Profiles),
+			Status:  status,
 		},
 	}, nil
 }
 
-func gatherProjectsData(in *compliance.Report) map[string][]string {
-	projectsData := make(map[string][]string)
+func gatherProjectsData(in *compliance.Report) map[string]*manager.ProjectsValues {
+	projectsData := make(map[string]*manager.ProjectsValues)
 	if len(in.GetEnvironment()) != 0 {
-		projectsData["environment"] = []string{in.GetEnvironment()}
+		projectsData["environment"] = &manager.ProjectsValues{Values: []string{in.GetEnvironment()}}
 	}
 	if len(in.GetRoles()) != 0 {
-		projectsData["roles"] = in.GetRoles()
+		projectsData["roles"] = &manager.ProjectsValues{Values: in.GetRoles()}
 	}
 	if len(in.GetPolicyName()) != 0 {
-		projectsData["policy_name"] = []string{in.GetPolicyName()}
+		projectsData["policy_name"] = &manager.ProjectsValues{Values: []string{in.GetPolicyName()}}
 	}
 	if len(in.GetPolicyGroup()) != 0 {
-		projectsData["policy_group"] = []string{in.GetPolicyGroup()}
+		projectsData["policy_group"] = &manager.ProjectsValues{Values: []string{in.GetPolicyGroup()}}
 	}
 	if len(in.GetOrganizationName()) != 0 {
-		projectsData["organization_name"] = []string{in.GetOrganizationName()}
+		projectsData["organization_name"] = &manager.ProjectsValues{Values: []string{in.GetOrganizationName()}}
 	}
 	if len(in.GetChefTags()) != 0 {
-		projectsData["chef_tags"] = in.GetChefTags()
+		projectsData["chef_tags"] = &manager.ProjectsValues{Values: in.GetChefTags()}
 	}
 	if len(in.GetSourceFqdn()) != 0 {
-		projectsData["chef_server"] = []string{in.GetSourceFqdn()}
+		projectsData["chef_server"] = &manager.ProjectsValues{Values: []string{in.GetSourceFqdn()}}
 	}
 	return projectsData
-}
-
-func getReportStatus(profiles []*ingest_inspec.Profile) nodes.LastContactData_Status {
-	// start with a status of passed as the default status
-	status := nodes.LastContactData_PASSED
-	skippedCounter := 0
-	for _, profile := range profiles {
-		profileStatus := getProfileStatus(profile)
-		// if any profile is failed, report is failed
-		if profileStatus == "failed" {
-			status = nodes.LastContactData_FAILED
-			break
-		}
-		// if all profiles are skipped, the report is skipped
-		// so we keep a count of skipped profiles and later
-		// check if the amount of profiles matches the skipped counter,
-		// setting the status to skipped if they match.
-		if profileStatus == "skipped" {
-			skippedCounter++
-		}
-	}
-	if skippedCounter == len(profiles) {
-		status = nodes.LastContactData_SKIPPED
-	}
-	return status
-}
-
-func getProfileStatus(profile *ingest_inspec.Profile) string {
-	// a profile skipped due to platform exceptions will have a status of skipped
-	if profile.Status == "skipped" {
-		return "skipped"
-	}
-	// set the defaults
-	status := "passed"
-	skippedCounter := 0
-	for _, control := range profile.Controls {
-		controlStatus := getControlStatus(control.Results)
-		// if any control is failed, report is failed
-		if controlStatus == "failed" {
-			status = "failed"
-			break
-		}
-		// if all controls are skipped, the profile is skipped
-		// so we keep a count of skipped profiles and later
-		// check if the amount of profiles matches the skipped counter,
-		// setting the status to skipped if they match.
-		if controlStatus == "skipped" {
-			skippedCounter++
-		}
-	}
-	if skippedCounter == len(profile.Controls) {
-		status = "skipped"
-	}
-	return status
-}
-
-func getControlStatus(results []*ingest_inspec.Result) string {
-	// set the defaults
-	status := "passed"
-	skippedCounter := 0
-	for _, result := range results {
-		// if any result is failed, control is failed
-		if result.Status == "failed" {
-			status = "failed"
-			break
-		}
-		// if all results are skipped, the control is skipped
-		if result.Status == "skipped" {
-			skippedCounter++
-		}
-	}
-	if skippedCounter == len(results) {
-		status = "skipped"
-	}
-	return status
 }
