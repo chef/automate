@@ -63,10 +63,10 @@ func TestGatherInfoForNode(t *testing.T) {
 		},
 		Projects: []string{"tomato", "cucumber"},
 		ProjectsData: []*nodes.ProjectsData{
-			{Key: "chef_server", Values: []string{"chef-server-2"}},
-			{Key: "organization_name", Values: []string{"test-org"}},
 			{Key: "roles", Values: []string{"my-cool-role"}},
+			{Key: "organization_name", Values: []string{"test-org"}},
 			{Key: "chef_tags", Values: []string{"application", "database"}},
+			{Key: "chef_server", Values: []string{"chef-server-2"}},
 		},
 	}, nodeMetadata)
 }
