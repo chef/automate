@@ -15,9 +15,9 @@ Cypress.Commands.add("restoreStorage", () => {
     localStorage.setItem(key, LOCAL_STORAGE_MEMORY[key]);
   });
   Object.keys(SESSION_MEMORY).forEach(key => {
-	  sessionStorage.setItem(key, SESSION_MEMORY[key]);
+    sessionStorage.setItem(key, SESSION_MEMORY[key]);
   });
-  
+
   cy.server()
   // mock refresh token call in case it fails
   let user = JSON.parse(localStorage.getItem('chef-automate-user'))
@@ -41,6 +41,8 @@ Cypress.Commands.add("login", (url, username) => {
   cy.visit(url)
   cy.get('button').contains('Log in with Username').click().then(() => {
     cy.url().should('include', '/dex/auth/')
+    cy.server()
+    cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth')
 
     // login
     cy.get('#login')
@@ -51,10 +53,12 @@ Cypress.Commands.add("login", (url, username) => {
 
     cy.get('[type=submit]').click().then(() => {
       expect(localStorage.getItem('chef-automate-user')).to.contain(username)
-    
+
       // close welcome modal if present
       cy.get('app-welcome-modal').invoke('hide')
       cy.saveStorage()
+
+      cy.wait('@getAuth')
     })
   })
 })
