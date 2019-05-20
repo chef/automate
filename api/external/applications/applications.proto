@@ -135,7 +135,7 @@ message HealthCounts {
   int32 unknown = 5;
 }
 
-// The package indentifier of a service is unique and is the combination
+// The package identifier of a service is unique and is the combination
 // of origin/name/version/release
 //
 // Example: core/redis/0.1.0/8743278934278923

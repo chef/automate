@@ -39,7 +39,7 @@ Options to build a Habitat Event message:
 	--site        <site>   The site of the server where the service is running
 	--channel     <name>   The habitat channel name that the service is subscribed to
 
-	Package Indentifier
+	Package Identifier
 	--origin   <origin>  The origin of a package
 	--name     <name>    The name of a package
 	--version  <version> The version of a package

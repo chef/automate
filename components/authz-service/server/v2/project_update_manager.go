@@ -407,7 +407,7 @@ func (manager *ProjectUpdateManager) sendProjectUpdateStartEvent(projectUpdateID
 		automate_event_type.ProjectRulesUpdate, manager.eventServiceClient)
 }
 
-// Publish a canel project update event with the event service
+// Publish a cancel project update event with the event service
 func (manager *ProjectUpdateManager) sendCancelProjectUpdateEvent() error {
 	return sendProjectUpdateEvent(manager.stage.ProjectUpdateID,
 		automate_event_type.ProjectRulesCancelUpdate, manager.eventServiceClient)
