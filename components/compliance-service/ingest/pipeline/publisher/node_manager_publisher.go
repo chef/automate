@@ -94,6 +94,9 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 
 func gatherProjectsData(in *compliance.Report) []*nodes.ProjectsData {
 	projectsData := make([]*nodes.ProjectsData, 0)
+	if len(in.GetJobUuid()) > 0 {
+		return projectsData
+	}
 	if len(in.GetEnvironment()) != 0 {
 		projectsData = append(projectsData, &nodes.ProjectsData{Key: "environment", Values: []string{in.GetEnvironment()}})
 	}
