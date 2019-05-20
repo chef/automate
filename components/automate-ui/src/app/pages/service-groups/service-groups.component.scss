@@ -64,6 +64,9 @@ chef-td {
   chef-icon {
     font-size: 18px;
     margin-right: 8px;
+    position: absolute;
+    left: 90px;
+    top: 25px;
 
     &.OK {
       color: $chef-success;
@@ -226,3 +229,47 @@ chef-tr.sg-row {
     }
   }
 }
+
+.chart-container {
+  display: flex;
+  width: 70px;
+}
+
+chef-radial-chart {
+  width: 70px;
+  height: 70px;
+
+  .percent {
+    font-size: 10px;
+    font-weight: bolder;
+
+    .value {
+      font-size: 16px;
+    }
+  }
+
+  ::ng-deep .critical {
+    color: $chef-critical;
+    fill: $chef-critical;
+    stroke: $chef-critical;
+  }
+
+  ::ng-deep .warning {
+    color: $chef-warning;
+    fill: $chef-warning;
+    stroke: $chef-warning;
+  }
+
+  ::ng-deep .ok {
+    color: $chef-ok;
+    fill: $chef-ok;
+    stroke: $chef-ok;
+  }
+
+  ::ng-deep .unknown {
+    color: $chef-unknown;
+    fill: $chef-unknown;
+    stroke: $chef-unknown;
+  }
+}
+
