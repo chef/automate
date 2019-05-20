@@ -13,13 +13,14 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/publisher"
+	"github.com/chef/automate/components/nodemanager-service/api/manager"
 )
 
 type Compliance struct {
 	in chan<- message.Compliance
 }
 
-func NewCompliancePipeline(client *ingestic.ESClient, authzClient iam_v2.ProjectsClient) Compliance {
+func NewCompliancePipeline(client *ingestic.ESClient, authzClient iam_v2.ProjectsClient, nodeMgrClient manager.NodeManagerServiceClient) Compliance {
 	in := make(chan message.Compliance, 100)
 	compliancePipeline(in,
 		processor.ComplianceShared,
@@ -27,6 +28,7 @@ func NewCompliancePipeline(client *ingestic.ESClient, authzClient iam_v2.Project
 		processor.ComplianceReport,
 		processor.ComplianceProfile,
 		processor.BundleReportProjectTagger(authzClient),
+		publisher.BuildNodeManagerPublisher(nodeMgrClient),
 		publisher.BuildCompliance(client, 100))
 	return Compliance{in: in}
 }
