@@ -193,8 +193,8 @@ func (manager *DomainProjectUpdateManager) PercentageComplete() float32 {
 	return 1.0
 }
 
-// EstimatedTimeCompelete - the estimated date and time of compeletion.
-func (manager *DomainProjectUpdateManager) EstimatedTimeCompelete() time.Time {
+// EstimatedTimeComplete - the estimated date and time of compeletion.
+func (manager *DomainProjectUpdateManager) EstimatedTimeComplete() time.Time {
 	switch manager.stage.state {
 	case NotRunningState:
 	case RunningState:
@@ -434,7 +434,7 @@ func (manager *DomainProjectUpdateManager) updateStatus(jobStatus JobStatus, pro
 						NumberValue: float64(jobStatus.PercentageComplete),
 					},
 				},
-				"EstimatedTimeCompeleteInSec": {
+				"EstimatedTimeCompleteInSec": {
 					Kind: &_struct.Value_NumberValue{
 						NumberValue: float64(jobStatus.EstimatedEndTimeInSec),
 					},

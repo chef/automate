@@ -91,7 +91,7 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
 	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
-		0.0,  // EstimatedTimeCompeleteInSec
+		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
@@ -100,7 +100,7 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 
 	complianceStatusEvent := createStatusEventMsg(
 		projectUpdateIDTag, // projectUpdateID not matching current
-		0.0,                // EstimatedTimeCompeleteInSec
+		0.0,                // EstimatedTimeCompleteInSec
 		1.0,                // percentageComplete
 		true,               // completed
 		event_ids.ComplianceInspecReportProducerID)
@@ -143,7 +143,7 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
 	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
-		0.0,  // EstimatedTimeCompeleteInSec
+		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
@@ -166,7 +166,7 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 
 	complianceStatusEvent := createStatusEventMsg(
 		projectUpdateIDTag, // projectUpdateID not matching current
-		0.0,                // EstimatedTimeCompeleteInSec
+		0.0,                // EstimatedTimeCompleteInSec
 		1.0,                // percentageComplete
 		true,               // completed
 		event_ids.ComplianceInspecReportProducerID)
@@ -208,7 +208,7 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
 	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
-		0.0,  // EstimatedTimeCompeleteInSec
+		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
@@ -217,7 +217,7 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 
 	complianceStatusEvent := createStatusEventMsg(
 		projectUpdateIDTag, // projectUpdateID not matching current
-		0.0,                // EstimatedTimeCompeleteInSec
+		0.0,                // EstimatedTimeCompleteInSec
 		1.0,                // percentageComplete
 		true,               // completed
 		event_ids.ComplianceInspecReportProducerID)
@@ -260,7 +260,7 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
 	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
-		0.0,  // EstimatedTimeCompeleteInSec
+		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
@@ -270,7 +270,7 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 
 	complianceStatusEvent := createStatusEventMsg(
 		"Not-active-project-update-id", // projectUpdateID not matching current
-		0.0,                            // EstimatedTimeCompeleteInSec
+		0.0,                            // EstimatedTimeCompleteInSec
 		1.0,                            // percentageComplete
 		true,                           // completed
 		event_ids.ComplianceInspecReportProducerID)
@@ -323,7 +323,7 @@ func TestProjectUpdateManagerPercentageComplete(t *testing.T) {
 	manager.ProcessStatusEvent(complianceStatusEvent)
 
 	assert.InDelta(t, 0.4, manager.PercentageComplete(), 0.001)
-	assert.Equal(t, time.Unix(1554845823, 0), manager.EstimatedTimeCompelete())
+	assert.Equal(t, time.Unix(1554845823, 0), manager.EstimatedTimeComplete())
 }
 
 func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
@@ -367,7 +367,7 @@ func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
 	manager.ProcessStatusEvent(complianceStatusEvent)
 
 	assert.InDelta(t, 1.0, manager.PercentageComplete(), 0.001)
-	assert.Equal(t, time.Time{}, manager.EstimatedTimeCompelete())
+	assert.Equal(t, time.Time{}, manager.EstimatedTimeComplete())
 }
 
 func TestProjectUpdateManagerFailureMessagesOldUpdate(t *testing.T) {
@@ -394,7 +394,7 @@ func TestProjectUpdateManagerFailureMessagesOldUpdate(t *testing.T) {
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
 	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
-		0.0,  // EstimatedTimeCompeleteInSec
+		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
 		event_ids.InfraClientRunsProducerID)
@@ -452,7 +452,7 @@ func createStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompeleteInSec
 						NumberValue: percentageComplete,
 					},
 				},
-				"EstimatedTimeCompeleteInSec": {
+				"EstimatedTimeCompleteInSec": {
 					Kind: &_struct.Value_NumberValue{
 						NumberValue: estimatedTimeCompeleteInSec,
 					},
