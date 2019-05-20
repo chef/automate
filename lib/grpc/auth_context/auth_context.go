@@ -102,14 +102,14 @@ func ProjectsFromMetadata(md metadata.MD) []string {
 	return ps
 }
 
-// ContextWithoutProjects removes previously added projects from the GRPC metadata
-// for those system operations that must not be filtered by projects.
+// ContextWithoutProjects removes any projects from the incoming GRPC metadata
+// attached to the context. Following attempts to read projects from incoming
+// metadata will yield nothing -- so this can be used in handlers that should
+// not do projects filtering, but would do that if the key was present.
 func ContextWithoutProjects(ctx context.Context) context.Context {
-	// This will fail on service start context, so only remove projects if ok.
 	md, ok := metadata.FromIncomingContext(ctx)
 	if ok {
 		delete(md, "projects")
-		ctx = metadata.NewOutgoingContext(ctx, md)
 	}
 	return ctx
 }
