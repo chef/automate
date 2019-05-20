@@ -61,7 +61,6 @@ defmodule Notifications.Dispatcher.Impl do
   #        same target action type that apply. (eg multiple slack rules for diff channels)
   defp process_targets([], _id, _notification), do: :ok
   defp process_targets([target | rest], id, notification) do
-
     if Prefilter.process_target(notification, id, target) == :continue do
       payload = apply(target.format, [notification])
       send_message(target, payload, id)

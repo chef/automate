@@ -44,7 +44,8 @@ defmodule Notifications.Prefilter.Impl.Test do
   alias Notifications.Prefilter.Impl
 
   @test_id  "an_id"
-  @service_now_compliance_target %Notifications.Target{url: "", username: "", password: "", filter: false, format: &Notifications.Formatters.ServiceNow.Compliance.format/1}
+  @service_now_compliance_target %Notifications.Target{url: "", username: "", password: "", filter: false, format: &Notifications.Formatters.ServiceNow.Compliance.format/1, critical_controls_only: false}
+  @service_now_criticals_compliance_target %Notifications.Target{url: "", username: "", password: "", filter: true, format: &Notifications.Formatters.ServiceNow.Compliance.format/1, critical_controls_only: true}
   @webhook_target %Notifications.Target{url: "", username: "", password: "", filter: true, format: &Notifications.Formatters.Webhook.Compliance.format/1}
 
   def mock_event_processed(ret_val) do
@@ -68,6 +69,12 @@ defmodule Notifications.Prefilter.Impl.Test do
       notif = load_notif("inspec-report-single-non-crit-control-failure")
       input = Impl.mk_target_input(notif, @test_id, @service_now_compliance_target)
       assert input == Impl.filter(input, :type, :target)
+    end
+
+    test "rejects compliance failures with no critical controls failed for servicenow" do
+      notif = load_notif("inspec-report-single-non-crit-control-failure")
+      input = Impl.mk_target_input(notif, @test_id, @service_now_criticals_compliance_target)
+      assert {:skip, :no_critical_controls_failed} == Impl.filter(input, :type, :target)
     end
   end
 

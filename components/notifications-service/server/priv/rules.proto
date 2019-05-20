@@ -17,6 +17,7 @@ message WebhookAlert {
 message ServiceNowAlert {
   string url = 1;
   string secret_id = 2;
+  bool critical_controls_only = 3;
 }
 
 message Rule {

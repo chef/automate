@@ -69,6 +69,14 @@
               {{model.rule.AlertTypeLabels[key]}}
             </chef-option>
           </chef-select>
+          <div *ngIf="displayCriticalControlsCheckbox()">
+            <p class="small"><em>Check to be notified of critical control failures only</em>&nbsp;
+              <chef-checkbox
+                (change)="updateCriticalControlsOnly($event.detail)"
+                [checked]="model.rule.criticalControlsOnly">
+              </chef-checkbox>
+            </p>
+          </div>
           <chef-form-field>
             <label>Enter your
               <span *ngIf="targetType === WEBHOOK">webhook URL</span>

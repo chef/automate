@@ -317,6 +317,10 @@ func init() {
         },
         "secret_id": {
           "type": "string"
+        },
+        "critical_controls_only": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

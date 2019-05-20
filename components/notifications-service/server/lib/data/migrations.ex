@@ -51,7 +51,12 @@ defmodule Notifications.Data.Migrator.Migrations do
      #
      %{description: "Add support for Assets event",
        queries: ["ALTER TYPE rule_event ADD VALUE 'Assets'"]
-     }
+     },
+     %{description: "Add critical_controls_only to rules table",
+       queries: [
+        "ALTER TABLE rules ADD COLUMN critical_controls_only BOOLEAN;",
+        "ALTER TABLE rules ALTER COLUMN critical_controls_only SET DEFAULT FALSE;"]
+     },
     ]
   end
 
