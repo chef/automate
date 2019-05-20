@@ -1,4 +1,4 @@
-import { takeUntil, withLatestFrom } from 'rxjs/operators';
+import { takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, Observable, combineLatest } from 'rxjs';
 import { Store, createSelector } from '@ngrx/store';
@@ -70,35 +70,36 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    this.route.queryParamMap.pipe(
+      distinctUntilChanged((a, b) => {
+        return a.get('status') === b.get('status') &&
+               a.get('page') === b.get('page') &&
+               a.get('sortField') === b.get('sortField') &&
+               a.get('sortDirection') === b.get('sortDirection');
+      }),
+      takeUntil(this.isDestroyed)
+    ).subscribe(queryParams => this.listParamsChange(queryParams));
+
     combineLatest(
-      this.route.queryParamMap,
+      this.route.queryParamMap.pipe(
+        distinctUntilChanged((a, b) => {
+          return a.get('sgId') === b.get('sgId') &&
+                 a.get('sgStatus') === b.get('sgStatus') &&
+                 a.get('sgPage') === b.get('sgPage');
+        })
+      ),
       this.store.select(allServiceGroups)
     )
     .pipe(takeUntil(this.isDestroyed))
-    .subscribe(([queryParams, groups]) => {
-      const sgId = queryParams.get('sgId');
-      if (sgId && groups.length > 0) {
-        const servicesFilters: ServicesFilters = {
-          service_group_id: sgId,
-          page: parseInt(queryParams.get('sgPage'), 10) || 1,
-          pageSize: parseInt(queryParams.get('sgPageSize'), 10) || 25,
-          health: queryParams.get('sgStatus') || 'total'
-        };
-        this.updateServicesSidebar(servicesFilters);
-      } else {
-        const allParameters = queryParams.keys.reduce((list, key) => {
-          return list.concat(queryParams.getAll(key).map(value => ({ type: key, text: value })));
-        }, []);
-        this.updateAllFilters(allParameters);
-      }
-    });
+    .subscribe(([queryParams]) => this.detailParamsChange(queryParams));
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
     this.serviceGroups$ = this.store.select(allServiceGroups);
     this.serviceGroups$.pipe(
       withLatestFrom(this.route.queryParamMap),
       takeUntil(this.isDestroyed)
-    ).subscribe(([serviceGroups, queryParams]) => {
+    )
+    .subscribe(([serviceGroups, queryParams]) => {
       if (serviceGroups.length > 0) {
         const sgId = queryParams.get('sgId') || serviceGroups[0]['id'];
         this.router.navigate([], { queryParams: { sgId }, queryParamsHandling: 'merge' });
@@ -145,6 +146,26 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  listParamsChange(queryParams) {
+    const allParameters = queryParams.keys.reduce((list, key) => {
+      return list.concat(queryParams.getAll(key).map(value => ({ type: key, text: value })));
+    }, []);
+    this.updateAllFilters(allParameters);
+  }
+
+  detailParamsChange(queryParams) {
+    const sgId = queryParams.get('sgId');
+    if (sgId) {
+      const servicesFilters: ServicesFilters = {
+        service_group_id: sgId,
+        page: parseInt(queryParams.get('sgPage'), 10) || 1,
+        pageSize: parseInt(queryParams.get('sgPageSize'), 10) || 25,
+        health: queryParams.get('sgStatus') || 'total'
+      };
+      this.updateServicesSidebar(servicesFilters);
+    }
   }
 
   public updateAllFilters(allParameters: Chicklet[]): void {
