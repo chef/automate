@@ -236,7 +236,12 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,
 		return nil, errors.GrpcErrorf(codes.InvalidArgument, "Invalid type parameter '%v'", typeParam)
 	}
 
-	filters, err := filterByProjects(ctx, map[string][]string{})
+	filters, err := params.FormatNodeFilters(request.Filter)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
 		return nil, errors.GrpcErrorf(codes.Internal, err.Error())
 	}
