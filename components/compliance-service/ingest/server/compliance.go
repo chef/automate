@@ -170,6 +170,8 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 		SourceRegion:    in.SourceRegion,
 		SourceAccountId: in.SourceAccountId,
 		Tags:            in.Tags,
+		// ProjectsData:    gatherProjectsData(in),
+		// Projects: in.Projects, <--- THIS WON'T WORK HERE. NEED TO MOVE ALL THIS TO THE PROCESSOR
 		ScanData: &nodes.LastContactData{
 			Id:      in.ReportUuid,
 			EndTime: endTimeTimestamp,
@@ -187,6 +189,32 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 	logrus.Debugf("Calling compliancePipeline.Run for report id %s", in.ReportUuid)
 	err = s.compliancePipeline.Run(in)
 	return &gp.Empty{}, err
+}
+
+func gatherProjectsData(in *compliance.Report) map[string][]string {
+	projectsData := make(map[string][]string)
+	if len(in.GetEnvironment()) != 0 {
+		projectsData["environment"] = []string{in.GetEnvironment()}
+	}
+	if len(in.GetRoles()) != 0 {
+		projectsData["roles"] = in.GetRoles()
+	}
+	if len(in.GetPolicyName()) != 0 {
+		projectsData["policy_name"] = []string{in.GetPolicyName()}
+	}
+	if len(in.GetPolicyGroup()) != 0 {
+		projectsData["policy_group"] = []string{in.GetPolicyGroup()}
+	}
+	if len(in.GetOrganizationName()) != 0 {
+		projectsData["organization_name"] = []string{in.GetOrganizationName()}
+	}
+	if len(in.GetChefTags()) != 0 {
+		projectsData["chef_tags"] = in.GetChefTags()
+	}
+	if len(in.GetSourceFqdn()) != 0 {
+		projectsData["chef_server"] = []string{in.GetSourceFqdn()}
+	}
+	return projectsData
 }
 
 func (s *ComplianceIngestServer) handleNotifications(ctx context.Context, report *compliance.Report) error {

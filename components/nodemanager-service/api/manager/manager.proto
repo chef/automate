@@ -76,6 +76,12 @@ message NodeMetadata {
 	repeated chef.automate.domain.compliance.api.common.Kv tags = 10;
 	chef.automate.domain.nodemanager.api.nodes.LastContactData run_data = 11;
 	chef.automate.domain.nodemanager.api.nodes.LastContactData scan_data = 12;
+	map<string, ProjectsValues> projects_data = 13;
+	repeated string projects = 14;
+}
+
+message ProjectsValues {
+	repeated string values = 1;
 }
 
 message Fields {
