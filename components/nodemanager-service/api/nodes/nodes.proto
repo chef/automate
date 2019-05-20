@@ -112,6 +112,12 @@ message Node {
 	repeated string projects = 28;
 	LastContactData run_data = 29;
 	LastContactData scan_data = 30;
+	repeated ProjectsData projects_data = 31;
+}
+
+message ProjectsData {
+	string key = 1;
+	repeated string values = 2;
 }
 
 message LastContactData {

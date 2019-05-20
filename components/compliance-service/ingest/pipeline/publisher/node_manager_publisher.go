@@ -92,28 +92,28 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 	}, nil
 }
 
-func gatherProjectsData(in *compliance.Report) map[string]*manager.ProjectsValues {
-	projectsData := make(map[string]*manager.ProjectsValues)
+func gatherProjectsData(in *compliance.Report) []*nodes.ProjectsData {
+	projectsData := make([]*nodes.ProjectsData, 0)
 	if len(in.GetEnvironment()) != 0 {
-		projectsData["environment"] = &manager.ProjectsValues{Values: []string{in.GetEnvironment()}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "environment", Values: []string{in.GetEnvironment()}})
 	}
 	if len(in.GetRoles()) != 0 {
-		projectsData["roles"] = &manager.ProjectsValues{Values: in.GetRoles()}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "roles", Values: in.GetRoles()})
 	}
 	if len(in.GetPolicyName()) != 0 {
-		projectsData["policy_name"] = &manager.ProjectsValues{Values: []string{in.GetPolicyName()}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "policy_name", Values: []string{in.GetPolicyName()}})
 	}
 	if len(in.GetPolicyGroup()) != 0 {
-		projectsData["policy_group"] = &manager.ProjectsValues{Values: []string{in.GetPolicyGroup()}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "policy_group", Values: []string{in.GetPolicyGroup()}})
 	}
 	if len(in.GetOrganizationName()) != 0 {
-		projectsData["organization_name"] = &manager.ProjectsValues{Values: []string{in.GetOrganizationName()}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "organization_name", Values: []string{in.GetOrganizationName()}})
 	}
 	if len(in.GetChefTags()) != 0 {
-		projectsData["chef_tags"] = &manager.ProjectsValues{Values: in.GetChefTags()}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "chef_tags", Values: in.GetChefTags()})
 	}
 	if len(in.GetSourceFqdn()) != 0 {
-		projectsData["chef_server"] = &manager.ProjectsValues{Values: []string{in.GetSourceFqdn()}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "chef_server", Values: []string{in.GetSourceFqdn()}})
 	}
 	return projectsData
 }

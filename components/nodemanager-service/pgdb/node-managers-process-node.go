@@ -118,7 +118,7 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	if err != nil {
 		return errors.Wrap(err, "ProcessIncomingNode unable to marshal last contact data")
 	}
-	projectsDataByte, err := json.Marshal(node.GetProjects())
+	projectsDataByte, err := json.Marshal(node.GetProjectsData())
 	if err != nil {
 		return errors.Wrap(err, "ProcessIncomingNode unable to marshal projects data")
 	}

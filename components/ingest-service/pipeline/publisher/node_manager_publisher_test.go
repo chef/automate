@@ -62,11 +62,11 @@ func TestGatherInfoForNode(t *testing.T) {
 			Status:  nodes.LastContactData_PASSED,
 		},
 		Projects: []string{"tomato", "cucumber"},
-		ProjectsData: map[string]*manager.ProjectsValues{
-			"chef_server":       &manager.ProjectsValues{Values: []string{"chef-server-2"}},
-			"organization_name": &manager.ProjectsValues{Values: []string{"test-org"}},
-			"roles":             &manager.ProjectsValues{Values: []string{"my-cool-role"}},
-			"chef_tags":         &manager.ProjectsValues{Values: []string{"application", "database"}},
+		ProjectsData: []*nodes.ProjectsData{
+			{Key: "roles", Values: []string{"my-cool-role"}},
+			{Key: "organization_name", Values: []string{"test-org"}},
+			{Key: "chef_tags", Values: []string{"application", "database"}},
+			{Key: "chef_server", Values: []string{"chef-server-2"}},
 		},
 	}, nodeMetadata)
 }

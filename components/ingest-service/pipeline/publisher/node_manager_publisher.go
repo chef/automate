@@ -90,28 +90,28 @@ func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
 	}, nil
 }
 
-func gatherProjectsData(in backend.Node) map[string]*manager.ProjectsValues {
-	projectsData := make(map[string]*manager.ProjectsValues)
+func gatherProjectsData(in backend.Node) []*nodes.ProjectsData {
+	projectsData := make([]*nodes.ProjectsData, 0)
 	if len(in.Environment) != 0 {
-		projectsData["environment"] = &manager.ProjectsValues{Values: []string{in.Environment}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "environment", Values: []string{in.Environment}})
 	}
 	if len(in.Roles) != 0 {
-		projectsData["roles"] = &manager.ProjectsValues{Values: in.Roles}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "roles", Values: in.Roles})
 	}
 	if len(in.PolicyName) != 0 {
-		projectsData["policy_name"] = &manager.ProjectsValues{Values: []string{in.PolicyName}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "policy_name", Values: []string{in.PolicyName}})
 	}
 	if len(in.PolicyGroup) != 0 {
-		projectsData["policy_group"] = &manager.ProjectsValues{Values: []string{in.PolicyGroup}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "policy_group", Values: []string{in.PolicyGroup}})
 	}
 	if len(in.OrganizationName) != 0 {
-		projectsData["organization_name"] = &manager.ProjectsValues{Values: []string{in.OrganizationName}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "organization_name", Values: []string{in.OrganizationName}})
 	}
 	if len(in.ChefTags) != 0 {
-		projectsData["chef_tags"] = &manager.ProjectsValues{Values: in.ChefTags}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "chef_tags", Values: in.ChefTags})
 	}
 	if len(in.SourceFqdn) != 0 {
-		projectsData["chef_server"] = &manager.ProjectsValues{Values: []string{in.SourceFqdn}}
+		projectsData = append(projectsData, &nodes.ProjectsData{Key: "chef_server", Values: []string{in.SourceFqdn}})
 	}
 	return projectsData
 }
