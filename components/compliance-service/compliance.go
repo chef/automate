@@ -176,7 +176,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient, configManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
-		conf.Service.Endpoint, conf.Secrets.Endpoint, conf.Manager.Endpoint))
+		conf.Service.Endpoint, conf.Secrets.Endpoint, conf.Manager.Endpoint, conf.RemoteInspecVersion))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr))
 
 	ps := profilesserver.New(db, &esr, &conf.Profiles, eventClient, statusSrv)
