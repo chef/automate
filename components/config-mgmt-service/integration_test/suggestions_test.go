@@ -247,7 +247,7 @@ func TestSuggestionsFiltered(t *testing.T) {
 			expected: []string{"1", "2"},
 		},
 		{
-			description: "Only node name suggestions for nodes that have names that start with 'a2-' are returned",
+			description: "All node name suggestions should be returned",
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
@@ -278,7 +278,7 @@ func TestSuggestionsFiltered(t *testing.T) {
 				Type:   "name",
 				Filter: []string{"name:a2-*"},
 			},
-			expected: []string{"a2-dev", "a2-prod"},
+			expected: []string{"a2-dev", "a2-prod", "a1-airgap", "a1-workflow"},
 		},
 		{
 			description: "Only node name suggestions for nodes that have a 'california' attribute, are returned",
