@@ -24,6 +24,6 @@ message ProjectUpdateStatusReq { }
 
 message ProjectUpdateStatusResp { 
     string state = 1;
-    google.protobuf.Timestamp estimated_time_compelete = 2;
+    google.protobuf.Timestamp estimated_time_complete = 2;
     float percentage_complete = 3;
 }

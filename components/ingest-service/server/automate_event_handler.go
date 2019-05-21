@@ -92,15 +92,15 @@ func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 
 func (s *AutomateEventHandlerServer) ProjectUpdateStatus(ctx context.Context,
 	req *ingest_api.ProjectUpdateStatusReq) (*ingest_api.ProjectUpdateStatusResp, error) {
-	time, err := ptypes.TimestampProto(s.updateManager.EstimatedTimeCompelete())
+	time, err := ptypes.TimestampProto(s.updateManager.EstimatedTimeComplete())
 	if err != nil {
-		log.Errorf("Could not convert EstimatedTimeCompelete to protobuf Timestamp %v", err)
+		log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
 	return &ingest_api.ProjectUpdateStatusResp{
 		State:                  s.updateManager.State(),
 		PercentageComplete:     float32(s.updateManager.PercentageComplete()),
-		EstimatedTimeCompelete: time,
+		EstimatedTimeComplete: time,
 	}, nil
 }
 

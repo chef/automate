@@ -164,17 +164,17 @@ func (s *state) UpdateProject(ctx context.Context,
 
 func (s *state) ProjectUpdateStatus(ctx context.Context,
 	req *api.ProjectUpdateStatusReq) (*api.ProjectUpdateStatusResp, error) {
-	time, err := ptypes.TimestampProto(s.projectUpdateManager.EstimatedTimeCompelete())
+	time, err := ptypes.TimestampProto(s.projectUpdateManager.EstimatedTimeComplete())
 	if err != nil {
-		log.Errorf("Could not convert EstimatedTimeCompelete to protobuf Timestamp %v", err)
+		log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
 	return &api.ProjectUpdateStatusResp{
-		State:                  s.projectUpdateManager.State(),
-		PercentageComplete:     float32(s.projectUpdateManager.PercentageComplete()),
-		EstimatedTimeCompelete: time,
-		Failed:                 s.projectUpdateManager.Failed(),
-		FailureMessage:         s.projectUpdateManager.FailureMessage(),
+		State:                 s.projectUpdateManager.State(),
+		PercentageComplete:    float32(s.projectUpdateManager.PercentageComplete()),
+		EstimatedTimeComplete: time,
+		Failed:                s.projectUpdateManager.Failed(),
+		FailureMessage:        s.projectUpdateManager.FailureMessage(),
 	}, nil
 }
 

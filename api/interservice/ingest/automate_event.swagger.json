@@ -101,7 +101,7 @@
         "state": {
           "type": "string"
         },
-        "estimated_time_compelete": {
+        "estimated_time_complete": {
           "type": "string",
           "format": "date-time"
         },

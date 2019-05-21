@@ -24,7 +24,7 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 
   [[project_update_config.domain_services]]
     complete = false
-    estimated_time_compelete = 0001-01-01T00:00:00Z
+    estimated_time_complete = 0001-01-01T00:00:00Z
     failed = false
     failure_message = ""
     last_update = 2019-04-26T21:13:34Z
@@ -33,7 +33,7 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 
   [[project_update_config.domain_services]]
     complete = false
-    estimated_time_compelete = 0001-01-01T00:00:00Z
+    estimated_time_complete = 0001-01-01T00:00:00Z
     failed = false
     failure_message = ""
     last_update = 2019-04-26T21:13:34Z

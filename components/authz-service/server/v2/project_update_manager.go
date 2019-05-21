@@ -5,16 +5,17 @@ import (
 	"fmt"
 	"time"
 
-	automate_event "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/authz-service/config"
-	automate_event_type "github.com/chef/automate/components/event-service/server"
-	project_update_tags "github.com/chef/automate/lib/authz"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
+
+	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/authz-service/config"
+	automate_event_type "github.com/chef/automate/components/event-service/server"
+	project_update_tags "github.com/chef/automate/lib/authz"
 )
 
 // Failure cases
@@ -184,7 +185,7 @@ func (manager *ProjectUpdateManager) ProcessStatusEvent(
 				return stage, err
 			}
 
-			estimatedTimeCompelete, err := getEstimatedTimeCompeleteInSec(eventMessage)
+			estimatedTimeCompelete, err := getEstimatedTimeCompleteInSec(eventMessage)
 			if err != nil {
 				return stage, err
 			}
@@ -204,7 +205,7 @@ func (manager *ProjectUpdateManager) ProcessStatusEvent(
 			}
 
 			stage.DomainServices[domainServiceIndex].Complete = completed
-			stage.DomainServices[domainServiceIndex].EstimatedTimeCompelete = estimatedTimeCompelete
+			stage.DomainServices[domainServiceIndex].EstimatedTimeComplete = estimatedTimeCompelete
 			stage.DomainServices[domainServiceIndex].PercentageComplete = percentageComplete
 			stage.DomainServices[domainServiceIndex].LastUpdate = time.Now()
 		default:
@@ -235,11 +236,11 @@ func (manager *ProjectUpdateManager) PercentageComplete() float64 {
 	case config.RunningState:
 		if !manager.Failed() {
 			longestDomainService := config.ProjectUpdateDomainService{
-				PercentageComplete:     1.0,
-				EstimatedTimeCompelete: time.Time{},
+				PercentageComplete:    1.0,
+				EstimatedTimeComplete: time.Time{},
 			}
 			for _, ds := range manager.stage.DomainServices {
-				if !ds.Complete && ds.EstimatedTimeCompelete.After(longestDomainService.EstimatedTimeCompelete) {
+				if !ds.Complete && ds.EstimatedTimeComplete.After(longestDomainService.EstimatedTimeComplete) {
 					longestDomainService = ds
 				}
 			}
@@ -251,21 +252,21 @@ func (manager *ProjectUpdateManager) PercentageComplete() float64 {
 	return 1.0
 }
 
-// EstimatedTimeCompelete - the estimated date and time of compeletion of the longest running job
+// EstimatedTimeComplete - the estimated date and time of compeletion of the longest running job
 // Read State
-func (manager *ProjectUpdateManager) EstimatedTimeCompelete() time.Time {
+func (manager *ProjectUpdateManager) EstimatedTimeComplete() time.Time {
 	switch manager.stage.State {
 	case config.NotRunningState:
 	case config.RunningState:
-		longestEstimatedTimeCompelete := time.Time{}
+		longestEstimatedTimeComplete := time.Time{}
 		if !manager.Failed() {
 			for _, ds := range manager.stage.DomainServices {
-				if !ds.Complete && ds.EstimatedTimeCompelete.After(longestEstimatedTimeCompelete) {
-					longestEstimatedTimeCompelete = ds.EstimatedTimeCompelete
+				if !ds.Complete && ds.EstimatedTimeComplete.After(longestEstimatedTimeComplete) {
+					longestEstimatedTimeComplete = ds.EstimatedTimeComplete
 				}
 			}
 		}
-		return longestEstimatedTimeCompelete
+		return longestEstimatedTimeComplete
 	default:
 	}
 
@@ -500,8 +501,8 @@ func getPercentageComplete(event *automate_event.EventMsg) (float64, error) {
 		fieldName, event.EventID)
 }
 
-func getEstimatedTimeCompeleteInSec(event *automate_event.EventMsg) (time.Time, error) {
-	fieldName := "EstimatedTimeCompeleteInSec"
+func getEstimatedTimeCompleteInSec(event *automate_event.EventMsg) (time.Time, error) {
+	fieldName := "EstimatedTimeCompleteInSec"
 	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil {
 		estimatedTimeCompeleteInSec := int64(event.Data.Fields[fieldName].GetNumberValue())
 		return time.Unix(estimatedTimeCompeleteInSec, 0), nil

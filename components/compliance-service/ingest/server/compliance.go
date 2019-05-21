@@ -17,6 +17,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	log "github.com/sirupsen/logrus"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/config"
@@ -32,7 +34,6 @@ import (
 	"github.com/chef/automate/components/notifications-client/notifier"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	event_ids "github.com/chef/automate/lib/event"
-	log "github.com/sirupsen/logrus"
 )
 
 type ComplianceIngestServer struct {
@@ -94,15 +95,15 @@ func (srv *ComplianceIngestServer) HandleEvent(ctx context.Context, req *automat
 
 func (srv *ComplianceIngestServer) ProjectUpdateStatus(ctx context.Context,
 	req *ingest_api.ProjectUpdateStatusReq) (*ingest_api.ProjectUpdateStatusResp, error) {
-	time, err := ptypes.TimestampProto(srv.updateManager.EstimatedTimeCompelete())
+	time, err := ptypes.TimestampProto(srv.updateManager.EstimatedTimeComplete())
 	if err != nil {
-		log.Errorf("Could not convert EstimatedTimeCompelete to protobuf Timestamp %v", err)
+		log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
 	return &ingest_api.ProjectUpdateStatusResp{
-		State:                  srv.updateManager.State(),
-		PercentageComplete:     srv.updateManager.PercentageComplete(),
-		EstimatedTimeCompelete: time,
+		State:                 srv.updateManager.State(),
+		PercentageComplete:    srv.updateManager.PercentageComplete(),
+		EstimatedTimeComplete: time,
 	}, nil
 }
 

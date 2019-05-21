@@ -1055,10 +1055,10 @@ func (m *ProjectUpdateStatusResp) Validate() error {
 
 	// no validation rules for State
 
-	if v, ok := interface{}(m.GetEstimatedTimeCompelete()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetEstimatedTimeComplete()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ProjectUpdateStatusRespValidationError{
-				field:  "EstimatedTimeCompelete",
+				field:  "EstimatedTimeComplete",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
