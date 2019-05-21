@@ -380,7 +380,7 @@ func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventSe
 
 	mem_v2 := memstore_v2.New()
 	eventServiceClient := &mockEventServiceClient{}
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err = os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)

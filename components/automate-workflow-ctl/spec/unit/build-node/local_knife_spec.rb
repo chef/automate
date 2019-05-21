@@ -243,7 +243,7 @@ describe BuildNode::LocalKnife do
       end
     end
 
-    context "whan an ssh identity file is given and no password is given" do
+    context "when an ssh identity file is given and no password is given" do
       let(:bootstrap_options) do
         ['--ssh-user', username, '--node-name', fqdn, '--sudo',
          '--use-sudo-password', '--ssh-identity-file', ssh_identity_file]

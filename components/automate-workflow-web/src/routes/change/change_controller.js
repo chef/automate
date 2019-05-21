@@ -44,10 +44,10 @@ function changeController(
 
   // In the time between the controller first getting initialized and the
   // streaming connection being established, new change events could have
-  // occured so we want to make sure we fetch any new change data once a
+  // occurred so we want to make sure we fetch any new change data once a
   // connection is opened. Also, it's common for the connection to disconnect
   // and reconnect so doing this data fetch when a connection is established
-  // ensures that any new change events that might have occured during this
+  // ensures that any new change events that might have occurred during this
   // disconnect/reconnect period are still reflected to the user.
   $scope.handleStreamOpen = (e) => {
     $scope.$apply(() => change.$fetch());

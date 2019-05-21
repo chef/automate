@@ -29,7 +29,7 @@ func TestProjectUpdateManagerOneUpdateRunningAtATime(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -66,7 +66,7 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -120,7 +120,7 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -186,7 +186,7 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -244,7 +244,7 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -290,7 +290,7 @@ func TestProjectUpdateManagerPercentageComplete(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -334,7 +334,7 @@ func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -378,7 +378,7 @@ func TestProjectUpdateManagerFailureMessagesOldUpdate(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)

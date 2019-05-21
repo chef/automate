@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # This script is meant to be included in every delivery-managed git repo as a
-# server-side git post-recieve hook
+# server-side git post-receive hook
 # see https://www.kernel.org/pub/software/scm/git/docs/githooks.html
 
 require 'json'

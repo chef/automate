@@ -300,7 +300,7 @@ job_dispatch_v2_filter() ->
           Cfg = deliv_proj_config:validate(make_config(NVJson)),
           ?assertMatch({error, _Config}, Cfg)
       end},
-     {"error if filter recieves keys that are invalid.",
+     {"error if filter receives keys that are invalid.",
       fun() ->
           FullJson = make_full_valid_json(),
           NVJson = ej:set({<<"job_dispatch">>}, FullJson,

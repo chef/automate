@@ -72,10 +72,10 @@ func ConnectivityCheck(c *config.EventGatewayConfig) error {
 		return errors.Wrap(err, "failed to publish message and receive reply within timeout")
 	}
 
-	log.WithFields(log.Fields{"data": string(reply.Data), "expected": slug}).Debug("recieved reply from event gateway")
+	log.WithFields(log.Fields{"data": string(reply.Data), "expected": slug}).Debug("received reply from event gateway")
 
 	if string(reply.Data) != slug {
-		return errors.Errorf("recieved unexpected reply. Expected %q, got %q", slug, string(reply.Data))
+		return errors.Errorf("received unexpected reply. Expected %q, got %q", slug, string(reply.Data))
 	}
 
 	return nil
