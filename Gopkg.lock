@@ -1369,7 +1369,7 @@
   revision = "67d6565462c5a0d99b88193d59fefa10ca7e3010"
 
 [[projects]]
-  digest = "1:b1a4f30a5884a325f07d2c650f6df1a9de80554e647372bd1422bf641cffe37f"
+  digest = "1:34a4668b08825463bd30a42862cea31c16371d1e6e95532d255d1e3461ad0545"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -1389,6 +1389,7 @@
     "health/grpc_health_v1",
     "internal",
     "internal/backoff",
+    "internal/balancerload",
     "internal/binarylog",
     "internal/channelz",
     "internal/envconfig",
@@ -1411,8 +1412,8 @@
     "test/bufconn",
   ]
   pruneopts = "NUT"
-  revision = "2fdaae294f38ed9a121193c51ec99fecd3b13eb7"
-  version = "v1.19.0"
+  revision = "25c4f928eaa6d96443009bd842389fb4fa48664e"
+  version = "v1.20.1"
 
 [[projects]]
   digest = "1:aea6e9483c167cc6fdf1274c442558c5dda8fd3373372be04d98c79100868da1"
