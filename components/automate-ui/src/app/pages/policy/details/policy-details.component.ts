@@ -10,7 +10,9 @@ import { routeParams } from 'app/route.selectors';
 import { routeURL } from 'app/route.selectors';
 import { GetPolicy } from 'app/entities/policies/policy.actions';
 import { policyFromRoute } from 'app/entities/policies/policy.selectors';
-import { Policy, Member, stringToMember } from 'app/entities/policies/policy.model';
+import {
+  Policy, Member, Type, stringToMember
+} from 'app/entities/policies/policy.model';
 import {
   RemovePolicyMembers, PolicyMembersMgmtPayload
 } from 'app/entities/policies/policy.actions';
@@ -27,6 +29,9 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
   public members$: Observable<Member[]>;
   public tabValue = 'definition';
   public url: string;
+  // Map of local user and team member IDs to URLs.
+  // Will not contain LDAP, SAML, or * members.
+  private memberURLs: { [id: string]: string[] } = {};
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -63,7 +68,14 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
         this.policyJSON = this.policyToString(this.policy);
         const members = [];
         this.policy.members.forEach(element => {
-          members.push(stringToMember(element));
+          const member = stringToMember(element);
+          members.push(member);
+          if (member.type === Type.LocalUser) {
+            this.memberURLs[member.name] = ['/settings', 'users', member.displayName];
+          }
+          if (member.type === Type.LocalTeam) {
+            this.memberURLs[member.name] = ['/settings', 'teams', member.displayName];
+          }
         });
         delete this.policy.members;
         return members;
