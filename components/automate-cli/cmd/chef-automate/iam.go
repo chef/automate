@@ -158,18 +158,28 @@ const alreadyMigratedMessage = `You have already upgraded to IAM %s.
   Then re-run this command.`
 
 func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
-	upgradeReq := &policies_req.UpgradeToV2Req{
-		Flag: policies_common.Flag_VERSION_2_0,
+	label := map[bool]string{
+		true:  "v2.1",
+		false: "v2",
 	}
-	isBetaVersion := iamCmdFlags.betaVersion
 
+	migrateV1Policies := !iamCmdFlags.skipLegacyUpgrade
+	upgradeReq := &policies_req.UpgradeToV2Req{
+		Flag:              policies_common.Flag_VERSION_2_0,
+		MigrateV1Policies: migrateV1Policies,
+	}
+
+	isBetaVersion := iamCmdFlags.betaVersion
 	if isBetaVersion {
 		upgradeReq.Flag = policies_common.Flag_VERSION_2_1
 		writer.Title("Enabling IAM v2.1")
 	} else {
 		writer.Title("Upgrading to IAM v2")
 	}
-	writer.Println("Migrating v1 policies...")
+
+	if migrateV1Policies {
+		writer.Println("Migrating v1 policies...")
+	}
 
 	ctx := context.Background()
 	apiClient, err := apiclient.OpenConnection(ctx)
@@ -193,11 +203,7 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
 			"Migration to IAM v2 already in progress")
 	case codes.AlreadyExists:
-		if isBetaVersion {
-			writer.Failf(alreadyMigratedMessage, "v2.1")
-		} else {
-			writer.Failf(alreadyMigratedMessage, "v2")
-		}
+		writer.Failf(alreadyMigratedMessage, label[isBetaVersion])
 		return nil
 	default: // something else: fail
 		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
@@ -227,10 +233,6 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 			"Failed to migrate teams service")
 	}
 
-	label := map[bool]string{
-		true:  "v2.1",
-		false: "v2",
-	}
 	writer.Successf("Enabled IAM %s", label[isBetaVersion])
 	return nil
 }
@@ -239,7 +241,7 @@ func outputReport(report string) {
 	// if it's got ":" in it, split on the first
 	parts := strings.SplitN(report, ":", 2)
 	writer.Body(parts[0])
-	if parts[1] != "" {
+	if len(parts) >= 2 {
 		writer.Body(strings.TrimSpace(parts[1]))
 	}
 }
