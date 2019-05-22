@@ -23,7 +23,7 @@ var host = os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_HOST")
 func TestGatewayNodesClient(t *testing.T) {
 	complianceEndpoint := "127.0.0.1:10121"
 	secretsEndpoint := "127.0.0.1:10131"
-	gatewayEndpoint := "127.0.0.1:2000"
+	gatewayEndpoint := "127.0.0.1:2001"
 	nodesEndpoint := "127.0.0.1:10120"
 	ctx := context.Background()
 	connFactory := helpers.SecureConnFactoryHabWithDeploymentServiceCerts()

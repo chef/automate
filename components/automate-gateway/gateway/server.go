@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"strings"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
@@ -254,19 +253,6 @@ func WithRouteFeatureToggles(c *Config) Opts {
 	}
 }
 
-// handle GRPC returns
-func (s *Server) grpcHandlerFunc(grpcServer *grpc.Server, muxHandler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// partial check of https://github.com/grpc/grpc-go/blob/master/transport/handler_server.go#L50
-		if r.ProtoMajor >= 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-			// TODO: proxy to s.grpcURI instead
-			grpcServer.ServeHTTP(w, r)
-		} else {
-			muxHandler.ServeHTTP(w, r)
-		}
-	})
-}
-
 // NewGRPCServer returns a *grpc.Server instance
 func (s *Server) NewGRPCServer() (*grpc.Server, error) {
 	authClient, err := s.clientsFactory.AuthenticationClient()
@@ -452,13 +438,11 @@ func (s *Server) Serve() error {
 	// Register Prometheus metrics handler.
 	mux.Handle("/metrics", promhttp.Handler())
 
-	handler := s.grpcHandlerFunc(grpcServer, mux)
-
 	// start server
 	uri := fmt.Sprintf("%s:%d", s.httpListenHost, s.httpListenPort)
 	srv := &http.Server{
 		Addr:    uri,
-		Handler: handler,
+		Handler: mux,
 		TLSConfig: &tls.Config{
 			Certificates: []tls.Certificate{*s.serviceKeyPair},
 			NextProtos:   []string{"h2"},
