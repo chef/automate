@@ -664,7 +664,7 @@ describe File.basename(__FILE__) do
       Common::Filter.new(key: "environment", values: ["trou"]),
       Common::Filter.new(key: "group", values: ["mak", "do"])
     ])
-    assert_equal(2, filtered_nodes_by_tags.total)
+    assert_equal(1, filtered_nodes_by_tags.total)
   end
 
   it "does not include deleted jobs in job list" do
