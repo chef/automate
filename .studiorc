@@ -117,7 +117,7 @@ GETTING_STARTED
 
 # Memory check. Because we all always forget to change the docker preferences
 # when we re-install it
-total_memory_kb=$(cat /proc/meminfo | grep MemTotal | grep -o -E '[[:digit:]]+')
+total_memory_kb=$(grep MemTotal /proc/meminfo | grep -o -E '[[:digit:]]+')
 # 8 gigs == 8164340kb, subtract a few kb so we can just do a less than comp
 if (( $total_memory_kb < 8164000 )); then
   warn "!!!"
