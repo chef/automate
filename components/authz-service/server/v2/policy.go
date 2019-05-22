@@ -556,14 +556,26 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		}
 	}
 
-	errs, err := s.migrateV1Policies(ctx)
-	if err != nil {
-		recordFailure()
-		return nil, status.Errorf(codes.Internal, "migrate v1 policies: %s", err.Error())
-	}
-	reports := make([]string, len(errs))
-	for i, e := range errs {
-		reports[i] = e.Error()
+	var reports []string
+	if req.MigrateV1Policies {
+		errs, err := s.migrateV1Policies(ctx)
+		if err != nil {
+			recordFailure()
+			return nil, status.Errorf(codes.Internal, "migrate v1 policies: %s", err.Error())
+		}
+		for _, e := range errs {
+			reports = append(reports, e.Error())
+		}
+	} else {
+		pols, err := s.v1.ListPoliciesWithSubjects(ctx)
+		if err != nil {
+			recordFailure()
+			return nil, status.Errorf(codes.Internal, "list v1 policies: %s", err.Error())
+		}
+		for _, pol := range pols {
+			reports = append(reports, pol.ID.String())
+		}
+
 	}
 
 	err = s.store.ApplyV2DataMigrations(ctx)
