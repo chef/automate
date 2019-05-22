@@ -185,7 +185,7 @@ func (manager *ProjectUpdateManager) ProcessStatusEvent(
 				return stage, err
 			}
 
-			estimatedTimeCompelete, err := getEstimatedTimeCompleteInSec(eventMessage)
+			estimatedTimeComplete, err := getEstimatedTimeCompleteInSec(eventMessage)
 			if err != nil {
 				return stage, err
 			}
@@ -196,8 +196,8 @@ func (manager *ProjectUpdateManager) ProcessStatusEvent(
 			}
 
 			log.Debugf("Status message from producer: %q projectUpdateID: %q percentageComplete: %f "+
-				"estimatedTimeCompelete: %v completed: %t",
-				fromProducer, projectUpdateID, percentageComplete, estimatedTimeCompelete, completed)
+				"estimatedTimeComplete: %v completed: %t",
+				fromProducer, projectUpdateID, percentageComplete, estimatedTimeComplete, completed)
 
 			domainServiceIndex, err := stage.FindDomainServiceIndex(fromProducer)
 			if err != nil {
@@ -205,7 +205,7 @@ func (manager *ProjectUpdateManager) ProcessStatusEvent(
 			}
 
 			stage.DomainServices[domainServiceIndex].Complete = completed
-			stage.DomainServices[domainServiceIndex].EstimatedTimeComplete = estimatedTimeCompelete
+			stage.DomainServices[domainServiceIndex].EstimatedTimeComplete = estimatedTimeComplete
 			stage.DomainServices[domainServiceIndex].PercentageComplete = percentageComplete
 			stage.DomainServices[domainServiceIndex].LastUpdate = time.Now()
 		default:
@@ -252,7 +252,7 @@ func (manager *ProjectUpdateManager) PercentageComplete() float64 {
 	return 1.0
 }
 
-// EstimatedTimeComplete - the estimated date and time of compeletion of the longest running job
+// EstimatedTimeComplete - the estimated date and time of completion of the longest running job
 // Read State
 func (manager *ProjectUpdateManager) EstimatedTimeComplete() time.Time {
 	switch manager.stage.State {
@@ -504,8 +504,8 @@ func getPercentageComplete(event *automate_event.EventMsg) (float64, error) {
 func getEstimatedTimeCompleteInSec(event *automate_event.EventMsg) (time.Time, error) {
 	fieldName := "EstimatedTimeCompleteInSec"
 	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil {
-		estimatedTimeCompeleteInSec := int64(event.Data.Fields[fieldName].GetNumberValue())
-		return time.Unix(estimatedTimeCompeleteInSec, 0), nil
+		estimatedTimeCompleteInSec := int64(event.Data.Fields[fieldName].GetNumberValue())
+		return time.Unix(estimatedTimeCompleteInSec, 0), nil
 	}
 
 	return time.Time{}, fmt.Errorf("Event message sent without a %s field eventID: %q",

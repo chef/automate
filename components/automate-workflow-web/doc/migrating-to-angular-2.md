@@ -16,7 +16,7 @@ Some thoughtful people on the Angular team created a thing called the [UpgradeAd
 
 ... and then boostraps Workflow UI using the UpgradeAdapter, passing it the name of our Angular 1 application (`cd`) and a selector (`html`) representing its root in the DOM tree. At this point, we're running a "hybrid" Angular app, and we can write our code in either Angular 1 or 2. (The Workflow UI app is essentially running on Angular 1, with portions of its DOM owned by Angular 2.)
 
-That's a very brief summary of how our hybrid app is compiled and started. Now we'll move on to some examples, beginning with a simple component that we'll develop progressively to handle various situations. We're also going to start referring to the Angulars as Ng1 and Ng2.
+That's a very brief summary of how our hybrid app is compiled and started. Now we'll move on to some examples, beginning with a simple component that we'll develop progressively to handle various situations. We're also going to start referring to the Angular frameworks as Ng1 and Ng2.
 
 ## On to the Examples
 
