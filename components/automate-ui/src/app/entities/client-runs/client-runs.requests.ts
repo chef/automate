@@ -68,7 +68,7 @@ export class ClientRunsRequests {
 
   public getNodeCount(filters?: NodeFilter): Observable<NodeCount> {
     const url = `${CONFIG_MGMT_URL}/stats/node_counts`;
-    const options = filters ? { params: this.formatFilters(filters) } : {};
+    const options = filters ? { params: this.formatNodeCountFilters(filters) } : {};
 
     return this.httpClient
       .get<NodeCount>(url, options);
@@ -175,10 +175,6 @@ export class ClientRunsRequests {
       filters = filters.concat(searchBarFilters);
     }
 
-    if (nodeFilter.status) {
-      filters.push('status:' + nodeFilter.status);
-    }
-
     return filters;
   }
 
@@ -222,11 +218,12 @@ export class ClientRunsRequests {
     return field;
   }
 
-  private formatFilters(filters: NodeFilter) {
+  private formatNodeCountFilters(filters: NodeFilter) {
     let searchParam = new HttpParams();
 
     if (filters.searchBar) {
-      searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
+      const searchBarRemovedStatus = this.removeTypeFromFilter(filters.searchBar, 'status');
+      searchParam = this.flattenSearchBar(searchBarRemovedStatus, searchParam);
     }
     if (filters.servers) {
       searchParam = this.flattenServerFilter(filters.servers, searchParam);
@@ -236,6 +233,11 @@ export class ClientRunsRequests {
     }
 
     return searchParam;
+  }
+
+  private removeTypeFromFilter(searchBar: Array<Chicklet>,
+    type: string): Array<Chicklet> {
+    return searchBar.filter(chicklet => chicklet.type !== type);
   }
 
   private flattenSearchBar(filters: object[], searchParam: HttpParams): HttpParams {

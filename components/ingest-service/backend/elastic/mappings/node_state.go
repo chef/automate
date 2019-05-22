@@ -65,7 +65,13 @@ var nodeProps = `
 		"type": "keyword"
 	},
 	"status": {
-		"type": "keyword"
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			}
+		}
 	},
 	"deprecations": {
 		"type": "object",

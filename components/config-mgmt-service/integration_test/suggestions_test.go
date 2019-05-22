@@ -418,6 +418,20 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 		{"should return one chef_tags suggestion 'boop'",
 			request.Suggestion{Type: "chef_tags", Text: "boop"},
 			[]string{"boop"}},
+
+		// Suggestions for status
+		{"should return all status suggestions",
+			request.Suggestion{Type: "status"},
+			[]string{"success", "failure", "missing"}},
+		{"should return one status suggestion 'success'",
+			request.Suggestion{Type: "status", Text: "succ"},
+			[]string{"success"}},
+		{"should return one status suggestion 'failure'",
+			request.Suggestion{Type: "status", Text: "fai"},
+			[]string{"failure"}},
+		{"should return no status suggestions",
+			request.Suggestion{Type: "status", Text: "bob"},
+			[]string{}},
 	}
 
 	// Run all the cases!

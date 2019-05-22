@@ -198,6 +198,34 @@ describe('ClientRunsRequests', () => {
     });
   });
 
+  describe('filtering with status filter selected', () => {
+    it('success status should be removed from the filter request', () => {
+      const filters: NodeFilter = <NodeFilter>{
+        page: 0,
+        pageSize: 100,
+        sortField: 'name',
+        sortDirection: 'asc',
+        searchBar: [{type: 'platform', text: 'ubuntu'},
+          {type: 'status', text: 'success'}]
+      };
+
+      const expectedPath = `${CONFIG_MGMT_URL}/stats/node_counts`;
+      const expectedSearch = 'filter=platform:ubuntu';
+      const expectedUrl = `${expectedPath}?${expectedSearch}`;
+      const expectedData: NodeCount = {total: 0, success: 0, failure: 0, missing: 0};
+
+      service.getNodeCount(filters).subscribe(data => {
+        expect(data).toEqual(expectedData);
+      });
+
+      const req = httpTestingController.expectOne(expectedUrl);
+
+      expect(req.request.method).toEqual('GET');
+
+      req.flush(expectedData);
+    });
+  });
+
   describe('build URLSearchParams', () => {
     it('empty filters empty url params', () => {
       const result: HttpParams = service.buildURLSearchParams({});

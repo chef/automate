@@ -19,6 +19,7 @@ const (
 	RolesSug
 	ChefVersionSug
 	ChefTagsSug
+	StatusSug
 )
 
 var suggestionType = map[string]SuggestionType{
@@ -35,6 +36,7 @@ var suggestionType = map[string]SuggestionType{
 	"role":            RolesSug,
 	"chef_version":    ChefVersionSug,
 	"chef_tags":       ChefTagsSug,
+	"status":          StatusSug,
 }
 
 func ValidSuggestionParam(field string) bool {

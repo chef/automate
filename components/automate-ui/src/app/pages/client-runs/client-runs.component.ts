@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Subject, Observable, combineLatest } from 'rxjs';
-import { Chicklet, NodeCount, RollupState, SortDirection } from '../../types/types';
+import { Chicklet, NodeCount, SortDirection } from '../../types/types';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { find, filter as fpFilter, pickBy, some, includes } from 'lodash/fp';
@@ -100,6 +100,10 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     {
       type: 'role',
       text: 'Role'
+    },
+    {
+      type: 'status',
+      text: 'Status'
     }
   ];
 
@@ -116,7 +120,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   };
 
   // The currently selected node status filter
-  selectedStatus$: Observable<string>;
+  selectedStatuses$: Observable<string[]>;
 
   // The number of success, failure, and missing nodes with the current filters
   nodeCounts$: Observable<NodeCount>;
@@ -245,29 +249,40 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     this.currentPage$ = this.store.select(createSelector(clientRunsState,
       (state) => state.nodeFilter.page));
 
-    this.selectedStatus$ = this.store.select(createSelector(clientRunsState,
-      (state) => state.nodeFilter.status));
+    this.selectedStatuses$ = this.searchBarFilters$.pipe(
+      map((chicklets: Chicklet[]) => chicklets.filter(chicket => chicket.type === 'status').
+        map(chicket => chicket.text)));
 
     this.totalNumberOfNodesWithStatusFilter$ = combineLatest(
-      this.selectedStatus$, this.nodeCounts$)
+      this.selectedStatuses$, this.nodeCounts$)
       .pipe(
-        map(([status, nodeCount]) => {
-          switch (status) {
-            case 'success':
-              return nodeCount.success;
-            case 'failure':
-              return nodeCount.failure;
-            case 'missing':
-              return nodeCount.missing;
-            default:
-              return nodeCount.total;
+        map(([statuses, nodeCount]) => {
+          if (statuses.length === 0 ) {
+            return nodeCount.total;
+          } else {
+            let count = 0;
+            if (statuses.findIndex(status => status === 'success') >= 0) {
+              count = count + nodeCount.success;
+            }
+            if (statuses.findIndex(status => status === 'failure') >= 0) {
+              count = count + nodeCount.success;
+            }
+            if (statuses.findIndex(status => status === 'missing') >= 0) {
+              count = count + nodeCount.success;
+            }
+
+            return count;
           }
         }));
 
-    this.isMissingStatusSelected$ = this.selectedStatus$.pipe(map(status => status === 'missing'));
-    this.isSuccessStatusSelected$ = this.selectedStatus$.pipe(map(status => status === 'success'));
-    this.isFailureStatusSelected$ = this.selectedStatus$.pipe(map(status => status === 'failure'));
-    this.isTotalStatusSelected$ = this.selectedStatus$.pipe(map(status => status === undefined));
+    this.isMissingStatusSelected$ = this.selectedStatuses$.pipe(map(statuses =>
+      statuses.findIndex(status => status === 'missing') >= 0));
+    this.isSuccessStatusSelected$ = this.selectedStatuses$.pipe(map(statuses =>
+      statuses.findIndex(status => status === 'success') >= 0));
+    this.isFailureStatusSelected$ = this.selectedStatuses$.pipe(map(statuses =>
+      statuses.findIndex(status => status === 'failure') >= 0));
+    this.isTotalStatusSelected$ = this.selectedStatuses$.pipe(map(statuses =>
+      statuses.length === 0));
 
     this.nodeSuggestions$ = this.store.select(createSelector(clientRunsState,
       (state) => state.nodeSuggestions)).pipe(map((nodeSuggestions: any[]) =>
@@ -503,15 +518,12 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
         return some({'type': chicklet.type}, this.categoryTypes);
       }, allUrlParameters);
 
-    const status = this.getSelectedStatus(allUrlParameters);
-
     const nodeFilters: NodeFilter = {
       page: pageField,
       pageSize: this.pageSize,
       searchBar: searchBarFilters,
       sortField: sortField,
-      sortDirection: sortDirection,
-      status: status
+      sortDirection: sortDirection
     };
 
     this.store.dispatch(new UpdateNodeFilters({filters: nodeFilters}));
@@ -541,18 +553,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       return sortField.text;
     } else {
       return 'name';
-    }
-  }
-
-  private getSelectedStatus(allUrlParameters: Chicklet[]): RollupState {
-    const status = find((chicklet) => {
-        return chicklet.type === 'status';
-      }, allUrlParameters);
-
-    if (status !== undefined && includes(status.text, this.allowedStatus)) {
-      return status.text as RollupState;
-    } else {
-      return undefined;
     }
   }
 

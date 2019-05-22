@@ -166,7 +166,7 @@ describe('ClientRunsComponent', () => {
       expect('/').toEqual(router.routerState.snapshot.url);
     }));
 
-    it('do not remove status or sort selections', fakeAsync(() => {
+    it('do not remove sort selections', fakeAsync(() => {
       router.navigate([''], {queryParams: { status: ['success'], sortField: ['name'],
         sortDirection: ['ASC'], name: ['chef-*'] }});
 
@@ -176,7 +176,7 @@ describe('ClientRunsComponent', () => {
 
       tick();
 
-      expect('/?status=success&sortField=name&sortDirection=ASC').
+      expect('/?sortField=name&sortDirection=ASC').
         toEqual(router.routerState.snapshot.url);
     }));
 
@@ -426,8 +426,7 @@ describe('ClientRunsComponent', () => {
           pageSize: 100,
           searchBar: [],
           sortField: 'name',
-          sortDirection: 'ASC',
-          status: undefined
+          sortDirection: 'ASC'
         }}));
     }));
 
@@ -442,8 +441,7 @@ describe('ClientRunsComponent', () => {
           pageSize: 100,
           searchBar: [{type: 'name', text: 'bob'}],
           sortField: 'name',
-          sortDirection: 'ASC',
-          status: undefined
+          sortDirection: 'ASC'
         }}));
     }));
 
@@ -459,8 +457,7 @@ describe('ClientRunsComponent', () => {
           pageSize: 100,
           searchBar: [],
           sortField: 'name',
-          sortDirection: 'ASC',
-          status: undefined
+          sortDirection: 'ASC'
         }}));
     }));
 
@@ -475,8 +472,7 @@ describe('ClientRunsComponent', () => {
           pageSize: 100,
           searchBar: [],
           sortField: 'name',
-          sortDirection: 'ASC',
-          status: undefined
+          sortDirection: 'ASC'
         }}));
     }));
 
@@ -491,8 +487,7 @@ describe('ClientRunsComponent', () => {
           pageSize: 100,
           searchBar: [],
           sortField: 'name',
-          sortDirection: 'ASC',
-          status: undefined
+          sortDirection: 'ASC'
         }}));
     }));
 
@@ -507,8 +502,7 @@ describe('ClientRunsComponent', () => {
           pageSize: 100,
           searchBar: [],
           sortField: 'name',
-          sortDirection: 'ASC',
-          status: undefined
+          sortDirection: 'ASC'
         }}));
     }));
 
@@ -524,8 +518,7 @@ describe('ClientRunsComponent', () => {
           pageSize: 100,
           searchBar: [],
           sortField: 'uptime_seconds',
-          sortDirection: 'DESC',
-          status: undefined
+          sortDirection: 'DESC'
         }}));
     }));
 
@@ -538,10 +531,9 @@ describe('ClientRunsComponent', () => {
         new UpdateNodeFilters({filters: {
           page: 1,
           pageSize: 100,
-          searchBar: [],
+          searchBar: [{type: 'status', text: 'success'}],
           sortField: 'name',
-          sortDirection: 'ASC',
-          status: 'success'
+          sortDirection: 'ASC'
         }}));
     }));
 
@@ -554,10 +546,9 @@ describe('ClientRunsComponent', () => {
         new UpdateNodeFilters({filters: {
           page: 1,
           pageSize: 100,
-          searchBar: [],
+          searchBar: [{type: 'status', text: 'wrong'}],
           sortField: 'name',
-          sortDirection: 'ASC',
-          status: undefined
+          sortDirection: 'ASC'
         }}));
     }));
   });

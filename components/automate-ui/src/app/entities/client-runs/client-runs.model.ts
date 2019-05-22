@@ -1,4 +1,4 @@
-import { Chicklet, RollupCompliance, RollupState, SortDirection } from '../../types/types';
+import { Chicklet, RollupCompliance, SortDirection } from '../../types/types';
 
 export interface RespNode {
   id: string;
@@ -35,7 +35,6 @@ export interface NodeFilter {
   servers?: Array<string>;
   sortDirection?: SortDirection;
   sortField?: string;
-  status?: RollupState;
   policy_group?: string;
   policy_name?: string;
   policy_revision?: string;
