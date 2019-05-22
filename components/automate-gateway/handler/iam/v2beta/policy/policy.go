@@ -213,8 +213,8 @@ func (p *Server) RemovePolicyMembers(
 func (p *Server) UpgradeToV2(
 	ctx context.Context, in *pb_req.UpgradeToV2Req) (*pb_resp.UpgradeToV2Resp, error) {
 	upgradeReq := &authz.MigrateToV2Req{
-		Flag:              authz.Flag_VERSION_2_0,
-		MigrateV1Policies: in.MigrateV1Policies,
+		Flag:           authz.Flag_VERSION_2_0,
+		SkipV1Policies: in.SkipV1Policies,
 	}
 	if in.Flag == pb_common.Flag_VERSION_2_1 {
 		upgradeReq.Flag = authz.Flag_VERSION_2_1

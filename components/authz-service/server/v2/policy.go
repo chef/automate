@@ -558,7 +558,7 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 	}
 
 	var reports []string
-	if req.MigrateV1Policies {
+	if !req.SkipV1Policies {
 		errs, err := s.migrateV1Policies(ctx)
 		if err != nil {
 			recordFailure()

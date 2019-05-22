@@ -163,10 +163,9 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 		false: "v2",
 	}
 
-	migrateV1Policies := !iamCmdFlags.skipLegacyUpgrade
 	upgradeReq := &policies_req.UpgradeToV2Req{
-		Flag:              policies_common.Flag_VERSION_2_0,
-		MigrateV1Policies: migrateV1Policies,
+		Flag:           policies_common.Flag_VERSION_2_0,
+		SkipV1Policies: iamCmdFlags.skipLegacyUpgrade,
 	}
 
 	isBetaVersion := iamCmdFlags.betaVersion
@@ -177,7 +176,7 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 		writer.Title("Upgrading to IAM v2")
 	}
 
-	if migrateV1Policies {
+	if !iamCmdFlags.skipLegacyUpgrade {
 		writer.Println("Migrating v1 policies...")
 	}
 
