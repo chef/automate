@@ -2269,6 +2269,8 @@ func (m *MigrateToV2Req) Validate() error {
 
 	// no validation rules for Flag
 
+	// no validation rules for MigrateV1Policies
+
 	return nil
 }
 
