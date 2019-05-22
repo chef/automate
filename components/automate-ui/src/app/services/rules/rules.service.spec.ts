@@ -115,7 +115,8 @@ describe('RulesService', () => {
     });
 
     it('with username and password, calls post with the correct url', () => {
-      const rule = new Rule('', '', null, '', ServiceActionType.SERVICENOW, 'super_secret_id', false);
+      const rule = new Rule('', '', null, '', ServiceActionType.SERVICENOW,
+        'super_secret_id', false);
       const response = <RuleResponse>{ rule: {} };
 
       service.createRule(rule, 'bob', 'super_secret_password').
