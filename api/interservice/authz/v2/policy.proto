@@ -225,6 +225,7 @@ enum Flag {
 
 message MigrateToV2Req {
     Flag flag = 1;
+    bool migrate_v1_policies = 2;
 }
 message MigrateToV2Resp {
     repeated string reports = 1;
