@@ -7,31 +7,9 @@ defmodule Notifications.Formatters.ServiceNow.Compliance do
 
   alias Notifications.ComplianceFailure
   alias Notifications.Formatters.ComplianceHelper
-  alias Notifications.Formatters.Utils
 
   @spec format(ComplianceFailure.t):: map()
-  def format(%ComplianceFailure{test_totals: totals} = notification) do
-    Utils.to_map(notification)
-
-    notification = ComplianceHelper.prune_and_augment(notification, 0.1)
-    # The payload includes all the same data, but names and format are different.
-    %{
-      automate_fqdn: Notifications.Config.automate_fqdn,
-      failure_snippet: "InSpec found a critical control failure on [#{notification.node_name}](#{notification.compliance_url})",
-      automate_failure_url: notification.compliance_url,
-      node_name: notification.node_name,
-      node_uuid: notification.node_id,
-      number_of_critical_tests: totals.critical,
-      total_number_of_tests: totals.failed + totals.passed + totals.skipped,
-      total_number_of_failed_tests: totals.failed,
-      number_of_failed_critical_tests: totals.critical_failed,
-      total_number_of_passed_tests: totals.passed,
-      total_number_of_skipped_tests: totals.skipped,
-      inspec_version: notification.inspec_version,
-      failed_critical_profiles: Utils.to_map(notification.failed_profiles),
-      timestamp_utc: Utils.format_date_string(notification.timestamp),
-      end_time_utc: Utils.format_date_string(notification.end_time),
-      type: "compliance_failure"
-    }
+  def format(notification) do
+    ComplianceHelper.get_servicenow_compliance_notification(notification, 0.1)
   end
 end

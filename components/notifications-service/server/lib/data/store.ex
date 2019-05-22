@@ -203,7 +203,7 @@ defmodule Notifications.Data.Store do
     end
 
     critical_controls_only = case rule.action do
-      {_, %type{critical_controls_only: critical_controls_only}} -> critical_controls_only
+      {_, %{critical_controls_only: critical_controls_only}} -> critical_controls_only
       _ -> false
     end
 

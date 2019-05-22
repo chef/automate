@@ -1,6 +1,9 @@
 defmodule Notifications.Formatters.ComplianceHelper do
   @moduledoc "Tools for the management of compliance notifications"
   alias Notifications.Profile
+  alias Notifications.ComplianceFailure
+  alias Notifications.Formatters.Utils
+
 
   @crit_control_threshold 0.7
 
@@ -47,7 +50,7 @@ defmodule Notifications.Formatters.ComplianceHelper do
     %{notification | failed_profiles: prune_profiles(notification.failed_profiles, [], control_threshold)}
   end
 
-  defp prune_profiles([], acc, control_threshold), do: acc
+  defp prune_profiles([], acc, _control_threshold), do: acc
   defp prune_profiles([profile | profiles], acc, control_threshold) do
     failed_controls = prune_controls(profile.failed_controls, [], control_threshold)
     if length(failed_controls) > 0 do
@@ -71,7 +74,7 @@ defmodule Notifications.Formatters.ComplianceHelper do
   # While all controls we receive have failures, some may not be critical.
   # For critical controls, further prune the results to limit to failures only.
   # For non-critical, drop them from the controls list.
-  defp prune_controls([], acc, impact), do: acc
+  defp prune_controls([], acc, _impact), do: acc
   defp prune_controls([%Profile.Control{impact: impact} = control | controls], acc, control_threshold) when impact >= control_threshold do
     pruned_results = prune_results(control.failed_results, [])
     stats = control.stats
@@ -99,4 +102,32 @@ defmodule Notifications.Formatters.ComplianceHelper do
   end
   # Anything that's not a failure gets excluded
   defp prune_results([_| results], acc), do: prune_results(results, acc)
+
+  @spec get_servicenow_compliance_notification(ComplianceFailure.t):: map()
+  def get_servicenow_compliance_notification(notification) do
+    get_servicenow_compliance_notification(notification, @crit_control_threshold)
+  end
+  def get_servicenow_compliance_notification(%ComplianceFailure{test_totals: totals} = notification, control_threshold) do
+    Utils.to_map(notification)
+
+    notification = prune_and_augment(notification, control_threshold)
+    %{
+      automate_fqdn: Notifications.Config.automate_fqdn,
+      failure_snippet: "InSpec found a critical control failure on [#{notification.node_name}](#{notification.compliance_url})",
+      automate_failure_url: notification.compliance_url,
+      node_name: notification.node_name,
+      node_uuid: notification.node_id,
+      number_of_critical_tests: totals.critical,
+      total_number_of_tests: totals.failed + totals.passed + totals.skipped,
+      total_number_of_failed_tests: totals.failed,
+      number_of_failed_critical_tests: totals.critical_failed,
+      total_number_of_passed_tests: totals.passed,
+      total_number_of_skipped_tests: totals.skipped,
+      inspec_version: notification.inspec_version,
+      failed_critical_profiles: Utils.to_map(notification.failed_profiles),
+      timestamp_utc: Utils.format_date_string(notification.timestamp),
+      end_time_utc: Utils.format_date_string(notification.end_time),
+      type: "compliance_failure"
+    }
+  end
 end

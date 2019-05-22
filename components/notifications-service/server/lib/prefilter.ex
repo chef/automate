@@ -60,6 +60,10 @@ defmodule Notifications.Prefilter.Impl do
     {:continue, {notification, id, target}}
   end
 
+ # When used as part of the pipeline, ensures that any previous failure
+  # stops us from evaluating further.
+  def filter({:skip, _reason} = args, _any_type), do: args
+
   def filter({:continue, {notification, id}}, :type) do
     type_filter(notification, id)
   end
@@ -78,17 +82,13 @@ defmodule Notifications.Prefilter.Impl do
     end
   end
 
-  # When used as part of the pipeline, ensures that any previous failure
-  # stops us from evaluating further.
-  def filter({:skip, _reason} = args, _any_type), do: args
-
   defp type_filter(%type{}, _id) when type in @unsupported_notifications, do: {:skip, :unsupported}
   defp type_filter(notification, id), do: {:continue, {notification, id}}
 
   defp type_filter(%ComplianceFailure{test_totals: %{critical_failed: num}} = notification, id, target) when num > 0 do
     {:continue, {notification, id, target}}
   end
-  defp type_filter(%ComplianceFailure{}, _id, target) do
+  defp type_filter(%ComplianceFailure{}, _id, _target) do
     {:skip, :no_critical_controls_failed}
   end
   defp type_filter(notification, id, target), do: {:continue, {notification, id, target}}

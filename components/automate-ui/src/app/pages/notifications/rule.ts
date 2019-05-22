@@ -38,7 +38,8 @@ export class Rule implements RuleInterface {
   public static fromResponse(rule: Object): Rule {
     const ruleTargetInfo = this.extractTargetInfo(rule);
     return new Rule(rule['id'], rule['name'], rule['event'],
-      ruleTargetInfo.targetUrl, ruleTargetInfo.targetType, ruleTargetInfo.targetSecretId, ruleTargetInfo.criticalControlsOnly);
+      ruleTargetInfo.targetUrl, ruleTargetInfo.targetType, ruleTargetInfo.targetSecretId,
+      ruleTargetInfo.criticalControlsOnly);
   }
 
   private static extractTargetInfo(rule: Object): {targetType: ServiceActionType,
@@ -54,8 +55,9 @@ export class Rule implements RuleInterface {
       return {targetType: ServiceActionType.WEBHOOK, targetUrl: webhook_action['url'],
       targetSecretId: '', criticalControlsOnly: false};
     } else if (servicenow_action !== null && servicenow_action !== undefined) {
-        return {targetType: ServiceActionType.SERVICENOW, targetUrl: servicenow_action['url'],
-        targetSecretId: servicenow_action['secret_id'], criticalControlsOnly: servicenow_action['critical_controls_only']};
+      return {targetType: ServiceActionType.SERVICENOW, targetUrl: servicenow_action['url'],
+      targetSecretId: servicenow_action['secret_id'],
+      criticalControlsOnly: servicenow_action['critical_controls_only']};
     } else {
       console.error(`Could not find action in rule ${JSON.stringify(rule)}`);
       throw new TypeError('Unable to extract action type');

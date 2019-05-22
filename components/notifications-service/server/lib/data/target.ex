@@ -31,9 +31,11 @@ defmodule Notifications.TargetBuilder do
 
   defp formatter(Notifications.WebhookAlert), do: &Formatters.Webhook.format/1
   defp formatter(Notifications.ServiceNowAlert), do: &Formatters.ServiceNow.format/1
-  defp criticals_only_formatter(Notifications.ServiceNowAlert), do: &Formatters.ServiceNowCritical.Compliance.format/1
   defp formatter(Notifications.SlackAlert), do: &Formatters.Slack.format/1
   defp formatter(_), do: &Notifications.Target.null_format/1
+
+  defp criticals_only_formatter(Notifications.ServiceNowAlert), do: &Formatters.ServiceNowCritical.Compliance.format/1
+
 
   defp pre_filter(Notifications.ServiceNowAlert, event), do: event != 2
   defp pre_filter(_, _), do: true

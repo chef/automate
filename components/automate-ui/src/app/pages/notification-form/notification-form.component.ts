@@ -71,7 +71,8 @@ export class NotificationFormComponent implements OnInit {
           this.targetType = rule.targetType;
           return this.model =
             new Model(new Rule(rule.id, rule.name, rule.ruleType,
-              rule.targetUrl, rule.targetType, rule.targetSecretId, rule.criticalControlsOnly), '', '');
+              rule.targetUrl, rule.targetType, rule.targetSecretId,
+              rule.criticalControlsOnly), '', '');
         });
     }
   }
@@ -100,7 +101,8 @@ export class NotificationFormComponent implements OnInit {
   }
 
   displayCriticalControlsCheckbox() {
-    return this.model.rule.targetType === ServiceActionType.SERVICENOW && this.model.rule.ruleType === 'ComplianceFailure';
+    return this.model.rule.targetType === ServiceActionType.SERVICENOW &&
+    this.model.rule.ruleType === 'ComplianceFailure';
   }
 
   onSelectionChange(name) {
