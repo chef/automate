@@ -8,8 +8,8 @@ control 'iam-v2-roles-1' do
   title 'v2-only access'
   desc 'role-based access for editor and viewer when v1 policies are purged'
 
-  VIEWER_USERNAME = 'inspec_test_viewer'
-  EDITOR_USERNAME = 'inspec_test_editor'
+  VIEWER_USERNAME = 'viewer'
+  EDITOR_USERNAME = 'editor'
 
   describe 'migrated legacy v1 policies' do
     it 'legacy policies can be deleted' do
@@ -26,60 +26,11 @@ control 'iam-v2-roles-1' do
   end
 
   describe 'viewer and editor access' do
-    before(:all) do
-      create_editor_request = automate_api_request(
-        '/apis/iam/v2beta/users',
-        http_method: 'POST',
-        request_body: {
-          id: EDITOR_USERNAME,
-          name: EDITOR_USERNAME,
-          password: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
-        }.to_json
-      )
-      expect(create_editor_request.http_status.to_s).to match(/200|409/)
-
-      create_viewer_request = automate_api_request(
-        '/apis/iam/v2beta/users',
-        http_method: 'POST',
-        request_body: {
-          id: VIEWER_USERNAME,
-          name: VIEWER_USERNAME,
-          password: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
-        }.to_json
-      )
-      expect(create_viewer_request.http_status.to_s).to match(/200|409/)
-
-      add_editor_request = automate_api_request(
-        '/apis/iam/v2beta/policies/editor-access/members:add',
-        http_method: 'POST',
-        request_body: {
-          members: [ "user:local:#{EDITOR_USERNAME}" ]
-        }.to_json
-      )
-      expect(add_editor_request.http_status.to_s).to match(/200|409/)
-
-      add_viewer_request = automate_api_request(
-        '/apis/iam/v2beta/policies/viewer-access/members:add',
-        http_method: 'POST',
-        request_body: {
-          members: [ "user:local:#{VIEWER_USERNAME}" ]
-        }.to_json
-      )
-      expect(add_viewer_request.http_status.to_s).to match(/200|409/)
-    end
-
-    after(:all) do
-      delete_editor_request = automate_api_request(
-        "/apis/iam/v2beta/users/#{EDITOR_USERNAME}",
-        http_method: 'DELETE',
-      )
-      expect(delete_editor_request.http_status.to_s).to match(/200|404/)
-
-      delete_viewer_request = automate_api_request(
-        "/apis/iam/v2beta/users/#{VIEWER_USERNAME}",
-        http_method: 'DELETE',
-      )
-      expect(delete_viewer_request.http_status.to_s).to match(/200|404/)
+    [ VIEWER_USERNAME, EDITOR_USERNAME ].each do |username|
+      it "user #{username} exists" do
+        user_read_request = automate_api_request("/apis/iam/v2beta/users/#{username}")
+        expect(user_read_request.http_status).to eq 200
+      end
     end
 
     describe "reading compliance data" do
