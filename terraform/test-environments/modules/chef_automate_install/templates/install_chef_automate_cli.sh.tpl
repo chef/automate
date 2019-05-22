@@ -130,12 +130,12 @@ hab pkg binlink core/hab --force
 if [[ ! -f /root/a2-iamv2-enabled ]]; then
     case "${iam_version}" in
     "v2.1")
-      chef-automate iam upgrade-to-v2 --beta2.1
+      chef-automate iam upgrade-to-v2 --beta2.1 --skip-legacy-upgrade
       chef-automate dev create-iam-dev-users
       touch /root/a2-iamv2-enabled
       ;;
     "v2")
-      chef-automate iam upgrade-to-v2
+      chef-automate iam upgrade-to-v2 --skip-legacy-upgrade
       chef-automate dev create-iam-dev-users
       touch /root/a2-iamv2-enabled
       ;;
