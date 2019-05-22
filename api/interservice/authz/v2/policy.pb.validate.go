@@ -2269,7 +2269,7 @@ func (m *MigrateToV2Req) Validate() error {
 
 	// no validation rules for Flag
 
-	// no validation rules for MigrateV1Policies
+	// no validation rules for SkipV1Policies
 
 	return nil
 }
