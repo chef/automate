@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"google.golang.org/grpc/codes"
 	grpc_status "google.golang.org/grpc/status"
 
@@ -20,10 +21,11 @@ import (
 )
 
 var iamCmdFlags = struct {
-	dryRun      bool
-	adminToken  bool
-	tokenID     string
-	betaVersion bool
+	dryRun            bool
+	adminToken        bool
+	tokenID           string
+	betaVersion       bool
+	skipLegacyUpgrade bool
 }{}
 
 func newIAMCommand() *cobra.Command {
@@ -94,16 +96,19 @@ func newIAMUpgradeToV2Cmd() *cobra.Command {
 		Args: cobra.ExactArgs(0),
 	}
 	cmd.PersistentFlags().BoolVar(
+		&iamCmdFlags.skipLegacyUpgrade,
+		"skip-legacy-upgrade",
+		false,
+		"Do not migrate policies from IAM v1.")
+	cmd.PersistentFlags().BoolVar(
 		&iamCmdFlags.betaVersion,
 		"beta2.1",
 		false,
 		"Upgrade to version 2.1 with beta project authorization.")
-	err := cmd.PersistentFlags().MarkHidden("beta2.1")
-	// we could also ignore the lint error :shrug:
-	if err != nil {
-		fmt.Printf("failed configuring cobra: %s\n", err.Error())
-		panic(err.Error())
-	}
+
+	// all flags are hidden right now
+	cmd.PersistentFlags().VisitAll(func(f *pflag.Flag) { f.Hidden = true })
+
 	return cmd
 }
 
