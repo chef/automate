@@ -947,7 +947,7 @@ func newCreateIAMDevUsersCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "create-iam-dev-users",
 		RunE:  runCreateIAMDevUsersCmd,
-		Short: `Create IAM v2 dev users ("viewer" and "editor")`,
+		Short: `Create IAM v2 dev users ("viewer" and "editor") idempotently`,
 		Args:  cobra.NoArgs,
 	}
 }
