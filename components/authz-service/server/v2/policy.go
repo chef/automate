@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -567,14 +568,15 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 			reports = append(reports, e.Error())
 		}
 	} else {
+		// Note 2019/05/22 (sr): policies without subjects are silently ignored -- this
+		// is to be in line with the migration case, that does the same. However, this
+		// could be worth revisiting?
 		pols, err := s.v1.ListPoliciesWithSubjects(ctx)
 		if err != nil {
 			recordFailure()
 			return nil, status.Errorf(codes.Internal, "list v1 policies: %s", err.Error())
 		}
-		for _, pol := range pols {
-			reports = append(reports, pol.ID.String())
-		}
+		reports = append(reports, fmt.Sprintf("%d v1 policies", len(pols)))
 
 	}
 
