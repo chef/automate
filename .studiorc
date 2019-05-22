@@ -128,7 +128,7 @@ fi
 
 document "start_all_services" <<DOC
   Simple wrapper for 'start_deployment_service' and 'chef-automate dev deployinate'.
-  Also applies a license (if present) and creates IAM v2 dev users.
+  Also applies a license (if present), creates IAM v2 dev users, and upgrades IAM to v2.
 DOC
 function start_all_services() {
   start_deployment_service
@@ -137,6 +137,7 @@ function start_all_services() {
      chef-automate license apply "/src/dev/license.jwt"
   fi
   chef-automate dev create-iam-dev-users
+  chef-automate iam upgrade-to-v2 --skip-legacy-upgrade
 }
 
 document "get_admin_token" <<DOC
