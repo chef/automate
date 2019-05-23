@@ -126,6 +126,10 @@ export class NotificationFormComponent implements OnInit {
 
   setFailureType(event) {
     this.model.rule.ruleType = event.target.value;
+    if (this.model.rule.ruleType !== 'ComplianceFailure' &&
+    this.model.rule.targetType === ServiceActionType.SERVICENOW) {
+      this.model.rule.criticalControlsOnly = false;
+    }
   }
 
   private revealUrlStatus(status: UrlTestState) {
