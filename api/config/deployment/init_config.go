@@ -356,9 +356,31 @@ func generatePrivateKey() (*rsa.PrivateKey, error) {
 	return rsa.GenerateKey(rand.Reader, keyLength)
 }
 
+func generateSerial() (*big.Int, error) {
+	// According to
+	// https://cabforum.org/wp-content/uploads/CA-Browser-Forum-BR-1.6.4.pdf:
+	//
+	// Effective September 30, 2016, CAs SHALL generate
+	// non-sequential Certificate serial numbers greater than zero
+	// (0) containing at least 64 bits of output from a CSPRNG.
+	//
+	// Here, we set the limit to double this requirement.
+	limit := new(big.Int).Lsh(big.NewInt(1), 128)
+	ret, err := rand.Int(rand.Reader, limit)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to generate serial number")
+	}
+	return ret, nil
+}
+
 func generateCert(priv *rsa.PrivateKey, fqdn string) ([]byte, error) {
+	serial, err := generateSerial()
+	if err != nil {
+		return nil, err
+	}
+
 	certSpec := x509.Certificate{
-		SerialNumber: big.NewInt(1),
+		SerialNumber: serial,
 		Subject: pkix.Name{
 			Country:            []string{"US"},
 			Organization:       []string{"Chef Software"},
