@@ -4,7 +4,6 @@
 </div>
 
 <app-server-org-filter-sidebar>
-  <!-- <chef-sidebar-entry route="/client-runs" icon="storage">Node State</chef-sidebar-entry> -->
   <a *ngIf="isWorkflowEnabled$ | async" href="/workflow">
     <chef-icon class="sidebar-icon" aria-hidden="true">local_shipping</chef-icon>
     Workflow
