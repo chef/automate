@@ -138,6 +138,10 @@ func (ccr *ChefClientRun) ToNode() (nodeState Node, err error) {
 			nodeState.Ec2.PlacementAvailabilityZone =
 				EmptyStringIfNil(chefRunEc2["placement_availability_zone"])
 		}
+
+		if ccr.Status == "failure" {
+			nodeState.ErrorMessage = ccr.Error.Message
+		}
 	}
 	return
 }
