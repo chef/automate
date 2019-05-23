@@ -3,6 +3,7 @@ package v2
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -299,6 +300,61 @@ func (s *state) HandleEvent(ctx context.Context,
 	return response, nil
 }
 
+func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.CreateRuleResp, error) {
+	// TODO: stringly-typed. meh.
+	ruleType, err := storage.NewRuleType(strings.ToLower(req.Type.String()))
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument,
+			"creating rule with ID %q: %s", req.Id, err.Error())
+	}
+	conditions, err := storageConditions(ruleType, req.Conditions)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument,
+			"creating rule with ID %q: %s", req.Id, err.Error())
+	}
+	r, err := storage.NewRule(req.Id, req.ProjectId, req.Name, ruleType, conditions)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument,
+			"creating rule with ID %q: %s", req.Id, err.Error())
+	}
+	resp, err := s.store.CreateRule(ctx, &r)
+	if err != nil {
+		if err == storage_errors.ErrConflict {
+			return nil, status.Errorf(codes.AlreadyExists, "rule with ID %q already exists", req.Id)
+		}
+		return nil, status.Errorf(codes.Internal,
+			"error creating rule with ID %q: %s", req.Id, err.Error())
+	}
+
+	apiRule, err := fromStorageRule(resp)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal,
+			"error converting rule with ID %q: %s", resp.ID, err.Error())
+	}
+	return &api.CreateRuleResp{Rule: apiRule}, nil
+}
+
+func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition) ([]storage.Condition, error) {
+	cs := make([]storage.Condition, len(apiConditions))
+	for i, c := range apiConditions {
+		var err error
+		cs[i], err = storageCondition(ruleType, c)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return cs, nil
+}
+
+func storageCondition(ruleType storage.RuleType, apiCondition *api.Condition) (storage.Condition, error) {
+	condAttr, err := storage.NewConditionAttribute(strings.ToLower(apiCondition.Type.String()))
+	if err != nil {
+		return storage.Condition{}, err
+	}
+
+	return storage.NewCondition(ruleType, apiCondition.Values, condAttr, storage.MemberOf)
+}
+
 // we want to reserve the option to return an error in this conversion
 // eventually, so for now, we stop the linter from complaining:
 // nolint: unparam
@@ -309,6 +365,59 @@ func fromStorageProject(p *storage.Project) (*api.Project, error) {
 		Type:     typeFromInternal(p.Type),
 		Projects: p.Projects,
 	}, nil
+}
+
+func fromStorageRule(r *storage.Rule) (*api.ProjectRule, error) {
+	cs, err := fromStorageConditions(r.Conditions)
+	if err != nil {
+		return nil, err
+	}
+	t, err := fromStorageRuleType(r.Type)
+	if err != nil {
+		return nil, err
+	}
+	return &api.ProjectRule{
+		Id:         r.ID,
+		Name:       r.Name,
+		Type:       t,
+		ProjectId:  r.ProjectID,
+		Conditions: cs,
+	}, nil
+}
+
+func fromStorageConditions(cs []storage.Condition) ([]*api.Condition, error) {
+	apiConditions := make([]*api.Condition, len(cs))
+	for i, c := range cs {
+		d, err :=  fromStorageCondition(c)
+		if err != nil {
+			return nil, err
+		}
+		apiConditions[i] = d
+	}
+	return apiConditions, nil
+}
+
+func fromStorageCondition(c storage.Condition) (*api.Condition, error) {
+	// TODO: stringly-typed. meh.
+	t, ok := api.ProjectRuleConditionTypes_value[strings.ToUpper(c.Type.String())]
+	if !ok {
+		return nil, fmt.Errorf("invalid condition type %s", c.Type.String())
+	}
+	return &api.Condition{
+		Type:   api.ProjectRuleConditionTypes(t),
+		Values: c.Value,
+	}, nil
+}
+
+func fromStorageRuleType(t storage.RuleType) (api.ProjectRuleTypes, error) {
+	switch t {
+	case storage.Node:
+		return api.ProjectRuleTypes_NODE, nil
+	case storage.Event:
+		return api.ProjectRuleTypes_EVENT, nil
+	default:
+		return 0, fmt.Errorf("unknown rule type: %v", t)
+	}
 }
 
 // TODO: Currently there is only collection of conditions in a project, which are called 'Rule'.
