@@ -70,11 +70,13 @@
             </chef-option>
           </chef-select>
           <div *ngIf="displayCriticalControlsCheckbox()">
-            <p class="small"><em>Check to be notified of critical control failures only</em>&nbsp;
+            <p class="small">
               <chef-checkbox
                 (change)="updateCriticalControlsOnly($event.detail)"
                 [checked]="model.rule.criticalControlsOnly">
               </chef-checkbox>
+              &nbsp;
+              Only send notifications for critical control failures
             </p>
           </div>
           <chef-form-field>
