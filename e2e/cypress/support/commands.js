@@ -101,14 +101,12 @@ Cypress.Commands.add("cleanupProjects", (id_token) => {
     failOnStatusCode: false
   }).then((resp) => {
     for (let project of resp.body.projects) {
-      if (project.id.startsWith('cypress')) {
-        cy.request({
-          auth: { bearer: id_token },
-          method: 'DELETE',
-          url: `/apis/iam/v2beta/projects/${project.id}`,
-          failOnStatusCode: false
-        })
-      }
+      cy.request({
+        auth: { bearer: id_token },
+        method: 'DELETE',
+        url: `/apis/iam/v2beta/projects/${project.id}`,
+        failOnStatusCode: false
+      })
     }
   })
 })
