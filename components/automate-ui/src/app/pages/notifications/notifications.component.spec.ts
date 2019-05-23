@@ -17,9 +17,9 @@ describe('NotificationsComponent', () => {
 
   const rules: Rule[] = [
     new Rule('id1', 'test rule1', 'ComplianceFailure',
-      'http://foo.com', ServiceActionType.SLACK, ''),
+      'http://foo.com', ServiceActionType.SLACK, '', false),
     new Rule('id2', 'test rule2', 'CCRFailure',
-      'http://foo.com', ServiceActionType.WEBHOOK, '')
+      'http://foo.com', ServiceActionType.WEBHOOK, '', false)
   ];
 
   // CSS identifiers
@@ -116,7 +116,7 @@ describe('NotificationsComponent', () => {
     });
 
     it('ensure telemetry is sent on deleting a rule', () => {
-      component.deleteRule(new Rule('', '', null, '', ServiceActionType.SLACK, ''));
+      component.deleteRule(new Rule('', '', null, '', ServiceActionType.SLACK, '', false));
 
       expect(telemetryService.track).toHaveBeenCalled();
     });

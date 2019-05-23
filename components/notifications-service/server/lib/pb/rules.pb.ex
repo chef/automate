@@ -36,12 +36,14 @@ defmodule Notifications.ServiceNowAlert do
 
   @type t :: %__MODULE__{
           url: String.t(),
-          secret_id: String.t()
+          secret_id: String.t(),
+          critical_controls_only: boolean
         }
-  defstruct [:url, :secret_id]
+  defstruct [:url, :secret_id, :critical_controls_only]
 
   field :url, 1, type: :string
   field :secret_id, 2, type: :string
+  field :critical_controls_only, 3, type: :bool
 end
 
 defmodule Notifications.Rule do

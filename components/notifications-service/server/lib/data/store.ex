@@ -106,16 +106,16 @@ defmodule Notifications.Data.Store do
   def statements() do
     [
       {:ping, "SELECT 'pong' as ping LIMIT 1"}, # used by sqerl to test for aliveness
-      {:add_rule, "INSERT INTO rules (id, name, event, action, url, secret_id) values ($1, $2, $3, $4, $5, $6)"},
+      {:add_rule, "INSERT INTO rules (id, name, event, action, url, secret_id, critical_controls_only) values ($1, $2, $3, $4, $5, $6, $7)"},
       {:delete_rule, "DELETE FROM rules WHERE id = $1"},
-      {:get_rule_by_id, "SELECT id, name, event, action, url, secret_id FROM rules WHERE id = $1"},
-      {:get_rules, "SELECT id, name, event, action, url, secret_id FROM rules ORDER BY id"},
-      {:get_rules_for_event, "SELECT id, name, event, action, url, secret_id FROM rules WHERE event = $1 ORDER BY id"},
+      {:get_rule_by_id, "SELECT id, name, event, action, url, secret_id, critical_controls_only FROM rules WHERE id = $1"},
+      {:get_rules, "SELECT id, name, event, action, url, secret_id, critical_controls_only FROM rules ORDER BY id"},
+      {:get_rules_for_event, "SELECT id, name, event, action, url, secret_id, critical_controls_only FROM rules WHERE event = $1 ORDER BY id"},
       # PG normally returns number of rows updated - so if we find a match but there is no
       # change to it, it will return 0 rows updated.  To work around that we declare "RETURNING id" -
       # this makes sure if the record is found, the ID is returned even if nothing changes.
       # When the record is not found, this will not be included in the response.
-      {:update_rule, "UPDATE rules SET name = $2, event = $3, action = $4, url = $5, secret_id = $6 WHERE id = $1 RETURNING id"},
+      {:update_rule, "UPDATE rules SET name = $2, event = $3, action = $4, url = $5, secret_id = $6, critical_controls_only = $7 WHERE id = $1 RETURNING id"},
       {:log_and_clean_event, "SELECT log_and_clean_event($1, $2, $3)"}
     ]
   end
@@ -175,8 +175,9 @@ defmodule Notifications.Data.Store do
     action_type = propval(db_rule, "action")
     url = propval(db_rule, "url")
     secret_id = propval(db_rule, "secret_id")
+    critical_controls_only = propval(db_rule, "critical_controls_only")
 
-    action = Module.concat(Notifications, action_type).new(url: url, secret_id: secret_id)
+    action = Module.concat(Notifications, action_type).new(url: url, secret_id: secret_id, critical_controls_only: critical_controls_only)
     event = rule_event_to_value(propval(db_rule, "event"))
     %Rule{id: propval(db_rule, "id"),
           name: propval(db_rule, "name"),
@@ -201,8 +202,13 @@ defmodule Notifications.Data.Store do
       _ -> ""
     end
 
+    critical_controls_only = case rule.action do
+      {_, %{critical_controls_only: critical_controls_only}} -> critical_controls_only
+      _ -> false
+    end
+
     [id, rule.name, rule_value_to_event(rule.event),
-     unqualified_type_name(type), url, secret_id]
+     unqualified_type_name(type), url, secret_id, critical_controls_only]
   end
 
   defp rule_event_to_value(event), do: Rule.Event.value(String.to_atom(event))

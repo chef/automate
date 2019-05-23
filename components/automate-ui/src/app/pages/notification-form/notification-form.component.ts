@@ -58,7 +58,7 @@ export class NotificationFormComponent implements OnInit {
     private route: ActivatedRoute,
     private featureFlags: FeatureFlagsService
   ) {
-    this.model = new Model(new Rule('', '', null, '', null, ''), '', '');
+    this.model = new Model(new Rule('', '', null, '', null, '', false), '', '');
     this.notificationId = this.route.snapshot.params['id'];
     this.isEditRule = this.notificationId ? true : false;
     this.showLoading = this.isEditRule;
@@ -71,7 +71,8 @@ export class NotificationFormComponent implements OnInit {
           this.targetType = rule.targetType;
           return this.model =
             new Model(new Rule(rule.id, rule.name, rule.ruleType,
-              rule.targetUrl, rule.targetType, rule.targetSecretId), '', '');
+              rule.targetUrl, rule.targetType, rule.targetSecretId,
+              rule.criticalControlsOnly), '', '');
         });
     }
   }
@@ -95,6 +96,15 @@ export class NotificationFormComponent implements OnInit {
     return alertKeys;
   }
 
+  updateCriticalControlsOnly(event) {
+    this.model.rule.criticalControlsOnly = event;
+  }
+
+  displayCriticalControlsCheckbox() {
+    return this.model.rule.targetType === ServiceActionType.SERVICENOW &&
+    this.model.rule.ruleType === 'ComplianceFailure';
+  }
+
   onSelectionChange(name) {
     this.targetType = name;
     this.model.rule.targetType = name;
@@ -116,6 +126,10 @@ export class NotificationFormComponent implements OnInit {
 
   setFailureType(event) {
     this.model.rule.ruleType = event.target.value;
+    if (this.model.rule.ruleType !== 'ComplianceFailure' &&
+    this.model.rule.targetType === ServiceActionType.SERVICENOW) {
+      this.model.rule.criticalControlsOnly = false;
+    }
   }
 
   private revealUrlStatus(status: UrlTestState) {
