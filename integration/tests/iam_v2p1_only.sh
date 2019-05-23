@@ -39,8 +39,8 @@ do_deploy() {
 }
 
 do_test_deploy() {
-    log_info "run chef-automate iam upgrade-to-v2 --beta2.1 --skip-legacy-upgrade"
-    chef-automate iam upgrade-to-v2 --beta2.1 --skip-legacy-upgrade || return 1
+    log_info "run chef-automate iam upgrade-to-v2 --beta2.1 --skip-policy-migration"
+    chef-automate iam upgrade-to-v2 --beta2.1 --skip-policy-migration || return 1
 
     verify_legacy_policies_not_migrated
 

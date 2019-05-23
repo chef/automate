@@ -97,7 +97,7 @@ func newIAMUpgradeToV2Cmd() *cobra.Command {
 	}
 	cmd.PersistentFlags().BoolVar(
 		&iamCmdFlags.skipLegacyUpgrade,
-		"skip-legacy-upgrade",
+		"skip-policy-migration",
 		false,
 		"Do not migrate policies from IAM v1.")
 	cmd.PersistentFlags().BoolVar(
