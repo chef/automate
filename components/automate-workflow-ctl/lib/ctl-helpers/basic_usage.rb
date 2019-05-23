@@ -9,7 +9,7 @@ module CtlHelpers
   #   ARGV: [my-command some args]
   # But you should simply pass:
   #   args: [some args]
-  # So, you probably wanna initalize this class like:
+  # So, you probably wanna initialize this class like:
   #   CtlHelpers::BasicUsage.new(ARGV[1..-1], "my-command", "Optional description.")
   class BasicUsage
 

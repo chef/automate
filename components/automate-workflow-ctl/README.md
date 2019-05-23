@@ -18,7 +18,7 @@ run `make test` to run the tests.
 
 The RSpec unit tests are in the spec directory. The specs in the
 spec/integration directory test the functionality of the commands, but all
-configuration is mocked so it can run in any envionment.
+configuration is mocked so it can run in any environment.
 
 ## Functional Tests
 

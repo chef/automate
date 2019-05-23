@@ -7,7 +7,7 @@
 # health         hardcode to 0 (OK) for now.
 # status         hardcode to 0 (RUNNING) for now
 # 
-# Package Indentifier
+# Package Identifier
 # --origin      parse from service name 
 # --name        parse from service name 
 # --version     hardcode to 1.0.0 for now

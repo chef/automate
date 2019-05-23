@@ -14,6 +14,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/olivere/elastic"
+	"github.com/spf13/viper"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/event"
 	cfgBackend "github.com/chef/automate/components/config-mgmt-service/backend"
@@ -24,9 +28,6 @@ import (
 	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/golang/mock/gomock"
-	"github.com/olivere/elastic"
-	"github.com/spf13/viper"
 )
 
 var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
@@ -182,7 +183,7 @@ func (s *Suite) IngestNodes(nodes []iBackend.Node) {
 	s.RefreshIndices(mappings.NodeState.Index)
 }
 
-// IngestActions ingests a number of actions then refreshe the all the action indexes
+// IngestActions ingests a number of actions then refreshes all the action indexes
 func (s *Suite) IngestActions(actions []iBackend.InternalChefAction) {
 	// Insert actions
 	for _, action := range actions {

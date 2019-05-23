@@ -497,7 +497,7 @@ func TestMSADConfig(t *testing.T) {
 		assert.Equal(t, "ou=people,dc=org", c.GetConnectors().GetMsadLdap().GetBaseUserSearchDn().GetValue())
 		assert.Equal(t, "ou=groups,dc=org", c.GetConnectors().GetMsadLdap().GetBaseGroupSearchDn().GetValue())
 
-		// Defaults are unset so that they recieve overrides in config
+		// Defaults are unset so that they receive overrides in config
 		assert.Equal(t, true, c.GetConnectors().GetMsadLdap().GetInsecureNoSsl().GetValue())
 		assert.Equal(t, "(objectClass=NotPerson)", c.GetConnectors().GetMsadLdap().GetUserQueryFilter().GetValue())
 		assert.Equal(t, "NotsAMAccountName", c.GetConnectors().GetMsadLdap().GetUsernameAttr().GetValue())

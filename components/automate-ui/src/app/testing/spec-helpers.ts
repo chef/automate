@@ -80,11 +80,11 @@ export function checkFirstPerm(
   // If permsFromTemplate path is more than 30 characters,
   // verb will be undefined. We will be unable to test the verb
   // and need to mark firstCheckItem[1] as undefined to pass test.
-  // AND If permsFromTemplate verb charaters is less than the
+  // AND If permsFromTemplate verb characters is less than the
   // firstCheckItem[1] we need to match the character length to pass test.
   firstCheckItem[1] = verb ? firstCheckItem[1].substring(0, verb.length) : undefined;
   // If permsFromTemplate path is more than 30 characters, the path
-  // will be cutt off and firstCheckItem[0] will need to match
+  // will be cut off and firstCheckItem[0] will need to match
   // character length to pass test.
   expect(path).toBe(firstCheckItem[0].substring(0, 30));
   expect(verb).toBe(firstCheckItem[1]);

@@ -90,7 +90,7 @@ func (s *server) CancelBackup(ctx context.Context, req *api.CancelBackupRequest)
 
 	err := s.backupRunner.Cancel(ctx)
 	if err != nil {
-		logrus.WithError(err).Error("failed to cancle backup operation")
+		logrus.WithError(err).Error("failed to cancel backup operation")
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 

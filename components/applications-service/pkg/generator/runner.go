@@ -6,11 +6,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/duration"
+	"github.com/pkg/errors"
+
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	uuid "github.com/chef/automate/lib/uuid4"
-	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -237,7 +238,7 @@ func (s *SupSim) PublishAll() error {
 // health         hardcode to 0 (OK) for now.
 // status         hardcode to 0 (RUNNING) for now
 //
-// Package Indentifier
+// Package Identifier
 // --origin      parse from service name
 // --name        parse from service name
 // --version     hardcode to 1.0.0 for now
