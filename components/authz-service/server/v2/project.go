@@ -3,7 +3,7 @@ package v2
 import (
 	"context"
 	"fmt"
-	"strings"
+	"sync"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -301,8 +301,7 @@ func (s *state) HandleEvent(ctx context.Context,
 }
 
 func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.CreateRuleResp, error) {
-	// TODO: stringly-typed. meh.
-	ruleType, err := storage.NewRuleType(strings.ToLower(req.Type.String()))
+	ruleType, err := fromAPIType(req.Type)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"creating rule with ID %q: %s", req.Id, err.Error())
@@ -347,7 +346,7 @@ func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition
 }
 
 func storageCondition(ruleType storage.RuleType, apiCondition *api.Condition) (storage.Condition, error) {
-	condAttr, err := storage.NewConditionAttribute(strings.ToLower(apiCondition.Type.String()))
+	condAttr, err := fromAPIProjectRuleConditionTypes(apiCondition.Type)
 	if err != nil {
 		return storage.Condition{}, err
 	}
@@ -388,7 +387,7 @@ func fromStorageRule(r *storage.Rule) (*api.ProjectRule, error) {
 func fromStorageConditions(cs []storage.Condition) ([]*api.Condition, error) {
 	apiConditions := make([]*api.Condition, len(cs))
 	for i, c := range cs {
-		d, err :=  fromStorageCondition(c)
+		d, err := fromStorageCondition(c)
 		if err != nil {
 			return nil, err
 		}
@@ -398,15 +397,47 @@ func fromStorageConditions(cs []storage.Condition) ([]*api.Condition, error) {
 }
 
 func fromStorageCondition(c storage.Condition) (*api.Condition, error) {
-	// TODO: stringly-typed. meh.
-	t, ok := api.ProjectRuleConditionTypes_value[strings.ToUpper(c.Type.String())]
-	if !ok {
-		return nil, fmt.Errorf("invalid condition type %s", c.Type.String())
+	t, err := fromStorageConditionType(c.Attribute)
+	if err != nil {
+		return nil, err
 	}
 	return &api.Condition{
-		Type:   api.ProjectRuleConditionTypes(t),
+		Type:   t,
 		Values: c.Value,
 	}, nil
+}
+
+var storageToAPIConditionAttributes = map[storage.ConditionAttribute]api.ProjectRuleConditionTypes{
+	storage.ChefRole:     api.ProjectRuleConditionTypes_ROLES,
+	storage.ChefServer:   api.ProjectRuleConditionTypes_CHEF_SERVERS,
+	storage.ChefTag:      api.ProjectRuleConditionTypes_CHEF_TAGS,
+	storage.Environment:  api.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
+	storage.Organization: api.ProjectRuleConditionTypes_CHEF_ORGS,
+	storage.PolicyGroup:  api.ProjectRuleConditionTypes_POLICY_GROUP,
+	storage.PolicyName:   api.ProjectRuleConditionTypes_POLICY_NAME,
+}
+
+var apiToStorageConditionAttributes map[api.ProjectRuleConditionTypes]storage.ConditionAttribute
+var onceReverseConditionAttributesMapping sync.Once
+
+func fromStorageConditionType(t storage.ConditionAttribute) (api.ProjectRuleConditionTypes, error) {
+	if s, ok := storageToAPIConditionAttributes[t]; ok {
+		return s, nil
+	}
+	return 0, fmt.Errorf("invalid condition type %s", t.String())
+}
+
+func fromAPIProjectRuleConditionTypes(t api.ProjectRuleConditionTypes) (storage.ConditionAttribute, error) {
+	onceReverseConditionAttributesMapping.Do(func() {
+		for k, v := range storageToAPIConditionAttributes {
+			apiToStorageConditionAttributes[v] = k
+		}
+	})
+
+	if s, ok := apiToStorageConditionAttributes[t]; ok {
+		return s, nil
+	}
+	return 0, fmt.Errorf("invalid condition type %s", t.String())
 }
 
 func fromStorageRuleType(t storage.RuleType) (api.ProjectRuleTypes, error) {
@@ -417,6 +448,17 @@ func fromStorageRuleType(t storage.RuleType) (api.ProjectRuleTypes, error) {
 		return api.ProjectRuleTypes_EVENT, nil
 	default:
 		return 0, fmt.Errorf("unknown rule type: %v", t)
+	}
+}
+
+func fromAPIType(t api.ProjectRuleTypes) (storage.RuleType, error) {
+	switch t {
+	case api.ProjectRuleTypes_NODE:
+		return storage.Node, nil
+	case api.ProjectRuleTypes_EVENT:
+		return storage.Event, nil
+	default:
+		return 0, fmt.Errorf("unknown rule type %s", t.String())
 	}
 }
 
