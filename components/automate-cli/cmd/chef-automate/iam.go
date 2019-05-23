@@ -107,7 +107,7 @@ func newIAMUpgradeToV2Cmd() *cobra.Command {
 		"Upgrade to version 2.1 with beta project authorization.")
 
 	// all flags are hidden right now
-	cmd.PersistentFlags().VisitAll(func(f *pflag.Flag) { f.Hidden = true })
+	cmd.PersistentFlags().VisitAll(func(f *pflag.Flag) { f.Hidden = !isDevMode() })
 
 	return cmd
 }
