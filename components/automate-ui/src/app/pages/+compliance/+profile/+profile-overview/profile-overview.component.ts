@@ -60,8 +60,8 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   // notification data
   downloadErrorVisible = false;
 
-  // show spinner befor loading data
-  ProfilesDataLoading = true
+  // show spinner before loading data
+  ProfilesDataLoading = true;
   userProfilesDataLoaded = false;
   availableProfilesDataLoaded = false;
 

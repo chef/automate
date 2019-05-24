@@ -13,7 +13,7 @@ export class ScannerComponent implements OnInit {
   jobsCount$: Observable<number>;
   nodesCount$: Observable<number>;
 
-  // show spinner befor loading data
+  // show spinner before loading data
   countsLoading = true;
   jobsCountLoaded = false;
   nodesCountLoaded = false;
