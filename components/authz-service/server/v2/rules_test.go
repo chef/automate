@@ -39,9 +39,6 @@ func TestCreateRule(t *testing.T) {
 		desc string
 		f    func(*testing.T)
 	}{
-		// Note 2019/05/24 (sr): These three invalid argument tests are a bit silly because
-		// all they test is different cases of bad input _into the storage/v2 helper
-		// functions_.
 		{"if the rule name is empty, returns 'invalid argument'", func(t *testing.T) {
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
 				Id:         "empty-name",
@@ -82,11 +79,23 @@ func TestCreateRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
+		{"if there are no conditions, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
+				Id:        "foo",
+				Name:      "foo rule",
+				ProjectId: "bar",
+			})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, resp)
+		}},
 		{"if a rule with that id already exists, returns 'already exists'", func(t *testing.T) {
 			id := "foo-rule"
 			addRuleToStore(t, store, id, "my foo rule", storage.Node, "foo-project", storageConditions)
 
-			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{Id: id, Name: "my other foo", ProjectId: "bar",
+			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
+				Id:         id,
+				Name:       "my other foo",
+				ProjectId:  "bar",
 				Conditions: apiConditions,
 			})
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
@@ -97,7 +106,7 @@ func TestCreateRule(t *testing.T) {
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
 				Id:        "any-name",
 				Name:      "any name",
-				ProjectId: "foo bar",
+				ProjectId: "foo",
 				Type:      api.ProjectRuleTypes_NODE,
 				Conditions: []*api.Condition{
 					{
@@ -108,11 +117,11 @@ func TestCreateRule(t *testing.T) {
 			})
 			assert.NoError(t, err)
 			assert.Equal(t, &api.CreateRuleResp{
-					Rule: &api.ProjectRule{
+				Rule: &api.ProjectRule{
 					Id:        "any-name",
 					Name:      "any name",
-					ProjectId: "foo bar",
-					Type: api.ProjectRuleTypes_NODE,
+					ProjectId: "foo",
+					Type:      api.ProjectRuleTypes_NODE,
 					Conditions: []*api.Condition{
 						{
 							Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
