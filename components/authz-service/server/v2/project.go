@@ -417,7 +417,7 @@ var storageToAPIConditionAttributes = map[storage.ConditionAttribute]api.Project
 	storage.PolicyName:   api.ProjectRuleConditionTypes_POLICY_NAME,
 }
 
-var apiToStorageConditionAttributes map[api.ProjectRuleConditionTypes]storage.ConditionAttribute
+var apiToStorageConditionAttributes = map[api.ProjectRuleConditionTypes]storage.ConditionAttribute{}
 var onceReverseConditionAttributesMapping sync.Once
 
 func fromStorageConditionType(t storage.ConditionAttribute) (api.ProjectRuleConditionTypes, error) {

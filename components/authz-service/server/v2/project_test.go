@@ -370,7 +370,12 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 	}
 }
 
+
 func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventServiceClient) {
+	cl, ca, _, mc := setupProjectsAndRules(t)
+	return cl, ca, mc
+}
+func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cache.Cache, *mockEventServiceClient) {
 	t.Helper()
 	ctx := context.Background()
 	prng.Seed(t)
@@ -405,7 +410,7 @@ func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventSe
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
 
-	return api.NewProjectsClient(conn), mem_v2.ProjectsCache(), eventServiceClient
+	return api.NewProjectsClient(conn), mem_v2.ProjectsCache(), mem_v2.RulesCache(), eventServiceClient
 }
 
 // TODO More testing

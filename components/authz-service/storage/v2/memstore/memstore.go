@@ -19,6 +19,7 @@ type State struct {
 	policies       *cache.Cache
 	roles          *cache.Cache
 	projects       *cache.Cache
+	rules          *cache.Cache
 	ms             storage.MigrationStatus
 }
 
@@ -29,6 +30,7 @@ func New() *State {
 		policies:       cache.New(cache.NoExpiration, -1 /* never run cleanup */),
 		roles:          cache.New(cache.NoExpiration, -1),
 		projects:       cache.New(cache.NoExpiration, -1),
+		rules:          cache.New(cache.NoExpiration, -1),
 		policyChangeID: 0,
 		changeManager:  newPolicyChangeNotifierManager(),
 	}
@@ -241,7 +243,9 @@ func (s *State) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNot
 }
 
 func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule, error) {
-	// TODO implement
+	if err := s.rules.Add(rule.ID, rule, cache.NoExpiration); err != nil {
+		return nil, storage_errors.ErrConflict
+	}
 	return rule, nil
 }
 
@@ -477,6 +481,10 @@ func (s *State) ProjectsCache() *cache.Cache {
 	return s.projects
 }
 
+// RulesCache is used in testing
+func (s *State) RulesCache() *cache.Cache {
+	return s.rules
+}
 func (s *State) Pristine(context.Context) error {
 	s.ms = storage.Pristine
 	return nil
