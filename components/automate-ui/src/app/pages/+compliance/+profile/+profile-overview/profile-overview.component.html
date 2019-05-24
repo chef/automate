@@ -1,4 +1,5 @@
 <app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
+<chef-loading-spinner *ngIf="ProfilesDataLoading" size='50' fixed></chef-loading-spinner>
 
 <div class="container">
   <main>
@@ -25,12 +26,10 @@
 
       <chef-tab-selector class="profiles-tabs" [value]="selectedTab" (change)="onTabChange($event)">
         <chef-option value='installed'>
-          <img *ngIf="userProfileDataLoading" src="assets/img/dataloader.gif" class="profiles-spinner" alt="show before loading profile" />
-          <span *ngIf="userProfileDataLoaded">{{ filteredProfiles.length }}</span> Profiles
+          <span *ngIf="userProfilesDataLoaded">{{ filteredProfiles.length }}</span> Profiles
         </chef-option>
         <chef-option value='available'>
-          <img *ngIf="availableProfileDataLoading" src="assets/img/dataloader.gif" class="profiles-spinner" alt="show before loading profile" />
-          <span *ngIf="availableProfileDataLoaded">{{ filteredAvailableProfiles.length }}</span> Available
+          <span *ngIf="availableProfilesDataLoaded">{{ filteredAvailableProfiles.length }}</span> Available
         </chef-option>
       </chef-tab-selector>
     </chef-page-header>

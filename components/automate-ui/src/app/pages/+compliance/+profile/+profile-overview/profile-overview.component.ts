@@ -61,10 +61,9 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   downloadErrorVisible = false;
 
   // show spinner befor loading data
-  userProfileDataLoading = true;
-  userProfileDataLoaded = false;
-  availableProfileDataLoading = true;
-  availableProfileDataLoaded = false;
+  ProfilesDataLoading = true
+  userProfilesDataLoaded = false;
+  availableProfilesDataLoaded = false;
 
   // Tabs
   selectedTab: 'installed' | 'available' = 'installed';
@@ -93,6 +92,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(([profiles, _availableProfiles]) => {
         this.checkForUpdatesAvailable(profiles);
+        this.stopSpinnerAfterDataLoad();
       });
   }
 
@@ -117,8 +117,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
         this.installedProfiles = profiles;
         this.filteredProfiles = profiles;
         this.profilesEmpty = this.installedProfiles.length === 0 ? true : false;
-        this.userProfileDataLoading = false;
-        this.userProfileDataLoaded = true;
+        this.userProfilesDataLoaded = true;
         return profiles;
       }),
       catchError(resp => {
@@ -143,8 +142,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
         this.availableListLoading = false;
         this.availableProfiles = availableProfiles;
         this.filteredAvailableProfiles = availableProfiles;
-        this.availableProfileDataLoading = false;
-        this.availableProfileDataLoaded = true;
+        this.availableProfilesDataLoaded = true;
         return availableProfiles;
       }),
       catchError(resp => {
@@ -153,6 +151,12 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
         }
         return observableThrowError(resp);
       }));
+  }
+
+  stopSpinnerAfterDataLoad() {
+    if (this.userProfilesDataLoaded && this.availableProfilesDataLoaded) {
+      this.ProfilesDataLoading = false;
+    }
   }
 
   checkForUpdatesAvailable(profiles: Array<Profile>) {

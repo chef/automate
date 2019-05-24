@@ -14,9 +14,8 @@ export class ScannerComponent implements OnInit {
   nodesCount$: Observable<number>;
 
   // show spinner befor loading data
-  jobsCountLoading = true;
+  countsLoading = true;
   jobsCountLoaded = false;
-  nodesCountLoading = true;
   nodesCountLoaded = false;
 
   constructor(private store: Store<any>) {}
@@ -24,13 +23,12 @@ export class ScannerComponent implements OnInit {
   ngOnInit() {
     this.jobsCount$ = this.store.select(selectors.jobsList)
       .pipe(map(jobsList => jobsList.total));
-    this.jobsCountLoading = false;
     this.jobsCountLoaded = true;
 
     this.nodesCount$ = this.store.select(selectors.nodeTotals)
       .pipe(map(nodeTotals => nodeTotals.all));
-    this.nodesCountLoading = false;
     this.nodesCountLoaded = true;
 
+    this.countsLoading = false;
   }
 }
