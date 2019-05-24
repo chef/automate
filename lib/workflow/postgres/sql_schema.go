@@ -109,7 +109,7 @@ CREATE TYPE task_status AS ENUM('success', 'failed');
 
 CREATE TABLE tasks (
     id BIGSERIAL PRIMARY KEY,
-    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
+    workflow_instance_id BIGINT NOT NULL,
     try_remaining INT NOT NULL DEFAULT 1,
     enqueued_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -120,7 +120,7 @@ CREATE TABLE tasks (
 
 CREATE TABLE tasks_results (
     id BIGSERIAL PRIMARY KEY,
-    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
+    workflow_instance_id BIGINT NOT NULL,
     parameters   BYTEA,
     task_name    TEXT NOT NULL,
     enqueued_at  TIMESTAMPTZ NOT NULL,
@@ -137,10 +137,10 @@ CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete', 'cancel', 'tas
 CREATE TABLE workflow_events (
     id BIGSERIAL PRIMARY KEY,
     event_type workflow_event_type NOT NULL,
-    workflow_instance_id BIGINT NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
+    workflow_instance_id BIGINT,
     enqueued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     -- task_complete members
-    task_result_id BIGINT REFERENCES tasks_results(id)
+    task_result_id BIGINT
 );
 
 -- Workflow Functions
@@ -248,7 +248,10 @@ AS $$
             (SELECT name, workflow_name, parameters, start_at FROM done_workflows) 
     )
     SELECT pg_notify('workflow_instance_complete', id::text) FROM done_workflows;
-    DELETE FROM workflow_instances WHERE id = wid
+    DELETE FROM tasks WHERE workflow_instance_id = wid;
+    DELETE FROM tasks_results WHERE workflow_instance_id = wid;
+    DELETE FROM workflow_events WHERE workflow_instance_id = wid;
+    DELETE FROM workflow_instances WHERE id = wid;
 $$;
 
 CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, _payload BYTEA,
