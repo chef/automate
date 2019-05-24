@@ -283,10 +283,6 @@ else
 end
 
 Vagrant.configure('2') do |config|
-  config.trigger.before :all do |trigger|
-    trigger.info = "Running a before trigger!"
-  end
-
   config.vm.box = 'aws'
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
