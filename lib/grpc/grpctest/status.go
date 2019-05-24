@@ -38,7 +38,7 @@ var codeToString = map[codes.Code]string{
 func AssertCode(t *testing.T, expected codes.Code, err error) {
 	t.Helper()
 
-	require.NotNil(t, err)
+	require.Error(t, err)
 	s := status.Convert(err)
 	if actual := s.Code(); actual != expected {
 		assert.Equal(t, codeToString[expected], codeToString[actual], "expected status codes to match")
