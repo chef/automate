@@ -1654,13 +1654,35 @@ func (m *CreateRuleReq) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
+	if !_CreateRuleReq_Id_Pattern.MatchString(m.GetId()) {
+		return CreateRuleReqValidationError{
+			field:  "Id",
+			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+		}
+	}
 
-	// no validation rules for ProjectId
+	if !_CreateRuleReq_ProjectId_Pattern.MatchString(m.GetProjectId()) {
+		return CreateRuleReqValidationError{
+			field:  "ProjectId",
+			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+		}
+	}
 
-	// no validation rules for Name
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		return CreateRuleReqValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+	}
 
 	// no validation rules for Type
+
+	if len(m.GetConditions()) < 1 {
+		return CreateRuleReqValidationError{
+			field:  "Conditions",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
 
 	for idx, item := range m.GetConditions() {
 		_, _ = idx, item
@@ -1733,6 +1755,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CreateRuleReqValidationError{}
+
+var _CreateRuleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+
+var _CreateRuleReq_ProjectId_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
 
 // Validate checks the field values on CreateRuleResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
