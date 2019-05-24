@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha1"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/asn1"
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
@@ -310,27 +312,49 @@ const selfSignedTLSWarning = `
     # certificate signed by a certificate authority you trust.`
 
 func generateTLSCerts(fqdn string) (string, string, error) {
-	key, err := generatePrivateKey()
+	CAKey, err := generatePrivateKey()
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to generate private key")
 	}
 
-	cert, err := generateCert(key, fqdn)
+	serverKey, err := generatePrivateKey()
 	if err != nil {
-		return "", "", errors.Wrap(err, "failed to generate TLS certificate")
+		return "", "", errors.Wrap(err, "failed to generate private key")
 	}
 
-	pemKey, err := pemEncodePrivateKey(key)
+	CACertBytes, err := generateSelfSignedCA(CAKey)
+	if err != nil {
+		return "", "", errors.Wrap(err, "failed to generate TLS CA certificate")
+	}
+
+	CACert, err := x509.ParseCertificate(CACertBytes)
+	if err != nil {
+		return "", "", errors.Wrap(err, "failed to parse generated CA certificate")
+	}
+
+	serverCertBytes, err := generateCert(serverKey, CACert, fqdn)
+	if err != nil {
+		return "", "", errors.Wrap(err, "failed to generate TLS Server certificate")
+	}
+
+	pemKey, err := pemEncodePrivateKey(serverKey)
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to PEM-encode private key")
 	}
 
-	pemCert, err := pemEncodeCert(cert)
+	pemServerCert, err := pemEncodeCert(serverCertBytes)
 	if err != nil {
 		return "", "", errors.Wrap(err, "failed to PEM-encode certificate")
 	}
 
-	return pemKey, pemCert, nil
+	pemCACert, err := pemEncodeCert(CACertBytes)
+	if err != nil {
+		return "", "", errors.Wrap(err, "faled to PEM-encode certificate")
+	}
+
+	certChain := fmt.Sprintf("%s%s", pemServerCert, pemCACert)
+
+	return pemKey, certChain, nil
 }
 
 func pemEncode(dType string, data []byte) (string, error) {
@@ -373,7 +397,65 @@ func generateSerial() (*big.Int, error) {
 	return ret, nil
 }
 
-func generateCert(priv *rsa.PrivateKey, fqdn string) ([]byte, error) {
+func subjectKeyIDFromPrivateKey(priv *rsa.PrivateKey) ([]byte, error) {
+	// NOTE(ssd) 2019-05-24: Because Public() returns an
+	// interface, the best way I found to get the raw bytes was to
+	// marshal and unmarshal it.
+	spkiASN1, err := x509.MarshalPKIXPublicKey(priv.Public())
+	if err != nil {
+		return nil, err
+	}
+
+	var spki struct {
+		Algorithm        pkix.AlgorithmIdentifier
+		SubjectPublicKey asn1.BitString
+	}
+	_, err = asn1.Unmarshal(spkiASN1, &spki)
+	if err != nil {
+		return nil, err
+	}
+
+	sum := sha1.Sum(spki.SubjectPublicKey.Bytes)
+	return sum[:], nil
+}
+
+// generateSelfSignedCA generates a self-signed CA certificate
+func generateSelfSignedCA(priv *rsa.PrivateKey) ([]byte, error) {
+	serial, err := generateSerial()
+	if err != nil {
+		return nil, err
+	}
+
+	skid, err := subjectKeyIDFromPrivateKey(priv)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not retrieve subject key ID from public key")
+	}
+
+	certSpec := x509.Certificate{
+		SerialNumber: serial,
+		Subject: pkix.Name{
+			Country:            []string{"US"},
+			Organization:       []string{"Chef Software"},
+			OrganizationalUnit: []string{"Chef Automate Self-Signed CA"},
+			CommonName:         "Chef Automate Self-Signed CA",
+		},
+		SubjectKeyId:          skid,
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(certLifetime),
+		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
+		IsCA:                  true,
+		BasicConstraintsValid: true,
+	}
+
+	cert, err := x509.CreateCertificate(rand.Reader, &certSpec, &certSpec, &priv.PublicKey, priv)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return cert, nil
+}
+
+func generateCert(priv *rsa.PrivateKey, caCert *x509.Certificate, fqdn string) ([]byte, error) {
 	serial, err := generateSerial()
 	if err != nil {
 		return nil, err
@@ -387,15 +469,10 @@ func generateCert(priv *rsa.PrivateKey, fqdn string) ([]byte, error) {
 			OrganizationalUnit: []string{"Chef Automate"},
 			CommonName:         fqdn,
 		},
-		NotBefore: time.Now(),
-		NotAfter:  time.Now().Add(certLifetime),
-		// KeyUsageCertSign is here because of the IsCA: true below.
-		KeyUsage:    x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
-		// NOTE(ssd) 2018-04-17: This is what A1 does and
-		// might be required by some browsers, but I'm not
-		// convinced this is correct.
-		IsCA:                  true,
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(certLifetime),
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 		BasicConstraintsValid: true,
 	}
 
@@ -405,7 +482,7 @@ func generateCert(priv *rsa.PrivateKey, fqdn string) ([]byte, error) {
 		certSpec.DNSNames = []string{fqdn}
 	}
 
-	cert, err := x509.CreateCertificate(rand.Reader, &certSpec, &certSpec, &priv.PublicKey, priv)
+	cert, err := x509.CreateCertificate(rand.Reader, &certSpec, caCert, &priv.PublicKey, priv)
 	if err != nil {
 		return []byte{}, err
 	}
