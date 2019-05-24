@@ -115,10 +115,6 @@ message FilterAuthorizedPairsResp {
     repeated Pair pairs = 1;
 }
 
-message FilterAuthorizedProjectsResp {
-    repeated string projects = 1;
-}
-
 message Pair {
     string resource = 2
       [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*$"];
@@ -130,7 +126,6 @@ service Authorization {
     rpc GetVersion (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
     rpc IsAuthorized (IsAuthorizedReq) returns (IsAuthorizedResp) {};
     rpc FilterAuthorizedPairs (FilterAuthorizedPairsReq) returns (FilterAuthorizedPairsResp) {};
-    rpc FilterAuthorizedProjects (FilterAuthorizedPairsReq) returns (FilterAuthorizedProjectsResp) {};
     rpc CreatePolicy (CreatePolicyReq) returns (CreatePolicyResp) {};
     rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {};
     rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {};
