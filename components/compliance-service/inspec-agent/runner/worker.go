@@ -140,13 +140,19 @@ func (r *Runner) work(worker *types.WorkerStats, jobs <-chan *types.InspecJob) {
 				detectInfoByte, err := json.Marshal(detectInfo)
 				if err != nil {
 					logrus.Errorf("error trying to marshal detectInfo for job %s", job.JobID)
-					continue
+					*job.NodeStatus = types.StatusFailed
+					inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 				}
 				r.scannerServer.UpdateResult(ctx, job, detectInfoByte, inspecErr, "")
 			case types.JobTypeExec:
 				if *job.NodeStatus == types.StatusCompleted {
 					reportID = uuid.Must(uuid.NewV4()).String()
-					r.reportIt(ctx, job, execInfo, reportID)
+					err := r.reportIt(ctx, job, execInfo, reportID)
+					if err != nil {
+						logrus.Errorf("worker error: %s", err)
+						*job.NodeStatus = types.StatusFailed
+						inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
+					}
 				}
 				r.scannerServer.UpdateResult(ctx, job, nil, inspecErr, reportID)
 			default:
