@@ -83,7 +83,7 @@ func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
 		resp, err = a.v1.FilterAuthorizedPairs(ctx, subjects, pairsV1)
 		if err == nil {
 			return &middleware.FilterPairsResponse{
-				Pairs: resp,
+				Pairs:                  resp,
 				MapByResourceAndAction: mapByResourceAndActionV1, // passed back as-is
 				MethodsInfo:            methodsInfoV1,            // to simplify processing
 			}, nil
@@ -93,7 +93,7 @@ func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
 		resp, err = a.v2.FilterAuthorizedPairs(ctx, subjects, pairsV2)
 		if err == nil {
 			return &middleware.FilterPairsResponse{
-				Pairs: resp,
+				Pairs:                  resp,
 				MapByResourceAndAction: mapByResourceAndActionV2,
 				MethodsInfo:            methodsInfoV2,
 			}, nil
@@ -104,50 +104,6 @@ func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
 	case codes.FailedPrecondition:
 		if a.fromStatus(st) {
 			return a.FilterAuthorizedPairs(ctx, subjects,
-				mapByResourceAndActionV1, mapByResourceAndActionV2,
-				methodsInfoV1, methodsInfoV2)
-		}
-		fallthrough
-	default: // any other error status
-		return nil, err
-	}
-}
-
-func (a *state) FilterAuthorizedProjects(ctx context.Context, subjects []string,
-	mapByResourceAndActionV1, mapByResourceAndActionV2 map[pairs.Pair][]string,
-	methodsInfoV1, methodsInfoV2 map[string]pairs.Info,
-) (*middleware.FilterProjectsResponse, error) {
-	var (
-		resp []string
-		err  error
-	)
-	switch a.next {
-	case a.v1:
-		pairsV1 := pairs.GetKeys(mapByResourceAndActionV1)
-		resp, err = a.v1.FilterAuthorizedProjects(ctx, subjects, pairsV1)
-		if err == nil {
-			return &middleware.FilterProjectsResponse{
-				Projects:               resp,
-				MapByResourceAndAction: mapByResourceAndActionV1, // passed back as-is
-				MethodsInfo:            methodsInfoV1,            // to simplify processing
-			}, nil
-		}
-	case a.v2:
-		pairsV2 := pairs.GetKeys(mapByResourceAndActionV2)
-		resp, err := a.v2.FilterAuthorizedProjects(ctx, subjects, pairsV2)
-		if err == nil {
-			return &middleware.FilterProjectsResponse{
-				Projects:               resp,
-				MapByResourceAndAction: mapByResourceAndActionV2,
-				MethodsInfo:            methodsInfoV2,
-			}, nil
-		}
-	}
-	st := status.Convert(err)
-	switch st.Code() {
-	case codes.FailedPrecondition:
-		if a.fromStatus(st) {
-			return a.FilterAuthorizedProjects(ctx, subjects,
 				mapByResourceAndActionV1, mapByResourceAndActionV2,
 				methodsInfoV1, methodsInfoV2)
 		}

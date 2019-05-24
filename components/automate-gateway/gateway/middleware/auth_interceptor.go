@@ -50,10 +50,6 @@ type SwitchingFilterHandler interface {
 		mapByResourceAndActionV1, mapByResourceAndActionV2 map[pairs.Pair][]string,
 		methodsInfoV1, methodsInfoV2 map[string]pairs.Info,
 	) (*FilterPairsResponse, error)
-	FilterAuthorizedProjects(ctx context.Context, subjects []string,
-		mapByResourceAndActionV1, mapByResourceAndActionV2 map[pairs.Pair][]string,
-		methodsInfoV1, methodsInfoV2 map[string]pairs.Info,
-	) (*FilterProjectsResponse, error)
 }
 
 // FilterPairsResponse includes the "used" half of the inputs, according to
@@ -80,7 +76,6 @@ type HTTPAuthorizationHandler interface {
 
 type IntrospectionHandler interface {
 	FilterAuthorizedPairs(ctx context.Context, subjects []string, pairs []*pairs.Pair) ([]*pairs.Pair, error)
-	FilterAuthorizedProjects(ctx context.Context, subjects []string, pairs []*pairs.Pair) ([]string, error)
 }
 
 type AuthorizationHandler interface {

@@ -108,24 +108,6 @@ func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, i
 	return respPairs, nil
 }
 
-func (c *client) FilterAuthorizedProjects(ctx context.Context, subjects []string, inputPairs []*pairs.Pair,
-) ([]string, error) {
-	pairsV1 := make([]*authz.Pair, len(inputPairs))
-	for i, p := range inputPairs {
-		pairsV1[i] = &authz.Pair{Resource: p.Resource, Action: p.Action}
-	}
-
-	// Need to make this call to allow auto-switching to v2 if needed
-	_, err := c.client.FilterAuthorizedProjects(ctx, &authz.FilterAuthorizedPairsReq{
-		Subjects: subjects,
-		Pairs:    pairsV1,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return []string{"~v1~"}, nil // magic V1 identifier
-}
-
 func AuthorizationHandler(cl authz.AuthorizationClient) middleware.AuthorizationHandler {
 	return &client{client: cl}
 }
