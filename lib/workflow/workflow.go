@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/pkg/errors"
@@ -141,6 +142,9 @@ type WorkflowInstance interface {
 	// this workflow instance is processed by a WorkflowExecutor next.
 	Continue(payload interface{}) Decision
 
+	// InstanceName returns the workflow instance name
+	InstanceName() string
+
 	// TotalEnqueuedTasks returns the total number of tasks that been enqueued
 	// for the lifetime of the running workflow instance.
 	TotalEnqueuedTasks() int
@@ -169,6 +173,10 @@ func (w *workflowInstanceImpl) GetParameters(obj interface{}) error {
 		return json.Unmarshal(w.instance.Parameters, obj)
 	}
 	return nil
+}
+
+func (w *workflowInstanceImpl) InstanceName() string {
+	return w.instance.InstanceName
 }
 
 func (w *workflowInstanceImpl) TotalEnqueuedTasks() int {
@@ -276,6 +284,8 @@ type WorkflowManager struct {
 	taskExecutors     map[string]registeredExecutor
 	workflowScheduler *workflowScheduler
 	backend           backend.Driver
+	cancel            context.CancelFunc
+	wg                sync.WaitGroup
 }
 
 // NewManager creates a new WorkflowManager with the given Driver. If
@@ -330,9 +340,17 @@ func (m *WorkflowManager) RegisterTaskExecutor(taskName string, executor TaskExe
 // Start starts the WorkflowManager. No workflows, tasks, or schedules will be
 // processed before Start is called. This should only be called once.
 func (m *WorkflowManager) Start(ctx context.Context) error {
-	go m.startTaskExecutors(ctx)
+	ctx, cancel := context.WithCancel(ctx)
+	m.cancel = cancel
+	m.startTaskExecutors(ctx)
 	go m.workflowScheduler.run(ctx)
-	go m.run(ctx)
+	go m.runWorkflowExecutor(ctx)
+	return nil
+}
+
+func (m *WorkflowManager) Stop() error {
+	m.cancel()
+	m.wg.Wait()
 	return nil
 }
 
@@ -483,10 +501,14 @@ func (m *WorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, 
 	workerName := fmt.Sprintf("%s/%d", taskName, workerID)
 	logrus.Infof("starting task executor %s", workerName)
 
+	m.wg.Add(1)
+
+LOOP:
 	for {
 		select {
 		case <-ctx.Done():
 			logrus.Infof("exiting task executor %s", workerName)
+			break LOOP
 		default:
 		}
 
@@ -530,17 +552,21 @@ func (m *WorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, 
 
 		cancel()
 	}
+	m.wg.Done()
 }
 
-func (m *WorkflowManager) run(ctx context.Context) {
+func (m *WorkflowManager) runWorkflowExecutor(ctx context.Context) {
 	workflowNames := make([]string, 0, len(m.workflowExecutors))
 	for k := range m.workflowExecutors {
 		workflowNames = append(workflowNames, k)
 	}
+	m.wg.Add(1)
+LOOP:
 	for {
 		select {
 		case <-ctx.Done():
-			panic("DONE")
+			logrus.Info("exiting workflow executor")
+			break LOOP
 		case <-time.After(2 * time.Second):
 			for {
 				if m.processWorkflow(ctx, workflowNames) {
@@ -549,9 +575,13 @@ func (m *WorkflowManager) run(ctx context.Context) {
 			}
 		}
 	}
+	m.wg.Done()
 }
 
 func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []string) bool {
+	m.wg.Add(1)
+	defer m.wg.Done()
+
 	s := newStatsInfo()
 	s.Begin("dequeue")
 	wevt, completer, err := m.backend.DequeueWorkflow(ctx, workflowNames)
