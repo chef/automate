@@ -156,6 +156,10 @@ func (pg *PostgresBackend) Init() error {
 	return nil
 }
 
+func (pg *PostgresBackend) Close() error {
+	return pg.db.Close()
+}
+
 func (pg *PostgresBackend) GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string) ([]byte, error) {
 	row := pg.db.QueryRowContext(ctx, "SELECT parameters FROM recurring_workflow_schedules WHERE name = $1 and workflow_name = $2",
 		scheduleName, workflowName)
@@ -401,13 +405,6 @@ VALUES ($1, $2, $3, $4, $5, $6)`,
 
 func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.WorkflowInstance) error {
 	wrapErr := func(err error, msg string) error {
-		if pqErr, ok := err.(*pq.Error); ok {
-			// unique violation
-			if pqErr.Code == "23505" {
-				return workflow.ErrWorkflowInstanceExists
-			}
-		}
-
 		return errors.Wrap(err, msg)
 	}
 	ctx, cancel := context.WithCancel(ctx)
@@ -427,7 +424,7 @@ func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.Workf
 		return wrapErr(err, "failed to commit enqueue workflow")
 	}
 	if count.Int64 == 0 {
-		return workflow.ErrNoDueWorkflows
+		return workflow.ErrWorkflowInstanceExists
 	}
 	return nil
 }
@@ -520,6 +517,25 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts bac
 	return nil
 }
 
+func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *backend.Task, error) {
+	row := tx.QueryRow(dequeueTaskQuery, taskName)
+	task := &backend.Task{
+		Name: taskName,
+	}
+
+	var tid int64
+	err := row.Scan(&tid, &task.WorkflowInstanceID, &task.Parameters)
+	if err == sql.ErrNoRows {
+		if err != nil {
+			logrus.WithError(err).Warn("failed to commit dequeue_task transaction after ErrNoRows")
+		}
+		return 0, nil, workflow.ErrNoTasks
+
+	} else if err != nil {
+		return 0, nil, errors.Wrap(err, "failed to dequeue task")
+	}
+	return tid, task, nil
+}
 func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
@@ -529,29 +545,18 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*b
 		return nil, nil, errors.Wrap(err, "failed to dequeue task")
 	}
 
-	row := tx.QueryRowContext(ctx, dequeueTaskQuery, taskName)
-	task := &backend.Task{
-		Name: taskName,
-	}
 	taskc := &PostgresTaskCompleter{
 		ctx:    ctx,
 		_tx:    tx,
 		cancel: cancel,
 	}
 
-	err = row.Scan(&taskc.tid, &task.WorkflowInstanceID, &task.Parameters)
-	if err == sql.ErrNoRows {
-		err := tx.Commit()
-		if err != nil {
-			logrus.WithError(err).Warn("failed to commit dequeue_task transaction after ErrNoRows")
-		}
+	tid, task, err := pg.dequeueTask(tx, taskName)
+	if err != nil {
 		cancel()
-		return nil, nil, workflow.ErrNoTasks
-
-	} else if err != nil {
-		cancel()
-		return nil, nil, errors.Wrap(err, "failed to dequeue task")
+		return nil, nil, err
 	}
+	taskc.tid = tid
 
 	// pinger
 	go func() {

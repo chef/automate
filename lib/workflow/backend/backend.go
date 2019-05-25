@@ -23,6 +23,7 @@ type Driver interface {
 	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
 
 	Init() error
+	Close() error
 }
 
 type WorkflowInstanceStatus string
