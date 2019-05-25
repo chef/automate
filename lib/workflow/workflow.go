@@ -26,6 +26,8 @@ var (
 )
 
 // Schedule represents a recurring workflow.
+// TODO(jaym): we should wrap this in the workflow pacakge and provide a getter
+// for the parameters
 type Schedule backend.Schedule
 
 // Task is an interface to an object representing a running Task. This will be

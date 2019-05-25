@@ -20,6 +20,7 @@ type workflowExecutor struct {
 type workflowManagerOpt struct {
 	TaskExecutors     []taskExecutor
 	WorkflowExecutors []workflowExecutor
+	NoStart           bool
 }
 type workflowManagerOptFunc func(*workflowManagerOpt)
 
@@ -38,6 +39,12 @@ func WithTaskExecutor(name string, executor workflow.TaskExecutor) workflowManag
 			Name:     name,
 			Executor: executor,
 		})
+	}
+}
+
+func WithNoStart() workflowManagerOptFunc {
+	return func(o *workflowManagerOpt) {
+		o.NoStart = true
 	}
 }
 
