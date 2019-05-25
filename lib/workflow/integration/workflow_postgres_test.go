@@ -54,6 +54,7 @@ func TestPostgresWorkflowManager(t *testing.T) {
 	ctx := context.Background()
 	require.NoError(t, runResetDB())
 	pgBackend := postgres.NewPostgresBackend(defaultConnURIForDatabase(defaultDatabaseName))
+	defer pgBackend.Close()
 	s := &WorkflowTestSuite{
 		newManager: func(opts ...workflowManagerOptFunc) *workflow.WorkflowManager {
 			o := workflowManagerOpt{}
@@ -70,9 +71,12 @@ func TestPostgresWorkflowManager(t *testing.T) {
 				err := m.RegisterTaskExecutor(te.Name, te.Executor, workflow.TaskExecutorOpts{})
 				require.NoError(t, err)
 			}
-			m.Start(ctx)
+			if !o.NoStart {
+				m.Start(ctx)
+			}
 			return m
 		},
 	}
 	suite.Run(t, s)
+	require.NoError(t, pgBackend.Close())
 }

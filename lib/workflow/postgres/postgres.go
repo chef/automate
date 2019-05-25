@@ -157,7 +157,10 @@ func (pg *PostgresBackend) Init() error {
 }
 
 func (pg *PostgresBackend) Close() error {
-	return pg.db.Close()
+	if pg.db != nil {
+		return pg.db.Close()
+	}
+	return nil
 }
 
 func (pg *PostgresBackend) GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string) ([]byte, error) {
@@ -526,11 +529,7 @@ func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *bac
 	var tid int64
 	err := row.Scan(&tid, &task.WorkflowInstanceID, &task.Parameters)
 	if err == sql.ErrNoRows {
-		if err != nil {
-			logrus.WithError(err).Warn("failed to commit dequeue_task transaction after ErrNoRows")
-		}
 		return 0, nil, workflow.ErrNoTasks
-
 	} else if err != nil {
 		return 0, nil, errors.Wrap(err, "failed to dequeue task")
 	}

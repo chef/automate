@@ -38,7 +38,7 @@ func (w *workflowScheduler) run(ctx context.Context) {
 			if err != nil {
 				logrus.WithError(err).Error("failed to schedule workflows")
 			}
-			logrus.Debugf("Recurring workflow scheduler sleep for %fs", nextSleep.Seconds())
+			logrus.Infof("Recurring workflow scheduler sleep for %fs", nextSleep.Seconds())
 		}
 	}
 }
@@ -57,6 +57,10 @@ func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duratio
 		if err != nil {
 			return sleepTime, err
 		}
+		// BUG(jaym): It's possible to get into a busy loop here.
+		// If there is a workflow instance that is past due and
+		// currently running, we spin because we don't return an
+		// error
 	}
 }
 
@@ -96,6 +100,11 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 
 	nowUTC := time.Now().UTC()
 	nextDueAt := recurrence.After(nowUTC, true).UTC()
+	if nextDueAt.IsZero() {
+		// BUG(jaym): nextDueAt can be zero, for example when a recurrence
+		// will never again be due (Until)
+		panic("Unimplemented")
+	}
 	sleepTime := time.Until(nextDueAt)
 	logrus.Infof("Starting scheduled workflow %q", workflowInstanceName)
 	err = completer.EnqueueRecurringWorkflow(s, workflowInstanceName, nextDueAt, nowUTC)
