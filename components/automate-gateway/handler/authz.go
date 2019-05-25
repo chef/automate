@@ -359,9 +359,7 @@ func (a *AuthzServer) getAllowedProjects(
 		log.WithError(err).Debug("Error on client.FilterAuthorizedProjects")
 		return nil, err
 	}
-	respProjects := make([]string, len(resp.Projects))
-	copy(respProjects, resp.Projects)
-	return respProjects, nil
+	return resp.Projects, nil
 }
 
 func domainPolicyToGatewayPolicy(pol *authz.Policy) *gwAuthzRes.Policy {
