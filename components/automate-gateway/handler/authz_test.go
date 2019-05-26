@@ -181,11 +181,11 @@ func TestIntrospectAllProjectsV2(t *testing.T) {
 	}{
 		"empty response": {
 			&authz_v2.FilterAuthorizedProjectsResp{},
-			[]string(nil),
+			nil,
 		},
 		"empty list": {
 			&authz_v2.FilterAuthorizedProjectsResp{Projects: []string{}},
-			[]string(nil),
+			nil,
 		},
 		"some projects": {
 			&authz_v2.FilterAuthorizedProjectsResp{Projects: []string{"p1", "p2"}},
