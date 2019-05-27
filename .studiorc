@@ -117,7 +117,7 @@ GETTING_STARTED
 
 # Memory check. Because we all always forget to change the docker preferences
 # when we re-install it
-total_memory_kb=$(cat /proc/meminfo | grep MemTotal | grep -o -E '[[:digit:]]+')
+total_memory_kb=$(grep MemTotal /proc/meminfo | grep -o -E '[[:digit:]]+')
 # 8 gigs == 8164340kb, subtract a few kb so we can just do a less than comp
 if (( $total_memory_kb < 8164000 )); then
   warn "!!!"
@@ -128,6 +128,7 @@ fi
 
 document "start_all_services" <<DOC
   Simple wrapper for 'start_deployment_service' and 'chef-automate dev deployinate'.
+  Also applies a license (if present), creates IAM v2 dev users, and upgrades IAM to v2.
 DOC
 function start_all_services() {
   start_deployment_service
@@ -135,6 +136,8 @@ function start_all_services() {
   if [[ -f "/src/dev/license.jwt" ]]; then
      chef-automate license apply "/src/dev/license.jwt"
   fi
+  chef-automate dev create-iam-dev-users
+  chef-automate iam upgrade-to-v2 --skip-policy-migration
 }
 
 document "get_admin_token" <<DOC

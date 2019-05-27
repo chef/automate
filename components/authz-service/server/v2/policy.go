@@ -2,6 +2,7 @@ package v2
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -556,14 +557,27 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		}
 	}
 
-	errs, err := s.migrateV1Policies(ctx)
-	if err != nil {
-		recordFailure()
-		return nil, status.Errorf(codes.Internal, "migrate v1 policies: %s", err.Error())
-	}
-	reports := make([]string, len(errs))
-	for i, e := range errs {
-		reports[i] = e.Error()
+	var reports []string
+	if !req.SkipV1Policies {
+		errs, err := s.migrateV1Policies(ctx)
+		if err != nil {
+			recordFailure()
+			return nil, status.Errorf(codes.Internal, "migrate v1 policies: %s", err.Error())
+		}
+		for _, e := range errs {
+			reports = append(reports, e.Error())
+		}
+	} else {
+		// Note 2019/05/22 (sr): policies without subjects are silently ignored -- this
+		// is to be in line with the migration case, that does the same. However, this
+		// could be worth revisiting?
+		pols, err := s.v1.ListPoliciesWithSubjects(ctx)
+		if err != nil {
+			recordFailure()
+			return nil, status.Errorf(codes.Internal, "list v1 policies: %s", err.Error())
+		}
+		reports = append(reports, fmt.Sprintf("%d v1 policies", len(pols)))
+
 	}
 
 	err = s.store.ApplyV2DataMigrations(ctx)

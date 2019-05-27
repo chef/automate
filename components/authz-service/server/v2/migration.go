@@ -3,7 +3,6 @@ package v2
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -54,7 +53,7 @@ func (s *policyServer) migrateV1Policies(ctx context.Context) ([]error, error) {
 			if err := s.addTokenToAdminPolicy(ctx, adminTokenPolicy.Subjects[0]); err != nil {
 				errs = append(errs, errors.Wrapf(err, "adding members %q for admin policy %q", pol.Subjects, pol.ID.String()))
 			}
-			continue //don't migrate admin policies with single token
+			continue // don't migrate admin policies with single token
 		}
 		storagePol, err := migrateV1Policy(pol)
 		if err != nil {
@@ -100,8 +99,7 @@ func (s *policyServer) addTokenToAdminPolicy(ctx context.Context, tok string) er
 }
 
 func checkForAdminTokenPolicy(pol *storage_v1.Policy) (*storage_v1.Policy, error) {
-	var tokenRE = regexp.MustCompile(`^token`)
-	if pol.Action == "*" && pol.Resource == "*" && len(pol.Subjects) == 1 && tokenRE.MatchString(pol.Subjects[0]) {
+	if pol.Action == "*" && pol.Resource == "*" && len(pol.Subjects) == 1 && strings.HasPrefix(pol.Subjects[0], "token:") {
 		return pol, nil
 	}
 	return nil, nil

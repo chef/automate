@@ -26,12 +26,20 @@ import (
 // boolean representing whether the user was found or created.
 func CreateAdminUserOrUpdatePassword(ctx context.Context,
 	apiClient client.APIClient, newAdminPassword string, dryRun bool) (string, bool, error) {
+	return CreateUserOrUpdatePassword(ctx, apiClient, "admin", "Local Administrator", newAdminPassword, dryRun)
+}
+
+// CreateUserOrUpdatePassword either creates a new user with the supplied
+// username or updates the existing user's password. In either case, it returns
+// the ID and a boolean representing whether the user was found or created.
+func CreateUserOrUpdatePassword(ctx context.Context,
+	apiClient client.APIClient, username, displayName, newPassword string, dryRun bool) (string, bool, error) {
 
 	var userID string
 	var found bool
 
 	getUserResp, err := apiClient.UsersClient().GetUserByUsername(ctx, &users_req.Username{
-		Username: "admin",
+		Username: username,
 	})
 
 	s := grpc_status.Convert(err)
@@ -41,12 +49,12 @@ func CreateAdminUserOrUpdatePassword(ctx context.Context,
 
 		if !dryRun {
 			createUserResp, err := apiClient.UsersClient().CreateUser(ctx, &users_req.CreateUser{
-				Name:     "Local Administrator",
-				Username: "admin",
-				Password: newAdminPassword,
+				Name:     displayName,
+				Username: username,
+				Password: newPassword,
 			})
 			if err != nil {
-				return "", false, wrapUnexpectedError(err, "Failed to create the admin user")
+				return "", false, wrapUnexpectedError(err, "Failed to create the user")
 			}
 			userID = createUserResp.Id
 		}
@@ -58,18 +66,18 @@ func CreateAdminUserOrUpdatePassword(ctx context.Context,
 		if !dryRun {
 			_, err = apiClient.UsersClient().UpdateUser(ctx, &users_req.UpdateUser{
 				Id:       userID,
-				Name:     "Local Administrator",
-				Username: "admin",
-				Password: newAdminPassword,
+				Name:     displayName,
+				Username: username,
+				Password: newPassword,
 			})
 			if err != nil {
 				// The first two args are not-to-be-looked-at by convention, as the err is
 				// NOT nil; so, we don't bother returning the userID and true.
-				return "", false, wrapUnexpectedError(err, "Failed to update admin user's password")
+				return "", false, wrapUnexpectedError(err, "Failed to update user's password")
 			}
 		}
 	default: // some error occurred querying the user
-		return "", false, wrapUnexpectedError(err, "Failed to check if admin user exists")
+		return "", false, wrapUnexpectedError(err, "Failed to check if user exists")
 	}
 
 	return userID, found, nil
@@ -84,27 +92,32 @@ func CreateAdminTeamIfMissing(ctx context.Context,
 	return EnsureTeam(ctx, "admins", descr, apiClient, dryRun)
 }
 
-// AddAdminUserToTeam adds the admin user to the admins team by its ID,
-// unless the admin is already in the team. It returns a boolean representing
-// whether or not the user needed to be added.
 func AddAdminUserToTeam(ctx context.Context,
-	apiClient client.APIClient, adminsTeamID, userID string, dryRun bool) (bool, error) {
+	apiClient client.APIClient, adminTeamID, adminUserID string, dryRun bool) (bool, error) {
+	return AddUserToTeam(ctx, apiClient, adminTeamID, adminUserID, dryRun)
+}
+
+// AddUserToTeam adds the user to a team by its ID, unless they are already in
+// the team. It returns a boolean representing whether or not the user needed to
+// be added.
+func AddUserToTeam(ctx context.Context,
+	apiClient client.APIClient, teamID, userID string, dryRun bool) (bool, error) {
 
 	getUsersResp, err := apiClient.TeamsClient().GetUsers(ctx, &teams_req.GetUsersReq{
-		Id: adminsTeamID,
+		Id: teamID,
 	})
 	if err != nil {
-		return false, wrapUnexpectedError(err, "Failed to check admins team membership")
+		return false, wrapUnexpectedError(err, "Failed to check team membership")
 	}
 
 	addUser := !stringutils.SliceContains(getUsersResp.UserIds, userID)
 	if addUser && !dryRun {
 		_, err := apiClient.TeamsClient().AddUsers(ctx, &teams_req.AddUsersReq{
-			Id:      adminsTeamID,
+			Id:      teamID,
 			UserIds: []string{userID},
 		})
 		if err != nil {
-			return false, wrapUnexpectedError(err, "Failed to add admin user to admins team")
+			return false, wrapUnexpectedError(err, "Failed to add user to team")
 		}
 	}
 
