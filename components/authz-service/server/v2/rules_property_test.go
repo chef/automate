@@ -14,29 +14,36 @@ import (
 
 func TestCreateRuleCreatesRulesInStorage(t *testing.T) {
 	ctx := context.Background()
-	cl, _, _, seed := setupRules(t)
+	cl, store, _, seed := setupRules(t)
 
-	conditionsGen := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
+	// conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
+	// 	"Type": gen.OneConstOf(
+	// 		api.ProjectRuleConditionTypes_CHEF_SERVERS,
+	// 		api.ProjectRuleConditionTypes_CHEF_ORGS,
+	// 		api.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
+	// 		api.ProjectRuleConditionTypes_ROLES,
+	// 		api.ProjectRuleConditionTypes_CHEF_TAGS,
+	// 		api.ProjectRuleConditionTypes_POLICY_GROUP,
+	// 		api.ProjectRuleConditionTypes_POLICY_NAME,
+	// 	),
+	// 	"Values": gen.SliceOf(gen.AnyString()),
+	// })
+	conditionsGenEvent := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
 			api.ProjectRuleConditionTypes_CHEF_SERVERS,
 			api.ProjectRuleConditionTypes_CHEF_ORGS,
-			api.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-			api.ProjectRuleConditionTypes_ROLES,
-			api.ProjectRuleConditionTypes_CHEF_TAGS,
-			api.ProjectRuleConditionTypes_POLICY_GROUP,
-			api.ProjectRuleConditionTypes_POLICY_NAME,
 		),
 		"Values": gen.SliceOf(gen.AnyString()),
 	})
 	createRuleReqGen := gen.Struct(reflect.TypeOf(&api.CreateRuleReq{}), map[string]gopter.Gen{
 		"Id":        gen.RegexMatch("^[a-z0-9-]{1,64}$"),
 		"Name":      gen.AnyString(),
-		"ProjectId": gen.Identifier(),
+		"ProjectId": gen.RegexMatch("^[a-z0-9-]{1,64}$"),
 		"Type": gen.OneConstOf(
 			api.ProjectRuleTypes_NODE,
 			api.ProjectRuleTypes_EVENT,
 		),
-		"Conditions": gen.SliceOf(conditionsGen),
+		"Conditions": gen.SliceOf(conditionsGenEvent),
 	})
 
 	params := gopter.DefaultTestParametersWithSeed(seed)
@@ -44,6 +51,7 @@ func TestCreateRuleCreatesRulesInStorage(t *testing.T) {
 	properties := gopter.NewProperties(params)
 	properties.Property("creates a rule in storage", prop.ForAll(
 		func(req api.CreateRuleReq) bool {
+			store.Flush()
 			_, err := cl.CreateRule(ctx, &req)
 			good := err == nil
 
