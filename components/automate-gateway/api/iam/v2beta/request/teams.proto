@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.iam.v2beta;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request";
 
-message GetTeamsReq {}
+message ListTeamsReq {}
 
 message GetTeamReq {
     string id = 1;

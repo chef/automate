@@ -21,8 +21,8 @@ func NewServer(client teams.TeamsV2Client) *Server {
 	}
 }
 
-// GetTeams fetches an array of existing teams
-func (a *Server) GetTeams(ctx context.Context, _ *gwreq.GetTeamsReq) (*gwres.GetTeamsResp, error) {
+// ListTeams fetches an array of existing teams
+func (a *Server) ListTeams(ctx context.Context, _ *gwreq.ListTeamsReq) (*gwres.ListTeamsResp, error) {
 	req := &teams.GetTeamsReq{}
 
 	res, err := a.client.GetTeams(ctx, req)
@@ -30,7 +30,7 @@ func (a *Server) GetTeams(ctx context.Context, _ *gwreq.GetTeamsReq) (*gwres.Get
 		return nil, err
 	}
 
-	return &gwres.GetTeamsResp{
+	return &gwres.ListTeamsResp{
 		Teams: fromUpstreamTeams(res.Teams),
 	}, nil
 }

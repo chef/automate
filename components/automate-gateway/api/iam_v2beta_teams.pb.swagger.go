@@ -20,12 +20,12 @@ func init() {
   "paths": {
     "/iam/v2beta/teams": {
       "get": {
-        "operationId": "GetTeams",
+        "operationId": "ListTeams",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetTeamsResp"
+              "$ref": "#/definitions/v2betaListTeamsResp"
             }
           }
         },
@@ -339,7 +339,7 @@ func init() {
         }
       }
     },
-    "v2betaGetTeamsResp": {
+    "v2betaListTeamsResp": {
       "type": "object",
       "properties": {
         "teams": {
