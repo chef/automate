@@ -16,7 +16,7 @@ import (
 
 func TestCreateRule(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _ := setupRules(t)
+	cl, store, _, _ := setupRules(t)
 
 	// it's cumbersome to set this up, so we re-use it in a few of the following
 	// cases
@@ -157,7 +157,7 @@ func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType 
 	store.Add(id, rule, 0)
 }
 
-func setupRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventServiceClient) {
-	cl, _, ca, mc := setupProjectsAndRules(t)
-	return cl, ca, mc
+func setupRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventServiceClient, int64) {
+	cl, _, ca, mc, s := setupProjectsAndRules(t)
+	return cl, ca, mc, s
 }
