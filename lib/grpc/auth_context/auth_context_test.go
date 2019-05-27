@@ -43,7 +43,7 @@ func TestOutgoingMetadata(t *testing.T) {
 			metadata.MD{
 				"resource": []string{"res"},
 				"action":   []string{"act"},
-				"subjects": []string(nil),
+				"subjects": nil,
 				"projects": []string{"projects"},
 				"policy":   []string{"v999"}},
 		},

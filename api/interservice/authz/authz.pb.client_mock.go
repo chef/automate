@@ -95,26 +95,6 @@ func (mr *MockAuthorizationClientMockRecorder) FilterAuthorizedPairs(ctx, in int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedPairs", reflect.TypeOf((*MockAuthorizationClient)(nil).FilterAuthorizedPairs), varargs...)
 }
 
-// FilterAuthorizedProjects mocks base method
-func (m *MockAuthorizationClient) FilterAuthorizedProjects(ctx context.Context, in *FilterAuthorizedPairsReq, opts ...grpc.CallOption) (*FilterAuthorizedProjectsResp, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "FilterAuthorizedProjects", varargs...)
-	ret0, _ := ret[0].(*FilterAuthorizedProjectsResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// FilterAuthorizedProjects indicates an expected call of FilterAuthorizedProjects
-func (mr *MockAuthorizationClientMockRecorder) FilterAuthorizedProjects(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedProjects", reflect.TypeOf((*MockAuthorizationClient)(nil).FilterAuthorizedProjects), varargs...)
-}
-
 // CreatePolicy mocks base method
 func (m *MockAuthorizationClient) CreatePolicy(ctx context.Context, in *CreatePolicyReq, opts ...grpc.CallOption) (*CreatePolicyResp, error) {
 	m.ctrl.T.Helper()
@@ -261,21 +241,6 @@ func (m *MockAuthorizationServer) FilterAuthorizedPairs(arg0 context.Context, ar
 func (mr *MockAuthorizationServerMockRecorder) FilterAuthorizedPairs(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedPairs", reflect.TypeOf((*MockAuthorizationServer)(nil).FilterAuthorizedPairs), arg0, arg1)
-}
-
-// FilterAuthorizedProjects mocks base method
-func (m *MockAuthorizationServer) FilterAuthorizedProjects(arg0 context.Context, arg1 *FilterAuthorizedPairsReq) (*FilterAuthorizedProjectsResp, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FilterAuthorizedProjects", arg0, arg1)
-	ret0, _ := ret[0].(*FilterAuthorizedProjectsResp)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// FilterAuthorizedProjects indicates an expected call of FilterAuthorizedProjects
-func (mr *MockAuthorizationServerMockRecorder) FilterAuthorizedProjects(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterAuthorizedProjects", reflect.TypeOf((*MockAuthorizationServer)(nil).FilterAuthorizedProjects), arg0, arg1)
 }
 
 // CreatePolicy mocks base method
