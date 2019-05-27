@@ -142,29 +142,19 @@ func TestCreateRule(t *testing.T) {
 		store.Flush()
 	}
 }
+
 func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType storage.RuleType, projectID string,
 	conditions []storage.Condition) {
 	t.Helper()
 
 	rule := &storage.Rule{
-		ID:        id,
-		Name:      name,
-		Type:      ruleType,
-		ProjectID: projectID,
-		// TODO conditions
+		ID:         id,
+		Name:       name,
+		Type:       ruleType,
+		ProjectID:  projectID,
+		Conditions: conditions,
 	}
 	store.Add(id, rule, 0)
-
-	//	returnType := api.Type_CHEF_MANAGED
-	//	if projType == storage.Custom {
-	//		returnType = api.Type_CUSTOM
-	//	}
-	//	return api.Rule{
-	//		Id:       id,
-	//		Name:     name,
-	//		Type:     returnType,
-	//		ProjectId: projectID,
-	//	}
 }
 
 func setupRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventServiceClient) {
