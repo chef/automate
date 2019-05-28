@@ -21,8 +21,9 @@ var (
 	ErrNoWorkflowInstances    = errors.New("no workflow instances in queue")
 	ErrWorkflowScheduleExists = errors.New("workflow schedule already exists")
 	ErrWorkflowInstanceExists = errors.New("workflow instance already exists")
-	ErrNoDueWorkflows         = errors.New("No due workflows")
-	ErrNoScheduledWorkflows   = errors.New("No workflows are scheduled")
+	ErrNoDueWorkflows         = errors.New("no due workflows")
+	ErrNoScheduledWorkflows   = errors.New("no workflows are scheduled")
+	ErrInvalidSchedule        = errors.New("workflow schedule is not valid")
 )
 
 // Schedule represents a recurring workflow.
@@ -367,6 +368,10 @@ func (m *WorkflowManager) CreateWorkflowSchedule(
 	recurRule *rrule.RRule,
 ) error {
 	nextRunAt := recurRule.After(time.Now().UTC(), true).UTC()
+	logrus.Info(nextRunAt)
+	if nextRunAt.IsZero() {
+		return ErrInvalidSchedule
+	}
 	jsonData, err := jsonify(parameters)
 	if err != nil {
 		return err

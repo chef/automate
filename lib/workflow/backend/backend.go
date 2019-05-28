@@ -102,7 +102,7 @@ type WorkflowCompleter interface {
 }
 
 type RecurringWorkflowCompleter interface {
-	EnqueueRecurringWorkflow(s *Schedule, workflowInstanceName string, nextDueAt time.Time, lastStartedAt time.Time) error
+	EnqueueRecurringWorkflow(s *Schedule) error
 	Close()
 }
 
@@ -110,15 +110,18 @@ type Schedule struct {
 	// NOTE(ssd) 2019-05-13: Since name and workflow-name are
 	// user-controlled in the case of many scheduled workflows, we
 	// need the ID to create unique workflow names.
-	ID           int64
-	Enabled      bool
-	Name         string
-	WorkflowName string
-	Parameters   []byte
-	Recurrence   string
-	NextDueAt    time.Time
-	LastStart    *time.Time
-	LastEnd      *time.Time
+	ID             int64
+	Enabled        bool
+	Name           string
+	WorkflowName   string
+	Parameters     []byte
+	Recurrence     string
+	NextDueAt      time.Time
+	LastEnqueuedAt time.Time
+
+	// These come from the latest result
+	LastStart *time.Time
+	LastEnd   *time.Time
 }
 
 type WorkflowScheduleUpdateOpts struct {

@@ -101,18 +101,18 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	nowUTC := time.Now().UTC()
 	nextDueAt := recurrence.After(nowUTC, true).UTC()
 	if nextDueAt.IsZero() {
-		// BUG(jaym): nextDueAt can be zero, for example when a recurrence
-		// will never again be due (Until)
-		panic("Unimplemented")
+		s.Enabled = false
 	}
 	sleepTime := time.Until(nextDueAt)
 	logrus.Infof("Starting scheduled workflow %q", workflowInstanceName)
-	err = completer.EnqueueRecurringWorkflow(s, workflowInstanceName, nextDueAt, nowUTC)
+	s.NextDueAt = nextDueAt
+	s.LastEnqueuedAt = nowUTC
+	err = completer.EnqueueRecurringWorkflow(s)
 	if err != nil {
 		if err == ErrWorkflowInstanceExists {
 			logrus.Warnf(
 				"Recurring workflow %q still running, consider increasing recurrence interval",
-				workflowInstanceName)
+				s.Name)
 			// TODO(jaym): what do we want to do here? i think we're going to keep trying
 			//             until we succeed here? Maybe we want to skip this interval?
 			return maxWakeupInterval, nil

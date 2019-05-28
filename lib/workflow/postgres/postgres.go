@@ -53,11 +53,18 @@ const (
         FOR UPDATE SKIP LOCKED LIMIT 1
         `
 	updateRecurringWorkflowQuery = `
-        UPDATE recurring_workflow_schedules SET next_run_at = $2, last_enqueued_at = $3 WHERE id = $1
+		UPDATE recurring_workflow_schedules 
+		SET next_run_at = $2, 
+		last_enqueued_at = $3,
+		enabled = $4
+		WHERE id = $1
         `
 
 	updateSlowRecurringWorkflowQuery = `
-        UPDATE recurring_workflow_schedules SET next_run_at = $2 WHERE id = $1
+		UPDATE recurring_workflow_schedules 
+		SET next_run_at = $2,
+		enabled = $3
+		WHERE id = $1
         `
 )
 
@@ -656,12 +663,7 @@ func (workc *PostgresWorkflowCompleter) Close() error {
 }
 
 // TODO(ssd) 2019-05-14: We should probably allow bulk insertion of workflows and tasks
-func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
-	s *backend.Schedule,
-	workflowInstanceName string,
-	nextDueAt time.Time,
-	lastStartedAt time.Time,
-) error {
+func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(s *backend.Schedule) error {
 	defer c.cancel()
 	wrapErr := func(err error, msg string) error {
 		if pqErr, ok := err.(*pq.Error); ok {
@@ -674,7 +676,12 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
 		return errors.Wrap(err, msg)
 	}
 
-	row := c.tx.QueryRowContext(c.ctx, enqueueWorkflowQuery, workflowInstanceName, s.WorkflowName, s.Parameters)
+	row := c.tx.QueryRowContext(
+		c.ctx,
+		enqueueWorkflowQuery,
+		s.Name,
+		s.WorkflowName,
+		s.Parameters)
 
 	var count sql.NullInt64
 	err := row.Scan(&count)
@@ -683,7 +690,12 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
 	}
 
 	if count.Int64 == 0 {
-		_, err = c.tx.ExecContext(c.ctx, updateSlowRecurringWorkflowQuery, s.ID, nextDueAt)
+		_, err = c.tx.ExecContext(
+			c.ctx,
+			updateSlowRecurringWorkflowQuery,
+			s.ID,
+			s.NextDueAt,
+			s.Enabled)
 		if err != nil {
 			return wrapErr(err, "failed to update workflow schedule")
 		}
@@ -694,7 +706,13 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(
 		}
 		return workflow.ErrWorkflowInstanceExists
 	} else {
-		_, err = c.tx.ExecContext(c.ctx, updateRecurringWorkflowQuery, s.ID, nextDueAt, lastStartedAt)
+		_, err = c.tx.ExecContext(
+			c.ctx,
+			updateRecurringWorkflowQuery,
+			s.ID,
+			s.NextDueAt,
+			s.LastEnqueuedAt,
+			s.Enabled)
 		if err != nil {
 			return wrapErr(err, "failed to update workflow schedule")
 		}
