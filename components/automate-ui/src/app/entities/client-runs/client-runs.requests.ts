@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of as observableOf } from 'rxjs';
 import { reduce, includes, union } from 'lodash/fp';
 import { Chicklet, NodeCount } from '../../types/types';
+import { clone } from 'lodash/fp';
 import {
   NodeFilter
 } from './client-runs.model';
@@ -68,7 +69,9 @@ export class ClientRunsRequests {
 
   public getNodeCount(filters?: NodeFilter): Observable<NodeCount> {
     const url = `${CONFIG_MGMT_URL}/stats/node_counts`;
-    const options = filters ? { params: this.formatNodeCountFilters(filters) } : {};
+    const updatedFilters = this.removeTypeFromFilterSearchBar(filters, 'status');
+    const searchParam = this.formatFilters(updatedFilters);
+    const options = filters ? { params: searchParam } : {};
 
     return this.httpClient
       .get<NodeCount>(url, options);
@@ -217,26 +220,31 @@ export class ClientRunsRequests {
     return field;
   }
 
-  private formatNodeCountFilters(filters: NodeFilter) {
+  private formatFilters(filters: NodeFilter) {
     let searchParam = new HttpParams();
 
-    if (filters.searchBar) {
-      const searchBarRemovedStatus = this.removeTypeFromFilter(filters.searchBar, 'status');
-      searchParam = this.flattenSearchBar(searchBarRemovedStatus, searchParam);
-    }
-    if (filters.servers) {
-      searchParam = this.flattenServerFilter(filters.servers, searchParam);
-    }
-    if (filters.organizations) {
-      searchParam = this.flattenOrganizationFilter(filters.organizations, searchParam);
+    if (filters) {
+      if (filters.searchBar) {
+        searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
+      }
+      if (filters.servers) {
+        searchParam = this.flattenServerFilter(filters.servers, searchParam);
+      }
+      if (filters.organizations) {
+        searchParam = this.flattenOrganizationFilter(filters.organizations, searchParam);
+      }
     }
 
     return searchParam;
   }
 
-  private removeTypeFromFilter(searchBar: Array<Chicklet>,
-    type: string): Array<Chicklet> {
-    return searchBar.filter(chicklet => chicklet.type !== type);
+  private removeTypeFromFilterSearchBar(filters: NodeFilter,
+    type: string): NodeFilter {
+    const filtersClone = clone(filters);
+    if (filtersClone && filtersClone.searchBar) {
+      filtersClone.searchBar = filtersClone.searchBar.filter(chicklet => chicklet.type !== type);
+    }
+    return filtersClone;
   }
 
   private flattenSearchBar(filters: object[], searchParam: HttpParams): HttpParams {
