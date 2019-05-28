@@ -17,12 +17,13 @@ import {
   RemovePolicyMembers, PolicyMembersMgmtPayload
 } from 'app/entities/policies/policy.actions';
 
+const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
+
 @Component({
   selector: 'app-policy-details',
   templateUrl: './policy-details.component.html',
   styleUrls: ['./policy-details.component.scss']
 })
-
 export class PolicyDetailsComponent implements OnInit, OnDestroy {
   public policy: Policy;
   public policyJSON: string;
@@ -66,15 +67,16 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       map((state) => {
         this.policy = <Policy>Object.assign({}, state);
         this.policyJSON = this.policyToString(this.policy);
-        const members = [];
+        const members = <Member[]>[];
         this.policy.members.forEach(element => {
           const member = stringToMember(element);
           members.push(member);
           if (member.type === Type.LocalUser) {
             this.memberURLs[member.name] = ['/settings', 'users', member.displayName];
-          }
-          if (member.type === Type.LocalTeam) {
+          } else if (member.type === Type.LocalTeam) {
             this.memberURLs[member.name] = ['/settings', 'teams', member.displayName];
+          } else if (member.type === Type.Token) {
+            this.memberURLs[member.name] = ['/settings', 'tokens', member.displayName];
           }
         });
         delete this.policy.members;
@@ -87,7 +89,17 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed))
       .subscribe((id: string) => {
-        this.store.dispatch(new GetPolicy({ id }));
+        this.store.select(routeURL).pipe(
+          filter(identity),
+          takeUntil(this.isDestroyed))
+          .subscribe((url: string) => {
+            // Only fetch if we are on the policy details route, otherwise
+            // we'll trigger GetPolicy with the wrong input on any route
+            // away to a page that also uses the :id param.
+            if (POLICY_DETAILS_ROUTE.test(url)) {
+              this.store.dispatch(new GetPolicy({ id }));
+            }
+        });
       });
   }
 

@@ -53,7 +53,7 @@
           <chef-tbody>
             <chef-tr *ngFor="let member of members$ | async">
               <chef-td>
-                <a *ngIf="memberURLs.hasOwnProperty(member.name)" [routerLink]="memberURLs[member.name]" target="_blank">
+                <a *ngIf="memberURLs.hasOwnProperty(member.name)" [routerLink]="memberURLs[member.name]">
                   {{ member.displayName }}
                 </a>
                 <ng-container *ngIf="!memberURLs.hasOwnProperty(member.name)">
