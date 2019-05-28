@@ -20,7 +20,7 @@ Use this command to publish messages as a habitat supervisor would publish to th
 
 NATS Flags:
 	--uniq-client-id     Generate a unique client-id to connect to server
-	--infinite-stream    Publish message every second intinitely
+	--infinite-stream    Publish message every second infinitely
 	--internal-nats      Connect to the Automate Internal NATS Server
 	--disable-tls        Disables TLS when connecting to the server (only applies for event-gateway/external NATS)
 
@@ -39,7 +39,7 @@ Options to build a Habitat Event message:
 	--site        <site>   The site of the server where the service is running
 	--channel     <name>   The habitat channel name that the service is subscribed to
 
-	Package Indentifier
+	Package Identifier
 	--origin   <origin>  The origin of a package
 	--name     <name>    The name of a package
 	--version  <version> The version of a package

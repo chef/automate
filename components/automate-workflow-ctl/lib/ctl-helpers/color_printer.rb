@@ -92,7 +92,7 @@ module CtlHelpers
     # Outputs usage in a format similar to OptParse.
     # Should only be used on very similar commands that
     # aren't doing much validation. Was written to
-    # get --help output for every commmand.
+    # get --help output for every command.
     #
     # Example:
     #  usage_line: "my_command [options...]"

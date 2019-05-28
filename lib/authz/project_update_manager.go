@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"time"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	automate_event "github.com/chef/automate/api/interservice/event"
-	automate_event_type "github.com/chef/automate/components/event-service/server"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	automate_event "github.com/chef/automate/api/interservice/event"
+	automate_event_type "github.com/chef/automate/components/event-service/server"
 )
 
 const (
@@ -193,7 +194,7 @@ func (manager *DomainProjectUpdateManager) PercentageComplete() float32 {
 	return 1.0
 }
 
-// EstimatedTimeComplete - the estimated date and time of compeletion.
+// EstimatedTimeComplete - the estimated date and time of completion.
 func (manager *DomainProjectUpdateManager) EstimatedTimeComplete() time.Time {
 	switch manager.stage.state {
 	case NotRunningState:

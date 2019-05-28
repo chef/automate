@@ -155,7 +155,7 @@ duplicate_assertion_check(Assertion, Digest) ->
     KeepSecs = Stale - Now + 1,
     case auth_saml_assertion_timer:check_and_set_digest(Digest, timer:seconds(KeepSecs)) of
         true ->
-            chef_log:error("Recieved duplicate assertion: ~p", [Assertion]),
+            chef_log:error("Received duplicate assertion: ~p", [Assertion]),
             {error, duplicate_assertion};
         _ ->
             ok

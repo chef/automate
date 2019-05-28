@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -42,7 +41,7 @@ type SwitchingAuthorizationHandler interface {
 	GRPCAuthorizationHandler
 	SwitchingFilterHandler
 	IsAuthorized(ctx context.Context, subjects []string,
-		resourceV1, actionV1, resourceV2, actionV2 string) (AnnotatedAuthorizationResponse, error)
+		resourceV1, actionV1, resourceV2, actionV2 string, projects []string) (AnnotatedAuthorizationResponse, error)
 }
 
 type SwitchingFilterHandler interface {
@@ -50,10 +49,6 @@ type SwitchingFilterHandler interface {
 		mapByResourceAndActionV1, mapByResourceAndActionV2 map[pairs.Pair][]string,
 		methodsInfoV1, methodsInfoV2 map[string]pairs.Info,
 	) (*FilterPairsResponse, error)
-	FilterAuthorizedProjects(ctx context.Context, subjects []string,
-		mapByResourceAndActionV1, mapByResourceAndActionV2 map[pairs.Pair][]string,
-		methodsInfoV1, methodsInfoV2 map[string]pairs.Info,
-	) (*FilterProjectsResponse, error)
 }
 
 // FilterPairsResponse includes the "used" half of the inputs, according to
@@ -75,12 +70,11 @@ type GRPCAuthorizationHandler interface {
 }
 
 type HTTPAuthorizationHandler interface {
-	IsAuthorized(ctx context.Context, subjects []string, resource, action string) (AuthorizationResponse, error)
+	IsAuthorized(ctx context.Context, subjects []string, resource, action string, projects []string) (AuthorizationResponse, error)
 }
 
 type IntrospectionHandler interface {
 	FilterAuthorizedPairs(ctx context.Context, subjects []string, pairs []*pairs.Pair) ([]*pairs.Pair, error)
-	FilterAuthorizedProjects(ctx context.Context, subjects []string, pairs []*pairs.Pair) ([]string, error)
 }
 
 type AuthorizationHandler interface {
@@ -90,10 +84,12 @@ type AuthorizationHandler interface {
 }
 
 type AuthorizationResponse interface {
+	Ctx() context.Context
 	GetAuthorized() bool
 }
 
 type AnnotatedAuthorizationResponse interface {
+	AuthorizationResponse
 	Err() error
 }
 
@@ -148,8 +144,7 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			subs = append(authResponse.Teams, authResponse.Subject)
 		}
 
-		projectHeaderEntries := md.Get(runtime.MetadataPrefix + "projects")
-		projects := getProjectsFromMetadata(projectHeaderEntries)
+		projects := auth_context.ProjectsFromMetadata(md)
 
 		ctx, err = a.authz.Handle(authCtx, subs, projects, req)
 		if err != nil {
@@ -182,7 +177,7 @@ func getProjectsFromMetadata(projectHeaderEntries []string) []string {
 	for _, entry := range projectHeaderEntries {
 		for _, project := range strings.Split(entry, ",") {
 			newProject := strings.TrimSpace(project)
-			if _, value := keys[newProject]; !value {
+			if !keys[newProject] {
 				keys[newProject] = true
 				projects = append(projects, newProject)
 			}

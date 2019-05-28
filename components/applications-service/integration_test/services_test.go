@@ -10,10 +10,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/habitat"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGetServicesBasic(t *testing.T) {
@@ -438,7 +439,7 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 
 // @afiune there are cases where the order of the services that are returned are not
 // exactly the same, we do care about order but in some degree, for example health check
-// status and fqdn, but we don't care about things like order of supervidor_id so we can
+// status and fqdn, but we don't care about things like order of supervisor_id so we can
 // skip that check by not specifying it into the expected response
 func assertServicesEqual(t *testing.T, expected, actual []*applications.Service) {
 	if assert.Equal(t, len(expected), len(actual), "The number of services are not the same") {

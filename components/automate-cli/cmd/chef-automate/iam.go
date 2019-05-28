@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"google.golang.org/grpc/codes"
 	grpc_status "google.golang.org/grpc/status"
 
@@ -20,10 +21,11 @@ import (
 )
 
 var iamCmdFlags = struct {
-	dryRun      bool
-	adminToken  bool
-	tokenID     string
-	betaVersion bool
+	dryRun            bool
+	adminToken        bool
+	tokenID           string
+	betaVersion       bool
+	skipLegacyUpgrade bool
 }{}
 
 func newIAMCommand() *cobra.Command {
@@ -94,16 +96,19 @@ func newIAMUpgradeToV2Cmd() *cobra.Command {
 		Args: cobra.ExactArgs(0),
 	}
 	cmd.PersistentFlags().BoolVar(
+		&iamCmdFlags.skipLegacyUpgrade,
+		"skip-policy-migration",
+		false,
+		"Do not migrate policies from IAM v1.")
+	cmd.PersistentFlags().BoolVar(
 		&iamCmdFlags.betaVersion,
 		"beta2.1",
 		false,
 		"Upgrade to version 2.1 with beta project authorization.")
-	err := cmd.PersistentFlags().MarkHidden("beta2.1")
-	// we could also ignore the lint error :shrug:
-	if err != nil {
-		fmt.Printf("failed configuring cobra: %s\n", err.Error())
-		panic(err.Error())
-	}
+
+	// all flags are hidden right now
+	cmd.PersistentFlags().VisitAll(func(f *pflag.Flag) { f.Hidden = !isDevMode() })
+
 	return cmd
 }
 
@@ -153,18 +158,27 @@ const alreadyMigratedMessage = `You have already upgraded to IAM %s.
   Then re-run this command.`
 
 func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
-	upgradeReq := &policies_req.UpgradeToV2Req{
-		Flag: policies_common.Flag_VERSION_2_0,
+	label := map[bool]string{
+		true:  "v2.1",
+		false: "v2",
 	}
-	isBetaVersion := iamCmdFlags.betaVersion
 
+	upgradeReq := &policies_req.UpgradeToV2Req{
+		Flag:           policies_common.Flag_VERSION_2_0,
+		SkipV1Policies: iamCmdFlags.skipLegacyUpgrade,
+	}
+
+	isBetaVersion := iamCmdFlags.betaVersion
 	if isBetaVersion {
 		upgradeReq.Flag = policies_common.Flag_VERSION_2_1
 		writer.Title("Enabling IAM v2.1")
 	} else {
 		writer.Title("Upgrading to IAM v2")
 	}
-	writer.Println("Migrating v1 policies...")
+
+	if !iamCmdFlags.skipLegacyUpgrade {
+		writer.Println("Migrating v1 policies...")
+	}
 
 	ctx := context.Background()
 	apiClient, err := apiclient.OpenConnection(ctx)
@@ -188,11 +202,7 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
 			"Migration to IAM v2 already in progress")
 	case codes.AlreadyExists:
-		if isBetaVersion {
-			writer.Failf(alreadyMigratedMessage, "v2.1")
-		} else {
-			writer.Failf(alreadyMigratedMessage, "v2")
-		}
+		writer.Failf(alreadyMigratedMessage, label[isBetaVersion])
 		return nil
 	default: // something else: fail
 		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
@@ -222,10 +232,6 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 			"Failed to migrate teams service")
 	}
 
-	label := map[bool]string{
-		true:  "v2.1",
-		false: "v2",
-	}
 	writer.Successf("Enabled IAM %s", label[isBetaVersion])
 	return nil
 }
@@ -234,7 +240,7 @@ func outputReport(report string) {
 	// if it's got ":" in it, split on the first
 	parts := strings.SplitN(report, ":", 2)
 	writer.Body(parts[0])
-	if parts[1] != "" {
+	if len(parts) >= 2 {
 		writer.Body(strings.TrimSpace(parts[1]))
 	}
 }

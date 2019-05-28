@@ -44,6 +44,504 @@ func TestSuggestionsWithAnInvalidTypeReturnsError(t *testing.T) {
 	}
 }
 
+func TestSuggestionsFiltered(t *testing.T) {
+
+	ctx := context.Background()
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Suggestion
+		expected    []string
+	}{
+		{
+			description: "All node names suggestions are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "3",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "4",
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "name",
+			},
+			expected: []string{"1", "2", "3", "4"},
+		},
+		{
+			description: "All node name suggestions are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "3",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "4",
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "name",
+			},
+			expected: []string{"1", "2", "3", "4"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have environment 'a' are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "1",
+						Environment: "a",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "2",
+						Environment: "a",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "3",
+						Environment: "b",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "4",
+						Environment: "b",
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"environment:a"},
+			},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have environment 'a' and platform 'ubuntu' are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "1",
+						Environment: "a",
+						Platform:    "ubuntu",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "2",
+						Environment: "a",
+						Platform:    "debian",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "3",
+						Environment: "b",
+						Platform:    "windows",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "4",
+						Environment: "b",
+						Platform:    "windows",
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"environment:a", "platform:ubuntu"},
+			},
+			expected: []string{"1"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have environments that start with 'a-' are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "1",
+						Environment: "a-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "2",
+						Environment: "a-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "3",
+						Environment: "b",
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"environment:a-*"},
+			},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have the 'nginx' cookbook are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "1",
+						Cookbooks: []string{"nginx", "mariadb"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "2",
+						Cookbooks: []string{"nginx"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "3",
+						Cookbooks: []string{"apache", "mariadb"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "4",
+						Cookbooks: []string{"apache", "wordpress"},
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"cookbook:nginx"},
+			},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "All node name suggestions should be returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a2-dev",
+						Cookbooks: []string{"nginx", "mariadb"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a2-prod",
+						Cookbooks: []string{"nginx"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a1-airgap",
+						Cookbooks: []string{"apache", "mariadb"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a1-workflow",
+						Cookbooks: []string{"apache", "wordpress"},
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"name:a2-*"},
+			},
+			expected: []string{"a2-dev", "a2-prod", "a1-airgap", "a1-workflow"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have a 'california' attribute, are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+					},
+					Attributes: []string{"california", "m4"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+					},
+					Attributes: []string{"california"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "3",
+					},
+					Attributes: []string{"ohio", "m2"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "4",
+					},
+					Attributes: []string{"Florida", "m7"},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"attribute:california"},
+			},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have an 'v2' chef tag, are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+						ChefTags: []string{"v2", "dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+						ChefTags: []string{"v2"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "3",
+						ChefTags: []string{"v1", "prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "4",
+						ChefTags: []string{"v3", "dev"},
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"chef_tags:v2"},
+			},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have an 'v2' Chef Client Version, are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "1",
+						ChefVersion: "v2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "2",
+						ChefVersion: "v2",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "3",
+						ChefVersion: "v1",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "4",
+						ChefVersion: "v3",
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"chef_version:v2"},
+			},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Only suggestions for cookbooks from nodes that have names that start with 'a2-' are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a2-dev",
+						Cookbooks: []string{"nginx", "mariadb"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a2-prod",
+						Cookbooks: []string{"nginx"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a1-airgap",
+						Cookbooks: []string{"apache", "mariadb"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a1-workflow",
+						Cookbooks: []string{"apache", "wordpress"},
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "cookbook",
+				Filter: []string{"name:a2-*"},
+			},
+			expected: []string{"nginx", "mariadb"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have the 'nginx' recipe are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+						Recipes:  []string{"nginx", "mariadb"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+						Recipes:  []string{"nginx"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "3",
+						Recipes:  []string{"apache", "mariadb"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "4",
+						Recipes:  []string{"apache", "wordpress"},
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"recipe:nginx"},
+			},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have the 'a' resource name are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "1",
+						ResourceNames: []string{"a", "b"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "2",
+						ResourceNames: []string{"a"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "3",
+						ResourceNames: []string{"c", "b"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "4",
+						ResourceNames: []string{"d", "e"},
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"resource_name:a"},
+			},
+			expected: []string{"1", "2"},
+		},
+		{
+			description: "Only node name suggestions for nodes that have the 'a' role are returned",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "1",
+						Roles:    []string{"a", "b"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "2",
+						Roles:    []string{"a"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "3",
+						Roles:    []string{"c", "b"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "4",
+						Roles:    []string{"d", "e"},
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type:   "name",
+				Filter: []string{"role:a"},
+			},
+			expected: []string{"1", "2"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Narrowing: %s", test.description), func(t *testing.T) {
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+			res, err := cfgmgmt.GetSuggestions(ctx, &test.request)
+			assert.Nil(t, err)
+
+			actualSuggestions := extractTextFromSuggestionsResponse(res, t)
+
+			assert.ElementsMatch(t, test.expected, actualSuggestions)
+		})
+	}
+
+}
+
 func TestSuggestionsWithTableDriven(t *testing.T) {
 	dataNodes := []struct {
 		number     int
@@ -442,7 +940,7 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 				assert.Nil(t, err)
 
 				// We actually don't care about the scores since it is something
-				// the UI uses to order the results, therefor we will just abstract
+				// the UI uses to order the results, therefore we will just abstract
 				// the text into an array and compare it
 				actualSuggestionsArray := extractTextFromSuggestionsResponse(res, t)
 

@@ -78,13 +78,24 @@ func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV1.String()), nil
 }
 
+type resp struct {
+	ctx        context.Context
+	*authz.IsAuthorizedResp
+}
+
+func (r *resp) Ctx() context.Context {
+	return r.ctx
+}
+
 func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, action string,
+	_ []string, // projects aren't used
 ) (middleware.AuthorizationResponse, error) {
-	return c.client.IsAuthorized(ctx, &authz.IsAuthorizedReq{
+	r, err :=  c.client.IsAuthorized(ctx, &authz.IsAuthorizedReq{
 		Subjects: subjects,
 		Resource: resource,
 		Action:   action,
 	})
+	return &resp{IsAuthorizedResp: r, ctx: ctx}, err
 }
 
 func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, inputPairs []*pairs.Pair,
@@ -106,24 +117,6 @@ func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, i
 		respPairs[i] = &pairs.Pair{Resource: p.Resource, Action: p.Action}
 	}
 	return respPairs, nil
-}
-
-func (c *client) FilterAuthorizedProjects(ctx context.Context, subjects []string, inputPairs []*pairs.Pair,
-) ([]string, error) {
-	pairsV1 := make([]*authz.Pair, len(inputPairs))
-	for i, p := range inputPairs {
-		pairsV1[i] = &authz.Pair{Resource: p.Resource, Action: p.Action}
-	}
-
-	// Need to make this call to allow auto-switching to v2 if needed
-	_, err := c.client.FilterAuthorizedProjects(ctx, &authz.FilterAuthorizedPairsReq{
-		Subjects: subjects,
-		Pairs:    pairsV1,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return []string{"~v1~"}, nil // magic V1 identifier
 }
 
 func AuthorizationHandler(cl authz.AuthorizationClient) middleware.AuthorizationHandler {

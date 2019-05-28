@@ -152,7 +152,7 @@ ldapsearch -H ldap://ldap-server:636/ \  # host
   '(&(objectClass=person)(memberof=CN=YourGroupToFilterOn,OU=Users,DC=YourDomain,DC=com))'
 ```
 
-See the [ldapsearch Queries]({{< relref "ldap.md#ldapsearch-queries" >}}) for more info on debugging
+See [Troubleshoot LDAP Search Queries]({{< relref "ldap.md#troubleshoot-ldap-search-queries" >}}) for more info on debugging
 your LDAP integration via `ldapsearch`.
 
 #### Login Bind
@@ -642,5 +642,4 @@ example in servers supporting _extensible match_, all group entries below
 `AGroups` and `BGroups` could be retrieved using a `group_query_filter` of
 `(|(ou:dn:=AGroups)(ou:dn:=BGroups))`.
 
-See [ldapwiki.com on "Extensible
-Match"](http://ldapwiki.com/wiki/ExtensibleMatch) for details.
+See [LDAP Wiki Extensible Match Search Filter](http://ldapwiki.com/wiki/ExtensibleMatch) for details.

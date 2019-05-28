@@ -123,7 +123,7 @@ func renderTemplate(cmd *cobra.Command, args []string) error {
 	//        of a missing key, so it's not usable
 	// zero-value: Seems sane, but it doesn't work when you have a nested nil struct.
 	//             For example, if your data was {} and you tried to check {{if .Foo.Bar}}
-	//             you'd get an error. If you just rendererd {{.Foo}}, you'd get <no value>
+	//             you'd get an error. If you just rendered {{.Foo}}, you'd get <no value>
 	//             because https://github.com/golang/go/issues/24963
 	// ignore: errors are allowed in this case. We're free to check {{if .Foo.Bar.Baz}} and
 	//         as one would expect, it is false.

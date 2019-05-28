@@ -45,7 +45,7 @@ func (manager *policyChangeNotifierManager) register() *policyChangeNotifier {
 }
 
 func (*policyChangeNotifier) Close() error {
-	// This is test code, don't need to worry about cleanin stuff up
+	// This is test code, don't need to worry about cleaning stuff up
 	return nil
 }
 

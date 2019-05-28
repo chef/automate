@@ -711,3 +711,91 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithUUIDAndRunD
 
 	_, err = suite.Database.DeleteNode(listNodes[0].Id)
 }
+
+func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithProjects() {
+	// test that a new node with uuid, no source_id makes it into the db
+	// with the right info and is readable
+	nowTime := ptypes.TimestampNow()
+	node := &manager.NodeMetadata{
+		Uuid:            "1223-4254-2424-1322",
+		Name:            "my really client run node",
+		PlatformName:    "debian",
+		PlatformRelease: "8.6",
+		LastContact:     nowTime,
+		SourceId:        "",
+		SourceRegion:    "",
+		SourceAccountId: "",
+		JobUuid:         "12343-232324-1231242",
+		RunData: &nodes.LastContactData{
+			Id:      "1003-9254-2004-1322",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
+		},
+		Projects: []string{"proj-1", "proj-2"},
+	}
+	err := suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+
+	readNode, err := suite.Database.GetNode(ctx, listNodes[0].Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("my really client run node", readNode.Name)
+	suite.Equal([]string{"proj-1", "proj-2"}, readNode.Projects)
+
+	_, err = suite.Database.DeleteNode(listNodes[0].Id)
+}
+
+func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithProjectsData() {
+	// test that a new node with uuid, no source_id makes it into the db
+	// with the right info and is readable
+	nowTime := ptypes.TimestampNow()
+	node := &manager.NodeMetadata{
+		Uuid:            "1223-4254-2424-1322",
+		Name:            "my really client run node 2",
+		PlatformName:    "debian",
+		PlatformRelease: "8.6",
+		LastContact:     nowTime,
+		SourceId:        "",
+		SourceRegion:    "",
+		SourceAccountId: "",
+		JobUuid:         "12343-232324-1231242",
+		RunData: &nodes.LastContactData{
+			Id:      "1003-9254-2004-1322",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
+		},
+		ProjectsData: []*nodes.ProjectsData{
+			{Key: "environment", Values: []string{"test"}},
+			{Key: "chef-server", Values: []string{"chef-server-2"}},
+		},
+	}
+	err := suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+
+	readNode, err := suite.Database.GetNode(ctx, listNodes[0].Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("my really client run node 2", readNode.Name)
+	suite.Equal([]*nodes.ProjectsData{
+		{Key: "environment", Values: []string{"test"}},
+		{Key: "chef-server", Values: []string{"chef-server-2"}},
+	}, readNode.ProjectsData)
+
+	_, err = suite.Database.DeleteNode(listNodes[0].Id)
+}

@@ -1517,7 +1517,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 
 func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 	event := &automate_event.EventMsg{
-		EventID:   "lskdjflsdkfj",
+		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
 		Published: ptypes.TimestampNow(),
 	}
@@ -1526,7 +1526,7 @@ func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 	assert.Error(t, err)
 
 	event = &automate_event.EventMsg{
-		EventID:   "lskdjflsdkfj",
+		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{
@@ -1536,7 +1536,7 @@ func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 	assert.Error(t, err)
 
 	event = &automate_event.EventMsg{
-		EventID:   "lskdjflsdkfj",
+		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{
@@ -1565,7 +1565,7 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 		&iam_v2.ProjectCollectionRulesResp{}, nil)
 
 	event := &automate_event.EventMsg{
-		EventID:   "lskdjflsdkfj",
+		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{

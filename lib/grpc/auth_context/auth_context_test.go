@@ -43,7 +43,7 @@ func TestOutgoingMetadata(t *testing.T) {
 			metadata.MD{
 				"resource": []string{"res"},
 				"action":   []string{"act"},
-				"subjects": []string(nil),
+				"subjects": nil,
 				"projects": []string{"projects"},
 				"policy":   []string{"v999"}},
 		},
@@ -132,6 +132,22 @@ func TestRoundTripMetadata(t *testing.T) {
 			assert.Equal(t, "res", auth.Resource)
 			assert.Equal(t, "act", auth.Action)
 			assert.Equal(t, "v999", auth.PolicyVersion)
+		})
+	}
+}
+
+func TestProjectsFromMetadata(t *testing.T) {
+	tests := map[string]metadata.MD{
+		"simple case": metadata.Pairs("grpcgateway-projects", "foo,bar,baz"),
+		"duplicates": metadata.Pairs("grpcgateway-projects", "foo,bar,baz,baz"),
+		"spaces": metadata.Pairs("grpcgateway-projects", " foo  , bar,baz  "),
+		"multiple values": metadata.Pairs("grpcgateway-projects", "foo", "grpcgateway-projects", "baz,bar"),
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			assert.ElementsMatch(t, []string{"foo", "bar", "baz"},
+				auth_context.ProjectsFromMetadata(tc))
 		})
 	}
 }

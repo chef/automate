@@ -83,13 +83,44 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()), nil
 }
 
+type resp struct {
+	ctx        context.Context
+	authorized bool
+}
+
+
+func (r *resp) Ctx() context.Context {
+	return r.ctx
+}
+
+func (r *resp) GetAuthorized() bool {
+	return r.authorized
+}
+
 func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, action string,
-) (middleware.AuthorizationResponse, error) {
-	return c.client.IsAuthorized(ctx, &authz.IsAuthorizedReq{
-		Subjects: subjects,
-		Resource: resource,
-		Action:   action,
+	projectsToFilter []string) (middleware.AuthorizationResponse, error) {
+	log := ctxlogrus.Extract(ctx)
+	filteredResp, err := c.client.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
+		Subjects:       subjects,
+		Resource:       resource,
+		Action:         action,
+		ProjectsFilter: projectsToFilter,
 	})
+	if err != nil {
+		if status.Convert(err).Code() == codes.FailedPrecondition {
+			return nil, err
+		}
+		log.WithError(err).Error("error authorizing request")
+		return nil, status.Errorf(codes.PermissionDenied,
+			"error authorizing action %q on resource %q for subjects %q: %s",
+			action, resource, subjects, err.Error())
+	}
+	projects := filteredResp.Projects
+
+	return &resp{
+		ctx:        auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()),
+		authorized: len(projects) != 0,
+	}, nil
 }
 
 func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, inputPairs []*pairs.Pair,
@@ -111,25 +142,6 @@ func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, i
 		respPairs[i] = &pairs.Pair{Resource: p.Resource, Action: p.Action}
 	}
 	return respPairs, nil
-}
-
-func (c *client) FilterAuthorizedProjects(ctx context.Context, subjects []string, inputPairs []*pairs.Pair,
-) ([]string, error) {
-	pairsV2 := make([]*authz.Pair, len(inputPairs))
-	for i, p := range inputPairs {
-		pairsV2[i] = &authz.Pair{Resource: p.Resource, Action: p.Action}
-	}
-
-	resp, err := c.client.FilterAuthorizedProjects(ctx, &authz.FilterAuthorizedPairsReq{
-		Subjects: subjects,
-		Pairs:    pairsV2,
-	})
-	if err != nil {
-		return nil, err
-	}
-	respProjects := make([]string, len(resp.Projects))
-	copy(respProjects, resp.Projects)
-	return respProjects, nil
 }
 
 func AuthorizationHandler(cl authz.AuthorizationClient) middleware.AuthorizationHandler {

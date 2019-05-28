@@ -133,7 +133,7 @@ func waitForInterval(feedInterval time.Duration, feedEndTime time.Time, now time
 	 * E.g. for first wait now may be 1:55pm, waiting an hour to get data from a rounded
 	 * down window of 12pm-1pm will introduce a 55min lag by waking at 2:55pm
 	 *
-	 * Calulating the sleepDuration will reduce the value
+	 * Calculating the sleepDuration will reduce the value
 	 * e.g nextFeedEndTime 2pm - 1.55pm = 5min sleep
 	 * waking at 2pm rather than 2:55pm to get 1pm-2pm data witout lag.
 	 */

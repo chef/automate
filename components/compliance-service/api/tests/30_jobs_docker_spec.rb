@@ -420,7 +420,8 @@ describe File.basename(__FILE__) do
             "status": "SKIPPED",
             "penultimateStatus": "SKIPPED",
             "endTime": {}
-          }
+          },
+          "projectsData": []
         },
         {
           "id": @docker_node_id2,
@@ -447,7 +448,8 @@ describe File.basename(__FILE__) do
           "scanData": {
             "id": "some-id",
             "endTime": {}
-          }
+          },
+          "projectsData": []
         }
       ],
       "total": 2,

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	natsc "github.com/nats-io/go-nats"
-	"github.com/nats-io/go-nats-streaming"
+	stan "github.com/nats-io/go-nats-streaming"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 
@@ -185,7 +185,7 @@ func newClientID() string {
 }
 
 // getNewToken creates an auth token and adds it to a policy that is allowed to
-// perfom the action(s) described by `authorizedAction` on all resources.
+// perform the action(s) described by `authorizedAction` on all resources.
 func getNewToken(t *testing.T, authorizedAction string) string {
 	ctx := context.Background()
 

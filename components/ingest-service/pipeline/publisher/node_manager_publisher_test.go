@@ -23,12 +23,15 @@ func TestGatherInfoForNode(t *testing.T) {
 
 	backendNode := backend.Node{
 		NodeInfo: backend.NodeInfo{
-			EntityUuid:      "8dcca219-a730-3985-907b-e6b22f9f848d",
-			NodeName:        "chef-load-44",
-			Platform:        "ubuntu",
-			PlatformVersion: "16.04",
-			ChefTags:        []string{"application", "database"},
-			Status:          "success",
+			EntityUuid:       "8dcca219-a730-3985-907b-e6b22f9f848d",
+			NodeName:         "chef-load-44",
+			Platform:         "ubuntu",
+			PlatformVersion:  "16.04",
+			ChefTags:         []string{"application", "database"},
+			Status:           "success",
+			OrganizationName: "test-org",
+			SourceFqdn:       "chef-server-2",
+			Roles:            []string{"my-cool-role"},
 		},
 		Checkin: nowTime,
 		Ec2: backend.Ec2{
@@ -36,6 +39,7 @@ func TestGatherInfoForNode(t *testing.T) {
 			PlacementAvailabilityZone: "us-west-2a",
 		},
 		LatestRunID: "123353254545425",
+		Projects:    []string{"tomato", "cucumber"},
 	}
 
 	nodeMetadata, err := gatherInfoForNode(backendNode)
@@ -56,6 +60,13 @@ func TestGatherInfoForNode(t *testing.T) {
 			Id:      "123353254545425",
 			EndTime: timestampNow,
 			Status:  nodes.LastContactData_PASSED,
+		},
+		Projects: []string{"tomato", "cucumber"},
+		ProjectsData: []*nodes.ProjectsData{
+			{Key: "roles", Values: []string{"my-cool-role"}},
+			{Key: "organization_name", Values: []string{"test-org"}},
+			{Key: "chef_tags", Values: []string{"application", "database"}},
+			{Key: "chef_server", Values: []string{"chef-server-2"}},
 		},
 	}, nodeMetadata)
 }

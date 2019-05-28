@@ -3421,7 +3421,7 @@ func TestListRules(t *testing.T) {
 			assert.Nil(t, resp)
 			assert.Equal(t, 0, len(resp))
 		},
-		"when mutiple rules exist with no project fitler, returns the full list": func(t *testing.T) {
+		"when multiple rules exist with no project filter, returns the full list": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3445,7 +3445,7 @@ func TestListRules(t *testing.T) {
 			assert.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{rule1, &rule2}, resp)
 		},
-		"when mutiple rules exist with a project fitler, returns filtered list": func(t *testing.T) {
+		"when multiple rules exist with a project filter, returns filtered list": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3647,7 +3647,7 @@ func TestGetRule(t *testing.T) {
 			assert.Nil(t, resp)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
-		"when mulitple rules exists with no project filter, return correct rule": func(t *testing.T) {
+		"when multiple rules exists with no project filter, return correct rule": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3671,7 +3671,7 @@ func TestGetRule(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, ruleToGet, resp)
 		},
-		"when mulitple rules exists with a matching project filter, return correct rule": func(t *testing.T) {
+		"when multiple rules exists with a matching project filter, return correct rule": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3698,7 +3698,7 @@ func TestGetRule(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, ruleToGet, resp)
 		},
-		"when mulitple rules exists with a non-matching project filter, return NotFoundErr": func(t *testing.T) {
+		"when multiple rules exists with a non-matching project filter, return NotFoundErr": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3765,7 +3765,7 @@ func TestDeleteRule(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 		},
-		"when mulitple rules exists with no project filter, delete rule and associated conditions": func(t *testing.T) {
+		"when multiple rules exists with no project filter, delete rule and associated conditions": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3792,7 +3792,7 @@ func TestDeleteRule(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 		},
-		"when mulitple rules exists with a matching project filter, delete rule and associated conditions": func(t *testing.T) {
+		"when multiple rules exists with a matching project filter, delete rule and associated conditions": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3820,7 +3820,7 @@ func TestDeleteRule(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 		},
-		"when mulitple rules exists with a non-matching project filter, do not delete anything": func(t *testing.T) {
+		"when multiple rules exists with a non-matching project filter, do not delete anything": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"

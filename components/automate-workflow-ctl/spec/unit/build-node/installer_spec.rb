@@ -401,7 +401,7 @@ describe BuildNode::Installer do
           expect{installer.register_node!}.to raise_error(exception)
         end
 
-        it "registers with the overrwrite option if the user does choose over-writing" do
+        it "registers with the overwrite option if the user does choose over-writing" do
           expect(config).to receive(:overwrite_registration?).and_return(true)
           expect(local_knife).to receive(:bootstrap).with(overwrite: true, tag: nil)
           installer.register_node!
@@ -495,7 +495,7 @@ describe BuildNode::Installer do
         installer.output_error(BuildNode::Exceptions::BaseError.new("oopsie"))
       end
 
-      it "displays the associated message and remediation steps when they are availalbe" do
+      it "displays the associated message and remediation steps when they are available" do
         expect(installer_output).to receive(:call).with("oopsie")
         expect(installer_output).to receive(:call).with("")
         expect(installer_output).to receive(:call).with("Fix it.")

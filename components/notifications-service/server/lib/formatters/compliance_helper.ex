@@ -1,6 +1,9 @@
 defmodule Notifications.Formatters.ComplianceHelper do
   @moduledoc "Tools for the management of compliance notifications"
   alias Notifications.Profile
+  alias Notifications.ComplianceFailure
+  alias Notifications.Formatters.Utils
+
 
   @crit_control_threshold 0.7
 
@@ -47,7 +50,7 @@ defmodule Notifications.Formatters.ComplianceHelper do
     %{notification | failed_profiles: prune_profiles(notification.failed_profiles, [], control_threshold)}
   end
 
-  defp prune_profiles([], acc, control_threshold), do: acc
+  defp prune_profiles([], acc, _control_threshold), do: acc
   defp prune_profiles([profile | profiles], acc, control_threshold) do
     failed_controls = prune_controls(profile.failed_controls, [], control_threshold)
     if length(failed_controls) > 0 do
@@ -71,7 +74,7 @@ defmodule Notifications.Formatters.ComplianceHelper do
   # While all controls we receive have failures, some may not be critical.
   # For critical controls, further prune the results to limit to failures only.
   # For non-critical, drop them from the controls list.
-  defp prune_controls([], acc, impact), do: acc
+  defp prune_controls([], acc, _impact), do: acc
   defp prune_controls([%Profile.Control{impact: impact} = control | controls], acc, control_threshold) when impact >= control_threshold do
     pruned_results = prune_results(control.failed_results, [])
     stats = control.stats
@@ -99,4 +102,5 @@ defmodule Notifications.Formatters.ComplianceHelper do
   end
   # Anything that's not a failure gets excluded
   defp prune_results([_| results], acc), do: prune_results(results, acc)
+
 end
