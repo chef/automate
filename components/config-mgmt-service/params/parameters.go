@@ -51,7 +51,7 @@ func ConvertParamToNodeRunBackend(parameter string) string {
 	case "chef_tags":
 		return backend.ChefTags
 	case "error":
-		return "error_message"
+		return backend.ErrorMessage
 	default:
 		return parameter
 	}

@@ -38,6 +38,7 @@ var (
 	ChefVersion        string = "chef_version"
 	ChefTags           string = "chef_tags"
 	Project            string = "projects"
+	ErrorMessage       string = "error_message"
 )
 
 // NodeFieldToJson returns the value associated with key in the tag

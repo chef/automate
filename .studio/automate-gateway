@@ -226,7 +226,7 @@ function send_chef_run_failure_example() {
   local run_uuid=$(uuidgen)
   local node_uuid=$(uuidgen)
   local node_name="node_failed_$(($RANDOM % 100))"
-  local rfc_time=$(date --rfc-3339=seconds  -d "$(($RANDOM % 144)) hour ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
+  local rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
 
   local examples_path="/src/components/ingest-service/examples";
   [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/run"
