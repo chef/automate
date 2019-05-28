@@ -256,8 +256,9 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context, request *sharedReq.S
 	typeParam := request.GetType()
 
 	sugRequest := cmsReq.Suggestion{
-		Text: textParam,
-		Type: typeParam,
+		Text:   textParam,
+		Type:   typeParam,
+		Filter: request.Filter,
 	}
 
 	return s.cfgMgmtClient.GetSuggestions(ctx, &sugRequest)

@@ -39,7 +39,7 @@ describe('RulesService', () => {
 
   describe('deleteRule', () => {
     it('calls delete with the correct url', () => {
-      const rule = new Rule('1234', '', null, '', ServiceActionType.SLACK, '');
+      const rule = new Rule('1234', '', null, '', ServiceActionType.SLACK, '', false);
       const expectedUrl = `${NOTIFIER_URL}/rules/${rule.id}`;
       const response = <RuleResponse>{ rule: {} };
 
@@ -53,7 +53,7 @@ describe('RulesService', () => {
 
   describe('editRule', () => {
     it('calls put with the correct url', () => {
-      const rule = new Rule('1234', '', null, '', ServiceActionType.SLACK, '');
+      const rule = new Rule('1234', '', null, '', ServiceActionType.SLACK, '', false);
       const expectedUrl = `${NOTIFIER_URL}/rules/${rule.id}`;
       const response = <RuleResponse>{ rule: {} };
 
@@ -66,7 +66,7 @@ describe('RulesService', () => {
 
     it('calls put and patch with the correct url', () => {
       const secretId = '5678';
-      const rule = new Rule('1234', '', null, '', ServiceActionType.SERVICENOW, secretId);
+      const rule = new Rule('1234', '', null, '', ServiceActionType.SERVICENOW, secretId, false);
       const expectedUrl = `${NOTIFIER_URL}/rules/${rule.id}`;
       const response = <RuleResponse>{ rule: {} };
 
@@ -85,7 +85,7 @@ describe('RulesService', () => {
 
     it('calls put with the correct url when not username or password is set', () => {
       const secretId = '5678';
-      const rule = new Rule('1234', '', null, '', ServiceActionType.SERVICENOW, secretId);
+      const rule = new Rule('1234', '', null, '', ServiceActionType.SERVICENOW, secretId, false);
       const expectedUrl = `${NOTIFIER_URL}/rules/${rule.id}`;
       const response = <RuleResponse>{ rule: {} };
 
@@ -102,7 +102,7 @@ describe('RulesService', () => {
   describe('createRule', () => {
     it('calls post with the correct url', () => {
       const expectedUrl = `${NOTIFIER_URL}/rules`;
-      const rule = new Rule('', '', null, '', ServiceActionType.SLACK, '');
+      const rule = new Rule('', '', null, '', ServiceActionType.SLACK, '', false);
       const response = <RuleResponse>{ rule: {} };
 
       service.createRule(rule, '', '').subscribe((resp) => expect(resp).toEqual(response));
@@ -115,7 +115,8 @@ describe('RulesService', () => {
     });
 
     it('with username and password, calls post with the correct url', () => {
-      const rule = new Rule('', '', null, '', ServiceActionType.SERVICENOW, 'super_secret_id');
+      const rule = new Rule('', '', null, '', ServiceActionType.SERVICENOW,
+        'super_secret_id', false);
       const response = <RuleResponse>{ rule: {} };
 
       service.createRule(rule, 'bob', 'super_secret_password').

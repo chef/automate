@@ -3,6 +3,11 @@
 
 .page-body {
   padding-top: 0;
+  margin-right: 450px;
+}
+
+chef-page-header {
+  margin-right: 450px;
 }
 
 // Table list styles
@@ -120,41 +125,67 @@ chef-td {
 }
 
 chef-tr.sg-row {
-  &>chef-td:first-child:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 2px;
-    transition: width 0.2s;
-    background: $chef-success;
-    border-top-left-radius: $global-radius;
-    border-bottom-left-radius: $global-radius;
+  > chef-td:first-child {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 2px;
+      transition: width 0.2s;
+      background: $chef-success;
+      border-top-left-radius: $global-radius;
+      border-bottom-left-radius: $global-radius;
+    }
+
+    &.OK::before {
+      background: $chef-success;
+    }
+
+    &.WARNING::before {
+      background: $chef-primary;
+    }
+
+    &.UNKNOWN::before {
+      background: $chef-dark-grey;
+    }
+
+    &.CRITICAL::before {
+      background: $chef-critical;
+    }
+
+    &.DEPLOYING::before {
+      background: $chef-dark-grey;
+    }
   }
 
-  &:hover>chef-td:first-child:before {
-    width: 7px;
+  &:hover,
+  &.selected {
+    > chef-td:first-child::before {
+      width: 7px;
+    }
   }
 
-  &>chef-td.OK:first-child:before {
-    background: $chef-success;
-  }
+  &.selected {
+    position: relative;
 
-  &>chef-td.WARNING:first-child:before {
-    background: $chef-primary;
-  }
+    &::after {
+      display: block;
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: rotate(45deg);
+      border: 4px solid transparent;
+      border-right: 4px solid $chef-primary-bright;
+      border-top: 4px solid $chef-primary-bright;
+      margin-top: -4px;
+      content: '';
+    }
 
-  &>chef-td.UNKNOWN:first-child:before {
-    background: $chef-dark-grey;
-  }
-
-  &>chef-td.CRITICAL:first-child:before {
-    background: $chef-critical;
-  }
-
-  &>chef-td.DEPLOYING:first-child:before {
-    background: $chef-dark-grey;
+    > chef-td {
+      background: #F2F8FD;
+    }
   }
 }
 

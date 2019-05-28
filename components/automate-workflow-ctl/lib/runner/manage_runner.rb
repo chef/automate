@@ -128,7 +128,7 @@ module Runner
       rescue Runner::Exceptions::ChefDK404
         puts_error "You requested ChefDK version #{@config.chefdk_version} via --chefdk-version but the package did not exist.\nFor a valid list of versions for your platform, see https://downloads.chef.io/chef-dk/."
       rescue Runner::Exceptions::ChefDKHTTPError
-        puts "An unexpected error occured when trying to download the latest ChefDK. Please try again."
+        puts "An unexpected error occurred when trying to download the latest ChefDK. Please try again."
       rescue RuntimeError => e
         if logger
           logger.fatal("Error: #{e.class} #{e.message}:")

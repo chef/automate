@@ -58,6 +58,7 @@ import (
 
 	// anything else
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/service_authn"
 )
 
@@ -372,7 +373,8 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	)
 	resourceV1 := fmt.Sprintf("compliance:profiles:storage:%s", owner)
 	resourceV2 := fmt.Sprintf("compliance:profiles:%s", owner)
-	if err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2); err != nil {
+	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
@@ -460,7 +462,8 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 		resourceV2 = "compliance:profiles:market"
 	}
 
-	if err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2); err != nil {
+	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
@@ -506,15 +509,15 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 		actionV2 = "compliance:reports:export"
 	)
 
-	if err := s.authRequest(r, resource, actionV1, resource, actionV2); err != nil {
+	ctx, err := s.authRequest(r, resource, actionV1, resource, actionV2)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var query reporting.Query
-	err := decoder.Decode(&query)
-	if err != nil {
+	if err := decoder.Decode(&query); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -554,15 +557,15 @@ func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Requ
 		resourceV2 = "infra:nodes"
 	)
 
-	if err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2); err != nil {
+	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var nodeExportRequest cfgmgmt_request.NodeExport
-	err := decoder.Decode(&nodeExportRequest)
-	if err != nil {
+	if err := decoder.Decode(&nodeExportRequest); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -606,7 +609,7 @@ func init() {
 
 func (s *Server) authRequest(r *http.Request,
 	resourceV1, actionV1, resourceV2, actionV2 string,
-) error {
+) (context.Context, error) {
 	subjects := []string{}
 	// Create a context with the request headers metadata. Normally grpc-gateway
 	// does this, but since this is being used in a custom handler we've got do
@@ -638,34 +641,29 @@ func (s *Server) authRequest(r *http.Request,
 	if len(subjects) < 1 {
 		authnClient, err := s.clientsFactory.AuthenticationClient()
 		if err != nil {
-			return errors.Wrap(err, "authn-service unavailable")
+			return nil, errors.Wrap(err, "authn-service unavailable")
 		}
 
 		authnResp, err := authnClient.Authenticate(ctx, &authn.AuthenticateRequest{})
 		if err != nil {
-			return errors.Wrap(err, "authn-service error")
+			return nil, errors.Wrap(err, "authn-service error")
 		}
 
 		subjects = append(authnResp.Teams, authnResp.Subject)
 	}
 
 	if len(subjects) < 1 {
-		return errors.New("no policy subject detected in headers or verified certificates")
+		return nil, errors.New("no policy subject detected in headers or verified certificates")
 	}
 
-	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2)
+	projects := auth_context.ProjectsFromMetadata(md)
+
+	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2, projects)
 	if err != nil {
-		return errors.Wrap(err, "authz-service error")
+		return nil, errors.Wrap(err, "authz-service error")
 	}
 
-	// returns nil if authorization succeeded
-	return authzResp.Err()
-}
-
-func logError(err error, resource, action string) {
-	log.WithFields(log.Fields{
-		"error":    err,
-		"resource": resource,
-		"action":   action,
-	}).Error("error authorizing request")
+	// err is nil if authorization succeeded
+	// Note: if we need all the auth info, use auth_context.NewOutgoingContext
+	return auth_context.NewOutgoingProjectsContext(authzResp.Ctx()), authzResp.Err()
 }

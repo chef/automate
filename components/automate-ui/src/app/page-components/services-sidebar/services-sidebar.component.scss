@@ -1,12 +1,20 @@
 @import "~styles/variables";
 @import "~styles/mixins";
 
-ul {
-  margin-top: 5px;
+:host {
+  display: block;
+  position: fixed;
+  width: 450px;
+  top: 70px;
+  right: 0;
+  bottom: 0;
+  background: $chef-white;
+  border-left: 1px solid $chef-grey;
+  overflow: auto;
 }
 
-.services-panel {
-  background-color: #FFFFFF;
+ul {
+  margin-top: 5px;
 }
 
 app-page-picker {

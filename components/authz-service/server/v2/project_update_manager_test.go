@@ -7,16 +7,17 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/golang/mock/gomock"
+	"github.com/golang/protobuf/ptypes"
+	_struct "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
+
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	project_update_tags "github.com/chef/automate/lib/authz"
 	event_ids "github.com/chef/automate/lib/event"
-	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/ptypes"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestProjectUpdateManagerOneUpdateRunningAtATime(t *testing.T) {
@@ -29,7 +30,7 @@ func TestProjectUpdateManagerOneUpdateRunningAtATime(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -66,7 +67,7 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -120,7 +121,7 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -186,7 +187,7 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -244,7 +245,7 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -290,7 +291,7 @@ func TestProjectUpdateManagerPercentageComplete(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -334,7 +335,7 @@ func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -378,7 +379,7 @@ func TestProjectUpdateManagerFailureMessagesOldUpdate(t *testing.T) {
 			lastestPublishedEvent = in.Msg
 			return &automate_event.PublishResponse{}, nil
 		})
-	configFile := "/tmp/.authz-delet-me"
+	configFile := "/tmp/.authz-delete-me"
 	err := os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
@@ -431,7 +432,7 @@ func createFailureEventMsg(projectUpdateIDTag string, producer string) *automate
 	}
 }
 
-func createStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompeleteInSec float64,
+func createStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompleteInSec float64,
 	percentageComplete float64, completed bool, producer string) *automate_event.EventMsg {
 	return &automate_event.EventMsg{
 		EventID:   "event-id-2",
@@ -454,7 +455,7 @@ func createStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompeleteInSec
 				},
 				"EstimatedTimeCompleteInSec": {
 					Kind: &_struct.Value_NumberValue{
-						NumberValue: estimatedTimeCompeleteInSec,
+						NumberValue: estimatedTimeCompleteInSec,
 					},
 				},
 				project_update_tags.ProjectUpdateIDTag: {

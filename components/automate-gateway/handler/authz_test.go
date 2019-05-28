@@ -166,8 +166,7 @@ func TestIntrospectAllV2(t *testing.T) {
 }
 
 func TestIntrospectAllProjectsV2(t *testing.T) {
-	authzSrvV1, authzSrv, s, hdlr := testServerAndHandler(t)
-	authzSrvV1.FilterAuthorizedProjectsFunc = shouldUseV2ProjectsFunc
+	_, authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedProjectsFunc = nil
@@ -182,11 +181,11 @@ func TestIntrospectAllProjectsV2(t *testing.T) {
 	}{
 		"empty response": {
 			&authz_v2.FilterAuthorizedProjectsResp{},
-			[]string{},
+			nil,
 		},
 		"empty list": {
 			&authz_v2.FilterAuthorizedProjectsResp{Projects: []string{}},
-			[]string{},
+			nil,
 		},
 		"some projects": {
 			&authz_v2.FilterAuthorizedProjectsResp{Projects: []string{"p1", "p2"}},
@@ -213,15 +212,6 @@ func TestIntrospectAllProjectsV2(t *testing.T) {
 }
 
 func shouldUseV2PairsFunc(context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
-	st := status.New(codes.FailedPrecondition, "should use v2")
-	st, err := st.WithDetails(&common.ErrorShouldUseV2{})
-	if err != nil {
-		return nil, err
-	}
-	return nil, st.Err()
-}
-
-func shouldUseV2ProjectsFunc(context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedProjectsResp, error) {
 	st := status.New(codes.FailedPrecondition, "should use v2")
 	st, err := st.WithDetails(&common.ErrorShouldUseV2{})
 	if err != nil {

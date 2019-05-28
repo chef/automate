@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/chef/automate/api/external/applications"
 	ver_api "github.com/chef/automate/api/external/common/version"
 	"github.com/chef/automate/components/applications-service/pkg/config"
@@ -12,7 +14,6 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/version"
-	log "github.com/sirupsen/logrus"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -226,7 +227,7 @@ func (app *ApplicationsServer) GetServices(
 	}, nil
 }
 
-// Converte storage.Service array to applications.Service array
+// Convert storage.Service array to applications.Service array
 func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*applications.Service {
 	services := make([]*applications.Service, len(svcs))
 	for i, svc := range svcs {

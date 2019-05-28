@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"time"
 
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/blang/semver"
 	"github.com/gofrs/uuid"
 	gp "github.com/golang/protobuf/ptypes/empty"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
@@ -23,13 +21,11 @@ import (
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	ingest_inspec "github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	ingest_api "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
 	event "github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -51,7 +47,7 @@ func NewComplianceIngestServer(esClient *ingestic.ESClient, mgrClient manager.No
 	automateURL string, notifierClient notifier.Notifier, authzProjectsClient iam_v2.ProjectsClient,
 	eventServiceClient automate_event.EventServiceClient, configManager *config.ConfigManager) *ComplianceIngestServer {
 
-	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient)
+	compliancePipeline := pipeline.NewCompliancePipeline(esClient, authzProjectsClient, mgrClient)
 
 	updateManager := project_update_lib.NewDomainProjectUpdateManager(esClient, authzProjectsClient, eventServiceClient,
 		configManager, event_ids.ComplianceInspecReportProducerID)
@@ -144,41 +140,6 @@ func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in
 		}
 	}
 
-	// if the end_time on the report is not parsable, we want to set
-	// the node last_contact time to beg of time, b/c we don't know when
-	// the last_contact was
-	endTime, err := time.Parse(time.RFC3339, in.EndTime)
-	if err != nil {
-		logrus.Errorf("ProcessComplianceReport unable to parse report end_time, setting end_time to beg of time")
-		endTime = time.Time{}
-	}
-	endTimeTimestamp, err := ptypes.TimestampProto(endTime)
-	if err != nil {
-		logrus.Errorf("ProcessComplianceReport unable to parse end_time as proto timestamp, setting end_time timestamp to beg of time")
-		endTimeTimestamp = &tspb.Timestamp{}
-	}
-	logrus.Debugf("Calling sendNodeInfoToManager for report id %s", in.ReportUuid)
-
-	err = s.sendNodeInfoToManager(ctx, manager.NodeMetadata{
-		Uuid:            in.NodeUuid,
-		Name:            in.NodeName,
-		PlatformName:    in.Platform.GetName(),
-		PlatformRelease: in.Platform.GetRelease(),
-		JobUuid:         in.JobUuid,
-		LastContact:     endTimeTimestamp,
-		SourceId:        in.SourceId,
-		SourceRegion:    in.SourceRegion,
-		SourceAccountId: in.SourceAccountId,
-		Tags:            in.Tags,
-		ScanData: &nodes.LastContactData{
-			Id:      in.ReportUuid,
-			EndTime: endTimeTimestamp,
-			Status:  getReportStatus(in.Profiles),
-		},
-	})
-	if err != nil {
-		logrus.Errorf("ProcessComplianceReport unable to send node info to manager: %s", err.Error())
-	}
 	logrus.Debugf("Calling handleNotifications for report id %s", in.ReportUuid)
 	err = s.handleNotifications(ctx, in)
 	if err != nil {
@@ -203,91 +164,4 @@ func (s *ComplianceIngestServer) handleNotifications(ctx context.Context, report
 		s.notifierClient.Send(ctx, ev)
 	}
 	return nil
-}
-
-func (s *ComplianceIngestServer) sendNodeInfoToManager(ctx context.Context, node manager.NodeMetadata) error {
-	if s.mgrClient == nil {
-		return fmt.Errorf("no manager client found")
-	}
-	logrus.Debugf("sendNodeInfoToManager handing-over node to manager %+v", s)
-	_, err := s.mgrClient.ProcessNode(ctx, &node)
-	if err != nil {
-		return errors.Wrap(err, "sendNodeInfoToManager error calling ProcessNode")
-	}
-	return nil
-}
-
-func getReportStatus(profiles []*ingest_inspec.Profile) nodes.LastContactData_Status {
-	// start with a status of passed as the default status
-	status := nodes.LastContactData_PASSED
-	skippedCounter := 0
-	for _, profile := range profiles {
-		profileStatus := getProfileStatus(profile)
-		// if any profile is failed, report is failed
-		if profileStatus == "failed" {
-			status = nodes.LastContactData_FAILED
-			break
-		}
-		// if all profiles are skipped, the report is skipped
-		// so we keep a count of skipped profiles and later
-		// check if the amount of profiles matches the skipped counter,
-		// setting the status to skipped if they match.
-		if profileStatus == "skipped" {
-			skippedCounter++
-		}
-	}
-	if skippedCounter == len(profiles) {
-		status = nodes.LastContactData_SKIPPED
-	}
-	return status
-}
-
-func getProfileStatus(profile *ingest_inspec.Profile) string {
-	// a profile skipped due to platform exceptions will have a status of skipped
-	if profile.Status == "skipped" {
-		return "skipped"
-	}
-	// set the defaults
-	status := "passed"
-	skippedCounter := 0
-	for _, control := range profile.Controls {
-		controlStatus := getControlStatus(control.Results)
-		// if any control is failed, report is failed
-		if controlStatus == "failed" {
-			status = "failed"
-			break
-		}
-		// if all controls are skipped, the profile is skipped
-		// so we keep a count of skipped profiles and later
-		// check if the amount of profiles matches the skipped counter,
-		// setting the status to skipped if they match.
-		if controlStatus == "skipped" {
-			skippedCounter++
-		}
-	}
-	if skippedCounter == len(profile.Controls) {
-		status = "skipped"
-	}
-	return status
-}
-
-func getControlStatus(results []*ingest_inspec.Result) string {
-	// set the defaults
-	status := "passed"
-	skippedCounter := 0
-	for _, result := range results {
-		// if any result is failed, control is failed
-		if result.Status == "failed" {
-			status = "failed"
-			break
-		}
-		// if all results are skipped, the control is skipped
-		if result.Status == "skipped" {
-			skippedCounter++
-		}
-	}
-	if skippedCounter == len(results) {
-		status = "skipped"
-	}
-	return status
 }

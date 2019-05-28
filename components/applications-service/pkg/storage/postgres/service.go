@@ -3,9 +3,10 @@ package postgres
 import (
 	"fmt"
 
-	"github.com/chef/automate/components/applications-service/pkg/storage"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
+
+	"github.com/chef/automate/components/applications-service/pkg/storage"
 )
 
 const (
@@ -116,7 +117,7 @@ func (db *Postgres) GetServices(
 	return services, err
 }
 
-// getServiceFromUniqueFields retreives a service from the db without the need of an id
+// getServiceFromUniqueFields retrieves a service from the db without the need of an id
 func (db *Postgres) getServiceFromUniqueFields(origin, name, member string) (*service, bool) {
 	var svc service
 	err := db.SelectOne(&svc, selectService, origin, name, member)

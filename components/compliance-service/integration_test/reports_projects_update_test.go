@@ -6,15 +6,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/golang/protobuf/ptypes"
+	_struct "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	project_update_tags "github.com/chef/automate/lib/authz"
-	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/ptypes"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestProjectUpdate(t *testing.T) {
@@ -1333,7 +1334,7 @@ func TestProjectUpdate(t *testing.T) {
 
 func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 	event := &automate_event.EventMsg{
-		EventID:   "lskdjflsdkfj",
+		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
 		Published: ptypes.TimestampNow(),
 	}
@@ -1342,7 +1343,7 @@ func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 	assert.Error(t, err)
 
 	event = &automate_event.EventMsg{
-		EventID:   "lskdjflsdkfj",
+		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{
@@ -1352,7 +1353,7 @@ func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
 	assert.Error(t, err)
 
 	event = &automate_event.EventMsg{
-		EventID:   "lskdjflsdkfj",
+		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{
@@ -1380,7 +1381,7 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 	localSuite.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&iam_v2.ProjectCollectionRulesResp{}, nil)
 	event := &automate_event.EventMsg{
-		EventID:   "lskdjflsdkfj",
+		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
 		Published: ptypes.TimestampNow(),
 		Data: &_struct.Struct{

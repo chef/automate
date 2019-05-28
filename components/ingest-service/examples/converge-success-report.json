@@ -17,7 +17,7 @@
   "message_type": "run_converge",
   "node": {
     "name": "supermarket-rhel-7-builder-45f356",
-    "chef_environment": "wilson",
+    "chef_environment": "B",
     "run_list": [
       "recipe[opscode-ci::slave]"
     ],
@@ -2824,7 +2824,7 @@
       }
     }
   },
-  "node_name": "insights.chef.co",
+  "node_name": "insights.B",
   "organization_name": "chef_delivery",
   "resources": [
     {

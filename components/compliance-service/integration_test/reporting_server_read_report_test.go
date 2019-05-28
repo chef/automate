@@ -91,7 +91,7 @@ func TestReadReport(t *testing.T) {
 			reportId:        assignedReportId,
 		},
 		{
-			description:     "Projects: user without unassigned access accessing an unassinged report",
+			description:     "Projects: user without unassigned access accessing an unassigned report",
 			allowedProjects: []string{"project1"},
 			reportId:        unassignedReportId,
 		},

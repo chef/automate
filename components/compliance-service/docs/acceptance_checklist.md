@@ -12,7 +12,7 @@ from the context of one of the acceptance instances, logged in as any user:
  ## test asset store
  - view and delete install linux-baseline, windows-baseline, aws-cis profiles
  - ensure the event feed has received the deleted profile events
- - install linux-baseline or ssh-baseline, windows-baseline, and aws-cis profilee
+ - install linux-baseline or ssh-baseline, windows-baseline, and aws-cis profiles
  - install profile with dependencies: see `api/tests/mario-0.1.0.tar.gz` or make your own
  - ensure the event feed has received the profile creation events
 

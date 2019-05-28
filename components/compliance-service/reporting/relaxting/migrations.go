@@ -482,7 +482,7 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s cannot create sum index template %s", myName, dstSumIndex))
 	}
-	// Create the summary destination index if needed. The index should't exist unless a
+	// Create the summary destination index if needed. The index shouldn't exist unless a
 	// previous migration failed or was canceled. Trying to avoid creation error in this case
 	if exists, _ := StoreExists(esClient, dstSumIndex); !exists {
 		_, err = esClient.CreateIndex(dstSumIndex).Do(ctx)

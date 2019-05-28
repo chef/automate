@@ -101,7 +101,7 @@ add_enterprise_command "generate-password-reset-token", "Generate a password res
   enterprise_ctl!('generate password reset token', ARGV[1..-1])
 end
 
-add_enterprise_command "revoke-token", "Revoke's a user's token", 2 do
+add_enterprise_command "revoke-token", "Revokes a user's token", 2 do
   enterprise_ctl!('revoke-token', ARGV[1..-1])
 end
 
@@ -129,7 +129,7 @@ end
 
 ## Same as above, but performs a dry run instead. There are no write actions,
 ## but there are read actions, which could in theory have side effects, though
-## they should be neglible.
+## they should be negligible.
 ##
 ## WARNING: You should always make a backup first!
 add_enterprise_command "migrate-change-description-dry-run", "Migrate change description DRY RUN", 2 do

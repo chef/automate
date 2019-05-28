@@ -34,8 +34,9 @@ describe('ClientRunsRequests', () => {
         expectedData.push({'text': '', 'type': ''});
       }
       const expectedUrl = `${CONFIG_MGMT_URL}/suggestions?type=name&text=fred`;
+      const filters: NodeFilter = <NodeFilter>{};
 
-      service.getSuggestions('name', 'fred').subscribe(data => {
+      service.getSuggestions('name', 'fred', filters).subscribe(data => {
         expect(data.length).toEqual(50);
       });
 
@@ -53,7 +54,8 @@ describe('ClientRunsRequests', () => {
       }
       const expectedUrl = `${CONFIG_MGMT_URL}/suggestions?type=name&text=fred`;
 
-      service.getSuggestions('name', 'fred').subscribe(data => {
+      const filters: NodeFilter = <NodeFilter>{};
+      service.getSuggestions('name', 'fred', filters).subscribe(data => {
         expect(data.length).toEqual(10);
         for ( const item of data ) {
           expect(Number(item.text)).toBeLessThan(10);
@@ -65,6 +67,30 @@ describe('ClientRunsRequests', () => {
       expect(req.request.method).toEqual('GET');
 
       req.flush(expectedData);
+    });
+
+    it('narrowing suggestions', () => {
+      const expectedData: Chicklet[] = [];
+      for (let i = 0; i < 10; i++) {
+        expectedData.push({'text': i.toString(), 'type': ''});
+      }
+      const expectedUrl = CONFIG_MGMT_URL + '/suggestions?' +
+      'filter=name:bob&filter=source_fqdn:chef.org&filter=organization:org1&type=name&text=fred';
+
+      const filters: NodeFilter = <NodeFilter>{
+        page: 0,
+        pageSize: 100,
+        organizations: ['org1'],
+        servers: ['chef.org'],
+        status: 'success',
+        searchBar: [{'text': 'bob', 'type': 'name'}]
+      };
+
+      service.getSuggestions('name', 'fred', filters).subscribe();
+
+      const req = httpTestingController.expectOne(expectedUrl);
+
+      expect(req.request.method).toEqual('GET');
     });
   });
 

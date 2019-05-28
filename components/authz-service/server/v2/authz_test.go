@@ -62,9 +62,9 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 				[]string{"p1", "p2"},
 				[]string{"p1", "p2"},
 			},
-			"when engine response is NO projects, returns the engine response verbatim": {
-				[]string{},    // no projects
-				[]string(nil), // well, almost verbatim
+			"when engine response is NO projects, returns no projects": {
+				[]string{}, // no projects
+				nil,
 			},
 			"when engine response is list of all projects + unassigned, returns external ALL projects": {
 				[]string{"p1", "p2", "p3", "(unassigned)"},
@@ -105,7 +105,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 			},
 			"when engine response is false, returns NO projects": {
 				false,
-				[]string(nil), // well, almost verbatim
+				nil,
 			},
 		}
 		for name, tc := range cases {

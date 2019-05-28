@@ -2,7 +2,7 @@
 # automate-ctl but are not supported in the workflow-ctl commands.
 DEPRECATED_COMMANDS = [
   { cmd_name: "service-list",
-    alterantive: "chef-automate service-versions" },
+    alternative: "chef-automate service-versions" },
   { cmd_name: "show-config",
     alternative: "chef-automate config show" },
   { cmd_name: "start",
@@ -12,7 +12,7 @@ DEPRECATED_COMMANDS = [
   { cmd_name: "restart",
     alternative: "chef-automate restart-services" },
   { cmd_name: "status",
-    alterantive: "chef-automate status" },
+    alternative: "chef-automate status" },
   { cmd_name: "tail",
     alternative: "chef-automate system-logs" },
   { cmd_name: "cleanse",

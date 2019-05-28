@@ -345,12 +345,16 @@ func (a *AuthzServer) getAllowedProjects(
 	// Fetches the id of the current user PLUS the team ids for that user
 	subjects := auth_context.FromContext(ctx).Subjects
 
-	// Note that projects do not exist in v1 of course,
-	// but as project introspection is so similar to endpoint introspection,
-	// it was easy to mirror that code here.
-	resp, err := a.filterHandler.FilterAuthorizedProjects(ctx, subjects,
-		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2)
+	inputPairs := pairs.GetKeys(mapByResourceAndActionV2)
+	pairsV2 := make([]*authzV2.Pair, len(inputPairs))
+	for i, p := range inputPairs {
+		pairsV2[i] = &authzV2.Pair{Resource: p.Resource, Action: p.Action}
+	}
+
+	resp, err := a.clientV2.FilterAuthorizedProjects(ctx, &authzV2.FilterAuthorizedPairsReq{
+		Subjects: subjects,
+		Pairs:    pairsV2,
+	})
 	if err != nil {
 		log.WithError(err).Debug("Error on client.FilterAuthorizedProjects")
 		return nil, err

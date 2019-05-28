@@ -20,6 +20,8 @@ import (
 	dc "github.com/chef/automate/api/config/deployment"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
+	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/dev/hab"
 	"github.com/chef/automate/components/automate-cli/pkg/docs"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -81,6 +83,7 @@ func init() {
 	devCmd.AddCommand(newVerifyPackagesCmd())
 	devCmd.AddCommand(newEnablePrometheusCmd())
 	devCmd.AddCommand(newDisablePrometheusCmd())
+	devCmd.AddCommand(newCreateIAMDevUsersCmd())
 	RootCmd.AddCommand(devCmd)
 }
 
@@ -940,6 +943,15 @@ func newDisablePrometheusCmd() *cobra.Command {
 	}
 }
 
+func newCreateIAMDevUsersCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "create-iam-dev-users",
+		RunE:  runCreateIAMDevUsersCmd,
+		Short: `Create IAM v2 dev users ("viewer" and "editor") idempotently`,
+		Args:  cobra.NoArgs,
+	}
+}
+
 // Equivalent to patching the config with the following toml:
 // [deployment.v1.svc]
 // enable_dev_monitoring = true
@@ -972,5 +984,37 @@ func runDisablePrometheusCmd(*cobra.Command, []string) error {
 	if err := client.PatchAutomateConfig(configCmdFlags.timeout, cfg, writer); err != nil {
 		return err
 	}
+	return nil
+}
+
+func runCreateIAMDevUsersCmd(*cobra.Command, []string) error {
+	ctx := context.TODO()
+	apiClient, err := apiclient.OpenConnection(ctx)
+	if err != nil {
+		return err
+	}
+	for username, data := range map[string]struct {
+		displayName, password, team string
+	}{
+		"viewer": {"Viewer User", "chefautomate", "viewers"},
+		"editor": {"Editor User", "chefautomate", "editors"},
+	} {
+		userID, _, err := adminmgmt.CreateUserOrUpdatePassword(ctx,
+			apiClient, username, data.displayName, data.password, false /* dry run */)
+		if err != nil {
+			return err
+		}
+		// Note: the teams SHOULD exist. But since you never know what happens in a
+		// long running acceptance env, we'll better ensure them:
+		teamID, _, err := adminmgmt.EnsureTeam(ctx, data.team, data.team /* description */, apiClient, false /* dry run */)
+		if err != nil {
+			return err
+		}
+		_, err = adminmgmt.AddUserToTeam(ctx, apiClient, teamID, userID, false /* dry run */)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

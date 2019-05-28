@@ -181,7 +181,7 @@ handle_metadata({ok, IdPMetadata}, SSOBinding, NameId) ->
 handle_return([], _) -> {error, not_found};
 handle_return([Config], EntName) -> {ok, deserialize(Config, EntName)};
 handle_return({error, Why}, _) ->
-    chef_log:error("An internal server error occured in trying to perform a db operation on SAML configuration. ~n~p", [Why]),
+    chef_log:error("An internal server error occurred in trying to perform a db operation on SAML configuration. ~n~p", [Why]),
     {error, Why}.
 
 -spec deserialize(#auth_saml_config{}, binary()) -> #saml_config{}.

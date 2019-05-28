@@ -16,6 +16,7 @@ message Sorting {
 message Suggestion {
   string type = 1;
   string text = 2;
+  repeated string filter = 3;
 }
 
 enum Order {

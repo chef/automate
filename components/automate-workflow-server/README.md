@@ -11,7 +11,7 @@ brew install erlang@18
 
 ### Tests
 
-To run the below tests you must first setup sqitch and pgtab. The two below READMEs will help to
+To run the below tests you must first setup sqitch and pgtap. The two below READMEs will help to
 install these programs.
 *   [Get set up](server/schema/doc/setup_sqitch.md) to hack on the schema
 *   [Get set up](server/schema/doc/setup_pgtap.md) to run schema tests

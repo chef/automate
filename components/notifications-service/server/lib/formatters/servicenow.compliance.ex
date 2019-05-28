@@ -9,15 +9,27 @@ defmodule Notifications.Formatters.ServiceNow.Compliance do
   alias Notifications.Formatters.ComplianceHelper
   alias Notifications.Formatters.Utils
 
+  @crit_control_threshold 0.7
+
   @spec format(ComplianceFailure.t):: map()
-  def format(%ComplianceFailure{test_totals: totals} = notification) do
+  def format(notification) do
+    get_servicenow_compliance_notification(notification, 0.1)
+  end
+
+  def format_critical(notification) do
+    get_servicenow_compliance_notification(notification)
+  end
+
+  def get_servicenow_compliance_notification(notification) do
+    get_servicenow_compliance_notification(notification, @crit_control_threshold)
+  end
+  def get_servicenow_compliance_notification(%ComplianceFailure{test_totals: totals} = notification, control_threshold) do
     Utils.to_map(notification)
 
-    notification = ComplianceHelper.prune_and_augment(notification, 0.1)
-    # The payload includes all the same data, but names and format are different.
+    notification = ComplianceHelper.prune_and_augment(notification, control_threshold)
     %{
       automate_fqdn: Notifications.Config.automate_fqdn,
-      failure_snippet: "InSpec found a critical control failure on [#{notification.node_name}](#{notification.compliance_url})",
+      failure_snippet: "InSpec found a control failure on [#{notification.node_name}](#{notification.compliance_url})",
       automate_failure_url: notification.compliance_url,
       node_name: notification.node_name,
       node_uuid: notification.node_id,

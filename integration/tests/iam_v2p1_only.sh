@@ -39,15 +39,15 @@ do_deploy() {
 }
 
 do_test_deploy() {
-    log_info "run chef-automate iam upgrade-to-v2 --beta2.1"
-    chef-automate iam upgrade-to-v2 --beta2.1 || return 1
+    log_info "run chef-automate iam upgrade-to-v2 --beta2.1 --skip-policy-migration"
+    chef-automate iam upgrade-to-v2 --beta2.1 --skip-policy-migration || return 1
 
-    remove_legacy_policies
+    verify_legacy_policies_not_migrated
 
     do_test_deploy_default
 }
 
-remove_legacy_policies() {
+verify_legacy_policies_not_migrated() {
     local token=$(chef-automate iam token create ADMIN_TEST --admin)
     local legacy_policies=(secrets-access-legacy
             events-access-legacy
@@ -61,7 +61,9 @@ remove_legacy_policies() {
 
     for id in "${legacy_policies[@]}"
     do
-        echo "Deleting legacy policy $id..."
-        curl -sSkH "api-token: $token" -X DELETE https://localhost/apis/iam/v2beta/policies/$id
+        echo "checking legacy policy $id..."
+	# only capture the response code
+        local code=$(hab_curl -s -o /dev/null -k -w '%{http_code}' -H "api-token: $token" https://localhost/apis/iam/v2beta/policies/$id)
+	[[ $code -eq 404 ]] || return 1
     done
 }

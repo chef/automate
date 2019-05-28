@@ -262,7 +262,7 @@ describe Runner::LocalKnife do
       end
     end
 
-    context "whan an ssh identity file is given and no password is given" do
+    context "when an ssh identity file is given and no password is given" do
       let(:bootstrap_options) do
         ['--ssh-user', username, '--node-name', fqdn, '--yes', '--ssh-identity-file', ssh_identity_file, '--sudo',
          '--use-sudo-password', '--ssh-port', port , /--config-option client_d_dir=/]

@@ -35,7 +35,7 @@ run_inspec_tests() {
     for test_name in "${test_names[@]}"
     do
         log_info "Running inspec profile ${test_name}"
-        inspec exec --no-backend-cache "${root_dir}/inspec/${test_name}" || errcode=$? && true;
+        CHEF_LICENSE="accept-no-persist" inspec exec --no-backend-cache "${root_dir}/inspec/${test_name}" || errcode=$? && true;
 
         if [[ $errcode -ne 0 && $errcode -ne 101  ]]
         then

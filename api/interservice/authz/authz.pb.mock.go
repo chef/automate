@@ -33,7 +33,6 @@ type AuthorizationServerMock struct {
 	GetVersionFunc               func(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
 	IsAuthorizedFunc             func(context.Context, *IsAuthorizedReq) (*IsAuthorizedResp, error)
 	FilterAuthorizedPairsFunc    func(context.Context, *FilterAuthorizedPairsReq) (*FilterAuthorizedPairsResp, error)
-	FilterAuthorizedProjectsFunc func(context.Context, *FilterAuthorizedPairsReq) (*FilterAuthorizedProjectsResp, error)
 	CreatePolicyFunc             func(context.Context, *CreatePolicyReq) (*CreatePolicyResp, error)
 	ListPoliciesFunc             func(context.Context, *ListPoliciesReq) (*ListPoliciesResp, error)
 	DeletePolicyFunc             func(context.Context, *DeletePolicyReq) (*DeletePolicyResp, error)
@@ -74,18 +73,6 @@ func (m *AuthorizationServerMock) FilterAuthorizedPairs(ctx context.Context, req
 		return f(ctx, req)
 	}
 	return nil, status.Error(codes.Internal, "mock: 'FilterAuthorizedPairs' not implemented")
-}
-
-func (m *AuthorizationServerMock) FilterAuthorizedProjects(ctx context.Context, req *FilterAuthorizedPairsReq) (*FilterAuthorizedProjectsResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.FilterAuthorizedProjectsFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'FilterAuthorizedProjects' not implemented")
 }
 
 func (m *AuthorizationServerMock) CreatePolicy(ctx context.Context, req *CreatePolicyReq) (*CreatePolicyResp, error) {
@@ -141,7 +128,6 @@ func (m *AuthorizationServerMock) Reset() {
 	m.GetVersionFunc = nil
 	m.IsAuthorizedFunc = nil
 	m.FilterAuthorizedPairsFunc = nil
-	m.FilterAuthorizedProjectsFunc = nil
 	m.CreatePolicyFunc = nil
 	m.ListPoliciesFunc = nil
 	m.DeletePolicyFunc = nil

@@ -18,7 +18,7 @@ describe Runner::Install::Options do
     end
   end
 
-  context "when flags that take manditory arguments are passed" do
+  context "when flags that take mandatory arguments are passed" do
     [:installer, :"chefdk-version", :port,
      "ssh-identity-file", "fips-custom-cert-filename"].each do |target|
       let(:name) { target.to_s.gsub("-", "_") }

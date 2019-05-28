@@ -141,16 +141,6 @@ func (s *Server) FilterAuthorizedPairs(
 	}, nil
 }
 
-// FilterAuthorizedProjects just returns empty for V1.
-func (s *Server) FilterAuthorizedProjects(
-	ctx context.Context,
-	req *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedProjectsResp, error) {
-
-	return &authz.FilterAuthorizedProjectsResp{
-		Projects: []string{},
-	}, nil
-}
-
 func toPBPairs(pairs []engine.Pair) []*authz.Pair {
 	ps := make([]*authz.Pair, len(pairs))
 	for i, p := range pairs {

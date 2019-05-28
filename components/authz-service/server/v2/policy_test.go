@@ -2226,6 +2226,23 @@ func TestMigrateToV2(t *testing.T) {
 			pol := getPolicyFromStore(t, policyStore, constants_v2.ComplianceTokenPolicyID)
 			assert.Equal(t, "[Legacy] Compliance Profile Access", pol.Name)
 		},
+		"legacy default and custom v1 policies are skipped when asked to skip them": func(t *testing.T) {
+			polID := genUUID(t)
+			v1List = v1Lister{pols: []*storage_v1.Policy{
+				wellknown(t, constants_v1.ComplianceTokenReadProfilesPolicyID),
+				{
+					ID:       polID,
+					Subjects: []string{"user:ldap:bob", "team:ldap:ops"},
+					Action:   "create",
+					Resource: "ingest:nodes",
+				},
+			}}
+
+			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{SkipV1Policies: true})
+			require.NoError(t, err)
+			assert.NotNil(t, resp)
+			assert.Equal(t, defaultPolicyCount, policyStore.ItemCount()) // nothing extra
+		},
 		// --------- migration status related tests ---------
 		"when no migration has been run, migration status is set to v1": func(t *testing.T) {
 			s, err := status.MigrationStatus(ctx)
@@ -2940,7 +2957,7 @@ func setupV2(t *testing.T,
 	require.NoError(t, err)
 
 	eventServiceClient := &mockEventServiceClient{}
-	configMgr, err := config.NewManager("/tmp/.authz-delet-me")
+	configMgr, err := config.NewManager("/tmp/.authz-delete-me")
 	require.NoError(t, err)
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
 		&testProjectRulesRetriever{}, eventServiceClient, configMgr)
