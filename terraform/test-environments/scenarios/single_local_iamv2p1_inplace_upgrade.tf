@@ -18,7 +18,7 @@ module "single_local_iamv2p1_inplace_upgrade" {
   vpc            = "${var.environment}"
   platform       = "ubuntu-16.04"
   key_name       = "cd-infrastructure"
-  instance_type  = "m4.large"
+  instance_type  = "m5.large"
   root_volume_gb = "200"
 
   # Required AWS Tags
