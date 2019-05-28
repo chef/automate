@@ -295,6 +295,7 @@ func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFe
 		"users v2beta":    pb_iam_v2beta.RegisterUsersHandlerFromEndpoint,
 		"tokens v2beta":   pb_iam_v2beta.RegisterTokensHandlerFromEndpoint,
 		"teams v2beta":    pb_iam_v2beta.RegisterTeamsHandlerFromEndpoint,
+		"rules v2beta":    pb_iam_v2beta.RegisterRulesHandlerFromEndpoint,
 	}
 	if toggles["applications"] {
 		endpointMap["apps beta"] = pb_apps.RegisterApplicationsServiceHandlerFromEndpoint
