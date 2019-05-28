@@ -255,6 +255,26 @@ func (mr *MockProjectsClientMockRecorder) CreateRule(ctx, in interface{}, opts .
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRule", reflect.TypeOf((*MockProjectsClient)(nil).CreateRule), varargs...)
 }
 
+// GetRule mocks base method
+func (m *MockProjectsClient) GetRule(ctx context.Context, in *GetRuleReq, opts ...grpc.CallOption) (*GetRuleResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetRule", varargs...)
+	ret0, _ := ret[0].(*GetRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRule indicates an expected call of GetRule
+func (mr *MockProjectsClientMockRecorder) GetRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRule", reflect.TypeOf((*MockProjectsClient)(nil).GetRule), varargs...)
+}
+
 // MockProjectsServer is a mock of ProjectsServer interface
 type MockProjectsServer struct {
 	ctrl     *gomock.Controller
@@ -441,4 +461,19 @@ func (m *MockProjectsServer) CreateRule(arg0 context.Context, arg1 *CreateRuleRe
 func (mr *MockProjectsServerMockRecorder) CreateRule(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRule", reflect.TypeOf((*MockProjectsServer)(nil).CreateRule), arg0, arg1)
+}
+
+// GetRule mocks base method
+func (m *MockProjectsServer) GetRule(arg0 context.Context, arg1 *GetRuleReq) (*GetRuleResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRule", arg0, arg1)
+	ret0, _ := ret[0].(*GetRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRule indicates an expected call of GetRule
+func (mr *MockProjectsServerMockRecorder) GetRule(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRule", reflect.TypeOf((*MockProjectsServer)(nil).GetRule), arg0, arg1)
 }
