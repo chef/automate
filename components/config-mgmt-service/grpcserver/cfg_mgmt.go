@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"context"
+	"strings"
 
 	"github.com/golang/protobuf/proto"
 	gpStruct "github.com/golang/protobuf/ptypes/struct"
@@ -236,7 +237,14 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,
 		return nil, errors.GrpcErrorf(codes.InvalidArgument, "Invalid type parameter '%v'", typeParam)
 	}
 
-	filters, err := filterByProjects(ctx, map[string][]string{})
+	adjustedFilter := removeSuggestionTypeFromFilter(request.Filter, typeParam)
+
+	filters, err := params.FormatNodeFilters(adjustedFilter)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	filters, err = filterByProjects(ctx, filters)
 	if err != nil {
 		return nil, errors.GrpcErrorf(codes.Internal, err.Error())
 	}
@@ -252,17 +260,6 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,
 		return pSuggestions, errors.GrpcErrorFromErr(codes.Internal, err)
 	}
 	return pSuggestions, nil
-}
-
-func backendSuggestionsToProtoArray(suggestions []backend.Suggestion) []proto.Message {
-	messages := make([]proto.Message, len(suggestions))
-	for i, suggestion := range suggestions {
-		messages[i] = &response.Suggestion{
-			Text:  suggestion.Text,
-			Score: suggestion.Score,
-		}
-	}
-	return messages
 }
 
 // GetOrganizations returns the a list of all organizations
@@ -313,6 +310,30 @@ func (s *CfgMgmtServer) GetSourceFqdns(ctx context.Context,
 		}
 	}
 	return sourceFqdns, err
+}
+
+func removeSuggestionTypeFromFilter(filter []string, suggestionType string) []string {
+	adjustedFilter := make([]string, 0)
+	for _, filter := range filter {
+		keyValuePair := strings.Split(filter, ":")
+
+		if len(keyValuePair) == 2 && keyValuePair[0] != suggestionType {
+			adjustedFilter = append(adjustedFilter, filter)
+		}
+	}
+
+	return adjustedFilter
+}
+
+func backendSuggestionsToProtoArray(suggestions []backend.Suggestion) []proto.Message {
+	messages := make([]proto.Message, len(suggestions))
+	for i, suggestion := range suggestions {
+		messages[i] = &response.Suggestion{
+			Text:  suggestion.Text,
+			Score: suggestion.Score,
+		}
+	}
+	return messages
 }
 
 // stringArrayToListValue Casts a []string into a 'Proto ListValue'

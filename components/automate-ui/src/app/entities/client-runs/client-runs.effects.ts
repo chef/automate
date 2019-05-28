@@ -69,11 +69,15 @@ export class ClientRunsEffects {
   @Effect()
   fetchNodeSuggestions$ = this.actions$.pipe(
       ofType(ClientRunsActionTypes.GET_NODE_SUGGESTIONS),
-      mergeMap((action: GetNodeSuggestions) =>
-        this.requests.getSuggestions(action.payload.type, action.payload.text)),
-      map(nodeSuggestions => new GetNodeSuggestionsSuccess({ nodeSuggestions })),
-      catchError((error) => of(new GetNodeSuggestionsFailure(error)))
-    );
+      withLatestFrom(this.store),
+      switchMap(([action, storeState]) => {
+        const getNodeSuggestions = action as GetNodeSuggestions;
+        return this.requests.getSuggestions(
+          getNodeSuggestions.payload.type, getNodeSuggestions.payload.text,
+          storeState.clientRunsEntity.nodeFilter).pipe(
+        map(nodeSuggestions => new GetNodeSuggestionsSuccess({ nodeSuggestions })),
+        catchError((error) => of(new GetNodeSuggestionsFailure(error))));
+      }));
 
   @Effect()
   deleteNodes$ = this.actions$.pipe(

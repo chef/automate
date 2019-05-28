@@ -74,12 +74,11 @@ export class ClientRunsRequests {
       .get<NodeCount>(url, options);
   }
 
-  public getSuggestions(type: string, text: string): Observable<any[]> {
+  public getSuggestions(type: string, text: string, filters: NodeFilter): Observable<any[]> {
     if (text && text.length > 0) {
+      const params = this.formatFilters(filters).set('type', type).set('text', text);
       const url = `${CONFIG_MGMT_URL}/suggestions`;
-      const params = new HttpParams()
-        .set('type', type)
-        .set('text', text);
+
       return this.httpClient.get<Chicklet[]>(url, {params});
     } else {
       return observableOf([]);
