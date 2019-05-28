@@ -151,12 +151,9 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
-		// This is similar to AuthorizationBypasser, to let services opt-in if they
-		// want the auth context injected. Note that this happens after authorization,
-		// so, nothing is bypassed.
-		//
-		// However, every domain service will need the projects eventually,
-		// so we'll at least always inject project metadata.
+		// This lets services opt-in if they want the entire auth context injected.
+		// However, every domain service will need the projects eventually, so we'll
+		// at least always inject project metadata.
 		if _, ok := info.Server.(AuthContextReader); ok {
 			log.Debugf("injecting auth context for method %q to downstream", info.FullMethod)
 			ctx = auth_context.NewOutgoingContext(ctx)
