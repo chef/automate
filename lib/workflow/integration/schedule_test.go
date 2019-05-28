@@ -153,7 +153,7 @@ func (suite *WorkflowTestSuite) TestExpiringSchedule() {
 	// This recurrence is expected to run one time starting now. It's reoccurs
 	// every 10 seconds, but that's not possible because the rule is only good
 	// for 5 seconds.
-	dtStart := time.Now()
+	dtStart := time.Now().Add(2 * time.Second)
 	recurrence, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
 		Interval: 10,

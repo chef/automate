@@ -368,7 +368,6 @@ func (m *WorkflowManager) CreateWorkflowSchedule(
 	recurRule *rrule.RRule,
 ) error {
 	nextRunAt := recurRule.After(time.Now().UTC(), true).UTC()
-	logrus.Info(nextRunAt)
 	if nextRunAt.IsZero() {
 		return ErrInvalidSchedule
 	}
