@@ -9,7 +9,7 @@ message CreateUserResp {
   User user = 1;
 }
 
-message GetUsersResp {
+message ListUsersResp {
   repeated User users = 1;
 }
 

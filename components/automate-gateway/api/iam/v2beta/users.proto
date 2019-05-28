@@ -22,7 +22,7 @@ service Users {
     option (chef.automate.api.iam.policy).resource = "iam:users";
     option (chef.automate.api.iam.policy).action = "iam:users:create";
   };
-  rpc GetUsers (GetUsersReq) returns (GetUsersResp) {
+  rpc ListUsers (ListUsersReq) returns (ListUsersResp) {
     option (google.api.http).get = "/iam/v2beta/users";
     option (chef.automate.api.policy).resource = "auth:users";
     option (chef.automate.api.policy).action = "read";

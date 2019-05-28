@@ -53,12 +53,12 @@ func init() {
     },
     "/iam/v2beta/users": {
       "get": {
-        "operationId": "GetUsers",
+        "operationId": "ListUsers",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetUsersResp"
+              "$ref": "#/definitions/v2betaListUsersResp"
             }
           }
         },
@@ -203,7 +203,7 @@ func init() {
         }
       }
     },
-    "v2betaGetUsersResp": {
+    "v2betaListUsersResp": {
       "type": "object",
       "properties": {
         "users": {

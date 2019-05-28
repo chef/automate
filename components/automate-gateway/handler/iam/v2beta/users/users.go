@@ -43,8 +43,8 @@ func (p *Server) CreateUser(
 	return &pb_resp.CreateUserResp{User: convert(resp)}, nil
 }
 
-func (p *Server) GetUsers(
-	ctx context.Context, _ *pb_req.GetUsersReq) (*pb_resp.GetUsersResp, error) {
+func (p *Server) ListUsers(
+	ctx context.Context, _ *pb_req.ListUsersReq) (*pb_resp.ListUsersResp, error) {
 	resp, err := p.users.GetUsers(ctx, &local_user.GetUsersReq{})
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (p *Server) GetUsers(
 		users = append(users, &pb_common.User{Id: i, Name: u.Name, MembershipId: u.Id})
 	}
 
-	return &pb_resp.GetUsersResp{Users: users}, nil
+	return &pb_resp.ListUsersResp{Users: users}, nil
 }
 
 func (p *Server) DeleteUser(
