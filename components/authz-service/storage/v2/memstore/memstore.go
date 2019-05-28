@@ -255,8 +255,17 @@ func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 }
 
 func (s *State) GetRule(_ context.Context, id string) (*storage.Rule, error) {
-	// TODO implement
-	return nil, nil
+	item, exists := s.rules.Get(id)
+	if !exists {
+		return nil, storage_errors.ErrNotFound
+	}
+
+	rule, ok := item.(*storage.Rule)
+	if !ok {
+		return nil, ErrTypeAssertionFailed
+	}
+
+	return rule, nil
 }
 
 func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
