@@ -44,6 +44,7 @@ SELECT
   n.target_config,
   n.last_scan,
   n.last_run,
+  n.projects_data,
   COALESCE(('[' || string_agg('{"key":"' || t.key || '"' || ',"value": "' || t.value || '"}', ',') || ']'), '[]') :: JSON AS tags,
   COALESCE(array_to_json(array_remove(array_agg(DISTINCT m.manager_id), NULL)), '[]') AS manager_ids,
   COALESCE(array_to_json(array_remove(array_agg(p.project_id), NULL)), '[]') AS projects,
@@ -173,6 +174,7 @@ type dbNode struct {
 	TotalCount      int64            `db:"total_count"`
 	LastScan        json.RawMessage  `db:"last_scan"`
 	LastRun         json.RawMessage  `db:"last_run"`
+	ProjectsData    json.RawMessage  `db:"projects_data"`
 }
 
 type nodeCounts struct {
@@ -265,6 +267,15 @@ func (db *DB) fromDBNode(inNode *dbNode) (*nodes.Node, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "fromDBNode unable to translate scan data")
 		}
+	}
+
+	if inNode.ProjectsData != nil {
+		dbProjectsData := []*nodes.ProjectsData{}
+		err = json.Unmarshal(inNode.ProjectsData, &dbProjectsData)
+		if err != nil {
+			return nil, errors.Wrap(err, "fromDBNode unable to unmarshal projects data")
+		}
+		newNode.ProjectsData = dbProjectsData
 	}
 
 	t := inNode.LastContact.Round(1 * time.Second)
