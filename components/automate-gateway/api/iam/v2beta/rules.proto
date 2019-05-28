@@ -22,4 +22,12 @@ service Rules {
     option (chef.automate.api.iam.policy).resource = "iam:rules"; // TODO: not really iam, is it?
     option (chef.automate.api.iam.policy).action = "iam:rules:create";
   };
+
+  rpc GetRule (GetRuleReq) returns (GetRuleResp) {
+    option (google.api.http).get= "/iam/v2beta/rules/{id}";
+    option (chef.automate.api.policy).resource = "auth:rules";
+    option (chef.automate.api.policy).action = "get";
+    option (chef.automate.api.iam.policy).resource = "iam:rules:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:rules:get";
+  };
 }

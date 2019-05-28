@@ -12,3 +12,7 @@ message CreateRuleReq {
     RuleType type = 4;
     repeated Condition conditions = 5;
 }
+
+message GetRuleReq {
+  string id = 1;
+}

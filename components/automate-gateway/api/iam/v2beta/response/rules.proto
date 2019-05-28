@@ -8,3 +8,7 @@ import "components/automate-gateway/api/iam/v2beta/common/rules.proto";
 message CreateRuleResp {
   Rule rule = 1;
 }
+
+message GetRuleResp {
+  Rule rule = 1;
+}
