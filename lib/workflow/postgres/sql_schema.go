@@ -150,7 +150,6 @@ CREATE OR REPLACE FUNCTION enqueue_workflow(
     parameters BYTEA)
 RETURNS INTEGER
 AS $$
-    SELECT pg_notify('workflow_instance_new', workflow_name);
     WITH winst AS (
         INSERT INTO workflow_instances(name, workflow_name, parameters)
             VALUES(name, workflow_name, parameters)
@@ -229,11 +228,6 @@ AS $$
     DELETE FROM workflow_instances WHERE id=workflow_instance_id;
 $$ LANGUAGE SQL;
 
--- Notification channels
---
--- workflow_task_new
--- workflow_task_complete
---
 CREATE OR REPLACE FUNCTION complete_workflow(wid BIGINT)
 RETURNS VOID
 LANGUAGE SQL
@@ -242,12 +236,10 @@ AS $$
     done_workflows AS (
         SELECT id, name, workflow_name, parameters, start_at 
         FROM workflow_instances where id = wid
-    ),
-    result_ins AS (
-        INSERT INTO workflow_results(name, workflow_name, parameters, start_at)
-            (SELECT name, workflow_name, parameters, start_at FROM done_workflows) 
     )
-    SELECT pg_notify('workflow_instance_complete', id::text) FROM done_workflows;
+    INSERT INTO workflow_results(name, workflow_name, parameters, start_at)
+        (SELECT name, workflow_name, parameters, start_at FROM done_workflows);
+    
     DELETE FROM tasks WHERE workflow_instance_id = wid;
     DELETE FROM tasks_results WHERE workflow_instance_id = wid;
     DELETE FROM workflow_events WHERE workflow_instance_id = wid;
@@ -278,7 +270,6 @@ RETURNS VOID
 AS $$
     INSERT INTO tasks(workflow_instance_id, try_remaining, start_after, task_name, parameters)
         VALUES(workflow_instance_id, try_remaining, start_after, task_name, parameters);
-    SELECT pg_notify('workflow_task_new', task_name);
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION dequeue_task(task_name TEXT)
@@ -296,8 +287,6 @@ CREATE OR REPLACE FUNCTION complete_task(tid BIGINT, status task_status, error t
 RETURNS VOID
 LANGUAGE SQL
 AS $$
-    WITH done_tasks AS (SELECT workflow_instance_id AS id FROM tasks where id = tid)
-    SELECT pg_notify('workflow_task_complete', id::text) FROM done_tasks;
     WITH in_vals AS (SELECT
         tid as id,
         status as status,
