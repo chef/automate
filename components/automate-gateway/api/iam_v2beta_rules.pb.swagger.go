@@ -43,6 +43,30 @@ func init() {
           "Rules"
         ]
       }
+    },
+    "/iam/v2beta/rules/{id}": {
+      "get": {
+        "operationId": "GetRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetRuleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Rules"
+        ]
+      }
     }
   },
   "definitions": {
@@ -110,6 +134,14 @@ func init() {
       }
     },
     "v2betaCreateRuleResp": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v2betaRule"
+        }
+      }
+    },
+    "v2betaGetRuleResp": {
       "type": "object",
       "properties": {
         "rule": {
