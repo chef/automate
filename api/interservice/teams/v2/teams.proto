@@ -22,9 +22,9 @@ message GetTeamResp {
   Team team = 1;
 }
 
-message GetTeamsReq {}
+message ListTeamsReq {}
 
-message GetTeamsResp {
+message ListTeamsResp {
   repeated Team teams = 1;
 }
 
@@ -139,7 +139,7 @@ message UpgradeToV2Resp { }
 
 service TeamsV2 {
   rpc GetTeam (GetTeamReq) returns (GetTeamResp) {};
-  rpc GetTeams (GetTeamsReq) returns (GetTeamsResp) {};
+  rpc ListTeams (ListTeamsReq) returns (ListTeamsResp) {};
   rpc CreateTeam (CreateTeamReq) returns (CreateTeamResp) {};
   rpc UpdateTeam (UpdateTeamReq) returns (UpdateTeamResp) {};
   rpc DeleteTeam (DeleteTeamReq) returns (DeleteTeamResp) {};

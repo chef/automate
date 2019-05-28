@@ -125,7 +125,7 @@ func runAllServerTests(
 		})
 	})
 
-	t.Run("GetTeams", func(t *testing.T) {
+	t.Run("ListTeams", func(t *testing.T) {
 		resetState(context.Background(), t, serviceRef)
 
 		t.Run("when the list is successfully returned", func(t *testing.T) {
@@ -143,7 +143,7 @@ func runAllServerTests(
 			})
 			require.NoError(t, err)
 
-			list, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			list, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			require.NotNil(t, list)
 			assert.Contains(t, list.Teams, resp1.Team)
@@ -170,7 +170,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 
 			ctx = insertProjectsIntoNewContext([]string{"project1"})
-			list, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			list, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			require.NotNil(t, list)
 			assert.Contains(t, list.Teams, resp1.Team)
@@ -196,7 +196,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 
 			ctx = insertProjectsIntoNewContext([]string{"*"})
-			list, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			list, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			require.NotNil(t, list)
 			assert.Contains(t, list.Teams, resp1.Team)
@@ -222,7 +222,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 
 			ctx = insertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
-			list, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			list, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			require.NotNil(t, list)
 			assert.Contains(t, list.Teams, resp1.Team)
@@ -234,7 +234,7 @@ func runAllServerTests(
 
 		t.Run("when there is only the non-deletable teams", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			resp, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			require.Equal(t, len(storage.NonDeletableTeams), len(resp.Teams))
@@ -329,7 +329,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamListBefore, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
 
@@ -339,7 +339,7 @@ func runAllServerTests(
 			assert.Equal(t, resp1.Team.Id, resp.Team.Id)
 			assert.Equal(t, resp1.Team.Name, resp.Team.Name)
 
-			teamListAfter, err3 := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamListAfter, err3 := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err3)
 			assert.Equal(t, len(storage.NonDeletableTeams), len(teamListAfter.Teams)-1)
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
@@ -375,7 +375,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamListBefore, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
 
@@ -386,7 +386,7 @@ func runAllServerTests(
 			assert.Equal(t, resp1.Team.Id, resp.Team.Id)
 			assert.Equal(t, resp1.Team.Name, resp.Team.Name)
 
-			teamListAfter, err3 := cl.GetTeams(context.Background(), &teams.GetTeamsReq{})
+			teamListAfter, err3 := cl.ListTeams(context.Background(), &teams.ListTeamsReq{})
 			require.NoError(t, err3)
 			assert.Equal(t, len(storage.NonDeletableTeams), len(teamListAfter.Teams)-1)
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
@@ -422,7 +422,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamListBefore, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
 
@@ -433,7 +433,7 @@ func runAllServerTests(
 			assert.Equal(t, resp1.Team.Id, resp.Team.Id)
 			assert.Equal(t, resp1.Team.Name, resp.Team.Name)
 
-			teamListAfter, err3 := cl.GetTeams(context.Background(), &teams.GetTeamsReq{})
+			teamListAfter, err3 := cl.ListTeams(context.Background(), &teams.ListTeamsReq{})
 			require.NoError(t, err3)
 			assert.Equal(t, len(storage.NonDeletableTeams), len(teamListAfter.Teams)-1)
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
@@ -469,7 +469,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamListBefore, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
 
@@ -480,7 +480,7 @@ func runAllServerTests(
 			assert.Equal(t, resp1.Team.Id, resp.Team.Id)
 			assert.Equal(t, resp1.Team.Name, resp.Team.Name)
 
-			teamListAfter, err3 := cl.GetTeams(context.Background(), &teams.GetTeamsReq{})
+			teamListAfter, err3 := cl.ListTeams(context.Background(), &teams.ListTeamsReq{})
 			require.NoError(t, err3)
 			assert.Equal(t, len(storage.NonDeletableTeams), len(teamListAfter.Teams)-1)
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
@@ -508,7 +508,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			require.NotNil(t, resp2)
 
-			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamListBefore, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			assert.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
 
@@ -541,7 +541,7 @@ func runAllServerTests(
 			})
 			require.NoError(t, err)
 
-			teamListBefore, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamListBefore, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err)
 			require.Equal(t, 2+len(storage.NonDeletableTeams), len(teamListBefore.Teams))
 
@@ -550,7 +550,7 @@ func runAllServerTests(
 			require.NotNil(t, err2)
 			grpctest.AssertCode(t, codes.Internal, err2)
 
-			teamListAfter, err3 := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamListAfter, err3 := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err3)
 			assert.Equal(t, 1+len(storage.NonDeletableTeams), len(teamListAfter.Teams))
 			assert.Contains(t, teamListAfter.Teams, resp2.Team)
@@ -603,7 +603,7 @@ func runAllServerTests(
 			assert.Equal(t, updateReq.Name, updatedTeamResp.Team.Name)
 			assert.Equal(t, updateReq.Projects, updatedTeamResp.Team.Projects)
 
-			teamsList, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamsList, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err, "reading back teams")
 
 			require.Equal(t, 2, len(teamsList.Teams))
@@ -642,7 +642,7 @@ func runAllServerTests(
 			assert.Equal(t, updateReq.Name, updatedTeamResp.Team.Name)
 			assert.Equal(t, updateReq.Projects, updatedTeamResp.Team.Projects)
 
-			teamsList, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamsList, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err, "reading back teams")
 
 			require.Equal(t, 2, len(teamsList.Teams))
@@ -681,7 +681,7 @@ func runAllServerTests(
 			assert.Equal(t, updateReq.Name, updatedTeamResp.Team.Name)
 			assert.Equal(t, updateReq.Projects, updatedTeamResp.Team.Projects)
 
-			teamsList, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamsList, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err, "reading back teams")
 
 			require.Equal(t, 2, len(teamsList.Teams))
@@ -720,7 +720,7 @@ func runAllServerTests(
 			assert.Equal(t, updateReq.Name, updatedTeamResp.Team.Name)
 			assert.Equal(t, updateReq.Projects, updatedTeamResp.Team.Projects)
 
-			teamsList, err := cl.GetTeams(ctx, &teams.GetTeamsReq{})
+			teamsList, err := cl.ListTeams(ctx, &teams.ListTeamsReq{})
 			require.NoError(t, err, "reading back teams")
 
 			require.Equal(t, 2, len(teamsList.Teams))

@@ -249,10 +249,10 @@ var _ interface {
 	ErrorName() string
 } = GetTeamRespValidationError{}
 
-// Validate checks the field values on GetTeamsReq with the rules defined in
+// Validate checks the field values on ListTeamsReq with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
-func (m *GetTeamsReq) Validate() error {
+func (m *ListTeamsReq) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -260,9 +260,9 @@ func (m *GetTeamsReq) Validate() error {
 	return nil
 }
 
-// GetTeamsReqValidationError is the validation error returned by
-// GetTeamsReq.Validate if the designated constraints aren't met.
-type GetTeamsReqValidationError struct {
+// ListTeamsReqValidationError is the validation error returned by
+// ListTeamsReq.Validate if the designated constraints aren't met.
+type ListTeamsReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -270,22 +270,22 @@ type GetTeamsReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetTeamsReqValidationError) Field() string { return e.field }
+func (e ListTeamsReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetTeamsReqValidationError) Reason() string { return e.reason }
+func (e ListTeamsReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetTeamsReqValidationError) Cause() error { return e.cause }
+func (e ListTeamsReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetTeamsReqValidationError) Key() bool { return e.key }
+func (e ListTeamsReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetTeamsReqValidationError) ErrorName() string { return "GetTeamsReqValidationError" }
+func (e ListTeamsReqValidationError) ErrorName() string { return "ListTeamsReqValidationError" }
 
 // Error satisfies the builtin error interface
-func (e GetTeamsReqValidationError) Error() string {
+func (e ListTeamsReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -297,14 +297,14 @@ func (e GetTeamsReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetTeamsReq.%s: %s%s",
+		"invalid %sListTeamsReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetTeamsReqValidationError{}
+var _ error = ListTeamsReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -312,12 +312,12 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetTeamsReqValidationError{}
+} = ListTeamsReqValidationError{}
 
-// Validate checks the field values on GetTeamsResp with the rules defined in
+// Validate checks the field values on ListTeamsResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
-func (m *GetTeamsResp) Validate() error {
+func (m *ListTeamsResp) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -327,7 +327,7 @@ func (m *GetTeamsResp) Validate() error {
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return GetTeamsRespValidationError{
+				return ListTeamsRespValidationError{
 					field:  fmt.Sprintf("Teams[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -340,9 +340,9 @@ func (m *GetTeamsResp) Validate() error {
 	return nil
 }
 
-// GetTeamsRespValidationError is the validation error returned by
-// GetTeamsResp.Validate if the designated constraints aren't met.
-type GetTeamsRespValidationError struct {
+// ListTeamsRespValidationError is the validation error returned by
+// ListTeamsResp.Validate if the designated constraints aren't met.
+type ListTeamsRespValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -350,22 +350,22 @@ type GetTeamsRespValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetTeamsRespValidationError) Field() string { return e.field }
+func (e ListTeamsRespValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetTeamsRespValidationError) Reason() string { return e.reason }
+func (e ListTeamsRespValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetTeamsRespValidationError) Cause() error { return e.cause }
+func (e ListTeamsRespValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetTeamsRespValidationError) Key() bool { return e.key }
+func (e ListTeamsRespValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetTeamsRespValidationError) ErrorName() string { return "GetTeamsRespValidationError" }
+func (e ListTeamsRespValidationError) ErrorName() string { return "ListTeamsRespValidationError" }
 
 // Error satisfies the builtin error interface
-func (e GetTeamsRespValidationError) Error() string {
+func (e ListTeamsRespValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -377,14 +377,14 @@ func (e GetTeamsRespValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetTeamsResp.%s: %s%s",
+		"invalid %sListTeamsResp.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetTeamsRespValidationError{}
+var _ error = ListTeamsRespValidationError{}
 
 var _ interface {
 	Field() string
@@ -392,7 +392,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetTeamsRespValidationError{}
+} = ListTeamsRespValidationError{}
 
 // Validate checks the field values on UpdateTeamReq with the rules defined in
 // the proto definition for this message. If any rules are violated, an error

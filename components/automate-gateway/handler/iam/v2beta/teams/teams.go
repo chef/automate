@@ -23,9 +23,9 @@ func NewServer(client teams.TeamsV2Client) *Server {
 
 // ListTeams fetches an array of existing teams
 func (a *Server) ListTeams(ctx context.Context, _ *gwreq.ListTeamsReq) (*gwres.ListTeamsResp, error) {
-	req := &teams.GetTeamsReq{}
+	req := &teams.ListTeamsReq{}
 
-	res, err := a.client.GetTeams(ctx, req)
+	res, err := a.client.ListTeams(ctx, req)
 	if err != nil {
 		return nil, err
 	}
