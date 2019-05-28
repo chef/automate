@@ -1,9 +1,9 @@
-import { map, takeUntil } from 'rxjs/operators';
+import { takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, combineLatest } from 'rxjs';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Chicklet, RollupServiceStatus, SortDirection } from '../../types/types';
 import { EntityStatus } from '../../entities/entities';
 import {
@@ -29,10 +29,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public sgHealthSummary: HealthSummary;
 
   // The selected service-group id that will be sent to the services-sidebar
-  public selectedServiceGroupId: number;
-
-  // Weather or not the the services sidebar is visible
-  public servicesSidebarVisible = false;
+  public selectedServiceGroupId: string;
 
   // The current page the user is visualizing
   public currentPage = 1;
@@ -73,20 +70,51 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    const allUrlParameters$ = this.getAllUrlParameters();
+    this.route.queryParamMap.pipe(
+      distinctUntilChanged((a, b) => {
+        return a.get('status') === b.get('status') &&
+               a.get('page') === b.get('page') &&
+               a.get('sortField') === b.get('sortField') &&
+               a.get('sortDirection') === b.get('sortDirection');
+      }),
+      takeUntil(this.isDestroyed)
+    ).subscribe(queryParams => this.listParamsChange(queryParams));
 
-    allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
-      allUrlParameters => this.updateAllFilters(allUrlParameters));
+    combineLatest(
+      this.route.queryParamMap.pipe(
+        distinctUntilChanged((a, b) => {
+          return a.get('sgId') === b.get('sgId') &&
+                 a.get('sgStatus') === b.get('sgStatus') &&
+                 a.get('sgPage') === b.get('sgPage');
+        })
+      ),
+      this.store.select(allServiceGroups)
+    )
+    .pipe(takeUntil(this.isDestroyed))
+    .subscribe(([queryParams]) => this.detailParamsChange(queryParams));
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
     this.serviceGroups$ = this.store.select(allServiceGroups);
+    this.serviceGroups$.pipe(
+      withLatestFrom(this.route.queryParamMap),
+      takeUntil(this.isDestroyed)
+    )
+    .subscribe(([serviceGroups, queryParams]) => {
+      if (serviceGroups.length > 0) {
+        const sgId = queryParams.get('sgId') || serviceGroups[0]['id'];
+        this.router.navigate([], { queryParams: { sgId }, queryParamsHandling: 'merge' });
+      } else {
+        this.selectedServiceGroupId = null;
+      }
+    });
 
     this.healthSummary$ = this.store.select(allServiceGroupHealth);
-    this.healthSummary$.subscribe(sgHealthSummary => this.sgHealthSummary = sgHealthSummary);
+    this.healthSummary$.pipe(takeUntil(this.isDestroyed))
+      .subscribe(sgHealthSummary => this.sgHealthSummary = sgHealthSummary);
 
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.status));
-    this.selectedStatus$.subscribe((status) => {
+    this.selectedStatus$.pipe(takeUntil(this.isDestroyed)).subscribe((status) => {
       // This code enables the pagination of service groups correctly, when the user selects
       // a Health Filter, we adjust the total number of service groups
       if ( includes(status, this.allowedStatus) ) {
@@ -99,24 +127,45 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.selectedFieldDirection$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.sortDirection));
 
-    this.selectedFieldDirection$.subscribe(currentFieldDirection =>
-      this.currentFieldDirection = currentFieldDirection);
+    this.selectedFieldDirection$.pipe(takeUntil(this.isDestroyed))
+      .subscribe(currentFieldDirection => this.currentFieldDirection = currentFieldDirection);
 
     this.selectedSortField$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.sortField));
 
-    this.selectedSortField$.subscribe(currentSortField =>
+    this.selectedSortField$.pipe(takeUntil(this.isDestroyed)).subscribe(currentSortField =>
       this.currentSortField = currentSortField);
 
     this.currentPage$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.page));
 
-    this.currentPage$.subscribe(currentPage => this.currentPage = currentPage);
+    this.currentPage$.pipe(takeUntil(this.isDestroyed))
+      .subscribe(currentPage => this.currentPage = currentPage);
   }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  listParamsChange(queryParams) {
+    const allParameters = queryParams.keys.reduce((list, key) => {
+      return list.concat(queryParams.getAll(key).map(value => ({ type: key, text: value })));
+    }, []);
+    this.updateAllFilters(allParameters);
+  }
+
+  detailParamsChange(queryParams) {
+    const sgId = queryParams.get('sgId');
+    if (sgId) {
+      const servicesFilters: ServicesFilters = {
+        service_group_id: sgId,
+        page: parseInt(queryParams.get('sgPage'), 10) || 1,
+        pageSize: parseInt(queryParams.get('sgPageSize'), 10) || 25,
+        health: queryParams.get('sgStatus') || 'total'
+      };
+      this.updateServicesSidebar(servicesFilters);
+    }
   }
 
   public updateAllFilters(allParameters: Chicklet[]): void {
@@ -144,26 +193,27 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }
 
     delete queryParams['page'];
+    delete queryParams['sgId'];
+    delete queryParams['sgPage'];
+    delete queryParams['sgStatus'];
 
     this.router.navigate([], {queryParams});
   }
 
-  public openServicesSidebar(id: number) {
-    const servicesFilters: ServicesFilters = {
-      service_group_id: id,
-      page: 1,
-      health: 'total'
-    };
-    this.selectedServiceGroupId = id;
-    this.servicesSidebarVisible = true;
-    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
-    document.getElementById('services-panel').focus();
+  public onServiceGroupSelect(event: Event, id: string) {
+    event.preventDefault();
+
+    const queryParams = { ...this.route.snapshot.queryParams };
+    queryParams['sgId'] = id;
+    delete queryParams['sgPage'];
+    delete queryParams['sgStatus'];
+    this.router.navigate([], { queryParams });
   }
 
-  public closeServicesSidebar() {
-    if (this.servicesSidebarVisible) {
-      this.servicesSidebarVisible = false;
-    }
+  public updateServicesSidebar(servicesFilters: ServicesFilters) {
+    this.selectedServiceGroupId = servicesFilters.service_group_id;
+    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
+    document.querySelector<HTMLElement>('app-services-sidebar').focus();
   }
 
   private getSelectedStatus(allParameters: Chicklet[]): RollupServiceStatus {
@@ -177,26 +227,18 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
-  private getAllUrlParameters(): Observable<Chicklet[]> {
-    return this.route.queryParamMap.pipe(map((params: ParamMap) => {
-      return params.keys.reduce((list, key) => {
-        const paramValues = params.getAll(key);
-        return list.concat(paramValues.map(value => ({type: key, text: value})));
-      }, []);
-    }));
-   }
-
   onPageChange(pageNumber: number) {
-    if (pageNumber > 1 ) {
-      const queryParams = {...this.route.snapshot.queryParams, page: [pageNumber]};
+    const queryParams = { ...this.route.snapshot.queryParams, page: pageNumber };
 
-      this.router.navigate([], {queryParams});
-    } else if ( pageNumber === 1 ) {
-      const queryParams = {...this.route.snapshot.queryParams};
+    if (pageNumber <= 1) {
       delete queryParams['page'];
-
-      this.router.navigate([], {queryParams});
     }
+
+    delete queryParams['sgId'];
+    delete queryParams['sgPage'];
+    delete queryParams['sgStatus'];
+
+    this.router.navigate([], { queryParams });
   }
 
   onToggleSort(field: string) {
@@ -216,6 +258,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         sortField: [field], sortDirection: [fieldDirection]};
 
       delete queryParams['page'];
+      delete queryParams['sgId'];
+      delete queryParams['sgPage'];
+      delete queryParams['sgStatus'];
 
       this.router.navigate([], {queryParams});
     }

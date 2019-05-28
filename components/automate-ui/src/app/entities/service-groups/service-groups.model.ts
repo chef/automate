@@ -39,7 +39,7 @@ export interface ServiceGroupFilters {
 }
 
 export interface ServicesFilters {
-  service_group_id?: number;
+  service_group_id?: string;
   health: string;
   page: number;
   pageSize?: number;
