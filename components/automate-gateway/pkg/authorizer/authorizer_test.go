@@ -58,8 +58,9 @@ func TestAuthorizerHandle(t *testing.T) {
 
 func TestAuthorizerIsAuthorized(t *testing.T) {
 	ctx := context.Background()
-	args := func() (context.Context, []string, string, string, string, string) {
-		return ctx, []string{"user:local:admin"}, "resource:v1", "v1action", "svc:type:v2resource", "svc:type:v2action"
+	args := func() (context.Context, []string, string, string, string, string, []string) {
+		return ctx, []string{"user:local:admin"}, "resource:v1", "v1action", "svc:type:v2resource", "svc:type:v2action",
+			[]string{"foo-project", "bar-project"}
 	}
 
 	t.Run("if first succeeds, doesn't call second", func(t *testing.T) {
@@ -127,7 +128,7 @@ func (*success) Handle(ctx context.Context, _ []string, _ []string, _ interface{
 	return ctx, nil
 }
 
-func (s *success) IsAuthorized(context.Context, []string, string, string) (middleware.AuthorizationResponse, error) {
+func (s *success) IsAuthorized(context.Context, []string, string, string, []string) (middleware.AuthorizationResponse, error) {
 	return authzSuccess, nil
 }
 
@@ -143,7 +144,7 @@ func (f *failure) Handle(ctx context.Context, _ []string, _ []string, _ interfac
 	return ctx, f.Err()
 }
 
-func (f *failure) IsAuthorized(context.Context, []string, string, string) (middleware.AuthorizationResponse, error) {
+func (f *failure) IsAuthorized(context.Context, []string, string, string, []string) (middleware.AuthorizationResponse, error) {
 	return nil, f.Err()
 }
 
@@ -165,6 +166,14 @@ func (*authorized) GetAuthorized() bool {
 	return true
 }
 
+func (*authorized) Ctx() context.Context {
+	return nil
+}
+
 func (*notAuthorized) GetAuthorized() bool {
 	return false
+}
+
+func (*notAuthorized) Ctx() context.Context {
+	return nil
 }

@@ -78,13 +78,24 @@ func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
 	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV1.String()), nil
 }
 
+type resp struct {
+	ctx        context.Context
+	*authz.IsAuthorizedResp
+}
+
+func (r *resp) Ctx() context.Context {
+	return r.ctx
+}
+
 func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, action string,
+	_ []string, // projects aren't used
 ) (middleware.AuthorizationResponse, error) {
-	return c.client.IsAuthorized(ctx, &authz.IsAuthorizedReq{
+	r, err :=  c.client.IsAuthorized(ctx, &authz.IsAuthorizedReq{
 		Subjects: subjects,
 		Resource: resource,
 		Action:   action,
 	})
+	return &resp{IsAuthorizedResp: r, ctx: ctx}, err
 }
 
 func (c *client) FilterAuthorizedPairs(ctx context.Context, subjects []string, inputPairs []*pairs.Pair,

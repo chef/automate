@@ -39,7 +39,7 @@ func (a *state) Handle(ctx context.Context,
 }
 
 func (a *state) IsAuthorized(ctx context.Context, subjects []string,
-	resourceV1, actionV1, resourceV2, actionV2 string,
+	resourceV1, actionV1, resourceV2, actionV2 string, projects []string,
 ) (middleware.AnnotatedAuthorizationResponse, error) {
 	var (
 		resp middleware.AuthorizationResponse
@@ -47,12 +47,12 @@ func (a *state) IsAuthorized(ctx context.Context, subjects []string,
 	)
 	switch a.next {
 	case a.v1:
-		resp, err = a.v1.IsAuthorized(ctx, subjects, resourceV1, actionV1)
+		resp, err = a.v1.IsAuthorized(ctx, subjects, resourceV1, actionV1, nil) // projects are not used  here
 		if err == nil {
 			return annotate(resp, subjects, resourceV1, actionV1), nil
 		}
 	case a.v2:
-		resp, err = a.v2.IsAuthorized(ctx, subjects, resourceV2, actionV2)
+		resp, err = a.v2.IsAuthorized(ctx, subjects, resourceV2, actionV2, projects)
 		if err == nil {
 			return annotate(resp, subjects, resourceV2, actionV2), nil
 		}
@@ -61,7 +61,7 @@ func (a *state) IsAuthorized(ctx context.Context, subjects []string,
 	switch st.Code() {
 	case codes.FailedPrecondition:
 		if a.fromStatus(st) {
-			return a.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2)
+			return a.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2, projects)
 		}
 		fallthrough
 	default: // any other error status
@@ -114,20 +114,21 @@ func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
 }
 
 type annotated struct {
-	r   middleware.AuthorizationResponse
+	middleware.AuthorizationResponse
 	err error
 }
 
 func (r *annotated) Err() error {
-	if r.r.GetAuthorized() {
+	if r.GetAuthorized() {
 		return nil
 	}
 	return r.err
 }
 
 func annotate(resp middleware.AuthorizationResponse, subjects []string, resource, action string) middleware.AnnotatedAuthorizationResponse {
-	return &annotated{r: resp, err: fmt.Errorf("subject %q is not authorized to %q resource %q",
-		subjects, action, resource)}
+	return &annotated{AuthorizationResponse: resp,
+		err: fmt.Errorf("subject %q is not authorized to %q resource %q",
+			subjects, action, resource)}
 }
 
 func (a *state) fromStatus(st *status.Status) bool {
