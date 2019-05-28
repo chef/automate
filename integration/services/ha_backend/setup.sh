@@ -119,6 +119,10 @@ mkdir -p "/hab/user/${PG_PKG_NAME}/config/"
 cat > "/hab/user/${PG_PKG_NAME}/config/user.toml" <<EOF
 [superuser]
 password = 'thisisapassword'
+[ssl]
+enable = true
+ssl_cert    = """$(cat /certificates/postgresql.pem)"""
+ssl_key     = """$(cat /certificates/postgresql.key)"""
 EOF
 
 echo "Starting HA Backend Habitat services"
@@ -126,4 +130,3 @@ HAB_LICENSE="accept-no-persist" hab svc load ${postgresql_pkg_ident} --topology 
 HAB_LICENSE="accept-no-persist" hab svc load ${pgleaderchk_pkg_ident} --topology leader --bind database:"$PG_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
 HAB_LICENSE="accept-no-persist" hab svc load ${proxy_pkg_ident} --topology leader --bind database:"$PG_PKG_NAME".default --bind pgleaderchk:"$PGLEADERCHK_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
 HAB_LICENSE="accept-no-persist" hab svc load ${elasticsearch_pkg_ident} --topology leader --bind elasticsearch:"$ELASTICSEARCH_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
-
