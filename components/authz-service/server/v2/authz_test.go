@@ -265,8 +265,6 @@ func (e *responderEngine) V2FilterAuthorizedPairs(
 }
 
 func (e *responderEngine) V2FilterAuthorizedProjects(
-	context.Context,
-	engine.Subjects,
-	[]engine.Pair) ([]string, error) {
+	context.Context, engine.Subjects) ([]string, error) {
 	return e.projects, nil
 }

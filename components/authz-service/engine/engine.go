@@ -57,9 +57,9 @@ type V2Authorizer interface {
 	// allowed by the subjects.
 	V2FilterAuthorizedPairs(context.Context, Subjects, []Pair) ([]Pair, error)
 
-	// V2FilterAuthorizedProjects returns a list of projects corresponding to the
-	// sublist of authorized Pairs allowed from the passed-in list.
-	V2FilterAuthorizedProjects(context.Context, Subjects, []Pair) ([]string, error)
+	// V2FilterAuthorizedProjects returns a list of allowed projects
+	// for the given subjects
+	V2FilterAuthorizedProjects(context.Context, Subjects) ([]string, error)
 }
 
 // Writer is the interface for writing policies to a decision engine

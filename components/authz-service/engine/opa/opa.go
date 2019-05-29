@@ -397,13 +397,10 @@ func (s *State) V2FilterAuthorizedPairs(
 // lets it take care of the filtering,
 // and returns the projects associated with the resulting (sub)list.
 func (s *State) V2FilterAuthorizedProjects(
-	ctx context.Context,
-	subjects engine.Subjects,
-	pairs []engine.Pair) ([]string, error) {
+	ctx context.Context, subjects engine.Subjects) ([]string, error) {
 
 	opaInput := map[string]interface{}{
 		"subjects": subjects,
-		"pairs":    pairs,
 	}
 
 	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsV2Query], opaInput, s.v2Store)

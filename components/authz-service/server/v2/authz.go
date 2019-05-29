@@ -144,9 +144,7 @@ func (s *authzServer) FilterAuthorizedProjects(
 	// Introspection needs unfiltered access.
 	ctx = auth_context.ContextWithoutProjects(ctx)
 
-	resp, err := s.engine.V2FilterAuthorizedProjects(ctx,
-		engine.Subjects(req.Subjects),
-		toEnginePairs(req.Pairs))
+	resp, err := s.engine.V2FilterAuthorizedProjects(ctx, engine.Subjects(req.Subjects))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

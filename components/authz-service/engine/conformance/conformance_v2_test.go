@@ -499,11 +499,8 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 	act1, res1 := "compliance:profiles:delete", "compliance:profiles"
 	act2, res2 := "iam:users:delete", "nodes:someid"
 	proj0, proj1, proj2, proj3, proj4 := "proj-0", "proj-1", "proj-2", "proj-3", "proj-4"
-	pair0 := engine.Pair{Resource: engine.Resource(res0), Action: engine.Action(act0)}
-	pair1 := engine.Pair{Resource: engine.Resource(res1), Action: engine.Action(act1)}
-	pair2 := engine.Pair{Resource: engine.Resource(res2), Action: engine.Action(act2)}
-	args := func() (context.Context, engine.Subjects, []engine.Pair) {
-		return ctx, engine.Subject(sub), []engine.Pair{pair0, pair1, pair2}
+	args := func() (context.Context, engine.Subjects) {
+		return ctx, engine.Subject(sub)
 	}
 
 	for desc, e := range engines {
@@ -511,7 +508,7 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 
 			t.Run("no matching policies", func(t *testing.T) {
 				policy0 := map[string]interface{}{
-					"members": engine.Subject(sub),
+					"members": engine.Subject("team:local:foo"),
 					"statements": map[string]interface{}{
 						"statement-id-0": map[string]interface{}{
 							"actions":   []string{act0},
@@ -522,7 +519,7 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 					},
 				}
 				policy1 := map[string]interface{}{
-					"members": engine.Subject(sub),
+					"members": engine.Subject("user:local:bar"),
 					"statements": map[string]interface{}{
 						"statement-id-1": map[string]interface{}{
 							"actions":   []string{"iam:users:nomatch"},
