@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"golang.org/x/net/context"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/compliance-service/api/reporting"
@@ -14,6 +16,103 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
+
+func TestReportingListSuggestionsFiltering(t *testing.T) {
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	ctx := context.Background()
+
+	cases := []struct {
+		description   string
+		summaries     []*relaxting.ESInSpecSummary
+		request       reporting.SuggestionRequest
+		expectedTerms []string
+	}{
+		{
+			description: "Only two orgs are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:           "1",
+					OrganizationName: "org1",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "org2",
+				},
+				{
+					NodeID:           "3",
+					OrganizationName: "1/75th Airborne Rangers",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "organization",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All orgs are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:           "1",
+					OrganizationName: "org1",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "org2",
+				},
+				{
+					NodeID:           "3",
+					OrganizationName: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "organization",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No orgs are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:           "1",
+					OrganizationName: "org1",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "org2",
+				},
+				{
+					NodeID:           "3",
+					OrganizationName: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "organization",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(test.description, func(t *testing.T) {
+			suite.InsertInspecSummaries(test.summaries)
+			defer suite.DeleteAllDocuments()
+
+			response, err := server.ListSuggestions(ctx, &test.request)
+			assert.NoError(t, err)
+			require.NotNil(t, response)
+
+			actualTerms := make([]string, len(response.Suggestions))
+			for i, suggestion := range response.Suggestions {
+				actualTerms[i] = suggestion.Text
+			}
+
+			assert.ElementsMatch(t, test.expectedTerms, actualTerms)
+		})
+	}
+}
 
 func TestReportingListSuggestions(t *testing.T) {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"

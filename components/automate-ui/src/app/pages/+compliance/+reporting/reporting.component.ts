@@ -74,6 +74,12 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'title': 'Recipe',
       'description': 'Add the recipe to filter this report to a specific recipe',
       'placeholder': 'Recipe'
+    },
+    {
+      'name': 'organization',
+      'title': 'Organization',
+      'description': 'Add the organization to filter this report to a specific organization',
+      'placeholder': 'Organization'
     }
   ];
 

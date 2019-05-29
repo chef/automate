@@ -6,13 +6,90 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"golang.org/x/net/context"
+
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/compliance-service/api/reporting"
 	reportingServer "github.com/chef/automate/components/compliance-service/api/reporting/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
 
-func TestListNodes(t *testing.T) {
+func TestListNodesFiltering(t *testing.T) {
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	ctx := context.Background()
+
+	cases := []struct {
+		description string
+		reports     []*relaxting.ESInSpecReport
+		query       reporting.Query
+		expectedIds []string
+	}{
+		{
+			description: "Filter out one of the nodes by 'organization'",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:           "1",
+					OrganizationName: "org1",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "org2",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "organization",
+						Values: []string{"org1"},
+					},
+				},
+			},
+			expectedIds: []string{"1"},
+		},
+		{
+			description: "Filter out all of the nodes by 'organization'",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:           "1",
+					OrganizationName: "org1",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "org2",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "organization",
+						Values: []string{"org3"},
+					},
+				},
+			},
+			expectedIds: []string{},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(test.description, func(t *testing.T) {
+			suite.InsertInspecReports(test.reports)
+			defer suite.DeleteAllDocuments()
+
+			response, err := server.ListNodes(ctx, &test.query)
+			assert.NoError(t, err)
+			require.NotNil(t, response)
+
+			actualIds := make([]string, len(response.Nodes))
+			for i, node := range response.Nodes {
+				actualIds[i] = node.Id
+			}
+
+			assert.ElementsMatch(t, test.expectedIds, actualIds)
+		})
+	}
+}
+
+func TestListNodesProjectFiltering(t *testing.T) {
 	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
 	nodeIds := []string{newUUID(), newUUID(), newUUID(), newUUID(), newUUID(), newUUID()}
 	reports := []*relaxting.ESInSpecReport{
