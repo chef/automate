@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response";
+
+import "components/automate-gateway/api/iam/v2beta/common/rules.proto";
+
+message CreateRuleResp {
+  Rule rule = 1;
+}

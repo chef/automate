@@ -40,6 +40,7 @@ type ProjectsServerMock struct {
 	HandleEventFunc         func(context.Context, *event.EventMsg) (*event.EventResponse, error)
 	ProjectUpdateStatusFunc func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
 	ProjectUpdateCancelFunc func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error)
+	CreateRuleFunc          func(context.Context, *CreateRuleReq) (*CreateRuleResp, error)
 }
 
 func (m *ProjectsServerMock) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
@@ -162,6 +163,18 @@ func (m *ProjectsServerMock) ProjectUpdateCancel(ctx context.Context, req *Proje
 	return nil, status.Error(codes.Internal, "mock: 'ProjectUpdateCancel' not implemented")
 }
 
+func (m *ProjectsServerMock) CreateRule(ctx context.Context, req *CreateRuleReq) (*CreateRuleResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.CreateRuleFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'CreateRule' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *ProjectsServerMock) Reset() {
 	m.UpdateProjectFunc = nil
@@ -174,4 +187,5 @@ func (m *ProjectsServerMock) Reset() {
 	m.HandleEventFunc = nil
 	m.ProjectUpdateStatusFunc = nil
 	m.ProjectUpdateCancelFunc = nil
+	m.CreateRuleFunc = nil
 }

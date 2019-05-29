@@ -262,3 +262,8 @@ required = [
 [[constraint]]
   name = "github.com/nats-io/go-nats-streaming"
   branch = "master"
+
+# for testing
+[[constraint]]
+  name = "github.com/leanovate/gopter"
+  version = "0.2.4"

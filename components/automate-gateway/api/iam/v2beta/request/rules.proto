@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request";
+
+import "components/automate-gateway/api/iam/v2beta/common/rules.proto";
+
+message CreateRuleReq {
+    string id = 1;
+    string project_id = 2;
+    string name = 3;
+    RuleType type = 4;
+    repeated Condition conditions = 5;
+}

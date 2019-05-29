@@ -1500,6 +1500,12 @@ func (m *ProjectRule) Validate() error {
 		return nil
 	}
 
+	// no validation rules for Id
+
+	// no validation rules for ProjectId
+
+	// no validation rules for Name
+
 	// no validation rules for Type
 
 	for idx, item := range m.GetConditions() {
@@ -1639,3 +1645,192 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ConditionValidationError{}
+
+// Validate checks the field values on CreateRuleReq with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *CreateRuleReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if !_CreateRuleReq_Id_Pattern.MatchString(m.GetId()) {
+		return CreateRuleReqValidationError{
+			field:  "Id",
+			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+		}
+	}
+
+	if !_CreateRuleReq_ProjectId_Pattern.MatchString(m.GetProjectId()) {
+		return CreateRuleReqValidationError{
+			field:  "ProjectId",
+			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		return CreateRuleReqValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	// no validation rules for Type
+
+	if len(m.GetConditions()) < 1 {
+		return CreateRuleReqValidationError{
+			field:  "Conditions",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetConditions() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateRuleReqValidationError{
+					field:  fmt.Sprintf("Conditions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// CreateRuleReqValidationError is the validation error returned by
+// CreateRuleReq.Validate if the designated constraints aren't met.
+type CreateRuleReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateRuleReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateRuleReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateRuleReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateRuleReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateRuleReqValidationError) ErrorName() string { return "CreateRuleReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e CreateRuleReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateRuleReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateRuleReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateRuleReqValidationError{}
+
+var _CreateRuleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+
+var _CreateRuleReq_ProjectId_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+
+// Validate checks the field values on CreateRuleResp with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *CreateRuleResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetRule()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CreateRuleRespValidationError{
+				field:  "Rule",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// CreateRuleRespValidationError is the validation error returned by
+// CreateRuleResp.Validate if the designated constraints aren't met.
+type CreateRuleRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateRuleRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateRuleRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateRuleRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateRuleRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateRuleRespValidationError) ErrorName() string { return "CreateRuleRespValidationError" }
+
+// Error satisfies the builtin error interface
+func (e CreateRuleRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateRuleResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateRuleRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateRuleRespValidationError{}
