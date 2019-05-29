@@ -180,6 +180,30 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal(expected_data, actual_data.to_json)
 
+    # Filter by status
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+        filters: [
+            Reporting::ListFilter.new(type: "end_time", values: ["2018-03-04T#{END_OF_DAY}"]),
+            Reporting::ListFilter.new(type: 'status', values: ['passed'])
+        ],
+        page: 1, per_page: 2)
+    expected_data = {
+        "profiles" => [
+            {
+                "name" => "nginx-baseline",
+                "title" => "DevSec Nginx Baseline",
+                "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                "version" => "2.1.0",
+                "status" => "passed"
+            }
+        ],
+        "counts" => {
+            "total" => 1,
+            "passed" => 1
+        }
+    }.to_json
+    assert_equal(expected_data, actual_data.to_json)
+
     # Get profiles used by node with node_id
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'node_id', values: ['9b9f4e51-b049-4b10-9555-10578916e149']),
