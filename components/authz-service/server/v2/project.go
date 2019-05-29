@@ -390,7 +390,7 @@ func fromStorageProject(p *storage.Project) (*api.Project, error) {
 }
 
 func fromStorageRule(r *storage.Rule) (*api.ProjectRule, error) {
-	cs, err := FromStorageConditions(r.Conditions)
+	cs, err := fromStorageConditions(r.Conditions)
 	if err != nil {
 		return nil, err
 	}
@@ -407,7 +407,7 @@ func fromStorageRule(r *storage.Rule) (*api.ProjectRule, error) {
 	}, nil
 }
 
-func FromStorageConditions(cs []storage.Condition) ([]*api.Condition, error) {
+func fromStorageConditions(cs []storage.Condition) ([]*api.Condition, error) {
 	apiConditions := make([]*api.Condition, len(cs))
 	for i, c := range cs {
 		d, err := fromStorageCondition(c)

@@ -6,13 +6,11 @@ import (
 	"testing"
 
 	cache "github.com/patrickmn/go-cache"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -163,6 +161,12 @@ func TestGetRule(t *testing.T) {
 	ctx := context.Background()
 	cl, store, _, _ := setupRules(t)
 
+	apiConditions := []*api.Condition{
+		{
+			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values: []string{"opscode"},
+		},
+	}
 	storageConditions := []storage.Condition{
 		{
 			Type:      storage.Node,
@@ -193,13 +197,38 @@ func TestGetRule(t *testing.T) {
 		}},
 		{"if a rule with the requested id exists, returns the rule", func(t *testing.T) {
 			id := "foo-rule"
-			apiRule, err := addRuleToStore(t, store, id, "my coo foo rule", storage.Node, "foo-project", storageConditions)
-			require.NoError(t, err)
-
+			projectID := "foo-project"
+			name := "my coo foo rule"
+			addRuleToStore(t, store, id, name, storage.Node, projectID, storageConditions)
+			expectedRule := api.ProjectRule{
+				Id:         id,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_NODE,
+				ProjectId:  projectID,
+				Conditions: apiConditions,
+			}
 			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: id})
 
 			require.NoError(t, err)
-			assert.Equal(t, &apiRule, resp.Rule)
+			assert.Equal(t, &expectedRule, resp.Rule)
+		}},
+		{"if there are multiple rules and one matches the requested ID, returns the matching rule", func(t *testing.T) {
+			id := "foo-rule"
+			projectID := "foo-project"
+			name := "my coo foo rule"
+			addRuleToStore(t, store, id, name, storage.Node, projectID, storageConditions)
+			addRuleToStore(t, store, "bar-rule", "bar rule", storage.Event, projectID, storageConditions)
+			expectedRule := api.ProjectRule{
+				Id:         id,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_NODE,
+				ProjectId:  projectID,
+				Conditions: apiConditions,
+			}
+
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: id})
+			require.NoError(t, err)
+			assert.Equal(t, &expectedRule, resp.Rule)
 		}},
 	}
 
@@ -214,7 +243,7 @@ func TestGetRule(t *testing.T) {
 }
 
 func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType storage.RuleType, projectID string,
-	conditions []storage.Condition) (api.ProjectRule, error) {
+	conditions []storage.Condition) {
 	t.Helper()
 
 	rule := &storage.Rule{
@@ -225,24 +254,6 @@ func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType 
 		Conditions: conditions,
 	}
 	store.Add(id, rule, 0)
-
-	returnType := api.ProjectRuleTypes_NODE
-	if ruleType == storage.Event {
-		returnType = api.ProjectRuleTypes_EVENT
-	}
-
-	returnConditions, err := v2.FromStorageConditions(conditions)
-	if err != nil {
-		return api.ProjectRule{}, errors.Errorf("failed to convert conditions: %s", err)
-	}
-
-	return api.ProjectRule{
-		Id:         id,
-		Name:       name,
-		Type:       returnType,
-		ProjectId:  projectID,
-		Conditions: returnConditions,
-	}, nil
 }
 
 func setupRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventServiceClient, int64) {
