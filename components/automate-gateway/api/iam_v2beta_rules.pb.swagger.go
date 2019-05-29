@@ -19,6 +19,20 @@ func init() {
   ],
   "paths": {
     "/iam/v2beta/rules": {
+      "get": {
+        "operationId": "ListRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListRulesResp"
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      },
       "post": {
         "operationId": "CreateRule",
         "responses": {
@@ -146,6 +160,17 @@ func init() {
       "properties": {
         "rule": {
           "$ref": "#/definitions/v2betaRule"
+        }
+      }
+    },
+    "v2betaListRulesResp": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaRule"
+          }
         }
       }
     },

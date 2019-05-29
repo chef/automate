@@ -39,4 +39,7 @@ func init() {
 		}
 		return ""
 	})
+	policyv2.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/ListRules", "iam:rules", "iam:rules:list", "GET", "/iam/v2beta/rules", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }
