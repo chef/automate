@@ -33,7 +33,25 @@ func (s *Server) CreateRule(ctx context.Context, req *pb_req.CreateRuleReq) (*pb
 	if err != nil {
 		return nil, err
 	}
-	return fromInternal(resp)
+
+	rule, err := fromInternal(resp.Rule)
+	if err != nil {
+		return nil, err
+	}
+	return &pb_resp.CreateRuleResp{Rule: rule}, nil
+}
+
+func (s *Server) GetRule(ctx context.Context, req *pb_req.GetRuleReq) (*pb_resp.GetRuleResp, error) {
+	resp, err := s.projects.GetRule(ctx, &authz.GetRuleReq{Id: req.Id})
+	if err != nil {
+		return nil, err
+	}
+
+	rule, err := fromInternal(resp.Rule)
+	if err != nil {
+		return nil, err
+	}
+	return &pb_resp.GetRuleResp{Rule: rule}, nil
 }
 
 func fromExternal(req *pb_req.CreateRuleReq) (*authz.CreateRuleReq, error) {
@@ -133,8 +151,7 @@ func fromExternalConditionOperator(t pb_common.ConditionOperator) (authz.Project
 	}
 }
 
-func fromInternal(resp *authz.CreateRuleResp) (*pb_resp.CreateRuleResp, error) {
-	r := resp.Rule
+func fromInternal(r *authz.ProjectRule) (*pb_common.Rule, error) {
 	cs, err := fromInternalConditions(r.Conditions)
 	if err != nil {
 		return nil, err
@@ -150,7 +167,7 @@ func fromInternal(resp *authz.CreateRuleResp) (*pb_resp.CreateRuleResp, error) {
 		ProjectId:  r.ProjectId,
 		Conditions: cs,
 	}
-	return &pb_resp.CreateRuleResp{Rule: &rule}, nil
+	return &rule, nil
 }
 
 func fromInternalConditions(cs []*authz.Condition) ([]*pb_common.Condition, error) {
