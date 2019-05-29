@@ -655,6 +655,11 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
+	if len(filters["inspec_version"]) > 0 {
+		termQuery := elastic.NewTermsQuery("version", stringArrayToInterfaceArray(filters["inspec_version"])...)
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
 	if len(filters["job_id"]) > 0 {
 		termQuery := elastic.NewTermsQuery("job_uuid", stringArrayToInterfaceArray(filters["job_id"])...)
 		boolQuery = boolQuery.Must(termQuery)
