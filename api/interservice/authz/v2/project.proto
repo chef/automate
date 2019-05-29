@@ -69,6 +69,9 @@ service Projects {
         chef.automate.domain.event.api.EventResponse);
     rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
     rpc ProjectUpdateCancel(ProjectUpdateStatusReq) returns (ProjectUpdateCancelResp);
+
+    // "proper" methods go here (and the ones above will be phased out eventually)
+    rpc CreateRule(CreateRuleReq) returns (CreateRuleResp) {};
 }
 
 message ProjectUpdateCancelReq { }
@@ -101,9 +104,13 @@ message GetProjectRulesResp {
 message ProjectRules {
     repeated ProjectRule rules = 2;
 }
+
 message ProjectRule {
-    ProjectRuleTypes type = 1;
-    repeated Condition conditions = 2;
+    string id = 1;
+    string project_id = 2;
+    string name = 3;
+    ProjectRuleTypes type = 4;
+    repeated Condition conditions = 5;
 }
 
 enum ProjectRuleTypes {
@@ -124,4 +131,18 @@ enum ProjectRuleConditionTypes {
 message Condition {
     ProjectRuleConditionTypes type = 1;
     repeated string values = 2;
+}
+
+// CreateRuleReq is ProjectRule, so the input is just one JSON object. Also adds
+// basic validation.
+message CreateRuleReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string name = 3 [(validate.rules).string.min_len = 1];
+    ProjectRuleTypes type = 4;
+    repeated Condition conditions = 5 [(validate.rules).repeated.min_items = 1];
+}
+
+message CreateRuleResp {
+    ProjectRule rule = 1;
 }

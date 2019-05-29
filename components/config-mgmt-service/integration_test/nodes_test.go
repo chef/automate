@@ -140,6 +140,128 @@ func TestNodesWithSorting(t *testing.T) {
 		})
 }
 
+func TestGetNodesRegexWithExactSameField(t *testing.T) {
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Nodes
+		expected    []string
+	}{
+		{
+			description: "Matching two with regex one with exact",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a1-prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"name:a2-*", "name:a1-prod"},
+			},
+			expected: []string{"a2-dev", "a2-prod", "a1-prod"},
+		},
+		{
+			description: "Two regex filters on same type",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a1-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a1-dev",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"name:a2-*", "name:a1-*"},
+			},
+			expected: []string{"a2-dev", "a2-prod", "a1-prod", "a1-dev"},
+		},
+		{
+			description: "Overlapping regex filters on same type",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a1-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a1-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b1-dev",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"name:a2-*", "name:a*"},
+			},
+			expected: []string{"a2-dev", "a2-prod", "a1-prod", "a1-dev"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Regex with exact filter: %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodes
+			res, err := cfgmgmt.GetNodes(context.Background(), &test.request)
+			assert.NoError(t, err)
+
+			names := getFieldValues(res, "name")
+
+			// Test what nodes are returned.
+			assert.ElementsMatch(t, test.expected, names)
+		})
+	}
+}
+
 func TestGetRunsProjectFilter(t *testing.T) {
 	cases := []struct {
 		description string

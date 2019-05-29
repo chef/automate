@@ -1,12 +1,14 @@
-<chef-click-outside omit="sg-row" (clickOutside)="closeServicesSidebar()">
-  <chef-side-panel id="services-panel" class="services-panel" tabindex="0" [visible]="visible">
-    <chef-page-header>
-      <chef-heading>
-        <chef-icon>grain</chef-icon>
-        Services in {{ serviceGroupName$ | async }}
-      </chef-heading>
-      <chef-subheading>Services run by each Habitat Supervisor on a node.</chef-subheading>
-    </chef-page-header>
+<div id="services-panel" class="services-panel">
+  <chef-page-header>
+    <chef-heading>
+      <chef-icon>grain</chef-icon>
+      Services in
+      <span *ngIf="serviceGroupId">{{ serviceGroupName$ | async }}</span>
+      <span *ngIf="!serviceGroupId">Group</span>
+    </chef-heading>
+    <chef-subheading>Services run by each Habitat Supervisor on a node.</chef-subheading>
+  </chef-page-header>
+  <div class="services-panel-body" *ngIf="serviceGroupId">
     <div class="status-filter-bar">
       <chef-status-filter-group [value]="selectedHealth" lean>
         <chef-option class="filter general" value="total" (click)="updateHealthFilter('total')" selected>
@@ -24,7 +26,7 @@
           <div class="filter-label">Warning</div>
           <div class="filter-total">{{ servicesHealthSummary.warning }}</div>
         </chef-option>
-        <chef-option class="filter success" value='success' (click)="updateHealthFilter('ok')">
+        <chef-option class="filter success" value='ok' (click)="updateHealthFilter('ok')">
           <chef-icon class="filter-icon">check_circle</chef-icon>
           <div class="filter-label">OK</div>
           <div class="filter-total">{{ servicesHealthSummary.ok }}</div>
@@ -62,5 +64,8 @@
       [page]="currentPage"
       (pageChanged)="updatePageNumber($event)">
     </app-page-picker>
-  </chef-side-panel>
-</chef-click-outside>
+  </div>
+  <div class="services-panel-body no-services" *ngIf="!serviceGroupId">
+    Add service groups to see more service details
+  </div>
+</div>

@@ -20,7 +20,7 @@
       <div class="filter-label">Warning</div>
       <div class="filter-total">{{ sgHealthSummary["warning"] }}</div>
     </chef-option>
-    <chef-option class="filter success" value='success' (click)="statusFilter('ok')">
+    <chef-option class="filter success" value='ok' (click)="statusFilter('ok')">
       <chef-icon class="filter-icon">check_circle</chef-icon>
       <div class="filter-label">OK</div>
       <div class="filter-total">{{ sgHealthSummary["ok"] }}</div>
@@ -53,7 +53,10 @@
       <chef-tr
         tabindex="0"
         class="{{serviceGroup.status}} sg-row"
-        (click)="openServicesSidebar(serviceGroup.id)"
+        [ngClass]="{'selected': (selectedServiceGroupId === serviceGroup.id)}"
+        (click)="onServiceGroupSelect($event, serviceGroup.id)"
+        (keydown.space)="onServiceGroupSelect($event, serviceGroup.id)"
+        (keydown.enter)="onServiceGroupSelect($event, serviceGroup.id)"
         *ngFor="let serviceGroup of serviceGroups$ | async">
         <chef-td class="{{serviceGroup.status}} health">
           <chef-icon class="{{serviceGroup.status}}">{{ serviceGroup.status | serviceStatusIcon }}</chef-icon>
@@ -86,10 +89,9 @@
       <chef-button primary>Learn More</chef-button>
     </div>
   </div>
-  <app-services-sidebar
-    [serviceGroupId]="selectedServiceGroupId"
-    [visible]="servicesSidebarVisible"
-    class="services-sidebar-container"
-    (closeServicesSidebarEvent)="closeServicesSidebar()">
-  </app-services-sidebar>
 </div>
+<app-services-sidebar
+  tabindex="0"
+  [serviceGroupId]="selectedServiceGroupId"
+  class="services-sidebar-container">
+</app-services-sidebar>

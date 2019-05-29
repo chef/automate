@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -35,12 +34,15 @@ var codeToString = map[codes.Code]string{
 // AssertCode is an assertion helper that unwraps the passed error argument,
 // and compares its code to the expected code argument. On mismatch, it displays
 // the textual code representation. Fails the test if the passed error is nil.
-func AssertCode(t *testing.T, expected codes.Code, err error) {
+// Returns true if the assertion was met (same as the well-known testify
+// methods).
+func AssertCode(t *testing.T, expected codes.Code, err error) bool {
 	t.Helper()
 
-	require.NotNil(t, err)
-	s := status.Convert(err)
-	if actual := s.Code(); actual != expected {
-		assert.Equal(t, codeToString[expected], codeToString[actual], "expected status codes to match")
+	if assert.Error(t, err) {
+		s := status.Convert(err)
+		actual := s.Code()
+		return assert.Equal(t, codeToString[expected], codeToString[actual], "expected status codes to match")
 	}
+	return false
 }

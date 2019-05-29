@@ -1,5 +1,9 @@
+@import "~styles/variables";
+
 main {
-  background: white;
+  background: $chef-white;
+  height: calc(100vh - 70px);
+  overflow: auto;
 }
 
 chef-subheading {
