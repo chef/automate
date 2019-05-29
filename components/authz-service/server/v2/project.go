@@ -351,6 +351,25 @@ func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleR
 	return &api.GetRuleResp{Rule: apiRule}, nil
 }
 
+func (s *state) ListRules(ctx context.Context, req *api.ListRulesReq) (*api.ListRulesResp, error) {
+	resp, err := s.store.ListRules(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
+	}
+
+	rules := []*api.ProjectRule{}
+	for _, rule := range resp {
+		apiRule, err := fromStorageRule(rule)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal,
+				"error converting rule with ID %q: %s", rule.ID, err.Error())
+		}
+		rules = append(rules, apiRule)
+	}
+
+	return &api.ListRulesResp{Rules: rules}, nil
+}
+
 func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition) ([]storage.Condition, error) {
 	cs := make([]storage.Condition, len(apiConditions))
 	for i, c := range apiConditions {

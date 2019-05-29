@@ -269,8 +269,16 @@ func (s *State) GetRule(_ context.Context, id string) (*storage.Rule, error) {
 }
 
 func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
-	// TODO implement
-	return []*storage.Rule{}, nil
+	items := s.rules.Items()
+	rules := []*storage.Rule{}
+
+	for _, item := range items {
+		if rule, ok := item.Object.(*storage.Rule); ok {
+			rules = append(rules, rule)
+		}
+	}
+
+	return rules, nil
 }
 
 func (s *State) DeleteRule(_ context.Context, id string) error {
