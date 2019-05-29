@@ -27,7 +27,7 @@ var (
 )
 
 // Schedule represents a recurring workflow.
-// TODO(jaym): we should wrap this in the workflow pacakge and provide a getter
+// TODO(jaym): we should wrap this in the workflow package and provide a getter
 // for the parameters
 type Schedule backend.Schedule
 
@@ -275,7 +275,7 @@ type TaskExecutor interface {
 	// Run implements the logic for running the task. The returned result/err
 	// will be provided to the workflow instance that started this task on
 	// completion. This method should strive to be retryable / idempotent
-	// as there is a possiblility that it can run multiple times.
+	// as there is a possibility that it can run multiple times.
 	Run(ctx context.Context, task Task) (result interface{}, err error)
 }
 
@@ -548,7 +548,9 @@ LOOP:
 			jsonResults, err := jsonify(result)
 			if err != nil {
 				logrus.WithError(err).Error("could not convert returned results to JSON")
-				taskCompleter.Fail(err.Error())
+				if err := taskCompleter.Fail(err.Error()); err != nil {
+					logrus.WithError(err).Error("Failed to fail task completer")
+				}
 			}
 			err = taskCompleter.Succeed(jsonResults)
 			if err != nil {
