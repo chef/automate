@@ -11,10 +11,7 @@ BEGIN;
 -- Workflows coordinate a set of tasks. For example, a scan job is a
 -- workflow that create and then waits for the completion of a number
 -- of inspec scan tasks.
---
--- The schedule for recurring workflows are stored in SQL and (TODO)
--- go-level code will push on new workflow_instances and the appointed
--- time.
+
 CREATE TABLE recurring_workflow_schedules (
     id BIGSERIAL PRIMARY KEY,
 
@@ -97,7 +94,7 @@ CREATE TABLE workflow_results (
 
 -- Tasks
 --
--- Tasks are units of descrete work that need to be done.
+-- Tasks are units of discrete work that need to be done.
 --
 -- Workers dequeue tasks from the task table, do the work related to
 -- that task, and then post their results back.
@@ -132,8 +129,6 @@ CREATE TABLE tasks_results (
 
 CREATE TYPE workflow_event_type AS ENUM('start', 'task_complete', 'cancel', 'tasks_abandoned');
 
--- NOTE(ssd) 2019-05-09: Workflow events are defined here because they
--- may reference task_restuls
 CREATE TABLE workflow_events (
     id BIGSERIAL PRIMARY KEY,
     event_type workflow_event_type NOT NULL,
@@ -256,8 +251,6 @@ AS $$
     -- We've decided there is more to do but are done processing this event.
     DELETE FROM workflow_events WHERE id = eid
 $$;
-
--- (jaym): I think we can just have 1 notification channel for workflow events
 
 -- Task Functions
 CREATE OR REPLACE FUNCTION enqueue_task(

@@ -21,7 +21,7 @@ const (
 	enqueueTaskQuery   = `SELECT enqueue_task($1, $2, $3, $4, $5)`
 	dequeueTaskQuery   = `SELECT * FROM dequeue_task($1)`
 	completeTaskQuery  = `SELECT complete_task($1::bigint, $2::task_status, $3::text, $4)`
-	getTaskResultQuery = `SELECT task_name, parameters, status, error, result from tasks_results WHERE id = $1`
+	getTaskResultQuery = `SELECT task_name, parameters, status, error, result FROM tasks_results WHERE id = $1`
 
 	enqueueWorkflowQuery  = `SELECT enqueue_workflow($1, $2, $3)`
 	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow(VARIADIC $1)`
@@ -31,7 +31,7 @@ const (
 
 	listRecurringWorkflowsQuery = `
 		WITH res AS
-			(SELECT DISTINCT ON (name, workflow_name) * from workflow_results
+			(SELECT DISTINCT ON (name, workflow_name) * FROM workflow_results
 			ORDER BY name, workflow_name, end_at DESC)
 		SELECT s.id, enabled, s.name, s.workflow_name, s.parameters, recurrence,
 			next_run_at, start_at last_start, end_at last_end
@@ -380,7 +380,6 @@ func (pg *PostgresBackend) updateWorkflowScheduleByID(tx *sql.Tx, id int64, o *b
 	return nil
 }
 
-// TODO(ssd) 2019-05-13: We need to decide on what "update" will look like
 func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string,
 	parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error {
 
@@ -453,7 +452,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		cancel()
 		return nil, nil, err
 	}
-	// TODO: allow multiple workflow names
+
 	row := tx.QueryRowContext(ctx, dequeueWorkflowQuery, pq.Array(workflowNames))
 	event := &backend.WorkflowEvent{}
 	workc := &PostgresWorkflowCompleter{
