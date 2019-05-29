@@ -55,7 +55,6 @@ message ProjectsAuthorizedResp {
    }];
 }
 
-// FilterAuthorizedProjects uses this SAME request
 message FilterAuthorizedPairsReq {
     repeated string subjects = 1
       [(validate.rules).repeated = {
@@ -69,10 +68,6 @@ message FilterAuthorizedPairsResp {
     repeated Pair pairs = 1;
 }
 
-message FilterAuthorizedProjectsResp {
-    repeated string projects = 1;
-}
-
 message Pair {
     string resource = 2
       [(validate.rules).string.pattern = "^[a-z][^:*]*(?::[^:*]+)*$"];
@@ -80,9 +75,21 @@ message Pair {
       [(validate.rules).string.pattern = "^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$"];
 }
 
+message FilterAuthorizedProjectsReq {
+    repeated string subjects = 1
+      [(validate.rules).repeated = {
+        min_items: 1,
+        items: { string: { pattern: "^(?:(?:team|user):(?:local|ldap|saml)|token|tls:service:[^:*]+):[^:*]+$" } }
+       }];
+}
+
+message FilterAuthorizedProjectsResp {
+    repeated string projects = 1;
+}
+
 service Authorization {
     rpc IsAuthorized (IsAuthorizedReq) returns (IsAuthorizedResp) {};
     rpc FilterAuthorizedPairs (FilterAuthorizedPairsReq) returns (FilterAuthorizedPairsResp) {};
-    rpc FilterAuthorizedProjects (FilterAuthorizedPairsReq) returns (FilterAuthorizedProjectsResp) {};
+    rpc FilterAuthorizedProjects (FilterAuthorizedProjectsReq) returns (FilterAuthorizedProjectsResp) {};
     rpc ProjectsAuthorized (ProjectsAuthorizedReq) returns (ProjectsAuthorizedResp) {};
 }

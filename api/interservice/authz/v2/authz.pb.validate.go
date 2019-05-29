@@ -612,74 +612,6 @@ var _ interface {
 	ErrorName() string
 } = FilterAuthorizedPairsRespValidationError{}
 
-// Validate checks the field values on FilterAuthorizedProjectsResp with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *FilterAuthorizedProjectsResp) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	return nil
-}
-
-// FilterAuthorizedProjectsRespValidationError is the validation error returned
-// by FilterAuthorizedProjectsResp.Validate if the designated constraints
-// aren't met.
-type FilterAuthorizedProjectsRespValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e FilterAuthorizedProjectsRespValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e FilterAuthorizedProjectsRespValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e FilterAuthorizedProjectsRespValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e FilterAuthorizedProjectsRespValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e FilterAuthorizedProjectsRespValidationError) ErrorName() string {
-	return "FilterAuthorizedProjectsRespValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e FilterAuthorizedProjectsRespValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sFilterAuthorizedProjectsResp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = FilterAuthorizedProjectsRespValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = FilterAuthorizedProjectsRespValidationError{}
-
 // Validate checks the field values on Pair with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.
 func (m *Pair) Validate() error {
@@ -761,3 +693,160 @@ var _ interface {
 var _Pair_Resource_Pattern = regexp.MustCompile("^[a-z][^:*]*(?::[^:*]+)*$")
 
 var _Pair_Action_Pattern = regexp.MustCompile("^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$")
+
+// Validate checks the field values on FilterAuthorizedProjectsReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *FilterAuthorizedProjectsReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetSubjects()) < 1 {
+		return FilterAuthorizedProjectsReqValidationError{
+			field:  "Subjects",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetSubjects() {
+		_, _ = idx, item
+
+		if !_FilterAuthorizedProjectsReq_Subjects_Pattern.MatchString(item) {
+			return FilterAuthorizedProjectsReqValidationError{
+				field:  fmt.Sprintf("Subjects[%v]", idx),
+				reason: "value does not match regex pattern \"^(?:(?:team|user):(?:local|ldap|saml)|token|tls:service:[^:*]+):[^:*]+$\"",
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// FilterAuthorizedProjectsReqValidationError is the validation error returned
+// by FilterAuthorizedProjectsReq.Validate if the designated constraints
+// aren't met.
+type FilterAuthorizedProjectsReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FilterAuthorizedProjectsReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FilterAuthorizedProjectsReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FilterAuthorizedProjectsReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FilterAuthorizedProjectsReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FilterAuthorizedProjectsReqValidationError) ErrorName() string {
+	return "FilterAuthorizedProjectsReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e FilterAuthorizedProjectsReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFilterAuthorizedProjectsReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FilterAuthorizedProjectsReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FilterAuthorizedProjectsReqValidationError{}
+
+var _FilterAuthorizedProjectsReq_Subjects_Pattern = regexp.MustCompile("^(?:(?:team|user):(?:local|ldap|saml)|token|tls:service:[^:*]+):[^:*]+$")
+
+// Validate checks the field values on FilterAuthorizedProjectsResp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *FilterAuthorizedProjectsResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// FilterAuthorizedProjectsRespValidationError is the validation error returned
+// by FilterAuthorizedProjectsResp.Validate if the designated constraints
+// aren't met.
+type FilterAuthorizedProjectsRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FilterAuthorizedProjectsRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FilterAuthorizedProjectsRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FilterAuthorizedProjectsRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FilterAuthorizedProjectsRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FilterAuthorizedProjectsRespValidationError) ErrorName() string {
+	return "FilterAuthorizedProjectsRespValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e FilterAuthorizedProjectsRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFilterAuthorizedProjectsResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FilterAuthorizedProjectsRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FilterAuthorizedProjectsRespValidationError{}
