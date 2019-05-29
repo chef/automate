@@ -12,3 +12,7 @@ message CreateRuleResp {
 message GetRuleResp {
   Rule rule = 1;
 }
+
+message ListRulesResp {
+  repeated Rule rules = 1;
+}

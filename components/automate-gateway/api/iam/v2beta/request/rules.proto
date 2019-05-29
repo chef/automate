@@ -16,3 +16,5 @@ message CreateRuleReq {
 message GetRuleReq {
   string id = 1;
 }
+
+message ListRulesReq {}
