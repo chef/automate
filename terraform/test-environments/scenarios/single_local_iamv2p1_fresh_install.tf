@@ -1,17 +1,17 @@
 #
-# A simple local install of A2 with IAMv2 using the chef-automate CLI. It is rebuilt everytime we run `terraform apply`.
+# A simple local install of A2 with IAMv2p1 using the chef-automate CLI. It is rebuilt everytime we run `terraform apply`.
 #
 
-module "single_local_iamv2_fresh_install" {
+module "single_local_iamv2p1_fresh_install" {
   source = "git@github.com:chef/es-terraform.git//modules/cd_instance_v2"
 
-  # DNS components ( a2-iamv2-local-fresh-install-{{channel}}.cd.chef.co )
-  subdomain        = "a2-iamv2-local-fresh-install"
+  # DNS components ( a2-iamv2p1-local-fresh-install-{{channel}}.cd.chef.co )
+  subdomain        = "a2-iamv2p1-local-fresh-install"
   subdomain_suffix = "-${var.dns_suffix}"
 
   # Metadata
-  meta_title       = "Single Local (Fresh Install) with IAMv2"
-  meta_description = "A2 stack with IAMv2 (using SAML) deployed locally as Habitat packages on a single host using the chef-automate CLI."
+  meta_title       = "Single Local (Fresh Install) with IAMv2p1"
+  meta_description = "A2 stack with IAMv2p1 (using SAML) deployed locally as Habitat packages on a single host using the chef-automate CLI."
   meta_type        = "habitat"
 
   # AWS Instance Configuration
@@ -37,12 +37,12 @@ module "single_local_iamv2_fresh_install" {
   }
 }
 
-module "single_local_iamv2_fresh_install_deploy" {
+module "single_local_iamv2p1_fresh_install_deploy" {
   source = "../modules/chef_automate_install"
 
-  instance_id   = "${module.single_local_iamv2_fresh_install.instance_id}"
-  instance_fqdn = "${module.single_local_iamv2_fresh_install.fqdn}"
-  ssh_username  = "${module.single_local_iamv2_fresh_install.ssh_username}"
+  instance_id   = "${module.single_local_iamv2p1_fresh_install.instance_id}"
+  instance_fqdn = "${module.single_local_iamv2p1_fresh_install.fqdn}"
+  ssh_username  = "${module.single_local_iamv2p1_fresh_install.ssh_username}"
 
   journald_system_max_use = "${var.channel == "acceptance" ? "20G" : "6G"}"
 
@@ -53,5 +53,5 @@ module "single_local_iamv2_fresh_install_deploy" {
   # Automate Install
   channel         = "${var.channel}"
   deployment_type = "local"
-  iam_version     = "v2"
+  iam_version     = "v2.1"
 }
