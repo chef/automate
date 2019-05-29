@@ -199,7 +199,7 @@ func TestIntrospectAllProjectsV2(t *testing.T) {
 				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action:do", middleware.AuthV2.String())
 			req := &request.IntrospectAllProjectsReq{}
 			authzSrv.FilterAuthorizedProjectsFunc = func(
-				context.Context, *authz_v2.FilterAuthorizedPairsReq) (*authz_v2.FilterAuthorizedProjectsResp, error) {
+				context.Context, *authz_v2.FilterAuthorizedProjectsReq) (*authz_v2.FilterAuthorizedProjectsResp, error) {
 				return tc.authzResp, nil
 			}
 			resp, err := hdlr.IntrospectAllProjects(ctx, req)

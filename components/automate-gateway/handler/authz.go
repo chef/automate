@@ -351,9 +351,8 @@ func (a *AuthzServer) getAllowedProjects(
 		pairsV2[i] = &authzV2.Pair{Resource: p.Resource, Action: p.Action}
 	}
 
-	resp, err := a.clientV2.FilterAuthorizedProjects(ctx, &authzV2.FilterAuthorizedPairsReq{
+	resp, err := a.clientV2.FilterAuthorizedProjects(ctx, &authzV2.FilterAuthorizedProjectsReq{
 		Subjects: subjects,
-		Pairs:    pairsV2,
 	})
 	if err != nil {
 		log.WithError(err).Debug("Error on client.FilterAuthorizedProjects")
