@@ -52,6 +52,7 @@ import (
 	"github.com/chef/automate/components/automate-gateway/handler"
 	handler_compliance "github.com/chef/automate/components/automate-gateway/handler/compliance"
 	handler_policies "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/policy"
+	handler_rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/rules"
 	handler_teams "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/teams"
 	handler_tokens "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/tokens"
 	handler_users "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/users"
@@ -149,6 +150,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		return errors.Wrap(err, "create projects client for authz-service")
 	}
 	pb_iam_v2beta.RegisterPoliciesServer(grpcServer, handler_policies.NewServer(policiesClient, projectsClient))
+	pb_iam_v2beta.RegisterRulesServer(grpcServer, handler_rules.NewServer(projectsClient))
 
 	tokensMgmtClient, err := clients.TokensMgmtClient()
 	if err != nil {
@@ -293,6 +295,7 @@ func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFe
 		"users v2beta":    pb_iam_v2beta.RegisterUsersHandlerFromEndpoint,
 		"tokens v2beta":   pb_iam_v2beta.RegisterTokensHandlerFromEndpoint,
 		"teams v2beta":    pb_iam_v2beta.RegisterTeamsHandlerFromEndpoint,
+		"rules v2beta":    pb_iam_v2beta.RegisterRulesHandlerFromEndpoint,
 	}
 	if toggles["applications"] {
 		endpointMap["apps beta"] = pb_apps.RegisterApplicationsServiceHandlerFromEndpoint

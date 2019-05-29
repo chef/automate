@@ -235,6 +235,26 @@ func (mr *MockProjectsClientMockRecorder) ProjectUpdateCancel(ctx, in interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateCancel", reflect.TypeOf((*MockProjectsClient)(nil).ProjectUpdateCancel), varargs...)
 }
 
+// CreateRule mocks base method
+func (m *MockProjectsClient) CreateRule(ctx context.Context, in *CreateRuleReq, opts ...grpc.CallOption) (*CreateRuleResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CreateRule", varargs...)
+	ret0, _ := ret[0].(*CreateRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRule indicates an expected call of CreateRule
+func (mr *MockProjectsClientMockRecorder) CreateRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRule", reflect.TypeOf((*MockProjectsClient)(nil).CreateRule), varargs...)
+}
+
 // MockProjectsServer is a mock of ProjectsServer interface
 type MockProjectsServer struct {
 	ctrl     *gomock.Controller
@@ -406,4 +426,19 @@ func (m *MockProjectsServer) ProjectUpdateCancel(arg0 context.Context, arg1 *Pro
 func (mr *MockProjectsServerMockRecorder) ProjectUpdateCancel(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateCancel", reflect.TypeOf((*MockProjectsServer)(nil).ProjectUpdateCancel), arg0, arg1)
+}
+
+// CreateRule mocks base method
+func (m *MockProjectsServer) CreateRule(arg0 context.Context, arg1 *CreateRuleReq) (*CreateRuleResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRule", arg0, arg1)
+	ret0, _ := ret[0].(*CreateRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRule indicates an expected call of CreateRule
+func (mr *MockProjectsServerMockRecorder) CreateRule(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRule", reflect.TypeOf((*MockProjectsServer)(nil).CreateRule), arg0, arg1)
 }

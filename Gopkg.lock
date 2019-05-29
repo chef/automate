@@ -622,7 +622,7 @@
   revision = "d65d576e9348f5982d7f6d83682b694e731a45c6"
 
 [[projects]]
-  digest = "1:84c4d722fdf79be1378453caa5d94519e59d141b625a1980b56bff65361414d0"
+  digest = "1:b7af953efb0400c3116d3fc7b3229e38e6a7b3729763ed5b63c4ae0890dac51f"
   name = "github.com/leanovate/gopter"
   packages = [
     ".",
@@ -630,8 +630,8 @@
     "prop",
   ]
   pruneopts = "NUT"
-  revision = "55d63c2a7cf19619ab64a7248c958afdc38e96a3"
-  version = "v0.2.3"
+  revision = "c8df375e1ea5a53748eb0dff007e9cc5e07b7cd3"
+  version = "v0.2.4"
 
 [[projects]]
   branch = "master"

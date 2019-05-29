@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2beta;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common";
+
+enum RuleType {
+    RULE_TYPE_UNSET = 0;
+    NODE = 1;
+    EVENT = 2;
+}
+
+enum ConditionType {
+    CONDITION_TYPE_UNSET = 0;
+    CHEF_SERVERS = 1;
+    CHEF_ORGS = 2;
+    CHEF_ENVIRONMENTS = 3;
+    ROLES = 4;
+    CHEF_TAGS = 5;
+    POLICY_GROUP = 6;
+    POLICY_NAME = 7;
+}
+
+message Rule {
+    string id = 1;
+    string project_id = 2;
+    string name = 3;
+    RuleType type = 4;
+    repeated Condition conditions = 5;
+}
+
+message Condition {
+    ConditionType type = 1;
+    repeated string values = 2;
+}
