@@ -3333,6 +3333,34 @@ func TestCreateRule(t *testing.T) {
 			_, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{})
 			assert.Error(t, err)
 		},
+		"creating a condition with zero entries for the 'equals' operator returns an error": func(t *testing.T) {
+			condition1, err := storage.NewCondition(storage.Event, []string{}, storage.ChefServer, storage.Equals)
+			assert.Equal(t, storage.Condition{}, condition1)
+			assert.Error(t, err)
+		},
+		"creating a condition with zero entries for the 'member-of' operator returns an error": func(t *testing.T) {
+			condition1, err := storage.NewCondition(storage.Event, []string{}, storage.ChefServer, storage.MemberOf)
+			assert.Equal(t, storage.Condition{}, condition1)
+			assert.Error(t, err)
+		},
+		"creating an equals condition with multiple entries returns an error": func(t *testing.T) {
+			condition1, err := storage.NewCondition(storage.Event,
+				[]string{"chef-server-1", "chef-server-2"}, storage.ChefServer, storage.Equals)
+			assert.Equal(t, storage.Condition{}, condition1)
+			assert.Error(t, err)
+		},
+		"creating a condition with multiple entries for 'member-of' operator is allowed": func(t *testing.T) {
+			condition1, err := storage.NewCondition(storage.Event,
+				[]string{"1", "2", "3"}, storage.ChefServer, storage.MemberOf)
+			assert.NotNil(t, condition1)
+			assert.NoError(t, err)
+		},
+		"creating a condition with a single entry for 'member-of' operator is allowed": func(t *testing.T) {
+			condition1, err := storage.NewCondition(storage.Event,
+				[]string{"1"}, storage.ChefServer, storage.MemberOf)
+			assert.NotNil(t, condition1)
+			assert.NoError(t, err)
+		},
 		"creating a rule with inconsistent child condition type returns an error": func(t *testing.T) {
 			ruleType := storage.Node
 			differentRuleType := storage.Event
@@ -5995,7 +6023,7 @@ func createRuleWithMultipleConditions(t *testing.T, store storage.Storage, projI
 		[]string{"org1", "org2", "org3"}, storage.Organization, storage.MemberOf)
 	require.NoError(t, err)
 	condition3, err := storage.NewCondition(ruleType,
-		[]string{"chef-server-2,chef-server-3"}, storage.ChefServer, storage.MemberOf)
+		[]string{"chef-server-2"}, storage.ChefServer, storage.Equals)
 	require.NoError(t, err)
 	req, err := storage.NewRule("new-id-1", projID, "name", ruleType,
 		[]storage.Condition{condition1, condition2, condition3})
