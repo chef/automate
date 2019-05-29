@@ -32,7 +32,7 @@ func TestSuggestionsEmptyRequestReturnsError(t *testing.T) {
 
 func TestSuggestionsWithAnInvalidTypeReturnsError(t *testing.T) {
 	ctx := context.Background()
-	cases := []string{"fake", "my-platform", "PolicyName", "error", "something_else"}
+	cases := []string{"fake", "my-platform", "PolicyName", "something_else"}
 
 	for _, cType := range cases {
 		t.Run(fmt.Sprintf("with type '%v' it should throw error", cType), func(t *testing.T) {

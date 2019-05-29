@@ -223,13 +223,16 @@ function send_chef_run_failure_example() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
 
-  uuid=$(uuidgen)
+  local run_uuid=$(uuidgen)
+  local node_uuid=$(uuidgen)
+  local node_name="node_failed_$(($RANDOM % 100))"
+  local rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
 
   local examples_path="/src/components/ingest-service/examples";
   [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/run"
 
-  # Update the 'id'
-  tmp_ccr_json="$(jq --arg id "$uuid" '.id = $id' <$examples_path/converge-failure-report.json)"
+  # Update the IDs, names, and dates
+  tmp_ccr_json="$(jq --arg rfc_time "$rfc_time" --arg run_uuid "$run_uuid" --arg node_name "$node_name" --arg node_uuid "$node_uuid" '.end_time = $rfc_time | .start_time = $rfc_time | .entity_uuid = $node_uuid | .id = $run_uuid | .run_id = $run_uuid | .node_name = $node_name' <$examples_path/converge-failure-report.json)"
 
   echo "$tmp_ccr_json" \
        | curl -f --insecure -H "api-token: $(get_api_token)" \

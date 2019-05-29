@@ -67,6 +67,20 @@ func TestFlatten3(t *testing.T) {
 	assert.Equal(t, expect, m)
 }
 
+func TestFailedCCRToNode(t *testing.T) {
+	run, err := ReadCCRJson("../examples/converge-failure-report.json")
+	assert.NoError(t, err)
+
+	translatedNode, err := run.ToNode()
+	assert.NoError(t, err)
+
+	expectedMessage := "file[/failed/file/resource] (insights-test::default line 26) had an error: Chef::Exceptions::EnclosingDirectoryDoesNotExist: Parent directory /failed/file does not exist."
+
+	assert.Equal(t, expectedMessage, translatedNode.ErrorMessage)
+	assert.Equal(t, "failure", translatedNode.Status)
+	assert.Equal(t, subject.ChefError{}, translatedNode.Error)
+}
+
 func TestCCRToNode(t *testing.T) {
 	run, _ := ReadCCRJsonDefault()
 	translatedNode, err := run.ToNode()
@@ -287,11 +301,11 @@ func TestCCRToRun(t *testing.T) {
 	assert.Contains(t, translatedRun.Cookbooks, "apt")
 	assert.Contains(t, translatedRun.Cookbooks, "aws")
 	var vCookbooks = []subject.VersionedCookbook{
-		subject.VersionedCookbook{
+		{
 			Name:    "apt",
 			Version: "2.9.2",
 		},
-		subject.VersionedCookbook{
+		{
 			Name:    "aws",
 			Version: "2.3.0",
 		},
