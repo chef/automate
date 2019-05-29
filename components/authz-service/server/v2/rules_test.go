@@ -242,6 +242,86 @@ func TestGetRule(t *testing.T) {
 	}
 }
 
+func TestListRules(t *testing.T) {
+	ctx := context.Background()
+	cl, store, _, _ := setupRules(t)
+
+	apiConditions1 := []*api.Condition{
+		{
+			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values: []string{"opscode"},
+		},
+	}
+	storageConditions1 := []storage.Condition{
+		{
+			Type:      storage.Node,
+			Attribute: storage.Organization,
+			Operator:  storage.MemberOf,
+			Value:     []string{"opscode"},
+		},
+	}
+	apiConditions2 := []*api.Condition{
+		{
+			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values: []string{"chef"},
+		},
+	}
+	storageConditions2 := []storage.Condition{
+		{
+			Type:      storage.Event,
+			Attribute: storage.Organization,
+			Operator:  storage.MemberOf,
+			Value:     []string{"chef"},
+		},
+	}
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"if no rules exist, returns empty list", func(t *testing.T) {
+			resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
+			require.NoError(t, err)
+			assert.Equal(t, &api.ListRulesResp{}, resp)
+		}},
+		{"if many rules exist, returns all rules", func(t *testing.T) {
+			id1, id2 := "rule-number-1", "rule-number-2"
+			projectID := "foo-project"
+			name := "you don't talk about fight club"
+			addRuleToStore(t, store, id1, name, storage.Node, projectID, storageConditions1)
+			addRuleToStore(t, store, id2, name, storage.Event, projectID, storageConditions2)
+			expected1 := api.ProjectRule{
+				Id:         id1,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_NODE,
+				ProjectId:  projectID,
+				Conditions: apiConditions1,
+			}
+			expected2 := api.ProjectRule{
+				Id:         id2,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_EVENT,
+				ProjectId:  projectID,
+				Conditions: apiConditions2,
+			}
+			expected := []*api.ProjectRule{&expected1, &expected2}
+
+			resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
+			require.NoError(t, err)
+			assert.ElementsMatch(t, expected, resp.Rules)
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		store.Flush()
+	}
+}
+
 func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType storage.RuleType, projectID string,
 	conditions []storage.Condition) {
 	t.Helper()
