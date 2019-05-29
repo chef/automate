@@ -46,7 +46,8 @@ authorized_pair[pair] {
 
 allowed_project[project] {
 	project := policies[pol_id].statements[statement_id].projects[_]
-	match_pair[["allow", _, pol_id, statement_id]]
+	"allow" == policies[pol_id].statements[statement_id].effect
+	authz.has_member[pol_id]
 	not policies[pol_id].type == const_system_type
 }
 
