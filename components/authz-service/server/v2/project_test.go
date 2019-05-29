@@ -374,8 +374,9 @@ func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventSe
 	cl, ca, _, mc, _ := setupProjectsAndRules(t)
 	return cl, ca, mc
 }
-func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cache.Cache, *mockEventServiceClient,
-	int64) {
+
+func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cache.Cache,
+	*mockEventServiceClient, int64) {
 	t.Helper()
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
