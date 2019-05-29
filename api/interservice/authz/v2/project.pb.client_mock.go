@@ -275,6 +275,26 @@ func (mr *MockProjectsClientMockRecorder) GetRule(ctx, in interface{}, opts ...i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRule", reflect.TypeOf((*MockProjectsClient)(nil).GetRule), varargs...)
 }
 
+// ListRules mocks base method
+func (m *MockProjectsClient) ListRules(ctx context.Context, in *ListRulesReq, opts ...grpc.CallOption) (*ListRulesResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListRules", varargs...)
+	ret0, _ := ret[0].(*ListRulesResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListRules indicates an expected call of ListRules
+func (mr *MockProjectsClientMockRecorder) ListRules(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRules", reflect.TypeOf((*MockProjectsClient)(nil).ListRules), varargs...)
+}
+
 // MockProjectsServer is a mock of ProjectsServer interface
 type MockProjectsServer struct {
 	ctrl     *gomock.Controller
@@ -476,4 +496,19 @@ func (m *MockProjectsServer) GetRule(arg0 context.Context, arg1 *GetRuleReq) (*G
 func (mr *MockProjectsServerMockRecorder) GetRule(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRule", reflect.TypeOf((*MockProjectsServer)(nil).GetRule), arg0, arg1)
+}
+
+// ListRules mocks base method
+func (m *MockProjectsServer) ListRules(arg0 context.Context, arg1 *ListRulesReq) (*ListRulesResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListRules", arg0, arg1)
+	ret0, _ := ret[0].(*ListRulesResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListRules indicates an expected call of ListRules
+func (mr *MockProjectsServerMockRecorder) ListRules(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRules", reflect.TypeOf((*MockProjectsServer)(nil).ListRules), arg0, arg1)
 }

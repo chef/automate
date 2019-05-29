@@ -1984,3 +1984,148 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetRuleRespValidationError{}
+
+// Validate checks the field values on ListRulesReq with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ListRulesReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ListRulesReqValidationError is the validation error returned by
+// ListRulesReq.Validate if the designated constraints aren't met.
+type ListRulesReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListRulesReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListRulesReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListRulesReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListRulesReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListRulesReqValidationError) ErrorName() string { return "ListRulesReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ListRulesReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListRulesReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListRulesReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListRulesReqValidationError{}
+
+// Validate checks the field values on ListRulesResp with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ListRulesResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetRules() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListRulesRespValidationError{
+					field:  fmt.Sprintf("Rules[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ListRulesRespValidationError is the validation error returned by
+// ListRulesResp.Validate if the designated constraints aren't met.
+type ListRulesRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListRulesRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListRulesRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListRulesRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListRulesRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListRulesRespValidationError) ErrorName() string { return "ListRulesRespValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ListRulesRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListRulesResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListRulesRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListRulesRespValidationError{}
