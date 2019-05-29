@@ -11,10 +11,11 @@ type ConditionOperator int
 
 const (
 	MemberOf ConditionOperator = iota
+	Equals
 )
 
 func (c ConditionOperator) String() string {
-	if c != MemberOf {
+	if c < MemberOf || c > Equals {
 		panic(fmt.Sprintf("unknown value from iota ConditionOperator on String() conversion: %d", c))
 	}
 
@@ -26,6 +27,8 @@ func NewConditionOperator(in string) (ConditionOperator, error) {
 	switch in {
 	case "member-of":
 		return MemberOf, nil
+	case "equals":
+		return Equals, nil
 	default:
 		return MemberOf,
 			fmt.Errorf("condition operator type must be one of %q, you passed %s",
@@ -44,8 +47,9 @@ func (c *ConditionOperator) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func conditionOperatorStringValues() [1]string {
+func conditionOperatorStringValues() [2]string {
 	return [...]string{
 		"member-of",
+		"equals",
 	}
 }
