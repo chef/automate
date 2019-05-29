@@ -20,6 +20,12 @@ enum ConditionType {
     POLICY_NAME = 7;
 }
 
+enum ConditionOperator {
+    CONDITION_OPERATOR_UNSET = 0;
+    MEMBER_OF = 1;
+    EQUALS = 2;
+}
+
 message Rule {
     string id = 1;
     string project_id = 2;
@@ -31,4 +37,5 @@ message Rule {
 message Condition {
     ConditionType type = 1;
     repeated string values = 2;
+    ConditionOperator operator = 3;
 }

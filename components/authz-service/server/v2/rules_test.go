@@ -22,8 +22,9 @@ func TestCreateRule(t *testing.T) {
 	// cases
 	apiConditions := []*api.Condition{
 		{
-			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values: []string{"opscode"},
+			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values:   []string{"opscode"},
+			Operator: api.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	storageConditions := []storage.Condition{
@@ -110,8 +111,14 @@ func TestCreateRule(t *testing.T) {
 				Type:      api.ProjectRuleTypes_NODE,
 				Conditions: []*api.Condition{
 					{
-						Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
-						Values: []string{"chef"},
+						Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+						Values:   []string{"chef"},
+						Operator: api.ProjectRuleConditionOperators_EQUALS,
+					},
+					{
+						Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
+						Values:   []string{"tag1", "tag2"},
+						Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
 					},
 				},
 			})
@@ -124,8 +131,14 @@ func TestCreateRule(t *testing.T) {
 					Type:      api.ProjectRuleTypes_NODE,
 					Conditions: []*api.Condition{
 						{
-							Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
-							Values: []string{"chef"},
+							Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+							Values:   []string{"chef"},
+							Operator: api.ProjectRuleConditionOperators_EQUALS,
+						},
+						{
+							Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
+							Values:   []string{"tag1", "tag2"},
+							Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
 						},
 					},
 				},
