@@ -1559,6 +1559,7 @@
     "github.com/lyft/protoc-gen-validate/validate",
     "github.com/mattes/migrate",
     "github.com/mattes/migrate/database/postgres",
+    "github.com/mattes/migrate/source",
     "github.com/mattes/migrate/source/file",
     "github.com/mitchellh/mapstructure",
     "github.com/muesli/crunchy",
