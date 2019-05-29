@@ -193,7 +193,7 @@ describe('ClientRunsRequests', () => {
     });
   });
 
-  describe('filtering by platform , org an server', () => {
+  describe('filtering by platform, org, and server', () => {
     it('encodes the value only once', () => {
       const filters: NodeFilter = <NodeFilter>{
         page: 0,
