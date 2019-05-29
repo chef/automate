@@ -95,44 +95,39 @@ func Default() Backend {
 func newBoolQueryFromFilters(filters map[string][]string) *elastic.BoolQuery {
 	boolQuery := elastic.NewBoolQuery()
 	for field, values := range filters {
+		filterQuery := elastic.NewBoolQuery()
+		refinedValues := make([]string, 0, 0)
 		if field == backend.Project {
-			projectsQuery := elastic.NewBoolQuery()
 			if stringutils.SliceContains(values, authzConstants.UnassignedProjectID) {
 				emptyProjectQuery := elastic.NewBoolQuery()
 				emptyProjectQuery.MustNot(elastic.NewExistsQuery(field))
-				projectsQuery.Should(emptyProjectQuery)
+				filterQuery = filterQuery.Should(emptyProjectQuery)
 			}
 
-			assignedProjectIds := stringutils.SliceFilter(values, func(projectId string) bool {
+			refinedValues = stringutils.SliceFilter(values, func(projectId string) bool {
 				return projectId != authzConstants.UnassignedProjectID
 			})
+		} else { // Do not want projects to use wildcards
+			for _, value := range values {
+				// Determine if the filters contain any wildcards
+				if strings.Contains(value, "*") || strings.Contains(value, "?") {
+					wildQuery := elastic.NewWildcardQuery(field, value)
+					filterQuery = filterQuery.Should(wildQuery)
+				} else {
+					refinedValues = append(refinedValues, value)
+				}
+			}
+		}
 
-			if len(assignedProjectIds) > 0 {
-				projectMatchQuery := elastic.NewTermsQuery(field, stringArrayToInterfaceArray(assignedProjectIds)...)
-				projectsQuery.Should(projectMatchQuery)
-			}
-			boolQuery = boolQuery.Filter(projectsQuery)
-			continue
-		}
-		// We don't know how many values will end up here
-		// Decided appending values might be faster than removing them.
-		refinedValues := make([]string, 0, 0)
-		for _, value := range values {
-			// Determine if the filters contain any wildcards
-			if strings.Contains(value, "*") || strings.Contains(value, "?") {
-				wildQuery := elastic.NewWildcardQuery(field, value)
-				boolQuery = boolQuery.Must(wildQuery)
-			} else {
-				refinedValues = append(refinedValues, value)
-			}
-		}
 		// Even if there is a wildcard value found, we still want to narrow down by any other values.
 		// This would probably negate anything found with wildcards but using should brings back extra results
 		if len(refinedValues) > 0 {
 			termQuery := elastic.NewTermsQuery(field, stringArrayToInterfaceArray(refinedValues)...)
-			boolQuery = boolQuery.Must(termQuery)
+			filterQuery = filterQuery.Should(termQuery)
 		}
+		boolQuery = boolQuery.Filter(filterQuery)
 	}
+
 	return boolQuery
 }
 
