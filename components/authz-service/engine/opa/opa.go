@@ -25,6 +25,7 @@ type State struct {
 	log               logger.Logger
 	store             storage.Store
 	v2Store           storage.Store
+	v2p1Store         storage.Store
 	queries           map[string]ast.Body
 	compiler          *ast.Compiler
 	modules           map[string]*ast.Module
@@ -84,9 +85,10 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 		return nil, errors.Wrapf(err, "parse query %q", listProjectMapQuery)
 	}
 	s := State{
-		log:     l,
-		store:   inmem.New(),
-		v2Store: inmem.New(),
+		log:       l,
+		store:     inmem.New(),
+		v2Store:   inmem.New(),
+		v2p1Store: inmem.New(),
 		queries: map[string]ast.Body{
 			authzQuery:              authzQueryParsed,
 			filteredPairsQuery:      filteredPairsQueryParsed,
@@ -112,6 +114,10 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 
 	if err := s.initPartialResultV2(ctx); err != nil {
 		return nil, errors.Wrap(err, "init OPA partial result state (v2)")
+	}
+
+	if err := s.initPartialResultV2p1(ctx); err != nil {
+		return nil, errors.Wrap(err, "init OPA partial result state (v2.1)")
 	}
 
 	return &s, nil
@@ -194,17 +200,20 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 		return errors.Wrap(err, "partial eval (authorized)")
 	}
 	s.v2PartialAuth = v2Partial
+	return nil
+}
 
+func (s *State) initPartialResultV2p1(ctx context.Context) error {
 	// Partial eval for authzProjectsV2Query.
 	// Each partial eval needs a separate compiler.
-	compiler, err = s.newCompiler()
+	compiler, err := s.newCompiler()
 	if err != nil {
 		return err
 	}
-	r = rego.New(
+	r := rego.New(
 		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
 		rego.Compiler(compiler),
-		rego.Store(s.v2Store),
+		rego.Store(s.v2p1Store),
 	)
 	v2PartialProjects, err := r.PartialResult(ctx)
 	if err != nil {
@@ -634,6 +643,20 @@ func (s *State) V2SetPolicies(
 	})
 
 	return s.initPartialResultV2(ctx)
+}
+
+// V2p1SetPolicies replaces OPA's data with a new set of policies and roles,
+// and resets the partial evaluation cache for v2
+func (s *State) V2p1SetPolicies(
+	ctx context.Context, policyMap map[string]interface{},
+	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": policyMap,
+		"roles":    roleMap,
+		"rules":    ruleMap,
+	})
+
+	return s.initPartialResultV2p1(ctx)
 }
 
 // ErrUnexpectedResultExpression is returned when one of the result sets

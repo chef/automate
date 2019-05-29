@@ -18,9 +18,13 @@ type Engine interface {
 	// service needs V2Authorizer, the policy section cares about V2Writer), so we
 	// collect them here instead of introducing a V2Engine interface.
 	V2Authorizer
-	V2Writer
-
+	V2pXWriter
 	ProjectRulesRetriever
+}
+
+type V2pXWriter interface {
+	V2Writer
+	V2p1Writer
 }
 
 // V1Engine is the interface representing the IAM v1 backing engine methods:
@@ -69,6 +73,10 @@ type Writer interface {
 
 type V2Writer interface {
 	V2SetPolicies(context.Context, map[string]interface{}, map[string]interface{}, map[string][]interface{}) error
+}
+
+type V2p1Writer interface {
+	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}, map[string][]interface{}) error
 }
 
 type ProjectRulesRetriever interface {

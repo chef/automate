@@ -28,9 +28,10 @@ import (
 type policyServer struct {
 	log             logger.Logger
 	store           storage.Storage
-	engine          engine.V2Writer
+	engine          engine.V2pXWriter
 	v1              storage_v1.PoliciesLister
 	vChan           chan api.Version
+	version         api.Version
 	policyRefresher PolicyRefresher
 }
 
@@ -46,7 +47,7 @@ type PolicyServer interface {
 func NewMemstorePolicyServer(
 	ctx context.Context,
 	l logger.Logger,
-	e engine.V2Writer,
+	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vChan chan api.Version) (PolicyServer, error) {
 
@@ -57,7 +58,7 @@ func NewMemstorePolicyServer(
 func NewPostgresPolicyServer(
 	ctx context.Context,
 	l logger.Logger,
-	e engine.V2Writer,
+	e engine.V2pXWriter,
 	migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config,
 	pl storage_v1.PoliciesLister,
@@ -75,7 +76,7 @@ func NewPoliciesServer(
 	ctx context.Context,
 	l logger.Logger,
 	s storage.Storage,
-	e engine.V2Writer,
+	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vChan chan api.Version) (PolicyServer, error) {
 
@@ -709,7 +710,7 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 }
 
 func (s *policyServer) updateEngineStore(ctx context.Context) error {
-	return s.policyRefresher.Refresh(ctx)
+	return s.policyRefresher.Refresh(ctx, s.version)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -895,5 +896,6 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 func (s *policyServer) setVersion(v api.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
+		s.version = v
 	}
 }
