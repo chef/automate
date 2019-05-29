@@ -57,6 +57,10 @@ defmodule Notifications.Data.Migrator.Migrations do
         "ALTER TABLE rules ADD COLUMN critical_controls_only BOOLEAN;",
         "ALTER TABLE rules ALTER COLUMN critical_controls_only SET DEFAULT FALSE;"]
      },
+     %{description: "UPDATE rules SET critical_controls_only=FALSE",
+       queries: [
+        "UPDATE rules SET critical_controls_only=FALSE;"]
+     },
     ]
   end
 
