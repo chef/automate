@@ -47,6 +47,7 @@ func (x ProjectRuleTypes) String() string {
 }
 func (ProjectRuleTypes) EnumDescriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{0}
 =======
 <<<<<<< HEAD
@@ -55,6 +56,9 @@ func (ProjectRuleTypes) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{0}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{0}
+>>>>>>> api: regen protobufs post-rebase
 }
 
 type ProjectRuleConditionTypes int32
@@ -93,6 +97,7 @@ func (x ProjectRuleConditionTypes) String() string {
 }
 func (ProjectRuleConditionTypes) EnumDescriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{1}
 }
 
@@ -124,6 +129,9 @@ func (ProjectRuleConditionOperators) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{1}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{1}
+>>>>>>> api: regen protobufs post-rebase
 }
 
 type Project struct {
@@ -141,6 +149,7 @@ func (m *Project) String() string { return proto.CompactTextString(m) }
 func (*Project) ProtoMessage()    {}
 func (*Project) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{0}
 =======
 <<<<<<< HEAD
@@ -149,6 +158,9 @@ func (*Project) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{0}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{0}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *Project) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Project.Unmarshal(m, b)
@@ -209,6 +221,7 @@ func (m *CreateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*CreateProjectReq) ProtoMessage()    {}
 func (*CreateProjectReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{1}
 =======
 <<<<<<< HEAD
@@ -217,6 +230,9 @@ func (*CreateProjectReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{1}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{1}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *CreateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectReq.Unmarshal(m, b)
@@ -262,6 +278,7 @@ func (m *CreateProjectResp) String() string { return proto.CompactTextString(m) 
 func (*CreateProjectResp) ProtoMessage()    {}
 func (*CreateProjectResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{2}
 =======
 <<<<<<< HEAD
@@ -270,6 +287,9 @@ func (*CreateProjectResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{2}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{2}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *CreateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectResp.Unmarshal(m, b)
@@ -308,6 +328,7 @@ func (m *GetProjectReq) String() string { return proto.CompactTextString(m) }
 func (*GetProjectReq) ProtoMessage()    {}
 func (*GetProjectReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{3}
 =======
 <<<<<<< HEAD
@@ -316,6 +337,9 @@ func (*GetProjectReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{3}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{3}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *GetProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectReq.Unmarshal(m, b)
@@ -354,6 +378,7 @@ func (m *GetProjectResp) String() string { return proto.CompactTextString(m) }
 func (*GetProjectResp) ProtoMessage()    {}
 func (*GetProjectResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{4}
 =======
 <<<<<<< HEAD
@@ -362,6 +387,9 @@ func (*GetProjectResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{4}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{4}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *GetProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectResp.Unmarshal(m, b)
@@ -399,6 +427,7 @@ func (m *ListProjectsReq) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsReq) ProtoMessage()    {}
 func (*ListProjectsReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{5}
 =======
 <<<<<<< HEAD
@@ -407,6 +436,9 @@ func (*ListProjectsReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{5}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{5}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ListProjectsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsReq.Unmarshal(m, b)
@@ -438,6 +470,7 @@ func (m *ListProjectsResp) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsResp) ProtoMessage()    {}
 func (*ListProjectsResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{6}
 =======
 <<<<<<< HEAD
@@ -446,6 +479,9 @@ func (*ListProjectsResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{6}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{6}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ListProjectsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsResp.Unmarshal(m, b)
@@ -485,6 +521,7 @@ func (m *UpdateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*UpdateProjectReq) ProtoMessage()    {}
 func (*UpdateProjectReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{7}
 =======
 <<<<<<< HEAD
@@ -493,6 +530,9 @@ func (*UpdateProjectReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{7}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{7}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *UpdateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectReq.Unmarshal(m, b)
@@ -538,6 +578,7 @@ func (m *UpdateProjectResp) String() string { return proto.CompactTextString(m) 
 func (*UpdateProjectResp) ProtoMessage()    {}
 func (*UpdateProjectResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{8}
 =======
 <<<<<<< HEAD
@@ -546,6 +587,9 @@ func (*UpdateProjectResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{8}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{8}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *UpdateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectResp.Unmarshal(m, b)
@@ -584,6 +628,7 @@ func (m *DeleteProjectReq) String() string { return proto.CompactTextString(m) }
 func (*DeleteProjectReq) ProtoMessage()    {}
 func (*DeleteProjectReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{9}
 =======
 <<<<<<< HEAD
@@ -592,6 +637,9 @@ func (*DeleteProjectReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{9}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{9}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *DeleteProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectReq.Unmarshal(m, b)
@@ -629,6 +677,7 @@ func (m *DeleteProjectResp) String() string { return proto.CompactTextString(m) 
 func (*DeleteProjectResp) ProtoMessage()    {}
 func (*DeleteProjectResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{10}
 =======
 <<<<<<< HEAD
@@ -637,6 +686,9 @@ func (*DeleteProjectResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{10}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{10}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *DeleteProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectResp.Unmarshal(m, b)
@@ -667,6 +719,7 @@ func (m *ProjectUpdateCancelReq) String() string { return proto.CompactTextStrin
 func (*ProjectUpdateCancelReq) ProtoMessage()    {}
 func (*ProjectUpdateCancelReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{11}
 =======
 <<<<<<< HEAD
@@ -675,6 +728,9 @@ func (*ProjectUpdateCancelReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{11}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{11}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ProjectUpdateCancelReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateCancelReq.Unmarshal(m, b)
@@ -705,6 +761,7 @@ func (m *ProjectUpdateCancelResp) String() string { return proto.CompactTextStri
 func (*ProjectUpdateCancelResp) ProtoMessage()    {}
 func (*ProjectUpdateCancelResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{12}
 =======
 <<<<<<< HEAD
@@ -713,6 +770,9 @@ func (*ProjectUpdateCancelResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{12}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{12}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ProjectUpdateCancelResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateCancelResp.Unmarshal(m, b)
@@ -743,6 +803,7 @@ func (m *ProjectUpdateStatusReq) String() string { return proto.CompactTextStrin
 func (*ProjectUpdateStatusReq) ProtoMessage()    {}
 func (*ProjectUpdateStatusReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{13}
 =======
 <<<<<<< HEAD
@@ -751,6 +812,9 @@ func (*ProjectUpdateStatusReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{13}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{13}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ProjectUpdateStatusReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateStatusReq.Unmarshal(m, b)
@@ -786,6 +850,7 @@ func (m *ProjectUpdateStatusResp) String() string { return proto.CompactTextStri
 func (*ProjectUpdateStatusResp) ProtoMessage()    {}
 func (*ProjectUpdateStatusResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{14}
 =======
 <<<<<<< HEAD
@@ -794,6 +859,9 @@ func (*ProjectUpdateStatusResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{14}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{14}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ProjectUpdateStatusResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateStatusResp.Unmarshal(m, b)
@@ -859,6 +927,7 @@ func (m *ListProjectRulesReq) String() string { return proto.CompactTextString(m
 func (*ListProjectRulesReq) ProtoMessage()    {}
 func (*ListProjectRulesReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{15}
 =======
 <<<<<<< HEAD
@@ -867,6 +936,9 @@ func (*ListProjectRulesReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{15}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{15}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ListProjectRulesReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectRulesReq.Unmarshal(m, b)
@@ -898,6 +970,7 @@ func (m *ProjectCollectionRulesResp) String() string { return proto.CompactTextS
 func (*ProjectCollectionRulesResp) ProtoMessage()    {}
 func (*ProjectCollectionRulesResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{16}
 =======
 <<<<<<< HEAD
@@ -906,6 +979,9 @@ func (*ProjectCollectionRulesResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{16}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{16}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ProjectCollectionRulesResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectCollectionRulesResp.Unmarshal(m, b)
@@ -944,6 +1020,7 @@ func (m *GetProjectRulesReq) String() string { return proto.CompactTextString(m)
 func (*GetProjectRulesReq) ProtoMessage()    {}
 func (*GetProjectRulesReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{17}
 =======
 <<<<<<< HEAD
@@ -952,6 +1029,9 @@ func (*GetProjectRulesReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{17}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{17}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *GetProjectRulesReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectRulesReq.Unmarshal(m, b)
@@ -990,6 +1070,7 @@ func (m *GetProjectRulesResp) String() string { return proto.CompactTextString(m
 func (*GetProjectRulesResp) ProtoMessage()    {}
 func (*GetProjectRulesResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{18}
 =======
 <<<<<<< HEAD
@@ -998,6 +1079,9 @@ func (*GetProjectRulesResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{18}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{18}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *GetProjectRulesResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectRulesResp.Unmarshal(m, b)
@@ -1036,6 +1120,7 @@ func (m *ProjectRules) String() string { return proto.CompactTextString(m) }
 func (*ProjectRules) ProtoMessage()    {}
 func (*ProjectRules) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{19}
 =======
 <<<<<<< HEAD
@@ -1044,6 +1129,9 @@ func (*ProjectRules) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{19}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{19}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ProjectRules) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRules.Unmarshal(m, b)
@@ -1086,6 +1174,7 @@ func (m *ProjectRule) String() string { return proto.CompactTextString(m) }
 func (*ProjectRule) ProtoMessage()    {}
 func (*ProjectRule) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{20}
 =======
 <<<<<<< HEAD
@@ -1094,6 +1183,9 @@ func (*ProjectRule) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{20}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{20}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *ProjectRule) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRule.Unmarshal(m, b)
@@ -1162,6 +1254,7 @@ func (m *Condition) String() string { return proto.CompactTextString(m) }
 func (*Condition) ProtoMessage()    {}
 func (*Condition) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{21}
 =======
 <<<<<<< HEAD
@@ -1170,6 +1263,9 @@ func (*Condition) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{21}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{21}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *Condition) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Condition.Unmarshal(m, b)
@@ -1228,6 +1324,7 @@ func (m *CreateRuleReq) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleReq) ProtoMessage()    {}
 func (*CreateRuleReq) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{22}
 =======
 <<<<<<< HEAD
@@ -1236,6 +1333,9 @@ func (*CreateRuleReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{22}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{22}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *CreateRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleReq.Unmarshal(m, b)
@@ -1302,6 +1402,7 @@ func (m *CreateRuleResp) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleResp) ProtoMessage()    {}
 func (*CreateRuleResp) Descriptor() ([]byte, []int) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return fileDescriptor_project_03d5f849509bcfb9, []int{23}
 =======
 <<<<<<< HEAD
@@ -1310,6 +1411,9 @@ func (*CreateRuleResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_543223da4e92b081, []int{23}
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+	return fileDescriptor_project_fd77d049a339b189, []int{23}
+>>>>>>> api: regen protobufs post-rebase
 }
 func (m *CreateRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleResp.Unmarshal(m, b)
@@ -1347,7 +1451,7 @@ func (m *GetRuleReq) Reset()         { *m = GetRuleReq{} }
 func (m *GetRuleReq) String() string { return proto.CompactTextString(m) }
 func (*GetRuleReq) ProtoMessage()    {}
 func (*GetRuleReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_543223da4e92b081, []int{24}
+	return fileDescriptor_project_fd77d049a339b189, []int{24}
 }
 func (m *GetRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRuleReq.Unmarshal(m, b)
@@ -1385,7 +1489,7 @@ func (m *GetRuleResp) Reset()         { *m = GetRuleResp{} }
 func (m *GetRuleResp) String() string { return proto.CompactTextString(m) }
 func (*GetRuleResp) ProtoMessage()    {}
 func (*GetRuleResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_543223da4e92b081, []int{25}
+	return fileDescriptor_project_fd77d049a339b189, []int{25}
 }
 func (m *GetRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRuleResp.Unmarshal(m, b)
@@ -1888,6 +1992,7 @@ var _Projects_serviceDesc = grpc.ServiceDesc{
 
 func init() {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_03d5f849509bcfb9)
 }
 
@@ -2062,6 +2167,12 @@ var fileDescriptor_project_ecf7fd4118e2186d = []byte{
 }
 
 var fileDescriptor_project_543223da4e92b081 = []byte{
+=======
+	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_fd77d049a339b189)
+}
+
+var fileDescriptor_project_fd77d049a339b189 = []byte{
+>>>>>>> api: regen protobufs post-rebase
 	// 1254 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0xcd, 0x6e, 0xdb, 0xc6,
 	0x13, 0x17, 0xf5, 0xe1, 0x58, 0x23, 0x7f, 0x50, 0xab, 0xbf, 0x13, 0x85, 0x40, 0xf0, 0x37, 0xd8,
@@ -2142,6 +2253,9 @@ var fileDescriptor_project_543223da4e92b081 = []byte{
 	0x95, 0xae, 0x49, 0x4e, 0x06, 0x47, 0x4a, 0xdb, 0xee, 0xab, 0x14, 0xa9, 0x06, 0x48, 0xf5, 0xca,
 	0x3f, 0x2f, 0x8e, 0x66, 0xd8, 0x67, 0xc9, 0x93, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x89, 0xc3,
 	0x14, 0xbe, 0x41, 0x11, 0x00, 0x00,
+<<<<<<< HEAD
 >>>>>>> e6de1ef8... api: generate protobufs
 >>>>>>> api: generate protobufs
+=======
+>>>>>>> api: regen protobufs post-rebase
 }
