@@ -38,6 +38,7 @@ do_unpack() {
 }
 
 do_build() {
+  NG_FORCE_TTY='FALSE'
   for dir in $CACHE_PATH/chef-ui-library $CACHE_PATH/automate-ui; do
     pushd $dir
       echo "Building $dir"
