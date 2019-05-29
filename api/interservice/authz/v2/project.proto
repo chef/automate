@@ -133,7 +133,8 @@ message Condition {
     repeated string values = 2;
 }
 
-// CreateRuleReq subsumes ProjectRule, adding id/project/name
+// CreateRuleReq is ProjectRule, so the input is just one JSON object. Also adds
+// basic validation.
 message CreateRuleReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
     string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
