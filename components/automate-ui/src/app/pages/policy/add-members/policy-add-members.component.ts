@@ -101,7 +101,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
                   this.policy = <Policy>Object.assign({}, policy);
 
                   teams.forEach((team: Team) => {
-                    const member = stringToMember(`team:local:${team.name}`);
+                    const member = stringToMember(`team:local:${team.id}`);
                     this.memberURLs[member.name] = ['/settings', 'teams', team.id];
                     // We'll refresh the sorted map for the chef-table below.
                     this.addAvailableMember(member, false);

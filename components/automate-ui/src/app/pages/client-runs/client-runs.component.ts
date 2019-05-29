@@ -104,6 +104,10 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     {
       type: 'status',
       text: 'Status'
+    },
+    {
+      type: 'error',
+      text: 'Error'
     }
   ];
 

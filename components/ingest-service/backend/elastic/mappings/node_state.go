@@ -134,6 +134,15 @@ var nodeProps = `
 			}
 		}
 	},
+	"error_message": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			}
+		}
+	},
 	"recipes": {
 		"type": "keyword",
 		"fields": {
