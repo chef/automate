@@ -42,7 +42,18 @@ chef-td {
 
   &.release {
     min-width: 160px;
-    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.env {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.app {
+    max-width: 160px;
     overflow: hidden;
     text-overflow: ellipsis;
   }

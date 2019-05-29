@@ -28,6 +28,8 @@ export interface ServiceGroup {
   status: string;
   health_percentage: boolean;
   services_health_counts: HealthSummary;
+  applications: string;
+  environment: string;
 }
 
 export interface ServiceGroupFilters {
@@ -58,4 +60,6 @@ export interface ServiceGroupsPayload {
 export interface FieldDirection {
   name: SortDirection;
   percent_ok: SortDirection;
+  environment: SortDirection;
+  app_name: SortDirection;
 }
