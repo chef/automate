@@ -24,7 +24,7 @@ const (
 //
 // If "Airgap" is set to true it will use the manifest contained in the airgap
 // install bundle
-func LoadBackupManifest(bucket Bucket, r *api.BackupRestoreTask) (manifest.ReleaseManifest, error) {
+func LoadBackupManifest(ctx context.Context, bucket Bucket, r *api.BackupRestoreTask) (manifest.ReleaseManifest, error) {
 	var manifestProvider manifest.ReleaseManifestProvider
 
 	if r.Airgap {
@@ -39,7 +39,7 @@ func LoadBackupManifest(bucket Bucket, r *api.BackupRestoreTask) (manifest.Relea
 	} else {
 		// TODO: currently we don't have a way to validate the manifest itself;
 		// when we do, this needs to not use NoOpObjectVerifier
-		reader, err := bucket.NewReader(context.TODO(), relativeManifestPath, &NoOpObjectVerifier{})
+		reader, err := bucket.NewReader(ctx, relativeManifestPath, &NoOpObjectVerifier{})
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to open package manifest from backup")
 		}
@@ -53,5 +53,5 @@ func LoadBackupManifest(bucket Bucket, r *api.BackupRestoreTask) (manifest.Relea
 		manifestProvider = manifest_client.NewInMemoryClient(data)
 	}
 
-	return manifestProvider.GetCurrentManifest(context.Background(), r.Channel)
+	return manifestProvider.GetCurrentManifest(ctx, r.Channel)
 }

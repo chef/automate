@@ -685,7 +685,6 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	// to STDOUT is the restore task ID after we've started the server side
 	// restore. In that case we need to silence all non-error output in the
 	// deployment restore.
-	// TODO: respect a context deadline in the deployment-service restore
 	dsRestore := client.NewDeploymentRestore(
 		client.WithDeploymentRestoreTask(rt),
 		client.WithDeploymentRestoreSkipPreflight(backupCmdFlags.skipPreflight),

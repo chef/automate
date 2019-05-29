@@ -54,6 +54,7 @@ service Deployment {
 	rpc Usage(UsageRequest) returns (UsageResponse);
 	rpc GetCLIExecutable(GetCLIExecutableRequest) returns (stream GetCLIExecutableResponse);
 	rpc BootstrapBundle (BootstrapBundleRequest) returns (stream BootstrapBundleResponse);
+	rpc SetManifest(SetManifestRequest) returns (SetManifestResponse);
 }
 
 message BootstrapBundleRequest {
@@ -647,4 +648,12 @@ message A1UpgradeStatusResponse {
 		// doing.
 		string info = 4;
 	}
+}
+
+message SetManifestRequest {
+	ReleaseManifest manifest = 1;
+	// bool upgrade = 2;
+}
+
+message SetManifestResponse {
 }

@@ -69,14 +69,14 @@ func TestLoadMetadataVerifier(t *testing.T) {
 		err = w.Close()
 		require.NoError(t, err)
 
-		_, err = LoadMetadataVerifier(bucket, "incorrect-sha256-for-test")
+		_, err = LoadMetadataVerifier(ctx, bucket, "incorrect-sha256-for-test")
 		require.Error(t, err)
 	})
 
 	t.Run("returns a SHA256Verifier when the checksums file exists", func(t *testing.T) {
 		bucketReader := newChecksummingReader(ioutil.NopCloser(bytes.NewBuffer(mdChecksumsJSON)))
 		bucket := &mockBucket{reader: bucketReader}
-		verifier, err := LoadMetadataVerifier(bucket, "")
+		verifier, err := LoadMetadataVerifier(context.Background(), bucket, "")
 		require.NoError(t, err)
 		require.IsType(t, &SHA256Verifier{}, verifier)
 
@@ -87,7 +87,7 @@ func TestLoadMetadataVerifier(t *testing.T) {
 
 	t.Run("returns a no op verifier when the checksums file doesn't exist", func(t *testing.T) {
 		bucket := &noExistBucket{}
-		verifier, err := LoadMetadataVerifier(bucket, "")
+		verifier, err := LoadMetadataVerifier(context.Background(), bucket, "")
 		require.NoError(t, err)
 		assert.Equal(t, &NoOpObjectVerifier{}, verifier)
 	})
@@ -136,7 +136,7 @@ func TestLoadMetadataVerification(t *testing.T) {
 	t.Run("loads the metadata when the metadata file is successfully verified", func(t *testing.T) {
 		bucket, cleanup := setupFsBucketMetadata(t, metadataJSON)
 		defer cleanup()
-		md, err := LoadServiceMetadata(bucket, "example", verifier)
+		md, err := LoadServiceMetadata(context.Background(), bucket, "example", verifier)
 		require.NoError(t, err)
 		assert.IsType(t, &Metadata{}, md)
 	})
@@ -148,7 +148,7 @@ func TestLoadMetadataVerification(t *testing.T) {
 
 		bucket, cleanup := setupFsBucketMetadata(t, badMetadataJSON)
 		defer cleanup()
-		_, err := LoadServiceMetadata(bucket, "example", verifier)
+		_, err := LoadServiceMetadata(context.Background(), bucket, "example", verifier)
 		require.Error(t, err)
 	})
 
@@ -159,7 +159,7 @@ func TestLoadMetadataVerification(t *testing.T) {
 		bucket, cleanup := setupFsBucketMetadata(t, metadataJSON)
 		defer cleanup()
 
-		_, err := LoadServiceMetadata(bucket, "example", verifier)
+		_, err := LoadServiceMetadata(context.Background(), bucket, "example", verifier)
 		require.Error(t, err)
 	})
 }

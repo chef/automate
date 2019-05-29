@@ -6,8 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/pkg/errors"
-
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/parser"
@@ -30,7 +28,7 @@ func NewPathClient(path string) *Path {
 func (d *Path) GetCurrentManifest(_ context.Context, channel string) (*manifest.A2, error) {
 	stat, err := os.Stat(d.path)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read manifest")
+		return nil, manifest.NewErrNoSuchManifest(err)
 	}
 	path := d.path
 
@@ -44,7 +42,7 @@ func (d *Path) GetCurrentManifest(_ context.Context, channel string) (*manifest.
 func (d *Path) GetManifest(_ context.Context, release string) (*manifest.A2, error) {
 	stat, err := os.Stat(d.path)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read manifest")
+		return nil, manifest.NewErrNoSuchManifest(err)
 	}
 	path := d.path
 
@@ -58,12 +56,12 @@ func (d *Path) GetManifest(_ context.Context, release string) (*manifest.A2, err
 func (d *Path) manifestFromPath(path string) (*manifest.A2, error) {
 	body, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read manifest at path '%s'", path)
+		return nil, manifest.NewErrNoSuchManifest(err)
 	}
 
 	m, err := parser.ManifestFromBytes(body)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse manifest loaded from '%s'", path)
+		return nil, err
 	}
 
 	if m.HartOverrides == nil {

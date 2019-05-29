@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 )
 
@@ -55,7 +56,8 @@ func TestDirectoryGetCurrentManifestWhenDoesntExist(t *testing.T) {
 	client := client.NewPathClient(dir)
 	_, err = client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to read manifest at path")
+	_, ok := err.(*manifest.ErrNoSuchManifest)
+	require.True(t, ok, "error should be a ErrNoSuchManifest")
 }
 
 func TestDirectoryGetCurrentManifestWhenInvalid(t *testing.T) {
@@ -69,7 +71,8 @@ func TestDirectoryGetCurrentManifestWhenInvalid(t *testing.T) {
 	client := client.NewPathClient(dir)
 	_, err = client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to parse manifest loaded from")
+	_, ok := err.(*manifest.ErrInvalidSchema)
+	require.True(t, ok, "error should be a ErrInvalidSchema")
 }
 
 func TestFileGetCurrentManifestA2(t *testing.T) {
@@ -141,7 +144,8 @@ func TestFileGetCurrentManifestWhenDoesntExist(t *testing.T) {
 	client := client.NewPathClient(filename)
 	_, err = client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to read manifest")
+	_, ok := err.(*manifest.ErrNoSuchManifest)
+	require.True(t, ok, "error should be a ErrNoSuchManifest")
 }
 
 func TestFileGetCurrentManifestWhenInvalid(t *testing.T) {
@@ -155,7 +159,8 @@ func TestFileGetCurrentManifestWhenInvalid(t *testing.T) {
 	err = ioutil.WriteFile(filename, []byte("::::::"), 0700)
 	_, err = client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to parse manifest loaded from")
+	_, ok := err.(*manifest.ErrInvalidSchema)
+	require.True(t, ok, "error should be a ErrInvalidSchema")
 }
 
 func TestFileGetManifest(t *testing.T) {

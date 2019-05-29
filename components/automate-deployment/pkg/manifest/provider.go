@@ -2,17 +2,12 @@ package manifest
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
-)
-
-var (
-	NoSuchManifest = errors.New("No such manifest found")
 )
 
 // A ReleaseManifestProvider is something that can return a manifest
