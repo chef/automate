@@ -31,6 +31,3 @@ touch /etc/delivery/.a1-migration-data-ready
 
 echo "A1 configuration and data loaded"
 
-# Run forever
-set +x
-while :; do sleep 1; done

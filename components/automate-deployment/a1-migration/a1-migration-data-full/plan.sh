@@ -17,6 +17,9 @@ pkg_build_deps=(
 )
 pkg_svc_user=root
 pkg_svc_group=root
+# Workaround to ensure install hook runs as root:
+# https://github.com/habitat-sh/habitat/issues/6341
+pkg_svc_run="return 0"
 
 do_build() {
   return 0
