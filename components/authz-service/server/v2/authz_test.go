@@ -151,9 +151,8 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 		ctx, ts := setupV2AuthTests(t, &eng)
 
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
-			&api_v2.FilterAuthorizedPairsReq{
+			&api_v2.FilterAuthorizedProjectsReq{
 				Subjects: []string{"user:local:admin"},
-				Pairs:    []*api_v2.Pair{},
 			})
 		require.NoError(t, err)
 		assert.Equal(t, expProjects, resp.Projects)
@@ -168,9 +167,8 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 		allProjects := []string{"project-1", "project-2", "(unassigned)"}
 
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
-			&api_v2.FilterAuthorizedPairsReq{
+			&api_v2.FilterAuthorizedProjectsReq{
 				Subjects: []string{"user:local:admin"},
-				Pairs:    []*api_v2.Pair{},
 			})
 		require.NoError(t, err)
 		assert.ElementsMatch(t, allProjects, resp.Projects)
