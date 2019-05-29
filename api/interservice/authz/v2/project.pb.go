@@ -46,7 +46,7 @@ func (x ProjectRuleTypes) String() string {
 	return proto.EnumName(ProjectRuleTypes_name, int32(x))
 }
 func (ProjectRuleTypes) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{0}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{0}
 }
 
 type ProjectRuleConditionTypes int32
@@ -84,7 +84,7 @@ func (x ProjectRuleConditionTypes) String() string {
 	return proto.EnumName(ProjectRuleConditionTypes_name, int32(x))
 }
 func (ProjectRuleConditionTypes) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{1}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{1}
 }
 
 type Project struct {
@@ -101,7 +101,7 @@ func (m *Project) Reset()         { *m = Project{} }
 func (m *Project) String() string { return proto.CompactTextString(m) }
 func (*Project) ProtoMessage()    {}
 func (*Project) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{0}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{0}
 }
 func (m *Project) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Project.Unmarshal(m, b)
@@ -161,7 +161,7 @@ func (m *CreateProjectReq) Reset()         { *m = CreateProjectReq{} }
 func (m *CreateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*CreateProjectReq) ProtoMessage()    {}
 func (*CreateProjectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{1}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{1}
 }
 func (m *CreateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectReq.Unmarshal(m, b)
@@ -206,7 +206,7 @@ func (m *CreateProjectResp) Reset()         { *m = CreateProjectResp{} }
 func (m *CreateProjectResp) String() string { return proto.CompactTextString(m) }
 func (*CreateProjectResp) ProtoMessage()    {}
 func (*CreateProjectResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{2}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{2}
 }
 func (m *CreateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectResp.Unmarshal(m, b)
@@ -244,7 +244,7 @@ func (m *GetProjectReq) Reset()         { *m = GetProjectReq{} }
 func (m *GetProjectReq) String() string { return proto.CompactTextString(m) }
 func (*GetProjectReq) ProtoMessage()    {}
 func (*GetProjectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{3}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{3}
 }
 func (m *GetProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectReq.Unmarshal(m, b)
@@ -282,7 +282,7 @@ func (m *GetProjectResp) Reset()         { *m = GetProjectResp{} }
 func (m *GetProjectResp) String() string { return proto.CompactTextString(m) }
 func (*GetProjectResp) ProtoMessage()    {}
 func (*GetProjectResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{4}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{4}
 }
 func (m *GetProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectResp.Unmarshal(m, b)
@@ -319,7 +319,7 @@ func (m *ListProjectsReq) Reset()         { *m = ListProjectsReq{} }
 func (m *ListProjectsReq) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsReq) ProtoMessage()    {}
 func (*ListProjectsReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{5}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{5}
 }
 func (m *ListProjectsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsReq.Unmarshal(m, b)
@@ -350,7 +350,7 @@ func (m *ListProjectsResp) Reset()         { *m = ListProjectsResp{} }
 func (m *ListProjectsResp) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsResp) ProtoMessage()    {}
 func (*ListProjectsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{6}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{6}
 }
 func (m *ListProjectsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsResp.Unmarshal(m, b)
@@ -389,7 +389,7 @@ func (m *UpdateProjectReq) Reset()         { *m = UpdateProjectReq{} }
 func (m *UpdateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*UpdateProjectReq) ProtoMessage()    {}
 func (*UpdateProjectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{7}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{7}
 }
 func (m *UpdateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectReq.Unmarshal(m, b)
@@ -434,7 +434,7 @@ func (m *UpdateProjectResp) Reset()         { *m = UpdateProjectResp{} }
 func (m *UpdateProjectResp) String() string { return proto.CompactTextString(m) }
 func (*UpdateProjectResp) ProtoMessage()    {}
 func (*UpdateProjectResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{8}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{8}
 }
 func (m *UpdateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectResp.Unmarshal(m, b)
@@ -472,7 +472,7 @@ func (m *DeleteProjectReq) Reset()         { *m = DeleteProjectReq{} }
 func (m *DeleteProjectReq) String() string { return proto.CompactTextString(m) }
 func (*DeleteProjectReq) ProtoMessage()    {}
 func (*DeleteProjectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{9}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{9}
 }
 func (m *DeleteProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectReq.Unmarshal(m, b)
@@ -509,7 +509,7 @@ func (m *DeleteProjectResp) Reset()         { *m = DeleteProjectResp{} }
 func (m *DeleteProjectResp) String() string { return proto.CompactTextString(m) }
 func (*DeleteProjectResp) ProtoMessage()    {}
 func (*DeleteProjectResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{10}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{10}
 }
 func (m *DeleteProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectResp.Unmarshal(m, b)
@@ -539,7 +539,7 @@ func (m *ProjectUpdateCancelReq) Reset()         { *m = ProjectUpdateCancelReq{}
 func (m *ProjectUpdateCancelReq) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateCancelReq) ProtoMessage()    {}
 func (*ProjectUpdateCancelReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{11}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{11}
 }
 func (m *ProjectUpdateCancelReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateCancelReq.Unmarshal(m, b)
@@ -569,7 +569,7 @@ func (m *ProjectUpdateCancelResp) Reset()         { *m = ProjectUpdateCancelResp
 func (m *ProjectUpdateCancelResp) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateCancelResp) ProtoMessage()    {}
 func (*ProjectUpdateCancelResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{12}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{12}
 }
 func (m *ProjectUpdateCancelResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateCancelResp.Unmarshal(m, b)
@@ -599,7 +599,7 @@ func (m *ProjectUpdateStatusReq) Reset()         { *m = ProjectUpdateStatusReq{}
 func (m *ProjectUpdateStatusReq) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateStatusReq) ProtoMessage()    {}
 func (*ProjectUpdateStatusReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{13}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{13}
 }
 func (m *ProjectUpdateStatusReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateStatusReq.Unmarshal(m, b)
@@ -634,7 +634,7 @@ func (m *ProjectUpdateStatusResp) Reset()         { *m = ProjectUpdateStatusResp
 func (m *ProjectUpdateStatusResp) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateStatusResp) ProtoMessage()    {}
 func (*ProjectUpdateStatusResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{14}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{14}
 }
 func (m *ProjectUpdateStatusResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateStatusResp.Unmarshal(m, b)
@@ -699,7 +699,7 @@ func (m *ListProjectRulesReq) Reset()         { *m = ListProjectRulesReq{} }
 func (m *ListProjectRulesReq) String() string { return proto.CompactTextString(m) }
 func (*ListProjectRulesReq) ProtoMessage()    {}
 func (*ListProjectRulesReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{15}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{15}
 }
 func (m *ListProjectRulesReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectRulesReq.Unmarshal(m, b)
@@ -730,7 +730,7 @@ func (m *ProjectCollectionRulesResp) Reset()         { *m = ProjectCollectionRul
 func (m *ProjectCollectionRulesResp) String() string { return proto.CompactTextString(m) }
 func (*ProjectCollectionRulesResp) ProtoMessage()    {}
 func (*ProjectCollectionRulesResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{16}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{16}
 }
 func (m *ProjectCollectionRulesResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectCollectionRulesResp.Unmarshal(m, b)
@@ -768,7 +768,7 @@ func (m *GetProjectRulesReq) Reset()         { *m = GetProjectRulesReq{} }
 func (m *GetProjectRulesReq) String() string { return proto.CompactTextString(m) }
 func (*GetProjectRulesReq) ProtoMessage()    {}
 func (*GetProjectRulesReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{17}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{17}
 }
 func (m *GetProjectRulesReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectRulesReq.Unmarshal(m, b)
@@ -806,7 +806,7 @@ func (m *GetProjectRulesResp) Reset()         { *m = GetProjectRulesResp{} }
 func (m *GetProjectRulesResp) String() string { return proto.CompactTextString(m) }
 func (*GetProjectRulesResp) ProtoMessage()    {}
 func (*GetProjectRulesResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{18}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{18}
 }
 func (m *GetProjectRulesResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectRulesResp.Unmarshal(m, b)
@@ -844,7 +844,7 @@ func (m *ProjectRules) Reset()         { *m = ProjectRules{} }
 func (m *ProjectRules) String() string { return proto.CompactTextString(m) }
 func (*ProjectRules) ProtoMessage()    {}
 func (*ProjectRules) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{19}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{19}
 }
 func (m *ProjectRules) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRules.Unmarshal(m, b)
@@ -886,7 +886,7 @@ func (m *ProjectRule) Reset()         { *m = ProjectRule{} }
 func (m *ProjectRule) String() string { return proto.CompactTextString(m) }
 func (*ProjectRule) ProtoMessage()    {}
 func (*ProjectRule) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{20}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{20}
 }
 func (m *ProjectRule) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRule.Unmarshal(m, b)
@@ -953,7 +953,7 @@ func (m *Condition) Reset()         { *m = Condition{} }
 func (m *Condition) String() string { return proto.CompactTextString(m) }
 func (*Condition) ProtoMessage()    {}
 func (*Condition) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{21}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{21}
 }
 func (m *Condition) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Condition.Unmarshal(m, b)
@@ -987,7 +987,8 @@ func (m *Condition) GetValues() []string {
 	return nil
 }
 
-// CreateRuleReq subsumes ProjectRule, adding id/project/name
+// CreateRuleReq is ProjectRule, so the input is just one JSON object. Also adds
+// basic validation.
 type CreateRuleReq struct {
 	Id                   string           `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
 	ProjectId            string           `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty" toml:"project_id,omitempty" mapstructure:"project_id,omitempty"`
@@ -1003,7 +1004,7 @@ func (m *CreateRuleReq) Reset()         { *m = CreateRuleReq{} }
 func (m *CreateRuleReq) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleReq) ProtoMessage()    {}
 func (*CreateRuleReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{22}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{22}
 }
 func (m *CreateRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleReq.Unmarshal(m, b)
@@ -1069,7 +1070,7 @@ func (m *CreateRuleResp) Reset()         { *m = CreateRuleResp{} }
 func (m *CreateRuleResp) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleResp) ProtoMessage()    {}
 func (*CreateRuleResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_e24ac2efeee0c639, []int{23}
+	return fileDescriptor_project_ecf7fd4118e2186d, []int{23}
 }
 func (m *CreateRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleResp.Unmarshal(m, b)
@@ -1535,10 +1536,10 @@ var _Projects_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_e24ac2efeee0c639)
+	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_ecf7fd4118e2186d)
 }
 
-var fileDescriptor_project_e24ac2efeee0c639 = []byte{
+var fileDescriptor_project_ecf7fd4118e2186d = []byte{
 	// 1219 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0xcd, 0x6e, 0xdb, 0xc6,
 	0x13, 0x17, 0xf5, 0xe1, 0x58, 0xe3, 0x2f, 0x6a, 0xf5, 0x77, 0xac, 0x10, 0x30, 0xfe, 0x06, 0x1b,
