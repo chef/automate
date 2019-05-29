@@ -38,6 +38,9 @@ do_unpack() {
 }
 
 do_build() {
+  # Disabling Usage Analytics
+  export NG_CLI_ANALYTICS=false
+
   for dir in $CACHE_PATH/chef-ui-library $CACHE_PATH/automate-ui; do
     pushd $dir
       echo "Building $dir"
@@ -61,6 +64,7 @@ do_build() {
       for b in node_modules/.bin/*; do
         fix_interpreter "$(readlink -f -n "$b")" core/coreutils bin/env
       done
+
       # Compile the Angular application
       npm run build:prod
 
