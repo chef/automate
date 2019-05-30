@@ -194,7 +194,6 @@ RETURNS VOID
 AS $$
     INSERT INTO workflow_events(event_type, workflow_instance_id)
         VALUES('cancel', workflow_instance_id);
-    -- TODO: notify
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION abandon_workflow(_workflow_instance_id BIGINT, eid BIGINT, _completed_tasks INTEGER)
@@ -214,13 +213,6 @@ AS $$
 
     INSERT INTO workflow_events(event_type, workflow_instance_id)
         VALUES('tasks_abandoned', _workflow_instance_id);
-$$ LANGUAGE SQL;
-
-
-CREATE OR REPLACE FUNCTION cancel_workflow(workflow_instance_id BIGINT)
-RETURNS VOID
-AS $$
-    DELETE FROM workflow_instances WHERE id=workflow_instance_id;
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION complete_workflow(wid BIGINT)
