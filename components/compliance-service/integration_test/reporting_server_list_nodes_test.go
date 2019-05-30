@@ -229,6 +229,52 @@ func TestListNodesFiltering(t *testing.T) {
 			},
 			expectedIds: []string{},
 		},
+
+		// policy_name
+		{
+			description: "Filter out one of the nodes with the policy name",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:     "1",
+					PolicyName: "org1",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "org2",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "policy_name",
+						Values: []string{"org1"},
+					},
+				},
+			},
+			expectedIds: []string{"1"},
+		},
+		{
+			description: "Filter out all of the nodes by policy name",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:     "1",
+					PolicyName: "org1",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "org2",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "policy_name",
+						Values: []string{"org3"},
+					},
+				},
+			},
+			expectedIds: []string{},
+		},
 	}
 
 	for _, test := range cases {

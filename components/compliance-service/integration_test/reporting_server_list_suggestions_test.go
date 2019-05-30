@@ -298,6 +298,74 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			},
 			expectedTerms: []string{},
 		},
+
+		// policy_name
+		{
+			description: "Only two policy names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					PolicyName: "org1",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "org2",
+				},
+				{
+					NodeID:     "3",
+					PolicyName: "bob",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_name",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All policy names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					PolicyName: "org1",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "org2",
+				},
+				{
+					NodeID:     "3",
+					PolicyName: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_name",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No policy names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					PolicyName: "org1",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "org2",
+				},
+				{
+					NodeID:     "3",
+					PolicyName: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_name",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
 	}
 
 	for _, test := range cases {
