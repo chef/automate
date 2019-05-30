@@ -7,10 +7,7 @@ describe('chef-badge', () => {
   beforeEach(async () => {
     page = await newE2EPage();
     await page.setContent(`
-      <chef-badge>
-        <chef-icon>check</chef-icon>
-        <span>Badge Text</span>
-      </chef-badge>
+      <chef-badge>Badge Text</chef-badge>
     `);
     element = await page.find('chef-badge');
   });
@@ -19,72 +16,57 @@ describe('chef-badge', () => {
     expect(element).toHaveClass('hydrated');
   });
 
-  it('displays slotted content', async () => {
-    expect(await element.find('chef-icon')).toBeTruthy();
-  });
-
-  describe('when `type` prop is not set', () => {
-    it('defaults `type` attr to `badge`', async () => {
-      expect(element.getAttribute('type')).toEqual('badge');
+  describe('when `no-data` prop is not set', () => {
+    it('defaults `no-data` attr to `false`', async () => {
+      expect(element.getAttribute('noData')).toBeNull();
     });
   });
 
-  describe('when `type` prop is set', () => {
-    it('sets `type` attr to prop val', async () => {
-      element.setProperty('type', 'reset');
-      await page.waitForChanges();
-
-      expect(element.getAttribute('type')).toEqual('reset');
-    });
-  });
-
-  describe('when `disabled` property is false', () => {
+  describe('when `no-data` property is true', () => {
     beforeEach(async () => {
-      element.setProperty('disabled', false);
+      element.setProperty('noData', true);
       await page.waitForChanges();
     });
 
-    it('does not have an `aria-disabled` attribute', async () => {
-      expect(element.hasAttribute('aria-disabled')).toEqual(false);
+    it('has an `no-data` attribute', async () => {
+      expect(element.getAttribute('noData')).toBeNull();
     });
   });
 
-  describe('when `disabled` property is true', () => {
+  describe('when `id` property is set', () => {
     beforeEach(async () => {
-      element.setProperty('disabled', true);
+      element.setProperty('id', 'myId');
       await page.waitForChanges();
     });
 
-    it('has an `aria-disabled` attribute', async () => {
-      expect(element.hasAttribute('aria-disabled')).toEqual(true);
+    it('has an `id` attribute', async () => {
+      expect(element.getAttribute('id')).toEqual('myId');
     });
   });
 
-  describe('when clicked', () => {
+  describe('when `id` property is not set', () => {
+
+    it('will not have a `id` attribute', async () => {
+      expect(element.getAttribute('id')).toBeNull();
+    });
+  });
+
+  describe('when `tooltip` property is set', () => {
     beforeEach(async () => {
-      await page.$eval('chef-badge', el => {
-        el.addEventListener('click', () => el.innerHTML = 'clicked');
-      });
+      element.setProperty('id', 'myId');
+      element.setProperty('tooltip', 'Tooltip');
       await page.waitForChanges();
     });
 
-    it('triggers click handlers', async () => {
-      await element.click();
-      await page.waitForChanges();
-      expect(element).toEqualText('clicked');
+    it('has an `tooltip` attribute', async () => {
+      expect(element.getAttribute('tooltip')).toEqual('Tooltip');
     });
+  });
 
-    describe('and when disabled', () => {
-      beforeEach(async () => {
-        element.setProperty('disabled', true);
-        await page.waitForChanges();
-      });
+  describe('when `tooltip` property is not set', () => {
 
-      it('does not trigger click handlers', async () => {
-        await element.click();
-        await page.waitForChanges();
-        expect(element).not.toEqualText('clicked');
-      });
+    it('will not have a `tooltip` attribute', async () => {
+      expect(element.getAttribute('tooltip')).toBeNull();
     });
   });
 });
