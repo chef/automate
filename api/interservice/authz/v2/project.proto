@@ -32,8 +32,7 @@ message GetProjectResp {
     Project project = 1;
 }
 
-message ListProjectsReq {
-}
+message ListProjectsReq {}
 
 message ListProjectsResp {
     repeated Project projects = 1;
@@ -72,13 +71,15 @@ service Projects {
 
     // "proper" methods go here (and the ones above will be phased out eventually)
     rpc CreateRule(CreateRuleReq) returns (CreateRuleResp) {};
+    rpc GetRule(GetRuleReq) returns (GetRuleResp) {};
+    rpc ListRules(ListRulesReq) returns (ListRulesResp) {};
 }
 
-message ProjectUpdateCancelReq { }
+message ProjectUpdateCancelReq {}
 
-message ProjectUpdateCancelResp { }
+message ProjectUpdateCancelResp {}
 
-message ProjectUpdateStatusReq { }
+message ProjectUpdateStatusReq {}
 
 message ProjectUpdateStatusResp {
     string state = 1;
@@ -151,4 +152,18 @@ message CreateRuleReq {
 
 message CreateRuleResp {
     ProjectRule rule = 1;
+}
+
+message GetRuleReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+}
+
+message GetRuleResp {
+    ProjectRule rule = 1;
+}
+
+message ListRulesReq {}
+
+message ListRulesResp {
+    repeated ProjectRule rules = 1;
 }

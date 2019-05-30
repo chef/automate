@@ -7,6 +7,7 @@ import (
 
 	cache "github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
@@ -143,6 +144,157 @@ func TestCreateRule(t *testing.T) {
 					},
 				},
 			}, resp)
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		store.Flush()
+	}
+}
+
+func TestGetRule(t *testing.T) {
+	ctx := context.Background()
+	cl, store, _, _ := setupRules(t)
+
+	apiConditions := []*api.Condition{
+		{
+			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values:   []string{"opscode"},
+			Operator: api.ProjectRuleConditionOperators_EQUALS,
+		},
+	}
+	storageConditions := []storage.Condition{
+		{
+			Type:      storage.Node,
+			Attribute: storage.Organization,
+			Operator:  storage.Equals,
+			Value:     []string{"opscode"},
+		},
+	}
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"if the rule id is empty, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: ""})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "no_underscore_allowed"})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the rule does not exist, returns 'not found'", func(t *testing.T) {
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "foo"})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
+		{"if there are multiple rules and one matches the requested ID, returns the matching rule", func(t *testing.T) {
+			id := "foo-rule"
+			projectID := "foo-project"
+			name := "my coo foo rule"
+			addRuleToStore(t, store, id, name, storage.Node, projectID, storageConditions)
+			addRuleToStore(t, store, "bar-rule", "bar rule", storage.Event, projectID, storageConditions)
+			expectedRule := api.ProjectRule{
+				Id:         id,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_NODE,
+				ProjectId:  projectID,
+				Conditions: apiConditions,
+			}
+
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: id})
+			require.NoError(t, err)
+			assert.Equal(t, &expectedRule, resp.Rule)
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		store.Flush()
+	}
+}
+
+func TestListRules(t *testing.T) {
+	ctx := context.Background()
+	cl, store, _, _ := setupRules(t)
+
+	apiConditions1 := []*api.Condition{
+		{
+			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values: []string{"opscode", "chef"},
+			Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+		},
+	}
+	storageConditions1 := []storage.Condition{
+		{
+			Type:      storage.Node,
+			Attribute: storage.Organization,
+			Operator:  storage.MemberOf,
+			Value:     []string{"opscode", "chef"},
+		},
+	}
+	apiConditions2 := []*api.Condition{
+		{
+			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values: []string{"chef"},
+			Operator: api.ProjectRuleConditionOperators_EQUALS,
+		},
+	}
+	storageConditions2 := []storage.Condition{
+		{
+			Type:      storage.Event,
+			Attribute: storage.Organization,
+			Operator:  storage.Equals,
+			Value:     []string{"chef"},
+		},
+	}
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"if no rules exist, returns empty list", func(t *testing.T) {
+			resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
+			require.NoError(t, err)
+			assert.Equal(t, &api.ListRulesResp{}, resp)
+		}},
+		{"if multiple rules exist, returns all rules", func(t *testing.T) {
+			id1, id2 := "rule-number-1", "rule-number-2"
+			projectID := "foo-project"
+			name := "you don't talk about fight club"
+			addRuleToStore(t, store, id1, name, storage.Node, projectID, storageConditions1)
+			addRuleToStore(t, store, id2, name, storage.Event, projectID, storageConditions2)
+			expected1 := api.ProjectRule{
+				Id:         id1,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_NODE,
+				ProjectId:  projectID,
+				Conditions: apiConditions1,
+			}
+			expected2 := api.ProjectRule{
+				Id:         id2,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_EVENT,
+				ProjectId:  projectID,
+				Conditions: apiConditions2,
+			}
+			expected := []*api.ProjectRule{&expected1, &expected2}
+
+			resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
+			require.NoError(t, err)
+			assert.ElementsMatch(t, expected, resp.Rules)
 		}},
 	}
 

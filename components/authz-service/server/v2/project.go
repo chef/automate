@@ -333,6 +333,43 @@ func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.Cr
 	return &api.CreateRuleResp{Rule: apiRule}, nil
 }
 
+func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
+	resp, err := s.store.GetRule(ctx, req.Id)
+	if err != nil {
+		if err == storage_errors.ErrNotFound {
+			return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
+		}
+		return nil, status.Errorf(codes.Internal,
+			"error retrieving rule with ID %q: %s", req.Id, err.Error())
+	}
+
+	apiRule, err := fromStorageRule(resp)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal,
+			"error converting rule with ID %q: %s", resp.ID, err.Error())
+	}
+	return &api.GetRuleResp{Rule: apiRule}, nil
+}
+
+func (s *state) ListRules(ctx context.Context, req *api.ListRulesReq) (*api.ListRulesResp, error) {
+	resp, err := s.store.ListRules(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
+	}
+
+	rules := make([]*api.ProjectRule, len(resp))
+	for i, rule := range resp {
+		apiRule, err := fromStorageRule(rule)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal,
+				"error converting rule with ID %q: %s", rule.ID, err.Error())
+		}
+		rules[i] = apiRule
+	}
+
+	return &api.ListRulesResp{Rules: rules}, nil
+}
+
 func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition) ([]storage.Condition, error) {
 	cs := make([]storage.Condition, len(apiConditions))
 	for i, c := range apiConditions {

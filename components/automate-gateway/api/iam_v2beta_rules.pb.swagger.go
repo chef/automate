@@ -19,6 +19,20 @@ func init() {
   ],
   "paths": {
     "/iam/v2beta/rules": {
+      "get": {
+        "operationId": "ListRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListRulesResp"
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      },
       "post": {
         "operationId": "CreateRule",
         "responses": {
@@ -37,6 +51,30 @@ func init() {
             "schema": {
               "$ref": "#/definitions/v2betaCreateRuleReq"
             }
+          }
+        ],
+        "tags": [
+          "Rules"
+        ]
+      }
+    },
+    "/iam/v2beta/rules/{id}": {
+      "get": {
+        "operationId": "GetRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetRuleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -114,6 +152,25 @@ func init() {
       "properties": {
         "rule": {
           "$ref": "#/definitions/v2betaRule"
+        }
+      }
+    },
+    "v2betaGetRuleResp": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v2betaRule"
+        }
+      }
+    },
+    "v2betaListRulesResp": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaRule"
+          }
         }
       }
     },
