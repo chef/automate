@@ -75,6 +75,15 @@ func (s *Server) ListRules(ctx context.Context, req *pb_req.ListRulesReq) (*pb_r
 	}, nil
 }
 
+func (s *Server) DeleteRule(ctx context.Context, req *pb_req.DeleteRuleReq) (*pb_resp.DeleteRuleResp, error) {
+	_, err := s.projects.DeleteRule(ctx, &authz.DeleteRuleReq{Id: req.Id})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb_resp.DeleteRuleResp{}, nil
+}
+
 func fromExternal(req *pb_req.CreateRuleReq) (*authz.CreateRuleReq, error) {
 	t, err := fromExternalType(req.Type)
 	if err != nil {
