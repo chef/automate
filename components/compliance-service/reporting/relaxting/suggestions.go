@@ -36,6 +36,7 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 		"organization": "organization_name",
 		"chef_server":  "source_fqdn",
 		"chef_tags":    "chef_tags",
+		"policy_group": "policy_group",
 	}
 
 	target, ok := SUGGESTIONS_TYPES[typeParam]

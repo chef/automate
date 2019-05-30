@@ -230,6 +230,74 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			},
 			expectedTerms: []string{},
 		},
+
+		// policy_group
+		{
+			description: "Only two policy groups are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:      "1",
+					PolicyGroup: "org1",
+				},
+				{
+					NodeID:      "2",
+					PolicyGroup: "org2",
+				},
+				{
+					NodeID:      "3",
+					PolicyGroup: "bob",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_group",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All policy groups are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:      "1",
+					PolicyGroup: "org1",
+				},
+				{
+					NodeID:      "2",
+					PolicyGroup: "org2",
+				},
+				{
+					NodeID:      "3",
+					PolicyGroup: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_group",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No policy groups are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:      "1",
+					PolicyGroup: "org1",
+				},
+				{
+					NodeID:      "2",
+					PolicyGroup: "org2",
+				},
+				{
+					NodeID:      "3",
+					PolicyGroup: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_group",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
 	}
 
 	for _, test := range cases {
