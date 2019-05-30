@@ -215,13 +215,6 @@ AS $$
         VALUES('tasks_abandoned', _workflow_instance_id);
 $$ LANGUAGE SQL;
 
-
-CREATE OR REPLACE FUNCTION cancel_workflow(workflow_instance_id BIGINT)
-RETURNS VOID
-AS $$
-    DELETE FROM workflow_instances WHERE id=workflow_instance_id;
-$$ LANGUAGE SQL;
-
 CREATE OR REPLACE FUNCTION complete_workflow(wid BIGINT)
 RETURNS VOID
 LANGUAGE SQL
