@@ -237,47 +237,12 @@ func (refresher *policyRefresher) getRoleMap(ctx context.Context) (map[string]in
 	return data, nil
 }
 
-// TODO: mocked struct that will eventually be
-// the storage struct.
-type rule struct {
-	ID     string
-	Type   string
-	Values []string
-}
-
-// TODO: nolint can go away when connected to the database
-// nolint: unparam
-func (refresher *policyRefresher) getRuleMap(_ context.Context) (map[string][]interface{}, error) {
-	// Mocked rule data
-	// notlint: gofmt
-	// rules := [5]*rule{
-	// 	{
-	// 		ID:     "project1",
-	// 		Type:   "ChefServers",
-	// 		Values: []string{"chef-server-1", "chef-server-2", "chef-server-3"},
-	// 	},
-	// 	{
-	// 		ID:     "project2",
-	// 		Type:   "ChefOrgs",
-	// 		Values: []string{"Org1", "Org2"},
-	// 	},
-	// 	{
-	// 		ID:     "project2",
-	// 		Type:   "ChefServers",
-	// 		Values: []string{"chef-server-3", "chef-server-4", "chef-server-5"},
-	// 	},
-	// 	{
-	// 		ID:     "project3",
-	// 		Type:   "ChefEnvironment",
-	// 		Values: []string{"env-1", "env-2", "env-3"},
-	// 	},
-	// 	{
-	// 		ID:     "project4",
-	// 		Type:   "ChefEnvironment",
-	// 		Values: []string{"env-4", "env-5", "env-6"},
-	// 	},
-	// }
-	rules := []*rule{}
+func (refresher *policyRefresher) getRuleMap(ctx context.Context) (map[string][]interface{}, error) {
+	var rules []*storage.Rule
+	var err error
+	if rules, err = refresher.store.ListRules(ctx); err != nil {
+		return nil, err
+	}
 
 	refresher.log.Infof("initializing OPA store with %d V2 project rule mappings", len(rules))
 
@@ -287,11 +252,28 @@ func (refresher *policyRefresher) getRuleMap(_ context.Context) (map[string][]in
 		if _, ok := data[r.ID]; !ok {
 			data[r.ID] = make([]interface{}, 0)
 		}
+
+		conditions := make([]interface{}, len(r.Conditions))
+		for i, condition := range r.Conditions {
+			c := []map[string]interface{}{
+				{
+					"type":     condition.Type.String(),
+					"operator": condition.Operator.String(),
+					"values":   condition.Value,
+				},
+			}
+			conditions[i] = c
+		}
+
 		data[r.ID] = append(data[r.ID],
 			map[string]interface{}{
-				"type":   r.Type,
-				"values": r.Values,
+				"id":         r.ID,
+				"project_id": r.ProjectID,
+				"name":       r.Name,
+				"type":       r.Type,
+				"conditions": conditions,
 			})
 	}
+
 	return data, nil
 }
