@@ -624,6 +624,11 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
+	if len(filters["chef_tags"]) > 0 {
+		termQuery := elastic.NewTermsQuery("chef_tags", stringArrayToInterfaceArray(filters["chef_tags"])...)
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
 	if len(filters["status"]) > 0 {
 		termQuery := elastic.NewTermsQuery("status", stringArrayToInterfaceArray(filters["status"])...)
 		boolQuery = boolQuery.Must(termQuery)

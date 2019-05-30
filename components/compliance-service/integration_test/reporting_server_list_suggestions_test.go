@@ -162,6 +162,74 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			},
 			expectedTerms: []string{},
 		},
+
+		// chef_tags
+		{
+			description: "Only two chef tags are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"org1", "org4"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"org2", "org3"},
+				},
+				{
+					NodeID:   "3",
+					ChefTags: []string{"bob"},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_tags",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2", "org3", "org4"},
+		},
+		{
+			description: "All chef tags are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"org1", "org4"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"org2", "org5"},
+				},
+				{
+					NodeID:   "3",
+					ChefTags: []string{"org3", "org6"},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_tags",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3", "org4", "org5", "org6"},
+		},
+		{
+			description: "No chef tags are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"org1", "org4"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"org2", "org5"},
+				},
+				{
+					NodeID:   "3",
+					ChefTags: []string{"org3", "org6"},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_tags",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
 	}
 
 	for _, test := range cases {

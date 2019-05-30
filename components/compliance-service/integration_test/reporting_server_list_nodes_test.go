@@ -115,6 +115,74 @@ func TestListNodesFiltering(t *testing.T) {
 			},
 			expectedIds: []string{},
 		},
+
+		// chef tags
+		{
+			description: "Filter out one of the nodes with chef tags",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"org1"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"org2"},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "chef_tags",
+						Values: []string{"org1"},
+					},
+				},
+			},
+			expectedIds: []string{"1"},
+		},
+		{
+			description: "Filter out one of the nodes with multiple tags use chef tags",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"org1", "org3"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"org2"},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "chef_tags",
+						Values: []string{"org1"},
+					},
+				},
+			},
+			expectedIds: []string{"1"},
+		},
+		{
+			description: "Filter out all of the nodes by chef tags",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"org1"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"org2", "org4"},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "chef_tags",
+						Values: []string{"org3"},
+					},
+				},
+			},
+			expectedIds: []string{},
+		},
 	}
 
 	for _, test := range cases {
