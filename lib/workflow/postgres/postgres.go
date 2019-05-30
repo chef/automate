@@ -21,7 +21,7 @@ const (
 	enqueueTaskQuery   = `SELECT enqueue_task($1, $2, $3, $4, $5)`
 	dequeueTaskQuery   = `SELECT * FROM dequeue_task($1)`
 	completeTaskQuery  = `SELECT complete_task($1::bigint, $2::task_status, $3::text, $4)`
-	getTaskResultQuery = `SELECT task_name, parameters, status, error, result FROM tasks_results WHERE id = $1`
+	getTaskResultQuery = `SELECT task_name, parameters, status, error, result FROM task_results WHERE id = $1`
 
 	enqueueWorkflowQuery  = `SELECT enqueue_workflow($1, $2, $3)`
 	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow(VARIADIC $1)`
