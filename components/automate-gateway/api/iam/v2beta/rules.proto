@@ -38,4 +38,12 @@ service Rules {
     option (chef.automate.api.iam.policy).resource = "iam:rules";
     option (chef.automate.api.iam.policy).action = "iam:rules:list";
   };
+
+  rpc DeleteRule (DeleteRuleReq) returns (DeleteRuleResp) {
+    option (google.api.http).delete= "/iam/v2beta/rules/{id}";
+    option (chef.automate.api.policy).resource = "auth:rules:{id}";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "iam:rules:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:rules:delete";
+  };
 }

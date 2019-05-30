@@ -18,3 +18,7 @@ message GetRuleReq {
 }
 
 message ListRulesReq {}
+
+message DeleteRuleReq {
+  string id = 1;
+}
