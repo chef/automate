@@ -11,14 +11,14 @@ type Driver interface {
 
 	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 
-	CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
+	CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
 	GetDueRecurringWorkflow(ctx context.Context) (*Schedule, RecurringWorkflowCompleter, error)
 	GetNextScheduledWorkflow(ctx context.Context) (*Schedule, error)
 	UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts WorkflowScheduleUpdateOpts) error
-	UpdateWorkflowScheduleByName(ctx context.Context, scheduleName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
+	UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
 
-	GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string) ([]byte, error)
-	GetScheduledWorkflowRecurrence(ctx context.Context, scheduleName string, workflowName string) (string, error)
+	GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string) ([]byte, error)
+	GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (string, error)
 
 	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
 
@@ -112,7 +112,7 @@ type Schedule struct {
 	// need the ID to create unique workflow names.
 	ID             int64
 	Enabled        bool
-	Name           string
+	InstanceName   string
 	WorkflowName   string
 	Parameters     []byte
 	Recurrence     string
