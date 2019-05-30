@@ -115,7 +115,7 @@ CREATE TABLE tasks (
     parameters    BYTEA
 );
 
-CREATE TABLE tasks_results (
+CREATE TABLE task_results (
     id BIGSERIAL PRIMARY KEY,
     workflow_instance_id BIGINT NOT NULL,
     parameters   BYTEA,
@@ -235,7 +235,7 @@ AS $$
         (SELECT instance_name, workflow_name, parameters, start_at FROM done_workflows);
     
     DELETE FROM tasks WHERE workflow_instance_id = wid;
-    DELETE FROM tasks_results WHERE workflow_instance_id = wid;
+    DELETE FROM task_results WHERE workflow_instance_id = wid;
     DELETE FROM workflow_events WHERE workflow_instance_id = wid;
     DELETE FROM workflow_instances WHERE id = wid;
 $$;
@@ -285,7 +285,7 @@ AS $$
         error as error,
         result as result),
     tres AS (
-        INSERT INTO tasks_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
+        INSERT INTO task_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
             (SELECT workflow_instance_id, parameters, task_name, enqueued_at, in_vals.status, in_vals.error, in_vals.result
             FROM tasks JOIN in_vals ON in_vals.id = tasks.id WHERE tasks.id = tid) RETURNING id, workflow_instance_id
     )
