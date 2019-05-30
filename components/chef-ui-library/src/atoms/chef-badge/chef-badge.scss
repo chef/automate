@@ -1,0 +1,98 @@
+@import '../../global/variables.css';
+
+// Reset styles for the inner badge.
+// Most styling should be done on the parent. This should
+// make it easier for folks to tweak the styles if needed
+// during implementation.
+chef-badge {
+  badge {
+    background: transparent;
+    border: 0px solid transparent;
+    color: inherit;
+    cursor: inherit;
+    display: inherit;
+    align-items: inherit;
+    justify-content: inherit;
+    flex-direction: inherit;
+    flex-wrap: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    height: inherit;
+    line-height: inherit;
+    margin: 0;
+    padding: 0 5px;
+    pointer-events: inherit;
+    text-decoration: inherit;
+    text-transform: uppercase;
+    width: inherit;
+    min-width: inherit;
+    max-width: inherit;
+    height: inherit;
+    min-height: inherit;
+    max-height: inherit;
+  }
+
+  &[tooltip] {
+    cursor: pointer;
+  }
+}
+
+chef-badge {
+  #{--background-color}: var(--chef-lightest-grey);
+  #{--border-color}: var(--chef-grey);
+  #{--color}: var(--chef-primary-dark);
+}
+
+chef-badge {
+  background-color: var(--background-color);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--border-color);
+  border-radius: 2px;
+  color: var(--color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  font-size: 10px;
+  font-weight: 600;
+  margin: 5px;
+  min-height: 15px;
+  min-width: 15px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: top;
+
+  chef-tooltip {
+    font-size: 13px;
+    padding: 1.5em;
+  }
+
+  &[no-data] {
+    border-style: dashed;
+  }
+}
+
+chef-badge[primary] {
+  #{--background-color}: var(--chef-badge-primary-background);
+  #{--border-color}: var(--chef-badge-primary-border);
+  #{--color}: var(--chef-badge-primary-color);
+}
+
+chef-badge[critical] {
+  #{--background-color}: var(--chef-badge-critical-background);
+  #{--border-color}: var(--chef-badge-critical-border);
+  #{--color}: var(--chef-badge-critical-color);
+}
+
+chef-badge[warning] {
+  #{--background-color}: var(--chef-badge-warning-background);
+  #{--border-color}: var(--chef-badge-warning-border);
+  #{--color}: var(--chef-badge-warning-color);
+}
+
+chef-badge[success] {
+  #{--background-color}: var(--chef-badge-success-background);
+  #{--border-color}: var(--chef-badge-success-border);
+  #{--color}: var(--chef-badge-success-color);
+}
