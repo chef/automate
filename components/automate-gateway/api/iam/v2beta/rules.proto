@@ -34,7 +34,7 @@ service Rules {
   rpc ListRules (ListRulesReq) returns (ListRulesResp) {
     option (google.api.http).get= "/iam/v2beta/rules";
     option (chef.automate.api.policy).resource = "auth:rules";
-    option (chef.automate.api.policy).action = "get";
+    option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:rules";
     option (chef.automate.api.iam.policy).action = "iam:rules:list";
   };
