@@ -27,6 +27,7 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 		request       reporting.SuggestionRequest
 		expectedTerms []string
 	}{
+		// organization
 		{
 			description: "Only two orgs are returned",
 			summaries: []*relaxting.ESInSpecSummary{
@@ -89,6 +90,74 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			},
 			request: reporting.SuggestionRequest{
 				Type: "organization",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
+
+		// chef_server
+		{
+			description: "Only two chef servers are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					SourceFQDN: "org1",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "org2",
+				},
+				{
+					NodeID:     "3",
+					SourceFQDN: "bob",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_server",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All chef servers are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					SourceFQDN: "org1",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "org2",
+				},
+				{
+					NodeID:     "3",
+					SourceFQDN: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_server",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No chef servers are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					SourceFQDN: "org1",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "org2",
+				},
+				{
+					NodeID:     "3",
+					SourceFQDN: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_server",
 				Text: "bob",
 			},
 			expectedTerms: []string{},

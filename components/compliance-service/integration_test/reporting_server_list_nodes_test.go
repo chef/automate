@@ -24,6 +24,7 @@ func TestListNodesFiltering(t *testing.T) {
 		query       reporting.Query
 		expectedIds []string
 	}{
+		// organization
 		{
 			description: "Filter out one of the nodes by 'organization'",
 			reports: []*relaxting.ESInSpecReport{
@@ -62,6 +63,52 @@ func TestListNodesFiltering(t *testing.T) {
 				Filters: []*reporting.ListFilter{
 					{
 						Type:   "organization",
+						Values: []string{"org3"},
+					},
+				},
+			},
+			expectedIds: []string{},
+		},
+
+		// chef_server
+		{
+			description: "Filter out one of the nodes by chef servers",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:     "1",
+					SourceFQDN: "org1",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "org2",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "chef_server",
+						Values: []string{"org1"},
+					},
+				},
+			},
+			expectedIds: []string{"1"},
+		},
+		{
+			description: "Filter out all of the nodes by chef servers",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:     "1",
+					SourceFQDN: "org1",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "org2",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "chef_server",
 						Values: []string{"org3"},
 					},
 				},
