@@ -1589,6 +1589,8 @@ func (m *Condition) Validate() error {
 
 	// no validation rules for Type
 
+	// no validation rules for Operator
+
 	return nil
 }
 

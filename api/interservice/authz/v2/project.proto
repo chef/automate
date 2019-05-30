@@ -80,7 +80,7 @@ message ProjectUpdateCancelResp { }
 
 message ProjectUpdateStatusReq { }
 
-message ProjectUpdateStatusResp { 
+message ProjectUpdateStatusResp {
     string state = 1;
     google.protobuf.Timestamp estimated_time_complete = 2;
     float percentage_complete = 3;
@@ -128,9 +128,15 @@ enum ProjectRuleConditionTypes {
     POLICY_NAME = 6;
 }
 
+enum ProjectRuleConditionOperators {
+    MEMBER_OF = 0;
+    EQUALS = 1;
+}
+
 message Condition {
     ProjectRuleConditionTypes type = 1;
     repeated string values = 2;
+    ProjectRuleConditionOperators operator = 3;
 }
 
 // CreateRuleReq is ProjectRule, so the input is just one JSON object. Also adds

@@ -57,8 +57,20 @@ func init() {
           "items": {
             "type": "string"
           }
+        },
+        "operator": {
+          "$ref": "#/definitions/v2betaConditionOperator"
         }
       }
+    },
+    "v2betaConditionOperator": {
+      "type": "string",
+      "enum": [
+        "CONDITION_OPERATOR_UNSET",
+        "MEMBER_OF",
+        "EQUALS"
+      ],
+      "default": "CONDITION_OPERATOR_UNSET"
     },
     "v2betaConditionType": {
       "type": "string",
