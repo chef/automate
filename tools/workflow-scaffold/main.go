@@ -359,7 +359,7 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 	}
 
 	workflowManager.UpdateWorkflowScheduleByName(context.Background(),
-		schedules[0].Name, schedules[0].WorkflowName, workflow.UpdateParameters("youwin"))
+		schedules[0].InstanceName, schedules[0].WorkflowName, workflow.UpdateParameters("youwin"))
 
 	workflowManager.Start(context.Background())
 
@@ -370,7 +370,7 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		}
 		for _, s := range schedules {
 			logrus.WithFields(logrus.Fields{
-				"name":          s.Name,
+				"name":          s.InstanceName,
 				"workflow_name": s.WorkflowName,
 				"enabled":       s.Enabled,
 				"next_due_at":   s.NextDueAt,

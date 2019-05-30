@@ -361,7 +361,7 @@ func (m *WorkflowManager) Stop() error {
 // rule provided. The first run will happen during when the recurrence is first
 // due from Now.
 func (m *WorkflowManager) CreateWorkflowSchedule(
-	scheduleName string,
+	instanceName string,
 	workflowName string,
 	parameters interface{},
 	enabled bool,
@@ -375,7 +375,7 @@ func (m *WorkflowManager) CreateWorkflowSchedule(
 	if err != nil {
 		return err
 	}
-	return m.backend.CreateWorkflowSchedule(context.TODO(), scheduleName, workflowName,
+	return m.backend.CreateWorkflowSchedule(context.TODO(), instanceName, workflowName,
 		jsonData, enabled, recurRule.String(), nextRunAt)
 }
 
@@ -415,9 +415,9 @@ func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
 }
 
 // UpdateWorkflowScheduleByName updates the scheduled workflow identified by
-// (scheduleName, workflowName).
+// (instanceName, workflowName).
 func (m *WorkflowManager) UpdateWorkflowScheduleByName(ctx context.Context,
-	scheduleName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error {
+	instanceName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error {
 
 	o := backend.WorkflowScheduleUpdateOpts{}
 	for _, opt := range opts {
@@ -426,7 +426,7 @@ func (m *WorkflowManager) UpdateWorkflowScheduleByName(ctx context.Context,
 			return err
 		}
 	}
-	return m.backend.UpdateWorkflowScheduleByName(ctx, scheduleName, workflowName, o)
+	return m.backend.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, o)
 }
 
 // ListWorkflowSchedules list all the scheduled workflows.
@@ -443,9 +443,9 @@ func (m *WorkflowManager) ListWorkflowSchedules(ctx context.Context) ([]*Schedul
 }
 
 // GetScheduledWorkflowParameters returns the parameters that the scheduled workflow
-// identified by (scheduleName, workflowName) will be started with.
-func (m *WorkflowManager) GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string, out interface{}) error {
-	data, err := m.backend.GetScheduledWorkflowParameters(ctx, scheduleName, workflowName)
+// identified by (instanceName, workflowName) will be started with.
+func (m *WorkflowManager) GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string, out interface{}) error {
+	data, err := m.backend.GetScheduledWorkflowParameters(ctx, instanceName, workflowName)
 	if err != nil {
 		return errors.Wrap(err, "could not retrieve parameters for workflow")
 	}
@@ -458,9 +458,9 @@ func (m *WorkflowManager) GetScheduledWorkflowParameters(ctx context.Context, sc
 }
 
 // GetScheduledWorkflowRecurrence returns the recurrence rule for the scheduled workflow
-// identified by (scheduleName, workflowName)
-func (m *WorkflowManager) GetScheduledWorkflowRecurrence(ctx context.Context, scheduleName string, workflowName string) (*rrule.RRule, error) {
-	ruleStr, err := m.backend.GetScheduledWorkflowRecurrence(ctx, scheduleName, workflowName)
+// identified by (instanceName, workflowName)
+func (m *WorkflowManager) GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (*rrule.RRule, error) {
+	ruleStr, err := m.backend.GetScheduledWorkflowRecurrence(ctx, instanceName, workflowName)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not retrieve parameters for workflow")
 	}

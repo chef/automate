@@ -31,22 +31,22 @@ const (
 
 	listRecurringWorkflowsQuery = `
 		WITH res AS
-			(SELECT DISTINCT ON (name, workflow_name) * FROM workflow_results
-			ORDER BY name, workflow_name, end_at DESC)
-		SELECT s.id, enabled, s.name, s.workflow_name, s.parameters, recurrence,
+			(SELECT DISTINCT ON (instance_name, workflow_name) * FROM workflow_results
+			ORDER BY instance_name, workflow_name, end_at DESC)
+		SELECT s.id, enabled, s.instance_name, s.workflow_name, s.parameters, recurrence,
 			next_run_at, start_at last_start, end_at last_end
 			FROM recurring_workflow_schedules s LEFT JOIN res
-			ON s.name = res.name AND s.workflow_name = res.workflow_name;
+			ON s.instance_name = res.instance_name AND s.workflow_name = res.workflow_name;
 		`
 
 	getNextRecurringWorkflowQuery = `
-        SELECT id, enabled, name, workflow_name, parameters, recurrence, next_run_at
+        SELECT id, enabled, instance_name, workflow_name, parameters, recurrence, next_run_at
         FROM recurring_workflow_schedules
         WHERE enabled = TRUE
         ORDER BY next_run_at LIMIT 1
         `
 	getDueRecurringWorkflowQuery = `
-        SELECT id, enabled, name, workflow_name, parameters, recurrence, next_run_at
+        SELECT id, enabled, instance_name, workflow_name, parameters, recurrence, next_run_at
         FROM recurring_workflow_schedules
         WHERE next_run_at < NOW() AND enabled = TRUE
         ORDER BY next_run_at
@@ -170,9 +170,9 @@ func (pg *PostgresBackend) Close() error {
 	return nil
 }
 
-func (pg *PostgresBackend) GetScheduledWorkflowParameters(ctx context.Context, scheduleName string, workflowName string) ([]byte, error) {
-	row := pg.db.QueryRowContext(ctx, "SELECT parameters FROM recurring_workflow_schedules WHERE name = $1 and workflow_name = $2",
-		scheduleName, workflowName)
+func (pg *PostgresBackend) GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string) ([]byte, error) {
+	row := pg.db.QueryRowContext(ctx, "SELECT parameters FROM recurring_workflow_schedules WHERE instance_name = $1 and workflow_name = $2",
+		instanceName, workflowName)
 	var data []byte
 
 	err := row.Scan(&data)
@@ -183,9 +183,9 @@ func (pg *PostgresBackend) GetScheduledWorkflowParameters(ctx context.Context, s
 	return data, nil
 }
 
-func (pg *PostgresBackend) GetScheduledWorkflowRecurrence(ctx context.Context, scheduleName string, workflowName string) (string, error) {
-	row := pg.db.QueryRowContext(ctx, "SELECT recurrence FROM recurring_workflow_schedules WHERE name = $1 and workflow_name = $2",
-		scheduleName, workflowName)
+func (pg *PostgresBackend) GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (string, error) {
+	row := pg.db.QueryRowContext(ctx, "SELECT recurrence FROM recurring_workflow_schedules WHERE instance_name = $1 and workflow_name = $2",
+		instanceName, workflowName)
 
 	var data string
 	err := row.Scan(&data)
@@ -213,7 +213,7 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 		err := rows.Scan(
 			&scheduledWorkflow.ID,
 			&scheduledWorkflow.Enabled,
-			&scheduledWorkflow.Name,
+			&scheduledWorkflow.InstanceName,
 			&scheduledWorkflow.WorkflowName,
 			&scheduledWorkflow.Parameters,
 			&scheduledWorkflow.Recurrence,
@@ -239,7 +239,7 @@ func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*backe
 	err := row.Scan(
 		&scheduledWorkflow.ID,
 		&scheduledWorkflow.Enabled,
-		&scheduledWorkflow.Name,
+		&scheduledWorkflow.InstanceName,
 		&scheduledWorkflow.WorkflowName,
 		&scheduledWorkflow.Parameters,
 		&scheduledWorkflow.Recurrence,
@@ -269,7 +269,7 @@ func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*backen
 	err = row.Scan(
 		&scheduledWorkflow.ID,
 		&scheduledWorkflow.Enabled,
-		&scheduledWorkflow.Name,
+		&scheduledWorkflow.InstanceName,
 		&scheduledWorkflow.WorkflowName,
 		&scheduledWorkflow.Parameters,
 		&scheduledWorkflow.Recurrence,
@@ -295,7 +295,7 @@ func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*backen
 }
 
 func (pg *PostgresBackend) UpdateWorkflowScheduleByName(
-	ctx context.Context, scheduleName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
+	ctx context.Context, instanceName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -305,8 +305,8 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByName(
 	}
 
 	// Lock row to update
-	r := tx.QueryRow("SELECT id FROM recurring_workflow_schedules WHERE name = $1 AND workflow_name = $2 FOR UPDATE",
-		scheduleName, workflowName)
+	r := tx.QueryRow("SELECT id FROM recurring_workflow_schedules WHERE instance_name = $1 AND workflow_name = $2 FOR UPDATE",
+		instanceName, workflowName)
 	var id int64
 	if err := r.Scan(&id); err != nil {
 		if err != sql.ErrNoRows {
@@ -380,7 +380,7 @@ func (pg *PostgresBackend) updateWorkflowScheduleByID(tx *sql.Tx, id int64, o *b
 	return nil
 }
 
-func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleName string, workflowName string,
+func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string,
 	parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error {
 
 	wrapErr := func(err error, msg string) error {
@@ -402,9 +402,9 @@ func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, scheduleN
 	}
 
 	_, err = pg.db.ExecContext(context.TODO(), `
-INSERT INTO recurring_workflow_schedules(name, workflow_name, parameters, recurrence, enabled, next_run_at)
+INSERT INTO recurring_workflow_schedules(instance_name, workflow_name, parameters, recurrence, enabled, next_run_at)
 VALUES ($1, $2, $3, $4, $5, $6)`,
-		scheduleName, workflowName, parameters, recurrence, enabled, nextRunAt)
+		instanceName, workflowName, parameters, recurrence, enabled, nextRunAt)
 	if err != nil {
 		return wrapErr(err, "could not update workflow schedule")
 	}
@@ -678,7 +678,7 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(s *backend
 	row := c.tx.QueryRowContext(
 		c.ctx,
 		enqueueWorkflowQuery,
-		s.Name,
+		s.InstanceName,
 		s.WorkflowName,
 		s.Parameters)
 
