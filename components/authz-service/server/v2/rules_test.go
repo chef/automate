@@ -163,15 +163,16 @@ func TestGetRule(t *testing.T) {
 
 	apiConditions := []*api.Condition{
 		{
-			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values: []string{"opscode"},
+			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values:   []string{"opscode"},
+			Operator: api.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	storageConditions := []storage.Condition{
 		{
 			Type:      storage.Node,
 			Attribute: storage.Organization,
-			Operator:  storage.MemberOf,
+			Operator:  storage.Equals,
 			Value:     []string{"opscode"},
 		},
 	}
@@ -232,7 +233,8 @@ func TestListRules(t *testing.T) {
 	apiConditions1 := []*api.Condition{
 		{
 			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values: []string{"opscode"},
+			Values: []string{"opscode", "chef"},
+			Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
 		},
 	}
 	storageConditions1 := []storage.Condition{
@@ -240,20 +242,21 @@ func TestListRules(t *testing.T) {
 			Type:      storage.Node,
 			Attribute: storage.Organization,
 			Operator:  storage.MemberOf,
-			Value:     []string{"opscode"},
+			Value:     []string{"opscode", "chef"},
 		},
 	}
 	apiConditions2 := []*api.Condition{
 		{
 			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
 			Values: []string{"chef"},
+			Operator: api.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	storageConditions2 := []storage.Condition{
 		{
 			Type:      storage.Event,
 			Attribute: storage.Organization,
-			Operator:  storage.MemberOf,
+			Operator:  storage.Equals,
 			Value:     []string{"chef"},
 		},
 	}
