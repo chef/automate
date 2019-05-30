@@ -40,5 +40,5 @@ make a1-migration-up
 sleep 20 # TODO: Do we really need this sleep?
 make a1-migration-load-sample-data
 HARTIFACT_DIR="/a2/results" make a1-migration-migrate
-# Password for a1-migration-data-full/0.0.1/20181210102316
-A1_BUILDER_PASSWORD='N4pYOUDm0AFo0XbCje0ipbphmzQf4NrWK2c=' AUTOMATE_API_DEFAULT_PASSWORD='hDMfTHlHasxieSrk3HhSFaur9L+Oe4D0wzQ=' make a1-migration-test
+# Password for a1-migration-data-full/0.0.1/20190530183952
+A1_BUILDER_PASSWORD='KfK1LU/nGzk6J8BmnD+G3GwPn9+TqD5VGwQ=' AUTOMATE_API_DEFAULT_PASSWORD='WThqQgjnI6vAhi3TEVoM7GntWBI1HvJMREQ=' make a1-migration-test
