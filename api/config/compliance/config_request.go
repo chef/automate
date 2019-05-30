@@ -31,6 +31,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Retention.ComplianceReportDays = w.Int32(60)
 	c.V1.Sys.Agent.BufferSize = w.Int32(1000)
 	c.V1.Sys.Agent.Workers = w.Int32(10)
+	c.V1.Sys.Agent.RemoteInspecVersion = w.String("REPLACE-FROM-PLAN.SH")
 	return c
 }
 

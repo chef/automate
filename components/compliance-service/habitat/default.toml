@@ -22,4 +22,4 @@ manual_polling_interval = 1440
 [agent]
 workers = 10
 buffer_size = 1000
-remote_inspec_version = "3.9.0"
+remote_inspec_version = "REPLACE-FROM-PLAN.SH"

@@ -31,6 +31,7 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
+inspec_release="3.9.0/20190401200826"
 pkg_deps=(
   core/bash
   core/glibc
@@ -40,8 +41,7 @@ pkg_deps=(
   # WARNING: Update with care. The chef/inspec is managed with Expeditor.
 
   # See .expeditor/update-inspec-version.sh for details
-  # When updating this, also update 'remote_inspec_version' in ./default.toml
-  chef/inspec/3.9.0/20190401200826
+  chef/inspec/${inspec_release}
   chef/mlsa
 )
 
@@ -78,6 +78,11 @@ do_prepare() {
 do_install() {
   # Scaffolding go install callback
   scaffolding_go_install
+
+  inspec_sem_version=$(awk -F  '/' '{print $1}' <<< ${inspec_release})
+  build_line "Setting InSpec version ${inspec_sem_version}"
+  sed -i "s/REPLACE-FROM-PLAN.SH/${inspec_sem_version}/" habitat/default.toml
+  sed -i "s/REPLACE-FROM-PLAN.SH/${inspec_sem_version}/" ../../api/config/compliance/config_request.go
 
   build_line "Copying migration files"
   mkdir "${pkg_prefix}/migrations"
