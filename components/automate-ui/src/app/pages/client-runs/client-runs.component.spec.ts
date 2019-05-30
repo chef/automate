@@ -53,6 +53,32 @@ describe('ClientRunsComponent', () => {
     router = TestBed.get(Router);
   });
 
+  describe('sets categoryTypes', () => {
+    it('ensure types are included', () => {
+      const expected = [
+        'attribute', 'cookbook', 'chef_tags', 'chef_version', 'environment', 'name', 'platform',
+        'policy_group', 'policy_name', 'policy_revision', 'recipe', 'role', 'resource_name',
+        'error'];
+
+      const types = component.categoryTypes.map(type => type.type);
+
+      expect(types.length).toBe(expected.length);
+
+      // Each expected type is in the availableFilterTypesNames
+      expected.forEach(expectedType =>
+        expect(types.indexOf(expectedType)).toBeGreaterThanOrEqual(0));
+    });
+
+    it('ensure types text is sorted', () => {
+      const typeText = component.categoryTypes.map(type => type.text);
+      const expectedTypeText =
+        component.categoryTypes.map( type => type.text).sort(
+        (type1, type2) => (type1 < type2 ? -1 : 1));
+
+      expect(expectedTypeText).toEqual(typeText, 'Filter Types are not sorted');
+    });
+  });
+
   describe('statusFilter', () => {
     it('when set to an allowed value', () => {
       spyOn(component.router, 'navigate');
