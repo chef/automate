@@ -108,7 +108,13 @@ If you wish to publish artifacts to the depot, you must first:
    `#releng-support` slack channel)
 
 Now create a hab data artifact: `make a1-migration-create-artifact`
-Optionally upload it: `make a1-migration-upload-artifact`
+Optionally upload: `make a1-migration-upload-artifact`
+
+If you rebuild the data artifact used in the nightly a1-migration test, you will need to
+update `A1_BUILDER_PASSWORD` and `AUTOMATE_API_DEFAULT_PASSWORD` in `automate/scripts/nightly_migration.sh`
+with the credentials generated during `make a1-migration-up` when you built the data artifact. The generated creds are in
+`automate/components/automate-deployment/a1-migration/keys/enterprise-test-admin-login-creds`.
+
 
 ```
 NOTE: If you have troubles with docker make sure you increase the resources available
