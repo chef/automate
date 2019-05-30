@@ -281,8 +281,14 @@ func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
 	return rules, nil
 }
 
-func (s *State) DeleteRule(_ context.Context, id string) error {
-	// TODO implement
+func (s *State) DeleteRule(ctx context.Context, id string) error {
+	_, err := s.GetRule(ctx, id)
+
+	if err != nil {
+		return err
+	}
+
+	s.rules.Delete(id)
 	return nil
 }
 
