@@ -13,6 +13,14 @@ message CreateRuleReq {
     repeated Condition conditions = 5;
 }
 
+message UpdateRuleReq {
+  string id = 1;
+  string project_id = 2;
+  string name = 3;
+  RuleType type = 4;
+  repeated Condition conditions = 5;
+}
+
 message GetRuleReq {
   string id = 1;
 }

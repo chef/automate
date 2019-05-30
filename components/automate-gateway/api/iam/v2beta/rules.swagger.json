@@ -99,6 +99,36 @@
         "tags": [
           "Rules"
         ]
+      },
+      "put": {
+        "operationId": "UpdateRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRuleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRuleReq"
+            }
+          }
+        ],
+        "tags": [
+          "Rules"
+        ]
       }
     }
   },
@@ -227,6 +257,37 @@
         "EVENT"
       ],
       "default": "RULE_TYPE_UNSET"
+    },
+    "v2betaUpdateRuleReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "project_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v2betaRuleType"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaCondition"
+          }
+        }
+      }
+    },
+    "v2betaUpdateRuleResp": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v2betaRule"
+        }
+      }
     }
   }
 }

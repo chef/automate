@@ -9,6 +9,10 @@ message CreateRuleResp {
   Rule rule = 1;
 }
 
+message UpdateRuleResp {
+  Rule rule = 1;
+}
+
 message GetRuleResp {
   Rule rule = 1;
 }

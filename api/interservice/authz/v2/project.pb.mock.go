@@ -41,6 +41,7 @@ type ProjectsServerMock struct {
 	ProjectUpdateStatusFunc func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
 	ProjectUpdateCancelFunc func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error)
 	CreateRuleFunc          func(context.Context, *CreateRuleReq) (*CreateRuleResp, error)
+	UpdateRuleFunc          func(context.Context, *UpdateRuleReq) (*UpdateRuleResp, error)
 	GetRuleFunc             func(context.Context, *GetRuleReq) (*GetRuleResp, error)
 	ListRulesFunc           func(context.Context, *ListRulesReq) (*ListRulesResp, error)
 	DeleteRuleFunc          func(context.Context, *DeleteRuleReq) (*DeleteRuleResp, error)
@@ -178,6 +179,18 @@ func (m *ProjectsServerMock) CreateRule(ctx context.Context, req *CreateRuleReq)
 	return nil, status.Error(codes.Internal, "mock: 'CreateRule' not implemented")
 }
 
+func (m *ProjectsServerMock) UpdateRule(ctx context.Context, req *UpdateRuleReq) (*UpdateRuleResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.UpdateRuleFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'UpdateRule' not implemented")
+}
+
 func (m *ProjectsServerMock) GetRule(ctx context.Context, req *GetRuleReq) (*GetRuleResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
@@ -227,6 +240,7 @@ func (m *ProjectsServerMock) Reset() {
 	m.ProjectUpdateStatusFunc = nil
 	m.ProjectUpdateCancelFunc = nil
 	m.CreateRuleFunc = nil
+	m.UpdateRuleFunc = nil
 	m.GetRuleFunc = nil
 	m.ListRulesFunc = nil
 	m.DeleteRuleFunc = nil

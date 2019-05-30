@@ -250,7 +250,22 @@ func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 }
 
 func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule, error) {
-	// TODO implement
+	item, exists := s.rules.Get(rule.ID)
+	if !exists {
+		return nil, storage_errors.ErrNotFound
+	}
+	existingRule, ok := item.(*storage.Rule)
+	if !ok {
+		return nil, ErrTypeAssertionFailed
+	}
+
+	if existingRule.ProjectID != rule.ProjectID {
+		return nil, storage_errors.ErrChangeProjectForRule
+	}
+
+	if err := s.rules.Replace(rule.ID, rule, cache.NoExpiration); err != nil {
+		return nil, storage_errors.ErrConflict
+	}
 	return rule, nil
 }
 

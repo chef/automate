@@ -1837,6 +1837,195 @@ var _ interface {
 	ErrorName() string
 } = CreateRuleRespValidationError{}
 
+// Validate checks the field values on UpdateRuleReq with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *UpdateRuleReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if !_UpdateRuleReq_Id_Pattern.MatchString(m.GetId()) {
+		return UpdateRuleReqValidationError{
+			field:  "Id",
+			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+		}
+	}
+
+	if !_UpdateRuleReq_ProjectId_Pattern.MatchString(m.GetProjectId()) {
+		return UpdateRuleReqValidationError{
+			field:  "ProjectId",
+			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		return UpdateRuleReqValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	// no validation rules for Type
+
+	if len(m.GetConditions()) < 1 {
+		return UpdateRuleReqValidationError{
+			field:  "Conditions",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetConditions() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UpdateRuleReqValidationError{
+					field:  fmt.Sprintf("Conditions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// UpdateRuleReqValidationError is the validation error returned by
+// UpdateRuleReq.Validate if the designated constraints aren't met.
+type UpdateRuleReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateRuleReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateRuleReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateRuleReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateRuleReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateRuleReqValidationError) ErrorName() string { return "UpdateRuleReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpdateRuleReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateRuleReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateRuleReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateRuleReqValidationError{}
+
+var _UpdateRuleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+
+var _UpdateRuleReq_ProjectId_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+
+// Validate checks the field values on UpdateRuleResp with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *UpdateRuleResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetRule()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateRuleRespValidationError{
+				field:  "Rule",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// UpdateRuleRespValidationError is the validation error returned by
+// UpdateRuleResp.Validate if the designated constraints aren't met.
+type UpdateRuleRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateRuleRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateRuleRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateRuleRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateRuleRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateRuleRespValidationError) ErrorName() string { return "UpdateRuleRespValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UpdateRuleRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateRuleResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateRuleRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateRuleRespValidationError{}
+
 // Validate checks the field values on GetRuleReq with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *GetRuleReq) Validate() error {

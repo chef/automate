@@ -32,6 +32,7 @@ func NewRulesServerMockWithoutValidation() *RulesServerMock {
 type RulesServerMock struct {
 	validateRequests bool
 	CreateRuleFunc   func(context.Context, *request.CreateRuleReq) (*response.CreateRuleResp, error)
+	UpdateRuleFunc   func(context.Context, *request.UpdateRuleReq) (*response.UpdateRuleResp, error)
 	GetRuleFunc      func(context.Context, *request.GetRuleReq) (*response.GetRuleResp, error)
 	ListRulesFunc    func(context.Context, *request.ListRulesReq) (*response.ListRulesResp, error)
 	DeleteRuleFunc   func(context.Context, *request.DeleteRuleReq) (*response.DeleteRuleResp, error)
@@ -47,6 +48,18 @@ func (m *RulesServerMock) CreateRule(ctx context.Context, req *request.CreateRul
 		return f(ctx, req)
 	}
 	return nil, status.Error(codes.Internal, "mock: 'CreateRule' not implemented")
+}
+
+func (m *RulesServerMock) UpdateRule(ctx context.Context, req *request.UpdateRuleReq) (*response.UpdateRuleResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.UpdateRuleFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'UpdateRule' not implemented")
 }
 
 func (m *RulesServerMock) GetRule(ctx context.Context, req *request.GetRuleReq) (*response.GetRuleResp, error) {
@@ -88,6 +101,7 @@ func (m *RulesServerMock) DeleteRule(ctx context.Context, req *request.DeleteRul
 // Reset resets all overridden functions
 func (m *RulesServerMock) Reset() {
 	m.CreateRuleFunc = nil
+	m.UpdateRuleFunc = nil
 	m.GetRuleFunc = nil
 	m.ListRulesFunc = nil
 	m.DeleteRuleFunc = nil

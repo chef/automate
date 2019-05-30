@@ -71,6 +71,7 @@ service Projects {
 
     // "proper" methods go here (and the ones above will be phased out eventually)
     rpc CreateRule(CreateRuleReq) returns (CreateRuleResp) {};
+    rpc UpdateRule(UpdateRuleReq) returns (UpdateRuleResp) {};
     rpc GetRule(GetRuleReq) returns (GetRuleResp) {};
     rpc ListRules(ListRulesReq) returns (ListRulesResp) {};
     rpc DeleteRule(DeleteRuleReq) returns (DeleteRuleResp) {};
@@ -152,6 +153,18 @@ message CreateRuleReq {
 }
 
 message CreateRuleResp {
+    ProjectRule rule = 1;
+}
+
+message UpdateRuleReq {
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string name = 3 [(validate.rules).string.min_len = 1];
+    ProjectRuleTypes type = 4;
+    repeated Condition conditions = 5 [(validate.rules).repeated.min_items = 1];
+}
+
+message UpdateRuleResp {
     ProjectRule rule = 1;
 }
 

@@ -157,6 +157,149 @@ func TestCreateRule(t *testing.T) {
 	}
 }
 
+func TestUpdateRule(t *testing.T) {
+	ctx := context.Background()
+	cl, store, _, _ := setupRules(t)
+
+	apiConditions := []*api.Condition{
+		{
+			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values:   []string{"opscode"},
+			Operator: api.ProjectRuleConditionOperators_EQUALS,
+		},
+	}
+	storageConditions := []storage.Condition{
+		{
+			Type:      storage.Node,
+			Attribute: storage.Organization,
+			Operator:  storage.MemberOf,
+			Value:     []string{"opscode"},
+		},
+	}
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"if the rule name is empty, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:         "empty-name",
+				Name:       "",
+				ProjectId:  "foo",
+				Conditions: apiConditions,
+			})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the rule id is empty, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:         "",
+				Name:       "empty id",
+				ProjectId:  "foo",
+				Conditions: apiConditions,
+			})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:         "no_underscores",
+				Name:       "any name",
+				ProjectId:  "foo",
+				Conditions: apiConditions,
+			})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, resp)
+		}},
+		{"if there are no conditions, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:        "foo",
+				Name:      "foo rule",
+				ProjectId: "bar",
+			})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, resp)
+		}},
+		{"if a rule with that id does not exist, returns 'not found'", func(t *testing.T) {
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:         "not-found",
+				Name:       "my other foo",
+				ProjectId:  "bar",
+				Conditions: apiConditions,
+			})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the passed rule changes the project, returns 'failed precondition'", func(t *testing.T) {
+			id := "foo-rule"
+			addRuleToStore(t, store, id, "my foo rule", storage.Node, "foo-project", storageConditions)
+
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:         id,
+				Name:       "my other foo",
+				ProjectId:  "cannot-change",
+				Conditions: apiConditions,
+			})
+			grpctest.AssertCode(t, codes.FailedPrecondition, err)
+			assert.Nil(t, resp)
+		}},
+		{"with valid rule data, returns no error and updates the rule in storage", func(t *testing.T) {
+			id := "foo-rule"
+			projectID := "foo-project"
+			addRuleToStore(t, store, id, "my foo rule", storage.Node, projectID, storageConditions)
+
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:        id,
+				Name:      "updated name",
+				ProjectId: projectID,
+				Type:      api.ProjectRuleTypes_NODE,
+				Conditions: []*api.Condition{
+					{
+						Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+						Values:   []string{"chef"},
+						Operator: api.ProjectRuleConditionOperators_EQUALS,
+					},
+					{
+						Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
+						Values:   []string{"tag1", "tag2"},
+						Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+					},
+				},
+			})
+			assert.NoError(t, err)
+			assert.Equal(t, &api.UpdateRuleResp{
+				Rule: &api.ProjectRule{
+					Id:        id,
+					Name:      "updated name",
+					ProjectId: projectID,
+					Type:      api.ProjectRuleTypes_NODE,
+					Conditions: []*api.Condition{
+						{
+							Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+							Values:   []string{"chef"},
+							Operator: api.ProjectRuleConditionOperators_EQUALS,
+						},
+						{
+							Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
+							Values:   []string{"tag1", "tag2"},
+							Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+						},
+					},
+				},
+			}, resp)
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		store.Flush()
+	}
+}
+
 func TestGetRule(t *testing.T) {
 	ctx := context.Background()
 	cl, store, _, _ := setupRules(t)

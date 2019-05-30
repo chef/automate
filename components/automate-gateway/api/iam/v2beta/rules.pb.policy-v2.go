@@ -26,6 +26,23 @@ func init() {
 		}
 		return ""
 	})
+	policyv2.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/UpdateRule", "iam:rules:{id}", "iam:rules:update", "PUT", "/iam/v2beta/rules/{id}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.UpdateRuleReq); ok {
+			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				case "project_id":
+					return m.ProjectId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policyv2.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/GetRule", "iam:rules:{id}", "iam:rules:get", "GET", "/iam/v2beta/rules/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetRuleReq); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {

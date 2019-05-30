@@ -301,22 +301,12 @@ func (s *state) HandleEvent(ctx context.Context,
 }
 
 func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.CreateRuleResp, error) {
-	ruleType, err := fromAPIType(req.Type)
+	r, err := s.prepareStorageRule(req.Id, req.ProjectId, req.Name, req.Type, req.Conditions)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument,
-			"creating rule with ID %q: %s", req.Id, err.Error())
+		return nil, err
 	}
-	conditions, err := storageConditions(ruleType, req.Conditions)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument,
-			"creating rule with ID %q: %s", req.Id, err.Error())
-	}
-	r, err := storage.NewRule(req.Id, req.ProjectId, req.Name, ruleType, conditions)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument,
-			"creating rule with ID %q: %s", req.Id, err.Error())
-	}
-	resp, err := s.store.CreateRule(ctx, &r)
+
+	resp, err := s.store.CreateRule(ctx, r)
 	if err != nil {
 		if err == storage_errors.ErrConflict {
 			return nil, status.Errorf(codes.AlreadyExists, "rule with ID %q already exists", req.Id)
@@ -331,6 +321,33 @@ func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.Cr
 			"error converting rule with ID %q: %s", resp.ID, err.Error())
 	}
 	return &api.CreateRuleResp{Rule: apiRule}, nil
+}
+
+func (s *state) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (*api.UpdateRuleResp, error) {
+	r, err := s.prepareStorageRule(req.Id, req.ProjectId, req.Name, req.Type, req.Conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.store.UpdateRule(ctx, r)
+	if err != nil {
+		if err == storage_errors.ErrNotFound {
+			return nil, status.Errorf(codes.NotFound, "rule with ID %q not found", req.Id)
+		}
+		if err == storage_errors.ErrChangeProjectForRule {
+			return nil, status.Errorf(codes.FailedPrecondition,
+				"cannot change project_id for existing rule with ID %q ", req.Id)
+		}
+		return nil, status.Errorf(codes.Internal,
+			"error creating rule with ID %q: %s", req.Id, err.Error())
+	}
+
+	apiRule, err := fromStorageRule(resp)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal,
+			"error converting rule with ID %q: %s", resp.ID, err.Error())
+	}
+	return &api.UpdateRuleResp{Rule: apiRule}, nil
 }
 
 func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
@@ -574,4 +591,25 @@ func rulesToProjectRules(rules []engine.Rule) ([]*api.ProjectRule, error) {
 		Type:       api.ProjectRuleTypes_NODE,
 	}
 	return []*api.ProjectRule{rule}, nil
+}
+
+func (s *state) prepareStorageRule(inID, projectID, name string,
+	inType api.ProjectRuleTypes, inConditions []*api.Condition) (*storage.Rule, error) {
+
+	ruleType, err := fromAPIType(inType)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument,
+			"creating rule with ID %q: %s", inID, err.Error())
+	}
+	conditions, err := storageConditions(ruleType, inConditions)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument,
+			"creating rule with ID %q: %s", inID, err.Error())
+	}
+	r, err := storage.NewRule(inID, projectID, name, ruleType, conditions)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument,
+			"creating rule with ID %q: %s", inID, err.Error())
+	}
+	return &r, nil
 }
