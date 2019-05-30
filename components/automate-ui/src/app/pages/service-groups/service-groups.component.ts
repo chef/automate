@@ -60,7 +60,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   private currentSortField: string;
   private defaultFieldDirection: FieldDirection = {
     name: 'ASC',
-    percent_ok: 'ASC'
+    percent_ok: 'ASC',
+    environment: 'ASC',
+    app_name: 'ASC'
   };
 
   constructor(
