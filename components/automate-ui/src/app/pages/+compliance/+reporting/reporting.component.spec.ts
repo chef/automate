@@ -61,57 +61,26 @@ describe('ReportingComponent', () => {
 
   describe('sets availableFilterTypes', () => {
     it('to include profile, platform, environment, node, and control', () => {
-      expect(component.availableFilterTypes).toEqual([
-        {
-          'name': 'profile',
-          'title': 'Profile',
-          'description': 'Add the name or ID to filter this report against a profile',
-          'placeholder': 'Name or ID'
-        },
-        {
-          'name': 'node',
-          'title': 'Node',
-          'description':
-          'Add the name, ID, or hostname to filter this report against a specific node',
-          'placeholder': 'Name, ID, or hostname'
-        },
-        {
-          'name': 'platform',
-          'title': 'Platform',
-          'description': 'Add the name to filter this report to a specific platform',
-          'placeholder': 'Name'
-        },
-        {
-          'name': 'environment',
-          'title': 'Environment',
-          'description': 'Add the name to filter this report to a specific environment',
-          'placeholder': 'Name'
-        },
-        {
-          'name': 'control',
-          'title': 'Control',
-          'description': 'Add the title to filter this report against a control',
-          'placeholder': 'Title'
-        },
-        {
-          'name': 'role',
-          'title': 'Role',
-          'description': 'Add the role to filter this report to a specific role',
-          'placeholder': 'Role'
-        },
-        {
-          'name': 'recipe',
-          'title': 'Recipe',
-          'description': 'Add the recipe to filter this report to a specific recipe',
-          'placeholder': 'Recipe'
-        },
-        {
-          'name': 'organization',
-          'title': 'Organization',
-          'description': 'Add the organization to filter this report to a specific organization',
-          'placeholder': 'Organization'
-        }
-      ]);
+      const availableFilterTypesNames = component.availableFilterTypes.map( type => type.name);
+
+      const expected = [
+        'chef_server', 'chef_tags', 'control', 'environment', 'node', 'organization', 'platform',
+        'policy_group', 'policy_name', 'profile', 'recipe', 'role'];
+
+      expect(availableFilterTypesNames.length).toBe(expected.length);
+
+      // Each expected type is in the availableFilterTypesNames
+      expected.forEach(expectedType =>
+          expect(availableFilterTypesNames.indexOf(expectedType)).toBeGreaterThanOrEqual(0));
+
+      // Ensure availableFilterTypes.Titles are sorted
+      const availableFilterTypesTitles = component.availableFilterTypes.map( type => type.title);
+      const expectedAvailableFilterTypesTitle =
+        component.availableFilterTypes.map( type => type.title).sort(
+        (type1, type2) => (type1 < type2 ? -1 : 1));
+
+      expect(expectedAvailableFilterTypesTitle).toEqual(availableFilterTypesTitles,
+        'Filter Types are not sorted');
     });
   });
 
