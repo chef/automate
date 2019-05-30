@@ -357,14 +357,14 @@ func (s *state) ListRules(ctx context.Context, req *api.ListRulesReq) (*api.List
 		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
 	}
 
-	rules := []*api.ProjectRule{}
-	for _, rule := range resp {
+	rules := make([]*api.ProjectRule, len(resp))
+	for i, rule := range resp {
 		apiRule, err := fromStorageRule(rule)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal,
 				"error converting rule with ID %q: %s", rule.ID, err.Error())
 		}
-		rules = append(rules, apiRule)
+		rules[i] = apiRule
 	}
 
 	return &api.ListRulesResp{Rules: rules}, nil

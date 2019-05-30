@@ -190,27 +190,10 @@ func TestGetRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
-		{"if the rule does not exist, returns code 'not found'", func(t *testing.T) {
+		{"if the rule does not exist, returns 'not found'", func(t *testing.T) {
 			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "foo"})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
-		}},
-		{"if a rule with the requested id exists, returns the rule", func(t *testing.T) {
-			id := "foo-rule"
-			projectID := "foo-project"
-			name := "my coo foo rule"
-			addRuleToStore(t, store, id, name, storage.Node, projectID, storageConditions)
-			expectedRule := api.ProjectRule{
-				Id:         id,
-				Name:       name,
-				Type:       api.ProjectRuleTypes_NODE,
-				ProjectId:  projectID,
-				Conditions: apiConditions,
-			}
-			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: id})
-
-			require.NoError(t, err)
-			assert.Equal(t, &expectedRule, resp.Rule)
 		}},
 		{"if there are multiple rules and one matches the requested ID, returns the matching rule", func(t *testing.T) {
 			id := "foo-rule"
@@ -284,7 +267,7 @@ func TestListRules(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, &api.ListRulesResp{}, resp)
 		}},
-		{"if many rules exist, returns all rules", func(t *testing.T) {
+		{"if multiple rules exist, returns all rules", func(t *testing.T) {
 			id1, id2 := "rule-number-1", "rule-number-2"
 			projectID := "foo-project"
 			name := "you don't talk about fight club"
