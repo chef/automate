@@ -9,6 +9,7 @@ $chef-primary-bright: $royal-blue;
 $chef-primary-light: $malibu;
 //secondary
 $chef-critical: $pink;
+$chef-warning: $atomic-tangerine;
 $chef-major: $violet;
 $chef-minor: $indigo;
 $chef-success: $science-blue;
@@ -20,6 +21,9 @@ $chef-lightest-grey: $haze;
 $chef-white: $white;
 $chef-black: $black;
 $transparent-white: rgba(255, 255, 255, 0.85);
+//chart
+$chef-ok: $blue-de-france;
+$chef-unknown: $gray;
 
 // logos
 $default-logo: url('/assets/img/logos/AutomateLogo-default.svg');
