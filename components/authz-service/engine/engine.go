@@ -76,9 +76,20 @@ type ProjectRulesRetriever interface {
 	ListProjectMappings(context.Context) (map[string][]Rule, error)
 }
 
+// Rule belongs to a project and has one or more conditions
 type Rule struct {
-	Type   string
-	Values []string
+	ID         string
+	ProjectID  string
+	Name       string
+	Type       string
+	Conditions []Condition
+}
+
+// Condition contains filtering information for a project's rule
+type Condition struct {
+	Type     string
+	Operator string
+	Values   []string
 }
 
 // Subjects contains the requestor and all the teams they're a member of.

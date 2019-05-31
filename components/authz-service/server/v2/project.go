@@ -569,28 +569,29 @@ func fromAPIType(t api.ProjectRuleTypes) (storage.RuleType, error) {
 	}
 }
 
-// TODO: Currently there is only collection of conditions in a project, which are called 'Rule'.
-// We need to update this data structure to have projects have collection of rules. The rules have a
-// collection of conditions. The conditions have a 'type' and 'values' (like rules currently do).
-// The rules should have a 'type' either 'node' or 'event'.
 func rulesToProjectRules(rules []engine.Rule) ([]*api.ProjectRule, error) {
-	conditions := make([]*api.Condition, len(rules))
-	for j, rule := range rules {
-		conditionType, exists := api.ProjectRuleConditionTypes_value[rule.Type]
-		if !exists {
-			return []*api.ProjectRule{}, errors.New(fmt.Sprintf("Condition type %s is not supported", rule.Type))
+	fmt.Printf("HEY! rules %#v", rules)
+	apiRules := make([]*api.ProjectRule, len(rules))
+	for i, rule := range rules {
+		conditions := make([]*api.Condition, len(rules[i].Conditions))
+		for j, condition := range rules[i].Conditions {
+			conditions[j] = &api.Condition{
+				Type:     api.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS, // TODO convert type
+				Operator: api.ProjectRuleConditionOperators_MEMBER_OF,     // TODO convert type
+				Values:   condition.Values,
+			}
 		}
-		conditions[j] = &api.Condition{
-			Type:   api.ProjectRuleConditionTypes(conditionType),
-			Values: rule.Values,
+
+		apiRules[i] = &api.ProjectRule{
+			Id:         rule.ID,
+			Name:       rule.Name,
+			Type:       api.ProjectRuleTypes_NODE, // TODO convert type
+			ProjectId:  rule.ProjectID,
+			Conditions: conditions,
 		}
 	}
-	// TODO: The ProjectRule Type needs to be added to the database
-	rule := &api.ProjectRule{
-		Conditions: conditions,
-		Type:       api.ProjectRuleTypes_NODE,
-	}
-	return []*api.ProjectRule{rule}, nil
+	fmt.Printf("HEY! apiRules %#v", rules)
+	return apiRules, nil
 }
 
 func (s *state) prepareStorageRule(inID, projectID, name string,
@@ -613,3 +614,21 @@ func (s *state) prepareStorageRule(inID, projectID, name string,
 	}
 	return &r, nil
 }
+
+// func fromEngineRuleType(t string) (api.ProjectRuleTypes, error) {
+// 	switch t {
+// 		TODO
+// 	}
+// }
+
+// func fromEngineConditionType(t string) (api.ProjectRuleConditionTypes, error) {
+// 	switch t {
+// 		TODO
+// 	}
+// }
+
+// func fromEngineOperatorType(o string) (api.ProjectRuleConditionOperators, error) {
+// 	switch o {
+// 		TODO
+// 	}
+// }

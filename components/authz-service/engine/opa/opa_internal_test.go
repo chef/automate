@@ -519,8 +519,17 @@ var rule engine.Rule
 func BenchmarkUnmarshallingWithMapstructure(b *testing.B) {
 	var r engine.Rule
 	m := map[string]interface{}{
-		"type":   "ChefServers",
-		"values": []string{"foo", "bar"},
+		"id":   "rule-1",
+		"name": "rule number 1",
+		"type": "node",
+		"project_id": "project-1",
+		"conditions": []map[string]interface{}{
+			{
+				"type": "chef_servers",
+				"operator": "equals",
+				"values": []string{"foo", "bar"},
+			},
+		},
 	}
 	for n := 0; n < b.N; n++ {
 		r = engine.Rule{}
@@ -534,21 +543,46 @@ func BenchmarkUnmarshallingWithMapstructure(b *testing.B) {
 func BenchmarkUnmarshallingWithoutMapstructure(b *testing.B) {
 	var r engine.Rule
 	m := map[string]interface{}{
-		"type":   "ChefServers",
-		"values": []string{"foo", "bar"},
+		"id":   "rule-1",
+		"name": "rule number 1",
+		"type": "node",
+		"project_id": "project-1",
+		"conditions": []map[string]interface{}{
+			{
+				"type": "chef_servers",
+				"operator": "equals",
+				"values": []string{"foo", "bar"},
+			},
+		},
 	}
 	for n := 0; n < b.N; n++ {
 		r = engine.Rule{}
+		if id, ok := m["id"]; ok {
+			if id, ok := id.(string); ok {
+				r.ID = id
+			}
+		}
+		if name, ok := m["name"]; ok {
+			if name, ok := name.(string); ok {
+				r.Name = name
+			}
+		}
 		if t, ok := m["type"]; ok {
 			if t, ok := t.(string); ok {
 				r.Type = t
 			}
 		}
-		if vs, ok := m["values"]; ok {
-			if vs, ok := vs.([]string); ok {
-				r.Values = vs
+		if pid, ok := m["project_id"]; ok {
+			if pid, ok := pid.(string); ok {
+				r.ProjectID = pid
 			}
 		}
+		// TODO conditions
+		// if vs, ok := m["values"]; ok {
+		// 	if vs, ok := vs.([]string); ok {
+		// 		r.Values = vs
+		// 	}
+		// }
 	}
 	rule = r
 }

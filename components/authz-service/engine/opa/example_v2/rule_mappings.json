@@ -1,24 +1,85 @@
 {
-  "project1" : [
-    {
-      "type":   "ChefServers",
-      "values": ["chef-server-1", "chef-server-2", "chef-server-3"]
-    }
-  ],
-  "project2" : [
-    {
-      "type":   "ChefOrgs",
-      "values": ["Org1", "Org2"]
+  "projectRules": {
+    "project1": {
+      "rules": [
+        {
+          "id": "rule1",
+          "projectId": "project1",
+          "name": "project number 1",
+          "type": "event",
+          "conditions": [
+            {
+              "type": "chef_servers",
+              "operator": "member_of",
+              "values": [
+                "chef-server-1",
+                "chef-server-2",
+                "chef-server-3"
+              ]
+            }
+          ]
+        }
+      ]
     },
-    {
-      "type":   "ChefServers",
-      "values": ["chef-server-3", "chef-server-4", "chef-server-5"]
+    "project2": {
+      "rules": [
+        {
+          "id": "rule2",
+          "projectId": "project2",
+          "name": "project number 2",
+          "type": "node",
+          "conditions": [
+            {
+              "type": "chef_orgs",
+              "operator": "member_of",
+              "values": [
+                "org1",
+                "org2"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "project3": {
+      "rules": [
+        {
+          "id": "rule3",
+          "projectId": "project3",
+          "name": "project number 3",
+          "type": "event",
+          "conditions": [
+            {
+              "type": "chef_servers",
+              "operator": "equals",
+              "values": [
+                "chef-server-3"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "project4": {
+      "rules": [
+        {
+          "id": "rule4",
+          "projectId": "project4",
+          "name": "project number 4",
+          "type": "node",
+          "conditions": [
+            {
+              "type": "chef_environment",
+              "operator": "member_of",
+              "values": [
+                    "env-1",
+                    "env-2",
+                    "env3-3"
+              ]
+            }
+          ]
+        }
+      ]
     }
-  ],
-  "project3" : [
-    {
-      "type":   "ChefEnvironment",
-      "values": ["env-1", "env-2", "env3-3"]
-    }
-  ]
+  }
 }

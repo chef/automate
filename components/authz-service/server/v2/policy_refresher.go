@@ -253,27 +253,30 @@ func (refresher *policyRefresher) getRuleMap(ctx context.Context) (map[string][]
 			data[r.ID] = make([]interface{}, 0)
 		}
 
-		conditions := make([]interface{}, len(r.Conditions))
-		for i, condition := range r.Conditions {
-			c := []map[string]interface{}{
-				{
-					"type":     condition.Type.String(),
-					"operator": condition.Operator.String(),
-					"values":   condition.Value,
-				},
-			}
-			conditions[i] = c
-		}
+		// TODO conditions
+		// conditions := make([]interface{}, len(r.Conditions))
+		// for i, condition := range r.Conditions {
+		// 	c := []map[string]interface{}{
+		// 		{
+		// 			"type":     condition.Type.String(),
+		// 			"operator": condition.Operator.String(),
+		// 			"values":   condition.Value,
+		// 		},
+		// 	}
+		// 	conditions[i] = c
+		// }
 
 		data[r.ID] = append(data[r.ID],
 			map[string]interface{}{
 				"id":         r.ID,
 				"project_id": r.ProjectID,
 				"name":       r.Name,
-				"type":       r.Type,
-				"conditions": conditions,
+				"type":       r.Type.String(),
+				// "conditions": r.Conditions,
 			})
 	}
+
+	refresher.log.Infof("HEY! got this first rule %#v in getRuleMap", data["foo-rule"])
 
 	return data, nil
 }

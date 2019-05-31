@@ -25,6 +25,7 @@ type State struct {
 	log               logger.Logger
 	store             storage.Store
 	v2Store           storage.Store
+	ruleStore         storage.Store
 	queries           map[string]ast.Body
 	compiler          *ast.Compiler
 	modules           map[string]*ast.Module
@@ -85,9 +86,10 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 		return nil, errors.Wrapf(err, "parse query %q", listProjectMapQuery)
 	}
 	s := State{
-		log:     l,
-		store:   inmem.New(),
-		v2Store: inmem.New(),
+		log:       l,
+		store:     inmem.New(),
+		v2Store:   inmem.New(),
+		ruleStore: inmem.New(),
 		queries: map[string]ast.Body{
 			authzQuery:              authzQueryParsed,
 			filteredPairsQuery:      filteredPairsQueryParsed,
@@ -431,7 +433,7 @@ func (s *State) RulesForProject(
 
 // ListProjectMappings returns a map of all the rules for each projectID.
 func (s *State) ListProjectMappings(ctx context.Context) (map[string][]engine.Rule, error) {
-	rs, err := s.evalQuery(ctx, s.queries[listProjectMapQuery], map[string]interface{}{}, s.v2Store)
+	rs, err := s.evalQuery(ctx, s.queries[listProjectMapQuery], map[string]interface{}{}, s.ruleStore)
 	if err != nil {
 		return nil, &ErrEvaluation{e: err}
 	}
@@ -561,7 +563,7 @@ func (s *State) projectMappingsFromResults(rs rego.ResultSet) (map[string][]engi
 		if len(outer) != 1 {
 			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
 		}
-		projectMap := outer[0].(map[string]interface{})
+		projectMap, ok := outer[0].(map[string]interface{})
 		if !ok {
 			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
 		}
@@ -589,21 +591,40 @@ func (s *State) convertRulesList(ms []interface{}, rules []engine.Rule) ([]engin
 		if !ok {
 			return nil, errors.New("error converting map[string]interface{}")
 		}
+		id, ok := m["id"].(string)
+		if !ok {
+			return nil, errors.New("error converting id")
+		}
+		name, ok := m["name"].(string)
+		if !ok {
+			return nil, errors.New("error converting name")
+		}
 		t, ok := m["type"].(string)
 		if !ok {
 			return nil, errors.New("error converting type")
 		}
-		vs, ok := m["values"].([]interface{})
+		pid, ok := m["project_id"].(string)
 		if !ok {
-			return nil, errors.New("error converting values")
+			return nil, errors.New("error converting project_id")
 		}
-		vals := make([]string, len(vs))
-		for j := range vs {
-			if val, ok := vs[j].(string); ok {
-				vals[j] = val
-			}
-		}
-		rules = append(rules, engine.Rule{Type: t, Values: vals})
+		// TODO conditions
+		// vs, ok := m["values"].([]interface{})
+		// if !ok {
+		// 	return nil, errors.New("error converting values")
+		// }
+		// vals := make([]string, len(vs))
+		// for j := range vs {
+		// 	if val, ok := vs[j].(string); ok {
+		// 		vals[j] = val
+		// 	}
+		// }
+		rules = append(rules, engine.Rule{
+			ID:         id,
+			Name:       name,
+			Type:       t,
+			ProjectID:  pid,
+			Conditions: []engine.Condition{},
+		})
 	}
 	return rules, nil
 }
@@ -627,10 +648,14 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
+	// TODO break this out into new function
+	s.ruleStore = inmem.NewFromObject(map[string]interface{}{
+		"rules": ruleMap,
+	})
+
 	s.v2Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
 		"roles":    roleMap,
-		"rules":    ruleMap,
 	})
 
 	return s.initPartialResultV2(ctx)

@@ -500,6 +500,63 @@ func TestHasProject(t *testing.T) {
 		})
 	}
 }
+func TestListProjectMappings(t *testing.T) {
+	data := `{
+  "projectRules": {
+    "project1": {
+      "rules": [
+        {
+          "id": "rule1",
+          "projectId": "project1",
+          "name": "project number 1",
+          "type": "event",
+          "conditions": [
+            {
+              "type": "chef_servers",
+              "operator": "member_of",
+              "values": [
+                "chef-server-1",
+                "chef-server-2",
+                "chef-server-3"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "project2": {
+      "rules": [
+        {
+          "id": "rule2",
+          "projectId": "project2",
+          "name": "project number 2",
+          "type": "node",
+          "conditions": [
+            {
+              "type": "chef_orgs",
+              "operator": "equals",
+              "values": [
+                "org1"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}`
+
+	query := "data.rule_mappings.rules_for_all_projects"
+
+	t.Run("returns complete list of rules", func(t *testing.T) {
+		rs := resultSetV2(t, nil, strings.NewReader(data), query)
+
+		require.Equal(t, 1, len(rs), "expected one result")
+		require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
+		// TODO unmarshal result
+		// assert.Equal(t, data, result)
+	})
+}
 
 // Helper functions
 
@@ -542,5 +599,6 @@ func compilerV2(t *testing.T) *ast.Compiler {
 		"authz_v2.rego":         "../opa/policy/authz_v2.rego",
 		"introspection_v2.rego": "../opa/policy/introspection_v2.rego",
 		"common.rego":           "../opa/policy/common.rego",
+		"rule_mappings.rego":    "../opa/policy/rule_mappings.rego",
 	})
 }
