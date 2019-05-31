@@ -33,10 +33,28 @@ export class ReportingComponent implements OnInit, OnDestroy {
   // Query search bar
   availableFilterTypes = [
     {
-      'name': 'profile',
-      'title': 'Profile',
-      'description': 'Add the name or ID to filter this report against a profile',
-      'placeholder': 'Name or ID'
+      'name': 'chef_server',
+      'title': 'Chef Server',
+      'description': '',
+      'placeholder': 'Chef Server'
+    },
+    {
+      'name': 'chef_tags',
+      'title': 'Chef Tags',
+      'description': '',
+      'placeholder': 'Chef Tags'
+    },
+    {
+      'name': 'control',
+      'title': 'Control',
+      'description': 'Add the title to filter this report against a control',
+      'placeholder': 'Title'
+    },
+    {
+      'name': 'environment',
+      'title': 'Environment',
+      'description': 'Add the name to filter this report to a specific environment',
+      'placeholder': 'Name'
     },
     {
       'name': 'node',
@@ -46,34 +64,46 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'placeholder': 'Name, ID, or hostname'
     },
     {
+      'name': 'organization',
+      'title': 'Organization',
+      'description': 'Add the organization to filter this report to a specific organization',
+      'placeholder': 'Organization'
+    },
+    {
       'name': 'platform',
       'title': 'Platform',
       'description': 'Add the name to filter this report to a specific platform',
       'placeholder': 'Name'
     },
     {
-      'name': 'environment',
-      'title': 'Environment',
-      'description': 'Add the name to filter this report to a specific environment',
-      'placeholder': 'Name'
+      'name': 'policy_group',
+      'title': 'Policy Group',
+      'description': '',
+      'placeholder': 'Policy Group'
     },
     {
-      'name': 'control',
-      'title': 'Control',
-      'description': 'Add the title to filter this report against a control',
-      'placeholder': 'Title'
+      'name': 'policy_name',
+      'title': 'Policy Name',
+      'description': '',
+      'placeholder': 'Policy Name'
     },
     {
-      'name': 'role',
-      'title': 'Role',
-      'description': 'Add the role to filter this report to a specific role',
-      'placeholder': 'Role'
+      'name': 'profile',
+      'title': 'Profile',
+      'description': 'Add the name or ID to filter this report against a profile',
+      'placeholder': 'Name or ID'
     },
     {
       'name': 'recipe',
       'title': 'Recipe',
       'description': 'Add the recipe to filter this report to a specific recipe',
       'placeholder': 'Recipe'
+    },
+    {
+      'name': 'role',
+      'title': 'Role',
+      'description': 'Add the role to filter this report to a specific role',
+      'placeholder': 'Role'
     }
   ];
 

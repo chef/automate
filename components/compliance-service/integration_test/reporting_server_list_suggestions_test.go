@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"golang.org/x/net/context"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/compliance-service/api/reporting"
@@ -14,6 +16,376 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
+
+func TestReportingListSuggestionsFiltering(t *testing.T) {
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	ctx := context.Background()
+
+	cases := []struct {
+		description   string
+		summaries     []*relaxting.ESInSpecSummary
+		request       reporting.SuggestionRequest
+		expectedTerms []string
+	}{
+		// organization
+		{
+			description: "Only two orgs are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:           "1",
+					OrganizationName: "org1",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "org2",
+				},
+				{
+					NodeID:           "3",
+					OrganizationName: "1/75th Airborne Rangers",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "organization",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All orgs are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:           "1",
+					OrganizationName: "org1",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "org2",
+				},
+				{
+					NodeID:           "3",
+					OrganizationName: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "organization",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No orgs are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:           "1",
+					OrganizationName: "org1",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "org2",
+				},
+				{
+					NodeID:           "3",
+					OrganizationName: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "organization",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
+
+		// chef_server
+		{
+			description: "Only two chef servers are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					SourceFQDN: "org1",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "org2",
+				},
+				{
+					NodeID:     "3",
+					SourceFQDN: "bob",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_server",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All chef servers are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					SourceFQDN: "org1",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "org2",
+				},
+				{
+					NodeID:     "3",
+					SourceFQDN: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_server",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No chef servers are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					SourceFQDN: "org1",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "org2",
+				},
+				{
+					NodeID:     "3",
+					SourceFQDN: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_server",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
+
+		// chef_tags
+		{
+			description: "Only two chef tags are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"org1", "org4"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"org2", "org3"},
+				},
+				{
+					NodeID:   "3",
+					ChefTags: []string{"bob"},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_tags",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2", "org3", "org4"},
+		},
+		{
+			description: "All chef tags are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"org1", "org4"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"org2", "org5"},
+				},
+				{
+					NodeID:   "3",
+					ChefTags: []string{"org3", "org6"},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_tags",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3", "org4", "org5", "org6"},
+		},
+		{
+			description: "No chef tags are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"org1", "org4"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"org2", "org5"},
+				},
+				{
+					NodeID:   "3",
+					ChefTags: []string{"org3", "org6"},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "chef_tags",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
+
+		// policy_group
+		{
+			description: "Only two policy groups are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:      "1",
+					PolicyGroup: "org1",
+				},
+				{
+					NodeID:      "2",
+					PolicyGroup: "org2",
+				},
+				{
+					NodeID:      "3",
+					PolicyGroup: "bob",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_group",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All policy groups are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:      "1",
+					PolicyGroup: "org1",
+				},
+				{
+					NodeID:      "2",
+					PolicyGroup: "org2",
+				},
+				{
+					NodeID:      "3",
+					PolicyGroup: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_group",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No policy groups are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:      "1",
+					PolicyGroup: "org1",
+				},
+				{
+					NodeID:      "2",
+					PolicyGroup: "org2",
+				},
+				{
+					NodeID:      "3",
+					PolicyGroup: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_group",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
+
+		// policy_name
+		{
+			description: "Only two policy names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					PolicyName: "org1",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "org2",
+				},
+				{
+					NodeID:     "3",
+					PolicyName: "bob",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_name",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All policy names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					PolicyName: "org1",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "org2",
+				},
+				{
+					NodeID:     "3",
+					PolicyName: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_name",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No policy names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:     "1",
+					PolicyName: "org1",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "org2",
+				},
+				{
+					NodeID:     "3",
+					PolicyName: "org3",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "policy_name",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(test.description, func(t *testing.T) {
+			suite.InsertInspecSummaries(test.summaries)
+			defer suite.DeleteAllDocuments()
+
+			response, err := server.ListSuggestions(ctx, &test.request)
+			assert.NoError(t, err)
+			require.NotNil(t, response)
+
+			actualTerms := make([]string, len(response.Suggestions))
+			for i, suggestion := range response.Suggestions {
+				actualTerms[i] = suggestion.Text
+			}
+
+			assert.ElementsMatch(t, test.expectedTerms, actualTerms)
+		})
+	}
+}
 
 func TestReportingListSuggestions(t *testing.T) {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
