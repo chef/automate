@@ -21,41 +21,41 @@ service ApplicationsService {
     // TODO (dan, 2/2019): need to replace this once we have resources and such
     // created in the auth system
     option (chef.automate.api.policy) = {
-      resource: "nodes"
+      resource: "service_groups"
       action: "list"
     };
     option (chef.automate.api.iam.policy) = {
-      resource: "infra:nodes"
-      action: "infra:nodes:list"
+      resource: "applications:serviceGroups"
+      action: "applications:serviceGroups:list"
     };
   };
   rpc GetServiceGroupsHealthCounts(ServiceGroupsHealthCountsReq) returns (HealthCounts) {
     // TODO (afiune, 3/2019): need to replace this once we have resources and such
     // created in the auth system
     option (google.api.http).get = "/beta/applications/service_groups_health_counts";
-    option (chef.automate.api.policy).resource = "nodes";
+    option (chef.automate.api.policy).resource = "service_groups";
     option (chef.automate.api.policy).action = "list";
-    option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
   };
   rpc GetServices(ServicesReq) returns (ServicesRes) {
     // TODO (afiune, 4/2019): need to replace this once we have resources and such
     // created in the auth system
     option (google.api.http).get = "/beta/applications/services";
-    option (chef.automate.api.policy).resource = "nodes";
+    option (chef.automate.api.policy).resource = "service_groups";
     option (chef.automate.api.policy).action = "list";
-    option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
   };
 
   rpc GetServicesBySG(ServicesBySGReq) returns (ServicesBySGRes) {
     // TODO (afiune, 4/2019): need to replace this once we have resources and such
     // created in the auth system
     option (google.api.http).get = "/beta/applications/service-groups/{service_group_id}";
-    option (chef.automate.api.policy).resource = "nodes";
+    option (chef.automate.api.policy).resource = "service_groups";
     option (chef.automate.api.policy).action = "list";
-    option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
   };
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/beta/applications/version";
