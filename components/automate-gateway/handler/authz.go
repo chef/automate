@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus"
@@ -250,14 +251,30 @@ func (a *AuthzServer) IntrospectAllProjects(
 }
 
 func logResult(log *logrus.Entry, endpointMap map[string]*gwAuthzRes.MethodsAllowed) {
-	if len(endpointMap) == 0 {
-		log.Debug("Allowed paths: NONE")
-		return
-	}
 	paths := make([]string, len(endpointMap))
 	i := 0
-	for k := range endpointMap {
-		paths[i] = k
+	for k, v := range endpointMap {
+		methods := []string{}
+		if v.Get == true {
+			methods = append(methods, "Get")
+		}
+		if v.Put == true {
+			methods = append(methods, "Put")
+		}
+		if v.Post == true {
+			methods = append(methods, "Post")
+		}
+		if v.Delete == true {
+			methods = append(methods, "Delete")
+		}
+		if v.Patch == true {
+			methods = append(methods, "Patch")
+		}
+		if len(methods) > 0 {
+			paths[i] = fmt.Sprintf("%s[%s]", k, strings.Join(methods, ","))
+		} else {
+			paths[i] = fmt.Sprintf("%s[NONE]", k)
+		}
 		i++
 	}
 	log.Debugf("Allowed paths: " + strings.Join(paths, ", "))
