@@ -115,7 +115,13 @@ func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*repo
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
+
 	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err = filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	profiles, counts, err := srv.es.GetAllProfilesFromNodes(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, "")
