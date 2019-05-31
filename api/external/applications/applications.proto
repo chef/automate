@@ -18,8 +18,6 @@ import "api/external/common/query/parameters.proto";
 service ApplicationsService {
   rpc GetServiceGroups(ServiceGroupsReq) returns (ServiceGroups) {
     option (google.api.http).get = "/beta/applications/service-groups";
-    // TODO (dan, 2/2019): need to replace this once we have resources and such
-    // created in the auth system
     option (chef.automate.api.policy) = {
       resource: "service_groups"
       action: "list"

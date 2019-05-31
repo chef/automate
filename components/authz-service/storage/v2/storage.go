@@ -234,6 +234,7 @@ func DefaultRoles() []Role {
 			"ingest:*",
 			"secrets:*",
 			"telemetry:*",
+			"applications:*",
 		},
 		Type: ChefManaged,
 	}
@@ -254,6 +255,7 @@ func DefaultRoles() []Role {
 			"event:*:list",
 			"ingest:*:get",
 			"ingest:*:list",
+			"applications:*:list",
 		},
 		Type: ChefManaged,
 	}
