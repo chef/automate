@@ -558,9 +558,6 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 		return nil, nil, errors.Wrapf(err, "%s, cannot connect to ElasticSearch", myName)
 	}
 
-	var inspecProfilesQuery elastic.Query
-
-	query := elastic.NewIdsQuery(mappings.DocType)
 	//if one of the "other" filters are sent in, regardless of profile_id, we need to get the ids from scans
 	profileMins, counts, err := backend.getProfileMinsFromNodes(filters)
 	if err != nil {
@@ -573,8 +570,8 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 		logrus.Debugf("profile id: %s", profileMin.ID)
 	}
 
+	query := elastic.NewIdsQuery(mappings.DocType)
 	query.Ids(profileIDs...)
-	inspecProfilesQuery = query
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"name",
@@ -583,7 +580,7 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
-		Query(inspecProfilesQuery).
+		Query(query).
 		Sort(sort_field, sort_asc).
 		From(int(from)).
 		Size(int(size))
