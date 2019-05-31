@@ -255,19 +255,19 @@ func logResult(log *logrus.Entry, endpointMap map[string]*gwAuthzRes.MethodsAllo
 	i := 0
 	for k, v := range endpointMap {
 		methods := []string{}
-		if v.Get == true {
+		if v.Get {
 			methods = append(methods, "Get")
 		}
-		if v.Put == true {
+		if v.Put {
 			methods = append(methods, "Put")
 		}
-		if v.Post == true {
+		if v.Post {
 			methods = append(methods, "Post")
 		}
-		if v.Delete == true {
+		if v.Delete {
 			methods = append(methods, "Delete")
 		}
-		if v.Patch == true {
+		if v.Patch {
 			methods = append(methods, "Patch")
 		}
 		if len(methods) > 0 {
