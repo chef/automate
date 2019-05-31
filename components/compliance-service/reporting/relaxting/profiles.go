@@ -641,8 +641,6 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 	filters map[string][]string) (map[string]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
 	myName := "getProfileMinsFromNodes"
 
-	profileMins := make(map[string]reporting.ProfileMin)
-
 	for filterName, filterValue := range filters {
 		logrus.Debugf("%s, filter: name=>%s value=>%s\n", myName, filterName, filterValue)
 	}
@@ -653,7 +651,7 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 
 	depth, err := backend.NewDepth(filters, false, true)
 	if err != nil {
-		return profileMins, nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
+		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
 
 	queryInfo := depth.getQueryInfo()
@@ -678,7 +676,7 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 		Do(context.Background())
 
 	if err != nil {
-		return profileMins, nil, errors.Wrapf(err, "%s unable to complete search", myName)
+		return nil, nil, errors.Wrapf(err, "%s unable to complete search", myName)
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult, fmt.Sprintf("%s - search results", myName))
