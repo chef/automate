@@ -27,6 +27,7 @@ var (
 	validSortFieldsForServiceGroups = map[string]SortField{
 		"name":        NameField,
 		"percent_ok":  PercentOkField,
+		"health":      HealthField,
 		"app_name":    AppField,
 		"environment": EnvironmentField,
 		"":            DefaultField,

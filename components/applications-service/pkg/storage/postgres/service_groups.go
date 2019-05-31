@@ -49,18 +49,21 @@ ON sg.deployment_id = d.id
 GROUP BY sg.id, sg.deployment_id, sg.name, d.app_name, d.environment
 `
 	// conditional expression to calculate the overall health of the service group
+	// NOTE: @afiune We are adding a number to order the health statuses ('X_') so
+	// that we don't have to do a custom ORDER BY statement, this number must be
+	// removed before sending back any objects to the caller. (grpc functions)
 	conditionalOverallHealth = `
-CASE WHEN health_critical > 0 THEN 'CRITICAL'
-     WHEN health_unknown  > 0 THEN 'UNKNOWN'
-     WHEN health_warning  > 0 THEN 'WARNING'
-     ELSE 'OK'
+CASE WHEN health_critical > 0 THEN '1_CRITICAL'
+     WHEN health_unknown  > 0 THEN '2_UNKNOWN'
+     WHEN health_warning  > 0 THEN '3_WARNING'
+     ELSE '4_OK'
 END
 `
 	// Service group health main query. Here we add the overall health calculation.
 	// NOTE: This query has NO pagination and sorting since it is reused for the HealthCounts.
 	// @afiune maybe in the future we could create a sql view so we don't have it here.
 	selectServiceGroupHealth = `
-SELECT *,(` + conditionalOverallHealth + `) overall_health
+SELECT *,(` + conditionalOverallHealth + `) health
 FROM (` + selectServiceGroupHealthCalculation + `) AS service_groups_health_calculation
 `
 
@@ -90,14 +93,14 @@ FROM (` + selectServiceGroupHealth + `) AS service_groups_health_counts
 
 	selectServiceGroupHealthWithPageSort = `
 SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
-ORDER BY %s %s
+ORDER BY %s
 LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterCRITICAL = `
 SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
 WHERE health_critical > 0
-ORDER BY %s %s
+ORDER BY %s
 LIMIT $1
 OFFSET $2
 `
@@ -105,7 +108,7 @@ OFFSET $2
 SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
 WHERE health_unknown  > 0
   AND health_critical = 0
-ORDER BY %s %s
+ORDER BY %s
 LIMIT $1
 OFFSET $2
 `
@@ -114,7 +117,7 @@ SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
 WHERE health_warning  > 0
   AND health_critical = 0
   AND health_unknown  = 0
-ORDER BY %s %s
+ORDER BY %s
 LIMIT $1
 OFFSET $2
 `
@@ -124,7 +127,7 @@ WHERE health_ok > 0
   AND health_critical = 0
   AND health_warning  = 0
   AND health_unknown  = 0
-ORDER BY %s %s
+ORDER BY %s
 LIMIT $1
 OFFSET $2
 `
@@ -136,6 +139,7 @@ type serviceGroupHealth struct {
 	Releases       pq.StringArray `db:"releases"`
 	Name           string         `db:"name"`
 	DeploymentID   int32          `db:"deployment_id"`
+	Health         string         `db:"health"`
 	HealthOk       int32          `db:"health_ok"`
 	HealthCritical int32          `db:"health_critical"`
 	HealthWarning  int32          `db:"health_warning"`
@@ -144,7 +148,6 @@ type serviceGroupHealth struct {
 	PercentOk      int32          `db:"percent_ok"`
 	Application    string         `db:"app_name"`
 	Environment    string         `db:"environment"`
-	OverallHealth  string         `db:"overall_health"`
 }
 
 // getServiceFromUniqueFields retrieve a service from the db without the need of an id
@@ -188,7 +191,9 @@ func (db *Postgres) GetServiceGroups(
 		}
 	}
 
-	formattedQuery := fmt.Sprintf(selectQuery, sortField, sortOrder)
+	// Formatting our Query with sort field and sort order
+	formattedQuery := fmt.Sprintf(selectQuery, formatSortFields(sortField, sortOrder))
+
 	_, err = db.DbMap.Select(&sgHealth, formattedQuery, pageSize, offset)
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to retrieve service groups from the database")
@@ -200,7 +205,7 @@ func (db *Postgres) GetServiceGroups(
 			Release:          sgh.ReleaseString(),
 			Name:             sgh.Name,
 			DeploymentID:     sgh.DeploymentID,
-			HealthStatus:     sgh.OverallHealth,
+			HealthStatus:     sgh.Health[2:], // Quick trick to remove health order from DB
 			HealthPercentage: sgh.PercentOk,
 			Application:      sgh.Application,
 			Environment:      sgh.Environment,
@@ -268,5 +273,27 @@ func queryFromStatusFilter(text string) (string, error) {
 		return selectServiceGroupHealthFilterUNKNOWN, nil
 	default:
 		return "", errors.Errorf("invalid status filter '%s'", text)
+	}
+}
+
+// formatSortFields returns a customized ORDER BY statement from the provided sort field,
+// if the field doesn't require a special ORDER BY it will return the same field
+//
+// Criteria:
+// * When sort by percent_ok, add a second order by group health criticality.
+// * When sort by group health criticality, add a second order by percent_ok.
+//
+// The second ORDER BY added with this function will be static and it will always be ascending
+// since we want to always give more priority to the things that are in a critical state
+func formatSortFields(field, sort string) string {
+	sortField := field + " " + sort
+
+	switch field {
+	case "health":
+		return sortField + ", percent_ok ASC"
+	case "percent_ok":
+		return sortField + ", health ASC"
+	default:
+		return sortField
 	}
 }
