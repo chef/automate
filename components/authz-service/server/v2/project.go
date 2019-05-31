@@ -303,7 +303,7 @@ func (s *state) HandleEvent(ctx context.Context,
 func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.CreateRuleResp, error) {
 	r, err := s.prepareStorageRule(req.Id, req.ProjectId, req.Name, req.Type, req.Conditions)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.InvalidArgument, "error processing request: %s", err.Error())
 	}
 
 	resp, err := s.store.CreateRule(ctx, r)
@@ -326,7 +326,7 @@ func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.Cr
 func (s *state) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (*api.UpdateRuleResp, error) {
 	r, err := s.prepareStorageRule(req.Id, req.ProjectId, req.Name, req.Type, req.Conditions)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.InvalidArgument, "error processing request: %s", err.Error())
 	}
 
 	resp, err := s.store.UpdateRule(ctx, r)

@@ -108,6 +108,9 @@ func fromExternalCreate(req *pb_req.CreateRuleReq) (*authz.CreateRuleReq, error)
 		return nil, err
 	}
 	conditions, err := fromExternalConditions(req.Conditions)
+	if err != nil {
+		return nil, err
+	}
 	return &authz.CreateRuleReq{
 		Id:         req.Id,
 		Name:       req.Name,

@@ -187,6 +187,7 @@ func TestUpdateRule(t *testing.T) {
 				Name:       "",
 				ProjectId:  "foo",
 				Conditions: apiConditions,
+				Type:       api.ProjectRuleTypes_NODE,
 			})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
@@ -197,6 +198,7 @@ func TestUpdateRule(t *testing.T) {
 				Name:       "empty id",
 				ProjectId:  "foo",
 				Conditions: apiConditions,
+				Type:       api.ProjectRuleTypes_NODE,
 			})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
@@ -207,6 +209,7 @@ func TestUpdateRule(t *testing.T) {
 				Name:       "any name",
 				ProjectId:  "foo",
 				Conditions: apiConditions,
+				Type:       api.ProjectRuleTypes_NODE,
 			})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
@@ -216,6 +219,7 @@ func TestUpdateRule(t *testing.T) {
 				Id:        "foo",
 				Name:      "foo rule",
 				ProjectId: "bar",
+				Type:      api.ProjectRuleTypes_NODE,
 			})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
@@ -226,6 +230,7 @@ func TestUpdateRule(t *testing.T) {
 				Name:       "my other foo",
 				ProjectId:  "bar",
 				Conditions: apiConditions,
+				Type:       api.ProjectRuleTypes_NODE,
 			})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
@@ -239,8 +244,31 @@ func TestUpdateRule(t *testing.T) {
 				Name:       "my other foo",
 				ProjectId:  "cannot-change",
 				Conditions: apiConditions,
+				Type:       api.ProjectRuleTypes_NODE,
 			})
 			grpctest.AssertCode(t, codes.FailedPrecondition, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the updated rule passes conditions not compatible with the type, throw an error", func(t *testing.T) {
+			id := "foo-rule"
+			addRuleToStore(t, store, id, "my foo rule", storage.Event, "foo-project", storageConditions)
+
+			changedAPIConditions := []*api.Condition{
+				{
+					Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
+					Values:   []string{"should-break"},
+					Operator: api.ProjectRuleConditionOperators_EQUALS,
+				},
+			}
+
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:         id,
+				Name:       "my other foo",
+				ProjectId:  "foo-project",
+				Conditions: changedAPIConditions,
+				Type:       api.ProjectRuleTypes_EVENT,
+			})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"with valid rule data, returns no error and updates the rule in storage", func(t *testing.T) {
