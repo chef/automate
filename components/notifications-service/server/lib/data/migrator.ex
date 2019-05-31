@@ -117,7 +117,7 @@ defmodule Notifications.Data.Migrator.DB do
   end
 
   def exec_migration_sql(conn, query) do
-    Logger.info("migration query #{query}")
+    Logger.debug fn() -> "migration query #{query}" end
     case :epgsql.equery(conn, query, []) do
       {:ok, _, _} -> :ok
       {:ok, _} -> :ok

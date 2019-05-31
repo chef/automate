@@ -15,7 +15,7 @@ BEGIN;
 CREATE TABLE recurring_workflow_schedules (
     id BIGSERIAL PRIMARY KEY,
 
-    name TEXT NOT NULL,
+    instance_name TEXT NOT NULL,
     workflow_name TEXT NOT NULL,
     parameters BYTEA,
     recurrence TEXT,
@@ -25,7 +25,7 @@ CREATE TABLE recurring_workflow_schedules (
     last_enqueued_at TIMESTAMPTZ,
     next_run_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT say_my_name UNIQUE(name, workflow_name)
+    CONSTRAINT say_my_name UNIQUE(instance_name, workflow_name)
 );
 
 CREATE OR REPLACE FUNCTION update_recurring_workflow_parameters(
@@ -69,7 +69,7 @@ CREATE TYPE workflow_instance_status AS ENUM('running', 'abandoned');
 
 CREATE TABLE workflow_instances (
     id BIGSERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
+    instance_name TEXT NOT NULL,
     workflow_name TEXT NOT NULL,
     parameters BYTEA,
     payload BYTEA,
@@ -79,12 +79,12 @@ CREATE TABLE workflow_instances (
     completed_tasks INTEGER NOT NULL DEFAULT 0,
     status workflow_instance_status NOT NULL DEFAULT 'running',
 
-    CONSTRAINT say_my_name1 UNIQUE(name, workflow_name)
+    CONSTRAINT say_my_name1 UNIQUE(instance_name, workflow_name)
 );
 
 CREATE TABLE workflow_results (
     id BIGSERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
+    instance_name TEXT NOT NULL,
     workflow_name TEXT NOT NULL,
     parameters BYTEA,
     start_at TIMESTAMPTZ NOT NULL,
@@ -115,7 +115,7 @@ CREATE TABLE tasks (
     parameters    BYTEA
 );
 
-CREATE TABLE tasks_results (
+CREATE TABLE task_results (
     id BIGSERIAL PRIMARY KEY,
     workflow_instance_id BIGINT NOT NULL,
     parameters   BYTEA,
@@ -140,14 +140,14 @@ CREATE TABLE workflow_events (
 
 -- Workflow Functions
 CREATE OR REPLACE FUNCTION enqueue_workflow(
-    name TEXT,
+    instance_name TEXT,
     workflow_name TEXT,
     parameters BYTEA)
 RETURNS INTEGER
 AS $$
     WITH winst AS (
-        INSERT INTO workflow_instances(name, workflow_name, parameters)
-            VALUES(name, workflow_name, parameters)
+        INSERT INTO workflow_instances(instance_name, workflow_name, parameters)
+            VALUES(instance_name, workflow_name, parameters)
             ON CONFLICT DO NOTHING
             RETURNING id
         )
@@ -165,7 +165,7 @@ AS $$
     WITH nextwinst AS (
         SELECT
             a.id id,
-            a.name instance_name,
+            a.instance_name instance_name,
             a.workflow_name workflow_name,
             a.status status,
             a.parameters parameters,
@@ -194,7 +194,6 @@ RETURNS VOID
 AS $$
     INSERT INTO workflow_events(event_type, workflow_instance_id)
         VALUES('cancel', workflow_instance_id);
-    -- TODO: notify
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION abandon_workflow(_workflow_instance_id BIGINT, eid BIGINT, _completed_tasks INTEGER)
@@ -216,27 +215,20 @@ AS $$
         VALUES('tasks_abandoned', _workflow_instance_id);
 $$ LANGUAGE SQL;
 
-
-CREATE OR REPLACE FUNCTION cancel_workflow(workflow_instance_id BIGINT)
-RETURNS VOID
-AS $$
-    DELETE FROM workflow_instances WHERE id=workflow_instance_id;
-$$ LANGUAGE SQL;
-
 CREATE OR REPLACE FUNCTION complete_workflow(wid BIGINT)
 RETURNS VOID
 LANGUAGE SQL
 AS $$
     WITH 
     done_workflows AS (
-        SELECT id, name, workflow_name, parameters, start_at 
+        SELECT id, instance_name, workflow_name, parameters, start_at 
         FROM workflow_instances where id = wid
     )
-    INSERT INTO workflow_results(name, workflow_name, parameters, start_at)
-        (SELECT name, workflow_name, parameters, start_at FROM done_workflows);
+    INSERT INTO workflow_results(instance_name, workflow_name, parameters, start_at)
+        (SELECT instance_name, workflow_name, parameters, start_at FROM done_workflows);
     
     DELETE FROM tasks WHERE workflow_instance_id = wid;
-    DELETE FROM tasks_results WHERE workflow_instance_id = wid;
+    DELETE FROM task_results WHERE workflow_instance_id = wid;
     DELETE FROM workflow_events WHERE workflow_instance_id = wid;
     DELETE FROM workflow_instances WHERE id = wid;
 $$;
@@ -286,7 +278,7 @@ AS $$
         error as error,
         result as result),
     tres AS (
-        INSERT INTO tasks_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
+        INSERT INTO task_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
             (SELECT workflow_instance_id, parameters, task_name, enqueued_at, in_vals.status, in_vals.error, in_vals.result
             FROM tasks JOIN in_vals ON in_vals.id = tasks.id WHERE tasks.id = tid) RETURNING id, workflow_instance_id
     )

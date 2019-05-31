@@ -244,6 +244,10 @@ data. Chef employees have access to this data via an internal instance
 of Vault. To get started, the `scripts/get_secrets` script will
 download the mostly commonly needed secrets:
 
+1. Connect to the Chef VPN.
+
+2. Run the `get_secrets` script as below:
+
 ``` console
 CHEF_USERNAME=your-chef-ad-username scripts/get_secrets
 source dev/secrets-env.sh
@@ -255,11 +259,27 @@ a secret, let other developers know via Slack.
 
 You can interact with vault directly using the `vault` command:
 
+1. Connect to the Chef VPN.
+
+2. Install vault and log into our vault instance. One easy way to do
+   this is to run the get_secrets script again:
+
 ``` console
+CHEF_USERNAME=your-chef-ad-username scripts/get_secrets
+```
+
+3. Setup your environment to run `vault`:
+
+```
 export VAULT_ADDR=https://vault.chef.co:8200
 # If you are in the studio, install the cacerts:
 export VAULT_CACERT="$(hab pkg path core/cacerts)/ssl/certs/cacert.pem"
-vault kv list 'secrets/a2'
+```
+
+4. Run your desired `vault` commands:
+
+```console
+vault kv list 'secret/a2'
 ```
 
 ## Working with Automate UI

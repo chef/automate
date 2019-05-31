@@ -180,6 +180,37 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal(expected_data, actual_data.to_json)
 
+    # Filter by status
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+        filters: [
+            Reporting::ListFilter.new(type: "end_time", values: ["2018-03-04T#{END_OF_DAY}"]),
+            Reporting::ListFilter.new(type: 'status', values: ['skipped'])
+        ],
+        page: 1, per_page: 2)
+    expected_data = {
+        "profiles" => [
+            {
+                "name" => "fake-baseline",
+                "title" => "A fake one",
+                "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                "version" => "2.0.1",
+                "status" => "skipped"
+            },
+            {
+                "name" => "apache-baseline",
+                "title" => "DevSec Apache Baseline",
+                "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                "version" => "2.0.1",
+                "status" => "skipped"
+            }
+        ],
+        "counts" => {
+            "total" => 2,
+            "skipped" => 2
+        }
+    }
+    assert_equal_json_content(expected_data, actual_data)
+
     # Get profiles used by node with node_id
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'node_id', values: ['9b9f4e51-b049-4b10-9555-10578916e149']),

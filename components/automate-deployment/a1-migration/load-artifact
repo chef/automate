@@ -9,7 +9,7 @@ chef-server-ctl stop
 ## code path
 ## see https://chefio.atlassian.net/wiki/spaces/ENG/pages/455147533/Migrating+A1+Elasticsearch+data
 ## and https://drive.google.com/open?id=1dtdt8kRXywDAE9G03WX7a3mWQoAWsYY1
-DATA_PACKAGE_RELEASE="20190524202433"
+DATA_PACKAGE_RELEASE="20190530183952"
 HAB_LICENSE=accept-no-persist hab pkg install "devchef/a1-migration-data-full/0.0.1/$DATA_PACKAGE_RELEASE" --channel unstable
 
 echo "waiting for migration data to sync..."

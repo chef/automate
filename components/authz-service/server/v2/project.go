@@ -333,6 +333,43 @@ func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.Cr
 	return &api.CreateRuleResp{Rule: apiRule}, nil
 }
 
+func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
+	resp, err := s.store.GetRule(ctx, req.Id)
+	if err != nil {
+		if err == storage_errors.ErrNotFound {
+			return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
+		}
+		return nil, status.Errorf(codes.Internal,
+			"error retrieving rule with ID %q: %s", req.Id, err.Error())
+	}
+
+	apiRule, err := fromStorageRule(resp)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal,
+			"error converting rule with ID %q: %s", resp.ID, err.Error())
+	}
+	return &api.GetRuleResp{Rule: apiRule}, nil
+}
+
+func (s *state) ListRules(ctx context.Context, req *api.ListRulesReq) (*api.ListRulesResp, error) {
+	resp, err := s.store.ListRules(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
+	}
+
+	rules := make([]*api.ProjectRule, len(resp))
+	for i, rule := range resp {
+		apiRule, err := fromStorageRule(rule)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal,
+				"error converting rule with ID %q: %s", rule.ID, err.Error())
+		}
+		rules[i] = apiRule
+	}
+
+	return &api.ListRulesResp{Rules: rules}, nil
+}
+
 func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition) ([]storage.Condition, error) {
 	cs := make([]storage.Condition, len(apiConditions))
 	for i, c := range apiConditions {
@@ -351,7 +388,12 @@ func storageCondition(ruleType storage.RuleType, apiCondition *api.Condition) (s
 		return storage.Condition{}, err
 	}
 
-	return storage.NewCondition(ruleType, apiCondition.Values, condAttr, storage.MemberOf)
+	condOp, err := fromAPIProjectRuleConditionOperators(apiCondition.Operator)
+	if err != nil {
+		return storage.Condition{}, err
+	}
+
+	return storage.NewCondition(ruleType, apiCondition.Values, condAttr, condOp)
 }
 
 // we want to reserve the option to return an error in this conversion
@@ -401,9 +443,16 @@ func fromStorageCondition(c storage.Condition) (*api.Condition, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	o, err := fromStorageConditionOperator(c.Operator)
+	if err != nil {
+		return nil, err
+	}
+
 	return &api.Condition{
-		Type:   t,
-		Values: c.Value,
+		Type:     t,
+		Values:   c.Value,
+		Operator: o,
 	}, nil
 }
 
@@ -424,7 +473,7 @@ func fromStorageConditionType(t storage.ConditionAttribute) (api.ProjectRuleCond
 	if s, ok := storageToAPIConditionAttributes[t]; ok {
 		return s, nil
 	}
-	return 0, fmt.Errorf("invalid condition type %s", t.String())
+	return 0, fmt.Errorf("invalid condition type %q", t.String())
 }
 
 func fromAPIProjectRuleConditionTypes(t api.ProjectRuleConditionTypes) (storage.ConditionAttribute, error) {
@@ -437,7 +486,35 @@ func fromAPIProjectRuleConditionTypes(t api.ProjectRuleConditionTypes) (storage.
 	if s, ok := apiToStorageConditionAttributes[t]; ok {
 		return s, nil
 	}
-	return 0, fmt.Errorf("invalid condition type %s", t.String())
+	return 0, fmt.Errorf("invalid condition type %q", t.String())
+}
+
+var storageToAPIConditionOperators = map[storage.ConditionOperator]api.ProjectRuleConditionOperators{
+	storage.MemberOf: api.ProjectRuleConditionOperators_MEMBER_OF,
+	storage.Equals:   api.ProjectRuleConditionOperators_EQUALS,
+}
+
+var apiToStorageConditionOperators = map[api.ProjectRuleConditionOperators]storage.ConditionOperator{}
+var onceReverseConditionOperatorsMapping sync.Once
+
+func fromStorageConditionOperator(t storage.ConditionOperator) (api.ProjectRuleConditionOperators, error) {
+	if s, ok := storageToAPIConditionOperators[t]; ok {
+		return s, nil
+	}
+	return 0, fmt.Errorf("invalid condition operator %q", t.String())
+}
+
+func fromAPIProjectRuleConditionOperators(t api.ProjectRuleConditionOperators) (storage.ConditionOperator, error) {
+	onceReverseConditionOperatorsMapping.Do(func() {
+		for k, v := range storageToAPIConditionOperators {
+			apiToStorageConditionOperators[v] = k
+		}
+	})
+
+	if s, ok := apiToStorageConditionOperators[t]; ok {
+		return s, nil
+	}
+	return 0, fmt.Errorf("invalid condition operator %q", t.String())
 }
 
 func fromStorageRuleType(t storage.RuleType) (api.ProjectRuleTypes, error) {

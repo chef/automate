@@ -33,7 +33,46 @@ func (s *Server) CreateRule(ctx context.Context, req *pb_req.CreateRuleReq) (*pb
 	if err != nil {
 		return nil, err
 	}
-	return fromInternal(resp)
+
+	rule, err := fromInternal(resp.Rule)
+	if err != nil {
+		return nil, err
+	}
+	return &pb_resp.CreateRuleResp{Rule: rule}, nil
+}
+
+func (s *Server) GetRule(ctx context.Context, req *pb_req.GetRuleReq) (*pb_resp.GetRuleResp, error) {
+	resp, err := s.projects.GetRule(ctx, &authz.GetRuleReq{Id: req.Id})
+	if err != nil {
+		return nil, err
+	}
+
+	rule, err := fromInternal(resp.Rule)
+	if err != nil {
+		return nil, err
+	}
+	return &pb_resp.GetRuleResp{Rule: rule}, nil
+}
+
+func (s *Server) ListRules(ctx context.Context, req *pb_req.ListRulesReq) (*pb_resp.ListRulesResp, error) {
+	resp, err := s.projects.ListRules(ctx, &authz.ListRulesReq{})
+	if err != nil {
+		return nil, err
+	}
+
+	rules := make([]*pb_common.Rule, len(resp.Rules))
+	for i, rule := range resp.Rules {
+		apiRule, err := fromInternal(rule)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		rules[i] = apiRule
+	}
+
+	return &pb_resp.ListRulesResp{
+		Rules: rules,
+	}, nil
 }
 
 func fromExternal(req *pb_req.CreateRuleReq) (*authz.CreateRuleReq, error) {
@@ -81,9 +120,16 @@ func fromExternalCondition(c *pb_common.Condition) (*authz.Condition, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	o, err := fromExternalConditionOperator(c.Operator)
+	if err != nil {
+		return nil, err
+	}
+
 	return &authz.Condition{
-		Type:   t,
-		Values: c.Values,
+		Type:     t,
+		Values:   c.Values,
+		Operator: o,
 	}, nil
 }
 
@@ -109,8 +155,24 @@ func fromExternalConditionType(t pb_common.ConditionType) (authz.ProjectRuleCond
 	}
 }
 
-func fromInternal(resp *authz.CreateRuleResp) (*pb_resp.CreateRuleResp, error) {
-	r := resp.Rule
+var externalToAPIConditionOperators = map[pb_common.ConditionOperator]authz.ProjectRuleConditionOperators{
+	pb_common.ConditionOperator_MEMBER_OF: authz.ProjectRuleConditionOperators_MEMBER_OF,
+	pb_common.ConditionOperator_EQUALS:    authz.ProjectRuleConditionOperators_EQUALS,
+}
+var apiToExternalConditionOperators = map[authz.ProjectRuleConditionOperators]pb_common.ConditionOperator{}
+var onceReverseConditionOperatorsMapping sync.Once
+
+func fromExternalConditionOperator(t pb_common.ConditionOperator) (authz.ProjectRuleConditionOperators, error) {
+	if t == pb_common.ConditionOperator_CONDITION_OPERATOR_UNSET {
+		return 0, status.Error(codes.InvalidArgument, "rule condition operator not provided")
+	} else if o, ok := externalToAPIConditionOperators[t]; ok {
+		return o, nil
+	} else {
+		return 0, fmt.Errorf("unknown rule operator: %v", t)
+	}
+}
+
+func fromInternal(r *authz.ProjectRule) (*pb_common.Rule, error) {
 	cs, err := fromInternalConditions(r.Conditions)
 	if err != nil {
 		return nil, err
@@ -126,7 +188,7 @@ func fromInternal(resp *authz.CreateRuleResp) (*pb_resp.CreateRuleResp, error) {
 		ProjectId:  r.ProjectId,
 		Conditions: cs,
 	}
-	return &pb_resp.CreateRuleResp{Rule: &rule}, nil
+	return &rule, nil
 }
 
 func fromInternalConditions(cs []*authz.Condition) ([]*pb_common.Condition, error) {
@@ -146,9 +208,15 @@ func fromInternalCondition(c *authz.Condition) (*pb_common.Condition, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	o, err := fromInternalConditionOperator(c.Operator)
+	if err != nil {
+		return nil, err
+	}
 	return &pb_common.Condition{
-		Type:   t,
-		Values: c.Values,
+		Type:     t,
+		Values:   c.Values,
+		Operator: o,
 	}, nil
 }
 
@@ -162,6 +230,18 @@ func fromInternalConditionType(t authz.ProjectRuleConditionTypes) (pb_common.Con
 		return s, nil
 	}
 	return 0, fmt.Errorf("invalid condition type %s", t.String())
+}
+
+func fromInternalConditionOperator(t authz.ProjectRuleConditionOperators) (pb_common.ConditionOperator, error) {
+	onceReverseConditionOperatorsMapping.Do(func() {
+		for k, v := range externalToAPIConditionOperators {
+			apiToExternalConditionOperators[v] = k
+		}
+	})
+	if s, ok := apiToExternalConditionOperators[t]; ok {
+		return s, nil
+	}
+	return 0, fmt.Errorf("invalid condition operator %s", t.String())
 }
 
 func fromInternalRuleType(t authz.ProjectRuleTypes) (pb_common.RuleType, error) {

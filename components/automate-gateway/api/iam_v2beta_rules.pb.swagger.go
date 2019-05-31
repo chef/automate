@@ -19,6 +19,20 @@ func init() {
   ],
   "paths": {
     "/iam/v2beta/rules": {
+      "get": {
+        "operationId": "ListRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListRulesResp"
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      },
       "post": {
         "operationId": "CreateRule",
         "responses": {
@@ -43,6 +57,30 @@ func init() {
           "Rules"
         ]
       }
+    },
+    "/iam/v2beta/rules/{id}": {
+      "get": {
+        "operationId": "GetRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetRuleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Rules"
+        ]
+      }
     }
   },
   "definitions": {
@@ -57,8 +95,20 @@ func init() {
           "items": {
             "type": "string"
           }
+        },
+        "operator": {
+          "$ref": "#/definitions/v2betaConditionOperator"
         }
       }
+    },
+    "v2betaConditionOperator": {
+      "type": "string",
+      "enum": [
+        "CONDITION_OPERATOR_UNSET",
+        "MEMBER_OF",
+        "EQUALS"
+      ],
+      "default": "CONDITION_OPERATOR_UNSET"
     },
     "v2betaConditionType": {
       "type": "string",
@@ -102,6 +152,25 @@ func init() {
       "properties": {
         "rule": {
           "$ref": "#/definitions/v2betaRule"
+        }
+      }
+    },
+    "v2betaGetRuleResp": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v2betaRule"
+        }
+      }
+    },
+    "v2betaListRulesResp": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaRule"
+          }
         }
       }
     },

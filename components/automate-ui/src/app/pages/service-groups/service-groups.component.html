@@ -35,7 +35,7 @@
     <chef-thead>
         <chef-tr>
           <chef-th class="health sort" (click)="onToggleSort('percent_ok')">
-            Health<i class="sort-icon {{sortIcon('percent_ok')}}"></i>
+            Health <i class="sort-icon {{sortIcon('percent_ok')}}"></i>
           </chef-th>
           <chef-th class="services">
             Services
@@ -45,6 +45,12 @@
           </chef-th>
           <chef-th class="release">
             Release
+          </chef-th>
+          <chef-th class="env sort" (click)="onToggleSort('environment')">
+            Env <i class="sort-icon {{sortIcon('environment')}}"></i>
+          </chef-th>
+          <chef-th class="app sort" (click)="onToggleSort('app_name')">
+            App <i class="sort-icon {{sortIcon('app_name')}}"></i>
           </chef-th>
         </chef-tr>
     </chef-thead>
@@ -72,6 +78,12 @@
         </chef-td>
         <chef-td class="release">
           {{ serviceGroup.release }}
+        </chef-td>
+        <chef-td class="env">
+          {{ serviceGroup.environment }}
+        </chef-td>
+        <chef-td class="app">
+          {{ serviceGroup.application }}
         </chef-td>
       </chef-tr>
     </chef-tbody>

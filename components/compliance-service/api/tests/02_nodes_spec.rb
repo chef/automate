@@ -392,6 +392,54 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal(expected_nodes, actual_nodes.to_json)
 
+    # Test filters by inspec version
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'inspec_version', values: ['3.1.0']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+    ])
+    expected_nodes = {
+        "nodes" => [
+            {
+                "id" => "9b9f4e51-b049-4b10-9555-10578916e149",
+                "name" => "centos-beta",
+                "platform" => {
+                    "name" => "centos",
+                    "release" => "5.11"
+                },
+                "environment" => "DevSec Prod beta",
+                "latestReport" => {
+                    "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                    "endTime" => {
+                        "seconds" => 1520155121
+                    },
+                    "status" => "passed",
+                    "controls" => {
+                        "total" => 18,
+                        "passed" => {
+                            "total" => 3
+                        },
+                        "skipped" => {
+                            "total" => 15
+                        },
+                        "failed" => {}
+                    }
+                },
+                "tags" => [],
+                "profiles" => []
+            }
+        ],
+        "total" => 1
+    }.to_json
+    assert_equal(expected_nodes, actual_nodes.to_json)
+
+    # Test filters by inspec version
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'inspec_version', values: ['3.1.3']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+    ])
+    assert_equal(actual_nodes.total, 4)
+
+
     # Test filters by env and status
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod beta']),

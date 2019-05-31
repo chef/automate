@@ -1,4 +1,5 @@
 <app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
+<chef-loading-spinner *ngIf="countsLoading" size='50' fixed></chef-loading-spinner>
 
 <div class="container">
   <main>
@@ -9,10 +10,10 @@
 
     <ul class="nav-tabs">
       <li class="nav-tab" routerLink="/compliance/scan-jobs/jobs" routerLinkActive="active">
-        {{jobsCount$ | async | number}} Scan jobs
+        <span *ngIf="jobsCountLoaded">{{jobsCount$ | async | number}}</span> Scan jobs 
       </li>
       <li class="nav-tab" routerLink="/compliance/scan-jobs/nodes" routerLinkActive="active">
-        {{nodesCount$ | async | number}} Nodes added
+        <span *ngIf="nodesCountLoaded">{{nodesCount$ | async | number}}</span> Nodes added
       </li>
     </ul>
 

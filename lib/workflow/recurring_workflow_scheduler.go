@@ -87,7 +87,7 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 		logrus.Warnf("Recurring workflow %fs past due. (expected at %s)", time.Since(s.NextDueAt).Seconds(), s.NextDueAt)
 	}
 
-	workflowInstanceName := s.Name
+	workflowInstanceName := s.InstanceName
 
 	// TODO(ssd) 2019-05-13: We might need two different
 	// rule types here to suppor the different use cases.
@@ -112,7 +112,7 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 		if err == ErrWorkflowInstanceExists {
 			logrus.Warnf(
 				"Recurring workflow %q still running, consider increasing recurrence interval",
-				s.Name)
+				s.InstanceName)
 			// TODO(jaym): what do we want to do here? i think we're going to keep trying
 			//             until we succeed here? Maybe we want to skip this interval?
 			return maxWakeupInterval, nil

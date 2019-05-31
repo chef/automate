@@ -34,7 +34,7 @@ func (p *Condition) Scan(src interface{}) error {
 func NewCondition(ruleType RuleType, value []string,
 	attribute ConditionAttribute, operator ConditionOperator) (Condition, error) {
 
-	err := validateConditionInputs(value, attribute, ruleType)
+	err := validateConditionInputs(value, attribute, ruleType, operator)
 	if err != nil {
 		return Condition{}, err
 	}
@@ -47,10 +47,17 @@ func NewCondition(ruleType RuleType, value []string,
 	}, nil
 }
 
-func validateConditionInputs(value []string, attribute ConditionAttribute, ruleType RuleType) error {
+func validateConditionInputs(value []string,
+	attribute ConditionAttribute, ruleType RuleType, operator ConditionOperator) error {
 
 	if len(value) == 0 {
-		return errors.New("a condition must have a value list that is not empty")
+		return errors.New("a condition must specify one or more values")
+	}
+
+	if operator == Equals {
+		if len(value) != 1 {
+			return errors.New("a condition must specify exactly one value for 'equals' operator")
+		}
 	}
 
 	if ruleType == Event {
