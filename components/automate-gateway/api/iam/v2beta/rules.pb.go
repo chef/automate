@@ -200,10 +200,10 @@ var _Rules_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("components/automate-gateway/api/iam/v2beta/rules.proto", fileDescriptor_rules_4e5098b933c6df65)
+	proto.RegisterFile("components/automate-gateway/api/iam/v2beta/rules.proto", fileDescriptor_rules_e8f8c898e7ea90f7)
 }
 
-var fileDescriptor_rules_4e5098b933c6df65 = []byte{
+var fileDescriptor_rules_e8f8c898e7ea90f7 = []byte{
 	// 463 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0xbf, 0x8e, 0xd3, 0x40,
 	0x10, 0xc6, 0x65, 0x8e, 0x33, 0x77, 0xcb, 0x9f, 0xcb, 0xcd, 0x49, 0xc8, 0x8a, 0xae, 0x4a, 0x05,

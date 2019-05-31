@@ -15,7 +15,7 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Rules {
   rpc CreateRule (CreateRuleReq) returns (CreateRuleResp) {
-    option (google.api.http).post= "/iam/v2beta/rules";
+    option (google.api.http).post = "/iam/v2beta/rules";
     option (google.api.http).body = "*";
     option (chef.automate.api.policy).resource = "auth:rules";
     option (chef.automate.api.policy).action = "create";
@@ -24,7 +24,7 @@ service Rules {
   };
 
   rpc GetRule (GetRuleReq) returns (GetRuleResp) {
-    option (google.api.http).get= "/iam/v2beta/rules/{id}";
+    option (google.api.http).get = "/iam/v2beta/rules/{id}";
     option (chef.automate.api.policy).resource = "auth:rules:{id}";
     option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:rules:{id}";
@@ -32,7 +32,7 @@ service Rules {
   };
 
   rpc ListRules (ListRulesReq) returns (ListRulesResp) {
-    option (google.api.http).get= "/iam/v2beta/rules";
+    option (google.api.http).get = "/iam/v2beta/rules";
     option (chef.automate.api.policy).resource = "auth:rules";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:rules";
@@ -40,7 +40,7 @@ service Rules {
   };
 
   rpc DeleteRule (DeleteRuleReq) returns (DeleteRuleResp) {
-    option (google.api.http).delete= "/iam/v2beta/rules/{id}";
+    option (google.api.http).delete = "/iam/v2beta/rules/{id}";
     option (chef.automate.api.policy).resource = "auth:rules:{id}";
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:rules:{id}";
