@@ -80,6 +80,28 @@ func init() {
         "tags": [
           "Rules"
         ]
+      },
+      "delete": {
+        "operationId": "DeleteRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteRuleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Rules"
+        ]
       }
     }
   },
@@ -154,6 +176,9 @@ func init() {
           "$ref": "#/definitions/v2betaRule"
         }
       }
+    },
+    "v2betaDeleteRuleResp": {
+      "type": "object"
     },
     "v2betaGetRuleResp": {
       "type": "object",

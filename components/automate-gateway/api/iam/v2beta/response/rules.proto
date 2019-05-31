@@ -16,3 +16,5 @@ message GetRuleResp {
 message ListRulesResp {
   repeated Rule rules = 1;
 }
+
+message DeleteRuleResp {}

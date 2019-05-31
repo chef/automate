@@ -43,6 +43,7 @@ type ProjectsServerMock struct {
 	CreateRuleFunc          func(context.Context, *CreateRuleReq) (*CreateRuleResp, error)
 	GetRuleFunc             func(context.Context, *GetRuleReq) (*GetRuleResp, error)
 	ListRulesFunc           func(context.Context, *ListRulesReq) (*ListRulesResp, error)
+	DeleteRuleFunc          func(context.Context, *DeleteRuleReq) (*DeleteRuleResp, error)
 }
 
 func (m *ProjectsServerMock) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
@@ -201,6 +202,18 @@ func (m *ProjectsServerMock) ListRules(ctx context.Context, req *ListRulesReq) (
 	return nil, status.Error(codes.Internal, "mock: 'ListRules' not implemented")
 }
 
+func (m *ProjectsServerMock) DeleteRule(ctx context.Context, req *DeleteRuleReq) (*DeleteRuleResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.DeleteRuleFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'DeleteRule' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *ProjectsServerMock) Reset() {
 	m.UpdateProjectFunc = nil
@@ -216,4 +229,5 @@ func (m *ProjectsServerMock) Reset() {
 	m.CreateRuleFunc = nil
 	m.GetRuleFunc = nil
 	m.ListRulesFunc = nil
+	m.DeleteRuleFunc = nil
 }

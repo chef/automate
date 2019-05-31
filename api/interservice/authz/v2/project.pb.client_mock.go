@@ -295,6 +295,26 @@ func (mr *MockProjectsClientMockRecorder) ListRules(ctx, in interface{}, opts ..
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRules", reflect.TypeOf((*MockProjectsClient)(nil).ListRules), varargs...)
 }
 
+// DeleteRule mocks base method
+func (m *MockProjectsClient) DeleteRule(ctx context.Context, in *DeleteRuleReq, opts ...grpc.CallOption) (*DeleteRuleResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DeleteRule", varargs...)
+	ret0, _ := ret[0].(*DeleteRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteRule indicates an expected call of DeleteRule
+func (mr *MockProjectsClientMockRecorder) DeleteRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRule", reflect.TypeOf((*MockProjectsClient)(nil).DeleteRule), varargs...)
+}
+
 // MockProjectsServer is a mock of ProjectsServer interface
 type MockProjectsServer struct {
 	ctrl     *gomock.Controller
@@ -511,4 +531,19 @@ func (m *MockProjectsServer) ListRules(arg0 context.Context, arg1 *ListRulesReq)
 func (mr *MockProjectsServerMockRecorder) ListRules(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRules", reflect.TypeOf((*MockProjectsServer)(nil).ListRules), arg0, arg1)
+}
+
+// DeleteRule mocks base method
+func (m *MockProjectsServer) DeleteRule(arg0 context.Context, arg1 *DeleteRuleReq) (*DeleteRuleResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteRule", arg0, arg1)
+	ret0, _ := ret[0].(*DeleteRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteRule indicates an expected call of DeleteRule
+func (mr *MockProjectsServerMockRecorder) DeleteRule(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRule", reflect.TypeOf((*MockProjectsServer)(nil).DeleteRule), arg0, arg1)
 }

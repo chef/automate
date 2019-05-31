@@ -370,6 +370,19 @@ func (s *state) ListRules(ctx context.Context, req *api.ListRulesReq) (*api.List
 	return &api.ListRulesResp{Rules: rules}, nil
 }
 
+func (s *state) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
+	err := s.store.DeleteRule(ctx, req.Id)
+	switch err {
+	case nil:
+		return &api.DeleteRuleResp{}, nil
+	case storage_errors.ErrNotFound:
+		return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
+	default: // any other error
+		return nil, status.Errorf(codes.Internal,
+			"error deleting rule with ID %q: %s", req.Id, err.Error())
+	}
+}
+
 func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition) ([]storage.Condition, error) {
 	cs := make([]storage.Condition, len(apiConditions))
 	for i, c := range apiConditions {

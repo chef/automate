@@ -232,8 +232,8 @@ func TestListRules(t *testing.T) {
 
 	apiConditions1 := []*api.Condition{
 		{
-			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values: []string{"opscode", "chef"},
+			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values:   []string{"opscode", "chef"},
 			Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
 		},
 	}
@@ -247,8 +247,8 @@ func TestListRules(t *testing.T) {
 	}
 	apiConditions2 := []*api.Condition{
 		{
-			Type:   api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values: []string{"chef"},
+			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values:   []string{"chef"},
 			Operator: api.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
@@ -295,6 +295,73 @@ func TestListRules(t *testing.T) {
 			resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
 			require.NoError(t, err)
 			assert.ElementsMatch(t, expected, resp.Rules)
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		store.Flush()
+	}
+}
+
+func TestDeleteRule(t *testing.T) {
+	ctx := context.Background()
+	cl, store, _, _ := setupRules(t)
+
+	storageConditions1 := []storage.Condition{
+		{
+			Type:      storage.Node,
+			Attribute: storage.Organization,
+			Operator:  storage.MemberOf,
+			Value:     []string{"opscode", "chef"},
+		},
+	}
+	storageConditions2 := []storage.Condition{
+		{
+			Type:      storage.Event,
+			Attribute: storage.Organization,
+			Operator:  storage.Equals,
+			Value:     []string{"chef"},
+		},
+	}
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"if the rule id is empty, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: ""})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "no_underscore_allowed"})
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the rule does not exist, returns 'not found'", func(t *testing.T) {
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "foo"})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
+		{"if there are multiple rules and one matches the requested ID, delete the matching rule", func(t *testing.T) {
+			id1, id2 := "rule-number-1", "rule-number-2"
+			projectID := "foo-project"
+			name := "you don't talk about fight club"
+			addRuleToStore(t, store, id1, name, storage.Node, projectID, storageConditions1)
+			addRuleToStore(t, store, id2, name, storage.Event, projectID, storageConditions2)
+
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: id1})
+			require.NoError(t, err)
+			assert.Equal(t, &api.DeleteRuleResp{}, resp)
+
+			rule, exists := store.Get(id1)
+			assert.Nil(t, rule)
+			assert.False(t, exists)
 		}},
 	}
 

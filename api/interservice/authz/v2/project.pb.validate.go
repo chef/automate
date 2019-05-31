@@ -2129,3 +2129,142 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListRulesRespValidationError{}
+
+// Validate checks the field values on DeleteRuleReq with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *DeleteRuleReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if !_DeleteRuleReq_Id_Pattern.MatchString(m.GetId()) {
+		return DeleteRuleReqValidationError{
+			field:  "Id",
+			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+		}
+	}
+
+	return nil
+}
+
+// DeleteRuleReqValidationError is the validation error returned by
+// DeleteRuleReq.Validate if the designated constraints aren't met.
+type DeleteRuleReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteRuleReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteRuleReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteRuleReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteRuleReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteRuleReqValidationError) ErrorName() string { return "DeleteRuleReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DeleteRuleReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteRuleReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteRuleReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteRuleReqValidationError{}
+
+var _DeleteRuleReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+
+// Validate checks the field values on DeleteRuleResp with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *DeleteRuleResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// DeleteRuleRespValidationError is the validation error returned by
+// DeleteRuleResp.Validate if the designated constraints aren't met.
+type DeleteRuleRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DeleteRuleRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DeleteRuleRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DeleteRuleRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DeleteRuleRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DeleteRuleRespValidationError) ErrorName() string { return "DeleteRuleRespValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DeleteRuleRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDeleteRuleResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DeleteRuleRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DeleteRuleRespValidationError{}
