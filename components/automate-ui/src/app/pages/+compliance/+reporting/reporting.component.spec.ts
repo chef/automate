@@ -67,17 +67,14 @@ describe('ReportingComponent', () => {
         'chef_server', 'chef_tags', 'control', 'environment', 'node', 'organization', 'platform',
         'policy_group', 'policy_name', 'profile', 'recipe', 'role'];
 
-      expect(availableFilterTypesNames.length).toBe(expected.length);
+      expect(expected.sort()).toEqual(availableFilterTypesNames.sort());
+    });
 
-      // Each expected type is in the availableFilterTypesNames
-      expected.forEach(expectedType =>
-          expect(availableFilterTypesNames.indexOf(expectedType)).toBeGreaterThanOrEqual(0));
-
+    it('to have the titles sorted', () => {
       // Ensure availableFilterTypes.Titles are sorted
       const availableFilterTypesTitles = component.availableFilterTypes.map( type => type.title);
       const expectedAvailableFilterTypesTitle =
-        component.availableFilterTypes.map( type => type.title).sort(
-        (type1, type2) => (type1 < type2 ? -1 : 1));
+        component.availableFilterTypes.map(type => type.title).sort();
 
       expect(expectedAvailableFilterTypesTitle).toEqual(availableFilterTypesTitles,
         'Filter Types are not sorted');
