@@ -602,17 +602,13 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 			"hits.hits._id",
 			"hits.hits._source").
 		Do(context.Background())
+	if err != nil {
+		return nil, nil, err
+	}
 
 	LogQueryPartMin(esIndex, searchResult, fmt.Sprintf("%s - search result", myName))
 
 	profiles := make([]*reportingapi.ProfileMin, 0)
-	if err != nil {
-		// should we be returning the error here...instead of logging it and then returning nil for the error?
-		logrus.Errorf("%s: Error while trying to get data from ES for index: %s error: %s",
-			myName, esIndex, err.Error())
-		return profiles, nil, nil
-	}
-
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			var profile reportingapi.ProfileMin
