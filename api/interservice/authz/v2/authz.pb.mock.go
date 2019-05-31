@@ -31,7 +31,7 @@ type AuthorizationServerMock struct {
 	validateRequests             bool
 	IsAuthorizedFunc             func(context.Context, *IsAuthorizedReq) (*IsAuthorizedResp, error)
 	FilterAuthorizedPairsFunc    func(context.Context, *FilterAuthorizedPairsReq) (*FilterAuthorizedPairsResp, error)
-	FilterAuthorizedProjectsFunc func(context.Context, *FilterAuthorizedPairsReq) (*FilterAuthorizedProjectsResp, error)
+	FilterAuthorizedProjectsFunc func(context.Context, *FilterAuthorizedProjectsReq) (*FilterAuthorizedProjectsResp, error)
 	ProjectsAuthorizedFunc       func(context.Context, *ProjectsAuthorizedReq) (*ProjectsAuthorizedResp, error)
 }
 
@@ -59,7 +59,7 @@ func (m *AuthorizationServerMock) FilterAuthorizedPairs(ctx context.Context, req
 	return nil, status.Error(codes.Internal, "mock: 'FilterAuthorizedPairs' not implemented")
 }
 
-func (m *AuthorizationServerMock) FilterAuthorizedProjects(ctx context.Context, req *FilterAuthorizedPairsReq) (*FilterAuthorizedProjectsResp, error) {
+func (m *AuthorizationServerMock) FilterAuthorizedProjects(ctx context.Context, req *FilterAuthorizedProjectsReq) (*FilterAuthorizedProjectsResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())

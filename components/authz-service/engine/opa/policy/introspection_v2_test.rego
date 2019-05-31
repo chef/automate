@@ -73,22 +73,16 @@ test_authorized_pair_overrules_allowed_project_with_denied_project {
 	expected_pairs == actual_pairs
 }
 
-test_authorized_project_returns_multiple_projects {
+test_authorized_project_returns_multiple_projects_from_multiple_statements {
 	actual_projects = authorized_project with data.policies.polid as {
 		"members": ["bob"],
 		"statements": {
-			"sid1": {"effect": "allow", "actions": ["x1"], "resources": ["y1"], "projects": ["proj1", "proj2"]},
-			"sid2": {"effect": "allow", "actions": ["x2"], "resources": ["y2"], "projects": ["proj1", "proj3"]},
-			"sid3": {"effect": "allow", "actions": ["x3"], "resources": ["y3"], "projects": ["proj2"]},
+			"sid1": {"effect": "allow", "projects": ["proj1", "proj2"]},
+			"sid2": {"effect": "allow", "projects": ["proj1", "proj3"]},
+			"sid3": {"effect": "allow", "projects": ["proj2"]},
 		},
 	}
-		 with input as {
-			"subjects": ["bob"],
-			"pairs": [
-				{"action": "x1", "resource": "y1"},
-				{"action": "x2", "resource": "y2"},
-			],
-		}
+		 with input.subjects as ["bob"]
 
 	actual_projects == {"proj1", "proj2", "proj3"}
 }
@@ -98,57 +92,58 @@ test_authorized_project_ignores_system_policies {
 		"policy_id": {
 			"members": ["user:local:bob"],
 			"statements": {
-				"sid1": {"effect": "allow", "actions": ["x1"], "resources": ["y1"], "projects": ["proj1", "proj2"]},
-				"sid2": {"effect": "allow", "actions": ["x2"], "resources": ["y2"], "projects": ["proj1", "proj3"]},
-				"sid3": {"effect": "allow", "actions": ["x3"], "resources": ["y3"], "projects": ["proj2"]},
+				"sid1": {"effect": "allow", "projects": ["proj1", "proj2"]},
+				"sid2": {"effect": "allow", "projects": ["proj1", "proj3"]},
+				"sid3": {"effect": "allow", "projects": ["proj2"]},
 			},
 		},
 		"policy_id2": {
 			"type": "system",
 			"members": ["user:local:*"],
-			"statements": {"sid1": {"effect": "allow", "actions": ["x1"], "resources": ["y1"], "projects": [common.const_all_projects]}},
+			"statements": {"sid1": {"effect": "allow", "projects": [common.const_all_projects]}},
 		},
 	}
-		 with input as {
-			"subjects": ["user:local:bob"],
-			"pairs": [
-				{"action": "x1", "resource": "y1"},
-				{"action": "x2", "resource": "y2"},
-			],
-		}
+		 with input.subjects as ["user:local:bob"]
 
 	actual_projects == {"proj1", "proj2", "proj3"}
 }
 
-test_authorized_project_include_all_allowed_policies_and_omits_denied_policies {
+# As long as some statement allows a project, it is possible for the user to see something there
+test_authorized_project_includes_project_both_allowed_and_denied {
 	actual_projects = authorized_project with data.policies.polid as {
 		"members": ["bob"],
 		"statements": {
-			# Allowed with single project
-			"sid1": {"effect": "allow", "actions": ["x1"], "resources": ["y1"], "projects": ["proj2"]},
-			# Allowed with multiple projects
-			"sid2": {"effect": "allow", "actions": ["x2"], "resources": ["y2"], "projects": ["proj1", "proj3"]},
-			# Allowed with some overlapping projects
-			"sid3": {"effect": "allow", "actions": ["x2"], "resources": ["y2"], "projects": ["proj1", "proj2", "proj10"]},
-			# Denied on allowed action/resource and same project
-			"sid4": {"effect": "deny", "actions": ["x1"], "resources": ["y1"], "projects": ["proj1"]},
-			# Denied on allowed action/resource and different project
-			"sid5": {"effect": "deny", "actions": ["x1"], "resources": ["y1"], "projects": ["proj4"]},
-			# Denied on some other action/resource and same project
-			"sid6": {"effect": "deny", "actions": ["x3"], "resources": ["y3"], "projects": ["proj2", "proj5"]},
-			# Denied on some other action/resource and different project
-			"sid7": {"effect": "deny", "actions": ["x3"], "resources": ["y3"], "projects": ["proj6", "proj7", "proj8"]},
+			"sid1": {"effect": "allow", "projects": ["proj1"]},
+			"sid2": {"effect": "deny", "projects": ["proj1"]},
 		},
 	}
-		 with input as {
-			"subjects": ["bob"],
-			"pairs": [
-				{"action": "x1", "resource": "y1"},
-				{"action": "x2", "resource": "y2"},
-				{"action": "x3", "resource": "y3"},
-				{"action": "x4", "resource": "y4"},
-			],
-		}
+		 with input.subjects as ["bob"]
 
-	actual_projects == {"proj1", "proj2", "proj3", "proj10"}
+	actual_projects == {"proj1"}
+}
+
+test_authorized_project_includes_allowed_projects_overlapping_denied_projects {
+	actual_projects = authorized_project with data.policies.polid as {
+		"members": ["bob"],
+		"statements": {
+			"sid1": {"effect": "allow", "projects": ["proj1", "proj2"]},
+			"sid2": {"effect": "deny", "projects": ["proj1", "proj3"]},
+		},
+	}
+		 with input.subjects as ["bob"]
+
+	actual_projects == {"proj1", "proj2"}
+}
+
+test_authorized_project_ignores_denied_project_that_is_disjoint {
+	actual_projects = authorized_project with data.policies.polid as {
+		"members": ["bob"],
+		"statements": {
+			"sid1": {"effect": "allow", "projects": ["proj1"]},
+			"sid2": {"effect": "deny", "projects": ["proj3"]},
+		},
+	}
+		 with input.subjects as ["bob"]
+
+	actual_projects == {"proj1"}
 }

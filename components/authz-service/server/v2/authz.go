@@ -139,14 +139,12 @@ func (s *authzServer) FilterAuthorizedPairs(
 
 func (s *authzServer) FilterAuthorizedProjects(
 	ctx context.Context,
-	req *api.FilterAuthorizedPairsReq) (*api.FilterAuthorizedProjectsResp, error) {
+	req *api.FilterAuthorizedProjectsReq) (*api.FilterAuthorizedProjectsResp, error) {
 
 	// Introspection needs unfiltered access.
 	ctx = auth_context.ContextWithoutProjects(ctx)
 
-	resp, err := s.engine.V2FilterAuthorizedProjects(ctx,
-		engine.Subjects(req.Subjects),
-		toEnginePairs(req.Pairs))
+	resp, err := s.engine.V2FilterAuthorizedProjects(ctx, engine.Subjects(req.Subjects))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

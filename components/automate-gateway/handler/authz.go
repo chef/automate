@@ -226,21 +226,7 @@ func (a *AuthzServer) Introspect(
 func (a *AuthzServer) IntrospectAllProjects(
 	ctx context.Context, gwReq *gwAuthzReq.IntrospectAllProjectsReq) (*gwAuthzRes.IntrospectProjectsResp, error) {
 
-	methodsInfoV1 := policy.GetInfoMap()
-	methodsInfoV2 := policy_v2.GetInfoMap()
-
-	// Filter out parameterized API methods; can only evaluate concrete methods.
-	// TODO?? Is that what we want?
-	mapByResourceAndActionV1 := pairs.InvertMapNonParameterized(methodsInfoV1)
-	mapByResourceAndActionV2 := pairs.InvertMapNonParameterized(methodsInfoV2)
-
-	// Note that projects do not exist in v1 of course,
-	// but as project introspection is so similar to endpoint introspection,
-	// it was easy to mirror that code here.
-	projects, err := a.getAllowedProjects(ctx,
-		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2,
-		false)
+	projects, err := a.getAllowedProjects(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -334,26 +320,15 @@ func (a *AuthzServer) getAllowedMap(
 	return endpointMap, nil
 }
 
-func (a *AuthzServer) getAllowedProjects(
-	ctx context.Context,
-	mapByResourceAndActionV1, mapByResourceAndActionV2 map[pairs.Pair][]string,
-	methodsInfoV1, methodsInfoV2 map[string]pairs.Info,
-	fullyHydrate bool) ([]string, error) {
+func (a *AuthzServer) getAllowedProjects(ctx context.Context) ([]string, error) {
 
 	log := ctxlogrus.Extract(ctx)
 
 	// Fetches the id of the current user PLUS the team ids for that user
 	subjects := auth_context.FromContext(ctx).Subjects
 
-	inputPairs := pairs.GetKeys(mapByResourceAndActionV2)
-	pairsV2 := make([]*authzV2.Pair, len(inputPairs))
-	for i, p := range inputPairs {
-		pairsV2[i] = &authzV2.Pair{Resource: p.Resource, Action: p.Action}
-	}
-
-	resp, err := a.clientV2.FilterAuthorizedProjects(ctx, &authzV2.FilterAuthorizedPairsReq{
+	resp, err := a.clientV2.FilterAuthorizedProjects(ctx, &authzV2.FilterAuthorizedProjectsReq{
 		Subjects: subjects,
-		Pairs:    pairsV2,
 	})
 	if err != nil {
 		log.WithError(err).Debug("Error on client.FilterAuthorizedProjects")

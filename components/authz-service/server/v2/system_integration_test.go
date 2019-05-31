@@ -80,14 +80,8 @@ func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 		require.NoError(t, err)
 
 		resp, err := ts.authz.FilterAuthorizedProjects(ctx,
-			&api_v2.FilterAuthorizedPairsReq{
+			&api_v2.FilterAuthorizedProjectsReq{
 				Subjects: []string{"user:local:alice"},
-				Pairs: []*api_v2.Pair{
-					// normally all resources/actions are passed, but here we only need 
-					// at least one system policy pair
-					&api_v2.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
-					// and at least one non-system policy pair
-					&api_v2.Pair{Resource: "infra:nodes:foo", Action: "infra:nodes:get"}},
 			})
 		require.NoError(t, err)
 
