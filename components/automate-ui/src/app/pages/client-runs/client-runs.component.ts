@@ -54,20 +54,24 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       text: 'Attribute'
     },
     {
-      type: 'cookbook',
-      text: 'Cookbook'
+      type: 'chef_version',
+      text: 'Chef Client Version'
     },
     {
       type: 'chef_tags',
       text: 'Chef Tag'
     },
     {
-      type: 'chef_version',
-      text: 'Chef Client Version'
+      type: 'cookbook',
+      text: 'Cookbook'
     },
     {
       type: 'environment',
       text: 'Environment'
+    },
+    {
+      type: 'error',
+      text: 'Error'
     },
     {
       type: 'name',
@@ -100,10 +104,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     {
       type: 'role',
       text: 'Role'
-    },
-    {
-      type: 'error',
-      text: 'Error'
     }
   ];
 
