@@ -2,7 +2,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: ef164629df290f5f7f24f112b2ce5654ae025378f32aba2ec97b0659584f63ed
+        image_sha256: e94972998cc43c6a7c9ac713ec6342b34fb345ea92367819b6a28de3b5ab5f53
         workdir: /go/src/github.com/chef/automate
 
 steps:
