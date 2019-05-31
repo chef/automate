@@ -21,8 +21,8 @@ main() {
     esac
   done
 
-  ensure_container_build
-  run_hab_in_container
+  ensure_container_build || exit 1
+  run_hab_in_container || exit 1
 }
 
 print_help() {
