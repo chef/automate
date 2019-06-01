@@ -1,4 +1,4 @@
-import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpParams } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { StoreModule } from '@ngrx/store';
@@ -120,6 +120,45 @@ describe('HttpClientAuthInterceptor', () => {
           httpRequest.flush('response');
 
           expect(httpRequest.request.headers.keys()).not.toContain('projects');
+        });
+      });
+    });
+
+    describe('unfiltered flag', () => {
+      beforeEach(() => {
+        const projectList = [
+          { value: 'proj1', label: 'proj 1', checked: true },
+          { value: 'proj2', label: 'proj 2', checked: false },
+          { value: 'proj3', label: 'proj 3', checked: true },
+          { value: 'proj4', label: 'proj 4', checked: false }
+        ];
+        configure(projectList);
+        httpClient = TestBed.get(HttpClient);
+        httpMock = TestBed.get(HttpTestingController);
+        chefSession = TestBed.get(ChefSessionService);
+        spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+      });
+
+      using([
+        ['does not include project header', true],
+        ['includes project header', false]
+      ], function (description: string, setting: boolean) {
+
+        it(description + 'when unfiltered flag set to ' + setting, done => {
+          const options = {
+            params: new HttpParams().set('unfiltered', String(setting))
+          };
+          httpClient.get('/endpoint', options).subscribe(done);
+
+          const httpRequest = httpMock.expectOne('/endpoint');
+          httpRequest.flush('response');
+
+          const headerKeys = httpRequest.request.headers.keys();
+          if (setting) {
+            expect(headerKeys).not.toContain('projects');
+          } else {
+            expect(headerKeys).toContain('projects');
+          }
         });
       });
     });
