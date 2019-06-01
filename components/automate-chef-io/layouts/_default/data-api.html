@@ -1,0 +1,13 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+  <div class="prose">
+  {{ range .Site.Data.docs.api_chef_automate.endpoints }}
+  {{ $id := replace .title " " "-" }}
+  {{ $map := .paths}}
+  {{ range $elem_index, $elem_val := $map }}
+    <h2>{{ $elem_index }}</h2>
+      <p>{{ $elem_val }}</p>
+    {{ end }}
+  {{ end }}
+</div>
+{{ end }}
