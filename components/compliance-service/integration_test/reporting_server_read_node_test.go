@@ -28,7 +28,8 @@ func TestReadNode(t *testing.T) {
 			Projects: []string{"project1", "project2"},
 		},
 	}
-	reportIds := suite.InsertInspecReports(reports)
+	reportIds, err := suite.InsertInspecReports(reports)
+	require.NoError(t, err)
 
 	defer suite.DeleteAllDocuments()
 

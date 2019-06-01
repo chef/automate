@@ -35,7 +35,8 @@ func TestListReports(t *testing.T) {
 		},
 	}
 
-	reportIds := suite.InsertInspecReports(reports)
+	reportIds, err := suite.InsertInspecReports(reports)
+	require.NoError(t, err)
 
 	defer suite.DeleteAllDocuments()
 
