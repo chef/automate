@@ -1301,30 +1301,30 @@ func TestProjectUpdate(t *testing.T) {
 
 				// Send a project rules update event
 				esJobID, err := suite.ingesticESClient.UpdateReportProjectsTags(ctx, test.projects)
-				assert.Nil(t, err)
+				require.NoError(t, err)
 
 				suite.WaitForESJobToComplete(esJobID)
 
 				suite.RefreshComplianceReportIndex()
 
 				esJobID, err = suite.ingesticESClient.UpdateSummaryProjectsTags(ctx, test.projects)
-				assert.Nil(t, err)
+				require.NoError(t, err)
 
 				suite.WaitForESJobToComplete(esJobID)
 
 				suite.RefreshComplianceSummaryIndex()
 
 				reports, err := suite.GetAllReportsESInSpecReport()
-				assert.NoError(t, err)
-				assert.Equal(t, 1, len(reports))
+				require.NoError(t, err)
+				require.Equal(t, 1, len(reports))
 
 				updatedReport := reports[0]
 
 				assert.ElementsMatch(t, test.projectIDs, updatedReport.Projects)
 
 				summaries, err := suite.GetAllSummaryESInSpecSummary()
-				assert.NoError(t, err)
-				assert.Equal(t, 1, len(summaries))
+				require.NoError(t, err)
+				require.Equal(t, 1, len(summaries))
 
 				updatedSummary := summaries[0]
 
