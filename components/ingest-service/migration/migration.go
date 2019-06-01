@@ -14,11 +14,14 @@ import (
 var (
 	// This variable will allow us to add a test so that if the mappings.NodeState.Index
 	// changes we might need to add some migration bits over here
-	a2CurrentNodeStateIndex = "node-state-5"
+	a2CurrentNodeStateIndex = "node-state-6"
 
-	// The previous NodeState index: This change was made since we are now indexing the
+	// NodeState 5 index: This change was made since we are now indexing the 'projects' field
+	a2NodeState5Index = "node-state-5"
+
+	// NodeState 4 index: This change was made since we are now indexing the
 	// chef_tags and chef_version fields to be engram's (searchable fields)
-	a2PreviousNodeStateIndex = "node-state-4"
+	a2NodeState4Index = "node-state-4"
 
 	a1NodeStateIndexName     = "node-state-2"
 	berlinNodeStateIndexName = "node-state-1"
@@ -76,26 +79,37 @@ func (ms *Status) Start() {
 		return
 	}
 
-	exists, err = ms.hasPreviousNodeStateData()
+	exists, err = ms.hasNodeState4Data()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to detect migration status")
 		return
 	}
 	if exists {
 		ms.update("Starting migration to latest node state index")
-		ms.migrateNodeStateToCurrent(a2PreviousNodeStateIndex) //pass last previous index
+		ms.migrateNodeStateToCurrent(a2NodeState4Index)
+		return
 	}
 
+	exists, err = ms.hasNodeState5Data()
+	if err != nil {
+		ms.updateErr(err.Error(), "Unable to detect migration status")
+		return
+	}
+	if exists {
+		ms.update("Starting migration to latest node state index")
+		ms.migrateNodeStateToCurrent(a2NodeState5Index)
+	}
 }
 
 // MigrationNeeded Verify if a migration is needed
 func (ms *Status) MigrationNeeded() (bool, error) {
 	var (
-		nodeStateAliasExists          = ms.client.DoesAliasExists(ms.ctx, nodeStateAliasName)
-		a1Exists, err1                = ms.hasA1ElasticsearchData()
-		BerlinExists, err2            = ms.hasBerlinElasticsearchData()
-		nodeStateIndexExists, err3    = ms.client.DoesIndexExists(ms.ctx, nodeStateAliasName)
-		previousNodeStateExists, err4 = ms.hasPreviousNodeStateData()
+		nodeStateAliasExists       = ms.client.DoesAliasExists(ms.ctx, nodeStateAliasName)
+		a1Exists, err1             = ms.hasA1ElasticsearchData()
+		BerlinExists, err2         = ms.hasBerlinElasticsearchData()
+		nodeStateIndexExists, err3 = ms.client.DoesIndexExists(ms.ctx, nodeStateAliasName)
+		nodeState4Exists, err4     = ms.hasNodeState4Data()
+		nodeState5Exists, err5     = ms.hasNodeState5Data()
 	)
 
 	if err1 != nil {
@@ -110,6 +124,9 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 	if err4 != nil {
 		logFatal(err4.Error(), "Error detecting migration status")
 	}
+	if err5 != nil {
+		logFatal(err4.Error(), "Error detecting migration status")
+	}
 
 	// If the node-state alias doesn't exist and it is an index
 	// instead, we might have corrupted data
@@ -119,7 +136,7 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 		return false, err
 	}
 
-	if a1Exists || BerlinExists || previousNodeStateExists {
+	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists {
 		return true, nil
 	}
 
@@ -185,8 +202,12 @@ func (ms *Status) hasA1ElasticsearchData() (bool, error) {
 	return ms.client.DoesIndexExists(ms.ctx, a1NodeStateIndexName)
 }
 
-func (ms *Status) hasPreviousNodeStateData() (bool, error) {
-	return ms.client.DoesIndexExists(ms.ctx, a2PreviousNodeStateIndex)
+func (ms *Status) hasNodeState4Data() (bool, error) {
+	return ms.client.DoesIndexExists(ms.ctx, a2NodeState4Index)
+}
+
+func (ms *Status) hasNodeState5Data() (bool, error) {
+	return ms.client.DoesIndexExists(ms.ctx, a2NodeState5Index)
 }
 
 func (ms *Status) migrateBerlinToCurrent() error {

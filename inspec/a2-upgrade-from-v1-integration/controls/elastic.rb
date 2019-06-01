@@ -32,9 +32,9 @@ control 'elastic-data-migration-1' do
 
     its('status') { should eq 200 }
 
-    it "returns JSON data about node-state-5" do
+    it "returns JSON data about node-state-6" do
       data = JSON.parse(subject.body)
-      expect(data).to have_key("node-state-5")
+      expect(data).to have_key("node-state-6")
     end
 
   end
