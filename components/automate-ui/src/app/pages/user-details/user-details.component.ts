@@ -1,10 +1,10 @@
-import { combineLatest as combineLatest,  Observable ,  Subscription } from 'rxjs';
+import { combineLatest, Observable, Subscription } from 'rxjs';
 
-import { filter, pluck, map } from 'rxjs/operators';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { filter, pluck, map } from 'rxjs/operators';
 import { find, identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
