@@ -10,7 +10,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/lib/logger"
-	"github.com/chef/automate/lib/stringutils"
 
 	"github.com/golang/protobuf/ptypes"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
@@ -19,7 +18,7 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
-	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -117,7 +116,7 @@ func (s *state) CreateProject(ctx context.Context,
 			return nil, status.Errorf(codes.AlreadyExists, "project with ID %q already exists", req.Id)
 		} else if err == storage_errors.ErrMaxProjectsExceeded {
 			return nil, status.Errorf(codes.FailedPrecondition,
-				"max of %d projects allowed while IAM v2 Beta", v2_constants.MaxProjects)
+				"max of %d projects allowed while IAM v2 Beta", constants_v2.MaxProjects)
 		}
 		return nil, status.Errorf(codes.Internal,
 			"error retrieving project with ID %q: %s", req.Id, err.Error())
@@ -188,13 +187,12 @@ func (s *state) ProjectUpdateCancel(ctx context.Context,
 	return &api.ProjectUpdateCancelResp{}, nil
 }
 
-func (s *state) ListProjects(ctx context.Context,
-	_ *api.ListProjectsReq) (*api.ListProjectsResp, error) {
+func (s *state) ListProjects(
+	ctx context.Context, req *api.ListProjectsReq) (*api.ListProjectsResp, error) {
 	ps, err := s.store.ListProjects(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error retrieving projects: %s", err.Error())
 	}
-	systemProjects := storage.DefaultProjectIDs()
 
 	resp := api.ListProjectsResp{
 		Projects: make([]*api.Project, 0, len(ps)),
@@ -205,8 +203,10 @@ func (s *state) ListProjects(ctx context.Context,
 			return nil, status.Errorf(codes.Internal,
 				"error converting project with ID %q: %s", p.ID, err.Error())
 		}
-		// exclude "all projects" meta-project from the API
-		if !stringutils.SliceContains(systemProjects, apiProject.Id) {
+		// Exclude "all projects" meta-project from the API.
+		// Exclude "unassigned" meta-project from the API--except for introspection!
+		if (apiProject.Id != constants_v2.AllProjectsID) &&
+			(req.GlobalFilterView || (apiProject.Id != constants_v2.UnassignedProjectID)) {
 			resp.Projects = append(resp.Projects, apiProject)
 		}
 	}

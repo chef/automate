@@ -428,7 +428,7 @@ func (p *Server) ListProjects(
 // global projects filter, so it may include unassigned.
 func (p *Server) IntrospectAllProjects(
 	ctx context.Context, req *pb_req.ListProjectsReq) (*pb_resp.ListProjectsResp, error) {
-	resp, err := p.projects.ListProjects(ctx, &authz.ListProjectsReq{Unfiltered: req.Unfiltered})
+	resp, err := p.projects.ListProjects(ctx, &authz.ListProjectsReq{GlobalFilterView: true})
 	if err != nil {
 		return nil, err
 	}

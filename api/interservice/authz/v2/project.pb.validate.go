@@ -413,6 +413,8 @@ func (m *ListProjectsReq) Validate() error {
 		return nil
 	}
 
+	// no validation rules for GlobalFilterView
+
 	return nil
 }
 

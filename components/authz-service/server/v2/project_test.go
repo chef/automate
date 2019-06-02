@@ -322,7 +322,7 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			assert.ElementsMatch(t, []*api.Project{&apiProject0, &apiProject1}, resp.Projects)
 		}},
-		{"suppresses hidden system projects", func(t *testing.T) {
+		{"suppresses all hidden system projects by default", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
 			addProjectToStore(t, store, constants.AllProjectsID, "All Projects", storage.ChefManaged)
 			addProjectToStore(t, store, constants.UnassignedProjectID, "Unassigned", storage.ChefManaged)
@@ -334,6 +334,19 @@ func TestListProjects(t *testing.T) {
 			resp, err := cl.ListProjects(ctx, &api.ListProjectsReq{})
 			require.NoError(t, err)
 			assert.ElementsMatch(t, []*api.Project{&apiProject0, &apiProject1}, resp.Projects)
+		}},
+		{"allows unassigned project when explicitly requested", func(t *testing.T) {
+			require.Zero(t, store.ItemCount())
+			addProjectToStore(t, store, constants.AllProjectsID, "All Projects", storage.ChefManaged)
+			unassignedProject := addProjectToStore(t, store, constants.UnassignedProjectID, "Unassigned", storage.ChefManaged)
+			id0 := "foo-project"
+			apiProject0 := addProjectToStore(t, store, id0, "my foo", storage.ChefManaged)
+			id1 := "bar-project"
+			apiProject1 := addProjectToStore(t, store, id1, "my bar", storage.Custom)
+
+			resp, err := cl.ListProjects(ctx, &api.ListProjectsReq{GlobalFilterView: true})
+			require.NoError(t, err)
+			assert.ElementsMatch(t, []*api.Project{&apiProject0, &apiProject1, &unassignedProject}, resp.Projects)
 		}},
 	}
 

@@ -32,7 +32,9 @@ message GetProjectResp {
     Project project = 1;
 }
 
-message ListProjectsReq {}
+message ListProjectsReq {
+    bool globalFilterView = 1;
+}
 
 message ListProjectsResp {
     repeated Project projects = 1;

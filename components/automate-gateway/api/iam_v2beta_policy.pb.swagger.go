@@ -18,6 +18,22 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/iam/v2beta/introspect_projects": {
+      "get": {
+        "operationId": "IntrospectAllProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListProjectsResp"
+            }
+          }
+        },
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
     "/iam/v2beta/policies": {
       "get": {
         "operationId": "ListPolicies",

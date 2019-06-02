@@ -26,15 +26,6 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "unfiltered",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          }
-        ],
         "tags": [
           "Policies"
         ]
