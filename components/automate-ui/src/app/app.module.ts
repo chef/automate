@@ -74,8 +74,6 @@ import { RoleRequests } from './entities/roles/role.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
 import { UserRequests } from './entities/users/user.requests';
-import { ProjectsFilterRequests } from './services/projects-filter/projects-filter.requests';
-
 
 // Helpers
 import { HistorySelection } from './helpers/history-selection/history-selection';
@@ -320,7 +318,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     PolicyRequests,
     ProfileRequests,
     ProjectRequests,
-    ProjectsFilterRequests,
     ProjectsFilterService,
     RoleRequests,
     { provide: RouterStateSerializer, useClass: RouterSerializer },

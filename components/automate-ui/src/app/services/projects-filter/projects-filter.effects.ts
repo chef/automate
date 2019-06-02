@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Actions, Effect, ofType } from '@ngrx/effects';
 import { interval as observableInterval, of as observableOf, Observable } from 'rxjs';
 import { catchError, mergeMap, map, tap } from 'rxjs/operators';
-import { Actions, Effect, ofType } from '@ngrx/effects';
+
+import { Project } from 'app/entities/projects/project.model';
+import { ProjectRequests } from 'app/entities/projects/project.requests';
+import { GetProjectsSuccessPayload } from 'app/entities/projects/project.actions';
 import { ProjectsFilterOption, ProjectsFilterOptionTuple } from './projects-filter.reducer';
 import { ProjectsFilterService } from './projects-filter.service';
-import { ProjectsFilterRequests, AuthorizedProjectsResponse } from './projects-filter.requests';
 import {
   ProjectsFilterActionTypes,
   ProjectsFilterActions,
@@ -20,7 +23,7 @@ export class ProjectsFilterEffects {
   constructor(
     private actions$: Actions,
     private projectsFilter: ProjectsFilterService,
-    private requests: ProjectsFilterRequests
+    private requests: ProjectRequests
   ) { }
 
   private POLLING_INTERVAL_IN_SECONDS = 120; // 2 minutes
@@ -41,8 +44,8 @@ export class ProjectsFilterEffects {
   );
 
   private loadOptionsAction$(): () => Observable<ProjectsFilterActions> {
-    return () => this.requests.fetchOptions().pipe(
-      map((fetched: AuthorizedProjectsResponse) => {
+    return () => this.requests.getProjects(true).pipe(
+      map((fetched: GetProjectsSuccessPayload) => {
         const converted = this.convertResponse(fetched.projects);
         const restored = this.projectsFilter.restoreOptions() || [];
         return new LoadOptionsSuccess(<ProjectsFilterOptionTuple>{
@@ -53,11 +56,11 @@ export class ProjectsFilterEffects {
       catchError((error: HttpErrorResponse) => observableOf(new LoadOptionsFailure(error))));
   }
 
-  private convertResponse(authorizedProjects: string[]): ProjectsFilterOption[] {
+  private convertResponse(authorizedProjects: Project[]): ProjectsFilterOption[] {
     return authorizedProjects.map(
       project => <ProjectsFilterOption>{
-        label: project,
-        value: project,
+        label: project.name,
+        value: project.id,
         checked: false
       });
   }
