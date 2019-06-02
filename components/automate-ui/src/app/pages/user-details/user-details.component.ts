@@ -1,4 +1,4 @@
-import { combineLatest as combineLatest,  Observable ,  Subscription } from 'rxjs';
+import { combineLatest,  Observable ,  Subscription } from 'rxjs';
 
 import { filter, pluck, map } from 'rxjs/operators';
 import { Component, OnDestroy, OnInit } from '@angular/core';
