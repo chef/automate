@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment as env } from 'environments/environment';
@@ -18,14 +18,8 @@ export class ProjectRequests {
 
   constructor(private http: HttpClient) { }
 
-  public getProjects(unfiltered?: boolean): Observable<GetProjectsSuccessPayload> {
-    const options = unfiltered
-      ? {
-        params: new HttpParams().set('unfiltered', 'true')
-      }
-      : {};
-
-    return this.http.get<GetProjectsSuccessPayload>(`${env.auth_v2_url}/projects`, options);
+  public getProjects(): Observable<GetProjectsSuccessPayload> {
+    return this.http.get<GetProjectsSuccessPayload>(`${env.auth_v2_url}/projects`);
   }
 
   public getProject(id: string): Observable<ProjectSuccessPayload> {

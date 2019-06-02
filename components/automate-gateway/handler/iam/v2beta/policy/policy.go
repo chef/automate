@@ -406,10 +406,29 @@ func (p *Server) GetProject(
 	return &pb_resp.GetProjectResp{Project: proj}, nil
 }
 
-// ListProjects returns the list of all projects.
+// ListProjects returns the list of all projects for display on the List Projects view.
 func (p *Server) ListProjects(
 	ctx context.Context, _ *pb_req.ListProjectsReq) (*pb_resp.ListProjectsResp, error) {
 	resp, err := p.projects.ListProjects(ctx, &authz.ListProjectsReq{})
+	if err != nil {
+		return nil, err
+	}
+	projects := make([]*pb_common.Project, len(resp.Projects))
+	for i, proj := range resp.Projects {
+		apiProj, err := domainProjectToAPIProject(proj)
+		if err != nil {
+			return nil, err
+		}
+		projects[i] = apiProj
+	}
+	return &pb_resp.ListProjectsResp{Projects: projects}, nil
+}
+
+// IntrospectAllProjects returns the list of all projects for display in the
+// global projects filter, so it may include unassigned.
+func (p *Server) IntrospectAllProjects(
+	ctx context.Context, req *pb_req.ListProjectsReq) (*pb_resp.ListProjectsResp, error) {
+	resp, err := p.projects.ListProjects(ctx, &authz.ListProjectsReq{Unfiltered: req.Unfiltered})
 	if err != nil {
 		return nil, err
 	}

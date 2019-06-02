@@ -15,6 +15,31 @@
     "application/json"
   ],
   "paths": {
+    "/iam/v2beta/introspect_projects": {
+      "get": {
+        "operationId": "IntrospectAllProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListProjectsResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "unfiltered",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
     "/iam/v2beta/policies": {
       "get": {
         "operationId": "ListPolicies",

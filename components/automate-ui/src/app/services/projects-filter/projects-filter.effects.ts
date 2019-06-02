@@ -5,10 +5,10 @@ import { interval as observableInterval, of as observableOf, Observable } from '
 import { catchError, mergeMap, map, tap } from 'rxjs/operators';
 
 import { Project } from 'app/entities/projects/project.model';
-import { ProjectRequests } from 'app/entities/projects/project.requests';
 import { GetProjectsSuccessPayload } from 'app/entities/projects/project.actions';
 import { ProjectsFilterOption, ProjectsFilterOptionTuple } from './projects-filter.reducer';
 import { ProjectsFilterService } from './projects-filter.service';
+import { ProjectsFilterRequests } from './projects-filter.requests';
 import {
   ProjectsFilterActionTypes,
   ProjectsFilterActions,
@@ -23,7 +23,7 @@ export class ProjectsFilterEffects {
   constructor(
     private actions$: Actions,
     private projectsFilter: ProjectsFilterService,
-    private requests: ProjectRequests
+    private requests: ProjectsFilterRequests
   ) { }
 
   private POLLING_INTERVAL_IN_SECONDS = 120; // 2 minutes
@@ -44,7 +44,7 @@ export class ProjectsFilterEffects {
   );
 
   private loadOptionsAction$(): () => Observable<ProjectsFilterActions> {
-    return () => this.requests.getProjects(true).pipe(
+    return () => this.requests.fetchOptions().pipe(
       map((fetched: GetProjectsSuccessPayload) => {
         const converted = this.convertResponse(fetched.projects);
         const restored = this.projectsFilter.restoreOptions() || [];
