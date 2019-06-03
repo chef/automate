@@ -107,19 +107,6 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 	if err := s.initModules(); err != nil {
 		return nil, errors.Wrap(err, "init OPA modules")
 	}
-
-	if err := s.initPartialResult(ctx); err != nil {
-		return nil, errors.Wrap(err, "init OPA partial result state")
-	}
-
-	if err := s.initPartialResultV2(ctx); err != nil {
-		return nil, errors.Wrap(err, "init OPA partial result state (v2)")
-	}
-
-	if err := s.initPartialResultV2p1(ctx); err != nil {
-		return nil, errors.Wrap(err, "init OPA partial result state (v2.1)")
-	}
-
 	return &s, nil
 }
 
