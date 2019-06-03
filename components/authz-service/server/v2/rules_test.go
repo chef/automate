@@ -249,7 +249,7 @@ func TestUpdateRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.FailedPrecondition, err)
 			assert.Nil(t, resp)
 		}},
-		{"if the updated rule passes conditions not compatible with the type, throw an error", func(t *testing.T) {
+		{"if the updated rule passes conditions not compatible with the type, throw 'invalid argument'", func(t *testing.T) {
 			id := "foo-rule"
 			addRuleToStore(t, store, id, "my foo rule", storage.Event, "foo-project", storageConditions)
 
@@ -271,7 +271,7 @@ func TestUpdateRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
-		{"with valid rule data, returns no error and updates the rule in storage", func(t *testing.T) {
+		{"with valid node rule data, returns no error and updates the rule in storage", func(t *testing.T) {
 			id := "foo-rule"
 			projectID := "foo-project"
 			addRuleToStore(t, store, id, "my foo rule", storage.Node, projectID, storageConditions)
@@ -310,6 +310,96 @@ func TestUpdateRule(t *testing.T) {
 						{
 							Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
 							Values:   []string{"tag1", "tag2"},
+							Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+						},
+					},
+				},
+			}, resp)
+		}},
+		{"with valid node rule data, returns no error and updates the rule in storage when using conditions valid for event type", func(t *testing.T) {
+			id := "foo-rule"
+			projectID := "foo-project"
+			addRuleToStore(t, store, id, "my foo rule", storage.Node, projectID, storageConditions)
+
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:        id,
+				Name:      "updated name",
+				ProjectId: projectID,
+				Type:      api.ProjectRuleTypes_NODE,
+				Conditions: []*api.Condition{
+					{
+						Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+						Values:   []string{"chef"},
+						Operator: api.ProjectRuleConditionOperators_EQUALS,
+					},
+					{
+						Type:     api.ProjectRuleConditionTypes_CHEF_SERVERS,
+						Values:   []string{"server1", "server2"},
+						Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+					},
+				},
+			})
+			assert.NoError(t, err)
+			assert.Equal(t, &api.UpdateRuleResp{
+				Rule: &api.ProjectRule{
+					Id:        id,
+					Name:      "updated name",
+					ProjectId: projectID,
+					Type:      api.ProjectRuleTypes_NODE,
+					Conditions: []*api.Condition{
+						{
+							Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+							Values:   []string{"chef"},
+							Operator: api.ProjectRuleConditionOperators_EQUALS,
+						},
+						{
+							Type:     api.ProjectRuleConditionTypes_CHEF_SERVERS,
+							Values:   []string{"server1", "server2"},
+							Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+						},
+					},
+				},
+			}, resp)
+		}},
+		{"with valid event rule data, returns no error and updates the rule in storage", func(t *testing.T) {
+			id := "foo-rule"
+			projectID := "foo-project"
+			addRuleToStore(t, store, id, "my foo rule", storage.Event, projectID, storageConditions)
+
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:        id,
+				Name:      "updated name",
+				ProjectId: projectID,
+				Type:      api.ProjectRuleTypes_EVENT,
+				Conditions: []*api.Condition{
+					{
+						Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+						Values:   []string{"chef"},
+						Operator: api.ProjectRuleConditionOperators_EQUALS,
+					},
+					{
+						Type:     api.ProjectRuleConditionTypes_CHEF_SERVERS,
+						Values:   []string{"server1", "server2"},
+						Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+					},
+				},
+			})
+			assert.NoError(t, err)
+			assert.Equal(t, &api.UpdateRuleResp{
+				Rule: &api.ProjectRule{
+					Id:        id,
+					Name:      "updated name",
+					ProjectId: projectID,
+					Type:      api.ProjectRuleTypes_EVENT,
+					Conditions: []*api.Condition{
+						{
+							Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+							Values:   []string{"chef"},
+							Operator: api.ProjectRuleConditionOperators_EQUALS,
+						},
+						{
+							Type:     api.ProjectRuleConditionTypes_CHEF_SERVERS,
+							Values:   []string{"server1", "server2"},
 							Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
 						},
 					},
