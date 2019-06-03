@@ -1,4 +1,4 @@
-import { HTTP_INTERCEPTORS, HttpClient, HttpParams } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { StoreModule } from '@ngrx/store';
@@ -145,9 +145,7 @@ describe('HttpClientAuthInterceptor', () => {
       ], function (description: string, setting: boolean) {
 
         it(description + 'when unfiltered flag set to ' + setting, done => {
-          const options = {
-            params: new HttpParams().set('unfiltered', String(setting))
-          };
+          const options = { params: { unfiltered: String(setting) } };
           httpClient.get('/endpoint', options).subscribe(done);
 
           const httpRequest = httpMock.expectOne('/endpoint');

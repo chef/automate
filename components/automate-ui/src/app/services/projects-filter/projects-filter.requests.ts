@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment as env } from 'environments/environment';
@@ -16,9 +16,7 @@ export class ProjectsFilterRequests {
   fetchOptions(): Observable<AuthorizedProjectsResponse[]> {
     return this.http.get<AuthorizedProjectsResponse[]>(
       `${env.auth_v2_url}/introspect_projects`,
-      {
-        params: new HttpParams().set('unfiltered', 'true')
-      }
+      { params: { unfiltered: 'true'} }
     );
   }
 }
