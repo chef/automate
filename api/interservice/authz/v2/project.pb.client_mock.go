@@ -255,6 +255,26 @@ func (mr *MockProjectsClientMockRecorder) CreateRule(ctx, in interface{}, opts .
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRule", reflect.TypeOf((*MockProjectsClient)(nil).CreateRule), varargs...)
 }
 
+// UpdateRule mocks base method
+func (m *MockProjectsClient) UpdateRule(ctx context.Context, in *UpdateRuleReq, opts ...grpc.CallOption) (*UpdateRuleResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateRule", varargs...)
+	ret0, _ := ret[0].(*UpdateRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateRule indicates an expected call of UpdateRule
+func (mr *MockProjectsClientMockRecorder) UpdateRule(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRule", reflect.TypeOf((*MockProjectsClient)(nil).UpdateRule), varargs...)
+}
+
 // GetRule mocks base method
 func (m *MockProjectsClient) GetRule(ctx context.Context, in *GetRuleReq, opts ...grpc.CallOption) (*GetRuleResp, error) {
 	m.ctrl.T.Helper()
@@ -501,6 +521,21 @@ func (m *MockProjectsServer) CreateRule(arg0 context.Context, arg1 *CreateRuleRe
 func (mr *MockProjectsServerMockRecorder) CreateRule(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRule", reflect.TypeOf((*MockProjectsServer)(nil).CreateRule), arg0, arg1)
+}
+
+// UpdateRule mocks base method
+func (m *MockProjectsServer) UpdateRule(arg0 context.Context, arg1 *UpdateRuleReq) (*UpdateRuleResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateRule", arg0, arg1)
+	ret0, _ := ret[0].(*UpdateRuleResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateRule indicates an expected call of UpdateRule
+func (mr *MockProjectsServerMockRecorder) UpdateRule(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRule", reflect.TypeOf((*MockProjectsServer)(nil).UpdateRule), arg0, arg1)
 }
 
 // GetRule mocks base method

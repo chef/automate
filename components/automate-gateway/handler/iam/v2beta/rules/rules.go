@@ -25,7 +25,7 @@ func NewServer(projects authz.ProjectsClient) *Server {
 }
 
 func (s *Server) CreateRule(ctx context.Context, req *pb_req.CreateRuleReq) (*pb_resp.CreateRuleResp, error) {
-	internalReq, err := fromExternal(req)
+	internalReq, err := fromExternalCreate(req)
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +39,24 @@ func (s *Server) CreateRule(ctx context.Context, req *pb_req.CreateRuleReq) (*pb
 		return nil, err
 	}
 	return &pb_resp.CreateRuleResp{Rule: rule}, nil
+}
+
+func (s *Server) UpdateRule(ctx context.Context, req *pb_req.UpdateRuleReq) (*pb_resp.UpdateRuleResp, error) {
+	internalReq, err := fromExternalUpdate(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.projects.UpdateRule(ctx, internalReq)
+	if err != nil {
+		return nil, err
+	}
+
+	rule, err := fromInternal(resp.Rule)
+	if err != nil {
+		return nil, err
+	}
+	return &pb_resp.UpdateRuleResp{Rule: rule}, nil
 }
 
 func (s *Server) GetRule(ctx context.Context, req *pb_req.GetRuleReq) (*pb_resp.GetRuleResp, error) {
@@ -84,13 +102,32 @@ func (s *Server) DeleteRule(ctx context.Context, req *pb_req.DeleteRuleReq) (*pb
 	return &pb_resp.DeleteRuleResp{}, nil
 }
 
-func fromExternal(req *pb_req.CreateRuleReq) (*authz.CreateRuleReq, error) {
+func fromExternalCreate(req *pb_req.CreateRuleReq) (*authz.CreateRuleReq, error) {
 	t, err := fromExternalType(req.Type)
 	if err != nil {
 		return nil, err
 	}
 	conditions, err := fromExternalConditions(req.Conditions)
+	if err != nil {
+		return nil, err
+	}
 	return &authz.CreateRuleReq{
+		Id:         req.Id,
+		Name:       req.Name,
+		ProjectId:  req.ProjectId,
+		Type:       t,
+		Conditions: conditions,
+	}, nil
+}
+
+// Wish we had generics
+func fromExternalUpdate(req *pb_req.UpdateRuleReq) (*authz.UpdateRuleReq, error) {
+	t, err := fromExternalType(req.Type)
+	if err != nil {
+		return nil, err
+	}
+	conditions, err := fromExternalConditions(req.Conditions)
+	return &authz.UpdateRuleReq{
 		Id:         req.Id,
 		Name:       req.Name,
 		ProjectId:  req.ProjectId,

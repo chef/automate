@@ -23,6 +23,15 @@ service Rules {
     option (chef.automate.api.iam.policy).action = "iam:rules:create";
   };
 
+  rpc UpdateRule (UpdateRuleReq) returns (UpdateRuleResp) {
+    option (google.api.http).put = "/iam/v2beta/rules/{id}";
+    option (google.api.http).body = "*";
+    option (chef.automate.api.policy).resource = "auth:rules:{id}";
+    option (chef.automate.api.policy).action = "update";
+    option (chef.automate.api.iam.policy).resource = "iam:rules:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:rules:update";
+  };
+
   rpc GetRule (GetRuleReq) returns (GetRuleResp) {
     option (google.api.http).get = "/iam/v2beta/rules/{id}";
     option (chef.automate.api.policy).resource = "auth:rules:{id}";
