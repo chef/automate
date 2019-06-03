@@ -221,6 +221,10 @@ func (s *State) initPartialResultV2p1(ctx context.Context) error {
 	}
 	s.v2PartialProjects = v2PartialProjects
 
+	s.log.Info("Ran partial update v2.1")
+	if err := s.DumpDataV2p1(ctx); err != nil {
+		s.log.Warnf("error dumping v2.1 data: %v", err)
+	}
 	return nil
 }
 
@@ -249,12 +253,16 @@ func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
 	if err != nil {
 		return err
 	}
-	l.Debugf("data: %#v", data)
+	l.Infof("data: %#v", data)
 	return store.Commit(ctx, txn)
 }
 
 func (s *State) DumpDataV2(ctx context.Context) error {
 	return dumpData(ctx, s.v2Store, s.log)
+}
+
+func (s *State) DumpDataV2p1(ctx context.Context) error {
+	return dumpData(ctx, s.v2p1Store, s.log)
 }
 
 // IsAuthorized evaluates whether a given [subject, resource, action] tuple
