@@ -11,7 +11,7 @@ type Client interface {
 	// @param None
 	Initializing() bool
 	// @param (context, UTC time)
-	InitializeStore(context.Context)
+	InitializeStore(context.Context) error
 	// @param (context, UTC time, data)
 	InsertNode(context.Context, Node) error
 	// @param (context, UTC time, data)

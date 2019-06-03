@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/ingest"
+	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/migration"
@@ -32,6 +33,8 @@ import (
 //
 // Maybe even spawn multiple servers
 func Spawn(opts *serveropts.Opts) error {
+	var client backend.Client
+
 	// Initialize the backend client
 	client, err := elastic.New(opts.ElasticSearchUrl)
 
@@ -45,7 +48,7 @@ func Spawn(opts *serveropts.Opts) error {
 
 	var (
 		grpcServer  = opts.ConnFactory.NewServer()
-		A1migration = migration.New(client)
+		migrationer = migration.New(client)
 		uri         = fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 	)
 
@@ -57,7 +60,7 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 
 	// Register Status Server
-	ingestStatus := server.NewIngestStatus(client, A1migration)
+	ingestStatus := server.NewIngestStatus(client, migrationer)
 	ingest.RegisterIngestStatusServer(grpcServer, ingestStatus)
 
 	// Initialize elasticsearch indices or trigger a migration
@@ -65,16 +68,25 @@ func Spawn(opts *serveropts.Opts) error {
 	// This initialization will happen inside a goroutine so that we can then
 	// report the health of the system. We might have to do the same for the
 	// migration tasks.
-	migrationNeeded, err := A1migration.MigrationNeeded()
+	migrationNeeded, err := migrationer.MigrationNeeded()
 	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Fatal("Failed checking for migration")
 		return err
 	}
 
 	if migrationNeeded {
-		A1migration.Start()
+		err = migrationer.Start()
+		if err != nil {
+			log.WithFields(log.Fields{"error": err}).Fatal("Failed starting a migration")
+			return err
+		}
 	} else {
-		A1migration.MarkUnneeded()
-		client.InitializeStore(context.Background())
+		migrationer.MarkUnneeded()
+		err = client.InitializeStore(context.Background())
+		if err != nil {
+			log.WithFields(log.Fields{"error": err}).Fatal("Failed initializing elasticsearch")
+			return err
+		}
 	}
 
 	// Authz Interface

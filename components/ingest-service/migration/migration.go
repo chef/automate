@@ -56,49 +56,68 @@ func New(client backend.Client) *Status {
 // the second stage is migration from 1 -> 2 does not know what state the first stage has left the data in.
 // For the migration framework we are always going to migrate from the current state to the current version.
 // This does cause a maintenance problem because for each new version the old migration stages need to be updated.
-func (ms *Status) Start() {
+func (ms *Status) Start() error {
 	exists, err := ms.hasA1ElasticsearchData()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to detect migration status")
-		return
+		return err
 	}
 	if exists {
 		ms.update("Starting Automate 1.x migration")
-		ms.migrateA1ToCurrent()
-		return
+		err = ms.migrateA1ToCurrent()
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run 1.x to current migration")
+			return err
+		}
+		return nil
 	}
 
 	exists, err = ms.hasBerlinElasticsearchData()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to detect migration status")
-		return
+		return err
 	}
 	if exists {
 		ms.update("Starting Berlin migration")
-		ms.migrateBerlinToCurrent()
-		return
+		err = ms.migrateBerlinToCurrent()
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run berlin to current migration")
+			return err
+		}
+		return nil
 	}
 
 	exists, err = ms.hasNodeState4Data()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to detect migration status")
-		return
+		return err
 	}
 	if exists {
 		ms.update("Starting migration to latest node state index")
-		ms.migrateNodeStateToCurrent(a2NodeState4Index)
-		return
+		err = ms.migrateNodeStateToCurrent(a2NodeState4Index)
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run node-state 4 to current migration")
+			return err
+		}
+		return nil
 	}
 
 	exists, err = ms.hasNodeState5Data()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to detect migration status")
-		return
+		return err
 	}
 	if exists {
 		ms.update("Starting migration to latest node state index")
-		ms.migrateNodeStateToCurrent(a2NodeState5Index)
+		err = ms.migrateNodeStateToCurrent(a2NodeState5Index)
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run node-state 4 to current migration")
+			return err
+		}
+		return nil
 	}
+
+	return nil
 }
 
 // MigrationNeeded Verify if a migration is needed
