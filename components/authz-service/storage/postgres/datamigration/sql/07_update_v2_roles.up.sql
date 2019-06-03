@@ -11,6 +11,5 @@ UPDATE iam_roles
         actions = actions || '{applications:*}'
     WHERE
         id = 'editor';
-END;
 
 COMMIT;
