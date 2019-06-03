@@ -82,7 +82,6 @@ do_install() {
   inspec_sem_version=$(awk -F  '/' '{print $3}' <<< ${inspec_release})
   build_line "Setting InSpec version ${inspec_sem_version}"
   sed -i "s/REPLACE-FROM-PLAN.SH/${inspec_sem_version}/" habitat/default.toml
-  sed -i "s/REPLACE-FROM-PLAN.SH/${inspec_sem_version}/" ../../api/config/compliance/config_request.go
 
   build_line "Copying migration files"
   mkdir "${pkg_prefix}/migrations"
