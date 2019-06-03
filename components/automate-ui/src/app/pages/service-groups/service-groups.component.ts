@@ -58,6 +58,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   private currentPage$: Observable<number>;
   private currentFieldDirection: SortDirection;
   private currentSortField: string;
+  private defaultSortField = 'percent_ok';
   private defaultFieldDirection: FieldDirection = {
     name: 'ASC',
     percent_ok: 'ASC',
@@ -294,7 +295,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     if ( sortField !== undefined && this.defaultFieldDirection.hasOwnProperty(sortField.text) ) {
       return sortField.text;
     }
-    return 'name';
+    return this.defaultSortField;
   }
 
   private getSortDirection(allUrlParameters: Chicklet[]): 'ASC' | 'DESC' {
