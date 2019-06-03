@@ -36,7 +36,7 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
-var dummyWriter engine.V2Writer = nil
+var dummyWriter engine.V2pXWriter = nil
 
 func TestCreatePolicy(t *testing.T) {
 	ctx := context.Background()
@@ -2933,13 +2933,13 @@ type testSetup struct {
 }
 
 func setupV2WithWriter(t *testing.T,
-	writer engine.V2Writer) testSetup {
+	writer engine.V2pXWriter) testSetup {
 	return setupV2(t, nil, writer, nil, nil)
 }
 
 func setupV2(t *testing.T,
 	authorizer engine.V2Authorizer,
-	writer engine.V2Writer,
+	writer engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vChan chan api_v2.Version) testSetup {
 	t.Helper()
@@ -3216,6 +3216,12 @@ func (te *testEngine) V2SetPolicies(
 	te.roleMap = roles
 	te.ruleMap = rules
 	return nil
+}
+
+func (te *testEngine) V2p1SetPolicies(
+	ctx context.Context, policies map[string]interface{},
+	roles map[string]interface{}, rules map[string][]interface{}) error {
+	return te.V2SetPolicies(ctx, policies, roles, rules)
 }
 
 func id(t *testing.T, p *prng.Prng) string {

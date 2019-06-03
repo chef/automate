@@ -420,7 +420,7 @@ func (s *State) V2FilterAuthorizedProjects(
 		"subjects": subjects,
 	}
 
-	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsV2Query], opaInput, s.v2Store)
+	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsV2Query], opaInput, s.v2p1Store)
 	if err != nil {
 		return nil, &ErrEvaluation{e: err}
 	}
@@ -439,7 +439,7 @@ func (s *State) RulesForProject(
 		"project_id": projectID,
 	}
 
-	rs, err := s.evalQuery(ctx, s.queries[rulesForProjectQuery], opaInput, s.v2Store)
+	rs, err := s.evalQuery(ctx, s.queries[rulesForProjectQuery], opaInput, s.v2p1Store)
 	if err != nil {
 		return nil, &ErrEvaluation{e: err}
 	}
@@ -644,6 +644,7 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
+	// TODO: v2 doesn't care about rules
 	s.v2Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
 		"roles":    roleMap,
