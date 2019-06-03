@@ -25,6 +25,7 @@
             <chef-thead>
               <chef-tr>
                 <chef-th>Name</chef-th>
+                <chef-th>ID</chef-th>
                 <chef-th>Type</chef-th>
                 <chef-th class="controls"></chef-th>
               </chef-tr>
@@ -34,6 +35,7 @@
                 <chef-td>
                   <a [routerLink]="['/settings/projects', project.id]">{{ project.name }}</a>
                 </chef-td>
+                <chef-td>{{ project.id }}</chef-td>
                 <chef-td>{{ project.type | iamType }}</chef-td>
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
