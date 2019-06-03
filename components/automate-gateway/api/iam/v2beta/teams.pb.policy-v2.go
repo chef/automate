@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	policyv2.MapMethodTo("/chef.automate.api.iam.v2beta.Teams/GetTeams", "iam:teams", "iam:teams:list", "GET", "/iam/v2beta/teams", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.iam.v2beta.Teams/ListTeams", "iam:teams", "iam:teams:list", "GET", "/iam/v2beta/teams", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 	policyv2.MapMethodTo("/chef.automate.api.iam.v2beta.Teams/GetTeam", "iam:teams:{id}", "iam:teams:get", "GET", "/iam/v2beta/teams/{id}", func(unexpandedResource string, input interface{}) string {

@@ -38,8 +38,8 @@ func (s *Server) GetTeam(ctx context.Context, req *teams.GetTeamReq) (*teams.Get
 	}, nil
 }
 
-// GetTeams returns a list of teams from the db
-func (s *Server) GetTeams(ctx context.Context, req *teams.GetTeamsReq) (*teams.GetTeamsResp, error) {
+// ListTeams returns a list of teams from the db
+func (s *Server) ListTeams(ctx context.Context, req *teams.ListTeamsReq) (*teams.ListTeamsResp, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -48,7 +48,7 @@ func (s *Server) GetTeams(ctx context.Context, req *teams.GetTeamsReq) (*teams.G
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &teams.GetTeamsResp{
+	return &teams.ListTeamsResp{
 		Teams: fromStorageToList(teamsList),
 	}, nil
 }

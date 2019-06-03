@@ -9,7 +9,7 @@ message CreateUserReq {
   string password = 3;
 }
 
-message GetUsersReq {
+message ListUsersReq {
 }
 
 message DeleteUserReq {

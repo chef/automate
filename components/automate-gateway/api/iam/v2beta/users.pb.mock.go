@@ -32,7 +32,7 @@ func NewUsersServerMockWithoutValidation() *UsersServerMock {
 type UsersServerMock struct {
 	validateRequests bool
 	CreateUserFunc   func(context.Context, *request.CreateUserReq) (*response.CreateUserResp, error)
-	GetUsersFunc     func(context.Context, *request.GetUsersReq) (*response.GetUsersResp, error)
+	ListUsersFunc    func(context.Context, *request.ListUsersReq) (*response.ListUsersResp, error)
 	GetUserFunc      func(context.Context, *request.GetUserReq) (*response.GetUserResp, error)
 	DeleteUserFunc   func(context.Context, *request.DeleteUserReq) (*response.DeleteUserResp, error)
 	UpdateUserFunc   func(context.Context, *request.UpdateUserReq) (*response.UpdateUserResp, error)
@@ -51,16 +51,16 @@ func (m *UsersServerMock) CreateUser(ctx context.Context, req *request.CreateUse
 	return nil, status.Error(codes.Internal, "mock: 'CreateUser' not implemented")
 }
 
-func (m *UsersServerMock) GetUsers(ctx context.Context, req *request.GetUsersReq) (*response.GetUsersResp, error) {
+func (m *UsersServerMock) ListUsers(ctx context.Context, req *request.ListUsersReq) (*response.ListUsersResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
-	if f := m.GetUsersFunc; f != nil {
+	if f := m.ListUsersFunc; f != nil {
 		return f(ctx, req)
 	}
-	return nil, status.Error(codes.Internal, "mock: 'GetUsers' not implemented")
+	return nil, status.Error(codes.Internal, "mock: 'ListUsers' not implemented")
 }
 
 func (m *UsersServerMock) GetUser(ctx context.Context, req *request.GetUserReq) (*response.GetUserResp, error) {
@@ -114,7 +114,7 @@ func (m *UsersServerMock) UpdateSelf(ctx context.Context, req *request.UpdateSel
 // Reset resets all overridden functions
 func (m *UsersServerMock) Reset() {
 	m.CreateUserFunc = nil
-	m.GetUsersFunc = nil
+	m.ListUsersFunc = nil
 	m.GetUserFunc = nil
 	m.DeleteUserFunc = nil
 	m.UpdateUserFunc = nil

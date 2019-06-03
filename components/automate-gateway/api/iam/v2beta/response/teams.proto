@@ -9,7 +9,7 @@ message GetTeamResp {
     Team team = 1;
 }
 
-message GetTeamsResp {
+message ListTeamsResp {
     repeated Team teams = 1;
 }
 

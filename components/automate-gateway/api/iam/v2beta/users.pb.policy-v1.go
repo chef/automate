@@ -26,7 +26,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Users/GetUsers", "auth:users", "read", "GET", "/iam/v2beta/users", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Users/ListUsers", "auth:users", "read", "GET", "/iam/v2beta/users", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Users/GetUser", "auth:users:{id}", "get", "GET", "/iam/v2beta/users/{id}", func(unexpandedResource string, input interface{}) string {
