@@ -558,9 +558,6 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 		return nil, nil, errors.Wrapf(err, "%s, cannot connect to ElasticSearch", myName)
 	}
 
-	var inspecProfilesQuery elastic.Query
-
-	query := elastic.NewIdsQuery(mappings.DocType)
 	//if one of the "other" filters are sent in, regardless of profile_id, we need to get the ids from scans
 	profileMins, counts, err := backend.getProfileMinsFromNodes(filters)
 	if err != nil {
@@ -573,8 +570,8 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 		logrus.Debugf("profile id: %s", profileMin.ID)
 	}
 
+	query := elastic.NewIdsQuery(mappings.DocType)
 	query.Ids(profileIDs...)
-	inspecProfilesQuery = query
 
 	fsc := elastic.NewFetchSourceContext(true).Include(
 		"name",
@@ -583,7 +580,7 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 
 	searchSource := elastic.NewSearchSource().
 		FetchSourceContext(fsc).
-		Query(inspecProfilesQuery).
+		Query(query).
 		Sort(sort_field, sort_asc).
 		From(int(from)).
 		Size(int(size))
@@ -605,17 +602,13 @@ func (backend *ES2Backend) GetAllProfilesFromNodes(from int32, size int32, filte
 			"hits.hits._id",
 			"hits.hits._source").
 		Do(context.Background())
+	if err != nil {
+		return nil, nil, err
+	}
 
 	LogQueryPartMin(esIndex, searchResult, fmt.Sprintf("%s - search result", myName))
 
 	profiles := make([]*reportingapi.ProfileMin, 0)
-	if err != nil {
-		// should we be returning the error here...instead of logging it and then returning nil for the error?
-		logrus.Errorf("%s: Error while trying to get data from ES for index: %s error: %s",
-			myName, esIndex, err.Error())
-		return profiles, nil, nil
-	}
-
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
 		for _, hit := range searchResult.Hits.Hits {
 			var profile reportingapi.ProfileMin
@@ -641,8 +634,6 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 	filters map[string][]string) (map[string]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
 	myName := "getProfileMinsFromNodes"
 
-	profileMins := make(map[string]reporting.ProfileMin)
-
 	for filterName, filterValue := range filters {
 		logrus.Debugf("%s, filter: name=>%s value=>%s\n", myName, filterName, filterValue)
 	}
@@ -653,7 +644,7 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 
 	depth, err := backend.NewDepth(filters, false, true)
 	if err != nil {
-		return profileMins, nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
+		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
 
 	queryInfo := depth.getQueryInfo()
@@ -678,7 +669,7 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 		Do(context.Background())
 
 	if err != nil {
-		return profileMins, nil, errors.Wrapf(err, "%s unable to complete search", myName)
+		return nil, nil, errors.Wrapf(err, "%s unable to complete search", myName)
 	}
 
 	LogQueryPartMin(queryInfo.esIndex, searchResult, fmt.Sprintf("%s - search results", myName))
