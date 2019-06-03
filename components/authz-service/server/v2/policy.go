@@ -100,10 +100,6 @@ func NewPoliciesServer(
 		l.Warn("cleaned up in-progress migration status")
 	}
 
-	if err := srv.updateEngineStore(ctx); err != nil {
-		return nil, errors.Wrap(err, "initialize engine storage")
-	}
-
 	// check migration status
 	ms, err := srv.store.MigrationStatus(ctx)
 	if err != nil {
@@ -119,6 +115,10 @@ func NewPoliciesServer(
 		v = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
 	}
 	srv.setVersion(v)
+
+	if err := srv.updateEngineStore(ctx); err != nil {
+		return nil, errors.Wrap(err, "initialize engine storage")
+	}
 
 	if v.Major == api.Version_V2 {
 		err = srv.store.ApplyV2DataMigrations(ctx)
