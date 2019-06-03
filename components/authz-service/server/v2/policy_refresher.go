@@ -84,7 +84,7 @@ RUNLOOP:
 		case <-refresher.changeNotifier.C():
 			refresher.log.Infof("Received policy change notification (%s)", pretty(lastVersion))
 			var err error
-			lastPolicyID, err = refresher.refresh(context.Background(), lastPolicyID, lastVersion)
+			lastPolicyID, err = refresher.refresh(context.Background(), lastPolicyID, lastVersion, true)
 			if err != nil {
 				refresher.log.WithError(err).Warnf("Failed to refresh policies (%s)", pretty(lastVersion))
 			}
@@ -95,14 +95,14 @@ RUNLOOP:
 			refresher.log.Infof("Received local policy refresh request (%s)", pretty(m.version))
 			lastVersion = m.version
 			var err error
-			lastPolicyID, err = refresher.refresh(m.ctx, lastPolicyID, lastVersion)
+			lastPolicyID, err = refresher.refresh(m.ctx, lastPolicyID, lastVersion, true)
 			m.Respond(err)
 			if !antiEntropyTimer.Stop() {
 				<-antiEntropyTimer.C
 			}
 		case <-antiEntropyTimer.C:
 			var err error
-			lastPolicyID, err = refresher.refresh(ctx, lastPolicyID, lastVersion)
+			lastPolicyID, err = refresher.refresh(ctx, lastPolicyID, lastVersion, false)
 			if err != nil {
 				refresher.log.WithError(err).Warnf("Anti-entropy refresh failed (%s)", pretty(lastVersion))
 			}
@@ -114,17 +114,18 @@ RUNLOOP:
 	close(refresher.refreshRequests)
 }
 
-func (refresher *policyRefresher) refresh(ctx context.Context, lastPolicyID string, vsn api.Version) (string, error) {
+func (refresher *policyRefresher) refresh(ctx context.Context, lastPolicyID string, vsn api.Version, forceUpdate bool) (string, error) {
 	curPolicyID, err := refresher.store.GetPolicyChangeID(ctx)
 	if err != nil {
 		refresher.log.WithError(err).Warn("Failed to get current policy change ID")
 		return lastPolicyID, err
 	}
-	if curPolicyID != lastPolicyID {
+	if curPolicyID != lastPolicyID || forceUpdate {
 		refresher.log.WithFields(logrus.Fields{
 			"lastPolicyID": lastPolicyID,
 			"curPolicyID":  curPolicyID,
 			"version":      vsn,
+			"forceUpdate":  forceUpdate,
 		}).Debug("Refreshing engine store")
 
 		if err := refresher.updateEngineStore(ctx, vsn); err != nil {
