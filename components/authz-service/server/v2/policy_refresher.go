@@ -163,6 +163,11 @@ func (refresher *policyRefresher) RefreshAsync() error {
 
 // updates OPA engine store with policy
 func (refresher *policyRefresher) updateEngineStore(ctx context.Context, vsn api.Version) error {
+	if vsn.Major != api.Version_V2 {
+		// do nothing, IAM v1 isn't made multi-node-aware for now
+		return nil
+	}
+
 	// Engine updates need unfiltered access to all data.
 	ctx = auth_context.ContextWithoutProjects(ctx)
 
@@ -179,12 +184,11 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context, vsn api
 		return err
 	}
 
-	// ! \\ this assumes that vsp.Major can only be 2.
 	switch {
-	case vsn.Major == api.Version_V2 && vsn.Minor == api.Version_V1: // v2.1
-		return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap, ruleMap)
-	default: // v2.0
+	case vsn.Minor == api.Version_V1: // v2
 		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap)
+	default: // v2.1
+		return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap, ruleMap)
 	}
 }
 
