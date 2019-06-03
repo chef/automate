@@ -22,7 +22,7 @@ import (
  ************ ************ ************ ************ ************ ************/
 
 func TestV2IsAuthorized(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV2(t)
 	sub, act, res := "user:local:admin", "iam:users:create", "iam:users"
 
 	// We're always passing the same arguments to IsAuthorized(). This allows for
@@ -81,7 +81,7 @@ func TestV2IsAuthorized(t *testing.T) {
 }
 
 func TestV2p1ProjectsAuthorized(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV2p1(t)
 	sub, act, res := "user:local:admin", "iam:users:create", "iam:users"
 	proj1, proj2, proj3, proj4, unassigned := "proj-1", "proj-2", "proj-3", "proj-4", constants.UnassignedProjectID
 	allProjects := []string{proj1, proj2, proj3, proj4, unassigned}
@@ -370,7 +370,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				// in the server, we fetch the list of all projects when the projects filter is empty
 				actual, err := e.V2ProjectsAuthorized(args(allProjects))
 				require.NoError(t, err)
@@ -381,7 +381,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 }
 
 func TestV2FilterAuthorizedPairs(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV2(t)
 	sub, act0, res0, act1, res1 := "user:local:someid", "iam:users:create",
 		"nodes:someid", "compliance:profiles:delete", "compliance:profiles"
 	pair0 := engine.Pair{Resource: engine.Resource(res0), Action: engine.Action(act0)}
@@ -493,7 +493,7 @@ func TestV2FilterAuthorizedPairs(t *testing.T) {
 }
 
 func TestV2FilterAuthorizedProjects(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV2p1(t)
 	sub := "user:local:someid"
 	act0, res0 := "iam:users:create", "nodes:someid"
 	act1, res1 := "compliance:profiles:delete", "compliance:profiles"
@@ -712,11 +712,11 @@ func setPoliciesV2pX(t testing.TB, twoPointOne bool, e engine.Engine, policiesAn
 	for _, role := range roles {
 		roleMap[role["id"].(string)] = role
 	}
-	var err error
 	if twoPointOne {
-		err = e.V2p1SetPolicies(ctx, policyMap, roleMap, make(map[string][]interface{}))
+		err := e.V2p1SetPolicies(ctx, policyMap, roleMap, make(map[string][]interface{}))
+		require.NoError(t, err, "set policies(v2.1)")
 	} else {
-		err = e.V2SetPolicies(ctx, policyMap, roleMap, make(map[string][]interface{}))
+		err := e.V2SetPolicies(ctx, policyMap, roleMap)
+		require.NoError(t, err, "set policies(v2)")
 	}
-	require.NoError(t, err, "set policies(v2)")
 }

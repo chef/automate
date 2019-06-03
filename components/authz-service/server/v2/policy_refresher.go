@@ -184,7 +184,7 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context, vsn api
 	case vsn.Major == api.Version_V2 && vsn.Minor == api.Version_V1: // v2.1
 		return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap, ruleMap)
 	default: // v2.0
-		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap, ruleMap)
+		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap)
 	}
 }
 

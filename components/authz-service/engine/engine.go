@@ -72,7 +72,7 @@ type Writer interface {
 }
 
 type V2Writer interface {
-	V2SetPolicies(context.Context, map[string]interface{}, map[string]interface{}, map[string][]interface{}) error
+	V2SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
 }
 
 type V2p1Writer interface {

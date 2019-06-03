@@ -3209,19 +3209,19 @@ type testEngine struct {
 }
 
 func (te *testEngine) V2SetPolicies(
-	_ context.Context, policies map[string]interface{},
+	ctx context.Context, policies map[string]interface{},
+	roles map[string]interface{}) error {
+	return te.V2p1SetPolicies(ctx, policies, roles, map[string][]interface{}{})
+}
+
+func (te *testEngine) V2p1SetPolicies(
+	ctx context.Context, policies map[string]interface{},
 	roles map[string]interface{}, rules map[string][]interface{}) error {
 	te.policyMap = policies
 	// TODO: use these
 	te.roleMap = roles
 	te.ruleMap = rules
 	return nil
-}
-
-func (te *testEngine) V2p1SetPolicies(
-	ctx context.Context, policies map[string]interface{},
-	roles map[string]interface{}, rules map[string][]interface{}) error {
-	return te.V2SetPolicies(ctx, policies, roles, rules)
 }
 
 func id(t *testing.T, p *prng.Prng) string {

@@ -21,7 +21,7 @@ import (
 )
 
 func TestIsAuthorized(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV1(t)
 	sub, act, res := "user:local:admin", "read", "auth:users:admin"
 
 	// We're always passing the same arguments to IsAuthorized(). This allows for
@@ -210,7 +210,7 @@ func TestIsAuthorized(t *testing.T) {
 }
 
 func TestHierarchicalResourcePolicies(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV1(t)
 	sub, act, res := "user:local:someid", "read", "compliance:scans:123"
 	args := func() (context.Context, engine.Subjects, engine.Action, engine.Resource) {
 		return ctx, engine.Subject(sub), engine.Action(act), engine.Resource(res)
@@ -308,7 +308,7 @@ func TestHierarchicalResourcePolicies(t *testing.T) {
 }
 
 func TestWildcardActionPolicies(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV1(t)
 	sub, act, res := "user:local:someid", "read", "nodes:property"
 	args := func() (context.Context, engine.Subjects, engine.Action, engine.Resource) {
 		return ctx, engine.Subject(sub), engine.Action(act), engine.Resource(res)
@@ -397,7 +397,7 @@ func TestWildcardActionPolicies(t *testing.T) {
 }
 
 func TestWildcardSubjectsPolicies(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV1(t)
 	sub, act, res := "user:local:someid", "read", "nodes:property"
 	args := func() (context.Context, engine.Subjects, engine.Action, engine.Resource) {
 		return ctx, engine.Subject(sub), engine.Action(act), engine.Resource(res)
@@ -489,7 +489,7 @@ func TestWildcardSubjectsPolicies(t *testing.T) {
 }
 
 func TestFilterAuthorizedPairs(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV1(t)
 	sub, act0, res0, act1, res1 := "user:local:someid", "read", "nodes:someid", "delete", "compliance:profiles"
 	pair0 := engine.Pair{Resource: engine.Resource(res0), Action: engine.Action(act0)}
 	pair1 := engine.Pair{Resource: engine.Resource(res1), Action: engine.Action(act1)}
@@ -661,6 +661,30 @@ func BenchmarkFilterAuthorizedPairs(b *testing.B) {
 			filterResult = r
 		})
 	}
+}
+
+func setupV1(t testing.TB) (context.Context, map[string]engine.Engine) {
+	ctx, engines := setup(t)
+	if o, ok := engines["opa"]; ok {
+		o.SetPolicies(ctx, map[string]interface{}{})
+	}
+	return ctx, engines
+}
+
+func setupV2(t testing.TB) (context.Context, map[string]engine.Engine) {
+	ctx, engines := setup(t)
+	if o, ok := engines["opa"]; ok {
+		o.V2SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{})
+	}
+	return ctx, engines
+}
+
+func setupV2p1(t testing.TB) (context.Context, map[string]engine.Engine) {
+	ctx, engines := setup(t)
+	if o, ok := engines["opa"]; ok {
+		o.V2p1SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{}, map[string][]interface{}{})
+	}
+	return ctx, engines
 }
 
 func setup(t testing.TB) (context.Context, map[string]engine.Engine) {
