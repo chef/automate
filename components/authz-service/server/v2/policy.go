@@ -513,7 +513,7 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	if upgraded == true {
+	if upgraded {
 		return &api.MigrateToV2Resp{}, nil
 	}
 
@@ -704,10 +704,6 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 			// do nothing
 		}
 
-		s.log.Debugf("Initiating store update for %s", info.FullMethod)
-		if err := s.updateEngineStore(ctx); err != nil {
-			return nil, status.Errorf(codes.Internal, "error updating engine store: %s", err.Error())
-		}
 		return resp, nil
 	}
 }
