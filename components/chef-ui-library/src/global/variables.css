@@ -26,6 +26,20 @@
   --atomic-tangerine: #FF9654;
   --blue-de-france: #3DA5FF;
   --gray: #B7BCBC;
+  --blue: #174AF0;
+  --lavender-blue: #BDCBFB;
+  --lavender: #DEE5FD;
+  --maroon: #BA1E6A;
+  --lavender-pink: #F387D4;
+  --piggy-pink: #F9DBEA;
+  --mahogany: #B74500;
+  --deep-peach: #FFCAAA;
+  --antique-white: #FFE5D4;
+  --dark-cerulean: #00417A;
+  --medium-teal-blue: #005BAB;
+  --columbia-blue: #9ED2FF;
+  --glitter: #CFE8FF;
+
 
   /* ** THESE SEMANTIC COLOR VARIABLES ARE FREE TO BE USED WITHIN AUTOMATE ** */
   /* primary */
@@ -58,5 +72,21 @@
   --chef-modal-bg-color: rgba(34, 36, 53, 0.4);
     /* based on chef-gray 0.65 opacity. */
   --chef-loading-bg-color: rgba(224, 228, 230, 0.65);
-}
 
+  /* ADDING COLORS TO BE USED IN BADGES */
+  --chef-badge-primary-background: var(--lavender);
+  --chef-badge-primary-border: var(--lavender-blue);
+  --chef-badge-primary-color: var(--blue);
+
+  --chef-badge-critical-background: var(--piggy-pink);
+  --chef-badge-critical-border: var(--lavender-pink);
+  --chef-badge-critical-color: var(--maroon);
+
+  --chef-badge-warning-background: var(--antique-white);
+  --chef-badge-warning-border: var(--deep-peach);
+  --chef-badge-warning-color: var(--mahogany);
+
+  --chef-badge-success-background: var(--glitter);
+  --chef-badge-success-border: var(--columbia-blue);
+  --chef-badge-success-color: var(--medium-teal-blue);
+}
