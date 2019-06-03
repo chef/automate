@@ -9,7 +9,7 @@ import (
 type SortField int
 
 const (
-	DefaultSortFieldForServiceGroups = "name"
+	DefaultSortFieldForServiceGroups = "percent_ok"
 	DefaultSortFieldForServices      = "health"
 	DefaultSortAscending             = true
 

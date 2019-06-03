@@ -109,16 +109,15 @@ func TestServiceGroupsMultiService(t *testing.T) {
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
 				{
-					Name:             "myapp.default",
-					Release:          "core/myapp/0.1.0/20190101121212",
-					Status:           applications.HealthStatus_WARNING,
-					HealthPercentage: 67,
+					Name:             "test.default",
+					Release:          "core/test/0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
 					Application:      a,
 					Environment:      e,
 					ServicesHealthCounts: &applications.HealthCounts{
-						Total:   3,
-						Ok:      2,
-						Warning: 1,
+						Total:   1,
+						Unknown: 1,
 					},
 				},
 				{
@@ -136,6 +135,19 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					},
 				},
 				{
+					Name:             "myapp.default",
+					Release:          "core/myapp/0.1.0/20190101121212",
+					Status:           applications.HealthStatus_WARNING,
+					HealthPercentage: 67,
+					Application:      a,
+					Environment:      e,
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   3,
+						Ok:      2,
+						Warning: 1,
+					},
+				},
+				{
 					Name:             "redis.default",
 					Release:          "core/redis/0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
@@ -145,18 +157,6 @@ func TestServiceGroupsMultiService(t *testing.T) {
 					ServicesHealthCounts: &applications.HealthCounts{
 						Total: 3,
 						Ok:    3,
-					},
-				},
-				{
-					Name:             "test.default",
-					Release:          "core/test/0.1.0/20190101121212",
-					Status:           applications.HealthStatus_UNKNOWN,
-					HealthPercentage: 0,
-					Application:      a,
-					Environment:      e,
-					ServicesHealthCounts: &applications.HealthCounts{
-						Total:   1,
-						Unknown: 1,
 					},
 				},
 			},
@@ -325,9 +325,11 @@ func TestGetServiceGroupsInvalidPageNumberReturnsDefaultPageValues(t *testing.T)
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	// a.default should be returned since we default to page number one
+	// d.default should be returned since it is a Critical service-group and by default
+	// we return page number one and we sort by percent_ok
 	if assert.Equal(t, 1, len(response.ServiceGroups)) {
-		assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
+		assert.Equal(t, "d.default", response.ServiceGroups[0].Name)
+		assert.Equal(t, applications.HealthStatus_CRITICAL, response.ServiceGroups[0].Status)
 	}
 }
 
@@ -348,9 +350,10 @@ func TestGetServiceGroupsPage(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	// b.default should be on the second page with default sorting
+	// a.default should be on the second page with default sorting (Unknown Health)
 	if assert.Equal(t, 1, len(response.ServiceGroups)) {
-		assert.Equal(t, "b.default", response.ServiceGroups[0].Name)
+		assert.Equal(t, "a.default", response.ServiceGroups[0].Name)
+		assert.Equal(t, applications.HealthStatus_UNKNOWN, response.ServiceGroups[0].Status)
 	}
 }
 
@@ -387,6 +390,7 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 				Page: 2,
 				Size: 1,
 			},
+			Sorting: &query.Sorting{Field: "name"},
 		}
 		expected = &applications.ServiceGroups{
 			ServiceGroups: []*applications.ServiceGroup{
