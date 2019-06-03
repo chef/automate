@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
@@ -1293,35 +1294,37 @@ func TestProjectUpdate(t *testing.T) {
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("report match: %s", test.description),
 			func(t *testing.T) {
-				suite.InsertInspecReports([]*relaxting.ESInSpecReport{test.report})
-				suite.InsertInspecSummaries([]*relaxting.ESInSpecSummary{test.summary})
+				_, err := suite.InsertInspecReports([]*relaxting.ESInSpecReport{test.report})
+				require.NoError(t, err)
+				_, err = suite.InsertInspecSummaries([]*relaxting.ESInSpecSummary{test.summary})
+				require.NoError(t, err)
 
 				// Send a project rules update event
 				esJobID, err := suite.ingesticESClient.UpdateReportProjectsTags(ctx, test.projects)
-				assert.Nil(t, err)
+				require.NoError(t, err)
 
 				suite.WaitForESJobToComplete(esJobID)
 
 				suite.RefreshComplianceReportIndex()
 
 				esJobID, err = suite.ingesticESClient.UpdateSummaryProjectsTags(ctx, test.projects)
-				assert.Nil(t, err)
+				require.NoError(t, err)
 
 				suite.WaitForESJobToComplete(esJobID)
 
 				suite.RefreshComplianceSummaryIndex()
 
 				reports, err := suite.GetAllReportsESInSpecReport()
-				assert.NoError(t, err)
-				assert.Equal(t, 1, len(reports))
+				require.NoError(t, err)
+				require.Equal(t, 1, len(reports))
 
 				updatedReport := reports[0]
 
 				assert.ElementsMatch(t, test.projectIDs, updatedReport.Projects)
 
 				summaries, err := suite.GetAllSummaryESInSpecSummary()
-				assert.NoError(t, err)
-				assert.Equal(t, 1, len(summaries))
+				require.NoError(t, err)
+				require.Equal(t, 1, len(summaries))
 
 				updatedSummary := summaries[0]
 
