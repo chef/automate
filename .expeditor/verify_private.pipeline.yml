@@ -235,8 +235,7 @@ steps:
         hab studio run "source scripts/verify_studio_init &&
           start_deployment_service &&
           chef-automate dev deployinate &&
-          chef-automate iam upgrade-to-v2 &&
-          remove_legacy_v1_policies &&
+          chef-automate iam upgrade-to-v2 --skip-policy-migration &&
           gateway_integration"
     timeout_in_minutes: 20
     retry:
