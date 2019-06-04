@@ -157,7 +157,7 @@ describe('ServiceGroupsComponent', () => {
       expect(component.store.dispatch).toHaveBeenCalledWith(
         new UpdateServiceGroupFilters({filters: {
           status: undefined,
-          sortField: 'name',
+          sortField: 'percent_ok',
           sortDirection: 'ASC',
           page: 1,
           pageSize: 25
@@ -173,7 +173,7 @@ describe('ServiceGroupsComponent', () => {
       expect(component.store.dispatch).toHaveBeenCalledWith(
         new UpdateServiceGroupFilters({filters: {
           status: undefined,
-          sortField: 'name',
+          sortField: 'percent_ok',
           sortDirection: 'ASC',
           page: 1,
           pageSize: 25
@@ -188,7 +188,7 @@ describe('ServiceGroupsComponent', () => {
       expect(component.store.dispatch).toHaveBeenCalledWith(
         new UpdateServiceGroupFilters({filters: {
           status: 'ok',
-          sortField: 'name',
+          sortField: 'percent_ok',
           sortDirection: 'ASC',
           page: 1,
           pageSize: 25
@@ -203,7 +203,7 @@ describe('ServiceGroupsComponent', () => {
       expect(component.store.dispatch).toHaveBeenCalledWith(
         new UpdateServiceGroupFilters({filters: {
           status: undefined,
-          sortField: 'name',
+          sortField: 'percent_ok',
           sortDirection: 'ASC',
           page: 1,
           pageSize: 25
@@ -218,7 +218,7 @@ describe('ServiceGroupsComponent', () => {
       expect(component.store.dispatch).toHaveBeenCalledWith(
         new UpdateServiceGroupFilters({filters: {
           status: undefined,
-          sortField: 'name',
+          sortField: 'percent_ok',
           sortDirection: 'ASC',
           page: 1,
           pageSize: 25

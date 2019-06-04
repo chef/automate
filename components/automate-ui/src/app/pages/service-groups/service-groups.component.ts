@@ -52,6 +52,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   // The collection of allowable sort directions
   private allowedSortDirections = ['asc', 'desc', 'ASC', 'DESC'];
 
+  // Sorft field by default
+  readonly defaultSortField = 'percent_ok';
+
   private selectedFieldDirection$: Observable<SortDirection>;
   private selectedSortField$: Observable<string>;
   private healthSummary$: Observable<HealthSummary>;
@@ -294,7 +297,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     if ( sortField !== undefined && this.defaultFieldDirection.hasOwnProperty(sortField.text) ) {
       return sortField.text;
     }
-    return 'name';
+    return this.defaultSortField;
   }
 
   private getSortDirection(allUrlParameters: Chicklet[]): 'ASC' | 'DESC' {
