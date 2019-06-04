@@ -144,7 +144,7 @@ describe('HttpClientAuthInterceptor', () => {
         ['includes project header', false]
       ], function (description: string, setting: boolean) {
 
-        it(description + 'when unfiltered flag set to ' + setting, done => {
+        it(description + 'project header when unfiltered flag set to ' + setting, done => {
           const options = { params: { unfiltered: String(setting) } };
           httpClient.get('/endpoint', options).subscribe(done);
 
@@ -157,6 +157,18 @@ describe('HttpClientAuthInterceptor', () => {
           } else {
             expect(headerKeys).toContain('projects');
           }
+        });
+
+        it('strips unfiltered param when set to ' + setting, done => {
+          const options = { params: { unfiltered: String(setting), dummy: 'foobar' } };
+          httpClient.get('/endpoint', options).subscribe(done);
+
+          const httpRequest = httpMock.expectOne('/endpoint?dummy=foobar');
+          httpRequest.flush('response');
+
+          // This assertion is completely redundant with the expectOne above,
+          // but having it adds to clarity.
+          expect(httpRequest.request.params.get('unfiltered')).toBeFalsy();
         });
       });
     });

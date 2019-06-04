@@ -28,14 +28,14 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let headers = request.headers.set('Authorization', `Bearer ${this.chefSession.id_token}`);
     const filtered = request.params.get('unfiltered') !== 'true';
-    const newParams = request.params.delete('unfiltered');
+    const params = request.params.delete('unfiltered');
     if (this.projects && filtered) {
       headers = headers.set('projects', this.projects);
     }
     return next
       .handle(request.clone({
-        headers: headers,
-        params: newParams
+        headers,
+        params
       })).pipe(
         catchError((response: HttpEvent<any>) => {
           if (get('status', response) === 401) {
