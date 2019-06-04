@@ -2934,7 +2934,7 @@ type testSetup struct {
 
 func setupV2WithWriter(t *testing.T,
 	writer engine.V2pXWriter) testSetup {
-	return setupV2(t, nil, writer, nil, nil)
+	return setupV2(t, nil, writer, nil, make(chan api_v2.Version, 1))
 }
 
 func setupV2(t *testing.T,
@@ -2953,6 +2953,7 @@ func setupV2(t *testing.T,
 	}
 
 	mem_v2 := memstore_v2.New()
+	require.NoError(t, mem_v2.Success(ctx)) // this is IAM v2
 	polV2, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
 	require.NoError(t, err)
 
