@@ -182,7 +182,7 @@ service Policies {
     option (chef.automate.api.policy).resource = "auth_introspection:introspect_all_projects";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:introspect";
-    option (chef.automate.api.iam.policy).action = "iam:projects:getAllProjects";
+    option (chef.automate.api.iam.policy).action = "iam:introspect:getAllProjects";
   };
  
 }
