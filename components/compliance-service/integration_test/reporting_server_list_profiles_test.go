@@ -31,16 +31,10 @@ func TestListProfiles(t *testing.T) {
 		err := suite.ingestReport(reportFileName, func(r *compliance.Report) {
 			id := newUUID()
 
-			r.Environment = id
-			r.NodeName = id
-			r.Platform.Name = id
 			r.Profiles[0].Controls = r.Profiles[0].Controls[:1]
 			r.Profiles[0].Controls[0].Id = id
-			r.Profiles[0].Controls[0].Title = id
 			r.Profiles = r.Profiles[:1]
 			r.Profiles[0].Sha256 = id
-			r.Profiles[0].Title = id
-			r.Recipes = []string{id}
 			r.ReportUuid = id
 			r.Roles = []string{id}
 			r.EndTime = time.Now().UTC().Format(time.RFC3339)
@@ -88,13 +82,6 @@ func TestListProfiles(t *testing.T) {
 	suite.WaitForESJobToComplete(esJobID)
 
 	suite.RefreshComplianceReportIndex()
-
-	esJobID, err = suite.ingesticESClient.UpdateSummaryProjectsTags(everythingCtx, projectRules)
-	assert.Nil(t, err)
-
-	suite.WaitForESJobToComplete(esJobID)
-
-	suite.RefreshComplianceSummaryIndex()
 
 	profileIds := make([]string, len(reportIds))
 	for i := range reportIds {
