@@ -166,8 +166,6 @@ func (s *State) initPartialResult(ctx context.Context) error {
 		return errors.Wrap(err, "partial eval")
 	}
 	s.partialAuth = pr
-	s.v2PartialAuth = rego.PartialResult{}
-	s.v2PartialProjects = rego.PartialResult{}
 	return nil
 }
 
@@ -189,8 +187,6 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 		return errors.Wrap(err, "partial eval (authorized)")
 	}
 	s.v2PartialAuth = v2Partial
-	s.partialAuth = rego.PartialResult{}
-	s.v2PartialProjects = rego.PartialResult{}
 	return nil
 }
 
@@ -211,8 +207,11 @@ func (s *State) initPartialResultV2p1(ctx context.Context) error {
 		return errors.Wrap(err, "partial eval (authorized_project)")
 	}
 	s.v2PartialProjects = v2PartialProjects
-	s.partialAuth = rego.PartialResult{}
-	s.v2PartialAuth = rego.PartialResult{}
+
+	s.log.Info("Ran partial update v2.1")
+	if err := s.DumpDataV2p1(ctx); err != nil {
+		s.log.Warnf("error dumping v2.1 data: %v", err)
+	}
 	return nil
 }
 
