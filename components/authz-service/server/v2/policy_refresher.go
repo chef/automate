@@ -185,10 +185,10 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context, vsn api
 	}
 
 	switch {
-	case vsn.Minor == api.Version_V1: // v2
-		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap)
-	default: // v2.1
+	case vsn.Minor == api.Version_V1: // v2.1
 		return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap, ruleMap)
+	default: // v2
+		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap)
 	}
 }
 

@@ -117,14 +117,13 @@ func NewPoliciesServer(
 	srv.setVersion(v)
 
 	if v.Major == api.Version_V2 {
-		err = srv.store.ApplyV2DataMigrations(ctx)
-		if err != nil {
+		if err := srv.store.ApplyV2DataMigrations(ctx); err != nil {
 			return nil, errors.Wrap(err, "error migrating v2 data")
 		}
 	}
 
 	if err := srv.updateEngineStore(ctx); err != nil {
-		return nil, errors.Wrap(err, "initialize engine storage")
+		return nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
 	}
 
 	return srv, nil
