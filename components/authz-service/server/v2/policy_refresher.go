@@ -249,34 +249,33 @@ func (refresher *policyRefresher) getRuleMap(ctx context.Context) (map[string][]
 	// OPA requires this format
 	data := make(map[string][]interface{})
 	for _, r := range rules {
-		if _, ok := data[r.ID]; !ok {
-			data[r.ID] = make([]interface{}, 0)
+		if _, ok := data[r.ProjectID]; !ok {
+			data[r.ProjectID] = make([]interface{}, 0)
 		}
 
-		// TODO conditions
-		// conditions := make([]interface{}, len(r.Conditions))
-		// for i, condition := range r.Conditions {
-		// 	c := []map[string]interface{}{
-		// 		{
-		// 			"type":     condition.Type.String(),
-		// 			"operator": condition.Operator.String(),
-		// 			"values":   condition.Value,
-		// 		},
-		// 	}
-		// 	conditions[i] = c
-		// }
+		conditions := make([]interface{}, len(r.Conditions))
+		for i, condition := range r.Conditions {
+			c := []map[string]interface{}{
+				{
+					"type":     condition.Type.String(),
+					"operator": condition.Operator.String(),
+					"values":   condition.Value,
+				},
+			}
+			conditions[i] = c
+		}
 
-		data[r.ID] = append(data[r.ID],
+		data[r.ProjectID] = append(data[r.ProjectID],
 			map[string]interface{}{
 				"id":         r.ID,
-				"project_id": r.ProjectID,
 				"name":       r.Name,
 				"type":       r.Type.String(),
-				// "conditions": r.Conditions,
+				"project_id": r.ProjectID,
+				"conditions": r.Conditions,
 			})
 	}
 
-	refresher.log.Infof("HEY! got this first rule %#v in getRuleMap", data["foo-rule"])
+	refresher.log.Infof("HEY! 1. data in getRuleMap", data)
 
 	return data, nil
 }

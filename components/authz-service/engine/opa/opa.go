@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/storage"
@@ -550,6 +551,7 @@ func (s *State) rulesFromResults(rs rego.ResultSet) ([]engine.Rule, error) {
 
 func (s *State) projectMappingsFromResults(rs rego.ResultSet) (map[string][]engine.Rule, error) {
 	ruleMap := make(map[string][]engine.Rule)
+	spew.Dump(rs)
 	for _, r := range rs {
 		if len(r.Expressions) != 1 {
 			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
@@ -573,6 +575,7 @@ func (s *State) projectMappingsFromResults(rs rego.ResultSet) (map[string][]engi
 			if !ok {
 				return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
 			}
+			spew.Dump(ms)
 			rules, err := s.convertRulesList(ms, rules)
 			if err != nil {
 				return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
@@ -608,34 +611,37 @@ func (s *State) convertRulesList(ms []interface{}, rules []engine.Rule) ([]engin
 			return nil, errors.New("error converting project id")
 		}
 
-		// TODO fix condition typecasting
-		// convert to raw array first?
-		// s.log.Infof("HEY conditions %#v", m["conditions"])
-		cs, ok := m["conditions"].([]map[string]interface{})
+		cs, ok := m["conditions"].([]interface{})
 		if !ok {
 			// TODO bubble up this error
-			return nil, errors.New("error converting conditions")
+			return nil, errors.New("error converting conditions array")
 		}
+
 		conditions := make([]engine.Condition, len(cs))
 		for j, c := range cs {
-			ct, ok := c["type"].(string)
+			condition := c.(map[string]interface{})
+			if !ok {
+				return nil, errors.New("error converting condition")
+			}
+
+			ct, ok := condition["type"].(string)
 			if !ok {
 				return nil, errors.New("error converting condition type")
 			}
-			co, ok := c["operator"].(string)
+			co, ok := condition["operator"].(string)
 			if !ok {
 				return nil, errors.New("error converting condition operator")
 			}
 
-			rawArray, ok := c["values"].([]interface{})
+			rawValues, ok := condition["values"].([]interface{})
 			if !ok {
-				return nil, errors.New("error casting to array")
+				return nil, errors.New("error values casting to array")
 			}
-			vals := make([]string, len(rawArray))
-			for k := range rawArray {
-				v, ok := rawArray[k].(string)
+			vals := make([]string, len(rawValues))
+			for k := range rawValues {
+				v, ok := rawValues[k].(string)
 				if !ok {
-					return nil, errors.New("error casting to string")
+					return nil, errors.New("error value casting to string")
 				}
 				vals[k] = v
 			}
@@ -679,7 +685,7 @@ func (s *State) V2SetPolicies(
 	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
 	// TODO break this out into new function
 	s.ruleStore = inmem.NewFromObject(map[string]interface{}{
-		"rules": ruleMap,
+		"project_rules": ruleMap,
 	})
 	s.log.Infof("HEY! 2. ruleStore in v2SetPolicies %#v", s.ruleStore)
 

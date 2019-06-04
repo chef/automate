@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/mitchellh/mapstructure"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
@@ -502,7 +503,7 @@ func TestHasProject(t *testing.T) {
 }
 func TestListProjectMappings(t *testing.T) {
 	data := `{
-  "projectRules": {
+  "project_rules": {
     "project1": {
       "rules": [
         {
@@ -546,22 +547,59 @@ func TestListProjectMappings(t *testing.T) {
   }
 }`
 
+	values1 := []string{"chef-server-1", "chef-server-2", "chef-server-3"}
+	conditions1 := []map[string]interface{}{
+		{
+			"type":     "chef_servers",
+			"operator": "member_of",
+			"values":   values1,
+		},
+	}
+	rule1 := map[string]interface{}{
+		"id":         "rule1",
+		"projectId":  "project1",
+		"name":       "project number 1",
+		"type":       "event",
+		"conditions": conditions1,
+	}
+
+	values2 := []string{"org1"}
+	conditions2 := []map[string]interface{}{
+		{
+			"type":     "chef_orgs",
+			"operator": "equals",
+			"values":   values2,
+		},
+	}
+
+	rule2 := map[string]interface{}{
+		"id":         "rule2",
+		"projectId":  "project2",
+		"name":       "project number 2",
+		"type":       "node",
+		"conditions": conditions2,
+	}
+
+	rules := map[string]interface{}{
+		"project1": []map[string]interface{}{rule1},
+		"project2": []map[string]interface{}{rule2},
+	}
+
+	expectedProjectRules := []interface{}{rules}
+
 	query := "data.rule_mappings.rules_for_all_projects"
 
-	t.Run("returns complete list of rules", func(t *testing.T) {
-		rs := resultSetV2(t, map[string]interface{}{}, strings.NewReader(data), query)
-
+	t.Run("returns complete map of project rules", func(t *testing.T) {
+		rs := resultSetV2(t, nil, strings.NewReader(data), query)
+		spew.Dump(rs)
 		require.Equal(t, 1, len(rs), "expected one result")
 		require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
 
-		// outer, ok := rs[0].Expressions[0].Value.(map[string]interface{})
-		// require.True(t, ok, "outer result value is a map")
-		fmt.Printf("HEY! this thing %#v\n\n", rs[0].Expressions[0].Value)
 		projectMap, ok := rs[0].Expressions[0].Value.([]interface{})
-		require.True(t, ok, "projectMap result value is a map")
+		require.True(t, ok, "projectMap result value is a map of rule lists")
 		err := mapstructure.Decode(rs[0].Bindings, &projectMap)
 		require.NoError(t, err, "decode result bindings")
-		assert.Equal(t, nil, projectMap)
+		assert.Equal(t, expectedProjectRules, projectMap)
 	})
 }
 
