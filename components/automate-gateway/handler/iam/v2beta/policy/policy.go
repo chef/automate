@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	authz "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/lib/grpc/auth_context"
 
 	pb_common "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common"
 	pb_req "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
@@ -19,13 +20,18 @@ import (
 type Server struct {
 	policies authz.PoliciesClient
 	projects authz.ProjectsClient
+	authz    authz.AuthorizationClient
 }
 
 // NewServer creates a server with its client.
-func NewServer(policies authz.PoliciesClient, projects authz.ProjectsClient) *Server {
+func NewServer(
+	policies authz.PoliciesClient,
+	projects authz.ProjectsClient,
+	authz authz.AuthorizationClient) *Server {
 	return &Server{
 		policies: policies,
 		projects: projects,
+		authz:    authz,
 	}
 }
 
@@ -428,19 +434,51 @@ func (p *Server) ListProjects(
 // global projects filter, so it may include unassigned.
 func (p *Server) IntrospectAllProjects(
 	ctx context.Context, req *pb_req.ListProjectsReq) (*pb_resp.ListProjectsResp, error) {
+
+	projectIDs, err := p.getAllowedProjects(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// To correlate names with project IDs, use the standard ListProjects
+	// with the special flag to include "(unassigned)" too.
 	resp, err := p.projects.ListProjects(ctx, &authz.ListProjectsReq{GlobalFilterView: true})
 	if err != nil {
 		return nil, err
 	}
-	projects := make([]*pb_common.Project, len(resp.Projects))
-	for i, proj := range resp.Projects {
-		apiProj, err := domainProjectToAPIProject(proj)
+	// The last call actually returns all projects, not just all allowed projects.
+	// So here just use the correctly filtered id list to generate the return list.
+	projMap := toMap(resp.Projects)
+	projects := make([]*pb_common.Project, len(projectIDs))
+	for i, id := range projectIDs {
+		apiProj, err := domainProjectToAPIProject(projMap[id])
 		if err != nil {
 			return nil, err
 		}
 		projects[i] = apiProj
 	}
 	return &pb_resp.ListProjectsResp{Projects: projects}, nil
+}
+
+func toMap(projects []*authz.Project) map[string]*authz.Project {
+	m := make(map[string]*authz.Project)
+	for _, p := range projects {
+		m[p.Id] = p
+	}
+	return m
+}
+
+func (p *Server) getAllowedProjects(ctx context.Context) ([]string, error) {
+
+	// Fetches the id of the current user PLUS the team ids for that user
+	subjects := auth_context.FromContext(ctx).Subjects
+
+	resp, err := p.authz.FilterAuthorizedProjects(ctx, &authz.FilterAuthorizedProjectsReq{
+		Subjects: subjects,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resp.Projects, nil
 }
 
 // DeleteProject deletes a project.
