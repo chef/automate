@@ -498,6 +498,7 @@ func (s *State) InProgress(context.Context) error {
 func (s *State) Failure(context.Context) error {
 	if s.ms == storage.InProgress {
 		s.ms = storage.Failed
+		return nil
 	}
 	return errors.New("cannot transition to failure")
 }
