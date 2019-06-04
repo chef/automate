@@ -55,7 +55,7 @@ func Spawn(opts *serveropts.Opts) error {
 	log.WithFields(log.Fields{"uri": uri}).Info("Starting gRPC Server")
 	conn, err := net.Listen("tcp", uri)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Fatal("TCP listen failed")
+		log.WithError(err).Error("TCP listen failed")
 		return err
 	}
 
@@ -70,21 +70,21 @@ func Spawn(opts *serveropts.Opts) error {
 	// migration tasks.
 	migrationNeeded, err := migrationer.MigrationNeeded()
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Fatal("Failed checking for migration")
+		log.WithError(err).Error("Failed checking for migration")
 		return err
 	}
 
 	if migrationNeeded {
 		err = migrationer.Start()
 		if err != nil {
-			log.WithFields(log.Fields{"error": err}).Fatal("Failed starting a migration")
+			log.WithError(err).Error("Failed starting a migration")
 			return err
 		}
 	} else {
 		migrationer.MarkUnneeded()
 		err = client.InitializeStore(context.Background())
 		if err != nil {
-			log.WithFields(log.Fields{"error": err}).Fatal("Failed initializing elasticsearch")
+			log.WithError(err).Error("Failed initializing elasticsearch")
 			return err
 		}
 	}
@@ -93,7 +93,7 @@ func Spawn(opts *serveropts.Opts) error {
 	authzConn, err := opts.ConnFactory.Dial("authz-service", opts.AuthzAddress)
 	if err != nil {
 		// This should never happen
-		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create Authz connection")
+		log.WithError(err).Error("Failed to create Authz connection")
 		return err
 	}
 	defer authzConn.Close()
@@ -104,7 +104,7 @@ func Spawn(opts *serveropts.Opts) error {
 	eventConn, err := opts.ConnFactory.Dial("event-service", opts.EventAddress)
 	if err != nil {
 		// This should never happen
-		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create Event connection")
+		log.WithError(err).Error("Failed to create Event connection")
 		return err
 	}
 	defer eventConn.Close()
@@ -115,7 +115,7 @@ func Spawn(opts *serveropts.Opts) error {
 	nodeMgrConn, err := opts.ConnFactory.Dial("nodemanager-service", opts.NodeManagerAddress)
 	if err != nil {
 		// This should never happen
-		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create NodeManager connection")
+		log.WithError(err).Error("Failed to create NodeManager connection")
 		return err
 	}
 	defer nodeMgrConn.Close()
@@ -154,7 +154,7 @@ func Spawn(opts *serveropts.Opts) error {
 	esSidecarConn, err := opts.ConnFactory.Dial("es-sidecar-service", opts.EsSidecarAddress)
 	if err != nil {
 		// This should never happend
-		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create ES Sidecar connection")
+		log.WithError(err).Error("Failed to create ES Sidecar connection")
 		return err
 	}
 	defer esSidecarConn.Close()
