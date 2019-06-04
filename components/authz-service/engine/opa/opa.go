@@ -436,7 +436,7 @@ func (s *State) RulesForProject(
 
 // ListProjectMappings returns a map of all the rules for each projectID.
 func (s *State) ListProjectMappings(ctx context.Context) (map[string][]engine.Rule, error) {
-	rs, err := s.evalQuery(ctx, s.queries[listProjectMapQuery], map[string]interface{}{}, s.v2p1Store)
+	rs, err := s.evalQuery(ctx, s.queries[listProjectMapQuery], map[string]interface{}{}, s.v2Store)
 	if err != nil {
 		return nil, &ErrEvaluation{e: err}
 	}
