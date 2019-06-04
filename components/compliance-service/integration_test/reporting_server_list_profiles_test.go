@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,7 +36,6 @@ func TestListProfiles(t *testing.T) {
 			r.Profiles[0].Sha256 = id
 			r.ReportUuid = id
 			r.Roles = []string{id}
-			r.EndTime = time.Now().UTC().Format(time.RFC3339)
 
 			reportIds[i] = id
 		})
@@ -150,7 +148,9 @@ func TestListProfiles(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			ctx := contextWithProjects(test.allowedProjects)
 
-			response, err := server.ListProfiles(ctx, &reporting.Query{})
+			query := reporting.Query{Filters: []*reporting.ListFilter{{Type: "end_time", Values: []string{"2018-10-25T23:59:59Z"}}}}
+
+			response, err := server.ListProfiles(ctx, &query)
 
 			assert.NoError(t, err)
 			require.NotNil(t, response)
