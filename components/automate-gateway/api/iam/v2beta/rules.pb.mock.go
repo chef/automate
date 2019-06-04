@@ -30,12 +30,13 @@ func NewRulesServerMockWithoutValidation() *RulesServerMock {
 // RulesServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
 type RulesServerMock struct {
-	validateRequests bool
-	CreateRuleFunc   func(context.Context, *request.CreateRuleReq) (*response.CreateRuleResp, error)
-	UpdateRuleFunc   func(context.Context, *request.UpdateRuleReq) (*response.UpdateRuleResp, error)
-	GetRuleFunc      func(context.Context, *request.GetRuleReq) (*response.GetRuleResp, error)
-	ListRulesFunc    func(context.Context, *request.ListRulesReq) (*response.ListRulesResp, error)
-	DeleteRuleFunc   func(context.Context, *request.DeleteRuleReq) (*response.DeleteRuleResp, error)
+	validateRequests        bool
+	CreateRuleFunc          func(context.Context, *request.CreateRuleReq) (*response.CreateRuleResp, error)
+	UpdateRuleFunc          func(context.Context, *request.UpdateRuleReq) (*response.UpdateRuleResp, error)
+	GetRuleFunc             func(context.Context, *request.GetRuleReq) (*response.GetRuleResp, error)
+	ListRulesFunc           func(context.Context, *request.ListRulesReq) (*response.ListRulesResp, error)
+	ListRulesForProjectFunc func(context.Context, *request.ListRulesForProjectReq) (*response.ListRulesForProjectResp, error)
+	DeleteRuleFunc          func(context.Context, *request.DeleteRuleReq) (*response.DeleteRuleResp, error)
 }
 
 func (m *RulesServerMock) CreateRule(ctx context.Context, req *request.CreateRuleReq) (*response.CreateRuleResp, error) {
@@ -86,6 +87,18 @@ func (m *RulesServerMock) ListRules(ctx context.Context, req *request.ListRulesR
 	return nil, status.Error(codes.Internal, "mock: 'ListRules' not implemented")
 }
 
+func (m *RulesServerMock) ListRulesForProject(ctx context.Context, req *request.ListRulesForProjectReq) (*response.ListRulesForProjectResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.ListRulesForProjectFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'ListRulesForProject' not implemented")
+}
+
 func (m *RulesServerMock) DeleteRule(ctx context.Context, req *request.DeleteRuleReq) (*response.DeleteRuleResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
@@ -104,5 +117,6 @@ func (m *RulesServerMock) Reset() {
 	m.UpdateRuleFunc = nil
 	m.GetRuleFunc = nil
 	m.ListRulesFunc = nil
+	m.ListRulesForProjectFunc = nil
 	m.DeleteRuleFunc = nil
 }

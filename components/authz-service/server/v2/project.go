@@ -387,6 +387,25 @@ func (s *state) ListRules(ctx context.Context, req *api.ListRulesReq) (*api.List
 	return &api.ListRulesResp{Rules: rules}, nil
 }
 
+func (s *state) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
+	resp, err := s.store.ListRulesForProject(ctx, req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
+	}
+
+	rules := make([]*api.ProjectRule, len(resp))
+	for i, rule := range resp {
+		apiRule, err := fromStorageRule(rule)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal,
+				"error converting rule with ID %q: %s", rule.ID, err.Error())
+		}
+		rules[i] = apiRule
+	}
+
+	return &api.ListRulesForProjectResp{Rules: rules}, nil
+}
+
 func (s *state) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
 	err := s.store.DeleteRule(ctx, req.Id)
 	switch err {
