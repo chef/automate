@@ -53,22 +53,23 @@ type NodeStatus struct {
 // Timeout is the number of seconds until a timeout is issued and the job is aborted.
 type InspecJob struct {
 	InspecBaseJob
-	Profiles          []string            `json:"profiles,omitempty"`
-	Timeout           int32               `json:"timeout,omitempty"`
-	Retries           int32               `json:"retries"`
-	RetriesLeft       int32               `json:"retries_left"`
-	StartTime         *time.Time          `json:"start_time,omitempty"`
-	EndTime           *time.Time          `json:"end_time,omitempty"`
-	TargetConfig      inspec.TargetConfig `json:"target_config,omitempty"`
-	NodeStatus        *string             `json:"node_status,omitempty"`
-	SourceID          string              `json:"source_id,omitempty"`
-	SourceAccountID   string              `json:"account_id,omitempty"`
-	SSM               bool                `json:"ssm,omitempty"`
-	Reporter          inspec.Reporter     `json:"reporter,omitempty"`
-	ProfilesOwner     string              `json:"profiles_owner,omitempty"`
-	InternalProfiles  []string            `json:"internal_profiles,omitempty"`
-	MachineIdentifier string              `json:"machine_identifier,omitempty"`
-	Tags              []*common.Kv        `json:"kv,omitempty"`
+	Profiles            []string            `json:"profiles,omitempty"`
+	Timeout             int32               `json:"timeout,omitempty"`
+	Retries             int32               `json:"retries"`
+	RetriesLeft         int32               `json:"retries_left"`
+	StartTime           *time.Time          `json:"start_time,omitempty"`
+	EndTime             *time.Time          `json:"end_time,omitempty"`
+	TargetConfig        inspec.TargetConfig `json:"target_config,omitempty"`
+	NodeStatus          *string             `json:"node_status,omitempty"`
+	SourceID            string              `json:"source_id,omitempty"`
+	SourceAccountID     string              `json:"account_id,omitempty"`
+	SSM                 bool                `json:"ssm,omitempty"`
+	RemoteInspecVersion string              `json:"remote_inspec_version,omitempty"`
+	Reporter            inspec.Reporter     `json:"reporter,omitempty"`
+	ProfilesOwner       string              `json:"profiles_owner,omitempty"`
+	InternalProfiles    []string            `json:"internal_profiles,omitempty"`
+	MachineIdentifier   string              `json:"machine_identifier,omitempty"`
+	Tags                []*common.Kv        `json:"kv,omitempty"`
 }
 
 // WorkerStats describe the state of all inspec job workers to be used for analysis purposes

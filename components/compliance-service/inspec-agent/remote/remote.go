@@ -104,7 +104,7 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 		return fmt.Sprintf(`#!/bin/bash
 
 			# make sure inspec is installed
-			curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -P inspec
+			curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -s once -v '%s' -P inspec
 
 			# inspec will return non-zero exit codes for control failures (e.g. 100, 101)
 			# we don't want to fail the scan job for failed controls, so we overwrite those
@@ -118,12 +118,12 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 			}
 			echo '%s' | sudo CHEF_LICENSE="accept-no-persist" inspec exec %s --json-config=-
 
-			modify_exit_code $?`, string(jsonConf), profilesString), inspec.BashScript, nil
+			modify_exit_code $?`, job.RemoteInspecVersion, string(jsonConf), profilesString), inspec.BashScript, nil
 	case inspec.BackendSSMWindows, inspec.BackendAZWindows:
 		return fmt.Sprintf(`
 				$global:InspecBinaryLocation = "$env:systemdrive\opscode\inspec\bin\inspec"
 				Function Ensure-InspecInstalled {
-						. { Invoke-WebRequest -UseBasicParsing https://omnitruck.chef.io/install.ps1 } | iex; install -project inspec -channel stable;
+						. { Invoke-WebRequest -UseBasicParsing https://omnitruck.chef.io/install.ps1 } | iex; install -project inspec -channel stable -install_strategy once -version '%s';
 				}
 				Function Invoke-InspecCommand {
 						param(
@@ -139,7 +139,7 @@ func assembleRemoteJobConfigAndScript(job *types.InspecJob) (string, string, err
 				}
 				$env:CHEF_LICENSE="accept-no-persist"
 				Ensure-InspecInstalled
-				Invoke-InspecCommand -Command exec -Path "%s" -JsonConfig '%s'`, profilesString, string(jsonConf)), inspec.PowershellScript, nil
+				Invoke-InspecCommand -Command exec -Path "%s" -JsonConfig '%s'`, job.RemoteInspecVersion, profilesString, string(jsonConf)), inspec.PowershellScript, nil
 	}
 	// we really shouldn't ever get here, since this function is only called for ssm jobs
 	return "", "", fmt.Errorf("invalid job target config backend: %s", job.TargetConfig.Backend)

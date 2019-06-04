@@ -31,6 +31,7 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
+inspec_release="chef/inspec/3.9.0/20190401200826"
 pkg_deps=(
   core/bash
   core/glibc
@@ -38,8 +39,9 @@ pkg_deps=(
   core/jq-static            # Used in habitat/hooks/health_check
   ${local_platform_tools_origin:-chef}/automate-platform-tools
   # WARNING: Update with care. The chef/inspec is managed with Expeditor.
+
   # See .expeditor/update-inspec-version.sh for details
-  chef/inspec/3.9.0/20190401200826
+  ${inspec_release}
   chef/mlsa
 )
 
@@ -76,6 +78,10 @@ do_prepare() {
 do_install() {
   # Scaffolding go install callback
   scaffolding_go_install
+
+  inspec_sem_version=$(awk -F  '/' '{print $3}' <<< ${inspec_release})
+  build_line "Setting InSpec version ${inspec_sem_version}"
+  sed -i "s/REPLACE-FROM-PLAN.SH/${inspec_sem_version}/" habitat/default.toml
 
   build_line "Copying migration files"
   mkdir "${pkg_prefix}/migrations"

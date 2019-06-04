@@ -31,6 +31,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Retention.ComplianceReportDays = w.Int32(60)
 	c.V1.Sys.Agent.BufferSize = w.Int32(1000)
 	c.V1.Sys.Agent.Workers = w.Int32(10)
+	// Relying on default.toml to provide the value for RemoteInspecVersion
+	// c.V1.Sys.Agent.RemoteInspecVersion = w.String("3.9.0")
 	return c
 }
 

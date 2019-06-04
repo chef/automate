@@ -60,6 +60,7 @@ message ConfigRequest {
 			message Agent {
 				google.protobuf.Int32Value workers = 1;
 				google.protobuf.Int32Value buffer_size = 2;
+				google.protobuf.StringValue remote_inspec_version = 3;
 			}
 		}
 

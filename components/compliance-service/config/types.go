@@ -72,13 +72,14 @@ type Manager struct {
 
 // InspecAgent service specific config options
 type InspecAgent struct {
-	JobBufferSize int
-	JobWorkers    int
-	SocketPath    string
-	BackendCache  string
-	AuthnTarget   string
-	AutomateFQDN  string
-	TmpDir        string
+	JobBufferSize       int
+	JobWorkers          int
+	SocketPath          string
+	BackendCache        string
+	AuthnTarget         string
+	AutomateFQDN        string
+	TmpDir              string
+	RemoteInspecVersion string
 }
 
 // Postgres specific options
