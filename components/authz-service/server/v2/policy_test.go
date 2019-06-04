@@ -3228,8 +3228,8 @@ type testEngine struct {
 
 func (te *testEngine) V2SetPolicies(
 	ctx context.Context, policies map[string]interface{},
-	roles map[string]interface{}) error {
-	return te.V2p1SetPolicies(ctx, policies, roles, map[string][]interface{}{})
+	roles map[string]interface{}, rules map[string][]interface{}) error {
+	return te.V2p1SetPolicies(ctx, policies, roles, rules)
 }
 
 func (te *testEngine) V2p1SetPolicies(

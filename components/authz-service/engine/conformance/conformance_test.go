@@ -674,7 +674,7 @@ func setupV1(t testing.TB) (context.Context, map[string]engine.Engine) {
 func setupV2(t testing.TB) (context.Context, map[string]engine.Engine) {
 	ctx, engines := setup(t)
 	if o, ok := engines["opa"]; ok {
-		o.V2SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{})
+		o.V2SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{}, map[string][]interface{}{})
 	}
 	return ctx, engines
 }

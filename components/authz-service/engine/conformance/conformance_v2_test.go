@@ -713,10 +713,10 @@ func setPoliciesV2pX(t testing.TB, twoPointOne bool, e engine.Engine, policiesAn
 		roleMap[role["id"].(string)] = role
 	}
 	if twoPointOne {
-		err := e.V2p1SetPolicies(ctx, policyMap, roleMap, make(map[string][]interface{}))
+		err := e.V2p1SetPolicies(ctx, policyMap, roleMap, map[string][]interface{}{})
 		require.NoError(t, err, "set policies(v2.1)")
 	} else {
-		err := e.V2SetPolicies(ctx, policyMap, roleMap)
+		err := e.V2SetPolicies(ctx, policyMap, roleMap, map[string][]interface{}{})
 		require.NoError(t, err, "set policies(v2)")
 	}
 }
