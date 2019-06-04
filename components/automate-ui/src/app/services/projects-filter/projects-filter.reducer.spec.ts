@@ -14,7 +14,6 @@ import { LoadOptions, LoadOptionsSuccess } from './projects-filter.actions';
 const {
   UNASSIGNED_PROJECT_ID,
   UNASSIGNED_PROJECT_LABEL,
-  ALL_RESOURCES_LABEL,
   ALL_PROJECTS_LABEL,
   MULTIPLE_PROJECTS_LABEL
 } = ProjectConstants;
@@ -278,9 +277,9 @@ describe('projectsFilterReducer', () => {
           genProject('zz-proj')
         );
 
-        it('displays "All resources"', () => {
+        it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
-          expect(selectionLabel).toEqual(ALL_RESOURCES_LABEL);
+          expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
         });
 
         it('displays no count badge', () => {
@@ -343,9 +342,9 @@ describe('projectsFilterReducer', () => {
           genProject('zz-proj', true)
         );
 
-        it('displays "All resources"', () => {
+        it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
-          expect(selectionLabel).toEqual(ALL_RESOURCES_LABEL);
+          expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
         });
         it('displays no count badge', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
@@ -372,9 +371,9 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj')
         );
 
-        it('displays "All resources"', () => {
+        it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
-          expect(selectionLabel).toEqual(ALL_RESOURCES_LABEL);
+          expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
         });
 
         it('displays no count badge', () => {
@@ -551,9 +550,9 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj', true)
         );
 
-        it('displays "All resources"', () => {
+        it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
-          expect(selectionLabel).toEqual(ALL_RESOURCES_LABEL);
+          expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
         });
         it('displays no count badge', () => {
           const { selectionCountVisible } = projectsFilterReducer(initialState, action);
