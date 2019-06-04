@@ -486,12 +486,6 @@ test-prep: $(MARKET_PATH) $(PROFILES_PATH) start-es-pg start-ssh-node download-s
 install-inspec:
 	@gem list -i inspec --version $(shell cat ../../INSPEC_VERSION) || gem install inspec --no-document --version $(shell cat ../../INSPEC_VERSION)
 
-test-examples:
-	@printf "===> REQUIRES RUNNING SERVICE\n"
-	$(MAKE) send-ingest-report
-	cd examples/reporting/test && go test . -failfast
-	cd examples/profiles/test && go test . -failfast
-
 test-polling: start-ssh-node
 	$(MAKE) test TEST="poll_test*"
 
