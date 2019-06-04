@@ -207,11 +207,6 @@ func (s *State) initPartialResultV2p1(ctx context.Context) error {
 		return errors.Wrap(err, "partial eval (authorized_project)")
 	}
 	s.v2PartialProjects = v2PartialProjects
-
-	s.log.Info("Ran partial update v2.1")
-	if err := s.DumpDataV2p1(ctx); err != nil {
-		s.log.Warnf("error dumping v2.1 data: %v", err)
-	}
 	return nil
 }
 
