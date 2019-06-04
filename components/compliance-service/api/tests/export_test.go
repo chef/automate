@@ -337,3 +337,29 @@ func TestJSONExportWithTwoControlFiltersReturnsError(t *testing.T) {
 	grpctest.AssertCode(t, codes.InvalidArgument, err)
 	assert.Equal(t, "rpc error: code = InvalidArgument desc = Invalid: Only one 'control' filter is allowed", err.Error())
 }
+
+func TestJSONExportWithNonExistantProfileReturnsError(t *testing.T) {
+	// get reporting client
+	conn, err := getClientConn()
+	require.NoError(t, err)
+
+	defer conn.Close()
+
+	reporting := rs.NewReportingServiceClient(conn)
+	require.NoError(t, err)
+
+	profileFilterQuery := rs.Query{
+		Type: "json",
+		Filters: []*rs.ListFilter{
+			{Type: "profile_id", Values: []string{"i-am-not-here"}},
+		},
+	}
+
+	stream, err := reporting.Export(context.Background(), &profileFilterQuery)
+	require.NoError(t, err)
+
+	_, err = stream.Recv()
+
+	grpctest.AssertCode(t, codes.InvalidArgument, err)
+	assert.Equal(t, "rpc error: code = InvalidArgument desc = Invalid: Only one 'control' filter is allowed", err.Error())
+}
