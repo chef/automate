@@ -549,12 +549,19 @@ func TestListProjectMappings(t *testing.T) {
 	query := "data.rule_mappings.rules_for_all_projects"
 
 	t.Run("returns complete list of rules", func(t *testing.T) {
-		rs := resultSetV2(t, nil, strings.NewReader(data), query)
+		rs := resultSetV2(t, map[string]interface{}{}, strings.NewReader(data), query)
 
 		require.Equal(t, 1, len(rs), "expected one result")
 		require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
-		// TODO unmarshal result
-		// assert.Equal(t, data, result)
+
+		// outer, ok := rs[0].Expressions[0].Value.(map[string]interface{})
+		// require.True(t, ok, "outer result value is a map")
+		fmt.Printf("HEY! this thing %#v\n\n", rs[0].Expressions[0].Value)
+		projectMap, ok := rs[0].Expressions[0].Value.([]interface{})
+		require.True(t, ok, "projectMap result value is a map")
+		err := mapstructure.Decode(rs[0].Bindings, &projectMap)
+		require.NoError(t, err, "decode result bindings")
+		assert.Equal(t, nil, projectMap)
 	})
 }
 

@@ -238,7 +238,7 @@ func (s *state) ListProjectRules(ctx context.Context,
 
 	projects := make(map[string]*api.ProjectRules, len(ruleMap))
 	for projectID, rules := range ruleMap {
-		projectRules, err := rulesToProjectRules(rules)
+		projectRules, err := s.engineRulesToApiRules(rules)
 		if err != nil {
 			return &api.ProjectCollectionRulesResp{}, err
 		}
@@ -268,7 +268,7 @@ func (s *state) GetProjectRules(ctx context.Context,
 			"could not find project mapping rules for project %s", req.ProjectId)
 	}
 
-	projectRules, err := rulesToProjectRules(rules)
+	projectRules, err := s.engineRulesToApiRules(rules)
 	if err != nil {
 		return &api.GetProjectRulesResp{}, err
 	}
@@ -569,28 +569,39 @@ func fromAPIType(t api.ProjectRuleTypes) (storage.RuleType, error) {
 	}
 }
 
-func rulesToProjectRules(rules []engine.Rule) ([]*api.ProjectRule, error) {
-	fmt.Printf("HEY! rules %#v", rules)
+// TODO drop state
+func (s *state) engineRulesToApiRules(rules []engine.Rule) ([]*api.ProjectRule, error) {
 	apiRules := make([]*api.ProjectRule, len(rules))
 	for i, rule := range rules {
+		ruleType, err := fromEngineRuleType(rule.Type)
+		if err != nil {
+			return nil, err
+		}
 		conditions := make([]*api.Condition, len(rules[i].Conditions))
 		for j, condition := range rules[i].Conditions {
+			cType, err := fromEngineConditionType(condition.Type)
+			if err != nil {
+				return nil, err
+			}
+			cOperator, err := fromEngineOperator(condition.Operator)
+			if err != nil {
+				return nil, err
+			}
 			conditions[j] = &api.Condition{
-				Type:     api.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS, // TODO convert type
-				Operator: api.ProjectRuleConditionOperators_MEMBER_OF,     // TODO convert type
+				Type:     cType,
+				Operator: cOperator,
 				Values:   condition.Values,
 			}
 		}
-
 		apiRules[i] = &api.ProjectRule{
 			Id:         rule.ID,
 			Name:       rule.Name,
-			Type:       api.ProjectRuleTypes_NODE, // TODO convert type
+			Type:       ruleType,
 			ProjectId:  rule.ProjectID,
 			Conditions: conditions,
 		}
+		s.log.Infof("HEY! 4. project rule in API %#v", apiRules[i])
 	}
-	fmt.Printf("HEY! apiRules %#v", rules)
 	return apiRules, nil
 }
 
@@ -615,20 +626,26 @@ func (s *state) prepareStorageRule(inID, projectID, name string,
 	return &r, nil
 }
 
-// func fromEngineRuleType(t string) (api.ProjectRuleTypes, error) {
-// 	switch t {
-// 		TODO
-// 	}
-// }
+func fromEngineRuleType(t string) (api.ProjectRuleTypes, error) {
+	storageType, err := storage.NewRuleType(t)
+	if err != nil {
+		return 0, fmt.Errorf("unknown rule type: %v", t)
+	}
+	return fromStorageRuleType(storageType)
+}
 
-// func fromEngineConditionType(t string) (api.ProjectRuleConditionTypes, error) {
-// 	switch t {
-// 		TODO
-// 	}
-// }
+func fromEngineConditionType(t string) (api.ProjectRuleConditionTypes, error) {
+	storageType, err := storage.NewConditionAttribute(t)
+	if err != nil {
+		return 0, fmt.Errorf("unknown condition type: %v", t)
+	}
+	return fromStorageConditionType(storageType)
+}
 
-// func fromEngineOperatorType(o string) (api.ProjectRuleConditionOperators, error) {
-// 	switch o {
-// 		TODO
-// 	}
-// }
+func fromEngineOperator(o string) (api.ProjectRuleConditionOperators, error) {
+	storageOperator, err := storage.NewConditionOperator(o)
+	if err != nil {
+		return 0, fmt.Errorf("unknown condition operator: %v", o)
+	}
+	return fromStorageConditionOperator(storageOperator)
+}

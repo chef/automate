@@ -567,7 +567,6 @@ func (s *State) projectMappingsFromResults(rs rego.ResultSet) (map[string][]engi
 		if !ok {
 			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
 		}
-
 		for projectID, ms := range projectMap {
 			rules := make([]engine.Rule, 0)
 			ms, ok := ms.([]interface{})
@@ -582,6 +581,7 @@ func (s *State) projectMappingsFromResults(rs rego.ResultSet) (map[string][]engi
 		}
 	}
 
+	s.log.Infof("HEY! 3. ruleMap in projectMappingsFromResults %#v", ruleMap)
 	return ruleMap, nil
 }
 
@@ -605,25 +605,54 @@ func (s *State) convertRulesList(ms []interface{}, rules []engine.Rule) ([]engin
 		}
 		pid, ok := m["project_id"].(string)
 		if !ok {
-			return nil, errors.New("error converting project_id")
+			return nil, errors.New("error converting project id")
 		}
-		// TODO conditions
-		// vs, ok := m["values"].([]interface{})
-		// if !ok {
-		// 	return nil, errors.New("error converting values")
-		// }
-		// vals := make([]string, len(vs))
-		// for j := range vs {
-		// 	if val, ok := vs[j].(string); ok {
-		// 		vals[j] = val
-		// 	}
-		// }
+
+		// TODO fix condition typecasting
+		// convert to raw array first?
+		// s.log.Infof("HEY conditions %#v", m["conditions"])
+		cs, ok := m["conditions"].([]map[string]interface{})
+		if !ok {
+			// TODO bubble up this error
+			return nil, errors.New("error converting conditions")
+		}
+		conditions := make([]engine.Condition, len(cs))
+		for j, c := range cs {
+			ct, ok := c["type"].(string)
+			if !ok {
+				return nil, errors.New("error converting condition type")
+			}
+			co, ok := c["operator"].(string)
+			if !ok {
+				return nil, errors.New("error converting condition operator")
+			}
+
+			rawArray, ok := c["values"].([]interface{})
+			if !ok {
+				return nil, errors.New("error casting to array")
+			}
+			vals := make([]string, len(rawArray))
+			for k := range rawArray {
+				v, ok := rawArray[k].(string)
+				if !ok {
+					return nil, errors.New("error casting to string")
+				}
+				vals[k] = v
+			}
+
+			conditions[j] = engine.Condition{
+				Type:     ct,
+				Operator: co,
+				Values:   vals,
+			}
+		}
+
 		rules = append(rules, engine.Rule{
 			ID:         id,
 			Name:       name,
 			Type:       t,
 			ProjectID:  pid,
-			Conditions: []engine.Condition{},
+			Conditions: conditions,
 		})
 	}
 	return rules, nil
@@ -652,6 +681,7 @@ func (s *State) V2SetPolicies(
 	s.ruleStore = inmem.NewFromObject(map[string]interface{}{
 		"rules": ruleMap,
 	})
+	s.log.Infof("HEY! 2. ruleStore in v2SetPolicies %#v", s.ruleStore)
 
 	s.v2Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
