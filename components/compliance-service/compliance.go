@@ -10,6 +10,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/workflow/postgres"
+
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
@@ -96,18 +99,18 @@ func runHungJobs(ctx context.Context, scheduledJobsIds []string, schedulerServer
 
 // here we execute migrations, create the es and pg backends, read certs, set up the needed env vars,
 // and modify config info
-func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFactory *secureconn.Factory, esr relaxting.ES2Backend, statusSrv *statusserver.Server, err error) {
-	statusSrv = statusserver.New()
+func initBits(ctx context.Context, conf *config.Compliance, workflowManager *workflow.WorkflowManager) (db *pgdb.DB, connFactory *secureconn.Factory, esr relaxting.ES2Backend, statusSrv *statusserver.Server, err error) {
+	statusSrv = statusserver.New(workflowManager)
 
-	statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPG, "Initializing DB connection and schema migration...")
+	statusserver.AddMigrationUpdate(statusSrv, status.MigrationLabelPG, "Initializing DB connection and schema migration...")
 	// start pg backend
 	db, err = createPGBackend(&conf.Postgres)
 	if err != nil {
-		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPG, err.Error())
-		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPG, statusserver.MigrationFailedMsg)
+		statusserver.AddMigrationUpdate(statusSrv, status.MigrationLabelPG, err.Error())
+		statusserver.AddMigrationUpdate(statusSrv, status.MigrationLabelPG, status.MigrationFailedMsg)
 		return db, connFactory, esr, statusSrv, errors.Wrap(err, "createPGBackend failed")
 	}
-	statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPG, statusserver.MigrationCompletedMsg)
+	statusserver.AddMigrationUpdate(statusSrv, status.MigrationLabelPG, status.MigrationCompletedMsg)
 
 	// create esconfig info backend
 	esr = createESBackend(conf)
@@ -145,7 +148,7 @@ func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFa
 // register all the services, start the grpc server, and call setup
 func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory,
 	esr relaxting.ES2Backend, conf config.Compliance, binding string,
-	statusSrv *statusserver.Server) {
+	statusSrv *statusserver.Server, workflowManager *workflow.WorkflowManager) {
 
 	lis, err := net.Listen("tcp", binding)
 	if err != nil {
@@ -199,7 +202,8 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	logrus.Info("Starting GRPC server on " + binding)
 
 	// running ElasticSearch migration
-	err = relaxting.RunMigrations(esr, statusSrv)
+
+	err = relaxting.RunMigrations(ctx, workflowManager)
 	if err != nil {
 		logrus.Fatalf("serveGrpc aborting, unable to run migrations: %v", err)
 	}
@@ -512,12 +516,27 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 	logging.SetLogLevel(conf.Service.LogLevel)
 
 	ctx := context.Background()
-	db, connFactory, esr, statusSrv, err := initBits(ctx, &conf)
+	workflowManager, err := workflow.NewManager(postgres.NewPostgresBackend(conf.Postgres.ConnectionString))
 	if err != nil {
 		return err
 	}
+
+	db, connFactory, esr, statusSrv, err := initBits(ctx, &conf, workflowManager)
+	if err != nil {
+		return err
+	}
+
+	if err := relaxting.InitializeWorkflowManager(workflowManager, &esr); err != nil {
+		return err
+	}
+
+	if err := workflowManager.Start(ctx); err != nil {
+		return err
+	}
+
 	SERVICE_STATE = serviceStateStarting
-	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv) // nolint: errcheck
+
+	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, workflowManager) // nolint: errcheck
 
 	cfg := NewServiceConfig(&conf, connFactory)
 	return cfg.serveCustomRoutes()

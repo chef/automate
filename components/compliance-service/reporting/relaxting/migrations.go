@@ -15,11 +15,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 
-	statusserver "github.com/chef/automate/components/compliance-service/api/status/server"
+	status "github.com/chef/automate/components/compliance-service/api/status"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	reportingTypes "github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
+	"github.com/chef/automate/lib/workflow"
 )
 
 type esMigratable interface {
@@ -144,147 +145,6 @@ func indexNamesByAlias(client *elastic.Client, aliasName string) ([]string, erro
 		return nil, err
 	}
 	return res.IndicesByAlias(aliasName), nil
-}
-
-func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
-	myName := "RunMigrations"
-
-	// Migrates A1 indices to the current version
-	a1Indices := A1ElasticSearchIndices{backend: &backend}
-	err = backend.migrate(a1Indices, statusSrv, statusserver.MigrationLabelESa1)
-	if err != nil {
-		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa1))
-		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa1, errMsg.Error())
-		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa1, statusserver.MigrationFailedMsg)
-		return errMsg
-	}
-
-	// Migrates A2 version 1 indices to the current version
-	a2V1Indices := A2V1ElasticSearchIndices{backend: &backend}
-	err = backend.migrate(a2V1Indices, statusSrv, statusserver.MigrationLabelESa2v1)
-	if err != nil {
-		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v1))
-		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v1, errMsg.Error())
-		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v1, statusserver.MigrationFailedMsg)
-		return errMsg
-	}
-
-	// Migrates A2 version 2 indices to the current version
-	a2V2Indices := A2V2ElasticSearchIndices{backend: &backend}
-	err = backend.migrate(a2V2Indices, statusSrv, statusserver.MigrationLabelESa2v2)
-	if err != nil {
-		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v2))
-		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v2, errMsg.Error())
-		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v2, statusserver.MigrationFailedMsg)
-		return errMsg
-	}
-	return nil
-}
-
-func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserver.Server, migrationLabel string) error {
-	myName := fmt.Sprintf("migrate (%s)", migrationLabel)
-	logrus.Debugf(myName)
-	defer util.TimeTrack(time.Now(), fmt.Sprintf(" %s reindex indices", myName))
-
-	//migrate the feeds index
-	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrating the feeds index...")
-	err := migratable.migrateFeeds()
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("%s unable to migrate feeds in ElasticSearch", myName))
-	}
-
-	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Post feeds migration cleanup...")
-	err = migratable.postFeedsMigration()
-	if err != nil {
-		logrus.Error(err)
-		return err
-	}
-
-	//migrate the profiles index
-	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrating the profiles index...")
-	err = migratable.migrateProfiles()
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("%s unable to migrate profiles in ElasticSearch", myName))
-	}
-
-	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Post profiles migration cleanup...")
-	err = migratable.postProfilesMigration()
-	if err != nil {
-		logrus.Error(err)
-		return err
-	}
-
-	//migrate the compliance time-series indices
-	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Calculating TimeSeries migration range...")
-	earliest, latest, err := backend.getScanDateRange(migratable.getSourceSummaryIndexPrefix())
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("%s unable to get scans date range", myName))
-	}
-	if earliest != nil {
-		logrus.Debugf("%s Reports-->Earliest: %s, Latest: %s", migrationLabel, earliest.Format("2006-01-02"), latest.Format("2006-01-02"))
-
-		dayBeforeLatest := latest.AddDate(0, 0, -1)
-		dayToStartOnAsync := *latest
-		if latest.Truncate(24 * time.Hour).Equal(time.Now().UTC().Truncate(24 * time.Hour)) {
-			statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrate latest TimeSeries index...")
-			err = migratable.migrateTimeSeries(*latest)
-			//if we get back an error when attempting to migrate the latest index, return the error. This means that
-			// elasticsearch or the source/target index being migrated needs attention.
-			if err != nil {
-				return errors.Wrap(err, fmt.Sprintf("%s unable to migrate latest TimeSeries index in Elasticsearch", myName))
-			}
-			err = migratable.postTimeSeriesMigration(*latest)
-			//if we get back an error when attempting post-migration, we move forward.. if in fact the error was
-			// due to the fact that we couldn't connect to es for some reason, the post migration will be attempted
-			// again upon next compliance-service start.  Here, we could instead, actually return the error if desired
-			// and force the app owner to deal with it right away.. again, dealing with it may be as simple as letting
-			// compliance-service restart and hoping that it clears the second time.
-			if err != nil {
-				logrus.Errorf("%s unable to post-migrate a TimeSeries index in Elasticsearch, error: %s", myName, err.Error())
-			}
-			dayToStartOnAsync = dayBeforeLatest
-		}
-
-		statusserver.AddMigrationUpdate(statusSrv, migrationLabel,
-			fmt.Sprintf("Migrate TimeSeries indices when earliest=%s, latest=%s ...", earliest, latest))
-		go func(dateToStart time.Time) {
-			for d := dayToStartOnAsync; d.After(*earliest) || d.Equal(*earliest); d = d.AddDate(0, 0, -1) {
-				err = migratable.migrateTimeSeries(d)
-				//if we get an error here, move on, the error will be logged and the culprit index should be traceable
-				// as there are relevant log messages in the migrateTimeSeries func. Note that we are not running the
-				// postTimeSeriesMigration if migrateTimeSeries fails as we don't know if it's safe to delete it yet.
-				// this scenario could very well require someone to go into es and look at the indices to see what is
-				// causing the issue.
-				if err != nil {
-					logrus.Errorf("%s unable to migrate a TimeSeries index in Elasticsearch, error: %s", myName, err.Error())
-					continue
-				}
-
-				//if we get here, it means that migrateTimeSeries has succeeded and now we are able to cleanup by
-				// deleting the source index or indices.  Again, if it tries and fails to cleanup. The issue is logged
-				// and we move on.. the idea is that we want the owner to know that they are having an issue while not
-				// taking down compliance in the process.  This phase of migration is for past indices and is therefore
-				// non-blocking.  The indices that are being migrated are also not expected to change as they are from
-				// days past.. making their migration constant and therefore very predictable (nothing is being added to them over time).
-				err = migratable.postTimeSeriesMigration(d)
-				if err != nil {
-					logrus.Errorf("%s unable to post-migrate a TimeSeries index in Elasticsearch, error: %s", myName, err.Error())
-				}
-			}
-			statusserver.AddMigrationUpdate(statusSrv, migrationLabel, statusserver.MigrationCompletedMsg)
-		}(dayToStartOnAsync) // nolint: errcheck
-
-	} else {
-		logrus.Debugf("No %s data to migrate", migrationLabel)
-		statusserver.AddMigrationUpdate(statusSrv, migrationLabel, statusserver.MigrationCompletedMsg)
-	}
-
-	err = migratable.postMigration()
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("%s unable to clean up with PostMigration index in Elasticsearch", myName))
-	}
-
-	return nil
 }
 
 func (backend ES2Backend) getScanDateRange(indexPrefix string) (*time.Time, *time.Time, error) {
@@ -587,4 +447,469 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 			}
 		}
 	}
+}
+
+// A version of migrate for a workflow version
+type LogEntry struct {
+	Label     string
+	Text      string
+	Timestamp time.Time
+}
+
+type MigrationLog interface {
+	AddMigrationUpdate(label string, text string)
+}
+
+func migrateTimeSeries(backend *ES2Backend, migratable esMigratable, logger MigrationLog, migrationLabel string, earliest time.Time, dayToStartOnAsync time.Time) error {
+	myName := "migrateTimeSeries"
+	for d := dayToStartOnAsync; d.After(earliest) || d.Equal(earliest); d = d.AddDate(0, 0, -1) {
+		err = migratable.migrateTimeSeries(d)
+		//if we get an error here, move on, the error will be logged and the culprit index should be traceable
+		// as there are relevant log messages in the migrateTimeSeries func. Note that we are not running the
+		// postTimeSeriesMigration if migrateTimeSeries fails as we don't know if it's safe to delete it yet.
+		// this scenario could very well require someone to go into es and look at the indices to see what is
+		// causing the issue.
+		if err != nil {
+			logrus.Errorf("%s unable to migrate a TimeSeries index in Elasticsearch, error: %s", myName, err.Error())
+			return err
+		}
+
+		//if we get here, it means that migrateTimeSeries has succeeded and now we are able to cleanup by
+		// deleting the source index or indices.  Again, if it tries and fails to cleanup. The issue is logged
+		// and we move on.. the idea is that we want the owner to know that they are having an issue while not
+		// taking down compliance in the process.  This phase of migration is for past indices and is therefore
+		// non-blocking.  The indices that are being migrated are also not expected to change as they are from
+		// days past.. making their migration constant and therefore very predictable (nothing is being added to them over time).
+		err = migratable.postTimeSeriesMigration(d)
+		if err != nil {
+			logrus.Errorf("%s unable to post-migrate a TimeSeries index in Elasticsearch, error: %s", myName, err.Error())
+		}
+	}
+	logger.AddMigrationUpdate(migrationLabel, status.MigrationCompletedMsg)
+	return nil
+}
+
+type TimeseriesMigrateRange struct {
+	Earliest          time.Time
+	DayToStartOnAsync time.Time
+}
+
+func migrateStartup(backend *ES2Backend, migratable esMigratable, logger MigrationLog, migrationLabel string) (TimeseriesMigrateRange, error) {
+	myName := fmt.Sprintf("migrate (%s)", migrationLabel)
+	logrus.Debugf(myName)
+	defer util.TimeTrack(time.Now(), fmt.Sprintf(" %s reindex indices", myName))
+
+	var result TimeseriesMigrateRange
+
+	//migrate the feeds index
+	logger.AddMigrationUpdate(migrationLabel, "Migrating the feeds index...")
+	err := migratable.migrateFeeds()
+	if err != nil {
+		return result, errors.Wrap(err, fmt.Sprintf("%s unable to migrate feeds in ElasticSearch", myName))
+	}
+
+	logger.AddMigrationUpdate(migrationLabel, "Post feeds migration cleanup...")
+	err = migratable.postFeedsMigration()
+	if err != nil {
+		logrus.Error(err)
+		return result, err
+	}
+
+	//migrate the profiles index
+	logger.AddMigrationUpdate(migrationLabel, "Migrating the profiles index...")
+	err = migratable.migrateProfiles()
+	if err != nil {
+		return result, errors.Wrap(err, fmt.Sprintf("%s unable to migrate profiles in ElasticSearch", myName))
+	}
+
+	logger.AddMigrationUpdate(migrationLabel, "Post profiles migration cleanup...")
+	err = migratable.postProfilesMigration()
+	if err != nil {
+		logrus.Error(err)
+		return result, err
+	}
+
+	//migrate the compliance time-series indices
+	logger.AddMigrationUpdate(migrationLabel, "Calculating TimeSeries migration range...")
+	earliest, latest, err := backend.getScanDateRange(migratable.getSourceSummaryIndexPrefix())
+	if err != nil {
+		return result, errors.Wrap(err, fmt.Sprintf("%s unable to get scans date range", myName))
+	}
+
+	if earliest != nil {
+		logrus.Debugf("%s Reports-->Earliest: %s, Latest: %s", migrationLabel, earliest.Format("2006-01-02"), latest.Format("2006-01-02"))
+
+		dayBeforeLatest := latest.AddDate(0, 0, -1)
+		dayToStartOnAsync := *latest
+		if latest.Truncate(24 * time.Hour).Equal(time.Now().UTC().Truncate(24 * time.Hour)) {
+			logger.AddMigrationUpdate(migrationLabel, "Migrate latest TimeSeries index...")
+			err = migratable.migrateTimeSeries(*latest)
+			//if we get back an error when attempting to migrate the latest index, return the error. This means that
+			// elasticsearch or the source/target index being migrated needs attention.
+			if err != nil {
+				return result, errors.Wrap(err, fmt.Sprintf("%s unable to migrate latest TimeSeries index in Elasticsearch", myName))
+			}
+			err = migratable.postTimeSeriesMigration(*latest)
+			//if we get back an error when attempting post-migration, we move forward.. if in fact the error was
+			// due to the fact that we couldn't connect to es for some reason, the post migration will be attempted
+			// again upon next compliance-service start.  Here, we could instead, actually return the error if desired
+			// and force the app owner to deal with it right away.. again, dealing with it may be as simple as letting
+			// compliance-service restart and hoping that it clears the second time.
+			if err != nil {
+				logrus.Errorf("%s unable to post-migrate a TimeSeries index in Elasticsearch, error: %s", myName, err.Error())
+			}
+			dayToStartOnAsync = dayBeforeLatest
+		}
+		result.DayToStartOnAsync = dayToStartOnAsync
+		result.Earliest = *earliest
+	} else {
+		logrus.Debugf("No %s data to migrate", migrationLabel)
+		logger.AddMigrationUpdate(migrationLabel, status.MigrationCompletedMsg)
+	}
+
+	err = migratable.postMigration()
+	if err != nil {
+		return result, errors.Wrap(err, fmt.Sprintf("%s unable to clean up with PostMigration index in Elasticsearch", myName))
+	}
+
+	return result, nil
+}
+
+type MigrationWorkflowExecutor struct {
+}
+
+type MigrationWorkflowState struct {
+	ErrMsg               string
+	Logs                 []LogEntry
+	StartupMigrationDone bool
+}
+
+func mustEnqueueTask(w workflow.WorkflowInstance, taskName string, params interface{}) {
+	if err := w.EnqueueTask(taskName, params); err != nil {
+		panic(err)
+	}
+}
+
+func (state *MigrationWorkflowState) AppendLogs(logs []LogEntry) {
+	state.Logs = append(state.Logs, logs...)
+}
+
+func (m *MigrationWorkflowExecutor) OnStart(w workflow.WorkflowInstance, ev workflow.StartEvent) workflow.Decision {
+	mustEnqueueTask(w, StartupMigrationTaskName, nil)
+	return w.Continue(MigrationWorkflowState{
+		StartupMigrationDone: false,
+	})
+}
+
+func (m *MigrationWorkflowExecutor) OnTaskComplete(w workflow.WorkflowInstance, ev workflow.TaskCompleteEvent) workflow.Decision {
+	state := MigrationWorkflowState{}
+	if err := w.GetPayload(&state); err != nil {
+		logrus.WithError(err).Error("Failed to get MigrationWorkflow payload")
+		return w.Complete(workflow.WithResult(
+			MigrationWorkflowState{
+				ErrMsg: err.Error(),
+			},
+		))
+	}
+
+	switch ev.TaskName {
+	case StartupMigrationTaskName:
+		res := StartupMigrationTaskResult{}
+		if ev.Result.Err() != nil {
+			logrus.WithError(err).Error("Failed startup migration task")
+			state.ErrMsg = ev.Result.Err().Error()
+			return w.Complete(workflow.WithResult(state))
+		}
+
+		if resErr := ev.Result.Get(&res); resErr != nil {
+			logrus.WithError(resErr).Error("Failed to get startup migration result")
+			state.ErrMsg = resErr.Error()
+			return w.Complete(workflow.WithResult(state))
+		}
+
+		state.AppendLogs(res.Logs)
+		if res.ErrMsg != "" {
+			logrus.WithField("err", res.ErrMsg).Error("startup migration failed")
+			state.ErrMsg = res.ErrMsg
+			return w.Complete(workflow.WithResult(state))
+		}
+
+		for k, v := range res.TSRanges {
+			mustEnqueueTask(w, TimeseriesMigrationTaskName, TimeseriesMigrationTaskParams{
+				MigrationLabel: k,
+				TSRange:        v,
+			})
+		}
+		state.StartupMigrationDone = true
+		return w.Continue(state)
+	case TimeseriesMigrationTaskName:
+		params := TimeseriesMigrationTaskParams{}
+
+		if err := ev.Result.GetParameters(&params); err != nil {
+			logrus.WithError(err).Error("failed to get TimeseriesMigrationTaskName parameters")
+			state.ErrMsg = err.Error()
+			return w.Complete(workflow.WithResult(state))
+		}
+
+		res := TimeseriesMigrationTaskResult{}
+		if err := ev.Result.Get(&res); err != nil {
+			logrus.WithError(err).Error("failed to get TimeseriesMigrationTaskName result")
+			state.ErrMsg = err.Error()
+			return w.Complete(workflow.WithResult(state))
+		}
+
+		if w.TotalEnqueuedTasks() == w.TotalCompletedTasks() {
+			return w.Complete(workflow.WithResult(state))
+		}
+		return w.Continue(state)
+	}
+	return w.Complete()
+}
+
+func (m *MigrationWorkflowExecutor) OnCancel(w workflow.WorkflowInstance, ev workflow.CancelEvent) workflow.Decision {
+	return w.Complete()
+}
+
+type StartupMigrationTask struct {
+	backend *ES2Backend
+}
+
+type StartupMigrationTaskResult struct {
+	ErrMsg   string
+	Logs     []LogEntry
+	TSRanges map[string]TimeseriesMigrateRange
+}
+
+func (res *StartupMigrationTaskResult) AddMigrationUpdate(label string, text string) {
+	res.Logs = append(res.Logs, LogEntry{
+		Label:     label,
+		Text:      text,
+		Timestamp: time.Now(),
+	})
+}
+
+func (st *StartupMigrationTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+	myName := "StartupMigrationTask"
+	a1Indices := A1ElasticSearchIndices{backend: st.backend}
+	a2V1Indices := A2V1ElasticSearchIndices{backend: st.backend}
+	a2V2Indices := A2V2ElasticSearchIndices{backend: st.backend}
+	result := &StartupMigrationTaskResult{
+		TSRanges: make(map[string]TimeseriesMigrateRange),
+	}
+
+	if tsRange, err := migrateStartup(st.backend, a1Indices, result, status.MigrationLabelESa1); err != nil {
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, status.MigrationLabelESa1))
+		result.ErrMsg = errMsg.Error()
+		result.AddMigrationUpdate(status.MigrationLabelESa1, errMsg.Error())
+		result.AddMigrationUpdate(status.MigrationLabelESa1, status.MigrationFailedMsg)
+		return result, nil
+	} else {
+		result.TSRanges[status.MigrationLabelESa1] = tsRange
+	}
+
+	if tsRange, err := migrateStartup(st.backend, a2V1Indices, result, status.MigrationLabelESa2v1); err != nil {
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, status.MigrationLabelESa2v1))
+		result.ErrMsg = errMsg.Error()
+		result.AddMigrationUpdate(status.MigrationLabelESa2v1, errMsg.Error())
+		result.AddMigrationUpdate(status.MigrationLabelESa2v1, status.MigrationFailedMsg)
+		return result, nil
+	} else {
+		result.TSRanges[status.MigrationLabelESa2v1] = tsRange
+	}
+
+	if tsRange, err := migrateStartup(st.backend, a2V2Indices, result, status.MigrationLabelESa2v2); err != nil {
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, status.MigrationLabelESa2v2))
+		result.ErrMsg = errMsg.Error()
+		result.AddMigrationUpdate(status.MigrationLabelESa2v2, errMsg.Error())
+		result.AddMigrationUpdate(status.MigrationLabelESa2v2, status.MigrationFailedMsg)
+		return result, nil
+	} else {
+		result.TSRanges[status.MigrationLabelESa2v2] = tsRange
+	}
+
+	return result, nil
+}
+
+type TimeseriesMigrationTask struct {
+	backend *ES2Backend
+}
+type TimeseriesMigrationTaskParams struct {
+	MigrationLabel string
+	TSRange        TimeseriesMigrateRange
+}
+
+type TimeseriesMigrationTaskResult struct {
+	Logs []LogEntry
+}
+
+func (res *TimeseriesMigrationTaskResult) AddMigrationUpdate(label string, text string) {
+	res.Logs = append(res.Logs, LogEntry{
+		Label:     label,
+		Text:      text,
+		Timestamp: time.Now(),
+	})
+}
+
+func (tsm *TimeseriesMigrationTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+	params := TimeseriesMigrationTaskParams{}
+	result := TimeseriesMigrationTaskResult{}
+	if err := task.GetParameters(&params); err != nil {
+		time.Sleep(10 * time.Minute)
+		return result, err
+	}
+
+	tsRange := params.TSRange
+	if params.MigrationLabel == "" {
+		return result, errors.New("invalid TimeSeriesMigrationParams")
+	}
+
+	if params.TSRange.Earliest.IsZero() {
+		logrus.WithField("label", params.MigrationLabel).Info("No data to migrate")
+		result.AddMigrationUpdate(params.MigrationLabel, status.MigrationCompletedMsg)
+		return result, nil
+	}
+
+	var migratable esMigratable
+	switch params.MigrationLabel {
+	case status.MigrationLabelESa1:
+		migratable = A1ElasticSearchIndices{backend: tsm.backend}
+	case status.MigrationLabelESa2v1:
+		migratable = A2V1ElasticSearchIndices{backend: tsm.backend}
+	case status.MigrationLabelESa2v2:
+		migratable = A2V2ElasticSearchIndices{backend: tsm.backend}
+	}
+
+	err := migrateTimeSeries(tsm.backend, migratable, &result, params.MigrationLabel, tsRange.Earliest, tsRange.DayToStartOnAsync)
+
+	return result, err
+}
+
+const (
+	MigrationWorkflowName       = "RelaxtingMigrationWorkflowV1"
+	StartupMigrationTaskName    = "RelaxtingStartupMigrationTaskV1"
+	TimeseriesMigrationTaskName = "RelaxtingTimeseriesMigrationTaskV1"
+)
+
+func InitializeWorkflowManager(workflowManager *workflow.WorkflowManager, backend *ES2Backend) error {
+	err := workflowManager.RegisterWorkflowExecutor(
+		MigrationWorkflowName,
+		&MigrationWorkflowExecutor{},
+	)
+	if err != nil {
+		return err
+	}
+
+	err = workflowManager.RegisterTaskExecutor(
+		StartupMigrationTaskName,
+		&StartupMigrationTask{
+			backend: backend,
+		},
+		workflow.TaskExecutorOpts{
+			Workers: 1,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	err = workflowManager.RegisterTaskExecutor(
+		TimeseriesMigrationTaskName,
+		&TimeseriesMigrationTask{
+			backend: backend,
+		},
+		workflow.TaskExecutorOpts{
+			Workers: 1,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RunMigrations(ctx context.Context, workflowManager *workflow.WorkflowManager) error {
+	err := workflowManager.EnqueueWorkflow(ctx, MigrationWorkflowName, "singleton", nil)
+	if err != nil {
+		if err != workflow.ErrWorkflowInstanceExists {
+			return err
+		}
+	}
+OUTER:
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(6 * time.Second):
+			logrus.Info("Getting workflow instance")
+			w, err := workflowManager.GetWorkflowInstanceByName(ctx, "singleton", MigrationWorkflowName)
+			if err != nil {
+				logrus.WithError(err).Error("failed to get relaxting migration workflow instance")
+				if err == workflow.ErrWorkflowInstanceNotFound {
+					return err
+				}
+			}
+			state := MigrationWorkflowState{}
+			if w.IsRunning() {
+				logrus.Info("workflow running")
+				err := w.GetPayload(&state)
+				if err != nil {
+					logrus.WithError(err).Error("failed to get relaxting migration workflow payload for status")
+					continue
+				}
+				if state.StartupMigrationDone {
+					break OUTER
+				}
+			} else {
+				if err := w.GetResult(&state); err != nil {
+					return err
+				}
+				logrus.WithField("state", state).Info("Migration workflow is complete")
+
+				if state.StartupMigrationDone {
+					break OUTER
+				}
+				if state.ErrMsg != "" {
+					return errors.New(state.ErrMsg)
+				}
+
+				return errors.New("Migration workflow completed in unknown state")
+			}
+		}
+	}
+	// TODO (jaym): we need to check that the migration that ran was the one we needed
+	return nil
+}
+
+var ErrNotReady = errors.New("relaxting migration result not ready")
+
+func GetMigrationLogs(ctx context.Context, workflowManager *workflow.WorkflowManager) ([]LogEntry, error) {
+	w, err := workflowManager.GetWorkflowInstanceByName(ctx, "singleton", MigrationWorkflowName)
+	if err != nil {
+		logrus.WithError(err).Error("failed to get relaxting migration workflow instance")
+		if err == workflow.ErrWorkflowInstanceNotFound {
+			return nil, ErrNotReady
+		}
+	}
+	state := MigrationWorkflowState{}
+	if w.IsRunning() {
+		err := w.GetPayload(&state)
+		if err != nil {
+			logrus.WithError(err).Error("failed to get relaxting migration workflow payload for status")
+			return nil, err
+		}
+		return state.Logs, nil
+	}
+	if err := w.GetResult(&state); err != nil {
+		return nil, err
+	}
+	logrus.WithField("state", state).Info("Migration workflow is complete")
+	if state.ErrMsg != "" {
+		err := errors.New(state.ErrMsg)
+		logrus.WithError(err).Error("relaxting migration workflow failed")
+		return nil, err
+	}
+
+	return state.Logs, nil
+
 }

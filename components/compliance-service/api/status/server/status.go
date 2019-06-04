@@ -3,6 +3,9 @@ package status
 import (
 	"time"
 
+	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	"github.com/chef/automate/lib/workflow"
+
 	"github.com/golang/protobuf/ptypes"
 	pb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
@@ -11,23 +14,6 @@ import (
 	"github.com/chef/automate/components/compliance-service/api/status"
 )
 
-// List of labels used to differentiate between migrations that can run independent of each other
-const (
-	MigrationLabelESa1   = "ElasticSearch_A1"
-	MigrationLabelESa2v1 = "ElasticSearch_A2_v1"
-	MigrationLabelESa2v2 = "ElasticSearch_A2_v2"
-	MigrationLabelPG     = "PostgreSQL"
-	MigrationLabelPRO    = "Profiles"
-	//MigrationLabelFEEDS = "ElasticSearch_Feeds_1"
-)
-
-const maxMigrations = 5        // Total migrations should match the number of constants above
-const totalMigrationSteps = 24 // Max number of migration LogEntry items we can have across all migrations
-
-// Special message sent by the services to flag the end of a migration either failed or successful
-const MigrationFailedMsg = "FAILED"
-const MigrationCompletedMsg = "COMPLETED"
-
 // Server struct
 type Server struct {
 	MigrationStatus  *status.MigrationStatus
@@ -35,18 +21,18 @@ type Server struct {
 }
 
 // New creates a new instance of Server
-func New() *Server {
+func New(workflowManager *workflow.WorkflowManager) *Server {
 	migrationChannel := make(chan status.LogEntry)
 	migrationStatus := &status.MigrationStatus{
 		Completed: 0,
-		Total:     totalMigrationSteps,
+		Total:     status.TotalMigrationSteps,
 		Status:    status.MigrationStatus_RUNNING,
 	}
 	thisServer := &Server{
 		MigrationStatus:  migrationStatus,
 		MigrationChannel: migrationChannel,
 	}
-	go listenForMigrationUpdates(migrationChannel, thisServer)
+	go listenForMigrationUpdates(migrationChannel, workflowManager, thisServer)
 	return thisServer
 }
 
@@ -62,47 +48,79 @@ func migrationsStatus(labelMap map[string]string) (bool, bool) {
 	anyFailed := false
 	completeMigration := 0
 	for _, value := range labelMap {
-		if value == MigrationCompletedMsg || value == MigrationFailedMsg {
+		if value == status.MigrationCompletedMsg || value == status.MigrationFailedMsg {
 			completeMigration += 1
 		}
 
-		if value == MigrationFailedMsg {
+		if value == status.MigrationFailedMsg {
 			anyFailed = true
 		}
 	}
-	return completeMigration == maxMigrations, anyFailed
+	return completeMigration == status.MaxMigrations, anyFailed
+}
+
+func addEntry(entry status.LogEntry, statusSrv *Server, labelMap map[string]string) bool {
+	logrus.Info("HERE")
+	labelMap[entry.Label] = entry.Text
+	completed, failed := migrationsStatus(labelMap)
+	if entry.Text == status.MigrationFailedMsg || entry.Text == status.MigrationCompletedMsg {
+		entry.Text = entry.Label + " ended with status " + entry.Text
+		statusSrv.MigrationStatus.Logs = append(statusSrv.MigrationStatus.Logs, &entry)
+	} else {
+		statusSrv.MigrationStatus.Logs = append(statusSrv.MigrationStatus.Logs, &entry)
+	}
+	statusSrv.MigrationStatus.Completed = int64(len(statusSrv.MigrationStatus.Logs))
+	logrus.Infof("Migrations running (%d/%d) %s: %s", statusSrv.MigrationStatus.Completed, statusSrv.MigrationStatus.Total, entry.Label, entry.Text)
+	if failed {
+		// Set the overall status to failed but
+		// continue to collect other migration data
+		// until we've heard back from everything.
+		statusSrv.MigrationStatus.Status = status.MigrationStatus_FAILED
+	}
+	return completed
 }
 
 // listenForMigrationUpdates uses a LogEntry channel to listen for migration updates
 // coming from the various goroutines that are migrating at the same time.
 // It exits when all migrations (labels) have concluded
-func listenForMigrationUpdates(ch chan status.LogEntry, statusSrv *Server) {
+func listenForMigrationUpdates(ch chan status.LogEntry, workflowManager *workflow.WorkflowManager, statusSrv *Server) {
 	// a map that stores the most recent migration message per migration
 	labelMap := make(map[string]string, 0)
+OUTER:
 	for {
-		entry := <-ch
-		labelMap[entry.Label] = entry.Text
-		completed, failed := migrationsStatus(labelMap)
-		if entry.Text == MigrationFailedMsg || entry.Text == MigrationCompletedMsg {
-			entry.Text = entry.Label + " ended with status " + entry.Text
-			statusSrv.MigrationStatus.Logs = append(statusSrv.MigrationStatus.Logs, &entry)
-		} else {
-			statusSrv.MigrationStatus.Logs = append(statusSrv.MigrationStatus.Logs, &entry)
-		}
-		statusSrv.MigrationStatus.Completed = int64(len(statusSrv.MigrationStatus.Logs))
-		logrus.Infof("Migrations running (%d/%d) %s: %s", statusSrv.MigrationStatus.Completed, statusSrv.MigrationStatus.Total, entry.Label, entry.Text)
-		if failed {
-			// Set the overall status to failed but
-			// continue to collect other migration data
-			// until we've heard back from everything.
-			statusSrv.MigrationStatus.Status = status.MigrationStatus_FAILED
+		select {
+		case entry := <-ch:
+			completed := addEntry(entry, statusSrv, labelMap)
+			if completed {
+				break OUTER
+			}
+		case <-time.After(5 * time.Second):
+			entries, err := relaxting.GetMigrationLogs(context.TODO(), workflowManager)
+			if err != nil {
+				logrus.WithError(err).Error("failed to get migration logs")
+				continue
+			}
+			for _, entry := range entries {
+				if labelMap[entry.Label] == entry.Text {
+					logrus.Info("Doing some skipping")
+					continue
+				}
+				logrus.Info("Not skipping")
+				ts, _ := ptypes.TimestampProto(entry.Timestamp)
+				labelMap[entry.Label] = entry.Text
+				completed := addEntry(status.LogEntry{
+					Label:     entry.Label,
+					Text:      entry.Text,
+					Timestamp: ts,
+				}, statusSrv, labelMap)
+				if completed {
+					break OUTER
+				}
+			}
 		}
 
-		if completed {
-			close(ch)
-			break
-		}
 	}
+	close(ch)
 
 	statusSrv.MigrationStatus.Completed = statusSrv.MigrationStatus.Total
 	if statusSrv.MigrationStatus.Status == status.MigrationStatus_FAILED {

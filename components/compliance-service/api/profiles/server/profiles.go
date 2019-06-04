@@ -4,6 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	automate_event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/components/compliance-service/api/status"
 	statusserver "github.com/chef/automate/components/compliance-service/api/status/server"
 	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
@@ -23,7 +24,7 @@ func New(db *pgdb.DB, es *relaxting.ES2Backend, profiles *config.Profiles,
 
 	// TODO: unbundle object creation from service bootup sanity check
 
-	statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPRO, "Ensuring Market profiles are up-to-date...")
+	statusserver.AddMigrationUpdate(statusSrv, status.MigrationLabelPRO, "Ensuring Market profiles are up-to-date...")
 	// ensure all market profiles are up to date
 	err := srv.store.LoadMarketProfiles(profiles.MarketPath)
 	if err != nil {
@@ -36,17 +37,17 @@ func New(db *pgdb.DB, es *relaxting.ES2Backend, profiles *config.Profiles,
 		logrus.Errorf("could not ensure elastic profile cache is up-to-date: %v", err)
 	}
 
-	statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPRO, "Migrating profiles from disk, if any...")
+	statusserver.AddMigrationUpdate(statusSrv, status.MigrationLabelPRO, "Migrating profiles from disk, if any...")
 	// migrate a1 user profiles profiles
 	go func() {
 		err = srv.migrateDiskProfiles()
 		if err != nil {
 			logrus.Errorf("could not migrate disk profiles: %v", err)
-			statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPRO, statusserver.MigrationFailedMsg)
+			statusserver.AddMigrationUpdate(statusSrv, status.MigrationLabelPRO, status.MigrationFailedMsg)
 			return
 		}
 
-		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelPRO, statusserver.MigrationCompletedMsg)
+		statusserver.AddMigrationUpdate(statusSrv, status.MigrationLabelPRO, status.MigrationCompletedMsg)
 	}()
 
 	return srv
