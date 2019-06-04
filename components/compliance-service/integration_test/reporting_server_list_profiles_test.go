@@ -83,7 +83,7 @@ func TestListProfiles(t *testing.T) {
 
 	// Send a project rules update event
 	esJobID, err := suite.ingesticESClient.UpdateReportProjectsTags(everythingCtx, projectRules)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	suite.WaitForESJobToComplete(esJobID)
 

@@ -279,11 +279,12 @@ func TestListNodesFiltering(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.description, func(t *testing.T) {
-			suite.InsertInspecReports(test.reports)
+			_, err := suite.InsertInspecReports(test.reports)
+			require.NoError(t, err)
 			defer suite.DeleteAllDocuments()
 
 			response, err := server.ListNodes(ctx, &test.query)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			require.NotNil(t, response)
 
 			actualIds := make([]string, len(response.Nodes))
