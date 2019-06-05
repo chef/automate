@@ -42,6 +42,7 @@ var nodeProps = `
 	},
 	"node_name": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -54,7 +55,14 @@ var nodeProps = `
 		"null_value": false
 	},
 	"organization_name": {
-		"type": "keyword"
+		"type": "keyword",
+		"normalizer": "case_insensitive",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			}
+		}
 	},
 	"run_list": {
 		"type": "keyword",
@@ -262,7 +270,14 @@ var nodeProps = `
 		"type": "ip"
 	},
 	"source_fqdn": {
-		"type": "keyword"
+		"type": "keyword",
+		"normalizer": "case_insensitive",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			}
+		}
 	},
 	"policy_group": {
 		"type": "keyword",
@@ -337,6 +352,13 @@ var NodeState = Mapping{
 				"refresh_interval": "5s"
 			},
 			 "analysis": {
+				"normalizer": {
+					"case_insensitive": {
+						"type": "custom",
+						"char_filter": [],
+						"filter": ["lowercase", "asciifolding"]
+					}
+				},
 				"analyzer": {
 					"autocomplete": {
 						"tokenizer": "autocomplete_tokenizer",
