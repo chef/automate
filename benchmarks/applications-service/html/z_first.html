@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Performance Result Comparison</title>
+<style>
+.benchstat { border-collapse: collapse; }
+.benchstat th:nth-child(1) { text-align: left; }
+.benchstat tbody td:nth-child(1n+2):not(.note) { text-align: right; padding: 0em 1em; }
+.benchstat tr:not(.configs) th { border-top: 1px solid #666; border-bottom: 1px solid #ccc; }
+.benchstat .nodelta { text-align: center !important; }
+.benchstat .better td.delta { font-weight: bold; }
+.benchstat .worse td.delta { font-weight: bold; color: #c00; }
+</style>
+</head>
+<body>
+
+<table class='benchstat '>
+
+
+<tbody>
+
+<tr><th><th>time/op
+<tr><td>IngestionNewServices-4<td>11.2ms ±21%
+<tr><td>IngestionUpdateServices-4<td>3.81ms ±21%
+<tr><td>GetServiceGroups/max_1000_with_0_groups-4<td>2.38ms ± 6%
+<tr><td>GetServiceGroups/max_1000_with_100_groups-4<td>8.23ms ±15%
+<tr><td>GetServiceGroups/max_1000_with_200_groups-4<td>19.5ms ±14%
+<tr><td>GetServiceGroups/max_1000_with_300_groups-4<td>32.2ms ± 4%
+<tr><td>GetServiceGroups/max_1000_with_400_groups-4<td>51.3ms ± 9%
+<tr><td>GetServiceGroups/max_1000_with_500_groups-4<td>69.9ms ± 2%
+<tr><td>GetServiceGroups/max_1000_with_600_groups-4<td>102ms ± 6%
+<tr><td>GetServiceGroups/max_1000_with_700_groups-4<td>130ms ± 5%
+<tr><td>GetServiceGroups/max_1000_with_800_groups-4<td>165ms ± 5%
+<tr><td>GetServiceGroups/max_1000_with_900_groups-4<td>208ms ± 4%
+<tr><td>GetServiceGroups/max_1000_with_1000_groups-4<td>246ms ± 1%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_0_groups-4<td>2.28ms ± 8%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_1000_groups-4<td>288ms ±12%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_2000_groups-4<td>1.09s ±30%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_3000_groups-4<td>2.16s ± 2%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_4000_groups-4<td>3.82s ± 3%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_5000_groups-4<td>5.82s ± 2%
+<tr><td>GetServices/max_1000_with_0_services-4<td>2.22ms ± 6%
+<tr><td>GetServices/max_1000_with_100_services-4<td>2.74ms ± 7%
+<tr><td>GetServices/max_1000_with_200_services-4<td>3.14ms ± 5%
+<tr><td>GetServices/max_1000_with_300_services-4<td>3.17ms ± 7%
+<tr><td>GetServices/max_1000_with_400_services-4<td>3.20ms ± 1%
+<tr><td>GetServices/max_1000_with_500_services-4<td>3.60ms ± 7%
+<tr><td>GetServices/max_1000_with_600_services-4<td>3.84ms ± 2%
+<tr><td>GetServices/max_1000_with_700_services-4<td>4.08ms ± 3%
+<tr><td>GetServices/max_1000_with_800_services-4<td>4.35ms ± 1%
+<tr><td>GetServices/max_1000_with_900_services-4<td>4.61ms ± 2%
+<tr><td>GetServices/max_1000_with_1000_services-4<td>4.93ms ± 3%
+<tr><td>GetServicesHeavyLoad/max_5000_with_0_services-4<td>1.96ms ± 5%
+<tr><td>GetServicesHeavyLoad/max_5000_with_1000_services-4<td>4.90ms ± 3%
+<tr><td>GetServicesHeavyLoad/max_5000_with_2000_services-4<td>7.71ms ± 3%
+<tr><td>GetServicesHeavyLoad/max_5000_with_3000_services-4<td>10.6ms ± 1%
+<tr><td>GetServicesHeavyLoad/max_5000_with_4000_services-4<td>13.4ms ± 3%
+<tr><td>GetServicesHeavyLoad/max_5000_with_5000_services-4<td>16.2ms ± 1%
+<tr><td>&nbsp;
+</tbody>
+
+</table>
+</body>
+</html>
