@@ -22,6 +22,7 @@
 
   &:disabled {
     color: $chef-primary-dark;
+    cursor: default; // no pointer when there's only one element
   }
 
   // seems to be needed only for Safari
