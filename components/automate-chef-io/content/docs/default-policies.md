@@ -144,6 +144,40 @@ EventFeed | GetEventTypeCounts | /event_type_counts | GET | events:types | count
 EventFeed | GetEventTaskCounts | /event_task_counts | GET | events:tasks | count
 EventFeed | GetEventStringBuckets | /eventstrings | GET | events:strings | read
 
+## Applications (BETA)
+
+### Applications page
+
+> These default policies allow all users to perform any action on application page resources
+
+```bash
+  {
+      "action": "*",
+      "resource": "service_groups",
+      "subjects": [
+          "user:*"
+      ]
+  },
+  {
+      "action": "*",
+      "resource": "service_groups:*",
+      "subjects": [
+          "user:*"
+      ]
+  }
+```
+
+### Applications Page
+
+> Corresponds to "Application tab (`/applications`)
+
+Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
+---|---|---|---|---|---
+Applications | GetServiceGroups | /beta/applications/service-groups | GET | service_groups | list
+Applications | GetServiceGroupsHealthCounts | /beta/applications/service_groups_health_counts | GET | service_groups | list
+Applications | GetServices | /beta/applications/services | GET | service_groups| list
+Applications | GetServicesBySG | /beta/applications/service-groups/{service_group_id} | GET | service_groups | list
+
 ## Telemetry
 
 ### TelemetryPolicies

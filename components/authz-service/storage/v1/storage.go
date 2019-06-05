@@ -300,6 +300,14 @@ func DefaultPolicies() (map[string]*Policy, error) {
 			Effect:   "allow",
 			Version:  1,
 		},
+		constants.ApplicationsServiceGroupsPolicyID: {
+			ID:       ids[constants.ApplicationsServiceGroupsPolicyID],
+			Subjects: []string{"user:*"},
+			Resource: "service_groups",
+			Action:   "*",
+			Effect:   "allow",
+			Version:  1,
+		},
 	}
 	return defaultPolicies, nil
 }

@@ -6,16 +6,16 @@ package applications
 import policy "github.com/chef/automate/components/automate-gateway/api/authz/policy"
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroups", "nodes", "list", "GET", "/beta/applications/service-groups", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroups", "service_groups", "list", "GET", "/beta/applications/service-groups", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroupsHealthCounts", "nodes", "list", "GET", "/beta/applications/service_groups_health_counts", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroupsHealthCounts", "service_groups", "list", "GET", "/beta/applications/service_groups_health_counts", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServices", "nodes", "list", "GET", "/beta/applications/services", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServices", "service_groups", "list", "GET", "/beta/applications/services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesBySG", "nodes", "list", "GET", "/beta/applications/service-groups/{service_group_id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesBySG", "service_groups", "list", "GET", "/beta/applications/service-groups/{service_group_id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*ServicesBySGReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

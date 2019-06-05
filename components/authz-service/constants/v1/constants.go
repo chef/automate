@@ -107,6 +107,9 @@ const (
 	// data collector endpoint and have them proxied to A2's data collector without
 	// the need of a legacy data collector token
 	CSNginxComplianceDataCollectorPolicyID = "6e792df9-e51f-4474-9539-40ca2a2b308c"
+
+	// ApplicationsServiceGroupsPolicyID correlates to the policy applications:serviceGroups
+	ApplicationsServiceGroupsPolicyID = "aee14d59-da0b-4974-ba6d-1a018b024874"
 )
 
 // These are only used for testing and memstore purposes.
@@ -135,6 +138,7 @@ var (
 		ComplianceTokenSearchProfilesPolicyID,
 		ReadOwnUserProfilePolicyID,
 		LocalUserSelfPolicyID,
+		ApplicationsServiceGroupsPolicyID,
 	}
 
 	// NonDeletablePolicyIDs is an array of non-deletable policy IDs.
