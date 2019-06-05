@@ -25,10 +25,10 @@ type State struct {
 	log               logger.Logger
 	store             storage.Store
 	v2Store           storage.Store
+	v2p1Store         storage.Store
 	queries           map[string]ast.Body
 	compiler          *ast.Compiler
 	modules           map[string]*ast.Module
-	overrideModules   map[string]*ast.Module
 	partialAuth       rego.PartialResult
 	v2PartialAuth     rego.PartialResult
 	v2PartialProjects rego.PartialResult
@@ -85,9 +85,10 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 		return nil, errors.Wrapf(err, "parse query %q", listProjectMapQuery)
 	}
 	s := State{
-		log:     l,
-		store:   inmem.New(),
-		v2Store: inmem.New(),
+		log:       l,
+		store:     inmem.New(),
+		v2Store:   inmem.New(),
+		v2p1Store: inmem.New(),
 		queries: map[string]ast.Body{
 			authzQuery:              authzQueryParsed,
 			filteredPairsQuery:      filteredPairsQueryParsed,
@@ -106,15 +107,6 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 	if err := s.initModules(); err != nil {
 		return nil, errors.Wrap(err, "init OPA modules")
 	}
-
-	if err := s.initPartialResult(ctx); err != nil {
-		return nil, errors.Wrap(err, "init OPA partial result state")
-	}
-
-	if err := s.initPartialResultV2(ctx); err != nil {
-		return nil, errors.Wrap(err, "init OPA partial result state (v2)")
-	}
-
 	return &s, nil
 }
 
@@ -122,31 +114,32 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 // initialization.
 func WithModules(mods map[string]*ast.Module) OptFunc {
 	return func(s *State) {
-		s.overrideModules = mods
+		s.modules = mods
 	}
 }
 
 // initModules parses the rego files that have been compiled-in and stores the
 // result, to be used in initPartialResult.
 func (s *State) initModules() error {
-	if s.overrideModules != nil {
-		s.modules = s.overrideModules
-		return nil
-	}
-
-	mods := map[string]*ast.Module{}
-	for _, name := range AssetNames() {
-		if !strings.HasSuffix(name, ".rego") {
-			continue // skip this, whatever has been compiled-in here
+	if len(s.modules) == 0 {
+		mods := map[string]*ast.Module{}
+		for _, name := range AssetNames() {
+			if !strings.HasSuffix(name, ".rego") {
+				continue // skip this, whatever has been compiled-in here
+			}
+			parsed, err := ast.ParseModule(name, string(MustAsset(name)))
+			if err != nil {
+				return errors.Wrapf(err, "parse policy file %q", name)
+			}
+			mods[name] = parsed
 		}
-		parsed, err := ast.ParseModule(name, string(MustAsset(name)))
-		if err != nil {
-			return errors.Wrapf(err, "parse policy file %q", name)
-		}
-		mods[name] = parsed
+		s.modules = mods
 	}
-
-	s.modules = mods
+	compiler, err := s.newCompiler()
+	if err != nil {
+		return errors.Wrap(err, "init compiler")
+	}
+	s.compiler = compiler
 	return nil
 }
 
@@ -155,11 +148,7 @@ func (s *State) initModules() error {
 // IsAuthorized(), we want to do as little work per call as possible.
 func (s *State) initPartialResult(ctx context.Context) error {
 	// Reset compiler to avoid state issues
-	// Note: PartialResult will _compile_ the passed module; so when the engine is
-	// initialized, everything will also be ready to serve the other, non-partial
-	// queries
-	compiler, err := s.initCompiler()
-
+	compiler, err := s.newCompiler()
 	if err != nil {
 		return err
 	}
@@ -174,23 +163,15 @@ func (s *State) initPartialResult(ctx context.Context) error {
 		return errors.Wrap(err, "partial eval")
 	}
 	s.partialAuth = pr
-	s.compiler = compiler
 	return nil
 }
 
 func (s *State) initPartialResultV2(ctx context.Context) error {
 	// Reset compiler to avoid state issues
-	// Note: PartialResult will _compile_ the passed module; so when the engine is
-	// initialized, everything will also be ready to serve the other, non-partial
-	// queries
-	compiler, err := s.initCompiler()
+	compiler, err := s.newCompiler()
 	if err != nil {
 		return err
 	}
-	// Need a compiler for use by regular queries, too, so store it here.
-	s.compiler = compiler
-
-	// Partial eval for authzV2Query.
 	r := rego.New(
 		rego.ParsedQuery(s.queries[authzV2Query]),
 		rego.Compiler(compiler),
@@ -201,28 +182,30 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 		return errors.Wrap(err, "partial eval (authorized)")
 	}
 	s.v2PartialAuth = v2Partial
-
-	// Partial eval for authzProjectsV2Query.
-	// Each partial eval needs a separate compiler.
-	compiler, err = s.initCompiler()
-	if err != nil {
-		return err
-	}
-	r = rego.New(
-		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
-		rego.Compiler(compiler),
-		rego.Store(s.v2Store),
-	)
-	v2Partial, err = r.PartialResult(ctx)
-	if err != nil {
-		return errors.Wrap(err, "partial eval (authorized_project)")
-	}
-	s.v2PartialProjects = v2Partial
-
 	return nil
 }
 
-func (s *State) initCompiler() (*ast.Compiler, error) {
+func (s *State) initPartialResultV2p1(ctx context.Context) error {
+	// Partial eval for authzProjectsV2Query.
+	// Each partial eval needs a separate compiler.
+	compiler, err := s.newCompiler()
+	if err != nil {
+		return err
+	}
+	r := rego.New(
+		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
+		rego.Compiler(compiler),
+		rego.Store(s.v2p1Store),
+	)
+	v2PartialProjects, err := r.PartialResult(ctx)
+	if err != nil {
+		return errors.Wrap(err, "partial eval (authorized_project)")
+	}
+	s.v2PartialProjects = v2PartialProjects
+	return nil
+}
+
+func (s *State) newCompiler() (*ast.Compiler, error) {
 	compiler := ast.NewCompiler()
 	compiler.Compile(s.modules)
 	if compiler.Failed() {
@@ -232,20 +215,32 @@ func (s *State) initCompiler() (*ast.Compiler, error) {
 	return compiler, nil
 }
 
-// DumpData is a bit fast-and-loose when it comes to error checking; it's not meant
-// to be used in production
+// DumpData is a bit fast-and-loose when it comes to error checking; it's not
+// meant to be used in production. Anywhere you have an OPA engine struct (i.e.
+// `State`), you can use either one of these on it and it'll log the store
+// contents.
 func (s *State) DumpData(ctx context.Context) error {
-	txn, err := s.store.NewTransaction(ctx)
+	return dumpData(ctx, s.store, s.log)
+}
+func (s *State) DumpDataV2(ctx context.Context) error {
+	return dumpData(ctx, s.v2Store, s.log)
+}
+
+func (s *State) DumpDataV2p1(ctx context.Context) error {
+	return dumpData(ctx, s.v2p1Store, s.log)
+}
+
+func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
+	txn, err := store.NewTransaction(ctx)
 	if err != nil {
 		return err
 	}
-	data, err := s.store.Read(ctx, txn, storage.Path([]string{}))
+	data, err := store.Read(ctx, txn, storage.Path([]string{}))
 	if err != nil {
 		return err
 	}
-	// used to check activity in OPA store
-	s.log.Debugf("data retrieved from OPA store: %#v", data)
-	return s.store.Commit(ctx, txn)
+	l.Infof("data: %#v", data)
+	return store.Commit(ctx, txn)
 }
 
 // IsAuthorized evaluates whether a given [subject, resource, action] tuple
@@ -403,7 +398,7 @@ func (s *State) V2FilterAuthorizedProjects(
 		"subjects": subjects,
 	}
 
-	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsV2Query], opaInput, s.v2Store)
+	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsV2Query], opaInput, s.v2p1Store)
 	if err != nil {
 		return nil, &ErrEvaluation{e: err}
 	}
@@ -422,7 +417,7 @@ func (s *State) RulesForProject(
 		"project_id": projectID,
 	}
 
-	rs, err := s.evalQuery(ctx, s.queries[rulesForProjectQuery], opaInput, s.v2Store)
+	rs, err := s.evalQuery(ctx, s.queries[rulesForProjectQuery], opaInput, s.v2p1Store)
 	if err != nil {
 		return nil, &ErrEvaluation{e: err}
 	}
@@ -622,11 +617,12 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 // OR does the entire OPA store have to be re-evaluated at once. IF that's true,
 // should we have the same OPA instance in general for rules?
 //
-// V2SetPolicies replaces OPA's data with a new set of policies and roles,
-// and resets the partial evaluation cache for v2
+// V2SetPolicies replaces OPA's data with a new set of policies, roles, and
+// rules, and resets the partial evaluation cache for v2
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
+	// TODO: v2 doesn't care about rules
 	s.v2Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
 		"roles":    roleMap,
@@ -634,6 +630,20 @@ func (s *State) V2SetPolicies(
 	})
 
 	return s.initPartialResultV2(ctx)
+}
+
+// V2p1SetPolicies replaces OPA's data with a new set of policies, roles, and
+// rules, and resets the partial evaluation cache for v2.l
+func (s *State) V2p1SetPolicies(
+	ctx context.Context, policyMap map[string]interface{},
+	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": policyMap,
+		"roles":    roleMap,
+		"rules":    ruleMap,
+	})
+
+	return s.initPartialResultV2p1(ctx)
 }
 
 // ErrUnexpectedResultExpression is returned when one of the result sets

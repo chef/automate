@@ -36,7 +36,7 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
-var dummyWriter engine.V2Writer = nil
+var dummyWriter engine.V2pXWriter = nil
 
 func TestCreatePolicy(t *testing.T) {
 	ctx := context.Background()
@@ -2261,6 +2261,7 @@ func TestMigrateToV2(t *testing.T) {
 			assert.Zero(t, roleStore.ItemCount())
 		},
 		"when migration recorded as failed, it is run": func(t *testing.T) {
+			require.NoError(t, status.InProgress(ctx))
 			require.NoError(t, status.Failure(ctx))
 
 			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
@@ -2399,6 +2400,7 @@ func TestGetPolicyVersion(t *testing.T) {
 			assert.Equal(t, expectedV2p1, resp.Version)
 		},
 		"reports failed migration as v1": func(t *testing.T) {
+			require.NoError(t, status.InProgress(ctx))
 			require.NoError(t, status.Failure(ctx))
 			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
 			require.NoError(t, err)
@@ -2465,6 +2467,7 @@ func TestResetToV1(t *testing.T) {
 			assert.Equal(t, storage.Pristine, ms)
 		},
 		"migration status failure, resets to pristine": func(t *testing.T) {
+			require.NoError(t, status.InProgress(ctx))
 			require.NoError(t, status.Failure(ctx))
 
 			_, err := cl.ResetToV1(ctx, &api_v2.ResetToV1Req{})
@@ -2933,15 +2936,28 @@ type testSetup struct {
 }
 
 func setupV2WithWriter(t *testing.T,
-	writer engine.V2Writer) testSetup {
-	return setupV2(t, nil, writer, nil, nil)
+	writer engine.V2pXWriter) testSetup {
+	return setupV2WithMigrationState(t, nil, writer, nil, make(chan api_v2.Version, 1),
+		// if the MigrationStatus is set to "Success", that means we've migrated
+		// successfully to IAM v2 ("SuccessBeta1" is v2.1).
+		func(s storage.MigrationStatusProvider) error { return s.Success(context.Background()) })
 }
 
 func setupV2(t *testing.T,
 	authorizer engine.V2Authorizer,
-	writer engine.V2Writer,
+	writer engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vChan chan api_v2.Version) testSetup {
+	return setupV2WithMigrationState(t, authorizer, writer, pl, vChan, nil)
+}
+
+func setupV2WithMigrationState(t *testing.T,
+	authorizer engine.V2Authorizer,
+	writer engine.V2pXWriter,
+	pl storage_v1.PoliciesLister,
+	vChan chan api_v2.Version,
+	migration func(storage.MigrationStatusProvider) error) testSetup {
+
 	t.Helper()
 	ctx := context.Background()
 
@@ -2953,6 +2969,10 @@ func setupV2(t *testing.T,
 	}
 
 	mem_v2 := memstore_v2.New()
+	if migration != nil {
+		require.NoError(t, migration(mem_v2)) // this is IAM v2
+	}
+
 	polV2, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
 	require.NoError(t, err)
 
@@ -3209,7 +3229,15 @@ type testEngine struct {
 }
 
 func (te *testEngine) V2SetPolicies(
-	_ context.Context, policies map[string]interface{},
+	ctx context.Context, policies map[string]interface{},
+	roles map[string]interface{}, rules map[string][]interface{}) error {
+	// these only set the structs {policy,rule,role}Map, nothing specific to v2 and
+	// v2.1 yet
+	return te.V2p1SetPolicies(ctx, policies, roles, rules)
+}
+
+func (te *testEngine) V2p1SetPolicies(
+	ctx context.Context, policies map[string]interface{},
 	roles map[string]interface{}, rules map[string][]interface{}) error {
 	te.policyMap = policies
 	// TODO: use these
