@@ -27,6 +27,7 @@
                 <chef-th>Name</chef-th>
                 <chef-th>ID</chef-th>
                 <chef-th>Ingest Rules</chef-th>
+                <chef-th>Project Update Status</chef-th>
                 <chef-th class="controls"></chef-th>
               </chef-tr>
             </chef-thead>
@@ -37,6 +38,7 @@
                 </chef-td>
                 <chef-td>{{ project.id }}</chef-td>
                 <chef-td>Edits pending</chef-td>
+                <chef-td>Needs updating</chef-td>
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
                     <chef-control-menu>
