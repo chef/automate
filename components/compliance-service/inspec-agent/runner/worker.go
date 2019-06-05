@@ -46,8 +46,9 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 		return w.Complete()
 	}
 
-	for j := range jobs {
-		w.EnqueueTask("scan-job", j)
+	logrus.Debugf("OnStart got %d job(s)", len(jobs))
+	for _, job := range jobs {
+		w.EnqueueTask("scan-job", job)
 	}
 
 	initialVal := len(jobs)
@@ -56,6 +57,9 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 
 func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
+
+	logrus.Debugf("ScanJobWorkflow got OnTaskComplete")
+
 	var mycount int
 
 	if err := w.GetPayload(&mycount); err != nil {
@@ -71,6 +75,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 }
 
 func (s *ScanJobWorkflow) OnCancel(w workflow.WorkflowInstance, ev workflow.CancelEvent) workflow.Decision {
+	logrus.Debugf("ScanJobWorkflow got OnCancel")
 	return w.Complete()
 }
 
@@ -114,6 +119,7 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	}
 
 	job.StartTime = timeNowRef()
+	*job.NodeStatus = types.StatusRunning
 
 	currentJobSummary := job.JobType + " " + job.TargetConfig.Backend + " " + job.TargetConfig.Hostname
 

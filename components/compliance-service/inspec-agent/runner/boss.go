@@ -92,28 +92,6 @@ func init() {
 	jobStatusMap = NewJobStatusStore()
 }
 
-// Add is used to populate the jobs array and pass jobs to the workers via the channel
-func (r *Runner) Add(job *types.InspecJob) error {
-	logrus.Debugf("Add job %s to be handled by one of the %d workers", job.JobID, maxWorkers)
-	if maxWorkers == 0 {
-		return errors.New("No workers have been instantiated, can't add job")
-	}
-	if job == nil {
-		return errors.New("Job cannot be nil")
-	}
-	job.Status = types.StatusScheduled
-
-	if job.SSM {
-		job.RemoteInspecVersion = r.remoteInspecVersion
-	}
-
-	// place most recent job in the channel to be processed by the workers and updated based on the outcome
-	jobsChan <- job
-
-	logrus.Debugf("Add: added job %s", job.JobID)
-	return nil
-}
-
 // AddJobs is used to populate the jobs array and pass jobs to the workers via the channel
 func (r *Runner) AddJobs(id string, jobs []*types.InspecJob) error {
 	if len(jobs) == 0 {
@@ -139,6 +117,7 @@ func (r *Runner) AddJobs(id string, jobs []*types.InspecJob) error {
 		job.InternalProfiles, job.ProfilesOwner = updateComplianceURLs(job.Profiles)
 
 	}
+	logrus.Debugf("Calling EnqueueWorkflow for scan-job-workflow")
 	return r.workflowManager.EnqueueWorkflow(context.TODO(), "scan-job-workflow", fmt.Sprintf("scan-job-%s", id), jobs)
 }
 

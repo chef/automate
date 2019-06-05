@@ -435,6 +435,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	// these are all inspec-agent packages
 	scannerServer := scanner.New(mgrClient, nodesClient, db)
 	runner.InitWorkflowManager(workflowManager, conf.InspecAgent.JobWorkers, ingestClient, scannerServer)
+	workflowManager.Start(ctx)
 
 	schedulerServer := scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, conf.RemoteInspecVersion, workflowManager)
 
@@ -505,7 +506,6 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 	if err != nil {
 		return err
 	}
-	workflowManager.Start(ctx)
 
 	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, workflowManager) // nolint: errcheck
 
