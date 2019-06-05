@@ -253,7 +253,7 @@ describe('projectsFilterReducer', () => {
         genUnassignedProject()
       );
 
-      it('displays "Unassigned resources"', () => {
+      it('displays "(unassigned)"', () => {
         const { selectionLabel } = projectsFilterReducer(initialState, action);
         expect(selectionLabel).toEqual(UNASSIGNED_PROJECT_LABEL);
       });
@@ -321,7 +321,7 @@ describe('projectsFilterReducer', () => {
           genProject('zz-proj')
         );
 
-        it('displays "Unassigned resources"', () => {
+        it('displays "(unassigned)"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(UNASSIGNED_PROJECT_LABEL);
         });
@@ -421,7 +421,7 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj')
         );
 
-        it('displays "Unassigned resources"', () => {
+        it('displays "(unassigned)"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(UNASSIGNED_PROJECT_LABEL);
         });
