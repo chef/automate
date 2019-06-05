@@ -8,7 +8,7 @@ theme = "chef"
 # To develop against a local copy of the chef hugo theme, uncomment this line
 # and set the value to the parent directory of where you have checked out the
 # chef-hugo-theme repository
-themesDir = "../../../hugo-themes"
+# themesDir = "../../../hugo-themes"
 
 pygmentsStyle = "emacs"
 pygmentsCodefences = true
