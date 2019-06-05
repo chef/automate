@@ -7,11 +7,13 @@ package integration_test
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
+	uuid "github.com/chef/automate/lib/uuid4"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,6 +27,9 @@ var (
 	s = "us"
 	c = "stable"
 )
+
+// Used to generate random strings
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 // func type to override the HealthCheckEvent message
 type MessageOverrides func(*habitat.HealthCheckEvent) error
@@ -81,6 +86,27 @@ func NewHabitatEvent(overrides ...MessageOverrides) *habitat.HealthCheckEvent {
 	}
 
 	return event
+}
+
+// Creates a new HealthCheckEvent message with all its fields randomized
+func NewHabitatEventRandomized() *habitat.HealthCheckEvent {
+	var (
+		uuid, _ = uuid.NewV4()
+		svcName = RandString(10)
+		health  = HealthCheckIntToString(rand.Intn(4))
+	)
+
+	return NewHabitatEvent(
+		withSupervisorId(uuid.String()),
+		withPackageIdent(fmt.Sprintf("core/%s/0.1.0/20190101121212", svcName)),
+		withServiceGroup(fmt.Sprintf("%s.default", svcName)),
+		withStrategyAtOnce("stable"),
+		withApplication("cool-app"),
+		withEnvironment("development"),
+		withFqdn(fmt.Sprintf("%s.example.com", svcName)),
+		withHealth(health),
+		withSite("us"),
+	)
 }
 
 func withSupervisorId(id string) MessageOverrides {
@@ -169,6 +195,20 @@ func HealthCheckStringToInt32(health string) int32 {
 		return int32(3)
 	default:
 		return int32(4)
+	}
+}
+
+// HealthCheckIntToString converts a health check int to a string
+func HealthCheckIntToString(health int) string {
+	switch health {
+	case 0:
+		return "OK"
+	case 1:
+		return "WARNING"
+	case 2:
+		return "CRITICAL"
+	default:
+		return "UNKNOWN"
 	}
 }
 
@@ -294,4 +334,13 @@ func habServicesMatrix() []*habitat.HealthCheckEvent {
 			withSite(""),
 		),
 	}
+}
+
+// RandString generates a random string of the provided length
+func RandString(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
 }
