@@ -34,6 +34,8 @@ export class ProjectListComponent implements OnInit {
   public creatingProject = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   public MAX_PROJECTS = 6;
+  public confirmUpdateStartModalVisible = false;
+  public projectsUpdating = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -136,5 +138,18 @@ export class ProjectListComponent implements OnInit {
   resetCreateModal(): void {
     this.creatingProject = false;
     this.createProjectForm.reset();
+  }
+
+  openConfirmUpdateStartModal() {
+    this.confirmUpdateStartModalVisible = true;
+  }
+
+  closeConfirmUpdateStartModal() {
+    this.confirmUpdateStartModalVisible = false;
+  }
+
+  confirmUpdateStart() {
+    this.confirmUpdateStartModalVisible = false;
+    this.projectsUpdating = true;
   }
 }
