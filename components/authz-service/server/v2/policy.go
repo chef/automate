@@ -113,7 +113,7 @@ func NewPoliciesServer(
 	default:
 		v = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
 	}
-	srv.setVersion(v)
+	srv.setVersionForInterceptorSwitch(v)
 
 	if v.Major == api.Version_V2 {
 		if err := srv.store.ApplyV2DataMigrations(ctx); err != nil {
@@ -600,7 +600,7 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
 	}
 
-	s.setVersion(v)
+	s.setVersionForInterceptorSwitch(v)
 	return &api.MigrateToV2Resp{Reports: reports}, nil
 }
 
@@ -622,7 +622,7 @@ func (s *policyServer) handleMinorUpgrade(ctx context.Context, ms storage.Migrat
 	}
 
 	if upgraded {
-		s.setVersion(version)
+		s.setVersionForInterceptorSwitch(version)
 	}
 	return upgraded, nil
 }
@@ -649,7 +649,7 @@ func (s *policyServer) ResetToV1(ctx context.Context,
 	if err := s.store.Reset(ctx); err != nil {
 		return nil, status.Errorf(codes.Internal, "reset database state: %s", err.Error())
 	}
-	s.setVersion(api.Version{Major: api.Version_V1, Minor: api.Version_V0})
+	s.setVersionForInterceptorSwitch(api.Version{Major: api.Version_V1, Minor: api.Version_V0})
 	return &api.ResetToV1Resp{}, nil
 }
 
