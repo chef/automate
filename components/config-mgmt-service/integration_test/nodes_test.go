@@ -235,10 +235,194 @@ func TestGetNodesRegexWithExactSameField(t *testing.T) {
 			},
 			expected: []string{"a2-dev", "a2-prod", "a1-prod", "a1-dev"},
 		},
+		{
+			description: "Case sensitive regex filters 1",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"name:a2-*"},
+			},
+			expected: []string{"a2-dev", "A2-Dev", "A2-prod", "a2-Prod"},
+		},
+		{
+			description: "Case sensitive regex filters 2",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"name:A2-*"},
+			},
+			expected: []string{"a2-dev", "A2-Dev", "A2-prod", "a2-Prod"},
+		},
 	}
 
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("Regex with exact filter: %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodes
+			res, err := cfgmgmt.GetNodes(context.Background(), &test.request)
+			assert.NoError(t, err)
+
+			names := getFieldValues(res, "name")
+
+			// Test what nodes are returned.
+			assert.ElementsMatch(t, test.expected, names)
+		})
+	}
+}
+
+func TestGetNodesWildcardCaseInsensitive(t *testing.T) {
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Nodes
+		expected    []string
+	}{
+		// Node name
+		{
+			description: "Node name: term lower with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"name:a2-*"},
+			},
+			expected: []string{"a2-dev", "A2-Dev", "A2-prod", "a2-Prod"},
+		},
+		{
+			description: "Node name: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"name:A2-*"},
+			},
+			expected: []string{"a2-dev", "A2-Dev", "A2-prod", "a2-Prod"},
+		},
+
+		// organization
+
+		// environment
+
+		// status
+
+		// platform
+
+		// resource_names
+
+		// error_message
+
+		// recipes
+
+		// chef_tags
+
+		// cookbooks
+
+		// attributes
+
+		// chef_version
+
+		// roles
+
+		// policy_group
+
+		// policy_name
+
+		// policy_revision
+
+		// source_fqdn
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Wildcard case sensitive: %s", test.description), func(t *testing.T) {
 
 			// Adding required node data
 			for index := range test.nodes {
