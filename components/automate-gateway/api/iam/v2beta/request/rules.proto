@@ -27,6 +27,10 @@ message GetRuleReq {
 
 message ListRulesReq {}
 
+message ListRulesForProjectReq {
+  string id = 1;
+}
+
 message DeleteRuleReq {
   string id = 1;
 }

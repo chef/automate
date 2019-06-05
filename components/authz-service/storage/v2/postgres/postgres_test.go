@@ -519,7 +519,7 @@ func TestListPolicies(t *testing.T) {
 			resp, err := store.ListPolicies(ctx)
 			assert.NoError(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, 0, len(resp))
+			assert.Zero(t, len(resp))
 		},
 		"policy with no statements": func(t *testing.T) {
 			ctx := context.Background()
@@ -3447,7 +3447,7 @@ func TestListRules(t *testing.T) {
 			resp, err := store.ListRules(ctx)
 			assert.NoError(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, 0, len(resp))
+			assert.Zero(t, len(resp))
 		},
 		"when multiple rules exist with no project filter, returns the full list": func(t *testing.T) {
 			ctx := context.Background()
@@ -3504,6 +3504,169 @@ func TestListRules(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
+		db.flush(t)
+	}
+}
+
+func TestListRulesForProject(t *testing.T) {
+	store, db, _ := setup(t)
+	defer db.close(t)
+	defer store.Close()
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"when no rules or projects exist, returns an empty list", func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := store.ListRulesForProject(ctx, "not-found")
+			assert.NoError(t, err)
+			assert.Nil(t, resp)
+			assert.Zero(t, len(resp))
+		}},
+		{"when no rules, returns an empty list", func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			resp, err := store.ListRulesForProject(ctx, projID)
+			assert.NoError(t, err)
+			assert.Nil(t, resp)
+			assert.Zero(t, len(resp))
+		}},
+		{"when rules exist but not for the project queried, returns an empty list", func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+
+			createRuleWithMultipleConditions(t, store, projID2, storage.Node)
+
+			resp, err := store.ListRulesForProject(ctx, projID)
+			assert.NoError(t, err)
+			assert.Nil(t, resp)
+			assert.Zero(t, len(resp))
+		}},
+		{"when multiple rules exist with no project filter, returns the rules for the project", func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+
+			ruleType := storage.Node
+			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+
+			condition5, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-3", "chef-server-4"}, storage.ChefServer, storage.MemberOf)
+			rule3, err := storage.NewRule("new-id-3", projID2, "name3", ruleType,
+				[]storage.Condition{condition5})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule3)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule3.ID))
+			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			resp, err := store.ListRulesForProject(ctx, projID2)
+			assert.NoError(t, err)
+			assert.Equal(t, 2, len(resp))
+			assert.ElementsMatch(t, []*storage.Rule{&rule2, &rule3}, resp)
+		}},
+		{"when the project is in the filter, returns the rules for the project", func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{"project-3", projID2})
+
+			ruleType := storage.Node
+			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+
+			condition5, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-3", "chef-server-4"}, storage.ChefServer, storage.MemberOf)
+			rule3, err := storage.NewRule("new-id-3", projID2, "name3", ruleType,
+				[]storage.Condition{condition5})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule3)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule3.ID))
+			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			resp, err := store.ListRulesForProject(ctx, projID2)
+			assert.NoError(t, err)
+			assert.Equal(t, 2, len(resp))
+			assert.ElementsMatch(t, []*storage.Rule{&rule2, &rule3}, resp)
+		}},
+		{"when the project is not in the filter, returns an empty list", func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "pika p", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{"project-3", "project-4"})
+
+			ruleType := storage.Node
+			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule2)
+			require.NoError(t, err)
+
+			condition5, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-3", "chef-server-4"}, storage.ChefServer, storage.MemberOf)
+			rule3, err := storage.NewRule("new-id-3", projID2, "name3", ruleType,
+				[]storage.Condition{condition5})
+			require.NoError(t, err)
+			_, err = store.CreateRule(ctx, &rule3)
+			require.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule3.ID))
+			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+
+			resp, err := store.ListRulesForProject(ctx, projID2)
+			assert.NoError(t, err)
+			assert.Zero(t, len(resp))
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
 		db.flush(t)
 	}
 }
