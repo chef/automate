@@ -224,12 +224,12 @@ const routes: Routes = [
     },
     {
       path: 'profiles',
-      redirectTo: '/compliance/profiles',
+      redirectTo: '/compliance/profile',
       pathMatch: 'full'
     },
     {
       path: 'profiles/profile-details',
-      redirectTo: '/compliance/profiles/profile-details',
+      redirectTo: '/compliance/profile/profile-details',
       pathMatch: 'full'
     },
     {
