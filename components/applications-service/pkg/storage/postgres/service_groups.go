@@ -20,11 +20,9 @@ import (
 // OK        | Else if all services are 'Ok'
 // ---------------------------------------------------------------------
 const (
-	// The service-group health calculation query that:
-	// 1) Counts health of services (How many ok, critical, warning and unknown) and its total
-	// 2) Calculates the percentage of services with an ok health.
-	// 3) Concatenates all services releases
-	selectServiceGroupHealthCalculation = `
+	// This query has NO pagination and sorting since it is reused for the HealthCounts
+	// maybe in the future we could create a sql view so we don't have it
+	selectServiceGroupHealth = `
 SELECT sg.id
   , sg.deployment_id
   , sg.name as name
@@ -47,21 +45,6 @@ ON s.group_id = sg.id
 JOIN deployment as d
 ON sg.deployment_id = d.id
 GROUP BY sg.id, sg.deployment_id, sg.name, d.app_name, d.environment
-`
-	// conditional expression to calculate the overall health of the service group
-	conditionalOverallHealth = `
-CASE WHEN health_critical > 0 THEN 'CRITICAL'
-     WHEN health_unknown  > 0 THEN 'UNKNOWN'
-     WHEN health_warning  > 0 THEN 'WARNING'
-     ELSE 'OK'
-END
-`
-	// Service group health main query. Here we add the overall health calculation.
-	// NOTE: This query has NO pagination and sorting since it is reused for the HealthCounts.
-	// @afiune maybe in the future we could create a sql view so we don't have it here.
-	selectServiceGroupHealth = `
-SELECT *,(` + conditionalOverallHealth + `) overall_health
-FROM (` + selectServiceGroupHealthCalculation + `) AS service_groups_health_calculation
 `
 
 	// TODO: Update this query once we understand better the deploying status
@@ -144,7 +127,24 @@ type serviceGroupHealth struct {
 	PercentOk      int32          `db:"percent_ok"`
 	Application    string         `db:"app_name"`
 	Environment    string         `db:"environment"`
-	OverallHealth  string         `db:"overall_health"`
+}
+
+// OverallHealth is the logic that calculates the overall health of the service group
+func (sgh *serviceGroupHealth) OverallHealth() string {
+	if sgh.HealthCritical > 0 {
+		return storage.Critical
+	}
+
+	if sgh.HealthUnknown > 0 {
+		return storage.Unknown
+	}
+
+	if sgh.HealthWarning > 0 {
+		return storage.Warning
+	}
+
+	// We are only ok if we are 100% ok
+	return storage.Ok
 }
 
 // getServiceFromUniqueFields retrieve a service from the db without the need of an id
@@ -200,7 +200,7 @@ func (db *Postgres) GetServiceGroups(
 			Release:          sgh.ReleaseString(),
 			Name:             sgh.Name,
 			DeploymentID:     sgh.DeploymentID,
-			HealthStatus:     sgh.OverallHealth,
+			HealthStatus:     sgh.OverallHealth(),
 			HealthPercentage: sgh.PercentOk,
 			Application:      sgh.Application,
 			Environment:      sgh.Environment,
