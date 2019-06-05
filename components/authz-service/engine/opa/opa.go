@@ -14,9 +14,11 @@ import (
 	"github.com/open-policy-agent/opa/storage"
 	"github.com/open-policy-agent/opa/storage/inmem"
 	"github.com/open-policy-agent/opa/topdown"
+	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/authz-service/engine"
+	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -26,6 +28,7 @@ type State struct {
 	store             storage.Store
 	v2Store           storage.Store
 	v2p1Store         storage.Store
+	ruleStore         *cache.Cache
 	queries           map[string]ast.Body
 	compiler          *ast.Compiler
 	modules           map[string]*ast.Module
@@ -89,6 +92,7 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 		store:     inmem.New(),
 		v2Store:   inmem.New(),
 		v2p1Store: inmem.New(),
+		ruleStore: cache.New(cache.NoExpiration, -1),
 		queries: map[string]ast.Body{
 			authzQuery:              authzQueryParsed,
 			filteredPairsQuery:      filteredPairsQueryParsed,
@@ -425,12 +429,24 @@ func (s *State) RulesForProject(
 }
 
 // ListProjectMappings returns a map of all the rules for each projectID.
-func (s *State) ListProjectMappings(ctx context.Context) (map[string][]engine.Rule, error) {
-	rs, err := s.evalQuery(ctx, s.queries[listProjectMapQuery], map[string]interface{}{}, s.v2Store)
-	if err != nil {
-		return nil, &ErrEvaluation{e: err}
+func (s *State) ListProjectMappings(ctx context.Context) (map[string][]v2.Rule, error) {
+	items := s.ruleStore.Items()
+	s.log.Infof("HEY! 2. got this %#v in items", items)
+	// nothing stored while on v1 or v2.0
+	if len(items) == 0 {
+		return map[string][]v2.Rule{}, nil
 	}
-	return s.projectMappingsFromResults(rs)
+	projectRules := make(map[string][]v2.Rule, len(items))
+	for project, item := range items {
+		rules, ok := item.Object.([]v2.Rule)
+		if !ok {
+			return nil, errors.New("failed to convert rule list")
+		}
+
+		projectRules[project] = rules
+	}
+
+	return projectRules, nil
 }
 
 func (s *State) evalQuery(
@@ -621,12 +637,10 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 // rules, and resets the partial evaluation cache for v2
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
-	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
-	// TODO: v2 doesn't care about rules
+	roleMap map[string]interface{}) error {
 	s.v2Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
 		"roles":    roleMap,
-		"rules":    ruleMap,
 	})
 
 	return s.initPartialResultV2(ctx)
@@ -636,14 +650,28 @@ func (s *State) V2SetPolicies(
 // rules, and resets the partial evaluation cache for v2.l
 func (s *State) V2p1SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
-	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
+	roleMap map[string]interface{}, ruleMap map[string][]v2.Rule) error {
 	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
 		"roles":    roleMap,
-		"rules":    ruleMap,
 	})
 
+	if err := s.SetRules(ctx, ruleMap); err != nil {
+		return errors.New("failed to set rule store")
+	}
+	s.log.Infof("HEY! 2. ruleStore in v2p1SetPolicies %#v", s.ruleStore)
 	return s.initPartialResultV2p1(ctx)
+}
+
+func (s *State) SetRules(
+	ctx context.Context, ruleMap map[string][]v2.Rule) error {
+	s.ruleStore = cache.New(cache.NoExpiration, -1)
+	for project, rule := range ruleMap {
+		if err := s.ruleStore.Add(project, rule, cache.NoExpiration); err != nil {
+			return errors.New("failed to set rule store")
+		}
+	}
+	return nil
 }
 
 // ErrUnexpectedResultExpression is returned when one of the result sets

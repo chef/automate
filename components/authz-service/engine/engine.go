@@ -2,6 +2,8 @@ package engine
 
 import (
 	"context"
+
+	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 // Engine abstracts different decision engines.
@@ -72,16 +74,16 @@ type Writer interface {
 }
 
 type V2Writer interface {
-	V2SetPolicies(context.Context, map[string]interface{}, map[string]interface{}, map[string][]interface{}) error
+	V2SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
 }
 
 type V2p1Writer interface {
-	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}, map[string][]interface{}) error
+	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}, map[string][]v2.Rule) error
 }
 
 type ProjectRulesRetriever interface {
 	RulesForProject(context.Context, string) ([]Rule, error)
-	ListProjectMappings(context.Context) (map[string][]Rule, error)
+	ListProjectMappings(context.Context) (map[string][]v2.Rule, error)
 }
 
 type Rule struct {

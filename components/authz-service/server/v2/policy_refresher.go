@@ -186,7 +186,7 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	case vsn.Minor == api.Version_V1: // v2.1
 		return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap, ruleMap)
 	default: // v2.0 OR v1.0
-		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap, ruleMap)
+		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap)
 	}
 	// Note 2019/06/04 (sr): v1?! Yes, IAM v1. Our POC code depends on this query
 	// to be answered regardless of whether IAM is v1, v2 or v2.1.
@@ -283,55 +283,25 @@ type rule struct {
 	Values []string
 }
 
-// TODO: nolint can go away when connected to the database
-// nolint: unparam
-func (refresher *policyRefresher) getRuleMap(_ context.Context) (map[string][]interface{}, error) {
-	// Mocked rule data
-	// notlint: gofmt
-	// rules := [5]*rule{
-	// 	{
-	// 		ID:     "project1",
-	// 		Type:   "ChefServers",
-	// 		Values: []string{"chef-server-1", "chef-server-2", "chef-server-3"},
-	// 	},
-	// 	{
-	// 		ID:     "project2",
-	// 		Type:   "ChefOrgs",
-	// 		Values: []string{"Org1", "Org2"},
-	// 	},
-	// 	{
-	// 		ID:     "project2",
-	// 		Type:   "ChefServers",
-	// 		Values: []string{"chef-server-3", "chef-server-4", "chef-server-5"},
-	// 	},
-	// 	{
-	// 		ID:     "project3",
-	// 		Type:   "ChefEnvironment",
-	// 		Values: []string{"env-1", "env-2", "env-3"},
-	// 	},
-	// 	{
-	// 		ID:     "project4",
-	// 		Type:   "ChefEnvironment",
-	// 		Values: []string{"env-4", "env-5", "env-6"},
-	// 	},
-	// }
-	rules := []*rule{}
-
-	refresher.log.Infof("initializing OPA store with %d V2 project rule mappings", len(rules))
-
-	// OPA requires this format
-	data := make(map[string][]interface{})
-	for _, r := range rules {
-		if _, ok := data[r.ID]; !ok {
-			data[r.ID] = make([]interface{}, 0)
-		}
-		data[r.ID] = append(data[r.ID],
-			map[string]interface{}{
-				"type":   r.Type,
-				"values": r.Values,
-			})
+func (refresher *policyRefresher) getRuleMap(ctx context.Context) (map[string][]storage.Rule, error) {
+	rules, err := refresher.store.ListRules(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return data, nil
+
+	ruleMap := make(map[string][]storage.Rule)
+	for _, r := range rules {
+		refresher.log.Infof("HEY! 0. got this rule %#v in ListRules", *r)
+		if _, ok := ruleMap[r.ProjectID]; !ok {
+			ruleMap[r.ProjectID] = make([]storage.Rule, 0)
+		}
+
+		ruleMap[r.ProjectID] = append(ruleMap[r.ProjectID], *r)
+	}
+
+	refresher.log.Infof("HEY! 1. got this %#v in getRuleMap", ruleMap)
+
+	return ruleMap, nil
 }
 
 func pretty(vsn api.Version) string {
