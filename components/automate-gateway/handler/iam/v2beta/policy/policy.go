@@ -445,9 +445,14 @@ func (p *Server) IntrospectAllProjects(
 	if err != nil {
 		return nil, err
 	}
-	// The last call actually returns all projects, not just all allowed projects.
-	// So here just use the correctly filtered id list to generate the return list.
-	projMap := toMap(resp.Projects)
+	return mapProjectNamesToIds(projectIDs, resp.Projects)
+}
+
+func mapProjectNamesToIds(
+	projectIDs []string, refProjects []*authz.Project) (*pb_resp.ListProjectsResp, error) {
+	// refProjects is *all* projects, not just all *allowed* projects.
+	// This uses the correctly filtered id list to generate the desired return list.
+	projMap := toMap(refProjects)
 	projects := make([]*pb_common.Project, len(projectIDs))
 	for i, id := range projectIDs {
 		apiProj, err := domainProjectToAPIProject(projMap[id])

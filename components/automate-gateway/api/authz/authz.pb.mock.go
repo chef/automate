@@ -31,15 +31,14 @@ func NewAuthorizationServerMockWithoutValidation() *AuthorizationServerMock {
 // AuthorizationServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
 type AuthorizationServerMock struct {
-	validateRequests          bool
-	GetVersionFunc            func(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
-	CreatePolicyFunc          func(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
-	ListPoliciesFunc          func(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
-	DeletePolicyFunc          func(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
-	IntrospectAllFunc         func(context.Context, *request.IntrospectAllReq) (*response.IntrospectResp, error)
-	IntrospectSomeFunc        func(context.Context, *request.IntrospectSomeReq) (*response.IntrospectResp, error)
-	IntrospectFunc            func(context.Context, *request.IntrospectReq) (*response.IntrospectResp, error)
-	IntrospectAllProjectsFunc func(context.Context, *request.IntrospectAllProjectsReq) (*response.IntrospectProjectsResp, error)
+	validateRequests   bool
+	GetVersionFunc     func(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
+	CreatePolicyFunc   func(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
+	ListPoliciesFunc   func(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
+	DeletePolicyFunc   func(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
+	IntrospectAllFunc  func(context.Context, *request.IntrospectAllReq) (*response.IntrospectResp, error)
+	IntrospectSomeFunc func(context.Context, *request.IntrospectSomeReq) (*response.IntrospectResp, error)
+	IntrospectFunc     func(context.Context, *request.IntrospectReq) (*response.IntrospectResp, error)
 }
 
 func (m *AuthorizationServerMock) GetVersion(ctx context.Context, req *version.VersionInfoRequest) (*version.VersionInfo, error) {
@@ -126,18 +125,6 @@ func (m *AuthorizationServerMock) Introspect(ctx context.Context, req *request.I
 	return nil, status.Error(codes.Internal, "mock: 'Introspect' not implemented")
 }
 
-func (m *AuthorizationServerMock) IntrospectAllProjects(ctx context.Context, req *request.IntrospectAllProjectsReq) (*response.IntrospectProjectsResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.IntrospectAllProjectsFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'IntrospectAllProjects' not implemented")
-}
-
 // Reset resets all overridden functions
 func (m *AuthorizationServerMock) Reset() {
 	m.GetVersionFunc = nil
@@ -147,5 +134,4 @@ func (m *AuthorizationServerMock) Reset() {
 	m.IntrospectAllFunc = nil
 	m.IntrospectSomeFunc = nil
 	m.IntrospectFunc = nil
-	m.IntrospectAllProjectsFunc = nil
 }

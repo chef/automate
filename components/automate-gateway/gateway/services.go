@@ -73,7 +73,8 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for deployment service")
 	}
-	pb_deployment.RegisterDeploymentServer(grpcServer, handler.NewDeploymentServer(deploymentClient))
+	pb_deployment.RegisterDeploymentServer(grpcServer,
+		handler.NewDeploymentServer(deploymentClient))
 
 	licenseClient, err := clients.LicenseControlClient()
 	if err != nil {
@@ -82,7 +83,8 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 			"error":   err,
 		}).Warn("Could not create license-control-service client")
 	}
-	pb_telemetry.RegisterTelemetryServer(grpcServer, handler.NewTelemetryServer(licenseClient, deploymentClient))
+	pb_telemetry.RegisterTelemetryServer(grpcServer,
+		handler.NewTelemetryServer(licenseClient, deploymentClient))
 
 	pb_license.RegisterLicenseServer(grpcServer, handler.NewLicenseServer(
 		licenseClient,
@@ -97,7 +99,8 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 			"error":   err,
 		}).Fatal("Could not create client")
 	}
-	pb_cfgmgmt.RegisterConfigMgmtServer(grpcServer, handler.NewCfgMgmtServer(cfgMgmtClient))
+	pb_cfgmgmt.RegisterConfigMgmtServer(grpcServer,
+		handler.NewCfgMgmtServer(cfgMgmtClient))
 
 	notifier, err := clients.Notifier()
 	if err != nil {
@@ -122,13 +125,15 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		return errors.Wrap(err, "create client for IngestStatus service")
 	}
 
-	pb_legacy.RegisterLegacyDataCollectorServer(grpcServer, handler.NewLegacyIngestServer(ingestStatusClient))
+	pb_legacy.RegisterLegacyDataCollectorServer(grpcServer,
+		handler.NewLegacyIngestServer(ingestStatusClient))
 
 	notificationsClient, err := clients.NotificationsClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for Notifications service")
 	}
-	pb_notifications.RegisterNotificationsServer(grpcServer, handler.NewNotificationsServer(notificationsClient))
+	pb_notifications.RegisterNotificationsServer(grpcServer,
+		handler.NewNotificationsServer(notificationsClient))
 
 	authzClient, err := clients.AuthorizationClient()
 	if err != nil {
@@ -139,7 +144,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		return errors.Wrap(err, "create client for authzV2 service")
 	}
 	pb_authz.RegisterAuthorizationServer(grpcServer,
-		handler.NewAuthzServer(authzClient, authzV2Client, s.authorizer))
+		handler.NewAuthzServer(authzClient, s.authorizer))
 
 	policiesClient, err := clients.PoliciesClient()
 	if err != nil {
@@ -149,7 +154,8 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create projects client for authz-service")
 	}
-	pb_iam_v2beta.RegisterPoliciesServer(grpcServer, handler_policies.NewServer(policiesClient, projectsClient, authzV2Client))
+	pb_iam_v2beta.RegisterPoliciesServer(grpcServer,
+		handler_policies.NewServer(policiesClient, projectsClient, authzV2Client))
 	pb_iam_v2beta.RegisterRulesServer(grpcServer, handler_rules.NewServer(projectsClient))
 
 	tokensMgmtClient, err := clients.TokensMgmtClient()
@@ -190,33 +196,39 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for applications service")
 	}
-	pb_apps.RegisterApplicationsServiceServer(grpcServer, handler.NewApplicationsHandler(applicationsClient))
+	pb_apps.RegisterApplicationsServiceServer(grpcServer,
+		handler.NewApplicationsHandler(applicationsClient))
 
 	jobsClient, err := clients.ComplianceJobsServiceClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for compliances jobs service")
 	}
-	pb_cc_jobs.RegisterJobsServiceServer(grpcServer, handler_compliance.NewJobsHandler(jobsClient))
+	pb_cc_jobs.RegisterJobsServiceServer(grpcServer,
+		handler_compliance.NewJobsHandler(jobsClient))
 
 	nodesClient, err := clients.NodesClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for nodes service")
 	}
 	// give nodes handler access to the jobs client so it can auto-trigger detect jobs when adding nodes
-	pb_nodes.RegisterNodesServiceServer(grpcServer, handler.NewNodesHandler(nodesClient, jobsClient))
+	pb_nodes.RegisterNodesServiceServer(grpcServer,
+		handler.NewNodesHandler(nodesClient, jobsClient))
 
 	nodesManagerClient, err := clients.NodeManagerClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for nodes manager service")
 	}
-	// give nodemanager handler access to the jobs client so it can auto-trigger detect jobs when adding manager nodes
-	pb_nodes_manager.RegisterNodeManagerServiceServer(grpcServer, handler.NewNodeManagerHandler(nodesManagerClient, jobsClient))
+	// give nodemanager handler access to the jobs client
+	// so it can auto-trigger detect jobs when adding manager nodes
+	pb_nodes_manager.RegisterNodeManagerServiceServer(grpcServer,
+		handler.NewNodeManagerHandler(nodesManagerClient, jobsClient))
 
 	profilesClient, err := clients.ComplianceProfilesServiceClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for compliance profiles service")
 	}
-	pb_profiles.RegisterProfilesServiceServer(grpcServer, handler_compliance.NewProfilesHandler(profilesClient))
+	pb_profiles.RegisterProfilesServiceServer(grpcServer,
+		handler_compliance.NewProfilesHandler(profilesClient))
 
 	complianceReportingClient, err := clients.ComplianceReportingServiceClient()
 	if err != nil {
@@ -226,20 +238,23 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for compliance version service")
 	}
-	pb_cc_reporting.RegisterReportingServiceServer(grpcServer, handler_compliance.NewReportingHandler(complianceReportingClient, versionClient, jobsClient))
+	pb_cc_reporting.RegisterReportingServiceServer(grpcServer,
+		handler_compliance.NewReportingHandler(complianceReportingClient, versionClient, jobsClient))
 
 	feedClient, err := clients.FeedClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for feed service")
 	}
 
-	pb_eventfeed.RegisterEventFeedServer(grpcServer, handler.NewEventFeedServer(cfgMgmtClient, feedClient))
+	pb_eventfeed.RegisterEventFeedServer(grpcServer,
+		handler.NewEventFeedServer(cfgMgmtClient, feedClient))
 
 	statsClient, err := clients.ComplianceStatsServiceClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for compliance stats service")
 	}
-	pb_cc_stats.RegisterStatsServiceServer(grpcServer, handler_compliance.NewStatsHandler(statsClient))
+	pb_cc_stats.RegisterStatsServiceServer(grpcServer,
+		handler_compliance.NewStatsHandler(statsClient))
 
 	chefIngesterJobSchedulerClient, err := clients.ChefIngesterJobSchedulerClient()
 	if err != nil {

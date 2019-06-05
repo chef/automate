@@ -62,7 +62,4 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.authz.Authorization/IntrospectAllProjects", "auth_introspection:introspect_all_projects", "read", "GET", "/auth/introspect_projects", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
 }

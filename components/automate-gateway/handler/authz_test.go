@@ -165,52 +165,6 @@ func TestIntrospectAllV2(t *testing.T) {
 	}
 }
 
-func TestIntrospectAllProjectsV2(t *testing.T) {
-	_, authzSrv, s, hdlr := testServerAndHandler(t)
-	defer s.Close()
-	reset := func() {
-		authzSrv.FilterAuthorizedProjectsFunc = nil
-	}
-	// Unlike the regular introspection that does some additional work,
-	// this introspection is really just a pass-through with respect
-	// to the functionality being tested here, so these simple cases
-	// provide a sufficient smoke test.
-	cases := map[string]struct {
-		authzResp *authz_v2.FilterAuthorizedProjectsResp
-		expected  []string
-	}{
-		"empty response": {
-			&authz_v2.FilterAuthorizedProjectsResp{},
-			nil,
-		},
-		"empty list": {
-			&authz_v2.FilterAuthorizedProjectsResp{Projects: []string{}},
-			nil,
-		},
-		"some projects": {
-			&authz_v2.FilterAuthorizedProjectsResp{Projects: []string{"p1", "p2"}},
-			[]string{"p1", "p2"},
-		},
-	}
-
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action:do", middleware.AuthV2.String())
-			req := &request.IntrospectAllProjectsReq{}
-			authzSrv.FilterAuthorizedProjectsFunc = func(
-				context.Context, *authz_v2.FilterAuthorizedProjectsReq) (*authz_v2.FilterAuthorizedProjectsResp, error) {
-				return tc.authzResp, nil
-			}
-			resp, err := hdlr.IntrospectAllProjects(ctx, req)
-			require.NoError(t, err)
-			// require.NotNil(t, resp)
-			assert.Equal(t, tc.expected, resp.Projects)
-		})
-		reset()
-	}
-}
-
 func shouldUseV2PairsFunc(context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
 	st := status.New(codes.FailedPrecondition, "should use v2")
 	st, err := st.WithDetails(&common.ErrorShouldUseV2{})
@@ -394,7 +348,6 @@ func testServerAndHandler(t *testing.T) (
 		s,
 		handler.NewAuthzServer(
 			v1Client,
-			v2Client,
 			authorizer.NewAuthorizer(
 				authv1.AuthorizationHandler(v1Client),
 				authv2.AuthorizationHandler(v2Client)))
