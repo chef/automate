@@ -115,7 +115,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // navigate to asset store
     cy.get('.nav-link').contains('Compliance').click()
     cy.get('chef-sidebar-entry').contains('Profiles').click()
-    cy.url().should('include', '/compliance/profiles')
+    cy.url().should('include', '/compliance/compliance-profiles')
 
     // wait for data to return
     cy.wait('@getProfiles')
@@ -240,7 +240,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // navigate to asset store
     cy.get('.nav-link').contains('Compliance').click()
     cy.get('chef-sidebar-entry').contains('Profiles').click()
-    cy.url().should('include', '/compliance/profiles')
+    cy.url().should('include', '/compliance/compliance-profiles')
 
     // delete profile
     cy.contains('CIS Amazon Linux 2 Benchmark Level 1')
@@ -251,7 +251,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
       })
 
     // ensure that the profile is deleted
-    cy.url().should('include', '/profiles')
+    cy.url().should('include', '/compliance/compliance-profiles')
     cy.get('chef-tbody').should(($b) => {
       expect($b).not.to.contain('CIS Amazon Linux 2 Benchmark Level 1')
     })
