@@ -74,7 +74,7 @@ function applications_integration() {
   check_if_deployinate_started || return 1
 
   # Go based integration tests
-  A2_SVC_NAME="applications-service" A2_SVC_PATH="/hab/svc/applications-service" go_test "github.com/chef/automate/components/applications-service/integration_test" -v
+  A2_SVC_NAME="applications-service" A2_SVC_PATH="/hab/svc/applications-service" go_test "github.com/chef/automate/components/applications-service/integration_test" -v -bench=.
 }
 
 document "applications_publish_raw_message" <<DOC

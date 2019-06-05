@@ -19,7 +19,7 @@ import (
 
 func TestSystemPolicies(t *testing.T) {
 	ctx := context.Background()
-	ts := setupWithOPA(t)
+	ts := setupWithOPAV2(t)
 	cl := ts.authz
 
 	isAuthorized := func(subject, action, resource string) func(*testing.T) {
@@ -55,7 +55,7 @@ func TestSystemPolicies(t *testing.T) {
 
 func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 	ctx := context.Background()
-	ts := setupWithOPA(t)
+	ts := setupWithOPAV2p1(t)
 
 	t.Run("user should only get projects they have non-system level access to", func(t *testing.T) {
 		_, err := ts.projects.CreateProject(ctx, &api_v2.CreateProjectReq{
@@ -89,7 +89,15 @@ func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 	})
 }
 
-func setupWithOPA(t *testing.T) testSetup {
+func setupWithOPAV2(t *testing.T) testSetup {
+	return setupWithOPAV2pX(t, false)
+}
+
+func setupWithOPAV2p1(t *testing.T) testSetup {
+	return setupWithOPAV2pX(t, true)
+}
+
+func setupWithOPAV2pX(t *testing.T, twoPointOne bool) testSetup {
 	t.Helper()
 	ctx := context.Background()
 
@@ -102,7 +110,13 @@ func setupWithOPA(t *testing.T) testSetup {
 	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
 	ts := setupV2(t, o, o, &emptyV1List, vChan)
-	_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
+	var flag api_v2.Flag
+	if twoPointOne {
+		flag = api_v2.Flag_VERSION_2_1
+	} else {
+		flag = api_v2.Flag_VERSION_2_0
+	}
+	_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: flag})
 	require.NoError(t, err)
 	return ts
 }

@@ -28,9 +28,10 @@ import (
 type policyServer struct {
 	log             logger.Logger
 	store           storage.Storage
-	engine          engine.V2Writer
+	engine          engine.V2pXWriter
 	v1              storage_v1.PoliciesLister
 	vChan           chan api.Version
+	version         api.Version
 	policyRefresher PolicyRefresher
 }
 
@@ -46,7 +47,7 @@ type PolicyServer interface {
 func NewMemstorePolicyServer(
 	ctx context.Context,
 	l logger.Logger,
-	e engine.V2Writer,
+	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vChan chan api.Version) (PolicyServer, error) {
 
@@ -57,7 +58,7 @@ func NewMemstorePolicyServer(
 func NewPostgresPolicyServer(
 	ctx context.Context,
 	l logger.Logger,
-	e engine.V2Writer,
+	e engine.V2pXWriter,
 	migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config,
 	pl storage_v1.PoliciesLister,
@@ -75,7 +76,7 @@ func NewPoliciesServer(
 	ctx context.Context,
 	l logger.Logger,
 	s storage.Storage,
-	e engine.V2Writer,
+	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vChan chan api.Version) (PolicyServer, error) {
 
@@ -99,10 +100,6 @@ func NewPoliciesServer(
 		l.Warn("cleaned up in-progress migration status")
 	}
 
-	if err := srv.updateEngineStore(ctx); err != nil {
-		return nil, errors.Wrap(err, "initialize engine storage")
-	}
-
 	// check migration status
 	ms, err := srv.store.MigrationStatus(ctx)
 	if err != nil {
@@ -120,10 +117,14 @@ func NewPoliciesServer(
 	srv.setVersion(v)
 
 	if v.Major == api.Version_V2 {
-		err = srv.store.ApplyV2DataMigrations(ctx)
-		if err != nil {
+		if err := srv.store.ApplyV2DataMigrations(ctx); err != nil {
 			return nil, errors.Wrap(err, "error migrating v2 data")
 		}
+	}
+
+	// now that the data is all set, attempt to feed it into OPA:
+	if err := srv.updateEngineStore(ctx); err != nil {
+		return nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
 	}
 
 	return srv, nil
@@ -709,7 +710,7 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 }
 
 func (s *policyServer) updateEngineStore(ctx context.Context) error {
-	return s.policyRefresher.Refresh(ctx)
+	return s.policyRefresher.Refresh(ctx, s.version)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -895,5 +896,6 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 func (s *policyServer) setVersion(v api.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
+		s.version = v
 	}
 }

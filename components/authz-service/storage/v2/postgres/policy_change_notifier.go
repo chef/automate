@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/lib/pq"
 	"github.com/sirupsen/logrus"
+
+	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 type policyChangeNotifier struct {

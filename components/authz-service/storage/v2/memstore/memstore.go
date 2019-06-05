@@ -496,8 +496,11 @@ func (s *State) InProgress(context.Context) error {
 }
 
 func (s *State) Failure(context.Context) error {
-	s.ms = storage.Failed
-	return nil
+	if s.ms == storage.InProgress {
+		s.ms = storage.Failed
+		return nil
+	}
+	return errors.New("cannot transition to failure")
 }
 
 func (s *State) MigrationStatus(context.Context) (storage.MigrationStatus, error) {

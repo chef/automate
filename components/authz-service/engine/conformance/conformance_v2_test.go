@@ -22,7 +22,7 @@ import (
  ************ ************ ************ ************ ************ ************/
 
 func TestV2IsAuthorized(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV2(t)
 	sub, act, res := "user:local:admin", "iam:users:create", "iam:users"
 
 	// We're always passing the same arguments to IsAuthorized(). This allows for
@@ -80,8 +80,8 @@ func TestV2IsAuthorized(t *testing.T) {
 	}
 }
 
-func TestV2ProjectsAuthorized(t *testing.T) {
-	ctx, engines := setup(t)
+func TestV2p1ProjectsAuthorized(t *testing.T) {
+	ctx, engines := setupV2p1(t)
 	sub, act, res := "user:local:admin", "iam:users:create", "iam:users"
 	proj1, proj2, proj3, proj4, unassigned := "proj-1", "proj-2", "proj-3", "proj-4", constants.UnassignedProjectID
 	allProjects := []string{proj1, proj2, proj3, proj4, unassigned}
@@ -112,7 +112,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.Equal(t, []string{proj1}, actual)
@@ -134,7 +134,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2(t, e, pol, role)
+				setPoliciesV2p1(t, e, pol, role)
 				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj1, proj2}, actual)
@@ -156,7 +156,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2(t, e, pol, role)
+				setPoliciesV2p1(t, e, pol, role)
 				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.Equal(t, []string{}, actual)
@@ -178,7 +178,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2(t, e, pol, role)
+				setPoliciesV2p1(t, e, pol, role)
 				actual, err := e.V2ProjectsAuthorized(args(allProjects))
 				require.NoError(t, err)
 				assert.Equal(t, []string{proj1}, actual)
@@ -201,7 +201,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2(t, e, pol, role)
+				setPoliciesV2p1(t, e, pol, role)
 				actual, err := e.V2ProjectsAuthorized(args([]string{"*"}))
 				require.NoError(t, err)
 				assert.Equal(t, []string{}, actual)
@@ -219,7 +219,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.Equal(t, []string{}, actual)
@@ -237,7 +237,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{}, actual)
@@ -261,7 +261,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj2}, actual)
@@ -285,7 +285,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{}, actual)
@@ -309,7 +309,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				actual, err := e.V2ProjectsAuthorized(args(allProjects))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{}, actual)
@@ -333,7 +333,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				// in the server, we fetch the list of all projects when the projects filter is empty
 				actual, err := e.V2ProjectsAuthorized(args(allProjects))
 				require.NoError(t, err)
@@ -352,7 +352,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj1, proj2}, actual)
@@ -370,7 +370,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, pol)
+				setPoliciesV2p1(t, e, pol)
 				// in the server, we fetch the list of all projects when the projects filter is empty
 				actual, err := e.V2ProjectsAuthorized(args(allProjects))
 				require.NoError(t, err)
@@ -381,7 +381,7 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 }
 
 func TestV2FilterAuthorizedPairs(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV2(t)
 	sub, act0, res0, act1, res1 := "user:local:someid", "iam:users:create",
 		"nodes:someid", "compliance:profiles:delete", "compliance:profiles"
 	pair0 := engine.Pair{Resource: engine.Resource(res0), Action: engine.Action(act0)}
@@ -493,7 +493,7 @@ func TestV2FilterAuthorizedPairs(t *testing.T) {
 }
 
 func TestV2FilterAuthorizedProjects(t *testing.T) {
-	ctx, engines := setup(t)
+	ctx, engines := setupV2p1(t)
 	sub := "user:local:someid"
 	act0, res0 := "iam:users:create", "nodes:someid"
 	act1, res1 := "compliance:profiles:delete", "compliance:profiles"
@@ -560,7 +560,7 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, policy0, policy1)
+				setPoliciesV2p1(t, e, policy0, policy1)
 				expectedProjects := []string{proj0, proj1, proj2}
 
 				filtered, err := e.V2FilterAuthorizedProjects(args())
@@ -592,7 +592,7 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, policy0, policy1)
+				setPoliciesV2p1(t, e, policy0, policy1)
 				expectedProjects := []string{proj0, proj1}
 
 				filtered, err := e.V2FilterAuthorizedProjects(args())
@@ -624,7 +624,7 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, policy0, policy1)
+				setPoliciesV2p1(t, e, policy0, policy1)
 				expectedProjects := []string{proj0, proj1}
 
 				filtered, err := e.V2FilterAuthorizedProjects(args())
@@ -667,7 +667,7 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, policy0, policy1)
+				setPoliciesV2p1(t, e, policy0, policy1)
 				expectedProjects := []string{proj0, proj1, proj2}
 
 				filtered, err := e.V2FilterAuthorizedProjects(args())
@@ -679,6 +679,14 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 }
 
 func setPoliciesV2(t testing.TB, e engine.Engine, policiesAndRoles ...interface{}) {
+	setPoliciesV2pX(t, false, e, policiesAndRoles...)
+}
+
+func setPoliciesV2p1(t testing.TB, e engine.Engine, policiesAndRoles ...interface{}) {
+	setPoliciesV2pX(t, true, e, policiesAndRoles...)
+}
+
+func setPoliciesV2pX(t testing.TB, twoPointOne bool, e engine.Engine, policiesAndRoles ...interface{}) {
 	t.Helper()
 	ctx := context.Background()
 
@@ -704,6 +712,11 @@ func setPoliciesV2(t testing.TB, e engine.Engine, policiesAndRoles ...interface{
 	for _, role := range roles {
 		roleMap[role["id"].(string)] = role
 	}
-	err := e.V2SetPolicies(ctx, policyMap, roleMap, make(map[string][]interface{}))
-	require.NoError(t, err, "set policies(v2)")
+	if twoPointOne {
+		err := e.V2p1SetPolicies(ctx, policyMap, roleMap, map[string][]interface{}{})
+		require.NoError(t, err, "set policies(v2.1)")
+	} else {
+		err := e.V2SetPolicies(ctx, policyMap, roleMap, map[string][]interface{}{})
+		require.NoError(t, err, "set policies(v2)")
+	}
 }
