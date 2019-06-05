@@ -69,10 +69,7 @@ func NewPolicyRefresher(ctx context.Context, log logger.Logger, store storage.St
 }
 
 func (refresher *policyRefresher) run(ctx context.Context) {
-	var (
-		lastVersion  api.Version
-		lastPolicyID string
-	)
+	var lastPolicyChangeID string
 	antiEntropyTimer := time.NewTimer(refresher.antiEntropyTimerDuration)
 RUNLOOP:
 	for {
@@ -83,7 +80,7 @@ RUNLOOP:
 		case <-refresher.changeNotifier.C():
 			refresher.log.Info("Received policy change notification")
 			var err error
-			lastPolicyID, err = refresher.refresh(context.Background(), lastPolicyID)
+			lastPolicyChangeID, err = refresher.refresh(context.Background(), lastPolicyChangeID)
 			if err != nil {
 				refresher.log.WithError(err).Warn("Failed to refresh policies")
 			}
@@ -93,14 +90,14 @@ RUNLOOP:
 		case m := <-refresher.refreshRequests:
 			refresher.log.Info("Received local policy refresh request")
 			var err error
-			lastPolicyID, err = refresher.refresh(m.ctx, lastPolicyID)
+			lastPolicyChangeID, err = refresher.refresh(m.ctx, lastPolicyChangeID)
 			m.Respond(err)
 			if !antiEntropyTimer.Stop() {
 				<-antiEntropyTimer.C
 			}
 		case <-antiEntropyTimer.C:
 			var err error
-			lastPolicyID, err = refresher.refresh(ctx, lastPolicyID)
+			lastPolicyChangeID, err = refresher.refresh(ctx, lastPolicyChangeID)
 			if err != nil {
 				refresher.log.WithError(err).Warn("Anti-entropy refresh failed")
 			}
@@ -112,21 +109,21 @@ RUNLOOP:
 	close(refresher.refreshRequests)
 }
 
-func (refresher *policyRefresher) refresh(ctx context.Context, lastPolicyID string) (string, error) {
+func (refresher *policyRefresher) refresh(ctx context.Context, lastPolicyChangeID string) (string, error) {
 	curPolicyID, err := refresher.store.GetPolicyChangeID(ctx)
 	if err != nil {
 		refresher.log.WithError(err).Warn("Failed to get current policy change ID")
-		return lastPolicyID, err
+		return lastPolicyChangeID, err
 	}
-	if curPolicyID != lastPolicyID {
+	if curPolicyID != lastPolicyChangeID {
 		refresher.log.WithFields(logrus.Fields{
-			"lastPolicyID": lastPolicyID,
-			"curPolicyID":  curPolicyID,
+			"lastPolicyChangeID": lastPolicyChangeID,
+			"curPolicyID":        curPolicyID,
 		}).Debug("Refreshing engine store")
 
 		if err := refresher.updateEngineStore(ctx); err != nil {
 			refresher.log.WithError(err).Warn("Failed to refresh engine store")
-			return lastPolicyID, err
+			return lastPolicyChangeID, err
 		}
 	}
 	return curPolicyID, nil
@@ -160,7 +157,10 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	// Engine updates need unfiltered access to all data.
 	ctx = auth_context.ContextWithoutProjects(ctx)
 
-	vsn := refresher.getIAMVersion(ctx)
+	vsn, err := refresher.getIAMVersion(ctx)
+	if err != nil {
+		refresher.log.WithError(err).Warn("Failed to retrieve IAM version")
+	}
 	refresher.log.Infof("initializing OPA store (%s)", pretty(vsn))
 
 	policyMap, err := refresher.getPolicyMap(ctx)
