@@ -32,7 +32,7 @@ const routes: Routes = [
         loadChildren: './+scanner/scanner.module#ScannerModule'
       },
       {
-        path: 'profiles',
+        path: 'compliance-profiles',
         loadChildren: './+profile/profile.module#ProfileModule'
       }
     ]
