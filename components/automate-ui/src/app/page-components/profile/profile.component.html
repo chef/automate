@@ -27,8 +27,9 @@
         </li>
       </app-authorized>
       <li class="dropdown-list-item">
-        <span class="version">Version: {{ buildVersion }}</span>
-        <ul class="dropdown-sub-list">
+        <span class="version">Version: 2</span>
+        <span class="build">Build: {{ buildVersion }}</span>
+		<ul class="dropdown-sub-list">
           <li>
             <button (click)="showWelcomeModal()"
               (keydown.arrowup)="handleArrowUp($event)"
