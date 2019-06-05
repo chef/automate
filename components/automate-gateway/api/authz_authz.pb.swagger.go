@@ -58,22 +58,6 @@ func init() {
         ]
       }
     },
-    "/auth/introspect_projects": {
-      "get": {
-        "operationId": "IntrospectAllProjects",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/responseIntrospectProjectsResp"
-            }
-          }
-        },
-        "tags": [
-          "Authorization"
-        ]
-      }
-    },
     "/auth/introspect_some": {
       "post": {
         "operationId": "IntrospectSome",
@@ -284,17 +268,6 @@ func init() {
         "updated_at": {
           "type": "string",
           "format": "date-time"
-        }
-      }
-    },
-    "responseIntrospectProjectsResp": {
-      "type": "object",
-      "properties": {
-        "projects": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
