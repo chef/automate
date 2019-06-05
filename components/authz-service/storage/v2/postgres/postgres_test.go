@@ -519,7 +519,7 @@ func TestListPolicies(t *testing.T) {
 			resp, err := store.ListPolicies(ctx)
 			assert.NoError(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, 0, len(resp))
+			assert.Zero(t, len(resp))
 		},
 		"policy with no statements": func(t *testing.T) {
 			ctx := context.Background()
@@ -3447,7 +3447,7 @@ func TestListRules(t *testing.T) {
 			resp, err := store.ListRules(ctx)
 			assert.NoError(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, 0, len(resp))
+			assert.Zero(t, len(resp))
 		},
 		"when multiple rules exist with no project filter, returns the full list": func(t *testing.T) {
 			ctx := context.Background()
@@ -3513,15 +3513,18 @@ func TestListRulesForProject(t *testing.T) {
 	defer db.close(t)
 	defer store.Close()
 
-	cases := map[string]func(*testing.T){
-		"when no rules or projects exist, returns an empty list": func(t *testing.T) {
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"when no rules or projects exist, returns an empty list", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := store.ListRulesForProject(ctx, "not-found")
 			assert.NoError(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, 0, len(resp))
-		},
-		"when no rules, returns an empty list": func(t *testing.T) {
+			assert.Zero(t, len(resp))
+		}},
+		{"when no rules, returns an empty list", func(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
@@ -3529,9 +3532,9 @@ func TestListRulesForProject(t *testing.T) {
 			resp, err := store.ListRulesForProject(ctx, projID)
 			assert.NoError(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, 0, len(resp))
-		},
-		"when rules exist but not for the project queried, returns an empty list": func(t *testing.T) {
+			assert.Zero(t, len(resp))
+		}},
+		{"when rules exist but not for the project queried, returns an empty list", func(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
@@ -3544,9 +3547,9 @@ func TestListRulesForProject(t *testing.T) {
 			resp, err := store.ListRulesForProject(ctx, projID)
 			assert.NoError(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, 0, len(resp))
-		},
-		"when multiple rules exist with no project filter, returns the rules for the project": func(t *testing.T) {
+			assert.Zero(t, len(resp))
+		}},
+		{"when multiple rules exist with no project filter, returns the rules for the project", func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3582,8 +3585,8 @@ func TestListRulesForProject(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{&rule2, &rule3}, resp)
-		},
-		"when the project is in the filter, returns the rules for the project": func(t *testing.T) {
+		}},
+		{"when the project is in the filter, returns the rules for the project", func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3619,8 +3622,8 @@ func TestListRulesForProject(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{&rule2, &rule3}, resp)
-		},
-		"when the project is not in the filter, returns an empty list": func(t *testing.T) {
+		}},
+		{"when the project is not in the filter, returns an empty list", func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3654,13 +3657,16 @@ func TestListRulesForProject(t *testing.T) {
 
 			resp, err := store.ListRulesForProject(ctx, projID2)
 			assert.NoError(t, err)
-			assert.Equal(t, 0, len(resp))
-			assert.ElementsMatch(t, []*storage.Rule{}, resp)
-		},
+			assert.Zero(t, len(resp))
+		}},
 	}
 
-	for name, test := range cases {
-		t.Run(name, test)
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
 		db.flush(t)
 	}
 }

@@ -1162,13 +1162,13 @@ func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
 }
 
 func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.Rule, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
