@@ -25,8 +25,8 @@ func BenchmarkGetServices(b *testing.B) {
 	var (
 		ctx         = context.Background()
 		request     = new(applications.ServicesReq)
-		iterations  = 20
-		incremental = 50
+		iterations  = 10
+		incremental = 100
 		maxServices = incremental * iterations
 		nServices   = 0
 	)
