@@ -21,4 +21,8 @@ message ListRulesResp {
   repeated Rule rules = 1;
 }
 
+message ListRulesForProjectResp {
+  repeated Rule rules = 1;
+}
+
 message DeleteRuleResp {}

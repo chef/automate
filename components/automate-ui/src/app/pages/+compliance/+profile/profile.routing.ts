@@ -6,16 +6,11 @@ import { ProfileOverviewComponent } from './+profile-overview/profile-overview.c
 const routes: Routes = [
   {
     path: '',
-    children: [
-        {
-        path: '',
-        component: ProfileOverviewComponent
-        },
-        {
-        path: 'profile-details',
-        component: ProfileDetailsComponent
-        }
-    ]
+    component: ProfileOverviewComponent
+  },
+  {
+    path: 'profile-details',
+    component: ProfileDetailsComponent
   }
 ];
 

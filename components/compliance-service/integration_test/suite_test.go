@@ -363,12 +363,7 @@ func (s *Suite) DeleteAllDocuments() {
 	// ES Query to match all documents
 	q := elastic.RawStringQuery("{\"match_all\":{}}")
 
-	// Make sure we clean them all!
-	indices, _ := s.elasticClient.IndexNames()
-
-	_, err := s.elasticClient.DeleteByQuery().
-		Index(indices...).
-		Type(s.types()...).
+	_, err := s.elasticClient.DeleteByQuery("_all").
 		Query(q).
 		IgnoreUnavailable(true).
 		Refresh("true").
@@ -376,35 +371,9 @@ func (s *Suite) DeleteAllDocuments() {
 		Do(context.Background())
 
 	if err != nil {
-		fmt.Printf("Could not 'clean' ES documents from indices: '%v'\nError: %s", indices, err)
+		fmt.Printf("Could not 'clean' ES documents.\nError: %s", err)
 		os.Exit(3)
 	}
-}
-
-// types returns the list of ES types registered in the Ingest service code base
-func (s *Suite) types() []string {
-	types := make([]string, len(mappings.AllMappings))
-
-	for i, esMap := range mappings.AllMappings {
-		types[i] = esMap.Type
-	}
-
-	return types
-}
-
-// Indices returns the list of ES indices registered in the Ingest service code base
-func (s *Suite) Indices() []string {
-	indices := make([]string, len(mappings.AllMappings))
-
-	for i, esMap := range mappings.AllMappings {
-		if esMap.Timeseries {
-			indices[i] = esMap.IndexTimeseriesFmt(time.Now())
-		} else {
-			indices[i] = esMap.Index
-		}
-	}
-
-	return indices
 }
 
 type NotifierMock struct {

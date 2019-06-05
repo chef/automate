@@ -209,8 +209,8 @@ Roles you create are Custom roles.
 Chef-managed Role Name | ID| Actions
 -----------------------|-----|--------
 Owner       | owner       | `*`
-Viewer      | viewer      | `infra:*:get`, `infra:*:list`, `compliance:*:get`, `compliance:*:list`, `system:*:get`, `system:*:list`, `event:*:get`, `event:*:list`, `ingest:*:get`, `ingest:*:list`
-Editor      | editor      | `infra:*`, `compliance:*`, `system:*`, `event:*`, `ingest:*`, `secrets:*`, `telemetry:*`
+Viewer      | viewer      | `infra:*:get`, `infra:*:list`, `compliance:*:get`, `compliance:*:list`, `system:*:get`, `system:*:list`, `event:*:get`, `event:*:list`, `ingest:*:get`, `ingest:*:list`, `applications:*:list`, `applications:*:get`
+Editor      | editor      | `infra:*`, `compliance:*`, `system:*`, `event:*`, `ingest:*`, `secrets:*`, `telemetry:*`, `applications:*`
 Ingest      | ingest      | `infra:ingest:*`, `compliance:profiles:get`, `compliance:profiles:list`
 
 ### Listing Roles

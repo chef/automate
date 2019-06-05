@@ -93,6 +93,27 @@ func (s *Server) ListRules(ctx context.Context, req *pb_req.ListRulesReq) (*pb_r
 	}, nil
 }
 
+func (s *Server) ListRulesForProject(ctx context.Context, req *pb_req.ListRulesForProjectReq) (*pb_resp.ListRulesForProjectResp, error) {
+	resp, err := s.projects.ListRulesForProject(ctx, &authz.ListRulesForProjectReq{Id: req.Id})
+	if err != nil {
+		return nil, err
+	}
+
+	rules := make([]*pb_common.Rule, len(resp.Rules))
+	for i, rule := range resp.Rules {
+		apiRule, err := fromInternal(rule)
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+
+		rules[i] = apiRule
+	}
+
+	return &pb_resp.ListRulesForProjectResp{
+		Rules: rules,
+	}, nil
+}
+
 func (s *Server) DeleteRule(ctx context.Context, req *pb_req.DeleteRuleReq) (*pb_resp.DeleteRuleResp, error) {
 	_, err := s.projects.DeleteRule(ctx, &authz.DeleteRuleReq{Id: req.Id})
 	if err != nil {

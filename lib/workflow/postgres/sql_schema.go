@@ -257,13 +257,13 @@ AS $$
         VALUES(workflow_instance_id, try_remaining, start_after, task_name, parameters);
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION dequeue_task(task_name TEXT)
+CREATE OR REPLACE FUNCTION dequeue_task(_task_name TEXT)
 RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, parameters BYTEA)
 AS $$
     UPDATE tasks t1 SET try_remaining = try_remaining - 1, updated_at = NOW()
     WHERE t1.id = (
         SELECT t2.id FROM tasks t2
-        WHERE t2.task_name = task_name AND t2.try_remaining > 0 AND start_after < NOW()
+        WHERE t2.task_name = _task_name AND t2.try_remaining > 0 AND start_after < NOW()
         ORDER BY t2.enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
     ) RETURNING t1.id, t1.workflow_instance_id, t1.parameters
 $$ LANGUAGE SQL;

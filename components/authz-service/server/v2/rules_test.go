@@ -569,6 +569,105 @@ func TestListRules(t *testing.T) {
 	}
 }
 
+func TestListRulesForProject(t *testing.T) {
+	ctx := context.Background()
+	cl, store, _, _ := setupRules(t)
+
+	storageConditions1 := []storage.Condition{
+		{
+			Type:      storage.Node,
+			Attribute: storage.Organization,
+			Operator:  storage.MemberOf,
+			Value:     []string{"opscode", "chef"},
+		},
+	}
+	apiConditions2 := []*api.Condition{
+		{
+			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values:   []string{"chef"},
+			Operator: api.ProjectRuleConditionOperators_EQUALS,
+		},
+	}
+	storageConditions2 := []storage.Condition{
+		{
+			Type:      storage.Event,
+			Attribute: storage.Organization,
+			Operator:  storage.Equals,
+			Value:     []string{"chef"},
+		},
+	}
+	apiConditions3 := []*api.Condition{
+		{
+			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Values:   []string{"other", "org"},
+			Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+		},
+	}
+	storageConditions3 := []storage.Condition{
+		{
+			Type:      storage.Event,
+			Attribute: storage.Organization,
+			Operator:  storage.MemberOf,
+			Value:     []string{"other", "org"},
+		},
+	}
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"if project does not exist, returns empty list", func(t *testing.T) {
+			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: "wrong"})
+			require.NoError(t, err)
+			assert.Equal(t, &api.ListRulesForProjectResp{}, resp)
+		}},
+		{"if project does not have rules, returns empty list", func(t *testing.T) {
+			projectID := "test-project"
+			addProjectToStore(t, store, projectID, "my bar", storage.Custom)
+			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID})
+			require.NoError(t, err)
+			assert.Equal(t, &api.ListRulesForProjectResp{}, resp)
+		}},
+		{"if multiple rules exist, returns rules for specific project", func(t *testing.T) {
+			id1, id2, id3 := "rule-number-1", "rule-number-2", "rule-number-3"
+			projectID1 := "foo-project"
+			projectID2 := "foo-project-2"
+			name := "you don't talk about fight club"
+			addRuleToStore(t, store, id1, name, storage.Node, projectID1, storageConditions1)
+			addRuleToStore(t, store, id2, name, storage.Event, projectID2, storageConditions2)
+			addRuleToStore(t, store, id3, name, storage.Event, projectID2, storageConditions3)
+			expected2 := api.ProjectRule{
+				Id:         id2,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_EVENT,
+				ProjectId:  projectID2,
+				Conditions: apiConditions2,
+			}
+			expected3 := api.ProjectRule{
+				Id:         id3,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_EVENT,
+				ProjectId:  projectID2,
+				Conditions: apiConditions3,
+			}
+			expected := []*api.ProjectRule{&expected2, &expected3}
+
+			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID2})
+			require.NoError(t, err)
+			assert.ElementsMatch(t, expected, resp.Rules)
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		store.Flush()
+	}
+}
+
 func TestDeleteRule(t *testing.T) {
 	ctx := context.Background()
 	cl, store, _, _ := setupRules(t)

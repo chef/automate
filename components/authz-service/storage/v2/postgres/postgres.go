@@ -1161,6 +1161,50 @@ func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
 	return rules, nil
 }
 
+func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.Rule, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	projectsFilter, err := projectsListFromContext(ctx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	var rules []*v2.Rule
+	rows, err := p.db.QueryContext(ctx, `SELECT query_rules_for_project from query_rules_for_project($1, $2);`,
+		projectID, pq.Array(projectsFilter))
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	defer func() {
+		if err := rows.Close(); err != nil {
+			p.logger.Warnf("failed to close db rows: %s", err.Error())
+		}
+	}()
+
+	for rows.Next() {
+		var rule v2.Rule
+		err = rows.Scan(&rule)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+		rules = append(rules, &rule)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
+	}
+
+	return rules, nil
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * *   PROJECTS  * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

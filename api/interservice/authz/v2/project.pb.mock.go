@@ -44,6 +44,7 @@ type ProjectsServerMock struct {
 	UpdateRuleFunc          func(context.Context, *UpdateRuleReq) (*UpdateRuleResp, error)
 	GetRuleFunc             func(context.Context, *GetRuleReq) (*GetRuleResp, error)
 	ListRulesFunc           func(context.Context, *ListRulesReq) (*ListRulesResp, error)
+	ListRulesForProjectFunc func(context.Context, *ListRulesForProjectReq) (*ListRulesForProjectResp, error)
 	DeleteRuleFunc          func(context.Context, *DeleteRuleReq) (*DeleteRuleResp, error)
 }
 
@@ -215,6 +216,18 @@ func (m *ProjectsServerMock) ListRules(ctx context.Context, req *ListRulesReq) (
 	return nil, status.Error(codes.Internal, "mock: 'ListRules' not implemented")
 }
 
+func (m *ProjectsServerMock) ListRulesForProject(ctx context.Context, req *ListRulesForProjectReq) (*ListRulesForProjectResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.ListRulesForProjectFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'ListRulesForProject' not implemented")
+}
+
 func (m *ProjectsServerMock) DeleteRule(ctx context.Context, req *DeleteRuleReq) (*DeleteRuleResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
@@ -243,5 +256,6 @@ func (m *ProjectsServerMock) Reset() {
 	m.UpdateRuleFunc = nil
 	m.GetRuleFunc = nil
 	m.ListRulesFunc = nil
+	m.ListRulesForProjectFunc = nil
 	m.DeleteRuleFunc = nil
 }

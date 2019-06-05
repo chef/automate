@@ -24,7 +24,7 @@ export class ComplianceLandingComponent {
     },
     {
       allOfCheck: [['/compliance/profiles/search', 'post', '']],
-      route: '/compliance/profiles'
+      route: '/compliance/compliance-profiles'
     }
   ];
 

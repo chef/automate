@@ -296,6 +296,21 @@ func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
 	return rules, nil
 }
 
+func (s *State) ListRulesForProject(_ context.Context, projectID string) ([]*storage.Rule, error) {
+	items := s.rules.Items()
+	rules := []*storage.Rule{}
+
+	for _, item := range items {
+		if rule, ok := item.Object.(*storage.Rule); ok {
+			if rule.ProjectID == projectID {
+				rules = append(rules, rule)
+			}
+		}
+	}
+
+	return rules, nil
+}
+
 func (s *State) DeleteRule(ctx context.Context, id string) error {
 	_, err := s.GetRule(ctx, id)
 
