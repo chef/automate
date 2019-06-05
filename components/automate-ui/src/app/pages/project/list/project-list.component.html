@@ -22,6 +22,7 @@
               <span *ngIf="!projectsUpdating">Update Projects</span>
               <span *ngIf="projectsUpdating">Updating Projects 20%...</span>
             </chef-button>
+            <chef-button *ngIf="projectsUpdating" tertiary (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
           </app-authorized>
         </chef-toolbar>
         <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
@@ -103,6 +104,20 @@
             Update Projects
           </chef-button>
           <chef-button tertiary (click)="closeConfirmUpdateStartModal()">Cancel</chef-button>
+        </div>
+      </div>
+    </chef-modal>
+
+    <chef-modal id="confirm-update-stop-modal" [visible]="confirmUpdateStopModalVisible" (close)="closeConfirmUpdateStopModal()">
+      <h2 slot="title">Stop Updating Projects?</h2>
+      <div class="modal-content">
+        <chef-progress-bar value="20" prefix-text="20% complete" suffix-text="00:00:00 until finished"></chef-progress-bar>
+        <p>Stopping the project update early <strong>cannot be undone</strong> and will leave some ingested resources in the wrong projects.</p>
+        <div class="options">
+          <chef-button primary caution (click)="confirmUpdateStop()">
+            Stop Updating Projects
+          </chef-button>
+          <chef-button tertiary (click)="closeConfirmUpdateStopModal()">Cancel</chef-button>
         </div>
       </div>
     </chef-modal>

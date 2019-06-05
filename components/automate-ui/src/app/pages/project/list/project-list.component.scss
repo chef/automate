@@ -22,7 +22,8 @@ chef-table {
   }
 }
 
-#confirm-update-start-modal {
+#confirm-update-start-modal,
+#confirm-update-stop-modal {
   text-align: center;
 
   [slot=title] {

@@ -35,6 +35,7 @@ export class ProjectListComponent implements OnInit {
   public conflictErrorEvent = new EventEmitter<boolean>();
   public MAX_PROJECTS = 6;
   public confirmUpdateStartModalVisible = false;
+  public confirmUpdateStopModalVisible = false;
   public projectsUpdating = false;
 
   constructor(
@@ -151,5 +152,18 @@ export class ProjectListComponent implements OnInit {
   confirmUpdateStart() {
     this.confirmUpdateStartModalVisible = false;
     this.projectsUpdating = true;
+  }
+
+  openConfirmUpdateStopModal() {
+    this.confirmUpdateStopModalVisible = true;
+  }
+
+  closeConfirmUpdateStopModal() {
+    this.confirmUpdateStopModalVisible = false;
+  }
+
+  confirmUpdateStop() {
+    this.confirmUpdateStopModalVisible = false;
+    this.projectsUpdating = false;
   }
 }
