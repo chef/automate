@@ -1,0 +1,52 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+<div class="prose">
+  {{ range .Site.Data.docs.api_chef_automate.endpoints_yaml }}
+    {{ $id := replace .info.title " " "-" }}
+    <h2 id="{{ $id }}">{{ .info.title }}</h2>
+    <p id="{{ $id }}" >{{ .version }}</p>
+
+    <h3 id="{{ $id }}-schemes">Schemes</h3>
+    <ul>{{ .schemes }}</ul>
+
+    <h3 id="{{ $id }}-consumes">Consumes</h3>
+    <ul>{{ .consumes }}</ul>
+
+    <h3 id="{{ $id }}-produces">Produces</h3>
+    <ul>{{ .produces }}</ul>
+
+    <h3 id="{{ $id }}-methods">Methods</h2>
+      {{ $method := .paths }}
+        {{ range $method }}
+          {{ range $m_index, $m_val := . }}
+          <p>{{ $m_index }}</h2>
+            <h4 id="{{ $id }}-operationId">operationId</h3>
+            <p>{{ .operationId }}</p>
+
+            <h4 id="{{ $id }}-responses">responses</h3>
+              {{ $response := .responses }}
+               {{ range $r_index, $r_val := $response }}
+               {{ if (reflect.IsMap $r_val) }}
+                 {{ $val := $r_val}}
+                  {{ range $index_r, $val_r := . }}
+                    <p>{{ $index_r }} : {{ $val_r }} </p>
+                  {{ else }}
+                    {{ $r_index }} : {{ $r_val }}
+                  {{ end }}
+                {{ end }}
+              
+            <h4 id="{{ $id }}-parameters">parameters</h3>
+              
+            <h3 id="{{ $id }}-tags">tags</h3>
+            <p>{{ .tags }}</p>
+            <h3 id="{{ $id }}-tags">tags</h3>
+            <p>{{ .tags }}</p>
+        {{ end }}
+      {{ end }}
+
+    <h3 id="{{ $id }}-definitions">Definitions</h3>
+    <ul>{{ .schemes }}</ul>
+    {{ end }}
+  {{ end }}
+  </div>
+{{ end }}

@@ -1,13 +1,73 @@
 {{ define "main" }}
 <h1>{{ .Title }}</h1>
-  <div class="prose">
+<div class="prose">
   {{ range .Site.Data.docs.api_chef_automate.endpoints }}
-  {{ $id := replace .title " " "-" }}
-  {{ $map := .paths}}
-  {{ range $elem_index, $elem_val := $map }}
-    <h2>{{ $elem_index }}</h2>
-      <p>{{ $elem_val }}</p>
+    {{ $id := replace .info.title " " "-" }}
+    <h2 id="{{ $id }}">{{ .info.title }}</h2>
+    <p id="{{ $id }}" >{{ .info.version }}</p>
+
+    <h3 id="{{ $id }}-schemes">Schemes</h3>
+      {{ range $scheme_val := .schemes }}
+        <p id={{ $id }}-scheme-val>{{ $scheme_val }}</p>
+      {{ end }}
+
+    <h3 id="{{ $id }}-consumes">Consumes</h3>
+      {{ range $consumes_val := .consumes }}
+        <p id={{ $id }}-consumes-val>{{ $consumes_val }}</p>
+      {{ end }}
+
+    <h3 id="{{ $id }}-produces">Produces</h3>
+      {{ range $produces_val := .produces }}
+        <p id={{ $id }}-produces-val>{{ $produces_val }}</p>
+      {{ end }}
+
+    <h3 id="{{ $id }}-methods">Methods</h2>
+      {{ $method := .paths }}
+        {{ range $method }}
+          {{ range $m_index, $m_val := . }}
+          <p>{{ $m_index }}</h2>
+            <h4 id="{{ $id }}-operationId">operationId</h3>
+            <p>{{ .operationId }}</p>
+
+            <h4 id="{{ $id }}-responses">responses</h3>
+              {{ $responses := .responses }}
+
+              {{ range $responses_index, $responses_value := .responses }}
+                <p id="{{ $id }}-responses-val"> {{ $responses_index }} : {{ .responses_val }}</p>
+                {{ range $r_index, $r_val := $responses }}
+                
+                {{ if reflect.IsMap $r_val }}
+                  {{ range $ref_index, $ref_value := $r_val }}
+                    <p id="{{ $id }}-ref-val">{{ $ref_index }} : {{ $ref_value }}</p>
+
+                    {{ if reflect.IsMap $ref_value }}
+                      {{ range $third_index, $third_val := $ref_value }}
+                      <p id="{{ $id }}-third-val">{{ $third_index }} : {{ $third_val }}</p>
+
+                      {{ else }}
+                        <p id="{{ $id }}-r-val">{{ $r_index }} : {{ $r_val }}</p>
+                      {{ end }}
+                    {{ end }}
+                 {{ end }}
+              {{ end }}
+              
+            <h4 id="{{ $id }}-parameters">parameters</h3>
+              {{ range $parameters_val := .parameters }}
+                <p id={{ $id }}-parameters-val>{{ .parameters_val }}</p>
+              {{ end }}            
+            
+            <h4 id="{{ $id }}-tags">tags</h4>
+              {{ range $tags_index, $tags_val := .tags }}
+                <p id={{ $id }}-tags-val>{{ .tags_index }} : {{ .tags_val }}</p>
+              {{ end }}
+
+        {{ end }}
+      {{ end }}
+
+    <h3 id="{{ $id }}-definitions">Definitions</h3>
+    <ul>{{ .schemes }}</ul>
     {{ end }}
   {{ end }}
-</div>
+  {{ end }}
+  </div>
 {{ end }}
