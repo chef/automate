@@ -127,7 +127,7 @@
             <chef-tr *ngFor="let profile of filteredProfiles">
               <chef-td>
                 <a
-                  [routerLink]="['/compliance/profile/profile-details']"
+                  [routerLink]="['/compliance/compliance-profiles/profile-details']"
                   [queryParams]="{name: profile.name, version: profile.version, owner: user}">
                   {{ profile.title }}
                 </a>
@@ -166,7 +166,7 @@
             <chef-tr *ngFor="let profile of profileUpdatesAvailable">
               <chef-td>
                 <a
-                  [routerLink]="['/compliance/profile/profile-details']"
+                  [routerLink]="['/compliance/compliance-profiles/profile-details']"
                   [queryParams]="{name: profile.name, version: profile.version}">
                   {{ profile.title }}
                 </a>
@@ -196,7 +196,7 @@
             <chef-tr *ngFor="let profile of filteredAvailableProfiles">
               <chef-td>
                 <a
-                  [routerLink]="['/compliance/profile/profile-details']"
+                  [routerLink]="['/compliance/compliance-profiles/profile-details']"
                   [queryParams]="{name: profile.name, version: profile.version}">
                   {{ profile.title }}
                 </a>
