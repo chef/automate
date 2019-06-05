@@ -1382,12 +1382,29 @@ func (p *pg) Pristine(ctx context.Context) error {
 	return p.recordMigrationStatus(ctx, enumPristine)
 }
 
+func (p *pg) recordMigrationStatusAndNotifyPG(ctx context.Context, ms string) error {
+	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
+	if err != nil {
+		return p.processError(err)
+	}
+	if err := p.recordMigrationStatusWithQuerier(ctx, ms, tx); err != nil {
+		return p.processError(err)
+	}
+	if err := p.notifyPolicyChange(ctx, tx); err != nil {
+		return p.processError(err)
+	}
+	if err := tx.Commit(); err != nil {
+		return storage_errors.NewErrTxCommit(err)
+	}
+	return nil
+}
+
 func (p *pg) Success(ctx context.Context) error {
-	return p.recordMigrationStatus(ctx, enumSuccessful)
+	return p.recordMigrationStatusAndNotifyPG(ctx, enumSuccessful)
 }
 
 func (p *pg) SuccessBeta1(ctx context.Context) error {
-	return p.recordMigrationStatus(ctx, enumSuccessfulBeta1)
+	return p.recordMigrationStatusAndNotifyPG(ctx, enumSuccessfulBeta1)
 }
 
 func (p *pg) InProgress(ctx context.Context) error {
@@ -1429,7 +1446,11 @@ const (
 )
 
 func (p *pg) recordMigrationStatus(ctx context.Context, ms string) error {
-	_, err := p.db.ExecContext(ctx, `UPDATE migration_status SET state=$1`, ms)
+	return p.recordMigrationStatusWithQuerier(ctx, ms, p.db)
+}
+
+func (p *pg) recordMigrationStatusWithQuerier(ctx context.Context, ms string, q Querier) error {
+	_, err := q.ExecContext(ctx, `UPDATE migration_status SET state=$1`, ms)
 	return err
 }
 

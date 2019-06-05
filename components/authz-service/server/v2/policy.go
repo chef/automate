@@ -31,7 +31,6 @@ type policyServer struct {
 	engine          engine.V2pXWriter
 	v1              storage_v1.PoliciesLister
 	vChan           chan api.Version
-	version         api.Version
 	policyRefresher PolicyRefresher
 }
 
@@ -710,7 +709,7 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 }
 
 func (s *policyServer) updateEngineStore(ctx context.Context) error {
-	return s.policyRefresher.Refresh(ctx, s.version)
+	return s.policyRefresher.Refresh(ctx)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -893,9 +892,10 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 	s.log.WithFields(kv).Info("Policy definition")
 }
 
-func (s *policyServer) setVersion(v api.Version) {
+// setVersionForInterceptorSwitch informs the interceptor piece of this server
+// to deny v1 requests if set to v2/v2.1 and vice-versa.
+func (s *policyServer) setVersionForInterceptorSwitch(v api.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
-		s.version = v
 	}
 }
