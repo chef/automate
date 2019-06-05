@@ -1,0 +1,33 @@
+chef-progress-bar {
+  display: block;
+  margin: 1em 0;
+
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .progress-bars {
+    position: relative;
+    height: 6px;
+
+    .bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 100%;
+      border-radius: var(--chef-border-radius);
+
+      &.value {
+        background: #9CB2F9;
+      }
+
+      &.total {
+        background: #DEE5FD;
+        width: 100%;
+      }
+    }
+  }
+}
