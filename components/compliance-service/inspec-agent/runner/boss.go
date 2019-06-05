@@ -3,7 +3,6 @@ package runner
 import (
 	"context"
 	"sync"
-	"time"
 
 	"strings"
 
@@ -150,71 +149,4 @@ func updateComplianceURLs(urls []string) ([]string, string) {
 		}
 	}
 	return newProfiles, owner
-}
-
-func (s *jobStatusStore) CheckJobStatus(scannerServer *scanner.Scanner) {
-	jobStatusMap.Range(func(jobId interface{}, jobNodeStatusMap interface{}) bool {
-		logrus.Debugf("checking jobId %s", jobId)
-		finished, jobStatus := isJobFinished(jobNodeStatusMap.(map[string]*string))
-		if finished {
-			cleanupMaps(jobId.(string))
-			scannerServer.UpdateJobStatus(jobId.(string), jobStatus, nil, timeNowRef())
-		} else if jobStatus == types.StatusRunning {
-			// to prevent unnecessary db calls, ensure that the job has not already
-			// been marked as running by checking for the jobId in the jobRunningMap
-			running := jobRunningMap.Get(jobId.(string))
-			if !running {
-				jobRunningMap.Set(jobId.(string), true)
-				scannerServer.UpdateJobStatus(jobId.(string), jobStatus, timeNowRef(), nil)
-			}
-		}
-		return true
-	})
-}
-
-func watchJobsNodesStatus(scannerServer *scanner.Scanner) {
-	for {
-		jobStatusMap.CheckJobStatus(scannerServer)
-		time.Sleep(time.Duration(5) * time.Second)
-	}
-}
-
-func isJobFinished(jobNodeStatusMap map[string]*string) (bool, string) {
-	var scheduled, failure, completed, aborted bool
-
-	//gather the state for each node.
-	for _, status := range jobNodeStatusMap {
-		switch *status {
-		case types.StatusRunning:
-			return false, types.StatusRunning // If any nodes are still running, then the job is Running. That simple.
-		case types.StatusScheduled:
-			scheduled = true
-		case types.StatusFailed:
-			failure = true
-		case types.StatusAborted:
-			aborted = true
-		case types.StatusCompleted:
-			completed = true
-		}
-	}
-
-	if scheduled {
-		if failure || aborted || completed {
-			return false, types.StatusRunning
-		} else {
-			return false, types.StatusScheduled
-		}
-	} else if failure {
-		return true, types.StatusFailed
-	} else if aborted {
-		return true, types.StatusAborted
-	}
-
-	//if not running, scheduled, failed or aborted.. we must be complete!
-	return true, types.StatusCompleted
-}
-
-func cleanupMaps(jobId string) {
-	jobStatusMap.Remove(jobId)
-	jobRunningMap.Remove(jobId)
 }
