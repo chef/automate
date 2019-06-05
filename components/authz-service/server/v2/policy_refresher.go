@@ -185,8 +185,20 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context, vsn api
 	default: // v2.0 OR v1.0
 		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap, ruleMap)
 	}
-	// Note 2019/06/04 (sr): v1?! Yes, IAM v1. Our POC code depends on this query to be
-	// answered regardless of whether IAM is v1, v2 or v2.1.
+	// Note 2019/06/04 (sr): v1?! Yes, IAM v1. Our POC code depends on this query
+	// to be answered regardless of whether IAM is v1, v2 or v2.1.
+	//
+	// Note 2019/06/05 (sr): this doesn't yet support upgrading from v2 to v2.1 in
+	// a multi-node scenario -- since this would happen with nodes A and B:
+	//
+	// A: receive an upgrade-to-v2 --beta2.1 request, migrate stuff in the
+	//    database, set the internal state's version field to v2.1, update the v2.1
+	//    store
+	// B: receives an update-store-notification, has the internal state still set
+	//    to v2, will update the v2 store -- not v2.1
+	//
+	// A potential solution is to include the version in the notification bounced
+	// through the database. I'll look into that in a follow-up PR.
 }
 
 func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]interface{}, error) {
