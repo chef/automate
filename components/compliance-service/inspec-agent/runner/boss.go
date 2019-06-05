@@ -42,7 +42,7 @@ type Runner struct {
 func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB,
 	ingestClient ingest.ComplianceIngesterClient, remoteInspecVersion string, workflowManager *workflow.WorkflowManager) *Runner {
 	scannerServer := scanner.New(managerClient, nodesClient, db)
-	go watchJobsNodesStatus(scannerServer)
+	//go watchJobsNodesStatus(scannerServer)
 	return &Runner{managerClient, nodesClient, db, scannerServer, ingestClient, remoteInspecVersion, workflowManager}
 }
 

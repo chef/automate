@@ -30,14 +30,22 @@ func InitWorkflowManager(w *workflow.WorkflowManager, workerCount int, ingestCli
 		ingestClient,
 		scannerServer,
 	}, workflow.TaskExecutorOpts{Workers: workerCount})
+
+	w.RegisterTaskExecutor("scan-job-summary", &InspecJobSummaryTask{
+		ingestClient,
+		scannerServer,
+	}, workflow.TaskExecutorOpts{Workers: 1})
 }
 
 type ScanJobWorkflow struct{}
+type ScanJobWorkflowPayload struct {
+	OutstandingJobs int
+	ParentJobID     string
+	ParentJobStatus string
+}
 
 func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 	ev workflow.StartEvent) workflow.Decision {
-
-	logrus.Info("ScanJobWorkflow got OnStart")
 
 	jobs := []*types.InspecJob{}
 	err := w.GetParameters(&jobs)
@@ -52,26 +60,57 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 	}
 
 	initialVal := len(jobs)
-	return w.Continue(&initialVal)
+	return w.Continue(&ScanJobWorkflowPayload{
+		initialVal,
+		jobs[0].ParentJobID,
+		types.StatusRunning,
+	})
 }
 
 func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 	ev workflow.TaskCompleteEvent) workflow.Decision {
 
-	logrus.Debugf("ScanJobWorkflow got OnTaskComplete")
+	var payload ScanJobWorkflowPayload
 
-	var mycount int
-
-	if err := w.GetPayload(&mycount); err != nil {
+	if err := w.GetPayload(&payload); err != nil {
 		logrus.WithError(err).Fatal("Could not decode payload")
 	}
 
-	outstandingJobs := mycount - 1
-	if outstandingJobs > 0 {
-		return w.Continue(&outstandingJobs)
+	switch ev.TaskName {
+	case "scan-job":
+		payload.OutstandingJobs--
+		logrus.Debugf("ScanJobWorkflow got OnTaskComplete with outstandingJobs: %d", payload.OutstandingJobs)
+
+		var childJobStatus string
+		if err := ev.Result.Get(&childJobStatus); err != nil {
+			logrus.WithError(err).Error("Could not decode childJobStatus")
+		}
+
+		if childJobStatus == types.StatusFailed {
+			payload.ParentJobStatus = types.StatusFailed
+		}
+		switch childJobStatus {
+		case types.StatusFailed:
+			payload.ParentJobStatus = types.StatusFailed
+		case types.StatusAborted:
+			if payload.ParentJobStatus != types.StatusFailed {
+				payload.ParentJobStatus = types.StatusAborted
+			}
+		}
+
+		if payload.OutstandingJobs > 0 {
+			return w.Continue(&payload)
+		} else {
+			w.EnqueueTask("scan-job-summary", payload)
+			return w.Continue(&payload)
+		}
+	case "scan-job-summary":
+		// We only want to complete after processing the summary task
+		// This task is designed to conclude the overall status of a job that is resolved in child jobs
+		return w.Complete()
 	}
 
-	return w.Complete()
+	return w.Continue(&payload)
 }
 
 func (s *ScanJobWorkflow) OnCancel(w workflow.WorkflowInstance, ev workflow.CancelEvent) workflow.Decision {
@@ -80,6 +119,11 @@ func (s *ScanJobWorkflow) OnCancel(w workflow.WorkflowInstance, ev workflow.Canc
 }
 
 type InspecJobTask struct {
+	ingestClient  ingest.ComplianceIngesterClient
+	scannerServer *scanner.Scanner
+}
+
+type InspecJobSummaryTask struct {
 	ingestClient  ingest.ComplianceIngesterClient
 	scannerServer *scanner.Scanner
 }
@@ -119,6 +163,7 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	}
 
 	job.StartTime = timeNowRef()
+	logrus.Debugf("!!!!!!!! job=%+v", job)
 	*job.NodeStatus = types.StatusRunning
 
 	currentJobSummary := job.JobType + " " + job.TargetConfig.Backend + " " + job.TargetConfig.Hostname
@@ -218,16 +263,24 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	return types.StatusCompleted, nil
 }
 
+func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+	var jobsPayload ScanJobWorkflowPayload
+
+	if err := task.GetParameters(&jobsPayload); err != nil {
+		logrus.WithError(err).Error("could not unmarshal summary job parameters")
+		return nil, err
+	}
+
+	logrus.Debugf("Updating parent job %s with overall status of %s", jobsPayload.ParentJobID, jobsPayload.ParentJobStatus)
+
+	t.scannerServer.UpdateJobStatus(jobsPayload.ParentJobID, jobsPayload.ParentJobStatus, nil, timeNowRef())
+
+	return nil, nil
+}
+
 func timeNowRef() *time.Time {
 	tn := time.Now().UTC().Round(time.Second)
 	return &tn
-}
-
-func workerDone(worker *types.WorkerStats) {
-	worker.CompletedJobs++
-	worker.PreviousJob = worker.CurrentJob
-	worker.CurrentJob = ""
-	worker.CurrentJobSummary = ""
 }
 
 func nodeHasSecrets(tc *inspec.TargetConfig) bool {

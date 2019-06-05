@@ -583,6 +583,12 @@ func (r *Resolver) resolveDynamicJob(ctx context.Context, job *jobs.Job) ([]*typ
 		}
 		jobs = append(jobs, agentJobs...)
 	}
+
+	// Keeping the child - parent job reference alive in the resolved jobs array
+	for _, j := range jobs {
+		j.ParentJobID = job.Id
+	}
+
 	return jobs, nil
 }
 
