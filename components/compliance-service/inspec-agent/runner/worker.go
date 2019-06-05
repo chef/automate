@@ -8,28 +8,83 @@ import (
 	"encoding/json"
 
 	uuid "github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"io/ioutil"
 
 	"fmt"
 
+	"github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
+	"github.com/chef/automate/components/compliance-service/scanner"
+	"github.com/chef/automate/lib/workflow"
 )
 
-// returns false is job is not valid (no worker, no job, or job marked for deletion)
-func (r *Runner) validateJob(worker *types.WorkerStats, job *types.InspecJob) bool {
+func InitWorkflowManager(w *workflow.WorkflowManager, workerCount int, ingestClient ingest.ComplianceIngesterClient,
+	scannerServer *scanner.Scanner) {
+	w.RegisterWorkflowExecutor("scan-job-workflow", &ScanJobWorkflow{})
+	w.RegisterTaskExecutor("scan-job", &InspecJobTask{
+		ingestClient,
+		scannerServer,
+	}, workflow.TaskExecutorOpts{Workers: workerCount})
+}
+
+type ScanJobWorkflow struct{}
+
+func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
+	ev workflow.StartEvent) workflow.Decision {
+
+	logrus.Info("ScanJobWorkflow got OnStart")
+
+	jobs := []*types.InspecJob{}
+	err := w.GetParameters(&jobs)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to unmarshal jobs!")
+		return w.Complete()
+	}
+
+	for j := range jobs {
+		w.EnqueueTask("scan-job", j)
+	}
+
+	initialVal := len(jobs)
+	return w.Continue(&initialVal)
+}
+
+func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
+	ev workflow.TaskCompleteEvent) workflow.Decision {
+	var mycount int
+
+	if err := w.GetPayload(&mycount); err != nil {
+		logrus.WithError(err).Fatal("Could not decode payload")
+	}
+
+	outstandingJobs := mycount - 1
+	if outstandingJobs > 0 {
+		return w.Continue(&outstandingJobs)
+	}
+
+	return w.Complete()
+}
+
+func (s *ScanJobWorkflow) OnCancel(w workflow.WorkflowInstance, ev workflow.CancelEvent) workflow.Decision {
+	return w.Complete()
+}
+
+type InspecJobTask struct {
+	ingestClient  ingest.ComplianceIngesterClient
+	scannerServer *scanner.Scanner
+}
+
+func (t *InspecJobTask) validateJob(job *types.InspecJob) bool {
 	if job == nil {
 		logrus.Error("jobs.work: job cannot be nil, skipping")
 		return false
 	}
-	if worker == nil {
-		logrus.Error("jobs.work: worker cannot be nil, skipping")
-		return false
-	}
-	deleted, err := r.scannerServer.IsJobDeleted(job.JobID)
+	deleted, err := t.scannerServer.IsJobDeleted(job.JobID)
 	if err != nil {
 		// keep on going if we err here.  no reason to block on validating job existence
 		logrus.Errorf("inspec agent worker unable to validate job existence: %+v", err)
@@ -41,129 +96,120 @@ func (r *Runner) validateJob(worker *types.WorkerStats, job *types.InspecJob) bo
 	return true
 }
 
-// blocking function that processes inspec job events coming through the channel
-// normally called via go routines
-func (r *Runner) work(worker *types.WorkerStats, jobs <-chan *types.InspecJob) {
-	ctx := context.Background()
+func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+	var job types.InspecJob
+	if err := task.GetParameters(&job); err != nil {
+		logrus.WithError(err).Error("could not unmarshal job parameters")
+		return nil, err
+	}
 
-	for {
-		// blocking wait for jobs to be processed
-		job := <-jobs
-		logrus.Debugf("runner.work: worker %d picked up job %s for node %s", worker.ID, job.JobID, job.NodeID)
+	logrus.Debugf("working on job %s for node %s", job.JobID, job.NodeID)
 
-		if !r.validateJob(worker, job) {
-			*job.NodeStatus = types.StatusAborted
-			continue
-		}
-		if job.Retries > 0 && job.RetriesLeft == 0 {
-			job.RetriesLeft = job.Retries
-		}
+	if !t.validateJob(&job) {
+		return types.StatusAborted, nil
+	}
 
-		job.StartTime = timeNowRef()
-		*job.NodeStatus = types.StatusRunning
+	if job.Retries > 0 && job.RetriesLeft == 0 {
+		job.RetriesLeft = job.Retries
+	}
 
-		worker.CurrentJob = job.JobID
-		worker.CurrentJobSummary = job.JobType + " " + job.TargetConfig.Backend + " " + job.TargetConfig.Hostname
-		logrus.Debugf("Worker %d started job %s(%s) for node %s", worker.ID, job.JobID, worker.CurrentJobSummary, job.NodeID)
+	job.StartTime = timeNowRef()
 
-		if job.JobType != types.JobTypeDetect && job.JobType != types.JobTypeExec {
-			*job.NodeStatus = types.StatusFailed
-			logrus.Errorf("Invalid job type %s", job.JobType)
-			continue
-		}
+	currentJobSummary := job.JobType + " " + job.TargetConfig.Backend + " " + job.TargetConfig.Hostname
 
-		var inspecErr *inspec.Error
-		var execInfo []byte
-		var detectInfo *inspec.OSInfo
-		var reportID string
-		// retrying for certain error types
-		job.RetriesLeft++ // adding the implicit try
-		for job.RetriesLeft > 0 && *job.NodeStatus == types.StatusRunning {
-			if job.SSM {
-				switch job.JobType {
-				case types.JobTypeDetect:
-					// ssm ping is online, so we set node to reachable by setting node status to completed
-					// this is b/c we don't actually run an inspec detect, b/c ssm jobs need to report back to automate, and
-					// detect doesn't do this. so here we do nothing
-					*job.NodeStatus = types.StatusCompleted
-				case types.JobTypeExec:
-					// call out to do the ssm job
-					inspecErr = remote.RunSSMJob(ctx, job)
-				}
-			} else if nodeHasSecrets(&job.TargetConfig) {
-				switch job.JobType {
-				case types.JobTypeDetect:
-					detectInfo, inspecErr = doDetect(job)
-				case types.JobTypeExec:
-					execInfo, inspecErr = doExec(job)
-				}
-			} else {
-				*job.NodeStatus = types.StatusFailed
-				inspecErr = inspec.NewInspecError(inspec.NO_CREDS_PROVIDED, "insufficient information for ssh or winrm scan")
-			}
-			job.RetriesLeft--
-			if *job.NodeStatus == types.StatusRunning &&
-				(inspecErr.Type == inspec.CONN_TIMEOUT || inspecErr.Type == inspec.UNREACHABLE_HOST) &&
-				job.RetriesLeft > 0 {
-				logrus.Debugf("Worker %d retrying(%d) job %s(%s) for node %s",
-					worker.ID, job.RetriesLeft, job.JobID, worker.CurrentJobSummary, job.NodeID)
-			}
-		}
+	if job.JobType != types.JobTypeDetect && job.JobType != types.JobTypeExec {
+		return types.StatusFailed, errors.Errorf("Invalid job type %q", job.JobType)
+	}
 
-		cleanupKeys(job.TargetConfig.KeyFiles)
-		logrus.Debugf("Worker %d job %s completed", worker.ID, job.JobID)
-
-		if *job.NodeStatus == types.StatusRunning {
-			*job.NodeStatus = types.StatusFailed
-		}
-
-		job.EndTime = timeNowRef()
-
+	var inspecErr *inspec.Error
+	var execInfo []byte
+	var detectInfo *inspec.OSInfo
+	var reportID string
+	// retrying for certain error types
+	job.RetriesLeft++ // adding the implicit try
+	for job.RetriesLeft > 0 && *job.NodeStatus == types.StatusRunning {
 		if job.SSM {
 			switch job.JobType {
 			case types.JobTypeDetect:
-				// ssm ping is online, so we set node to reachable up above by setting node status to completed
-				// but we don't actually run an inspec detect, b/c ssm jobs need to report back to automate, and
-				// detect doesn't do this. so here we do nothing. we'll update the node further down.
-				detectInfo = &inspec.OSInfo{}
+				// ssm ping is online, so we set node to reachable by setting node status to completed
+				// this is b/c we don't actually run an inspec detect, b/c ssm jobs need to report back to automate, and
+				// detect doesn't do this. so here we do nothing
+				*job.NodeStatus = types.StatusCompleted
 			case types.JobTypeExec:
-				// ssm jobs report directly to automate, so we attached a report id to the
-				// reporter config when we assembled the script
-				r.scannerServer.UpdateResult(ctx, job, nil, inspecErr, job.Reporter.ReportUUID)
-			default:
-				logrus.Errorf("unknown job type: %+v", job.JobType)
-				continue
+				// call out to do the ssm job
+				inspecErr = remote.RunSSMJob(ctx, &job)
 			}
-		} else {
+		} else if nodeHasSecrets(&job.TargetConfig) {
 			switch job.JobType {
 			case types.JobTypeDetect:
-				detectInfoByte, err := json.Marshal(detectInfo)
+				detectInfo, inspecErr = doDetect(&job)
+			case types.JobTypeExec:
+				execInfo, inspecErr = doExec(&job)
+			}
+		} else {
+			*job.NodeStatus = types.StatusFailed
+			inspecErr = inspec.NewInspecError(inspec.NO_CREDS_PROVIDED, "insufficient information for ssh or winrm scan")
+		}
+		job.RetriesLeft--
+		if *job.NodeStatus == types.StatusRunning &&
+			(inspecErr.Type == inspec.CONN_TIMEOUT || inspecErr.Type == inspec.UNREACHABLE_HOST) &&
+			job.RetriesLeft > 0 {
+			logrus.Debugf("retrying(%d) job %s(%s) for node %s", job.RetriesLeft, job.JobID, currentJobSummary, job.NodeID)
+		}
+	}
+
+	cleanupKeys(job.TargetConfig.KeyFiles)
+	logrus.Debugf("job %s completed", job.JobID)
+
+	if *job.NodeStatus == types.StatusRunning {
+		*job.NodeStatus = types.StatusFailed
+	}
+
+	job.EndTime = timeNowRef()
+
+	if job.SSM {
+		switch job.JobType {
+		case types.JobTypeDetect:
+			// ssm ping is online, so we set node to reachable up above by setting node status to completed
+			// but we don't actually run an inspec detect, b/c ssm jobs need to report back to automate, and
+			// detect doesn't do this. so here we do nothing. we'll update the node further down.
+			detectInfo = &inspec.OSInfo{}
+		case types.JobTypeExec:
+			// ssm jobs report directly to automate, so we attached a report id to the
+			// reporter config when we assembled the script
+			t.scannerServer.UpdateResult(ctx, &job, nil, inspecErr, job.Reporter.ReportUUID)
+		default:
+			return types.StatusFailed, errors.Errorf("unknown job type: %s", job.JobType)
+		}
+	} else {
+		switch job.JobType {
+		case types.JobTypeDetect:
+			detectInfoByte, err := json.Marshal(detectInfo)
+			if err != nil {
+				logrus.Errorf("error trying to marshal detectInfo for job %s", job.JobID)
+				*job.NodeStatus = types.StatusFailed
+				inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
+			}
+			t.scannerServer.UpdateResult(ctx, &job, detectInfoByte, inspecErr, "")
+		case types.JobTypeExec:
+			if *job.NodeStatus == types.StatusCompleted {
+				reportID = uuid.Must(uuid.NewV4()).String()
+				err := t.reportIt(ctx, &job, execInfo, reportID)
 				if err != nil {
-					logrus.Errorf("error trying to marshal detectInfo for job %s", job.JobID)
+					logrus.Errorf("worker error: %s", err)
 					*job.NodeStatus = types.StatusFailed
 					inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 				}
-				r.scannerServer.UpdateResult(ctx, job, detectInfoByte, inspecErr, "")
-			case types.JobTypeExec:
-				if *job.NodeStatus == types.StatusCompleted {
-					reportID = uuid.Must(uuid.NewV4()).String()
-					err := r.reportIt(ctx, job, execInfo, reportID)
-					if err != nil {
-						logrus.Errorf("worker error: %s", err)
-						*job.NodeStatus = types.StatusFailed
-						inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
-					}
-				}
-				r.scannerServer.UpdateResult(ctx, job, nil, inspecErr, reportID)
-			default:
-				logrus.Errorf("unknown job type: %+v", job.JobType)
-				continue
 			}
+			t.scannerServer.UpdateResult(ctx, &job, nil, inspecErr, reportID)
+		default:
+			return types.StatusFailed, errors.Errorf("unknown job type: %+v", job.JobType)
+
 		}
-		r.scannerServer.UpdateNode(ctx, job, detectInfo)
-		workerDone(worker)
-		logrus.Debugf("Worker %d finished job %s", worker.ID, job.JobID)
 	}
+	t.scannerServer.UpdateNode(ctx, &job, detectInfo)
+	logrus.Debugf("finished job %s", job.JobID)
+	return types.StatusCompleted, nil
 }
 
 func timeNowRef() *time.Time {

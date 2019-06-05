@@ -56,6 +56,8 @@ import (
 	"github.com/chef/automate/components/notifications-client/notifier"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
+	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/workflow/postgres"
 )
 
 type serviceState int
@@ -143,7 +145,7 @@ func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFa
 // register all the services, start the grpc server, and call setup
 func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory,
 	esr relaxting.ES2Backend, conf config.Compliance, binding string,
-	statusSrv *statusserver.Server) {
+	statusSrv *statusserver.Server, workflowManager *workflow.WorkflowManager) {
 
 	lis, err := net.Listen("tcp", binding)
 	if err != nil {
@@ -174,7 +176,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient, configManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
-		conf.Service.Endpoint, conf.Secrets.Endpoint, conf.Manager.Endpoint, conf.RemoteInspecVersion))
+		conf.Service.Endpoint, conf.Secrets.Endpoint, conf.Manager.Endpoint, conf.RemoteInspecVersion, workflowManager))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr))
 
 	ps := profilesserver.New(db, &esr, &conf.Profiles, eventClient, statusSrv)
@@ -211,7 +213,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	// `setup` depends on `Serve` because it dials back to the compliance-service itself.
 	// For this to work we launch `Serve` in a goroutine and connect WithBlock to itself and other dependent services from `setup`
 	// A connect timeout is used to ensure error reporting in the event of failures to connect
-	err = setup(ctx, connFactory, conf, esr, db)
+	err = setup(ctx, connFactory, conf, esr, db, workflowManager)
 	if err != nil {
 		logrus.Fatalf("serveGrpc aborting, we have a problem, setup failed: %s", err.Error())
 	}
@@ -372,7 +374,7 @@ func setupDataLifecycleManageableInterface(ctx context.Context, connFactory *sec
 }
 
 func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Compliance,
-	esr relaxting.ES2Backend, db *pgdb.DB) error {
+	esr relaxting.ES2Backend, db *pgdb.DB, workflowManager *workflow.WorkflowManager) error {
 	var err error
 	var conn, mgrConn, secretsConn, authConn *grpc.ClientConn
 	timeoutCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
@@ -432,20 +434,14 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	// set up the scanner, scheduler, and runner servers with needed clients
 	// these are all inspec-agent packages
 	scannerServer := scanner.New(mgrClient, nodesClient, db)
-	schedulerServer := scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, conf.RemoteInspecVersion)
-	runnerServer := runner.New(mgrClient, nodesClient, db, ingestClient, conf.RemoteInspecVersion)
+	runner.InitWorkflowManager(workflowManager, conf.InspecAgent.JobWorkers, ingestClient, scannerServer)
+
+	schedulerServer := scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, conf.RemoteInspecVersion, workflowManager)
 
 	// start polling for jobs with a recurrence schedule that are due to run.
 	// this function will sleep for one minute, then query the db for all jobs
 	// with recurrence and check if it's time to run the job
 	go schedulerServer.PollForJobs(ctx)
-
-	// start the InspecAgent workers.  the workers represent the amount of goroutines
-	// available to execute a scan.  the buffer size represents the maximum amount of jobs
-	// that may get backed up in the agent queue
-	logrus.Infof("compliance service initializing %d job workers with %d job buffer size",
-		conf.InspecAgent.JobWorkers, conf.InspecAgent.JobBufferSize)
-	runnerServer.SetWorkers(conf.InspecAgent.JobWorkers, conf.InspecAgent.JobBufferSize)
 
 	if os.Getenv("RUN_MODE") == "test" {
 		logrus.Infof(`Skipping AUTHN client setup due to RUN_MODE env var being set to "test"`)
@@ -504,7 +500,14 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 		return err
 	}
 	SERVICE_STATE = serviceStateStarting
-	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv) // nolint: errcheck
+
+	workflowManager, err := workflow.NewManager(postgres.NewPostgresBackend(conf.Postgres.ConnectionString))
+	if err != nil {
+		return err
+	}
+	workflowManager.Start(ctx)
+
+	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, workflowManager) // nolint: errcheck
 
 	cfg := NewServiceConfig(&conf, connFactory)
 	return cfg.serveCustomRoutes()

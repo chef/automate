@@ -21,6 +21,7 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/lib/workflow"
 )
 
 type Scheduler struct {
@@ -32,11 +33,12 @@ type Scheduler struct {
 	resolverServer *resolver.Resolver
 }
 
-func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB, ingestClient ingest.ComplianceIngesterClient, secretsClient secrets.SecretsServiceClient, remoteInspecVer string) *Scheduler {
+func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB,
+	ingestClient ingest.ComplianceIngesterClient, secretsClient secrets.SecretsServiceClient, remoteInspecVer string, workflowManager *workflow.WorkflowManager) *Scheduler {
 	logrus.Debugf("setting up the scheduler server with mgrclient %+v and nodesclient %+v and ingestclient %+v and secretsclient %+v", managerClient, nodesClient, ingestClient, secretsClient)
 	// set up the server connections for resolver, runner, and scanner
 	resolverServer := resolver.New(managerClient, nodesClient, db, secretsClient)
-	runnerServer := runner.New(managerClient, nodesClient, db, ingestClient, remoteInspecVer)
+	runnerServer := runner.New(managerClient, nodesClient, db, ingestClient, remoteInspecVer, workflowManager)
 	scannerServer := scanner.New(managerClient, nodesClient, db)
 	return &Scheduler{managerClient, nodesClient, db, scannerServer, runnerServer, resolverServer}
 }
@@ -87,7 +89,7 @@ func (a *Scheduler) runNodeJobs(ctx context.Context, job *jobs.Job, nodeJobs []*
 		return errors.New("no nodes found for job, aborting")
 	}
 
-	err := a.runnerServer.AddJobs(nodeJobs)
+	err := a.runnerServer.AddJobs(job.Id, nodeJobs)
 	if err != nil {
 		strErr := fmt.Sprintf("Unable to add jobs to inspec agent: %s", err.Error())
 		logrus.Error(strErr)
@@ -155,7 +157,7 @@ func (a *Scheduler) handleChildJob(ctx context.Context, job *jobs.Job) error {
 	if err != nil {
 		return errors.Wrap(err, "Failed to resolve job")
 	}
-	err = a.runnerServer.AddJobs(nodeJobs)
+	err = a.runnerServer.AddJobs(childJob.Id, nodeJobs)
 	if err != nil {
 		return errors.Wrap(err, "Failed to hand jobs to workers")
 	}

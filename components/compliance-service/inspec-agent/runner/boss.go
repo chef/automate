@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -9,14 +10,16 @@ import (
 	"fmt"
 	neturl "net/url"
 
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"github.com/chef/automate/lib/workflow"
 )
 
 var maxWorkers int
@@ -33,12 +36,14 @@ type Runner struct {
 	scannerServer       *scanner.Scanner
 	ingestClient        ingest.ComplianceIngesterClient
 	remoteInspecVersion string
+	workflowManager     *workflow.WorkflowManager
 }
 
-func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB, ingestClient ingest.ComplianceIngesterClient, remoteInspecVersion string) *Runner {
+func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB,
+	ingestClient ingest.ComplianceIngesterClient, remoteInspecVersion string, workflowManager *workflow.WorkflowManager) *Runner {
 	scannerServer := scanner.New(managerClient, nodesClient, db)
 	go watchJobsNodesStatus(scannerServer)
-	return &Runner{managerClient, nodesClient, db, scannerServer, ingestClient, remoteInspecVersion}
+	return &Runner{managerClient, nodesClient, db, scannerServer, ingestClient, remoteInspecVersion, workflowManager}
 }
 
 type jobStatusStore struct {
@@ -87,30 +92,6 @@ func init() {
 	jobStatusMap = NewJobStatusStore()
 }
 
-// SetWorkers is used to instantiate the communication channel for the workers and then start the worker go routines
-func (r *Runner) SetWorkers(nWorkers int, nChannels int) {
-	if maxWorkers != 0 {
-		return
-	}
-	maxWorkers = nWorkers
-	logrus.Debugf("Initializing the job worker pool(%d)", maxWorkers)
-
-	// instantiating the channel as InspecJob pointers. This allows the workers to modify the job status, retries, etc
-	jobsChan = make(chan *types.InspecJob, nChannels)
-
-	for wid := 1; wid <= maxWorkers; wid++ {
-		worker := types.WorkerStats{
-			ID:                wid,
-			CurrentJob:        "",
-			CurrentJobSummary: "",
-			PreviousJob:       "",
-			CompletedJobs:     0,
-		}
-		go r.work(&worker, jobsChan)
-	}
-	// leaving the channel open so that Add can push jobs into
-}
-
 // Add is used to populate the jobs array and pass jobs to the workers via the channel
 func (r *Runner) Add(job *types.InspecJob) error {
 	logrus.Debugf("Add job %s to be handled by one of the %d workers", job.JobID, maxWorkers)
@@ -133,8 +114,8 @@ func (r *Runner) Add(job *types.InspecJob) error {
 	return nil
 }
 
-// Add is used to populate the jobs array and pass jobs to the workers via the channel
-func (r *Runner) AddJobs(jobs []*types.InspecJob) error {
+// AddJobs is used to populate the jobs array and pass jobs to the workers via the channel
+func (r *Runner) AddJobs(id string, jobs []*types.InspecJob) error {
 	if len(jobs) == 0 {
 		return errors.Errorf("no jobs have been provided!")
 	}
@@ -144,10 +125,6 @@ func (r *Runner) AddJobs(jobs []*types.InspecJob) error {
 		status := types.StatusScheduled
 		jobNodeStatusMap[job.NodeID] = &status
 		jobStatusMap.Set(job.JobID, jobNodeStatusMap)
-		logrus.Debugf("Add job %s to be handled by one of the %d workers", job.JobID, maxWorkers)
-		if maxWorkers == 0 {
-			return errors.New("No workers have been instantiated, can't add job")
-		}
 		if job == nil {
 			return errors.New("Job cannot be nil")
 		}
@@ -159,13 +136,10 @@ func (r *Runner) AddJobs(jobs []*types.InspecJob) error {
 		}
 
 		r.scannerServer.UpdateJobStatus(job.JobID, job.Status, nil, nil)
-
 		job.InternalProfiles, job.ProfilesOwner = updateComplianceURLs(job.Profiles)
 
-		// place most recent job in the channel to be processed by the workers and updated based on the outcome
-		jobsChan <- job
 	}
-	return nil
+	return r.workflowManager.EnqueueWorkflow(context.TODO(), "scan-job-workflow", fmt.Sprintf("scan-job-%s", id), jobs)
 }
 
 // This allows inspec to use automate profiles without the `automate login` headache. Only works when the profile store is local

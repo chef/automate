@@ -6,15 +6,16 @@ import (
 	"net"
 	"time"
 
-	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
-	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
+	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 )
 
-func (r *Runner) reportIt(ctx context.Context, job *types.InspecJob, content []byte, reportID string) error {
+func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, content []byte, reportID string) error {
 	var report compliance.Report
 	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
 	if err := unmarshaler.Unmarshal(bytes.NewReader(content), &report); err != nil {
@@ -43,7 +44,7 @@ func (r *Runner) reportIt(ctx context.Context, job *types.InspecJob, content []b
 	report.Tags = job.Tags
 	logrus.Debugf("hand-over report to ingest service")
 
-	_, err := r.ingestClient.ProcessComplianceReport(ctx, &report)
+	_, err := t.ingestClient.ProcessComplianceReport(ctx, &report)
 	if err != nil {
 		return errors.Wrap(err, "Report processing error")
 	}

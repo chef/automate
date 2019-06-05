@@ -26,6 +26,7 @@ import (
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/workflow"
 )
 
 // Server implementation for jobs
@@ -40,19 +41,21 @@ var empty = pb.Empty{}
 
 // New creates a new jobs server
 func New(db *pgdb.DB, connFactory *secureconn.Factory, eventsClient automate_event.EventServiceClient,
-	complianceEndpoint string, secretsEndpoint string, managerEndpoint string, remoteInspecVer string) *Server {
+	complianceEndpoint string, secretsEndpoint string, managerEndpoint string, remoteInspecVer string, workflowManager *workflow.WorkflowManager) *Server {
 	conf := &Server{
 		db:           db,
 		connFactory:  connFactory,
 		eventsClient: eventsClient,
 	}
-	conf.getComplianceAndSecretsConnection(connFactory, complianceEndpoint, db, secretsEndpoint, managerEndpoint, remoteInspecVer)
+	conf.getComplianceAndSecretsConnection(connFactory, complianceEndpoint, db, secretsEndpoint, managerEndpoint, remoteInspecVer, workflowManager)
 	return conf
 }
 
 // get the ManagerClient, NodesClient, and IngestClient to be able to set up the scheduler server
 // the scheduler server is used to call the inspec-agent
-func (srv *Server) getComplianceAndSecretsConnection(connectionFactory *secureconn.Factory, complianceEndpoint string, db *pgdb.DB, secretsEndpoint string, managerEndpoint string, remoteInspecVer string) {
+func (srv *Server) getComplianceAndSecretsConnection(
+	connectionFactory *secureconn.Factory, complianceEndpoint string, db *pgdb.DB,
+	secretsEndpoint string, managerEndpoint string, remoteInspecVer string, workflowManager *workflow.WorkflowManager) {
 	if complianceEndpoint == "" || managerEndpoint == "" {
 		logrus.Errorf("complianceEndpoint and managerEndpoint cannot be empty or Dial will get stuck")
 		return
@@ -101,7 +104,7 @@ func (srv *Server) getComplianceAndSecretsConnection(connectionFactory *secureco
 		logrus.Errorf("getComplianceAndSecretsConnection, could not obtain secrets service client: %s", err)
 		return
 	}
-	srv.schedulerServer = scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, remoteInspecVer)
+	srv.schedulerServer = scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, remoteInspecVer, workflowManager)
 }
 
 // GetJobResultByNodeId returns the results row for a given job id and node id
