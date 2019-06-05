@@ -122,6 +122,7 @@ func NewPoliciesServer(
 		}
 	}
 
+	// now that the data is all set, attempt to feed it into OPA:
 	if err := srv.updateEngineStore(ctx); err != nil {
 		return nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
 	}

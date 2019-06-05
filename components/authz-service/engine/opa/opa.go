@@ -148,9 +148,6 @@ func (s *State) initModules() error {
 // IsAuthorized(), we want to do as little work per call as possible.
 func (s *State) initPartialResult(ctx context.Context) error {
 	// Reset compiler to avoid state issues
-	// Note: PartialResult will _compile_ the passed module; so when the engine is
-	// initialized, everything will also be ready to serve the other, non-partial
-	// queries
 	compiler, err := s.newCompiler()
 	if err != nil {
 		return err
@@ -175,8 +172,6 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-
-	// Partial eval for authzV2Query.
 	r := rego.New(
 		rego.ParsedQuery(s.queries[authzV2Query]),
 		rego.Compiler(compiler),
@@ -220,10 +215,19 @@ func (s *State) newCompiler() (*ast.Compiler, error) {
 	return compiler, nil
 }
 
-// DumpData is a bit fast-and-loose when it comes to error checking; it's not meant
-// to be used in production
+// DumpData is a bit fast-and-loose when it comes to error checking; it's not
+// meant to be used in production. Anywhere you have an OPA engine struct (i.e.
+// `State`), you can use either one of these on it and it'll log the store
+// contents.
 func (s *State) DumpData(ctx context.Context) error {
 	return dumpData(ctx, s.store, s.log)
+}
+func (s *State) DumpDataV2(ctx context.Context) error {
+	return dumpData(ctx, s.v2Store, s.log)
+}
+
+func (s *State) DumpDataV2p1(ctx context.Context) error {
+	return dumpData(ctx, s.v2p1Store, s.log)
 }
 
 func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
@@ -237,14 +241,6 @@ func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
 	}
 	l.Infof("data: %#v", data)
 	return store.Commit(ctx, txn)
-}
-
-func (s *State) DumpDataV2(ctx context.Context) error {
-	return dumpData(ctx, s.v2Store, s.log)
-}
-
-func (s *State) DumpDataV2p1(ctx context.Context) error {
-	return dumpData(ctx, s.v2p1Store, s.log)
 }
 
 // IsAuthorized evaluates whether a given [subject, resource, action] tuple
@@ -621,8 +617,8 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 // OR does the entire OPA store have to be re-evaluated at once. IF that's true,
 // should we have the same OPA instance in general for rules?
 //
-// V2SetPolicies replaces OPA's data with a new set of policies and roles,
-// and resets the partial evaluation cache for v2
+// V2SetPolicies replaces OPA's data with a new set of policies, roles, and
+// rules, and resets the partial evaluation cache for v2
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
@@ -636,8 +632,8 @@ func (s *State) V2SetPolicies(
 	return s.initPartialResultV2(ctx)
 }
 
-// V2p1SetPolicies replaces OPA's data with a new set of policies and roles,
-// and resets the partial evaluation cache for v2
+// V2p1SetPolicies replaces OPA's data with a new set of policies, roles, and
+// rules, and resets the partial evaluation cache for v2.l
 func (s *State) V2p1SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {

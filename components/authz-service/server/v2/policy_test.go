@@ -2938,7 +2938,9 @@ type testSetup struct {
 func setupV2WithWriter(t *testing.T,
 	writer engine.V2pXWriter) testSetup {
 	return setupV2WithMigrationState(t, nil, writer, nil, make(chan api_v2.Version, 1),
-		func(s storage.MigrationStatusProvider) error { return s.Success(context.Background()) }) // IAM v2
+		// if the MigrationStatus is set to "Success", that means we've migrated
+		// successfully to IAM v2 ("SuccessBeta1" is v2.1).
+		func(s storage.MigrationStatusProvider) error { return s.Success(context.Background()) })
 }
 
 func setupV2(t *testing.T,
@@ -3229,6 +3231,8 @@ type testEngine struct {
 func (te *testEngine) V2SetPolicies(
 	ctx context.Context, policies map[string]interface{},
 	roles map[string]interface{}, rules map[string][]interface{}) error {
+	// these only set the structs {policy,rule,role}Map, nothing specific to v2 and
+	// v2.1 yet
 	return te.V2p1SetPolicies(ctx, policies, roles, rules)
 }
 
