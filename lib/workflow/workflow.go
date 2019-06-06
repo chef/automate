@@ -17,13 +17,15 @@ import (
 )
 
 var (
-	ErrNoTasks                = errors.New("no tasks in queue")
-	ErrNoWorkflowInstances    = errors.New("no workflow instances in queue")
-	ErrWorkflowScheduleExists = errors.New("workflow schedule already exists")
-	ErrWorkflowInstanceExists = errors.New("workflow instance already exists")
-	ErrNoDueWorkflows         = errors.New("no due workflows")
-	ErrNoScheduledWorkflows   = errors.New("no workflows are scheduled")
-	ErrInvalidSchedule        = errors.New("workflow schedule is not valid")
+	ErrNoTasks                  = errors.New("no tasks in queue")
+	ErrNoWorkflowInstances      = errors.New("no workflow instances in queue")
+	ErrWorkflowScheduleExists   = errors.New("workflow schedule already exists")
+	ErrWorkflowInstanceExists   = errors.New("workflow instance already exists")
+	ErrNoDueWorkflows           = errors.New("no due workflows")
+	ErrNoScheduledWorkflows     = errors.New("no workflows are scheduled")
+	ErrInvalidSchedule          = errors.New("workflow schedule is not valid")
+	ErrWorkflowInstanceNotFound = errors.New("workflow instance not found")
+	ErrWorkflowNotComplete      = errors.New("workflow instance is still running")
 )
 
 // Schedule represents a recurring workflow.
@@ -110,6 +112,14 @@ func StartAfter(startAfter time.Time) EnqueueOpts {
 // EnqueueOpts are optional parameters for enqueuing a task
 type EnqueueOpts func(*backend.TaskEnqueueOpts)
 
+type CompleteOpts func(*Decision)
+
+func WithResult(obj interface{}) CompleteOpts {
+	return func(d *Decision) {
+		d.result = obj
+	}
+}
+
 // WorkflowInstance is an interface to an object representing a running
 // workflow instance. A workflow instance keeps state of a currently
 // running workflow, and decides what decisions need to be made
@@ -138,7 +148,7 @@ type WorkflowInstance interface {
 	// the workflow instance will be considered abandoned. Abandoned
 	// workflows will not complete until all running tasks have been
 	// completed. All tasks which are queued will be dequeued.
-	Complete() Decision
+	Complete(...CompleteOpts) Decision
 
 	// Continue returns a decision to continue execution of the workflow for
 	// the running workflow instance. The provided payload will available when
@@ -203,13 +213,19 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface
 	return nil
 }
 
-func (w *workflowInstanceImpl) Complete() Decision {
+func (w *workflowInstanceImpl) Complete(opts ...CompleteOpts) Decision {
 	if len(w.tasks) > 0 {
 		panic("cannot call EnqueueTask and Complete() in same workflow step!")
 	}
-	return Decision{
+	d := Decision{
 		complete: true,
 	}
+
+	for _, o := range opts {
+		o(&d)
+	}
+
+	return d
 }
 
 func (w *workflowInstanceImpl) Continue(payload interface{}) Decision {
@@ -220,6 +236,53 @@ func (w *workflowInstanceImpl) Continue(payload interface{}) Decision {
 	}
 }
 
+type ImmutableWorkflowInstance interface {
+	// GetPayload unmarshals the payload of the workflow instance into the
+	// value pointed at by obj. This payload is any state the user wishes
+	// to keep.
+	GetPayload(obj interface{}) error
+
+	// GetParameters unmarshals the parameters the workflow instance was
+	// started with into the value pointed at by obj.
+	GetParameters(obj interface{}) error
+
+	IsRunning() bool
+
+	GetResult(obj interface{}) error
+}
+
+type immutableWorkflowInstanceImpl struct {
+	instance *backend.WorkflowInstance
+}
+
+func (w *immutableWorkflowInstanceImpl) GetPayload(obj interface{}) error {
+	if w.instance.Payload != nil && len(w.instance.Payload) > 0 {
+		return json.Unmarshal(w.instance.Payload, obj)
+	}
+	return nil
+}
+
+func (w *immutableWorkflowInstanceImpl) GetParameters(obj interface{}) error {
+	if w.instance.Parameters != nil && len(w.instance.Parameters) > 0 {
+		return json.Unmarshal(w.instance.Parameters, obj)
+	}
+	return nil
+}
+
+func (w *immutableWorkflowInstanceImpl) GetResult(obj interface{}) error {
+	if w.IsRunning() {
+		return ErrWorkflowNotComplete
+	}
+	if w.instance.Result != nil && len(w.instance.Result) > 0 {
+		return json.Unmarshal(w.instance.Result, obj)
+	}
+	return nil
+}
+
+func (w *immutableWorkflowInstanceImpl) IsRunning() bool {
+	return w.instance.Status != backend.WorkflowInstanceStatusCompleted
+}
+
 // Decision indicates how the execution of a workflow instance is to proceed.
 // This struct should not be created by the user. Instead, use the methods
 // that return Decision on the WorkflowInstance.
@@ -227,6 +290,7 @@ type Decision struct {
 	complete   bool
 	continuing bool
 	payload    interface{}
+	result     interface{}
 	tasks      []backend.Task
 }
 
@@ -472,6 +536,17 @@ func (m *WorkflowManager) GetScheduledWorkflowRecurrence(ctx context.Context, in
 	return rrule.StrToRRule(ruleStr)
 }
 
+func (m *WorkflowManager) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (ImmutableWorkflowInstance, error) {
+	workflowInstance, err := m.backend.GetWorkflowInstanceByName(ctx, instanceName, workflowName)
+	if err != nil {
+		return nil, err
+	}
+
+	return &immutableWorkflowInstanceImpl{
+		instance: workflowInstance,
+	}, nil
+}
+
 // EnqueueWorkflow enqueues a workflow of type workflowName. Only one instance of
 // (workflowName, instanceName) can be running at a time.
 func (m *WorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName string,
@@ -620,7 +695,7 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 		}
 		if wevt.CompletedTaskCount == wevt.EnqueuedTaskCount {
 			logrus.Info("Completing abandoned workflow")
-			if err := completer.Done(); err != nil {
+			if err := completer.Done(nil); err != nil {
 				logrus.WithError(err).Error("failed to complete with abandoned workflow")
 				return true
 			}
@@ -676,7 +751,14 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 				"enqueued":  wevt.EnqueuedTaskCount,
 				"completed": wevt.CompletedTaskCount,
 			}).Info("Completing workflow")
-			err := completer.Done()
+
+			jsonResult, err := jsonify(decision.result)
+			if err != nil {
+				logrus.WithError(err).Error("failed to jsonify workflow result")
+				jsonResult = nil
+			}
+
+			err = completer.Done(jsonResult)
 			if err != nil {
 				logrus.WithError(err).Error("failed to complete workflow")
 			}
@@ -700,7 +782,7 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 		if err != nil {
 			logrus.WithError(err).Error("could not marshal payload to JSON, completing workflow")
 			// TODO: We need to fail workflows
-			err := completer.Done()
+			err := completer.Done(nil)
 			if err != nil {
 				logrus.WithError(err).Error("failed to complete workflow after JSON marshal failure")
 			}
