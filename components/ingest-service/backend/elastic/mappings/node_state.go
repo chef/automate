@@ -129,6 +129,7 @@ var nodeProps = `
 	},
 	"resource_names": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -138,6 +139,7 @@ var nodeProps = `
 	},
 	"error_message": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -147,6 +149,7 @@ var nodeProps = `
 	},
 	"recipes": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -156,6 +159,7 @@ var nodeProps = `
 	},
 	"chef_tags": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -165,6 +169,7 @@ var nodeProps = `
 	},
 	"cookbooks": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -174,6 +179,7 @@ var nodeProps = `
 	},
 	"attributes": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -183,6 +189,7 @@ var nodeProps = `
 	},
 	"platform": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -204,6 +211,7 @@ var nodeProps = `
 	},
 	"chef_version": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -216,6 +224,7 @@ var nodeProps = `
 	},
 	"environment": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -225,6 +234,7 @@ var nodeProps = `
 	},
 	"roles": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -281,6 +291,7 @@ var nodeProps = `
 	},
 	"policy_group": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -290,6 +301,7 @@ var nodeProps = `
 	},
 	"policy_name": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -299,6 +311,7 @@ var nodeProps = `
 	},
 	"policy_revision": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
