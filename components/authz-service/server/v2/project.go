@@ -273,12 +273,17 @@ func (s *state) ListProjectRules(ctx context.Context,
 
 	projects := make(map[string]*api.ProjectRules, len(ruleMap))
 	for projectID, rules := range ruleMap {
-		projectRules, err := rulesToProjectRules(rules)
-		if err != nil {
-			return &api.ProjectCollectionRulesResp{}, err
+		apiRules := make([]*api.ProjectRule, len(rules))
+		for i, rule := range rules {
+			r, err := fromStorageRule(&rule)
+			if err != nil {
+				return &api.ProjectCollectionRulesResp{}, err
+			}
+			apiRules[i] = r
 		}
+
 		projects[projectID] = &api.ProjectRules{
-			Rules: projectRules,
+			Rules: apiRules,
 		}
 	}
 	return &api.ProjectCollectionRulesResp{
