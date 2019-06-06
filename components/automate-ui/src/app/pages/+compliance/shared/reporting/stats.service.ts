@@ -241,13 +241,30 @@ export class StatsService {
         formatted.push({type, values});
       } else {
         let type = filter['type']['name'];
-        // profile needs to be sent as profile_id
-        // node needs to be sent as node_id
-        if (type === 'profile' || type === 'node') {
-          type = `${type}_id`;
+        let value = filter['value']['id'] || filter['value']['text'];
+        if (type === 'profile') {
+            type = 'profile_id';
+          // profile needs to be sent as profile_id if we have the ID
+          // and 'profile_name' for wildcard filters
+          if ( filter['value']['id'] ) {
+            type = 'profile_id';
+            value = filter['value']['id'];
+          } else {
+            type = 'profile_name';
+            value = filter['value']['text'];
+          }
+        } else if (type === 'node') {
+          // node needs to be sent as node_id if we have the ID
+          // and 'node_name' for wildcard filters
+          if ( filter['value']['id'] ) {
+            type = 'node_id';
+            value = filter['value']['id'];
+          } else {
+            type = 'node_name';
+            value = filter['value']['text'];
+          }
         }
 
-        const value = filter['value']['id'] || filter['value']['text'];
         const group = formatted.filter(f => f.type === type)[0];
 
         if (group) {

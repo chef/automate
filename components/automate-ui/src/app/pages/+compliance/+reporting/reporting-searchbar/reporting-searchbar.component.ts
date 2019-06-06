@@ -99,18 +99,27 @@ export class ReportingSearchbarComponent implements OnInit {
 
   onValChange(e) {
     const type = this.selectedType;
-    const value = this.filterValues.filter(v => v.title === e.target.value)[0];
+    const text: string = e.target.value;
+    const suggestionValue = this.filterValues.filter(v => v.title === text)[0];
 
-    if (value) {
-      this.filterAdded.emit({ detail: { type, value }});
+    if (text.indexOf('?') >= 0 || text.indexOf('*') >= 0) {
+      const wildcardValue = {text, score: 0, version: '', title: text};
 
-      this.selectedType = null;
-      this.keyInputVisible = true;
-      this.valInputVisible = false;
-
-      this.keyInput.nativeElement.value = '';
-      this.valInput.nativeElement.value = '';
+      this.addNewFilter(type, wildcardValue);
+    } else if (suggestionValue) {
+      this.addNewFilter(type, suggestionValue);
     }
+  }
+
+  private addNewFilter(type, value) {
+    this.filterAdded.emit({ detail: { type, value }});
+
+    this.selectedType = null;
+    this.keyInputVisible = true;
+    this.valInputVisible = false;
+
+    this.keyInput.nativeElement.value = '';
+    this.valInput.nativeElement.value = '';
   }
 
   onClearClick() {

@@ -610,37 +610,37 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	}
 
 	if len(filters["environment"]) > 0 {
-		termQuery := elastic.NewTermsQuery("environment", stringArrayToInterfaceArray(filters["environment"])...)
+		termQuery := backend.newTermQueryFromFilter("environment", filters["environment"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["organization"]) > 0 {
-		termQuery := elastic.NewTermsQuery("organization_name", stringArrayToInterfaceArray(filters["organization"])...)
+		termQuery := backend.newTermQueryFromFilter("organization_name", filters["organization"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["chef_server"]) > 0 {
-		termQuery := elastic.NewTermsQuery("source_fqdn", stringArrayToInterfaceArray(filters["chef_server"])...)
+		termQuery := backend.newTermQueryFromFilter("source_fqdn", filters["chef_server"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["chef_tags"]) > 0 {
-		termQuery := elastic.NewTermsQuery("chef_tags", stringArrayToInterfaceArray(filters["chef_tags"])...)
+		termQuery := backend.newTermQueryFromFilter("chef_tags", filters["chef_tags"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["policy_group"]) > 0 {
-		termQuery := elastic.NewTermsQuery("policy_group", stringArrayToInterfaceArray(filters["policy_group"])...)
+		termQuery := backend.newTermQueryFromFilter("policy_group", filters["policy_group"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["policy_name"]) > 0 {
-		termQuery := elastic.NewTermsQuery("policy_name", stringArrayToInterfaceArray(filters["policy_name"])...)
+		termQuery := backend.newTermQueryFromFilter("policy_name", filters["policy_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["status"]) > 0 {
-		termQuery := elastic.NewTermsQuery("status", stringArrayToInterfaceArray(filters["status"])...)
+		termQuery := backend.newTermQueryFromFilter("status", filters["status"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
@@ -650,12 +650,35 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	}
 
 	if len(filters["node_name"]) > 0 {
-		termQuery := elastic.NewTermsQuery("node_name", stringArrayToInterfaceArray(filters["node_name"])...)
+		termQuery := backend.newTermQueryFromFilter("node_name", filters["node_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
+	if len(filters["profile_name"]) > 0 {
+		ESField := "profiles.title"
+		refinedValues := make([]string, 0, 0)
+		filterQuery := elastic.NewBoolQuery()
+
+		for _, value := range filters["profile_name"] {
+			if strings.Contains(value, "*") || strings.Contains(value, "?") {
+				wildQuery := elastic.NewWildcardQuery(ESField, value)
+				nestedQuery := elastic.NewNestedQuery("profiles", wildQuery)
+				filterQuery = filterQuery.Should(nestedQuery)
+			} else {
+				refinedValues = append(refinedValues, value)
+			}
+		}
+		if len(refinedValues) > 0 {
+			termQuery := elastic.NewTermsQuery(ESField, stringArrayToInterfaceArray(refinedValues)...)
+			nestedQuery := elastic.NewNestedQuery("profiles", termQuery)
+			filterQuery = filterQuery.Should(nestedQuery)
+		}
+
+		boolQuery = boolQuery.Must(filterQuery)
+	}
+
 	if len(filters["platform"]) > 0 {
-		termQuery := elastic.NewTermsQuery("platform.name", stringArrayToInterfaceArray(filters["platform"])...)
+		termQuery := backend.newTermQueryFromFilter("platform.name", filters["platform"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
@@ -664,24 +687,26 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	if numberOfProfiles > 0 || numberOfControls > 0 {
 		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
 		profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
-		controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status", "profiles.controls.impact"}
+		controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status",
+			"profiles.controls.impact"}
 
-		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes, profileLevelFscIncludes, controlLevelFscIncludes)
+		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes,
+			profileLevelFscIncludes, controlLevelFscIncludes)
 		boolQuery = boolQuery.Must(profileAndControlQuery)
 	}
 
 	if len(filters["role"]) > 0 {
-		termQuery := elastic.NewTermsQuery("roles", stringArrayToInterfaceArray(filters["role"])...)
+		termQuery := backend.newTermQueryFromFilter("roles", filters["role"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["recipe"]) > 0 {
-		termQuery := elastic.NewTermsQuery("recipes", stringArrayToInterfaceArray(filters["recipe"])...)
+		termQuery := backend.newTermQueryFromFilter("recipes", filters["recipe"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["inspec_version"]) > 0 {
-		termQuery := elastic.NewTermsQuery("version", stringArrayToInterfaceArray(filters["inspec_version"])...)
+		termQuery := backend.newTermQueryFromFilter("version", filters["inspec_version"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
@@ -695,6 +720,26 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	}
 
 	return boolQuery
+}
+
+func (backend ES2Backend) newTermQueryFromFilter(ESField string,
+	filters []string) *elastic.BoolQuery {
+	refinedValues := make([]string, 0, 0)
+	filterQuery := elastic.NewBoolQuery()
+
+	for _, value := range filters {
+		if strings.Contains(value, "*") || strings.Contains(value, "?") {
+			wildQuery := elastic.NewWildcardQuery(ESField, value)
+			filterQuery = filterQuery.Should(wildQuery)
+		} else {
+			refinedValues = append(refinedValues, value)
+		}
+	}
+	if len(refinedValues) > 0 {
+		termQuery := elastic.NewTermsQuery(ESField, stringArrayToInterfaceArray(refinedValues)...)
+		filterQuery = filterQuery.Should(termQuery)
+	}
+	return filterQuery
 }
 
 //  getFiltersQueryForDeepReport - builds up an elasticsearch query filter based on the reportId filters map passed in.
