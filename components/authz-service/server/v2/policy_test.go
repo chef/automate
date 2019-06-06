@@ -2855,8 +2855,7 @@ func TestVersionChannel(t *testing.T) {
 		ts.projectCache.Flush()
 
 		// reset to v1
-		ts.switcher.Version = api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
-		require.Equal(iamV1, ts.switcher.Version)
+		ts.switcher.Version = iamV1
 
 		t.Run(test.desc, test.f)
 	}

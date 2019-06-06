@@ -18,7 +18,7 @@ import (
 var ErrMessageBoxFull = errors.New("Message box full")
 
 type PolicyRefresher interface {
-	Refresh(context.Context, api.Version) error
+	Refresh(context.Context) error
 	RefreshAsync() error
 }
 
@@ -32,9 +32,8 @@ type policyRefresher struct {
 }
 
 type policyRefresherMessageRefresh struct {
-	ctx     context.Context
-	status  chan error
-	version api.Version
+	ctx    context.Context
+	status chan error
 }
 
 func (m *policyRefresherMessageRefresh) Respond(err error) {
@@ -70,10 +69,7 @@ func NewPolicyRefresher(ctx context.Context, log logger.Logger, store storage.St
 }
 
 func (refresher *policyRefresher) run(ctx context.Context) {
-	var (
-		lastVersion  api.Version
-		lastPolicyID string
-	)
+	var lastPolicyChangeID string
 	antiEntropyTimer := time.NewTimer(refresher.antiEntropyTimerDuration)
 RUNLOOP:
 	for {
@@ -82,29 +78,28 @@ RUNLOOP:
 			refresher.log.WithError(ctx.Err()).Info("Policy refresher exiting")
 			break RUNLOOP
 		case <-refresher.changeNotifier.C():
-			refresher.log.Infof("Received policy change notification (%s)", pretty(lastVersion))
+			refresher.log.Info("Received policy change notification")
 			var err error
-			lastPolicyID, err = refresher.refresh(context.Background(), lastPolicyID, lastVersion, true)
+			lastPolicyChangeID, err = refresher.refresh(context.Background(), lastPolicyChangeID)
 			if err != nil {
-				refresher.log.WithError(err).Warnf("Failed to refresh policies (%s)", pretty(lastVersion))
+				refresher.log.WithError(err).Warn("Failed to refresh policies")
 			}
 			if !antiEntropyTimer.Stop() {
 				<-antiEntropyTimer.C
 			}
 		case m := <-refresher.refreshRequests:
-			refresher.log.Infof("Received local policy refresh request (%s)", pretty(m.version))
-			lastVersion = m.version
+			refresher.log.Info("Received local policy refresh request")
 			var err error
-			lastPolicyID, err = refresher.refresh(m.ctx, lastPolicyID, lastVersion, true)
+			lastPolicyChangeID, err = refresher.refresh(m.ctx, lastPolicyChangeID)
 			m.Respond(err)
 			if !antiEntropyTimer.Stop() {
 				<-antiEntropyTimer.C
 			}
 		case <-antiEntropyTimer.C:
 			var err error
-			lastPolicyID, err = refresher.refresh(ctx, lastPolicyID, lastVersion, false)
+			lastPolicyChangeID, err = refresher.refresh(ctx, lastPolicyChangeID)
 			if err != nil {
-				refresher.log.WithError(err).Warnf("Anti-entropy refresh failed (%s)", pretty(lastVersion))
+				refresher.log.WithError(err).Warn("Anti-entropy refresh failed")
 			}
 		}
 
@@ -114,39 +109,35 @@ RUNLOOP:
 	close(refresher.refreshRequests)
 }
 
-func (refresher *policyRefresher) refresh(ctx context.Context, lastPolicyID string, vsn api.Version, forceUpdate bool) (string, error) {
+func (refresher *policyRefresher) refresh(ctx context.Context, lastPolicyChangeID string) (string, error) {
 	curPolicyID, err := refresher.store.GetPolicyChangeID(ctx)
 	if err != nil {
 		refresher.log.WithError(err).Warn("Failed to get current policy change ID")
-		return lastPolicyID, err
+		return lastPolicyChangeID, err
 	}
-	if curPolicyID != lastPolicyID || forceUpdate {
+	if curPolicyID != lastPolicyChangeID {
 		refresher.log.WithFields(logrus.Fields{
-			"lastPolicyID": lastPolicyID,
-			"curPolicyID":  curPolicyID,
-			"version":      vsn,
-			"forceUpdate":  forceUpdate,
+			"lastPolicyChangeID": lastPolicyChangeID,
+			"curPolicyID":        curPolicyID,
 		}).Debug("Refreshing engine store")
 
-		if err := refresher.updateEngineStore(ctx, vsn); err != nil {
+		if err := refresher.updateEngineStore(ctx); err != nil {
 			refresher.log.WithError(err).Warn("Failed to refresh engine store")
-			return lastPolicyID, err
+			return lastPolicyChangeID, err
 		}
 	}
 	return curPolicyID, nil
 }
 
-func (refresher *policyRefresher) Refresh(ctx context.Context, vsn api.Version) error {
+func (refresher *policyRefresher) Refresh(ctx context.Context) error {
 	m := policyRefresherMessageRefresh{
-		ctx:     ctx,
-		status:  make(chan error, 1),
-		version: vsn,
+		ctx:    ctx,
+		status: make(chan error, 1),
 	}
 	refresher.refreshRequests <- m
 	return m.Err()
 }
 
-// TODO: handle version: v2 vs v2.1
 func (refresher *policyRefresher) RefreshAsync() error {
 	m := policyRefresherMessageRefresh{
 		ctx: context.Background(),
@@ -162,9 +153,21 @@ func (refresher *policyRefresher) RefreshAsync() error {
 }
 
 // updates OPA engine store with policy
-func (refresher *policyRefresher) updateEngineStore(ctx context.Context, vsn api.Version) error {
+func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	// Engine updates need unfiltered access to all data.
 	ctx = auth_context.ContextWithoutProjects(ctx)
+
+	// Retrieve the IAM version from the database: some other node could have
+	// done a migration (v2 <-> v2.1) and this one wouldn't know. However, on
+	// success, it's written to the database, and we can thus retrieve it from
+	// there. Also, these version changes are registered as "policy changes",
+	// so even if no v2[.1] policy has actually changed, we'll update the correct
+	// store (v2 or v2.1) here.
+	vsn, err := refresher.getIAMVersion(ctx)
+	if err != nil {
+		refresher.log.WithError(err).Warn("Failed to retrieve IAM version")
+	}
+	refresher.log.Infof("initializing OPA store (%s)", pretty(vsn))
 
 	policyMap, err := refresher.getPolicyMap(ctx)
 	if err != nil {
@@ -187,18 +190,6 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context, vsn api
 	}
 	// Note 2019/06/04 (sr): v1?! Yes, IAM v1. Our POC code depends on this query
 	// to be answered regardless of whether IAM is v1, v2 or v2.1.
-	//
-	// Note 2019/06/05 (sr): this doesn't yet support upgrading from v2 to v2.1 in
-	// a multi-node scenario -- since this would happen with nodes A and B:
-	//
-	// A: receive an upgrade-to-v2 --beta2.1 request, migrate stuff in the
-	//    database, set the internal state's version field to v2.1, update the v2.1
-	//    store
-	// B: receives an update-store-notification, has the internal state still set
-	//    to v2, will update the v2 store -- not v2.1
-	//
-	// A potential solution is to include the version in the notification bounced
-	// through the database. I'll look into that in a follow-up PR.
 }
 
 func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]interface{}, error) {
@@ -265,6 +256,23 @@ func (refresher *policyRefresher) getRoleMap(ctx context.Context) (map[string]in
 		}
 	}
 	return data, nil
+}
+
+func (refresher *policyRefresher) getIAMVersion(ctx context.Context) (api.Version, error) {
+	var vsn api.Version
+	ms, err := refresher.store.MigrationStatus(ctx)
+	if err != nil {
+		return vsn, err
+	}
+	switch ms {
+	case storage.Successful:
+		vsn = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
+	case storage.SuccessfulBeta1:
+		vsn = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
+	default:
+		vsn = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
+	}
+	return vsn, nil
 }
 
 // TODO: mocked struct that will eventually be

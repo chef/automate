@@ -31,7 +31,6 @@ type policyServer struct {
 	engine          engine.V2pXWriter
 	v1              storage_v1.PoliciesLister
 	vChan           chan api.Version
-	version         api.Version
 	policyRefresher PolicyRefresher
 }
 
@@ -114,7 +113,7 @@ func NewPoliciesServer(
 	default:
 		v = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
 	}
-	srv.setVersion(v)
+	srv.setVersionForInterceptorSwitch(v)
 
 	if v.Major == api.Version_V2 {
 		if err := srv.store.ApplyV2DataMigrations(ctx); err != nil {
@@ -601,7 +600,7 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
 	}
 
-	s.setVersion(v)
+	s.setVersionForInterceptorSwitch(v)
 	return &api.MigrateToV2Resp{Reports: reports}, nil
 }
 
@@ -623,7 +622,7 @@ func (s *policyServer) handleMinorUpgrade(ctx context.Context, ms storage.Migrat
 	}
 
 	if upgraded {
-		s.setVersion(version)
+		s.setVersionForInterceptorSwitch(version)
 	}
 	return upgraded, nil
 }
@@ -650,7 +649,7 @@ func (s *policyServer) ResetToV1(ctx context.Context,
 	if err := s.store.Reset(ctx); err != nil {
 		return nil, status.Errorf(codes.Internal, "reset database state: %s", err.Error())
 	}
-	s.setVersion(api.Version{Major: api.Version_V1, Minor: api.Version_V0})
+	s.setVersionForInterceptorSwitch(api.Version{Major: api.Version_V1, Minor: api.Version_V0})
 	return &api.ResetToV1Resp{}, nil
 }
 
@@ -710,7 +709,7 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 }
 
 func (s *policyServer) updateEngineStore(ctx context.Context) error {
-	return s.policyRefresher.Refresh(ctx, s.version)
+	return s.policyRefresher.Refresh(ctx)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -893,9 +892,10 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 	s.log.WithFields(kv).Info("Policy definition")
 }
 
-func (s *policyServer) setVersion(v api.Version) {
+// setVersionForInterceptorSwitch informs the interceptor piece of this server
+// to deny v1 requests if set to v2/v2.1 and vice-versa.
+func (s *policyServer) setVersionForInterceptorSwitch(v api.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
-		s.version = v
 	}
 }
