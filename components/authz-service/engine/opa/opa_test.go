@@ -31,7 +31,7 @@ import (
 // require you to call `go generate ./...` or a Makefile target.
 func TestCompiledInOPAPolicy(t *testing.T) {
 	an := opa.AssetNames()
-	assert.Equal(t, 6, len(an), "expecting 6 assets")
+	assert.Equal(t, 5, len(an), "expecting 6 assets")
 
 	for _, asset := range opa.AssetNames() {
 		compiled := opa.MustAsset(asset)
