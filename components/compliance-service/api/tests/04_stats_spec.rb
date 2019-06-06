@@ -29,15 +29,12 @@ if !ENV['NO_STATS_TESTS']
       ])
 
       expected_data = {
-        "profiles" => [],
         "platforms" => [
           {
             "name" => "debian",
             "failures" => 1
           }
-        ],
-        "controls" => [],
-        "environments" => []
+        ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -48,9 +45,6 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles" => [],
-        "platforms" => [],
-        "controls" => [],
         "environments" => [
           {
             "name" => "DevSec Prod Zeta",
@@ -67,9 +61,6 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles" => [],
-        "platforms" => [],
-        "controls" => [],
         "environments" => [
           {
             "name" => "DevSec Prod Zeta",
@@ -86,9 +77,6 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles" => [],
-        "platforms" => [],
-        "controls" => [],
         "environments" => [
           {
             "name" => "DevSec Prod Zeta",
@@ -106,15 +94,12 @@ if !ENV['NO_STATS_TESTS']
       ],
                                                                  size: 1)
       expected_data = {
-        "profiles" => [],
         "platforms" => [
           {
             "name" => "debian",
             "failures" => 1
           }
-        ],
-        "controls" => [],
-        "environments" => []
+        ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -125,14 +110,12 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles" => [],
         "platforms" => [
           {
             "name" => "debian",
             "failures" => 1
           }
         ],
-        "controls" => [],
         "environments" => [
           {
             "name" => "DevSec Prod Zeta",
@@ -157,10 +140,7 @@ if !ENV['NO_STATS_TESTS']
             "failures" => 1,
             "id" => "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"
           }
-        ],
-        "platforms" => [],
-        "controls" => [],
-        "environments" => []
+        ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -173,8 +153,6 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-        "profiles" => [],
-        "platforms" => [],
         "controls" => [
           {
             "name" => "os-02",
@@ -216,8 +194,7 @@ if !ENV['NO_STATS_TESTS']
             "name" => "sysctl-15",
             "failures" => 1
           }
-        ],
-        "environments" => []
+        ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -227,15 +204,12 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
       ])
       expected_data = {
-        "profiles" => [],
-        "platforms" => [],
         "controls" =>
           [
             {"name" => "nginx-04", "failures" => 3},
             {"name" => "nginx-01", "failures" => 2},
             {"name" => "apache-02", "failures" => 1}
-          ],
-        "environments" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -246,12 +220,7 @@ if !ENV['NO_STATS_TESTS']
         Stats::ListFilter.new(type: "environment", values: ["missing In action"]),
         Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
       ])
-      expected_data = {
-        "profiles" => [],
-        "platforms" => [],
-        "controls" => [],
-        "environments" => []
-      }
+      expected_data = {}
       assert_equal_json_content(expected_data, actual_data)
 
       # todo - this one is in the deep test: 04_deep_stats_spec.rb::test1::line36
@@ -263,15 +232,12 @@ if !ENV['NO_STATS_TESTS']
           Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-          "profiles" => [],
           "platforms" => [
               {
                   "name" => "debian",
                   "failures" => 1
               }
-          ],
-          "controls" => [],
-          "environments" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -282,12 +248,7 @@ if !ENV['NO_STATS_TESTS']
           Stats::ListFilter.new(type: "environment", values: ["Dev&Test Trouble+Maker:Env"]),
           Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
       ])
-      expected_data = {
-          "profiles" => [],
-          "platforms" => [],
-          "controls" => [],
-          "environments" => []
-      }
+      expected_data = {}
       assert_equal_json_content(expected_data, actual_data)
 
 
@@ -296,29 +257,18 @@ if !ENV['NO_STATS_TESTS']
           Stats::ListFilter.new(type: "types", values: ["platform"]),
           Stats::ListFilter.new(type: "start_time", values: ["3000-03-03T03:03:03Z"])
       ])
-      expected_data = {
-          "profiles" => [],
-          "platforms" => [],
-          "controls" => [],
-          "environments" => []
-      }
+      expected_data = {}
       assert_equal_json_content(expected_data, actual_data)
 
 
       ##read profiles
       actual_data = GRPC stats, :read_profiles, Stats::Query.new()
-      expected_data = {
-          "profileList" => [],
-          "controlStats" => []
-      }
+      expected_data = {}
       assert_equal_json_content(expected_data, actual_data)
 
 
       actual_data = GRPC stats, :read_profiles, Stats::Query.new(size: 2)
-      expected_data = {
-          "profileList" => [],
-          "controlStats" => []
-      }
+      expected_data = {}
       assert_equal_json_content(expected_data, actual_data)
 
 
@@ -334,8 +284,7 @@ if !ENV['NO_STATS_TESTS']
                   "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                   "skipped" => 14
               }
-          ],
-          "controlStats" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -367,8 +316,7 @@ if !ENV['NO_STATS_TESTS']
             "name" => "fake-baseline",
             "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9"
           }
-        ],
-        "controlStats" => []
+        ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -385,8 +333,7 @@ if !ENV['NO_STATS_TESTS']
             "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
             "skipped" => 14
           }
-        ],
-        "controlStats" => []
+        ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -405,8 +352,7 @@ if !ENV['NO_STATS_TESTS']
             "criticals" => 22,
             "passed" => 23
           }
-        ],
-        "controlStats" => []
+        ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -419,10 +365,7 @@ if !ENV['NO_STATS_TESTS']
         type: "controls",
         id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
-      expected_data = {
-        "profileList" => [],
-        "controlStats" => []
-      }
+      expected_data = {}
       assert_equal_json_content(expected_data, actual_data)
 
 
@@ -434,7 +377,6 @@ if !ENV['NO_STATS_TESTS']
         id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
       expected_data = {
-        "profileList" => [],
         "controlStats" => [
           {
             "control" => "nginx-01",
@@ -472,7 +414,6 @@ if !ENV['NO_STATS_TESTS']
         id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
       expected_data = {
-        "profileList" => [],
         "profileSummary" => {
           "name" => "nginx-baseline",
           "title" => "DevSec Nginx Baseline",
@@ -484,8 +425,7 @@ if !ENV['NO_STATS_TESTS']
           "summary" => "Test-suite for best-practice nginx hardening",
           "supports" => [{"osFamily" => "unix"}],
           "stats" => {"failed" => 1, "passed" => 5, "skipped" => 2}
-        },
-        "controlStats" => []
+        }
       }
       assert_equal_json_content(expected_data, actual_data)
       # {"profileList":[],"profileSummary":{"name":"nginx-baseline","title":"DevSec Nginx Baseline","version":"2.1.0","license":"Apache-2.0","maintainer":"DevSec Hardening Framework Team","copyright":"DevSec Hardening Framework Team","copyrightEmail":"hello@dev-sec.io","summary":"Test-suite for best-practice nginx hardening","supports":[{"osFamily":"unix"}],"stats":{"failed":1,"passed":5,"skipped":2}},"controlStats":[]}
@@ -504,7 +444,6 @@ if !ENV['NO_STATS_TESTS']
         id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
       expected_data = {
-        "profileList" => [],
         "controlStats" => [
           {
             "control" => "nginx-01",

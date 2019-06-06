@@ -102,7 +102,6 @@ describe File.basename(__FILE__) do
                 "depends" => [],
                 "sha256" => "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8",
                 "groups" => [],
-                "controls" => [],
                 "attributes" => []
             }
         ],
@@ -140,7 +139,6 @@ describe File.basename(__FILE__) do
                 "depends" => [],
                 "sha256" => "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324",
                 "groups" => [],
-                "controls" => [],
                 "attributes" => []
             },
             {
@@ -157,7 +155,6 @@ describe File.basename(__FILE__) do
                 "depends" => [],
                 "sha256" => "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8",
                 "groups" => [],
-                "controls" => [],
                 "attributes" => []
             }
         ],
@@ -289,7 +286,6 @@ describe File.basename(__FILE__) do
                 "depends" => [],
                 "sha256" => "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
                 "groups" => [],
-                "controls" => [],
                 "attributes" => []
             },
             {
@@ -306,7 +302,6 @@ describe File.basename(__FILE__) do
                 "depends" => [],
                 "sha256" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                 "groups" => [],
-                "controls" => [],
                 "attributes" => []
             },
             {
@@ -323,7 +318,6 @@ describe File.basename(__FILE__) do
                 "depends" => [],
                 "sha256" => "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324",
                 "groups" => [],
-                "controls" => [],
                 "attributes" => []
             },
             {
@@ -340,7 +334,6 @@ describe File.basename(__FILE__) do
                 "depends" => [{"name" => "linux-baseline", "compliance" => "admin/linux-baseline"}],
                 "sha256" => "30965cce5dbab899fc90820d6f3465514d7bd6ea6e8a6ed44225f2bf410bd7a5",
                 "groups" => [],
-                "controls" => [],
                 "attributes" => []
             }
         ],

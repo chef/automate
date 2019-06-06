@@ -910,7 +910,6 @@ describe File.basename(__FILE__) do
                 }
             }
         },
-        "tags" => [],
         "profiles" => [
             {
                 "name" => "nginx-baseline",
