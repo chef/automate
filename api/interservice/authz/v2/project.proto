@@ -63,8 +63,6 @@ service Projects {
 
     // Note: POC functions that are not ready to expose outside of our
     // spike (aka keep them out of the gateway for now).
-    rpc ListProjectRules(ListProjectRulesReq) returns (ProjectCollectionRulesResp) {};
-    rpc GetProjectRules(GetProjectRulesReq) returns (GetProjectRulesResp) {};
     rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (
         chef.automate.domain.event.api.EventResponse);
     rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
@@ -77,6 +75,7 @@ service Projects {
     rpc ListRules(ListRulesReq) returns (ListRulesResp) {};
     rpc ListRulesForProject(ListRulesForProjectReq) returns (ListRulesForProjectResp) {};
     rpc DeleteRule(DeleteRuleReq) returns (DeleteRuleResp) {};
+    rpc ListProjectRules(ListProjectRulesReq) returns (ProjectCollectionRulesResp) {};
 }
 
 message ProjectUpdateCancelReq {}
@@ -96,14 +95,6 @@ message ProjectUpdateStatusResp {
 message ListProjectRulesReq {}
 message ProjectCollectionRulesResp {
     map<string, ProjectRules> project_rules = 2;
-}
-
-message GetProjectRulesReq {
-    string project_id = 1;
-}
-
-message GetProjectRulesResp {
-    ProjectRules rules_for_project = 2;
 }
 
 message ProjectRules {

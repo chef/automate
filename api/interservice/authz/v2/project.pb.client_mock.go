@@ -135,6 +135,7 @@ func (mr *MockProjectsClientMockRecorder) ListProjects(ctx, in interface{}, opts
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockProjectsClient)(nil).ListProjects), varargs...)
 }
 
+<<<<<<< HEAD
 // ListProjectsForIntrospection mocks base method
 func (m *MockProjectsClient) ListProjectsForIntrospection(ctx context.Context, in *ListProjectsReq, opts ...grpc.CallOption) (*ListProjectsResp, error) {
 	m.ctrl.T.Helper()
@@ -195,6 +196,8 @@ func (mr *MockProjectsClientMockRecorder) GetProjectRules(ctx, in interface{}, o
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectRules", reflect.TypeOf((*MockProjectsClient)(nil).GetProjectRules), varargs...)
 }
 
+=======
+>>>>>>> authz: drop no longer needed POC code
 // HandleEvent mocks base method
 func (m *MockProjectsClient) HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error) {
 	m.ctrl.T.Helper()
@@ -375,6 +378,26 @@ func (mr *MockProjectsClientMockRecorder) DeleteRule(ctx, in interface{}, opts .
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRule", reflect.TypeOf((*MockProjectsClient)(nil).DeleteRule), varargs...)
 }
 
+// ListProjectRules mocks base method
+func (m *MockProjectsClient) ListProjectRules(ctx context.Context, in *ListProjectRulesReq, opts ...grpc.CallOption) (*ProjectCollectionRulesResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListProjectRules", varargs...)
+	ret0, _ := ret[0].(*ProjectCollectionRulesResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListProjectRules indicates an expected call of ListProjectRules
+func (mr *MockProjectsClientMockRecorder) ListProjectRules(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectRules", reflect.TypeOf((*MockProjectsClient)(nil).ListProjectRules), varargs...)
+}
+
 // MockProjectsServer is a mock of ProjectsServer interface
 type MockProjectsServer struct {
 	ctrl     *gomock.Controller
@@ -473,6 +496,7 @@ func (mr *MockProjectsServerMockRecorder) ListProjects(arg0, arg1 interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjects", reflect.TypeOf((*MockProjectsServer)(nil).ListProjects), arg0, arg1)
 }
 
+<<<<<<< HEAD
 // ListProjectsForIntrospection mocks base method
 func (m *MockProjectsServer) ListProjectsForIntrospection(arg0 context.Context, arg1 *ListProjectsReq) (*ListProjectsResp, error) {
 	m.ctrl.T.Helper()
@@ -518,6 +542,8 @@ func (mr *MockProjectsServerMockRecorder) GetProjectRules(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectRules", reflect.TypeOf((*MockProjectsServer)(nil).GetProjectRules), arg0, arg1)
 }
 
+=======
+>>>>>>> authz: drop no longer needed POC code
 // HandleEvent mocks base method
 func (m *MockProjectsServer) HandleEvent(arg0 context.Context, arg1 *event.EventMsg) (*event.EventResponse, error) {
 	m.ctrl.T.Helper()
@@ -651,4 +677,19 @@ func (m *MockProjectsServer) DeleteRule(arg0 context.Context, arg1 *DeleteRuleRe
 func (mr *MockProjectsServerMockRecorder) DeleteRule(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRule", reflect.TypeOf((*MockProjectsServer)(nil).DeleteRule), arg0, arg1)
+}
+
+// ListProjectRules mocks base method
+func (m *MockProjectsServer) ListProjectRules(arg0 context.Context, arg1 *ListProjectRulesReq) (*ProjectCollectionRulesResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListProjectRules", arg0, arg1)
+	ret0, _ := ret[0].(*ProjectCollectionRulesResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListProjectRules indicates an expected call of ListProjectRules
+func (mr *MockProjectsServerMockRecorder) ListProjectRules(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectRules", reflect.TypeOf((*MockProjectsServer)(nil).ListProjectRules), arg0, arg1)
 }

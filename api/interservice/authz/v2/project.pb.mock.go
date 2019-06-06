@@ -29,6 +29,7 @@ func NewProjectsServerMockWithoutValidation() *ProjectsServerMock {
 // ProjectsServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
 type ProjectsServerMock struct {
+<<<<<<< HEAD
 	validateRequests                 bool
 	UpdateProjectFunc                func(context.Context, *UpdateProjectReq) (*UpdateProjectResp, error)
 	CreateProjectFunc                func(context.Context, *CreateProjectReq) (*CreateProjectResp, error)
@@ -47,6 +48,24 @@ type ProjectsServerMock struct {
 	ListRulesFunc                    func(context.Context, *ListRulesReq) (*ListRulesResp, error)
 	ListRulesForProjectFunc          func(context.Context, *ListRulesForProjectReq) (*ListRulesForProjectResp, error)
 	DeleteRuleFunc                   func(context.Context, *DeleteRuleReq) (*DeleteRuleResp, error)
+=======
+	validateRequests        bool
+	UpdateProjectFunc       func(context.Context, *UpdateProjectReq) (*UpdateProjectResp, error)
+	CreateProjectFunc       func(context.Context, *CreateProjectReq) (*CreateProjectResp, error)
+	GetProjectFunc          func(context.Context, *GetProjectReq) (*GetProjectResp, error)
+	DeleteProjectFunc       func(context.Context, *DeleteProjectReq) (*DeleteProjectResp, error)
+	ListProjectsFunc        func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
+	HandleEventFunc         func(context.Context, *event.EventMsg) (*event.EventResponse, error)
+	ProjectUpdateStatusFunc func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
+	ProjectUpdateCancelFunc func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error)
+	CreateRuleFunc          func(context.Context, *CreateRuleReq) (*CreateRuleResp, error)
+	UpdateRuleFunc          func(context.Context, *UpdateRuleReq) (*UpdateRuleResp, error)
+	GetRuleFunc             func(context.Context, *GetRuleReq) (*GetRuleResp, error)
+	ListRulesFunc           func(context.Context, *ListRulesReq) (*ListRulesResp, error)
+	ListRulesForProjectFunc func(context.Context, *ListRulesForProjectReq) (*ListRulesForProjectResp, error)
+	DeleteRuleFunc          func(context.Context, *DeleteRuleReq) (*DeleteRuleResp, error)
+	ListProjectRulesFunc    func(context.Context, *ListProjectRulesReq) (*ProjectCollectionRulesResp, error)
+>>>>>>> authz: drop no longer needed POC code
 }
 
 func (m *ProjectsServerMock) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
@@ -109,6 +128,7 @@ func (m *ProjectsServerMock) ListProjects(ctx context.Context, req *ListProjects
 	return nil, status.Error(codes.Internal, "mock: 'ListProjects' not implemented")
 }
 
+<<<<<<< HEAD
 func (m *ProjectsServerMock) ListProjectsForIntrospection(ctx context.Context, req *ListProjectsReq) (*ListProjectsResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
@@ -145,6 +165,8 @@ func (m *ProjectsServerMock) GetProjectRules(ctx context.Context, req *GetProjec
 	return nil, status.Error(codes.Internal, "mock: 'GetProjectRules' not implemented")
 }
 
+=======
+>>>>>>> authz: drop no longer needed POC code
 func (m *ProjectsServerMock) HandleEvent(ctx context.Context, req *event.EventMsg) (*event.EventResponse, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
@@ -253,6 +275,18 @@ func (m *ProjectsServerMock) DeleteRule(ctx context.Context, req *DeleteRuleReq)
 	return nil, status.Error(codes.Internal, "mock: 'DeleteRule' not implemented")
 }
 
+func (m *ProjectsServerMock) ListProjectRules(ctx context.Context, req *ListProjectRulesReq) (*ProjectCollectionRulesResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.ListProjectRulesFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'ListProjectRules' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *ProjectsServerMock) Reset() {
 	m.UpdateProjectFunc = nil
@@ -260,9 +294,12 @@ func (m *ProjectsServerMock) Reset() {
 	m.GetProjectFunc = nil
 	m.DeleteProjectFunc = nil
 	m.ListProjectsFunc = nil
+<<<<<<< HEAD
 	m.ListProjectsForIntrospectionFunc = nil
 	m.ListProjectRulesFunc = nil
 	m.GetProjectRulesFunc = nil
+=======
+>>>>>>> authz: drop no longer needed POC code
 	m.HandleEventFunc = nil
 	m.ProjectUpdateStatusFunc = nil
 	m.ProjectUpdateCancelFunc = nil
@@ -272,4 +309,5 @@ func (m *ProjectsServerMock) Reset() {
 	m.ListRulesFunc = nil
 	m.ListRulesForProjectFunc = nil
 	m.DeleteRuleFunc = nil
+	m.ListProjectRulesFunc = nil
 }

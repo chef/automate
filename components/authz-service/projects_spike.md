@@ -37,12 +37,12 @@ ListProjectRules requires no input values and returns a map of projectID -> list
 ...
 ```
 
-### GetProjectRules
+### GetRulesForProject
 
-GetProjectRules accepts a projectID and returns a list of the rules for the specified project.
+GetRulesForProject accepts a projectID and returns a list of the rules for the specified project.
 
 ```
-# grpcurl --insecure -cert /hab/svc/authz-service/config/service.crt -key /hab/svc/authz-service/config/service.key  -d '{"project_id":"project2"}' localhost:10130 chef.automate.domain.authz.v2.Projects.GetProjectRules
+# grpcurl --insecure -cert /hab/svc/authz-service/config/service.crt -key /hab/svc/authz-service/config/service.key  -d '{"project_id":"project2"}' localhost:10130 chef.automate.domain.authz.v2.Projects.GetRulesForProject
 {
   "rulesForProject": {
     "rules": [

@@ -46,7 +46,11 @@ func (x ProjectRuleTypes) String() string {
 	return proto.EnumName(ProjectRuleTypes_name, int32(x))
 }
 func (ProjectRuleTypes) EnumDescriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{0}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{0}
+>>>>>>> authz: drop no longer needed POC code
 }
 
 type ProjectRuleConditionTypes int32
@@ -84,7 +88,11 @@ func (x ProjectRuleConditionTypes) String() string {
 	return proto.EnumName(ProjectRuleConditionTypes_name, int32(x))
 }
 func (ProjectRuleConditionTypes) EnumDescriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{1}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{1}
+>>>>>>> authz: drop no longer needed POC code
 }
 
 type ProjectRuleConditionOperators int32
@@ -107,7 +115,11 @@ func (x ProjectRuleConditionOperators) String() string {
 	return proto.EnumName(ProjectRuleConditionOperators_name, int32(x))
 }
 func (ProjectRuleConditionOperators) EnumDescriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{2}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{2}
+>>>>>>> authz: drop no longer needed POC code
 }
 
 type Project struct {
@@ -124,7 +136,11 @@ func (m *Project) Reset()         { *m = Project{} }
 func (m *Project) String() string { return proto.CompactTextString(m) }
 func (*Project) ProtoMessage()    {}
 func (*Project) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{0}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{0}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *Project) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Project.Unmarshal(m, b)
@@ -184,7 +200,11 @@ func (m *CreateProjectReq) Reset()         { *m = CreateProjectReq{} }
 func (m *CreateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*CreateProjectReq) ProtoMessage()    {}
 func (*CreateProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{1}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{1}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *CreateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectReq.Unmarshal(m, b)
@@ -229,7 +249,11 @@ func (m *CreateProjectResp) Reset()         { *m = CreateProjectResp{} }
 func (m *CreateProjectResp) String() string { return proto.CompactTextString(m) }
 func (*CreateProjectResp) ProtoMessage()    {}
 func (*CreateProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{2}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{2}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *CreateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectResp.Unmarshal(m, b)
@@ -267,7 +291,11 @@ func (m *GetProjectReq) Reset()         { *m = GetProjectReq{} }
 func (m *GetProjectReq) String() string { return proto.CompactTextString(m) }
 func (*GetProjectReq) ProtoMessage()    {}
 func (*GetProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{3}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{3}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *GetProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectReq.Unmarshal(m, b)
@@ -305,7 +333,11 @@ func (m *GetProjectResp) Reset()         { *m = GetProjectResp{} }
 func (m *GetProjectResp) String() string { return proto.CompactTextString(m) }
 func (*GetProjectResp) ProtoMessage()    {}
 func (*GetProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{4}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{4}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *GetProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectResp.Unmarshal(m, b)
@@ -342,7 +374,11 @@ func (m *ListProjectsReq) Reset()         { *m = ListProjectsReq{} }
 func (m *ListProjectsReq) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsReq) ProtoMessage()    {}
 func (*ListProjectsReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{5}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{5}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ListProjectsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsReq.Unmarshal(m, b)
@@ -373,7 +409,11 @@ func (m *ListProjectsResp) Reset()         { *m = ListProjectsResp{} }
 func (m *ListProjectsResp) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsResp) ProtoMessage()    {}
 func (*ListProjectsResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{6}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{6}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ListProjectsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsResp.Unmarshal(m, b)
@@ -412,7 +452,11 @@ func (m *UpdateProjectReq) Reset()         { *m = UpdateProjectReq{} }
 func (m *UpdateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*UpdateProjectReq) ProtoMessage()    {}
 func (*UpdateProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{7}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{7}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *UpdateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectReq.Unmarshal(m, b)
@@ -457,7 +501,11 @@ func (m *UpdateProjectResp) Reset()         { *m = UpdateProjectResp{} }
 func (m *UpdateProjectResp) String() string { return proto.CompactTextString(m) }
 func (*UpdateProjectResp) ProtoMessage()    {}
 func (*UpdateProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{8}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{8}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *UpdateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectResp.Unmarshal(m, b)
@@ -495,7 +543,11 @@ func (m *DeleteProjectReq) Reset()         { *m = DeleteProjectReq{} }
 func (m *DeleteProjectReq) String() string { return proto.CompactTextString(m) }
 func (*DeleteProjectReq) ProtoMessage()    {}
 func (*DeleteProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{9}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{9}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *DeleteProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectReq.Unmarshal(m, b)
@@ -532,7 +584,11 @@ func (m *DeleteProjectResp) Reset()         { *m = DeleteProjectResp{} }
 func (m *DeleteProjectResp) String() string { return proto.CompactTextString(m) }
 func (*DeleteProjectResp) ProtoMessage()    {}
 func (*DeleteProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{10}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{10}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *DeleteProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectResp.Unmarshal(m, b)
@@ -562,7 +618,11 @@ func (m *ProjectUpdateCancelReq) Reset()         { *m = ProjectUpdateCancelReq{}
 func (m *ProjectUpdateCancelReq) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateCancelReq) ProtoMessage()    {}
 func (*ProjectUpdateCancelReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{11}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{11}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ProjectUpdateCancelReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateCancelReq.Unmarshal(m, b)
@@ -592,7 +652,11 @@ func (m *ProjectUpdateCancelResp) Reset()         { *m = ProjectUpdateCancelResp
 func (m *ProjectUpdateCancelResp) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateCancelResp) ProtoMessage()    {}
 func (*ProjectUpdateCancelResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{12}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{12}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ProjectUpdateCancelResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateCancelResp.Unmarshal(m, b)
@@ -622,7 +686,11 @@ func (m *ProjectUpdateStatusReq) Reset()         { *m = ProjectUpdateStatusReq{}
 func (m *ProjectUpdateStatusReq) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateStatusReq) ProtoMessage()    {}
 func (*ProjectUpdateStatusReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{13}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{13}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ProjectUpdateStatusReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateStatusReq.Unmarshal(m, b)
@@ -657,7 +725,11 @@ func (m *ProjectUpdateStatusResp) Reset()         { *m = ProjectUpdateStatusResp
 func (m *ProjectUpdateStatusResp) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateStatusResp) ProtoMessage()    {}
 func (*ProjectUpdateStatusResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{14}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{14}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ProjectUpdateStatusResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateStatusResp.Unmarshal(m, b)
@@ -722,7 +794,11 @@ func (m *ListProjectRulesReq) Reset()         { *m = ListProjectRulesReq{} }
 func (m *ListProjectRulesReq) String() string { return proto.CompactTextString(m) }
 func (*ListProjectRulesReq) ProtoMessage()    {}
 func (*ListProjectRulesReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{15}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{15}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ListProjectRulesReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectRulesReq.Unmarshal(m, b)
@@ -753,7 +829,11 @@ func (m *ProjectCollectionRulesResp) Reset()         { *m = ProjectCollectionRul
 func (m *ProjectCollectionRulesResp) String() string { return proto.CompactTextString(m) }
 func (*ProjectCollectionRulesResp) ProtoMessage()    {}
 func (*ProjectCollectionRulesResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{16}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{16}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ProjectCollectionRulesResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectCollectionRulesResp.Unmarshal(m, b)
@@ -780,6 +860,7 @@ func (m *ProjectCollectionRulesResp) GetProjectRules() map[string]*ProjectRules 
 	return nil
 }
 
+<<<<<<< HEAD
 type GetProjectRulesReq struct {
 	ProjectId            string   `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty" toml:"project_id,omitempty" mapstructure:"project_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -856,6 +937,8 @@ func (m *GetProjectRulesResp) GetRulesForProject() *ProjectRules {
 	return nil
 }
 
+=======
+>>>>>>> authz: drop no longer needed POC code
 type ProjectRules struct {
 	Rules                []*ProjectRule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" toml:"rules,omitempty" mapstructure:"rules,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -867,7 +950,11 @@ func (m *ProjectRules) Reset()         { *m = ProjectRules{} }
 func (m *ProjectRules) String() string { return proto.CompactTextString(m) }
 func (*ProjectRules) ProtoMessage()    {}
 func (*ProjectRules) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{19}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{17}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ProjectRules) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRules.Unmarshal(m, b)
@@ -909,7 +996,11 @@ func (m *ProjectRule) Reset()         { *m = ProjectRule{} }
 func (m *ProjectRule) String() string { return proto.CompactTextString(m) }
 func (*ProjectRule) ProtoMessage()    {}
 func (*ProjectRule) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{20}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{18}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ProjectRule) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRule.Unmarshal(m, b)
@@ -977,7 +1068,11 @@ func (m *Condition) Reset()         { *m = Condition{} }
 func (m *Condition) String() string { return proto.CompactTextString(m) }
 func (*Condition) ProtoMessage()    {}
 func (*Condition) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{21}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{19}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *Condition) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Condition.Unmarshal(m, b)
@@ -1035,7 +1130,11 @@ func (m *CreateRuleReq) Reset()         { *m = CreateRuleReq{} }
 func (m *CreateRuleReq) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleReq) ProtoMessage()    {}
 func (*CreateRuleReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{22}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{20}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *CreateRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleReq.Unmarshal(m, b)
@@ -1101,7 +1200,11 @@ func (m *CreateRuleResp) Reset()         { *m = CreateRuleResp{} }
 func (m *CreateRuleResp) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleResp) ProtoMessage()    {}
 func (*CreateRuleResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{23}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{21}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *CreateRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleResp.Unmarshal(m, b)
@@ -1143,7 +1246,11 @@ func (m *UpdateRuleReq) Reset()         { *m = UpdateRuleReq{} }
 func (m *UpdateRuleReq) String() string { return proto.CompactTextString(m) }
 func (*UpdateRuleReq) ProtoMessage()    {}
 func (*UpdateRuleReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{24}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{22}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *UpdateRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateRuleReq.Unmarshal(m, b)
@@ -1209,7 +1316,11 @@ func (m *UpdateRuleResp) Reset()         { *m = UpdateRuleResp{} }
 func (m *UpdateRuleResp) String() string { return proto.CompactTextString(m) }
 func (*UpdateRuleResp) ProtoMessage()    {}
 func (*UpdateRuleResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{25}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{23}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *UpdateRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateRuleResp.Unmarshal(m, b)
@@ -1247,7 +1358,11 @@ func (m *GetRuleReq) Reset()         { *m = GetRuleReq{} }
 func (m *GetRuleReq) String() string { return proto.CompactTextString(m) }
 func (*GetRuleReq) ProtoMessage()    {}
 func (*GetRuleReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{26}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{24}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *GetRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRuleReq.Unmarshal(m, b)
@@ -1285,7 +1400,11 @@ func (m *GetRuleResp) Reset()         { *m = GetRuleResp{} }
 func (m *GetRuleResp) String() string { return proto.CompactTextString(m) }
 func (*GetRuleResp) ProtoMessage()    {}
 func (*GetRuleResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{27}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{25}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *GetRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRuleResp.Unmarshal(m, b)
@@ -1322,7 +1441,11 @@ func (m *ListRulesReq) Reset()         { *m = ListRulesReq{} }
 func (m *ListRulesReq) String() string { return proto.CompactTextString(m) }
 func (*ListRulesReq) ProtoMessage()    {}
 func (*ListRulesReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{28}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{26}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ListRulesReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesReq.Unmarshal(m, b)
@@ -1353,7 +1476,11 @@ func (m *ListRulesResp) Reset()         { *m = ListRulesResp{} }
 func (m *ListRulesResp) String() string { return proto.CompactTextString(m) }
 func (*ListRulesResp) ProtoMessage()    {}
 func (*ListRulesResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{29}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{27}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ListRulesResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesResp.Unmarshal(m, b)
@@ -1391,7 +1518,11 @@ func (m *ListRulesForProjectReq) Reset()         { *m = ListRulesForProjectReq{}
 func (m *ListRulesForProjectReq) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForProjectReq) ProtoMessage()    {}
 func (*ListRulesForProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{30}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{28}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ListRulesForProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForProjectReq.Unmarshal(m, b)
@@ -1429,7 +1560,11 @@ func (m *ListRulesForProjectResp) Reset()         { *m = ListRulesForProjectResp
 func (m *ListRulesForProjectResp) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForProjectResp) ProtoMessage()    {}
 func (*ListRulesForProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{31}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{29}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *ListRulesForProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForProjectResp.Unmarshal(m, b)
@@ -1467,7 +1602,11 @@ func (m *DeleteRuleReq) Reset()         { *m = DeleteRuleReq{} }
 func (m *DeleteRuleReq) String() string { return proto.CompactTextString(m) }
 func (*DeleteRuleReq) ProtoMessage()    {}
 func (*DeleteRuleReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{32}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{30}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *DeleteRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteRuleReq.Unmarshal(m, b)
@@ -1504,7 +1643,11 @@ func (m *DeleteRuleResp) Reset()         { *m = DeleteRuleResp{} }
 func (m *DeleteRuleResp) String() string { return proto.CompactTextString(m) }
 func (*DeleteRuleResp) ProtoMessage()    {}
 func (*DeleteRuleResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_aaf2029eaced7736, []int{33}
+=======
+	return fileDescriptor_project_08a64cda17369101, []int{31}
+>>>>>>> authz: drop no longer needed POC code
 }
 func (m *DeleteRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteRuleResp.Unmarshal(m, b)
@@ -1543,8 +1686,6 @@ func init() {
 	proto.RegisterType((*ListProjectRulesReq)(nil), "chef.automate.domain.authz.v2.ListProjectRulesReq")
 	proto.RegisterType((*ProjectCollectionRulesResp)(nil), "chef.automate.domain.authz.v2.ProjectCollectionRulesResp")
 	proto.RegisterMapType((map[string]*ProjectRules)(nil), "chef.automate.domain.authz.v2.ProjectCollectionRulesResp.ProjectRulesEntry")
-	proto.RegisterType((*GetProjectRulesReq)(nil), "chef.automate.domain.authz.v2.GetProjectRulesReq")
-	proto.RegisterType((*GetProjectRulesResp)(nil), "chef.automate.domain.authz.v2.GetProjectRulesResp")
 	proto.RegisterType((*ProjectRules)(nil), "chef.automate.domain.authz.v2.ProjectRules")
 	proto.RegisterType((*ProjectRule)(nil), "chef.automate.domain.authz.v2.ProjectRule")
 	proto.RegisterType((*Condition)(nil), "chef.automate.domain.authz.v2.Condition")
@@ -1585,8 +1726,6 @@ type ProjectsClient interface {
 	ListProjectsForIntrospection(ctx context.Context, in *ListProjectsReq, opts ...grpc.CallOption) (*ListProjectsResp, error)
 	// Note: POC functions that are not ready to expose outside of our
 	// spike (aka keep them out of the gateway for now).
-	ListProjectRules(ctx context.Context, in *ListProjectRulesReq, opts ...grpc.CallOption) (*ProjectCollectionRulesResp, error)
-	GetProjectRules(ctx context.Context, in *GetProjectRulesReq, opts ...grpc.CallOption) (*GetProjectRulesResp, error)
 	HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error)
 	ProjectUpdateStatus(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateStatusResp, error)
 	ProjectUpdateCancel(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateCancelResp, error)
@@ -1597,6 +1736,7 @@ type ProjectsClient interface {
 	ListRules(ctx context.Context, in *ListRulesReq, opts ...grpc.CallOption) (*ListRulesResp, error)
 	ListRulesForProject(ctx context.Context, in *ListRulesForProjectReq, opts ...grpc.CallOption) (*ListRulesForProjectResp, error)
 	DeleteRule(ctx context.Context, in *DeleteRuleReq, opts ...grpc.CallOption) (*DeleteRuleResp, error)
+	ListProjectRules(ctx context.Context, in *ListProjectRulesReq, opts ...grpc.CallOption) (*ProjectCollectionRulesResp, error)
 }
 
 type projectsClient struct {
@@ -1652,6 +1792,7 @@ func (c *projectsClient) ListProjects(ctx context.Context, in *ListProjectsReq, 
 	return out, nil
 }
 
+<<<<<<< HEAD
 func (c *projectsClient) ListProjectsForIntrospection(ctx context.Context, in *ListProjectsReq, opts ...grpc.CallOption) (*ListProjectsResp, error) {
 	out := new(ListProjectsResp)
 	err := c.cc.Invoke(ctx, "/chef.automate.domain.authz.v2.Projects/ListProjectsForIntrospection", in, out, opts...)
@@ -1679,6 +1820,8 @@ func (c *projectsClient) GetProjectRules(ctx context.Context, in *GetProjectRule
 	return out, nil
 }
 
+=======
+>>>>>>> authz: drop no longer needed POC code
 func (c *projectsClient) HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error) {
 	out := new(event.EventResponse)
 	err := c.cc.Invoke(ctx, "/chef.automate.domain.authz.v2.Projects/HandleEvent", in, out, opts...)
@@ -1760,6 +1903,15 @@ func (c *projectsClient) DeleteRule(ctx context.Context, in *DeleteRuleReq, opts
 	return out, nil
 }
 
+func (c *projectsClient) ListProjectRules(ctx context.Context, in *ListProjectRulesReq, opts ...grpc.CallOption) (*ProjectCollectionRulesResp, error) {
+	out := new(ProjectCollectionRulesResp)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.authz.v2.Projects/ListProjectRules", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProjectsServer is the server API for Projects service.
 type ProjectsServer interface {
 	UpdateProject(context.Context, *UpdateProjectReq) (*UpdateProjectResp, error)
@@ -1770,8 +1922,6 @@ type ProjectsServer interface {
 	ListProjectsForIntrospection(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
 	// Note: POC functions that are not ready to expose outside of our
 	// spike (aka keep them out of the gateway for now).
-	ListProjectRules(context.Context, *ListProjectRulesReq) (*ProjectCollectionRulesResp, error)
-	GetProjectRules(context.Context, *GetProjectRulesReq) (*GetProjectRulesResp, error)
 	HandleEvent(context.Context, *event.EventMsg) (*event.EventResponse, error)
 	ProjectUpdateStatus(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
 	ProjectUpdateCancel(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error)
@@ -1782,6 +1932,7 @@ type ProjectsServer interface {
 	ListRules(context.Context, *ListRulesReq) (*ListRulesResp, error)
 	ListRulesForProject(context.Context, *ListRulesForProjectReq) (*ListRulesForProjectResp, error)
 	DeleteRule(context.Context, *DeleteRuleReq) (*DeleteRuleResp, error)
+	ListProjectRules(context.Context, *ListProjectRulesReq) (*ProjectCollectionRulesResp, error)
 }
 
 func RegisterProjectsServer(s *grpc.Server, srv ProjectsServer) {
@@ -1878,6 +2029,7 @@ func _Projects_ListProjects_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+<<<<<<< HEAD
 func _Projects_ListProjectsForIntrospection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListProjectsReq)
 	if err := dec(in); err != nil {
@@ -1932,6 +2084,8 @@ func _Projects_GetProjectRules_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+=======
+>>>>>>> authz: drop no longer needed POC code
 func _Projects_HandleEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(event.EventMsg)
 	if err := dec(in); err != nil {
@@ -2094,6 +2248,24 @@ func _Projects_DeleteRule_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Projects_ListProjectRules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListProjectRulesReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProjectsServer).ListProjectRules(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.authz.v2.Projects/ListProjectRules",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProjectsServer).ListProjectRules(ctx, req.(*ListProjectRulesReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Projects_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.domain.authz.v2.Projects",
 	HandlerType: (*ProjectsServer)(nil),
@@ -2119,6 +2291,7 @@ var _Projects_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Projects_ListProjects_Handler,
 		},
 		{
+<<<<<<< HEAD
 			MethodName: "ListProjectsForIntrospection",
 			Handler:    _Projects_ListProjectsForIntrospection_Handler,
 		},
@@ -2131,6 +2304,8 @@ var _Projects_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Projects_GetProjectRules_Handler,
 		},
 		{
+=======
+>>>>>>> authz: drop no longer needed POC code
 			MethodName: "HandleEvent",
 			Handler:    _Projects_HandleEvent_Handler,
 		},
@@ -2166,12 +2341,17 @@ var _Projects_serviceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteRule",
 			Handler:    _Projects_DeleteRule_Handler,
 		},
+		{
+			MethodName: "ListProjectRules",
+			Handler:    _Projects_ListProjectRules_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "api/interservice/authz/v2/project.proto",
 }
 
 func init() {
+<<<<<<< HEAD
 	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_aaf2029eaced7736)
 }
 
@@ -2269,4 +2449,98 @@ var fileDescriptor_project_aaf2029eaced7736 = []byte{
 	0x7e, 0x5a, 0x3e, 0x53, 0xc9, 0x79, 0xf7, 0x44, 0x6c, 0xea, 0x9d, 0x92, 0x0d, 0x2e, 0xb9, 0xe0,
 	0xd2, 0xa5, 0x9f, 0x9f, 0x4f, 0xa6, 0xe8, 0x87, 0xa5, 0x3b, 0x7f, 0x07, 0x00, 0x00, 0xff, 0xff,
 	0xbb, 0x96, 0xd3, 0xbc, 0x03, 0x17, 0x00, 0x00,
+=======
+	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_08a64cda17369101)
+}
+
+var fileDescriptor_project_08a64cda17369101 = []byte{
+	// 1382 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x58, 0x4f, 0x6f, 0x1b, 0x45,
+	0x14, 0xf7, 0xf8, 0x4f, 0x1a, 0xbf, 0xc4, 0xee, 0x66, 0x42, 0x12, 0xd7, 0x52, 0x44, 0xb4, 0x54,
+	0x34, 0xa4, 0xcd, 0x6e, 0x31, 0xa5, 0xf4, 0x0f, 0xaa, 0x9a, 0xb8, 0xdb, 0xb4, 0x22, 0x8e, 0xd3,
+	0x75, 0x12, 0x01, 0x15, 0x58, 0x1b, 0x7b, 0x92, 0x2c, 0xb5, 0xbd, 0xdb, 0xdd, 0x71, 0xa4, 0x14,
+	0x71, 0x01, 0xc4, 0x19, 0xf1, 0x49, 0x38, 0x73, 0xe2, 0xce, 0x87, 0xe0, 0x86, 0xc4, 0x07, 0xe0,
+	0xc6, 0x01, 0xcd, 0xec, 0xec, 0x66, 0xd7, 0xb1, 0xb3, 0xb6, 0xb1, 0x38, 0x71, 0xb1, 0x3c, 0x7f,
+	0xde, 0x7b, 0xbf, 0x79, 0xbf, 0x37, 0xef, 0xcd, 0x5b, 0xb8, 0x61, 0xd8, 0xa6, 0x6a, 0x76, 0x28,
+	0x71, 0x5c, 0xe2, 0x9c, 0x9a, 0x0d, 0xa2, 0x1a, 0x5d, 0x7a, 0xf2, 0x46, 0x3d, 0x2d, 0xa9, 0xb6,
+	0x63, 0x7d, 0x45, 0x1a, 0x54, 0xb1, 0x1d, 0x8b, 0x5a, 0x78, 0xb9, 0x71, 0x42, 0x8e, 0x14, 0xa3,
+	0x4b, 0xad, 0xb6, 0x41, 0x89, 0xd2, 0xb4, 0xda, 0x86, 0xd9, 0x51, 0xf8, 0x66, 0xe5, 0xb4, 0x54,
+	0x5c, 0x3a, 0x35, 0x5a, 0x66, 0xd3, 0xa0, 0x44, 0xf5, 0xff, 0x78, 0x72, 0xc5, 0xeb, 0x83, 0x0d,
+	0xd0, 0x33, 0xdb, 0xdf, 0x25, 0x5f, 0xd8, 0x45, 0x4e, 0x49, 0x87, 0x7a, 0xbf, 0x62, 0xcf, 0xdb,
+	0xc7, 0x96, 0x75, 0xdc, 0x22, 0x2a, 0x1f, 0x1d, 0x76, 0x8f, 0x54, 0x6a, 0xb6, 0x89, 0x4b, 0x8d,
+	0xb6, 0xed, 0x6d, 0x90, 0xbf, 0x45, 0x70, 0x65, 0xd7, 0x03, 0x8d, 0x31, 0xa4, 0x3b, 0x46, 0x9b,
+	0x14, 0xd0, 0x0a, 0x5a, 0xcd, 0xea, 0xfc, 0x3f, 0xce, 0x43, 0xd2, 0x6c, 0x16, 0x92, 0x7c, 0x26,
+	0x69, 0x36, 0xf1, 0x47, 0x90, 0x66, 0x10, 0x0a, 0xa9, 0x15, 0xb4, 0x9a, 0x2f, 0xbd, 0xa3, 0x5c,
+	0x7a, 0x42, 0x65, 0xef, 0xcc, 0x26, 0x3a, 0x17, 0xc0, 0x45, 0x98, 0x16, 0xce, 0x71, 0x0b, 0xe9,
+	0x95, 0xd4, 0x6a, 0x56, 0x0f, 0xc6, 0xb2, 0x0e, 0x52, 0xd9, 0x21, 0x06, 0x25, 0x02, 0x89, 0x4e,
+	0x5e, 0xf7, 0x05, 0xb3, 0x76, 0x0e, 0x66, 0xb3, 0xf8, 0xcb, 0x9f, 0xbf, 0xa6, 0x16, 0x9c, 0xf9,
+	0xd2, 0xdc, 0x97, 0x2f, 0x8d, 0xf5, 0x37, 0xb7, 0xd7, 0xef, 0xaf, 0x7f, 0xf1, 0xf5, 0xfb, 0xb7,
+	0xee, 0xde, 0xf9, 0xe6, 0x3a, 0x03, 0x2a, 0xef, 0xc3, 0x5c, 0x8f, 0x4e, 0xd7, 0xc6, 0x8f, 0xe1,
+	0x8a, 0x30, 0xca, 0xf5, 0xce, 0x94, 0xde, 0x8d, 0x39, 0x80, 0x2f, 0xec, 0x8b, 0xc9, 0x0f, 0x21,
+	0xb7, 0x45, 0x68, 0x08, 0xa7, 0x87, 0x09, 0x0d, 0x85, 0x49, 0x87, 0x7c, 0x58, 0x78, 0x22, 0x80,
+	0xe6, 0xe0, 0xea, 0xb6, 0xe9, 0xfa, 0x4a, 0x5d, 0x9d, 0xbc, 0x96, 0x0f, 0x40, 0x8a, 0x4e, 0xb9,
+	0x36, 0xde, 0x0c, 0xb9, 0x1f, 0xad, 0xa4, 0x46, 0xb0, 0x14, 0xa1, 0x69, 0xdf, 0x6e, 0x4e, 0x9c,
+	0xa6, 0x1e, 0x9d, 0x13, 0xf1, 0xca, 0x23, 0x90, 0x9e, 0x90, 0x16, 0x89, 0x40, 0x1d, 0x85, 0xa9,
+	0x79, 0x98, 0xeb, 0x91, 0x77, 0x6d, 0xb9, 0x00, 0x8b, 0x62, 0xe8, 0x41, 0x2e, 0x1b, 0x9d, 0x06,
+	0x69, 0x31, 0x8f, 0x5f, 0x83, 0xa5, 0xbe, 0x2b, 0x7d, 0x84, 0x6a, 0xd4, 0xa0, 0x5d, 0x4e, 0xd3,
+	0x5f, 0xa8, 0x47, 0xca, 0x5f, 0x72, 0x6d, 0xfc, 0x16, 0x64, 0x5c, 0x6a, 0x50, 0xdf, 0xaf, 0xde,
+	0x00, 0xeb, 0xb0, 0x44, 0x5c, 0x6a, 0x32, 0x17, 0x34, 0xeb, 0xec, 0x26, 0xd7, 0x1b, 0x56, 0xdb,
+	0x66, 0x30, 0xb9, 0xb7, 0x67, 0x4a, 0x45, 0xc5, 0xbb, 0xef, 0x8a, 0x7f, 0xdf, 0x95, 0x3d, 0xff,
+	0xbe, 0xeb, 0x0b, 0x81, 0x28, 0x9b, 0x2b, 0x0b, 0x41, 0xac, 0xc2, 0xbc, 0x4d, 0x9c, 0x06, 0xe9,
+	0x50, 0xe3, 0x38, 0xa4, 0x8f, 0xdd, 0xef, 0xa4, 0x8e, 0xcf, 0x97, 0x02, 0x81, 0x45, 0x98, 0x3a,
+	0x32, 0xcc, 0x16, 0x69, 0x16, 0xd2, 0x2b, 0x68, 0x75, 0x5a, 0x17, 0x23, 0x7c, 0x03, 0xae, 0xb2,
+	0x7f, 0x5d, 0x87, 0xd4, 0xdb, 0xc4, 0x75, 0x8d, 0x63, 0x52, 0xc8, 0x70, 0xf0, 0x79, 0x31, 0x5d,
+	0xf1, 0x66, 0xe5, 0x05, 0x98, 0x0f, 0x85, 0xa7, 0xde, 0x6d, 0x11, 0xee, 0x8e, 0xbf, 0x11, 0x14,
+	0xc5, 0x5c, 0xd9, 0x6a, 0xb5, 0x48, 0x83, 0x9a, 0x56, 0x47, 0xac, 0xba, 0x36, 0xb6, 0x21, 0x27,
+	0xc8, 0xad, 0x3b, 0x6c, 0xb2, 0x90, 0xe4, 0x51, 0xfc, 0xc9, 0x70, 0x91, 0xd1, 0x47, 0xa3, 0x12,
+	0x06, 0xa0, 0x75, 0xa8, 0x73, 0xa6, 0xcf, 0xda, 0xa1, 0xa9, 0x62, 0x0b, 0xe6, 0x2e, 0x6c, 0xc1,
+	0x12, 0xa4, 0x5e, 0x91, 0x33, 0x41, 0x0b, 0xfb, 0x8b, 0x37, 0x20, 0x73, 0x6a, 0xb4, 0xba, 0x3e,
+	0x05, 0x37, 0x87, 0x0c, 0x55, 0x0e, 0xc3, 0x93, 0x7c, 0x90, 0xbc, 0x87, 0xe4, 0x5d, 0x98, 0x0d,
+	0x2f, 0xe1, 0xc7, 0x90, 0x09, 0x9f, 0x73, 0x6d, 0x78, 0xb5, 0xba, 0x27, 0x28, 0xff, 0x8e, 0x60,
+	0x26, 0x34, 0x2d, 0x52, 0x39, 0x0a, 0x52, 0xf9, 0x32, 0x80, 0xef, 0xd1, 0x20, 0xc5, 0x67, 0xc5,
+	0xcc, 0xf3, 0x66, 0x70, 0xb3, 0x53, 0xa1, 0x9b, 0x5d, 0x16, 0xd9, 0x3f, 0xcd, 0xb3, 0xbf, 0x3a,
+	0x3c, 0x26, 0x56, 0x08, 0x5c, 0x51, 0x09, 0x9e, 0x01, 0x34, 0xac, 0x4e, 0xd3, 0x64, 0x6c, 0xb8,
+	0x85, 0x0c, 0x3f, 0xde, 0x6a, 0x8c, 0xaa, 0xb2, 0x2f, 0xa0, 0x87, 0x64, 0xe5, 0xdf, 0x10, 0x64,
+	0x83, 0x15, 0xbc, 0x2d, 0xc0, 0x21, 0x0e, 0xee, 0xde, 0xf0, 0xe0, 0x02, 0x15, 0x61, 0x94, 0x8b,
+	0x30, 0xc5, 0xc9, 0xf1, 0x08, 0xc8, 0xea, 0x62, 0x84, 0x3f, 0x85, 0x69, 0xcb, 0x26, 0x8e, 0x41,
+	0x2d, 0x47, 0x14, 0xc1, 0x8f, 0xc7, 0xb0, 0x54, 0x15, 0x2a, 0x5c, 0x3d, 0xd0, 0x26, 0xff, 0x9c,
+	0x84, 0x9c, 0x57, 0xb2, 0x38, 0x8b, 0xa3, 0x65, 0x2c, 0x7c, 0xff, 0x22, 0x9b, 0x97, 0xca, 0x84,
+	0x98, 0x5e, 0x0e, 0x33, 0xbd, 0x99, 0x65, 0x42, 0x69, 0x27, 0x29, 0xa1, 0x49, 0x92, 0xbe, 0xf7,
+	0x6f, 0x48, 0xdf, 0x04, 0x86, 0x29, 0xf3, 0x13, 0x4a, 0x4e, 0xa3, 0x48, 0x00, 0xec, 0x42, 0x3e,
+	0xec, 0x31, 0xd7, 0xc6, 0x8f, 0x20, 0xcd, 0xa2, 0x5f, 0xd4, 0x8d, 0x51, 0x6e, 0x0d, 0x97, 0xe3,
+	0x24, 0x78, 0xd9, 0xf8, 0x7f, 0x12, 0x86, 0x27, 0x21, 0xec, 0xb1, 0x09, 0x90, 0x70, 0x0f, 0x60,
+	0x8b, 0xd0, 0x31, 0x08, 0x90, 0x2b, 0x30, 0x13, 0x48, 0x4e, 0x00, 0x48, 0x1e, 0x66, 0x59, 0xa9,
+	0x0a, 0x6a, 0xd4, 0x0b, 0xc8, 0x85, 0xc6, 0xfc, 0xa5, 0x22, 0xb2, 0x34, 0x1a, 0x37, 0x4b, 0x3f,
+	0x81, 0xc5, 0x40, 0xe5, 0x53, 0xcb, 0x19, 0xf3, 0xbd, 0xf2, 0x12, 0x96, 0xfa, 0x6a, 0x99, 0x08,
+	0xc4, 0x87, 0x90, 0xf3, 0x1e, 0x43, 0xe3, 0x30, 0x22, 0x41, 0x3e, 0x2c, 0xec, 0xda, 0x6b, 0x37,
+	0x40, 0xea, 0x8d, 0x4f, 0x3c, 0x0d, 0xe9, 0x9d, 0xea, 0x13, 0x4d, 0x4a, 0xe0, 0x2c, 0x64, 0xb4,
+	0x03, 0x6d, 0x67, 0x4f, 0x42, 0x6b, 0x3f, 0x22, 0xb8, 0x36, 0x30, 0x4d, 0x63, 0x09, 0x66, 0xcb,
+	0xcf, 0xb4, 0xa7, 0xf5, 0x9a, 0xa6, 0x1f, 0x68, 0x7a, 0x4d, 0x4a, 0xe0, 0x1c, 0x64, 0xf9, 0x4c,
+	0x55, 0xdf, 0xaa, 0x49, 0x08, 0x2f, 0xc0, 0x1c, 0x1f, 0x6a, 0x3b, 0x07, 0xcf, 0xf5, 0xea, 0x4e,
+	0x45, 0xdb, 0xd9, 0xab, 0x49, 0x49, 0x66, 0x40, 0xaf, 0x6e, 0x6b, 0x35, 0x29, 0x15, 0x08, 0xec,
+	0x6d, 0x6c, 0xd5, 0xa4, 0x34, 0xd3, 0xb8, 0x5b, 0xdd, 0x7e, 0x5e, 0xfe, 0xac, 0xbe, 0xa5, 0x57,
+	0xf7, 0x77, 0xa5, 0x0c, 0xbe, 0x0a, 0x33, 0x62, 0x66, 0x67, 0xa3, 0xa2, 0x49, 0x53, 0x6b, 0x0f,
+	0x60, 0xf9, 0xd2, 0x74, 0xce, 0x54, 0x56, 0xb4, 0xca, 0xa6, 0xa6, 0xd7, 0xab, 0x4f, 0xa5, 0x04,
+	0x06, 0x98, 0xd2, 0x5e, 0xec, 0x6f, 0x6c, 0xd7, 0x24, 0x54, 0xfa, 0x23, 0x07, 0xd3, 0xfe, 0x9b,
+	0x1c, 0x53, 0x3f, 0xcd, 0xf8, 0xcd, 0x57, 0xdc, 0x95, 0xee, 0x7d, 0x79, 0x17, 0x6f, 0x8f, 0x26,
+	0xe0, 0xda, 0x72, 0x82, 0x59, 0x8d, 0x34, 0x45, 0xb1, 0x56, 0x7b, 0xdb, 0xb2, 0x58, 0xab, 0x17,
+	0x7a, 0x2e, 0x39, 0x81, 0x5f, 0xf1, 0xeb, 0xec, 0x9b, 0xbc, 0x15, 0xa3, 0x21, 0xd2, 0x5e, 0x15,
+	0xd7, 0x47, 0xd8, 0xed, 0x1f, 0x31, 0xf2, 0x72, 0x8f, 0x3d, 0x62, 0x6f, 0x9f, 0x10, 0x7b, 0xc4,
+	0x8b, 0x8d, 0x41, 0x02, 0xbf, 0xf6, 0x12, 0x45, 0x40, 0xaf, 0x12, 0xa3, 0xa3, 0xa7, 0x65, 0x2b,
+	0xaa, 0x23, 0xed, 0xe7, 0x26, 0x8f, 0x60, 0xe6, 0x99, 0xd1, 0x69, 0xb6, 0x88, 0xc6, 0xfa, 0x7d,
+	0x3c, 0x20, 0x8f, 0x7b, 0x1f, 0x03, 0x0c, 0xdb, 0x54, 0xf8, 0xb6, 0x8a, 0x7b, 0x3c, 0xc8, 0xa5,
+	0x3d, 0x3b, 0x99, 0x15, 0xab, 0xe3, 0x12, 0xfc, 0x3d, 0x82, 0xf9, 0x3e, 0x6d, 0x0a, 0xfe, 0x70,
+	0xb8, 0x44, 0xd2, 0xd3, 0xf5, 0x14, 0xef, 0x8e, 0x23, 0xe6, 0xda, 0x17, 0x61, 0x78, 0x3d, 0xd6,
+	0x7f, 0x02, 0xe3, 0xbc, 0x9d, 0x63, 0xb1, 0x7c, 0xfe, 0xe2, 0x88, 0x8d, 0xe5, 0xc8, 0x73, 0x2e,
+	0x36, 0x96, 0xa3, 0x4f, 0x19, 0xef, 0xe2, 0x9c, 0x57, 0xd6, 0x58, 0x63, 0x91, 0x67, 0x4b, 0xac,
+	0xb1, 0x68, 0xc9, 0x96, 0x13, 0xf8, 0x10, 0xae, 0x88, 0xd2, 0x89, 0xdf, 0x8b, 0xbf, 0x74, 0xbe,
+	0x99, 0xb5, 0x61, 0xb7, 0x72, 0x1b, 0x27, 0x90, 0x0d, 0xca, 0x14, 0xbe, 0x39, 0x44, 0xcc, 0xfb,
+	0x95, 0xb7, 0x78, 0x6b, 0xf8, 0xcd, 0xdc, 0xd2, 0x0f, 0xc8, 0xeb, 0x32, 0x7b, 0x2a, 0x62, 0x6c,
+	0xb8, 0xf4, 0xaf, 0xc5, 0xb1, 0xe1, 0x32, 0xa0, 0xf8, 0x7a, 0x1c, 0x9e, 0xd7, 0xbf, 0x58, 0x0e,
+	0x23, 0x75, 0x36, 0x96, 0xc3, 0x68, 0x61, 0x95, 0x13, 0xf8, 0x3b, 0x14, 0xf9, 0xf4, 0xe3, 0xf9,
+	0xb9, 0x34, 0x7c, 0x6e, 0x09, 0xdc, 0x7d, 0x7f, 0xec, 0xb6, 0x5a, 0x4e, 0x6c, 0xde, 0xf9, 0xbc,
+	0x74, 0x6c, 0xd2, 0x93, 0xee, 0xa1, 0xd2, 0xb0, 0xda, 0x2a, 0x53, 0xa4, 0xfa, 0x8a, 0xd4, 0x81,
+	0x5f, 0x36, 0x0f, 0xa7, 0xf8, 0x37, 0x8b, 0x0f, 0xfe, 0x09, 0x00, 0x00, 0xff, 0xff, 0x39, 0xb9,
+	0x1c, 0xe4, 0x5e, 0x15, 0x00, 0x00,
+>>>>>>> authz: drop no longer needed POC code
 }

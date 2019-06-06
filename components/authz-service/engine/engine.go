@@ -82,13 +82,7 @@ type V2p1Writer interface {
 }
 
 type ProjectRulesRetriever interface {
-	RulesForProject(context.Context, string) ([]Rule, error)
 	ListProjectMappings(context.Context) (map[string][]v2.Rule, error)
-}
-
-type Rule struct {
-	Type   string
-	Values []string
 }
 
 // Subjects contains the requestor and all the teams they're a member of.

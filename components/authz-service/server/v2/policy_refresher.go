@@ -275,14 +275,6 @@ func (refresher *policyRefresher) getIAMVersion(ctx context.Context) (api.Versio
 	return vsn, nil
 }
 
-// TODO: mocked struct that will eventually be
-// the storage struct.
-type rule struct {
-	ID     string
-	Type   string
-	Values []string
-}
-
 func (refresher *policyRefresher) getRuleMap(ctx context.Context) (map[string][]storage.Rule, error) {
 	rules, err := refresher.store.ListRules(ctx)
 	if err != nil {

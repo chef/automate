@@ -291,35 +291,6 @@ func (s *state) ListProjectRules(ctx context.Context,
 	}, nil
 }
 
-func (s *state) GetProjectRules(ctx context.Context,
-	req *api.GetProjectRulesReq) (*api.GetProjectRulesResp, error) {
-
-	if req.ProjectId == "" {
-		return nil, status.Error(codes.InvalidArgument, "GetProjectRules requires a ProjectID")
-	}
-
-	rules, err := s.engine.RulesForProject(ctx, req.ProjectId)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "could not retrieve rules for project %q: %s",
-			req.ProjectId, err.Error())
-	}
-	if len(rules) == 0 {
-		return nil, status.Errorf(codes.NotFound,
-			"could not find project mapping rules for project %s", req.ProjectId)
-	}
-
-	projectRules, err := rulesToProjectRules(rules)
-	if err != nil {
-		return &api.GetProjectRulesResp{}, err
-	}
-
-	return &api.GetProjectRulesResp{
-		RulesForProject: &api.ProjectRules{
-			Rules: projectRules,
-		},
-	}, nil
-}
-
 func (s *state) HandleEvent(ctx context.Context,
 	req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
 	log.Debugf("authz is handling your event %s", req.EventID)
@@ -626,30 +597,6 @@ func fromAPIType(t api.ProjectRuleTypes) (storage.RuleType, error) {
 	default:
 		return 0, fmt.Errorf("unknown rule type %s", t.String())
 	}
-}
-
-// TODO: Currently there is only collection of conditions in a project, which are called 'Rule'.
-// We need to update this data structure to have projects have collection of rules. The rules have a
-// collection of conditions. The conditions have a 'type' and 'values' (like rules currently do).
-// The rules should have a 'type' either 'node' or 'event'.
-func rulesToProjectRules(rules []engine.Rule) ([]*api.ProjectRule, error) {
-	conditions := make([]*api.Condition, len(rules))
-	for j, rule := range rules {
-		conditionType, exists := api.ProjectRuleConditionTypes_value[rule.Type]
-		if !exists {
-			return []*api.ProjectRule{}, errors.New(fmt.Sprintf("Condition type %s is not supported", rule.Type))
-		}
-		conditions[j] = &api.Condition{
-			Type:   api.ProjectRuleConditionTypes(conditionType),
-			Values: rule.Values,
-		}
-	}
-	// TODO: The ProjectRule Type needs to be added to the database
-	rule := &api.ProjectRule{
-		Conditions: conditions,
-		Type:       api.ProjectRuleTypes_NODE,
-	}
-	return []*api.ProjectRule{rule}, nil
 }
 
 func (s *state) prepareStorageRule(inID, projectID, name string,
