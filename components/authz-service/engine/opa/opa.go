@@ -431,7 +431,6 @@ func (s *State) RulesForProject(
 // ListProjectMappings returns a map of all the rules for each projectID.
 func (s *State) ListProjectMappings(ctx context.Context) (map[string][]v2.Rule, error) {
 	items := s.ruleStore.Items()
-	s.log.Infof("HEY! 2. got this %#v in items", items)
 	// nothing stored while on v1 or v2.0
 	if len(items) == 0 {
 		return map[string][]v2.Rule{}, nil
@@ -659,7 +658,6 @@ func (s *State) V2p1SetPolicies(
 	if err := s.SetRules(ctx, ruleMap); err != nil {
 		return errors.New("failed to set rule store")
 	}
-	s.log.Infof("HEY! 2. ruleStore in v2p1SetPolicies %#v", s.ruleStore)
 	return s.initPartialResultV2p1(ctx)
 }
 

@@ -291,15 +291,12 @@ func (refresher *policyRefresher) getRuleMap(ctx context.Context) (map[string][]
 
 	ruleMap := make(map[string][]storage.Rule)
 	for _, r := range rules {
-		refresher.log.Infof("HEY! 0. got this rule %#v in ListRules", *r)
 		if _, ok := ruleMap[r.ProjectID]; !ok {
 			ruleMap[r.ProjectID] = make([]storage.Rule, 0)
 		}
 
 		ruleMap[r.ProjectID] = append(ruleMap[r.ProjectID], *r)
 	}
-
-	refresher.log.Infof("HEY! 1. got this %#v in getRuleMap", ruleMap)
 
 	return ruleMap, nil
 }
