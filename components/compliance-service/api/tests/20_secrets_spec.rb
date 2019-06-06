@@ -189,51 +189,53 @@ describe File.basename(__FILE__) do
     assert_equal(36, secret_id4.size)
 
     # Get all secrets
-    res = SS_GRPC secrets, :list, Secrets::Query.new()
-    default_secrets_json = res
-    assert_equal(Google::Protobuf::Timestamp, default_secrets_json['secrets'][0]['last_modified'].class)
-    default_secrets_json['secrets'].each { |s|
+    actual_secrets = SS_GRPC secrets, :list, Secrets::Query.new()
+    assert_equal(Google::Protobuf::Timestamp, actual_secrets['secrets'][0]['last_modified'].class)
+    actual_secrets['secrets'].each { |s|
       s['last_modified'] = nil
     }
 
-    actual_secrets = default_secrets_json['secrets']
-    expected_secrets = [
-      Secrets::Secret.new(
-        id: "#{secret_id2}",
-        last_modified:nil,
-        name:"Alphasec",
-        tags: [
-          Secrets::Kv.new(key: "department", value: "marketing"),
-          Secrets::Kv.new(key: "reason", value: "How do I know?")
-        ],
-        type:"ssh"
-      ),
-      Secrets::Secret.new(
-        id: "#{secret_id1}",
-        last_modified:nil,
-        name:"betasec"
-      ),
-      Secrets::Secret.new(
-        id: "#{secret_id3}",
-        last_modified:nil,
-        name:"SUDO rocks",
-        type:"sudo"
-      ),
-      Secrets::Secret.new(
-        id: "#{secret_id4}",
-        last_modified:nil,
-        name:"Windows $tuff",
-        type:"winrm"
-      )
-    ]
-
-    assert_equal(expected_secrets, actual_secrets)
+    expected_secrets = {
+      "secrets": [
+        {
+          "id": secret_id2,
+          "name": "Alphasec",
+          "type": "ssh",
+          "tags": [
+            {
+              "key": "department",
+              "value": "marketing"
+            },
+            {
+              "key": "reason",
+              "value": "How do I know?"
+            }
+          ]
+        },
+        {
+          "id": secret_id1,
+          "name": "betasec"
+        },
+        {
+          "id": secret_id3,
+          "name": "SUDO rocks",
+          "type": "sudo"
+        },
+        {
+          "id": secret_id4,
+          "name": "Windows $tuff",
+          "type": "winrm"
+        }
+      ],
+      "total": 4
+    }
+    assert_equal_json_sorted(expected_secrets.to_json, actual_secrets.to_json)
     # Test the total count
-    assert_equal(4, default_secrets_json['total'])
+    assert_equal(4, actual_secrets['total'])
 
     # Testing the default sorting(name ASC)
     assert_equal( ["Alphasec", "betasec", "SUDO rocks", "Windows $tuff"],
-                  extract_grpc_field(default_secrets_json['secrets'], 'name'))
+                  extract_grpc_field(actual_secrets['secrets'], 'name'))
 
     # Get all secrets sorted DESC by last_modified
     query_params = {"sort": "last_modified", "order": "DESC"}
