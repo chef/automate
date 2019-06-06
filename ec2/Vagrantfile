@@ -73,7 +73,7 @@ aws_access_key_id = ENV['AWS_ACCESS_KEY_ID']
 aws_secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
 
 # Only run these checks on `vagrant up/ssh/destroy`
-if ['up', 'ssh', 'destroy'].include?(ARGV[0])
+if ['up', 'ssh', 'destroy', 'halt'].include?(ARGV[0])
   if (aws_access_key_id && aws_secret_access_key)
     puts " * Using the provided ENV variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to continue..."
   else
