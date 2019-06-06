@@ -52,14 +52,16 @@ type Querier interface {
 
 // CreatePolicy stores a new policy and its statements in postgres and returns the final policy.
 func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, error) {
-	// Note(sr): we're using BeginTx with the context that'll be cancelled when
-	// GRPC is done with the method call.
-	// This should rollback transactions that haven't been committed -- what would
-	// happen when any of the following `err != nil` cases return early.
-	//
-	// See https://gist.github.com/srenatus/ce12b31ea517f16c024e4f8736fa5f2b for
-	// a toy experiment asserting that the context actually is cancelled when the
-	// GRPC method is done.
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// Note(sr): we're using BeginTx with the context that'll be cancelled in a
+	// `defer` when the function ends. This should rollback transactions that
+	// haven't been committed -- what would happen when any of the following
+	// `err != nil` cases return early.
+	// However, I haven't played with this extensively, so there's a bit of a
+	// chance that this understanding is just plain wrong.
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
@@ -96,6 +98,8 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 
 func (p *pg) PurgeSubjectFromPolicies(ctx context.Context, sub string) ([]string, error) {
 	var polIDs []string
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
@@ -171,6 +175,9 @@ func (p *pg) GetPolicy(ctx context.Context, id string) (*v2.Policy, error) {
 }
 
 func (p *pg) DeletePolicy(ctx context.Context, id string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return p.processError(err)
@@ -204,6 +211,9 @@ func (p *pg) DeletePolicy(ctx context.Context, id string) error {
 }
 
 func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
@@ -421,6 +431,9 @@ func (p *pg) queryPolicy(ctx context.Context, id string, q Querier) (*v2.Policy,
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 func (p *pg) ListPolicyMembers(ctx context.Context, id string) ([]v2.Member, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
@@ -447,6 +460,9 @@ func (p *pg) ListPolicyMembers(ctx context.Context, id string) ([]v2.Member, err
 }
 
 func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []v2.Member) ([]v2.Member, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
@@ -490,6 +506,9 @@ func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []v2.Membe
 }
 
 func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members []v2.Member) ([]v2.Member, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
@@ -536,6 +555,10 @@ func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members 
 // list of members to remove and return the list of remaining users.
 func (p *pg) RemovePolicyMembers(ctx context.Context,
 	policyID string, members []v2.Member) ([]v2.Member, error) {
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
@@ -659,6 +682,9 @@ func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Queri
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 func (p *pg) CreateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
@@ -713,6 +739,9 @@ func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
 }
 
 func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
@@ -747,6 +776,9 @@ func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
 }
 
 func (p *pg) DeleteRole(ctx context.Context, id string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return p.processError(err)
@@ -791,6 +823,9 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 }
 
 func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
@@ -920,6 +955,9 @@ func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, p.processError(err)
@@ -957,6 +995,10 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	if err != nil {
 		return nil, p.processError(err)
 	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, p.processError(err)
@@ -1010,6 +1052,10 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	if err != nil {
 		return p.processError(err)
 	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return p.processError(err)
@@ -1043,6 +1089,10 @@ func (p *pg) GetRule(ctx context.Context, id string) (*v2.Rule, error) {
 	if err != nil {
 		return nil, p.processError(err)
 	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, p.processError(err)
@@ -1073,6 +1123,10 @@ func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
 	if err != nil {
 		return nil, p.processError(err)
 	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, p.processError(err)
@@ -1108,6 +1162,9 @@ func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
 }
 
 func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.Rule, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
@@ -1153,6 +1210,9 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Project, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, p.processError(err)
@@ -1184,6 +1244,9 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 }
 
 func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Project, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
