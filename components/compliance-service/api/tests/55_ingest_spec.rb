@@ -110,7 +110,7 @@ describe File.basename(__FILE__) do
           "latestReport": {
             "id": report_id,
             "endTime": {
-              "seconds": 1
+              "seconds": "1970-01-01T00:00:01Z"
             },
             "status": "skipped",
             "controls": {
