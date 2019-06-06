@@ -189,7 +189,7 @@ describe File.basename(__FILE__) do
 
 
     job = GRPC jobs, :create, Jobs::Job.new(
-      name: "My Exec Job For Missing node",
+      name: "My Exec Job For Bad Creds node",
       tags: [
         Common::Kv.new( key: "trigger", value: "Jenkins 008" )
       ],
@@ -203,7 +203,7 @@ describe File.basename(__FILE__) do
     assert_equal(36, job_id3.size)
 
 
-    # Add a detect jobs vis ssh+key
+    # Add a detect jobs via ssh+key
     job = GRPC jobs, :create, Jobs::Job.new(
       name: "My Exec Job For Existing node w/ Key",
       tags: [],
@@ -231,6 +231,7 @@ describe File.basename(__FILE__) do
 
     job1 = GRPC jobs, :read, Jobs::Id.new(id: job_id1)
     assert_equal("failed", job1['status'])
+
 
     # extra tests as these are likely to break on inspec bugs
     job2 = GRPC jobs, :read, Jobs::Id.new(id: job_id2)
@@ -295,7 +296,7 @@ describe File.basename(__FILE__) do
       ResultStuff.checkResultAndAdjustIfNeeded(result, 'result', result_should_contain)
     }
     assert_equal(job_id3, job3['id'])
-    assert_equal("My Exec Job For Missing node", job3['name'])
+    assert_equal("My Exec Job For Bad Creds node", job3['name'])
     assert_equal([ssh_node_id2_bad_creds], job3['nodes'])
     assert_equal("failed", job3['status'])
     assert_equal(1, job3['results'].length)
@@ -319,24 +320,24 @@ describe File.basename(__FILE__) do
     # Testing the default sorting(name ASC)
     assert_equal( [
       "My Detect Job For two nodes",
+      "My Exec Job For Bad Creds node",
       "My Exec Job For Existing node",
-      "My Exec Job For Existing node w/ Key",
-      "My Exec Job For Missing node"
+      "My Exec Job For Existing node w/ Key"
     ], extract_grpc_field(default_jobs_json['jobs'], 'name') )
 
     # Sort by name(DESC) before clearing up the jobs
     name_jobs_json = GRPC jobs, :list, Jobs::Query.new(sort: "name", order: 1)
     assert_equal( [
-      "My Exec Job For Missing node",
       "My Exec Job For Existing node w/ Key",
       "My Exec Job For Existing node",
+      "My Exec Job For Bad Creds node",
       "My Detect Job For two nodes"
     ], extract_grpc_field(name_jobs_json['jobs'], 'name') )
 
     # Sort by status(ASC), page 2, size 2
     name_jobs_json = GRPC jobs, :list, Jobs::Query.new(sort: "name", order: 1, per_page: 2, page: 2)
     assert_equal( [
-      "My Exec Job For Existing node",
+      "My Exec Job For Bad Creds node",
       "My Detect Job For two nodes"
     ], extract_grpc_field(name_jobs_json['jobs'], 'name') )
   end
@@ -346,7 +347,7 @@ describe File.basename(__FILE__) do
       Common::Filter.new(key: "job_type", values: ["exec"])
     ]))['jobs'].map { |j| j['name'] }
 
-    expected = ["My Exec Job For Existing node", "My Exec Job For Missing node"]
+    expected = ["My Exec Job For Bad Creds node", "My Exec Job For Existing node"]
 
     assert_equal expected, job_names
   end
@@ -369,7 +370,7 @@ describe File.basename(__FILE__) do
     expected = [
       "My Exec Job For Existing node w/ Key",
       "My Exec Job For Existing node",
-      "My Exec Job For Missing node",
+      "My Exec Job For Bad Creds node",
     ]
 
     assert_equal expected.sort, job_names.sort
