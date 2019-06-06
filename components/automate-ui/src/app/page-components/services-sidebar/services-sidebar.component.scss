@@ -24,6 +24,7 @@ app-page-picker {
 
 .service-item {
   @include modal-box();
+  box-shadow: none;
   display: block;
   background-color: #F2F5F7;
   margin-bottom: 1em;
@@ -31,9 +32,8 @@ app-page-picker {
   margin-left: -5px;
   padding: 0em;
   position: relative;
-  border-radius: 0;
   transition: all .2s;
-  border-radius: .4em;
+  border-radius: 4px;
 
   .body {
     display: block;
@@ -42,6 +42,7 @@ app-page-picker {
     position: relative;
     width: 100%;
     font-size: .8em;
+    border-radius: 4px;
   }
 
   .header {
@@ -51,21 +52,52 @@ app-page-picker {
     position: relative;
   }
 
-  .service-line {
+  .fqdn-line {
     display: flex;
     align-items: center;
-    margin-bottom: .6em;
+    margin-bottom: 8px;
+    font-size: 14px;
   }
 
   .supervisor-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    font-size: 12px;
     b {
-      font-size: .8em;
+      margin-right: 4px;
     }
+  }
 
+  .site-line {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    b {
+      margin-right: 4px;
+    }
+  }
+
+  .release-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .health-line {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  .channel-line {
+    padding-left: 18px;
+    margin-bottom: 8px;
   }
 
   chef-icon {
-    font-size: 19px;
+    font-size: 16px;
     margin-right: 8px;
 
     &.OK {
