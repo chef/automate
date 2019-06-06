@@ -28,14 +28,15 @@ export class HttpClientAuthInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let headers = request.headers.set('Authorization', `Bearer ${this.chefSession.id_token}`);
     const filtered = request.params.get('unfiltered') !== 'true';
-    const params = request.params.delete('unfiltered');
+    // Uncomment here and after to clone() arg list
+    // after https://github.com/angular/angular/issues/18812 is fixed.
+    // const params = request.params.delete('unfiltered');
     if (this.projects && filtered) {
       headers = headers.set('projects', this.projects);
     }
     return next
       .handle(request.clone({
-        headers,
-        params
+        headers
       })).pipe(
         catchError((response: HttpEvent<any>) => {
           if (get('status', response) === 401) {
