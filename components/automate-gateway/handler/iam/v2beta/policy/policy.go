@@ -439,9 +439,7 @@ func (p *Server) IntrospectAllProjects(
 	if err != nil {
 		return nil, err
 	}
-	// To correlate names with project IDs, use the standard ListProjects
-	// with the special flag to include "(unassigned)" too.
-	resp, err := p.projects.ListProjects(ctx, &authz.ListProjectsReq{GlobalFilterView: true})
+	resp, err := p.projects.ListProjectsForIntrospection(ctx, &authz.ListProjectsReq{})
 	if err != nil {
 		return nil, err
 	}

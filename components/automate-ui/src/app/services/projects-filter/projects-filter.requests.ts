@@ -14,10 +14,7 @@ export class ProjectsFilterRequests {
   constructor(private http: HttpClient) { }
 
   fetchOptions(): Observable<AuthorizedProjectsResponse[]> {
-    return this.http.get<AuthorizedProjectsResponse[]>(
-      `${env.auth_v2_url}/introspect_projects`,
-      { params: { unfiltered: 'true'} }
-    );
+    return this.http.get<AuthorizedProjectsResponse[]>(`${env.auth_v2_url}/introspect_projects`);
   }
 }
 

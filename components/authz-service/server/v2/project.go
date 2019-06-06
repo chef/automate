@@ -9,7 +9,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/stringutils"
 
 	"github.com/golang/protobuf/ptypes"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
@@ -188,11 +190,13 @@ func (s *state) ProjectUpdateCancel(ctx context.Context,
 }
 
 func (s *state) ListProjects(
-	ctx context.Context, req *api.ListProjectsReq) (*api.ListProjectsResp, error) {
+	ctx context.Context, _ *api.ListProjectsReq) (*api.ListProjectsResp, error) {
 	ps, err := s.store.ListProjects(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error retrieving projects: %s", err.Error())
 	}
+
+	systemProjects := storage.DefaultProjectIDs()
 
 	resp := api.ListProjectsResp{
 		Projects: make([]*api.Project, 0, len(ps)),
@@ -203,10 +207,41 @@ func (s *state) ListProjects(
 			return nil, status.Errorf(codes.Internal,
 				"error converting project with ID %q: %s", p.ID, err.Error())
 		}
-		// Exclude "all projects" meta-project from the API.
-		// Exclude "unassigned" meta-project from the API--except for introspection!
-		if (apiProject.Id != constants_v2.AllProjectsID) &&
-			(req.GlobalFilterView || (apiProject.Id != constants_v2.UnassignedProjectID)) {
+
+		// exclude all meta-projects from the API
+		if !stringutils.SliceContains(systemProjects, apiProject.Id) {
+			resp.Projects = append(resp.Projects, apiProject)
+		}
+	}
+
+	return &resp, nil
+}
+
+func (s *state) ListProjectsForIntrospection(
+	ctx context.Context, req *api.ListProjectsReq) (*api.ListProjectsResp, error) {
+
+	// Introspection needs unfiltered access.
+	ctx = auth_context.ContextWithoutProjects(ctx)
+
+	ps, err := s.store.ListProjects(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error retrieving projects: %s", err.Error())
+	}
+
+	systemProjects := storage.DefaultProjectIDs()
+
+	resp := api.ListProjectsResp{
+		Projects: make([]*api.Project, 0, len(ps)),
+	}
+	for _, p := range ps {
+		apiProject, err := fromStorageProject(p)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal,
+				"error converting project with ID %q: %s", p.ID, err.Error())
+		}
+		// Exclude all meta-projects from the API except "unassigned"
+		if !stringutils.SliceContains(systemProjects, apiProject.Id) ||
+			apiProject.Id == constants_v2.UnassignedProjectID {
 			resp.Projects = append(resp.Projects, apiProject)
 		}
 	}
