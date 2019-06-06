@@ -3224,20 +3224,21 @@ func assertInterfaceMapContainsPolicy(t *testing.T,
 type testEngine struct {
 	policyMap map[string]interface{}
 	roleMap   map[string]interface{}
-	ruleMap   map[string][]interface{}
+	ruleMap   map[string][]storage.Rule
 }
 
 func (te *testEngine) V2SetPolicies(
 	ctx context.Context, policies map[string]interface{},
-	roles map[string]interface{}, rules map[string][]interface{}) error {
-	// these only set the structs {policy,rule,role}Map, nothing specific to v2 and
-	// v2.1 yet
-	return te.V2p1SetPolicies(ctx, policies, roles, rules)
+	roles map[string]interface{}) error {
+	te.policyMap = policies
+	// TODO: use this
+	te.roleMap = roles
+	return nil
 }
 
 func (te *testEngine) V2p1SetPolicies(
 	ctx context.Context, policies map[string]interface{},
-	roles map[string]interface{}, rules map[string][]interface{}) error {
+	roles map[string]interface{}, rules map[string][]storage.Rule) error {
 	te.policyMap = policies
 	// TODO: use these
 	te.roleMap = roles

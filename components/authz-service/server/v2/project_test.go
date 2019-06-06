@@ -471,8 +471,8 @@ func (t *testProjectRulesRetriever) RulesForProject(
 }
 
 func (t *testProjectRulesRetriever) ListProjectMappings(
-	context.Context) (map[string][]engine.Rule, error) {
-	return make(map[string][]engine.Rule, 0), nil
+	context.Context) (map[string][]storage.Rule, error) {
+	return make(map[string][]storage.Rule, 0), nil
 }
 
 type mockEventServiceClient struct {
