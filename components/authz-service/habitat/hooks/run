@@ -18,7 +18,7 @@ pg-helper create-extension "{{cfg.storage.database}}" "uuid-ossp"
 # present. To solve that, and not ever be hit by this `cp -r` bug again,
 # we'll ensure that svc_static_path never contains any old cruft by
 # clearing it out first:
-rm -f {{pkg.svc_static_path}}/{migrations,data-migrations}/*
+rm -rf {{pkg.svc_static_path}}/{migrations,data-migrations}
 cp -r {{pkg.path}}/migrations {{pkg.svc_static_path}}
 cp -r {{pkg.path}}/data-migrations {{pkg.svc_static_path}}
 
