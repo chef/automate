@@ -44,6 +44,7 @@ describe File.basename(__FILE__) do
                         },
                         "status" => "passed",
                         "controls" => {
+                            "total" => 1,
                             "passed" => {
                                 "total" => 1
                             },
@@ -69,6 +70,7 @@ describe File.basename(__FILE__) do
                         },
                         "status" => "failed",
                         "controls" => {
+                            "total" => 1,
                             "passed" => {},
                             "skipped" => {},
                             "failed" => {
@@ -95,6 +97,7 @@ describe File.basename(__FILE__) do
                         },
                         "status" => "failed",
                         "controls" => {
+                            "total" => 1,
                             "passed" => {},
                             "skipped" => {},
                             "failed" => {
@@ -121,6 +124,7 @@ describe File.basename(__FILE__) do
                         },
                         "status" => "failed",
                         "controls" => {
+                            "total" => 1,
                             "passed" => {},
                             "skipped" => {},
                             "failed" => {
