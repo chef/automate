@@ -36,9 +36,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                "endTime" => {
-                    "seconds" => 1520155122
-                },
+                "endTime" => "2018-03-04T09:18:42Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 14,
@@ -57,9 +55,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
-                "endTime" => {
-                    "seconds" => 1520155122
-                },
+                "endTime" => "2018-03-04T09:18:42Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -75,9 +71,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                 "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
-                "endTime" => {
-                    "seconds" => 1520155123
-                },
+                "endTime" => "2018-03-04T09:18:43Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -93,9 +87,7 @@ describe File.basename(__FILE__) do
                 "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
                 "nodeId" => "a0ddd774-cbbb-49be-8730-49c92f3fc2a0",
                 "nodeName" => "windows(1)-zeta-apache(s)-skipped",
-                "endTime" => {
-                    "seconds" => 1520158721
-                },
+                "endTime" => "2018-03-04T10:18:41Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -111,9 +103,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520215322
-                },
+                "endTime" => "2018-03-05T02:02:02Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -129,9 +119,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520233322
-                },
+                "endTime" => "2018-03-05T07:02:02Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 14,
