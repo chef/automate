@@ -76,16 +76,16 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 		logrus.WithError(err).Fatal("Could not decode payload")
 	}
 
-	logrus.Debugf("***** starting OnTaskComplete with payload %+v", payload)
+	logrus.Debugf("Entered ScanJobWorkflow > OnTaskComplete with payload %+v", payload)
 	switch ev.TaskName {
 	case "scan-job":
 		payload.OutstandingJobs--
-		logrus.Debugf("ScanJobWorkflow got OnTaskComplete with outstandingJobs: %d", payload.OutstandingJobs)
 
 		var childJobStatus string
 		if err := ev.Result.Get(&childJobStatus); err != nil {
 			logrus.WithError(err).Error("Could not decode childJobStatus")
 		}
+		logrus.Debugf("ScanJobWorkflow > OnTaskComplete with %d outstanding jobs and childJobStatus of %s", payload.OutstandingJobs, childJobStatus)
 
 		if childJobStatus == types.StatusFailed {
 			payload.ParentJobStatus = types.StatusFailed
@@ -168,7 +168,6 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	}
 
 	job.StartTime = timeNowRef()
-	logrus.Debugf("!!!!!!!! job=%+v", job)
 	*job.NodeStatus = types.StatusRunning
 
 	currentJobSummary := job.JobType + " " + job.TargetConfig.Backend + " " + job.TargetConfig.Hostname
@@ -215,8 +214,9 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	}
 
 	cleanupKeys(job.TargetConfig.KeyFiles)
-	logrus.Debugf("job %s completed", job.JobID)
+	logrus.Debugf("job %s finished", job.JobID)
 
+	//
 	if *job.NodeStatus == types.StatusRunning {
 		*job.NodeStatus = types.StatusFailed
 	}
@@ -260,12 +260,11 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 			t.scannerServer.UpdateResult(ctx, &job, nil, inspecErr, reportID)
 		default:
 			return types.StatusFailed, errors.Errorf("unknown job type: %+v", job.JobType)
-
 		}
 	}
 	t.scannerServer.UpdateNode(ctx, &job, detectInfo)
-	logrus.Debugf("finished job %s", job.JobID)
-	return types.StatusCompleted, nil
+	logrus.Debugf("finished job %s with status %s", job.JobID, *job.NodeStatus)
+	return *job.NodeStatus, nil
 }
 
 func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
