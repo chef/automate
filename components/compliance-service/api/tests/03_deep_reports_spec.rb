@@ -20,9 +20,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520155121
-                },
+                "endTime" => "2018-03-04T09:18:41Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -153,7 +151,7 @@ describe File.basename(__FILE__) do
         ],
         "total" => 7
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'profile_id',
@@ -165,9 +163,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520155121
-                },
+                "endTime" => "2018-03-04T09:18:41Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -203,7 +199,7 @@ describe File.basename(__FILE__) do
         ],
         "total": 7
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'profile_id',
@@ -250,7 +246,7 @@ describe File.basename(__FILE__) do
         ],
         "total" => 7
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     #test that we are dedup-ing in case the same profile_id is passed in twice.. we still want dedup so that deep works
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
@@ -299,7 +295,7 @@ describe File.basename(__FILE__) do
         ],
         "total" => 7
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     # Get all reports for these two nodes, one missing
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
@@ -312,9 +308,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520155121
-                },
+                "endTime" => "2018-03-04T09:18:41Z",
                 "status" => "passed",
                 "controls" => {
                     "total" => 18,
@@ -374,7 +368,7 @@ describe File.basename(__FILE__) do
         ],
         "total" => 3
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
 
     #######Control depth###############
@@ -391,9 +385,7 @@ describe File.basename(__FILE__) do
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -516,7 +508,7 @@ describe File.basename(__FILE__) do
             ],
             "total" => 7
         }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'profile_id',
@@ -530,9 +522,7 @@ describe File.basename(__FILE__) do
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -656,7 +646,7 @@ describe File.basename(__FILE__) do
             ],
             "total" => 7
         }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     # Get a specific report1
     res = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04')
