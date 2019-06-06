@@ -56,7 +56,6 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 
 	logrus.Debugf("OnStart got %d job(s)", len(jobs))
 	for _, job := range jobs {
-		logrus.Debugf("???????? job=%+v", job)
 		w.EnqueueTask("scan-job", job)
 	}
 
@@ -64,7 +63,7 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 	return w.Continue(&ScanJobWorkflowPayload{
 		initialVal,
 		jobs[0].ParentJobID,
-		types.StatusRunning,
+		types.StatusScheduled,
 	})
 }
 
@@ -77,6 +76,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 		logrus.WithError(err).Fatal("Could not decode payload")
 	}
 
+	logrus.Debugf("***** starting OnTaskComplete with payload %+v", payload)
 	switch ev.TaskName {
 	case "scan-job":
 		payload.OutstandingJobs--
@@ -151,18 +151,6 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	if err := task.GetParameters(&job); err != nil {
 		logrus.WithError(err).Error("could not unmarshal job parameters")
 		return nil, err
-	}
-
-	// Added just to see what params are we getting
-	if job.NodeID == "" {
-		logrus.Debug("######### gotcha")
-		var jobsPayload ScanJobWorkflowPayload
-		if err := task.GetParameters(&jobsPayload); err != nil {
-			logrus.WithError(err).Error("could not unmarshal summary job parameters")
-			return nil, err
-		}
-		logrus.Debugf("$$$$$$$$$ Updating parent job %s with overall status of %s", jobsPayload.ParentJobID, jobsPayload.ParentJobStatus)
-		return jobsPayload.ParentJobStatus, nil
 	}
 
 	logrus.Debugf("working on job %s for node %s", job.JobID, job.NodeID)
