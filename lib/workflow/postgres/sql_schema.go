@@ -140,14 +140,14 @@ CREATE TABLE workflow_events (
 
 -- Workflow Functions
 CREATE OR REPLACE FUNCTION enqueue_workflow(
-    instance_name TEXT,
-    workflow_name TEXT,
-    parameters BYTEA)
+    _instance_name TEXT,
+    _workflow_name TEXT,
+    _parameters BYTEA)
 RETURNS INTEGER
 AS $$
     WITH winst AS (
         INSERT INTO workflow_instances(instance_name, workflow_name, parameters)
-            VALUES(instance_name, workflow_name, parameters)
+            VALUES(_instance_name, _workflow_name, _parameters)
             ON CONFLICT DO NOTHING
             RETURNING id
         )
@@ -156,7 +156,7 @@ AS $$
     RETURNING 1
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION dequeue_workflow(VARIADIC workflow_names TEXT[])
+CREATE OR REPLACE FUNCTION dequeue_workflow(VARIADIC _workflow_names TEXT[])
 RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT,
     status workflow_instance_status, parameters BYTEA, payload BYTEA, event_id BIGINT,
     event_type workflow_event_type, task_result_id BIGINT, enqueued_tasks INTEGER,
@@ -177,7 +177,7 @@ AS $$
             a.completed_tasks
         FROM workflow_instances a
         INNER JOIN workflow_events b ON a.id = b.workflow_instance_id
-        WHERE a.workflow_name = ANY(workflow_names)
+        WHERE a.workflow_name = ANY(_workflow_names)
         ORDER BY b.enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
     ),
     updated AS (
@@ -189,14 +189,14 @@ AS $$
     SELECT * from nextwinst
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION cancel_workflow(workflow_instance_id BIGINT)
+CREATE OR REPLACE FUNCTION cancel_workflow(_workflow_instance_id BIGINT)
 RETURNS VOID
 AS $$
     INSERT INTO workflow_events(event_type, workflow_instance_id)
-        VALUES('cancel', workflow_instance_id);
+        VALUES('cancel', _workflow_instance_id);
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION abandon_workflow(_workflow_instance_id BIGINT, eid BIGINT, _completed_tasks INTEGER)
+CREATE OR REPLACE FUNCTION abandon_workflow(_workflow_instance_id BIGINT, _eid BIGINT, _completed_tasks INTEGER)
 RETURNS VOID
 AS $$
     WITH unclaimed_tasks AS (
@@ -209,31 +209,31 @@ AS $$
     UPDATE workflow_instances w1 SET updated_at = NOW(), status = 'abandoned',
         completed_tasks = _completed_tasks + (select count(*) from unclaimed_tasks);
 
-    DELETE FROM workflow_events WHERE id = eid;
+    DELETE FROM workflow_events WHERE id = _eid;
 
     INSERT INTO workflow_events(event_type, workflow_instance_id)
         VALUES('tasks_abandoned', _workflow_instance_id);
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION complete_workflow(wid BIGINT)
+CREATE OR REPLACE FUNCTION complete_workflow(_wid BIGINT)
 RETURNS VOID
 LANGUAGE SQL
 AS $$
     WITH 
     done_workflows AS (
         SELECT id, instance_name, workflow_name, parameters, start_at 
-        FROM workflow_instances where id = wid
+        FROM workflow_instances where id = _wid
     )
     INSERT INTO workflow_results(instance_name, workflow_name, parameters, start_at)
         (SELECT instance_name, workflow_name, parameters, start_at FROM done_workflows);
     
-    DELETE FROM tasks WHERE workflow_instance_id = wid;
-    DELETE FROM task_results WHERE workflow_instance_id = wid;
-    DELETE FROM workflow_events WHERE workflow_instance_id = wid;
-    DELETE FROM workflow_instances WHERE id = wid;
+    DELETE FROM tasks WHERE workflow_instance_id = _wid;
+    DELETE FROM task_results WHERE workflow_instance_id = _wid;
+    DELETE FROM workflow_events WHERE workflow_instance_id = _wid;
+    DELETE FROM workflow_instances WHERE id = _wid;
 $$;
 
-CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, eid BIGINT, _payload BYTEA,
+CREATE OR REPLACE FUNCTION continue_workflow(wid BIGINT, _eid BIGINT, _payload BYTEA,
     _enqueued_tasks INTEGER, _completed_tasks INTEGER)
 RETURNS VOID
 LANGUAGE SQL
@@ -241,20 +241,20 @@ AS $$
     UPDATE workflow_instances SET updated_at = NOW(), payload = _payload,
         enqueued_tasks = _enqueued_tasks, completed_tasks = _completed_tasks WHERE id = wid;
     -- We've decided there is more to do but are done processing this event.
-    DELETE FROM workflow_events WHERE id = eid
+    DELETE FROM workflow_events WHERE id = _eid
 $$;
 
 -- Task Functions
 CREATE OR REPLACE FUNCTION enqueue_task(
-    workflow_instance_id BIGINT,
-    try_remaining INT,
-    start_after TIMESTAMPTZ,
-    task_name TEXT,
-    parameters BYTEA)
+    _workflow_instance_id BIGINT,
+    _try_remaining INT,
+    _start_after TIMESTAMPTZ,
+    _task_name TEXT,
+    _parameters BYTEA)
 RETURNS VOID
 AS $$
     INSERT INTO tasks(workflow_instance_id, try_remaining, start_after, task_name, parameters)
-        VALUES(workflow_instance_id, try_remaining, start_after, task_name, parameters);
+        VALUES(_workflow_instance_id, _try_remaining, _start_after, _task_name, _parameters);
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION dequeue_task(_task_name TEXT)
@@ -268,24 +268,24 @@ AS $$
     ) RETURNING t1.id, t1.workflow_instance_id, t1.parameters
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION complete_task(tid BIGINT, status task_status, error text, result BYTEA)
+CREATE OR REPLACE FUNCTION complete_task(_tid BIGINT, _status task_status, _error text, _result BYTEA)
 RETURNS VOID
 LANGUAGE SQL
 AS $$
     WITH in_vals AS (SELECT
-        tid as id,
-        status as status,
-        error as error,
-        result as result),
+        _tid as id,
+        _status as status,
+        _error as error,
+        _result as result),
     tres AS (
         INSERT INTO task_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
             (SELECT workflow_instance_id, parameters, task_name, enqueued_at, in_vals.status, in_vals.error, in_vals.result
-            FROM tasks JOIN in_vals ON in_vals.id = tasks.id WHERE tasks.id = tid) RETURNING id, workflow_instance_id
+            FROM tasks JOIN in_vals ON in_vals.id = tasks.id WHERE tasks.id = _tid) RETURNING id, workflow_instance_id
     )
     INSERT INTO workflow_events(event_type, task_result_id, workflow_instance_id)
         VALUES('task_complete', (select id from tres), (select workflow_instance_id from tres));
     ;
-    DELETE FROM tasks WHERE id = tid
+    DELETE FROM tasks WHERE id = _tid
 $$;
 
 COMMIT;
