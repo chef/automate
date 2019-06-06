@@ -114,7 +114,7 @@ function applications_benchmarks() {
 function rename_benchmark_files() {
   local results_txt=/src/benchmarks/applications-service/txt/new.txt
   local results_html=/src/benchmarks/applications-service/html/new.html
-  local name=
+  local name
 
   # check if files does exist
   if [[ ! -f $results_txt || ! -f $results_html ]]; then
@@ -157,7 +157,7 @@ function applications_integration() {
   # Go based integration tests
   A2_SVC_NAME="applications-service" A2_SVC_PATH="/hab/svc/applications-service" go_test \
 	  "github.com/chef/automate/components/applications-service/integration_test" \
-	  -bench=. -v
+	  -bench=. -benchmem -v
 }
 
 document "applications_publish_raw_message" <<DOC
