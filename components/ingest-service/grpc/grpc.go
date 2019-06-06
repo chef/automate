@@ -47,9 +47,9 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 
 	var (
-		grpcServer  = opts.ConnFactory.NewServer()
-		migrationer = migration.New(client)
-		uri         = fmt.Sprintf("%s:%d", opts.Host, opts.Port)
+		grpcServer = opts.ConnFactory.NewServer()
+		migrator   = migration.New(client)
+		uri        = fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 	)
 
 	log.WithFields(log.Fields{"uri": uri}).Info("Starting gRPC Server")
@@ -60,7 +60,7 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 
 	// Register Status Server
-	ingestStatus := server.NewIngestStatus(client, migrationer)
+	ingestStatus := server.NewIngestStatus(client, migrator)
 	ingest.RegisterIngestStatusServer(grpcServer, ingestStatus)
 
 	// Initialize elasticsearch indices or trigger a migration
@@ -68,20 +68,20 @@ func Spawn(opts *serveropts.Opts) error {
 	// This initialization will happen inside a goroutine so that we can then
 	// report the health of the system. We might have to do the same for the
 	// migration tasks.
-	migrationNeeded, err := migrationer.MigrationNeeded()
+	migrationNeeded, err := migrator.MigrationNeeded()
 	if err != nil {
 		log.WithError(err).Error("Failed checking for migration")
 		return err
 	}
 
 	if migrationNeeded {
-		err = migrationer.Start()
+		err = migrator.Start()
 		if err != nil {
 			log.WithError(err).Error("Failed starting a migration")
 			return err
 		}
 	} else {
-		migrationer.MarkUnneeded()
+		migrator.MarkUnneeded()
 		err = client.InitializeStore(context.Background())
 		if err != nil {
 			log.WithError(err).Error("Failed initializing elasticsearch")
