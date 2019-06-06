@@ -235,64 +235,6 @@ func TestGetNodesRegexWithExactSameField(t *testing.T) {
 			},
 			expected: []string{"a2-dev", "a2-prod", "a1-prod", "a1-dev"},
 		},
-		{
-			description: "Case sensitive regex filters 1",
-			nodes: []iBackend.Node{
-				{
-					NodeInfo: iBackend.NodeInfo{
-						NodeName: "a2-dev",
-					},
-				},
-				{
-					NodeInfo: iBackend.NodeInfo{
-						NodeName: "A2-Dev",
-					},
-				},
-				{
-					NodeInfo: iBackend.NodeInfo{
-						NodeName: "A2-prod",
-					},
-				},
-				{
-					NodeInfo: iBackend.NodeInfo{
-						NodeName: "a2-Prod",
-					},
-				},
-			},
-			request: request.Nodes{
-				Filter: []string{"name:a2-*"},
-			},
-			expected: []string{"a2-dev", "A2-Dev", "A2-prod", "a2-Prod"},
-		},
-		{
-			description: "Case sensitive regex filters 2",
-			nodes: []iBackend.Node{
-				{
-					NodeInfo: iBackend.NodeInfo{
-						NodeName: "a2-dev",
-					},
-				},
-				{
-					NodeInfo: iBackend.NodeInfo{
-						NodeName: "A2-Dev",
-					},
-				},
-				{
-					NodeInfo: iBackend.NodeInfo{
-						NodeName: "A2-prod",
-					},
-				},
-				{
-					NodeInfo: iBackend.NodeInfo{
-						NodeName: "a2-Prod",
-					},
-				},
-			},
-			request: request.Nodes{
-				Filter: []string{"name:A2-*"},
-			},
-			expected: []string{"a2-dev", "A2-Dev", "A2-prod", "a2-Prod"},
-		},
 	}
 
 	for _, test := range cases {
