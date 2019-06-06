@@ -57,6 +57,8 @@ ensure_container_build() {
 
 run_hab_in_container() {
   docker run -it chef/automate-apps-hab-client bash -c "
+    hab --version
+
     export HAB_FEAT_EVENT_STREAM=1 && \
     hab sup run \
       --event-stream-application=MY_APP \

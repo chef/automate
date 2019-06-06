@@ -13,7 +13,7 @@ RUN useradd -U -M hab
 ENV HAB_LICENSE=accept
 
 RUN curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh | bash -s -- -c unstable && \
-    hab pkg install core/hab-sup -c unstable && \
+    hab pkg install core/hab-sup/0.83.0-dev -c unstable && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
