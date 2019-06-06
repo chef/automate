@@ -51,8 +51,7 @@ describe File.basename(__FILE__) do
                             "total" => 22,
                             "critical" => 22
                         }
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
@@ -71,8 +70,7 @@ describe File.basename(__FILE__) do
                             "total" => 15
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
@@ -93,16 +91,13 @@ describe File.basename(__FILE__) do
                             "major" => 1,
                             "critical" => 1
                         }
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
-                    "endTime" => {
-                        "seconds" => 1520155122
-                    },
+                    "endTime" => "2018-03-04T09:18:42Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 18,
@@ -117,8 +112,7 @@ describe File.basename(__FILE__) do
                             "major" => 1,
                             "critical" => 1
                         }
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",

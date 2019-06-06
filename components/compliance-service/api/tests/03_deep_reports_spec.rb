@@ -29,8 +29,7 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
@@ -48,8 +47,7 @@ describe File.basename(__FILE__) do
                         "total" => 1,
                         "critical" => 1
                     }
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
@@ -64,8 +62,7 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
@@ -80,8 +77,7 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
@@ -96,8 +92,7 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
@@ -112,8 +107,7 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
@@ -133,8 +127,7 @@ describe File.basename(__FILE__) do
                         "total" => 1,
                         "major" => 1
                     }
-                },
-                "profiles" => []
+                }
             }
         ],
         "total" => 7
@@ -160,16 +153,13 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                "endTime" => {
-                    "seconds" => 1520155122
-                },
+                "endTime" => "2018-03-04T09:18:42Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 14,
@@ -181,8 +171,7 @@ describe File.basename(__FILE__) do
                         "total" => 1,
                         "critical" => 1
                     }
-                },
-                "profiles" => []
+                }
             }
         ],
         "total": 7
@@ -210,8 +199,7 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
@@ -228,8 +216,7 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             }
         ],
         "total" => 7
@@ -259,8 +246,7 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
@@ -277,8 +263,7 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             }
         ],
         "total" => 7
@@ -307,8 +292,7 @@ describe File.basename(__FILE__) do
                         "total" => 15
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
@@ -327,8 +311,7 @@ describe File.basename(__FILE__) do
                         "total" => 15
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
@@ -350,8 +333,7 @@ describe File.basename(__FILE__) do
                         "total" => 2,
                         "major" => 2
                     }
-                },
-                "profiles" => []
+                }
             }
         ],
         "total" => 3
@@ -382,8 +364,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
@@ -400,8 +381,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
@@ -418,8 +398,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
@@ -436,8 +415,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
@@ -454,8 +432,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
@@ -472,8 +449,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
@@ -490,8 +466,7 @@ describe File.basename(__FILE__) do
                         },
                         "skipped" => {},
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 7
@@ -519,8 +494,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
@@ -538,8 +512,7 @@ describe File.basename(__FILE__) do
                             "total" => 1,
                             "critical" => 1
                         }
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
@@ -556,8 +529,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
@@ -574,8 +546,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
@@ -592,8 +563,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
@@ -610,8 +580,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
@@ -628,8 +597,7 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 7

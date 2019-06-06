@@ -51,8 +51,7 @@ describe File.basename(__FILE__) do
                             "failed" => {}
                         }
                     },
-                    "tags" => [],
-                    "profiles" => []
+                    "tags" => []
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -75,8 +74,7 @@ describe File.basename(__FILE__) do
                             }
                         }
                     },
-                    "tags" => [],
-                    "profiles" => []
+                    "tags" => []
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -88,9 +86,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "passed" => {},
@@ -101,8 +97,7 @@ describe File.basename(__FILE__) do
                             }
                         }
                     },
-                    "tags" => [],
-                    "profiles" => []
+                    "tags" => []
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -125,8 +120,7 @@ describe File.basename(__FILE__) do
                             }
                         }
                     },
-                    "tags" => [],
-                    "profiles" => []
+                    "tags" => []
                 }
             ],
             "total" => 4
