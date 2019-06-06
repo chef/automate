@@ -1383,6 +1383,9 @@ func (p *pg) Pristine(ctx context.Context) error {
 }
 
 func (p *pg) recordMigrationStatusAndNotifyPG(ctx context.Context, ms string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return p.processError(err)
