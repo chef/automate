@@ -157,6 +157,12 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	// Engine updates need unfiltered access to all data.
 	ctx = auth_context.ContextWithoutProjects(ctx)
 
+	// Retrieve the IAM version from the database: some other node could have
+	// done a migration (v2 <-> v2.1) and this one wouldn't know. However, on
+	// success, it's written to the database, and we can thus retrieve it from
+	// there. Also, these version changes are registered as "policy changes",
+	// so even if no v2[.1] policy has actually changed, we'll update the correct
+	// store (v2 or v2.1) here.
 	vsn, err := refresher.getIAMVersion(ctx)
 	if err != nil {
 		refresher.log.WithError(err).Warn("Failed to retrieve IAM version")
