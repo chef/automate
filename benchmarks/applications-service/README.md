@@ -10,7 +10,7 @@ $ hab studio enter
 ```
 - Build and start the applications-service.
 ```
-[1][default:/src:0]# start_application_service
+[1][default:/src:0]# start_applications_service
 ```
 - Run the benchmarks and store them. _(NOTE: You should already have a PR open)_
 ```
