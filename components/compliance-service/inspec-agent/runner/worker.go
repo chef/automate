@@ -63,7 +63,7 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 	return w.Continue(&ScanJobWorkflowPayload{
 		initialVal,
 		jobs[0].ParentJobID,
-		types.StatusScheduled,
+		types.StatusRunning,
 	})
 }
 
@@ -102,6 +102,10 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 		if payload.OutstandingJobs > 0 {
 			return w.Continue(&payload)
 		} else {
+			// No more jobs left to run, if status hasn't changed from the initial Running, we change it to Completed
+			if payload.ParentJobStatus == types.StatusRunning {
+				payload.ParentJobStatus = types.StatusCompleted
+			}
 			w.EnqueueTask("scan-job-summary", payload)
 			return w.Continue(&payload)
 		}
