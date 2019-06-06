@@ -74,6 +74,7 @@ type ruleStorage interface {
 	UpdateRule(context.Context, *Rule) (*Rule, error)
 	ListRules(context.Context) ([]*Rule, error)
 	DeleteRule(context.Context, string) error
+	ListRulesForProject(context.Context, string) ([]*Rule, error)
 }
 
 type MigrationStatusProvider interface {

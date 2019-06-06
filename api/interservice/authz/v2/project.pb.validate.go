@@ -2319,6 +2319,164 @@ var _ interface {
 	ErrorName() string
 } = ListRulesRespValidationError{}
 
+// Validate checks the field values on ListRulesForProjectReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListRulesForProjectReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if !_ListRulesForProjectReq_Id_Pattern.MatchString(m.GetId()) {
+		return ListRulesForProjectReqValidationError{
+			field:  "Id",
+			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+		}
+	}
+
+	return nil
+}
+
+// ListRulesForProjectReqValidationError is the validation error returned by
+// ListRulesForProjectReq.Validate if the designated constraints aren't met.
+type ListRulesForProjectReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListRulesForProjectReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListRulesForProjectReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListRulesForProjectReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListRulesForProjectReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListRulesForProjectReqValidationError) ErrorName() string {
+	return "ListRulesForProjectReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListRulesForProjectReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListRulesForProjectReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListRulesForProjectReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListRulesForProjectReqValidationError{}
+
+var _ListRulesForProjectReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+
+// Validate checks the field values on ListRulesForProjectResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListRulesForProjectResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetRules() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListRulesForProjectRespValidationError{
+					field:  fmt.Sprintf("Rules[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ListRulesForProjectRespValidationError is the validation error returned by
+// ListRulesForProjectResp.Validate if the designated constraints aren't met.
+type ListRulesForProjectRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListRulesForProjectRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListRulesForProjectRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListRulesForProjectRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListRulesForProjectRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListRulesForProjectRespValidationError) ErrorName() string {
+	return "ListRulesForProjectRespValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListRulesForProjectRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListRulesForProjectResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListRulesForProjectRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListRulesForProjectRespValidationError{}
+
 // Validate checks the field values on DeleteRuleReq with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.

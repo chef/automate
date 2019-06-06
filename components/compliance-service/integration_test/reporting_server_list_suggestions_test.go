@@ -370,11 +370,12 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.description, func(t *testing.T) {
-			suite.InsertInspecSummaries(test.summaries)
+			_, err := suite.InsertInspecSummaries(test.summaries)
+			require.NoError(t, err)
 			defer suite.DeleteAllDocuments()
 
 			response, err := server.ListSuggestions(ctx, &test.request)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			require.NotNil(t, response)
 
 			actualTerms := make([]string, len(response.Suggestions))

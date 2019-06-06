@@ -6,16 +6,16 @@ package applications
 import policyv2 "github.com/chef/automate/components/automate-gateway/authz/policy_v2"
 
 func init() {
-	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroups", "infra:nodes", "infra:nodes:list", "GET", "/beta/applications/service-groups", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroups", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/beta/applications/service-groups", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroupsHealthCounts", "infra:nodes", "infra:nodes:list", "GET", "/beta/applications/service_groups_health_counts", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServiceGroupsHealthCounts", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/beta/applications/service_groups_health_counts", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServices", "infra:nodes", "infra:nodes:list", "GET", "/beta/applications/services", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServices", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/beta/applications/services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesBySG", "infra:nodes", "infra:nodes:list", "GET", "/beta/applications/service-groups/{service_group_id}", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesBySG", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/beta/applications/service-groups/{service_group_id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*ServicesBySGReq); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

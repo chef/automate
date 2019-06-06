@@ -1299,6 +1299,7 @@ func TestProjectUpdate(t *testing.T) {
 				_, err = suite.InsertInspecSummaries([]*relaxting.ESInSpecSummary{test.summary})
 				require.NoError(t, err)
 
+				defer suite.DeleteAllDocuments()
 				// Send a project rules update event
 				esJobID, err := suite.ingesticESClient.UpdateReportProjectsTags(ctx, test.projects)
 				require.NoError(t, err)
@@ -1329,8 +1330,6 @@ func TestProjectUpdate(t *testing.T) {
 				updatedSummary := summaries[0]
 
 				assert.ElementsMatch(t, test.projectIDs, updatedSummary.Projects)
-
-				suite.DeleteAllDocuments()
 			})
 	}
 }

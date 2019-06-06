@@ -33,7 +33,7 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 	filters map[string][]string,
 	searchResult *elastic.SearchResult,
 	statusFilters []string) (map[string]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
-	myName := "ProfileDepth::getProfileMinsFromNodes"
+	myName := "ProfileDepth::getProfileMinsFromNodesResults"
 
 	profileMins := make(map[string]reporting.ProfileMin)
 	statusMap := make(map[string]int, 3)
