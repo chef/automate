@@ -160,7 +160,7 @@ func TestListProjectRules(t *testing.T) {
 
 		expectedRules1 := []*api.ProjectRule{createResp1.Rule, createResp2.Rule}
 		expectedRules2 := []*api.ProjectRule{createResp3.Rule}
-
+		
 		expectedMap := map[string]*api.ProjectRules{
 			pid1: &api.ProjectRules{
 				Rules: expectedRules1,
@@ -200,7 +200,7 @@ func setupWithOPAV2pX(t *testing.T, twoPointOne bool) testSetup {
 
 	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
-	ts := setupV2(t, o, o, &emptyV1List, vChan)
+	ts := setupV2WithMigrationState(t, o, o, &emptyV1List, o, vChan, nil)
 	var flag api_v2.Flag
 	if twoPointOne {
 		flag = api_v2.Flag_VERSION_2_1

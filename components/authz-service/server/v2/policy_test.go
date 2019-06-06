@@ -2936,7 +2936,7 @@ type testSetup struct {
 
 func setupV2WithWriter(t *testing.T,
 	writer engine.V2pXWriter) testSetup {
-	return setupV2WithMigrationState(t, nil, writer, nil, make(chan api_v2.Version, 1),
+	return setupV2WithMigrationState(t, nil, writer, nil, nil, make(chan api_v2.Version, 1),
 		// if the MigrationStatus is set to "Success", that means we've migrated
 		// successfully to IAM v2 ("SuccessBeta1" is v2.1).
 		func(s storage.MigrationStatusProvider) error { return s.Success(context.Background()) })
@@ -2947,13 +2947,14 @@ func setupV2(t *testing.T,
 	writer engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vChan chan api_v2.Version) testSetup {
-	return setupV2WithMigrationState(t, authorizer, writer, pl, vChan, nil)
+	return setupV2WithMigrationState(t, authorizer, writer, pl, nil, vChan, nil)
 }
 
 func setupV2WithMigrationState(t *testing.T,
 	authorizer engine.V2Authorizer,
 	writer engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
+	rulesRetriever engine.ProjectRulesRetriever,
 	vChan chan api_v2.Version,
 	migration func(storage.MigrationStatusProvider) error) testSetup {
 
@@ -2965,6 +2966,9 @@ func setupV2WithMigrationState(t *testing.T,
 
 	if writer == nil {
 		writer = &testEngine{}
+	}
+	if rulesRetriever == nil {
+		rulesRetriever = &testProjectRulesRetriever{} 
 	}
 
 	mem_v2 := memstore_v2.New()
@@ -2979,7 +2983,7 @@ func setupV2WithMigrationState(t *testing.T,
 	configMgr, err := config.NewManager("/tmp/.authz-delete-me")
 	require.NoError(t, err)
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
-		&testProjectRulesRetriever{}, eventServiceClient, configMgr)
+		rulesRetriever, eventServiceClient, configMgr)
 	require.NoError(t, err)
 
 	vSwitch := v2.NewSwitch(vChan)
