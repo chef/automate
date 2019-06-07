@@ -9,7 +9,6 @@ import (
 
 	"github.com/chef/automate/lib/logger"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/engine/opa"
 )
@@ -90,50 +89,50 @@ func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 	})
 }
 
-func TestListProjectRules(t *testing.T) {
+func TestListRulesForAllProjects(t *testing.T) {
 	ctx := context.Background()
 	ts := setupWithOPAV2p1(t)
 
 	values1, values2, values3 := []string{"opscode", "chef"}, []string{"chef"}, []string{"other", "org"}
-	type1 := api.ProjectRuleTypes_NODE
-	conditions1 := []*api.Condition{
+	type1 := api_v2.ProjectRuleTypes_NODE
+	conditions1 := []*api_v2.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Type:     api_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 			Values:   values1,
-			Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+			Operator: api_v2.ProjectRuleConditionOperators_MEMBER_OF,
 		},
 	}
-	type2 := api.ProjectRuleTypes_EVENT
-	conditions2 := []*api.Condition{
+	type2 := api_v2.ProjectRuleTypes_EVENT
+	conditions2 := []*api_v2.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Type:     api_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 			Values:   values2,
-			Operator: api.ProjectRuleConditionOperators_EQUALS,
+			Operator: api_v2.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
-	conditions3 := []*api.Condition{
+	conditions3 := []*api_v2.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Type:     api_v2.ProjectRuleConditionTypes_CHEF_ORGS,
 			Values:   values3,
-			Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+			Operator: api_v2.ProjectRuleConditionOperators_MEMBER_OF,
 		},
 	}
 
 	t.Run("if no rules exist, returns empty list", func(t *testing.T) {
-		list, err := ts.projects.ListRules(ctx, &api.ListRulesReq{})
+		list, err := ts.projects.ListRules(ctx, &api_v2.ListRulesReq{})
 		require.Empty(t, list.Rules)
 		require.NoError(t, err)
 
-		resp, err := ts.projects.ListProjectRules(ctx, &api.ListProjectRulesReq{})
+		resp, err := ts.projects.ListRulesForAllProjects(ctx, &api_v2.ListRulesForAllProjectsReq{})
 		require.NoError(t, err)
-		assert.Equal(t, &api.ProjectCollectionRulesResp{}, resp)
+		assert.Equal(t, &api_v2.ListRulesForAllProjectsResp{}, resp)
 	})
 
 	t.Run("if multiple rules exist, returns complete rule map", func(t *testing.T) {
 		id1, id2, id3 := "rule-number-1", "rule-number-2", "rule-number-3"
 		pid1, pid2 := "foo-project", "bar-project"
 		name := "you don't talk about fight club"
-		createResp1, err := ts.projects.CreateRule(ctx, &api.CreateRuleReq{
+		createResp1, err := ts.projects.CreateRule(ctx, &api_v2.CreateRuleReq{
 			Id:         id1,
 			Name:       name,
 			Type:       type1,
@@ -141,7 +140,7 @@ func TestListProjectRules(t *testing.T) {
 			Conditions: conditions1,
 		})
 		require.NoError(t, err)
-		createResp2, err := ts.projects.CreateRule(ctx, &api.CreateRuleReq{
+		createResp2, err := ts.projects.CreateRule(ctx, &api_v2.CreateRuleReq{
 			Id:         id2,
 			Name:       name,
 			Type:       type2,
@@ -149,7 +148,7 @@ func TestListProjectRules(t *testing.T) {
 			Conditions: conditions2,
 		})
 		require.NoError(t, err)
-		createResp3, err := ts.projects.CreateRule(ctx, &api.CreateRuleReq{
+		createResp3, err := ts.projects.CreateRule(ctx, &api_v2.CreateRuleReq{
 			Id:         id3,
 			Name:       name,
 			Type:       type2,
@@ -158,23 +157,22 @@ func TestListProjectRules(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		expectedRules1 := []*api.ProjectRule{createResp1.Rule, createResp2.Rule}
-		expectedRules2 := []*api.ProjectRule{createResp3.Rule}
-		
-		expectedMap := map[string]*api.ProjectRules{
-			pid1: &api.ProjectRules{
+		expectedRules1 := []*api_v2.ProjectRule{createResp1.Rule, createResp2.Rule}
+		expectedRules2 := []*api_v2.ProjectRule{createResp3.Rule}
+		expectedMap := map[string]*api_v2.ProjectRules{
+			pid1: &api_v2.ProjectRules{
 				Rules: expectedRules1,
 			},
-			pid2: &api.ProjectRules{
+			pid2: &api_v2.ProjectRules{
 				Rules: expectedRules2,
 			},
 		}
 
-		list, err := ts.projects.ListRules(ctx, &api.ListRulesReq{})
+		list, err := ts.projects.ListRules(ctx, &api_v2.ListRulesReq{})
 		require.Equal(t, 3, len(list.Rules))
 		require.NoError(t, err)
 
-		resp, err := ts.projects.ListProjectRules(ctx, &api.ListProjectRulesReq{})
+		resp, err := ts.projects.ListRulesForAllProjects(ctx, &api_v2.ListRulesForAllProjectsReq{})
 		require.NoError(t, err)
 		assert.EqualValues(t, expectedMap, resp.ProjectRules)
 	})
