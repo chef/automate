@@ -59,6 +59,7 @@ service Projects {
     rpc GetProject(GetProjectReq) returns (GetProjectResp) {};
     rpc DeleteProject(DeleteProjectReq) returns (DeleteProjectResp) {};
     rpc ListProjects(ListProjectsReq) returns (ListProjectsResp) {};
+    rpc ListProjectsForIntrospection(ListProjectsReq) returns (ListProjectsResp) {};
 
     // Note: POC functions that are not ready to expose outside of our
     // spike (aka keep them out of the gateway for now).
