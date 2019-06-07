@@ -184,7 +184,10 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 
 	switch {
 	case vsn.Minor == api.Version_V1: // v2.1
-		return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap, ruleMap)
+		if err := refresher.engine.SetRules(ctx, ruleMap); err != nil {
+			return err
+		}
+		return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap)
 	default: // v2.0 OR v1.0
 		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap)
 	}

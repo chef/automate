@@ -78,7 +78,8 @@ type V2Writer interface {
 }
 
 type V2p1Writer interface {
-	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}, map[string][]v2.Rule) error
+	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
+	SetRules(context.Context, map[string][]v2.Rule) error
 }
 
 type ProjectRulesRetriever interface {

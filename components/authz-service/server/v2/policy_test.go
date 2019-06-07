@@ -3242,10 +3242,15 @@ func (te *testEngine) V2SetPolicies(
 
 func (te *testEngine) V2p1SetPolicies(
 	ctx context.Context, policies map[string]interface{},
-	roles map[string]interface{}, rules map[string][]storage.Rule) error {
+	roles map[string]interface{}) error {
 	te.policyMap = policies
 	// TODO: use these
 	te.roleMap = roles
+	return nil
+}
+
+func (te *testEngine) SetRules(
+	ctx context.Context, rules map[string][]storage.Rule) error {
 	te.ruleMap = rules
 	return nil
 }

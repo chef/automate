@@ -533,15 +533,12 @@ func (s *State) V2SetPolicies(
 // rules, and resets the partial evaluation cache for v2.l
 func (s *State) V2p1SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
-	roleMap map[string]interface{}, ruleMap map[string][]v2.Rule) error {
+	roleMap map[string]interface{}) error {
 	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
 		"roles":    roleMap,
 	})
 
-	if err := s.SetRules(ctx, ruleMap); err != nil {
-		return errors.New("failed to set rule store")
-	}
 	return s.initPartialResultV2p1(ctx)
 }
 

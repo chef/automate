@@ -18,7 +18,6 @@ import (
 
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/engine/opa"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 func TestIsAuthorized(t *testing.T) {
@@ -683,7 +682,7 @@ func setupV2(t testing.TB) (context.Context, map[string]engine.Engine) {
 func setupV2p1(t testing.TB) (context.Context, map[string]engine.Engine) {
 	ctx, engines := setup(t)
 	if o, ok := engines["opa"]; ok {
-		o.V2p1SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{}, map[string][]v2.Rule{})
+		o.V2p1SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{})
 	}
 	return ctx, engines
 }
