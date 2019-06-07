@@ -66,11 +66,4 @@ service Authorization {
     option (chef.automate.api.iam.policy).resource = "iam:introspect";
     option (chef.automate.api.iam.policy).action = "iam:introspect:get";
     };
-  rpc IntrospectAllProjects (authz.request.IntrospectAllProjectsReq) returns (authz.response.IntrospectProjectsResp) {
-    option (google.api.http).get = "/auth/introspect_projects";
-    option (chef.automate.api.policy).resource = "auth_introspection:introspect_all_projects";
-    option (chef.automate.api.policy).action = "read";
-    option (chef.automate.api.iam.policy).resource = "iam:introspect";
-    option (chef.automate.api.iam.policy).action = "iam:introspect:getAllProjects";
-    };
 }
