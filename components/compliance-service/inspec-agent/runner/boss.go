@@ -9,32 +9,21 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/components/compliance-service/dao/pgdb"
-	"github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/lib/workflow"
 )
 
 var ListenPort int = 2133
 
 type Runner struct {
-	managerClient       manager.NodeManagerServiceClient
-	nodesClient         nodes.NodesServiceClient
-	db                  *pgdb.DB
 	scannerServer       *scanner.Scanner
-	ingestClient        ingest.ComplianceIngesterClient
 	remoteInspecVersion string
 	workflowManager     *workflow.WorkflowManager
 }
 
-func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB,
-	ingestClient ingest.ComplianceIngesterClient, remoteInspecVersion string, workflowManager *workflow.WorkflowManager) *Runner {
-	scannerServer := scanner.New(managerClient, nodesClient, db)
-	//go watchJobsNodesStatus(scannerServer)
-	return &Runner{managerClient, nodesClient, db, scannerServer, ingestClient, remoteInspecVersion, workflowManager}
+func New(scannerServer *scanner.Scanner, remoteInspecVersion string, workflowManager *workflow.WorkflowManager) *Runner {
+	return &Runner{scannerServer, remoteInspecVersion, workflowManager}
 }
 
 // AddJobs is used to populate the jobs array and pass jobs to the workers via the channel

@@ -36,10 +36,12 @@ type Scheduler struct {
 func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB,
 	ingestClient ingest.ComplianceIngesterClient, secretsClient secrets.SecretsServiceClient, remoteInspecVer string, workflowManager *workflow.WorkflowManager) *Scheduler {
 	logrus.Debugf("setting up the scheduler server with mgrclient %+v and nodesclient %+v and ingestclient %+v and secretsclient %+v", managerClient, nodesClient, ingestClient, secretsClient)
+
 	// set up the server connections for resolver, runner, and scanner
 	resolverServer := resolver.New(managerClient, nodesClient, db, secretsClient)
-	runnerServer := runner.New(managerClient, nodesClient, db, ingestClient, remoteInspecVer, workflowManager)
 	scannerServer := scanner.New(managerClient, nodesClient, db)
+	runnerServer := runner.New(scannerServer, remoteInspecVer, workflowManager)
+
 	return &Scheduler{managerClient, nodesClient, db, scannerServer, runnerServer, resolverServer}
 }
 
