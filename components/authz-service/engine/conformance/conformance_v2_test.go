@@ -781,10 +781,9 @@ func setPoliciesV2pX(t testing.TB, twoPointOne bool, e engine.Engine, ruleMap ma
 		roleMap[role["id"].(string)] = role
 	}
 	if twoPointOne {
-		err := e.V2p1SetPolicies(ctx, policyMap, roleMap)
-		require.NoError(t, err, "set policies(v2.1)")
+		require.NoError(t, e.V2p1SetPolicies(ctx, policyMap, roleMap), "V2p1SetPolicies() [v2.1]")
+		require.NoError(t, e.SetRules(ctx, ruleMap), "SetRules() [v2.1]")
 	} else {
-		err := e.V2SetPolicies(ctx, policyMap, roleMap)
-		require.NoError(t, err, "set policies(v2)")
+		require.NoError(t, e.V2SetPolicies(ctx, policyMap, roleMap), "V1SetPolicies() [v2]")
 	}
 }
