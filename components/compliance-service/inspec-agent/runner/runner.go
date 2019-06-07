@@ -1,21 +1,26 @@
 package runner
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	neturl "net/url"
 	"os"
 	"strings"
 	"time"
 
 	uuid "github.com/gofrs/uuid"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/compliance-service/api/jobs"
+	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/ingest/ingest"
+	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
@@ -327,6 +332,42 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	t.scannerServer.UpdateNode(ctx, &job, detectInfo)
 	logrus.Debugf("finished job %s with status %s", job.JobID, job.NodeStatus)
 	return job.NodeStatus, nil
+}
+
+func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, content []byte, reportID string) error {
+	var report compliance.Report
+	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err := unmarshaler.Unmarshal(bytes.NewReader(content), &report); err != nil {
+		return errors.Wrap(err, "reportIt was unable to unmarshal the report output into a compliance.Report struct")
+	}
+
+	report.Environment = job.InspecBaseJob.NodeEnv
+	if report.Environment == "" {
+		report.Environment = "unknown"
+	}
+	report.Type = mappings.DocType
+	report.NodeName = job.InspecBaseJob.NodeName
+	report.NodeUuid = job.InspecBaseJob.NodeID
+	report.ReportUuid = reportID
+	report.JobUuid = job.JobID
+	report.EndTime = time.Now().UTC().Format(time.RFC3339)
+	report.SourceId = job.SourceID
+	report.SourceRegion = job.TargetConfig.TargetBaseConfig.Region
+	report.SourceAccountId = job.SourceAccountID
+	ipAddress := net.ParseIP(job.TargetConfig.TargetBaseConfig.Hostname)
+	if ipAddress != nil {
+		report.Ipaddress = ipAddress.String()
+	} else {
+		report.Fqdn = job.TargetConfig.TargetBaseConfig.Hostname
+	}
+	report.Tags = job.Tags
+	logrus.Debugf("hand-over report to ingest service")
+
+	_, err := t.ingestClient.ProcessComplianceReport(ctx, &report)
+	if err != nil {
+		return errors.Wrap(err, "Report processing error")
+	}
+	return nil
 }
 
 func (t *InspecJobTask) validateJob(job *types.InspecJob) bool {
