@@ -626,7 +626,7 @@ describe File.basename(__FILE__) do
     assert_equal(Reporting::Report, res.class)
 
     puts res['version']
-    assert_equal('3.1.3', res['version'])
+    assert_equal('3.1.0', res['version'])
     assert_equal('bb93e1b2-36d6-439e-ac70-cccccccccc04', res['id'])
     assert_equal('9b9f4e51-b049-4b10-9555-10578916e149', res['node_id'])
     assert_equal('centos-beta', res['node_name'])
