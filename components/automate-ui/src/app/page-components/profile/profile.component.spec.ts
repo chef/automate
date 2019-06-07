@@ -19,7 +19,7 @@ class MockMetadataService {
 }
 
 class MockTelemetryService {
-  track(_event?: string, _properties?: any): void {}
+  track(_event?: string, _properties?: any): void { }
 }
 
 describe('ProfileComponent', () => {
@@ -45,7 +45,7 @@ describe('ProfileComponent', () => {
         { provide: MetadataService, useClass: MockMetadataService },
         { provide: ChefSessionService, useClass: MockChefSessionService }
       ],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     });
 
     localStorage.setItem('welcome-modal-seen', 'true');
@@ -84,7 +84,7 @@ describe('ProfileComponent', () => {
 
       expect(metadataService.getBuildVersion).toHaveBeenCalled();
       expect(telemetryService.track).toHaveBeenCalledWith('automateVersion',
-        { automateVersion: `${expectedVersion}`});
+        { automateVersion: `${expectedVersion}` });
       expect(component.buildVersion).toEqual(expectedVersion);
     });
   });
@@ -102,10 +102,10 @@ describe('ProfileComponent', () => {
   });
 
   describe('displayName', () => {
-      it('returns first and last', () => {
-        expect(component.displayName).toEqual(chefSessionService.fullname);
-        expect(component.displayName).toEqual('Test Mock');
-      });
+    it('returns first and last', () => {
+      expect(component.displayName).toEqual(chefSessionService.fullname);
+      expect(component.displayName).toEqual('Test Mock');
+    });
   });
 
   describe('email', () => {
@@ -115,7 +115,7 @@ describe('ProfileComponent', () => {
     });
   });
 
-   describe('username', () => {
+  describe('username', () => {
     it('returns the username for the session user', () => {
       expect(component.userName).toEqual(chefSessionService.username);
       expect(component.userName).toEqual('testmock');
@@ -164,8 +164,8 @@ describe('ProfileComponent', () => {
       component.dropdownVisible = true;
       fixture.detectChanges();
 
-      const expected = `Version: ${version}`;
-      const actual = element.nativeElement.querySelector('.version').innerText;
+      const expected = `Build: ${version}`;
+      const actual = element.nativeElement.querySelector('.build').innerText;
       expect(actual).toEqual(expected);
     });
   });

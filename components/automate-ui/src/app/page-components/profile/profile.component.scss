@@ -98,3 +98,8 @@ a, button:not(.dropdown-toggle) {
   right: 16px;
   top: 8px;
 }
+
+.version:after {
+  content: '\A';
+  white-space: pre;
+}
