@@ -2,12 +2,9 @@ package runner
 
 import (
 	"context"
-	"sync"
-
-	"strings"
-
 	"fmt"
 	neturl "net/url"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -20,11 +17,6 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/lib/workflow"
 )
-
-var maxWorkers int
-var jobsChan chan *types.InspecJob
-var jobRunningMap jobRunningStore
-var jobStatusMap jobStatusStore
 
 var ListenPort int = 2133
 
@@ -45,68 +37,20 @@ func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.Nodes
 	return &Runner{managerClient, nodesClient, db, scannerServer, ingestClient, remoteInspecVersion, workflowManager}
 }
 
-type jobStatusStore struct {
-	*sync.Map
-}
-
-type jobRunningStore struct {
-	*sync.Map
-}
-
-func NewJobStatusStore() jobStatusStore {
-	return jobStatusStore{&sync.Map{}}
-}
-
-func NewJobRunningMap() jobRunningStore {
-	return jobRunningStore{&sync.Map{}}
-}
-
-func (s *jobStatusStore) Set(key string, value map[string]*string) {
-	s.Store(key, value)
-}
-
-func (s *jobStatusStore) Remove(key string) {
-	s.Delete(key)
-}
-
-func (s *jobRunningStore) Set(key string, value bool) {
-	s.Store(key, value)
-}
-
-func (s *jobRunningStore) Get(key string) bool {
-	val, ok := s.Load(key)
-	if !ok {
-		return false
-	}
-	return val.(bool)
-}
-
-func (s *jobRunningStore) Remove(key string) {
-	s.Delete(key)
-}
-
-func init() {
-	maxWorkers = 0
-	jobRunningMap = NewJobRunningMap()
-	jobStatusMap = NewJobStatusStore()
-}
-
 // AddJobs is used to populate the jobs array and pass jobs to the workers via the channel
 func (r *Runner) AddJobs(id string, jobs []*types.InspecJob) error {
 	if len(jobs) == 0 {
 		return errors.Errorf("no jobs have been provided!")
 	}
 
-	jobNodeStatusMap := make(map[string]*string)
 	for _, job := range jobs {
-		status := types.StatusScheduled
-		jobNodeStatusMap[job.NodeID] = &status
-		jobStatusMap.Set(job.JobID, jobNodeStatusMap)
 		if job == nil {
 			return errors.New("Job cannot be nil")
 		}
-		job.Status = types.StatusScheduled
-		job.NodeStatus = jobNodeStatusMap[job.NodeID]
+		s := types.StatusScheduled
+
+		job.Status = s
+		job.NodeStatus = &s
 
 		if job.SSM {
 			job.RemoteInspecVersion = r.remoteInspecVersion
