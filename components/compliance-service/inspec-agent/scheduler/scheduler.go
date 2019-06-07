@@ -9,48 +9,25 @@ import (
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 
-	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
-	"github.com/chef/automate/components/compliance-service/ingest/ingest"
-	"github.com/chef/automate/components/compliance-service/inspec"
-	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
-	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
-	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/workflow"
 )
 
 type Scheduler struct {
-	managerClient  manager.NodeManagerServiceClient
-	nodesClient    nodes.NodesServiceClient
-	db             *pgdb.DB
-	scannerServer  *scanner.Scanner
-	runnerServer   *runner.Runner
-	resolverServer *resolver.Resolver
+	db              *pgdb.DB
+	scanner         *scanner.Scanner
+	workflowManager *workflow.WorkflowManager
 }
 
-func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB,
-	ingestClient ingest.ComplianceIngesterClient, secretsClient secrets.SecretsServiceClient, remoteInspecVer string, workflowManager *workflow.WorkflowManager) *Scheduler {
-	logrus.Debugf("setting up the scheduler server with mgrclient %+v and nodesclient %+v and ingestclient %+v and secretsclient %+v", managerClient, nodesClient, ingestClient, secretsClient)
-
-	// set up the server connections for resolver, runner, and scanner
-	resolverServer := resolver.New(managerClient, nodesClient, db, secretsClient)
-	scannerServer := scanner.New(managerClient, nodesClient, db)
-	runnerServer := runner.New(scannerServer, remoteInspecVer, workflowManager)
-
-	return &Scheduler{managerClient, nodesClient, db, scannerServer, runnerServer, resolverServer}
+func New(db *pgdb.DB, scanner *scanner.Scanner, workflowManager *workflow.WorkflowManager) *Scheduler {
+	return &Scheduler{db, scanner, workflowManager}
 }
 
 // Run a job. Schedule, resolve, distribute, and execute it.
 func (a *Scheduler) Run(job *jobs.Job) error {
-	// Here we initialize a new context since if we used a passed in context here,
-	// the context eventually gets cancelled and the chain of calls is not completed.
-	ctx := context.Background()
-
 	logrus.Debugf("Processing job: %+v", job)
 	// 1. Schedule
 	jobToRun, err := a.scheduleJob(job)
@@ -59,45 +36,23 @@ func (a *Scheduler) Run(job *jobs.Job) error {
 		logrus.Error(strErr)
 		return errors.New(strErr)
 	}
-	// 2. Resolve
+	// 2. Trigger Workflow
 	if jobToRun != nil {
-		nodeJobs, err := a.resolverServer.ResolveJob(ctx, jobToRun)
+		err := a.pushWorkflow(job)
 		if err != nil {
-			strErr := fmt.Sprintf("Failed to resolve job %s: %s", job.Id, err.Error())
+			strErr := fmt.Sprintf("Unable to add jobs to inspec agent: %s", err.Error())
 			logrus.Error(strErr)
 			return errors.New(strErr)
 		}
-		// 3. Distribute and Execute
-		err = a.runNodeJobs(ctx, job, nodeJobs)
 	} else {
 		logrus.Debugf("No jobs provided, moving on...")
 	}
 	return nil
 }
 
-func (a *Scheduler) runNodeJobs(ctx context.Context, job *jobs.Job, nodeJobs []*types.InspecJob) error {
-	if len(nodeJobs) == 0 {
-		now := time.Now()
-		nodeJob := &types.InspecJob{
-			InspecBaseJob: types.InspecBaseJob{
-				JobID: job.Id,
-			},
-			StartTime:  &now,
-			EndTime:    &now,
-			NodeStatus: types.StatusAborted,
-		}
-		a.scannerServer.UpdateJobStatus(nodeJob.JobID, "failed", nodeJob.StartTime, nodeJob.EndTime)
-		a.scannerServer.UpdateResult(ctx, nodeJob, nil, &inspec.Error{Message: "no nodes found"}, "")
-		return errors.New("no nodes found for job, aborting")
-	}
-
-	err := a.runnerServer.AddJobs(job.Id, nodeJobs)
-	if err != nil {
-		strErr := fmt.Sprintf("Unable to add jobs to inspec agent: %s", err.Error())
-		logrus.Error(strErr)
-		return errors.New(strErr)
-	}
-	return nil
+func (a *Scheduler) pushWorkflow(job *jobs.Job) error {
+	logrus.Debugf("Calling EnqueueWorkflow for scan-job-workflow")
+	return a.workflowManager.EnqueueWorkflow(context.TODO(), "scan-job-workflow", fmt.Sprintf("scan-job-%s", job.Id), job)
 }
 
 func (a *Scheduler) scheduleJob(job *jobs.Job) (*jobs.Job, error) {
@@ -112,7 +67,7 @@ func (a *Scheduler) scheduleJob(job *jobs.Job) (*jobs.Job, error) {
 	if err != nil {
 		return nil, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid job recurrence rule: %v", err)}
 	}
-	a.scannerServer.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+	a.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
 	return nil, nil
 }
 
@@ -128,7 +83,7 @@ func (a *Scheduler) PollForJobs(ctx context.Context) {
 // processDueJobs uses GetDueJobs to query the database for any recurring jobs that are due to be run
 // For every due recurrent job, a child job is created and then the recurrent(parent) job updated
 func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
-	dueJobs := a.scannerServer.GetDueJobs(nowTime)
+	dueJobs := a.scanner.GetDueJobs(nowTime)
 	if len(dueJobs) > 0 {
 		logrus.Debugf("processDueJobs, %d recurring jobs are due for running...", len(dueJobs))
 	}
@@ -144,22 +99,18 @@ func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
 			logrus.Errorf("Error handling child job %q: %v", job.Id, err)
 			return
 		}
-		a.scannerServer.UpdateParentJobSchedule(parentJobID, parentJobCount, parentRecurrence, parentScheduledTime)
+		a.scanner.UpdateParentJobSchedule(parentJobID, parentJobCount, parentRecurrence, parentScheduledTime)
 	}
 }
 
 func (a *Scheduler) handleChildJob(ctx context.Context, job *jobs.Job) error {
 	job.Name = fmt.Sprintf("%s - run %d", job.Name, job.JobCount)
 	job.Recurrence = ""
-	childJob, err := a.scannerServer.CreateChildJob(job)
+	childJob, err := a.scanner.CreateChildJob(job)
 	if err != nil {
 		return errors.Wrap(err, "Failed to create child job")
 	}
-	nodeJobs, err := a.resolverServer.ResolveJob(ctx, childJob)
-	if err != nil {
-		return errors.Wrap(err, "Failed to resolve job")
-	}
-	err = a.runnerServer.AddJobs(childJob.Id, nodeJobs)
+	err = a.pushWorkflow(childJob)
 	if err != nil {
 		return errors.Wrap(err, "Failed to hand jobs to workers")
 	}

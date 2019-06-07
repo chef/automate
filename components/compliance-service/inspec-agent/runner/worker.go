@@ -5,32 +5,41 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	neturl "net/url"
 	"os"
+	"strings"
 	"time"
 
 	uuid "github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
+	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
 	"github.com/chef/automate/lib/workflow"
 )
 
+var ListenPort int = 2133
+
 func InitWorkflowManager(w *workflow.WorkflowManager, workerCount int, ingestClient ingest.ComplianceIngesterClient,
-	scannerServer *scanner.Scanner) {
+	scanner *scanner.Scanner, resolver *resolver.Resolver, remoteInspecVersion string) {
 	w.RegisterWorkflowExecutor("scan-job-workflow", &ScanJobWorkflow{})
+	w.RegisterTaskExecutor("resolve-job", &ResolveTask{
+		remoteInspecVersion,
+		scanner,
+		resolver,
+	}, workflow.TaskExecutorOpts{Workers: 1})
 	w.RegisterTaskExecutor("scan-job", &InspecJobTask{
 		ingestClient,
-		scannerServer,
+		scanner,
 	}, workflow.TaskExecutorOpts{Workers: workerCount})
-
 	w.RegisterTaskExecutor("scan-job-summary", &InspecJobSummaryTask{
-		ingestClient,
-		scannerServer,
+		scanner,
 	}, workflow.TaskExecutorOpts{Workers: 1})
 }
 
@@ -44,21 +53,18 @@ type ScanJobWorkflowPayload struct {
 func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 	ev workflow.StartEvent) workflow.Decision {
 
-	jobs := []*types.InspecJob{}
-	err := w.GetParameters(&jobs)
+	var job jobs.Job
+	err := w.GetParameters(&job)
 	if err != nil {
-		logrus.WithError(err).Error("Failed to unmarshal jobs!")
+		logrus.WithError(err).Error("Failed to unmarshal job!")
 		return w.Complete()
 	}
 
-	logrus.Debugf("OnStart got %d job(s)", len(jobs))
-	for _, job := range jobs {
-		w.EnqueueTask("scan-job", job)
-	}
+	w.EnqueueTask("resolve-job", job)
 
 	return w.Continue(&ScanJobWorkflowPayload{
-		len(jobs),
-		jobs[0].ParentJobID,
+		0,
+		job.Id,
 		types.StatusRunning,
 	})
 }
@@ -74,6 +80,29 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 
 	logrus.Debugf("Entered ScanJobWorkflow > OnTaskComplete with payload %+v", payload)
 	switch ev.TaskName {
+	case "resolve-job":
+		if ev.Result.Err() != nil {
+			return w.Complete()
+		}
+
+		jobs := []*types.InspecJob{}
+		err := ev.Result.Get(&jobs)
+		if err != nil {
+			logrus.WithError(err).Error("Failed to unmarshal jobs!")
+			return w.Complete()
+		}
+		logrus.Debugf("resolve-job returned %d job(s)", len(jobs))
+
+		if len(jobs) == 0 {
+			return w.Complete()
+		}
+
+		for _, job := range jobs {
+			w.EnqueueTask("scan-job", job)
+		}
+
+		payload.OutstandingJobs = len(jobs)
+		return w.Continue(&payload)
 	case "scan-job":
 		payload.OutstandingJobs--
 
@@ -125,8 +154,63 @@ type InspecJobTask struct {
 }
 
 type InspecJobSummaryTask struct {
-	ingestClient  ingest.ComplianceIngesterClient
 	scannerServer *scanner.Scanner
+}
+
+type ResolveTask struct {
+	remoteInspecVersion string
+	scanner             *scanner.Scanner
+	resolver            *resolver.Resolver
+}
+
+func (t *ResolveTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+	var job jobs.Job
+	if err := task.GetParameters(&job); err != nil {
+		logrus.WithError(err).Error("could not unmarshal job parameters")
+		return nil, err
+	}
+
+	nodeJobs, err := t.resolver.ResolveJob(ctx, &job)
+	if err != nil {
+		logrus.WithError(err).Errorf("failed to resolve job %s", job.Id)
+		// TODO(ssd) 2019-06-07: As far as I can tell
+		// the current code just returns, but it seems
+		// like we should update the job status with
+		// this failure?
+		return nil, errors.Wrapf(err, "Failed to resolve job %s", job.Id)
+	}
+
+	if len(nodeJobs) == 0 {
+		now := time.Now()
+		nodeJob := &types.InspecJob{
+			InspecBaseJob: types.InspecBaseJob{
+				JobID: job.Id,
+			},
+			StartTime:  &now,
+			EndTime:    &now,
+			NodeStatus: types.StatusAborted,
+		}
+		t.scanner.UpdateJobStatus(nodeJob.JobID, "failed", nodeJob.StartTime, nodeJob.EndTime)
+		t.scanner.UpdateResult(context.TODO(), nodeJob, nil, &inspec.Error{Message: "no nodes found"}, "")
+		return nil, errors.New("No nodes found for job")
+	}
+
+	for _, job := range nodeJobs {
+		if job == nil {
+			return nil, errors.New("Nil job returned from ResolveJob")
+		}
+
+		job.Status = types.StatusScheduled
+		job.NodeStatus = types.StatusScheduled
+		if job.SSM {
+			job.RemoteInspecVersion = t.remoteInspecVersion
+		}
+
+		t.scanner.UpdateJobStatus(job.JobID, job.Status, nil, nil)
+		job.InternalProfiles, job.ProfilesOwner = updateComplianceURLs(job.Profiles)
+	}
+
+	return nodeJobs, nil
 }
 
 func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
@@ -447,4 +531,35 @@ func cleanupCreds(envs map[string]string) {
 	if envs["GOOGLE_APPLICATION_CREDENTIALS"] != "" {
 		os.Remove(envs["GOOGLE_APPLICATION_CREDENTIALS"]) // nolint: errcheck
 	}
+}
+
+// This allows inspec to use automate profiles without the `automate login` headache. Only works when the profile store is local
+// A2: Replaces 'compliance://admin/apache-baseline#2.0.1' => 'http://127.0.0.1:2133/profiles/tar?owner=CiQwOGE4Njg0Yi1kYjg4LTRiNzMtOTBhOS0zY2QxNjYxZjU0NjYSBWxvY2Fs&name=apache-baseline&version=2.0.2'
+// NOTE: THIS IS NOT COMPATIBLE WITH 1.x; we changed the url schema here
+func updateComplianceURLs(urls []string) ([]string, string) {
+	var newProfiles []string
+	var owner string
+	for _, url := range urls {
+		if strings.HasPrefix(url, "compliance://") {
+			profile := url[13:]
+			owner_id := strings.SplitN(profile, "/", 2)
+			if len(owner_id) < 2 {
+				logrus.Errorf("no profile owner supplied")
+				continue
+			}
+			id_version := strings.SplitN(owner_id[1], "#", 2)
+			owner = neturl.QueryEscape(owner_id[0])
+			if len(id_version) < 2 {
+				logrus.Errorf("no profile version supplied")
+				continue
+			}
+			name := neturl.QueryEscape(id_version[0])
+			version := neturl.QueryEscape(id_version[1])
+			url = fmt.Sprintf("http://127.0.0.1:%d/profiles/tar?owner=%s&name=%s&version=%s", ListenPort, owner, name, version)
+			newProfiles = append(newProfiles, url)
+		} else {
+			newProfiles = append(newProfiles, url)
+		}
+	}
+	return newProfiles, owner
 }

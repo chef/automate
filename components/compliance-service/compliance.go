@@ -45,6 +45,7 @@ import (
 	ingestserver "github.com/chef/automate/components/compliance-service/ingest/server"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
+	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -176,7 +177,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient, configManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
-		conf.Service.Endpoint, conf.Secrets.Endpoint, conf.Manager.Endpoint, conf.RemoteInspecVersion, workflowManager))
+		conf.Manager.Endpoint, conf.RemoteInspecVersion, workflowManager))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr))
 
 	ps := profilesserver.New(db, &esr, &conf.Profiles, eventClient, statusSrv)
@@ -433,11 +434,12 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 
 	// set up the scanner, scheduler, and runner servers with needed clients
 	// these are all inspec-agent packages
-	scannerServer := scanner.New(mgrClient, nodesClient, db)
-	runner.InitWorkflowManager(workflowManager, conf.InspecAgent.JobWorkers, ingestClient, scannerServer)
-	workflowManager.Start(ctx)
+	scanner := scanner.New(mgrClient, nodesClient, db)
+	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient)
+	runner.InitWorkflowManager(workflowManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
 
-	schedulerServer := scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, conf.RemoteInspecVersion, workflowManager)
+	workflowManager.Start(ctx)
+	schedulerServer := scheduler.New(db, scanner, workflowManager)
 
 	// start polling for jobs with a recurrence schedule that are due to run.
 	// this function will sleep for one minute, then query the db for all jobs
@@ -470,7 +472,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	}
 
 	SERVICE_STATE = serviceStateStarted
-	go checkAndRunHungJobs(ctx, scannerServer, schedulerServer)
+	go checkAndRunHungJobs(ctx, scanner, schedulerServer)
 	return nil
 }
 
