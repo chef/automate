@@ -99,9 +99,26 @@ DOC
 function generate_bldr_config()
 {
   (
-    setup_go_workspace
     enter_go_workspace
     echo "Generating updated bldr config. It takes a couple of minutes. It is very slow on Docker for Mac"
     go run ./tools/bldr-config-gen/main.go
   )
+}
+
+document "install_benchstat" <<DOC
+  Install benchstat tool. Used to compare statistics about benchmarks.
+DOC
+function install_benchstat() {
+  GO_TOOL_METHOD="get" install_go_tool "github.com/golang/perf/cmd/benchstat"
+}
+
+document "install_gomock" <<DOC
+  Install gomock tool. Used for creating mocks for client-side unit tests.
+DOC
+function install_gomock() {
+  local go_mock_tools=(
+    github.com/golang/mock/gomock
+    github.com/golang/mock/mockgen
+  )
+  GO_TOOL_VENDOR=true install_go_tool "${go_mock_tools[@]}"
 }
