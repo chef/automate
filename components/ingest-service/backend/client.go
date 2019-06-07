@@ -83,5 +83,7 @@ type Client interface {
 	ReindexInsightstoActions(context.Context, string, string) error
 	RefreshIndex(context.Context, string) error
 	GetNodeCount(context.Context, string) (int64, error)
-	ReindexNodeStateToLatest(context.Context, string) error
+	// @parm (context, previousIndex)
+	// @return (taskID, error)
+	ReindexNodeStateToLatest(context.Context, string) (string, error)
 }

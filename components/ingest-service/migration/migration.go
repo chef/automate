@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -256,11 +257,28 @@ func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
 	ms.taskCompleted()
 
 	ms.update(fmt.Sprintf("Reindexing %s index to current", previousIndex))
-	err := ms.client.ReindexNodeStateToLatest(ms.ctx, previousIndex)
+	reindexTaskID, err := ms.client.ReindexNodeStateToLatest(ms.ctx, previousIndex)
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to reindex node-state to latest")
 		return err
 	}
+
+	// Wait for Reindex task to complete
+	for {
+		time.Sleep(time.Millisecond * 500)
+
+		status, err := ms.client.JobStatus(ms.ctx, reindexTaskID)
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable to check status on reindex of node-state to latest")
+			return err
+		}
+
+		if status.Completed {
+			ms.update(fmt.Sprintf("Reindexing is %f complete", status.PercentageComplete))
+			break
+		}
+	}
+
 	ms.taskCompleted()
 
 	ms.update(fmt.Sprintf("Removing alias %s from previous index", nodeStateAliasName))
