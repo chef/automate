@@ -9,7 +9,6 @@ import {
 
 const {
   UNASSIGNED_PROJECT_ID,
-  ALL_RESOURCES_LABEL,
   ALL_PROJECTS_LABEL,
   MULTIPLE_PROJECTS_LABEL
 } = ProjectConstants;
@@ -38,7 +37,7 @@ export interface ProjectsFilterState {
 export const projectsFilterInitialState: ProjectsFilterState = {
   options: [],
   optionsLoadingStatus: EntityStatus.notLoaded,
-  selectionLabel: ALL_RESOURCES_LABEL,
+  selectionLabel: ALL_PROJECTS_LABEL,
   selectionCount: 0,
   selectionCountVisible: false,
   selectionCountActive: false,
@@ -107,11 +106,11 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
   }
 
   if (hasAllProjectsChecked && hasUnassignedChecked) {
-    return ALL_RESOURCES_LABEL;
+    return ALL_PROJECTS_LABEL;
   }
 
   if (hasNoProjectsChecked && hasUnassigned && !hasUnassignedChecked) {
-    return ALL_RESOURCES_LABEL;
+    return ALL_PROJECTS_LABEL;
   }
 
   if (hasOneChecked || hasOneProjectChecked) {

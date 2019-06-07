@@ -19,6 +19,7 @@ provisioner:
     data_collector.token: <%= ENV['COLLECTOR_TOKEN'] %>
     ssl_verify_mode: :verify_none
     verify_api_cert: false
+    chef_license: accept
 
 
 platforms:

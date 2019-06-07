@@ -254,17 +254,6 @@ function display_available_components() {
   ls -1 /src/components | awk '{print "* "$1}'
 }
 
-document "install_gomock" <<DOC
-  Install gomock tool. Used for creating mocks for client-side unit tests.
-DOC
-function install_gomock() {
-  local go_mock_tools=(
-    github.com/golang/mock/gomock
-    github.com/golang/mock/mockgen
-  )
-  GO_TOOL_VENDOR=true install_go_tool "${go_mock_tools[@]}"
-}
-
 document "generate_dev_root_ca" <<DOC
 Create the key, certificate, and revocation list for the Automate root CA used in dev. These
 files live in dev/certs.

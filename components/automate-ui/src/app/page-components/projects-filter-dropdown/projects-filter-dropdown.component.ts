@@ -1,6 +1,9 @@
 import { Component, EventEmitter, OnChanges, Input, Output } from '@angular/core';
 import { cloneDeep } from 'lodash/fp';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { ProjectConstants } from 'app/entities/projects/project.model';
+
+const { ALL_PROJECTS_LABEL } = ProjectConstants;
 
 @Component({
   selector: 'app-projects-filter-dropdown',
@@ -10,7 +13,7 @@ import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filt
 export class ProjectsFilterDropdownComponent implements OnChanges {
   @Input() options: ProjectsFilterOption[] = [];
 
-  @Input() selectionLabel = 'All Resources';
+  @Input() selectionLabel = ALL_PROJECTS_LABEL;
 
   @Input() selectionCount = 0;
 

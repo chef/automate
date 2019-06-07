@@ -66,6 +66,87 @@ function applications_get_service_groups_unknown() {
       }'
 }
 
+# Run benchmarks for the applications-service
+document "applications_benchmarks" <<DOC
+  Runs benchmarks for the applications-service.
+DOC
+function applications_benchmarks() {
+  check_if_deployinate_started || return 1
+
+  (
+    enter_go_workspace
+    install_if_missing core/go go
+    install_if_missing core/git git
+
+    local tmp_txt=/tmp/new.txt
+    local results_txt=/src/benchmarks/applications-service/txt/new.txt
+    local results_html=/src/benchmarks/applications-service/html/new.html
+
+    log_line "Running applications-service benchmark. (temporarily stored at $(yellow $tmp_txt))"
+    log_line "$(yellow "This might take a while...")"
+    cd components/applications-service || return 1
+    A2_SVC_NAME="applications-service" A2_SVC_PATH="/hab/svc/applications-service" go test \
+      ./... \
+      -bench=Benchmark \
+      -benchmem \
+      -count=5 2>&1 | tee $tmp_txt
+
+    log_line "Saving benchmark results at $(green $results_txt)"
+    grep Benchmark $tmp_txt > $results_txt
+    rm $tmp_txt
+
+    # TODO @afiune When we save this files in the historical repo or somewhere else
+    # we will be able to compare master vs our new changes (PRs)
+
+    log_line "Using benchstat tool to compute the results. ('benchstat new.txt')"
+    install_benchstat
+    benchstat $results_txt
+
+    log_line "Generating HTML of the results at $(green $results_html)"
+    benchstat -html $results_txt > $results_html
+
+    rename_benchmark_files
+  )
+}
+
+# This function assumes you have a new.txt and new.html files generated
+# @afiune maybe we can make this function flexible for other components
+function rename_benchmark_files() {
+  local results_txt=/src/benchmarks/applications-service/txt/new.txt
+  local results_html=/src/benchmarks/applications-service/html/new.html
+  local name
+
+  # check if files does exist
+  if [[ ! -f $results_txt || ! -f $results_html ]]; then
+    log_error "Benchmark files not found. Run '$(yellow applications_benchmark)'."
+    return 1
+  fi
+
+  log_line "Renaming the generated benchmark files: \\n
+              $(yellow TXT:)  $results_txt
+              $(yellow HTML:) $results_html \\n"
+
+  if [ -z "$1" ]; then
+    log_line "Enter the new name based on the pull request opened. \\n
+              $(yellow Example:) For the following PR https://github.com/chef/automate/pull/510
+                       The suggested name would be '$(green PR_510)'\\n"
+    echo -en "              $(yellow "New name:") "
+    read -r name
+  else
+    name=$1
+  fi
+
+
+  new_results_txt=/src/benchmarks/applications-service/txt/${name}.txt
+  new_results_html=/src/benchmarks/applications-service/html/${name}.html
+  mv "$results_txt" "$new_results_txt"
+  mv "$results_html" "$new_results_html"
+
+  log_line "New benchmark files: \\n
+              $(yellow TXT:)  $new_results_txt
+              $(yellow HTML:) $new_results_html \\n"
+}
+
 # Run Integration tests for the applications-service
 document "applications_integration" <<DOC
   Runs the integration tests for the applications-service.
@@ -74,7 +155,9 @@ function applications_integration() {
   check_if_deployinate_started || return 1
 
   # Go based integration tests
-  A2_SVC_NAME="applications-service" A2_SVC_PATH="/hab/svc/applications-service" go_test "github.com/chef/automate/components/applications-service/integration_test" -v -bench=.
+  A2_SVC_NAME="applications-service" A2_SVC_PATH="/hab/svc/applications-service" go_test \
+	  "github.com/chef/automate/components/applications-service/integration_test" \
+	  -bench=. -benchmem -v
 }
 
 document "applications_publish_raw_message" <<DOC
@@ -242,4 +325,3 @@ function app_service_origin() {
     echo "chef"
   fi
 }
-
