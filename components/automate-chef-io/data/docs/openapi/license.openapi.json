@@ -1,0 +1,169 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "components/automate-gateway/api/license/license.proto",
+        "version": "0"
+    },
+    "paths": {
+        "/license/apply": {
+            "post": {
+                "operationId": "ApplyLicense",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/licenseApplyLicenseResp"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/licenseApplyLicenseReq"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "License"
+                ]
+            }
+        },
+        "/license/request": {
+            "post": {
+                "operationId": "RequestLicense",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/licenseRequestLicenseResp"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/licenseRequestLicenseReq"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "License"
+                ]
+            }
+        },
+        "/license/status": {
+            "get": {
+                "operationId": "GetStatus",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/licenseGetStatusResp"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "License"
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "GetStatusRespDateRange": {
+                "type": "object",
+                "properties": {
+                    "start": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "end": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "licenseApplyLicenseReq": {
+                "type": "object",
+                "properties": {
+                    "license": {
+                        "type": "string"
+                    }
+                }
+            },
+            "licenseApplyLicenseResp": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/licenseGetStatusResp"
+                    }
+                }
+            },
+            "licenseGetStatusResp": {
+                "type": "object",
+                "properties": {
+                    "license_id": {
+                        "type": "string"
+                    },
+                    "configured_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "licensed_period": {
+                        "$ref": "#/components/schemas/GetStatusRespDateRange"
+                    },
+                    "customer_name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "licenseRequestLicenseReq": {
+                "type": "object",
+                "properties": {
+                    "first_name": {
+                        "type": "string"
+                    },
+                    "last_name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "gdpr_agree": {
+                        "type": "boolean",
+                        "format": "boolean"
+                    }
+                }
+            },
+            "licenseRequestLicenseResp": {
+                "type": "object",
+                "properties": {
+                    "license": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/licenseGetStatusResp"
+                    }
+                }
+            }
+        }
+    }
+}

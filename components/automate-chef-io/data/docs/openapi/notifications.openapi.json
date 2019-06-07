@@ -1,0 +1,408 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "components/automate-gateway/api/notifications/notifications.proto",
+        "version": "0"
+    },
+    "paths": {
+        "/notifications/rules": {
+            "get": {
+                "operationId": "ListRules",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/notificationsRuleListResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Notifications"
+                ]
+            },
+            "post": {
+                "operationId": "AddRule",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/notificationsRuleAddResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/notificationsRuleAddRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Notifications"
+                ]
+            }
+        },
+        "/notifications/rules/{id}": {
+            "get": {
+                "operationId": "GetRule",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/notificationsRuleGetResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Notifications"
+                ]
+            },
+            "delete": {
+                "operationId": "DeleteRule",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/notificationsRuleDeleteResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Notifications"
+                ]
+            },
+            "put": {
+                "operationId": "UpdateRule",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/notificationsRuleUpdateResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/notificationsRuleUpdateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Notifications"
+                ]
+            }
+        },
+        "/notifications/version": {
+            "get": {
+                "operationId": "Version",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/notificationsVersionResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Notifications"
+                ]
+            }
+        },
+        "/notifications/webhook": {
+            "post": {
+                "operationId": "ValidateWebhook",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/notificationsURLValidationResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/notificationsURLValidationRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Notifications"
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "RuleEvent": {
+                "type": "string",
+                "enum": [
+                    "CCRFailure",
+                    "CCRSuccess",
+                    "ComplianceFailure",
+                    "ComplianceSuccess",
+                    "Assets"
+                ],
+                "default": "CCRFailure"
+            },
+            "notificationsEmpty": {
+                "type": "object"
+            },
+            "notificationsRule": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "event": {
+                        "$ref": "#/components/schemas/RuleEvent"
+                    },
+                    "SlackAlert": {
+                        "$ref": "#/components/schemas/notificationsSlackAlert"
+                    },
+                    "WebhookAlert": {
+                        "$ref": "#/components/schemas/notificationsWebhookAlert"
+                    },
+                    "ServiceNowAlert": {
+                        "$ref": "#/components/schemas/notificationsServiceNowAlert"
+                    }
+                }
+            },
+            "notificationsRuleAddRequest": {
+                "type": "object",
+                "properties": {
+                    "rule": {
+                        "$ref": "#/components/schemas/notificationsRule"
+                    }
+                }
+            },
+            "notificationsRuleAddResponse": {
+                "type": "object",
+                "properties": {
+                    "messages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "id": {
+                        "type": "string"
+                    }
+                }
+            },
+            "notificationsRuleDeleteResponse": {
+                "type": "object",
+                "properties": {
+                    "messages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "notificationsRuleGetResponse": {
+                "type": "object",
+                "properties": {
+                    "messages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "rule": {
+                        "$ref": "#/components/schemas/notificationsRule"
+                    }
+                }
+            },
+            "notificationsRuleListResponse": {
+                "type": "object",
+                "properties": {
+                    "messages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "rules": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/notificationsRule"
+                        }
+                    }
+                }
+            },
+            "notificationsRuleUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "rule": {
+                        "$ref": "#/components/schemas/notificationsRule"
+                    },
+                    "id": {
+                        "type": "string"
+                    }
+                }
+            },
+            "notificationsRuleUpdateResponse": {
+                "type": "object",
+                "properties": {
+                    "messages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "notificationsSecretId": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                }
+            },
+            "notificationsServiceNowAlert": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    },
+                    "secret_id": {
+                        "type": "string"
+                    },
+                    "critical_controls_only": {
+                        "type": "boolean",
+                        "format": "boolean"
+                    }
+                }
+            },
+            "notificationsSlackAlert": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    }
+                }
+            },
+            "notificationsURLValidationRequest": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    },
+                    "username_password": {
+                        "$ref": "#/components/schemas/notificationsUsernamePassword"
+                    },
+                    "secret_id": {
+                        "$ref": "#/components/schemas/notificationsSecretId"
+                    },
+                    "none": {
+                        "$ref": "#/components/schemas/notificationsEmpty"
+                    }
+                }
+            },
+            "notificationsURLValidationResponse": {
+                "type": "object"
+            },
+            "notificationsUsernamePassword": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            },
+            "notificationsVersionResponse": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "string"
+                    }
+                }
+            },
+            "notificationsWebhookAlert": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

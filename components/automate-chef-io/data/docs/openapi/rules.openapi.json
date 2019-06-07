@@ -1,0 +1,313 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "components/automate-gateway/api/iam/v2beta/rules.proto",
+        "version": "0"
+    },
+    "paths": {
+        "/iam/v2beta/rules": {
+            "get": {
+                "operationId": "ListRules",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/v2betaListRulesResp"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Rules"
+                ]
+            },
+            "post": {
+                "operationId": "CreateRule",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/v2betaCreateRuleResp"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/v2betaCreateRuleReq"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Rules"
+                ]
+            }
+        },
+        "/iam/v2beta/rules/{id}": {
+            "get": {
+                "operationId": "GetRule",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/v2betaGetRuleResp"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Rules"
+                ]
+            },
+            "delete": {
+                "operationId": "DeleteRule",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/v2betaDeleteRuleResp"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Rules"
+                ]
+            },
+            "put": {
+                "operationId": "UpdateRule",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/v2betaUpdateRuleResp"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/v2betaUpdateRuleReq"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Rules"
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "v2betaCondition": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/v2betaConditionType"
+                    },
+                    "values": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "operator": {
+                        "$ref": "#/components/schemas/v2betaConditionOperator"
+                    }
+                }
+            },
+            "v2betaConditionOperator": {
+                "type": "string",
+                "enum": [
+                    "CONDITION_OPERATOR_UNSET",
+                    "MEMBER_OF",
+                    "EQUALS"
+                ],
+                "default": "CONDITION_OPERATOR_UNSET"
+            },
+            "v2betaConditionType": {
+                "type": "string",
+                "enum": [
+                    "CONDITION_TYPE_UNSET",
+                    "CHEF_SERVERS",
+                    "CHEF_ORGS",
+                    "CHEF_ENVIRONMENTS",
+                    "ROLES",
+                    "CHEF_TAGS",
+                    "POLICY_GROUP",
+                    "POLICY_NAME"
+                ],
+                "default": "CONDITION_TYPE_UNSET"
+            },
+            "v2betaCreateRuleReq": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "project_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/v2betaRuleType"
+                    },
+                    "conditions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/v2betaCondition"
+                        }
+                    }
+                }
+            },
+            "v2betaCreateRuleResp": {
+                "type": "object",
+                "properties": {
+                    "rule": {
+                        "$ref": "#/components/schemas/v2betaRule"
+                    }
+                }
+            },
+            "v2betaDeleteRuleResp": {
+                "type": "object"
+            },
+            "v2betaGetRuleResp": {
+                "type": "object",
+                "properties": {
+                    "rule": {
+                        "$ref": "#/components/schemas/v2betaRule"
+                    }
+                }
+            },
+            "v2betaListRulesResp": {
+                "type": "object",
+                "properties": {
+                    "rules": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/v2betaRule"
+                        }
+                    }
+                }
+            },
+            "v2betaRule": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "project_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/v2betaRuleType"
+                    },
+                    "conditions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/v2betaCondition"
+                        }
+                    }
+                }
+            },
+            "v2betaRuleType": {
+                "type": "string",
+                "enum": [
+                    "RULE_TYPE_UNSET",
+                    "NODE",
+                    "EVENT"
+                ],
+                "default": "RULE_TYPE_UNSET"
+            },
+            "v2betaUpdateRuleReq": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "project_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/v2betaRuleType"
+                    },
+                    "conditions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/v2betaCondition"
+                        }
+                    }
+                }
+            },
+            "v2betaUpdateRuleResp": {
+                "type": "object",
+                "properties": {
+                    "rule": {
+                        "$ref": "#/components/schemas/v2betaRule"
+                    }
+                }
+            }
+        }
+    }
+}
