@@ -19,8 +19,10 @@ IAM v2 is a beta release and its functionality is subject to change during this 
 This is an opt-in only feature during the beta period.
 Chef Automate users will not be automatically upgraded.
 
-We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2.
-If at any time you decide to opt back out of the beta and revert to v1, your original v1 policies will still be intact.
+We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2. We do, however, recommend that you do not
+migrate v1 policies upon upgrade as they can interfere with expected behavior; to that end, we have provided a
+`--skip-policy-migration` flag that may be used with the upgrade command.
+Whether or not you migrate your v1 policies, if at any time you decide to opt back out of the beta and revert to v1, your original v1 policies will still be intact.
 Reverting to v1, however, will remove any new v2 policies or roles created while using IAM v2.
 Note that this applies only to policies and roles in this beta period. Users, teams, and tokens are currently shared between v1 and v2, but these are slated for separation before the full v2 release.
 
