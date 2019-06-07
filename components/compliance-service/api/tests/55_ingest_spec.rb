@@ -119,9 +119,7 @@ describe File.basename(__FILE__) do
               },
               "failed": {}
             }
-          },
-          "tags": [],
-          "profiles": []
+          }
         }
       ],
       "total": 1

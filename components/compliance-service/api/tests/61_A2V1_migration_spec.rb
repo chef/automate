@@ -48,9 +48,7 @@ describe File.basename(__FILE__) do
               },
               "failed": {}
             }
-          },
-          "tags": [],
-          "profiles": []
+          }
         }
       ],
       "total": 1
@@ -82,7 +80,6 @@ describe File.basename(__FILE__) do
           "failed": {}
         }
       },
-      "tags": [],
       "profiles": [
         {
           "name": "nginx-baseline",
@@ -154,7 +151,7 @@ describe File.basename(__FILE__) do
     assert_equal('centos(2)-beta-nginx(p)-apache(s)-passed', res['node_name'])
     assert_equal('DevSec Prod Beta', res['environment'])
     assert_equal('passed', res['status'])
-    assert_equal("2018-03-05T02:02:02Z", res['end_time'])
+    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520215322, nanos: 0), res['end_time'])
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 4.109065055847168), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
