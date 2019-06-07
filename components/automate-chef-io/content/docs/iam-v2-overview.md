@@ -102,7 +102,7 @@ Actions    | list of operations the role manages, e.g., read IAM users, get comp
 
 ### Members and Policies
 
-A **member**  called a _subject_ in v1) may be a user, a team, or a token.
+A **member**  (called a _subject_ in v1) may be a user, a team, or a token.
 Users and teams may be *local*, meaning they are defined within Chef Automate, or managed by an external identity provider, specifically LDAP or SAML.
 In this so far, v2 and v1 behave the same.
 
