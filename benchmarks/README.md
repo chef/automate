@@ -5,7 +5,7 @@ a particular function, or an entire component/service. This information can then
 used to identify gaps or deltas between code changes and will be the grounds for us
 to be able to make decisions in the near and long future.
 
-## Components with Benchmarks
+## Components with Benchmarks
 
 The list of components that has benchmarks:
 
