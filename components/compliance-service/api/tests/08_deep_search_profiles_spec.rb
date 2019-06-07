@@ -124,7 +124,7 @@ describe File.basename(__FILE__) do
                         },
                         "status" => "failed",
                         "controls" => {
-                            "total" => 1,
+                            "total" => 2,
                             "passed" => {},
                             "skipped" => {},
                             "failed" => {
