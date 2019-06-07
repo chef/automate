@@ -75,7 +75,7 @@ service Projects {
     rpc ListRules(ListRulesReq) returns (ListRulesResp) {};
     rpc ListRulesForProject(ListRulesForProjectReq) returns (ListRulesForProjectResp) {};
     rpc DeleteRule(DeleteRuleReq) returns (DeleteRuleResp) {};
-    rpc ListProjectRules(ListProjectRulesReq) returns (ProjectCollectionRulesResp) {};
+    rpc ListRulesForAllProjects(ListRulesForAllProjectsReq) returns (ListRulesForAllProjectsResp) {};
 }
 
 message ProjectUpdateCancelReq {}
@@ -92,8 +92,8 @@ message ProjectUpdateStatusResp {
     string failure_message = 5;
 }
 
-message ListProjectRulesReq {}
-message ProjectCollectionRulesResp {
+message ListRulesForAllProjectsReq {}
+message ListRulesForAllProjectsResp {
     map<string, ProjectRules> project_rules = 2;
 }
 
