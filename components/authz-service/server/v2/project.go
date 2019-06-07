@@ -263,8 +263,8 @@ func (s *state) DeleteProject(ctx context.Context,
 	}
 }
 
-func (s *state) ListProjectRules(ctx context.Context,
-	req *api.ListProjectRulesReq) (*api.ProjectCollectionRulesResp, error) {
+func (s *state) ListRulesForAllProjects(ctx context.Context,
+	req *api.ListRulesForAllProjectsReq) (*api.ListRulesForAllProjectsResp, error) {
 
 	ruleMap, err := s.engine.ListProjectMappings(ctx)
 	if err != nil {
@@ -277,7 +277,7 @@ func (s *state) ListProjectRules(ctx context.Context,
 		for i, rule := range rules {
 			r, err := fromStorageRule(&rule)
 			if err != nil {
-				return &api.ProjectCollectionRulesResp{}, err
+				return &api.ListRulesForAllProjectsResp{}, err
 			}
 			apiRules[i] = r
 		}
@@ -286,7 +286,7 @@ func (s *state) ListProjectRules(ctx context.Context,
 			Rules: apiRules,
 		}
 	}
-	return &api.ProjectCollectionRulesResp{
+	return &api.ListRulesForAllProjectsResp{
 		ProjectRules: projects,
 	}, nil
 }

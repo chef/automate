@@ -13,12 +13,12 @@ rebuild components/authz-service
 
 ## Endpoints
 
-### ListProjectRules
+### ListRulesForAllProjects
 
-ListProjectRules requires no input values and returns a map of projectID -> list of rules for each project.
+ListRulesForAllProjects requires no input values and returns a map of projectID -> list of rules for each project.
 
 ```
-# grpcurl --insecure -cert /hab/svc/authz-service/config/service.crt -key /hab/svc/authz-service/config/service.key localhost:10130 chef.automate.domain.authz.v2.Projects.ListProjectRules
+# grpcurl --insecure -cert /hab/svc/authz-service/config/service.crt -key /hab/svc/authz-service/config/service.key localhost:10130 chef.automate.domain.authz.v2.Projects.ListRulesForAllProjects
 {
   "projectRules": {
     "project1": {

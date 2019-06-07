@@ -288,10 +288,10 @@ func createAuthzProjectsClient(connectionFactory *secureconn.Factory,
 	if authzEndpoint == "" || authzEndpoint == ":0" {
 		if os.Getenv("RUN_MODE") == "test" {
 			logrus.Infof("using mock ProjectsClient")
-			// If any other rpc function other than the ListProjectRules is used the process will fail.
+			// If any other rpc function other than the ListRulesForAllProjects is used the process will fail.
 			mockProjectsClient := iam_v2.NewMockProjectsClient(gomock.NewController(nil))
-			mockProjectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Return(
-				&iam_v2.ProjectCollectionRulesResp{}, nil)
+			mockProjectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
+				&iam_v2.ListRulesForAllProjectsResp{}, nil)
 			return mockProjectsClient
 		}
 		logrus.Fatal("authzEndpoint cannot be empty or Dial will get stuck")

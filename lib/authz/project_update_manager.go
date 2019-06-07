@@ -217,8 +217,8 @@ func (manager *DomainProjectUpdateManager) startProjectTagUpdater() ([]string, e
 	logrus.Debug("starting project updater")
 	ctx := context.Background()
 
-	projectCollectionRulesResp, err := manager.authzProjectsClient.ListProjectRules(ctx,
-		&iam_v2.ListProjectRulesReq{})
+	projectCollectionRulesResp, err := manager.authzProjectsClient.ListRulesForAllProjects(ctx,
+		&iam_v2.ListRulesForAllProjectsReq{})
 	if err != nil {
 		return []string{}, errors.Wrap(err, "Failed to get authz project rules")
 	}

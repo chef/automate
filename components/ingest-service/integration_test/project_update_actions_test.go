@@ -363,8 +363,8 @@ func TestProjectUpdateRunsOnActions(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	localSuite.projectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{
+	localSuite.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{
 			ProjectRules: map[string]*iam_v2.ProjectRules{
 				updatedProjectTag: {
 					Rules: []*iam_v2.ProjectRule{

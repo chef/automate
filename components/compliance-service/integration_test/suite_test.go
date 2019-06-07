@@ -67,8 +67,8 @@ func NewGlobalSuite() *Suite {
 	s.ingesticESClient.InitializeStore(context.Background())
 
 	s.ProjectsClientMock = iam_v2.NewMockProjectsClient(gomock.NewController(nil))
-	s.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	s.ProjectsClientMock.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 	s.NodeManagerMock = &NodeManagerMock{}
 	s.NotifierMock = &NotifierMock{}
 	s.EventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
