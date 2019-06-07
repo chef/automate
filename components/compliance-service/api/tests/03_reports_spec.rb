@@ -35,9 +35,7 @@ describe File.basename(__FILE__) do
                     "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd",
                     "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                     "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
-                    "endTime" => {
-                        "seconds" => 1518167921
-                    },
+                    "endTime" => "2018-02-09T09:18:41Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 59,
@@ -189,9 +187,7 @@ describe File.basename(__FILE__) do
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e666",
                     "nodeName" => "ubuntu(1)-alpha-myprofile(s)-skipped",
-                    "endTime" => {
-                        "seconds" => 1520391722
-                    },
+                    "endTime" => "2018-03-07T03:02:02Z",
                     "status" => "skipped",
                     "controls" => {
                         "passed" => {},
@@ -202,7 +198,7 @@ describe File.basename(__FILE__) do
             ],
             "total" => 9
         }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
 
     # Get first two reports(on page 1)
@@ -213,9 +209,7 @@ describe File.basename(__FILE__) do
                 "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd",
                 "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                 "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
-                "endTime" => {
-                    "seconds" => 1518167921
-                },
+                "endTime" => "2018-02-09T09:18:41Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 59,
@@ -251,7 +245,7 @@ describe File.basename(__FILE__) do
         ],
         "total" => 9
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
 
     # Get "three" reports page 2
@@ -319,7 +313,7 @@ describe File.basename(__FILE__) do
             ],
             "total" => 9
         }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
 
     # Get all reports for a node
@@ -346,14 +340,14 @@ describe File.basename(__FILE__) do
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     # Get no reports as we find no match
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'job_id', values: ['12345678-1234-123e-b12e-22222missing'])
     ])
-    expected_json = {"reports" => []}.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    expected_json = {}.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     # Get all reports for a job
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
@@ -365,9 +359,7 @@ describe File.basename(__FILE__) do
                 "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd",
                 "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                 "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
-                "endTime" => {
-                    "seconds" => 1518167921
-                },
+                "endTime" => "2018-02-09T09:18:41Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 59,
@@ -386,7 +378,7 @@ describe File.basename(__FILE__) do
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
 
     # Get reports before a specific time, sorted by end_time, ascending
@@ -402,9 +394,7 @@ describe File.basename(__FILE__) do
                 "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd",
                 "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                 "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
-                "endTime" => {
-                    "seconds" => 1518167921
-                },
+                "endTime" => "2018-02-09T09:18:41Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 59,
@@ -423,7 +413,7 @@ describe File.basename(__FILE__) do
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
 
     # Get all reports for a missing environment
@@ -496,7 +486,7 @@ describe File.basename(__FILE__) do
         ],
         "total" => 3
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'node_name', values: ['windows(1)-zeta-apache(s)-skipped', 'missing-in-action'])
@@ -521,7 +511,7 @@ describe File.basename(__FILE__) do
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
 
     # Cover the other sort fields, node_name desc:
@@ -573,7 +563,7 @@ describe File.basename(__FILE__) do
     assert_equal(Reporting::Report, res.class)
 
     puts res['version']
-    assert_equal('3.1.3', res['version'])
+    assert_equal('3.1.0', res['version'])
     assert_equal('bb93e1b2-36d6-439e-ac70-cccccccccc04', res['id'])
     assert_equal('9b9f4e51-b049-4b10-9555-10578916e149', res['node_id'])
     assert_equal('centos-beta', res['node_name'])
