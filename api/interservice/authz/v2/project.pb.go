@@ -46,22 +46,26 @@ func (x ProjectRuleTypes) String() string {
 	return proto.EnumName(ProjectRuleTypes_name, int32(x))
 }
 func (ProjectRuleTypes) EnumDescriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{0}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{0}
+>>>>>>> api: condition Type -> Attribute
 }
 
-type ProjectRuleConditionTypes int32
+type ProjectRuleConditionAttributes int32
 
 const (
-	ProjectRuleConditionTypes_CHEF_SERVERS      ProjectRuleConditionTypes = 0
-	ProjectRuleConditionTypes_CHEF_ORGS         ProjectRuleConditionTypes = 1
-	ProjectRuleConditionTypes_CHEF_ENVIRONMENTS ProjectRuleConditionTypes = 2
-	ProjectRuleConditionTypes_ROLES             ProjectRuleConditionTypes = 3
-	ProjectRuleConditionTypes_CHEF_TAGS         ProjectRuleConditionTypes = 4
-	ProjectRuleConditionTypes_POLICY_GROUP      ProjectRuleConditionTypes = 5
-	ProjectRuleConditionTypes_POLICY_NAME       ProjectRuleConditionTypes = 6
+	ProjectRuleConditionAttributes_CHEF_SERVERS      ProjectRuleConditionAttributes = 0
+	ProjectRuleConditionAttributes_CHEF_ORGS         ProjectRuleConditionAttributes = 1
+	ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS ProjectRuleConditionAttributes = 2
+	ProjectRuleConditionAttributes_ROLES             ProjectRuleConditionAttributes = 3
+	ProjectRuleConditionAttributes_CHEF_TAGS         ProjectRuleConditionAttributes = 4
+	ProjectRuleConditionAttributes_POLICY_GROUP      ProjectRuleConditionAttributes = 5
+	ProjectRuleConditionAttributes_POLICY_NAME       ProjectRuleConditionAttributes = 6
 )
 
-var ProjectRuleConditionTypes_name = map[int32]string{
+var ProjectRuleConditionAttributes_name = map[int32]string{
 	0: "CHEF_SERVERS",
 	1: "CHEF_ORGS",
 	2: "CHEF_ENVIRONMENTS",
@@ -70,7 +74,7 @@ var ProjectRuleConditionTypes_name = map[int32]string{
 	5: "POLICY_GROUP",
 	6: "POLICY_NAME",
 }
-var ProjectRuleConditionTypes_value = map[string]int32{
+var ProjectRuleConditionAttributes_value = map[string]int32{
 	"CHEF_SERVERS":      0,
 	"CHEF_ORGS":         1,
 	"CHEF_ENVIRONMENTS": 2,
@@ -80,11 +84,16 @@ var ProjectRuleConditionTypes_value = map[string]int32{
 	"POLICY_NAME":       6,
 }
 
-func (x ProjectRuleConditionTypes) String() string {
-	return proto.EnumName(ProjectRuleConditionTypes_name, int32(x))
+func (x ProjectRuleConditionAttributes) String() string {
+	return proto.EnumName(ProjectRuleConditionAttributes_name, int32(x))
 }
+<<<<<<< HEAD
 func (ProjectRuleConditionTypes) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_project_3cccbec51318149b, []int{1}
+=======
+func (ProjectRuleConditionAttributes) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_project_e93142f63827c9c9, []int{1}
+>>>>>>> api: condition Type -> Attribute
 }
 
 type ProjectRuleConditionOperators int32
@@ -107,7 +116,11 @@ func (x ProjectRuleConditionOperators) String() string {
 	return proto.EnumName(ProjectRuleConditionOperators_name, int32(x))
 }
 func (ProjectRuleConditionOperators) EnumDescriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{2}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{2}
+>>>>>>> api: condition Type -> Attribute
 }
 
 type Project struct {
@@ -124,7 +137,11 @@ func (m *Project) Reset()         { *m = Project{} }
 func (m *Project) String() string { return proto.CompactTextString(m) }
 func (*Project) ProtoMessage()    {}
 func (*Project) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{0}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{0}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *Project) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Project.Unmarshal(m, b)
@@ -184,7 +201,11 @@ func (m *CreateProjectReq) Reset()         { *m = CreateProjectReq{} }
 func (m *CreateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*CreateProjectReq) ProtoMessage()    {}
 func (*CreateProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{1}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{1}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *CreateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectReq.Unmarshal(m, b)
@@ -229,7 +250,11 @@ func (m *CreateProjectResp) Reset()         { *m = CreateProjectResp{} }
 func (m *CreateProjectResp) String() string { return proto.CompactTextString(m) }
 func (*CreateProjectResp) ProtoMessage()    {}
 func (*CreateProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{2}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{2}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *CreateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectResp.Unmarshal(m, b)
@@ -267,7 +292,11 @@ func (m *GetProjectReq) Reset()         { *m = GetProjectReq{} }
 func (m *GetProjectReq) String() string { return proto.CompactTextString(m) }
 func (*GetProjectReq) ProtoMessage()    {}
 func (*GetProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{3}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{3}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *GetProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectReq.Unmarshal(m, b)
@@ -305,7 +334,11 @@ func (m *GetProjectResp) Reset()         { *m = GetProjectResp{} }
 func (m *GetProjectResp) String() string { return proto.CompactTextString(m) }
 func (*GetProjectResp) ProtoMessage()    {}
 func (*GetProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{4}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{4}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *GetProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectResp.Unmarshal(m, b)
@@ -342,7 +375,11 @@ func (m *ListProjectsReq) Reset()         { *m = ListProjectsReq{} }
 func (m *ListProjectsReq) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsReq) ProtoMessage()    {}
 func (*ListProjectsReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{5}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{5}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ListProjectsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsReq.Unmarshal(m, b)
@@ -373,7 +410,11 @@ func (m *ListProjectsResp) Reset()         { *m = ListProjectsResp{} }
 func (m *ListProjectsResp) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsResp) ProtoMessage()    {}
 func (*ListProjectsResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{6}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{6}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ListProjectsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsResp.Unmarshal(m, b)
@@ -412,7 +453,11 @@ func (m *UpdateProjectReq) Reset()         { *m = UpdateProjectReq{} }
 func (m *UpdateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*UpdateProjectReq) ProtoMessage()    {}
 func (*UpdateProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{7}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{7}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *UpdateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectReq.Unmarshal(m, b)
@@ -457,7 +502,11 @@ func (m *UpdateProjectResp) Reset()         { *m = UpdateProjectResp{} }
 func (m *UpdateProjectResp) String() string { return proto.CompactTextString(m) }
 func (*UpdateProjectResp) ProtoMessage()    {}
 func (*UpdateProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{8}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{8}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *UpdateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectResp.Unmarshal(m, b)
@@ -495,7 +544,11 @@ func (m *DeleteProjectReq) Reset()         { *m = DeleteProjectReq{} }
 func (m *DeleteProjectReq) String() string { return proto.CompactTextString(m) }
 func (*DeleteProjectReq) ProtoMessage()    {}
 func (*DeleteProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{9}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{9}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *DeleteProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectReq.Unmarshal(m, b)
@@ -532,7 +585,11 @@ func (m *DeleteProjectResp) Reset()         { *m = DeleteProjectResp{} }
 func (m *DeleteProjectResp) String() string { return proto.CompactTextString(m) }
 func (*DeleteProjectResp) ProtoMessage()    {}
 func (*DeleteProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{10}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{10}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *DeleteProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectResp.Unmarshal(m, b)
@@ -562,7 +619,11 @@ func (m *ProjectUpdateCancelReq) Reset()         { *m = ProjectUpdateCancelReq{}
 func (m *ProjectUpdateCancelReq) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateCancelReq) ProtoMessage()    {}
 func (*ProjectUpdateCancelReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{11}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{11}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ProjectUpdateCancelReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateCancelReq.Unmarshal(m, b)
@@ -592,7 +653,11 @@ func (m *ProjectUpdateCancelResp) Reset()         { *m = ProjectUpdateCancelResp
 func (m *ProjectUpdateCancelResp) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateCancelResp) ProtoMessage()    {}
 func (*ProjectUpdateCancelResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{12}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{12}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ProjectUpdateCancelResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateCancelResp.Unmarshal(m, b)
@@ -622,7 +687,11 @@ func (m *ProjectUpdateStatusReq) Reset()         { *m = ProjectUpdateStatusReq{}
 func (m *ProjectUpdateStatusReq) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateStatusReq) ProtoMessage()    {}
 func (*ProjectUpdateStatusReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{13}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{13}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ProjectUpdateStatusReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateStatusReq.Unmarshal(m, b)
@@ -657,7 +726,11 @@ func (m *ProjectUpdateStatusResp) Reset()         { *m = ProjectUpdateStatusResp
 func (m *ProjectUpdateStatusResp) String() string { return proto.CompactTextString(m) }
 func (*ProjectUpdateStatusResp) ProtoMessage()    {}
 func (*ProjectUpdateStatusResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{14}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{14}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ProjectUpdateStatusResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectUpdateStatusResp.Unmarshal(m, b)
@@ -718,11 +791,19 @@ type ListRulesForAllProjectsReq struct {
 	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
 }
 
+<<<<<<< HEAD
 func (m *ListRulesForAllProjectsReq) Reset()         { *m = ListRulesForAllProjectsReq{} }
 func (m *ListRulesForAllProjectsReq) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForAllProjectsReq) ProtoMessage()    {}
 func (*ListRulesForAllProjectsReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_3cccbec51318149b, []int{15}
+=======
+func (m *ListProjectRulesReq) Reset()         { *m = ListProjectRulesReq{} }
+func (m *ListProjectRulesReq) String() string { return proto.CompactTextString(m) }
+func (*ListProjectRulesReq) ProtoMessage()    {}
+func (*ListProjectRulesReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_e93142f63827c9c9, []int{15}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ListRulesForAllProjectsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForAllProjectsReq.Unmarshal(m, b)
@@ -749,11 +830,19 @@ type ListRulesForAllProjectsResp struct {
 	XXX_sizecache        int32                    `json:"-" toml:"-" mapstructure:"-,omitempty"`
 }
 
+<<<<<<< HEAD
 func (m *ListRulesForAllProjectsResp) Reset()         { *m = ListRulesForAllProjectsResp{} }
 func (m *ListRulesForAllProjectsResp) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForAllProjectsResp) ProtoMessage()    {}
 func (*ListRulesForAllProjectsResp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_project_3cccbec51318149b, []int{16}
+=======
+func (m *ProjectCollectionRulesResp) Reset()         { *m = ProjectCollectionRulesResp{} }
+func (m *ProjectCollectionRulesResp) String() string { return proto.CompactTextString(m) }
+func (*ProjectCollectionRulesResp) ProtoMessage()    {}
+func (*ProjectCollectionRulesResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_e93142f63827c9c9, []int{16}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ListRulesForAllProjectsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForAllProjectsResp.Unmarshal(m, b)
@@ -780,6 +869,85 @@ func (m *ListRulesForAllProjectsResp) GetProjectRules() map[string]*ProjectRules
 	return nil
 }
 
+<<<<<<< HEAD
+=======
+type GetProjectRulesReq struct {
+	ProjectId            string   `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty" toml:"project_id,omitempty" mapstructure:"project_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *GetProjectRulesReq) Reset()         { *m = GetProjectRulesReq{} }
+func (m *GetProjectRulesReq) String() string { return proto.CompactTextString(m) }
+func (*GetProjectRulesReq) ProtoMessage()    {}
+func (*GetProjectRulesReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_e93142f63827c9c9, []int{17}
+}
+func (m *GetProjectRulesReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetProjectRulesReq.Unmarshal(m, b)
+}
+func (m *GetProjectRulesReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetProjectRulesReq.Marshal(b, m, deterministic)
+}
+func (dst *GetProjectRulesReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetProjectRulesReq.Merge(dst, src)
+}
+func (m *GetProjectRulesReq) XXX_Size() int {
+	return xxx_messageInfo_GetProjectRulesReq.Size(m)
+}
+func (m *GetProjectRulesReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetProjectRulesReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetProjectRulesReq proto.InternalMessageInfo
+
+func (m *GetProjectRulesReq) GetProjectId() string {
+	if m != nil {
+		return m.ProjectId
+	}
+	return ""
+}
+
+type GetProjectRulesResp struct {
+	RulesForProject      *ProjectRules `protobuf:"bytes,2,opt,name=rules_for_project,json=rulesForProject,proto3" json:"rules_for_project,omitempty" toml:"rules_for_project,omitempty" mapstructure:"rules_for_project,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte        `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32         `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *GetProjectRulesResp) Reset()         { *m = GetProjectRulesResp{} }
+func (m *GetProjectRulesResp) String() string { return proto.CompactTextString(m) }
+func (*GetProjectRulesResp) ProtoMessage()    {}
+func (*GetProjectRulesResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_e93142f63827c9c9, []int{18}
+}
+func (m *GetProjectRulesResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetProjectRulesResp.Unmarshal(m, b)
+}
+func (m *GetProjectRulesResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetProjectRulesResp.Marshal(b, m, deterministic)
+}
+func (dst *GetProjectRulesResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetProjectRulesResp.Merge(dst, src)
+}
+func (m *GetProjectRulesResp) XXX_Size() int {
+	return xxx_messageInfo_GetProjectRulesResp.Size(m)
+}
+func (m *GetProjectRulesResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetProjectRulesResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetProjectRulesResp proto.InternalMessageInfo
+
+func (m *GetProjectRulesResp) GetRulesForProject() *ProjectRules {
+	if m != nil {
+		return m.RulesForProject
+	}
+	return nil
+}
+
+>>>>>>> api: condition Type -> Attribute
 type ProjectRules struct {
 	Rules                []*ProjectRule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty" toml:"rules,omitempty" mapstructure:"rules,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -791,7 +959,11 @@ func (m *ProjectRules) Reset()         { *m = ProjectRules{} }
 func (m *ProjectRules) String() string { return proto.CompactTextString(m) }
 func (*ProjectRules) ProtoMessage()    {}
 func (*ProjectRules) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{17}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{19}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ProjectRules) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRules.Unmarshal(m, b)
@@ -833,7 +1005,11 @@ func (m *ProjectRule) Reset()         { *m = ProjectRule{} }
 func (m *ProjectRule) String() string { return proto.CompactTextString(m) }
 func (*ProjectRule) ProtoMessage()    {}
 func (*ProjectRule) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{18}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{20}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ProjectRule) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRule.Unmarshal(m, b)
@@ -889,19 +1065,23 @@ func (m *ProjectRule) GetConditions() []*Condition {
 }
 
 type Condition struct {
-	Type                 ProjectRuleConditionTypes     `protobuf:"varint,1,opt,name=type,proto3,enum=chef.automate.domain.authz.v2.ProjectRuleConditionTypes" json:"type,omitempty" toml:"type,omitempty" mapstructure:"type,omitempty"`
-	Values               []string                      `protobuf:"bytes,2,rep,name=values,proto3" json:"values,omitempty" toml:"values,omitempty" mapstructure:"values,omitempty"`
-	Operator             ProjectRuleConditionOperators `protobuf:"varint,3,opt,name=operator,proto3,enum=chef.automate.domain.authz.v2.ProjectRuleConditionOperators" json:"operator,omitempty" toml:"operator,omitempty" mapstructure:"operator,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                      `json:"-" toml:"-" mapstructure:"-,omitempty"`
-	XXX_unrecognized     []byte                        `json:"-" toml:"-" mapstructure:"-,omitempty"`
-	XXX_sizecache        int32                         `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	Attribute            ProjectRuleConditionAttributes `protobuf:"varint,1,opt,name=attribute,proto3,enum=chef.automate.domain.authz.v2.ProjectRuleConditionAttributes" json:"attribute,omitempty" toml:"attribute,omitempty" mapstructure:"attribute,omitempty"`
+	Values               []string                       `protobuf:"bytes,2,rep,name=values,proto3" json:"values,omitempty" toml:"values,omitempty" mapstructure:"values,omitempty"`
+	Operator             ProjectRuleConditionOperators  `protobuf:"varint,3,opt,name=operator,proto3,enum=chef.automate.domain.authz.v2.ProjectRuleConditionOperators" json:"operator,omitempty" toml:"operator,omitempty" mapstructure:"operator,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                       `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte                         `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32                          `json:"-" toml:"-" mapstructure:"-,omitempty"`
 }
 
 func (m *Condition) Reset()         { *m = Condition{} }
 func (m *Condition) String() string { return proto.CompactTextString(m) }
 func (*Condition) ProtoMessage()    {}
 func (*Condition) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{19}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{21}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *Condition) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Condition.Unmarshal(m, b)
@@ -921,11 +1101,11 @@ func (m *Condition) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Condition proto.InternalMessageInfo
 
-func (m *Condition) GetType() ProjectRuleConditionTypes {
+func (m *Condition) GetAttribute() ProjectRuleConditionAttributes {
 	if m != nil {
-		return m.Type
+		return m.Attribute
 	}
-	return ProjectRuleConditionTypes_CHEF_SERVERS
+	return ProjectRuleConditionAttributes_CHEF_SERVERS
 }
 
 func (m *Condition) GetValues() []string {
@@ -959,7 +1139,11 @@ func (m *CreateRuleReq) Reset()         { *m = CreateRuleReq{} }
 func (m *CreateRuleReq) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleReq) ProtoMessage()    {}
 func (*CreateRuleReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{20}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{22}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *CreateRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleReq.Unmarshal(m, b)
@@ -1025,7 +1209,11 @@ func (m *CreateRuleResp) Reset()         { *m = CreateRuleResp{} }
 func (m *CreateRuleResp) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleResp) ProtoMessage()    {}
 func (*CreateRuleResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{21}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{23}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *CreateRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleResp.Unmarshal(m, b)
@@ -1067,7 +1255,11 @@ func (m *UpdateRuleReq) Reset()         { *m = UpdateRuleReq{} }
 func (m *UpdateRuleReq) String() string { return proto.CompactTextString(m) }
 func (*UpdateRuleReq) ProtoMessage()    {}
 func (*UpdateRuleReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{22}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{24}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *UpdateRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateRuleReq.Unmarshal(m, b)
@@ -1133,7 +1325,11 @@ func (m *UpdateRuleResp) Reset()         { *m = UpdateRuleResp{} }
 func (m *UpdateRuleResp) String() string { return proto.CompactTextString(m) }
 func (*UpdateRuleResp) ProtoMessage()    {}
 func (*UpdateRuleResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{23}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{25}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *UpdateRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateRuleResp.Unmarshal(m, b)
@@ -1171,7 +1367,11 @@ func (m *GetRuleReq) Reset()         { *m = GetRuleReq{} }
 func (m *GetRuleReq) String() string { return proto.CompactTextString(m) }
 func (*GetRuleReq) ProtoMessage()    {}
 func (*GetRuleReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{24}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{26}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *GetRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRuleReq.Unmarshal(m, b)
@@ -1209,7 +1409,11 @@ func (m *GetRuleResp) Reset()         { *m = GetRuleResp{} }
 func (m *GetRuleResp) String() string { return proto.CompactTextString(m) }
 func (*GetRuleResp) ProtoMessage()    {}
 func (*GetRuleResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{25}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{27}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *GetRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRuleResp.Unmarshal(m, b)
@@ -1246,7 +1450,11 @@ func (m *ListRulesReq) Reset()         { *m = ListRulesReq{} }
 func (m *ListRulesReq) String() string { return proto.CompactTextString(m) }
 func (*ListRulesReq) ProtoMessage()    {}
 func (*ListRulesReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{26}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{28}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ListRulesReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesReq.Unmarshal(m, b)
@@ -1277,7 +1485,11 @@ func (m *ListRulesResp) Reset()         { *m = ListRulesResp{} }
 func (m *ListRulesResp) String() string { return proto.CompactTextString(m) }
 func (*ListRulesResp) ProtoMessage()    {}
 func (*ListRulesResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{27}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{29}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ListRulesResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesResp.Unmarshal(m, b)
@@ -1315,7 +1527,11 @@ func (m *ListRulesForProjectReq) Reset()         { *m = ListRulesForProjectReq{}
 func (m *ListRulesForProjectReq) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForProjectReq) ProtoMessage()    {}
 func (*ListRulesForProjectReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{28}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{30}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ListRulesForProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForProjectReq.Unmarshal(m, b)
@@ -1353,7 +1569,11 @@ func (m *ListRulesForProjectResp) Reset()         { *m = ListRulesForProjectResp
 func (m *ListRulesForProjectResp) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForProjectResp) ProtoMessage()    {}
 func (*ListRulesForProjectResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{29}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{31}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *ListRulesForProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForProjectResp.Unmarshal(m, b)
@@ -1391,7 +1611,11 @@ func (m *DeleteRuleReq) Reset()         { *m = DeleteRuleReq{} }
 func (m *DeleteRuleReq) String() string { return proto.CompactTextString(m) }
 func (*DeleteRuleReq) ProtoMessage()    {}
 func (*DeleteRuleReq) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{30}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{32}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *DeleteRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteRuleReq.Unmarshal(m, b)
@@ -1428,7 +1652,11 @@ func (m *DeleteRuleResp) Reset()         { *m = DeleteRuleResp{} }
 func (m *DeleteRuleResp) String() string { return proto.CompactTextString(m) }
 func (*DeleteRuleResp) ProtoMessage()    {}
 func (*DeleteRuleResp) Descriptor() ([]byte, []int) {
+<<<<<<< HEAD
 	return fileDescriptor_project_3cccbec51318149b, []int{31}
+=======
+	return fileDescriptor_project_e93142f63827c9c9, []int{33}
+>>>>>>> api: condition Type -> Attribute
 }
 func (m *DeleteRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteRuleResp.Unmarshal(m, b)
@@ -1483,7 +1711,7 @@ func init() {
 	proto.RegisterType((*DeleteRuleReq)(nil), "chef.automate.domain.authz.v2.DeleteRuleReq")
 	proto.RegisterType((*DeleteRuleResp)(nil), "chef.automate.domain.authz.v2.DeleteRuleResp")
 	proto.RegisterEnum("chef.automate.domain.authz.v2.ProjectRuleTypes", ProjectRuleTypes_name, ProjectRuleTypes_value)
-	proto.RegisterEnum("chef.automate.domain.authz.v2.ProjectRuleConditionTypes", ProjectRuleConditionTypes_name, ProjectRuleConditionTypes_value)
+	proto.RegisterEnum("chef.automate.domain.authz.v2.ProjectRuleConditionAttributes", ProjectRuleConditionAttributes_name, ProjectRuleConditionAttributes_value)
 	proto.RegisterEnum("chef.automate.domain.authz.v2.ProjectRuleConditionOperators", ProjectRuleConditionOperators_name, ProjectRuleConditionOperators_value)
 }
 
@@ -2061,6 +2289,7 @@ var _Projects_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
+<<<<<<< HEAD
 	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_3cccbec51318149b)
 }
 
@@ -2154,4 +2383,102 @@ var fileDescriptor_project_3cccbec51318149b = []byte{
 	0x7d, 0x59, 0x3c, 0xd6, 0xe9, 0x49, 0xfb, 0x50, 0xaa, 0x9b, 0x2d, 0x99, 0x59, 0x92, 0x7d, 0x4b,
 	0x72, 0xdf, 0x7f, 0x5d, 0x0f, 0x27, 0xf8, 0xff, 0x29, 0x1f, 0xff, 0x1b, 0x00, 0x00, 0xff, 0xff,
 	0x32, 0xfe, 0x19, 0x19, 0xfa, 0x15, 0x00, 0x00,
+=======
+	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_e93142f63827c9c9)
+}
+
+var fileDescriptor_project_e93142f63827c9c9 = []byte{
+	// 1454 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x58, 0x5f, 0x6f, 0xdb, 0x54,
+	0x14, 0x8f, 0xd3, 0xa4, 0x6b, 0x4e, 0xdb, 0xd4, 0xb9, 0xa5, 0x6b, 0x88, 0x54, 0xa8, 0xcc, 0xc4,
+	0x4a, 0xb7, 0x3a, 0x5b, 0x36, 0xc6, 0xfe, 0xc0, 0xb4, 0x36, 0xf3, 0xba, 0x89, 0xa6, 0xe9, 0x6e,
+	0xda, 0xf2, 0x67, 0x82, 0xc8, 0x4d, 0x6e, 0x5b, 0xb3, 0x24, 0xf6, 0xec, 0x9b, 0x48, 0x1d, 0xe2,
+	0x05, 0x10, 0x1f, 0x00, 0x89, 0xef, 0xc1, 0x33, 0x4f, 0x7c, 0x0e, 0x5e, 0x90, 0x78, 0xe3, 0x03,
+	0xf0, 0xc6, 0x03, 0xf2, 0xf5, 0xb5, 0x63, 0x3b, 0x69, 0xed, 0x84, 0x88, 0x27, 0x5e, 0xa2, 0xf8,
+	0xf8, 0xfc, 0xce, 0x39, 0xf7, 0xfc, 0xb9, 0xe7, 0x1c, 0xc3, 0x55, 0xd5, 0xd0, 0x8a, 0x5a, 0x87,
+	0x12, 0xd3, 0x22, 0x66, 0x4f, 0x6b, 0x90, 0xa2, 0xda, 0xa5, 0xa7, 0xaf, 0x8b, 0xbd, 0x52, 0xd1,
+	0x30, 0xf5, 0xaf, 0x48, 0x83, 0xca, 0x86, 0xa9, 0x53, 0x1d, 0xad, 0x34, 0x4e, 0xc9, 0xb1, 0xac,
+	0x76, 0xa9, 0xde, 0x56, 0x29, 0x91, 0x9b, 0x7a, 0x5b, 0xd5, 0x3a, 0x32, 0x63, 0x96, 0x7b, 0xa5,
+	0xc2, 0x72, 0x4f, 0x6d, 0x69, 0x4d, 0x95, 0x92, 0xa2, 0xfb, 0xc7, 0xc1, 0x15, 0xae, 0x9c, 0xaf,
+	0x80, 0x9e, 0x19, 0x2e, 0x97, 0x34, 0xc0, 0x45, 0x7a, 0xa4, 0x43, 0x9d, 0x5f, 0xce, 0xf3, 0xf6,
+	0x89, 0xae, 0x9f, 0xb4, 0x48, 0x91, 0x3d, 0x1d, 0x75, 0x8f, 0x8b, 0x54, 0x6b, 0x13, 0x8b, 0xaa,
+	0x6d, 0xc3, 0x61, 0x90, 0xbe, 0x15, 0xe0, 0xd2, 0x9e, 0x63, 0x34, 0x42, 0x90, 0xea, 0xa8, 0x6d,
+	0x92, 0x17, 0x56, 0x85, 0xb5, 0x0c, 0x66, 0xff, 0x51, 0x16, 0x92, 0x5a, 0x33, 0x9f, 0x64, 0x94,
+	0xa4, 0xd6, 0x44, 0x1f, 0x40, 0xca, 0x36, 0x21, 0x3f, 0xb5, 0x2a, 0xac, 0x65, 0x4b, 0xef, 0xc8,
+	0x17, 0x9e, 0x50, 0xde, 0x3f, 0x33, 0x08, 0x66, 0x00, 0x54, 0x80, 0x19, 0xee, 0x1c, 0x2b, 0x9f,
+	0x5a, 0x9d, 0x5a, 0xcb, 0x60, 0xef, 0x59, 0xc2, 0x20, 0x96, 0x4d, 0xa2, 0x52, 0xc2, 0x2d, 0xc1,
+	0xe4, 0xd5, 0x50, 0x63, 0xd6, 0xfb, 0xc6, 0x6c, 0x15, 0x7e, 0xf9, 0xf3, 0xd7, 0xa9, 0x25, 0x73,
+	0xb1, 0x94, 0xfb, 0xf2, 0x85, 0xba, 0xf1, 0xfa, 0xc6, 0xc6, 0xbd, 0x8d, 0x2f, 0xbe, 0xbe, 0x79,
+	0xfd, 0xce, 0xed, 0x6f, 0xae, 0xd8, 0x86, 0x4a, 0x07, 0x90, 0x0b, 0xc9, 0xb4, 0x0c, 0xf4, 0x08,
+	0x2e, 0x71, 0xa5, 0x4c, 0xee, 0x6c, 0xe9, 0xdd, 0x88, 0x03, 0xb8, 0x60, 0x17, 0x26, 0x3d, 0x80,
+	0xf9, 0x6d, 0x42, 0x7d, 0x76, 0x3a, 0x36, 0x09, 0xb1, 0x6c, 0xc2, 0x90, 0xf5, 0x83, 0x27, 0x62,
+	0x50, 0x0e, 0x16, 0x76, 0x34, 0xcb, 0x15, 0x6a, 0x61, 0xf2, 0x4a, 0x3a, 0x04, 0x31, 0x48, 0xb2,
+	0x0c, 0xb4, 0xe5, 0x73, 0xbf, 0xb0, 0x3a, 0x35, 0x82, 0xa6, 0x40, 0x98, 0x0e, 0x8c, 0xe6, 0xc4,
+	0xc3, 0x14, 0x92, 0x39, 0x11, 0xaf, 0x3c, 0x04, 0xf1, 0x31, 0x69, 0x91, 0x80, 0xa9, 0xa3, 0x44,
+	0x6a, 0x11, 0x72, 0x21, 0xbc, 0x65, 0x48, 0x79, 0xb8, 0xcc, 0x1f, 0x1d, 0x93, 0xcb, 0x6a, 0xa7,
+	0x41, 0x5a, 0xb6, 0xc7, 0xdf, 0x84, 0xe5, 0xa1, 0x6f, 0x86, 0x80, 0x6a, 0x54, 0xa5, 0x5d, 0x16,
+	0xa6, 0xbf, 0x84, 0x10, 0xca, 0x7d, 0x65, 0x19, 0xe8, 0x0d, 0x48, 0x5b, 0x54, 0xa5, 0xae, 0x5f,
+	0x9d, 0x07, 0x84, 0x61, 0x99, 0x58, 0x54, 0xb3, 0x5d, 0xd0, 0xac, 0xdb, 0x95, 0x5c, 0x6f, 0xe8,
+	0x6d, 0xc3, 0x36, 0x93, 0x79, 0x7b, 0xb6, 0x54, 0x90, 0x9d, 0x7a, 0x97, 0xdd, 0x7a, 0x97, 0xf7,
+	0xdd, 0x7a, 0xc7, 0x4b, 0x1e, 0xd4, 0xa6, 0x95, 0x39, 0x10, 0x15, 0x61, 0xd1, 0x20, 0x66, 0x83,
+	0x74, 0xa8, 0x7a, 0xe2, 0x93, 0x67, 0xd7, 0x77, 0x12, 0xa3, 0xfe, 0x2b, 0x0f, 0x70, 0x19, 0xa6,
+	0x8f, 0x55, 0xad, 0x45, 0x9a, 0xf9, 0xd4, 0xaa, 0xb0, 0x36, 0x83, 0xf9, 0x13, 0xba, 0x0a, 0x0b,
+	0xf6, 0xbf, 0xae, 0x49, 0xea, 0x6d, 0x62, 0x59, 0xea, 0x09, 0xc9, 0xa7, 0x99, 0xf1, 0x59, 0x4e,
+	0xae, 0x38, 0x54, 0x69, 0x09, 0x16, 0x7d, 0xe9, 0x89, 0xbb, 0x2d, 0xc2, 0xdc, 0xf1, 0xb7, 0x00,
+	0x05, 0x4e, 0x2b, 0xeb, 0xad, 0x16, 0x69, 0x50, 0x4d, 0xef, 0xf0, 0xb7, 0x96, 0x81, 0x0c, 0x98,
+	0xe7, 0xc1, 0xad, 0x9b, 0x36, 0x31, 0x9f, 0x64, 0x59, 0xfc, 0x71, 0xbc, 0xcc, 0x18, 0x22, 0x51,
+	0xf6, 0x1b, 0xa0, 0x74, 0xa8, 0x79, 0x86, 0xe7, 0x0c, 0x1f, 0xa9, 0xd0, 0x82, 0xdc, 0x00, 0x0b,
+	0x12, 0x61, 0xea, 0x25, 0x39, 0xe3, 0x61, 0xb1, 0xff, 0xa2, 0x4d, 0x48, 0xf7, 0xd4, 0x56, 0xd7,
+	0x0d, 0xc1, 0xb5, 0x98, 0xa9, 0xca, 0xcc, 0x70, 0x90, 0xf7, 0x93, 0x77, 0x05, 0xe9, 0x16, 0x20,
+	0xdf, 0xdd, 0xc0, 0x9d, 0x82, 0x56, 0x00, 0xdc, 0x53, 0xbb, 0xb9, 0x8b, 0x33, 0x9c, 0xf2, 0xac,
+	0x29, 0x75, 0x60, 0x71, 0x00, 0x64, 0x19, 0xe8, 0x13, 0xc8, 0x31, 0x1f, 0xd5, 0x8f, 0x75, 0xb3,
+	0xee, 0x56, 0xd2, 0x18, 0xe6, 0x2d, 0x30, 0x29, 0x4f, 0x74, 0x93, 0x53, 0xa5, 0x3d, 0x98, 0xf3,
+	0x33, 0xa0, 0x47, 0x90, 0xf6, 0x07, 0x63, 0x3d, 0xbe, 0x70, 0xec, 0x00, 0xa5, 0xdf, 0x05, 0x98,
+	0xf5, 0x91, 0x79, 0xbf, 0x11, 0xbc, 0x7e, 0x13, 0x74, 0x40, 0x32, 0xe4, 0x00, 0xef, 0xfa, 0x99,
+	0xf2, 0x5d, 0x3f, 0x65, 0xde, 0xa2, 0x52, 0xac, 0x45, 0x15, 0xe3, 0xdb, 0x64, 0x77, 0x2b, 0x8b,
+	0xb7, 0xab, 0xa7, 0x00, 0x0d, 0xbd, 0xd3, 0xd4, 0xec, 0x94, 0xb1, 0xf2, 0x69, 0x76, 0xbc, 0xb5,
+	0x08, 0x51, 0x65, 0x17, 0x80, 0x7d, 0x58, 0xe9, 0x37, 0x01, 0x32, 0xde, 0x1b, 0xf4, 0x02, 0x32,
+	0x2a, 0xa5, 0xa6, 0x76, 0xd4, 0xe5, 0xc5, 0x9d, 0x2d, 0x7d, 0x14, 0xdf, 0x42, 0x4f, 0xce, 0xa6,
+	0x2b, 0xc3, 0xc2, 0x7d, 0x79, 0x76, 0x69, 0xb2, 0x84, 0x72, 0xe2, 0x91, 0xc1, 0xfc, 0x09, 0x7d,
+	0x0a, 0x33, 0xba, 0x41, 0x4c, 0x95, 0xea, 0x26, 0x6f, 0xdc, 0x1f, 0x8e, 0xa1, 0xb3, 0xca, 0x45,
+	0x58, 0xd8, 0x93, 0x26, 0xfd, 0x9c, 0x84, 0x79, 0xa7, 0xcd, 0xb2, 0xa0, 0x8e, 0x76, 0xcb, 0xa2,
+	0x7b, 0x83, 0xc1, 0xbd, 0x10, 0xe3, 0x0b, 0xfc, 0x8a, 0x3f, 0xf0, 0x5b, 0x19, 0x1b, 0x94, 0x32,
+	0x93, 0xa2, 0x30, 0xc9, 0x1c, 0xd8, 0xff, 0x37, 0x39, 0xb0, 0x05, 0xb6, 0x4d, 0xe9, 0x1f, 0x85,
+	0xe4, 0x8c, 0x10, 0xc8, 0x87, 0x3d, 0xc8, 0xfa, 0x3d, 0x66, 0x19, 0xe8, 0x21, 0xa4, 0xec, 0x62,
+	0xe0, 0xbd, 0x6e, 0x94, 0x22, 0x62, 0x38, 0x16, 0x04, 0xa7, 0x83, 0xfc, 0x1f, 0x84, 0xf8, 0x41,
+	0xf0, 0x7b, 0x6c, 0x02, 0x41, 0xb8, 0x0b, 0xb0, 0x4d, 0xe8, 0x18, 0x01, 0x90, 0x2a, 0x30, 0xeb,
+	0x21, 0x27, 0x60, 0x48, 0x16, 0xe6, 0xec, 0xf6, 0xea, 0xf5, 0xd5, 0xe7, 0x30, 0xef, 0x7b, 0x66,
+	0xd3, 0x15, 0xbf, 0xb4, 0x85, 0x71, 0x2f, 0xed, 0xc7, 0x70, 0xd9, 0x13, 0xd9, 0xef, 0x0e, 0xa3,
+	0x9e, 0xfb, 0x05, 0x2c, 0x0f, 0x95, 0x32, 0x11, 0x13, 0x1f, 0xc0, 0xbc, 0x33, 0xc0, 0x8d, 0x13,
+	0x11, 0x11, 0xb2, 0x7e, 0xb0, 0x65, 0xac, 0x5f, 0x05, 0x31, 0x9c, 0x9f, 0x68, 0x06, 0x52, 0xbb,
+	0xd5, 0xc7, 0x8a, 0x98, 0x40, 0x19, 0x48, 0x2b, 0x87, 0xca, 0xee, 0xbe, 0x28, 0xac, 0xff, 0x24,
+	0xc0, 0x5b, 0x17, 0x5f, 0xd8, 0x48, 0x84, 0xb9, 0xf2, 0x53, 0xe5, 0x49, 0xbd, 0xa6, 0xe0, 0x43,
+	0x05, 0xd7, 0xc4, 0x04, 0x9a, 0x87, 0x0c, 0xa3, 0x54, 0xf1, 0x76, 0x4d, 0x14, 0xd0, 0x12, 0xe4,
+	0xd8, 0xa3, 0xb2, 0x7b, 0xf8, 0x0c, 0x57, 0x77, 0x2b, 0xca, 0xee, 0x7e, 0x4d, 0x4c, 0xda, 0x5a,
+	0x70, 0x75, 0x47, 0xa9, 0x89, 0x53, 0x1e, 0x60, 0x7f, 0x73, 0xbb, 0x26, 0xa6, 0x6c, 0x89, 0x7b,
+	0xd5, 0x9d, 0x67, 0xe5, 0xcf, 0xea, 0xdb, 0xb8, 0x7a, 0xb0, 0x27, 0xa6, 0xd1, 0x02, 0xcc, 0x72,
+	0xca, 0xee, 0x66, 0x45, 0x11, 0xa7, 0xd7, 0xef, 0xc3, 0xca, 0x85, 0x77, 0xba, 0x2d, 0xb2, 0xa2,
+	0x54, 0xb6, 0x14, 0x5c, 0xaf, 0x3e, 0x11, 0x13, 0x08, 0x60, 0x5a, 0x79, 0x7e, 0xb0, 0xb9, 0x53,
+	0x13, 0x85, 0xd2, 0x1f, 0x59, 0x98, 0x71, 0x97, 0x09, 0x44, 0xdd, 0xbb, 0xc6, 0xdd, 0x1a, 0xa3,
+	0xea, 0x3a, 0xbc, 0x32, 0x14, 0x6e, 0x8c, 0x06, 0xb0, 0x0c, 0x29, 0x61, 0x6b, 0x0d, 0x6c, 0x73,
+	0x91, 0x5a, 0xc3, 0xfb, 0x64, 0xa4, 0xd6, 0x81, 0x65, 0x51, 0x4a, 0xa0, 0x97, 0xac, 0xa6, 0x5d,
+	0x95, 0xd7, 0x23, 0x24, 0x04, 0xf6, 0xc2, 0xc2, 0xc6, 0x08, 0xdc, 0xee, 0x11, 0x03, 0x2b, 0x47,
+	0xe4, 0x11, 0xc3, 0x0b, 0x4e, 0xe4, 0x11, 0x07, 0x37, 0x9a, 0x04, 0x7a, 0xe5, 0xdc, 0x16, 0x5e,
+	0x78, 0xe5, 0x08, 0x19, 0xa1, 0x5d, 0xb3, 0x50, 0x1c, 0x89, 0x9f, 0xa9, 0xfc, 0x4e, 0x08, 0xec,
+	0xa7, 0xce, 0x24, 0x59, 0x8a, 0x2f, 0xc7, 0xbd, 0xd9, 0x0a, 0xf7, 0xc6, 0x9e, 0xfd, 0xa5, 0x04,
+	0x7a, 0x0d, 0x0b, 0xa1, 0xd1, 0x19, 0xdd, 0x8c, 0x1f, 0x32, 0xd7, 0x84, 0xd2, 0xa8, 0x10, 0xa6,
+	0xfb, 0x18, 0x66, 0x9f, 0xaa, 0x9d, 0x66, 0x8b, 0x28, 0x3d, 0xd2, 0xa1, 0xe8, 0x9c, 0x76, 0xe6,
+	0x7c, 0xc7, 0x51, 0x0d, 0x4d, 0x66, 0x6c, 0x15, 0xeb, 0xe4, 0xbc, 0xa4, 0x0a, 0x71, 0xda, 0x5a,
+	0xf4, 0x8e, 0x45, 0xd0, 0xf7, 0x02, 0x2c, 0x0e, 0xd9, 0x30, 0xd1, 0xfb, 0xf1, 0x1c, 0x17, 0x5a,
+	0x58, 0x0b, 0x77, 0xc6, 0x81, 0x59, 0xc6, 0xa0, 0x19, 0xce, 0x7a, 0xfc, 0x9f, 0x98, 0xd1, 0xdf,
+	0xc4, 0xed, 0x6a, 0xee, 0x0f, 0x5e, 0x91, 0xd5, 0x1c, 0x98, 0x6a, 0x23, 0xab, 0x39, 0x38, 0xd1,
+	0x39, 0x57, 0x47, 0x7f, 0xc0, 0x88, 0x54, 0x16, 0x98, 0xde, 0x22, 0x95, 0x05, 0x27, 0x17, 0x29,
+	0x81, 0x8e, 0xe0, 0x12, 0x9f, 0x20, 0xd0, 0x7b, 0xd1, 0x09, 0xe9, 0xaa, 0x59, 0x8f, 0xcb, 0xca,
+	0x74, 0x9c, 0x42, 0xc6, 0xeb, 0xd6, 0xe8, 0x5a, 0x8c, 0x6a, 0xf5, 0x6a, 0xe4, 0x7a, 0x7c, 0x66,
+	0xa6, 0xe9, 0x07, 0xc1, 0xf9, 0x40, 0x10, 0x1a, 0x0c, 0x22, 0xd3, 0x65, 0xf8, 0x48, 0x12, 0x99,
+	0x2e, 0xe7, 0xcc, 0x20, 0x4e, 0x0c, 0xfb, 0x63, 0x40, 0x64, 0x0c, 0x03, 0xe3, 0x46, 0x64, 0x0c,
+	0x83, 0xf3, 0x85, 0x94, 0xd8, 0xba, 0xfd, 0x79, 0xe9, 0x44, 0xa3, 0xa7, 0xdd, 0x23, 0xb9, 0xa1,
+	0xb7, 0x8b, 0x36, 0xb8, 0xe8, 0x82, 0x8b, 0xe7, 0x7e, 0x0e, 0x3e, 0x9a, 0x66, 0x1f, 0x7a, 0x6e,
+	0xfd, 0x13, 0x00, 0x00, 0xff, 0xff, 0x44, 0xa3, 0x58, 0x6e, 0x93, 0x16, 0x00, 0x00,
+>>>>>>> api: condition Type -> Attribute
 }
