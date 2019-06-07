@@ -24,8 +24,8 @@ app-page-picker {
 
 .service-item {
   @include modal-box();
-  box-shadow: none;
   display: block;
+  box-shadow: none;
   background-color: #F2F5F7;
   margin-bottom: 1em;
   margin-right: 35px;
@@ -64,6 +64,7 @@ app-page-picker {
     align-items: center;
     margin-bottom: 4px;
     font-size: 12px;
+
     b {
       margin-right: 4px;
     }
@@ -73,6 +74,7 @@ app-page-picker {
     display: flex;
     align-items: center;
     font-size: 12px;
+
     b {
       margin-right: 4px;
     }

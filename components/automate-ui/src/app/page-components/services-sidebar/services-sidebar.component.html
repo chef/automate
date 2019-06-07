@@ -47,7 +47,7 @@
         </div>
         <div class="body">
           <div class ="release-line"><chef-icon>grain</chef-icon>{{ service.release }}</div>
-	  <div class ="channel-line">
+          <div class ="channel-line">
             <chef-badge general *ngIf="service.channel !== ''">{{ service.channel | uppercase }}</chef-badge>
             <chef-badge no-data *ngIf="service.channel === ''">NO CHANNEL</chef-badge>
           </div>
