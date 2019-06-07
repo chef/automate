@@ -11,24 +11,21 @@ import (
 	"fmt"
 	"time"
 
-	uuid "github.com/chef/automate/lib/uuid4"
-	"github.com/pkg/errors"
-
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
-
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	rrule "github.com/teambition/rrule-go"
-
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
+	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	uuid "github.com/chef/automate/lib/uuid4"
 )
 
 type Scanner struct {
@@ -188,12 +185,12 @@ func (s *Scanner) UpdateNode(ctx context.Context, job *types.InspecJob, detectIn
 		logrus.Errorf("UpdateNode unable to parse job end time")
 		endTimeTimestamp = ptypes.TimestampNow()
 	}
-	logrus.Debugf("UpdateNode %s with status %s", job.NodeID, *job.NodeStatus)
+	logrus.Debugf("UpdateNode %s with status %s", job.NodeID, job.NodeStatus)
 	_, err = s.nodesClient.UpdateNodeDetectInfo(ctx, &nodes.NodeDetectJobInfo{
 		NodeId:          job.NodeID,
 		PlatformName:    detectInfo.OSName,
 		PlatformRelease: detectInfo.OSRelease,
-		NodeStatus:      *job.NodeStatus,
+		NodeStatus:      job.NodeStatus,
 		JobEndTime:      endTimeTimestamp,
 		JobId:           job.JobID,
 		JobType:         job.JobType,
@@ -241,12 +238,12 @@ func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output
 		JobID:     job.JobID,
 		NodeID:    job.NodeID,
 		ReportID:  reportID,
-		Status:    *job.NodeStatus,
+		Status:    job.NodeStatus,
 		StartTime: *job.StartTime,
 		EndTime:   *job.EndTime,
 	}
 
-	if *job.NodeStatus == types.StatusFailed || *job.NodeStatus == types.StatusAborted {
+	if job.NodeStatus == types.StatusFailed || job.NodeStatus == types.StatusAborted {
 		if inspecErr != nil {
 			result.Result = inspecErr.Message
 		}

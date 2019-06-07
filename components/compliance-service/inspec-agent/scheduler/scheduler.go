@@ -74,17 +74,17 @@ func (a *Scheduler) Run(job *jobs.Job) error {
 	}
 	return nil
 }
+
 func (a *Scheduler) runNodeJobs(ctx context.Context, job *jobs.Job, nodeJobs []*types.InspecJob) error {
 	if len(nodeJobs) == 0 {
 		now := time.Now()
-		status := types.StatusAborted
 		nodeJob := &types.InspecJob{
 			InspecBaseJob: types.InspecBaseJob{
 				JobID: job.Id,
 			},
 			StartTime:  &now,
 			EndTime:    &now,
-			NodeStatus: &status,
+			NodeStatus: types.StatusAborted,
 		}
 		a.scannerServer.UpdateJobStatus(nodeJob.JobID, "failed", nodeJob.StartTime, nodeJob.EndTime)
 		a.scannerServer.UpdateResult(ctx, nodeJob, nil, &inspec.Error{Message: "no nodes found"}, "")

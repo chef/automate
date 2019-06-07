@@ -36,10 +36,9 @@ func (r *Runner) AddJobs(id string, jobs []*types.InspecJob) error {
 		if job == nil {
 			return errors.New("Job cannot be nil")
 		}
-		s := types.StatusScheduled
 
-		job.Status = s
-		job.NodeStatus = &s
+		job.Status = types.StatusScheduled
+		job.NodeStatus = types.StatusScheduled
 
 		if job.SSM {
 			job.RemoteInspecVersion = r.remoteInspecVersion

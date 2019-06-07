@@ -60,7 +60,7 @@ type InspecJob struct {
 	StartTime           *time.Time          `json:"start_time,omitempty"`
 	EndTime             *time.Time          `json:"end_time,omitempty"`
 	TargetConfig        inspec.TargetConfig `json:"target_config,omitempty"`
-	NodeStatus          *string             `json:"node_status,omitempty"`
+	NodeStatus          string              `json:"node_status,omitempty"`
 	SourceID            string              `json:"source_id,omitempty"`
 	SourceAccountID     string              `json:"account_id,omitempty"`
 	SSM                 bool                `json:"ssm,omitempty"`

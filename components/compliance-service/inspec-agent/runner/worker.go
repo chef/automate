@@ -2,18 +2,15 @@ package runner
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"os"
 	"time"
-
-	"encoding/json"
 
 	uuid "github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
-	"io/ioutil"
-
-	"fmt"
 
 	"github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/inspec"
@@ -168,7 +165,7 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	}
 
 	job.StartTime = timeNowRef()
-	*job.NodeStatus = types.StatusRunning
+	job.NodeStatus = types.StatusRunning
 
 	currentJobSummary := job.JobType + " " + job.TargetConfig.Backend + " " + job.TargetConfig.Hostname
 
@@ -182,14 +179,14 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	var reportID string
 	// retrying for certain error types
 	job.RetriesLeft++ // adding the implicit try
-	for job.RetriesLeft > 0 && *job.NodeStatus == types.StatusRunning {
+	for job.RetriesLeft > 0 && job.NodeStatus == types.StatusRunning {
 		if job.SSM {
 			switch job.JobType {
 			case types.JobTypeDetect:
 				// ssm ping is online, so we set node to reachable by setting node status to completed
 				// this is b/c we don't actually run an inspec detect, b/c ssm jobs need to report back to automate, and
 				// detect doesn't do this. so here we do nothing
-				*job.NodeStatus = types.StatusCompleted
+				job.NodeStatus = types.StatusCompleted
 			case types.JobTypeExec:
 				// call out to do the ssm job
 				inspecErr = remote.RunSSMJob(ctx, &job)
@@ -202,11 +199,11 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 				execInfo, inspecErr = doExec(&job)
 			}
 		} else {
-			*job.NodeStatus = types.StatusFailed
+			job.NodeStatus = types.StatusFailed
 			inspecErr = inspec.NewInspecError(inspec.NO_CREDS_PROVIDED, "insufficient information for ssh or winrm scan")
 		}
 		job.RetriesLeft--
-		if *job.NodeStatus == types.StatusRunning &&
+		if job.NodeStatus == types.StatusRunning &&
 			(inspecErr.Type == inspec.CONN_TIMEOUT || inspecErr.Type == inspec.UNREACHABLE_HOST) &&
 			job.RetriesLeft > 0 {
 			logrus.Debugf("retrying(%d) job %s(%s) for node %s", job.RetriesLeft, job.JobID, currentJobSummary, job.NodeID)
@@ -216,9 +213,8 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	cleanupKeys(job.TargetConfig.KeyFiles)
 	logrus.Debugf("job %s finished", job.JobID)
 
-	//
-	if *job.NodeStatus == types.StatusRunning {
-		*job.NodeStatus = types.StatusFailed
+	if job.NodeStatus == types.StatusRunning {
+		job.NodeStatus = types.StatusFailed
 	}
 
 	job.EndTime = timeNowRef()
@@ -243,17 +239,17 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 			detectInfoByte, err := json.Marshal(detectInfo)
 			if err != nil {
 				logrus.Errorf("error trying to marshal detectInfo for job %s", job.JobID)
-				*job.NodeStatus = types.StatusFailed
+				job.NodeStatus = types.StatusFailed
 				inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 			}
 			t.scannerServer.UpdateResult(ctx, &job, detectInfoByte, inspecErr, "")
 		case types.JobTypeExec:
-			if *job.NodeStatus == types.StatusCompleted {
+			if job.NodeStatus == types.StatusCompleted {
 				reportID = uuid.Must(uuid.NewV4()).String()
 				err := t.reportIt(ctx, &job, execInfo, reportID)
 				if err != nil {
 					logrus.Errorf("worker error: %s", err)
-					*job.NodeStatus = types.StatusFailed
+					job.NodeStatus = types.StatusFailed
 					inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 				}
 			}
@@ -263,8 +259,8 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 		}
 	}
 	t.scannerServer.UpdateNode(ctx, &job, detectInfo)
-	logrus.Debugf("finished job %s with status %s", job.JobID, *job.NodeStatus)
-	return *job.NodeStatus, nil
+	logrus.Debugf("finished job %s with status %s", job.JobID, job.NodeStatus)
+	return job.NodeStatus, nil
 }
 
 func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
@@ -385,7 +381,7 @@ func doDetect(job *types.InspecJob) (osInfo *inspec.OSInfo, err *inspec.Error) {
 		return nil, err
 	}
 
-	*job.NodeStatus = types.StatusCompleted
+	job.NodeStatus = types.StatusCompleted
 	return osInfo, nil
 }
 
@@ -410,7 +406,7 @@ func doExec(job *types.InspecJob) (jsonBytes []byte, err *inspec.Error) {
 		return nil, err
 	}
 
-	*job.NodeStatus = types.StatusCompleted
+	job.NodeStatus = types.StatusCompleted
 	return jsonBytes, nil
 }
 
