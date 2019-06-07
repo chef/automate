@@ -56,9 +56,8 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 		w.EnqueueTask("scan-job", job)
 	}
 
-	initialVal := len(jobs)
 	return w.Continue(&ScanJobWorkflowPayload{
-		initialVal,
+		len(jobs),
 		jobs[0].ParentJobID,
 		types.StatusRunning,
 	})
@@ -128,23 +127,6 @@ type InspecJobTask struct {
 type InspecJobSummaryTask struct {
 	ingestClient  ingest.ComplianceIngesterClient
 	scannerServer *scanner.Scanner
-}
-
-func (t *InspecJobTask) validateJob(job *types.InspecJob) bool {
-	if job == nil {
-		logrus.Error("jobs.work: job cannot be nil, skipping")
-		return false
-	}
-	deleted, err := t.scannerServer.IsJobDeleted(job.JobID)
-	if err != nil {
-		// keep on going if we err here.  no reason to block on validating job existence
-		logrus.Errorf("inspec agent worker unable to validate job existence: %+v", err)
-	}
-	if deleted {
-		logrus.Infof("aborting job. job id %s has been marked for deletion", job.JobID)
-		return false
-	}
-	return true
 }
 
 func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
@@ -263,6 +245,23 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	return job.NodeStatus, nil
 }
 
+func (t *InspecJobTask) validateJob(job *types.InspecJob) bool {
+	if job == nil {
+		logrus.Error("jobs.work: job cannot be nil, skipping")
+		return false
+	}
+	deleted, err := t.scannerServer.IsJobDeleted(job.JobID)
+	if err != nil {
+		// keep on going if we err here.  no reason to block on validating job existence
+		logrus.Errorf("inspec agent worker unable to validate job existence: %+v", err)
+	}
+	if deleted {
+		logrus.Infof("aborting job. job id %s has been marked for deletion", job.JobID)
+		return false
+	}
+	return true
+}
+
 func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
 	var jobsPayload ScanJobWorkflowPayload
 
@@ -272,9 +271,7 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (int
 	}
 
 	logrus.Debugf("Updating parent job %s with overall status of %s", jobsPayload.ParentJobID, jobsPayload.ParentJobStatus)
-
 	t.scannerServer.UpdateJobStatus(jobsPayload.ParentJobID, jobsPayload.ParentJobStatus, nil, timeNowRef())
-
 	return nil, nil
 }
 
