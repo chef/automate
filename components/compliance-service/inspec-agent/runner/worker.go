@@ -542,19 +542,19 @@ func updateComplianceURLs(urls []string) ([]string, string) {
 	for _, url := range urls {
 		if strings.HasPrefix(url, "compliance://") {
 			profile := url[13:]
-			owner_id := strings.SplitN(profile, "/", 2)
-			if len(owner_id) < 2 {
+			ownerID := strings.SplitN(profile, "/", 2)
+			if len(ownerID) < 2 {
 				logrus.Errorf("no profile owner supplied")
 				continue
 			}
-			id_version := strings.SplitN(owner_id[1], "#", 2)
-			owner = neturl.QueryEscape(owner_id[0])
-			if len(id_version) < 2 {
+			idVersion := strings.SplitN(ownerID[1], "#", 2)
+			owner = neturl.QueryEscape(ownerID[0])
+			if len(idVersion) < 2 {
 				logrus.Errorf("no profile version supplied")
 				continue
 			}
-			name := neturl.QueryEscape(id_version[0])
-			version := neturl.QueryEscape(id_version[1])
+			name := neturl.QueryEscape(idVersion[0])
+			version := neturl.QueryEscape(idVersion[1])
 			url = fmt.Sprintf("http://127.0.0.1:%d/profiles/tar?owner=%s&name=%s&version=%s", ListenPort, owner, name, version)
 			newProfiles = append(newProfiles, url)
 		} else {
