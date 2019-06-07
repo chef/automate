@@ -262,6 +262,1544 @@ func TestGetNodesRegexWithExactSameField(t *testing.T) {
 	}
 }
 
+func TestGetNodesWildcardCaseInsensitive(t *testing.T) {
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Nodes
+		expected    []string
+	}{
+		// Node name
+		{
+			description: "Node name: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"name:a2-*"},
+			},
+			expected: []string{"a2-dev", "A2-Dev", "A2-prod", "a2-Prod"},
+		},
+		{
+			description: "Node name: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"name:A2-*"},
+			},
+			expected: []string{"a2-dev", "A2-Dev", "A2-prod", "a2-Prod"},
+		},
+
+		// organization
+		{
+			description: "Org: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "a",
+						OrganizationName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "b",
+						OrganizationName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "c",
+						OrganizationName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "d",
+						OrganizationName: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "e",
+						OrganizationName: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"organization:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "Org: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "a",
+						OrganizationName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "b",
+						OrganizationName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "c",
+						OrganizationName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "d",
+						OrganizationName: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:         "e",
+						OrganizationName: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"organization:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// environment
+		{
+			description: "environment: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "a",
+						Environment: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "b",
+						Environment: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "c",
+						Environment: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "d",
+						Environment: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "e",
+						Environment: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"environment:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "environment: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "a",
+						Environment: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "b",
+						Environment: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "c",
+						Environment: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "d",
+						Environment: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "e",
+						Environment: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"environment:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// platform
+		{
+			description: "Platform: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						Platform: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						Platform: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						Platform: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						Platform: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						Platform: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"platform:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "platform: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						Platform: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						Platform: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						Platform: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						Platform: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						Platform: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"platform:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// resource_names
+		{
+			description: "resource_names: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "a",
+						ResourceNames: []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "b",
+						ResourceNames: []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "c",
+						ResourceNames: []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "d",
+						ResourceNames: []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "e",
+						ResourceNames: []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"resource_names:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "resource_names: term lowercase with array values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "a",
+						ResourceNames: []string{"a2-dev", "a3-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "b",
+						ResourceNames: []string{"b2-prod", "A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "c",
+						ResourceNames: []string{"A2-prod", "A1-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "d",
+						ResourceNames: []string{"c-9", "a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "e",
+						ResourceNames: []string{"c-9", "a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"resource_names:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "resource_names: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "a",
+						ResourceNames: []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "b",
+						ResourceNames: []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "c",
+						ResourceNames: []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "d",
+						ResourceNames: []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:      "e",
+						ResourceNames: []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"resource_names:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// error_message
+		{
+			description: "error_message: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+					},
+					ErrorMessage: "a2-dev",
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+					},
+					ErrorMessage: "A2-Dev",
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+					},
+					ErrorMessage: "A2-prod",
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+					},
+					ErrorMessage: "a2-Prod",
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+					},
+					ErrorMessage: "a3-Prod",
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"error:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "error_message: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+					},
+					ErrorMessage: "a2-dev",
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+					},
+					ErrorMessage: "A2-Dev",
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+					},
+					ErrorMessage: "A2-prod",
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+					},
+					ErrorMessage: "a2-Prod",
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+					},
+					ErrorMessage: "a3-Prod",
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"error:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// recipes
+		{
+			description: "recipe: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						Recipes:  []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						Recipes:  []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						Recipes:  []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						Recipes:  []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						Recipes:  []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"recipe:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "recipe: term lowercase with array values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						Recipes:  []string{"a2-dev", "a3-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						Recipes:  []string{"b2-prod", "A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						Recipes:  []string{"A2-prod", "A1-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						Recipes:  []string{"c-9", "a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						Recipes:  []string{"c-9", "a4-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"recipe:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "recipe: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						Recipes:  []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						Recipes:  []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						Recipes:  []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						Recipes:  []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						Recipes:  []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"recipe:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// chef_tags
+		{
+			description: "ChefTags: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						ChefTags: []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						ChefTags: []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						ChefTags: []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						ChefTags: []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						ChefTags: []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"chef_tags:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "ChefTags: term lowercase with array values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						ChefTags: []string{"a2-dev", "a3-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						ChefTags: []string{"b2-prod", "A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						ChefTags: []string{"A2-prod", "A1-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						ChefTags: []string{"c-9", "a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						ChefTags: []string{"c-9", "a4-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"chef_tags:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "ChefTags: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						ChefTags: []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						ChefTags: []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						ChefTags: []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						ChefTags: []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						ChefTags: []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"chef_tags:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// cookbooks
+		{
+			description: "cookbooks: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a",
+						Cookbooks: []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "b",
+						Cookbooks: []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "c",
+						Cookbooks: []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "d",
+						Cookbooks: []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "e",
+						Cookbooks: []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cookbook:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "cookbooks: term lowercase with array values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a",
+						Cookbooks: []string{"a2-dev", "a3-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "b",
+						Cookbooks: []string{"b2-prod", "A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "c",
+						Cookbooks: []string{"A2-prod", "A1-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "d",
+						Cookbooks: []string{"c-9", "a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "e",
+						Cookbooks: []string{"c-9", "a4-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cookbook:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "cookbooks: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "a",
+						Cookbooks: []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "b",
+						Cookbooks: []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "c",
+						Cookbooks: []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "d",
+						Cookbooks: []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:  "e",
+						Cookbooks: []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"cookbook:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// attributes
+		{
+			description: "attribute: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+					},
+					Attributes: []string{"a2-dev"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+					},
+					Attributes: []string{"A2-Dev"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+					},
+					Attributes: []string{"A2-prod"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+					},
+					Attributes: []string{"a2-Prod"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+					},
+					Attributes: []string{"a3-Prod"},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"attribute:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "attribute: term lowercase with array values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+					},
+					Attributes: []string{"a2-dev", "a3-dev"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+					},
+					Attributes: []string{"b2-prod", "A2-Dev"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+					},
+					Attributes: []string{"A2-prod", "A1-prod"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+					},
+					Attributes: []string{"c-9", "a2-Prod"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+					},
+					Attributes: []string{"c-9", "a4-Prod"},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"attribute:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "attribute: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+					},
+					Attributes: []string{"a2-dev"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+					},
+					Attributes: []string{"A2-Dev"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+					},
+					Attributes: []string{"A2-prod"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+					},
+					Attributes: []string{"a2-Prod"},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+					},
+					Attributes: []string{"a3-Prod"},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"attribute:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// chef_version
+		{
+			description: "chef_version: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "a",
+						ChefVersion: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "b",
+						ChefVersion: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "c",
+						ChefVersion: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "d",
+						ChefVersion: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "e",
+						ChefVersion: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"chef_version:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "chef_version: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "a",
+						ChefVersion: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "b",
+						ChefVersion: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "c",
+						ChefVersion: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "d",
+						ChefVersion: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "e",
+						ChefVersion: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"chef_version:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// roles
+		{
+			description: "roles: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						Roles:    []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						Roles:    []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						Roles:    []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						Roles:    []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						Roles:    []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"role:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "roles: term lowercase with array values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						Roles:    []string{"a2-dev", "a3-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						Roles:    []string{"b2-prod", "A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						Roles:    []string{"A2-prod", "A1-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						Roles:    []string{"c-9", "a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						Roles:    []string{"c-9", "a4-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"role:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "roles: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "a",
+						Roles:    []string{"a2-dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "b",
+						Roles:    []string{"A2-Dev"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "c",
+						Roles:    []string{"A2-prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "d",
+						Roles:    []string{"a2-Prod"},
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName: "e",
+						Roles:    []string{"a3-Prod"},
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"role:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// policy_group
+		{
+			description: "policy_group: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "a",
+						PolicyGroup: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "b",
+						PolicyGroup: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "c",
+						PolicyGroup: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "d",
+						PolicyGroup: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "e",
+						PolicyGroup: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"policy_group:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "policy_group: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "a",
+						PolicyGroup: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "b",
+						PolicyGroup: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "c",
+						PolicyGroup: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "d",
+						PolicyGroup: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:    "e",
+						PolicyGroup: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"policy_group:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// policy_name
+		{
+			description: "policy_name: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "a",
+						PolicyName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "b",
+						PolicyName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "c",
+						PolicyName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "d",
+						PolicyName: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "e",
+						PolicyName: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"policy_name:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "policy_name: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "a",
+						PolicyName: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "b",
+						PolicyName: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "c",
+						PolicyName: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "d",
+						PolicyName: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "e",
+						PolicyName: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"policy_name:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// policy_revision
+		{
+			description: "policy_revision: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "a",
+						PolicyRevision: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "b",
+						PolicyRevision: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "c",
+						PolicyRevision: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "d",
+						PolicyRevision: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "e",
+						PolicyRevision: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"policy_revision:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "policy_revision: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "a",
+						PolicyRevision: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "b",
+						PolicyRevision: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "c",
+						PolicyRevision: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "d",
+						PolicyRevision: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:       "e",
+						PolicyRevision: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"policy_revision:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+
+		// source_fqdn
+		{
+			description: "source_fqdn: term lowercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "a",
+						SourceFqdn: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "b",
+						SourceFqdn: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "c",
+						SourceFqdn: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "d",
+						SourceFqdn: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "e",
+						SourceFqdn: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"source_fqdn:a2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+		{
+			description: "source_fqdn: term uppercase with values with varying cases",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "a",
+						SourceFqdn: "a2-dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "b",
+						SourceFqdn: "A2-Dev",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "c",
+						SourceFqdn: "A2-prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "d",
+						SourceFqdn: "a2-Prod",
+					},
+				},
+				{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   "e",
+						SourceFqdn: "a3-Prod",
+					},
+				},
+			},
+			request: request.Nodes{
+				Filter: []string{"source_fqdn:A2-*"},
+			},
+			expected: []string{"a", "b", "c", "d"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Wildcard case sensitive: %s", test.description), func(t *testing.T) {
+
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add node with project
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+
+			// call GetNodes
+			res, err := cfgmgmt.GetNodes(context.Background(), &test.request)
+			assert.NoError(t, err)
+
+			names := getFieldValues(res, "name")
+
+			// Test what nodes are returned.
+			assert.ElementsMatch(t, test.expected, names)
+		})
+	}
+}
+
 func TestGetRunsProjectFilter(t *testing.T) {
 	cases := []struct {
 		description string
