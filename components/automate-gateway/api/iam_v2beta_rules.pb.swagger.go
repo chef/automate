@@ -163,8 +163,8 @@ func init() {
     "v2betaCondition": {
       "type": "object",
       "properties": {
-        "type": {
-          "$ref": "#/definitions/v2betaConditionType"
+        "attribute": {
+          "$ref": "#/definitions/v2betaConditionAttribute"
         },
         "values": {
           "type": "array",
@@ -177,16 +177,7 @@ func init() {
         }
       }
     },
-    "v2betaConditionOperator": {
-      "type": "string",
-      "enum": [
-        "CONDITION_OPERATOR_UNSET",
-        "MEMBER_OF",
-        "EQUALS"
-      ],
-      "default": "CONDITION_OPERATOR_UNSET"
-    },
-    "v2betaConditionType": {
+    "v2betaConditionAttribute": {
       "type": "string",
       "enum": [
         "CONDITION_TYPE_UNSET",
@@ -199,6 +190,15 @@ func init() {
         "POLICY_NAME"
       ],
       "default": "CONDITION_TYPE_UNSET"
+    },
+    "v2betaConditionOperator": {
+      "type": "string",
+      "enum": [
+        "CONDITION_OPERATOR_UNSET",
+        "MEMBER_OF",
+        "EQUALS"
+      ],
+      "default": "CONDITION_OPERATOR_UNSET"
     },
     "v2betaCreateRuleReq": {
       "type": "object",
