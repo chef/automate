@@ -176,7 +176,7 @@ func TestListProjectRules(t *testing.T) {
 
 		resp, err := ts.projects.ListProjectRules(ctx, &api.ListProjectRulesReq{})
 		require.NoError(t, err)
-		assert.Equal(t, expectedMap, resp.ProjectRules)
+		assert.EqualValues(t, expectedMap, resp.ProjectRules)
 	})
 }
 
