@@ -151,10 +151,7 @@ describe File.basename(__FILE__) do
           "copyrightEmail": "support@chef.io",
           "summary": "Demonstrates the use of InSpec Compliance Profile",
           "version": "1.0.0",
-          "supports": [],
-          "depends": [],
           "sha256": "d94022291cae7c87bb13d42bbd0dbc86b027c1e32fdc6790d2555d62deb8b6a9",
-          "groups": [],
           "controls": [
             {
               "id": "/etc/group must exist",
@@ -171,7 +168,6 @@ describe File.basename(__FILE__) do
                   "runTime": 0.000103
                 }
               ],
-              "refs": [],
               "tags": {}
             },
             {
@@ -189,11 +185,9 @@ describe File.basename(__FILE__) do
                   "runTime": 0.001871
                 }
               ],
-              "refs": [],
               "tags": {}
             }
           ],
-          "attributes": [],
           "status": "passed"
         }
       ]
