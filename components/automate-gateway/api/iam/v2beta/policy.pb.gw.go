@@ -515,6 +515,15 @@ func request_Policies_DeleteProject_0(ctx context.Context, marshaler runtime.Mar
 
 }
 
+func request_Policies_IntrospectAllProjects_0(ctx context.Context, marshaler runtime.Marshaler, client PoliciesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.ListProjectsReq
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.IntrospectAllProjects(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
 // RegisterPoliciesHandlerFromEndpoint is same as RegisterPoliciesHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterPoliciesHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
@@ -953,6 +962,26 @@ func RegisterPoliciesHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 
 	})
 
+	mux.Handle("GET", pattern_Policies_IntrospectAllProjects_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Policies_IntrospectAllProjects_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Policies_IntrospectAllProjects_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -996,6 +1025,8 @@ var (
 	pattern_Policies_ListProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "projects"}, ""))
 
 	pattern_Policies_DeleteProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "projects", "id"}, ""))
+
+	pattern_Policies_IntrospectAllProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "introspect_projects"}, ""))
 )
 
 var (
@@ -1038,4 +1069,6 @@ var (
 	forward_Policies_ListProjects_0 = runtime.ForwardResponseMessage
 
 	forward_Policies_DeleteProject_0 = runtime.ForwardResponseMessage
+
+	forward_Policies_IntrospectAllProjects_0 = runtime.ForwardResponseMessage
 )
