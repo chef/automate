@@ -565,9 +565,6 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
-
-      exit
-
       # Global Compliancy across all controls for nodes that failed the scan
       actual_data = GRPC stats, :read_summary, Stats::Query.new(
         type: "controls",
