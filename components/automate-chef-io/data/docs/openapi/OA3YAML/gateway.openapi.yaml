@@ -1,0 +1,65 @@
+openapi: 3.0.0
+info:
+  title: components/automate-gateway/api/gateway/gateway.proto
+  version: "0"
+paths:
+  /gateway/health:
+    get:
+      operationId: GetHealth
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/apiHealth"
+      tags:
+        - Gateway
+  /gateway/version:
+    get:
+      operationId: GetVersion
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/apiVersion"
+      tags:
+        - Gateway
+components:
+  schemas:
+    apiHealth:
+      type: object
+      properties:
+        status:
+          type: string
+      description: >-
+        The automate-gateway service health is constructed with:
+
+        * Status:
+                   => ok:             Everything is alright
+                   => initialization: The service is in its initialization process
+                   => warning:        Something might be wrong?
+                   => critical:       Something is wrong!
+
+        @afiune: Here we can add more health information to the response
+      title: Health message
+    apiVersion:
+      type: object
+      properties:
+        version:
+          type: string
+        built:
+          type: string
+        name:
+          type: string
+        sha:
+          type: string
+      description: |-
+        The service version constructed with:
+        * Service name
+        * Built time
+        * Semantic version
+        * Git SHA
+      title: Version message

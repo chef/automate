@@ -1,0 +1,58 @@
+openapi: 3.0.0
+info:
+  title: components/automate-gateway/api/deployment/deployment.proto
+  version: "0"
+paths:
+  /deployment/service_versions:
+    get:
+      operationId: ServiceVersions
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/deploymentServiceVersionsResponse"
+      tags:
+        - Deployment
+  /version:
+    get:
+      operationId: GetVersion
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/deploymentVersion"
+      tags:
+        - Deployment
+components:
+  schemas:
+    deploymentServiceVersion:
+      type: object
+      properties:
+        name:
+          type: string
+        origin:
+          type: string
+        version:
+          type: string
+        release:
+          type: string
+    deploymentServiceVersionsResponse:
+      type: object
+      properties:
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/deploymentServiceVersion"
+    deploymentVersion:
+      type: object
+      properties:
+        build_timestamp:
+          type: string
+      description: |-
+        The manifest version constructed with:
+        * build_timestamp
+      title: Version message

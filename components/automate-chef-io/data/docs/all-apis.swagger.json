@@ -1,0 +1,7457 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/authz/authz.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/auth/introspect": {
+      "get": {
+        "operationId": "IntrospectAll",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseIntrospectResp"
+            }
+          }
+        },
+        "tags": [
+          "Authorization"
+        ]
+      },
+      "post": {
+        "operationId": "Introspect",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseIntrospectResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestIntrospectReq"
+            }
+          }
+        ],
+        "tags": [
+          "Authorization"
+        ]
+      }
+    },
+    "/auth/introspect_projects": {
+      "get": {
+        "operationId": "IntrospectAllProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseIntrospectProjectsResp"
+            }
+          }
+        },
+        "tags": [
+          "Authorization"
+        ]
+      }
+    },
+    "/auth/introspect_some": {
+      "post": {
+        "operationId": "IntrospectSome",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseIntrospectResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestIntrospectSomeReq"
+            }
+          }
+        ],
+        "tags": [
+          "Authorization"
+        ]
+      }
+    },
+    "/auth/policies": {
+      "get": {
+        "operationId": "ListPolicies",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseListPoliciesResp"
+            }
+          }
+        },
+        "tags": [
+          "Authorization"
+        ]
+      },
+      "post": {
+        "operationId": "CreatePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseCreatePolicyResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestCreatePolicyReq"
+            }
+          }
+        ],
+        "tags": [
+          "Authorization"
+        ]
+      }
+    },
+    "/auth/policies/version": {
+      "get": {
+        "operationId": "GetVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/versionVersionInfo"
+            }
+          }
+        },
+        "tags": [
+          "Authorization"
+        ]
+      }
+    },
+    "/auth/policies/{id}": {
+      "delete": {
+        "operationId": "DeletePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseDeletePolicyResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Authorization"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "requestCreatePolicyReq": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resource": {
+          "type": "string"
+        }
+      }
+    },
+    "requestIntrospectReq": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requestIntrospectSomeReq": {
+      "type": "object",
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responseCreatePolicyResp": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "effect": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "We aren't using a Policy message here since we want to\nreturn a flat object via our external HTTP API."
+    },
+    "responseDeletePolicyResp": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "effect": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "responseIntrospectProjectsResp": {
+      "type": "object",
+      "properties": {
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responseIntrospectResp": {
+      "type": "object",
+      "properties": {
+        "endpoints": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/responseMethodsAllowed"
+          }
+        }
+      }
+    },
+    "responseListPoliciesResp": {
+      "type": "object",
+      "properties": {
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/responsePolicy"
+          }
+        }
+      }
+    },
+    "responseMethodsAllowed": {
+      "type": "object",
+      "properties": {
+        "get": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "put": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "post": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "delete": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "patch": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "responsePolicy": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "effect": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "versionVersionInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "built": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+;
+
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/deployment/deployment.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/deployment/service_versions": {
+      "get": {
+        "operationId": "ServiceVersions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/deploymentServiceVersionsResponse"
+            }
+          }
+        },
+        "tags": [
+          "Deployment"
+        ]
+      }
+    },
+    "/version": {
+      "get": {
+        "operationId": "GetVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/deploymentVersion"
+            }
+          }
+        },
+        "tags": [
+          "Deployment"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "deploymentServiceVersion": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        }
+      }
+    },
+    "deploymentServiceVersionsResponse": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/deploymentServiceVersion"
+          }
+        }
+      }
+    },
+    "deploymentVersion": {
+      "type": "object",
+      "properties": {
+        "build_timestamp": {
+          "type": "string"
+        }
+      },
+      "description": "The manifest version constructed with:\n* build_timestamp",
+      "title": "Version message"
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/event_feed/event_feed.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/event_task_counts": {
+      "get": {
+        "operationId": "GetEventTaskCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseEventCounts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "EventFeed"
+        ]
+      }
+    },
+    "/event_type_counts": {
+      "get": {
+        "operationId": "GetEventTypeCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseEventCounts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "EventFeed"
+        ]
+      }
+    },
+    "/eventfeed": {
+      "get": {
+        "operationId": "GetEventFeed",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseEvents"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "collapse",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          }
+        ],
+        "tags": [
+          "EventFeed"
+        ]
+      }
+    },
+    "/eventstrings": {
+      "get": {
+        "operationId": "GetEventStringBuckets",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/event_feedresponseEventStrings"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "hours_between",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "EventFeed"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "event_feedresponseEventStrings": {
+      "type": "object",
+      "properties": {
+        "strings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/responseEventString"
+          }
+        },
+        "start": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        },
+        "hours_between": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "responseEvent": {
+      "type": "object",
+      "properties": {
+        "event_type": {
+          "type": "string"
+        },
+        "task": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "entity_name": {
+          "type": "string"
+        },
+        "requestor_type": {
+          "type": "string"
+        },
+        "requestor_name": {
+          "type": "string"
+        },
+        "service_hostname": {
+          "type": "string"
+        },
+        "start_id": {
+          "type": "string"
+        },
+        "event_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "parent_name": {
+          "type": "string"
+        },
+        "parent_type": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_id": {
+          "type": "string"
+        }
+      }
+    },
+    "responseEventCollection": {
+      "type": "object",
+      "properties": {
+        "events_count": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/responseEventCount"
+          }
+        }
+      }
+    },
+    "responseEventCount": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "count": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "responseEventCounts": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "counts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/responseEventCount"
+          }
+        }
+      }
+    },
+    "responseEventString": {
+      "type": "object",
+      "properties": {
+        "collection": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/responseEventCollection"
+          }
+        },
+        "event_action": {
+          "type": "string"
+        }
+      }
+    },
+    "responseEvents": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/responseEvent"
+          }
+        },
+        "total_events": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/gateway/gateway.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/gateway/health": {
+      "get": {
+        "operationId": "GetHealth",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiHealth"
+            }
+          }
+        },
+        "tags": [
+          "Gateway"
+        ]
+      }
+    },
+    "/gateway/version": {
+      "get": {
+        "operationId": "GetVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiVersion"
+            }
+          }
+        },
+        "tags": [
+          "Gateway"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "apiHealth": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      },
+      "description": "The automate-gateway service health is constructed with:\n* Status:\n           =\u003e ok:             Everything is alright\n           =\u003e initialization: The service is in its initialization process\n           =\u003e warning:        Something might be wrong?\n           =\u003e critical:       Something is wrong!\n\n@afiune: Here we can add more health information to the response",
+      "title": "Health message"
+    },
+    "apiVersion": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "built": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        }
+      },
+      "description": "The service version constructed with:\n* Service name\n* Built time\n* Semantic version\n* Git SHA",
+      "title": "Version message"
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/compliance/scanner/jobs/jobs.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/compliance/scanner/jobs": {
+      "post": {
+        "operationId": "Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Id"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Job"
+            }
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      }
+    },
+    "/compliance/scanner/jobs/id/{id}": {
+      "get": {
+        "operationId": "Read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Job"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      },
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      },
+      "put": {
+        "operationId": "Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Job"
+            }
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      }
+    },
+    "/compliance/scanner/jobs/rerun/id/{id}": {
+      "get": {
+        "operationId": "Rerun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RerunResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      }
+    },
+    "/compliance/scanner/jobs/search": {
+      "post": {
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Jobs"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "QueryOrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "commonFilter": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "commonKv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Id": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Job": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "timeout": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonKv"
+          }
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string"
+        },
+        "retries": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "retries_left": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ResultsRow"
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "node_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "profile_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "node_selectors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ManagerFilter"
+          }
+        },
+        "scheduled_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "recurrence": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "job_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "deleted": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "v1Jobs": {
+      "type": "object",
+      "properties": {
+        "jobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Job"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ManagerFilter": {
+      "type": "object",
+      "properties": {
+        "manager_id": {
+          "type": "string"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonFilter"
+          }
+        }
+      }
+    },
+    "v1Query": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonFilter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/QueryOrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1RerunResponse": {
+      "type": "object"
+    },
+    "v1ResultsRow": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string"
+        },
+        "report_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        },
+        "job_id": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/legacy/legacy.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/events/data-collector": {
+      "get": {
+        "summary": "This is used by chef-server, it requests a GET /data-collector/v0 to check\nAutomate's status.\nWe proxy /data-collector/v0 to /api/v0/events/data-collector, so this is\nwhere we need to respond.\nSince this is for legacy-support only, we don't bother much about having\ngoogle.protobuf.Empty as argument.",
+        "operationId": "Status",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/legacyStatusResponse"
+            }
+          }
+        },
+        "tags": [
+          "LegacyDataCollector"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "legacyStatusResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/license/license.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/license/apply": {
+      "post": {
+        "operationId": "ApplyLicense",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/licenseApplyLicenseResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/licenseApplyLicenseReq"
+            }
+          }
+        ],
+        "tags": [
+          "License"
+        ]
+      }
+    },
+    "/license/request": {
+      "post": {
+        "operationId": "RequestLicense",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/licenseRequestLicenseResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/licenseRequestLicenseReq"
+            }
+          }
+        ],
+        "tags": [
+          "License"
+        ]
+      }
+    },
+    "/license/status": {
+      "get": {
+        "operationId": "GetStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/licenseGetStatusResp"
+            }
+          }
+        },
+        "tags": [
+          "License"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "GetStatusRespDateRange": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "licenseApplyLicenseReq": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "string"
+        }
+      }
+    },
+    "licenseApplyLicenseResp": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/licenseGetStatusResp"
+        }
+      }
+    },
+    "licenseGetStatusResp": {
+      "type": "object",
+      "properties": {
+        "license_id": {
+          "type": "string"
+        },
+        "configured_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "licensed_period": {
+          "$ref": "#/definitions/GetStatusRespDateRange"
+        },
+        "customer_name": {
+          "type": "string"
+        }
+      }
+    },
+    "licenseRequestLicenseReq": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "gdpr_agree": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "licenseRequestLicenseResp": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/licenseGetStatusResp"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/nodes/manager/manager.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/nodemanagers": {
+      "post": {
+        "operationId": "Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Ids"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1NodeManager"
+            }
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      }
+    },
+    "/nodemanagers/id/{id}": {
+      "get": {
+        "operationId": "Read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NodeManager"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      },
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      },
+      "put": {
+        "operationId": "Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1NodeManager"
+            }
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      }
+    },
+    "/nodemanagers/id/{id}/with-node-state/stopped": {
+      "delete": {
+        "operationId": "DeleteWithNodeStateStopped",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      }
+    },
+    "/nodemanagers/id/{id}/with-node-state/terminated": {
+      "delete": {
+        "operationId": "DeleteWithNodeStateTerminated",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      }
+    },
+    "/nodemanagers/id/{id}/with-nodes": {
+      "delete": {
+        "operationId": "DeleteWithNodes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Ids"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      }
+    },
+    "/nodemanagers/id/{node_manager_id}/search-fields": {
+      "post": {
+        "operationId": "SearchNodeFields",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Fields"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "node_manager_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1FieldQuery"
+            }
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      }
+    },
+    "/nodemanagers/id/{node_manager_id}/search-nodes": {
+      "post": {
+        "operationId": "SearchNodes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Nodes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "node_manager_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1NodeQuery"
+            }
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      }
+    },
+    "/nodemanagers/rerun/id/{id}": {
+      "post": {
+        "operationId": "Connect",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ConnectResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Id"
+            }
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      }
+    },
+    "/nodemanagers/search": {
+      "post": {
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NodeManagers"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "NodeManagerService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "QueryOrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "commonFilter": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "commonKv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ConnectResponse": {
+      "type": "object"
+    },
+    "v1CredentialsByTags": {
+      "type": "object",
+      "properties": {
+        "tag_key": {
+          "type": "string"
+        },
+        "tag_value": {
+          "type": "string"
+        },
+        "credential_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1FieldQuery": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "$ref": "#/definitions/v1Query"
+        },
+        "field": {
+          "type": "string"
+        },
+        "node_manager_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Fields": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1Id": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Ids": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Id"
+          }
+        }
+      }
+    },
+    "v1NodeManager": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "credential_id": {
+          "type": "string"
+        },
+        "instance_credentials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1CredentialsByTags"
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "account_id": {
+          "type": "string"
+        },
+        "date_added": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "credential_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonKv"
+          }
+        }
+      }
+    },
+    "v1NodeManagers": {
+      "type": "object",
+      "properties": {
+        "managers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1NodeManager"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1NodeQuery": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "$ref": "#/definitions/v1Query"
+        },
+        "node_manager_id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Nodes": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Query": {
+      "type": "object",
+      "properties": {
+        "filter_map": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonFilter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/QueryOrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/nodes/nodes.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/nodes": {
+      "post": {
+        "operationId": "Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Id"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Node"
+            }
+          }
+        ],
+        "tags": [
+          "NodesService"
+        ]
+      }
+    },
+    "/nodes/bulk-create": {
+      "post": {
+        "operationId": "BulkCreate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Ids"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Nodes"
+            }
+          }
+        ],
+        "tags": [
+          "NodesService"
+        ]
+      }
+    },
+    "/nodes/delete": {
+      "post": {
+        "operationId": "BulkDelete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BulkDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "NodesService"
+        ]
+      }
+    },
+    "/nodes/delete/ids": {
+      "post": {
+        "operationId": "BulkDeleteById",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BulkDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Ids"
+            }
+          }
+        ],
+        "tags": [
+          "NodesService"
+        ]
+      }
+    },
+    "/nodes/id/{id}": {
+      "get": {
+        "operationId": "Read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Node"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NodesService"
+        ]
+      },
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NodesService"
+        ]
+      },
+      "put": {
+        "operationId": "Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Node"
+            }
+          }
+        ],
+        "tags": [
+          "NodesService"
+        ]
+      }
+    },
+    "/nodes/rerun/id/{id}": {
+      "get": {
+        "operationId": "Rerun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RerunResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NodesService"
+        ]
+      }
+    },
+    "/nodes/search": {
+      "post": {
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Nodes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "NodesService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "LastContactDataStatus": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "PASSED",
+        "FAILED",
+        "SKIPPED"
+      ],
+      "default": "UNKNOWN"
+    },
+    "QueryOrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "commonFilter": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "commonKv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1BulkDeleteResponse": {
+      "type": "object",
+      "properties": {
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1Id": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Ids": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1LastContactData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/LastContactDataStatus"
+        },
+        "penultimate_status": {
+          "$ref": "#/definitions/LastContactDataStatus"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1Node": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "platform_version": {
+          "type": "string"
+        },
+        "manager": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonKv"
+          }
+        },
+        "last_contact": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string"
+        },
+        "last_job": {
+          "$ref": "#/definitions/v1ResultsRow"
+        },
+        "target_config": {
+          "$ref": "#/definitions/v1TargetConfig"
+        },
+        "manager_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "connection_error": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "name_prefix": {
+          "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "run_data": {
+          "$ref": "#/definitions/v1LastContactData"
+        },
+        "scan_data": {
+          "$ref": "#/definitions/v1LastContactData"
+        }
+      }
+    },
+    "v1Nodes": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Node"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_unreachable": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_reachable": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_unknown": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Query": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/commonFilter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/QueryOrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1RerunResponse": {
+      "type": "object"
+    },
+    "v1ResultsRow": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string"
+        },
+        "report_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        },
+        "job_id": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "v1TargetConfig": {
+      "type": "object",
+      "properties": {
+        "secrets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "format": {
+          "type": "string"
+        },
+        "backend": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sudo": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "ssl": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "self_signed": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "user": {
+          "type": "string"
+        },
+        "key_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sudo_options": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "subscription_id": {
+          "type": "string"
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/notifications/notifications.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/notifications/rules": {
+      "get": {
+        "operationId": "ListRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleListResponse"
+            }
+          }
+        },
+        "tags": [
+          "Notifications"
+        ]
+      },
+      "post": {
+        "operationId": "AddRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleAddResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleAddRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/rules/{id}": {
+      "get": {
+        "operationId": "GetRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleGetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Notifications"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Notifications"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/version": {
+      "get": {
+        "operationId": "Version",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsVersionResponse"
+            }
+          }
+        },
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/webhook": {
+      "post": {
+        "operationId": "ValidateWebhook",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsURLValidationResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/notificationsURLValidationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Notifications"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "RuleEvent": {
+      "type": "string",
+      "enum": [
+        "CCRFailure",
+        "CCRSuccess",
+        "ComplianceFailure",
+        "ComplianceSuccess",
+        "Assets"
+      ],
+      "default": "CCRFailure"
+    },
+    "notificationsEmpty": {
+      "type": "object"
+    },
+    "notificationsRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "event": {
+          "$ref": "#/definitions/RuleEvent"
+        },
+        "SlackAlert": {
+          "$ref": "#/definitions/notificationsSlackAlert"
+        },
+        "WebhookAlert": {
+          "$ref": "#/definitions/notificationsWebhookAlert"
+        },
+        "ServiceNowAlert": {
+          "$ref": "#/definitions/notificationsServiceNowAlert"
+        }
+      }
+    },
+    "notificationsRuleAddRequest": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/notificationsRule"
+        }
+      }
+    },
+    "notificationsRuleAddResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsRuleDeleteResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notificationsRuleGetResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rule": {
+          "$ref": "#/definitions/notificationsRule"
+        }
+      }
+    },
+    "notificationsRuleListResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/notificationsRule"
+          }
+        }
+      }
+    },
+    "notificationsRuleUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/notificationsRule"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsRuleUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notificationsSecretId": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsServiceNowAlert": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "secret_id": {
+          "type": "string"
+        },
+        "critical_controls_only": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "notificationsSlackAlert": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsURLValidationRequest": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "username_password": {
+          "$ref": "#/definitions/notificationsUsernamePassword"
+        },
+        "secret_id": {
+          "$ref": "#/definitions/notificationsSecretId"
+        },
+        "none": {
+          "$ref": "#/definitions/notificationsEmpty"
+        }
+      }
+    },
+    "notificationsURLValidationResponse": {
+      "type": "object"
+    },
+    "notificationsUsernamePassword": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsVersionResponse": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsWebhookAlert": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/iam/v2beta/policy.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/iam/v2beta/policies": {
+      "get": {
+        "operationId": "ListPolicies",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListPoliciesResp"
+            }
+          }
+        },
+        "tags": [
+          "Policies"
+        ]
+      },
+      "post": {
+        "operationId": "CreatePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreatePolicyResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreatePolicyReq"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/iam/v2beta/policies/{id}": {
+      "get": {
+        "operationId": "GetPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetPolicyResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      },
+      "delete": {
+        "operationId": "DeletePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeletePolicyResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      },
+      "put": {
+        "operationId": "UpdatePolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdatePolicyResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdatePolicyReq"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/iam/v2beta/policies/{id}/members": {
+      "get": {
+        "operationId": "ListPolicyMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListPolicyMembersResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      },
+      "put": {
+        "operationId": "ReplacePolicyMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaReplacePolicyMembersResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaReplacePolicyMembersReq"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/iam/v2beta/policies/{id}/members:add": {
+      "post": {
+        "operationId": "AddPolicyMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaAddPolicyMembersResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaAddPolicyMembersReq"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/iam/v2beta/policies/{id}/members:remove": {
+      "post": {
+        "operationId": "RemovePolicyMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaRemovePolicyMembersResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaRemovePolicyMembersReq"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/iam/v2beta/policy_version": {
+      "get": {
+        "operationId": "GetPolicyVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetPolicyVersionResp"
+            }
+          }
+        },
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/iam/v2beta/projects": {
+      "get": {
+        "operationId": "ListProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListProjectsResp"
+            }
+          }
+        },
+        "tags": [
+          "Policies"
+        ]
+      },
+      "post": {
+        "operationId": "CreateProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateProjectResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateProjectReq"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/iam/v2beta/projects/{id}": {
+      "get": {
+        "operationId": "GetProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetProjectResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteProjectResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateProjectResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateProjectReq"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/iam/v2beta/roles": {
+      "get": {
+        "operationId": "ListRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListRolesResp"
+            }
+          }
+        },
+        "tags": [
+          "Policies"
+        ]
+      },
+      "post": {
+        "operationId": "CreateRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateRoleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateRoleReq"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    },
+    "/iam/v2beta/roles/{id}": {
+      "get": {
+        "operationId": "GetRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetRoleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteRoleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRoleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRoleReq"
+            }
+          }
+        ],
+        "tags": [
+          "Policies"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "StatementEffect": {
+      "type": "string",
+      "enum": [
+        "ALLOW",
+        "DENY"
+      ],
+      "default": "ALLOW"
+    },
+    "VersionVersionNumber": {
+      "type": "string",
+      "enum": [
+        "V0",
+        "V1",
+        "V2"
+      ],
+      "default": "V0"
+    },
+    "iamv2betaType": {
+      "type": "string",
+      "enum": [
+        "CHEF_MANAGED",
+        "CUSTOM"
+      ],
+      "default": "CHEF_MANAGED"
+    },
+    "v2betaAddPolicyMembersReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaAddPolicyMembersResp": {
+      "type": "object",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaCreatePolicyReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaStatement"
+          }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Does not contain type as the enduser can only create 'custom' policies."
+    },
+    "v2betaCreatePolicyResp": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "$ref": "#/definitions/v2betaPolicy"
+        }
+      }
+    },
+    "v2betaCreateProjectReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v2betaCreateProjectResp": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v2betaProject"
+        }
+      }
+    },
+    "v2betaCreateRoleReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Does not contain type as the enduser can only create 'custom' roles."
+    },
+    "v2betaCreateRoleResp": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v2betaRole"
+        }
+      }
+    },
+    "v2betaDeletePolicyResp": {
+      "type": "object"
+    },
+    "v2betaDeleteProjectResp": {
+      "type": "object"
+    },
+    "v2betaDeleteRoleResp": {
+      "type": "object"
+    },
+    "v2betaFlag": {
+      "type": "string",
+      "enum": [
+        "VERSION_2_0",
+        "VERSION_2_1"
+      ],
+      "default": "VERSION_2_0",
+      "title": "passed to UpgradeToV2 to set version"
+    },
+    "v2betaGetPolicyResp": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "$ref": "#/definitions/v2betaPolicy"
+        }
+      }
+    },
+    "v2betaGetPolicyVersionResp": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/v2betaVersion"
+        }
+      }
+    },
+    "v2betaGetProjectResp": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v2betaProject"
+        }
+      }
+    },
+    "v2betaGetRoleResp": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v2betaRole"
+        }
+      }
+    },
+    "v2betaListPoliciesResp": {
+      "type": "object",
+      "properties": {
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaPolicy"
+          }
+        }
+      }
+    },
+    "v2betaListPolicyMembersResp": {
+      "type": "object",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaListProjectsResp": {
+      "type": "object",
+      "properties": {
+        "projects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaProject"
+          }
+        }
+      }
+    },
+    "v2betaListRolesResp": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaRole"
+          }
+        }
+      }
+    },
+    "v2betaPolicy": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/iamv2betaType"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaStatement"
+          }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaProject": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/iamv2betaType"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaRemovePolicyMembersReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaRemovePolicyMembersResp": {
+      "type": "object",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaReplacePolicyMembersReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaReplacePolicyMembersResp": {
+      "type": "object",
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaResetToV1Resp": {
+      "type": "object"
+    },
+    "v2betaRole": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/iamv2betaType"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaStatement": {
+      "type": "object",
+      "properties": {
+        "effect": {
+          "$ref": "#/definitions/StatementEffect"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "inline definitions"
+        },
+        "role": {
+          "type": "string",
+          "title": "references"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Note: these are for display only, not to be set in CreatePolicy/UpdatePolicy"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaUpdatePolicyReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaStatement"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Does not contain type as the enduser can only create 'custom' policies."
+    },
+    "v2betaUpdatePolicyResp": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "$ref": "#/definitions/v2betaPolicy"
+        }
+      }
+    },
+    "v2betaUpdateProjectReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v2betaUpdateProjectResp": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v2betaProject"
+        }
+      }
+    },
+    "v2betaUpdateRoleReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaUpdateRoleResp": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v2betaRole"
+        }
+      }
+    },
+    "v2betaUpgradeToV2Resp": {
+      "type": "object",
+      "properties": {
+        "reports": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaVersion": {
+      "type": "object",
+      "properties": {
+        "major": {
+          "$ref": "#/definitions/VersionVersionNumber"
+        },
+        "minor": {
+          "$ref": "#/definitions/VersionVersionNumber"
+        }
+      },
+      "title": "the only values that may be returned by GetPolicyVersion"
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/compliance/profiles/profiles.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/compliance/market/read/{name}/version/{version}": {
+      "get": {
+        "operationId": "ReadFromMarket",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profile"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProfilesService"
+        ]
+      }
+    },
+    "/compliance/profiles/read/{owner}/{name}/version/{version}": {
+      "get": {
+        "operationId": "Read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profile"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProfilesService"
+        ]
+      }
+    },
+    "/compliance/profiles/search": {
+      "post": {
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profiles"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "ProfilesService"
+        ]
+      }
+    },
+    "/compliance/profiles/{owner}/{name}/version/{version}": {
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProfilesService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "QueryOrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeStreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Attribute": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/v1Option"
+        }
+      }
+    },
+    "v1CheckMessage": {
+      "type": "object",
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "column": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "control_id": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CheckResult": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "$ref": "#/definitions/v1ResultSummary"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1CheckMessage"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1CheckMessage"
+          }
+        }
+      }
+    },
+    "v1Chunk": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "byte"
+        },
+        "position": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1Control": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "desc": {
+          "type": "string"
+        },
+        "impact": {
+          "type": "number",
+          "format": "float"
+        },
+        "title": {
+          "type": "string"
+        },
+        "source_location": {
+          "$ref": "#/definitions/v1SourceLocation"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Result"
+          }
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Ref"
+          }
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1Dependency": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "git": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "supermarket": {
+          "type": "string"
+        },
+        "github": {
+          "type": "string"
+        },
+        "compliance": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Group": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ListFilter": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Metadata": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "content_type": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Option": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "default": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Profile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "copyright": {
+          "type": "string"
+        },
+        "copyright_email": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "supports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Support"
+          }
+        },
+        "depends": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Dependency"
+          }
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Group"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Control"
+          }
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Attribute"
+          }
+        },
+        "latest_version": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProfileData": {
+      "type": "object",
+      "properties": {
+        "owner": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v1Profiles": {
+      "type": "object",
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Profile"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Query": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ListFilter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/QueryOrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Ref": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Result": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "code_desc": {
+          "type": "string"
+        },
+        "run_time": {
+          "type": "number",
+          "format": "float"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "skip_message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ResultSummary": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "controls": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1SourceLocation": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Support": {
+      "type": "object",
+      "properties": {
+        "os_name": {
+          "type": "string"
+        },
+        "os_family": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        },
+        "inspec_version": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-stream-definitions": {
+    "v1ProfileData": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v1ProfileData"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of v1ProfileData"
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/compliance/reporting/reporting.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/compliance/reporting/nodes/id/{id}": {
+      "get": {
+        "operationId": "ReadNode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Node"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/compliance/reporting/nodes/search": {
+      "post": {
+        "operationId": "ListNodes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Nodes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/compliance/reporting/profiles": {
+      "post": {
+        "summary": "should cover /search/profiles",
+        "operationId": "ListProfiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ProfileMins"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/compliance/reporting/reports": {
+      "post": {
+        "summary": "should cover /reports",
+        "operationId": "ListReports",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Reports"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/compliance/reporting/reports/id/{id}": {
+      "post": {
+        "summary": "should cover /reports/:reportid",
+        "operationId": "ReadReport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Report"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/compliance/reporting/suggestions": {
+      "post": {
+        "summary": "should cover /suggestions",
+        "operationId": "ListSuggestions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Suggestions"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SuggestionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
+    "/compliance/reporting/version": {
+      "get": {
+        "operationId": "GetVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/versionVersionInfo"
+            }
+          }
+        },
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "QueryOrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeStreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Attribute": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/v1Option"
+        }
+      }
+    },
+    "v1Control": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "desc": {
+          "type": "string"
+        },
+        "impact": {
+          "type": "number",
+          "format": "float"
+        },
+        "title": {
+          "type": "string"
+        },
+        "source_location": {
+          "$ref": "#/definitions/v1SourceLocation"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Result"
+          }
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Ref"
+          }
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1ControlSummary": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "$ref": "#/definitions/v1Total"
+        },
+        "skipped": {
+          "$ref": "#/definitions/v1Total"
+        },
+        "failed": {
+          "$ref": "#/definitions/v1Failed"
+        }
+      }
+    },
+    "v1Dependency": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "git": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "supermarket": {
+          "type": "string"
+        },
+        "github": {
+          "type": "string"
+        },
+        "compliance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "skip_message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ExportData": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v1Failed": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "minor": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "major": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "critical": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Group": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v1Kv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "v1LatestReportSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string"
+        },
+        "controls": {
+          "$ref": "#/definitions/v1ControlSummary"
+        }
+      }
+    },
+    "v1ListFilter": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Node": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/definitions/v1Platform"
+        },
+        "environment": {
+          "type": "string"
+        },
+        "latest_report": {
+          "$ref": "#/definitions/v1LatestReportSummary"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Kv"
+          }
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProfileMeta"
+          }
+        }
+      }
+    },
+    "v1Nodes": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Node"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Option": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "default": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Platform": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Profile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "copyright": {
+          "type": "string"
+        },
+        "copyright_email": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "supports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Support"
+          }
+        },
+        "depends": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Dependency"
+          }
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Group"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Control"
+          }
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Attribute"
+          }
+        },
+        "latest_version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "skip_message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProfileCounts": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ProfileMeta": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProfileMin": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProfileMins": {
+      "type": "object",
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProfileMin"
+          }
+        },
+        "counts": {
+          "$ref": "#/definitions/v1ProfileCounts"
+        }
+      }
+    },
+    "v1Query": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ListFilter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/QueryOrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Ref": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Report": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "node_name": {
+          "type": "string"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string"
+        },
+        "controls": {
+          "$ref": "#/definitions/v1ControlSummary"
+        },
+        "environment": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/definitions/v1Platform"
+        },
+        "statistics": {
+          "$ref": "#/definitions/v1Statistics"
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Profile"
+          }
+        },
+        "job_id": {
+          "type": "string"
+        },
+        "ipaddress": {
+          "type": "string"
+        },
+        "fqdn": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Reports": {
+      "type": "object",
+      "properties": {
+        "reports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Report"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Result": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "code_desc": {
+          "type": "string"
+        },
+        "run_time": {
+          "type": "number",
+          "format": "float"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "skip_message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SourceLocation": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Statistics": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "v1Suggestion": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "format": "float"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "v1SuggestionRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ListFilter"
+          }
+        }
+      }
+    },
+    "v1Suggestions": {
+      "type": "object",
+      "properties": {
+        "suggestions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Suggestion"
+          }
+        }
+      }
+    },
+    "v1Support": {
+      "type": "object",
+      "properties": {
+        "os_name": {
+          "type": "string"
+        },
+        "os_family": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        },
+        "inspec_version": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Total": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "versionVersionInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "built": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "x-stream-definitions": {
+    "v1ExportData": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/v1ExportData"
+        },
+        "error": {
+          "$ref": "#/definitions/runtimeStreamError"
+        }
+      },
+      "title": "Stream result of v1ExportData"
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/iam/v2beta/rules.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/iam/v2beta/rules": {
+      "get": {
+        "operationId": "ListRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListRulesResp"
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      },
+      "post": {
+        "operationId": "CreateRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateRuleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateRuleReq"
+            }
+          }
+        ],
+        "tags": [
+          "Rules"
+        ]
+      }
+    },
+    "/iam/v2beta/rules/{id}": {
+      "get": {
+        "operationId": "GetRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetRuleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Rules"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteRuleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Rules"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateRule",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRuleResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRuleReq"
+            }
+          }
+        ],
+        "tags": [
+          "Rules"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "v2betaCondition": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v2betaConditionType"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "operator": {
+          "$ref": "#/definitions/v2betaConditionOperator"
+        }
+      }
+    },
+    "v2betaConditionOperator": {
+      "type": "string",
+      "enum": [
+        "CONDITION_OPERATOR_UNSET",
+        "MEMBER_OF",
+        "EQUALS"
+      ],
+      "default": "CONDITION_OPERATOR_UNSET"
+    },
+    "v2betaConditionType": {
+      "type": "string",
+      "enum": [
+        "CONDITION_TYPE_UNSET",
+        "CHEF_SERVERS",
+        "CHEF_ORGS",
+        "CHEF_ENVIRONMENTS",
+        "ROLES",
+        "CHEF_TAGS",
+        "POLICY_GROUP",
+        "POLICY_NAME"
+      ],
+      "default": "CONDITION_TYPE_UNSET"
+    },
+    "v2betaCreateRuleReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "project_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v2betaRuleType"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaCondition"
+          }
+        }
+      }
+    },
+    "v2betaCreateRuleResp": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v2betaRule"
+        }
+      }
+    },
+    "v2betaDeleteRuleResp": {
+      "type": "object"
+    },
+    "v2betaGetRuleResp": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v2betaRule"
+        }
+      }
+    },
+    "v2betaListRulesResp": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaRule"
+          }
+        }
+      }
+    },
+    "v2betaRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "project_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v2betaRuleType"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaCondition"
+          }
+        }
+      }
+    },
+    "v2betaRuleType": {
+      "type": "string",
+      "enum": [
+        "RULE_TYPE_UNSET",
+        "NODE",
+        "EVENT"
+      ],
+      "default": "RULE_TYPE_UNSET"
+    },
+    "v2betaUpdateRuleReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "project_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/v2betaRuleType"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaCondition"
+          }
+        }
+      }
+    },
+    "v2betaUpdateRuleResp": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/v2betaRule"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/compliance/reporting/stats/stats.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/compliance/reporting/stats/failures": {
+      "post": {
+        "operationId": "ReadFailures",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Failures"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "StatsService"
+        ]
+      }
+    },
+    "/compliance/reporting/stats/profiles": {
+      "post": {
+        "summary": "should cover /profiles, profiles/:profile-id/summary, profiles/:profile-id/controls",
+        "operationId": "ReadProfiles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profile"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "StatsService"
+        ]
+      }
+    },
+    "/compliance/reporting/stats/summary": {
+      "post": {
+        "summary": "should cover /summary, /summary/nodes, /summary/controls",
+        "operationId": "ReadSummary",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Summary"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "StatsService"
+        ]
+      }
+    },
+    "/compliance/reporting/stats/trend": {
+      "post": {
+        "summary": "should cover /trend/nodes, /trend/controls",
+        "operationId": "ReadTrend",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Trends"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "StatsService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "QueryOrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "v1ControlStats": {
+      "type": "object",
+      "properties": {
+        "control": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "impact": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "v1ControlsSummary": {
+      "type": "object",
+      "properties": {
+        "failures": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "majors": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "minors": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "criticals": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1FailureSummary": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "failures": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "id": {
+          "type": "string"
+        },
+        "profile": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Failures": {
+      "type": "object",
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1FailureSummary"
+          }
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1FailureSummary"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1FailureSummary"
+          }
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1FailureSummary"
+          }
+        }
+      }
+    },
+    "v1ListFilter": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "v1NodeSummary": {
+      "type": "object",
+      "properties": {
+        "compliant": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "noncompliant": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "high_risk": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "medium_risk": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "low_risk": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Profile": {
+      "type": "object",
+      "properties": {
+        "profile_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProfileList"
+          }
+        },
+        "profile_summary": {
+          "$ref": "#/definitions/v1ProfileSummary"
+        },
+        "control_stats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ControlStats"
+          }
+        }
+      }
+    },
+    "v1ProfileList": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "failures": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "majors": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "minors": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "criticals": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ProfileSummary": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "copyright": {
+          "type": "string"
+        },
+        "copyright_email": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "supports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Support"
+          }
+        },
+        "stats": {
+          "$ref": "#/definitions/v1ProfileSummaryStats"
+        }
+      }
+    },
+    "v1ProfileSummaryStats": {
+      "type": "object",
+      "properties": {
+        "failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failed_nodes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_nodes": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Query": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "interval": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ListFilter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/QueryOrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ReportSummary": {
+      "type": "object",
+      "properties": {
+        "stats": {
+          "$ref": "#/definitions/v1Stats"
+        },
+        "status": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "number",
+          "format": "double"
+        },
+        "start_date": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Stats": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "string",
+          "format": "int64"
+        },
+        "platforms": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "environments": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "profiles": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Summary": {
+      "type": "object",
+      "properties": {
+        "controls_summary": {
+          "$ref": "#/definitions/v1ControlsSummary"
+        },
+        "node_summary": {
+          "$ref": "#/definitions/v1NodeSummary"
+        },
+        "report_summary": {
+          "$ref": "#/definitions/v1ReportSummary"
+        }
+      }
+    },
+    "v1Support": {
+      "type": "object",
+      "properties": {
+        "os_name": {
+          "type": "string"
+        },
+        "os_family": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        },
+        "inspec_version": {
+          "type": "string"
+        },
+        "platform_name": {
+          "type": "string"
+        },
+        "platform_family": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Trend": {
+      "type": "object",
+      "properties": {
+        "report_time": {
+          "type": "string"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1Trends": {
+      "type": "object",
+      "properties": {
+        "trends": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Trend"
+          }
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/iam/v2beta/teams.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/iam/v2beta/teams": {
+      "get": {
+        "operationId": "ListTeams",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListTeamsResp"
+            }
+          }
+        },
+        "tags": [
+          "Teams"
+        ]
+      },
+      "post": {
+        "operationId": "CreateTeam",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateTeamResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateTeamReq"
+            }
+          }
+        ],
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/iam/v2beta/teams/{id}": {
+      "get": {
+        "operationId": "GetTeam",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetTeamResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Teams"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteTeam",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteTeamResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Teams"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateTeam",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateTeamResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateTeamReq"
+            }
+          }
+        ],
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/iam/v2beta/teams/{id}/users": {
+      "get": {
+        "operationId": "GetTeamMembership",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetTeamMembershipResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/iam/v2beta/teams/{id}/users:add": {
+      "post": {
+        "operationId": "AddTeamMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaAddTeamMembersResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaAddTeamMembersReq"
+            }
+          }
+        ],
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/iam/v2beta/teams/{id}/users:remove": {
+      "post": {
+        "operationId": "RemoveTeamMembers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaRemoveTeamMembersResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaRemoveTeamMembersReq"
+            }
+          }
+        ],
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
+    "/iam/v2beta/users/{id}/teams": {
+      "get": {
+        "operationId": "GetTeamsForMember",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetTeamsForMemberResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Teams"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "v2betaAddTeamMembersReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaAddTeamMembersResp": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaApplyV2DataMigrationsResp": {
+      "type": "object"
+    },
+    "v2betaCreateTeamReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaCreateTeamResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/v2betaTeam"
+        }
+      }
+    },
+    "v2betaDeleteTeamResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/v2betaTeam"
+        }
+      }
+    },
+    "v2betaGetTeamMembershipResp": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaGetTeamResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/v2betaTeam"
+        }
+      }
+    },
+    "v2betaGetTeamsForMemberResp": {
+      "type": "object",
+      "properties": {
+        "teams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaTeam"
+          }
+        }
+      }
+    },
+    "v2betaListTeamsResp": {
+      "type": "object",
+      "properties": {
+        "teams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaTeam"
+          }
+        }
+      }
+    },
+    "v2betaRemoveTeamMembersReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaRemoveTeamMembersResp": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaTeam": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaUpdateTeamReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaUpdateTeamResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/v2betaTeam"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/telemetry/telemetry.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/telemetry/config": {
+      "get": {
+        "operationId": "GetTelemetryConfiguration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/telemetryTelemetryResponse"
+            }
+          }
+        },
+        "tags": [
+          "Telemetry"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "telemetryTelemetryResponse": {
+      "type": "object",
+      "properties": {
+        "license_id": {
+          "type": "string"
+        },
+        "customer_name": {
+          "type": "string"
+        },
+        "customer_id": {
+          "type": "string"
+        },
+        "license_type": {
+          "type": "string"
+        },
+        "telemetry_enabled": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "telemetry_url": {
+          "type": "string"
+        },
+        "max_nodes": {
+          "type": "string",
+          "format": "int64"
+        },
+        "deployment_id": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/iam/v2beta/tokens.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/iam/v2beta/tokens": {
+      "get": {
+        "operationId": "ListTokens",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListTokensResp"
+            }
+          }
+        },
+        "tags": [
+          "Tokens"
+        ]
+      },
+      "post": {
+        "operationId": "CreateToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateTokenResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateTokenReq"
+            }
+          }
+        ],
+        "tags": [
+          "Tokens"
+        ]
+      }
+    },
+    "/iam/v2beta/tokens/{id}": {
+      "get": {
+        "operationId": "GetToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetTokenResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Tokens"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteTokenResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Tokens"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateTokenResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ID can't be changed; ID used to discover token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateTokenReq"
+            }
+          }
+        ],
+        "tags": [
+          "Tokens"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "v2betaCreateTokenReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "value": {
+          "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaCreateTokenResp": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/v2betaToken"
+        }
+      }
+    },
+    "v2betaDeleteTokenResp": {
+      "type": "object"
+    },
+    "v2betaGetTokenResp": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/v2betaToken"
+        }
+      }
+    },
+    "v2betaListTokensResp": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaToken"
+          }
+        }
+      }
+    },
+    "v2betaToken": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaUpdateTokenReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "ID can't be changed; ID used to discover token"
+        },
+        "name": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v2betaUpdateTokenResp": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/v2betaToken"
+        }
+      }
+    }
+  }
+}
+;
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "components/automate-gateway/api/iam/v2beta/users.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/iam/v2beta/self/{id}": {
+      "put": {
+        "operationId": "UpdateSelf",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateSelfResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The id cannot be changed, it's for determining which user this is supposed\nto update",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateSelfReq"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/iam/v2beta/users": {
+      "get": {
+        "operationId": "ListUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListUsersResp"
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
+      "post": {
+        "operationId": "CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateUserResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateUserReq"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/iam/v2beta/users/{id}": {
+      "get": {
+        "operationId": "GetUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetUserResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "DeleteUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteUserResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateUserResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "The id cannot be changed, it's for determining which user this is supposed\nto update",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateUserReq"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "v2betaCreateUserReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "v2betaCreateUserResp": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v2betaUser"
+        }
+      }
+    },
+    "v2betaDeleteUserResp": {
+      "type": "object"
+    },
+    "v2betaGetUserResp": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v2betaUser"
+        }
+      }
+    },
+    "v2betaListUsersResp": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v2betaUser"
+          }
+        }
+      }
+    },
+    "v2betaUpdateSelfReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "The id cannot be changed, it's for determining which user this is supposed\nto update"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string",
+          "description": "Note: for UpdateSelfReq, the password and previous_password are optional,\nbut if passed, they must both be passed."
+        },
+        "previous_password": {
+          "type": "string"
+        }
+      }
+    },
+    "v2betaUpdateSelfResp": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v2betaUser"
+        }
+      }
+    },
+    "v2betaUpdateUserReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "The id cannot be changed, it's for determining which user this is supposed\nto update"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "v2betaUpdateUserResp": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v2betaUser"
+        }
+      }
+    },
+    "v2betaUser": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "membership_id": {
+          "type": "string",
+          "title": "TODO (tc): Will remove post-GA"
+        }
+      }
+    }
+  }
+}
+;

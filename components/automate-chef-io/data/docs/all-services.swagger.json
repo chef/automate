@@ -1,0 +1,5674 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "title": "api/external/secrets/secrets.proto",
+    "version": "version not set"
+  },
+  "paths": {
+    "/auth/introspect": {
+      "get": {
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "IntrospectAll",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseIntrospectResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "Introspect",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestIntrospectReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseIntrospectResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/introspect_projects": {
+      "get": {
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "IntrospectAllProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseIntrospectProjectsResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/introspect_some": {
+      "post": {
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "IntrospectSome",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestIntrospectSomeReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseIntrospectResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/policies": {
+      "get": {
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "ListPoliciesMixin22",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseListPoliciesResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "CreatePolicyMixin22",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestCreatePolicyReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseCreatePolicyResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/policies/version": {
+      "get": {
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "GetVersionMixin22",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/versionVersionInfo"
+            }
+          }
+        }
+      }
+    },
+    "/auth/policies/{id}": {
+      "delete": {
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "DeletePolicyMixin22",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseDeletePolicyResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/teams": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "GetTeams",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseTeams"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "CreateTeam",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestCreateTeamReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseCreateTeamResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/teams/version": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "GetVersionMixin9",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/versionVersionInfo"
+            }
+          }
+        }
+      }
+    },
+    "/auth/teams/{id}": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "GetTeam",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseGetTeamResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "UpdateTeam",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestUpdateTeamReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseUpdateTeamResp"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "DeleteTeam",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseDeleteTeamResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/teams/{id}/users": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "GetUsersMixin9",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseGetUsersResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "RemoveUsers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestRemoveUsersReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseRemoveUsersResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "AddUsers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestAddUsersReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseAddUsersResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/tokens": {
+      "get": {
+        "tags": [
+          "TokensMgmt"
+        ],
+        "operationId": "GetTokens",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseTokens"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "TokensMgmt"
+        ],
+        "operationId": "CreateToken",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestCreateToken"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseToken"
+            }
+          }
+        }
+      }
+    },
+    "/auth/tokens/{id}": {
+      "get": {
+        "tags": [
+          "TokensMgmt"
+        ],
+        "operationId": "GetToken",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseToken"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "TokensMgmt"
+        ],
+        "operationId": "UpdateToken",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestUpdateToken"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseToken"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "TokensMgmt"
+        ],
+        "operationId": "DeleteToken",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseDeleteTokenResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/users": {
+      "get": {
+        "tags": [
+          "UsersMgmt"
+        ],
+        "operationId": "GetUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseUsers"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "UsersMgmt"
+        ],
+        "operationId": "CreateUser",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestCreateUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseUser"
+            }
+          }
+        }
+      }
+    },
+    "/auth/users/{id}/teams": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "GetTeamsForUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseGetTeamsForUserResp"
+            }
+          }
+        }
+      }
+    },
+    "/auth/users/{username}": {
+      "get": {
+        "tags": [
+          "UsersMgmt"
+        ],
+        "operationId": "GetUserByUsername",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "username",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseUser"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "UsersMgmt"
+        ],
+        "operationId": "UpdateUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "username",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestUpdateUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseUser"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "UsersMgmt"
+        ],
+        "operationId": "DeleteUserByUsername",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "username",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseDeleteUserResp"
+            }
+          }
+        }
+      }
+    },
+    "/beta/applications/service-groups": {
+      "get": {
+        "tags": [
+          "ApplicationsService"
+        ],
+        "operationId": "GetServiceGroups",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sorting.field",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "type": "string",
+            "default": "ASC",
+            "name": "sorting.order",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsServiceGroups"
+            }
+          }
+        }
+      }
+    },
+    "/beta/applications/service-groups/{service_group_id}": {
+      "get": {
+        "tags": [
+          "ApplicationsService"
+        ],
+        "operationId": "GetServicesBySG",
+        "parameters": [
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "service_group_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sorting.field",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "type": "string",
+            "default": "ASC",
+            "name": "sorting.order",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "health",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsServicesBySGRes"
+            }
+          }
+        }
+      }
+    },
+    "/beta/applications/service_groups_health_counts": {
+      "get": {
+        "tags": [
+          "ApplicationsService"
+        ],
+        "operationId": "GetServiceGroupsHealthCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsHealthCounts"
+            }
+          }
+        }
+      }
+    },
+    "/beta/applications/services": {
+      "get": {
+        "tags": [
+          "ApplicationsService"
+        ],
+        "operationId": "GetServices",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sorting.field",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "type": "string",
+            "default": "ASC",
+            "name": "sorting.order",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsServicesRes"
+            }
+          }
+        }
+      }
+    },
+    "/beta/applications/version": {
+      "get": {
+        "tags": [
+          "ApplicationsService"
+        ],
+        "operationId": "GetVersionMixin2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/versionVersionInfo"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/nodes": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetNodes",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "sorting.field",
+            "in": "query"
+          },
+          {
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "type": "string",
+            "default": "ASC",
+            "name": "sorting.order",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protobufListValue"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/nodes/{node_id}/attribute": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetAttributes",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "node_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseNodeAttribute"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/nodes/{node_id}/runs": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetRuns",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "node_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.page",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "pagination.size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "TODO: (@afiune) Should we standardize these parameters as well?.",
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "end",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protobufListValue"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/nodes/{node_id}/runs/{run_id}": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetNodeRun",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "node_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "run_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "name": "end_time",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseRun"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/organizations": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetOrganizations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protobufListValue"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/policy_revision/{revision_id}": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetPolicyCookbooks",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "revision_id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responsePolicyCookbooks"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/source_fqdns": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetSourceFqdns",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protobufListValue"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/stats/node_counts": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetNodesCounts",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cfgmgmtresponseNodesCounts"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/stats/run_counts": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetRunsCounts",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "end",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "node_id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/cfgmgmtresponseRunsCounts"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/suggestions": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetSuggestions",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "text",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protobufListValue"
+            }
+          }
+        }
+      }
+    },
+    "/cfgmgmt/version": {
+      "get": {
+        "tags": [
+          "ConfigMgmt"
+        ],
+        "operationId": "GetVersionMixin3",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/versionVersionInfo"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/market/read/{name}/version/{version}": {
+      "get": {
+        "tags": [
+          "ProfilesService"
+        ],
+        "operationId": "ReadFromMarket",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "version",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "owner",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profile"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/profiles/read/{owner}/{name}/version/{version}": {
+      "get": {
+        "tags": [
+          "ProfilesService"
+        ],
+        "operationId": "ReadMixin14",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "owner",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "version",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profile"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/profiles/search": {
+      "post": {
+        "tags": [
+          "ProfilesService"
+        ],
+        "operationId": "ListMixin14",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profiles"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/profiles/{owner}/{name}/version/{version}": {
+      "delete": {
+        "tags": [
+          "ProfilesService"
+        ],
+        "operationId": "DeleteMixin14",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "owner",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "version",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/compliance/reporting/nodes/id/{id}": {
+      "get": {
+        "tags": [
+          "ReportingService"
+        ],
+        "operationId": "ReadNode",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Node"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/nodes/search": {
+      "post": {
+        "tags": [
+          "ReportingService"
+        ],
+        "operationId": "ListNodes",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Nodes"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/profiles": {
+      "post": {
+        "tags": [
+          "ReportingService"
+        ],
+        "summary": "should cover /search/profiles",
+        "operationId": "ListProfiles",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ProfileMins"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/reports": {
+      "post": {
+        "tags": [
+          "ReportingService"
+        ],
+        "summary": "should cover /reports",
+        "operationId": "ListReports",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Reports"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/reports/id/{id}": {
+      "post": {
+        "tags": [
+          "ReportingService"
+        ],
+        "summary": "should cover /reports/:reportid",
+        "operationId": "ReadReport",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Report"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/stats/failures": {
+      "post": {
+        "tags": [
+          "StatsService"
+        ],
+        "operationId": "ReadFailures",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Failures"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/stats/profiles": {
+      "post": {
+        "tags": [
+          "StatsService"
+        ],
+        "summary": "should cover /profiles, profiles/:profile-id/summary, profiles/:profile-id/controls",
+        "operationId": "ReadProfiles",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Profile"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/stats/summary": {
+      "post": {
+        "tags": [
+          "StatsService"
+        ],
+        "summary": "should cover /summary, /summary/nodes, /summary/controls",
+        "operationId": "ReadSummary",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Summary"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/stats/trend": {
+      "post": {
+        "tags": [
+          "StatsService"
+        ],
+        "summary": "should cover /trend/nodes, /trend/controls",
+        "operationId": "ReadTrend",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Trends"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/suggestions": {
+      "post": {
+        "tags": [
+          "ReportingService"
+        ],
+        "summary": "should cover /suggestions",
+        "operationId": "ListSuggestions",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1SuggestionRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Suggestions"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/reporting/version": {
+      "get": {
+        "tags": [
+          "ReportingService"
+        ],
+        "operationId": "GetVersionMixin12",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/versionVersionInfo"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/scanner/jobs": {
+      "post": {
+        "tags": [
+          "JobsService"
+        ],
+        "operationId": "CreateMixin15",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Job"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Id"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/scanner/jobs/id/{id}": {
+      "get": {
+        "tags": [
+          "JobsService"
+        ],
+        "operationId": "ReadMixin15",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Job"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "JobsService"
+        ],
+        "operationId": "UpdateMixin15",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Job"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "JobsService"
+        ],
+        "operationId": "DeleteMixin15",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/compliance/scanner/jobs/rerun/id/{id}": {
+      "get": {
+        "tags": [
+          "JobsService"
+        ],
+        "operationId": "RerunMixin15",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RerunResponse"
+            }
+          }
+        }
+      }
+    },
+    "/compliance/scanner/jobs/search": {
+      "post": {
+        "tags": [
+          "JobsService"
+        ],
+        "operationId": "ListMixin15",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Jobs"
+            }
+          }
+        }
+      }
+    },
+    "/deployment/service_versions": {
+      "get": {
+        "tags": [
+          "Deployment"
+        ],
+        "operationId": "ServiceVersions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/deploymentServiceVersionsResponse"
+            }
+          }
+        }
+      }
+    },
+    "/event_task_counts": {
+      "get": {
+        "tags": [
+          "EventFeed"
+        ],
+        "operationId": "GetEventTaskCounts",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "end",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseEventCounts"
+            }
+          }
+        }
+      }
+    },
+    "/event_type_counts": {
+      "get": {
+        "tags": [
+          "EventFeed"
+        ],
+        "operationId": "GetEventTypeCounts",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "end",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseEventCounts"
+            }
+          }
+        }
+      }
+    },
+    "/eventfeed": {
+      "get": {
+        "tags": [
+          "EventFeed"
+        ],
+        "operationId": "GetEventFeed",
+        "parameters": [
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "end",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "page_size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "after",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "before",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "format": "boolean",
+            "name": "collapse",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseEvents"
+            }
+          }
+        }
+      }
+    },
+    "/events/data-collector": {
+      "get": {
+        "tags": [
+          "LegacyDataCollector"
+        ],
+        "summary": "This is used by chef-server, it requests a GET /data-collector/v0 to check\nAutomate's status.\nWe proxy /data-collector/v0 to /api/v0/events/data-collector, so this is\nwhere we need to respond.\nSince this is for legacy-support only, we don't bother much about having\ngoogle.protobuf.Empty as argument.",
+        "operationId": "Status",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/legacyStatusResponse"
+            }
+          }
+        }
+      }
+    },
+    "/eventstrings": {
+      "get": {
+        "tags": [
+          "EventFeed"
+        ],
+        "operationId": "GetEventStringBuckets",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "start",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "end",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "timezone",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int32",
+            "name": "hours_between",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi",
+            "name": "filter",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/event_feedresponseEventStrings"
+            }
+          }
+        }
+      }
+    },
+    "/gateway/health": {
+      "get": {
+        "tags": [
+          "Gateway"
+        ],
+        "operationId": "GetHealth",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiHealth"
+            }
+          }
+        }
+      }
+    },
+    "/gateway/version": {
+      "get": {
+        "tags": [
+          "Gateway"
+        ],
+        "operationId": "GetVersionMixin25",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiVersion"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/policies": {
+      "get": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "ListPolicies",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListPoliciesResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "CreatePolicy",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreatePolicyReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreatePolicyResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/policies/{id}": {
+      "get": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "GetPolicy",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetPolicyResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "UpdatePolicy",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdatePolicyReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdatePolicyResp"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "DeletePolicy",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeletePolicyResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/policies/{id}/members": {
+      "get": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "ListPolicyMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListPolicyMembersResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "ReplacePolicyMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaReplacePolicyMembersReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaReplacePolicyMembersResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/policies/{id}/members:add": {
+      "post": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "AddPolicyMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaAddPolicyMembersReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaAddPolicyMembersResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/policies/{id}/members:remove": {
+      "post": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "RemovePolicyMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaRemovePolicyMembersReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaRemovePolicyMembersResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/policy_version": {
+      "get": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "GetPolicyVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetPolicyVersionResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/projects": {
+      "get": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "ListProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListProjectsResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "CreateProject",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateProjectReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateProjectResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/projects/{id}": {
+      "get": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "GetProject",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetProjectResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "UpdateProject",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateProjectReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateProjectResp"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "DeleteProject",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteProjectResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/projects/{id}/rules": {
+      "get": {
+        "tags": [
+          "Rules"
+        ],
+        "operationId": "ListRulesForProject",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListRulesForProjectResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/roles": {
+      "get": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "ListRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListRolesResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "CreateRole",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateRoleReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateRoleResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/roles/{id}": {
+      "get": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "GetRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetRoleResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "UpdateRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRoleReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRoleResp"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Policies"
+        ],
+        "operationId": "DeleteRole",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteRoleResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/rules": {
+      "get": {
+        "tags": [
+          "Rules"
+        ],
+        "operationId": "ListRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListRulesResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Rules"
+        ],
+        "operationId": "CreateRule",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateRuleReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateRuleResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/rules/{id}": {
+      "get": {
+        "tags": [
+          "Rules"
+        ],
+        "operationId": "GetRule",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetRuleResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Rules"
+        ],
+        "operationId": "UpdateRule",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRuleReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateRuleResp"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rules"
+        ],
+        "operationId": "DeleteRule",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteRuleResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/self/{id}": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "UpdateSelfMixin16",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id cannot be changed, it's for determining which user this is supposed\nto update",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateSelfReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateSelfResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/teams": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "ListTeams",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListTeamsResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "CreateTeamMixin19",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateTeamReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateTeamResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/teams/{id}": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "GetTeamMixin19",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetTeamResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "UpdateTeamMixin19",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateTeamReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateTeamResp"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "DeleteTeamMixin19",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteTeamResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/teams/{id}/users": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "GetTeamMembership",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetTeamMembershipResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/teams/{id}/users:add": {
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "AddTeamMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaAddTeamMembersReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaAddTeamMembersResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/teams/{id}/users:remove": {
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "RemoveTeamMembers",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaRemoveTeamMembersReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaRemoveTeamMembersResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/tokens": {
+      "get": {
+        "tags": [
+          "Tokens"
+        ],
+        "operationId": "ListTokens",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListTokensResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tokens"
+        ],
+        "operationId": "CreateTokenMixin18",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateTokenReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateTokenResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/tokens/{id}": {
+      "get": {
+        "tags": [
+          "Tokens"
+        ],
+        "operationId": "GetTokenMixin18",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetTokenResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tokens"
+        ],
+        "operationId": "UpdateTokenMixin18",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "ID can't be changed; ID used to discover token",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateTokenReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateTokenResp"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tokens"
+        ],
+        "operationId": "DeleteTokenMixin18",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteTokenResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "ListUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaListUsersResp"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "CreateUserMixin16",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateUserReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaCreateUserResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetUserResp"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "UpdateUserMixin16",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id cannot be changed, it's for determining which user this is supposed\nto update",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateUserReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaUpdateUserResp"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "DeleteUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaDeleteUserResp"
+            }
+          }
+        }
+      }
+    },
+    "/iam/v2beta/users/{id}/teams": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "operationId": "GetTeamsForMember",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaGetTeamsForMemberResp"
+            }
+          }
+        }
+      }
+    },
+    "/ingest/events/chef/action": {
+      "post": {
+        "tags": [
+          "ChefIngester"
+        ],
+        "operationId": "ProcessChefAction",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestAction"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseProcessChefActionResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ingest/events/chef/liveness": {
+      "post": {
+        "tags": [
+          "ChefIngester"
+        ],
+        "operationId": "ProcessLivenessPing",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestLiveness"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseProcessLivenessResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ingest/events/chef/node-multiple-deletes": {
+      "post": {
+        "tags": [
+          "ChefIngester"
+        ],
+        "operationId": "ProcessMultipleNodeDeletes",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestMultipleNodeDeleteRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseProcessMultipleNodeDeleteResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ingest/events/chef/nodedelete": {
+      "post": {
+        "tags": [
+          "ChefIngester"
+        ],
+        "operationId": "ProcessNodeDelete",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestDelete"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseProcessNodeDeleteResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ingest/events/chef/run": {
+      "post": {
+        "tags": [
+          "ChefIngester"
+        ],
+        "operationId": "ProcessChefRun",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestRun"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseProcessChefRunResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ingest/version": {
+      "get": {
+        "tags": [
+          "ChefIngester"
+        ],
+        "operationId": "GetVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/versionVersionInfo"
+            }
+          }
+        }
+      }
+    },
+    "/license/apply": {
+      "post": {
+        "tags": [
+          "License"
+        ],
+        "operationId": "ApplyLicense",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/licenseApplyLicenseReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/licenseApplyLicenseResp"
+            }
+          }
+        }
+      }
+    },
+    "/license/request": {
+      "post": {
+        "tags": [
+          "License"
+        ],
+        "operationId": "RequestLicense",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/licenseRequestLicenseReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/licenseRequestLicenseResp"
+            }
+          }
+        }
+      }
+    },
+    "/license/status": {
+      "get": {
+        "tags": [
+          "License"
+        ],
+        "operationId": "GetStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/licenseGetStatusResp"
+            }
+          }
+        }
+      }
+    },
+    "/nodemanagers": {
+      "post": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "CreateMixin7",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1NodeManager"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Ids"
+            }
+          }
+        }
+      }
+    },
+    "/nodemanagers/id/{id}": {
+      "get": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "ReadMixin7",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NodeManager"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "UpdateMixin7",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1NodeManager"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "DeleteMixin7",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/nodemanagers/id/{id}/with-node-state/stopped": {
+      "delete": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "DeleteWithNodeStateStopped",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/nodemanagers/id/{id}/with-node-state/terminated": {
+      "delete": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "DeleteWithNodeStateTerminated",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/nodemanagers/id/{id}/with-nodes": {
+      "delete": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "DeleteWithNodes",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Ids"
+            }
+          }
+        }
+      }
+    },
+    "/nodemanagers/id/{node_manager_id}/search-fields": {
+      "post": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "SearchNodeFields",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "node_manager_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1FieldQuery"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Fields"
+            }
+          }
+        }
+      }
+    },
+    "/nodemanagers/id/{node_manager_id}/search-nodes": {
+      "post": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "SearchNodes",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "node_manager_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1NodeQuery"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Nodes"
+            }
+          }
+        }
+      }
+    },
+    "/nodemanagers/rerun/id/{id}": {
+      "post": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "Connect",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ConnectResponse"
+            }
+          }
+        }
+      }
+    },
+    "/nodemanagers/search": {
+      "post": {
+        "tags": [
+          "NodeManagerService"
+        ],
+        "operationId": "ListMixin7",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1NodeManagers"
+            }
+          }
+        }
+      }
+    },
+    "/nodes": {
+      "post": {
+        "tags": [
+          "NodesService"
+        ],
+        "operationId": "CreateMixin6",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Node"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Id"
+            }
+          }
+        }
+      }
+    },
+    "/nodes/bulk-create": {
+      "post": {
+        "tags": [
+          "NodesService"
+        ],
+        "operationId": "BulkCreate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Nodes"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Ids"
+            }
+          }
+        }
+      }
+    },
+    "/nodes/delete": {
+      "post": {
+        "tags": [
+          "NodesService"
+        ],
+        "operationId": "BulkDelete",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BulkDeleteResponse"
+            }
+          }
+        }
+      }
+    },
+    "/nodes/delete/ids": {
+      "post": {
+        "tags": [
+          "NodesService"
+        ],
+        "operationId": "BulkDeleteById",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Ids"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BulkDeleteResponse"
+            }
+          }
+        }
+      }
+    },
+    "/nodes/id/{id}": {
+      "get": {
+        "tags": [
+          "NodesService"
+        ],
+        "operationId": "ReadMixin6",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Node"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "NodesService"
+        ],
+        "operationId": "UpdateMixin6",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Node"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "NodesService"
+        ],
+        "operationId": "DeleteMixin6",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/nodes/rerun/id/{id}": {
+      "get": {
+        "tags": [
+          "NodesService"
+        ],
+        "operationId": "Rerun",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RerunResponse"
+            }
+          }
+        }
+      }
+    },
+    "/nodes/search": {
+      "post": {
+        "tags": [
+          "NodesService"
+        ],
+        "operationId": "ListMixin6",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Nodes"
+            }
+          }
+        }
+      }
+    },
+    "/notifications/rules": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "ListRulesMixin24",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleListResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "AddRule",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleAddRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleAddResponse"
+            }
+          }
+        }
+      }
+    },
+    "/notifications/rules/{id}": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "GetRuleMixin24",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleGetResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "UpdateRuleMixin24",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleUpdateResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "DeleteRuleMixin24",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsRuleDeleteResponse"
+            }
+          }
+        }
+      }
+    },
+    "/notifications/version": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "Version",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsVersionResponse"
+            }
+          }
+        }
+      }
+    },
+    "/notifications/webhook": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "ValidateWebhook",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/notificationsURLValidationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/notificationsURLValidationResponse"
+            }
+          }
+        }
+      }
+    },
+    "/retention/nodes/delete-nodes/config": {
+      "post": {
+        "tags": [
+          "JobScheduler"
+        ],
+        "operationId": "ConfigureDeleteNodesScheduler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestSchedulerConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseConfigureDeleteNodesScheduler"
+            }
+          }
+        }
+      }
+    },
+    "/retention/nodes/missing-nodes-deletion/config": {
+      "post": {
+        "tags": [
+          "JobScheduler"
+        ],
+        "operationId": "ConfigureMissingNodesForDeletionScheduler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestSchedulerConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseConfigureMissingNodesForDeletionScheduler"
+            }
+          }
+        }
+      }
+    },
+    "/retention/nodes/missing-nodes/config": {
+      "post": {
+        "tags": [
+          "JobScheduler"
+        ],
+        "operationId": "ConfigureNodesMissingScheduler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestSchedulerConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseConfigureNodesMissingScheduler"
+            }
+          }
+        }
+      }
+    },
+    "/retention/nodes/status": {
+      "get": {
+        "tags": [
+          "JobScheduler"
+        ],
+        "operationId": "GetStatusJobScheduler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseJobSchedulerStatus"
+            }
+          }
+        }
+      }
+    },
+    "/secrets": {
+      "post": {
+        "tags": [
+          "SecretsService"
+        ],
+        "operationId": "Create",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/secretsSecret"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsId"
+            }
+          }
+        }
+      }
+    },
+    "/secrets/id/{id}": {
+      "get": {
+        "tags": [
+          "SecretsService"
+        ],
+        "operationId": "Read",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsSecret"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "SecretsService"
+        ],
+        "operationId": "Delete",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsDeleteResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "SecretsService"
+        ],
+        "operationId": "Update",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/secretsSecret"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsUpdateResponse"
+            }
+          }
+        }
+      }
+    },
+    "/secrets/search": {
+      "post": {
+        "tags": [
+          "SecretsService"
+        ],
+        "operationId": "List",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/secretsQuery"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/secretsSecrets"
+            }
+          }
+        }
+      }
+    },
+    "/telemetry/config": {
+      "get": {
+        "tags": [
+          "Telemetry"
+        ],
+        "operationId": "GetTelemetryConfiguration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/telemetryTelemetryResponse"
+            }
+          }
+        }
+      }
+    },
+    "/users/{username}": {
+      "put": {
+        "tags": [
+          "UsersMgmt"
+        ],
+        "operationId": "UpdateSelf",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "username",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/requestUpdateSelf"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/responseUser"
+            }
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "tags": [
+          "Deployment"
+        ],
+        "operationId": "GetVersionMixin21",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/deploymentVersion"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "GetStatusRespDateRange": {
+      "type": "object",
+      "properties": {
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "LastContactDataStatus": {
+      "type": "string",
+      "default": "UNKNOWN",
+      "enum": [
+        "UNKNOWN",
+        "PASSED",
+        "FAILED",
+        "SKIPPED"
+      ]
+    },
+    "QueryOrderType": {
+      "type": "string",
+      "default": "ASC",
+      "enum": [
+        "ASC",
+        "DESC"
+      ]
+    },
+    "RuleEvent": {
+      "type": "string",
+      "default": "CCRFailure",
+      "enum": [
+        "CCRFailure",
+        "CCRSuccess",
+        "ComplianceFailure",
+        "ComplianceSuccess",
+        "Assets"
+      ]
+    },
+    "StatementEffect": {
+      "type": "string",
+      "default": "ALLOW",
+      "enum": [
+        "ALLOW",
+        "DENY"
+      ]
+    },
+    "VersionVersionNumber": {
+      "type": "string",
+      "default": "V0",
+      "enum": [
+        "V0",
+        "V1",
+        "V2"
+      ]
+    },
+    "apiHealth": {
+      "description": "The automate-gateway service health is constructed with:\n* Status:\n           =\u003e ok:             Everything is alright\n           =\u003e initialization: The service is in its initialization process\n           =\u003e warning:        Something might be wrong?\n           =\u003e critical:       Something is wrong!\n\n@afiune: Here we can add more health information to the response",
+      "type": "object",
+      "title": "Health message",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "apiVersion": {
+      "description": "The service version constructed with:\n* Service name\n* Built time\n* Semantic version\n* Git SHA",
+      "type": "object",
+      "title": "Version message",
+      "properties": {
+        "built": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "applicationsHealthCounts": {
+      "type": "object",
+      "properties": {
+        "critical": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ok": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "unknown": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "warning": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "applicationsHealthStatus": {
+      "type": "string",
+      "title": "The HealthStatus enum matches the habitat implementation for health-check status:\n=\u003e https://www.habitat.sh/docs/reference/#health-check",
+      "default": "OK",
+      "enum": [
+        "OK",
+        "WARNING",
+        "CRITICAL",
+        "UNKNOWN"
+      ]
+    },
+    "applicationsService": {
+      "type": "object",
+      "properties": {
+        "application": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "string"
+        },
+        "fqdn": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "health_check": {
+          "$ref": "#/definitions/applicationsHealthStatus"
+        },
+        "release": {
+          "type": "string"
+        },
+        "site": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/applicationsServiceStatus"
+        },
+        "supervisor_id": {
+          "type": "string"
+        }
+      }
+    },
+    "applicationsServiceGroup": {
+      "type": "object",
+      "title": "A service group message is the representation of one single service group that\nis internally generated by aggregating all the services",
+      "properties": {
+        "application": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "string"
+        },
+        "health_percentage": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The health_percentage can be a number between 0-100"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string",
+          "title": "This field is the full package identifier combined in a single string like:\nExample: core/redis/0.1.0/8743278934278923"
+        },
+        "services_health_counts": {
+          "$ref": "#/definitions/applicationsHealthCounts"
+        },
+        "status": {
+          "$ref": "#/definitions/applicationsHealthStatus"
+        }
+      }
+    },
+    "applicationsServiceGroups": {
+      "type": "object",
+      "properties": {
+        "service_groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/applicationsServiceGroup"
+          }
+        }
+      }
+    },
+    "applicationsServiceStatus": {
+      "type": "string",
+      "title": "The ServiceStatus enum describes the status of the service\n@afiune have we defined these states somewhere?",
+      "default": "RUNNING",
+      "enum": [
+        "RUNNING",
+        "INITIALIZING",
+        "DEPLOYING",
+        "DOWN"
+      ]
+    },
+    "applicationsServicesBySGRes": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/applicationsService"
+          }
+        },
+        "services_health_counts": {
+          "$ref": "#/definitions/applicationsHealthCounts"
+        }
+      }
+    },
+    "applicationsServicesRes": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/applicationsService"
+          }
+        }
+      }
+    },
+    "cfgmgmtresponseNodesCounts": {
+      "type": "object",
+      "properties": {
+        "failure": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "missing": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "success": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "cfgmgmtresponseRunsCounts": {
+      "type": "object",
+      "properties": {
+        "failure": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "success": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "commonFilter": {
+      "type": "object",
+      "properties": {
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "key": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "commonKv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "deploymentServiceVersion": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "deploymentServiceVersionsResponse": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/deploymentServiceVersion"
+          }
+        }
+      }
+    },
+    "deploymentVersion": {
+      "description": "The manifest version constructed with:\n* build_timestamp",
+      "type": "object",
+      "title": "Version message",
+      "properties": {
+        "build_timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "event_feedresponseEventStrings": {
+      "type": "object",
+      "properties": {
+        "end": {
+          "type": "string"
+        },
+        "hours_between": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "start": {
+          "type": "string"
+        },
+        "strings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/responseEventString"
+          }
+        }
+      }
+    },
+    "iamv2betaType": {
+      "type": "string",
+      "default": "CHEF_MANAGED",
+      "enum": [
+        "CHEF_MANAGED",
+        "CUSTOM"
+      ]
+    },
+    "legacyStatusResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "licenseApplyLicenseReq": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "string"
+        }
+      }
+    },
+    "licenseApplyLicenseResp": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/licenseGetStatusResp"
+        }
+      }
+    },
+    "licenseGetStatusResp": {
+      "type": "object",
+      "properties": {
+        "configured_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "customer_name": {
+          "type": "string"
+        },
+        "license_id": {
+          "type": "string"
+        },
+        "licensed_period": {
+          "$ref": "#/definitions/GetStatusRespDateRange"
+        }
+      }
+    },
+    "licenseRequestLicenseReq": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "gdpr_agree": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "last_name": {
+          "type": "string"
+        }
+      }
+    },
+    "licenseRequestLicenseResp": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/licenseGetStatusResp"
+        }
+      }
+    },
+    "notificationsEmpty": {
+      "type": "object"
+    },
+    "notificationsRule": {
+      "type": "object",
+      "properties": {
+        "ServiceNowAlert": {
+          "$ref": "#/definitions/notificationsServiceNowAlert"
+        },
+        "SlackAlert": {
+          "$ref": "#/definitions/notificationsSlackAlert"
+        },
+        "WebhookAlert": {
+          "$ref": "#/definitions/notificationsWebhookAlert"
+        },
+        "event": {
+          "$ref": "#/definitions/RuleEvent"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsRuleAddRequest": {
+      "type": "object",
+      "properties": {
+        "rule": {
+          "$ref": "#/definitions/notificationsRule"
+        }
+      }
+    },
+    "notificationsRuleAddResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notificationsRuleDeleteResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notificationsRuleGetResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rule": {
+          "$ref": "#/definitions/notificationsRule"
+        }
+      }
+    },
+    "notificationsRuleListResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/notificationsRule"
+          }
+        }
+      }
+    },
+    "notificationsRuleUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "rule": {
+          "$ref": "#/definitions/notificationsRule"
+        }
+      }
+    },
+    "notificationsRuleUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notificationsSecretId": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsServiceNowAlert": {
+      "type": "object",
+      "properties": {
+        "critical_controls_only": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "secret_id": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsSlackAlert": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsURLValidationRequest": {
+      "type": "object",
+      "properties": {
+        "none": {
+          "$ref": "#/definitions/notificationsEmpty"
+        },
+        "secret_id": {
+          "$ref": "#/definitions/notificationsSecretId"
+        },
+        "url": {
+          "type": "string"
+        },
+        "username_password": {
+          "$ref": "#/definitions/notificationsUsernamePassword"
+        }
+      }
+    },
+    "notificationsURLValidationResponse": {
+      "type": "object"
+    },
+    "notificationsUsernamePassword": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsVersionResponse": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "notificationsWebhookAlert": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "protobufListValue": {
+      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array.",
+      "type": "object",
+      "properties": {
+        "values": {
+          "description": "Repeated field of dynamically typed values.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufValue"
+          }
+        }
+      }
+    },
+    "protobufNullValue": {
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value.",
+      "type": "string",
+      "default": "NULL_VALUE",
+      "enum": [
+        "NULL_VALUE"
+      ]
+    },
+    "protobufStruct": {
+      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object.",
+      "type": "object",
+      "properties": {
+        "fields": {
+          "description": "Unordered map of dynamically typed values.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/protobufValue"
+          }
+        }
+      }
+    },
+    "protobufValue": {
+      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value.",
+      "type": "object",
+      "properties": {
+        "bool_value": {
+          "description": "Represents a boolean value.",
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "list_value": {
+          "description": "Represents a repeated `Value`.",
+          "$ref": "#/definitions/protobufListValue"
+        },
+        "null_value": {
+          "description": "Represents a null value.",
+          "$ref": "#/definitions/protobufNullValue"
+        },
+        "number_value": {
+          "description": "Represents a double value.",
+          "type": "number",
+          "format": "double"
+        },
+        "string_value": {
+          "description": "Represents a string value.",
+          "type": "string"
+        },
+        "struct_value": {
+          "description": "Represents a structured value.",
+          "$ref": "#/definitions/protobufStruct"
+        }
+      }
+    },
+    "queryPagination": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "querySortOrder": {
+      "type": "string",
+      "default": "ASC",
+      "enum": [
+        "ASC",
+        "DESC"
+      ]
+    },
+    "querySorting": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "order": {
+          "$ref": "#/definitions/querySortOrder"
+        }
+      }
+    },
+    "requestAction": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "description": "This new field called 'content' is being used to send the entire raw JSON\nmessage in bytes, this field is heavily used by the gateway for the DataCollector\nFunc Handler that will send the Action message to the (receiver) ingest-service\nthat will manually unmarshal the message from this field if it is provided.\nThe main purpose of this field it to improve the performance of ingestion when\nthe requests comes in REST/HTTP format.",
+          "type": "string",
+          "format": "byte"
+        },
+        "entity_name": {
+          "type": "string"
+        },
+        "entity_type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "title": "ID of the action message itself"
+        },
+        "message_type": {
+          "type": "string"
+        },
+        "message_version": {
+          "type": "string"
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "organization_name": {
+          "type": "string"
+        },
+        "parent_name": {
+          "type": "string"
+        },
+        "parent_type": {
+          "type": "string"
+        },
+        "recorded_at": {
+          "type": "string"
+        },
+        "remote_hostname": {
+          "type": "string"
+        },
+        "remote_request_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "type": "string"
+        },
+        "requestor_name": {
+          "type": "string"
+        },
+        "requestor_type": {
+          "type": "string"
+        },
+        "revision_id": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "service_hostname": {
+          "type": "string"
+        },
+        "task": {
+          "type": "string"
+        },
+        "user_agent": {
+          "type": "string"
+        }
+      }
+    },
+    "requestAddUsersReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requestCreatePolicyReq": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requestCreateTeamReq": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "requestCreateToken": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "requestCreateUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "requestDelete": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "ID of the action message itself"
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "node_name": {
+          "type": "string"
+        },
+        "organization_name": {
+          "type": "string"
+        },
+        "remote_hostname": {
+          "type": "string"
+        },
+        "service_hostname": {
+          "type": "string"
+        }
+      }
+    },
+    "requestDeprecation": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "requestDescription": {
+      "type": "object",
+      "properties": {
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufStruct"
+          }
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "requestError": {
+      "type": "object",
+      "properties": {
+        "backtrace": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "class": {
+          "type": "string"
+        },
+        "description": {
+          "$ref": "#/definitions/requestDescription"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "requestExpandedRunList": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/requestRunList"
+          }
+        }
+      }
+    },
+    "requestIntrospectReq": {
+      "type": "object",
+      "properties": {
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "path": {
+          "type": "string"
+        }
+      }
+    },
+    "requestIntrospectSomeReq": {
+      "type": "object",
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requestLiveness": {
+      "type": "object",
+      "properties": {
+        "chef_server_fqdn": {
+          "type": "string"
+        },
+        "entity_uuid": {
+          "type": "string"
+        },
+        "event_type": {
+          "type": "string"
+        },
+        "message_version": {
+          "type": "string"
+        },
+        "node_name": {
+          "type": "string"
+        },
+        "organization_name": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "requestMultipleNodeDeleteRequest": {
+      "type": "object",
+      "properties": {
+        "node_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requestRemoveUsersReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requestResource": {
+      "type": "object",
+      "properties": {
+        "after": {
+          "$ref": "#/definitions/protobufStruct"
+        },
+        "before": {
+          "$ref": "#/definitions/protobufStruct"
+        },
+        "conditional": {
+          "type": "string"
+        },
+        "cookbook_name": {
+          "type": "string"
+        },
+        "cookbook_version": {
+          "type": "string"
+        },
+        "delta": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "ignore_failure": {
+          "$ref": "#/definitions/protobufValue"
+        },
+        "name": {
+          "type": "string"
+        },
+        "recipe_name": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "requestRun": {
+      "type": "object",
+      "properties": {
+        "chef_server_fqdn": {
+          "type": "string"
+        },
+        "content": {
+          "description": "This new field called 'content' is being used to send the entire raw JSON\nmessage in bytes, this field is heavily used by the gateway for the DataCollector\nFunc Handler that will send the Run message to the (receiver) ingest-service\nthat will manually unmarshal the message from this field if it is provided.\nThe main purpose of this field it to improve the performance of ingestion when\nthe requests comes in REST/HTTP format.",
+          "type": "string",
+          "format": "byte"
+        },
+        "deprecations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/requestDeprecation"
+          }
+        },
+        "end_time": {
+          "type": "string"
+        },
+        "entity_uuid": {
+          "type": "string"
+        },
+        "error": {
+          "$ref": "#/definitions/requestError"
+        },
+        "expanded_run_list": {
+          "$ref": "#/definitions/requestExpandedRunList"
+        },
+        "id": {
+          "description": "1 through 15 are for frequently occuring fields\nReserving for shared fields between run_start and run_converge mesages.",
+          "type": "string"
+        },
+        "message_type": {
+          "type": "string"
+        },
+        "message_version": {
+          "type": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/protobufStruct"
+        },
+        "node_name": {
+          "type": "string"
+        },
+        "organization_name": {
+          "type": "string"
+        },
+        "policy_group": {
+          "type": "string"
+        },
+        "policy_name": {
+          "type": "string"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/requestResource"
+          }
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "total_resource_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "updated_resource_count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "requestRunList": {
+      "type": "object",
+      "properties": {
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/requestRunList"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "skipped": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "requestSchedulerConfig": {
+      "description": "SchedulerConfig\nThe job message to configure the Delete Node Job\nevery - It accepts '1h30m', '1m', '2h30m', ...",
+      "type": "object",
+      "properties": {
+        "every": {
+          "type": "string"
+        },
+        "running": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "threshold": {
+          "type": "string"
+        }
+      }
+    },
+    "requestUpdateSelf": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "previous_password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "requestUpdateTeamReq": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "requestUpdateToken": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "requestUpdateUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
+    "responseAddUsersResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/teamsresponseTeam"
+        }
+      }
+    },
+    "responseChefError": {
+      "type": "object",
+      "properties": {
+        "backtrace": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "class": {
+          "type": "string"
+        },
+        "description": {
+          "$ref": "#/definitions/responseDescription"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "responseConfigureDeleteNodesScheduler": {
+      "type": "object"
+    },
+    "responseConfigureMissingNodesForDeletionScheduler": {
+      "type": "object"
+    },
+    "responseConfigureNodesMissingScheduler": {
+      "type": "object"
+    },
+    "responseCookbookLock": {
+      "type": "object",
+      "properties": {
+        "cookbook": {
+          "type": "string"
+        },
+        "policy_identifier": {
+          "type": "string"
+        }
+      }
+    },
+    "responseCreatePolicyResp": {
+      "description": "We aren't using a Policy message here since we want to\nreturn a flat object via our external HTTP API.",
+      "type": "object",
+      "properties": {
