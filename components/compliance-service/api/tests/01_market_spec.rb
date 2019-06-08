@@ -19,9 +19,7 @@ describe File.basename(__FILE__) do
     actual_data = GRPC profiles, :list, Profiles::Query.new(
       name: 'missing-in-action'
     )
-    expected_data = {
-      "profiles": []
-    }
+    expected_data = {}
     assert_equal_json_content(expected_data, actual_data)
   end
 
@@ -39,11 +37,7 @@ describe File.basename(__FILE__) do
           "summary": "Verifies that all patches have been applied",
           "version": "0.3.0",
           "supports"=>[{}],
-          "depends": [],
-          "sha256": "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324",
-          "groups": [],
-          "controls": [],
-          "attributes": []
+          "sha256": "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324"
         },
         {
           "name": "windows-baseline",
@@ -55,11 +49,7 @@ describe File.basename(__FILE__) do
           "summary": "Baselin for best-preactice Windows OS hardening",
           "version": "1.1.0",
           "supports"=>[{}],
-          "depends": [],
-          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8",
-          "groups": [],
-          "controls": [],
-          "attributes": []
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
         }
       ],
       "total": 2
@@ -84,11 +74,7 @@ describe File.basename(__FILE__) do
           "summary": "Baselin for best-preactice Windows OS hardening",
           "version": "1.1.0",
           "supports"=>[{}],
-          "depends": [],
-          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8",
-          "groups": [],
-          "controls": [],
-          "attributes": []
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
         }
       ],
       "total": 1
@@ -113,11 +99,7 @@ describe File.basename(__FILE__) do
           "summary": "Baselin for best-preactice Windows OS hardening",
           "version": "1.1.0",
           "supports"=>[{}],
-          "depends": [],
-          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8",
-          "groups": [],
-          "controls": [],
-          "attributes": []
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
         },
         {
           "name": "linux-patch-baseline",
@@ -129,11 +111,7 @@ describe File.basename(__FILE__) do
           "summary": "Verifies that all patches have been applied",
           "version": "0.3.0",
           "supports"=>[{}],
-          "depends": [],
-          "sha256": "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324",
-          "groups": [],
-          "controls": [],
-          "attributes": []
+          "sha256": "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324"
         }
       ],
       "total": 2

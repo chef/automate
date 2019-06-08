@@ -25,9 +25,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 18,
@@ -39,14 +37,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Test filter by profile_id, one node back  CONTROL!
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -67,9 +63,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => {
-                            "seconds" => 1520155121
-                        },
+                        "endTime" => "2018-03-04T09:18:41Z",
                         "status" => "passed",
                         "controls" => {
                             "total"=> 1,
@@ -79,9 +73,7 @@ describe File.basename(__FILE__) do
                             "skipped" => {},
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -93,9 +85,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total"=> 1,
@@ -106,9 +96,7 @@ describe File.basename(__FILE__) do
                                 "major" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -120,9 +108,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total"=> 1,
@@ -133,9 +119,7 @@ describe File.basename(__FILE__) do
                                 "major" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -147,9 +131,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                        "endTime" => {
-                            "seconds" => 1520155123
-                        },
+                        "endTime" => "2018-03-04T09:18:43Z",
                         "status" => "failed",
                         "controls" => {
                             "total"=> 1,
@@ -160,14 +142,12 @@ describe File.basename(__FILE__) do
                                 "major" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 4
         }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     actual = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['non-existent'])
@@ -193,9 +173,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => {
-                            "seconds" => 1520155121
-                        },
+                        "endTime" => "2018-03-04T09:18:41Z",
                         "status" => "passed",
                         "controls" => {
                             "total" => 4,
@@ -207,9 +185,7 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -221,9 +197,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 4,
@@ -238,9 +212,7 @@ describe File.basename(__FILE__) do
                                 "major" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -252,9 +224,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 4,
@@ -270,9 +240,7 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -284,9 +252,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                        "endTime" => {
-                            "seconds" => 1520155123
-                        },
+                        "endTime" => "2018-03-04T09:18:43Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 4,
@@ -302,14 +268,12 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 4
         }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Test filter by profile_id, multiple nodes
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -329,9 +293,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => {
-                            "seconds" => 1520155121
-                        },
+                        "endTime" => "2018-03-04T09:18:41Z",
                         "status" => "skipped",
                         "controls" => {
                             "total" => 14,
@@ -341,9 +303,7 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -355,9 +315,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 14,
@@ -370,9 +328,7 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -384,9 +340,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "skipped",
                         "controls" => {
                             "total" => 14,
@@ -396,9 +350,7 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -410,9 +362,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                        "endTime" => {
-                            "seconds" => 1520155123
-                        },
+                        "endTime" => "2018-03-04T09:18:43Z",
                         "status" => "skipped",
                         "controls" => {
                             "total" => 14,
@@ -422,9 +372,7 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "a0ddd774-cbbb-49be-8730-49c92f3fc2a0",
@@ -436,9 +384,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Zeta",
                     "latestReport" => {
                         "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
-                        "endTime" => {
-                            "seconds" => 1520158721
-                        },
+                        "endTime" => "2018-03-04T10:18:41Z",
                         "status" => "skipped",
                         "controls" => {
                             "total" => 14,
@@ -448,14 +394,12 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 5
         }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Get nodes that are using at least one of the given profiles
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -475,9 +419,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => {
-                            "seconds" => 1520155121
-                        },
+                        "endTime" => "2018-03-04T09:18:41Z",
                         "status" => "passed",
                         "controls" => {
                             "total" => 18,
@@ -489,9 +431,7 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -503,9 +443,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -521,9 +459,7 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -535,9 +471,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -553,9 +487,7 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -567,9 +499,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                        "endTime" => {
-                            "seconds" => 1520155123
-                        },
+                        "endTime" => "2018-03-04T09:18:43Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -585,13 +515,11 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 4
         }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
   end
 end

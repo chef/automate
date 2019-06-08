@@ -15,6 +15,7 @@ require 'minitest/hooks/default'
 require 'json'
 require 'pry'
 require 'grpc'
+require 'deepsort'
 
 module VulcanoTest
 
@@ -104,6 +105,10 @@ module VulcanoTest
 
   def assert_equal_json_content(expected, actual)
     assert_equal JSON.parse(expected.to_json), JSON.parse(actual.to_json)
+  end
+
+  def assert_equal_json_sorted(expected, actual)
+    assert_equal JSON.parse(expected).deep_sort, JSON.parse(actual).deep_sort
   end
 end
 

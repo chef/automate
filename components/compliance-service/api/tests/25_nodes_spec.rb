@@ -151,60 +151,69 @@ describe File.basename(__FILE__) do
     node_id3 = node3['id']
 
     # Get all nodes
-    res = MANAGER_GRPC nodes, :list, Nodes::Query.new()
-    res['nodes'].each { |n|
+    actual_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new()
+    actual_nodes['nodes'].each { |n|
       n['last_contact'] = nil
     }
-    actual_nodes = res['nodes']
-    expected_nodes = [
-      Nodes::Node.new(
-        id: node_id3,
-        name: "Alphamale",
-        last_contact: nil,
-        manager: "automate",
-        manager_ids: ["e69dc612-7e67-43f2-9b19-256afd385820"],
-        status: "unknown",
-        tags: [
-          Common::Kv.new(key: "environment", value: "Pro duc tion")
-        ],
-        run_data: Nodes::LastContactData.new(),
-        scan_data: Nodes::LastContactData.new()
-
-      ),
-      Nodes::Node.new(
-        id: node_id2,
-        name: "betamaniac",
-        last_contact: nil,
-        manager: "automate",
-        manager_ids: ["e69dc612-7e67-43f2-9b19-256afd385820"],
-        status: "unknown",
-        tags: [
-          Common::Kv.new(key: "department", value: "marketing"),
-          Common::Kv.new(key: "boss", value: "John")
-        ],
-        run_data: Nodes::LastContactData.new(),
-        scan_data: Nodes::LastContactData.new()
-      ),
-      Nodes::Node.new(
-        id: node_id1,
-        name: "M$",
-        last_contact: nil,
-        manager: "automate",
-        manager_ids: ["e69dc612-7e67-43f2-9b19-256afd385820"],
-        status: "unknown",
-        run_data: Nodes::LastContactData.new(),
-        scan_data: Nodes::LastContactData.new()
-      )
-    ]
-    assert_equal(expected_nodes, actual_nodes)
-    # Test the total count
-    assert_equal(3, res['total'])
-    assert_equal(0, res['total_unreachable'])
-    assert_equal(0, res['total_reachable'])
-    assert_equal(3, res['total_unknown'])
+    expected_nodes = {
+      "nodes": [
+        {
+          "id": node_id3,
+          "name": "Alphamale",
+          "manager": "automate",
+          "tags": [
+            {
+              "key": "environment",
+              "value": "Pro duc tion"
+            }
+          ],
+          "status": "unknown",
+          "managerIds": [
+            "e69dc612-7e67-43f2-9b19-256afd385820"
+          ],
+          "runData": {},
+          "scanData": {}
+        },
+        {
+          "id": node_id2,
+          "name": "betamaniac",
+          "manager": "automate",
+          "tags": [
+            {
+              "key": "department",
+              "value": "marketing"
+            },
+            {
+              "key": "boss",
+              "value": "John"
+            }
+          ],
+          "status": "unknown",
+          "managerIds": [
+            "e69dc612-7e67-43f2-9b19-256afd385820"
+          ],
+          "runData": {},
+          "scanData": {}
+        },
+        {
+          "id": node_id1,
+          "name": "M$",
+          "manager": "automate",
+          "status": "unknown",
+          "managerIds": [
+            "e69dc612-7e67-43f2-9b19-256afd385820"
+          ],
+          "runData": {},
+          "scanData": {}
+        }
+      ],
+      "total": 3,
+      "totalUnknown": 3
+    }
+    assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
     # Testing the default sorting(name ASC)
-    assert_equal(["Alphamale", "betamaniac", "M$"], extract_grpc_field(actual_nodes, 'name'))
+    assert_equal(["Alphamale", "betamaniac", "M$"], extract_grpc_field(actual_nodes['nodes'], 'name'))
 
     # Get all nodes sorted DESC by name, get first two on page 1
     res = MANAGER_GRPC nodes, :list, Nodes::Query.new(
@@ -231,76 +240,87 @@ describe File.basename(__FILE__) do
     # Get node by id with all details
     node1 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id1)
     node1['last_contact'] = nil
-    expected_node1 = Nodes::Node.new(
-      id: node_id1,
-      last_contact: nil,
-      manager: "automate",
-      manager_ids: ["e69dc612-7e67-43f2-9b19-256afd385820"],
-      name: "M$",
-      status: "unknown",
-      tags: [],
-      target_config: Nodes::TargetConfig.new(
-        backend: "winrm",
-        host: "5.6.7.8",
-        secrets: [secret_id],
-        port: 5985,
-        user: "administrator",
-        password: "123456"
-      ),
-      run_data: Nodes::LastContactData.new(),
-      scan_data: Nodes::LastContactData.new()
-    )
-    assert_equal(expected_node1, node1)
+    expected_node1 = {
+      "id": node_id1,
+      "name": "M$",
+      "manager": "automate",
+      "status": "unknown",
+      "managerIds": [
+        "e69dc612-7e67-43f2-9b19-256afd385820"
+      ],
+      "runData": {},
+      "scanData": {},
+      "targetConfig": {
+        "secrets": [secret_id],
+        "backend": "winrm",
+        "host": "5.6.7.8",
+        "port": 5985,
+        "user": "administrator",
+        "password": "123456"
+      }
+    }
+    assert_equal_json_sorted(expected_node1.to_json, node1.to_json)
 
     # Get node by id with all details
     node2 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id2)
     node2['last_contact'] = nil
-    expected_node2 = Nodes::Node.new(
-      id: node_id2,
-      name: "betamaniac",
-      last_contact: nil,
-      manager: "automate",
-      manager_ids: ["e69dc612-7e67-43f2-9b19-256afd385820"],
-      status: "unknown",
-      tags: [
-        Common::Kv.new(key: "department", value: "marketing"),
-        Common::Kv.new(key: "boss", value: "John")
+    expected_node2 ={
+      "id": node_id2,
+      "name": "betamaniac",
+      "manager": "automate",
+      "tags": [
+        {
+          "key": "department",
+          "value": "marketing"
+        },
+        {
+          "key": "boss",
+          "value": "John"
+        }
       ],
-      target_config: Nodes::TargetConfig.new(
-        backend: "aws",
-        secrets: [secret_id]
-      ),
-      run_data: Nodes::LastContactData.new(),
-      scan_data: Nodes::LastContactData.new()
-    )
-    assert_equal(expected_node2, node2)
+      "status": "unknown",
+      "managerIds": [
+        "e69dc612-7e67-43f2-9b19-256afd385820"
+      ],
+      "runData": {},
+      "scanData": {},
+      "targetConfig": {
+        "secrets": [secret_id],
+        "backend": "aws"
+      }
+    }
+    assert_equal_json_sorted(expected_node2.to_json, node2.to_json)
 
     # # Get node by id with all details
     node3 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id3)
     node3['last_contact'] = nil
-    expected_node3 = Nodes::Node.new(
-      id: node_id3,
-      name: "Alphamale",
-      last_contact: nil,
-      manager: "automate",
-      manager_ids: ["e69dc612-7e67-43f2-9b19-256afd385820"],
-      status: "unknown",
-      tags: [
-        Common::Kv.new(key: "environment", value: "Pro duc tion")
+    expected_node3 = {
+      "id": node_id3,
+      "name": "Alphamale",
+      "manager": "automate",
+      "tags": [
+        {
+          "key": "environment",
+          "value": "Pro duc tion"
+        }
       ],
-      target_config: Nodes::TargetConfig.new(
-        backend: "ssh",
-        host: "1.2.3.4",
-        secrets: [secret_id],
-        port: 22,
-        sudo: true,
-        user: "administrator",
-        password: "123456"
-      ),
-      run_data: Nodes::LastContactData.new(),
-      scan_data: Nodes::LastContactData.new()
-    )
-    assert_equal(expected_node3, node3)
+      "status": "unknown",
+      "managerIds": [
+        "e69dc612-7e67-43f2-9b19-256afd385820"
+      ],
+      "runData": {},
+      "scanData": {},
+      "targetConfig": {
+        "secrets": [secret_id],
+        "backend": "ssh",
+        "host": "1.2.3.4",
+        "port": 22,
+        "sudo": true,
+        "user": "administrator",
+        "password": "123456"
+      }
+    }
+    assert_equal_json_sorted(expected_node3.to_json, node3.to_json)
 
     # Update a node
     MANAGER_GRPC nodes, :update, Nodes::Node.new(
@@ -322,29 +342,36 @@ describe File.basename(__FILE__) do
     # Get node by id with all details to compare
     updated_node3 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id3)
     updated_node3['last_contact'] = nil
-    expected_node3 = Nodes::Node.new(
-      id: node_id3,
-      manager: "automate",
-      manager_ids: ["e69dc612-7e67-43f2-9b19-256afd385820"],
-      name: "Donkey Kong",
-      last_contact: nil,
-      status: "unknown",
-      target_config: Nodes::TargetConfig.new(
-        backend: "ssh",
-        host: "5.6.7.8",
-        secrets: [secret_id],
-        port: 22,
-        user: "administrator",
-        password: "123456"
-      ),
-      tags: [
-        Common::Kv.new(key: "environment", value: "Yo yo duckies"),
-        Common::Kv.new(key: "something", value: "as cute as red pandas")
+    expected_node3 = {
+      "id": node_id3,
+      "name": "Donkey Kong",
+      "manager": "automate",
+      "tags": [
+        {
+          "key": "environment",
+          "value": "Yo yo duckies"
+        },
+        {
+          "key": "something",
+          "value": "as cute as red pandas"
+        }
       ],
-      run_data: Nodes::LastContactData.new(),
-      scan_data: Nodes::LastContactData.new()
-    )
-    assert_equal(expected_node3, updated_node3)
+      "status": "unknown",
+      "managerIds": [
+        "e69dc612-7e67-43f2-9b19-256afd385820"
+      ],
+      "runData": {},
+      "scanData": {},
+      "targetConfig": {
+        "secrets": [secret_id],
+        "backend": "ssh",
+        "host": "5.6.7.8",
+        "port": 22,
+        "user": "administrator",
+        "password": "123456"
+      }
+    }
+    assert_equal_json_sorted(expected_node3.to_json, updated_node3.to_json)
 
     # Add a second secret to reference
     new_ssh_secret = SS_GRPC secrets, :create, Secrets::Secret.new(
@@ -428,37 +455,41 @@ describe File.basename(__FILE__) do
     # Get node by id with all details to compare
     super_duper_updated_node_3 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id3)
     super_duper_updated_node_3['last_contact'] = nil
-    expected_node3 = Nodes::Node.new(
-      id: node_id3,
-      name: "Donkey Kong",
-      last_contact: nil,
-      manager: "automate",
-      manager_ids: ["e69dc612-7e67-43f2-9b19-256afd385820"],
-      status: "unknown",
-      target_config: Nodes::TargetConfig.new(
-        backend: "ssh",
-        host: "0.4.9.8",
-        sudo: true,
-        secrets: [secret_id, ssh_super_duper_secret_id],
-        port: 22,
-        secrets_arr: [
-          Nodes::NodeSecrets.new(
-            user: "administrator",
-            password: "123456"
-          ),
-          Nodes::NodeSecrets.new(
-            user: "administratore_blah",
-            password: "blah"
-          )
-        ]
-      ),
-      tags: [
-        Common::Kv.new(key: "department", value: "engineering")
+    expected_node3 = {
+      "id": node_id3,
+      "name": "Donkey Kong",
+      "manager": "automate",
+      "tags": [
+        {
+          "key": "department",
+          "value": "engineering"
+        }
       ],
-      run_data: Nodes::LastContactData.new(),
-      scan_data: Nodes::LastContactData.new()
-    )
-    assert_equal(expected_node3, super_duper_updated_node_3)
+      "status": "unknown",
+      "managerIds": [
+        "e69dc612-7e67-43f2-9b19-256afd385820"
+      ],
+      "runData": {},
+      "scanData": {},
+      "targetConfig": {
+        "secrets": [secret_id, ssh_super_duper_secret_id],
+        "backend": "ssh",
+        "host": "0.4.9.8",
+        "port": 22,
+        "sudo": true,
+        "secretsArr": [
+          {
+            "user": "administrator",
+            "password": "123456"
+          },
+          {
+            "user": "administratore_blah",
+            "password": "blah"
+          }
+        ]
+      }
+    }
+    assert_equal_json_sorted(expected_node3.to_json, super_duper_updated_node_3.to_json)
 
     # add a node to test automatic job creation
     auto_job_creation_test_node_id = (MANAGER_GRPC nodes, :create, Nodes::Node.new(

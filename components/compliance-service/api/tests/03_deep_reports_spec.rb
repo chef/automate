@@ -20,9 +20,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520155121
-                },
+                "endTime" => "2018-03-04T09:18:41Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -31,16 +29,13 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                "endTime" => {
-                    "seconds" => 1520155122
-                },
+                "endTime" => "2018-03-04T09:18:42Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 14,
@@ -52,16 +47,13 @@ describe File.basename(__FILE__) do
                         "total" => 1,
                         "critical" => 1
                     }
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
-                "endTime" => {
-                    "seconds" => 1520155122
-                },
+                "endTime" => "2018-03-04T09:18:42Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -70,16 +62,13 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                 "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
-                "endTime" => {
-                    "seconds" => 1520155123
-                },
+                "endTime" => "2018-03-04T09:18:43Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -88,16 +77,13 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
                 "nodeId" => "a0ddd774-cbbb-49be-8730-49c92f3fc2a0",
                 "nodeName" => "windows(1)-zeta-apache(s)-skipped",
-                "endTime" => {
-                    "seconds" => 1520158721
-                },
+                "endTime" => "2018-03-04T10:18:41Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -106,16 +92,13 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520215322
-                },
+                "endTime" => "2018-03-05T02:02:02Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -124,16 +107,13 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520233322
-                },
+                "endTime" => "2018-03-05T07:02:02Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 14,
@@ -147,13 +127,12 @@ describe File.basename(__FILE__) do
                         "total" => 1,
                         "major" => 1
                     }
-                },
-                "profiles" => []
+                }
             }
         ],
         "total" => 7
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'profile_id',
@@ -165,9 +144,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520155121
-                },
+                "endTime" => "2018-03-04T09:18:41Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -176,16 +153,13 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                "endTime" => {
-                    "seconds" => 1520155122
-                },
+                "endTime" => "2018-03-04T09:18:42Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 14,
@@ -197,13 +171,12 @@ describe File.basename(__FILE__) do
                         "total" => 1,
                         "critical" => 1
                     }
-                },
-                "profiles" => []
+                }
             }
         ],
         "total": 7
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'profile_id',
@@ -215,9 +188,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
-                "endTime" => {
-                    "seconds" => 1520155122
-                },
+                "endTime" => "2018-03-04T09:18:42Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -226,16 +197,13 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                 "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
-                "endTime" => {
-                    "seconds" => 1520155123
-                },
+                "endTime" => "2018-03-04T09:18:43Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -244,13 +212,12 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             }
         ],
         "total" => 7
-    }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    }
+    assert_equal_json_sorted(expected_json.to_json, actual_data.to_json)
 
     #test that we are dedup-ing in case the same profile_id is passed in twice.. we still want dedup so that deep works
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
@@ -264,9 +231,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
-                "endTime" => {
-                    "seconds" => 1520155122
-                },
+                "endTime" => "2018-03-04T09:18:42Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -275,16 +240,13 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                 "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
-                "endTime" => {
-                    "seconds" => 1520155123
-                },
+                "endTime" => "2018-03-04T09:18:43Z",
                 "status" => "skipped",
                 "controls" => {
                     "total" => 14,
@@ -293,13 +255,12 @@ describe File.basename(__FILE__) do
                         "total" => 14
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             }
         ],
         "total" => 7
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     # Get all reports for these two nodes, one missing
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
@@ -312,9 +273,7 @@ describe File.basename(__FILE__) do
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520155121
-                },
+                "endTime" => "2018-03-04T09:18:41Z",
                 "status" => "passed",
                 "controls" => {
                     "total" => 18,
@@ -325,16 +284,13 @@ describe File.basename(__FILE__) do
                         "total" => 15
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520215322
-                },
+                "endTime" => "2018-03-05T02:02:02Z",
                 "status" => "passed",
                 "controls" => {
                     "total" => 18,
@@ -345,16 +301,13 @@ describe File.basename(__FILE__) do
                         "total" => 15
                     },
                     "failed" => {}
-                },
-                "profiles" => []
+                }
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
-                "endTime" => {
-                    "seconds" => 1520233322
-                },
+                "endTime" => "2018-03-05T07:02:02Z",
                 "status" => "failed",
                 "controls" => {
                     "total" => 18,
@@ -368,13 +321,12 @@ describe File.basename(__FILE__) do
                         "total" => 2,
                         "major" => 2
                     }
-                },
-                "profiles" => []
+                }
             }
         ],
         "total" => 3
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
 
     #######Control depth###############
@@ -391,9 +343,7 @@ describe File.basename(__FILE__) do
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -402,16 +352,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                    "endTime" => {
-                        "seconds" => 1520155122
-                    },
+                    "endTime" => "2018-03-04T09:18:42Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -420,16 +367,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
-                    "endTime" => {
-                        "seconds" => 1520155122
-                    },
+                    "endTime" => "2018-03-04T09:18:42Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -438,16 +382,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                     "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
-                    "endTime" => {
-                        "seconds" => 1520155123
-                    },
+                    "endTime" => "2018-03-04T09:18:43Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -456,16 +397,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
                     "nodeId" => "a0ddd774-cbbb-49be-8730-49c92f3fc2a0",
                     "nodeName" => "windows(1)-zeta-apache(s)-skipped",
-                    "endTime" => {
-                        "seconds" => 1520158721
-                    },
+                    "endTime" => "2018-03-04T10:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -474,16 +412,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => {
-                        "seconds" => 1520215322
-                    },
+                    "endTime" => "2018-03-05T02:02:02Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -492,16 +427,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => {
-                        "seconds" => 1520233322
-                    },
+                    "endTime" => "2018-03-05T07:02:02Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 1,
@@ -510,13 +442,12 @@ describe File.basename(__FILE__) do
                         },
                         "skipped" => {},
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 7
         }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'profile_id',
@@ -530,9 +461,7 @@ describe File.basename(__FILE__) do
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -541,16 +470,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
-                    "endTime" => {
-                        "seconds" => 1520155122
-                    },
+                    "endTime" => "2018-03-04T09:18:42Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 1,
@@ -560,16 +486,13 @@ describe File.basename(__FILE__) do
                             "total" => 1,
                             "critical" => 1
                         }
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
-                    "endTime" => {
-                        "seconds" => 1520155122
-                    },
+                    "endTime" => "2018-03-04T09:18:42Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -578,16 +501,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                     "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
-                    "endTime" => {
-                        "seconds" => 1520155123
-                    },
+                    "endTime" => "2018-03-04T09:18:43Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -596,16 +516,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
                     "nodeId" => "a0ddd774-cbbb-49be-8730-49c92f3fc2a0",
                     "nodeName" => "windows(1)-zeta-apache(s)-skipped",
-                    "endTime" => {
-                        "seconds" => 1520158721
-                    },
+                    "endTime" => "2018-03-04T10:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -614,16 +531,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => {
-                        "seconds" => 1520215322
-                    },
+                    "endTime" => "2018-03-05T02:02:02Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -632,16 +546,13 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
-                    "endTime" => {
-                        "seconds" => 1520233322
-                    },
+                    "endTime" => "2018-03-05T07:02:02Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 1,
@@ -650,13 +561,12 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "failed" => {}
-                    },
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 7
         }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     # Get a specific report1
     res = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04')

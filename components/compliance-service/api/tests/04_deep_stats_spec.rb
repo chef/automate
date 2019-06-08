@@ -19,14 +19,12 @@ if !ENV['NO_STATS_TESTS']
           Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
       ])
       expected_data = {
-          "profiles" => [],
           "platforms" => [
               {
                   "name" => "redhat",
                   "failures" => 3
               }
           ],
-          "controls" => [],
           "environments" => [
               {
                   "name" => "DevSec Prod Alpha",
@@ -59,9 +57,7 @@ if !ENV['NO_STATS_TESTS']
                   "name" => "redhat",
                   "failures" => 3
               }
-          ],
-          "controls" => [],
-          "environments" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -86,7 +82,6 @@ if !ENV['NO_STATS_TESTS']
                   "failures" => 3
               }
           ],
-          "controls" => [],
           "environments" => [
               {
                   "name" => "DevSec Prod Alpha",
@@ -198,7 +193,6 @@ if !ENV['NO_STATS_TESTS']
                   "failures" => 3
               }
           ],
-          "platforms" => [],
           "controls" => [
               {
                   "name" => "nginx-04",
@@ -208,8 +202,7 @@ if !ENV['NO_STATS_TESTS']
                   "name" => "nginx-01",
                   "failures" => 2
               }
-          ],
-          "environments" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -223,15 +216,12 @@ if !ENV['NO_STATS_TESTS']
           Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-          "profiles" => [],
           "platforms" => [
               {
                   "name" => "debian",
                   "failures" => 1
               }
-          ],
-          "controls" => [],
-          "environments" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -249,10 +239,7 @@ if !ENV['NO_STATS_TESTS']
                   "failures" => 1,
                   "id" => "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"
               }
-          ],
-          "platforms" => [],
-          "controls" => [],
-          "environments" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -263,8 +250,6 @@ if !ENV['NO_STATS_TESTS']
           Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
       ])
       expected_data = {
-          "profiles" => [],
-          "platforms" => [],
           "controls" => [
               {
                   "name" => "os-02",
@@ -306,8 +291,7 @@ if !ENV['NO_STATS_TESTS']
                   "name" => "sysctl-15",
                   "failures" => 1
               }
-          ],
-          "environments" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -394,8 +378,7 @@ if !ENV['NO_STATS_TESTS']
                   "criticals" => 22,
                   "passed" => 23
               }
-          ],
-          "controlStats" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
@@ -409,7 +392,6 @@ if !ENV['NO_STATS_TESTS']
       ], type: "controls", id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
       expected_data = {
-          "profileList" => [],
           "controlStats" => [
               {
                   "control" => "nginx-04",
@@ -430,7 +412,6 @@ if !ENV['NO_STATS_TESTS']
       ], type: "controls", id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
       )
       expected_data = {
-          "profileList" => [],
           "controlStats" => [
               {
 
@@ -460,8 +441,7 @@ if !ENV['NO_STATS_TESTS']
                   "majors" => 3,
                   "passed" => 1
               }
-          ],
-          "controlStats" => []
+          ]
       }
       assert_equal_json_content(expected_data, actual_data)
     end

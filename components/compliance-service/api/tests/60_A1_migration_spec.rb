@@ -36,9 +36,7 @@ describe File.basename(__FILE__) do
           "environment": "_default",
           "latestReport": {
             "id": "491285be-b513-4f8a-ad05-295829243b51",
-            "endTime": {
-              "seconds": 1498732765
-            },
+            "endTime": "2017-06-29T10:39:25Z",
             "status": "passed",
             "controls": {
               "total": 2,
@@ -48,14 +46,12 @@ describe File.basename(__FILE__) do
               "skipped": {},
               "failed": {}
             }
-          },
-          "tags": [],
-          "profiles": []
+          }
         }
       ],
       "total": 1
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Node details API
     actual_node = GRPC reporting, :read_node, Reporting::Id.new(id: '6dd7c19c-c1bc-4cf5-b431-524e3e42f551')
@@ -69,9 +65,7 @@ describe File.basename(__FILE__) do
       "environment": "_default",
       "latestReport": {
         "id": "491285be-b513-4f8a-ad05-295829243b52",
-        "endTime": {
-          "seconds": 1501324765
-        },
+        "endTime": "2017-07-29T10:39:25Z",
         "status": "passed",
         "controls": {
           "total": 2,
@@ -82,7 +76,6 @@ describe File.basename(__FILE__) do
           "failed": {}
         }
       },
-      "tags": [],
       "profiles": [
         {
           "name": "mylinux-success",
@@ -91,7 +84,7 @@ describe File.basename(__FILE__) do
         }
       ]
     }.to_json
-    assert_equal(expected_node, actual_node.to_json)
+    assert_equal_json_sorted(expected_node, actual_node.to_json)
 
     END_OF_DAY = "23:59:59Z"
     # Get "two" profiles page 1
@@ -115,7 +108,7 @@ describe File.basename(__FILE__) do
         "passed": 1
       }
     }.to_json
-    assert_equal(expected_data, actual_data.to_json)
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control', text: 'icMP'
@@ -139,9 +132,7 @@ describe File.basename(__FILE__) do
       "id": "491285be-b513-4f8a-ad05-295829243b52",
       "nodeId": "6dd7c19c-c1bc-4cf5-b431-524e3e42f551",
       "nodeName": "centos6-node1",
-      "endTime": {
-        "seconds": 1501324765
-      },
+      "endTime": "2017-07-29T10:39:25Z",
       "status": "passed",
       "environment": "_default",
       "version": "1.39.1",
@@ -160,10 +151,7 @@ describe File.basename(__FILE__) do
           "copyrightEmail": "support@chef.io",
           "summary": "Demonstrates the use of InSpec Compliance Profile",
           "version": "1.0.0",
-          "supports": [],
-          "depends": [],
           "sha256": "d94022291cae7c87bb13d42bbd0dbc86b027c1e32fdc6790d2555d62deb8b6a9",
-          "groups": [],
           "controls": [
             {
               "id": "/etc/group must exist",
@@ -180,7 +168,6 @@ describe File.basename(__FILE__) do
                   "runTime": 0.000103
                 }
               ],
-              "refs": [],
               "tags": {}
             },
             {
@@ -198,16 +185,14 @@ describe File.basename(__FILE__) do
                   "runTime": 0.001871
                 }
               ],
-              "refs": [],
               "tags": {}
             }
           ],
-          "attributes": [],
           "status": "passed"
         }
       ]
     }.to_json
-    assert_equal(expected_json, actual_data.to_json)
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
 
   end
 end
