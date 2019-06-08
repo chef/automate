@@ -183,7 +183,7 @@ func fromExternalConditions(cs []*pb_common.Condition) ([]*authz.Condition, erro
 }
 
 func fromExternalCondition(c *pb_common.Condition) (*authz.Condition, error) {
-	t, err := fromExternalConditionType(c.Type)
+	a, err := fromExternalConditionAttribute(c.Attribute)
 	if err != nil {
 		return nil, err
 	}
@@ -194,31 +194,31 @@ func fromExternalCondition(c *pb_common.Condition) (*authz.Condition, error) {
 	}
 
 	return &authz.Condition{
-		Type:     t,
-		Values:   c.Values,
-		Operator: o,
+		Attribute: a,
+		Values:    c.Values,
+		Operator:  o,
 	}, nil
 }
 
-var externalToAPIConditionTypes = map[pb_common.ConditionType]authz.ProjectRuleConditionTypes{
-	pb_common.ConditionType_ROLES:             authz.ProjectRuleConditionTypes_ROLES,
-	pb_common.ConditionType_CHEF_SERVERS:      authz.ProjectRuleConditionTypes_CHEF_SERVERS,
-	pb_common.ConditionType_CHEF_TAGS:         authz.ProjectRuleConditionTypes_CHEF_TAGS,
-	pb_common.ConditionType_CHEF_ENVIRONMENTS: authz.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-	pb_common.ConditionType_CHEF_ORGS:         authz.ProjectRuleConditionTypes_CHEF_ORGS,
-	pb_common.ConditionType_POLICY_GROUP:      authz.ProjectRuleConditionTypes_POLICY_GROUP,
-	pb_common.ConditionType_POLICY_NAME:       authz.ProjectRuleConditionTypes_POLICY_NAME,
+var externalToAPIConditionAttributes = map[pb_common.ConditionAttribute]authz.ProjectRuleConditionAttributes{
+	pb_common.ConditionAttribute_ROLES:             authz.ProjectRuleConditionAttributes_ROLES,
+	pb_common.ConditionAttribute_CHEF_SERVERS:      authz.ProjectRuleConditionAttributes_CHEF_SERVERS,
+	pb_common.ConditionAttribute_CHEF_TAGS:         authz.ProjectRuleConditionAttributes_CHEF_TAGS,
+	pb_common.ConditionAttribute_CHEF_ENVIRONMENTS: authz.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+	pb_common.ConditionAttribute_CHEF_ORGS:         authz.ProjectRuleConditionAttributes_CHEF_ORGS,
+	pb_common.ConditionAttribute_POLICY_GROUP:      authz.ProjectRuleConditionAttributes_POLICY_GROUP,
+	pb_common.ConditionAttribute_POLICY_NAME:       authz.ProjectRuleConditionAttributes_POLICY_NAME,
 }
-var apiToExternalConditionTypes = map[authz.ProjectRuleConditionTypes]pb_common.ConditionType{}
-var onceReverseConditionTypesMapping sync.Once
+var apiToExternalConditionAttributes = map[authz.ProjectRuleConditionAttributes]pb_common.ConditionAttribute{}
+var onceReverseConditionAttributesMapping sync.Once
 
-func fromExternalConditionType(t pb_common.ConditionType) (authz.ProjectRuleConditionTypes, error) {
-	if t == pb_common.ConditionType_CONDITION_TYPE_UNSET {
-		return 0, status.Error(codes.InvalidArgument, "rule condition type not provided")
-	} else if m, ok := externalToAPIConditionTypes[t]; ok {
+func fromExternalConditionAttribute(a pb_common.ConditionAttribute) (authz.ProjectRuleConditionAttributes, error) {
+	if a == pb_common.ConditionAttribute_CONDITION_ATTRIBUTE_UNSET {
+		return 0, status.Error(codes.InvalidArgument, "rule condition attribute not provided")
+	} else if m, ok := externalToAPIConditionAttributes[a]; ok {
 		return m, nil
 	} else {
-		return 0, fmt.Errorf("unknown rule type: %v", t)
+		return 0, fmt.Errorf("unknown condition attribute: %v", a)
 	}
 }
 
@@ -271,7 +271,7 @@ func fromInternalConditions(cs []*authz.Condition) ([]*pb_common.Condition, erro
 }
 
 func fromInternalCondition(c *authz.Condition) (*pb_common.Condition, error) {
-	t, err := fromInternalConditionType(c.Type)
+	a, err := fromInternalConditionAttribute(c.Attribute)
 	if err != nil {
 		return nil, err
 	}
@@ -281,19 +281,19 @@ func fromInternalCondition(c *authz.Condition) (*pb_common.Condition, error) {
 		return nil, err
 	}
 	return &pb_common.Condition{
-		Type:     t,
-		Values:   c.Values,
-		Operator: o,
+		Attribute: a,
+		Values:    c.Values,
+		Operator:  o,
 	}, nil
 }
 
-func fromInternalConditionType(t authz.ProjectRuleConditionTypes) (pb_common.ConditionType, error) {
-	onceReverseConditionTypesMapping.Do(func() {
-		for k, v := range externalToAPIConditionTypes {
-			apiToExternalConditionTypes[v] = k
+func fromInternalConditionAttribute(t authz.ProjectRuleConditionAttributes) (pb_common.ConditionAttribute, error) {
+	onceReverseConditionAttributesMapping.Do(func() {
+		for k, v := range externalToAPIConditionAttributes {
+			apiToExternalConditionAttributes[v] = k
 		}
 	})
-	if s, ok := apiToExternalConditionTypes[t]; ok {
+	if s, ok := apiToExternalConditionAttributes[t]; ok {
 		return s, nil
 	}
 	return 0, fmt.Errorf("invalid condition type %s", t.String())

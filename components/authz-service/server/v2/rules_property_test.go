@@ -25,20 +25,20 @@ func TestCreateRuleProperties(t *testing.T) {
 
 	conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
-			api.ProjectRuleConditionTypes_CHEF_SERVERS,
-			api.ProjectRuleConditionTypes_CHEF_ORGS,
-			api.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-			api.ProjectRuleConditionTypes_ROLES,
-			api.ProjectRuleConditionTypes_CHEF_TAGS,
-			api.ProjectRuleConditionTypes_POLICY_GROUP,
-			api.ProjectRuleConditionTypes_POLICY_NAME,
+			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+			api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			api.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+			api.ProjectRuleConditionAttributes_ROLES,
+			api.ProjectRuleConditionAttributes_CHEF_TAGS,
+			api.ProjectRuleConditionAttributes_POLICY_GROUP,
+			api.ProjectRuleConditionAttributes_POLICY_NAME,
 		),
 		"Values": gen.SliceOf(gen.AnyString()),
 	})
 	conditionsGenEvent := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
-			api.ProjectRuleConditionTypes_CHEF_SERVERS,
-			api.ProjectRuleConditionTypes_CHEF_ORGS,
+			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+			api.ProjectRuleConditionAttributes_CHEF_ORGS,
 		),
 		"Values": gen.SliceOf(gen.AnyString()),
 	})

@@ -401,7 +401,7 @@ func setupReadSummary(t *testing.T) *statsServer.Server {
 				{
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
+							Type:   iam_v2.ProjectRuleConditionAttributes_ROLES,
 							Values: v,
 						},
 					},
