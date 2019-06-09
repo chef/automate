@@ -18,14 +18,6 @@ control 'iam-v2-global-projects-filter-1' do
             }
     end
 
-    def genOutputProject(p)
-      return { id: p[:id],
-              name: p[:name],
-              projects: [ p[:id] ],
-              type: p[:id] == UNASSIGNED_PROJECT_ID ? "CHEF_MANAGED" : "CUSTOM"
-            }
-    end
-
     PROJECT_ID_1 = "inspec-custom-project-1-#{Time.now.utc.to_i}"
     PROJECT_ID_2 = "inspec-custom-project-2-#{Time.now.utc.to_i}"
     PROJECT_ID_3 = "inspec-custom-project-3-#{Time.now.utc.to_i}"
@@ -34,6 +26,7 @@ control 'iam-v2-global-projects-filter-1' do
     PROJECT_2 = genInputProject(PROJECT_ID_2, "Test Project 2")
     PROJECT_3 = genInputProject(PROJECT_ID_3, "Test Project 3")
     PROJECTS = [ PROJECT_1, PROJECT_2, PROJECT_3 ]
+    UNASSIGNED = genInputProject(UNASSIGNED_PROJECT_ID, UNASSIGNED_PROJECT_NAME)
  
     before(:all) do
       PROJECTS.each do|project|
@@ -57,10 +50,14 @@ control 'iam-v2-global-projects-filter-1' do
         resp = automate_api_request("/apis/iam/v2beta/introspect_projects", http_method: 'GET')
 
         expect(resp.http_status).to eq 200
-        expected_projects = PROJECTS.map { |p| p.dup }
-        expected_projects.push(genInputProject(UNASSIGNED_PROJECT_ID, UNASSIGNED_PROJECT_NAME))
+        expected_projects = [ PROJECT_1, PROJECT_2, PROJECT_3, UNASSIGNED ]
         expected_projects.each do |p|
-          expect(resp.parsed_response_body[:projects]).to include(genOutputProject(p))
+          expect(resp.parsed_response_body[:projects]).to include(
+            { id: p[:id],
+              name: p[:name],
+              projects: [ p[:id] ],
+              type: p[:id] == UNASSIGNED_PROJECT_ID ? "CHEF_MANAGED" : "CUSTOM"
+            })
         end
       end
     end
@@ -122,7 +119,14 @@ control 'iam-v2-global-projects-filter-1' do
 
         expect(resp.http_status).to eq 200
         expected_projects = [PROJECT_1, PROJECT_2]
-        expect(resp.parsed_response_body[:projects]).to match_array(expected_projects.map { |p| genOutputProject(p) })
+        expect(resp.parsed_response_body[:projects]).to match_array(
+          expected_projects.map { |p|
+            { id: p[:id],
+              name: p[:name],
+              projects: [ p[:id] ],
+              type: "CUSTOM"
+            }}
+        )
       end
     end
   end
