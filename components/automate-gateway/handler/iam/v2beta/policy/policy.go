@@ -412,7 +412,7 @@ func (p *Server) GetProject(
 	return &pb_resp.GetProjectResp{Project: proj}, nil
 }
 
-// ListProjects returns the list of all projects for display on the List Projects view.
+// ListProjects returns the list of all projects.
 func (p *Server) ListProjects(
 	ctx context.Context, _ *pb_req.ListProjectsReq) (*pb_resp.ListProjectsResp, error) {
 	resp, err := p.projects.ListProjects(ctx, &authz.ListProjectsReq{})
