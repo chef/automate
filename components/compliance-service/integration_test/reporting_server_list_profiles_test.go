@@ -64,8 +64,8 @@ func TestListProfiles(t *testing.T) {
 				{
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionAttributes_ROLES,
-							Values: v,
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+							Values:    v,
 						},
 					},
 				},
