@@ -10,7 +10,7 @@ enum RuleType {
 }
 
 enum ConditionAttribute {
-    CONDITION_TYPE_UNSET = 0;
+    CONDITION_ATTRIBUTE_UNSET = 0;
     CHEF_SERVERS = 1;
     CHEF_ORGS = 2;
     CHEF_ENVIRONMENTS = 3;

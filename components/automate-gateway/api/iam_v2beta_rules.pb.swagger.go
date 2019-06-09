@@ -180,7 +180,7 @@ func init() {
     "v2betaConditionAttribute": {
       "type": "string",
       "enum": [
-        "CONDITION_TYPE_UNSET",
+        "CONDITION_ATTRIBUTE_UNSET",
         "CHEF_SERVERS",
         "CHEF_ORGS",
         "CHEF_ENVIRONMENTS",
@@ -189,7 +189,7 @@ func init() {
         "POLICY_GROUP",
         "POLICY_NAME"
       ],
-      "default": "CONDITION_TYPE_UNSET"
+      "default": "CONDITION_ATTRIBUTE_UNSET"
     },
     "v2betaConditionOperator": {
       "type": "string",
