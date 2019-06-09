@@ -28,7 +28,6 @@ Chef Automate requires
 * `useradd`
 * `curl` or `wget`
 * The shell that starts Automate should have a # of open files max of at least 65535, 
-not 1024 which is common
 
 Commercial support for Chef Automate is available for platforms that satisfy these
 criteria.
