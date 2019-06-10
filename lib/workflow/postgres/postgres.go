@@ -25,7 +25,7 @@ const (
 
 	enqueueWorkflowQuery  = `SELECT enqueue_workflow($1, $2, $3)`
 	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow(VARIADIC $1)`
-	completeWorkflowQuery = `SELECT complete_workflow($1)`
+	completeWorkflowQuery = `SELECT complete_workflow($1, $2)`
 	continueWorkflowQuery = `SELECT continue_workflow($1, $2, $3, $4, $5)`
 	abandonWorkflowQuery  = `SELECT abandon_workflow($1, $2, $3)`
 
@@ -412,6 +412,56 @@ VALUES ($1, $2, $3, $4, $5, $6)`,
 	return wrapErr(tx.Commit(), "failed to commit workflow schedule update")
 }
 
+func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*backend.WorkflowInstance, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := pg.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	row := tx.QueryRowContext(ctx,
+		"SELECT status, parameters, payload FROM workflow_instances WHERE workflow_name = $1 AND instance_name = $2",
+		workflowName, instanceName,
+	)
+	workflowInstance := backend.WorkflowInstance{
+		WorkflowName: workflowName,
+		InstanceName: instanceName,
+	}
+	err = row.Scan(
+		&workflowInstance.Status,
+		&workflowInstance.Parameters,
+		&workflowInstance.Payload,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			row := tx.QueryRowContext(ctx,
+				"SELECT parameters, result FROM workflow_results WHERE workflow_name = $1 AND instance_name = $2 ORDER BY id DESC",
+				workflowName, instanceName,
+			)
+			err := row.Scan(
+				&workflowInstance.Parameters,
+				&workflowInstance.Result,
+			)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					return nil, workflow.ErrWorkflowInstanceNotFound
+				}
+				return nil, err
+			}
+			workflowInstance.Status = backend.WorkflowInstanceStatusCompleted
+		} else {
+			return nil, err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	return &workflowInstance, nil
+}
+
 func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.WorkflowInstance) error {
 	wrapErr := func(err error, msg string) error {
 		return errors.Wrap(err, msg)
@@ -622,11 +672,11 @@ func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 	})
 }
 
-func (workc *PostgresWorkflowCompleter) Done() error {
+func (workc *PostgresWorkflowCompleter) Done(result []byte) error {
 	ctx := workc.ctx
 	defer workc.cancel()
 
-	_, err := workc.tx.ExecContext(ctx, completeWorkflowQuery, workc.wid)
+	_, err := workc.tx.ExecContext(ctx, completeWorkflowQuery, workc.wid, result)
 	if err != nil {
 		return errors.Wrapf(err, "failed to mark workflow %d as complete", workc.wid)
 	}

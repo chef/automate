@@ -215,7 +215,7 @@ AS $$
         VALUES('tasks_abandoned', _workflow_instance_id);
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION complete_workflow(_wid BIGINT)
+CREATE OR REPLACE FUNCTION complete_workflow(_wid BIGINT, _result BYTEA)
 RETURNS VOID
 LANGUAGE SQL
 AS $$
@@ -223,9 +223,11 @@ AS $$
     done_workflows AS (
         SELECT id, instance_name, workflow_name, parameters, start_at 
         FROM workflow_instances where id = _wid
-    )
-    INSERT INTO workflow_results(instance_name, workflow_name, parameters, start_at)
-        (SELECT instance_name, workflow_name, parameters, start_at FROM done_workflows);
+    ),
+    in_vals AS (SELECT
+        _result as result)
+    INSERT INTO workflow_results(instance_name, workflow_name, parameters, start_at, result)
+        (SELECT done_workflows.instance_name, done_workflows.workflow_name, done_workflows.parameters, done_workflows.start_at, in_vals.result FROM done_workflows, in_vals);
     
     DELETE FROM tasks WHERE workflow_instance_id = _wid;
     DELETE FROM task_results WHERE workflow_instance_id = _wid;

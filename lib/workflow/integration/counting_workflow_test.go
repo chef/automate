@@ -64,7 +64,7 @@ func (suite *WorkflowTestSuite) TestCountToNWorkflow() {
 							instance10Count = currentCount
 						}
 						wgWorkflow.Done()
-						return w.Complete()
+						return w.Complete(workflow.WithResult(currentCount))
 					}
 					return w.Continue(currentCount)
 				},
@@ -84,6 +84,13 @@ func (suite *WorkflowTestSuite) TestCountToNWorkflow() {
 	// Otherwise, Stop cancels the context, which prevents any transactions
 	// from commiting.
 	time.Sleep(20 * time.Millisecond)
+
+	w100, err := m.GetWorkflowInstanceByName(context.Background(), instance100Name, workflowName)
+	suite.Require().NoError(err)
+	var total int
+	suite.NoError(w100.GetResult(&total))
+	suite.Equal(100, total)
+
 	err = m.Stop()
 	suite.NoError(err)
 }
