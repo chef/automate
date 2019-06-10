@@ -297,7 +297,7 @@ func TestGetServicesMultiServicaPaginationOutOfRange(t *testing.T) {
 	assertServicesEqual(t, expected.GetServices(), response.GetServices())
 }
 
-func TestGetServicesMultiServicaPaginationAndSorting(t *testing.T) {
+func TestGetServicesMultiServicePaginationAndSorting(t *testing.T) {
 	suite.IngestServices(habServicesMatrixAllHealthStatusDifferent())
 	defer suite.DeleteDataFromStorage()
 
@@ -305,7 +305,7 @@ func TestGetServicesMultiServicaPaginationAndSorting(t *testing.T) {
 		ctx     = context.Background()
 		request = &applications.ServicesReq{
 			Pagination: &query.Pagination{
-				Page: 2,
+				Page: 3,
 				Size: 1,
 			},
 			Sorting: &query.Sorting{
@@ -317,10 +317,10 @@ func TestGetServicesMultiServicaPaginationAndSorting(t *testing.T) {
 			Services: []*applications.Service{
 				{
 					SupervisorId: "sup1",
-					Group:        "redis.default",
-					Release:      "core/redis/0.1.0/20190101121212",
+					Group:        "myapp.default",
+					Release:      "core/myapp/0.1.0/20190101121212",
 					Status:       applications.ServiceStatus_RUNNING,
-					HealthCheck:  applications.HealthStatus_OK,
+					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 					Channel: c, Site: s,
 				},

@@ -344,3 +344,46 @@ func RandString(n int) string {
 	}
 	return string(b)
 }
+
+// Returns 4 service groups with a single service each, the services/service-groups are named
+// with s single letter:
+// => a.default
+// => b.default
+// => c.default
+// => d.default
+func habServicesABCD() []*habitat.HealthCheckEvent {
+	return []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.default"),
+			withPackageIdent("core/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("b.default"),
+			withPackageIdent("core/b/0.1.0/20190101121212"),
+			withHealth("OK"),
+			withApplication("b_app"),
+			withEnvironment("b_env"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup4"),
+			withServiceGroup("c.default"),
+			withPackageIdent("core/c/0.1.0/20190101121212"),
+			withHealth("WARNING"),
+			withApplication("c_app"),
+			withEnvironment("c_env"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup5"),
+			withServiceGroup("d.default"),
+			withPackageIdent("core/d/0.1.0/20190101121212"),
+			withHealth("CRITICAL"),
+			withApplication("d_app"),
+			withEnvironment("d_env"),
+		),
+	}
+}
