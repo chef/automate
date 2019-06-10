@@ -70,6 +70,10 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       text: 'Environment'
     },
     {
+      type: 'error',
+      text: 'Error'
+    },
+    {
       type: 'name',
       text: 'Node Name'
     },
