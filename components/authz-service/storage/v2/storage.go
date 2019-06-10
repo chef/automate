@@ -198,7 +198,7 @@ func DefaultProjects() []Project {
 
 	unassignedProject := Project{
 		ID:       constants_v2.UnassignedProjectID,
-		Name:     "Unassigned Project",
+		Name:     constants_v2.UnassignedProjectID,
 		Type:     ChefManaged,
 		Projects: []string{constants_v2.UnassignedProjectID},
 	}
