@@ -12,7 +12,7 @@
     <div class="status-filter-bar">
       <chef-status-filter-group [value]="selectedHealth" lean>
         <chef-option class="filter general" value="total" (click)="updateHealthFilter('total')" selected>
-          <chef-icon class="filter-icon">group_work</chef-icon>
+          <chef-icon class="filter-icon">grain</chef-icon>
           <div class="filter-label">Total</div>
           <div class="filter-total">{{ servicesHealthSummary.total }}</div>
         </chef-option>
