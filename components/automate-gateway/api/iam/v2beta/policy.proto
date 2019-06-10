@@ -177,4 +177,12 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "system:iam:resetToV1";
     option (chef.automate.api.iam.policy).action = "system:iam:reset";
   };
+  rpc IntrospectAllProjects (ListProjectsReq) returns (ListProjectsResp) {
+    option (google.api.http).get = "/iam/v2beta/introspect_projects";
+    option (chef.automate.api.policy).resource = "auth_introspection:introspect_all_projects";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "iam:introspect";
+    option (chef.automate.api.iam.policy).action = "iam:introspect:getAllProjects";
+  };
+ 
 }

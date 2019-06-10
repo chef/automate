@@ -30,29 +30,30 @@ func NewPoliciesServerMockWithoutValidation() *PoliciesServerMock {
 // PoliciesServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
 type PoliciesServerMock struct {
-	validateRequests         bool
-	CreatePolicyFunc         func(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
-	GetPolicyFunc            func(context.Context, *request.GetPolicyReq) (*response.GetPolicyResp, error)
-	ListPoliciesFunc         func(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
-	DeletePolicyFunc         func(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
-	UpdatePolicyFunc         func(context.Context, *request.UpdatePolicyReq) (*response.UpdatePolicyResp, error)
-	GetPolicyVersionFunc     func(context.Context, *request.GetPolicyVersionReq) (*response.GetPolicyVersionResp, error)
-	ListPolicyMembersFunc    func(context.Context, *request.ListPolicyMembersReq) (*response.ListPolicyMembersResp, error)
-	ReplacePolicyMembersFunc func(context.Context, *request.ReplacePolicyMembersReq) (*response.ReplacePolicyMembersResp, error)
-	RemovePolicyMembersFunc  func(context.Context, *request.RemovePolicyMembersReq) (*response.RemovePolicyMembersResp, error)
-	AddPolicyMembersFunc     func(context.Context, *request.AddPolicyMembersReq) (*response.AddPolicyMembersResp, error)
-	CreateRoleFunc           func(context.Context, *request.CreateRoleReq) (*response.CreateRoleResp, error)
-	ListRolesFunc            func(context.Context, *request.ListRolesReq) (*response.ListRolesResp, error)
-	GetRoleFunc              func(context.Context, *request.GetRoleReq) (*response.GetRoleResp, error)
-	DeleteRoleFunc           func(context.Context, *request.DeleteRoleReq) (*response.DeleteRoleResp, error)
-	UpdateRoleFunc           func(context.Context, *request.UpdateRoleReq) (*response.UpdateRoleResp, error)
-	CreateProjectFunc        func(context.Context, *request.CreateProjectReq) (*response.CreateProjectResp, error)
-	UpdateProjectFunc        func(context.Context, *request.UpdateProjectReq) (*response.UpdateProjectResp, error)
-	GetProjectFunc           func(context.Context, *request.GetProjectReq) (*response.GetProjectResp, error)
-	ListProjectsFunc         func(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
-	DeleteProjectFunc        func(context.Context, *request.DeleteProjectReq) (*response.DeleteProjectResp, error)
-	UpgradeToV2Func          func(context.Context, *request.UpgradeToV2Req) (*response.UpgradeToV2Resp, error)
-	ResetToV1Func            func(context.Context, *request.ResetToV1Req) (*response.ResetToV1Resp, error)
+	validateRequests          bool
+	CreatePolicyFunc          func(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
+	GetPolicyFunc             func(context.Context, *request.GetPolicyReq) (*response.GetPolicyResp, error)
+	ListPoliciesFunc          func(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
+	DeletePolicyFunc          func(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
+	UpdatePolicyFunc          func(context.Context, *request.UpdatePolicyReq) (*response.UpdatePolicyResp, error)
+	GetPolicyVersionFunc      func(context.Context, *request.GetPolicyVersionReq) (*response.GetPolicyVersionResp, error)
+	ListPolicyMembersFunc     func(context.Context, *request.ListPolicyMembersReq) (*response.ListPolicyMembersResp, error)
+	ReplacePolicyMembersFunc  func(context.Context, *request.ReplacePolicyMembersReq) (*response.ReplacePolicyMembersResp, error)
+	RemovePolicyMembersFunc   func(context.Context, *request.RemovePolicyMembersReq) (*response.RemovePolicyMembersResp, error)
+	AddPolicyMembersFunc      func(context.Context, *request.AddPolicyMembersReq) (*response.AddPolicyMembersResp, error)
+	CreateRoleFunc            func(context.Context, *request.CreateRoleReq) (*response.CreateRoleResp, error)
+	ListRolesFunc             func(context.Context, *request.ListRolesReq) (*response.ListRolesResp, error)
+	GetRoleFunc               func(context.Context, *request.GetRoleReq) (*response.GetRoleResp, error)
+	DeleteRoleFunc            func(context.Context, *request.DeleteRoleReq) (*response.DeleteRoleResp, error)
+	UpdateRoleFunc            func(context.Context, *request.UpdateRoleReq) (*response.UpdateRoleResp, error)
+	CreateProjectFunc         func(context.Context, *request.CreateProjectReq) (*response.CreateProjectResp, error)
+	UpdateProjectFunc         func(context.Context, *request.UpdateProjectReq) (*response.UpdateProjectResp, error)
+	GetProjectFunc            func(context.Context, *request.GetProjectReq) (*response.GetProjectResp, error)
+	ListProjectsFunc          func(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
+	DeleteProjectFunc         func(context.Context, *request.DeleteProjectReq) (*response.DeleteProjectResp, error)
+	UpgradeToV2Func           func(context.Context, *request.UpgradeToV2Req) (*response.UpgradeToV2Resp, error)
+	ResetToV1Func             func(context.Context, *request.ResetToV1Req) (*response.ResetToV1Resp, error)
+	IntrospectAllProjectsFunc func(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
 }
 
 func (m *PoliciesServerMock) CreatePolicy(ctx context.Context, req *request.CreatePolicyReq) (*response.CreatePolicyResp, error) {
@@ -319,6 +320,18 @@ func (m *PoliciesServerMock) ResetToV1(ctx context.Context, req *request.ResetTo
 	return nil, status.Error(codes.Internal, "mock: 'ResetToV1' not implemented")
 }
 
+func (m *PoliciesServerMock) IntrospectAllProjects(ctx context.Context, req *request.ListProjectsReq) (*response.ListProjectsResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.IntrospectAllProjectsFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'IntrospectAllProjects' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *PoliciesServerMock) Reset() {
 	m.CreatePolicyFunc = nil
@@ -343,4 +356,5 @@ func (m *PoliciesServerMock) Reset() {
 	m.DeleteProjectFunc = nil
 	m.UpgradeToV2Func = nil
 	m.ResetToV1Func = nil
+	m.IntrospectAllProjectsFunc = nil
 }
