@@ -295,7 +295,7 @@ XoB1V6vwQXRubclyH8Ei2+1j
   [elasticsearch.v1]
     [elasticsearch.v1.sys]
       [elasticsearch.v1.sys.runtime]
-        heapsize = "${var.enable_cloudwatch_metrics == "true" ? "16g" : "1g"}"
+        heapsize = "${var.enable_cloudwatch_metrics == "true" ? "16g" : "2g"}"
 TOML
   }
 
