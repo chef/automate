@@ -54,10 +54,18 @@
     "collection": "chef-server",
     "data_services": [],
     "all_services": [
+      "chef/backup-gateway",
+      "chef/automate-postgresql",
+      "chef/automate-pg-gateway",
+      "chef/automate-elasticsearch",
+      "chef/automate-es-gateway",
+      "chef/pg-sidecar-service",
+      "chef/es-sidecar-service",
       "chef/automate-cs-bookshelf",
       "chef/automate-cs-oc-bifrost",
       "chef/automate-cs-oc-erchef",
-      "chef/automate-cs-nginx"
+      "chef/automate-cs-nginx",
+      "chef/automate-load-balancer"
     ],
     "pinned_packages": [],
     "extra_packages": [],

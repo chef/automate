@@ -29,6 +29,9 @@ pkg_binds=(
   [automate-cs-bookshelf]="http-port"
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
+)
+
+pkg_binds_optional=(
   [automate-gateway]="port"
 )
 

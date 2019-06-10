@@ -12,6 +12,15 @@ EOH
   rm /tmp/.enable_chef_server.toml
 }
 
+function stop_chef_server() {
+  cat << EOH > /tmp/.enable_chef_server.toml
+[deployment.v1.svc]
+  enable_chef_server = false
+EOH
+  chef-automate config patch /tmp/.enable_chef_server.toml
+  rm /tmp/.enable_chef_server.toml
+}
+
 
 function set_up_chef_server_test_environment() {
   chef_server_hostname=${CONTAINER_HOSTNAME:-a2-dev.test}
