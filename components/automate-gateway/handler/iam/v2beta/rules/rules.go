@@ -287,16 +287,16 @@ func fromInternalCondition(c *authz.Condition) (*pb_common.Condition, error) {
 	}, nil
 }
 
-func fromInternalConditionAttribute(t authz.ProjectRuleConditionAttributes) (pb_common.ConditionAttribute, error) {
+func fromInternalConditionAttribute(a authz.ProjectRuleConditionAttributes) (pb_common.ConditionAttribute, error) {
 	onceReverseConditionAttributesMapping.Do(func() {
 		for k, v := range externalToAPIConditionAttributes {
 			apiToExternalConditionAttributes[v] = k
 		}
 	})
-	if s, ok := apiToExternalConditionAttributes[t]; ok {
+	if s, ok := apiToExternalConditionAttributes[a]; ok {
 		return s, nil
 	}
-	return 0, fmt.Errorf("invalid condition type %s", t.String())
+	return 0, fmt.Errorf("invalid condition attribute %s", a.String())
 }
 
 func fromInternalConditionOperator(t authz.ProjectRuleConditionOperators) (pb_common.ConditionOperator, error) {
