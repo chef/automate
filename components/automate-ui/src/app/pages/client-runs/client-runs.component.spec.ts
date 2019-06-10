@@ -57,7 +57,8 @@ describe('ClientRunsComponent', () => {
     it('ensure types are included', () => {
       const expected = [
         'attribute', 'cookbook', 'chef_tags', 'chef_version', 'environment', 'name', 'platform',
-        'policy_group', 'policy_name', 'policy_revision', 'recipe', 'role', 'resource_name'];
+        'policy_group', 'policy_name', 'policy_revision', 'recipe', 'role', 'resource_name',
+        'error'];
 
       const types = component.categoryTypes.map(type => type.type);
 
