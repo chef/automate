@@ -25,7 +25,7 @@ function install_from_results_or_depot() {
     fi
   fi
 
-  HAB_LICENSE=accept-no-persist hab pkg install -b /bin "chef/$package" --channel "$channel"
+  HAB_LICENSE=accept-no-persist hab pkg install --binlink-dir /bin "chef/$package" --channel "$channel"
 }
 
 install_from_results_or_depot automate-cli dev "$HARTIFACT_DIR"

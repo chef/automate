@@ -26,7 +26,7 @@ function install_from_results_or_depot() {
     fi
   fi
 
-  HAB_LICENSE=accept-no-persist hab pkg install -b /bin "chef/$1" --channel "$channel"
+  HAB_LICENSE=accept-no-persist hab pkg install --binlink-dir /bin "chef/$1" --channel "$channel"
 }
 
 if find /a1-migration/hab_keys/ -name devchef*sig.key | grep -c devchef
