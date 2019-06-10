@@ -10,7 +10,7 @@ control 'iam-v2-global-projects-filter-1' do
  describe 'allowed projects' do
 
     UNASSIGNED_PROJECT_ID = '(unassigned)'
-    UNASSIGNED_PROJECT_NAME = 'Unassigned Project'
+    UNASSIGNED_PROJECT_NAME = UNASSIGNED_PROJECT_ID
 
     def genInputProject(id, name)
       return { id: id,

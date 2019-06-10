@@ -456,11 +456,17 @@ func mapProjectNamesToIds(
 	projMap := toMap(refProjects)
 	projects := make([]*pb_common.Project, len(projectIDs))
 	for i, id := range projectIDs {
-		apiProj, err := domainProjectToAPIProject(projMap[id])
-		if err != nil {
-			return nil, err
+		// Due to concurrent requests, this lookup conceivably might fail
+		// (meaning an expected id was not returned from ListProjects).
+		// If that is the case, just skip it.
+		domainProj, ok := projMap[id]
+		if ok {
+			apiProj, err := domainProjectToAPIProject(domainProj)
+			if err != nil {
+				return nil, err
+			}
+			projects[i] = apiProj
 		}
-		projects[i] = apiProj
 	}
 	return &pb_resp.ListProjectsResp{Projects: projects}, nil
 }
