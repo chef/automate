@@ -201,7 +201,7 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 		}
 
 		// 4) Service
-		svc := newService(pkgIdent, health, did, sid, gid)
+		svc := newService(pkgIdent, health, did, sid, gid, svcMetadata.GetPackageIdent())
 		if svcMetadata.GetUpdateConfig() != nil {
 			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
 		}
@@ -215,7 +215,7 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 
 }
 
-func newService(pkgIdent *packageIdent, health string, did, sid, gid int32) *service {
+func newService(pkgIdent *packageIdent, health string, did, sid, gid int32, fullPkgIdent string) *service {
 	return &service{
 		Origin:       pkgIdent.Origin,
 		Name:         pkgIdent.Name,
@@ -225,6 +225,7 @@ func newService(pkgIdent *packageIdent, health string, did, sid, gid int32) *ser
 		GroupID:      gid,
 		DeploymentID: did,
 		SupID:        sid,
+		FullPkgIdent: fullPkgIdent,
 	}
 }
 
