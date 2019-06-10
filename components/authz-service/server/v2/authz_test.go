@@ -258,7 +258,8 @@ func (e *responderEngine) V2ProjectsAuthorized(
 func (e *responderEngine) V2FilterAuthorizedPairs(
 	context.Context,
 	engine.Subjects,
-	[]engine.Pair) ([]engine.Pair, error) {
+	[]engine.Pair,
+	bool) ([]engine.Pair, error) {
 	return e.pairs, nil
 }
 

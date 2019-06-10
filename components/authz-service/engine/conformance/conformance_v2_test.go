@@ -387,8 +387,8 @@ func TestV2FilterAuthorizedPairs(t *testing.T) {
 		"nodes:someid", "compliance:profiles:delete", "compliance:profiles"
 	pair0 := engine.Pair{Resource: engine.Resource(res0), Action: engine.Action(act0)}
 	pair1 := engine.Pair{Resource: engine.Resource(res1), Action: engine.Action(act1)}
-	args := func() (context.Context, engine.Subjects, []engine.Pair) {
-		return ctx, engine.Subject(sub), []engine.Pair{pair0, pair1}
+	args := func() (context.Context, engine.Subjects, []engine.Pair, bool) {
+		return ctx, engine.Subject(sub), []engine.Pair{pair0, pair1}, false
 	}
 
 	for desc, e := range engines {
