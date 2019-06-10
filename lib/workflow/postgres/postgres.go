@@ -437,7 +437,7 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 	if err != nil {
 		if err == sql.ErrNoRows {
 			row := tx.QueryRowContext(ctx,
-				"SELECT parameters, result FROM workflow_results WHERE workflow_name = $1 AND instance_name = $2 ORDER BY end_at DESC",
+				"SELECT parameters, result FROM workflow_results WHERE workflow_name = $1 AND instance_name = $2 ORDER BY id DESC",
 				workflowName, instanceName,
 			)
 			err := row.Scan(
