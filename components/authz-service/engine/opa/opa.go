@@ -545,10 +545,10 @@ func (s *State) V2p1SetPolicies(
 // SetRules replaces OPA's rule cache with an updated rule map
 func (s *State) SetRules(
 	ctx context.Context, ruleMap map[string][]v2.Rule) error {
-	s.ruleStore = cache.New(cache.NoExpiration, -1)
+	s.ruleStore = cache.New(cache.NoExpiration, -1 /* never run cleanup */)
 	for project, rule := range ruleMap {
 		if err := s.ruleStore.Add(project, rule, cache.NoExpiration); err != nil {
-			return errors.New("failed to set rule store")
+			return errors.New("failed to add to rule store")
 		}
 	}
 	return nil
