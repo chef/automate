@@ -979,7 +979,7 @@ control 'iam-v2-1' do
       end
 
 
-      it "PUT /iam/v2beta/rules/:id returns updates the rule" do
+      it "PUT /iam/v2beta/rules/:id updates the rule" do
         updated_rule = {
           id: CUSTOM_RULE_1[:id],
           name: "updated display name",
