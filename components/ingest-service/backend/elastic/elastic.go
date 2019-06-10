@@ -324,11 +324,11 @@ func (es *Backend) updateMapping(ctx context.Context, esMap mappings.Mapping) er
 	return err
 }
 
-func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex string) error {
+func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex string) (string, error) {
 	src := elastic.NewReindexSource().Index(previousIndex)
 	dst := elastic.NewReindexDestination().Index(mappings.NodeState.Index)
-	_, err := es.client.Reindex().Source(src).Destination(dst).Do(ctx)
-	return err
+	startTaskResult, err := es.client.Reindex().Source(src).Destination(dst).DoAsync(ctx)
+	return startTaskResult.TaskId, err
 }
 
 func (es *Backend) storeExists(ctx context.Context, indexName string) bool {
