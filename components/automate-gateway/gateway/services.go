@@ -545,6 +545,9 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		data, err := stream.Recv()
 		if err == io.EOF {
+			if query.Type == "json" {
+				w.Write([]byte("]"))
+			}
 			break
 		}
 		if err != nil {

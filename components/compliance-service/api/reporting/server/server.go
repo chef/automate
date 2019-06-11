@@ -201,12 +201,19 @@ func getExportHandler(format string, stream reporting.ReportingService_ExportSer
 }
 
 func jsonExport(stream reporting.ReportingService_ExportServer) exportHandler {
+	initialRun := true
 	return func(data *reporting.Report) error {
 		raw, err := json.Marshal(data)
 		if err != nil {
 			return fmt.Errorf("Failed to marshal JSON export data: %+v", err)
 		}
 
+		if initialRun {
+			raw = append([]byte("["), raw...)
+			initialRun = false
+		} else {
+			raw = append([]byte(","), raw...)
+		}
 		reader := bytes.NewReader(raw)
 		buf := make([]byte, streamBufferSize)
 
