@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
@@ -21,7 +21,8 @@ const (
 
 func TestCreateRuleProperties(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _, seed := setupRules(t)
+	// cl, store, _, seed := setupRules(t)
+	cl, testDB, store, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 
 	conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
@@ -74,10 +75,17 @@ func TestCreateRuleProperties(t *testing.T) {
 	properties := gopter.NewProperties(params)
 	properties.Property("creates a rule in storage", prop.ForAll(
 		func(req api.CreateRuleReq) bool {
-			defer store.Flush()
+			defer testDB.Flush(t)
+			_, err := cl.CreateProject(ctx, &api.CreateProjectReq{
+				Name: "TODO",
+				Id:   req.ProjectId,
+			})
+			if err != nil {
+				t.Error(err.Error())
+				return false // bad run
+			}
 
-			_, err := cl.CreateRule(ctx, &req)
-
+			_, err = cl.CreateRule(ctx, &req)
 			// Note: this could be very noisy, but it's hard to figure out what went
 			// wrong without the error
 			if err != nil {
@@ -85,11 +93,11 @@ func TestCreateRuleProperties(t *testing.T) {
 				return false // bad run
 			}
 
-			i, found := store.Get(req.Id)
-			if !found {
+			r, err := store.GetRule(ctx, req.Id)
+			if err != nil {
 				return false
 			}
-			r := i.(*storage.Rule)
+
 			// Note: we're ignoring type conversion, as asserting that would require us
 			// to replicate the mapping logic in tests.
 			// Instead, as we add ReadRule, and ListRules etc, methods, we can use this
@@ -103,7 +111,7 @@ func TestCreateRuleProperties(t *testing.T) {
 	))
 	properties.Property("ensures IDs are unique", prop.ForAll(
 		func(reqs []api.CreateRuleReq) bool {
-			defer store.Flush()
+			defer testDB.Flush(t)
 
 			if _, err := cl.CreateRule(ctx, &reqs[0]); err != nil {
 				return false
