@@ -151,10 +151,6 @@ func loadServiceIDs() map[string][]habpkg.HabPkg {
 }
 
 func removeDeploymentService(collectionName string, serviceIDs []habpkg.HabPkg) []habpkg.HabPkg {
-	if collectionName != "automate-full" {
-		return serviceIDs
-	}
-
 	// remove deployment-services from Services slice
 	for i := range serviceIDs {
 		if serviceIDs[i].Name() == "deployment-service" {
@@ -162,7 +158,7 @@ func removeDeploymentService(collectionName string, serviceIDs []habpkg.HabPkg) 
 			return serviceIDs
 		}
 	}
-	panic("never found deployment-service")
+	return serviceIDs
 }
 
 func loadSupplementaryPackages() map[string][]habpkg.HabPkg {

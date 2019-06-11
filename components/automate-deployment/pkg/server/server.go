@@ -2055,8 +2055,6 @@ func (s *server) reloadBackupRunner() error {
 		Port: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetPort().GetValue(),
 	}
 
-	chefServerEnabled := s.deployment.Config.GetDeployment().GetV1().GetSvc().GetEnableChefServer().GetValue()
-	workflowEnabled := s.deployment.Config.GetDeployment().GetV1().GetSvc().GetEnableWorkflow().GetValue()
 	target := target.NewLocalTarget(airgap.AirgapInUse())
 
 	if s.backupRunner == nil {
@@ -2066,7 +2064,7 @@ func (s *server) reloadBackupRunner() error {
 	s.backupRunner.Configure(
 		backup.WithConfigRenderer(configRenderer),
 		backup.WithConnFactory(s.connFactory),
-		backup.WithSpecs(backup.DefaultSpecs(chefServerEnabled, workflowEnabled)),
+		backup.WithSpecs(backup.DefaultSpecs(s.deployment.ServiceNames())),
 		backup.WithBackupLocationSpecification(locationSpec),
 		backup.WithPGConnInfo(pgConnInfo),
 		backup.WithEsSidecarInfo(esSidecarInfo),

@@ -52,9 +52,14 @@
   },
   {
     "collection": "chef-server",
-    "data_services": [],
+    "data_services": [
+      "chef/backup-gateway",
+      "chef/automate-postgresql",
+      "chef/automate-elasticsearch"
+    ],
     "all_services": [
       "chef/backup-gateway",
+      "chef/deployment-service",
       "chef/automate-postgresql",
       "chef/automate-pg-gateway",
       "chef/automate-elasticsearch",
