@@ -434,6 +434,7 @@ func (backend *ES2Backend) getProfileMetadata(profileID string) (*stats.ProfileS
 		"copyright",
 		"copyright_email",
 		"summary",
+		"depends",
 	)
 
 	searchSource := elastic.NewSearchSource().
