@@ -7,6 +7,8 @@ cd /workdir/e2e
 instances_to_test=( \
     "a2-iamv2-local-fresh-install-${CHANNEL}.cd.chef.co" \
     "a2-iamv2-local-inplace-upgrade-${CHANNEL}.cd.chef.co" \
+    "a2-iamv2p1-local-fresh-install-${CHANNEL}.cd.chef.co" \
+    "a2-iamv2p1-local-inplace-upgrade-${CHANNEL}.cd.chef.co" \
     "a2-local-fresh-install-${CHANNEL}.cd.chef.co" \
     "a2-perf-test-single-local-inplace-upgrade-${CHANNEL}.cd.chef.co" \
 )
