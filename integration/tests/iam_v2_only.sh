@@ -41,6 +41,12 @@ do_deploy() {
 do_test_deploy() {
     log_info "run chef-automate iam upgrade-to-v2"
     chef-automate iam upgrade-to-v2 || return 1
+
+    # ensure service startup works with IAM v2:
+    # - kill authz-service to force startup,
+    # - wait for service status to be healthy again
+    pkill -f authz-service && sleep 2 && chef-automate status -w || return 1
+
     log_info "creating test users with automate-cli"
     chef-automate dev create-iam-dev-users || return 1
     do_test_deploy_default
