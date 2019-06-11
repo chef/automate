@@ -9,7 +9,7 @@ import find from 'lodash/fp/find';
 
 /**
  * @description
- * A toggle button. Uses the chef-option atom to define it's different states.
+ * A group of status filters. Uses the chef-option atom to render the status filters.
  *
  * @example
  * <chef-status-filter-group id="filters-example">
