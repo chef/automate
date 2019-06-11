@@ -1,4 +1,4 @@
-import { 
+import {
   Component,
   Event,
   EventEmitter,
@@ -7,11 +7,12 @@ import {
 
 /**
  * @description
- * Simple atom to wrap content in chef styled "page". Provides a slot named 'label' to provide
- * a label for the page. Labels can be one or multiple elements and can be styled as necessary.
+ * Template to wrap content in chef styled "page". Provides a slot for page content.
+ *
+ * Events: confirm, cancel and secondaryConfirm
  *
  * @example
- * <chef-page 
+ * <chef-page
  *  class="example-page-width"
  *  heading="Add Members to Administrator"
  *  subheading="Automate only displays local users and local teams. For other types of members add a member expression."
@@ -22,19 +23,19 @@ import {
  * >
  *  <chef-table>
  *    <chef-thead>
-*       <chef-tr>
-*         <chef-th class="checkbox-row"></chef-th>
-*         <chef-th>ID</chef-th>
-*         <chef-th>Type</chef-th>
-*       </chef-tr>
+ *       <chef-tr>
+ *         <chef-th class="checkbox-row"></chef-th>
+ *         <chef-th>ID</chef-th>
+ *         <chef-th>Type</chef-th>
+ *       </chef-tr>
  *    </chef-thead>
  *    <chef-tbody>
  *      <chef-tr >
-*        <chef-td>
-*         <chef-checkbox></chef-checkbox>
-*        </chef-td>
-*        <chef-td>1</chef-td>
-*        <chef-td>apple</chef-td>
+ *        <chef-td>
+ *         <chef-checkbox></chef-checkbox>
+ *        </chef-td>
+ *        <chef-td>1</chef-td>
+ *        <chef-td>apple</chef-td>
  *      </chef-tr>
  *    </chef-tbody>
  *  </chef-table>
@@ -61,7 +62,7 @@ export class ChefPage {
    */
   @Prop({ reflectToAttr: true }) errorMessage: string;
 
-   /**
+  /**
    * Text for secondary button
    */
   @Prop({ reflectToAttr: true }) secondaryBtnText: string;
@@ -69,22 +70,22 @@ export class ChefPage {
   /**
    * Text for confirm button
    */
-  @Prop({ reflectToAttr: true }) confirmBtnText: string = 'Confirm';
+  @Prop({ reflectToAttr: true }) confirmBtnText = 'Confirm';
 
   /**
    * Text for cancel button
    */
-  @Prop({ reflectToAttr: true }) cancelBtnText: string = 'Cancel';
+  @Prop({ reflectToAttr: true }) cancelBtnText = 'Cancel';
 
   /**
    * Indicate confirm is loading
    */
-  @Prop({ reflectToAttr: true }) confirmLoading: boolean = false;
+  @Prop({ reflectToAttr: true }) confirmLoading = false;
 
   /**
    * Disable confirm buttom
    */
-  @Prop({ reflectToAttr: true }) disableConfirm: boolean = true;
+  @Prop({ reflectToAttr: true }) disableConfirm = true;
 
   @Event() secondaryConfirm: EventEmitter;
   @Event() confirm: EventEmitter;
@@ -102,7 +103,7 @@ export class ChefPage {
         </div>
 
         <div id="close-button" class="flex-right">
-          <chef-button 
+          <chef-button
             secondary
             class="close-button"
             aria-label="Close"
@@ -158,7 +159,7 @@ export class ChefPage {
   }
 
   private getLoading() {
-    return this.confirmLoading 
+    return this.confirmLoading
       ? <chef-loading-spinner></chef-loading-spinner>
       : '';
   }
