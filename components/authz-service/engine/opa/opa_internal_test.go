@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/storage"
 	"github.com/open-policy-agent/opa/storage/inmem"
@@ -512,43 +511,4 @@ func randomPolicies(i int) []map[string]interface{} {
 	}
 
 	return newPolicies
-}
-
-var rule engine.Rule
-
-func BenchmarkUnmarshallingWithMapstructure(b *testing.B) {
-	var r engine.Rule
-	m := map[string]interface{}{
-		"type":   "ChefServers",
-		"values": []string{"foo", "bar"},
-	}
-	for n := 0; n < b.N; n++ {
-		r = engine.Rule{}
-		if err := mapstructure.Decode(m, &r); err != nil {
-			b.Error(err)
-		}
-	}
-	rule = r
-}
-
-func BenchmarkUnmarshallingWithoutMapstructure(b *testing.B) {
-	var r engine.Rule
-	m := map[string]interface{}{
-		"type":   "ChefServers",
-		"values": []string{"foo", "bar"},
-	}
-	for n := 0; n < b.N; n++ {
-		r = engine.Rule{}
-		if t, ok := m["type"]; ok {
-			if t, ok := t.(string); ok {
-				r.Type = t
-			}
-		}
-		if vs, ok := m["values"]; ok {
-			if vs, ok := vs.([]string); ok {
-				r.Values = vs
-			}
-		}
-	}
-	rule = r
 }

@@ -246,6 +246,7 @@ func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 	if err := s.rules.Add(rule.ID, rule, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}
+	s.bumpPolicyVersion()
 	return rule, nil
 }
 
@@ -266,6 +267,7 @@ func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 	if err := s.rules.Replace(rule.ID, rule, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}
+	s.bumpPolicyVersion()
 	return rule, nil
 }
 
@@ -319,6 +321,7 @@ func (s *State) DeleteRule(ctx context.Context, id string) error {
 	}
 
 	s.rules.Delete(id)
+	s.bumpPolicyVersion()
 	return nil
 }
 

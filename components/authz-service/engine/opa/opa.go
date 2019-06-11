@@ -14,9 +14,11 @@ import (
 	"github.com/open-policy-agent/opa/storage"
 	"github.com/open-policy-agent/opa/storage/inmem"
 	"github.com/open-policy-agent/opa/topdown"
+	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/authz-service/engine"
+	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -26,6 +28,7 @@ type State struct {
 	store             storage.Store
 	v2Store           storage.Store
 	v2p1Store         storage.Store
+	ruleStore         *cache.Cache
 	queries           map[string]ast.Body
 	compiler          *ast.Compiler
 	modules           map[string]*ast.Module
@@ -41,8 +44,6 @@ const (
 	authzV2Query            = "data.authz_v2.authorized"
 	authzProjectsV2Query    = "data.authz_v2.authorized_project"
 	filteredPairsV2Query    = "data.authz_v2.introspection.authorized_pair[_]"
-	rulesForProjectQuery    = "data.rule_mappings.rules_for_project"
-	listProjectMapQuery     = "data.rule_mappings.rules_for_all_projects"
 	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project"
 )
 
@@ -76,19 +77,12 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 	if err != nil {
 		return nil, errors.Wrapf(err, "parse query %q", filteredProjectsV2Query)
 	}
-	rulesForProjectQueryParsed, err := ast.ParseBody(rulesForProjectQuery)
-	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", rulesForProjectQuery)
-	}
-	listProjectMapQueryParsed, err := ast.ParseBody(listProjectMapQuery)
-	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", listProjectMapQuery)
-	}
 	s := State{
 		log:       l,
 		store:     inmem.New(),
 		v2Store:   inmem.New(),
 		v2p1Store: inmem.New(),
+		ruleStore: cache.New(cache.NoExpiration, -1),
 		queries: map[string]ast.Body{
 			authzQuery:              authzQueryParsed,
 			filteredPairsQuery:      filteredPairsQueryParsed,
@@ -96,8 +90,6 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 			authzProjectsV2Query:    authzProjectsV2QueryParsed,
 			filteredPairsV2Query:    filteredPairsV2QueryParsed,
 			filteredProjectsV2Query: filteredProjectsV2QueryParsed,
-			rulesForProjectQuery:    rulesForProjectQueryParsed,
-			listProjectMapQuery:     listProjectMapQueryParsed,
 		},
 	}
 	for _, opt := range opts {
@@ -406,31 +398,24 @@ func (s *State) V2FilterAuthorizedProjects(
 	return s.projectsFromResults(rs)
 }
 
-// Note(sr) Right now, it doesn't seem like this was doing much more than
-// retrieving data from OPA's store. However, that's fine -- we'll need those
-// mapping rules in OPA's store for other things (most likely), so retrieving
-// them from there is a decent approximation of our approach.
-func (s *State) RulesForProject(
-	ctx context.Context,
-	projectID string) ([]engine.Rule, error) {
-	opaInput := map[string]interface{}{
-		"project_id": projectID,
-	}
-
-	rs, err := s.evalQuery(ctx, s.queries[rulesForProjectQuery], opaInput, s.v2p1Store)
-	if err != nil {
-		return nil, &ErrEvaluation{e: err}
-	}
-	return s.rulesFromResults(rs)
-}
-
 // ListProjectMappings returns a map of all the rules for each projectID.
-func (s *State) ListProjectMappings(ctx context.Context) (map[string][]engine.Rule, error) {
-	rs, err := s.evalQuery(ctx, s.queries[listProjectMapQuery], map[string]interface{}{}, s.v2Store)
-	if err != nil {
-		return nil, &ErrEvaluation{e: err}
+func (s *State) ListProjectMappings(ctx context.Context) (map[string][]v2.Rule, error) {
+	items := s.ruleStore.Items()
+	// nothing stored while on v1 or v2.0
+	if len(items) == 0 {
+		return map[string][]v2.Rule{}, nil
 	}
-	return s.projectMappingsFromResults(rs)
+	projectRules := make(map[string][]v2.Rule, len(items))
+	for project, item := range items {
+		rules, ok := item.Object.([]v2.Rule)
+		if !ok {
+			return nil, errors.New("failed to convert rule list")
+		}
+
+		projectRules[project] = rules
+	}
+
+	return projectRules, nil
 }
 
 func (s *State) evalQuery(
@@ -517,92 +502,6 @@ func (s *State) stringArrayFromResults(exps []*rego.ExpressionValue) ([]string, 
 	return vals, nil
 }
 
-func (s *State) rulesFromResults(rs rego.ResultSet) ([]engine.Rule, error) {
-	rules := make([]engine.Rule, 0)
-	if len(rs) != 1 {
-		return nil, &ErrUnexpectedResultSet{set: rs} // or something similar
-	}
-	r := rs[0]
-	if len(r.Expressions) != 1 {
-		return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
-	}
-
-	exp := r.Expressions[0]
-	ms, ok := exp.Value.([]interface{})
-	if !ok {
-		return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
-	}
-	var err error
-	rules, err = s.convertRulesList(ms, rules)
-	if err != nil {
-		return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
-	}
-
-	return rules, nil
-}
-
-func (s *State) projectMappingsFromResults(rs rego.ResultSet) (map[string][]engine.Rule, error) {
-	ruleMap := make(map[string][]engine.Rule)
-	for _, r := range rs {
-		if len(r.Expressions) != 1 {
-			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
-		}
-
-		exp := r.Expressions[0]
-		outer, ok := exp.Value.([]interface{})
-		if !ok {
-			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
-		}
-		if len(outer) != 1 {
-			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
-		}
-		projectMap := outer[0].(map[string]interface{})
-		if !ok {
-			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
-		}
-
-		for projectID, ms := range projectMap {
-			rules := make([]engine.Rule, 0)
-			ms, ok := ms.([]interface{})
-			if !ok {
-				return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
-			}
-			rules, err := s.convertRulesList(ms, rules)
-			if err != nil {
-				return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
-			}
-			ruleMap[projectID] = rules
-		}
-	}
-
-	return ruleMap, nil
-}
-
-func (s *State) convertRulesList(ms []interface{}, rules []engine.Rule) ([]engine.Rule, error) {
-	for i := range ms {
-		m, ok := ms[i].(map[string]interface{})
-		if !ok {
-			return nil, errors.New("error converting map[string]interface{}")
-		}
-		t, ok := m["type"].(string)
-		if !ok {
-			return nil, errors.New("error converting type")
-		}
-		vs, ok := m["values"].([]interface{})
-		if !ok {
-			return nil, errors.New("error converting values")
-		}
-		vals := make([]string, len(vs))
-		for j := range vs {
-			if val, ok := vs[j].(string); ok {
-				vals[j] = val
-			}
-		}
-		rules = append(rules, engine.Rule{Type: t, Values: vals})
-	}
-	return rules, nil
-}
-
 // SetPolicies replaces OPA's data with a new set of policies, and resets the
 // partial evaluation cache
 func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}) error {
@@ -621,12 +520,10 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 // rules, and resets the partial evaluation cache for v2
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
-	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
-	// TODO: v2 doesn't care about rules
+	roleMap map[string]interface{}) error {
 	s.v2Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
 		"roles":    roleMap,
-		"rules":    ruleMap,
 	})
 
 	return s.initPartialResultV2(ctx)
@@ -636,14 +533,25 @@ func (s *State) V2SetPolicies(
 // rules, and resets the partial evaluation cache for v2.l
 func (s *State) V2p1SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
-	roleMap map[string]interface{}, ruleMap map[string][]interface{}) error {
+	roleMap map[string]interface{}) error {
 	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policyMap,
 		"roles":    roleMap,
-		"rules":    ruleMap,
 	})
 
 	return s.initPartialResultV2p1(ctx)
+}
+
+// SetRules replaces OPA's rule cache with an updated rule map
+func (s *State) SetRules(
+	ctx context.Context, ruleMap map[string][]v2.Rule) error {
+	s.ruleStore = cache.New(cache.NoExpiration, -1 /* never run cleanup */)
+	for project, rule := range ruleMap {
+		if err := s.ruleStore.Add(project, rule, cache.NoExpiration); err != nil {
+			return errors.New("failed to add to rule store")
+		}
+	}
+	return nil
 }
 
 // ErrUnexpectedResultExpression is returned when one of the result sets

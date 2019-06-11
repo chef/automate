@@ -981,6 +981,11 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		}
 	}
 
+	err = p.notifyPolicyChange(ctx, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, storage_errors.NewErrTxCommit(err)

@@ -19,7 +19,6 @@ import (
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
-	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
@@ -465,14 +464,9 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 // TODO More testing
 type testProjectRulesRetriever struct{}
 
-func (t *testProjectRulesRetriever) RulesForProject(
-	context.Context, string) ([]engine.Rule, error) {
-	return []engine.Rule{}, nil
-}
-
 func (t *testProjectRulesRetriever) ListProjectMappings(
-	context.Context) (map[string][]engine.Rule, error) {
-	return make(map[string][]engine.Rule, 0), nil
+	context.Context) (map[string][]storage.Rule, error) {
+	return make(map[string][]storage.Rule, 0), nil
 }
 
 type mockEventServiceClient struct {

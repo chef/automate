@@ -1561,8 +1561,8 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	localSuite.projectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	localSuite.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 
 	event := &automate_event.EventMsg{
 		EventID:   "any",
@@ -1605,8 +1605,8 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	localSuite.projectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	localSuite.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 
 	event1 := &automate_event.EventMsg{
 		EventID:   "1",

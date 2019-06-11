@@ -65,7 +65,7 @@ func findMatchingProjects(node backend.Node, projects map[string]*iam_v2.Project
 
 func getProjectRulesFromAuthz(ctx context.Context,
 	authzClient iam_v2.ProjectsClient) map[string]*iam_v2.ProjectRules {
-	projectsCollection, err := authzClient.ListProjectRules(ctx, &iam_v2.ListProjectRulesReq{})
+	projectsCollection, err := authzClient.ListRulesForAllProjects(ctx, &iam_v2.ListRulesForAllProjectsReq{})
 	if err != nil {
 		// If there is an error getting the project rules from authz crash the service.
 		log.WithError(err).Fatal("Could not fetch project rules from authz")

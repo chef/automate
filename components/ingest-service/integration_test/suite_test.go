@@ -363,8 +363,8 @@ func createServices(s *Suite) {
 
 func createMocksWithDefaultFunctions(s *Suite) {
 	s.projectsClient = iam_v2.NewMockProjectsClient(gomock.NewController(nil))
-	s.projectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	s.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 
 	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(nil))
 	s.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().Return(

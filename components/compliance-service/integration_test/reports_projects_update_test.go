@@ -1380,8 +1380,8 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	localSuite.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	localSuite.ProjectsClientMock.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 	event := &automate_event.EventMsg{
 		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
@@ -1417,8 +1417,8 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 	var eventsSent []*automate_event.EventMsg
 	localSuite := NewLocalSuite(t)
 	defer localSuite.GlobalTeardown()
-	localSuite.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	localSuite.ProjectsClientMock.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 	localSuite.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(ctx interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
 			eventsSent = append(eventsSent, in.Msg)

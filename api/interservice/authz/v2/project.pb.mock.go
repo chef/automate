@@ -36,8 +36,6 @@ type ProjectsServerMock struct {
 	DeleteProjectFunc                func(context.Context, *DeleteProjectReq) (*DeleteProjectResp, error)
 	ListProjectsFunc                 func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
 	ListProjectsForIntrospectionFunc func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
-	ListProjectRulesFunc             func(context.Context, *ListProjectRulesReq) (*ProjectCollectionRulesResp, error)
-	GetProjectRulesFunc              func(context.Context, *GetProjectRulesReq) (*GetProjectRulesResp, error)
 	HandleEventFunc                  func(context.Context, *event.EventMsg) (*event.EventResponse, error)
 	ProjectUpdateStatusFunc          func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
 	ProjectUpdateCancelFunc          func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error)
@@ -47,6 +45,7 @@ type ProjectsServerMock struct {
 	ListRulesFunc                    func(context.Context, *ListRulesReq) (*ListRulesResp, error)
 	ListRulesForProjectFunc          func(context.Context, *ListRulesForProjectReq) (*ListRulesForProjectResp, error)
 	DeleteRuleFunc                   func(context.Context, *DeleteRuleReq) (*DeleteRuleResp, error)
+	ListRulesForAllProjectsFunc      func(context.Context, *ListRulesForAllProjectsReq) (*ListRulesForAllProjectsResp, error)
 }
 
 func (m *ProjectsServerMock) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
@@ -119,30 +118,6 @@ func (m *ProjectsServerMock) ListProjectsForIntrospection(ctx context.Context, r
 		return f(ctx, req)
 	}
 	return nil, status.Error(codes.Internal, "mock: 'ListProjectsForIntrospection' not implemented")
-}
-
-func (m *ProjectsServerMock) ListProjectRules(ctx context.Context, req *ListProjectRulesReq) (*ProjectCollectionRulesResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.ListProjectRulesFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'ListProjectRules' not implemented")
-}
-
-func (m *ProjectsServerMock) GetProjectRules(ctx context.Context, req *GetProjectRulesReq) (*GetProjectRulesResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.GetProjectRulesFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'GetProjectRules' not implemented")
 }
 
 func (m *ProjectsServerMock) HandleEvent(ctx context.Context, req *event.EventMsg) (*event.EventResponse, error) {
@@ -253,6 +228,18 @@ func (m *ProjectsServerMock) DeleteRule(ctx context.Context, req *DeleteRuleReq)
 	return nil, status.Error(codes.Internal, "mock: 'DeleteRule' not implemented")
 }
 
+func (m *ProjectsServerMock) ListRulesForAllProjects(ctx context.Context, req *ListRulesForAllProjectsReq) (*ListRulesForAllProjectsResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.ListRulesForAllProjectsFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'ListRulesForAllProjects' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *ProjectsServerMock) Reset() {
 	m.UpdateProjectFunc = nil
@@ -261,8 +248,6 @@ func (m *ProjectsServerMock) Reset() {
 	m.DeleteProjectFunc = nil
 	m.ListProjectsFunc = nil
 	m.ListProjectsForIntrospectionFunc = nil
-	m.ListProjectRulesFunc = nil
-	m.GetProjectRulesFunc = nil
 	m.HandleEventFunc = nil
 	m.ProjectUpdateStatusFunc = nil
 	m.ProjectUpdateCancelFunc = nil
@@ -272,4 +257,5 @@ func (m *ProjectsServerMock) Reset() {
 	m.ListRulesFunc = nil
 	m.ListRulesForProjectFunc = nil
 	m.DeleteRuleFunc = nil
+	m.ListRulesForAllProjectsFunc = nil
 }

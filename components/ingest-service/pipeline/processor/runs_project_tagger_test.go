@@ -1085,10 +1085,10 @@ func TestBundlerSingleMessage(t *testing.T) {
 	inbox := make(chan message.ChefRun, 100)
 	listProjectRulesCount := 0
 	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx interface{}, in interface{}) (*iam_v2.ProjectCollectionRulesResp, error) {
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx interface{}, in interface{}) (*iam_v2.ListRulesForAllProjectsResp, error) {
 			listProjectRulesCount++
-			return &iam_v2.ProjectCollectionRulesResp{}, nil
+			return &iam_v2.ListRulesForAllProjectsResp{}, nil
 		})
 	errc := make(chan error)
 
@@ -1101,15 +1101,15 @@ func TestBundlerSingleMessage(t *testing.T) {
 	assert.Equal(t, 1, listProjectRulesCount)
 }
 
-// When 5 messages are in the inbox the ListProjectRules function is only called once.
+// When 5 messages are in the inbox the ListRulesForAllProjects function is only called once.
 func TestBundler5Messages(t *testing.T) {
 	inbox := make(chan message.ChefRun, 100)
 	listProjectRulesCount := 0
 	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx interface{}, in interface{}) (*iam_v2.ProjectCollectionRulesResp, error) {
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).DoAndReturn(
+		func(ctx interface{}, in interface{}) (*iam_v2.ListRulesForAllProjectsResp, error) {
 			listProjectRulesCount++
-			return &iam_v2.ProjectCollectionRulesResp{}, nil
+			return &iam_v2.ListRulesForAllProjectsResp{}, nil
 		})
 	errc := make(chan error)
 
@@ -1152,8 +1152,8 @@ func TestBundlerMatchProjectRule(t *testing.T) {
 		},
 	}
 	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Return(
-		&iam_v2.ProjectCollectionRulesResp{ProjectRules: projectRules}, nil)
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
+		&iam_v2.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 	errc := make(chan error)
 
 	chefRun1 := message.NewChefRun(context.Background(), &chef.Run{}, errc)
@@ -1194,8 +1194,8 @@ func TestBundlerMatchProjectRuleEventRuleType(t *testing.T) {
 		},
 	}
 	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Return(
-		&iam_v2.ProjectCollectionRulesResp{ProjectRules: projectRules}, nil)
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
+		&iam_v2.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 	errc := make(chan error)
 
 	chefRun1 := message.NewChefRun(context.Background(), &chef.Run{}, errc)
