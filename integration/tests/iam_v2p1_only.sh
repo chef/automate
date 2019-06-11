@@ -42,6 +42,11 @@ do_test_deploy() {
     log_info "run chef-automate iam upgrade-to-v2 --beta2.1 --skip-policy-migration"
     chef-automate iam upgrade-to-v2 --beta2.1 --skip-policy-migration || return 1
 
+    # ensure service startup works with IAM v2.1:
+    # - kill authz-service to force startup,
+    # - wait for service status to be healthy again
+    pkill -f authz-service && sleep 2 && chef-automate status -w || return 1
+
     verify_legacy_policies_not_migrated
 
     do_test_deploy_default
