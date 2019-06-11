@@ -99,10 +99,24 @@
           {{ serviceGroup.release }}
         </chef-td>
         <chef-td class="env">
-          {{ serviceGroup.environment }}
+          <!-- if environment is empty, display a badge -->
+          <chef-badge no-data warning
+            id="warning-env-tooltip"
+            *ngIf="serviceGroup.environment === ''"
+            [tooltip]="tooltipMessageFor('env')">NO ENV</chef-badge>
+
+          <!-- else, display the environment name -->
+          <div *ngIf="serviceGroup.environment !== ''">{{ serviceGroup.environment }}</div>
         </chef-td>
         <chef-td class="app">
-          {{ serviceGroup.application }}
+          <!-- if application is empty, display a badge -->
+          <chef-badge no-data warning
+            id="warning-app-tooltip"
+            *ngIf="serviceGroup.application === ''"
+            [tooltip]="tooltipMessageFor('app')">NO APP</chef-badge>
+
+          <!-- else, display the application name -->
+          <div *ngIf="serviceGroup.application !== ''">{{ serviceGroup.application }}</div>
         </chef-td>
       </chef-tr>
     </chef-tbody>
