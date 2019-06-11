@@ -1,7 +1,7 @@
 describe('global projects filter', () => {
-  const proj1  = "cypress-project-1"
-  const proj2  = "cypress-project-2"
-  const proj3  = "cypress-project-3"
+  const proj1 = { id: "cypress-project-1", name: "Cypress Project 1 " + Cypress.moment().format('MMDDYYhhmm') }
+  const proj2 = { id: "cypress-project-2", name: "Cypress Project 2 " + Cypress.moment().format('MMDDYYhhmm')}
+  const proj3 = { id: "cypress-project-3", name: "Cypress Project 3 " + Cypress.moment().format('MMDDYYhhmm') }
   // TODO uncomment with non-admin test
   // const pol_id = "cypress-policy"
   // const nonAdminUsername = "nonadmin"
@@ -29,7 +29,7 @@ describe('global projects filter', () => {
         if (version === 'v1') {
           cy.get('[data-cy=projects-filter-button]').click()
           
-          const allowedProjects = [proj1, proj2, proj3, '(unassigned)'];
+          const allowedProjects = [proj1.name, proj2.name, proj3.name, '(unassigned)'];
           // we don't check that projects in dropdown match *exactly* as
           // we can't control creation of other projects in the test env
           allowedProjects.forEach(project => {
