@@ -34,6 +34,9 @@ var ListenPort int = 2133
 func InitWorkflowManager(w *workflow.WorkflowManager, workerCount int, ingestClient ingest.ComplianceIngesterClient,
 	scanner *scanner.Scanner, resolver *resolver.Resolver, remoteInspecVersion string) {
 	w.RegisterWorkflowExecutor("scan-job-workflow", &ScanJobWorkflow{})
+	w.RegisterTaskExecutor("create-child", &CreateChildTask{
+		scanner,
+	}, workflow.TaskExecutorOpts{Workers: 1})
 	w.RegisterTaskExecutor("resolve-job", &ResolveTask{
 		remoteInspecVersion,
 		scanner,
@@ -65,7 +68,11 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 		return w.Complete()
 	}
 
-	w.EnqueueTask("resolve-job", job)
+	if job.Recurrence != "" {
+		w.EnqueueTask("create-child", job)
+	} else {
+		w.EnqueueTask("resolve-job", job)
+	}
 
 	return w.Continue(&ScanJobWorkflowPayload{
 		0,
@@ -85,6 +92,19 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 
 	logrus.Debugf("Entered ScanJobWorkflow > OnTaskComplete with payload %+v", payload)
 	switch ev.TaskName {
+	case "create-child":
+		if ev.Result.Err() != nil {
+			return w.Complete()
+		}
+
+		var childJob jobs.Job
+		err := ev.Result.Get(&childJob)
+		if err != nil {
+			logrus.WithError(err).Error("Failed to unmarshal job!")
+			return w.Complete()
+		}
+		w.EnqueueTask("resolve-job", childJob)
+		return w.Continue(&payload)
 	case "resolve-job":
 		if ev.Result.Err() != nil {
 			return w.Complete()
@@ -129,16 +149,14 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 			}
 		}
 
-		if payload.OutstandingJobs > 0 {
-			return w.Continue(&payload)
-		} else {
+		if payload.OutstandingJobs <= 0 {
 			// No more jobs left to run, if status hasn't changed from the initial Running, we change it to Completed
 			if payload.ParentJobStatus == types.StatusRunning {
 				payload.ParentJobStatus = types.StatusCompleted
 			}
 			w.EnqueueTask("scan-job-summary", payload)
-			return w.Continue(&payload)
 		}
+		return w.Continue(&payload)
 	case "scan-job-summary":
 		// We only want to complete after processing the summary task
 		// This task is designed to conclude the overall status of a job that is resolved in child jobs
@@ -151,6 +169,10 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 func (s *ScanJobWorkflow) OnCancel(w workflow.WorkflowInstance, ev workflow.CancelEvent) workflow.Decision {
 	logrus.Debugf("ScanJobWorkflow got OnCancel")
 	return w.Complete()
+}
+
+type CreateChildTask struct {
+	scanner *scanner.Scanner
 }
 
 type InspecJobTask struct {
@@ -398,6 +420,26 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (int
 	logrus.Debugf("Updating parent job %s with overall status of %s", jobsPayload.ParentJobID, jobsPayload.ParentJobStatus)
 	t.scannerServer.UpdateJobStatus(jobsPayload.ParentJobID, jobsPayload.ParentJobStatus, nil, timeNowRef())
 	return nil, nil
+}
+
+func (t *CreateChildTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+	var job jobs.Job
+	if err := task.GetParameters(&job); err != nil {
+		logrus.WithError(err).Error("could not unmarshal job")
+		return nil, err
+	}
+
+	job.JobCount++
+	job.Name = fmt.Sprintf("%s - run %d", job.Name, job.JobCount)
+	job.Recurrence = ""
+
+	t.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+	childJob, err := t.scanner.CreateChildJob(&job)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to create child job")
+	}
+
+	return childJob, nil
 }
 
 func timeNowRef() *time.Time {
