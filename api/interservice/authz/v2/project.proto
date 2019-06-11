@@ -114,7 +114,7 @@ enum ProjectRuleTypes {
     EVENT = 1;
 }
 
-enum ProjectRuleConditionTypes {
+enum ProjectRuleConditionAttributes {
     CHEF_SERVERS = 0;
     CHEF_ORGS = 1;
     CHEF_ENVIRONMENTS = 2;
@@ -130,7 +130,7 @@ enum ProjectRuleConditionOperators {
 }
 
 message Condition {
-    ProjectRuleConditionTypes type = 1;
+    ProjectRuleConditionAttributes attribute = 1;
     repeated string values = 2;
     ProjectRuleConditionOperators operator = 3;
 }

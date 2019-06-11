@@ -825,7 +825,7 @@ control 'iam-v2-1' do
           type: "NODE",
           conditions: [
             {
-              type: "CHEF_TAGS",
+              attribute: "CHEF_TAGS",
               operator: "MEMBER_OF",
               values: ["tag1", "tag2"]
             }
@@ -860,7 +860,7 @@ control 'iam-v2-1' do
         type: "NODE",
         conditions: [
           {
-            type: "CHEF_TAGS",
+            attribute: "CHEF_TAGS",
             operator: "MEMBER_OF",
             values: ["tag1", "tag2"]
           }
@@ -874,7 +874,7 @@ control 'iam-v2-1' do
         type: "EVENT",
         conditions: [
           {
-            type: "CHEF_SERVERS",
+            attribute: "CHEF_SERVERS",
             operator: "EQUALS",
             values: ["server1"]
           }
@@ -889,7 +889,7 @@ control 'iam-v2-1' do
         type: "NODE",
         conditions: [
           {
-            type: "CHEF_ORGS",
+            attribute: "CHEF_ORGS",
             operator: "EQUALS",
             values: ["org1"]
           }
@@ -987,7 +987,7 @@ control 'iam-v2-1' do
           type: "NODE",
           conditions: [
             {
-              type: "CHEF_TAGS",
+              attribute: "CHEF_TAGS",
               operator: "EQUALS",
               values: ["new tag"]
             }

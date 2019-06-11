@@ -103,12 +103,12 @@ func reportMatchesAllConditions(report *relaxting.ESInSpecReport, conditions []*
 	}
 
 	for _, condition := range conditions {
-		switch condition.Type {
-		case iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS:
+		switch condition.Attribute {
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS:
 			if !stringutils.SliceContains(condition.Values, report.Environment) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_ROLES:
+		case iam_v2.ProjectRuleConditionAttributes_ROLES:
 			foundMatch := false
 			for _, projectRole := range condition.Values {
 				if stringutils.SliceContains(report.Roles, projectRole) {
@@ -119,23 +119,23 @@ func reportMatchesAllConditions(report *relaxting.ESInSpecReport, conditions []*
 			if !foundMatch {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS:
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS:
 			if !stringutils.SliceContains(condition.Values, report.SourceFQDN) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_CHEF_ORGS:
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS:
 			if !stringutils.SliceContains(condition.Values, report.OrganizationName) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_POLICY_GROUP:
+		case iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP:
 			if !stringutils.SliceContains(condition.Values, report.PolicyGroup) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_POLICY_NAME:
+		case iam_v2.ProjectRuleConditionAttributes_POLICY_NAME:
 			if !stringutils.SliceContains(condition.Values, report.PolicyName) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_CHEF_TAGS:
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS:
 			foundMatch := false
 			for _, projectChefTag := range condition.Values {
 				if stringutils.SliceContains(report.ChefTags, projectChefTag) {

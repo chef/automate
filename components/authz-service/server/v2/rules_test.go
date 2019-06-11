@@ -23,9 +23,9 @@ func TestCreateRule(t *testing.T) {
 	// cases
 	apiConditions := []*api.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values:   []string{"opscode"},
-			Operator: api.ProjectRuleConditionOperators_EQUALS,
+			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    []string{"opscode"},
+			Operator:  api.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	storageConditions := []storage.Condition{
@@ -112,14 +112,14 @@ func TestCreateRule(t *testing.T) {
 				Type:      api.ProjectRuleTypes_NODE,
 				Conditions: []*api.Condition{
 					{
-						Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-						Values:   []string{"chef"},
-						Operator: api.ProjectRuleConditionOperators_EQUALS,
+						Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+						Values:    []string{"chef"},
+						Operator:  api.ProjectRuleConditionOperators_EQUALS,
 					},
 					{
-						Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
-						Values:   []string{"tag1", "tag2"},
-						Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+						Attribute: api.ProjectRuleConditionAttributes_CHEF_TAGS,
+						Values:    []string{"tag1", "tag2"},
+						Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 					},
 				},
 			})
@@ -132,14 +132,14 @@ func TestCreateRule(t *testing.T) {
 					Type:      api.ProjectRuleTypes_NODE,
 					Conditions: []*api.Condition{
 						{
-							Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-							Values:   []string{"chef"},
-							Operator: api.ProjectRuleConditionOperators_EQUALS,
+							Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Values:    []string{"chef"},
+							Operator:  api.ProjectRuleConditionOperators_EQUALS,
 						},
 						{
-							Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
-							Values:   []string{"tag1", "tag2"},
-							Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+							Attribute: api.ProjectRuleConditionAttributes_CHEF_TAGS,
+							Values:    []string{"tag1", "tag2"},
+							Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 						},
 					},
 				},
@@ -163,9 +163,9 @@ func TestUpdateRule(t *testing.T) {
 
 	apiConditions := []*api.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values:   []string{"opscode"},
-			Operator: api.ProjectRuleConditionOperators_EQUALS,
+			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    []string{"opscode"},
+			Operator:  api.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	storageConditions := []storage.Condition{
@@ -255,9 +255,9 @@ func TestUpdateRule(t *testing.T) {
 
 			changedAPIConditions := []*api.Condition{
 				{
-					Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
-					Values:   []string{"should-break"},
-					Operator: api.ProjectRuleConditionOperators_EQUALS,
+					Attribute: api.ProjectRuleConditionAttributes_CHEF_TAGS,
+					Values:    []string{"should-break"},
+					Operator:  api.ProjectRuleConditionOperators_EQUALS,
 				},
 			}
 
@@ -283,14 +283,14 @@ func TestUpdateRule(t *testing.T) {
 				Type:      api.ProjectRuleTypes_NODE,
 				Conditions: []*api.Condition{
 					{
-						Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-						Values:   []string{"chef"},
-						Operator: api.ProjectRuleConditionOperators_EQUALS,
+						Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+						Values:    []string{"chef"},
+						Operator:  api.ProjectRuleConditionOperators_EQUALS,
 					},
 					{
-						Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
-						Values:   []string{"tag1", "tag2"},
-						Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+						Attribute: api.ProjectRuleConditionAttributes_CHEF_TAGS,
+						Values:    []string{"tag1", "tag2"},
+						Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 					},
 				},
 			})
@@ -303,14 +303,14 @@ func TestUpdateRule(t *testing.T) {
 					Type:      api.ProjectRuleTypes_NODE,
 					Conditions: []*api.Condition{
 						{
-							Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-							Values:   []string{"chef"},
-							Operator: api.ProjectRuleConditionOperators_EQUALS,
+							Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Values:    []string{"chef"},
+							Operator:  api.ProjectRuleConditionOperators_EQUALS,
 						},
 						{
-							Type:     api.ProjectRuleConditionTypes_CHEF_TAGS,
-							Values:   []string{"tag1", "tag2"},
-							Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+							Attribute: api.ProjectRuleConditionAttributes_CHEF_TAGS,
+							Values:    []string{"tag1", "tag2"},
+							Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 						},
 					},
 				},
@@ -328,14 +328,14 @@ func TestUpdateRule(t *testing.T) {
 				Type:      api.ProjectRuleTypes_NODE,
 				Conditions: []*api.Condition{
 					{
-						Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-						Values:   []string{"chef"},
-						Operator: api.ProjectRuleConditionOperators_EQUALS,
+						Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+						Values:    []string{"chef"},
+						Operator:  api.ProjectRuleConditionOperators_EQUALS,
 					},
 					{
-						Type:     api.ProjectRuleConditionTypes_CHEF_SERVERS,
-						Values:   []string{"server1", "server2"},
-						Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+						Attribute: api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+						Values:    []string{"server1", "server2"},
+						Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 					},
 				},
 			})
@@ -348,14 +348,14 @@ func TestUpdateRule(t *testing.T) {
 					Type:      api.ProjectRuleTypes_NODE,
 					Conditions: []*api.Condition{
 						{
-							Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-							Values:   []string{"chef"},
-							Operator: api.ProjectRuleConditionOperators_EQUALS,
+							Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Values:    []string{"chef"},
+							Operator:  api.ProjectRuleConditionOperators_EQUALS,
 						},
 						{
-							Type:     api.ProjectRuleConditionTypes_CHEF_SERVERS,
-							Values:   []string{"server1", "server2"},
-							Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+							Attribute: api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+							Values:    []string{"server1", "server2"},
+							Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 						},
 					},
 				},
@@ -373,14 +373,14 @@ func TestUpdateRule(t *testing.T) {
 				Type:      api.ProjectRuleTypes_EVENT,
 				Conditions: []*api.Condition{
 					{
-						Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-						Values:   []string{"chef"},
-						Operator: api.ProjectRuleConditionOperators_EQUALS,
+						Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+						Values:    []string{"chef"},
+						Operator:  api.ProjectRuleConditionOperators_EQUALS,
 					},
 					{
-						Type:     api.ProjectRuleConditionTypes_CHEF_SERVERS,
-						Values:   []string{"server1", "server2"},
-						Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+						Attribute: api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+						Values:    []string{"server1", "server2"},
+						Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 					},
 				},
 			})
@@ -393,14 +393,14 @@ func TestUpdateRule(t *testing.T) {
 					Type:      api.ProjectRuleTypes_EVENT,
 					Conditions: []*api.Condition{
 						{
-							Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-							Values:   []string{"chef"},
-							Operator: api.ProjectRuleConditionOperators_EQUALS,
+							Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Values:    []string{"chef"},
+							Operator:  api.ProjectRuleConditionOperators_EQUALS,
 						},
 						{
-							Type:     api.ProjectRuleConditionTypes_CHEF_SERVERS,
-							Values:   []string{"server1", "server2"},
-							Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+							Attribute: api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+							Values:    []string{"server1", "server2"},
+							Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 						},
 					},
 				},
@@ -424,9 +424,9 @@ func TestGetRule(t *testing.T) {
 
 	apiConditions := []*api.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values:   []string{"opscode"},
-			Operator: api.ProjectRuleConditionOperators_EQUALS,
+			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    []string{"opscode"},
+			Operator:  api.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	storageConditions := []storage.Condition{
@@ -493,9 +493,9 @@ func TestListRules(t *testing.T) {
 
 	apiConditions1 := []*api.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values:   []string{"opscode", "chef"},
-			Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    []string{"opscode", "chef"},
+			Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 		},
 	}
 	storageConditions1 := []storage.Condition{
@@ -508,9 +508,9 @@ func TestListRules(t *testing.T) {
 	}
 	apiConditions2 := []*api.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
-			Values:   []string{"chef"},
-			Operator: api.ProjectRuleConditionOperators_EQUALS,
+			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    []string{"chef"},
+			Operator:  api.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	storageConditions2 := []storage.Condition{
@@ -583,7 +583,7 @@ func TestListRulesForProject(t *testing.T) {
 	}
 	apiConditions2 := []*api.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Attribute:     api.ProjectRuleConditionAttributes_CHEF_ORGS,
 			Values:   []string{"chef"},
 			Operator: api.ProjectRuleConditionOperators_EQUALS,
 		},
@@ -598,7 +598,7 @@ func TestListRulesForProject(t *testing.T) {
 	}
 	apiConditions3 := []*api.Condition{
 		{
-			Type:     api.ProjectRuleConditionTypes_CHEF_ORGS,
+			Attribute:     api.ProjectRuleConditionAttributes_CHEF_ORGS,
 			Values:   []string{"other", "org"},
 			Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
 		},

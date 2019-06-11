@@ -443,7 +443,7 @@ func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition
 }
 
 func storageCondition(ruleType storage.RuleType, apiCondition *api.Condition) (storage.Condition, error) {
-	condAttr, err := fromAPIProjectRuleConditionTypes(apiCondition.Type)
+	condAttr, err := fromAPIProjectRuleConditionAttributes(apiCondition.Attribute)
 	if err != nil {
 		return storage.Condition{}, err
 	}
@@ -499,7 +499,7 @@ func fromStorageConditions(cs []storage.Condition) ([]*api.Condition, error) {
 }
 
 func fromStorageCondition(c storage.Condition) (*api.Condition, error) {
-	t, err := fromStorageConditionType(c.Attribute)
+	a, err := fromStorageConditionAttribute(c.Attribute)
 	if err != nil {
 		return nil, err
 	}
@@ -510,43 +510,43 @@ func fromStorageCondition(c storage.Condition) (*api.Condition, error) {
 	}
 
 	return &api.Condition{
-		Type:     t,
-		Values:   c.Value,
-		Operator: o,
+		Attribute: a,
+		Values:    c.Value,
+		Operator:  o,
 	}, nil
 }
 
-var storageToAPIConditionAttributes = map[storage.ConditionAttribute]api.ProjectRuleConditionTypes{
-	storage.ChefRole:     api.ProjectRuleConditionTypes_ROLES,
-	storage.ChefServer:   api.ProjectRuleConditionTypes_CHEF_SERVERS,
-	storage.ChefTag:      api.ProjectRuleConditionTypes_CHEF_TAGS,
-	storage.Environment:  api.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-	storage.Organization: api.ProjectRuleConditionTypes_CHEF_ORGS,
-	storage.PolicyGroup:  api.ProjectRuleConditionTypes_POLICY_GROUP,
-	storage.PolicyName:   api.ProjectRuleConditionTypes_POLICY_NAME,
+var storageToAPIConditionAttributes = map[storage.ConditionAttribute]api.ProjectRuleConditionAttributes{
+	storage.ChefRole:     api.ProjectRuleConditionAttributes_ROLES,
+	storage.ChefServer:   api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+	storage.ChefTag:      api.ProjectRuleConditionAttributes_CHEF_TAGS,
+	storage.Environment:  api.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+	storage.Organization: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+	storage.PolicyGroup:  api.ProjectRuleConditionAttributes_POLICY_GROUP,
+	storage.PolicyName:   api.ProjectRuleConditionAttributes_POLICY_NAME,
 }
 
-var apiToStorageConditionAttributes = map[api.ProjectRuleConditionTypes]storage.ConditionAttribute{}
+var apiToStorageConditionAttributes = map[api.ProjectRuleConditionAttributes]storage.ConditionAttribute{}
 var onceReverseConditionAttributesMapping sync.Once
 
-func fromStorageConditionType(t storage.ConditionAttribute) (api.ProjectRuleConditionTypes, error) {
-	if s, ok := storageToAPIConditionAttributes[t]; ok {
+func fromStorageConditionAttribute(a storage.ConditionAttribute) (api.ProjectRuleConditionAttributes, error) {
+	if s, ok := storageToAPIConditionAttributes[a]; ok {
 		return s, nil
 	}
-	return 0, fmt.Errorf("invalid condition type %q", t.String())
+	return 0, fmt.Errorf("invalid condition attribute %q", a.String())
 }
 
-func fromAPIProjectRuleConditionTypes(t api.ProjectRuleConditionTypes) (storage.ConditionAttribute, error) {
+func fromAPIProjectRuleConditionAttributes(a api.ProjectRuleConditionAttributes) (storage.ConditionAttribute, error) {
 	onceReverseConditionAttributesMapping.Do(func() {
 		for k, v := range storageToAPIConditionAttributes {
 			apiToStorageConditionAttributes[v] = k
 		}
 	})
 
-	if s, ok := apiToStorageConditionAttributes[t]; ok {
+	if s, ok := apiToStorageConditionAttributes[a]; ok {
 		return s, nil
 	}
-	return 0, fmt.Errorf("invalid condition type %q", t.String())
+	return 0, fmt.Errorf("invalid condition attribute %q", a.String())
 }
 
 var storageToAPIConditionOperators = map[storage.ConditionOperator]api.ProjectRuleConditionOperators{
