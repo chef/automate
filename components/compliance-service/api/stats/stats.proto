@@ -4,6 +4,7 @@ package chef.automate.domain.compliance.api.stats;
 option go_package = "github.com/chef/automate/components/compliance-service/api/stats";
 
 import "google/api/annotations.proto";
+import "components/compliance-service/api/reporting/reporting.proto";
 
 service StatsService {
 	rpc ReadSummary(Query) returns (Summary) {};
@@ -103,6 +104,7 @@ message ProfileSummary {
 	string summary = 8;
 	repeated Support supports = 9;
 	ProfileSummaryStats stats = 10;
+	repeated chef.automate.domain.compliance.api.reporting.Dependency depends = 11;
 }
 
 message ProfileSummaryStats {
