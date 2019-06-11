@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/reportingstatsv1Query"
             }
           }
         ],
@@ -52,7 +52,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Profile"
+              "$ref": "#/definitions/reportingstatsv1Profile"
             }
           }
         },
@@ -62,7 +62,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/reportingstatsv1Query"
             }
           }
         ],
@@ -89,7 +89,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/reportingstatsv1Query"
             }
           }
         ],
@@ -116,7 +116,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/reportingstatsv1Query"
             }
           }
         ],
@@ -127,13 +127,112 @@ func init() {
     }
   },
   "definitions": {
-    "QueryOrderType": {
+    "reportingstatsv1ListFilter": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "reportingstatsv1Profile": {
+      "type": "object",
+      "properties": {
+        "profile_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ProfileList"
+          }
+        },
+        "profile_summary": {
+          "$ref": "#/definitions/v1ProfileSummary"
+        },
+        "control_stats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ControlStats"
+          }
+        }
+      }
+    },
+    "reportingstatsv1Query": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "interval": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/reportingstatsv1ListFilter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/reportingstatsv1QueryOrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "reportingstatsv1QueryOrderType": {
       "type": "string",
       "enum": [
         "ASC",
         "DESC"
       ],
       "default": "ASC"
+    },
+    "reportingstatsv1Support": {
+      "type": "object",
+      "properties": {
+        "os_name": {
+          "type": "string"
+        },
+        "os_family": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        },
+        "inspec_version": {
+          "type": "string"
+        },
+        "platform_name": {
+          "type": "string"
+        },
+        "platform_family": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
     },
     "v1ControlStats": {
       "type": "object",
@@ -191,6 +290,50 @@ func init() {
         }
       }
     },
+    "v1Dependency": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "git": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "supermarket": {
+          "type": "string"
+        },
+        "github": {
+          "type": "string"
+        },
+        "compliance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "skip_message": {
+          "type": "string"
+        }
+      }
+    },
     "v1FailureSummary": {
       "type": "object",
       "properties": {
@@ -238,20 +381,6 @@ func init() {
         }
       }
     },
-    "v1ListFilter": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "type": {
-          "type": "string"
-        }
-      }
-    },
     "v1NodeSummary": {
       "type": "object",
       "properties": {
@@ -278,26 +407,6 @@ func init() {
         "low_risk": {
           "type": "integer",
           "format": "int32"
-        }
-      }
-    },
-    "v1Profile": {
-      "type": "object",
-      "properties": {
-        "profile_list": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1ProfileList"
-          }
-        },
-        "profile_summary": {
-          "$ref": "#/definitions/v1ProfileSummary"
-        },
-        "control_stats": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1ControlStats"
-          }
         }
       }
     },
@@ -366,11 +475,17 @@ func init() {
         "supports": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Support"
+            "$ref": "#/definitions/reportingstatsv1Support"
           }
         },
         "stats": {
           "$ref": "#/definitions/v1ProfileSummaryStats"
+        },
+        "depends": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Dependency"
+          }
         }
       }
     },
@@ -394,45 +509,6 @@ func init() {
           "format": "int32"
         },
         "total_nodes": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "v1Query": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        },
-        "size": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "interval": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1ListFilter"
-          }
-        },
-        "order": {
-          "$ref": "#/definitions/QueryOrderType"
-        },
-        "sort": {
-          "type": "string"
-        },
-        "page": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "per_page": {
           "type": "integer",
           "format": "int32"
         }
@@ -488,32 +564,6 @@ func init() {
         },
         "report_summary": {
           "$ref": "#/definitions/v1ReportSummary"
-        }
-      }
-    },
-    "v1Support": {
-      "type": "object",
-      "properties": {
-        "os_name": {
-          "type": "string"
-        },
-        "os_family": {
-          "type": "string"
-        },
-        "release": {
-          "type": "string"
-        },
-        "inspec_version": {
-          "type": "string"
-        },
-        "platform_name": {
-          "type": "string"
-        },
-        "platform_family": {
-          "type": "string"
-        },
-        "platform": {
-          "type": "string"
         }
       }
     },
