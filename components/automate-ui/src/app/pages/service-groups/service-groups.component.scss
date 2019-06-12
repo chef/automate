@@ -19,7 +19,6 @@ chef-page-header {
 
 chef-th,
 chef-td {
-  line-height: 1.2;
 
   &.sort:hover {
     cursor: pointer;
@@ -29,33 +28,45 @@ chef-td {
     max-width: 110px;
   }
 
-  &.services {
-    max-width: 140px;
+  &.service-group {
+    display: grid;
+    align-content: flex-start;
   }
 
-  &.name {
-    max-width: 200px;
-    white-space: nowrap;
+  &.package-name {
+    display: flex;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-wrap: wrap;
+    align-content: flex-start;
   }
 
   &.release {
-    min-width: 160px;
+    display: flex;
+    min-width: 170px;
+    max-width: 210px;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-wrap: wrap;
+    align-content: flex-start;
   }
 
   &.env {
+    display: flex;
     max-width: 160px;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-wrap: wrap;
+    align-content: flex-start;
   }
 
   &.app {
+    display: flex;
     max-width: 160px;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-wrap: wrap;
+    align-content: flex-start;
   }
 }
 

@@ -132,14 +132,14 @@ Cypress.Commands.add("createPolicy", (id_token, id, username, projects) => {
     url: '/apis/iam/v2beta/policies',
     failOnStatusCode: false,
     body: {
-      id: id,
+      id,
       name: "non-admin policy",
       members: ["user:local:" + username],
       statements: [
         {
           effect: "ALLOW",
           actions: ["iam:teams:list", "iam:teams:get"],
-          projects: projects
+          projects
         }
       ]
     }
@@ -148,16 +148,15 @@ Cypress.Commands.add("createPolicy", (id_token, id, username, projects) => {
   })
 })
 
-Cypress.Commands.add("createProject", (id_token, id) => {
-  const name = "cypress project" + Cypress.moment().format('MMDDYYhhmm')
+Cypress.Commands.add("createProject", (id_token, { id, name }) => {
   cy.request({
     auth: { bearer: id_token },
     method: 'POST',
     url: '/apis/iam/v2beta/projects',
     failOnStatusCode: false,
     body: {
-      id: id,
-      name: name
+      id,
+      name
     }
   }).then((response) => {
     expect([200, 409]).to.include(response.status)

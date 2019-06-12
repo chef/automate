@@ -97,7 +97,7 @@ func TestListRulesForAllProjects(t *testing.T) {
 	type1 := api_v2.ProjectRuleTypes_NODE
 	conditions1 := []*api_v2.Condition{
 		{
-			Type:     api_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+			Attribute:     api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 			Values:   values1,
 			Operator: api_v2.ProjectRuleConditionOperators_MEMBER_OF,
 		},
@@ -105,14 +105,14 @@ func TestListRulesForAllProjects(t *testing.T) {
 	type2 := api_v2.ProjectRuleTypes_EVENT
 	conditions2 := []*api_v2.Condition{
 		{
-			Type:     api_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+			Attribute:     api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 			Values:   values2,
 			Operator: api_v2.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	conditions3 := []*api_v2.Condition{
 		{
-			Type:     api_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+			Attribute:     api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 			Values:   values3,
 			Operator: api_v2.ProjectRuleConditionOperators_MEMBER_OF,
 		},

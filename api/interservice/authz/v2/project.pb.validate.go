@@ -1442,7 +1442,7 @@ func (m *Condition) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Type
+	// no validation rules for Attribute
 
 	// no validation rules for Operator
 

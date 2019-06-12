@@ -37,11 +37,11 @@
           <chef-th class="health sort" (click)="onToggleSort('percent_ok')">
             Health <i class="sort-icon {{sortIcon('percent_ok')}}"></i>
           </chef-th>
-          <chef-th class="services">
-            Services
+          <chef-th class="service-group">
+            Service Group
           </chef-th>
-          <chef-th class="name sort" (click)="onToggleSort('name')">
-            Name <i class="sort-icon {{sortIcon('name')}}"></i>
+          <chef-th class="package-name sort" (click)="onToggleSort('name')">
+            Package <i class="sort-icon {{sortIcon('name')}}"></i>
           </chef-th>
           <chef-th class="release">
             Release
@@ -72,7 +72,6 @@
                   <span class="value">{{ serviceGroup.health_percentage }}</span>%
                 </span>
               </span>
-            
               <chef-data-point value="{{ serviceGroup.services_health_counts.critical }}" class="critical">
                 {{ serviceGroup.services_health_counts.critical }} Critical
               </chef-data-point>
@@ -89,14 +88,18 @@
           </div>
           <chef-icon class="{{serviceGroup.status}}">{{ serviceGroup.status | serviceStatusIcon }}</chef-icon>
         </chef-td>
-        <chef-td class="services">
-          {{ serviceGroup.services_health_counts.ok }} of {{ serviceGroup.services_health_counts.total }} OK
+        <chef-td class="service-group">
+          <div>{{ serviceGroup.name }}</div>
+          <div>
+            <b>{{ serviceGroup.services_health_counts.ok }} of {{ serviceGroup.services_health_counts.total }}</b>
+             OK
+          </div>
         </chef-td>
-        <chef-td class="name">
-          {{ serviceGroup.name }}
+        <chef-td class="package-name">
+          {{ getPackageNameFromFullRelease(serviceGroup.release) }}
         </chef-td>
         <chef-td class="release">
-          {{ serviceGroup.release }}
+          {{ getShortReleaseFromFullRelease(serviceGroup.release) }}
         </chef-td>
         <chef-td class="env">
           <!-- if environment is empty, display a badge -->
