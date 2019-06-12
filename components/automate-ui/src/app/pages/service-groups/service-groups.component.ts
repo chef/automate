@@ -221,18 +221,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     document.querySelector<HTMLElement>('app-services-sidebar').focus();
   }
 
-  // TODO @afiune: Add links when they work
-  public tooltipMessageFor(field: string): string {
-    switch (field) {
-      case 'env':
-        return 'Add environment data. Learn more in Configuring the Habitat Supervisor.';
-      case 'app':
-        return 'Add application data. Learn more in Configuring the Habitat Supervisor.';
-      default:
-        return '--';
-    }
-  }
-
   private getSelectedStatus(allParameters: Chicklet[]): RollupServiceStatus {
     const status = find((chicklet) => {
         return chicklet.type === 'status';
