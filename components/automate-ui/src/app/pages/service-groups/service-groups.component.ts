@@ -221,6 +221,18 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     document.querySelector<HTMLElement>('app-services-sidebar').focus();
   }
 
+  // TODO @afiune: Add links when they work
+  public tooltipMessageFor(field: string): string {
+    switch (field) {
+      case 'env':
+        return 'Add environment data. Learn more in Configuring the Habitat Supervisor.';
+      case 'app':
+        return 'Add application data. Learn more in Configuring the Habitat Supervisor.';
+      default:
+        return '--';
+    }
+  }
+
   // TODO: @afiune change the backend to send the values already splitted
   public getPackageNameFromFullRelease(release: string): string {
     const brokenRel = this.splitFullRelease(release);

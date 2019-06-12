@@ -41,15 +41,18 @@
     <ul>
       <li class="service-item" *ngFor="let service of services$ | async">
         <div class="header">
-          <div class ="fqdn-line"><chef-icon>storage</chef-icon> {{ service.fqdn || "- -"}}</div>
-          <div class ="supervisor-line"><b>Supervisor:</b> {{ service.supervisor_id }}</div>
-          <div class ="site-line"><b>Site:</b> {{ service.site  || "- -"}}</div>
+          <div class ="fqdn-line"><chef-icon>storage</chef-icon> {{ service.fqdn || "--"}}</div>
+          <div class ="supervisor-line"><b>Supervisor:</b> {{ service.supervisor_id || "--"}}</div>
+          <div class ="site-line"><b>Site:</b> {{ service.site  || "--"}}</div>
         </div>
         <div class="body">
-          <div class ="release-line"><chef-icon>grain</chef-icon>{{ service.release }}</div>
+          <div class ="release-line"><chef-icon>grain</chef-icon>{{ service.release || "--"}}</div>
           <div class ="channel-line">
-            <chef-badge general *ngIf="service.channel !== ''">{{ service.channel | uppercase }}</chef-badge>
-            <chef-badge no-data *ngIf="service.channel === ''">NO CHANNEL</chef-badge>
+            <chef-badge *ngIf="service.channel !== ''">{{ service.channel | uppercase }}</chef-badge>
+            <chef-badge no-data
+              id="general-channel-tooltip"
+              [tooltip]="tooltipMessageFor('channel')"
+              *ngIf="service.channel === ''">NO CHANNEL</chef-badge>
           </div>
           <div class ="health-line">
             <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
