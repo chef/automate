@@ -7,6 +7,7 @@ import (
 
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -90,6 +91,15 @@ func (c *ConfigRequest) Validate() error {
 	if packageCleanupMode != nil {
 		if valid, msg := validatePackageCleanupMode(packageCleanupMode.Value); !valid {
 			err.AddInvalidValue("deployment.v1.svc.package_cleanup_mode", msg)
+		}
+	}
+
+	if desiredCollections := c.V1.Svc.GetCollections(); len(desiredCollections) > 0 {
+		availableCollections := services.ListCollections()
+		for _, desiredCollection := range desiredCollections {
+			if !stringutils.SliceContains(availableCollections, desiredCollection) {
+				err.AddInvalidValue("deployment.v1.svc.collections", fmt.Sprintf("Valid collections are %s", strings.Join(availableCollections, ", ")))
+			}
 		}
 	}
 

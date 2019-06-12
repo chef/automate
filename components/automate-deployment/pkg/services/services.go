@@ -58,6 +58,16 @@ func AllServices() ([]habpkg.HabPkg, error) {
 	return ServicesInCollections(names)
 }
 
+func ListCollections() []string {
+	collections := make([]string, len(serviceCollections))
+	i := 0
+	for k := range serviceCollections {
+		collections[i] = k
+		i++
+	}
+	return collections
+}
+
 func ServicesInCollections(collections []string) ([]habpkg.HabPkg, error) {
 	combined := []habpkg.HabPkg{}
 	for _, collectionName := range collections {
