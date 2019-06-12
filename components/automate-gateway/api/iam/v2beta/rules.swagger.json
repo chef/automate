@@ -15,14 +15,30 @@
     "application/json"
   ],
   "paths": {
-    "/iam/v2beta/apply-rules": {
+    "/iam/v2beta/apply-rules-cancel": {
       "get": {
-        "operationId": "ApplyRules",
+        "operationId": "ApplyRulesCancel",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaApplyRulesResp"
+              "$ref": "#/definitions/v2betaApplyRulesCancelResp"
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      }
+    },
+    "/iam/v2beta/apply-rules-start": {
+      "get": {
+        "operationId": "ApplyRulesStart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaApplyRulesStartResp"
             }
           }
         },
@@ -173,7 +189,10 @@
     }
   },
   "definitions": {
-    "v2betaApplyRulesResp": {
+    "v2betaApplyRulesCancelResp": {
+      "type": "object"
+    },
+    "v2betaApplyRulesStartResp": {
       "type": "object"
     },
     "v2betaCondition": {

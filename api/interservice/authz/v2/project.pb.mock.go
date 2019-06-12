@@ -37,8 +37,9 @@ type ProjectsServerMock struct {
 	ListProjectsFunc                 func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
 	ListProjectsForIntrospectionFunc func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
 	HandleEventFunc                  func(context.Context, *event.EventMsg) (*event.EventResponse, error)
-	ProjectUpdateStatusFunc          func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
-	ProjectUpdateCancelFunc          func(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error)
+	ApplyRulesStartFunc              func(context.Context, *ApplyRulesStartReq) (*ApplyRulesStartResp, error)
+	ApplyRulesCancelFunc             func(context.Context, *ApplyRulesCancelReq) (*ApplyRulesCancelResp, error)
+	ApplyRulesStatusFunc             func(context.Context, *ApplyRulesStatusReq) (*ApplyRulesStatusResp, error)
 	CreateRuleFunc                   func(context.Context, *CreateRuleReq) (*CreateRuleResp, error)
 	UpdateRuleFunc                   func(context.Context, *UpdateRuleReq) (*UpdateRuleResp, error)
 	GetRuleFunc                      func(context.Context, *GetRuleReq) (*GetRuleResp, error)
@@ -46,7 +47,6 @@ type ProjectsServerMock struct {
 	ListRulesForProjectFunc          func(context.Context, *ListRulesForProjectReq) (*ListRulesForProjectResp, error)
 	DeleteRuleFunc                   func(context.Context, *DeleteRuleReq) (*DeleteRuleResp, error)
 	ListRulesForAllProjectsFunc      func(context.Context, *ListRulesForAllProjectsReq) (*ListRulesForAllProjectsResp, error)
-	ApplyRulesFunc                   func(context.Context, *ApplyRulesReq) (*ApplyRulesResp, error)
 }
 
 func (m *ProjectsServerMock) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
@@ -133,28 +133,40 @@ func (m *ProjectsServerMock) HandleEvent(ctx context.Context, req *event.EventMs
 	return nil, status.Error(codes.Internal, "mock: 'HandleEvent' not implemented")
 }
 
-func (m *ProjectsServerMock) ProjectUpdateStatus(ctx context.Context, req *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error) {
+func (m *ProjectsServerMock) ApplyRulesStart(ctx context.Context, req *ApplyRulesStartReq) (*ApplyRulesStartResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
-	if f := m.ProjectUpdateStatusFunc; f != nil {
+	if f := m.ApplyRulesStartFunc; f != nil {
 		return f(ctx, req)
 	}
-	return nil, status.Error(codes.Internal, "mock: 'ProjectUpdateStatus' not implemented")
+	return nil, status.Error(codes.Internal, "mock: 'ApplyRulesStart' not implemented")
 }
 
-func (m *ProjectsServerMock) ProjectUpdateCancel(ctx context.Context, req *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error) {
+func (m *ProjectsServerMock) ApplyRulesCancel(ctx context.Context, req *ApplyRulesCancelReq) (*ApplyRulesCancelResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
-	if f := m.ProjectUpdateCancelFunc; f != nil {
+	if f := m.ApplyRulesCancelFunc; f != nil {
 		return f(ctx, req)
 	}
-	return nil, status.Error(codes.Internal, "mock: 'ProjectUpdateCancel' not implemented")
+	return nil, status.Error(codes.Internal, "mock: 'ApplyRulesCancel' not implemented")
+}
+
+func (m *ProjectsServerMock) ApplyRulesStatus(ctx context.Context, req *ApplyRulesStatusReq) (*ApplyRulesStatusResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.ApplyRulesStatusFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'ApplyRulesStatus' not implemented")
 }
 
 func (m *ProjectsServerMock) CreateRule(ctx context.Context, req *CreateRuleReq) (*CreateRuleResp, error) {
@@ -241,18 +253,6 @@ func (m *ProjectsServerMock) ListRulesForAllProjects(ctx context.Context, req *L
 	return nil, status.Error(codes.Internal, "mock: 'ListRulesForAllProjects' not implemented")
 }
 
-func (m *ProjectsServerMock) ApplyRules(ctx context.Context, req *ApplyRulesReq) (*ApplyRulesResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.ApplyRulesFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'ApplyRules' not implemented")
-}
-
 // Reset resets all overridden functions
 func (m *ProjectsServerMock) Reset() {
 	m.UpdateProjectFunc = nil
@@ -262,8 +262,9 @@ func (m *ProjectsServerMock) Reset() {
 	m.ListProjectsFunc = nil
 	m.ListProjectsForIntrospectionFunc = nil
 	m.HandleEventFunc = nil
-	m.ProjectUpdateStatusFunc = nil
-	m.ProjectUpdateCancelFunc = nil
+	m.ApplyRulesStartFunc = nil
+	m.ApplyRulesCancelFunc = nil
+	m.ApplyRulesStatusFunc = nil
 	m.CreateRuleFunc = nil
 	m.UpdateRuleFunc = nil
 	m.GetRuleFunc = nil
@@ -271,5 +272,4 @@ func (m *ProjectsServerMock) Reset() {
 	m.ListRulesForProjectFunc = nil
 	m.DeleteRuleFunc = nil
 	m.ListRulesForAllProjectsFunc = nil
-	m.ApplyRulesFunc = nil
 }

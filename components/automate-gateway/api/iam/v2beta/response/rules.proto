@@ -27,6 +27,6 @@ message ListRulesForProjectResp {
 
 message DeleteRuleResp {}
 
-message ApplyRulesResp {}
+message ApplyRulesStartResp {}
 
-message ProjectUpdateCancelResp {}
+message ApplyRulesCancelResp {}

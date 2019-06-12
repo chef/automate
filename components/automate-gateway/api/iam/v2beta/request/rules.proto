@@ -35,6 +35,6 @@ message DeleteRuleReq {
   string id = 1;
 }
 
-message ApplyRulesReq {}
+message ApplyRulesStartReq {}
 
-message ProjectUpdateCancelReq {}
+message ApplyRulesCancelReq {}

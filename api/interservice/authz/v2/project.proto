@@ -63,9 +63,9 @@ service Projects {
 
     rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (
         chef.automate.domain.event.api.EventResponse);
-    rpc ProjectUpdateApply(ProjectUpdateApplyReq ) returns (ProjectUpdateApplyResp) {};
-    rpc ProjectUpdateCancel(ProjectUpdateStatusReq) returns (ProjectUpdateCancelResp);
-    rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
+    rpc ApplyRulesStart(ApplyRulesStartReq ) returns (ApplyRulesStartResp) {};
+    rpc ApplyRulesCancel(ApplyRulesCancelReq) returns (ApplyRulesCancelResp);
+    rpc ApplyRulesStatus(ApplyRulesStatusReq) returns (ApplyRulesStatusResp);
 
     // "proper" methods go here (and the ones above will be phased out eventually)
     rpc CreateRule(CreateRuleReq) returns (CreateRuleResp) {};
@@ -78,17 +78,17 @@ service Projects {
 }
 
 
-message ProjectUpdateApplyReq {}
+message ApplyRulesStartReq {}
 
-message ProjectUpdateApplyResp {}
+message ApplyRulesStartResp {}
 
-message ProjectUpdateCancelReq {}
+message ApplyRulesCancelReq {}
 
-message ProjectUpdateCancelResp {}
+message ApplyRulesCancelResp {}
 
-message ProjectUpdateStatusReq {}
+message ApplyRulesStatusReq {}
 
-message ProjectUpdateStatusResp {
+message ApplyRulesStatusResp {
     string state = 1;
     google.protobuf.Timestamp estimated_time_complete = 2;
     float percentage_complete = 3;

@@ -158,29 +158,40 @@ func (s *state) UpdateProject(ctx context.Context,
 	return &api.UpdateProjectResp{Project: apiProject}, nil
 }
 
-func (s *state) ProjectUpdateStatus(ctx context.Context,
-	req *api.ProjectUpdateStatusReq) (*api.ProjectUpdateStatusResp, error) {
+func (s *state) ApplyRulesStart(ctx context.Context, req *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
+	log.Info("apply project rules: START")
+	err := s.projectUpdateManager.Start()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal,
+			"error starting project update: %s", err.Error())
+	}
+	return &api.ApplyRulesStartResp{}, nil
+}
+
+func (s *state) ApplyRulesCancel(ctx context.Context,
+	_ *api.ApplyRulesCancelReq) (*api.ApplyRulesCancelResp, error) {
+	log.Info("apply project rules: CANCEL")
+	err := s.projectUpdateManager.Cancel()
+	if err != nil {
+		log.Errorf("Could not cancel project update: %v", err.Error())
+	}
+	return &api.ApplyRulesCancelResp{}, nil
+}
+
+func (s *state) ApplyRulesStatus(ctx context.Context,
+	req *api.ApplyRulesStatusReq) (*api.ApplyRulesStatusResp, error) {
 	time, err := ptypes.TimestampProto(s.projectUpdateManager.EstimatedTimeComplete())
 	if err != nil {
 		log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
-	return &api.ProjectUpdateStatusResp{
+	return &api.ApplyRulesStatusResp{
 		State:                 s.projectUpdateManager.State(),
 		PercentageComplete:    float32(s.projectUpdateManager.PercentageComplete()),
 		EstimatedTimeComplete: time,
 		Failed:                s.projectUpdateManager.Failed(),
 		FailureMessage:        s.projectUpdateManager.FailureMessage(),
 	}, nil
-}
-
-func (s *state) ProjectUpdateCancel(ctx context.Context,
-	_ *api.ProjectUpdateCancelReq) (*api.ProjectUpdateCancelResp, error) {
-	err := s.projectUpdateManager.Cancel()
-	if err != nil {
-		log.Errorf("Could not cancel project update: %v", err.Error())
-	}
-	return &api.ProjectUpdateCancelResp{}, nil
 }
 
 func (s *state) ListProjects(
@@ -422,16 +433,6 @@ func (s *state) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.De
 		return nil, status.Errorf(codes.Internal,
 			"error deleting rule with ID %q: %s", req.Id, err.Error())
 	}
-}
-
-func (s *state) ApplyRules(ctx context.Context, req *api.ApplyRulesReq) (*api.ApplyRulesResp, error) {
-	log.Info("applying project rules: START")
-	err := s.projectUpdateManager.Start()
-	if err != nil {
-		return nil, status.Errorf(codes.Internal,
-			"error starting project update: %s", err.Error())
-	}
-	return &api.ApplyRulesResp{}, nil
 }
 
 func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition) ([]storage.Condition, error) {
