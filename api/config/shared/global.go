@@ -162,6 +162,13 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 		}
 	}
 
+	switch c.GetV1().GetExternal().GetDataCollector().GetAuth().GetScheme().GetValue() {
+	case "", "token":
+		break
+	default:
+		cfgErr.AddInvalidValue("global.v1.external.data_collector.auth.scheme", "scheme must be one of '', 'token'")
+	}
+
 	if cfgErr.IsEmpty() {
 		return nil
 	}
