@@ -1,16 +1,6 @@
 @import "~styles/variables";
 
-main {
-  background-color: $chef-white;
-  height: 100vh;
-  min-height: 450px;
-  width: 100vw;
-  overflow: hidden;
-
-  chef-page-header {
-    padding-left: 0px;
-  }
-
+chef-page {
   chef-modal {
     #{--modal-width}: 777px;
 
@@ -44,28 +34,6 @@ main {
     }
   }
 
-  .add-member-button {
-    margin-left: 64px;
-    width: 175px;
-  }
-
-  #header-description {
-    margin-left: 64px;
-    margin-top: 64px;
-  }
-
-  #close-button {
-    padding: 32px;
-  }
-
-  .flex {
-    display: flex;
-
-    .flex-right {
-      margin-left: auto;
-    }
-  }
-
   #no-members-container {
     position: relative;
     top: 70px;
@@ -73,8 +41,6 @@ main {
   }
 
   #table-container {
-    margin-left: 64px;
-    margin-right: 64px;
 
     #members-selected {
       font-size: 12px;
@@ -92,29 +58,6 @@ main {
         .checkbox-row {
           max-width: 50px;
         }
-      }
-    }
-  }
-
-  #footer {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    margin-bottom: 64px;
-    width: 100%;
-
-    #right-buttons {
-      margin-right: 64px;
-      float: right;
-
-      chef-error {
-        display: inline-block;
-      }
-
-      chef-loading-spinner {
-        position: relative;
-        top: 2px;
-        margin-right: 5px;
       }
     }
   }

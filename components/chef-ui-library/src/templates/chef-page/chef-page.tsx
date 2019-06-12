@@ -18,7 +18,7 @@ import {
  *  subheading="Automate only displays local users and local teams. For other types of members add a member expression."
  *  secondary-btn-text="Add Member Expression"
  *  confirm-btn-text="Add Member"
- *  disableConfirm="true"
+ *  disable-confirm="true"
  *  cancel-btn-text="Cancel"
  * >
  *  <chef-table>
@@ -83,6 +83,11 @@ export class ChefPage {
   @Prop({ reflectToAttr: true }) confirmLoading = false;
 
   /**
+   * Indicate page is loading
+   */
+  @Prop({ reflectToAttr: true }) pageLoading = false;
+
+  /**
    * Disable confirm buttom
    */
   @Prop({ reflectToAttr: true }) disableConfirm = true;
@@ -92,70 +97,76 @@ export class ChefPage {
   @Event() close: EventEmitter;
 
   render() {
-    return [
-      <div id="page-header" class="flex">
+    if (this.pageLoading) {
+      return [
+        <chef-loading-spinner size="50" fixed></chef-loading-spinner>
+      ];
+    } else {
+      return [
+        <div id="page-header" class="flex">
 
-        <div id="header-description" class="flex-left">
-          <chef-page-header>
-            <chef-heading>{this.heading}</chef-heading>
-            <chef-subheading>{this.subheading}</chef-subheading>
-          </chef-page-header>
-        </div>
+          <div id="header-description" class="flex-left">
+            <chef-page-header>
+              <chef-heading>{this.heading}</chef-heading>
+              <chef-subheading>{this.subheading}</chef-subheading>
+            </chef-page-header>
+          </div>
 
-        <div id="close-button" class="flex-right">
-          <chef-button
-            secondary
-            class="close-button"
-            aria-label="Close"
-            onClick={this.handleClose.bind(this)}>
-            <chef-icon aria-hidden="true">close</chef-icon>
-          </chef-button>
-        </div>
-
-      </div>,
-
-      <div id="page-container">
-        <slot />
-      </div>,
-
-      <div id="page-footer">
-
-        {this.secondaryBtnText
-          ? <chef-button
+          <div id="close-button" class="flex-right">
+            <chef-button
               secondary
-              onClick={this.handleSecondaryConfirm.bind(this)}>
-              {this.secondaryBtnText}
+              class="close-button"
+              aria-label="Close"
+              onClick={this.handleClose.bind(this)}>
+              <chef-icon aria-hidden="true">close</chef-icon>
             </chef-button>
-          : ''
-        }
+          </div>
 
-        <div id="right-buttons">
+        </div>,
 
-          {(this.disableConfirm || this.confirmLoading)
-            ? <chef-button primary disabled>
-                {this.getLoading()}
-                <ng-container>{this.confirmBtnText}</ng-container>
+        <div id="page-container">
+          <slot />
+        </div>,
+
+        <div id="page-footer">
+
+          {this.secondaryBtnText
+            ? <chef-button
+                secondary
+                onClick={this.handleSecondaryConfirm.bind(this)}>
+                {this.secondaryBtnText}
               </chef-button>
-            : <chef-button primary onClick={this.handleConfirm.bind(this)}>
-                <ng-container>{this.confirmBtnText}</ng-container>
-              </chef-button>
-          }
-
-          {this.errorMessage
-            ? <chef-error>{this.errorMessage}</chef-error>
             : ''
           }
 
-          <chef-button
-            tertiary
-            onClick={this.handleClose.bind(this)}>
-            {this.cancelBtnText}
-          </chef-button>
+          <div id="right-buttons">
+
+            {(this.disableConfirm || this.confirmLoading)
+              ? <chef-button primary disabled>
+                  {this.getLoading()}
+                  <ng-container>{this.confirmBtnText}</ng-container>
+                </chef-button>
+              : <chef-button primary onClick={this.handleConfirm.bind(this)}>
+                  <ng-container>{this.confirmBtnText}</ng-container>
+                </chef-button>
+            }
+
+            {this.errorMessage
+              ? <chef-error>{this.errorMessage}</chef-error>
+              : ''
+            }
+
+            <chef-button
+              tertiary
+              onClick={this.handleClose.bind(this)}>
+              {this.cancelBtnText}
+            </chef-button>
+
+          </div>
 
         </div>
-
-      </div>
-    ];
+      ];
+    }
   }
 
   private getLoading() {
