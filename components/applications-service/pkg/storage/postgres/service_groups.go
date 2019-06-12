@@ -234,7 +234,7 @@ func (db *Postgres) GetServiceGroups(
 // Example: From the package_ident:       'core/redis/0.1.0/20200101000000'
 //          The release string should be: '0.1.0/20200101000000'
 //
-// Criterias:
+// Criteria:
 // * if the group of services has only one release, it returns it.
 // * if it has several releases then it returns the string 'Several'
 // * if it has no releases, (which it is impossible but we should protect against it) it
@@ -256,7 +256,7 @@ func (sgh *serviceGroupHealth) ReleaseString() string {
 // Example: From the package_ident:            'core/redis/0.1.0/20200101000000'
 //          The package name string should be: 'core/redis'
 //
-// Criterias:
+// Criteria:
 // * if the group of services has only one package name, it returns it.
 // * if it has several package names then it returns the string 'Several'
 //   (this case could happen when two services are running a package from different origins)
