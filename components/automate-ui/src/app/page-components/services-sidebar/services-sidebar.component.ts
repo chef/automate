@@ -103,6 +103,16 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
+  // TODO @afiune: Add links when they work
+  public tooltipMessageFor(field: string): string {
+    switch (field) {
+      case 'channel':
+        return 'Add channel data. Learn more in Continuous Deployment Using Channels.';
+      default:
+      return '--';
+    }
+  }
+
   private updateServicesFilters(): void {
     const queryParams = {
       'sgStatus': this.selectedHealth,
