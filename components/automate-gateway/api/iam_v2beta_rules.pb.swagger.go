@@ -18,6 +18,22 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/iam/v2beta/apply-rules": {
+      "get": {
+        "operationId": "ApplyRules",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaApplyRulesResp"
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      }
+    },
     "/iam/v2beta/projects/{id}/rules": {
       "get": {
         "operationId": "ListRulesForProject",
@@ -160,6 +176,9 @@ func init() {
     }
   },
   "definitions": {
+    "v2betaApplyRulesResp": {
+      "type": "object"
+    },
     "v2betaCondition": {
       "type": "object",
       "properties": {

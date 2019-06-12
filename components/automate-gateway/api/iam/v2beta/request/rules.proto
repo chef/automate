@@ -34,3 +34,5 @@ message ListRulesForProjectReq {
 message DeleteRuleReq {
   string id = 1;
 }
+
+message ApplyRulesReq {}
