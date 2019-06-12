@@ -3445,15 +3445,14 @@ func TestListRules(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
 			ruleType := storage.Node
-			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			rule1 := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			rule2, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule2)
-			require.NoError(t, err)
+			insertRule(t, db, rule2)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
@@ -3472,15 +3471,14 @@ func TestListRules(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{"project-3", projID2})
 
 			ruleType := storage.Node
-			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			rule1 := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule2)
-			require.NoError(t, err)
+			insertRule(t, db, rule2)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
@@ -3531,7 +3529,7 @@ func TestListRulesForProject(t *testing.T) {
 			projID2 := "project-2"
 			insertTestProject(t, db, projID2, "pika p", storage.Custom)
 
-			createRuleWithMultipleConditions(t, store, projID2, storage.Node)
+			insertRuleWithMultipleConditions(t, db, projID2, storage.Node)
 
 			resp, err := store.ListRulesForProject(ctx, projID)
 			assert.NoError(t, err)
@@ -3548,23 +3546,22 @@ func TestListRulesForProject(t *testing.T) {
 			insertTestProject(t, db, projID2, "pika p", storage.Custom)
 
 			ruleType := storage.Node
-			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			rule1 := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule2)
-			require.NoError(t, err)
+			insertRule(t, db, rule2)
 
 			condition5, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-3", "chef-server-4"}, storage.ChefServer, storage.MemberOf)
 			rule3, err := storage.NewRule("new-id-3", projID2, "name3", ruleType,
 				[]storage.Condition{condition5})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule3)
-			require.NoError(t, err)
+			insertRule(t, db, rule3)
+
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule3.ID))
@@ -3585,23 +3582,21 @@ func TestListRulesForProject(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{"project-3", projID2})
 
 			ruleType := storage.Node
-			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			rule1 := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule2)
-			require.NoError(t, err)
+			insertRule(t, db, rule2)
 
 			condition5, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-3", "chef-server-4"}, storage.ChefServer, storage.MemberOf)
 			rule3, err := storage.NewRule("new-id-3", projID2, "name3", ruleType,
 				[]storage.Condition{condition5})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule3)
-			require.NoError(t, err)
+			insertRule(t, db, rule3)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule3.ID))
@@ -3622,23 +3617,21 @@ func TestListRulesForProject(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{"project-3", "project-4"})
 
 			ruleType := storage.Node
-			rule1 := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			rule1 := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule2)
-			require.NoError(t, err)
+			insertRule(t, db, rule2)
 
 			condition5, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-3", "chef-server-4"}, storage.ChefServer, storage.MemberOf)
 			rule3, err := storage.NewRule("new-id-3", projID2, "name3", ruleType,
 				[]storage.Condition{condition5})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule3)
-			require.NoError(t, err)
+			insertRule(t, db, rule3)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule3.ID))
@@ -3691,8 +3684,7 @@ func TestUpdateRule(t *testing.T) {
 			ruleOriginal, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
 				[]storage.Condition{condition1})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &ruleOriginal)
-			require.NoError(t, err)
+			insertRule(t, db, ruleOriginal)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
 				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
@@ -3714,7 +3706,7 @@ func TestUpdateRule(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
 			ruleType := storage.Node
-			rule := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			rule := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 
@@ -3749,8 +3741,7 @@ func TestUpdateRule(t *testing.T) {
 			rule, err := storage.NewRule("new-id-1", projID, "name", ruleType,
 				[]storage.Condition{condition1, condition2, condition3})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule)
-			require.NoError(t, err)
+			insertRule(t, db, rule)
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 
 			newRuleType := storage.Event
@@ -3773,7 +3764,7 @@ func TestUpdateRule(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{"not-a-match", "some-other-project"})
 
 			ruleType := storage.Node
-			ruleOriginal := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			ruleOriginal := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
 				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
 
@@ -3818,8 +3809,8 @@ func TestGetRule(t *testing.T) {
 			require.NoError(t, err)
 			rule, err := storage.NewRule("new-id-1", projID, "name", ruleType, []storage.Condition{condition1})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule)
-			require.NoError(t, err)
+			insertRule(t, db, rule)
+
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 
@@ -3834,15 +3825,15 @@ func TestGetRule(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
 			ruleType := storage.Node
-			ruleToGet := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			ruleToGet := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			otherRule, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &otherRule)
-			require.NoError(t, err)
+			insertRule(t, db, otherRule)
+
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToGet.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, otherRule.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
@@ -3861,7 +3852,7 @@ func TestGetRule(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{projID, projID2, "some-other-project"})
 
 			ruleType := storage.Node
-			ruleToGet := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			ruleToGet := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToGet.ID))
 
 			condition4, err := storage.NewCondition(ruleType,
@@ -3869,8 +3860,8 @@ func TestGetRule(t *testing.T) {
 			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule2)
-			require.NoError(t, err)
+			insertRule(t, db, rule2)
+
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 
@@ -3888,15 +3879,15 @@ func TestGetRule(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{projID2, "some-other-project"})
 
 			ruleType := storage.Node
-			ruleToGet := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			ruleToGet := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule2)
-			require.NoError(t, err)
+			insertRule(t, db, rule2)
+
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToGet.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
@@ -3935,8 +3926,8 @@ func TestDeleteRule(t *testing.T) {
 			require.NoError(t, err)
 			rule, err := storage.NewRule("new-id-1", projID, "name", ruleType, []storage.Condition{condition1})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &rule)
-			require.NoError(t, err)
+			insertRule(t, db, rule)
+
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 
@@ -3952,15 +3943,14 @@ func TestDeleteRule(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
 			ruleType := storage.Node
-			ruleToDelete := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			ruleToDelete := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &ruleToSave)
-			require.NoError(t, err)
+			insertRule(t, db, ruleToSave)
 
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToSave.ID))
@@ -3980,15 +3970,14 @@ func TestDeleteRule(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{projID, "project-2"})
 
 			ruleType := storage.Node
-			ruleToDelete := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			ruleToDelete := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &ruleToSave)
-			require.NoError(t, err)
+			insertRule(t, db, ruleToSave)
 
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToSave.ID))
@@ -4008,15 +3997,14 @@ func TestDeleteRule(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{"project-3", "project-2"})
 
 			ruleType := storage.Node
-			ruleToDelete := createRuleWithMultipleConditions(t, store, projID, ruleType)
+			ruleToDelete := insertRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			_, err = store.CreateRule(ctx, &ruleToSave)
-			require.NoError(t, err)
+			insertRule(t, db, ruleToSave)
 
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToSave.ID))
@@ -6165,27 +6153,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 	}
 }
 
-func createRuleWithMultipleConditions(t *testing.T, store storage.Storage, projID string, ruleType storage.RuleType) *storage.Rule {
-	t.Helper()
-	ctx := context.Background()
-	condition1, err := storage.NewCondition(ruleType,
-		[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
-	require.NoError(t, err)
-	condition2, err := storage.NewCondition(ruleType,
-		[]string{"org1", "org2", "org3"}, storage.Organization, storage.MemberOf)
-	require.NoError(t, err)
-	condition3, err := storage.NewCondition(ruleType,
-		[]string{"chef-server-2"}, storage.ChefServer, storage.Equals)
-	require.NoError(t, err)
-	req, err := storage.NewRule("new-id-1", projID, "name", ruleType,
-		[]storage.Condition{condition1, condition2, condition3})
-	require.NoError(t, err)
-	resp, err := store.CreateRule(ctx, &req)
-	require.NoError(t, err)
-	return resp
-}
-
-func assertProjectsMatch(t *testing.T, db *testhelpers.TestDB, project storage.Project) {
+func assertProjectsMatch(t *testing.T, db *testDB, project storage.Project) {
 	t.Helper()
 	dbProject := storage.Project{}
 	err := db.QueryRow(`SELECT query_project($1, '{}');`, project.ID).Scan(&dbProject)
@@ -6364,6 +6332,136 @@ func insertStatementProject(t *testing.T, db *testhelpers.TestDB, statementID uu
 			INSERT INTO iam_statement_projects (statement_id, project_id) VALUES ($1, $2);`,
 		statementID, projectId)
 	require.NoError(t, err)
+}
+
+func insertRule(t *testing.T, db *testDB, rule storage.Rule) {
+	t.Helper()
+	row := db.QueryRow(`
+		INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type)
+	var dbID string
+	err := row.Scan(&dbID)
+	require.NoError(t, err)
+	for _, c := range rule.Conditions {
+		_, err = db.Exec(`
+			INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			dbID, pq.Array(c.Value), c.Attribute, c.Operator)
+		require.NoError(t, err)
+	}
+}
+
+func insertRuleWithMultipleConditions(t *testing.T, db *testDB, projID string, ruleType storage.RuleType) *storage.Rule {
+	t.Helper()
+	condition1, err := storage.NewCondition(ruleType,
+		[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+	require.NoError(t, err)
+	condition2, err := storage.NewCondition(ruleType,
+		[]string{"org1", "org2", "org3"}, storage.Organization, storage.MemberOf)
+	require.NoError(t, err)
+	condition3, err := storage.NewCondition(ruleType,
+		[]string{"chef-server-2"}, storage.ChefServer, storage.Equals)
+	require.NoError(t, err)
+	rule, err := storage.NewRule("new-id-1", projID, "name", ruleType,
+		[]storage.Condition{condition1, condition2, condition3})
+	require.NoError(t, err)
+
+	row := db.QueryRow(`
+		INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
+		rule.ID, projID, rule.Name, ruleType)
+	var dbID string
+	err = row.Scan(&dbID)
+	require.NoError(t, err)
+	for _, c := range rule.Conditions {
+		_, err = db.Exec(`
+			INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			dbID, pq.Array(c.Value), c.Attribute, c.Operator)
+		require.NoError(t, err)
+	}
+	return &rule
+}
+
+func setup(t *testing.T) (storage.Storage, *testDB, *prng.Prng) {
+	t.Helper()
+
+	ctx := context.Background()
+	l, err := logger.NewLogger("text", "error")
+	require.NoError(t, err, "init logger for postgres storage")
+
+	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/migration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
+	}
+
+	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/datamigration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
+	}
+
+	if migrationConfig == nil && dataMigrationConfig == nil {
+		t.Skipf("start pg container and set PG_URL to run")
+	}
+
+	// reset database the hard way -- we do this to ensure that our comparison
+	// between database content and hardcoded storage default policies actually
+	// compares the migrated policies with the hardcoded ones (and NOT the
+	// hardcoded policies with the hardcoded policies).
+	db := openDB(t)
+	_, err = db.ExecContext(ctx, resetDatabaseStatement)
+	require.NoError(t, err, "error resetting database")
+	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+	require.NoError(t, err, "error creating extension")
+
+	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
+	require.NoError(t, err)
+	return backend, &testDB{DB: db}, prng.Seed(t)
+}
+
+// migrationConfigIfPGTestsToBeRun either returns the pg migration config
+// if PG_URL is set or we are in CI, otherwise it returns nil, indicating
+// postgres based tests shouldn't be run.
+func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*migration.Config, error) {
+	customPGURL, pgURLPassed := os.LookupEnv("PG_URL")
+	ciMode := os.Getenv("CI") == "true"
+
+	// If in CI mode, use the default
+	if ciMode {
+		pgURL, err := url.Parse("postgres://postgres@127.0.0.1:5432/authz_test?sslmode=disable")
+		if err != nil {
+			return nil, err
+		}
+		return &migration.Config{
+			Path:   migrationPath,
+			Logger: l,
+			PGURL:  pgURL,
+		}, nil
+	}
+
+	// If PG_URL wasn't passed (and we aren't in CI)
+	// we shouldn't run the postgres tests, return nil.
+	if !pgURLPassed {
+		return nil, nil
+	}
+
+	pgURL, err := url.Parse(customPGURL)
+	if err != nil {
+		return nil, err
+	}
+
+	return &migration.Config{
+		Path:   migrationPath,
+		Logger: l,
+		PGURL:  pgURL,
+	}, nil
+}
+
+func openDB(t *testing.T) *sql.DB {
+	t.Helper()
+	db, err := sql.Open("postgres", "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable")
+	require.NoError(t, err, "error opening db")
+	err = db.Ping()
+	require.NoError(t, err, "error pinging db")
+
+	return db
 }
 
 func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
