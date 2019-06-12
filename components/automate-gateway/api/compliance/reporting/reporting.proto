@@ -30,6 +30,21 @@ service ReportingService {
 			action: "compliance:reports:list"
 		};
 	};
+	// should cover /reportids
+    rpc ListReportIds(Query) returns (ReportIds) {
+   		option (google.api.http) = {
+   			post: "/compliance/reporting/reportids"
+   			body: "*"
+   		};
+   		option (chef.automate.api.policy) = {
+   			resource: "compliance:reporting:reportids"
+   			action: "search"
+   		};
+   		option (chef.automate.api.iam.policy) = {
+   			resource: "compliance:reporting:reportids"
+   			action: "compliance:reportids:list"
+   		};
+   	};
 	// should cover /reports/:reportid
 	rpc ReadReport(Query) returns (Report) {
 		option (google.api.http) = {
@@ -179,6 +194,11 @@ message ControlSummary {
 
 message Reports {
 	repeated Report reports = 1;
+	int32 total = 2;
+}
+
+message ReportIds {
+	repeated string ids = 1;
 	int32 total = 2;
 }
 
