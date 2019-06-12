@@ -155,12 +155,6 @@ func (s *state) UpdateProject(ctx context.Context,
 			"error converting project with ID %q: %s", resp.ID, err.Error())
 	}
 
-	err = s.projectUpdateManager.Start()
-	if err != nil {
-		return nil, status.Errorf(codes.Internal,
-			"error starting project update %q: %s", resp.ID, err.Error())
-	}
-
 	return &api.UpdateProjectResp{Project: apiProject}, nil
 }
 
@@ -428,6 +422,16 @@ func (s *state) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.De
 		return nil, status.Errorf(codes.Internal,
 			"error deleting rule with ID %q: %s", req.Id, err.Error())
 	}
+}
+
+func (s *state) ApplyRules(ctx context.Context, req *api.ApplyRulesReq) (*api.ApplyRulesResp, error) {
+	log.Info("applying project rules: START")
+	err := s.projectUpdateManager.Start()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal,
+			"error starting project update: %s", err.Error())
+	}
+	return &api.ApplyRulesResp{}, nil
 }
 
 func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition) ([]storage.Condition, error) {

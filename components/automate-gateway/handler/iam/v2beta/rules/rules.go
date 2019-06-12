@@ -123,6 +123,14 @@ func (s *Server) DeleteRule(ctx context.Context, req *pb_req.DeleteRuleReq) (*pb
 	return &pb_resp.DeleteRuleResp{}, nil
 }
 
+func (s *Server) ApplyRules(ctx context.Context, req *pb_req.ApplyRulesReq) (*pb_resp.ApplyRulesResp, error) {
+	_, err := s.projects.ApplyRules(ctx, &authz.ApplyRulesReq{})
+	if err != nil {
+		return nil, err
+	}
+	return &pb_resp.ApplyRulesResp{}, nil
+}
+
 func fromExternalCreate(req *pb_req.CreateRuleReq) (*authz.CreateRuleReq, error) {
 	t, err := fromExternalType(req.Type)
 	if err != nil {
