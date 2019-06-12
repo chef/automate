@@ -236,18 +236,18 @@ func (db *Postgres) GetServiceGroups(
 //
 // Criteria:
 // * if the group of services has only one release, it returns it.
-// * if it has several releases then it returns the string 'Several'
+// * if it has several releases then it returns the string 'x releases'
 // * if it has no releases, (which it is impossible but we should protect against it) it
-//   will return the string 'Unknown'
+//   will return the string 'unknown'
 func (sgh *serviceGroupHealth) ReleaseString() string {
 	sgh.breakReleases()
 	switch rNumber := len(sgh.composedReleases); rNumber {
 	case 0:
-		return "Unknown"
+		return "unknown"
 	case 1:
 		return sgh.composedReleases[0]
 	default:
-		return fmt.Sprintf("Several (%d)", rNumber)
+		return fmt.Sprintf("%d releases", rNumber)
 	}
 }
 
@@ -258,19 +258,19 @@ func (sgh *serviceGroupHealth) ReleaseString() string {
 //
 // Criteria:
 // * if the group of services has only one package name, it returns it.
-// * if it has several package names then it returns the string 'Several'
+// * if it has several package names then it returns the string 'x packages'
 //   (this case could happen when two services are running a package from different origins)
 // * if it has no package name, (which it is impossible but we should protect against it) it
-//   will return the string 'Unknown'
+//   will return the string 'unknown'
 func (sgh *serviceGroupHealth) PackageString() string {
 	sgh.breakReleases()
 	switch pNumber := len(sgh.composedPackages); pNumber {
 	case 0:
-		return "Unknown"
+		return "unknown"
 	case 1:
 		return sgh.composedPackages[0]
 	default:
-		return fmt.Sprintf("Several (%d)", pNumber)
+		return fmt.Sprintf("%d packages", pNumber)
 	}
 }
 

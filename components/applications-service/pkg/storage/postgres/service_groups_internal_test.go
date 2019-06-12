@@ -10,7 +10,7 @@ import (
 func TestServiceGroupHealthReleaseStringEmpty(t *testing.T) {
 	var (
 		subject  = new(serviceGroupHealth)
-		expected = "Unknown"
+		expected = "unknown"
 	)
 	actual := subject.ReleaseString()
 	assert.Equal(t, expected, actual)
@@ -19,7 +19,7 @@ func TestServiceGroupHealthReleaseStringEmpty(t *testing.T) {
 func TestServiceGroupHealthPackageStringEmpty(t *testing.T) {
 	var (
 		subject  = new(serviceGroupHealth)
-		expected = "Unknown"
+		expected = "unknown"
 	)
 	actual := subject.PackageString()
 	assert.Equal(t, expected, actual)
@@ -30,7 +30,7 @@ func TestServiceGroupHealthReleaseStringMalformedReleaseIdent(t *testing.T) {
 		subject = serviceGroupHealth{
 			Releases: pq.StringArray{"malformed"},
 		}
-		expected = "Unknown"
+		expected = "unknown"
 	)
 	actual := subject.ReleaseString()
 	assert.Equal(t, expected, actual)
@@ -41,7 +41,7 @@ func TestServiceGroupHealthPackageStringMalformedReleaseIdent(t *testing.T) {
 		subject = serviceGroupHealth{
 			Releases: pq.StringArray{"kind/of/malformed"},
 		}
-		expected = "Unknown"
+		expected = "unknown"
 	)
 	actual := subject.PackageString()
 	assert.Equal(t, expected, actual)
@@ -74,7 +74,7 @@ func TestServiceGroupHealthWithMultipleReleaseIdents(t *testing.T) {
 				},
 			},
 			expectedPackage: "core/redis",
-			expectedRelease: "Several (4)",
+			expectedRelease: "4 releases",
 		},
 		{
 			message: "with multiple package_ident that has multiple package_name (origin)",
@@ -85,7 +85,7 @@ func TestServiceGroupHealthWithMultipleReleaseIdents(t *testing.T) {
 					"personal/redis/0.1.0/2020010101000000",
 				},
 			},
-			expectedPackage: "Several (3)",
+			expectedPackage: "3 packages",
 			expectedRelease: "0.1.0/2020010101000000",
 		},
 		{
@@ -100,8 +100,8 @@ func TestServiceGroupHealthWithMultipleReleaseIdents(t *testing.T) {
 					"personal/redis/0.1.0/2020010101000000",
 				},
 			},
-			expectedPackage: "Several (3)",
-			expectedRelease: "Several (5)",
+			expectedPackage: "3 packages",
+			expectedRelease: "5 releases",
 		},
 		{
 			message: "with a both, good and malformed package_ident should drop malformed",
