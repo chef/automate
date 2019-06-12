@@ -1,0 +1,4 @@
+grant { 
+    permission java.io.FilePermission "{{pkg.svc_var_path}}", "read,write";
+    permission java.io.FilePermission "{{pkg.svc_var_path}}/*", "read,write";
+};

@@ -86,3 +86,5 @@ s3.client.{{ cfg.s3.client.name }}.use_throttle_retries: {{cfg.s3.client.use_thr
 s3.client.{{ cfg.s3.client.name }}.endpoint: {{bgw.sys.ip}}:{{bgw.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}
+
+xpack.ml.enabled: false

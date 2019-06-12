@@ -1,7 +1,7 @@
 pkg_name="automate-elasticsearch"
 pkg_description="Wrapper package for core/elasticsearch"
 pkg_origin="chef"
-pkg_version="6.2.2"
+pkg_version="6.7.1"
 vendor_origin="core"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=("Chef-MLSA")
@@ -38,7 +38,7 @@ pkg_binds=(
 pkg_exposes=(http-port transport-port)
 
 do_download() {
-    download_file "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-s3/repository-s3-${pkg_version}.zip" "repository-s3.zip" "70a7ed6ad1597d91dcb20ec7cd3da3701ea66f70347d28d133649998778e0b8d"
+    download_file "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-s3/repository-s3-${pkg_version}.zip" "repository-s3.zip" "75e04e3dcf55e33a7e0d85eb17a06f95e90544c19f8a82deead8c850ffcab4e3"
 }
 
 do_build() {
@@ -48,4 +48,8 @@ do_build() {
 do_install() {
     cp -a "$(pkg_path_for ${vendor_origin}/elasticsearch)/es/"* "${pkg_prefix}/es/"
     "${pkg_prefix}/es/bin/elasticsearch-plugin" install -b "file://${HAB_CACHE_SRC_PATH}/repository-s3.zip"
+}
+
+do_strip() {
+    :
 }
