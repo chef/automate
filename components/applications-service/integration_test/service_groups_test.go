@@ -35,7 +35,8 @@ func TestGetServiceGroupsOneOk(t *testing.T) {
 				{
 					Id:               "number",
 					Name:             "postgres.default",
-					Release:          "core/postgres/0.1.0/20190101121212",
+					Package:          "core/postgres",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
 					HealthPercentage: 100,
 					Application:      a,
@@ -72,7 +73,8 @@ func TestGetServiceGroupsOneCritical(t *testing.T) {
 			ServiceGroups: []*applications.ServiceGroup{
 				{
 					Name:             "postgres.default",
-					Release:          "core/postgres/0.1.0/20190101121212",
+					Package:          "core/postgres",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 0,
 					Application:      a,
@@ -110,7 +112,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 			ServiceGroups: []*applications.ServiceGroup{
 				{
 					Name:             "test.default",
-					Release:          "core/test/0.1.0/20190101121212",
+					Package:          "core/test",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
 					HealthPercentage: 0,
 					Application:      a,
@@ -122,7 +125,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 				},
 				{
 					Name:             "postgres.default",
-					Release:          "core/postgres/0.1.0/20190101121212",
+					Package:          "core/postgres",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 33,
 					Application:      a,
@@ -136,7 +140,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 				},
 				{
 					Name:             "myapp.default",
-					Release:          "core/myapp/0.1.0/20190101121212",
+					Package:          "core/myapp",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
 					HealthPercentage: 67,
 					Application:      a,
@@ -149,7 +154,8 @@ func TestServiceGroupsMultiService(t *testing.T) {
 				},
 				{
 					Name:             "redis.default",
-					Release:          "core/redis/0.1.0/20190101121212",
+					Package:          "core/redis",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
 					HealthPercentage: 100,
 					Application:      a,
@@ -181,7 +187,8 @@ func TestGetServiceGroupsOneWarning(t *testing.T) {
 				{
 					Id:               "number",
 					Name:             "postgres.default",
-					Release:          "core/postgres/0.1.0/20190101121212",
+					Package:          "core/postgres",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
 					HealthPercentage: 0,
 					Application:      a,
@@ -220,7 +227,8 @@ func TestGetServiceGroupsOneUnknown(t *testing.T) {
 				{
 					Id:               "number",
 					Name:             "postgres.default",
-					Release:          "core/postgres/0.1.0/20190101121212",
+					Package:          "core/postgres",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
 					HealthPercentage: 0,
 					Application:      a,
@@ -258,7 +266,8 @@ func TestGetServiceGroupsOneEach(t *testing.T) {
 				{
 					Id:               "number",
 					Name:             "postgres.default",
-					Release:          "core/postgres/0.1.0/20190101121212",
+					Package:          "core/postgres",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 25,
 					Application:      a,
@@ -396,7 +405,8 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 			ServiceGroups: []*applications.ServiceGroup{
 				{
 					Name:                 "e.default",
-					Release:              "core/e/0.1.0/20190101121212",
+					Package:              "core/e",
+					Release:              "0.1.0/20190101121212",
 					Status:               applications.HealthStatus_OK,
 					HealthPercentage:     100,
 					Application:          a,

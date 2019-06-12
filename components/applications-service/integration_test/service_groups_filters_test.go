@@ -23,7 +23,8 @@ func TestServiceGroupsMultiServiceFilterStatusOk(t *testing.T) {
 			ServiceGroups: []*applications.ServiceGroup{
 				{
 					Name:             "redis.default",
-					Release:          "core/redis/0.1.0/20190101121212",
+					Package:          "core/redis",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_OK,
 					HealthPercentage: 100,
 					Application:      "app",
@@ -56,7 +57,8 @@ func TestServiceGroupsMultiServiceFilterStatusCritical(t *testing.T) {
 			ServiceGroups: []*applications.ServiceGroup{
 				{
 					Name:             "postgres.default",
-					Release:          "core/postgres/0.1.0/20190101121212",
+					Package:          "core/postgres",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_CRITICAL,
 					HealthPercentage: 33,
 					Application:      "app",
@@ -91,7 +93,8 @@ func TestServiceGroupsMultiServiceFilterStatusWarning(t *testing.T) {
 			ServiceGroups: []*applications.ServiceGroup{
 				{
 					Name:             "myapp.default",
-					Release:          "core/myapp/0.1.0/20190101121212",
+					Package:          "core/myapp",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_WARNING,
 					HealthPercentage: 67,
 					Application:      "app",
@@ -125,7 +128,8 @@ func TestServiceGroupsMultiServiceFilterStatusUnknown(t *testing.T) {
 			ServiceGroups: []*applications.ServiceGroup{
 				{
 					Name:             "test.default",
-					Release:          "core/test/0.1.0/20190101121212",
+					Package:          "core/test",
+					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
 					HealthPercentage: 0,
 					Application:      "app",

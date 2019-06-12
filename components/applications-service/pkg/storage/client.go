@@ -56,6 +56,7 @@ type ServiceGroupDisplay struct {
 	ID                   int32
 	Name                 string
 	DeploymentID         int32
+	Package              string
 	Release              string
 	HealthStatus         string
 	HealthPercentage     int32
