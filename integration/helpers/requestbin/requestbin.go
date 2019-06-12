@@ -34,8 +34,9 @@ func main() {
 
 		logctx := logrus.WithFields(
 			logrus.Fields{
-				"method": r.Method,
-				"path":   r.URL.EscapedPath(),
+				"method":  r.Method,
+				"headers": r.Header,
+				"path":    r.URL.EscapedPath(),
 			})
 
 		v := requests[r.URL.EscapedPath()]
@@ -69,7 +70,7 @@ func main() {
 			w.Header().Set("Content-Type", "application/javascript")
 			w.Write([]byte("{}"))
 		} else if r.Method == "GET" {
-			logrus.WithField("requests", v).Info("GET request info")
+			logctx.WithField("requests", v).Info("GET request info")
 			w.Header().Set("Content-Type", "application/javascript")
 			j, err := json.Marshal(v)
 			if err != nil {
