@@ -36,8 +36,9 @@ Note: To upgrade without porting existing policies, use the `--skip-policy-migra
 
 After you've logged in to Chef Automate, select the **Settings** tab in the top navigation bar, then select and locate the `Policies` section on the left hand panel.
 
-Here you can view all of your v2 policies. If you have upgraded without using the `--skip-policy-migration` flag, you will
-also see v1 policies. This includes the following:
+In this section, you can view all of your v2 policies. If you have upgraded without using the `--skip-policy-migration` flag, you will also see v1 policies.
+
+This includes the following:
 
 * New default (Chef-managed) policies: Administrator, Ingest, Editors, and Viewers.
 * Imported v1 default policies--now called *legacy policies*--in the new v2 policy format and marked with the `[Legacy]` prefix.
@@ -230,8 +231,6 @@ Open the menu on any custom policy, located at the end of the policy row, and se
 A warning appears if members are still attached to the policy, because deleting that policy disrupts access for all of its members.
 However, you can still delete the policy.
 Repeat for each legacy policy.
-
-Alternately, you can run `--skip-policy-migration` on upgrade to start without any policies at all.
 
 ## Reverting to IAM v1
 
