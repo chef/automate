@@ -30,8 +30,7 @@ Creating default teams Editors and Viewers...
 Success: Enabled IAM v2
 ```
 
-Note: We recommend users do not migrate existing IAM v1 policies as they can interfere with expected behavior. To upgrade
-without porting existing policies, use the `--skip-policy-migration` flag: `chef-automate iam upgrade-to-v2 --skip-policy-migration`.
+Note: To upgrade without porting existing policies, use the `--skip-policy-migration` flag: `chef-automate iam upgrade-to-v2 --skip-policy-migration`.
 
 ## View Policies
 

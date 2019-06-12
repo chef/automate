@@ -105,13 +105,8 @@ func newIAMUpgradeToV2Cmd() *cobra.Command {
 		false,
 		"Upgrade to version 2.1 with beta project authorization.")
 
-	var err error
 	if !isDevMode() {
-		err = cmd.PersistentFlags().MarkHidden("beta2.1")
-		if err != nil {
-			fmt.Printf("failed configuring cobra: %s\n", err.Error())
-			panic("failed configuring cobra")
-		}
+		_ = cmd.PersistentFlags().MarkHidden("beta2.1")
 	}
 	return cmd
 }
