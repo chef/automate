@@ -423,3 +423,92 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 	assert.Nil(t, err)
 	assertServiceGroupsEqual(t, expected, response)
 }
+
+func TestGetServiceGroupsSingleServiceWithMultiplePackages(t *testing.T) {
+	var (
+		ctx      = context.Background()
+		request  = new(applications.ServiceGroupsReq)
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "postgres.default",
+					Package:          "3 packages",
+					Release:          "3.6.0/20200101121212",
+					Status:           applications.HealthStatus_OK,
+					HealthPercentage: 100,
+					Application:      a,
+					Environment:      e,
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total: 3,
+						Ok:    3,
+					},
+				},
+			},
+		}
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("111"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/3.6.0/20200101121212"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("222"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("test/postgres/3.6.0/20200101121212"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("333"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("personal/postgres/3.6.0/20200101121212"),
+			),
+		}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestGetServiceGroupsSingleServiceWithMultipleReleases(t *testing.T) {
+	var (
+		ctx      = context.Background()
+		request  = new(applications.ServiceGroupsReq)
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "postgres.default",
+					Package:          "core/postgres",
+					Release:          "2 releases",
+					Status:           applications.HealthStatus_OK,
+					HealthPercentage: 100,
+					Application:      a,
+					Environment:      e,
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total: 2,
+						Ok:    2,
+					},
+				},
+			},
+		}
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("111"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("222"),
+				withServiceGroup("postgres.default"),
+				withPackageIdent("core/postgres/3.6.0/20200101121212"), // <- different release
+			),
+		}
+	)
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
