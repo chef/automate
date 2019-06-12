@@ -100,8 +100,25 @@ message External {
 		SSL ssl = 5;
 	}
 
+	message DataCollector {
+		message Authentication {
+			google.protobuf.StringValue scheme = 1;
+			google.protobuf.StringValue token = 2;
+		};
+
+		message SSL {
+			google.protobuf.StringValue root_cert = 1;
+		};
+
+		google.protobuf.BoolValue enable = 1;
+		google.protobuf.StringValue endpoint = 2;
+		Authentication auth = 3;
+		SSL ssl = 4;
+	};
+
 	Elasticsearch elasticsearch = 1;
 	Postgresql postgresql = 2;
+	DataCollector data_collector = 3;
 }
 
 message Mlsa {

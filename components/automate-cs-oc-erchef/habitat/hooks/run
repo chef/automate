@@ -55,6 +55,13 @@ export GEM_PATH={{pkgPathFor "core/bundler"}}
 # non root svc user and we need write access to the file
 cp {{pkg.svc_config_path}}/dark_launch_features.json {{pkg.svc_data_path}}
 
+{{#if cfg.external_data_collector.enable}}
+# TODO(jaym): Our config should know how to deal with the token. We shouldn't be showing
+# it in this script
+echo -n "{{cfg.external_data_collector.auth.token}}" | \
+  secrets-helper insert data_collector.token
+{{~/if}}
+
 secrets-helper insert chef-server.webui_pub_key <{{pkg.svc_data_path}}/webui_pub.pem
 
 # The erlang VM is also fussy about file descriptors.
@@ -68,6 +75,7 @@ exec secrets-helper exec \
      --secret bookshelf.access_key_id \
      --secret bookshelf.secret_access_key \
      --secret chef-server.webui_pub_key \
+     --optional-secret data_collector.token \
      -- \
      {{~#if cfg.memory.max_bytes}}
      chpst -d {{cfg.memory.max_bytes}} \
