@@ -96,7 +96,7 @@ type service struct {
 	DeploymentID int32  `db:"deployment_id"`
 	SupID        int32  `db:"sup_id"`
 	Channel      string `db:"channel"`
-	FullPkgIdent string `db:"full_pkg_id"`
+	FullPkgIdent string `db:"full_pkg_ident"`
 }
 
 // supervisor struct is the representation of the supervisor table inside the db

@@ -24,6 +24,7 @@ type packageIdent struct {
 	Name    string
 	Version string
 	Release string
+	Full    string
 }
 
 func newPackageIdentFromString(ident string) (*packageIdent, error) {
@@ -36,7 +37,7 @@ func newPackageIdentFromString(ident string) (*packageIdent, error) {
 		)
 	}
 
-	return &packageIdent{fields[0], fields[1], fields[2], fields[3]}, nil
+	return &packageIdent{fields[0], fields[1], fields[2], fields[3], ident}, nil
 }
 
 var (
@@ -201,7 +202,7 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 		}
 
 		// 4) Service
-		svc := newService(pkgIdent, health, did, sid, gid, svcMetadata.GetPackageIdent())
+		svc := newService(pkgIdent, health, did, sid, gid)
 		if svcMetadata.GetUpdateConfig() != nil {
 			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
 		}
@@ -215,7 +216,7 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 
 }
 
-func newService(pkgIdent *packageIdent, health string, did, sid, gid int32, fullPkgIdent string) *service {
+func newService(pkgIdent *packageIdent, health string, did, sid, gid int32) *service {
 	return &service{
 		Origin:       pkgIdent.Origin,
 		Name:         pkgIdent.Name,
@@ -225,7 +226,7 @@ func newService(pkgIdent *packageIdent, health string, did, sid, gid int32, full
 		GroupID:      gid,
 		DeploymentID: did,
 		SupID:        sid,
-		FullPkgIdent: fullPkgIdent,
+		FullPkgIdent: pkgIdent.Full,
 	}
 }
 
