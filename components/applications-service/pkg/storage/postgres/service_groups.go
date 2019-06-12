@@ -31,66 +31,66 @@ SELECT * from service_groups
 
 	// TODO: Update this query once we understand better the deploying status
 	selectServiceGroupsHealthCounts = `
-SELECT COUNT(*) AS total
-  , COUNT(*) FILTER (
-      WHERE health_critical > 0
-    ) AS critical
-  , COUNT(*) FILTER (
-      WHERE health_unknown  > 0
-        AND health_critical = 0
-    ) AS unknown
-  , COUNT(*) FILTER (
-      WHERE health_warning  > 0
-        AND health_critical = 0
-        AND health_unknown  = 0
-    ) AS warning
-  , COUNT(*) FILTER (
-      WHERE health_ok > 0
-        AND health_critical = 0
-        AND health_warning  = 0
-        AND health_unknown  = 0
-    ) AS ok
+	SELECT COUNT(*) AS total
+	,COUNT(*) FILTER (
+						 WHERE health_critical > 0
+			 ) AS critical
+	,COUNT(*) FILTER (
+						 WHERE health_unknown  > 0
+							 AND health_critical = 0
+			) AS unknown
+	,COUNT(*) FILTER (
+						 WHERE health_warning  > 0
+							 AND health_critical = 0
+							 AND health_unknown  = 0
+			 ) AS warning
+	,COUNT(*) FILTER (
+						 WHERE health_ok > 0
+							 AND health_critical = 0
+							 AND health_warning  = 0
+							 AND health_unknown  = 0
+			 ) AS ok
 FROM service_groups AS service_groups_health_counts
 `
 
 	selectServiceGroupHealthWithPageSort = `
 SELECT * FROM service_groups AS service_groups_health
-ORDER BY %s
-LIMIT $1
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterCRITICAL = `
 SELECT * FROM service_groups AS service_groups_health
-WHERE health_critical > 0
-ORDER BY %s
-LIMIT $1
+ WHERE health_critical > 0
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterUNKNOWN = `
 SELECT * FROM service_groups AS service_groups_health
-WHERE health_unknown  > 0
-  AND health_critical = 0
-ORDER BY %s
-LIMIT $1
+ WHERE health_unknown  > 0
+   AND health_critical = 0
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterWARNING = `
 SELECT * FROM service_groups AS service_groups_health
-WHERE health_warning  > 0
-  AND health_critical = 0
-  AND health_unknown  = 0
-ORDER BY %s
-LIMIT $1
+ WHERE health_warning  > 0
+   AND health_critical = 0
+   AND health_unknown  = 0
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterOK = `
 SELECT * FROM service_groups AS service_groups_health
-WHERE health_ok > 0
-  AND health_critical = 0
-  AND health_warning  = 0
-  AND health_unknown  = 0
-ORDER BY %s
-LIMIT $1
+ WHERE health_ok > 0
+   AND health_critical = 0
+   AND health_warning  = 0
+   AND health_unknown  = 0
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 )
