@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chef/automate/lib/stringutils"
+
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
@@ -150,6 +152,14 @@ func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig) error 
 	d.Config = mergedConfig
 
 	return nil
+}
+
+func ContainsAutomateCollection(c *dc.ConfigRequest) bool {
+	collections := c.GetV1().GetSvc().GetComponents()
+	if len(collections) > 0 {
+		return stringutils.SliceContains(collections, "automate-full")
+	}
+	return true
 }
 
 func ExpectedServiceIDsForConfig(c *dc.ConfigRequest) ([]habpkg.HabPkg, error) {
@@ -314,8 +324,7 @@ func (d *Deployment) UpdateExpectedServicesFromManifest() error {
 
 	// NOTE(ssd) 2018-07-16: Fix for A1 upgrade bug where services are stuck in
 	// Skip state since they were added post-upgrade.
-	/*
-		TODO(jaym): how do we fix this
+	if ContainsAutomateCollection(d.Config.GetDeployment()) {
 		a2ServicesWayBackWhen := map[string]bool{"authn-service": true, "authz-service": true, "automate-cli": true, "automate-dex": true, "automate-elasticsearch": true, "automate-gateway": true, "automate-load-balancer": true, "automate-postgresql": true, "automate-ui": true, "compliance-service": true, "config-mgmt-service": true, "data-lifecycle-service": true, "deployment-service": true, "es-sidecar-service": true, "ingest-service": true, "license-control-service": true, "local-user-service": true, "notifications-service": true, "session-service": true, "teams-service": true}
 		diff := make([]string, 0, len(serviceMap))
 		for key := range serviceMap {
@@ -334,7 +343,8 @@ func (d *Deployment) UpdateExpectedServicesFromManifest() error {
 					serviceMap[svc].DeploymentState = Running
 				}
 			}
-		}*/
+		}
+	}
 
 	// Remove any removed services
 	expectedServices := make([]*Service, len(serviceIDs))
