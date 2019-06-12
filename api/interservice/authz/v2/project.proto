@@ -66,7 +66,7 @@ service Projects {
     rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (
         chef.automate.domain.event.api.EventResponse);
     rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
-    rpc ProjectUpdateCancel(ProjectUpdateStatusReq) returns (ProjectUpdateCancelResp);
+    rpc ProjectUpdateCancel(ProjectUpdateCancelReq) returns (ProjectUpdateCancelResp);
 
     // "proper" methods go here (and the ones above will be phased out eventually)
     rpc CreateRule(CreateRuleReq) returns (CreateRuleResp) {};

@@ -36,3 +36,5 @@ message DeleteRuleReq {
 }
 
 message ApplyRulesReq {}
+
+message ProjectUpdateCancelReq {}

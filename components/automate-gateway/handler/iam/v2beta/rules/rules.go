@@ -131,6 +131,16 @@ func (s *Server) ApplyRules(ctx context.Context, req *pb_req.ApplyRulesReq) (*pb
 	return &pb_resp.ApplyRulesResp{}, nil
 }
 
+func (s *Server) ProjectUpdateCancel(ctx context.Context,
+	req *pb_req.ProjectUpdateCancelReq) (*pb_resp.ProjectUpdateCancelResp, error) {
+
+	_, err := s.projects.ProjectUpdateCancel(ctx, &authz.ProjectUpdateCancelReq{})
+	if err != nil {
+		return nil, err
+	}
+	return &pb_resp.ProjectUpdateCancelResp{}, nil
+}
+
 func fromExternalCreate(req *pb_req.CreateRuleReq) (*authz.CreateRuleReq, error) {
 	t, err := fromExternalType(req.Type)
 	if err != nil {
