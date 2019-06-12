@@ -21,10 +21,11 @@ import (
 // OK        | Else if all services are 'Ok'
 // ---------------------------------------------------------------------
 const (
-	// The service-group health calculation query that:
+	// The service-group query is based on a view which:
 	// 1) Counts health of services (How many ok, critical, warning and unknown) and its total
 	// 2) Calculates the percentage of services with an ok health.
-	// 3) Concatenates all services releases
+	// 3) Provides an array of all service releases within a service group
+	// 4) Determines the overall status of the service group
 	selectServiceGroupHealth = `
 SELECT * from service_groups
 `
