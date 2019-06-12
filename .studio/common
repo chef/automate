@@ -231,6 +231,7 @@ function build_all() {
     [[ -f "$d/habitat/plan.sh" ]] || continue # skip what can't be built
     if [[ "$d" = "/src/components/automate-chef-io" ]] && [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
         log_line "Skipping build of $d since AUTOMATE_OSS_BUILD is set."
+        continue
     fi
     log_line "Building $d"
     build "$d" || return 1
