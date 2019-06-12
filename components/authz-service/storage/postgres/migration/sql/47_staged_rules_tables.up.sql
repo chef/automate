@@ -15,7 +15,7 @@ CREATE TABLE iam_staged_project_rules (
   type TEXT NOT NULL,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  state (pending)
+  state staged_rule_state NOT NULL
 );
 
 CREATE TABLE iam_staged_rule_conditions (
@@ -25,8 +25,40 @@ CREATE TABLE iam_staged_rule_conditions (
   attribute TEXT NOT NULL,
   operator TEXT NOT NULL,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  state staged_rule_state NOT NULL
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE FUNCTION valid_staged_rule_state_change(
+  old_state staged_rule_state, new_state staged_rule_state
+) RETURNS boolean
+LANGUAGE sql AS
+$$
+  SELECT EXISTS(
+    SELECT 1
+    FROM (VALUES
+      ('updated', 'deleted'),
+      ('updated', 'updated')
+    ) AS valid(old, new)
+    WHERE valid.old::staged_rule_state=old_state
+    AND valid.new::staged_rule_state=new_state
+  )
+$$;
+
+CREATE OR REPLACE FUNCTION staged_rule_state_trigger_func() RETURNS trigger
+LANGUAGE plpgsql AS $$
+DECLARE
+BEGIN
+  IF OLD IS NULL THEN
+    RETURN NEW;
+  END IF;
+  IF valid_staged_rule_state_change(OLD.state, NEW.state) THEN
+    RETURN NEW;
+  END IF;
+  RAISE EXCEPTION 'invalid state change: % -> %', OLD.state, NEW.state;
+END
+$$;
+
+CREATE TRIGGER staged_rule_state_trigger_func BEFORE UPDATE ON iam_staged_project_rules
+  FOR EACH ROW EXECUTE PROCEDURE staged_rule_state_trigger_func();
 
 COMMIT;
