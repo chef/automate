@@ -127,6 +127,8 @@ func (s *State) initModules() error {
 		}
 		s.modules = mods
 	}
+
+	// this compiler is for the ad-hoc queries (those *not* having partial results prepped)
 	compiler, err := s.newCompiler()
 	if err != nil {
 		return errors.Wrap(err, "init compiler")
@@ -352,6 +354,7 @@ func (s *State) FilterAuthorizedPairs(
 		"pairs":    pairs,
 	}
 
+	// NB: V1 only, so s.store used here
 	rs, err := s.evalQuery(ctx, s.queries[filteredPairsQuery], opaInput, s.store)
 	if err != nil {
 		return nil, &ErrEvaluation{e: err}
@@ -365,14 +368,21 @@ func (s *State) FilterAuthorizedPairs(
 func (s *State) V2FilterAuthorizedPairs(
 	ctx context.Context,
 	subjects engine.Subjects,
-	pairs []engine.Pair) ([]engine.Pair, error) {
+	pairs []engine.Pair,
+	isBeta2p1 bool,
+) ([]engine.Pair, error) {
 
 	opaInput := map[string]interface{}{
 		"subjects": subjects,
 		"pairs":    pairs,
 	}
 
-	rs, err := s.evalQuery(ctx, s.queries[filteredPairsV2Query], opaInput, s.v2Store)
+	// NB: V2 --or-- V2.1 only, so need to version-adjust the store here
+	store := s.v2Store
+	if isBeta2p1 {
+		store = s.v2p1Store
+	}
+	rs, err := s.evalQuery(ctx, s.queries[filteredPairsV2Query], opaInput, store)
 	if err != nil {
 		return nil, &ErrEvaluation{e: err}
 	}
@@ -390,6 +400,7 @@ func (s *State) V2FilterAuthorizedProjects(
 		"subjects": subjects,
 	}
 
+	// NB: V2.1 only, so s.v2p1Store used here
 	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsV2Query], opaInput, s.v2p1Store)
 	if err != nil {
 		return nil, &ErrEvaluation{e: err}

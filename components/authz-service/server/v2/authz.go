@@ -62,8 +62,7 @@ func (s *authzServer) ProjectsAuthorized(
 	var authorizedProjects []string
 	// we check the version set in the channel on policy server
 	// in order to determine whether or not projects should factor in the authorization decision
-	version := s.vSwitch.Version
-	if !isBeta2p1(version) {
+	if !s.isBeta2p1() {
 		authorized, err := s.engine.V2IsAuthorized(ctx,
 			engine.Subjects(req.Subjects),
 			engine.Action(req.Action),
@@ -127,7 +126,8 @@ func (s *authzServer) FilterAuthorizedPairs(
 	req *api.FilterAuthorizedPairsReq) (*api.FilterAuthorizedPairsResp, error) {
 	resp, err := s.engine.V2FilterAuthorizedPairs(ctx,
 		engine.Subjects(req.Subjects),
-		toEnginePairs(req.Pairs))
+		toEnginePairs(req.Pairs),
+		s.isBeta2p1())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -170,7 +170,8 @@ func (s *authzServer) FilterAuthorizedProjects(
 	}, nil
 }
 
-func isBeta2p1(version api.Version) bool {
+func (s *authzServer) isBeta2p1() bool {
+	version := s.vSwitch.Version
 	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
 }
 

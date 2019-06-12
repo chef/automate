@@ -61,7 +61,7 @@ type V2Authorizer interface {
 
 	// FilterAuthorizedProjects returns a sublist of the passed-in pairs
 	// allowed by the subjects.
-	V2FilterAuthorizedPairs(context.Context, Subjects, []Pair) ([]Pair, error)
+	V2FilterAuthorizedPairs(context.Context, Subjects, []Pair, bool) ([]Pair, error)
 
 	// V2FilterAuthorizedProjects returns a list of allowed projects
 	// for the given subjects
