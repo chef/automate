@@ -221,30 +221,16 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     document.querySelector<HTMLElement>('app-services-sidebar').focus();
   }
 
-  // TODO: @afiune change the backend to send the values already splitted
-  public getPackageNameFromFullRelease(release: string): string {
-    const brokenRel = this.splitFullRelease(release);
-    return brokenRel[0].concat('/', brokenRel[1]);
-  }
-
-  // TODO: @afiune change the backend to send the values already splitted
-  public getShortReleaseFromFullRelease(release: string): string {
-    const brokenRel = this.splitFullRelease(release);
-    return brokenRel[2].concat('/', brokenRel[3]);
-  }
-
-  private splitFullRelease(release: string): string[] {
-    if (release) {
-      const releaseVars = release.split('/');
-      if (releaseVars.length === 4) {
-        return releaseVars;
-      }
-
-      // these returns should never happen, but just to be safe
-      return new Array('-', '-', '-', '-');
+  // TODO @afiune: Add links when they work
+  public tooltipMessageFor(field: string): string {
+    switch (field) {
+      case 'env':
+        return 'Add environment data. Learn more in Configuring the Habitat Supervisor.';
+      case 'app':
+        return 'Add application data. Learn more in Configuring the Habitat Supervisor.';
+      default:
+        return '--';
     }
-
-    return new Array('-', '-', '-', '-');
   }
 
   private getSelectedStatus(allParameters: Chicklet[]): RollupServiceStatus {
