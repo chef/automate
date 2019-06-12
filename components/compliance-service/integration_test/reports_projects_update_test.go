@@ -47,8 +47,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-									Values: []string{"env1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Values:    []string{"env1"},
 								},
 							},
 						},
@@ -73,8 +73,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-									Values: []string{"env1", "env2"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Values:    []string{"env1", "env2"},
 								},
 							},
 						},
@@ -101,12 +101,12 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-									Values: []string{"env1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Values:    []string{"env1"},
 								},
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-									Values: []string{"backend"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Values:    []string{"backend"},
 								},
 							},
 						},
@@ -133,12 +133,12 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-									Values: []string{"env1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Values:    []string{"env1"},
 								},
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-									Values: []string{"frontend"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Values:    []string{"frontend"},
 								},
 							},
 						},
@@ -163,16 +163,16 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-									Values: []string{"env2"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Values:    []string{"env2"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-									Values: []string{"env1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Values:    []string{"env1"},
 								},
 							},
 						},
@@ -197,8 +197,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-									Values: []string{"env2"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Values:    []string{"env2"},
 								},
 							},
 						},
@@ -209,8 +209,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-									Values: []string{"env1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Values:    []string{"env1"},
 								},
 							},
 						},
@@ -237,8 +237,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-									Values: []string{"backend"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Values:    []string{"backend"},
 								},
 							},
 						},
@@ -249,8 +249,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-									Values: []string{"env1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Values:    []string{"env1"},
 								},
 							},
 						},
@@ -277,8 +277,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Values:    []string{"area_51"},
 								},
 							},
 						},
@@ -303,8 +303,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-									Values: []string{"area_52"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Values:    []string{"area_52"},
 								},
 							},
 						},
@@ -329,8 +329,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Values:    []string{"area_51"},
 								},
 							},
 						},
@@ -355,8 +355,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-									Values: []string{"area_51", "area_52"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Values:    []string{"area_51", "area_52"},
 								},
 							},
 						},
@@ -381,8 +381,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Values:    []string{"area_51"},
 								},
 							},
 						},
@@ -407,8 +407,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_ROLES,
-									Values: []string{"area_54"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Values:    []string{"area_54"},
 								},
 							},
 						},
@@ -435,8 +435,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
-									Values: []string{"chef-server.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
@@ -461,8 +461,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
-									Values: []string{"chef-server.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
@@ -487,8 +487,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
-									Values: []string{"chef-server.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
@@ -513,8 +513,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
-									Values: []string{"chef-server.org", "chef-server2.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Values:    []string{"chef-server.org", "chef-server2.org"},
 								},
 							},
 						},
@@ -541,16 +541,16 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
-									Values: []string{"chef-server.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -577,16 +577,16 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
-									Values: []string{"chef-server2.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Values:    []string{"chef-server2.org"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -613,8 +613,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -639,8 +639,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org2"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org2"},
 								},
 							},
 						},
@@ -665,8 +665,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -693,8 +693,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
-									Values: []string{"prod"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Values:    []string{"prod"},
 								},
 							},
 						},
@@ -719,8 +719,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
-									Values: []string{"dev"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Values:    []string{"dev"},
 								},
 							},
 						},
@@ -745,8 +745,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
-									Values: []string{"Prod"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Values:    []string{"Prod"},
 								},
 							},
 						},
@@ -771,8 +771,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
-									Values: []string{"prod", "dev"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Values:    []string{"prod", "dev"},
 								},
 							},
 						},
@@ -799,16 +799,16 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
-									Values: []string{"prod"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Values:    []string{"prod"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -835,16 +835,16 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_GROUP,
-									Values: []string{"dev"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Values:    []string{"dev"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -871,8 +871,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
-									Values: []string{"prod"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Values:    []string{"prod"},
 								},
 							},
 						},
@@ -897,8 +897,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
-									Values: []string{"dev"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Values:    []string{"dev"},
 								},
 							},
 						},
@@ -923,8 +923,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
-									Values: []string{"Prod"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Values:    []string{"Prod"},
 								},
 							},
 						},
@@ -949,8 +949,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
-									Values: []string{"prod", "dev"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Values:    []string{"prod", "dev"},
 								},
 							},
 						},
@@ -977,16 +977,16 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
-									Values: []string{"prod"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Values:    []string{"prod"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -1013,12 +1013,12 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_POLICY_NAME,
-									Values: []string{"dev"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Values:    []string{"dev"},
 								},
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -1045,8 +1045,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Values:    []string{"area_51"},
 								},
 							},
 						},
@@ -1071,8 +1071,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
-									Values: []string{"area_52"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Values:    []string{"area_52"},
 								},
 							},
 						},
@@ -1097,8 +1097,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Values:    []string{"area_51"},
 								},
 							},
 						},
@@ -1123,8 +1123,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
-									Values: []string{"area_51", "area_52"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Values:    []string{"area_51", "area_52"},
 								},
 							},
 						},
@@ -1151,16 +1151,16 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Values:    []string{"area_51"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -1187,16 +1187,16 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Values:    []string{"area_51"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org2"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org2"},
 								},
 							},
 						},
@@ -1223,12 +1223,12 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Values:    []string{"area_51"},
 								},
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org2"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org2"},
 								},
 							},
 						},
@@ -1253,8 +1253,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Values:    []string{"area_51"},
 								},
 							},
 						},
@@ -1279,8 +1279,8 @@ func TestProjectUpdate(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_TAGS,
-									Values: []string{"area_54"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Values:    []string{"area_54"},
 								},
 							},
 						},
@@ -1380,8 +1380,8 @@ func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	localSuite.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	localSuite.ProjectsClientMock.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 	event := &automate_event.EventMsg{
 		EventID:   "any",
 		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
@@ -1417,8 +1417,8 @@ func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
 	var eventsSent []*automate_event.EventMsg
 	localSuite := NewLocalSuite(t)
 	defer localSuite.GlobalTeardown()
-	localSuite.ProjectsClientMock.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	localSuite.ProjectsClientMock.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 	localSuite.EventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(ctx interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
 			eventsSent = append(eventsSent, in.Msg)

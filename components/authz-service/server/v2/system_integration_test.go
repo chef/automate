@@ -89,6 +89,95 @@ func TestFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 	})
 }
 
+func TestListRulesForAllProjects(t *testing.T) {
+	ctx := context.Background()
+	ts := setupWithOPAV2p1(t)
+
+	values1, values2, values3 := []string{"opscode", "chef"}, []string{"chef"}, []string{"other", "org"}
+	type1 := api_v2.ProjectRuleTypes_NODE
+	conditions1 := []*api_v2.Condition{
+		{
+			Attribute:     api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:   values1,
+			Operator: api_v2.ProjectRuleConditionOperators_MEMBER_OF,
+		},
+	}
+	type2 := api_v2.ProjectRuleTypes_EVENT
+	conditions2 := []*api_v2.Condition{
+		{
+			Attribute:     api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:   values2,
+			Operator: api_v2.ProjectRuleConditionOperators_EQUALS,
+		},
+	}
+	conditions3 := []*api_v2.Condition{
+		{
+			Attribute:     api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:   values3,
+			Operator: api_v2.ProjectRuleConditionOperators_MEMBER_OF,
+		},
+	}
+
+	t.Run("if no rules exist, returns empty list", func(t *testing.T) {
+		list, err := ts.projects.ListRules(ctx, &api_v2.ListRulesReq{})
+		require.Empty(t, list.Rules)
+		require.NoError(t, err)
+
+		resp, err := ts.projects.ListRulesForAllProjects(ctx, &api_v2.ListRulesForAllProjectsReq{})
+		require.NoError(t, err)
+		assert.Equal(t, &api_v2.ListRulesForAllProjectsResp{}, resp)
+	})
+
+	t.Run("if multiple rules exist, returns complete rule map", func(t *testing.T) {
+		id1, id2, id3 := "rule-number-1", "rule-number-2", "rule-number-3"
+		pid1, pid2 := "foo-project", "bar-project"
+		name := "you don't talk about fight club"
+		createResp1, err := ts.projects.CreateRule(ctx, &api_v2.CreateRuleReq{
+			Id:         id1,
+			Name:       name,
+			Type:       type1,
+			ProjectId:  pid1,
+			Conditions: conditions1,
+		})
+		require.NoError(t, err)
+		createResp2, err := ts.projects.CreateRule(ctx, &api_v2.CreateRuleReq{
+			Id:         id2,
+			Name:       name,
+			Type:       type2,
+			ProjectId:  pid1,
+			Conditions: conditions2,
+		})
+		require.NoError(t, err)
+		createResp3, err := ts.projects.CreateRule(ctx, &api_v2.CreateRuleReq{
+			Id:         id3,
+			Name:       name,
+			Type:       type2,
+			ProjectId:  pid2,
+			Conditions: conditions3,
+		})
+		require.NoError(t, err)
+
+		expectedRules1 := []*api_v2.ProjectRule{createResp1.Rule, createResp2.Rule}
+		expectedRules2 := []*api_v2.ProjectRule{createResp3.Rule}
+		expectedMap := map[string]*api_v2.ProjectRules{
+			pid1: &api_v2.ProjectRules{
+				Rules: expectedRules1,
+			},
+			pid2: &api_v2.ProjectRules{
+				Rules: expectedRules2,
+			},
+		}
+
+		list, err := ts.projects.ListRules(ctx, &api_v2.ListRulesReq{})
+		require.Equal(t, 3, len(list.Rules))
+		require.NoError(t, err)
+
+		resp, err := ts.projects.ListRulesForAllProjects(ctx, &api_v2.ListRulesForAllProjectsReq{})
+		require.NoError(t, err)
+		assert.EqualValues(t, expectedMap, resp.ProjectRules)
+	})
+}
+
 func setupWithOPAV2(t *testing.T) testSetup {
 	return setupWithOPAV2pX(t, false)
 }
@@ -109,7 +198,7 @@ func setupWithOPAV2pX(t *testing.T, twoPointOne bool) testSetup {
 
 	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
-	ts := setupV2(t, o, o, &emptyV1List, vChan)
+	ts := setupV2WithMigrationState(t, o, o, &emptyV1List, o, vChan, nil)
 	var flag api_v2.Flag
 	if twoPointOne {
 		flag = api_v2.Flag_VERSION_2_1

@@ -11,7 +11,7 @@ type Client interface {
 	// @param None
 	Initializing() bool
 	// @param (context, UTC time)
-	InitializeStore(context.Context)
+	InitializeStore(context.Context) error
 	// @param (context, UTC time, data)
 	InsertNode(context.Context, Node) error
 	// @param (context, UTC time, data)
@@ -83,5 +83,7 @@ type Client interface {
 	ReindexInsightstoActions(context.Context, string, string) error
 	RefreshIndex(context.Context, string) error
 	GetNodeCount(context.Context, string) (int64, error)
-	ReindexNodeStateToLatest(context.Context, string) error
+	// @param (context, previousIndex)
+	// @return (taskID, error)
+	ReindexNodeStateToLatest(context.Context, string) (string, error)
 }

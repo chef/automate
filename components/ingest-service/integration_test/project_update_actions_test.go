@@ -44,8 +44,8 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -66,8 +66,8 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org2"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org2"},
 								},
 							},
 						},
@@ -88,8 +88,8 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -112,7 +112,7 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 									Values: []string{"chef-server.org"},
 								},
 							},
@@ -134,7 +134,7 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 									Values: []string{"chef-server.org"},
 								},
 							},
@@ -156,7 +156,7 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 									Values: []string{"chef-server.org"},
 								},
 							},
@@ -178,7 +178,7 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 									Values: []string{"chef-server.org", "chef-server2.org"},
 								},
 							},
@@ -201,7 +201,7 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 									Values: []string{"chef-server.org"},
 								},
 							},
@@ -209,7 +209,7 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -232,7 +232,7 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 									Values: []string{"chef-server2.org"},
 								},
 							},
@@ -240,7 +240,7 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -263,11 +263,11 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 									Values: []string{"chef-server2.org"},
 								},
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},
@@ -363,8 +363,8 @@ func TestProjectUpdateRunsOnActions(t *testing.T) {
 			eventsSent = append(eventsSent, in.Msg)
 			return &automate_event.PublishResponse{}, nil
 		})
-	localSuite.projectsClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ProjectCollectionRulesResp{
+	localSuite.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		&iam_v2.ListRulesForAllProjectsResp{
 			ProjectRules: map[string]*iam_v2.ProjectRules{
 				updatedProjectTag: {
 					Rules: []*iam_v2.ProjectRule{
@@ -372,7 +372,7 @@ func TestProjectUpdateRunsOnActions(t *testing.T) {
 							Type: iam_v2.ProjectRuleTypes_EVENT,
 							Conditions: []*iam_v2.Condition{
 								{
-									Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 									Values: []string{"org1"},
 								},
 							},

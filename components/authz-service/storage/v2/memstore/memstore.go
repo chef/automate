@@ -7,7 +7,7 @@ import (
 	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
-	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	v2 "github.com/chef/automate/components/authz-service/storage/v2"
@@ -246,6 +246,7 @@ func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 	if err := s.rules.Add(rule.ID, rule, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}
+	s.bumpPolicyVersion()
 	return rule, nil
 }
 
@@ -266,6 +267,7 @@ func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 	if err := s.rules.Replace(rule.ID, rule, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}
+	s.bumpPolicyVersion()
 	return rule, nil
 }
 
@@ -319,6 +321,7 @@ func (s *State) DeleteRule(ctx context.Context, id string) error {
 	}
 
 	s.rules.Delete(id)
+	s.bumpPolicyVersion()
 	return nil
 }
 
@@ -335,7 +338,7 @@ func (s *State) CreateProject(_ context.Context, project *storage.Project) (*sto
 			}
 		}
 
-		if len(projects) >= v2_constants.MaxProjects {
+		if len(projects) >= constants_v2.MaxProjects {
 			return nil, storage_errors.ErrMaxProjectsExceeded
 		}
 	}

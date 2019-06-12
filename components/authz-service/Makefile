@@ -3,7 +3,7 @@ include ../../Makefile.common_go
 PACKAGE_PATH = github.com/chef/automate/components/authz-service
 
 BINS = ${PACKAGE_PATH}/cmd/authz-service
-
+MIGRATION_READMES = storage/postgres/migration/sql/README.md storage/postgres/datamigration/sql/README.md
 VERSION ?= $(shell git rev-pasrse HEAD)
 BUILD_TIME ?= $(shell date -u '+%Y%m%d%H%M%S')
 GO_LDFLAGS = --ldflags "-X ${LIBRARY_PATH}/version.Version=${BUILD_TIME} -X ${LIBRARY_PATH}/version.GitSHA=${GIT_SHA}"
@@ -14,9 +14,16 @@ ifdef CI
 endif
 
 all: lint build test
-
-static: lint
+static: lint ${MIGRATION_READMES}
 unit: build test
+
+.PHONY: ${MIGRATION_READMES}
+${MIGRATION_READMES}:
+	@echo '## SQL migrations\n' > $@
+	@for file in $$(dirname $@)/*.up.sql; do f=$$(basename $$file); echo "- [\`$$f\`]($$f)" >> $@; done
+	@git diff --exit-code $@; CODE=$$?;\
+	  if ! [[ $$CODE -eq 0 ]]; then echo "$@ index not committed; please commit $@"; fi;\
+	  exit $$CODE
 
 ${BINS}: bin
 	@echo "GO $@"

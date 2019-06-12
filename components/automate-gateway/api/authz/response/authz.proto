@@ -56,7 +56,3 @@ message MethodsAllowed {
 message IntrospectResp {
     map<string, MethodsAllowed> endpoints = 1;
 }
-
-message IntrospectProjectsResp {
-    repeated string projects = 1;
-}

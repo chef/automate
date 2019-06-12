@@ -35,10 +35,10 @@ describe File.basename(__FILE__) do
     end
   end
 
-  before(:all) { cleanup }
   after(:all) { cleanup }
 
   before(:all) {
+    cleanup
     secret = SS_GRPC secrets, :create, Secrets::Secret.new(
       data: [
         Secrets::Kv.new( key: "username", value: "bobby" ),
@@ -184,82 +184,94 @@ describe File.basename(__FILE__) do
       assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, j, 'start_time'))
       j['status'] = 'good' if j['status'] == 'running' || j['status'] == 'scheduled'
     }
-    expected_jobs = [
-      Jobs::Job.new(
-        end_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0),
-        id: job_id1,
-        name: "my Detect Job For two nodes",
-        node_count: 2,
-        parent_id: "123",
-        start_time: nil,
-        status: "good",
-        tags: [
-          Common::Kv.new( key: "reason", value: "checking the connectivity" ),
-          Common::Kv.new( key: "team", value: "Spain" )
-        ],
-        type: "detect",
-        scheduled_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0),
-        recurrence: ""
-      ),
-      Jobs::Job.new(
-        end_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0),
-        id: job_id2,
-        name: "My Exec Job For Existing node",
-        node_count: 1,
-        profile_count: 1,
-        start_time: nil,
-        status: "good",
-        type: "exec",
-        scheduled_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0)
-      )
-    ]
-    assert_equal(expected_jobs, all_jobs['jobs'])
+    expected_jobs = {
+      "jobs": [
+        {
+          "id": job_id1,
+          "name": "my Detect Job For two nodes",
+          "type": "detect",
+          "tags": [
+            {
+              "key": "reason",
+              "value": "checking the connectivity"
+            },
+            {
+              "key": "team",
+              "value": "Spain"
+            }
+          ],
+          "endTime": "0001-01-01T00:00:00Z",
+          "status": "good",
+          "nodeCount": 2,
+          "scheduledTime": "0001-01-01T00:00:00Z",
+          "parentId": "123"
+        },
+        {
+          "id": job_id2,
+          "name": "My Exec Job For Existing node",
+          "type": "exec",
+          "endTime": "0001-01-01T00:00:00Z",
+          "status": "good",
+          "nodeCount": 1,
+          "profileCount": 1,
+          "scheduledTime": "0001-01-01T00:00:00Z"
+        }
+      ],
+      "total": 2
+    }
+    assert_equal_json_sorted(expected_jobs.to_json, all_jobs.to_json)
 
     # Get job by id with all details
     job1 = GRPC jobs, :read, Jobs::Id.new(id: job_id1)
     assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, job1, 'start_time'))
     job1['status'] = 'good' if job1['status'] == 'running' || job1['status'] == 'scheduled'
-    expected_job1 = Jobs::Job.new(
-      end_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0),
-      id: job_id1,
-      name: "my Detect Job For two nodes",
-      node_count: 2,
-      nodes: [@docker_node_id1, @docker_node_id2],
-      parent_id: "123",
-      retries: 1,
-      retries_left: 1,
-      start_time: nil,
-      status: "good",
-      tags: [
-        Common::Kv.new( key: "reason", value: "checking the connectivity" ),
-        Common::Kv.new( key: "team", value: "Spain" )
+    expected_job1 = {
+      "id": job_id1,
+      "name": "my Detect Job For two nodes",
+      "type": "detect",
+      "timeout": 600,
+      "tags": [
+        {
+          "key": "reason",
+          "value": "checking the connectivity"
+        },
+        {
+          "key": "team",
+          "value": "Spain"
+        }
       ],
-      scheduled_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0),
-      timeout: 600,
-      type: "detect"
-    )
-    assert_equal(expected_job1, job1)
+      "endTime": "0001-01-01T00:00:00Z",
+      "status": "good",
+      "retries": 1,
+      "retriesLeft": 1,
+      "nodes": [@docker_node_id1, @docker_node_id2],
+      "nodeCount": 2,
+      "scheduledTime": "0001-01-01T00:00:00Z",
+      "parentId": "123"
+    }
+    assert_equal_json_sorted(expected_job1.to_json, job1.to_json)
 
     # Get job by id with all details
     job2 = GRPC jobs, :read, Jobs::Id.new(id: job_id2)
     assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, job2, 'start_time'))
     job2['status'] = 'good' if job2['status'] == 'running' || job2['status'] == 'scheduled'
-    expected_job2 = Jobs::Job.new(
-      end_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0),
-      id: job_id2,
-      name: "My Exec Job For Existing node",
-      node_count: 1,
-      nodes: [@docker_node_id1],
-      profiles: ["https://github.com/dev-sec/apache-baseline/archive/master.tar.gz"],
-      retries: 1,
-      retries_left: 1,
-      start_time: nil,
-      status: "good",
-      timeout: 7200,
-      type: "exec",
-      scheduled_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0)
-    )
-    assert_equal(expected_job2, job2)
+    expected_job2 = {
+      "id": job_id2,
+      "name": "My Exec Job For Existing node",
+      "type": "exec",
+      "timeout": 7200,
+      "endTime": "0001-01-01T00:00:00Z",
+      "status": "good",
+      "retries": 1,
+      "retriesLeft": 1,
+      "nodes": [@docker_node_id1],
+      "profiles": [
+        "https://github.com/dev-sec/apache-baseline/archive/master.tar.gz"
+      ],
+      "nodeCount": 1,
+      "scheduledTime": "0001-01-01T00:00:00Z"
+    }
+    assert_equal(expected_job2.to_json, job2.to_json)
 
     # give the jobs some time to reach a conclusion
     job1 = GRPC jobs, :read, Jobs::Id.new(id: job_id1)
@@ -287,29 +299,29 @@ describe File.basename(__FILE__) do
       assert_uuid(result['report_id'])
       result['report_id'] = 'some-report-id'
     }
-    expected_job2 = Jobs::Job.new(
-      end_time: nil,
-      id: job_id2,
-      name: "My Exec Job For Existing node",
-      node_count: 1,
-      nodes: [@docker_node_id1],
-      profiles: ["https://github.com/dev-sec/apache-baseline/archive/master.tar.gz"],
-      results: [ Jobs::ResultsRow.new(
-        end_time: nil,
-        node_id: @docker_node_id1,
-        report_id: "some-report-id",
-        start_time: nil,
-        status: "completed"
-      )],
-      retries: 1,
-      retries_left: 1,
-      start_time: nil,
-      status: "completed",
-      timeout: 7200,
-      type: "exec",
-      scheduled_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0)
-    )
-    assert_equal(expected_job2, job2)
+    expected_job2 = {
+      "id": job_id2,
+      "name": "My Exec Job For Existing node",
+      "type": "exec",
+      "timeout": 7200,
+      "status": "completed",
+      "retries": 1,
+      "retriesLeft": 1,
+      "results": [
+        {
+          "nodeId": @docker_node_id1,
+          "reportId": "some-report-id",
+          "status": "completed"
+        }
+      ],
+      "nodes": [@docker_node_id1],
+      "profiles": [
+        "https://github.com/dev-sec/apache-baseline/archive/master.tar.gz"
+      ],
+      "nodeCount": 1,
+      "scheduledTime": "0001-01-01T00:00:00Z"
+    }
+    assert_equal(expected_job2.to_json, job2.to_json)
 
     # Get all jobs after they had time to finish
     all_jobs = GRPC jobs, :list, Jobs::Query.new()
@@ -317,40 +329,44 @@ describe File.basename(__FILE__) do
       assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, j, 'start_time'))
       assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, j, 'end_time'))
     }
-    actual_jobs = all_jobs['jobs']
-    expected_jobs = [
-      Jobs::Job.new(
-        end_time: nil,
-        id: job_id1,
-        name: "my Detect Job For two nodes",
-        node_count: 2,
-        parent_id: "123",
-        start_time: nil,
-        status: "failed",
-        tags: [
-          Common::Kv.new( key: "reason", value: "checking the connectivity" ),
-          Common::Kv.new( key: "team", value: "Spain" )
-        ],
-        type: "detect",
-        scheduled_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0)
-      ),
-      Jobs::Job.new(
-        end_time: nil,
-        id: job_id2,
-        name: "My Exec Job For Existing node",
-        node_count: 1,
-        profile_count: 1,
-        start_time: nil,
-        status: "completed",
-        type: "exec",
-        scheduled_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0)
-      )
-    ]
-    assert_equal(expected_jobs, actual_jobs)
+    expected_jobs = {
+      "jobs": [
+        {
+          "id": job_id1,
+          "name": "my Detect Job For two nodes",
+          "type": "detect",
+          "tags": [
+            {
+              "key": "reason",
+              "value": "checking the connectivity"
+            },
+            {
+              "key": "team",
+              "value": "Spain"
+            }
+          ],
+          "status": "failed",
+          "nodeCount": 2,
+          "scheduledTime": "0001-01-01T00:00:00Z",
+          "parentId": "123"
+        },
+        {
+          "id": job_id2,
+          "name": "My Exec Job For Existing node",
+          "type": "exec",
+          "status": "completed",
+          "nodeCount": 1,
+          "profileCount": 1,
+          "scheduledTime": "0001-01-01T00:00:00Z"
+        }
+      ],
+      "total": 2
+    }
+    assert_equal_json_sorted(expected_jobs.to_json, all_jobs.to_json)
 
     # Getting job2 details to grab the end_time before rerunning the job
     job2 = GRPC jobs, :read, Jobs::Id.new(id: job_id2)
-    job2_orig_end_time = job2.end_time.seconds\
+    job2_orig_end_time = job2.end_time.seconds
     print "\n * Rerunning job: #{job2.id}\n"
     # Test rerun for job2
     GRPC jobs, :rerun, Jobs::Id.new(id: job_id2)
@@ -407,21 +423,19 @@ describe File.basename(__FILE__) do
           "lastJob": {
             "jobId": job_id2,
             "nodeId": @docker_node_id1,
-            "status": "completed",
+            "status": "completed"
           },
           "managerIds": [
             "e69dc612-7e67-43f2-9b19-256afd385820"
           ],
           "state": "RUNNING",
-          "projects": [],
           "runData": {},
           "scanData": {
             "id": "some-id",
             "status": "SKIPPED",
             "penultimateStatus": "SKIPPED",
-            "endTime": {}
-          },
-          "projectsData": []
+            "endTime": "1970-01-01T00:00:00Z"
+          }
         },
         {
           "id": @docker_node_id2,
@@ -437,26 +451,24 @@ describe File.basename(__FILE__) do
           "lastJob": {
             "jobId": job_id1,
             "nodeId": @docker_node_id2,
-            "status": "failed",
+            "status": "failed"
           },
           "managerIds": [
             "e69dc612-7e67-43f2-9b19-256afd385820"
           ],
           "connectionError": "unknown error",
-          "projects": [],
           "runData": {},
           "scanData": {
             "id": "some-id",
-            "endTime": {}
-          },
-          "projectsData": []
+            "endTime": "1970-01-01T00:00:00Z"
+          }
         }
       ],
       "total": 2,
       "totalUnreachable": 1,
       "totalReachable": 1
     }
-    assert_equal_json_content(expected_nodes, actual_nodes)
+    assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
     default_jobs_json = GRPC jobs, :list, Jobs::Query.new()
     # Testing the default sorting(name ASC)
@@ -502,37 +514,40 @@ describe File.basename(__FILE__) do
     assert_equal(true, job2['nodes'].include?(@docker_node_id1))
     assert_equal(true, job2['nodes'].include?(@docker_node_id2))
     job2['nodes'] = Google::Protobuf::RepeatedField.new(:string)
-    updated_expected_job2 = Jobs::Job.new(
-      id: job_id2,
-      end_time: Google::Protobuf::Timestamp.new(seconds: -62135596800, nanos: 0),
-      name: "My Exec Job For two nodes",
-      nodes: [],
-      profiles: ["https://github.com/dev-sec/linux-baseline/archive/master.tar.gz"],
-      recurrence: "FREQ=HOURLY;INTERVAL=1;COUNT=5;DTSTART=20290101T000000Z",
-      results: [ Jobs::ResultsRow.new(
-        end_time: nil,
-        node_id: @docker_node_id1,
-        report_id: "some-report-id",
-        start_time: nil,
-        status: "completed"
-      ),
-      Jobs::ResultsRow.new(
-        end_time: nil,
-        node_id: @docker_node_id1,
-        report_id: "some-report-id",
-        start_time: nil,
-        status: "completed"
-      )],
-      retries: 3,
-      retries_left: 3,
-      start_time:nil,
-      status: "good-stuff",
-      tags: [Common::Kv.new( key: "team", value: "Canada" )],
-      timeout: 7200,
-      type: "exec",
-      scheduled_time: Google::Protobuf::Timestamp.new(seconds: 1861920000, nanos: 0)
-    )
-    assert_equal(updated_expected_job2, job2)
+    updated_expected_job2 = {
+      "id": job_id2,
+      "name": "My Exec Job For two nodes",
+      "type": "exec",
+      "timeout": 7200,
+      "tags": [
+        {
+          "key": "team",
+          "value": "Canada"
+        }
+      ],
+      "endTime": "0001-01-01T00:00:00Z",
+      "status": "good-stuff",
+      "retries": 3,
+      "retriesLeft": 3,
+      "results": [
+        {
+          "nodeId": @docker_node_id1,
+          "reportId": "some-report-id",
+          "status": "completed"
+        },
+        {
+          "nodeId": @docker_node_id1,
+          "reportId": "some-report-id",
+          "status": "completed"
+        }
+      ],
+      "profiles": [
+        "https://github.com/dev-sec/linux-baseline/archive/master.tar.gz"
+      ],
+      "scheduledTime": "2029-01-01T00:00:00Z",
+      "recurrence": "FREQ=HOURLY;INTERVAL=1;COUNT=5;DTSTART=20290101T000000Z"
+    }
+    assert_equal_json_sorted(updated_expected_job2.to_json, job2.to_json)
 
     GRPC jobs, :update, Jobs::Job.new(
       id: job_id2,

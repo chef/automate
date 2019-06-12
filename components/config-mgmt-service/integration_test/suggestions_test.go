@@ -734,13 +734,13 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 		// Suggestions for Policy Group
 		{"should return all policy_group suggestions",
 			request.Suggestion{Type: "policy_group"},
-			[]string{"sports", "tv_series", "RPGs", "heros", "movies", "nintendo"}},
+			[]string{"sports", "tv_series", "rpgs", "heros", "movies", "nintendo"}},
 		{"should return zero policy_group suggestions",
 			request.Suggestion{Type: "policy_group", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'nintendo'",
 			request.Suggestion{Type: "policy_group", Text: "n"}, // less than 2 characters we return all results?
-			[]string{"sports", "tv_series", "RPGs", "heros", "movies", "nintendo"}},
+			[]string{"sports", "tv_series", "rpgs", "heros", "movies", "nintendo"}},
 		{"should return one policy_group suggestion 'nintendo'",
 			request.Suggestion{Type: "policy_group", Text: "ni"},
 			[]string{"nintendo"}},

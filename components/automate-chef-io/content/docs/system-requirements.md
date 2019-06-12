@@ -27,6 +27,7 @@ Chef Automate requires
 * `systemd` as the init system
 * `useradd`
 * `curl` or `wget`
+* The shell that starts Automate should have a max open files setting of at least 65535
 
 Commercial support for Chef Automate is available for platforms that satisfy these
 criteria.

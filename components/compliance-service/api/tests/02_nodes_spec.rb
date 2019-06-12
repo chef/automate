@@ -50,9 +50,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
-                    "endTime" => {
-                        "seconds" => 1520215322
-                    },
+                    "endTime" => "2018-03-05T02:02:02Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 18,
@@ -64,14 +62,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 1
-    }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    }
+    assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
     # Filtering for end_date 2018-03-04 as it has two nodes scanned that day
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -89,9 +85,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 18,
@@ -103,9 +97,7 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             },
             {
                 "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -117,9 +109,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod Alpha",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                    "endTime" => {
-                        "seconds" => 1520155122
-                    },
+                    "endTime" => "2018-03-04T09:18:42Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 18,
@@ -135,9 +125,7 @@ describe File.basename(__FILE__) do
                             "critical" => 1
                         }
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             },
             {
                 "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -149,9 +137,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod Alpha",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                    "endTime" => {
-                        "seconds" => 1520155122
-                    },
+                    "endTime" => "2018-03-04T09:18:42Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 18,
@@ -167,9 +153,7 @@ describe File.basename(__FILE__) do
                             "critical" => 1
                         }
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             },
             {
                 "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -181,9 +165,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                    "endTime" => {
-                        "seconds" => 1520155123
-                    },
+                    "endTime" => "2018-03-04T09:18:43Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 18,
@@ -199,9 +181,7 @@ describe File.basename(__FILE__) do
                             "critical" => 1
                         }
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             },
             {
                 "id" => "a0ddd774-cbbb-49be-8730-49c92f3fc2a0",
@@ -213,9 +193,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
                     "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
-                    "endTime" => {
-                        "seconds" => 1520158721
-                    },
+                    "endTime" => "2018-03-04T10:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 14,
@@ -225,14 +203,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 5
-    }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    }
+    assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
 
     # Filtering for end_date 2018-03-04 as it has two nodes scanned that day
@@ -253,9 +229,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
                     "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
-                    "endTime" => {
-                        "seconds" => 1520158721
-                    },
+                    "endTime" => "2018-03-04T10:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 14,
@@ -265,14 +239,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 1
-    }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    }
+    assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
 
     # Test page size
@@ -291,9 +263,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
                     "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
-                    "endTime" => {
-                        "seconds" => 1520158721
-                    },
+                    "endTime" => "2018-03-04T10:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 14,
@@ -303,14 +273,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 5
-    }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    }
+    assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
     # Test pagination(per_page+page+order)
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(per_page: 1, page: 2, order: 1, filters: [
@@ -328,9 +296,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                    "endTime" => {
-                        "seconds" => 1520155123
-                    },
+                    "endTime" => "2018-03-04T09:18:43Z",
                     "status" => "failed",
                     "controls" => {
                         "total" => 18,
@@ -346,14 +312,12 @@ describe File.basename(__FILE__) do
                             "critical" => 1
                         }
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 5
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod Zeta']),
@@ -371,9 +335,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
                     "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
-                    "endTime" => {
-                        "seconds" => 1520158721
-                    },
+                    "endTime" => "2018-03-04T10:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 14,
@@ -383,14 +345,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Test filters by inspec version
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -409,9 +369,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 18,
@@ -423,14 +381,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Test filters by inspec version
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -458,9 +414,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 18,
@@ -472,14 +426,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Test filters by env and status
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -499,9 +451,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 18,
@@ -513,14 +463,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Test filter by job_id
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -539,9 +487,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 18,
@@ -553,14 +499,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 1
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Testing non matching filters
     actual = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -586,9 +530,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                    "endTime" => {
-                        "seconds" => 1520155121
-                    },
+                    "endTime" => "2018-03-04T09:18:41Z",
                     "status" => "passed",
                     "controls" => {
                         "total" => 18,
@@ -600,9 +542,7 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             },
             {
                 "id" => "a0ddd774-cbbb-49be-8730-49c92f3fc2a0",
@@ -614,9 +554,7 @@ describe File.basename(__FILE__) do
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
                     "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
-                    "endTime" => {
-                        "seconds" => 1520158721
-                    },
+                    "endTime" => "2018-03-04T10:18:41Z",
                     "status" => "skipped",
                     "controls" => {
                         "total" => 14,
@@ -626,14 +564,12 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                },
-                "tags" => [],
-                "profiles" => []
+                }
             }
         ],
         "total" => 2
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Target missing environment that contains special characters
     actual = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -663,9 +599,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Zeta",
                     "latestReport" => {
                         "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
-                        "endTime" => {
-                            "seconds" => 1520158721
-                        },
+                        "endTime" => "2018-03-04T10:18:41Z",
                         "status" => "skipped",
                         "controls" => {
                             "total" => 14,
@@ -675,9 +609,7 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e149",
@@ -689,9 +621,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => {
-                            "seconds" => 1520155121
-                        },
+                        "endTime" => "2018-03-04T09:18:41Z",
                         "status" => "passed",
                         "controls" => {
                             "total" => 18,
@@ -703,9 +633,7 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -717,9 +645,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                        "endTime" => {
-                            "seconds" => 1520155123
-                        },
+                        "endTime" => "2018-03-04T09:18:43Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -735,9 +661,7 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -749,9 +673,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -767,9 +689,7 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -781,9 +701,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -799,14 +717,12 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 5
         }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(sort: 'name', order: 0, filters: [
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
@@ -824,9 +740,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => {
-                            "seconds" => 1520155121
-                        },
+                        "endTime" => "2018-03-04T09:18:41Z",
                         "status" => "passed",
                         "controls" => {
                             "total" => 18,
@@ -838,9 +752,7 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -852,9 +764,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -870,9 +780,7 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -884,9 +792,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -902,9 +808,7 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -916,9 +820,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                        "endTime" => {
-                            "seconds" => 1520155123
-                        },
+                        "endTime" => "2018-03-04T09:18:43Z",
                         "status" => "failed",
                         "controls" => {
                             "total" => 18,
@@ -934,9 +836,7 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "a0ddd774-cbbb-49be-8730-49c92f3fc2a0",
@@ -948,9 +848,7 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Zeta",
                     "latestReport" => {
                         "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
-                        "endTime" => {
-                            "seconds" => 1520158721
-                        },
+                        "endTime" => "2018-03-04T10:18:41Z",
                         "status" => "skipped",
                         "controls" => {
                             "total" => 14,
@@ -960,14 +858,12 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 5
         }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Cover the other sort fields:
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(
@@ -998,9 +894,7 @@ describe File.basename(__FILE__) do
         "environment" => "DevSec Prod beta",
         "latestReport" => {
             "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
-            "endTime" => {
-                "seconds" => 1520233322
-            },
+            "endTime" => "2018-03-05T07:02:02Z",
             "status" => "failed",
             "controls" => {
                 "total" => 18,
@@ -1016,7 +910,6 @@ describe File.basename(__FILE__) do
                 }
             }
         },
-        "tags" => [],
         "profiles" => [
             {
                 "name" => "nginx-baseline",
@@ -1030,7 +923,7 @@ describe File.basename(__FILE__) do
             }
         ]
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # sort by node name ASC when a profile filter is used
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [

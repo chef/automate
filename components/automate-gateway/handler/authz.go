@@ -15,7 +15,6 @@ import (
 
 	// Authz Service Requests/Response/Service definitions
 	authz "github.com/chef/automate/api/interservice/authz"
-	authzV2 "github.com/chef/automate/api/interservice/authz/v2"
 
 	// Gateway Requests/Response/Service definitions
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
@@ -32,19 +31,16 @@ import (
 // AuthzServer is the server interface
 type AuthzServer struct {
 	client        authz.AuthorizationClient
-	clientV2      authzV2.AuthorizationClient
 	filterHandler middleware.SwitchingFilterHandler
 }
 
 // NewAuthzServer creates a server with its client
 func NewAuthzServer(
 	client authz.AuthorizationClient,
-	clientV2 authzV2.AuthorizationClient,
 	filterHandler middleware.SwitchingFilterHandler,
 ) *AuthzServer {
 	return &AuthzServer{
 		client:        client,
-		clientV2:      clientV2,
 		filterHandler: filterHandler,
 	}
 }
@@ -223,19 +219,6 @@ func (a *AuthzServer) Introspect(
 	}, nil
 }
 
-// IntrospectAllProjects returns a list of all projects the requestor has access to.
-func (a *AuthzServer) IntrospectAllProjects(
-	ctx context.Context, gwReq *gwAuthzReq.IntrospectAllProjectsReq) (*gwAuthzRes.IntrospectProjectsResp, error) {
-
-	projects, err := a.getAllowedProjects(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &gwAuthzRes.IntrospectProjectsResp{
-		Projects: projects,
-	}, nil
-}
-
 func logResult(log *logrus.Entry, endpointMap map[string]*gwAuthzRes.MethodsAllowed) {
 	paths := make([]string, len(endpointMap))
 	i := 0
@@ -335,23 +318,6 @@ func (a *AuthzServer) getAllowedMap(
 		return nil, err
 	}
 	return endpointMap, nil
-}
-
-func (a *AuthzServer) getAllowedProjects(ctx context.Context) ([]string, error) {
-
-	log := ctxlogrus.Extract(ctx)
-
-	// Fetches the id of the current user PLUS the team ids for that user
-	subjects := auth_context.FromContext(ctx).Subjects
-
-	resp, err := a.clientV2.FilterAuthorizedProjects(ctx, &authzV2.FilterAuthorizedProjectsReq{
-		Subjects: subjects,
-	})
-	if err != nil {
-		log.WithError(err).Debug("Error on client.FilterAuthorizedProjects")
-		return nil, err
-	}
-	return resp.Projects, nil
 }
 
 func domainPolicyToGatewayPolicy(pol *authz.Policy) *gwAuthzRes.Policy {

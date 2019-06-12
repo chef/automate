@@ -7,26 +7,27 @@ title 'IAM v2.1 get all allowed projects for global projects filter'
 control 'iam-v2-global-projects-filter-1' do
   title 'getting all allowed projects for a user on v2.1'
 
-  PROJECT_ID_1 = "inspec-custom-project-1-#{Time.now.utc.to_i}"
-  PROJECT_ID_2 = "inspec-custom-project-2-#{Time.now.utc.to_i}"
-  PROJECT_ID_3 = "inspec-custom-project-3-#{Time.now.utc.to_i}"
+ describe 'allowed projects' do
 
-  PROJECT_1 = {
-          id: PROJECT_ID_1,
-          name: "Test Project 1"
-  }
-  PROJECT_2 = {
-          id: PROJECT_ID_2,
-          name: "Test Project 2"
-  }
-  PROJECT_3 = {
-          id: PROJECT_ID_3,
-          name: "Test Project 3"
-  }
+    UNASSIGNED_PROJECT_ID = '(unassigned)'
+    UNASSIGNED_PROJECT_NAME = UNASSIGNED_PROJECT_ID
 
-  PROJECTS = [ PROJECT_1, PROJECT_2, PROJECT_3 ]
-  
-  describe 'allowed projects' do
+    def genInputProject(id, name)
+      return { id: id,
+              name: name
+            }
+    end
+
+    PROJECT_ID_1 = "inspec-custom-project-1-#{Time.now.utc.to_i}"
+    PROJECT_ID_2 = "inspec-custom-project-2-#{Time.now.utc.to_i}"
+    PROJECT_ID_3 = "inspec-custom-project-3-#{Time.now.utc.to_i}"
+
+    PROJECT_1 = genInputProject(PROJECT_ID_1, "Test Project 1")
+    PROJECT_2 = genInputProject(PROJECT_ID_2, "Test Project 2")
+    PROJECT_3 = genInputProject(PROJECT_ID_3, "Test Project 3")
+    PROJECTS = [ PROJECT_1, PROJECT_2, PROJECT_3 ]
+    UNASSIGNED = genInputProject(UNASSIGNED_PROJECT_ID, UNASSIGNED_PROJECT_NAME)
+ 
     before(:all) do
       PROJECTS.each do|project|
         resp = automate_api_request("/apis/iam/v2beta/projects",
@@ -46,12 +47,18 @@ control 'iam-v2-global-projects-filter-1' do
 
     describe 'allowed projects for admin' do
       it 'returns list of all projects and unassigned' do
-        resp = automate_api_request("/api/v0/auth/introspect_projects", http_method: 'GET')
+        resp = automate_api_request("/apis/iam/v2beta/introspect_projects", http_method: 'GET')
 
         expect(resp.http_status).to eq 200
-        # always returns complete list of projects + (unassigned)
-        expected_projects = PROJECTS.map { |p| p[:id] }.push('(unassigned)')
-        expect(resp.parsed_response_body[:projects]).to match_array(expected_projects)
+        expected_projects = [ PROJECT_1, PROJECT_2, PROJECT_3, UNASSIGNED ]
+        expected_projects.each do |p|
+          expect(resp.parsed_response_body[:projects]).to include(
+            { id: p[:id],
+              name: p[:name],
+              projects: [ p[:id] ],
+              type: p[:id] == UNASSIGNED_PROJECT_ID ? "CHEF_MANAGED" : "CUSTOM"
+            })
+        end
       end
     end
 
@@ -108,11 +115,18 @@ control 'iam-v2-global-projects-filter-1' do
       end
 
       it 'returns list of allowed projects' do
-        resp = automate_api_request("/api/v0/auth/introspect_projects", http_method: 'GET', user: non_admin_username)
+        resp = automate_api_request("/apis/iam/v2beta/introspect_projects", http_method: 'GET', user: non_admin_username)
 
         expect(resp.http_status).to eq 200
-        expected_projects = [PROJECT_ID_1, PROJECT_ID_2]
-        expect(resp.parsed_response_body[:projects]).to match_array(expected_projects)
+        expected_projects = [PROJECT_1, PROJECT_2]
+        expect(resp.parsed_response_body[:projects]).to match_array(
+          expected_projects.map { |p|
+            { id: p[:id],
+              name: p[:name],
+              projects: [ p[:id] ],
+              type: "CUSTOM"
+            }}
+        )
       end
     end
   end

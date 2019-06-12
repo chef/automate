@@ -5,8 +5,8 @@ import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 
 export interface AuthorizedProjectsResponse {
-    projects: string[];
-  }
+  projects: string[];
+}
 
 @Injectable()
 export class ProjectsFilterRequests {
@@ -14,7 +14,7 @@ export class ProjectsFilterRequests {
   constructor(private http: HttpClient) { }
 
   fetchOptions(): Observable<AuthorizedProjectsResponse[]> {
-    return this.http.get<AuthorizedProjectsResponse[]>(`${env.auth_url}/introspect_projects`);
+    return this.http.get<AuthorizedProjectsResponse[]>(`${env.auth_v2_url}/introspect_projects`);
   }
 }
 

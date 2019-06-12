@@ -19,8 +19,9 @@ type Driver interface {
 
 	GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string) ([]byte, error)
 	GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (string, error)
-
 	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
+
+	GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*WorkflowInstance, error)
 
 	Init() error
 	Close() error
@@ -31,6 +32,7 @@ type WorkflowInstanceStatus string
 const (
 	WorkflowInstanceStatusRunning   WorkflowInstanceStatus = "running"
 	WorkflowInstanceStatusAbandoned WorkflowInstanceStatus = "abandoned"
+	WorkflowInstanceStatusCompleted WorkflowInstanceStatus = "completed"
 )
 
 type WorkflowInstance struct {
@@ -39,6 +41,9 @@ type WorkflowInstance struct {
 	Status       WorkflowInstanceStatus
 	Parameters   []byte
 	Payload      []byte
+
+	IsRunning bool
+	Result    []byte
 }
 
 type WorkflowEventType string
@@ -97,7 +102,7 @@ type WorkflowCompleter interface {
 
 	Continue(payload []byte) error
 	Abandon() error
-	Done() error
+	Done(result []byte) error
 	Close() error
 }
 

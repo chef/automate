@@ -36,9 +36,7 @@ describe File.basename(__FILE__) do
           "environment": "DevSec Prod Beta",
           "latestReport": {
             "id": "bb93e1b2-36d6-439e-ac70-cccccccccc05",
-            "endTime": {
-              "seconds": 1520215322
-            },
+            "endTime": "2018-03-05T02:02:02Z",
             "status": "passed",
             "controls": {
               "total": 16,
@@ -50,14 +48,12 @@ describe File.basename(__FILE__) do
               },
               "failed": {}
             }
-          },
-          "tags": [],
-          "profiles": []
+          }
         }
       ],
       "total": 1
     }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Node details API
     actual_node = GRPC reporting, :read_node, Reporting::Id.new(id: '74a54a28-c628-4f82-86df-centosssssss')
@@ -71,9 +67,7 @@ describe File.basename(__FILE__) do
       "environment": "DevSec Prod Beta",
       "latestReport": {
         "id": "bb93e1b2-36d6-439e-ac70-cccccccccc05",
-        "endTime": {
-          "seconds": 1520215322
-        },
+        "endTime": "2018-03-05T02:02:02Z",
         "status": "passed",
         "controls": {
           "total": 16,
@@ -86,7 +80,6 @@ describe File.basename(__FILE__) do
           "failed": {}
         }
       },
-      "tags": [],
       "profiles": [
         {
           "name": "nginx-baseline",
@@ -100,7 +93,7 @@ describe File.basename(__FILE__) do
         }
       ]
     }.to_json
-    assert_equal(expected_node, actual_node.to_json)
+    assert_equal_json_sorted(expected_node, actual_node.to_json)
 
     END_OF_DAY = "23:59:59Z"
     # Get "two" profiles page 1
@@ -132,7 +125,7 @@ describe File.basename(__FILE__) do
         "passed": 1
       }
     }.to_json
-    assert_equal(expected_data, actual_data.to_json)
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
 
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control', text: 'icMP'

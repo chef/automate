@@ -553,20 +553,20 @@ func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2
 				chefTags := []string{}
 				policyGroups := []string{}
 				policyNames := []string{}
-				switch condition.Type {
-				case iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS:
+				switch condition.Attribute {
+				case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS:
 					chefServers = condition.Values
-				case iam_v2.ProjectRuleConditionTypes_CHEF_ORGS:
+				case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS:
 					organizations = condition.Values
-				case iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS:
+				case iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS:
 					environments = condition.Values
-				case iam_v2.ProjectRuleConditionTypes_ROLES:
+				case iam_v2.ProjectRuleConditionAttributes_ROLES:
 					roles = condition.Values
-				case iam_v2.ProjectRuleConditionTypes_CHEF_TAGS:
+				case iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS:
 					chefTags = condition.Values
-				case iam_v2.ProjectRuleConditionTypes_POLICY_GROUP:
+				case iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP:
 					policyGroups = condition.Values
-				case iam_v2.ProjectRuleConditionTypes_POLICY_NAME:
+				case iam_v2.ProjectRuleConditionAttributes_POLICY_NAME:
 					policyNames = condition.Values
 				}
 				esConditionCollection[conditionIndex] = map[string]interface{}{

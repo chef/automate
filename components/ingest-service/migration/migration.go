@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -14,11 +15,14 @@ import (
 var (
 	// This variable will allow us to add a test so that if the mappings.NodeState.Index
 	// changes we might need to add some migration bits over here
-	a2CurrentNodeStateIndex = "node-state-5"
+	a2CurrentNodeStateIndex = "node-state-6"
 
-	// The previous NodeState index: This change was made since we are now indexing the
+	// NodeState 5 index: This change was made since we are now indexing the 'projects' field
+	a2NodeState5Index = "node-state-5"
+
+	// NodeState 4 index: This change was made since we are now indexing the
 	// chef_tags and chef_version fields to be engram's (searchable fields)
-	a2PreviousNodeStateIndex = "node-state-4"
+	a2NodeState4Index = "node-state-4"
 
 	a1NodeStateIndexName     = "node-state-2"
 	berlinNodeStateIndexName = "node-state-1"
@@ -53,49 +57,79 @@ func New(client backend.Client) *Status {
 // the second stage is migration from 1 -> 2 does not know what state the first stage has left the data in.
 // For the migration framework we are always going to migrate from the current state to the current version.
 // This does cause a maintenance problem because for each new version the old migration stages need to be updated.
-func (ms *Status) Start() {
+func (ms *Status) Start() error {
 	exists, err := ms.hasA1ElasticsearchData()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to detect migration status")
-		return
+		return err
 	}
 	if exists {
 		ms.update("Starting Automate 1.x migration")
-		ms.migrateA1ToCurrent()
-		return
+		err = ms.migrateA1ToCurrent()
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run 1.x to current migration")
+			return err
+		}
+		return nil
 	}
 
 	exists, err = ms.hasBerlinElasticsearchData()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to detect migration status")
-		return
+		return err
 	}
 	if exists {
 		ms.update("Starting Berlin migration")
-		ms.migrateBerlinToCurrent()
-		return
+		err = ms.migrateBerlinToCurrent()
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run berlin to current migration")
+			return err
+		}
+		return nil
 	}
 
-	exists, err = ms.hasPreviousNodeStateData()
+	exists, err = ms.hasNodeState4Data()
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to detect migration status")
-		return
+		return err
 	}
 	if exists {
 		ms.update("Starting migration to latest node state index")
-		ms.migrateNodeStateToCurrent(a2PreviousNodeStateIndex) //pass last previous index
+		err = ms.migrateNodeStateToCurrent(a2NodeState4Index)
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run node-state 4 to current migration")
+			return err
+		}
+		return nil
 	}
 
+	exists, err = ms.hasNodeState5Data()
+	if err != nil {
+		ms.updateErr(err.Error(), "Unable to detect migration status")
+		return err
+	}
+	if exists {
+		ms.update("Starting migration to latest node state index")
+		err = ms.migrateNodeStateToCurrent(a2NodeState5Index)
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run node-state 4 to current migration")
+			return err
+		}
+		return nil
+	}
+
+	return nil
 }
 
 // MigrationNeeded Verify if a migration is needed
 func (ms *Status) MigrationNeeded() (bool, error) {
 	var (
-		nodeStateAliasExists          = ms.client.DoesAliasExists(ms.ctx, nodeStateAliasName)
-		a1Exists, err1                = ms.hasA1ElasticsearchData()
-		BerlinExists, err2            = ms.hasBerlinElasticsearchData()
-		nodeStateIndexExists, err3    = ms.client.DoesIndexExists(ms.ctx, nodeStateAliasName)
-		previousNodeStateExists, err4 = ms.hasPreviousNodeStateData()
+		nodeStateAliasExists       = ms.client.DoesAliasExists(ms.ctx, nodeStateAliasName)
+		a1Exists, err1             = ms.hasA1ElasticsearchData()
+		BerlinExists, err2         = ms.hasBerlinElasticsearchData()
+		nodeStateIndexExists, err3 = ms.client.DoesIndexExists(ms.ctx, nodeStateAliasName)
+		nodeState4Exists, err4     = ms.hasNodeState4Data()
+		nodeState5Exists, err5     = ms.hasNodeState5Data()
 	)
 
 	if err1 != nil {
@@ -110,6 +144,9 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 	if err4 != nil {
 		logFatal(err4.Error(), "Error detecting migration status")
 	}
+	if err5 != nil {
+		logFatal(err4.Error(), "Error detecting migration status")
+	}
 
 	// If the node-state alias doesn't exist and it is an index
 	// instead, we might have corrupted data
@@ -119,7 +156,7 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 		return false, err
 	}
 
-	if a1Exists || BerlinExists || previousNodeStateExists {
+	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists {
 		return true, nil
 	}
 
@@ -185,8 +222,12 @@ func (ms *Status) hasA1ElasticsearchData() (bool, error) {
 	return ms.client.DoesIndexExists(ms.ctx, a1NodeStateIndexName)
 }
 
-func (ms *Status) hasPreviousNodeStateData() (bool, error) {
-	return ms.client.DoesIndexExists(ms.ctx, a2PreviousNodeStateIndex)
+func (ms *Status) hasNodeState4Data() (bool, error) {
+	return ms.client.DoesIndexExists(ms.ctx, a2NodeState4Index)
+}
+
+func (ms *Status) hasNodeState5Data() (bool, error) {
+	return ms.client.DoesIndexExists(ms.ctx, a2NodeState5Index)
 }
 
 func (ms *Status) migrateBerlinToCurrent() error {
@@ -216,11 +257,28 @@ func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
 	ms.taskCompleted()
 
 	ms.update(fmt.Sprintf("Reindexing %s index to current", previousIndex))
-	err := ms.client.ReindexNodeStateToLatest(ms.ctx, previousIndex)
+	reindexTaskID, err := ms.client.ReindexNodeStateToLatest(ms.ctx, previousIndex)
 	if err != nil {
 		ms.updateErr(err.Error(), "Unable to reindex node-state to latest")
 		return err
 	}
+
+	// Wait for Reindex task to complete
+	for {
+		time.Sleep(time.Millisecond * 500)
+
+		status, err := ms.client.JobStatus(ms.ctx, reindexTaskID)
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable to check status on reindex of node-state to latest")
+			return err
+		}
+
+		if status.Completed {
+			ms.update(fmt.Sprintf("Reindexing is %f complete", status.PercentageComplete))
+			break
+		}
+	}
+
 	ms.taskCompleted()
 
 	ms.update(fmt.Sprintf("Removing alias %s from previous index", nodeStateAliasName))

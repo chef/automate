@@ -338,8 +338,7 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'node_id', values: ['9b9f4e51-b049-4b10-9555-10578916e149']),
         Reporting::ListFilter.new(type: 'profile_id', values: ['some-profile_id'])
     ])
-    expected_data = {
-        "profiles" => [], "counts" => {}
+    expected_data = { "counts" => {}
     }.to_json
     assert_equal(expected_data, actual_data.to_json)
 
@@ -372,8 +371,7 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'profile_id', values: ['some-profile_id']),
         Reporting::ListFilter.new(type: "end_time", values: ["2018-02-09T#{END_OF_DAY}"])
     ])
-    expected_data = {
-        "profiles" => [], "counts" => {}
+    expected_data = { "counts" => {}
     }.to_json
     assert_equal(expected_data, actual_data.to_json)
 

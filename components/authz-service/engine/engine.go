@@ -2,6 +2,8 @@ package engine
 
 import (
 	"context"
+
+	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 // Engine abstracts different decision engines.
@@ -59,7 +61,7 @@ type V2Authorizer interface {
 
 	// FilterAuthorizedProjects returns a sublist of the passed-in pairs
 	// allowed by the subjects.
-	V2FilterAuthorizedPairs(context.Context, Subjects, []Pair) ([]Pair, error)
+	V2FilterAuthorizedPairs(context.Context, Subjects, []Pair, bool) ([]Pair, error)
 
 	// V2FilterAuthorizedProjects returns a list of allowed projects
 	// for the given subjects
@@ -72,21 +74,16 @@ type Writer interface {
 }
 
 type V2Writer interface {
-	V2SetPolicies(context.Context, map[string]interface{}, map[string]interface{}, map[string][]interface{}) error
+	V2SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
 }
 
 type V2p1Writer interface {
-	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}, map[string][]interface{}) error
+	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
+	SetRules(context.Context, map[string][]v2.Rule) error
 }
 
 type ProjectRulesRetriever interface {
-	RulesForProject(context.Context, string) ([]Rule, error)
-	ListProjectMappings(context.Context) (map[string][]Rule, error)
-}
-
-type Rule struct {
-	Type   string
-	Values []string
+	ListProjectMappings(context.Context) (map[string][]v2.Rule, error)
 }
 
 // Subjects contains the requestor and all the teams they're a member of.

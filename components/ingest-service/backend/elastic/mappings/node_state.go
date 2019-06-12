@@ -42,6 +42,7 @@ var nodeProps = `
 	},
 	"node_name": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -54,7 +55,14 @@ var nodeProps = `
 		"null_value": false
 	},
 	"organization_name": {
-		"type": "keyword"
+		"type": "keyword",
+		"normalizer": "case_insensitive",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			}
+		}
 	},
 	"run_list": {
 		"type": "keyword",
@@ -121,6 +129,7 @@ var nodeProps = `
 	},
 	"resource_names": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -130,6 +139,7 @@ var nodeProps = `
 	},
 	"error_message": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -139,6 +149,7 @@ var nodeProps = `
 	},
 	"recipes": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -148,6 +159,7 @@ var nodeProps = `
 	},
 	"chef_tags": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -157,6 +169,7 @@ var nodeProps = `
 	},
 	"cookbooks": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -166,6 +179,7 @@ var nodeProps = `
 	},
 	"attributes": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -175,6 +189,7 @@ var nodeProps = `
 	},
 	"platform": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -196,6 +211,7 @@ var nodeProps = `
 	},
 	"chef_version": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -208,6 +224,7 @@ var nodeProps = `
 	},
 	"environment": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -217,6 +234,7 @@ var nodeProps = `
 	},
 	"roles": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -262,10 +280,18 @@ var nodeProps = `
 		"type": "ip"
 	},
 	"source_fqdn": {
-		"type": "keyword"
+		"type": "keyword",
+		"normalizer": "case_insensitive",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			}
+		}
 	},
 	"policy_group": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -275,6 +301,7 @@ var nodeProps = `
 	},
 	"policy_name": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -284,6 +311,7 @@ var nodeProps = `
 	},
 	"policy_revision": {
 		"type": "keyword",
+		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
@@ -323,7 +351,7 @@ var nodeProps = `
 
 // NodeState is the representation of our `node-state` Mapping
 var NodeState = Mapping{
-	Index:      "node-state-5",
+	Index:      "node-state-6",
 	Alias:      "node-state",
 	Type:       "node-state",
 	Timeseries: false,
@@ -337,6 +365,13 @@ var NodeState = Mapping{
 				"refresh_interval": "5s"
 			},
 			 "analysis": {
+				"normalizer": {
+					"case_insensitive": {
+						"type": "custom",
+						"char_filter": [],
+						"filter": ["lowercase", "asciifolding"]
+					}
+				},
 				"analyzer": {
 					"autocomplete": {
 						"tokenizer": "autocomplete_tokenizer",

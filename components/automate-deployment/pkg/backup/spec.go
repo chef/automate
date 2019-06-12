@@ -295,7 +295,7 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 			SyncEsIndices: []ElasticsearchOperation{
 				{
 					ServiceName:    "ingest-service",
-					MultiIndexSpec: "node-state-5,node-attribute,converge-history-*,actions-*",
+					MultiIndexSpec: "node-state-6,node-attribute,converge-history-*,actions-*",
 				},
 			},
 		},

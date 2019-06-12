@@ -109,9 +109,7 @@ describe File.basename(__FILE__) do
           "environment": "trouble",
           "latestReport": {
             "id": report_id,
-            "endTime": {
-              "seconds": 1
-            },
+            "endTime": "1970-01-01T00:00:01Z",
             "status": "skipped",
             "controls": {
               "total": 14,
@@ -121,14 +119,12 @@ describe File.basename(__FILE__) do
               },
               "failed": {}
             }
-          },
-          "tags": [],
-          "profiles": []
+          }
         }
       ],
       "total": 1
     }.to_json
-    assert_equal(exp_rep_nodes, act_rep_nodes.to_json)
+    assert_equal_json_sorted(exp_rep_nodes, act_rep_nodes.to_json)
 
     # Filtering by node_id as this is leading to a search in the latest index
     act_rep_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -158,7 +154,7 @@ describe File.basename(__FILE__) do
         "skipped": 1
       }
     }.to_json
-    assert_equal(exp_rep_profiles, act_rep_profiles.to_json)
+    assert_equal_json_sorted(exp_rep_profiles, act_rep_profiles.to_json)
 
     # that node should have recent last contact time, so we expect more than 0 nodes here
     formatted_one_hour_ago_utc = (Time.now.utc - 3600).iso8601

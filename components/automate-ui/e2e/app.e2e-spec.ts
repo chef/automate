@@ -131,8 +131,8 @@ describe('Main Navigation', () => {
 describe('User Dropdown', () => {
 
   it('displays the version text', () => {
-    const expectedVersion = '20180416135645';
-    const body = `{"build_timestamp":"${expectedVersion}"}`;
+    const expectedBuild = '20180416135645';
+    const body = `{"build_timestamp":"${expectedBuild}"}`;
 
     fakeServer().get('/api/v0/version').many().reply(200, body);
 
@@ -142,7 +142,9 @@ describe('User Dropdown', () => {
     element(by.css('app-profile')).click();
 
     const versionLink = $('.version');
-    expect(versionLink.getText()).toBe(`Version: ${expectedVersion}`);
+    expect(versionLink.getText()).toBe('Version: 2');
+    const buildLink = $('.build');
+    expect(buildLink.getText()).toBe(`Build: ${expectedBuild}`);
   });
 
   it('shows the welcome modal when "About Chef Automate" clicked', () => {

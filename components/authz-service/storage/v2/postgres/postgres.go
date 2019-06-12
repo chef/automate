@@ -9,7 +9,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -981,6 +981,11 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		}
 	}
 
+	err = p.notifyPolicyChange(ctx, tx)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, storage_errors.NewErrTxCommit(err)
@@ -1225,7 +1230,7 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 			return nil, p.processError(err)
 		}
 
-		if numProjects >= v2_constants.MaxProjects {
+		if numProjects >= constants_v2.MaxProjects {
 			return nil, storage_errors.ErrMaxProjectsExceeded
 		}
 	}

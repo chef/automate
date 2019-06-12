@@ -34,6 +34,7 @@ type versionResult struct {
 var verbose bool
 
 func runVersionCmd(cmd *cobra.Command, args []string) error {
+	writer.Printf("Version: %s\n", "2")
 	printClientVersion()
 	return printServerVersion()
 }
@@ -43,11 +44,10 @@ func printClientVersion() {
 	if verbose {
 		writer.Println("CLI")
 		writer.Println("===")
-		writer.Printf("Version: %s\n", version.BuildTime)
-		writer.Printf("Build time: %s\n", version.BuildTime)
+		writer.Printf("CLI Build: %s\n", version.BuildTime)
 		writer.Printf("Git SHA: %s\n", version.GitSHA)
 	} else {
-		writer.Printf("CLI version: %s\n", version.BuildTime)
+		writer.Printf("CLI Build: %s\n", version.BuildTime)
 	}
 }
 
@@ -81,8 +81,7 @@ func printServerVersion() error {
 		writer.Println("======")
 		// TODO: (yzl) When we know what we want to display for Version, update it to be something other
 		// than the timestamp.
-		writer.Printf("Version: %s\n", response.BuildTimestamp)
-		writer.Printf("Build time: %s\n", response.BuildTimestamp)
+		writer.Printf("Server Build: %s\n", response.BuildTimestamp)
 		writer.Printf("Git SHA: %s\n", response.BuildSha)
 		err := printUpgradeStatus()
 		if err != nil {
@@ -90,7 +89,7 @@ func printServerVersion() error {
 		}
 	} else {
 		// get a server version
-		writer.Printf("Server version: %s\n", response.BuildTimestamp)
+		writer.Printf("Server Build: %s\n", response.BuildTimestamp)
 	}
 	status.GlobalResult = versionResult{
 		ClientVersion:   version.BuildTime,

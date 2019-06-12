@@ -59,11 +59,10 @@ service Projects {
     rpc GetProject(GetProjectReq) returns (GetProjectResp) {};
     rpc DeleteProject(DeleteProjectReq) returns (DeleteProjectResp) {};
     rpc ListProjects(ListProjectsReq) returns (ListProjectsResp) {};
+    rpc ListProjectsForIntrospection(ListProjectsReq) returns (ListProjectsResp) {};
 
     // Note: POC functions that are not ready to expose outside of our
     // spike (aka keep them out of the gateway for now).
-    rpc ListProjectRules(ListProjectRulesReq) returns (ProjectCollectionRulesResp) {};
-    rpc GetProjectRules(GetProjectRulesReq) returns (GetProjectRulesResp) {};
     rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (
         chef.automate.domain.event.api.EventResponse);
     rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
@@ -76,6 +75,7 @@ service Projects {
     rpc ListRules(ListRulesReq) returns (ListRulesResp) {};
     rpc ListRulesForProject(ListRulesForProjectReq) returns (ListRulesForProjectResp) {};
     rpc DeleteRule(DeleteRuleReq) returns (DeleteRuleResp) {};
+    rpc ListRulesForAllProjects(ListRulesForAllProjectsReq) returns (ListRulesForAllProjectsResp) {};
 }
 
 message ProjectUpdateCancelReq {}
@@ -92,17 +92,9 @@ message ProjectUpdateStatusResp {
     string failure_message = 5;
 }
 
-message ListProjectRulesReq {}
-message ProjectCollectionRulesResp {
+message ListRulesForAllProjectsReq {}
+message ListRulesForAllProjectsResp {
     map<string, ProjectRules> project_rules = 2;
-}
-
-message GetProjectRulesReq {
-    string project_id = 1;
-}
-
-message GetProjectRulesResp {
-    ProjectRules rules_for_project = 2;
 }
 
 message ProjectRules {
@@ -122,7 +114,7 @@ enum ProjectRuleTypes {
     EVENT = 1;
 }
 
-enum ProjectRuleConditionTypes {
+enum ProjectRuleConditionAttributes {
     CHEF_SERVERS = 0;
     CHEF_ORGS = 1;
     CHEF_ENVIRONMENTS = 2;
@@ -138,7 +130,7 @@ enum ProjectRuleConditionOperators {
 }
 
 message Condition {
-    ProjectRuleConditionTypes type = 1;
+    ProjectRuleConditionAttributes attribute = 1;
     repeated string values = 2;
     ProjectRuleConditionOperators operator = 3;
 }

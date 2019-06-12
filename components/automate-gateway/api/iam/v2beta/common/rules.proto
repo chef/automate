@@ -9,8 +9,8 @@ enum RuleType {
     EVENT = 2;
 }
 
-enum ConditionType {
-    CONDITION_TYPE_UNSET = 0;
+enum ConditionAttribute {
+    CONDITION_ATTRIBUTE_UNSET = 0;
     CHEF_SERVERS = 1;
     CHEF_ORGS = 2;
     CHEF_ENVIRONMENTS = 3;
@@ -35,7 +35,7 @@ message Rule {
 }
 
 message Condition {
-    ConditionType type = 1;
+    ConditionAttribute attribute = 1;
     repeated string values = 2;
     ConditionOperator operator = 3;
 }

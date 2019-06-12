@@ -52,8 +52,8 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-							Values: []string{"production"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+							Values:    []string{"production"},
 						},
 					},
 				},
@@ -71,7 +71,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -90,7 +90,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -99,7 +99,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -120,7 +120,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -139,7 +139,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 							Values: []string{"org_1"},
 						},
 					},
@@ -158,7 +158,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 							Values: []string{"org_2"},
 						},
 					},
@@ -177,7 +177,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 							Values: []string{"org_1", "org_2"},
 						},
 					},
@@ -198,7 +198,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 							Values: []string{"chef_server_1"},
 						},
 					},
@@ -217,7 +217,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 							Values: []string{"chef_server_1"},
 						},
 					},
@@ -236,7 +236,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 							Values: []string{"chef_server_1"},
 						},
 					},
@@ -255,7 +255,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Type:   iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
 							Values: []string{"chef_server_1", "chef_server_2"},
 						},
 					},
@@ -275,13 +275,13 @@ func TestActionProjectRulesMatching(t *testing.T) {
 	}
 }
 
-// When a single message is in the inbox the `ListProjectRules` should be called once
+// When a single message is in the inbox the `ListRulesForAllProjects` should be called once
 func TestActionBundlerSingleMessage(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
 	ctrl := gomock.NewController(t)
 	authzClient := iam_v2.NewMockProjectsClient(ctrl)
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Times(1).Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Times(1).Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 	errc := make(chan error)
 
 	inbox <- message.NewChefAction(context.Background(), &chef.Action{}, errc)
@@ -293,15 +293,15 @@ func TestActionBundlerSingleMessage(t *testing.T) {
 	ctrl.Finish()
 }
 
-// When 5 messages are in the inbox the `ListProjectRules` function is only called once.
+// When 5 messages are in the inbox the `ListRulesForAllProjects` function is only called once.
 // This is showing that the bundling of messages is working.
-// Where before the authz call to `ListProjectRules` was called for each message.
+// Where before the authz call to `ListRulesForAllProjects` was called for each message.
 func TestActionBundler5Messages(t *testing.T) {
 	inbox := make(chan message.ChefAction, 100)
 	ctrl := gomock.NewController(t)
 	authzClient := iam_v2.NewMockProjectsClient(ctrl)
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Times(1).Return(
-		&iam_v2.ProjectCollectionRulesResp{}, nil)
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Times(1).Return(
+		&iam_v2.ListRulesForAllProjectsResp{}, nil)
 	errc := make(chan error)
 
 	inbox <- message.NewChefAction(context.Background(), &chef.Action{}, errc)
@@ -330,14 +330,14 @@ func TestActionBundlerMatchProjectRule(t *testing.T) {
 	projectRules := map[string]*iam_v2.ProjectRules{}
 
 	// Project 'Test' has an ingest rule for events of orgs matching 'org_1'
-	// This will be returned in the `ListProjectRules` request
+	// This will be returned in the `ListRulesForAllProjects` request
 	projectRules[testProjectName] = &iam_v2.ProjectRules{
 		Rules: []*iam_v2.ProjectRule{
 			{
 				Type: iam_v2.ProjectRuleTypes_EVENT,
 				Conditions: []*iam_v2.Condition{
 					{
-						Type:   iam_v2.ProjectRuleConditionTypes_CHEF_ORGS,
+						Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
 						Values: []string{orgName},
 					},
 				},
@@ -345,8 +345,8 @@ func TestActionBundlerMatchProjectRule(t *testing.T) {
 		},
 	}
 	authzClient := iam_v2.NewMockProjectsClient(gomock.NewController(t))
-	authzClient.EXPECT().ListProjectRules(gomock.Any(), gomock.Any()).Return(
-		&iam_v2.ProjectCollectionRulesResp{ProjectRules: projectRules}, nil)
+	authzClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).Return(
+		&iam_v2.ListRulesForAllProjectsResp{ProjectRules: projectRules}, nil)
 	errc := make(chan error)
 
 	// Creating an ingest Chef Action that matches the project 'Test' rules

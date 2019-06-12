@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
 
@@ -19,7 +20,7 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
-	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -117,7 +118,7 @@ func (s *state) CreateProject(ctx context.Context,
 			return nil, status.Errorf(codes.AlreadyExists, "project with ID %q already exists", req.Id)
 		} else if err == storage_errors.ErrMaxProjectsExceeded {
 			return nil, status.Errorf(codes.FailedPrecondition,
-				"max of %d projects allowed while IAM v2 Beta", v2_constants.MaxProjects)
+				"max of %d projects allowed while IAM v2 Beta", constants_v2.MaxProjects)
 		}
 		return nil, status.Errorf(codes.Internal,
 			"error retrieving project with ID %q: %s", req.Id, err.Error())
@@ -188,12 +189,13 @@ func (s *state) ProjectUpdateCancel(ctx context.Context,
 	return &api.ProjectUpdateCancelResp{}, nil
 }
 
-func (s *state) ListProjects(ctx context.Context,
-	_ *api.ListProjectsReq) (*api.ListProjectsResp, error) {
+func (s *state) ListProjects(
+	ctx context.Context, _ *api.ListProjectsReq) (*api.ListProjectsResp, error) {
 	ps, err := s.store.ListProjects(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error retrieving projects: %s", err.Error())
 	}
+
 	systemProjects := storage.DefaultProjectIDs()
 
 	resp := api.ListProjectsResp{
@@ -205,8 +207,41 @@ func (s *state) ListProjects(ctx context.Context,
 			return nil, status.Errorf(codes.Internal,
 				"error converting project with ID %q: %s", p.ID, err.Error())
 		}
-		// exclude "all projects" meta-project from the API
+
+		// exclude all meta-projects from the API
 		if !stringutils.SliceContains(systemProjects, apiProject.Id) {
+			resp.Projects = append(resp.Projects, apiProject)
+		}
+	}
+
+	return &resp, nil
+}
+
+func (s *state) ListProjectsForIntrospection(
+	ctx context.Context, req *api.ListProjectsReq) (*api.ListProjectsResp, error) {
+
+	// Introspection needs unfiltered access.
+	ctx = auth_context.ContextWithoutProjects(ctx)
+
+	ps, err := s.store.ListProjects(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error retrieving projects: %s", err.Error())
+	}
+
+	systemProjects := storage.DefaultProjectIDs()
+
+	resp := api.ListProjectsResp{
+		Projects: make([]*api.Project, 0, len(ps)),
+	}
+	for _, p := range ps {
+		apiProject, err := fromStorageProject(p)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal,
+				"error converting project with ID %q: %s", p.ID, err.Error())
+		}
+		// Exclude all meta-projects from the API except "unassigned"
+		if !stringutils.SliceContains(systemProjects, apiProject.Id) ||
+			apiProject.Id == constants_v2.UnassignedProjectID {
 			resp.Projects = append(resp.Projects, apiProject)
 		}
 	}
@@ -228,8 +263,8 @@ func (s *state) DeleteProject(ctx context.Context,
 	}
 }
 
-func (s *state) ListProjectRules(ctx context.Context,
-	req *api.ListProjectRulesReq) (*api.ProjectCollectionRulesResp, error) {
+func (s *state) ListRulesForAllProjects(ctx context.Context,
+	req *api.ListRulesForAllProjectsReq) (*api.ListRulesForAllProjectsResp, error) {
 
 	ruleMap, err := s.engine.ListProjectMappings(ctx)
 	if err != nil {
@@ -238,45 +273,21 @@ func (s *state) ListProjectRules(ctx context.Context,
 
 	projects := make(map[string]*api.ProjectRules, len(ruleMap))
 	for projectID, rules := range ruleMap {
-		projectRules, err := rulesToProjectRules(rules)
-		if err != nil {
-			return &api.ProjectCollectionRulesResp{}, err
+		apiRules := make([]*api.ProjectRule, len(rules))
+		for i, rule := range rules {
+			r, err := fromStorageRule(&rule)
+			if err != nil {
+				return &api.ListRulesForAllProjectsResp{}, err
+			}
+			apiRules[i] = r
 		}
+
 		projects[projectID] = &api.ProjectRules{
-			Rules: projectRules,
+			Rules: apiRules,
 		}
 	}
-	return &api.ProjectCollectionRulesResp{
+	return &api.ListRulesForAllProjectsResp{
 		ProjectRules: projects,
-	}, nil
-}
-
-func (s *state) GetProjectRules(ctx context.Context,
-	req *api.GetProjectRulesReq) (*api.GetProjectRulesResp, error) {
-
-	if req.ProjectId == "" {
-		return nil, status.Error(codes.InvalidArgument, "GetProjectRules requires a ProjectID")
-	}
-
-	rules, err := s.engine.RulesForProject(ctx, req.ProjectId)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "could not retrieve rules for project %q: %s",
-			req.ProjectId, err.Error())
-	}
-	if len(rules) == 0 {
-		return nil, status.Errorf(codes.NotFound,
-			"could not find project mapping rules for project %s", req.ProjectId)
-	}
-
-	projectRules, err := rulesToProjectRules(rules)
-	if err != nil {
-		return &api.GetProjectRulesResp{}, err
-	}
-
-	return &api.GetProjectRulesResp{
-		RulesForProject: &api.ProjectRules{
-			Rules: projectRules,
-		},
 	}, nil
 }
 
@@ -432,7 +443,7 @@ func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition
 }
 
 func storageCondition(ruleType storage.RuleType, apiCondition *api.Condition) (storage.Condition, error) {
-	condAttr, err := fromAPIProjectRuleConditionTypes(apiCondition.Type)
+	condAttr, err := fromAPIProjectRuleConditionAttributes(apiCondition.Attribute)
 	if err != nil {
 		return storage.Condition{}, err
 	}
@@ -488,7 +499,7 @@ func fromStorageConditions(cs []storage.Condition) ([]*api.Condition, error) {
 }
 
 func fromStorageCondition(c storage.Condition) (*api.Condition, error) {
-	t, err := fromStorageConditionType(c.Attribute)
+	a, err := fromStorageConditionAttribute(c.Attribute)
 	if err != nil {
 		return nil, err
 	}
@@ -499,43 +510,43 @@ func fromStorageCondition(c storage.Condition) (*api.Condition, error) {
 	}
 
 	return &api.Condition{
-		Type:     t,
-		Values:   c.Value,
-		Operator: o,
+		Attribute: a,
+		Values:    c.Value,
+		Operator:  o,
 	}, nil
 }
 
-var storageToAPIConditionAttributes = map[storage.ConditionAttribute]api.ProjectRuleConditionTypes{
-	storage.ChefRole:     api.ProjectRuleConditionTypes_ROLES,
-	storage.ChefServer:   api.ProjectRuleConditionTypes_CHEF_SERVERS,
-	storage.ChefTag:      api.ProjectRuleConditionTypes_CHEF_TAGS,
-	storage.Environment:  api.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS,
-	storage.Organization: api.ProjectRuleConditionTypes_CHEF_ORGS,
-	storage.PolicyGroup:  api.ProjectRuleConditionTypes_POLICY_GROUP,
-	storage.PolicyName:   api.ProjectRuleConditionTypes_POLICY_NAME,
+var storageToAPIConditionAttributes = map[storage.ConditionAttribute]api.ProjectRuleConditionAttributes{
+	storage.ChefRole:     api.ProjectRuleConditionAttributes_ROLES,
+	storage.ChefServer:   api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+	storage.ChefTag:      api.ProjectRuleConditionAttributes_CHEF_TAGS,
+	storage.Environment:  api.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+	storage.Organization: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+	storage.PolicyGroup:  api.ProjectRuleConditionAttributes_POLICY_GROUP,
+	storage.PolicyName:   api.ProjectRuleConditionAttributes_POLICY_NAME,
 }
 
-var apiToStorageConditionAttributes = map[api.ProjectRuleConditionTypes]storage.ConditionAttribute{}
+var apiToStorageConditionAttributes = map[api.ProjectRuleConditionAttributes]storage.ConditionAttribute{}
 var onceReverseConditionAttributesMapping sync.Once
 
-func fromStorageConditionType(t storage.ConditionAttribute) (api.ProjectRuleConditionTypes, error) {
-	if s, ok := storageToAPIConditionAttributes[t]; ok {
+func fromStorageConditionAttribute(a storage.ConditionAttribute) (api.ProjectRuleConditionAttributes, error) {
+	if s, ok := storageToAPIConditionAttributes[a]; ok {
 		return s, nil
 	}
-	return 0, fmt.Errorf("invalid condition type %q", t.String())
+	return 0, fmt.Errorf("invalid condition attribute %q", a.String())
 }
 
-func fromAPIProjectRuleConditionTypes(t api.ProjectRuleConditionTypes) (storage.ConditionAttribute, error) {
+func fromAPIProjectRuleConditionAttributes(a api.ProjectRuleConditionAttributes) (storage.ConditionAttribute, error) {
 	onceReverseConditionAttributesMapping.Do(func() {
 		for k, v := range storageToAPIConditionAttributes {
 			apiToStorageConditionAttributes[v] = k
 		}
 	})
 
-	if s, ok := apiToStorageConditionAttributes[t]; ok {
+	if s, ok := apiToStorageConditionAttributes[a]; ok {
 		return s, nil
 	}
-	return 0, fmt.Errorf("invalid condition type %q", t.String())
+	return 0, fmt.Errorf("invalid condition attribute %q", a.String())
 }
 
 var storageToAPIConditionOperators = map[storage.ConditionOperator]api.ProjectRuleConditionOperators{
@@ -586,30 +597,6 @@ func fromAPIType(t api.ProjectRuleTypes) (storage.RuleType, error) {
 	default:
 		return 0, fmt.Errorf("unknown rule type %s", t.String())
 	}
-}
-
-// TODO: Currently there is only collection of conditions in a project, which are called 'Rule'.
-// We need to update this data structure to have projects have collection of rules. The rules have a
-// collection of conditions. The conditions have a 'type' and 'values' (like rules currently do).
-// The rules should have a 'type' either 'node' or 'event'.
-func rulesToProjectRules(rules []engine.Rule) ([]*api.ProjectRule, error) {
-	conditions := make([]*api.Condition, len(rules))
-	for j, rule := range rules {
-		conditionType, exists := api.ProjectRuleConditionTypes_value[rule.Type]
-		if !exists {
-			return []*api.ProjectRule{}, errors.New(fmt.Sprintf("Condition type %s is not supported", rule.Type))
-		}
-		conditions[j] = &api.Condition{
-			Type:   api.ProjectRuleConditionTypes(conditionType),
-			Values: rule.Values,
-		}
-	}
-	// TODO: The ProjectRule Type needs to be added to the database
-	rule := &api.ProjectRule{
-		Conditions: conditions,
-		Type:       api.ProjectRuleTypes_NODE,
-	}
-	return []*api.ProjectRule{rule}, nil
 }
 
 func (s *state) prepareStorageRule(inID, projectID, name string,

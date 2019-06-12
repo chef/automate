@@ -39,20 +39,18 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
-                        "endTime" => {
-                            "seconds" => 1520155121
-                        },
+                        "endTime" => "2018-03-04T09:18:41Z",
                         "status" => "passed",
                         "controls" => {
+                            "total" => 1,
                             "passed" => {
                                 "total" => 1
                             },
                             "skipped" => {},
-                            "failed" => {}
+                            "failed" => {},
+                            "total" => 1
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -64,21 +62,19 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
+                            "total" => 1,
                             "passed" => {},
                             "skipped" => {},
                             "failed" => {
                                 "total" => 1,
                                 "major" => 1
-                            }
+                            },
+                            "total" => 1
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -90,21 +86,19 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                        "endTime" => {
-                            "seconds" => 1520155122
-                        },
+                        "endTime" => "2018-03-04T09:18:42Z",
                         "status" => "failed",
                         "controls" => {
+                            "total" => 1,
                             "passed" => {},
                             "skipped" => {},
                             "failed" => {
                                 "total" => 1,
                                 "major" => 1
-                            }
+                            },
+                            "total" => 1
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -116,26 +110,24 @@ describe File.basename(__FILE__) do
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
                         "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                        "endTime" => {
-                            "seconds" => 1520155123
-                        },
+                        "endTime" => "2018-03-04T09:18:43Z",
                         "status" => "failed",
                         "controls" => {
+                            "total" => 1,
                             "passed" => {},
                             "skipped" => {},
                             "failed" => {
                                 "total" => 1,
                                 "major" => 1
-                            }
+                            },
+                            "total" => 1
                         }
-                    },
-                    "tags" => [],
-                    "profiles" => []
+                    }
                 }
             ],
             "total" => 4
         }.to_json
-    assert_equal(expected_nodes, actual_nodes.to_json)
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
 
     #todo - this one is also in 08_search_profiles_spec.. it's in here because it has profile id in filter, making it deep
@@ -161,7 +153,7 @@ describe File.basename(__FILE__) do
             "skipped" => 1
         }
     }.to_json
-    assert_equal(expected_data, actual_data.to_json)
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
 
 
     # Filter by node_id and profile_id where profile ran on node
@@ -185,7 +177,7 @@ describe File.basename(__FILE__) do
             "passed" => 1
         }
     }.to_json
-    assert_equal(expected_data, actual_data.to_json)
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
 
 
     # Filter by environment and profile_id where profile ran in environment
@@ -209,7 +201,7 @@ describe File.basename(__FILE__) do
             "failed" => 1
         }
     }.to_json
-    assert_equal(expected_data, actual_data.to_json)
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
 
 
     # Filter by platform and profile_id where profile ran on nodes on platform
@@ -233,7 +225,7 @@ describe File.basename(__FILE__) do
             "passed" => 1
         }
     }.to_json
-    assert_equal(expected_data, actual_data.to_json)
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
 
     # Filter by platform and profile_id where profile ran on nodes on platform
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
@@ -265,7 +257,7 @@ describe File.basename(__FILE__) do
             "passed" => 1
         }
     }.to_json
-    assert_equal(expected_data, actual_data.to_json)
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
 
 
     # Filter by platform and profile_id where profile ran on nodes on platform
@@ -289,7 +281,7 @@ describe File.basename(__FILE__) do
             "passed" => 1
         }
     }.to_json
-    assert_equal(expected_data, actual_data.to_json)
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
 
   end
 end

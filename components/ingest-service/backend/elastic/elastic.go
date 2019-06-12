@@ -241,53 +241,70 @@ func (es *Backend) createBulkUpdateRequestToIndexWithID(
 
 // InitializeStore runs the necessary initialization processes to make elasticsearch usable
 // in particular it creates the indexes and aliases for documents to be added
-func (es *Backend) InitializeStore(ctx context.Context) {
+func (es *Backend) InitializeStore(ctx context.Context) error {
 	if !es.initialized {
 		for _, esMap := range mappings.AllMappings {
 			if esMap.Timeseries {
-				es.createTemplate(ctx, esMap.Index, esMap.Mapping)
+				err := es.createTemplate(ctx, esMap.Index, esMap.Mapping)
+				if err != nil {
+					return err
+				}
 			} else {
-				es.createOrUpdateStore(ctx, esMap)
-				es.createStoreAliasIfNotExists(ctx, esMap.Alias, esMap.Index)
+				err := es.createOrUpdateStore(ctx, esMap)
+				if err != nil {
+					return err
+				}
+
+				err = es.createStoreAliasIfNotExists(ctx, esMap.Alias, esMap.Index)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
 	es.initialized = true
+
+	return nil
 }
 
-func (es *Backend) createStoreAliasIfNotExists(ctx context.Context, alias string, index string) {
+func (es *Backend) createStoreAliasIfNotExists(ctx context.Context, alias string, index string) error {
 	if len(alias) > 0 {
 		if !es.storeExists(ctx, alias) {
 			indexError := es.CreateAlias(ctx, alias, index)
 			if indexError != nil {
-				log.Errorf("Error creating alias %s with error: %s", alias, indexError.Error())
+				return errors.Errorf("Error creating alias %s with error: %s", alias, indexError.Error())
 			}
 		}
 	}
+
+	return nil
 }
 
-func (es *Backend) createTemplate(ctx context.Context, templateName string, mapping string) {
+func (es *Backend) createTemplate(ctx context.Context, templateName string, mapping string) error {
 	// We don't care if it already exists because it will update the template
 	_, err := es.client.IndexPutTemplate(templateName).BodyString(mapping).Do(ctx)
 	if err != nil {
-		log.Errorf("Error creating index %s with error: %s", templateName, err.Error())
+		return errors.Errorf("Error creating index %s with error: %s", templateName, err.Error())
 	}
+	return nil
 }
 
-func (es *Backend) createOrUpdateStore(ctx context.Context, esMap mappings.Mapping) {
+func (es *Backend) createOrUpdateStore(ctx context.Context, esMap mappings.Mapping) error {
 	indexName := esMap.Index
 	if !es.storeExists(ctx, indexName) {
 		indexError := es.createStore(ctx, indexName, esMap.Mapping)
 		if indexError != nil {
-			log.Errorf("Error creating index %s with error: %s", indexName, indexError.Error())
+			return errors.Errorf("Error creating index %s with error: %s", indexName, indexError.Error())
 		}
 	} else {
 		// Ensure we have the latest mapping registered.
 		indexError := es.updateMapping(ctx, esMap)
 		if indexError != nil {
-			log.Errorf("Error creating index %s with error: %s", indexName, indexError.Error())
+			return errors.Errorf("Error creating index %s with error: %s", indexName, indexError.Error())
 		}
 	}
+
+	return nil
 }
 
 func (es *Backend) CreateAlias(ctx context.Context, aliasName string, indexName string) error {
@@ -307,11 +324,11 @@ func (es *Backend) updateMapping(ctx context.Context, esMap mappings.Mapping) er
 	return err
 }
 
-func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex string) error {
+func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex string) (string, error) {
 	src := elastic.NewReindexSource().Index(previousIndex)
 	dst := elastic.NewReindexDestination().Index(mappings.NodeState.Index)
-	_, err := es.client.Reindex().Source(src).Destination(dst).Do(ctx)
-	return err
+	startTaskResult, err := es.client.Reindex().Source(src).Destination(dst).DoAsync(ctx)
+	return startTaskResult.TaskId, err
 }
 
 func (es *Backend) storeExists(ctx context.Context, indexName string) bool {

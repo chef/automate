@@ -11,7 +11,7 @@ import (
 func TestSortingForServiceGroupsDefaults(t *testing.T) {
 	var (
 		sorting                  = &query.Sorting{}
-		expectedSortField string = "name"
+		expectedSortField string = "percent_ok"
 		expectedSortAsc   bool   = true
 	)
 	actualSortField, actualSortAsc, err := subject.GetSortParamsForServiceGroups(sorting)
@@ -22,7 +22,7 @@ func TestSortingForServiceGroupsDefaults(t *testing.T) {
 
 func TestSortingForServiceGroupsNilReturnsDefaults(t *testing.T) {
 	var (
-		expectedSortField string = "name"
+		expectedSortField string = "percent_ok"
 		expectedSortAsc   bool   = true
 	)
 	actualSortField, actualSortAsc, err := subject.GetSortParamsForServiceGroups(nil)
@@ -43,14 +43,14 @@ func TestSortingForServiceGroupsMatrix(t *testing.T) {
 		{
 			message:           "with nil sorting query params should return defaults",
 			sorting:           nil,
-			expectedSortField: "name",
+			expectedSortField: "percent_ok",
 			expectedSortAsc:   true,
 			shouldReturnError: false,
 		},
 		{
 			message:           "with empty sorting query params should return defaults",
 			sorting:           &query.Sorting{},
-			expectedSortField: "name",
+			expectedSortField: "percent_ok",
 			expectedSortAsc:   true,
 			shouldReturnError: false,
 		},
@@ -77,14 +77,14 @@ func TestSortingForServiceGroupsMatrix(t *testing.T) {
 		{
 			message:           "with empty sorting field use default",
 			sorting:           &query.Sorting{Field: ""},
-			expectedSortField: "name",
+			expectedSortField: "percent_ok",
 			expectedSortAsc:   true,
 			shouldReturnError: false,
 		},
 		{
 			message:           "with invalid sorting field returns an error",
 			sorting:           &query.Sorting{Field: "not-valid-field"},
-			expectedSortField: "name",
+			expectedSortField: "percent_ok",
 			expectedSortAsc:   true,
 			shouldReturnError: true,
 			errMsg:            "Invalid sort field 'not-valid-field'.",
@@ -92,7 +92,7 @@ func TestSortingForServiceGroupsMatrix(t *testing.T) {
 		{
 			message:           "with invalid sorting field returns an error",
 			sorting:           &query.Sorting{Field: "names"},
-			expectedSortField: "name",
+			expectedSortField: "percent_ok",
 			expectedSortAsc:   true,
 			shouldReturnError: true,
 			errMsg:            "Invalid sort field 'names'.",

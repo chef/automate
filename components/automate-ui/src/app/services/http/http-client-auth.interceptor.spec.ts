@@ -123,6 +123,56 @@ describe('HttpClientAuthInterceptor', () => {
         });
       });
     });
+
+    describe('unfiltered flag', () => {
+      beforeEach(() => {
+        const projectList = [
+          { value: 'proj1', label: 'proj 1', checked: true },
+          { value: 'proj2', label: 'proj 2', checked: false },
+          { value: 'proj3', label: 'proj 3', checked: true },
+          { value: 'proj4', label: 'proj 4', checked: false }
+        ];
+        configure(projectList);
+        httpClient = TestBed.get(HttpClient);
+        httpMock = TestBed.get(HttpTestingController);
+        chefSession = TestBed.get(ChefSessionService);
+        spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
+      });
+
+      using([
+        ['does not include project header', true],
+        ['includes project header', false]
+      ], function (description: string, setting: boolean) {
+
+        it(description + 'project header when unfiltered flag set to ' + setting, done => {
+          const options = { params: { unfiltered: String(setting) } };
+          httpClient.get('/endpoint', options).subscribe(done);
+
+          const httpRequest = httpMock.expectOne(`/endpoint?unfiltered=${setting}`);
+          httpRequest.flush('response');
+
+          const headerKeys = httpRequest.request.headers.keys();
+          if (setting) {
+            expect(headerKeys).not.toContain('projects');
+          } else {
+            expect(headerKeys).toContain('projects');
+          }
+        });
+
+        // Uncomment test after https://github.com/angular/angular/issues/18812 is fixed.
+        // it('strips unfiltered param when set to ' + setting, done => {
+        //   const options = { params: { unfiltered: String(setting), dummy: 'foobar' } };
+        //   httpClient.get('/endpoint', options).subscribe(done);
+
+        //   const httpRequest = httpMock.expectOne('/endpoint?dummy=foobar');
+        //   httpRequest.flush('response');
+
+        //   // This assertion is completely redundant with the expectOne above,
+        //   // but having it adds to clarity.
+        //   expect(httpRequest.request.params.get('unfiltered')).toBeFalsy();
+        // });
+      });
+    });
   });
 });
 

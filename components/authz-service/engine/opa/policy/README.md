@@ -69,32 +69,6 @@ true
 >
 ```
 
-#### Project Mappings
-
-```
-opa run -w rule_mappings.rego rules:../example_v2/rule_mappings.json
-> data.rule_mappings.rules_for_project with input as { "project_id":"project2" }
-[
-  [
-    {
-      "type": "ChefOrgs",
-      "values": [
-        "Org1",
-        "Org2"
-      ]
-    },
-    {
-      "type": "ChefServers",
-      "values": [
-        "chef-server-3",
-        "chef-server-4",
-        "chef-server-5"
-      ]
-    }
-  ]
-]
-```
-
 ## Running OPA Unit Tests
 
 From the current directory, run V1 unit tests with:

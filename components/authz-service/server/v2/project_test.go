@@ -19,7 +19,6 @@ import (
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
-	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
@@ -322,7 +321,7 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			assert.ElementsMatch(t, []*api.Project{&apiProject0, &apiProject1}, resp.Projects)
 		}},
-		{"suppresses hidden system projects", func(t *testing.T) {
+		{"suppresses all hidden system projects", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
 			addProjectToStore(t, store, constants.AllProjectsID, "All Projects", storage.ChefManaged)
 			addProjectToStore(t, store, constants.UnassignedProjectID, "Unassigned", storage.ChefManaged)
@@ -334,6 +333,54 @@ func TestListProjects(t *testing.T) {
 			resp, err := cl.ListProjects(ctx, &api.ListProjectsReq{})
 			require.NoError(t, err)
 			assert.ElementsMatch(t, []*api.Project{&apiProject0, &apiProject1}, resp.Projects)
+		}},
+	}
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		store.Flush()
+	}
+}
+func TestListProjectsForIntrospection(t *testing.T) {
+	ctx := context.Background()
+	cl, store, _ := setupProjects(t)
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"if no projects exist, returns empty list", func(t *testing.T) {
+			resp, err := cl.ListProjectsForIntrospection(ctx, &api.ListProjectsReq{})
+			require.NoError(t, err)
+			assert.Empty(t, resp.Projects)
+		}},
+		{"if two projects exist, returns these projects", func(t *testing.T) {
+			require.Zero(t, store.ItemCount())
+			id0 := "foo-project"
+			apiProject0 := addProjectToStore(t, store, id0, "my foo", storage.ChefManaged)
+
+			id1 := "test-2-project"
+			apiProject1 := addProjectToStore(t, store, id1, "my bar", storage.Custom)
+
+			resp, err := cl.ListProjectsForIntrospection(ctx, &api.ListProjectsReq{})
+			require.NoError(t, err)
+			assert.ElementsMatch(t, []*api.Project{&apiProject0, &apiProject1}, resp.Projects)
+		}},
+		{"suppresses hidden system projects except for unassigned", func(t *testing.T) {
+			require.Zero(t, store.ItemCount())
+			addProjectToStore(t, store, constants.AllProjectsID, "All Projects", storage.ChefManaged)
+			unassignedProject := addProjectToStore(t, store, constants.UnassignedProjectID, "Unassigned", storage.ChefManaged)
+			id0 := "foo-project"
+			apiProject0 := addProjectToStore(t, store, id0, "my foo", storage.ChefManaged)
+			id1 := "bar-project"
+			apiProject1 := addProjectToStore(t, store, id1, "my bar", storage.Custom)
+
+			resp, err := cl.ListProjectsForIntrospection(ctx, &api.ListProjectsReq{})
+			require.NoError(t, err)
+			assert.ElementsMatch(t, []*api.Project{&apiProject0, &apiProject1, &unassignedProject}, resp.Projects)
 		}},
 	}
 
@@ -417,14 +464,9 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 // TODO More testing
 type testProjectRulesRetriever struct{}
 
-func (t *testProjectRulesRetriever) RulesForProject(
-	context.Context, string) ([]engine.Rule, error) {
-	return []engine.Rule{}, nil
-}
-
 func (t *testProjectRulesRetriever) ListProjectMappings(
-	context.Context) (map[string][]engine.Rule, error) {
-	return make(map[string][]engine.Rule, 0), nil
+	context.Context) (map[string][]storage.Rule, error) {
+	return make(map[string][]storage.Rule, 0), nil
 }
 
 type mockEventServiceClient struct {

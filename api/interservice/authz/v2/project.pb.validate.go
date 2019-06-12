@@ -1130,10 +1130,10 @@ var _ interface {
 	ErrorName() string
 } = ProjectUpdateStatusRespValidationError{}
 
-// Validate checks the field values on ListProjectRulesReq with the rules
-// defined in the proto definition for this message. If any rules are
+// Validate checks the field values on ListRulesForAllProjectsReq with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *ListProjectRulesReq) Validate() error {
+func (m *ListRulesForAllProjectsReq) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -1141,9 +1141,9 @@ func (m *ListProjectRulesReq) Validate() error {
 	return nil
 }
 
-// ListProjectRulesReqValidationError is the validation error returned by
-// ListProjectRulesReq.Validate if the designated constraints aren't met.
-type ListProjectRulesReqValidationError struct {
+// ListRulesForAllProjectsReqValidationError is the validation error returned
+// by ListRulesForAllProjectsReq.Validate if the designated constraints aren't met.
+type ListRulesForAllProjectsReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1151,24 +1151,24 @@ type ListProjectRulesReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e ListProjectRulesReqValidationError) Field() string { return e.field }
+func (e ListRulesForAllProjectsReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ListProjectRulesReqValidationError) Reason() string { return e.reason }
+func (e ListRulesForAllProjectsReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ListProjectRulesReqValidationError) Cause() error { return e.cause }
+func (e ListRulesForAllProjectsReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ListProjectRulesReqValidationError) Key() bool { return e.key }
+func (e ListRulesForAllProjectsReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ListProjectRulesReqValidationError) ErrorName() string {
-	return "ListProjectRulesReqValidationError"
+func (e ListRulesForAllProjectsReqValidationError) ErrorName() string {
+	return "ListRulesForAllProjectsReqValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ListProjectRulesReqValidationError) Error() string {
+func (e ListRulesForAllProjectsReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1180,14 +1180,14 @@ func (e ListProjectRulesReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sListProjectRulesReq.%s: %s%s",
+		"invalid %sListRulesForAllProjectsReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ListProjectRulesReqValidationError{}
+var _ error = ListRulesForAllProjectsReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -1195,12 +1195,12 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ListProjectRulesReqValidationError{}
+} = ListRulesForAllProjectsReqValidationError{}
 
-// Validate checks the field values on ProjectCollectionRulesResp with the
+// Validate checks the field values on ListRulesForAllProjectsResp with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *ProjectCollectionRulesResp) Validate() error {
+func (m *ListRulesForAllProjectsResp) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -1210,9 +1210,10 @@ func (m *ProjectCollectionRulesResp) Validate() error {
 	return nil
 }
 
-// ProjectCollectionRulesRespValidationError is the validation error returned
-// by ProjectCollectionRulesResp.Validate if the designated constraints aren't met.
-type ProjectCollectionRulesRespValidationError struct {
+// ListRulesForAllProjectsRespValidationError is the validation error returned
+// by ListRulesForAllProjectsResp.Validate if the designated constraints
+// aren't met.
+type ListRulesForAllProjectsRespValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1220,24 +1221,24 @@ type ProjectCollectionRulesRespValidationError struct {
 }
 
 // Field function returns field value.
-func (e ProjectCollectionRulesRespValidationError) Field() string { return e.field }
+func (e ListRulesForAllProjectsRespValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ProjectCollectionRulesRespValidationError) Reason() string { return e.reason }
+func (e ListRulesForAllProjectsRespValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ProjectCollectionRulesRespValidationError) Cause() error { return e.cause }
+func (e ListRulesForAllProjectsRespValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ProjectCollectionRulesRespValidationError) Key() bool { return e.key }
+func (e ListRulesForAllProjectsRespValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ProjectCollectionRulesRespValidationError) ErrorName() string {
-	return "ProjectCollectionRulesRespValidationError"
+func (e ListRulesForAllProjectsRespValidationError) ErrorName() string {
+	return "ListRulesForAllProjectsRespValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ProjectCollectionRulesRespValidationError) Error() string {
+func (e ListRulesForAllProjectsRespValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1249,14 +1250,14 @@ func (e ProjectCollectionRulesRespValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sProjectCollectionRulesResp.%s: %s%s",
+		"invalid %sListRulesForAllProjectsResp.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ProjectCollectionRulesRespValidationError{}
+var _ error = ListRulesForAllProjectsRespValidationError{}
 
 var _ interface {
 	Field() string
@@ -1264,153 +1265,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ProjectCollectionRulesRespValidationError{}
-
-// Validate checks the field values on GetProjectRulesReq with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *GetProjectRulesReq) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for ProjectId
-
-	return nil
-}
-
-// GetProjectRulesReqValidationError is the validation error returned by
-// GetProjectRulesReq.Validate if the designated constraints aren't met.
-type GetProjectRulesReqValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetProjectRulesReqValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetProjectRulesReqValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetProjectRulesReqValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetProjectRulesReqValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetProjectRulesReqValidationError) ErrorName() string {
-	return "GetProjectRulesReqValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GetProjectRulesReqValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetProjectRulesReq.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetProjectRulesReqValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetProjectRulesReqValidationError{}
-
-// Validate checks the field values on GetProjectRulesResp with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *GetProjectRulesResp) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	if v, ok := interface{}(m.GetRulesForProject()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GetProjectRulesRespValidationError{
-				field:  "RulesForProject",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	return nil
-}
-
-// GetProjectRulesRespValidationError is the validation error returned by
-// GetProjectRulesResp.Validate if the designated constraints aren't met.
-type GetProjectRulesRespValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetProjectRulesRespValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetProjectRulesRespValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetProjectRulesRespValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetProjectRulesRespValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetProjectRulesRespValidationError) ErrorName() string {
-	return "GetProjectRulesRespValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e GetProjectRulesRespValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetProjectRulesResp.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetProjectRulesRespValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetProjectRulesRespValidationError{}
+} = ListRulesForAllProjectsRespValidationError{}
 
 // Validate checks the field values on ProjectRules with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -1587,7 +1442,7 @@ func (m *Condition) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Type
+	// no validation rules for Attribute
 
 	// no validation rules for Operator
 

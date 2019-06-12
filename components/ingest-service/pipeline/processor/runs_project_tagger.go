@@ -65,7 +65,7 @@ func findMatchingProjects(node backend.Node, projects map[string]*iam_v2.Project
 
 func getProjectRulesFromAuthz(ctx context.Context,
 	authzClient iam_v2.ProjectsClient) map[string]*iam_v2.ProjectRules {
-	projectsCollection, err := authzClient.ListProjectRules(ctx, &iam_v2.ListProjectRulesReq{})
+	projectsCollection, err := authzClient.ListRulesForAllProjects(ctx, &iam_v2.ListRulesForAllProjectsReq{})
 	if err != nil {
 		// If there is an error getting the project rules from authz crash the service.
 		log.WithError(err).Fatal("Could not fetch project rules from authz")
@@ -93,28 +93,28 @@ func nodeMatchesAllConditions(node backend.Node, conditions []*iam_v2.Condition)
 	}
 
 	for _, condition := range conditions {
-		switch condition.Type {
-		case iam_v2.ProjectRuleConditionTypes_CHEF_SERVERS:
+		switch condition.Attribute {
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS:
 			if !stringutils.SliceContains(condition.Values, node.SourceFqdn) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_CHEF_ORGS:
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS:
 			if !stringutils.SliceContains(condition.Values, node.OrganizationName) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_CHEF_ENVIRONMENTS:
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS:
 			if !stringutils.SliceContains(condition.Values, node.Environment) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_POLICY_GROUP:
+		case iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP:
 			if !stringutils.SliceContains(condition.Values, node.PolicyGroup) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_POLICY_NAME:
+		case iam_v2.ProjectRuleConditionAttributes_POLICY_NAME:
 			if !stringutils.SliceContains(condition.Values, node.PolicyName) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_ROLES:
+		case iam_v2.ProjectRuleConditionAttributes_ROLES:
 			foundMatch := false
 			for _, projectRole := range condition.Values {
 				if stringutils.SliceContains(node.Roles, projectRole) {
@@ -125,7 +125,7 @@ func nodeMatchesAllConditions(node backend.Node, conditions []*iam_v2.Condition)
 			if !foundMatch {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionTypes_CHEF_TAGS:
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS:
 			foundMatch := false
 			for _, projectRole := range condition.Values {
 				if stringutils.SliceContains(node.ChefTags, projectRole) {

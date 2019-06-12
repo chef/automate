@@ -9,7 +9,7 @@ end
 # chef-automate version: prints the version
 #
 describe command("chef-automate version") do
-  its('stdout') { should match /CLI version: \d{14}\nServer version: \d{14}\n/ }
+  its('stdout') { should match /Version: 2\nCLI Build: \d{14}\nServer Build: \d{14}\n/ }
   its('stderr') { should eq '' }
   its('exit_status') { should eq 0 }
 end

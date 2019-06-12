@@ -10,6 +10,10 @@ toc = true
     weight = 30
 +++
 
+# Audit Cookbook + Inspec + Automate 2 Versions Support Matrix
+
+Refer to the [following Supported Versions list](https://github.com/chef-cookbooks/audit#chef-automate) to confirm a full set of working versions for your chef-client, Audit cookbook, Inspec, and Automate 2. When these do not match up, ingestion problems can occur because the messages will not show up in the expected format.
+
 # Node Run and Audit Data Collection
 
 Nodes can send their run data to Chef Automate.

@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/ingest"
+	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/migration"
@@ -32,6 +33,8 @@ import (
 //
 // Maybe even spawn multiple servers
 func Spawn(opts *serveropts.Opts) error {
+	var client backend.Client
+
 	// Initialize the backend client
 	client, err := elastic.New(opts.ElasticSearchUrl)
 
@@ -44,20 +47,20 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 
 	var (
-		grpcServer  = opts.ConnFactory.NewServer()
-		A1migration = migration.New(client)
-		uri         = fmt.Sprintf("%s:%d", opts.Host, opts.Port)
+		grpcServer = opts.ConnFactory.NewServer()
+		migrator   = migration.New(client)
+		uri        = fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 	)
 
 	log.WithFields(log.Fields{"uri": uri}).Info("Starting gRPC Server")
 	conn, err := net.Listen("tcp", uri)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Fatal("TCP listen failed")
+		log.WithError(err).Error("TCP listen failed")
 		return err
 	}
 
 	// Register Status Server
-	ingestStatus := server.NewIngestStatus(client, A1migration)
+	ingestStatus := server.NewIngestStatus(client, migrator)
 	ingest.RegisterIngestStatusServer(grpcServer, ingestStatus)
 
 	// Initialize elasticsearch indices or trigger a migration
@@ -65,23 +68,32 @@ func Spawn(opts *serveropts.Opts) error {
 	// This initialization will happen inside a goroutine so that we can then
 	// report the health of the system. We might have to do the same for the
 	// migration tasks.
-	migrationNeeded, err := A1migration.MigrationNeeded()
+	migrationNeeded, err := migrator.MigrationNeeded()
 	if err != nil {
+		log.WithError(err).Error("Failed checking for migration")
 		return err
 	}
 
 	if migrationNeeded {
-		A1migration.Start()
+		err = migrator.Start()
+		if err != nil {
+			log.WithError(err).Error("Failed starting a migration")
+			return err
+		}
 	} else {
-		A1migration.MarkUnneeded()
-		client.InitializeStore(context.Background())
+		migrator.MarkUnneeded()
+		err = client.InitializeStore(context.Background())
+		if err != nil {
+			log.WithError(err).Error("Failed initializing elasticsearch")
+			return err
+		}
 	}
 
 	// Authz Interface
 	authzConn, err := opts.ConnFactory.Dial("authz-service", opts.AuthzAddress)
 	if err != nil {
 		// This should never happen
-		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create Authz connection")
+		log.WithError(err).Error("Failed to create Authz connection")
 		return err
 	}
 	defer authzConn.Close()
@@ -92,7 +104,7 @@ func Spawn(opts *serveropts.Opts) error {
 	eventConn, err := opts.ConnFactory.Dial("event-service", opts.EventAddress)
 	if err != nil {
 		// This should never happen
-		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create Event connection")
+		log.WithError(err).Error("Failed to create Event connection")
 		return err
 	}
 	defer eventConn.Close()
@@ -103,7 +115,7 @@ func Spawn(opts *serveropts.Opts) error {
 	nodeMgrConn, err := opts.ConnFactory.Dial("nodemanager-service", opts.NodeManagerAddress)
 	if err != nil {
 		// This should never happen
-		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create NodeManager connection")
+		log.WithError(err).Error("Failed to create NodeManager connection")
 		return err
 	}
 	defer nodeMgrConn.Close()
@@ -142,7 +154,7 @@ func Spawn(opts *serveropts.Opts) error {
 	esSidecarConn, err := opts.ConnFactory.Dial("es-sidecar-service", opts.EsSidecarAddress)
 	if err != nil {
 		// This should never happend
-		log.WithFields(log.Fields{"error": err}).Fatal("Failed to create ES Sidecar connection")
+		log.WithError(err).Error("Failed to create ES Sidecar connection")
 		return err
 	}
 	defer esSidecarConn.Close()

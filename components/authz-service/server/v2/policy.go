@@ -696,7 +696,10 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 			"/chef.automate.domain.authz.v2.Policies/UpdateRole",
 			"/chef.automate.domain.authz.v2.Policies/RemovePolicyMembers",
 			"/chef.automate.domain.authz.v2.Policies/AddPolicyMembers",
-			"/chef.automate.domain.authz.v2.Policies/PurgeSubjectFromPolicies":
+			"/chef.automate.domain.authz.v2.Policies/PurgeSubjectFromPolicies",
+			"/chef.automate.domain.authz.v2.Projects/CreateRule",
+			"/chef.automate.domain.authz.v2.Projects/UpdateRule",
+			"/chef.automate.domain.authz.v2.Projects/DeleteRule":
 			if err := s.updateEngineStore(ctx); err != nil {
 				return nil, status.Errorf(codes.Internal, "error updating engine store: %s", err.Error())
 			}
