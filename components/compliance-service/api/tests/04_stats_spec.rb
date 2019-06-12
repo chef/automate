@@ -424,7 +424,8 @@ if !ENV['NO_STATS_TESTS']
           "copyrightEmail" => "hello@dev-sec.io",
           "summary" => "Test-suite for best-practice nginx hardening",
           "supports" => [{"osFamily" => "unix"}],
-          "stats" => {"failed" => 1, "passed" => 5, "skipped" => 2}
+          "stats" => {"failed" => 1, "passed" => 5, "skipped" => 2},
+          "depends"=>[{"name"=>"myprofile1-new-name", "path"=>"../myprofile1"}]
         }
       }
       assert_equal_json_content(expected_data, actual_data)
