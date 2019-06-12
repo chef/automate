@@ -2470,3 +2470,133 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteRuleRespValidationError{}
+
+// Validate checks the field values on ApplyRulesReq with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ApplyRulesReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ApplyRulesReqValidationError is the validation error returned by
+// ApplyRulesReq.Validate if the designated constraints aren't met.
+type ApplyRulesReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplyRulesReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplyRulesReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplyRulesReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplyRulesReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplyRulesReqValidationError) ErrorName() string { return "ApplyRulesReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ApplyRulesReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplyRulesReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplyRulesReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplyRulesReqValidationError{}
+
+// Validate checks the field values on ApplyRulesResp with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ApplyRulesResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ApplyRulesRespValidationError is the validation error returned by
+// ApplyRulesResp.Validate if the designated constraints aren't met.
+type ApplyRulesRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApplyRulesRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApplyRulesRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApplyRulesRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApplyRulesRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApplyRulesRespValidationError) ErrorName() string { return "ApplyRulesRespValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ApplyRulesRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApplyRulesResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApplyRulesRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApplyRulesRespValidationError{}

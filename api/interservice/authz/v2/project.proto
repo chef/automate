@@ -76,6 +76,7 @@ service Projects {
     rpc ListRulesForProject(ListRulesForProjectReq) returns (ListRulesForProjectResp) {};
     rpc DeleteRule(DeleteRuleReq) returns (DeleteRuleResp) {};
     rpc ListRulesForAllProjects(ListRulesForAllProjectsReq) returns (ListRulesForAllProjectsResp) {};
+    rpc ApplyRules(ApplyRulesReq) returns (ApplyRulesResp) {};
 }
 
 message ProjectUpdateCancelReq {}
@@ -188,3 +189,7 @@ message DeleteRuleReq {
 }
 
 message DeleteRuleResp {}
+
+message ApplyRulesReq {}
+
+message ApplyRulesResp {}
