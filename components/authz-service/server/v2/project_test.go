@@ -78,21 +78,6 @@ func TestUpdateProject(t *testing.T) {
 				require.Equal(t, 1, len(resp.Project.GetProjects()))
 				assert.Equal(t, id, resp.Project.Projects[0])
 			}},
-		{"when a project is updated an event is published",
-			func(t *testing.T) {
-				cl, store, eventServiceClient := setupProjects(t)
-				numberOfPublishes := eventServiceClient.PublishedEvents
-				id, updatedName := "my-foo", "updated name"
-				addProjectToStore(t, store, id, "original name", storage.ChefManaged)
-
-				_, _ = cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: id, Name: updatedName})
-
-				assert.Equal(t, numberOfPublishes+1, eventServiceClient.PublishedEvents)
-				assert.NotNil(t, eventServiceClient.LastestPublishedEvent.EventID)
-				assert.NotNil(t, eventServiceClient.LastestPublishedEvent.Published)
-				assert.NotNil(t,
-					eventServiceClient.LastestPublishedEvent.Data.Fields["ProjectUpdateID"].GetStringValue())
-			}},
 		{"when a project is not updated an event is not published", func(t *testing.T) {
 			cl, _, eventServiceClient := setupProjects(t)
 			numberOfPublishes := eventServiceClient.PublishedEvents
