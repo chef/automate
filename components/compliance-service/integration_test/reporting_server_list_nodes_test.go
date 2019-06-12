@@ -925,56 +925,159 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 		},
 
 		// control
-		// {
-		// 	description: "control: '*' wildcard",
-		// 	reports: []*relaxting.ESInSpecReport{
-		// 		{
-		// 			NodeID: "1",
-		// 			Profiles: []relaxting.ESInSpecReportProfile{
-		// 				{
-		// 					Controls: []relaxting.ESInSpecReportControl{
-		// 						{
-		// 							Title: "a2-prod",
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 		{
-		// 			NodeID: "2",
-		// 			Profiles: []relaxting.ESInSpecReportProfile{
-		// 				{
-		// 					Controls: []relaxting.ESInSpecReportControl{
-		// 						{
-		// 							Title: "a2-dev",
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 		{
-		// 			NodeID: "3",
-		// 			Profiles: []relaxting.ESInSpecReportProfile{
-		// 				{
-		// 					Controls: []relaxting.ESInSpecReportControl{
-		// 						{
-		// 							Title: "a1-dev",
-		// 						},
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	query: reporting.Query{
-		// 		Filters: []*reporting.ListFilter{
-		// 			{
-		// 				Type:   "control_name",
-		// 				Values: []string{"a2-*"},
-		// 			},
-		// 		},
-		// 	},
-		// 	expectedIds: []string{"1", "2"},
-		// },
+		{
+			description: "control: '*' wildcard",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a2-prod",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "2",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a2-dev",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "3",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a1-dev",
+								},
+							},
+						},
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "control_name",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "control: '*' wildcard one node with two matching controls",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a2-prod",
+								},
+								{
+									Title: "a2-test",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "2",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a2-dev",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "3",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a1-dev",
+								},
+							},
+						},
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "control_name",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "control: '?' wildcard",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "2",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a2-dev",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "3",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a1-dev",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "4",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "b1-dev",
+								},
+							},
+						},
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "control_name",
+						Values: []string{"a?-dev"},
+					},
+				},
+			},
+			expectedIds: []string{"3", "2"},
+		},
 	}
 
 	for _, test := range cases {

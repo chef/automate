@@ -263,6 +263,16 @@ export class StatsService {
             type = 'node_name';
             value = filter['value']['text'];
           }
+        } else if (type === 'control') {
+          // control needs to be sent as 'control' if we have the ID
+          // and 'control_name' for wildcard filters
+          if ( filter['value']['id'] ) {
+            type = 'control';
+            value = filter['value']['id'];
+          } else {
+            type = 'control_name';
+            value = filter['value']['text'];
+          }
         }
 
         const group = formatted.filter(f => f.type === type)[0];

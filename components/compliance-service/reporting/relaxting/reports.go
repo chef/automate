@@ -654,6 +654,29 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
+	if len(filters["control_name"]) > 0 {
+		ESField := "profiles.controls.title"
+		refinedValues := make([]string, 0, 0)
+		filterQuery := elastic.NewBoolQuery()
+
+		for _, value := range filters["control_name"] {
+			if strings.Contains(value, "*") || strings.Contains(value, "?") {
+				wildQuery := elastic.NewWildcardQuery(ESField, value)
+				nestedQuery := elastic.NewNestedQuery("profiles.controls", wildQuery)
+				filterQuery = filterQuery.Should(nestedQuery)
+			} else {
+				refinedValues = append(refinedValues, value)
+			}
+		}
+		if len(refinedValues) > 0 {
+			termQuery := elastic.NewTermsQuery(ESField, stringArrayToInterfaceArray(refinedValues)...)
+			nestedQuery := elastic.NewNestedQuery("profiles.controls", termQuery)
+			filterQuery = filterQuery.Should(nestedQuery)
+		}
+
+		boolQuery = boolQuery.Must(filterQuery)
+	}
+
 	if len(filters["profile_name"]) > 0 {
 		ESField := "profiles.title"
 		refinedValues := make([]string, 0, 0)
