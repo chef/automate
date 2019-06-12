@@ -209,7 +209,6 @@ func jsonExport(stream reporting.ReportingService_ExportServer) exportHandler {
 		}
 
 		if initialRun {
-			raw = append([]byte("["), raw...)
 			initialRun = false
 		} else {
 			raw = append([]byte(","), raw...)

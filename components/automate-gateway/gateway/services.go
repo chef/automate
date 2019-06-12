@@ -537,6 +537,11 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//when the type is json, we will be retrieving a json array of objects and since we will be getting them one at a
+	// time, we need to provide the '[' to open and the ']' to close (the close will happen on EOF, below)
+	if query.Type == "json" {
+		w.Write([]byte("["))
+	}
 	stream, err := reportingClient.Export(ctx, &query)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
