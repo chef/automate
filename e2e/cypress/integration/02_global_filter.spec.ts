@@ -1,3 +1,5 @@
+import { adminLogin, createProject, logout } from '../support/commands'
+
 describe('global projects filter', () => {
   const proj1  = "cypress-project-1"
   const proj2  = "cypress-project-2"
@@ -7,21 +9,21 @@ describe('global projects filter', () => {
   // const nonAdminUsername = "nonadmin"
 
   before(() => {
-    cy.adminLogin('/').then(() => {
+    adminLogin('/').then(() => {
       let admin = JSON.parse(localStorage.getItem('chef-automate-user'))
-      cy.cleanupProjects(admin.id_token)
-      cy.createProject(admin.id_token, proj1)
-      cy.createProject(admin.id_token, proj2)
-      cy.createProject(admin.id_token, proj3)
+      cleanupProjects(admin.id_token)
+      createProject(admin.id_token, proj1)
+      createProject(admin.id_token, proj2)
+      createProject(admin.id_token, proj3)
       // TODO uncomment with non-admin test/ move up project creation
-      // cy.createUser(admin.id_token, nonAdminUsername)
-      // cy.createPolicy(admin.id_token, pol_id, nonAdminUsername, [proj1, proj2])
-      cy.logout()
+      // createUser(admin.id_token, nonAdminUsername)
+      // createPolicy(admin.id_token, pol_id, nonAdminUsername, [proj1, proj2])
+      logout()
     })
   })
 
   it('shows all projects for admin', () => {
-    cy.adminLogin('/settings')
+    adminLogin('/settings')
 
     cy.get('chef-sidebar')
       .should('have.attr', 'minor-version')
@@ -37,13 +39,13 @@ describe('global projects filter', () => {
           })
         }
       })
-    cy.logout()
+    logout()
   })
 
   // TODO can uncomment when we have a flag to remove legacy policies,
   // which are currently allowing full project access to all users.
   // it('shows allowed projects for non-admin', () => {
-  //   cy.login('/settings', nonAdminUsername)
+  //   login('/settings', nonAdminUsername)
   //   // hide modal unrelated to test flow
   //   cy.get('app-welcome-modal').invoke('hide')
 
@@ -61,6 +63,6 @@ describe('global projects filter', () => {
   //         })
   //       }
   //     })
-  //   cy.logout()
+  //   logout()
   // })
 })
