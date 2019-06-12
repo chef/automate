@@ -685,7 +685,7 @@ func (backend ES2Backend) newTermQueryFromFilter(ESField string,
 	filterQuery := elastic.NewBoolQuery()
 
 	for _, value := range filters {
-		if containsWildcards(value) {
+		if containsWildcardChar(value) {
 			wildQuery := elastic.NewWildcardQuery(ESField, value)
 			filterQuery = filterQuery.Should(wildQuery)
 		} else {
@@ -705,7 +705,7 @@ func (backend ES2Backend) newNestedTermQueryFromFilter(ESField string, ESFieldPa
 	filterQuery := elastic.NewBoolQuery()
 
 	for _, value := range filters {
-		if containsWildcards(value) {
+		if containsWildcardChar(value) {
 			wildQuery := elastic.NewWildcardQuery(ESField, value)
 			nestedQuery := elastic.NewNestedQuery(ESFieldPath, wildQuery)
 			filterQuery = filterQuery.Should(nestedQuery)
@@ -722,7 +722,7 @@ func (backend ES2Backend) newNestedTermQueryFromFilter(ESField string, ESFieldPa
 	return filterQuery
 }
 
-func containsWildcards(value string) bool {
+func containsWildcardChar(value string) bool {
 	wildcardValues := []string{"*", "?"}
 
 	for _, wildcard := range wildcardValues {

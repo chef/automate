@@ -102,13 +102,17 @@ export class ReportingSearchbarComponent implements OnInit {
     const text: string = e.target.value;
     const suggestionValue = this.filterValues.filter(v => v.title === text)[0];
 
-    if (text.indexOf('?') >= 0 || text.indexOf('*') >= 0) {
-      const wildcardValue = {text, score: 0, version: '', title: text};
+    if (this.containsWildcardChar(text)) {
+      const wildcardValue = {text, title: text};
 
       this.addNewFilter(type, wildcardValue);
     } else if (suggestionValue) {
       this.addNewFilter(type, suggestionValue);
     }
+  }
+
+  private containsWildcardChar(text: string): boolean {
+    return (text.indexOf('?') >= 0 || text.indexOf('*') >= 0);
   }
 
   private addNewFilter(type, value) {
