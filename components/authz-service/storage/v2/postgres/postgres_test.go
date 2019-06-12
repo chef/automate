@@ -3364,6 +3364,9 @@ func TestCreateRule(t *testing.T) {
 				[]storage.Condition{condition1, condition2, condition3})
 			require.Error(t, err)
 		},
+		// TODO
+		// case: cannot create rule if it already exists in current rules
+		// case: cannot create rule if it already exists in staged rules
 		"create node rule with multiple conditions": func(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
@@ -3385,9 +3388,9 @@ func TestCreateRule(t *testing.T) {
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4`,
-				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name))
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4 AND state=$5`,
+				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name, "new"))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
 		"create event rule with multiple conditions": func(t *testing.T) {
 			projID := "project-1"
@@ -3410,9 +3413,9 @@ func TestCreateRule(t *testing.T) {
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4`,
-				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name))
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4 AND state=$5`,
+				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name, "new"))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
 	}
 

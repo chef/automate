@@ -962,9 +962,25 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	if err != nil {
 		return nil, p.processError(err)
 	}
+	
+	// we have to check that the rule doesn't already exist in the current rules table
+	// since the uniqueness constraint only applies to iam_staged_project_rules
+	// TODO extract into helper
+	res, err := tx.ExecContext(ctx,
+		`SELECT COUNT( * ) FROM iam_project_rules WHERE id=$1;`, rule.ID)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+	count, err:= res.RowsAffected()
+	if err != nil {
+		return nil, p.processError(err)
+	}
+	if count > 0 {
+		return nil, storage_errors.ErrConflict
+	}
 
 	row := tx.QueryRowContext(ctx,
-		`INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
+		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, state) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
 		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
 	var ruleDbID string
 	if err := row.Scan(&ruleDbID); err != nil {
@@ -973,7 +989,7 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	for _, condition := range rule.Conditions {
 		_, err := tx.ExecContext(ctx,
-			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
 			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
 		)
 		if err != nil {
