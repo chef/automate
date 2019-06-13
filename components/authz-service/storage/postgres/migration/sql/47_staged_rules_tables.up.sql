@@ -17,41 +17,56 @@ CREATE TABLE iam_staged_rule_conditions (
   value TEXT[] NOT NULL,
   attribute TEXT NOT NULL,
   operator TEXT NOT NULL,
+  deleted BOOLEAN,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE FUNCTION valid_staged_rule_state_change(
-  old_state staged_rule_state, new_state staged_rule_state
-) RETURNS boolean
-LANGUAGE sql AS
-$$
-  SELECT EXISTS(
-    SELECT 1
-    FROM (VALUES
-      ('updated', 'deleted'),
-      ('updated', 'updated')
-    ) AS valid(old, new)
-    WHERE valid.old::staged_rule_state=old_state
-    AND valid.new::staged_rule_state=new_state
+CREATE OR REPLACE FUNCTION
+  projects_match_for_staged_rule(_project_id TEXT, _projects_filter TEXT[])
+  RETURNS BOOLEAN AS $$
+    BEGIN
+      RETURN (
+        array_length(_projects_filter, 1) IS NULL
+        OR _project_id = ANY (_projects_filter)
+      );
+    END
+$$ LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION
+  query_staged_rule(_rule_db_id TEXT, _project_filter TEXT[])
+  RETURNS json AS $$
+
+  WITH t AS (
+    SELECT
+      r.id,
+      r.project_id,
+      r.name,
+      r.type,
+      r.deleted,
+      r.updated_at,
+      r.created_at
+      -- A rule can't exist without conditions so we don't need to worry
+      -- about null case here.
+      json_agg(rc) AS conditions
+    FROM iam_staged_project_rules AS r
+    LEFT OUTER JOIN iam_staged_rule_conditions
+    AS rc ON rc.rule_db_id=r.db_id
+    WHERE id=_rule_db_id AND projects_match_for_staged_rule(project_id, _project_filter)
+    GROUP BY r.id, r.project_id, r.name, r.type, r.deleted, r.updated_at, r.created_at
   )
-$$;
+  SELECT row_to_json(t) AS rule FROM t;
 
-CREATE OR REPLACE FUNCTION staged_rule_state_trigger_func() RETURNS trigger
-LANGUAGE plpgsql AS $$
-DECLARE
-BEGIN
-  IF OLD IS NULL THEN
-    RETURN NEW;
-  END IF;
-  IF valid_staged_rule_state_change(OLD.state, NEW.state) THEN
-    RETURN NEW;
-  END IF;
-  RAISE EXCEPTION 'invalid state change: % -> %', OLD.state, NEW.state;
-END
-$$;
+CREATE OR REPLACE FUNCTION
+  query_staged_rule_table(_rule_db_id TEXT)
+  RETURNS TEXT[] AS $$
 
-CREATE TRIGGER staged_rule_state_trigger_func BEFORE UPDATE ON iam_staged_project_rules
-  FOR EACH ROW EXECUTE PROCEDURE staged_rule_state_trigger_func();
+  SELECT ARRAY(
+    SELECT 'current' as TableName from iam_project_rules c where c.id=_rule_db_id
+    UNION
+    SELECT 'staged' as TableName from iam_staged_project_rules a where a.id=_rule_db_id
+    );
+
+$$ LANGUAGE sql;
 
 COMMIT;
