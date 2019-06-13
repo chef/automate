@@ -3309,6 +3309,32 @@ func TestCreateRule(t *testing.T) {
 			assert.Nil(t, resp)
 			assert.Error(t, storage_errors.ErrForeignKey, err)
 		},
+		"when rule exists in the current rules table, return Err": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			condition1, err := storage.NewCondition(storage.Node, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{condition1})
+			require.NoError(t, err)
+			insertRule(t, db, rule)
+			resp, err := store.CreateRule(ctx, &rule)
+			assert.Nil(t, resp)
+			assert.Error(t, storage_errors.ErrConflict, err)
+		},
+		"when rule exists in the staging rules table, return Err": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			condition1, err := storage.NewCondition(storage.Node, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{condition1})
+			insertStagedRule(t, db, rule)
+			require.NoError(t, err)
+			resp, err := store.CreateRule(ctx, &rule)
+			assert.Nil(t, resp)
+			assert.Error(t, storage_errors.ErrConflict, err)
+		},
 		"cannot use improper condition attributes for events": func(t *testing.T) {
 			_, err := storage.NewCondition(storage.Event, []string{"chef-server-1"}, storage.ChefTag, storage.MemberOf)
 			assert.Error(t, err)
@@ -6345,6 +6371,22 @@ func insertRule(t *testing.T, db *testDB, rule storage.Rule) {
 		_, err = db.Exec(`
 			INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
 			dbID, pq.Array(c.Value), c.Attribute.String(), c.Operator.String())
+		require.NoError(t, err)
+	}
+}
+
+func insertStagedRule(t *testing.T, db *testDB, rule storage.Rule) {
+	t.Helper()
+	row := db.QueryRow(`
+		INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false)
+	var dbID string
+	err := row.Scan(&dbID)
+	require.NoError(t, err)
+	for _, c := range rule.Conditions {
+		_, err = db.Exec(`
+			INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator, deleted) VALUES ($1, $2, $3, $4, $5);`,
+			dbID, pq.Array(c.Value), c.Attribute.String(), c.Operator.String(), false)
 		require.NoError(t, err)
 	}
 }
