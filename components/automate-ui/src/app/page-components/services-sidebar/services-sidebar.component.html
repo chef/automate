@@ -64,20 +64,20 @@
     <div class="no-services" *ngIf="(services$ | async)?.length === 0">
       No available services with <b>{{ selectedHealth }}</b> status
     </div>
+    <div class="services-panel-body no-services">
+      <div class="status-statement" *ngIf="'!serviceGroupId' && (servicesStatus$ | async) == 'notLoaded' ">
+          Add service groups to see more service details
+      </div>
+      <div class="status-statement" *ngIf="(servicesStatus$ | async) == 'loading'">
+          <chef-loading-spinner size='50'></chef-loading-spinner>
+        <h3>Loading Services...</h3>
+      </div>
+    </div>
     <app-page-picker
       [total]="totalServices"
       [perPage]="pageSize"
       [page]="currentPage"
       (pageChanged)="updatePageNumber($event)">
     </app-page-picker>
-  </div>
-  <div class="services-panel-body no-services" *ngIf="!serviceGroupId">
-      <div class="status-statement" *ngIf="(serviceGroupStatus$ | async) == 'loading'">
-          <chef-loading-spinner size='50'></chef-loading-spinner>
-        <h3>Loading Services...</h3>
-      </div>
-      <div class="status-statement" *ngIf="(serviceGroupStatus$ | async) == 'notLoaded'">
-        Add service groups to see more service details
-    </div>
   </div>
 </div>

@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { serviceGroupState, serviceGroupStatus
+import { serviceGroupState, servicesStatus
 } from '../../entities/service-groups/service-groups.selector';
 import { createSelector } from '@ngrx/store';
 import { EntityStatus } from '../../entities/entities';
@@ -24,7 +24,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   @Input() visible: boolean;
 
   public services$: Observable<Service[]>;
-  public serviceGroupStatus$: Observable<EntityStatus>;
+  public servicesStatus$: Observable<EntityStatus>;
   public serviceGroupName$: Observable<string>;
   public selectedHealth = 'total';
   public currentPage = 1;
@@ -48,7 +48,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.services$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.servicesList));
-    this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
+    this.servicesStatus$ = this.store.select(servicesStatus);
     this.serviceGroupName$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.selectedServiceGroupName));
 
