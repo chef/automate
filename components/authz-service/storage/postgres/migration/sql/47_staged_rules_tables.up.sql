@@ -4,8 +4,9 @@ CREATE TABLE iam_staged_projects (
   db_id SERIAL,
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  deleted BOOLEAN,
   type iam_policy_type NOT NULL DEFAULT 'custom',
+  projects TEXT[],
+  deleted BOOLEAN,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 );
@@ -76,6 +77,17 @@ CREATE OR REPLACE FUNCTION
     UNION
     SELECT 'staged' as TableName from iam_staged_project_rules a where a.id=_rule_db_id
     );
+
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION
+  query_staged_project(_project_id TEXT, _projects_filter TEXT[])
+  RETURNS json AS $$
+
+  WITH t AS
+    (SELECT p.id, p.name, p.type, p.projects p.deleted FROM iam_staged_projects p
+      WHERE p.id = _project_id AND (array_length(_projects_filter, 1) IS NULL OR p.projects && _projects_filter))
+  SELECT row_to_json(t) AS role FROM t;
 
 $$ LANGUAGE sql;
 
