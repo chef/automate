@@ -4,14 +4,16 @@ import (
 	"context"
 	"reflect"
 	"testing"
+	"unicode"
 
 	"github.com/leanovate/gopter"
 	"github.com/leanovate/gopter/gen"
 	"github.com/leanovate/gopter/prop"
+	"golang.org/x/text/unicode/rangetable"
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
@@ -21,7 +23,9 @@ const (
 
 func TestCreateRuleProperties(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _, seed := setupRules(t)
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+
+	graphicRange := rangetable.Merge(unicode.GraphicRanges...)
 
 	conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
@@ -33,25 +37,25 @@ func TestCreateRuleProperties(t *testing.T) {
 			api.ProjectRuleConditionAttributes_POLICY_GROUP,
 			api.ProjectRuleConditionAttributes_POLICY_NAME,
 		),
-		"Values": gen.SliceOf(gen.AnyString()),
+		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
 	})
 	conditionsGenEvent := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
 			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
 			api.ProjectRuleConditionAttributes_CHEF_ORGS,
 		),
-		"Values": gen.SliceOf(gen.AnyString()),
+		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
 	})
 	createRuleReqGenEvent := gen.Struct(reflect.TypeOf(&api.CreateRuleReq{}), map[string]gopter.Gen{
 		"Id":         gen.RegexMatch(idRegex),
-		"Name":       gen.AnyString(),
+		"Name":       gen.UnicodeString(graphicRange),
 		"ProjectId":  gen.RegexMatch(idRegex),
 		"Type":       gen.Const(api.ProjectRuleTypes_EVENT),
 		"Conditions": gen.SliceOf(conditionsGenEvent),
 	})
 	createRuleReqGenNode := gen.Struct(reflect.TypeOf(&api.CreateRuleReq{}), map[string]gopter.Gen{
 		"Id":         gen.RegexMatch(idRegex),
-		"Name":       gen.AnyString(),
+		"Name":       gen.UnicodeString(graphicRange),
 		"ProjectId":  gen.RegexMatch(idRegex),
 		"Type":       gen.Const(api.ProjectRuleTypes_NODE),
 		"Conditions": gen.SliceOf(conditionsGenNode),
@@ -69,15 +73,29 @@ func TestCreateRuleProperties(t *testing.T) {
 		}
 	})
 
+	createProjectReqGen := gen.Struct(reflect.TypeOf(&api.CreateProjectReq{}), map[string]gopter.Gen{
+		"Id":   gen.RegexMatch(idRegex),
+		"Name": gen.UnicodeString(graphicRange),
+	})
+
+	type projectAndRuleReq struct {
+		api.CreateProjectReq
+		rules []api.CreateRuleReq
+	}
+
 	params := gopter.DefaultTestParametersWithSeed(seed)
 	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
 	properties := gopter.NewProperties(params)
 	properties.Property("creates a rule in storage", prop.ForAll(
-		func(req api.CreateRuleReq) bool {
-			defer store.Flush()
+		func(reqs projectAndRuleReq) bool {
+			defer testDB.Flush(t)
+			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false // bad run
+			}
 
-			_, err := cl.CreateRule(ctx, &req)
-
+			_, err = cl.CreateRule(ctx, &reqs.rules[0])
 			// Note: this could be very noisy, but it's hard to figure out what went
 			// wrong without the error
 			if err != nil {
@@ -85,39 +103,61 @@ func TestCreateRuleProperties(t *testing.T) {
 				return false // bad run
 			}
 
-			i, found := store.Get(req.Id)
-			if !found {
+			r, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
 				return false
 			}
-			r := i.(*storage.Rule)
+
 			// Note: we're ignoring type conversion, as asserting that would require us
 			// to replicate the mapping logic in tests.
 			// Instead, as we add ReadRule, and ListRules etc, methods, we can use this
 			// testing approach to write meaningful assertions.
-			return len(r.Conditions) == len(req.Conditions) &&
-				r.ID == req.Id &&
-				r.Name == req.Name &&
-				r.ProjectID == req.ProjectId
+			return len(r.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
+				r.Rule.Id == reqs.rules[0].Id &&
+				r.Rule.Name == reqs.rules[0].Name &&
+				r.Rule.ProjectId == reqs.rules[0].ProjectId
 		},
-		createRuleReqGen,
+		gopter.CombineGens(createProjectReqGen, createRuleReqGen).Map(func(vals []interface{}) projectAndRuleReq {
+			p := vals[0].(api.CreateProjectReq)
+			r := vals[1].(api.CreateRuleReq)
+			r.ProjectId = p.Id
+			return projectAndRuleReq{
+				CreateProjectReq: p,
+				rules:            []api.CreateRuleReq{r},
+			}
+		}),
 	))
 	properties.Property("ensures IDs are unique", prop.ForAll(
-		func(reqs []api.CreateRuleReq) bool {
-			defer store.Flush()
+		func(reqs projectAndRuleReq) bool {
+			defer testDB.Flush(t)
+			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false // bad run
+			}
 
-			if _, err := cl.CreateRule(ctx, &reqs[0]); err != nil {
+			if _, err := cl.CreateRule(ctx, &reqs.rules[0]); err != nil {
+				t.Error(err.Error())
 				return false
 			}
 
-			_, err := cl.CreateRule(ctx, &reqs[1])
+			_, err = cl.CreateRule(ctx, &reqs.rules[1])
 			return grpctest.AssertCode(t, codes.AlreadyExists, err)
 		},
-		gopter.CombineGens(createRuleReqGen, createRuleReqGen).Map(func(vals []interface{}) []api.CreateRuleReq {
+		// TODO(sr): deduplicate with the combinegen above?
+		gopter.CombineGens(createProjectReqGen, createRuleReqGen, createRuleReqGen).Map(func(vals []interface{}) projectAndRuleReq {
+			p := vals[0].(api.CreateProjectReq)
 			// we "fix" the second req to use the same ID as the first one
-			r0 := vals[0].(api.CreateRuleReq)
-			r1 := vals[1].(api.CreateRuleReq)
+			r0 := vals[1].(api.CreateRuleReq)
+			r1 := vals[2].(api.CreateRuleReq)
 			r1.Id = r0.Id
-			return []api.CreateRuleReq{r0, r1}
+			r0.ProjectId = p.Id
+			r1.ProjectId = p.Id
+			return projectAndRuleReq{
+				CreateProjectReq: p,
+				rules:            []api.CreateRuleReq{r0, r1},
+			}
 		}),
 	))
 	properties.TestingRun(t)

@@ -31,6 +31,7 @@ import (
 	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
+	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"
@@ -2968,7 +2969,7 @@ func setupV2WithMigrationState(t *testing.T,
 		writer = &testEngine{}
 	}
 	if rulesRetriever == nil {
-		rulesRetriever = &testProjectRulesRetriever{} 
+		rulesRetriever = &testhelpers.TestProjectRulesRetriever{}
 	}
 
 	mem_v2 := memstore_v2.New()
@@ -2979,7 +2980,7 @@ func setupV2WithMigrationState(t *testing.T,
 	polV2, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
 	require.NoError(t, err)
 
-	eventServiceClient := &mockEventServiceClient{}
+	eventServiceClient := &testhelpers.MockEventServiceClient{}
 	configMgr, err := config.NewManager("/tmp/.authz-delete-me")
 	require.NoError(t, err)
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,

@@ -12,6 +12,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
@@ -749,7 +750,7 @@ func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType 
 	store.Add(id, rule, 0)
 }
 
-func setupRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventServiceClient, int64) {
+func setupRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *testhelpers.MockEventServiceClient, int64) {
 	cl, _, ca, mc, s := setupProjectsAndRules(t)
 	return cl, ca, mc, s
 }

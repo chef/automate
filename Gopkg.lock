@@ -1607,6 +1607,7 @@
     "golang.org/x/net/context/ctxhttp",
     "golang.org/x/oauth2",
     "golang.org/x/oauth2/google",
+    "golang.org/x/text/unicode/rangetable",
     "google.golang.org/api/compute/v1",
     "google.golang.org/genproto/googleapis/api/annotations",
     "google.golang.org/grpc",

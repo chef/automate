@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"math/rand"
-	"net/url"
-	"os"
 	"sort"
 	"strconv"
 	"testing"
@@ -19,19 +17,11 @@ import (
 	v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/prng"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
-	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
+	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/auth_context"
-	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
-
-const resetDatabaseStatement = `DROP SCHEMA public CASCADE;
-CREATE SCHEMA public;
-GRANT ALL ON SCHEMA public TO postgres;
-GRANT ALL ON SCHEMA public TO public;`
 
 // Note: to set up PG locally for running these tests,
 // run the following from your command line from the components/authz-service folder:
@@ -48,13 +38,9 @@ GRANT ALL ON SCHEMA public TO public;`
 //
 // make kill_docker_pg
 
-type testDB struct {
-	*sql.DB
-}
-
 func TestGetPolicy(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	// description => test func (map used for randomization)
@@ -367,13 +353,13 @@ func TestGetPolicy(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestListPolicyMembers(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
 
@@ -503,13 +489,13 @@ func TestListPolicyMembers(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestListPolicies(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	// description => test func (map used for randomization)
@@ -958,13 +944,13 @@ func TestListPolicies(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestDeletePolicy(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	// description => test func (map used for randomization)
@@ -1186,13 +1172,13 @@ func TestDeletePolicy(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestCreatePolicy(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
 
@@ -1736,13 +1722,13 @@ func TestCreatePolicy(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestReplacePolicyMembers(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -2010,13 +1996,13 @@ func TestReplacePolicyMembers(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestRemovePolicyMembers(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -2257,13 +2243,13 @@ func TestRemovePolicyMembers(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestAddPolicyMembers(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -2598,13 +2584,13 @@ func TestAddPolicyMembers(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestUpdatePolicy(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -3303,13 +3289,13 @@ func TestUpdatePolicy(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestCreateRule(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
 
@@ -3432,13 +3418,13 @@ func TestCreateRule(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestListRules(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -3504,13 +3490,13 @@ func TestListRules(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestListRulesForProject(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := []struct {
@@ -3667,13 +3653,13 @@ func TestListRulesForProject(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestUpdateRule(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -3802,13 +3788,13 @@ func TestUpdateRule(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestGetRule(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -3920,13 +3906,13 @@ func TestGetRule(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestDeleteRule(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -4043,13 +4029,13 @@ func TestDeleteRule(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestCreateProject(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
 
@@ -4157,13 +4143,13 @@ func TestCreateProject(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestUpdateProject(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -4250,13 +4236,13 @@ func TestUpdateProject(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestGetProject(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := []struct {
@@ -4332,13 +4318,13 @@ func TestGetProject(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestDeleteProject(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := []struct {
@@ -4432,13 +4418,13 @@ func TestDeleteProject(t *testing.T) {
 	})
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestListProjects(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := []struct {
@@ -4628,13 +4614,13 @@ func TestListProjects(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestCreateRole(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
 
@@ -4763,13 +4749,13 @@ func TestCreateRole(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestListRoles(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -5100,13 +5086,13 @@ func TestListRoles(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestGetRole(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -5322,13 +5308,13 @@ func TestGetRole(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestReset(t *testing.T) {
-	store, db, prngSeed := setup(t)
-	defer db.close(t)
+	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
 
@@ -5369,13 +5355,13 @@ func TestReset(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestDeleteRole(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
@@ -5601,13 +5587,13 @@ func TestDeleteRole(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestUpdateRole(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 	nonexistingRole := storage.Role{
 		ID:      "nonexistant",
@@ -5983,13 +5969,13 @@ func TestUpdateRole(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestMigrationStatusProvider(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
 
@@ -6099,13 +6085,13 @@ func TestMigrationStatusProvider(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, test)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
 func TestPurgeSubjectFromPolicies(t *testing.T) {
-	store, db, _ := setup(t)
-	defer db.close(t)
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
 	subject := "users:local:albertine"
@@ -6172,7 +6158,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		db.flush(t)
+		db.Flush(t)
 	}
 }
 
@@ -6196,7 +6182,7 @@ func createRuleWithMultipleConditions(t *testing.T, store storage.Storage, projI
 	return resp
 }
 
-func assertProjectsMatch(t *testing.T, db *testDB, project storage.Project) {
+func assertProjectsMatch(t *testing.T, db *testhelpers.TestDB, project storage.Project) {
 	t.Helper()
 	dbProject := storage.Project{}
 	err := db.QueryRow(`SELECT query_project($1, '{}');`, project.ID).Scan(&dbProject)
@@ -6204,7 +6190,7 @@ func assertProjectsMatch(t *testing.T, db *testDB, project storage.Project) {
 	assert.Equal(t, project, dbProject)
 }
 
-func assertRolesMatch(t *testing.T, db *testDB, role storage.Role) {
+func assertRolesMatch(t *testing.T, db *testhelpers.TestDB, role storage.Role) {
 	t.Helper()
 	dbRole := storage.Role{}
 	err := db.QueryRow(`SELECT query_role($1);`, role.ID).Scan(&dbRole)
@@ -6228,7 +6214,7 @@ func assertCount(t *testing.T, expected int, row *sql.Row) {
 	assert.Equal(t, expected, count)
 }
 
-func assertMembers(t *testing.T, db *testDB, policyID string, members []storage.Member) {
+func assertMembers(t *testing.T, db *testhelpers.TestDB, policyID string, members []storage.Member) {
 	t.Helper()
 	for _, member := range members {
 		assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1 and member_id=$2`, policyID, member.ID))
@@ -6305,7 +6291,7 @@ func genRole(t *testing.T, id string, name string, actions []string, projects []
 	return *role
 }
 
-func insertTestPolicy(t *testing.T, db *testDB, policyName string) string {
+func insertTestPolicy(t *testing.T, db *testhelpers.TestDB, policyName string) string {
 	row := db.QueryRow(fmt.Sprintf("INSERT INTO iam_policies "+
 		"(id, name) VALUES (uuid_generate_v4(), '%s') "+
 		"RETURNING id", policyName))
@@ -6317,7 +6303,7 @@ func insertTestPolicy(t *testing.T, db *testDB, policyName string) string {
 }
 
 // Will fail on conflict with existing name.
-func insertTestPolicyMember(t *testing.T, db *testDB, polID string, memberName string) storage.Member {
+func insertTestPolicyMember(t *testing.T, db *testhelpers.TestDB, polID string, memberName string) storage.Member {
 	member := genMember(t, memberName)
 
 	_, err := db.Exec(`INSERT INTO iam_members (id, name) values ($1, $2)`, member.ID, member.Name)
@@ -6329,7 +6315,7 @@ func insertTestPolicyMember(t *testing.T, db *testDB, polID string, memberName s
 }
 
 func insertTestRole(t *testing.T,
-	db *testDB, id string, name string, actions []string, projects []string) storage.Role {
+	db *testhelpers.TestDB, id string, name string, actions []string, projects []string) storage.Role {
 
 	role := genRole(t, id, name, actions, projects)
 
@@ -6349,7 +6335,7 @@ func insertTestRole(t *testing.T,
 	return role
 }
 
-func insertTestProject(t *testing.T, db *testDB, id string, name string, projType storage.Type) storage.Project {
+func insertTestProject(t *testing.T, db *testhelpers.TestDB, id string, name string, projType storage.Type) storage.Project {
 	t.Helper()
 	proj, err := storage.NewProject(id, name, projType)
 	require.NoError(t, err)
@@ -6361,7 +6347,7 @@ func insertTestProject(t *testing.T, db *testDB, id string, name string, projTyp
 	return proj
 }
 
-func insertPolicyProject(t *testing.T, db *testDB, policyID string, projectId string) {
+func insertPolicyProject(t *testing.T, db *testhelpers.TestDB, policyID string, projectId string) {
 	t.Helper()
 	_, err := db.Exec(`
 			INSERT INTO iam_policy_projects (policy_id, project_id) VALUES ($1, $2);`,
@@ -6369,7 +6355,7 @@ func insertPolicyProject(t *testing.T, db *testDB, policyID string, projectId st
 	require.NoError(t, err)
 }
 
-func insertStatementProject(t *testing.T, db *testDB, statementID uuid.UUID, projectId string) {
+func insertStatementProject(t *testing.T, db *testhelpers.TestDB, statementID uuid.UUID, projectId string) {
 	t.Helper()
 	_, err := db.Exec(`
 			INSERT INTO iam_statement_projects (statement_id, project_id) VALUES ($1, $2);`,
@@ -6377,105 +6363,9 @@ func insertStatementProject(t *testing.T, db *testDB, statementID uuid.UUID, pro
 	require.NoError(t, err)
 }
 
-func setup(t *testing.T) (storage.Storage, *testDB, *prng.Prng) {
-	t.Helper()
-
-	ctx := context.Background()
-	l, err := logger.NewLogger("text", "error")
-	require.NoError(t, err, "init logger for postgres storage")
-
-	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/migration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	if migrationConfig == nil && dataMigrationConfig == nil {
-		t.Skipf("start pg container and set PG_URL to run")
-	}
-
-	// reset database the hard way -- we do this to ensure that our comparison
-	// between database content and hardcoded storage default policies actually
-	// compares the migrated policies with the hardcoded ones (and NOT the
-	// hardcoded policies with the hardcoded policies).
-	db := openDB(t)
-	_, err = db.ExecContext(ctx, resetDatabaseStatement)
-	require.NoError(t, err, "error resetting database")
-	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
-	require.NoError(t, err, "error creating extension")
-
-	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
-	require.NoError(t, err)
-	return backend, &testDB{DB: db}, prng.Seed(t)
-}
-
-// migrationConfigIfPGTestsToBeRun either returns the pg migration config
-// if PG_URL is set or we are in CI, otherwise it returns nil, indicating
-// postgres based tests shouldn't be run.
-func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*migration.Config, error) {
-	customPGURL, pgURLPassed := os.LookupEnv("PG_URL")
-	ciMode := os.Getenv("CI") == "true"
-
-	// If in CI mode, use the default
-	if ciMode {
-		pgURL, err := url.Parse("postgres://postgres@127.0.0.1:5432/authz_test?sslmode=disable")
-		if err != nil {
-			return nil, err
-		}
-		return &migration.Config{
-			Path:   migrationPath,
-			Logger: l,
-			PGURL:  pgURL,
-		}, nil
-	}
-
-	// If PG_URL wasn't passed (and we aren't in CI)
-	// we shouldn't run the postgres tests, return nil.
-	if !pgURLPassed {
-		return nil, nil
-	}
-
-	pgURL, err := url.Parse(customPGURL)
-	if err != nil {
-		return nil, err
-	}
-
-	return &migration.Config{
-		Path:   migrationPath,
-		Logger: l,
-		PGURL:  pgURL,
-	}, nil
-}
-
-func openDB(t *testing.T) *sql.DB {
-	t.Helper()
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable")
-	require.NoError(t, err, "error opening db")
-	err = db.Ping()
-	require.NoError(t, err, "error pinging db")
-
-	return db
-}
-
 func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
 		[]string{}, projects, "resource", "action", "pol"))
-}
-
-func (d *testDB) flush(t *testing.T) {
-	_, err := d.Exec(`DELETE FROM iam_policies CASCADE; DELETE FROM iam_members CASCADE;
-		DELETE FROM iam_roles CASCADE; DELETE FROM iam_projects CASCADE; DELETE FROM iam_role_projects CASCADE;
-		DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
-	require.NoError(t, err)
-}
-
-func (d *testDB) close(t *testing.T) {
-	t.Helper()
-	require.NoError(t, d.Close())
 }
 
 func assertPolicyChange(t *testing.T, store storage.Storage, f func()) {
