@@ -105,7 +105,6 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 	}
 
 	boolQuery := backend.getFiltersQuery(filters, true)
-	lowerText := strings.ToLower(text)
 
 	if len(text) >= 2 {
 		// Any(or) of the text words can match
@@ -115,10 +114,10 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 		matchQuery = elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and")
 		boolQuery = boolQuery.Should(matchQuery)
 		// Give a score boost to values that equal the suggested text
-		termQuery := elastic.NewTermQuery(fmt.Sprintf("%s.lower", target), lowerText).Boost(100)
+		termQuery := elastic.NewTermQuery(fmt.Sprintf("%s", target), text).Boost(100)
 		boolQuery = boolQuery.Should(termQuery)
 		// Give a score boost to values that start with the suggested text
-		prefixQuery := elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", target), lowerText).Boost(100)
+		prefixQuery := elastic.NewPrefixQuery(fmt.Sprintf("%s", target), text).Boost(100)
 		boolQuery = boolQuery.Should(prefixQuery)
 	}
 	// Create a term aggregation in order to group all the documents that have the same

@@ -70,8 +70,8 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		Size(int(size))
 
 	// Adding a second sort field when we don't sort by node name
-	if sortField != "node_name.lower" {
-		searchSource.Sort("node_name.lower", true)
+	if sortField != "node_name" {
+		searchSource.Sort("node_name", true)
 	}
 
 	source, err := searchSource.Source()

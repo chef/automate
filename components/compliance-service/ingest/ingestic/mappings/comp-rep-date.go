@@ -112,33 +112,27 @@ var ComplianceRepDate = Mapping{
           "type": "date"
         },
         "environment": {
+          "type": "keyword",
+          "normalizer": "case_insensitive",
           "fields": {
             "engram": {
               "analyzer": "autocomplete",
               "type": "text"
-            },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
             }
-          },
-          "type": "keyword"
+          }
         },
         "job_uuid": {
           "type": "keyword"
         },
         "node_name": {
+          "type": "keyword",
+          "normalizer": "case_insensitive",
           "fields": {
             "engram": {
               "analyzer": "autocomplete",
               "type": "text"
-            },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
             }
-          },
-          "type": "keyword"
+          }
         },
         "node_uuid": {
           "type": "keyword"
@@ -149,30 +143,24 @@ var ComplianceRepDate = Mapping{
         "platform": {
           "properties": {
             "name": {
+              "type": "keyword",
               "fields": {
                 "engram": {
                   "analyzer": "autocomplete",
                   "type": "text"
-                },
-                "lower": {
-                  "normalizer": "case_insensitive",
-                  "type": "keyword"
                 }
               },
-              "type": "keyword"
+              "normalizer": "case_insensitive"
             },
             "release": {
+              "type": "keyword",
               "fields": {
                 "engram": {
                   "analyzer": "autocomplete",
                   "type": "text"
-                },
-                "lower": {
-                  "normalizer": "case_insensitive",
-                  "type": "keyword"
                 }
               },
-              "type": "keyword"
+              "normalizer": "case_insensitive"
             },
             "full": {
               "type": "keyword"
@@ -193,14 +181,11 @@ var ComplianceRepDate = Mapping{
                   "type": "keyword",
                   "fields": {
                     "engram": {
-                      "type": "text",
-                      "analyzer": "autocomplete"
-                    },
-                    "lower": {
-                      "normalizer": "case_insensitive",
-                      "type": "keyword"
+                      "analyzer": "autocomplete",
+                      "type": "text"
                     }
-                  }
+                  },
+                  "normalizer": "case_insensitive"
                 },
                 "results": {
                   "properties": {
@@ -269,14 +254,11 @@ var ComplianceRepDate = Mapping{
               "type": "keyword",
               "fields": {
                 "engram": {
-                  "type": "text",
-                  "analyzer": "autocomplete"
-                },
-                "lower": {
-                  "normalizer": "case_insensitive",
-                  "type": "keyword"
+                  "analyzer": "autocomplete",
+                  "type": "text"
                 }
-              }
+              },
+              "normalizer": "case_insensitive"
             },
             "profile": {
               "type": "keyword"
@@ -297,33 +279,27 @@ var ComplianceRepDate = Mapping{
           "type": "nested"
         },
         "recipes": {
+          "type": "keyword",
           "fields": {
             "engram": {
               "analyzer": "autocomplete",
               "type": "text"
-            },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
             }
           },
-          "type": "keyword"
+          "normalizer": "case_insensitive"
         },
         "report_uuid": {
           "type": "keyword"
         },
         "roles": {
+          "type": "keyword",
           "fields": {
             "engram": {
               "analyzer": "autocomplete",
               "type": "text"
-            },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
             }
           },
-          "type": "keyword"
+          "normalizer": "case_insensitive"
         },
         "statistics": {
           "properties": {
@@ -342,79 +318,61 @@ var ComplianceRepDate = Mapping{
           "type": "keyword",
           "fields": {
             "engram": {
-              "type": "text",
-              "analyzer": "autocomplete"
-            },
-            "lower": {
-              "normalizer": "case_insensitive",
-              "type": "keyword"
+              "analyzer": "autocomplete",
+              "type": "text"
             }
-          }
+          },
+          "normalizer": "case_insensitive"
         },
 				"policy_name": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "engram": {
+              "analyzer": "autocomplete",
+              "type": "text"
+            }
+          },
+          "normalizer": "case_insensitive"
 				},
 				"policy_group": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "engram": {
+              "analyzer": "autocomplete",
+              "type": "text"
+            }
+          },
+          "normalizer": "case_insensitive"
 				},
 				"organization_name": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "engram": {
+              "analyzer": "autocomplete",
+              "type": "text"
+            }
+          },
+          "normalizer": "case_insensitive"
 				},
 				"source_fqdn": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "engram": {
+              "analyzer": "autocomplete",
+              "type": "text"
+            }
+          },
+          "normalizer": "case_insensitive"
 				},
 				"chef_tags": {
-					"fields": {
-						"engram": {
-							"analyzer": "autocomplete",
-							"type": "text"
-						},
-						"lower": {
-							"normalizer": "case_insensitive",
-							"type": "keyword"
-						}
-					},
-					"type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "engram": {
+              "analyzer": "autocomplete",
+              "type": "text"
+            }
+          },
+          "normalizer": "case_insensitive"
 				},
 				"ipaddress": {
 					"type": "ip"
