@@ -1,7 +1,6 @@
-<chef-loading-spinner *ngIf="(serviceGroupStatus$ | async) == 'loading'" size='50' fixed></chef-loading-spinner>
 <chef-page-header>
   <chef-heading>Service Groups</chef-heading>
-  <chef-subheading>Group of Habitat services running the same package and configuration.</chef-subheading>
+  <chef-subheading>Service groups are Habitat services ordered by package identifiers and configurations.</chef-subheading>
 </chef-page-header>
 <div class="page-body">
   <chef-status-filter-group [value]="selectedStatus$ | async">
@@ -54,7 +53,6 @@
           </chef-th>
         </chef-tr>
     </chef-thead>
-
     <chef-tbody>
       <chef-tr
         tabindex="0"
@@ -130,11 +128,14 @@
     [page]="currentPage"
     (pageChanged)="onPageChange($event)">
   </app-page-picker>
-  <div class="empty-status" *ngIf="(serviceGroups$ | async)?.length === 0">
-    <div class="status-statement">
-      <h3>No service groups available</h3>
-      <p>Use habitat to run your services and view the group health status here.</p>
-      <chef-button primary>Learn More</chef-button>
+  <div class="empty-status">
+    <div class="status-statement" *ngIf="(serviceGroupStatus$ | async) == 'loading'">
+        <chef-loading-spinner size='50'></chef-loading-spinner>
+      <h3>Loading Service Groups...</h3>
+    </div>
+    <div class="status-statement" *ngIf="(serviceGroupStatus$ | async) == 'notLoaded'">
+      <h3>Add service groups</h3>
+      <p>Contact your account representative to find out more about adding service groups.</p>
     </div>
   </div>
 </div>

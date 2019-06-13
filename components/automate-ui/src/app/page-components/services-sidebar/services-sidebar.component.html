@@ -6,7 +6,7 @@
       <span *ngIf="serviceGroupId">{{ serviceGroupName$ | async }}</span>
       <span *ngIf="!serviceGroupId">Group</span>
     </chef-heading>
-    <chef-subheading>Services run by each Habitat Supervisor on a node.</chef-subheading>
+    <chef-subheading>All services running in a service group.</chef-subheading>
   </chef-page-header>
   <div class="services-panel-body" *ngIf="serviceGroupId">
     <div class="status-filter-bar">
@@ -72,6 +72,12 @@
     </app-page-picker>
   </div>
   <div class="services-panel-body no-services" *ngIf="!serviceGroupId">
-    Add service groups to see more service details
+      <div class="status-statement" *ngIf="(serviceGroupStatus$ | async) == 'loading'">
+          <chef-loading-spinner size='50'></chef-loading-spinner>
+        <h3>Loading Services...</h3>
+      </div>
+      <div class="status-statement" *ngIf="(serviceGroupStatus$ | async) == 'notLoaded'">
+        Add service groups to see more service details
+    </div>
   </div>
 </div>
