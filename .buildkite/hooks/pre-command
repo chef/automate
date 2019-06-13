@@ -12,14 +12,8 @@ git fetch origin master
 # Fetch the git tags to see if that addresses the weird smart build behavior for Habitat
 git fetch --tags --force
 
-# By default, Buildkite pulls down HEAD. If we're on a pull-request, pull down
-# the merged head: https://github.com/buildkite/agent/blob/master/bootstrap/bootstrap.go#L698
-if [[ "$BUILDKITE_PULL_REQUEST" != "false" ]]; then
-  echo "Switching to refspec 'refs/pull/$BUILDKITE_PULL_REQUEST/merge'"
-  git fetch origin +refs/pull/$BUILDKITE_PULL_REQUEST/merge
-  git checkout -qf FETCH_HEAD
-fi
-
 # Count retries as BK annotations; don't make all jobs explode if the script
 # is removed.
 [[ -x "scripts/count_retries" ]] && scripts/count_retries
+
+git diff-tree -s --pretty=%B HEAD | buildkite-agent annotate --context built-commit --style info
