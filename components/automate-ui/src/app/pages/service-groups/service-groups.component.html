@@ -96,10 +96,10 @@
           </div>
         </chef-td>
         <chef-td class="package-name">
-          {{ getPackageNameFromFullRelease(serviceGroup.release) }}
+          {{ serviceGroup.package }}
         </chef-td>
         <chef-td class="release">
-          {{ getShortReleaseFromFullRelease(serviceGroup.release) }}
+          {{ serviceGroup.release }}
         </chef-td>
         <chef-td class="env">
           <!-- if environment is empty, display a badge -->

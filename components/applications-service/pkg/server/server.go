@@ -78,6 +78,7 @@ func (a *ApplicationsServer) GetServiceGroups(c context.Context,
 		serviceGroupProtos[i] = &applications.ServiceGroup{
 			Id:               fmt.Sprint(sg.ID),
 			Name:             sg.Name,
+			Package:          sg.Package,
 			Release:          sg.Release,
 			Status:           convertHealthStatusToProto(sg.HealthStatus),
 			HealthPercentage: sg.HealthPercentage,

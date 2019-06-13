@@ -7,6 +7,7 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 // Service Group Health Status
@@ -148,6 +149,11 @@ type serviceGroupHealth struct {
 	PercentOk      int32          `db:"percent_ok"`
 	Application    string         `db:"app_name"`
 	Environment    string         `db:"environment"`
+
+	// These fields are not mapped to any database field,
+	// they are here just to help us internally
+	composedPackages []string
+	composedReleases []string
 }
 
 // getServiceFromUniqueFields retrieve a service from the db without the need of an id
@@ -203,6 +209,7 @@ func (db *Postgres) GetServiceGroups(
 		sgDisplay[i] = &storage.ServiceGroupDisplay{
 			ID:               sgh.ID,
 			Release:          sgh.ReleaseString(),
+			Package:          sgh.PackageString(),
 			Name:             sgh.Name,
 			DeploymentID:     sgh.DeploymentID,
 			HealthStatus:     sgh.Health[2:], // Quick trick to remove health order from DB
@@ -222,19 +229,97 @@ func (db *Postgres) GetServiceGroups(
 	return sgDisplay, nil
 }
 
-// ReleaseString returns the release string of the service group, our criteria are:
+// ReleaseString returns the release string of the service group.
+//
+// Example: From the package_ident:       'core/redis/0.1.0/20200101000000'
+//          The release string should be: '0.1.0/20200101000000'
+//
+// Criteria:
 // * if the group of services has only one release, it returns it.
-// * if it has several releases then it returns the string 'Several'
+// * if it has several releases then it returns the string 'x releases'
 // * if it has no releases, (which it is impossible but we should protect against it) it
-//   will return the string 'Unknown'
+//   will return the string 'unknown'
 func (sgh *serviceGroupHealth) ReleaseString() string {
-	switch rNumber := len(sgh.Releases); rNumber {
+	sgh.breakReleases()
+	switch rNumber := len(sgh.composedReleases); rNumber {
 	case 0:
-		return "Unknown"
+		return "unknown"
 	case 1:
-		return sgh.Releases[0]
+		return sgh.composedReleases[0]
 	default:
-		return fmt.Sprintf("Several (%d)", rNumber)
+		return fmt.Sprintf("%d releases", rNumber)
+	}
+}
+
+// PackageString returns the package name string of the service group.
+//
+// Example: From the package_ident:            'core/redis/0.1.0/20200101000000'
+//          The package name string should be: 'core/redis'
+//
+// Criteria:
+// * if the group of services has only one package name, it returns it.
+// * if it has several package names then it returns the string 'x packages'
+//   (this case could happen when two services are running a package from different origins)
+// * if it has no package name, (which it is impossible but we should protect against it) it
+//   will return the string 'unknown'
+func (sgh *serviceGroupHealth) PackageString() string {
+	sgh.breakReleases()
+	switch pNumber := len(sgh.composedPackages); pNumber {
+	case 0:
+		return "unknown"
+	case 1:
+		return sgh.composedPackages[0]
+	default:
+		return fmt.Sprintf("%d packages", pNumber)
+	}
+}
+
+// breakReleases is an internal function that is being called by PackageString() and
+// ReleaseString() to break down the multiple releases that a service group could have.
+// The function is designed to run only once for performance purposes, avoiding breaking
+// the releases down on each call.
+func (sgh *serviceGroupHealth) breakReleases() {
+	// If there are no releases to break, stop processing
+	if len(sgh.Releases) == 0 {
+		return
+	}
+
+	// If either one of the composed releases/packages have memebers
+	// it means that this function has ran already and therefore we
+	// wont continue processing
+	// TODO @afiune we could have a bool flag to force the execution
+	if len(sgh.composedReleases) != 0 || len(sgh.composedPackages) != 0 {
+		return
+	}
+
+	// We can break down the releases
+	for _, release := range sgh.Releases {
+
+		identFields := strings.Split(release, "/")
+		// This error "should" never happen since this will indicate that
+		// Habitat sent a malformed package_ident, still we will be covered
+		// and will report it as an error in the logs
+		if len(identFields) != 4 {
+			log.WithFields(log.Fields{
+				"func":           "serviceGroupHealth.breakReleases()",
+				"release_fields": identFields,
+			}).Error("Malformed 'package ident' from database.")
+
+			continue
+		}
+
+		var (
+			pkg = identFields[0] + "/" + identFields[1]
+			rel = identFields[2] + "/" + identFields[3]
+		)
+
+		if !inArray(pkg, sgh.composedPackages) {
+			sgh.composedPackages = append(sgh.composedPackages, pkg)
+		}
+
+		if !inArray(rel, sgh.composedReleases) {
+			sgh.composedReleases = append(sgh.composedReleases, rel)
+		}
 	}
 }
 
@@ -296,4 +381,13 @@ func formatSortFields(field, sort string) string {
 	default:
 		return sortField
 	}
+}
+
+func inArray(value string, array []string) bool {
+	for _, v := range array {
+		if value == v {
+			return true
+		}
+	}
+	return false
 }
