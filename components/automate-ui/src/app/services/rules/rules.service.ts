@@ -1,4 +1,4 @@
-import {of as observableOf,  Observable } from 'rxjs';
+import { of as observableOf, Observable } from 'rxjs';
 
 import { map, mergeMap, filter } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
