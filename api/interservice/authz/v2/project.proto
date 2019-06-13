@@ -61,12 +61,11 @@ service Projects {
     rpc ListProjects(ListProjectsReq) returns (ListProjectsResp) {};
     rpc ListProjectsForIntrospection(ListProjectsReq) returns (ListProjectsResp) {};
 
-    // Note: POC functions that are not ready to expose outside of our
-    // spike (aka keep them out of the gateway for now).
     rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (
         chef.automate.domain.event.api.EventResponse);
-    rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
-    rpc ProjectUpdateCancel(ProjectUpdateStatusReq) returns (ProjectUpdateCancelResp);
+    rpc ApplyRulesStart(ApplyRulesStartReq ) returns (ApplyRulesStartResp) {};
+    rpc ApplyRulesCancel(ApplyRulesCancelReq) returns (ApplyRulesCancelResp);
+    rpc ApplyRulesStatus(ApplyRulesStatusReq) returns (ApplyRulesStatusResp);
 
     // "proper" methods go here (and the ones above will be phased out eventually)
     rpc CreateRule(CreateRuleReq) returns (CreateRuleResp) {};
@@ -78,13 +77,18 @@ service Projects {
     rpc ListRulesForAllProjects(ListRulesForAllProjectsReq) returns (ListRulesForAllProjectsResp) {};
 }
 
-message ProjectUpdateCancelReq {}
 
-message ProjectUpdateCancelResp {}
+message ApplyRulesStartReq {}
 
-message ProjectUpdateStatusReq {}
+message ApplyRulesStartResp {}
 
-message ProjectUpdateStatusResp {
+message ApplyRulesCancelReq {}
+
+message ApplyRulesCancelResp {}
+
+message ApplyRulesStatusReq {}
+
+message ApplyRulesStatusResp {
     string state = 1;
     google.protobuf.Timestamp estimated_time_complete = 2;
     float percentage_complete = 3;

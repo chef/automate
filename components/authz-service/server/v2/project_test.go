@@ -78,7 +78,7 @@ func TestUpdateProject(t *testing.T) {
 				require.Equal(t, 1, len(resp.Project.GetProjects()))
 				assert.Equal(t, id, resp.Project.Projects[0])
 			}},
-		{"when a project is updated an event is published",
+		{"when a project is updated an event is NOT published",
 			func(t *testing.T) {
 				cl, store, eventServiceClient := setupProjects(t)
 				numberOfPublishes := eventServiceClient.PublishedEvents
@@ -86,20 +86,40 @@ func TestUpdateProject(t *testing.T) {
 				addProjectToStore(t, store, id, "original name", storage.ChefManaged)
 
 				_, _ = cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: id, Name: updatedName})
+				assert.Equal(t, numberOfPublishes, eventServiceClient.PublishedEvents)
+			}},
+	}
 
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+	}
+}
+
+func TestApplyStart(t *testing.T) {
+	ctx := context.Background()
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"when rules are applied an event is published",
+			func(t *testing.T) {
+				cl, store, eventServiceClient := setupProjects(t)
+				numberOfPublishes := eventServiceClient.PublishedEvents
+				addProjectToStore(t, store, "my-foo", "original name", storage.ChefManaged)
+
+				_, err := cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				require.Nil(t, err)
 				assert.Equal(t, numberOfPublishes+1, eventServiceClient.PublishedEvents)
 				assert.NotNil(t, eventServiceClient.LastestPublishedEvent.EventID)
 				assert.NotNil(t, eventServiceClient.LastestPublishedEvent.Published)
 				assert.NotNil(t,
 					eventServiceClient.LastestPublishedEvent.Data.Fields["ProjectUpdateID"].GetStringValue())
 			}},
-		{"when a project is not updated an event is not published", func(t *testing.T) {
-			cl, _, eventServiceClient := setupProjects(t)
-			numberOfPublishes := eventServiceClient.PublishedEvents
-			_, _ = cl.UpdateProject(ctx,
-				&api.UpdateProjectReq{Id: "false-project", Name: "my other foo"})
-			assert.Equal(t, numberOfPublishes, eventServiceClient.PublishedEvents)
-		}},
 	}
 
 	rand.Shuffle(len(cases), func(i, j int) {

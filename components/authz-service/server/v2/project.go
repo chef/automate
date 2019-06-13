@@ -15,7 +15,6 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
-	log "github.com/sirupsen/logrus"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
@@ -155,38 +154,44 @@ func (s *state) UpdateProject(ctx context.Context,
 			"error converting project with ID %q: %s", resp.ID, err.Error())
 	}
 
-	err = s.projectUpdateManager.Start()
-	if err != nil {
-		return nil, status.Errorf(codes.Internal,
-			"error starting project update %q: %s", resp.ID, err.Error())
-	}
-
 	return &api.UpdateProjectResp{Project: apiProject}, nil
 }
 
-func (s *state) ProjectUpdateStatus(ctx context.Context,
-	req *api.ProjectUpdateStatusReq) (*api.ProjectUpdateStatusResp, error) {
+func (s *state) ApplyRulesStart(
+	context.Context, *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
+	s.log.Info("apply project rules: START")
+	err := s.projectUpdateManager.Start()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal,
+			"error starting project update: %s", err.Error())
+	}
+	return &api.ApplyRulesStartResp{}, nil
+}
+
+func (s *state) ApplyRulesCancel(
+	context.Context, *api.ApplyRulesCancelReq) (*api.ApplyRulesCancelResp, error) {
+	s.log.Info("apply project rules: CANCEL")
+	err := s.projectUpdateManager.Cancel()
+	if err != nil {
+		s.log.Errorf("Could not cancel project update: %v", err.Error())
+	}
+	return &api.ApplyRulesCancelResp{}, nil
+}
+
+func (s *state) ApplyRulesStatus(
+	context.Context, *api.ApplyRulesStatusReq) (*api.ApplyRulesStatusResp, error) {
 	time, err := ptypes.TimestampProto(s.projectUpdateManager.EstimatedTimeComplete())
 	if err != nil {
-		log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
+		s.log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
-	return &api.ProjectUpdateStatusResp{
+	return &api.ApplyRulesStatusResp{
 		State:                 s.projectUpdateManager.State(),
 		PercentageComplete:    float32(s.projectUpdateManager.PercentageComplete()),
 		EstimatedTimeComplete: time,
 		Failed:                s.projectUpdateManager.Failed(),
 		FailureMessage:        s.projectUpdateManager.FailureMessage(),
 	}, nil
-}
-
-func (s *state) ProjectUpdateCancel(ctx context.Context,
-	req *api.ProjectUpdateStatusReq) (*api.ProjectUpdateCancelResp, error) {
-	err := s.projectUpdateManager.Cancel()
-	if err != nil {
-		log.Errorf("Could not cancel project update: %v", err.Error())
-	}
-	return &api.ProjectUpdateCancelResp{}, nil
 }
 
 func (s *state) ListProjects(
@@ -293,7 +298,7 @@ func (s *state) ListRulesForAllProjects(ctx context.Context,
 
 func (s *state) HandleEvent(ctx context.Context,
 	req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
-	log.Debugf("authz is handling your event %s", req.EventID)
+	s.log.Debugf("authz is handling your event %s", req.EventID)
 
 	response := &automate_event.EventResponse{}
 	if req.Type.Name == event.ProjectRulesUpdateStatus {

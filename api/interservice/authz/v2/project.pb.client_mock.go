@@ -175,44 +175,64 @@ func (mr *MockProjectsClientMockRecorder) HandleEvent(ctx, in interface{}, opts 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockProjectsClient)(nil).HandleEvent), varargs...)
 }
 
-// ProjectUpdateStatus mocks base method
-func (m *MockProjectsClient) ProjectUpdateStatus(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateStatusResp, error) {
+// ApplyRulesStart mocks base method
+func (m *MockProjectsClient) ApplyRulesStart(ctx context.Context, in *ApplyRulesStartReq, opts ...grpc.CallOption) (*ApplyRulesStartResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "ProjectUpdateStatus", varargs...)
-	ret0, _ := ret[0].(*ProjectUpdateStatusResp)
+	ret := m.ctrl.Call(m, "ApplyRulesStart", varargs...)
+	ret0, _ := ret[0].(*ApplyRulesStartResp)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ProjectUpdateStatus indicates an expected call of ProjectUpdateStatus
-func (mr *MockProjectsClientMockRecorder) ProjectUpdateStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+// ApplyRulesStart indicates an expected call of ApplyRulesStart
+func (mr *MockProjectsClientMockRecorder) ApplyRulesStart(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockProjectsClient)(nil).ProjectUpdateStatus), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStart", reflect.TypeOf((*MockProjectsClient)(nil).ApplyRulesStart), varargs...)
 }
 
-// ProjectUpdateCancel mocks base method
-func (m *MockProjectsClient) ProjectUpdateCancel(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateCancelResp, error) {
+// ApplyRulesCancel mocks base method
+func (m *MockProjectsClient) ApplyRulesCancel(ctx context.Context, in *ApplyRulesCancelReq, opts ...grpc.CallOption) (*ApplyRulesCancelResp, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "ProjectUpdateCancel", varargs...)
-	ret0, _ := ret[0].(*ProjectUpdateCancelResp)
+	ret := m.ctrl.Call(m, "ApplyRulesCancel", varargs...)
+	ret0, _ := ret[0].(*ApplyRulesCancelResp)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ProjectUpdateCancel indicates an expected call of ProjectUpdateCancel
-func (mr *MockProjectsClientMockRecorder) ProjectUpdateCancel(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+// ApplyRulesCancel indicates an expected call of ApplyRulesCancel
+func (mr *MockProjectsClientMockRecorder) ApplyRulesCancel(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateCancel", reflect.TypeOf((*MockProjectsClient)(nil).ProjectUpdateCancel), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesCancel", reflect.TypeOf((*MockProjectsClient)(nil).ApplyRulesCancel), varargs...)
+}
+
+// ApplyRulesStatus mocks base method
+func (m *MockProjectsClient) ApplyRulesStatus(ctx context.Context, in *ApplyRulesStatusReq, opts ...grpc.CallOption) (*ApplyRulesStatusResp, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ApplyRulesStatus", varargs...)
+	ret0, _ := ret[0].(*ApplyRulesStatusResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ApplyRulesStatus indicates an expected call of ApplyRulesStatus
+func (mr *MockProjectsClientMockRecorder) ApplyRulesStatus(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStatus", reflect.TypeOf((*MockProjectsClient)(nil).ApplyRulesStatus), varargs...)
 }
 
 // CreateRule mocks base method
@@ -483,34 +503,49 @@ func (mr *MockProjectsServerMockRecorder) HandleEvent(arg0, arg1 interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockProjectsServer)(nil).HandleEvent), arg0, arg1)
 }
 
-// ProjectUpdateStatus mocks base method
-func (m *MockProjectsServer) ProjectUpdateStatus(arg0 context.Context, arg1 *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error) {
+// ApplyRulesStart mocks base method
+func (m *MockProjectsServer) ApplyRulesStart(arg0 context.Context, arg1 *ApplyRulesStartReq) (*ApplyRulesStartResp, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ProjectUpdateStatus", arg0, arg1)
-	ret0, _ := ret[0].(*ProjectUpdateStatusResp)
+	ret := m.ctrl.Call(m, "ApplyRulesStart", arg0, arg1)
+	ret0, _ := ret[0].(*ApplyRulesStartResp)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ProjectUpdateStatus indicates an expected call of ProjectUpdateStatus
-func (mr *MockProjectsServerMockRecorder) ProjectUpdateStatus(arg0, arg1 interface{}) *gomock.Call {
+// ApplyRulesStart indicates an expected call of ApplyRulesStart
+func (mr *MockProjectsServerMockRecorder) ApplyRulesStart(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateStatus", reflect.TypeOf((*MockProjectsServer)(nil).ProjectUpdateStatus), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStart", reflect.TypeOf((*MockProjectsServer)(nil).ApplyRulesStart), arg0, arg1)
 }
 
-// ProjectUpdateCancel mocks base method
-func (m *MockProjectsServer) ProjectUpdateCancel(arg0 context.Context, arg1 *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error) {
+// ApplyRulesCancel mocks base method
+func (m *MockProjectsServer) ApplyRulesCancel(arg0 context.Context, arg1 *ApplyRulesCancelReq) (*ApplyRulesCancelResp, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ProjectUpdateCancel", arg0, arg1)
-	ret0, _ := ret[0].(*ProjectUpdateCancelResp)
+	ret := m.ctrl.Call(m, "ApplyRulesCancel", arg0, arg1)
+	ret0, _ := ret[0].(*ApplyRulesCancelResp)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ProjectUpdateCancel indicates an expected call of ProjectUpdateCancel
-func (mr *MockProjectsServerMockRecorder) ProjectUpdateCancel(arg0, arg1 interface{}) *gomock.Call {
+// ApplyRulesCancel indicates an expected call of ApplyRulesCancel
+func (mr *MockProjectsServerMockRecorder) ApplyRulesCancel(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectUpdateCancel", reflect.TypeOf((*MockProjectsServer)(nil).ProjectUpdateCancel), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesCancel", reflect.TypeOf((*MockProjectsServer)(nil).ApplyRulesCancel), arg0, arg1)
+}
+
+// ApplyRulesStatus mocks base method
+func (m *MockProjectsServer) ApplyRulesStatus(arg0 context.Context, arg1 *ApplyRulesStatusReq) (*ApplyRulesStatusResp, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ApplyRulesStatus", arg0, arg1)
+	ret0, _ := ret[0].(*ApplyRulesStatusResp)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ApplyRulesStatus indicates an expected call of ApplyRulesStatus
+func (mr *MockProjectsServerMockRecorder) ApplyRulesStatus(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplyRulesStatus", reflect.TypeOf((*MockProjectsServer)(nil).ApplyRulesStatus), arg0, arg1)
 }
 
 // CreateRule mocks base method
