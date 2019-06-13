@@ -127,7 +127,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 		}
 
 		for _, job := range jobs {
-			logrus.Infof("Enqueueing individual scan job %s for %s (child of %s)", job.JobID, payload.ChildJobID, payload.ParentJobID)
+			logrus.Infof("Enqueueing individual scan job %q for %q (child of %q)", job.JobID, payload.ChildJobID, payload.ParentJobID)
 			w.EnqueueTask("scan-job", job)
 		}
 
@@ -424,8 +424,16 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (int
 		return nil, err
 	}
 
-	logrus.Debugf("Updating job %s with overall status of %s", jobsPayload.ChildJobID, jobsPayload.OverallJobStatus)
-	t.scannerServer.UpdateJobStatus(jobsPayload.ChildJobID, jobsPayload.OverallJobStatus, nil, timeNowRef())
+	// If this is a /recurring/ job, then we will have a
+	// ChildJobID and that is the one we want to update.
+	if jobsPayload.ChildJobID != "" {
+		logrus.Debugf("Updating job %s with overall status of %s", jobsPayload.ChildJobID, jobsPayload.OverallJobStatus)
+		t.scannerServer.UpdateJobStatus(jobsPayload.ChildJobID, jobsPayload.OverallJobStatus, nil, timeNowRef())
+	} else {
+		logrus.Debugf("Updating job %s with overall status of %s", jobsPayload.ParentJobID, jobsPayload.OverallJobStatus)
+		t.scannerServer.UpdateJobStatus(jobsPayload.ParentJobID, jobsPayload.OverallJobStatus, nil, timeNowRef())
+	}
+
 	return nil, nil
 }
 
