@@ -1,12 +1,5 @@
 BEGIN;
 
-CREATE TYPE staged_rule_state
-  AS ENUM (
-    'new',
-    'deleted',
-    'updated'
-    );
-
 CREATE TABLE iam_staged_project_rules (
   db_id SERIAL PRIMARY KEY,
   id TEXT NOT NULL UNIQUE,
@@ -15,7 +8,7 @@ CREATE TABLE iam_staged_project_rules (
   type TEXT NOT NULL,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  state staged_rule_state NOT NULL
+  deleted BOOLEAN
 );
 
 CREATE TABLE iam_staged_rule_conditions (
