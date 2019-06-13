@@ -1,14 +1,24 @@
 BEGIN;
 
+CREATE TABLE iam_staged_projects (
+  db_id SERIAL,
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  deleted BOOLEAN,
+  type iam_policy_type NOT NULL DEFAULT 'custom',
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+);
+
 CREATE TABLE iam_staged_project_rules (
   db_id SERIAL PRIMARY KEY,
   id TEXT NOT NULL UNIQUE,
-  project_id TEXT REFERENCES iam_projects,
+  project_id TEXT REFERENCES iam_staged_projects ON DELETE CASCADE,
   name TEXT NOT NULL,
   type TEXT NOT NULL,
+  deleted BOOLEAN,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  deleted BOOLEAN
 );
 
 CREATE TABLE iam_staged_rule_conditions (
