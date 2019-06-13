@@ -12,8 +12,15 @@ git fetch origin master
 # Fetch the git tags to see if that addresses the weird smart build behavior for Habitat
 git fetch --tags --force
 
+# rebase onto current master to ensure this PR is closer to what happens when it's merged
+git config user.email "you@example.com" # these are needed for the rebase attempt
+git config user.name "Your Name"
+if ! git rebase origin/master; then
+  git rebase --abort
+  buildkite-agent annotate --style warning --context rebase-pr-branch \
+    "Couldn't rebase onto origin/master ($(git show-ref -s origin/master)), building PR HEAD $(git show-ref -s HEAD)"
+fi
+
 # Count retries as BK annotations; don't make all jobs explode if the script
 # is removed.
 [[ -x "scripts/count_retries" ]] && scripts/count_retries
-
-git diff-tree -s --pretty=%B HEAD | buildkite-agent annotate --context built-commit --style info
