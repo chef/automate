@@ -43,7 +43,7 @@ CREATE OR REPLACE FUNCTION
 $$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION
-  query_staged_rule_table(_id TEXT)
+  query_rule_table_associations(_id TEXT)
   RETURNS TEXT[] AS $$
 
   SELECT ARRAY(

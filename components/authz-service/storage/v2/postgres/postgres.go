@@ -964,7 +964,7 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	}
 	
 	row:= tx.QueryRowContext(ctx,
-		`SELECT query_staged_rule_table($1);`, rule.ID)
+		`SELECT query_rule_table_associations($1);`, rule.ID)
 	if err != nil {
 		return nil, p.processError(err)
 	}
