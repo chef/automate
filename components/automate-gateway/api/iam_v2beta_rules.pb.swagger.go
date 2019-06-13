@@ -50,6 +50,22 @@ func init() {
         ]
       }
     },
+    "/iam/v2beta/apply-rules-status": {
+      "get": {
+        "operationId": "ApplyRulesStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaApplyRulesStatusResp"
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      }
+    },
     "/iam/v2beta/projects/{id}/rules": {
       "get": {
         "operationId": "ListRulesForProject",
@@ -197,6 +213,29 @@ func init() {
     },
     "v2betaApplyRulesStartResp": {
       "type": "object"
+    },
+    "v2betaApplyRulesStatusResp": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string"
+        },
+        "estimated_time_complete": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "percentage_complete": {
+          "type": "number",
+          "format": "float"
+        },
+        "failed": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "failure_message": {
+          "type": "string"
+        }
+      }
     },
     "v2betaCondition": {
       "type": "object",

@@ -79,4 +79,12 @@ service Rules {
     option (chef.automate.api.iam.policy).resource = "iam:rules";
     option (chef.automate.api.iam.policy).action = "iam:rules:cancel";
   };
+
+  rpc ApplyRulesStatus (ApplyRulesStatusReq) returns (ApplyRulesStatusResp) {
+    option (google.api.http).get = "/iam/v2beta/apply-rules-status";
+    option (chef.automate.api.policy).resource = "auth:rules";
+    option (chef.automate.api.policy).action = "apply-rules-status";
+    option (chef.automate.api.iam.policy).resource = "iam:rules";
+    option (chef.automate.api.iam.policy).action = "iam:rules:status";
+  };
 }
