@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"io/ioutil"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -108,6 +109,28 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 
 	if logLevel := g.GetV1().GetLog().GetLevel().GetValue(); logLevel != "" {
 		c.V1.Sys.Log.Level.Value = ac.GlobalLogLevelToNginxLevel(logLevel)
+	}
+
+	if gExternalAutomate := g.GetV1().GetExternal().GetAutomate(); gExternalAutomate.GetEnable().GetValue() {
+		uri := gExternalAutomate.GetNode().GetValue()
+		var isSSL bool
+		var endpoint string
+		if strings.HasPrefix(uri, "http://") {
+			isSSL = false
+			endpoint = strings.TrimPrefix(uri, "http://")
+		} else {
+			isSSL = true
+			endpoint = strings.TrimPrefix(uri, "https://")
+		}
+
+		c.V1.Sys.ExternalAutomate = &ConfigRequest_V1_System_ExternalAutomate{
+			Enable:      w.Bool(true),
+			SslUpstream: w.Bool(isSSL),
+			Endpoint:    w.String(endpoint),
+			RootCert:    gExternalAutomate.GetSsl().GetRootCert(),
+			ServerName:  gExternalAutomate.GetSsl().GetServerName(),
+			Token:       gExternalAutomate.GetAuth().GetToken(),
+		}
 	}
 }
 

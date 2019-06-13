@@ -162,7 +162,7 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 		}
 	}
 
-	switch c.GetV1().GetExternal().GetDataCollector().GetAuth().GetScheme().GetValue() {
+	switch c.GetV1().GetExternal().GetAutomate().GetAuth().GetScheme().GetValue() {
 	case "", "token":
 		break
 	default:

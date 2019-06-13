@@ -24,6 +24,7 @@ message ConfigRequest {
 			Nginx ngx = 4;
 			chef.automate.infra.config.TLSCredentials tls = 5;
 			RequiredRecipe required_recipe = 6;
+			ExternalAutomate external_automate = 7;
 
 			message Service {
 				google.protobuf.StringValue host = 1;
@@ -76,6 +77,15 @@ message ConfigRequest {
 				// Auto-calculated
 				google.protobuf.StringValue content_md5 = 3;
 			}
+
+			message ExternalAutomate {
+				google.protobuf.BoolValue enable = 1;
+				google.protobuf.BoolValue ssl_upstream = 2;
+				google.protobuf.StringValue endpoint = 3;
+				google.protobuf.StringValue token = 4;
+				google.protobuf.StringValue root_cert = 5;
+				google.protobuf.StringValue server_name = 6;
+			};
 		}
 
 		message Service {

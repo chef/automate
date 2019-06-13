@@ -55,10 +55,10 @@ export GEM_PATH={{pkgPathFor "core/bundler"}}
 # non root svc user and we need write access to the file
 cp {{pkg.svc_config_path}}/dark_launch_features.json {{pkg.svc_data_path}}
 
-{{#if cfg.external_data_collector.enable}}
+{{#if cfg.external_automate.enable}}
 # TODO(jaym): Our config should know how to deal with the token. We shouldn't be showing
 # it in this script
-echo -n "{{cfg.external_data_collector.auth.token}}" | \
+echo -n "{{cfg.external_automate.auth.token}}" | \
   secrets-helper insert data_collector.token
 {{~/if}}
 

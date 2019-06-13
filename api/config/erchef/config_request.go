@@ -108,7 +108,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		c.V1.Sys.Log.Level.Value = logLevel
 	}
 
-	c.V1.Sys.ExternalDataCollector = g.GetV1().GetExternal().GetDataCollector()
+	c.V1.Sys.ExternalAutomate = g.GetV1().GetExternal().GetAutomate()
 }
 
 // PrepareSystemConfig returns a system configuration that can be used
