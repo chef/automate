@@ -15,7 +15,6 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
-	log "github.com/sirupsen/logrus"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
@@ -158,8 +157,9 @@ func (s *state) UpdateProject(ctx context.Context,
 	return &api.UpdateProjectResp{Project: apiProject}, nil
 }
 
-func (s *state) ApplyRulesStart(ctx context.Context, req *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
-	log.Info("apply project rules: START")
+func (s *state) ApplyRulesStart(
+	context.Context, *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
+	s.log.Info("apply project rules: START")
 	err := s.projectUpdateManager.Start()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal,
@@ -168,21 +168,21 @@ func (s *state) ApplyRulesStart(ctx context.Context, req *api.ApplyRulesStartReq
 	return &api.ApplyRulesStartResp{}, nil
 }
 
-func (s *state) ApplyRulesCancel(ctx context.Context,
-	_ *api.ApplyRulesCancelReq) (*api.ApplyRulesCancelResp, error) {
-	log.Info("apply project rules: CANCEL")
+func (s *state) ApplyRulesCancel(
+	context.Context, *api.ApplyRulesCancelReq) (*api.ApplyRulesCancelResp, error) {
+	s.log.Info("apply project rules: CANCEL")
 	err := s.projectUpdateManager.Cancel()
 	if err != nil {
-		log.Errorf("Could not cancel project update: %v", err.Error())
+		s.log.Errorf("Could not cancel project update: %v", err.Error())
 	}
 	return &api.ApplyRulesCancelResp{}, nil
 }
 
-func (s *state) ApplyRulesStatus(ctx context.Context,
-	req *api.ApplyRulesStatusReq) (*api.ApplyRulesStatusResp, error) {
+func (s *state) ApplyRulesStatus(
+	context.Context, *api.ApplyRulesStatusReq) (*api.ApplyRulesStatusResp, error) {
 	time, err := ptypes.TimestampProto(s.projectUpdateManager.EstimatedTimeComplete())
 	if err != nil {
-		log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
+		s.log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
 	return &api.ApplyRulesStatusResp{
@@ -298,7 +298,7 @@ func (s *state) ListRulesForAllProjects(ctx context.Context,
 
 func (s *state) HandleEvent(ctx context.Context,
 	req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
-	log.Debugf("authz is handling your event %s", req.EventID)
+	s.log.Debugf("authz is handling your event %s", req.EventID)
 
 	response := &automate_event.EventResponse{}
 	if req.Type.Name == event.ProjectRulesUpdateStatus {
