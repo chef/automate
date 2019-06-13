@@ -23,13 +23,20 @@ func NewServer(client authn.TokensMgmtClient) *Server {
 func (s *Server) CreateToken(
 	ctx context.Context, in *pb_req.CreateTokenReq) (*pb_resp.CreateTokenResp, error) {
 
+	// If active value not specified, default to True.
+	var active bool
+	if in.Active == nil {
+		active = true
+	} else {
+		active = in.Active.GetValue()
+	}
 	var err error
 	var token *authn.Token
 	if in.Value != "" {
 		req := &authn.CreateTokenWithValueReq{
 			Id:          in.Id,
 			Description: in.Name,
-			Active:      in.Active,
+			Active:      active,
 			Value:       in.Value,
 			Projects:    in.Projects,
 		}
@@ -38,7 +45,7 @@ func (s *Server) CreateToken(
 		token, err = s.client.CreateToken(ctx, &authn.CreateTokenReq{
 			Id:          in.Id,
 			Description: in.Name,
-			Active:      in.Active,
+			Active:      active,
 			Projects:    in.Projects,
 		})
 	}
@@ -67,10 +74,18 @@ func (s *Server) GetToken(
 // UpdateToken uses a token ID to update the Name/Active fields only
 func (s *Server) UpdateToken(
 	ctx context.Context, req *pb_req.UpdateTokenReq) (*pb_resp.UpdateTokenResp, error) {
+	// If active value not specified, default to True.
+	var active bool
+	if req.Active == nil {
+		active = true
+	} else {
+		active = req.Active.GetValue()
+	}
+
 	resp, err := s.client.UpdateToken(ctx, &authn.UpdateTokenReq{
 		Id:          req.Id,
 		Description: req.Name,
-		Active:      req.Active,
+		Active:      active,
 		Projects:    req.Projects,
 	})
 	if err != nil {
