@@ -153,6 +153,7 @@ message Backups {
 		AWSCredentials credentials = 1;
 		Elasticsearch es = 2;
 		Bucket bucket = 3;
+		SSL ssl = 4;
 
 		message AWSCredentials {
 			google.protobuf.StringValue access_key = 1;
@@ -182,6 +183,10 @@ message Backups {
 			google.protobuf.StringValue endpoint = 1;
 			google.protobuf.StringValue base_path = 2;
 			google.protobuf.StringValue name = 3;
+		}
+
+		message SSL {
+			google.protobuf.StringValue root_cert = 1;
 		}
 	}
 }
