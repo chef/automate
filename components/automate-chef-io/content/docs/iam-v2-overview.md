@@ -19,8 +19,10 @@ IAM v2 is a beta release and its functionality is subject to change during this 
 This is an opt-in only feature during the beta period.
 Chef Automate users will not be automatically upgraded.
 
-We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2.
-If at any time you decide to opt back out of the beta and revert to v1, your original v1 policies will still be intact.
+We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2; however, you can choose to not port over v1 policies by using the provided 
+`--skip-policy-migration` flag with the upgrade command.
+
+Whether or not you migrate your v1 policies, if at any time you decide to opt back out of the beta and revert to v1, your original v1 policies will still be intact.
 Reverting to v1, however, will remove any new v2 policies or roles created while using IAM v2.
 Note that this applies only to policies and roles in this beta period. Users, teams, and tokens are currently shared between v1 and v2, but these are slated for separation before the full v2 release.
 
@@ -100,7 +102,7 @@ Actions    | list of operations the role manages, e.g., read IAM users, get comp
 
 ### Members and Policies
 
-A **member**  called a _subject_ in v1) may be a user, a team, or a token.
+A **member**  (called a _subject_ in v1) may be a user, a team, or a token.
 Users and teams may be *local*, meaning they are defined within Chef Automate, or managed by an external identity provider, specifically LDAP or SAML.
 In this so far, v2 and v1 behave the same.
 

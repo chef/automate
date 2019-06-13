@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"google.golang.org/grpc/codes"
 	grpc_status "google.golang.org/grpc/status"
 
@@ -106,9 +105,9 @@ func newIAMUpgradeToV2Cmd() *cobra.Command {
 		false,
 		"Upgrade to version 2.1 with beta project authorization.")
 
-	// all flags are hidden right now
-	cmd.PersistentFlags().VisitAll(func(f *pflag.Flag) { f.Hidden = !isDevMode() })
-
+	if !isDevMode() {
+		_ = cmd.PersistentFlags().MarkHidden("beta2.1")
+	}
 	return cmd
 }
 

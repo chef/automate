@@ -30,11 +30,15 @@ Creating default teams Editors and Viewers...
 Success: Enabled IAM v2
 ```
 
+Note: To upgrade without porting existing policies, use the `--skip-policy-migration` flag: `chef-automate iam upgrade-to-v2 --skip-policy-migration`.
+
 ## View Policies
 
 After you've logged in to Chef Automate, select the **Settings** tab in the top navigation bar, then select and locate the `Policies` section on the left hand panel.
 
-This lists all of your v2 policies:
+In this section, you can view all of your v2 policies. If you have upgraded without using the `--skip-policy-migration` flag, you will also see v1 policies.
+
+This includes the following:
 
 * New default (Chef-managed) policies: Administrator, Ingest, Editors, and Viewers.
 * Imported v1 default policies--now called *legacy policies*--in the new v2 policy format and marked with the `[Legacy]` prefix.
@@ -46,6 +50,8 @@ This lists all of your v2 policies:
 
 Now that you are up-and-running with v2 policies, as the first step we recommend that you reconstitute your v1 policies as v2 policies.
 Once that is done, then delete the old legacy v1 policies and you will have a clean, up-to-date system.
+
+Alternately, you can run `--skip-policy-migration` on upgrade to start without any policies at all. You will still need to create new v2 policies to preserve any IAM behavior from v1.
 
 The next few sections explain how to use Chef-managed policies and how to create custom policies.
 
