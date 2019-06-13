@@ -24,10 +24,8 @@ func (s *Server) CreateToken(
 	ctx context.Context, in *pb_req.CreateTokenReq) (*pb_resp.CreateTokenResp, error) {
 
 	// If active value not specified, default to True.
-	var active bool
-	if in.Active == nil {
-		active = true
-	} else {
+	active := true
+	if in.Active != nil {
 		active = in.Active.GetValue()
 	}
 	var err error
@@ -75,10 +73,8 @@ func (s *Server) GetToken(
 func (s *Server) UpdateToken(
 	ctx context.Context, req *pb_req.UpdateTokenReq) (*pb_resp.UpdateTokenResp, error) {
 	// If active value not specified, default to True.
-	var active bool
-	if req.Active == nil {
-		active = true
-	} else {
+	active := true
+	if req.Active != nil {
 		active = req.Active.GetValue()
 	}
 
