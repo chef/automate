@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc/codes"
 	grpc_status "google.golang.org/grpc/status"
@@ -420,7 +421,7 @@ func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 	tokenResp, err := apiClient.TokensV2Client().CreateToken(ctx, &policies_req.CreateTokenReq{
 		Id:     id,
 		Name:   name,
-		Active: true,
+		Active: &wrappers.BoolValue{Value: true},
 		// TODO (tc): Might want to let them specify a --projects list somehow eventually.
 		Projects: []string{},
 	})
