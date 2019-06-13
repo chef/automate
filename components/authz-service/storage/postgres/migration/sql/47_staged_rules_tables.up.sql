@@ -43,13 +43,13 @@ CREATE OR REPLACE FUNCTION
 $$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION
-  query_staged_rule_table(_rule_db_id TEXT)
+  query_staged_rule_table(_id TEXT)
   RETURNS TEXT[] AS $$
 
   SELECT ARRAY(
-    SELECT 'current' as TableName from iam_project_rules c where c.id=_rule_db_id
+    SELECT 'current' as TableName from iam_project_rules c where c.id=_id
     UNION
-    SELECT 'staged' as TableName from iam_staged_project_rules a where a.id=_rule_db_id
+    SELECT 'staged' as TableName from iam_staged_project_rules a where a.id=_id
     );
 
 $$ LANGUAGE sql;
