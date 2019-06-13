@@ -3428,7 +3428,8 @@ func TestCreateRule(t *testing.T) {
 			condition3, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2", "chef-server-3"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
-			rule, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
+			ruleID := "new-id-1"
+			rule, err := storage.NewRule(ruleID, "project-1", "name", ruleType,
 				[]storage.Condition{condition1, condition2, condition3})
 			require.NoError(t, err)
 			resp, err := store.CreateRule(ctx, &rule)
@@ -3436,7 +3437,8 @@ func TestCreateRule(t *testing.T) {
 			require.Equal(t, &rule, resp)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4 AND deleted=$5`,
 				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name, false))
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`,
+				ruleID))
 		},
 	}
 
