@@ -40,13 +40,13 @@ var empty = pb.Empty{}
 
 // New creates a new jobs server
 func New(db *pgdb.DB, connFactory *secureconn.Factory, eventsClient automate_event.EventServiceClient,
-	managerEndpoint string, remoteInspecVer string, workflowManager *workflow.WorkflowManager) *Server {
+	managerEndpoint string, workflowManager *workflow.WorkflowManager) *Server {
 	conf := &Server{
 		db:           db,
 		connFactory:  connFactory,
 		eventsClient: eventsClient,
 	}
-	conf.getComplianceAndSecretsConnection(connFactory, db, managerEndpoint, remoteInspecVer, workflowManager)
+	conf.getComplianceAndSecretsConnection(connFactory, db, managerEndpoint, workflowManager)
 	return conf
 }
 
@@ -54,7 +54,7 @@ func New(db *pgdb.DB, connFactory *secureconn.Factory, eventsClient automate_eve
 // the scheduler server is used to call the inspec-agent
 func (srv *Server) getComplianceAndSecretsConnection(
 	connectionFactory *secureconn.Factory, db *pgdb.DB,
-	managerEndpoint string, remoteInspecVer string, workflowManager *workflow.WorkflowManager) {
+	managerEndpoint string, workflowManager *workflow.WorkflowManager) {
 	if managerEndpoint == "" {
 		logrus.Errorf("complianceEndpoint and managerEndpoint cannot be empty or Dial will get stuck")
 		return
@@ -79,7 +79,7 @@ func (srv *Server) getComplianceAndSecretsConnection(
 	}
 
 	scanner := scanner.New(mgrClient, nodesClient, db)
-	srv.schedulerServer = scheduler.New(db, scanner, workflowManager)
+	srv.schedulerServer = scheduler.New(scanner, workflowManager)
 }
 
 // GetJobResultByNodeId returns the results row for a given job id and node id

@@ -10,20 +10,18 @@ import (
 	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/components/compliance-service/api/jobs"
-	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/scanner"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/workflow"
 )
 
 type Scheduler struct {
-	db              *pgdb.DB
 	scanner         *scanner.Scanner
 	workflowManager *workflow.WorkflowManager
 }
 
-func New(db *pgdb.DB, scanner *scanner.Scanner, workflowManager *workflow.WorkflowManager) *Scheduler {
-	return &Scheduler{db, scanner, workflowManager}
+func New(scanner *scanner.Scanner, workflowManager *workflow.WorkflowManager) *Scheduler {
+	return &Scheduler{scanner, workflowManager}
 }
 
 // Run a job. Schedule, resolve, distribute, and execute it.
@@ -76,23 +74,6 @@ func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
 		err := a.pushWorkflow(job)
 		if err != nil {
 			logrus.Errorf("Error handling job %q: %v", job.Id, err)
-		}
-	}
-}
-
-func (a *Scheduler) RunHungJobs(ctx context.Context, scheduledJobsIds []string) {
-	// send each of the jobs through
-	for _, jobID := range scheduledJobsIds {
-		job, err := a.db.GetJob(jobID)
-		if err != nil {
-			logrus.Errorf("RunHungJobs unable get job info: %v", err)
-			continue
-		}
-
-		err = a.Run(job)
-		if err != nil {
-			logrus.Errorf("RunHungJobs unable to hand job over to inspec agent %v", err)
-			continue
 		}
 	}
 }

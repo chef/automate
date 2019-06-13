@@ -87,14 +87,6 @@ func createPGBackend(conf *config.Postgres) (*pgdb.DB, error) {
 	return pgdb.New(conf)
 }
 
-// hand over the array of job ids to the scheduler to be executed by the inspec-agent
-func runHungJobs(ctx context.Context, scheduledJobsIds []string, schedulerServer *scheduler.Scheduler) {
-	for SERVICE_STATE != serviceStateStarted {
-		time.Sleep(time.Second)
-	}
-	schedulerServer.RunHungJobs(ctx, scheduledJobsIds)
-}
-
 // here we execute migrations, create the es and pg backends, read certs, set up the needed env vars,
 // and modify config info
 func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFactory *secureconn.Factory, esr relaxting.ES2Backend, statusSrv *statusserver.Server, err error) {
@@ -177,7 +169,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient, configManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
-		conf.Manager.Endpoint, conf.RemoteInspecVersion, workflowManager))
+		conf.Manager.Endpoint, workflowManager))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr))
 
 	ps := profilesserver.New(db, &esr, &conf.Profiles, eventClient, statusSrv)
@@ -439,7 +431,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	runner.InitWorkflowManager(workflowManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
 
 	workflowManager.Start(ctx)
-	schedulerServer := scheduler.New(db, scanner, workflowManager)
+	schedulerServer := scheduler.New(scanner, workflowManager)
 
 	// start polling for jobs with a recurrence schedule that are due to run.
 	// this function will sleep for one minute, then query the db for all jobs
