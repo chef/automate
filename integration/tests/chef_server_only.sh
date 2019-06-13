@@ -38,7 +38,6 @@ do_deploy() {
 do_test_deploy() {
     PATH="/hab/bin:/bin" chef-server-ctl test
     test_chef_server_ctl
-    do_test_deploy_default
 }
 
 do_backup() {
