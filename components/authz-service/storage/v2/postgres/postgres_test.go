@@ -3385,11 +3385,10 @@ func TestCreateRule(t *testing.T) {
 			rule, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
 				[]storage.Condition{condition1, condition2, condition3})
 			require.NoError(t, err)
+			
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4 AND state=$5`,
-				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name, "new"))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
 		"create event rule with multiple conditions": func(t *testing.T) {
@@ -3409,12 +3408,12 @@ func TestCreateRule(t *testing.T) {
 			rule, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
 				[]storage.Condition{condition1, condition2, condition3})
 			require.NoError(t, err)
-
+				assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4 AND state=$5`,
-				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name, "new"))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4 AND deleted=$5`,
+				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name, false))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
 	}
@@ -6338,14 +6337,14 @@ func insertRule(t *testing.T, db *testDB, rule storage.Rule) {
 	t.Helper()
 	row := db.QueryRow(`
 		INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
-		rule.ID, rule.ProjectID, rule.Name, rule.Type)
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
 	var dbID string
 	err := row.Scan(&dbID)
 	require.NoError(t, err)
 	for _, c := range rule.Conditions {
 		_, err = db.Exec(`
 			INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
-			dbID, pq.Array(c.Value), c.Attribute, c.Operator)
+			dbID, pq.Array(c.Value), c.Attribute.String(), c.Operator.String())
 		require.NoError(t, err)
 	}
 }
@@ -6367,14 +6366,14 @@ func insertRuleWithMultipleConditions(t *testing.T, db *testDB, projID string, r
 
 	row := db.QueryRow(`
 		INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
-		rule.ID, projID, rule.Name, ruleType)
+		rule.ID, projID, rule.Name, ruleType.String())
 	var dbID string
 	err = row.Scan(&dbID)
 	require.NoError(t, err)
 	for _, c := range rule.Conditions {
 		_, err = db.Exec(`
 			INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
-			dbID, pq.Array(c.Value), c.Attribute, c.Operator)
+			dbID, pq.Array(c.Value), c.Attribute.String(), c.Operator.String())
 		require.NoError(t, err)
 	}
 	return &rule

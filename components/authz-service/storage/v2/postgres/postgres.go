@@ -963,25 +963,23 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		return nil, p.processError(err)
 	}
 	
-	// we have to check that the rule doesn't already exist in the current rules table
-	// since the uniqueness constraint only applies to iam_staged_project_rules
-	// TODO extract into helper
-	res, err := tx.ExecContext(ctx,
-		`SELECT COUNT( * ) FROM iam_project_rules WHERE id=$1;`, rule.ID)
+	row:= tx.QueryRowContext(ctx,
+		`SELECT query_staged_rule_table($1);`, rule.ID)
 	if err != nil {
 		return nil, p.processError(err)
 	}
-	count, err:= res.RowsAffected()
-	if err != nil {
+	var associations []string
+	if err := row.Scan(pq.Array(&associations)); err != nil {
 		return nil, p.processError(err)
 	}
-	if count > 0 {
+	// If any associations return, then the rule already exists in current, staged, or both tables
+	if len(associations) > 0 {
 		return nil, storage_errors.ErrConflict
 	}
 
-	row := tx.QueryRowContext(ctx,
-		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, state) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
-		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
+	row = tx.QueryRowContext(ctx,
+		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false)
 	var ruleDbID string
 	if err := row.Scan(&ruleDbID); err != nil {
 		return nil, p.processError(err)
@@ -989,8 +987,8 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	for _, condition := range rule.Conditions {
 		_, err := tx.ExecContext(ctx,
-			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
-			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
+			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator, deleted) VALUES ($1, $2, $3, $4, $5);`,
+			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(), false,
 		)
 		if err != nil {
 			return nil, p.processError(err)
