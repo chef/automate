@@ -6176,7 +6176,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 	}
 }
 
-func assertProjectsMatch(t *testing.T, db *testDB, project storage.Project) {
+func assertProjectsMatch(t *testing.T, db *testhelpers.TestDB, project storage.Project) {
 	t.Helper()
 	dbProject := storage.Project{}
 	err := db.QueryRow(`SELECT query_project($1, '{}');`, project.ID).Scan(&dbProject)
@@ -6357,7 +6357,7 @@ func insertStatementProject(t *testing.T, db *testhelpers.TestDB, statementID uu
 	require.NoError(t, err)
 }
 
-func insertRule(t *testing.T, db *testDB, rule storage.Rule) {
+func insertRule(t *testing.T, db *testhelpers.TestDB, rule storage.Rule) {
 	t.Helper()
 	row := db.QueryRow(`
 		INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
@@ -6373,7 +6373,7 @@ func insertRule(t *testing.T, db *testDB, rule storage.Rule) {
 	}
 }
 
-func insertStagedRule(t *testing.T, db *testDB, rule storage.Rule) {
+func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule storage.Rule) {
 	t.Helper()
 	row := db.QueryRow(`
 		INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
@@ -6389,7 +6389,7 @@ func insertStagedRule(t *testing.T, db *testDB, rule storage.Rule) {
 	}
 }
 
-func insertRuleWithMultipleConditions(t *testing.T, db *testDB, projID string, ruleType storage.RuleType) *storage.Rule {
+func insertRuleWithMultipleConditions(t *testing.T, db *testhelpers.TestDB, projID string, ruleType storage.RuleType) *storage.Rule {
 	t.Helper()
 	condition1, err := storage.NewCondition(ruleType,
 		[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
@@ -6417,90 +6417,6 @@ func insertRuleWithMultipleConditions(t *testing.T, db *testDB, projID string, r
 		require.NoError(t, err)
 	}
 	return &rule
-}
-
-func setup(t *testing.T) (storage.Storage, *testDB, *prng.Prng) {
-	t.Helper()
-
-	ctx := context.Background()
-	l, err := logger.NewLogger("text", "error")
-	require.NoError(t, err, "init logger for postgres storage")
-
-	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/migration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	if migrationConfig == nil && dataMigrationConfig == nil {
-		t.Skipf("start pg container and set PG_URL to run")
-	}
-
-	// reset database the hard way -- we do this to ensure that our comparison
-	// between database content and hardcoded storage default policies actually
-	// compares the migrated policies with the hardcoded ones (and NOT the
-	// hardcoded policies with the hardcoded policies).
-	db := openDB(t)
-	_, err = db.ExecContext(ctx, resetDatabaseStatement)
-	require.NoError(t, err, "error resetting database")
-	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
-	require.NoError(t, err, "error creating extension")
-
-	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
-	require.NoError(t, err)
-	return backend, &testDB{DB: db}, prng.Seed(t)
-}
-
-// migrationConfigIfPGTestsToBeRun either returns the pg migration config
-// if PG_URL is set or we are in CI, otherwise it returns nil, indicating
-// postgres based tests shouldn't be run.
-func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*migration.Config, error) {
-	customPGURL, pgURLPassed := os.LookupEnv("PG_URL")
-	ciMode := os.Getenv("CI") == "true"
-
-	// If in CI mode, use the default
-	if ciMode {
-		pgURL, err := url.Parse("postgres://postgres@127.0.0.1:5432/authz_test?sslmode=disable")
-		if err != nil {
-			return nil, err
-		}
-		return &migration.Config{
-			Path:   migrationPath,
-			Logger: l,
-			PGURL:  pgURL,
-		}, nil
-	}
-
-	// If PG_URL wasn't passed (and we aren't in CI)
-	// we shouldn't run the postgres tests, return nil.
-	if !pgURLPassed {
-		return nil, nil
-	}
-
-	pgURL, err := url.Parse(customPGURL)
-	if err != nil {
-		return nil, err
-	}
-
-	return &migration.Config{
-		Path:   migrationPath,
-		Logger: l,
-		PGURL:  pgURL,
-	}, nil
-}
-
-func openDB(t *testing.T) *sql.DB {
-	t.Helper()
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable")
-	require.NoError(t, err, "error opening db")
-	err = db.Ping()
-	require.NoError(t, err, "error pinging db")
-
-	return db
 }
 
 func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
