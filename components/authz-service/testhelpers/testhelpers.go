@@ -17,7 +17,7 @@ import (
 	"github.com/chef/automate/components/authz-service/config"
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
-	"github.com/chef/automate/components/authz-service/server/v2"
+	server "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
@@ -55,7 +55,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (api.ProjectsClient, *TestDB, sto
 
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
-	projectsSrv, err := v2.NewProjectsServer(ctx, l, pg, &TestProjectRulesRetriever{},
+	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, &TestProjectRulesRetriever{},
 		eventServiceClient, configMgr)
 	require.NoError(t, err)
 
