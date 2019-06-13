@@ -16,6 +16,7 @@ import {
   serviceGroupStatus, allServiceGroups, serviceGroupState, allServiceGroupHealth
 } from '../../entities/service-groups/service-groups.selector';
 import { find, includes, get } from 'lodash/fp';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-service-groups',
@@ -72,7 +73,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit() {
@@ -126,6 +128,10 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
           this.selectedStatus = 'total';
           this.totalServiceGroups = get('total', this.sgHealthSummary);
       }
+      this.telemetryService.track('applicationServiceGroupCount', {
+        totalServiceGroups: this.totalServiceGroups,
+        statusFilter: status
+      });
     });
 
     this.healthSummary$ = this.store.select(allServiceGroupHealth);
@@ -201,6 +207,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     const queryParams = {...this.route.snapshot.queryParams};
     if ( includes(status, this.allowedStatus) ) {
       queryParams['status'] = [status];
+      this.telemetryService.track('applicationStatusFilter',
+        { entity: 'serviceGroup', statusFilter: status});
     } else {
       delete queryParams['status'];
     }
@@ -254,7 +262,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   onPageChange(pageNumber: number) {
     const queryParams = { ...this.route.snapshot.queryParams, page: pageNumber };
-
+    const totalPages = Math.ceil(this.totalServiceGroups / this.pageSize) || 1;
+    this.telemetryService.track('applicationPageChange',
+     { entity: 'serviceGroup', pageNumber: pageNumber, totalPages: totalPages});
     if (pageNumber <= 1) {
       delete queryParams['page'];
     }
@@ -277,6 +287,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   onUpdateSort(event): void {
     const {field, fieldDirection} = event;
+    this.telemetryService.track('applicationSort',
+      { field: field, fieldDirection: fieldDirection});
     if (this.defaultFieldDirection.hasOwnProperty(field) &&
       this.allowedSortDirections.includes(fieldDirection) ) {
       const queryParams = {...this.route.snapshot.queryParams,
