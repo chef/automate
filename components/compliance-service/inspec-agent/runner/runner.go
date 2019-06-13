@@ -53,9 +53,10 @@ func InitWorkflowManager(w *workflow.WorkflowManager, workerCount int, ingestCli
 
 type ScanJobWorkflow struct{}
 type ScanJobWorkflowPayload struct {
-	OutstandingJobs int
-	ParentJobID     string
-	ParentJobStatus string
+	OutstandingJobs  int
+	ParentJobID      string
+	ChildJobID       string
+	OverallJobStatus string
 }
 
 func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
@@ -77,6 +78,7 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 	return w.Continue(&ScanJobWorkflowPayload{
 		0,
 		job.Id,
+		"",
 		types.StatusRunning,
 	})
 }
@@ -103,10 +105,12 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 			logrus.WithError(err).Error("Failed to unmarshal job!")
 			return w.Complete()
 		}
+		payload.ChildJobID = childJob.Id
 		w.EnqueueTask("resolve-job", childJob)
 		return w.Continue(&payload)
 	case "resolve-job":
 		if ev.Result.Err() != nil {
+			logrus.WithError(ev.Result.Err()).Debug("resolve-job failed with error")
 			return w.Complete()
 		}
 
@@ -123,6 +127,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 		}
 
 		for _, job := range jobs {
+			logrus.Infof("Enqueueing individual scan job %s for %s (child of %s)", job.JobID, payload.ChildJobID, payload.ParentJobID)
 			w.EnqueueTask("scan-job", job)
 		}
 
@@ -138,21 +143,21 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 		logrus.Debugf("ScanJobWorkflow > OnTaskComplete with %d outstanding jobs and childJobStatus of %s", payload.OutstandingJobs, childJobStatus)
 
 		if childJobStatus == types.StatusFailed {
-			payload.ParentJobStatus = types.StatusFailed
+			payload.OverallJobStatus = types.StatusFailed
 		}
 		switch childJobStatus {
 		case types.StatusFailed:
-			payload.ParentJobStatus = types.StatusFailed
+			payload.OverallJobStatus = types.StatusFailed
 		case types.StatusAborted:
-			if payload.ParentJobStatus != types.StatusFailed {
-				payload.ParentJobStatus = types.StatusAborted
+			if payload.OverallJobStatus != types.StatusFailed {
+				payload.OverallJobStatus = types.StatusAborted
 			}
 		}
 
 		if payload.OutstandingJobs <= 0 {
 			// No more jobs left to run, if status hasn't changed from the initial Running, we change it to Completed
-			if payload.ParentJobStatus == types.StatusRunning {
-				payload.ParentJobStatus = types.StatusCompleted
+			if payload.OverallJobStatus == types.StatusRunning {
+				payload.OverallJobStatus = types.StatusCompleted
 			}
 			w.EnqueueTask("scan-job-summary", payload)
 		}
@@ -417,8 +422,8 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (int
 		return nil, err
 	}
 
-	logrus.Debugf("Updating parent job %s with overall status of %s", jobsPayload.ParentJobID, jobsPayload.ParentJobStatus)
-	t.scannerServer.UpdateJobStatus(jobsPayload.ParentJobID, jobsPayload.ParentJobStatus, nil, timeNowRef())
+	logrus.Debugf("Updating job %s with overall status of %s", jobsPayload.ChildJobID, jobsPayload.OverallJobStatus)
+	t.scannerServer.UpdateJobStatus(jobsPayload.ChildJobID, jobsPayload.OverallJobStatus, nil, timeNowRef())
 	return nil, nil
 }
 
@@ -430,10 +435,8 @@ func (t *CreateChildTask) Run(ctx context.Context, task workflow.Task) (interfac
 	}
 
 	job.JobCount++
-	job.Name = fmt.Sprintf("%s - run %d", job.Name, job.JobCount)
-	job.Recurrence = ""
-
 	t.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+
 	childJob, err := t.scanner.CreateChildJob(&job)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to create child job")

@@ -369,6 +369,8 @@ func (s *Scanner) UpdateParentJobSchedule(jobId string, jobCount int32, recurren
 func (s *Scanner) CreateChildJob(job *jobs.Job) (*jobs.Job, error) {
 	// create a child job with parent job id association
 	childJob := job
+	job.Name = fmt.Sprintf("%s - run %d", job.Name, job.JobCount)
+	childJob.Recurrence = ""
 	childJob.ParentId = job.Id
 	childJob.JobCount = 0
 
