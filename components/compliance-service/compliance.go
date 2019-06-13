@@ -472,24 +472,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	}
 
 	SERVICE_STATE = serviceStateStarted
-	go checkAndRunHungJobs(ctx, scanner, schedulerServer)
 	return nil
-}
-
-func checkAndRunHungJobs(ctx context.Context, scannerServer *scanner.Scanner,
-	schedulerServer *scheduler.Scheduler) {
-	// check for 'abandoned' jobs by querying for jobs with a status of running or scheduled
-	// of type exec that have not been marked for deletion. jobs with a status of running will
-	// be marked as aborted.  only jobs with a status of scheduled will be returned.
-	// this is done b/c the inspec-agent is ephemeral -- if a service restart occurs when the agent
-	// has already been given jobs, it will lose all references to those jobs
-	scheduledJobsIds, err := scannerServer.CheckForHungJobs(ctx)
-	if err != nil {
-		logrus.Errorf("unable to check for abandoned jobs %+v", err)
-	} else {
-		// hand over all 'abandoned' jobs with status scheduled to the scheduler
-		runHungJobs(ctx, scheduledJobsIds, schedulerServer)
-	}
 }
 
 // Serve grpc
