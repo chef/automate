@@ -3390,9 +3390,6 @@ func TestCreateRule(t *testing.T) {
 				[]storage.Condition{condition1, condition2, condition3})
 			require.Error(t, err)
 		},
-		// TODO
-		// case: cannot create rule if it already exists in current rules
-		// case: cannot create rule if it already exists in staged rules
 		"create node rule with multiple conditions": func(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
@@ -3434,7 +3431,6 @@ func TestCreateRule(t *testing.T) {
 			rule, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
 				[]storage.Condition{condition1, condition2, condition3})
 			require.NoError(t, err)
-				assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
