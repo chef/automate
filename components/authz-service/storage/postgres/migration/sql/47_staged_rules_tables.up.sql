@@ -28,7 +28,7 @@ CREATE OR REPLACE FUNCTION
       r.project_id,
       r.name,
       r.type,
-      r.deleted
+      r.deleted,
       -- A rule can't exist without conditions so we don't need to worry
       -- about null case here.
       json_agg(rc) AS conditions
@@ -39,6 +39,8 @@ CREATE OR REPLACE FUNCTION
     GROUP BY r.id, r.project_id, r.name, r.type, r.deleted
   )
   SELECT row_to_json(t) AS rule FROM t;
+
+$$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION
   query_staged_rule_table(_rule_db_id TEXT)
