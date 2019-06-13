@@ -83,19 +83,10 @@
   },
   {
     "collection": "workflow",
-    "data_services": [
-      "chef/backup-gateway",
-      "chef/automate-postgresql"
-    ],
+    "data_services": [],
     "all_services": [
-      "chef/backup-gateway",
-      "chef/deployment-service",
-      "chef/automate-postgresql",
-      "chef/automate-pg-gateway",
-      "chef/pg-sidecar-service",
       "chef/automate-workflow-server",
-      "chef/automate-workflow-nginx",
-      "chef/automate-load-balancer"
+      "chef/automate-workflow-nginx"
     ],
     "pinned_packages": [],
     "extra_packages": [],
