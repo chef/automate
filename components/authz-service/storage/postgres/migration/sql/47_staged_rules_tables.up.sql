@@ -6,7 +6,7 @@ CREATE TABLE iam_staged_project_rules (
   project_id TEXT REFERENCES iam_projects ON DELETE CASCADE,
   name TEXT NOT NULL,
   type TEXT NOT NULL,
-  deleted BOOLEAN
+  deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE iam_staged_rule_conditions (
@@ -15,7 +15,7 @@ CREATE TABLE iam_staged_rule_conditions (
   value TEXT[] NOT NULL,
   attribute TEXT NOT NULL,
   operator TEXT NOT NULL,
-  deleted BOOLEAN
+  deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE OR REPLACE FUNCTION
