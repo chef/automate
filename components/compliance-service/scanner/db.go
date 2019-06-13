@@ -163,7 +163,7 @@ func (s *Scanner) GetDueJobs(nowTime time.Time) []*jobs.Job {
 	if len(sqlIds) > 0 {
 		logrus.Debugf("GetDueJobs, these are the ready jobs job_ids %v", sqlIds)
 	}
-	// get each job, update parent job and create child job
+	// get each job, update parent job
 	for _, id := range sqlIds {
 		job, err := s.DB.GetJob(id)
 		if err != nil {

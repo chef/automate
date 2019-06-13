@@ -265,6 +265,8 @@ func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{
 	job.StartTime = timeNowRef()
 	job.NodeStatus = types.StatusRunning
 
+	t.scannerServer.UpdateJobStatus(job.JobID, job.NodeStatus, job.StartTime, nil)
+
 	currentJobSummary := job.JobType + " " + job.TargetConfig.Backend + " " + job.TargetConfig.Hostname
 
 	if job.JobType != types.JobTypeDetect && job.JobType != types.JobTypeExec {

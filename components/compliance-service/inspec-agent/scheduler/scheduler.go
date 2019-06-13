@@ -64,8 +64,9 @@ func (a *Scheduler) PollForJobs(ctx context.Context) {
 	}
 }
 
-// processDueJobs uses GetDueJobs to query the database for any recurring jobs that are due to be run
-// For every due recurrent job, a child job is created and then the recurrent(parent) job updated
+// processDueJobs uses GetDueJobs to query the database for any
+// recurring jobs that are due to be run. For every due recurrent job,
+// we push that job onto the workflow queue.
 func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
 	dueJobs := a.scanner.GetDueJobs(nowTime)
 	if len(dueJobs) > 0 {
