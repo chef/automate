@@ -211,6 +211,14 @@ func WithChefServerEnabled(enabled bool) func(*AutomateConfig) error {
 	}
 }
 
+func WithCollections(collections []string) func(*AutomateConfig) error {
+	return func(c *AutomateConfig) error {
+		svc := c.GetDeployment().GetV1().GetSvc()
+		svc.Collections = collections
+		return nil
+	}
+}
+
 func (c *AutomateConfig) SetChefServerEnabled(enabled bool) error {
 	return c.OverrideConfigValues(&AutomateConfig{
 		Deployment: &ConfigRequest{
