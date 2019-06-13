@@ -123,7 +123,7 @@ func (s *Server) DeleteRule(ctx context.Context, req *pb_req.DeleteRuleReq) (*pb
 	return &pb_resp.DeleteRuleResp{}, nil
 }
 
-func (s *Server) ApplyRulesStart(ctx context.Context, req *pb_req.ApplyRulesStartReq) (*pb_resp.ApplyRulesStartResp, error) {
+func (s *Server) ApplyRulesStart(ctx context.Context, _ *pb_req.ApplyRulesStartReq) (*pb_resp.ApplyRulesStartResp, error) {
 	_, err := s.projects.ApplyRulesStart(ctx, &authz.ApplyRulesStartReq{})
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (s *Server) ApplyRulesStart(ctx context.Context, req *pb_req.ApplyRulesStar
 }
 
 func (s *Server) ApplyRulesCancel(ctx context.Context,
-	req *pb_req.ApplyRulesCancelReq) (*pb_resp.ApplyRulesCancelResp, error) {
+	_ *pb_req.ApplyRulesCancelReq) (*pb_resp.ApplyRulesCancelResp, error) {
 
 	_, err := s.projects.ApplyRulesCancel(ctx, &authz.ApplyRulesCancelReq{})
 	if err != nil {
@@ -142,7 +142,7 @@ func (s *Server) ApplyRulesCancel(ctx context.Context,
 }
 
 func (s *Server) ApplyRulesStatus(ctx context.Context,
-	req *pb_req.ApplyRulesStatusReq) (*pb_resp.ApplyRulesStatusResp, error) {
+	_ *pb_req.ApplyRulesStatusReq) (*pb_resp.ApplyRulesStatusResp, error) {
 
 	resp, err := s.projects.ApplyRulesStatus(ctx, &authz.ApplyRulesStatusReq{})
 	if err != nil {
