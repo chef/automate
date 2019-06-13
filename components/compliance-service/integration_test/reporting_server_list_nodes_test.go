@@ -361,6 +361,58 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			},
 			expectedIds: []string{"3", "2"},
 		},
+		{
+			description: "chef_server: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:     "1",
+					SourceFQDN: "A2-prod",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "a2-Dev",
+				},
+				{
+					NodeID:     "3",
+					SourceFQDN: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "chef_server",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "chef_server: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:     "1",
+					SourceFQDN: "A2-prod",
+				},
+				{
+					NodeID:     "2",
+					SourceFQDN: "a2-Dev",
+				},
+				{
+					NodeID:     "3",
+					SourceFQDN: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "chef_server",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
 
 		// chef tags
 		{
@@ -414,6 +466,58 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				},
 			},
 			expectedIds: []string{"3", "2"},
+		},
+		{
+			description: "chef_tags: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"A2-prod"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"a2-Dev"},
+				},
+				{
+					NodeID:   "3",
+					ChefTags: []string{"A1-dev"},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "chef_tags",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "chef_tags: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:   "1",
+					ChefTags: []string{"A2-prod"},
+				},
+				{
+					NodeID:   "2",
+					ChefTags: []string{"a2-Dev"},
+				},
+				{
+					NodeID:   "3",
+					ChefTags: []string{"A1-dev"},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "chef_tags",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
 		},
 
 		// environment
@@ -469,6 +573,58 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			},
 			expectedIds: []string{"3", "2"},
 		},
+		{
+			description: "environment: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:      "1",
+					Environment: "A2-prod",
+				},
+				{
+					NodeID:      "2",
+					Environment: "a2-Dev",
+				},
+				{
+					NodeID:      "3",
+					Environment: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "environment",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "environment: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:      "1",
+					Environment: "A2-prod",
+				},
+				{
+					NodeID:      "2",
+					Environment: "a2-Dev",
+				},
+				{
+					NodeID:      "3",
+					Environment: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "environment",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
 
 		// node
 		{
@@ -523,6 +679,58 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			},
 			expectedIds: []string{"3", "2"},
 		},
+		{
+			description: "node: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:   "1",
+					NodeName: "A2-prod",
+				},
+				{
+					NodeID:   "2",
+					NodeName: "a2-Dev",
+				},
+				{
+					NodeID:   "3",
+					NodeName: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "node_name",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "node: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:   "1",
+					NodeName: "A2-prod",
+				},
+				{
+					NodeID:   "2",
+					NodeName: "a2-Dev",
+				},
+				{
+					NodeID:   "3",
+					NodeName: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "node_name",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
 
 		// organization
 		{
@@ -576,6 +784,58 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				},
 			},
 			expectedIds: []string{"3", "2"},
+		},
+		{
+			description: "organization: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:           "1",
+					OrganizationName: "A2-prod",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "a2-Dev",
+				},
+				{
+					NodeID:           "3",
+					OrganizationName: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "organization",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "organization: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:           "1",
+					OrganizationName: "A2-prod",
+				},
+				{
+					NodeID:           "2",
+					OrganizationName: "a2-Dev",
+				},
+				{
+					NodeID:           "3",
+					OrganizationName: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "organization",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
 		},
 
 		// platform
@@ -667,6 +927,94 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			},
 			expectedIds: []string{"3", "2"},
 		},
+		{
+			description: "platform: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "A2-prod",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "a2-Dev",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "A1-dev",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "platform: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "A2-prod",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "a2-Dev",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "A1-dev",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
 
 		// Policy group
 		{
@@ -720,6 +1068,58 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				},
 			},
 			expectedIds: []string{"3", "2"},
+		},
+		{
+			description: "policy_group: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:      "1",
+					PolicyGroup: "A2-prod",
+				},
+				{
+					NodeID:      "2",
+					PolicyGroup: "a2-Dev",
+				},
+				{
+					NodeID:      "3",
+					PolicyGroup: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "policy_group",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "policy_group: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:      "1",
+					PolicyGroup: "A2-prod",
+				},
+				{
+					NodeID:      "2",
+					PolicyGroup: "a2-Dev",
+				},
+				{
+					NodeID:      "3",
+					PolicyGroup: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "policy_group",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
 		},
 
 		// Policy Name
@@ -775,6 +1175,58 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			},
 			expectedIds: []string{"3", "2"},
 		},
+		{
+			description: "policy_name: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:     "1",
+					PolicyName: "A2-prod",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "a2-Dev",
+				},
+				{
+					NodeID:     "3",
+					PolicyName: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "policy_name",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "policy_name: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:     "1",
+					PolicyName: "A2-prod",
+				},
+				{
+					NodeID:     "2",
+					PolicyName: "a2-Dev",
+				},
+				{
+					NodeID:     "3",
+					PolicyName: "A1-dev",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "policy_name",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
 
 		// Recipe
 		{
@@ -828,6 +1280,58 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				},
 			},
 			expectedIds: []string{"3", "2"},
+		},
+		{
+			description: "recipe: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:  "1",
+					Recipes: []string{"A2-prod"},
+				},
+				{
+					NodeID:  "2",
+					Recipes: []string{"a2-Dev"},
+				},
+				{
+					NodeID:  "3",
+					Recipes: []string{"A1-dev"},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "recipe",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "recipe: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:  "1",
+					Recipes: []string{"A2-prod"},
+				},
+				{
+					NodeID:  "2",
+					Recipes: []string{"a2-Dev"},
+				},
+				{
+					NodeID:  "3",
+					Recipes: []string{"A1-dev"},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "recipe",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
 		},
 
 		// Roles
@@ -883,6 +1387,58 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			},
 			expectedIds: []string{"3", "2"},
 		},
+		{
+			description: "role: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Roles:  []string{"A2-prod"},
+				},
+				{
+					NodeID: "2",
+					Roles:  []string{"a2-Dev"},
+				},
+				{
+					NodeID: "3",
+					Roles:  []string{"A1-dev"},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "role",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "role: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Roles:  []string{"A2-prod"},
+				},
+				{
+					NodeID: "2",
+					Roles:  []string{"a2-Dev"},
+				},
+				{
+					NodeID: "3",
+					Roles:  []string{"A1-dev"},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "role",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
 
 		// Profile
 		{
@@ -918,6 +1474,82 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					{
 						Type:   "profile_name",
 						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "Profile: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Title: "A2-prod",
+						},
+					},
+				},
+				{
+					NodeID: "2",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Title: "A2-dev",
+						},
+					},
+				},
+				{
+					NodeID: "3",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Title: "a1-dev",
+						},
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "profile_name",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "Profile: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Title: "A2-prod",
+						},
+					},
+				},
+				{
+					NodeID: "2",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Title: "a2-dev",
+						},
+					},
+				},
+				{
+					NodeID: "3",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Title: "a1-dev",
+						},
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "profile_name",
+						Values: []string{"A2-*"},
 					},
 				},
 			},
@@ -970,6 +1602,106 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 					{
 						Type:   "control_name",
 						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "control: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "A2-prod",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "2",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "A2-dev",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "3",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a1-dev",
+								},
+							},
+						},
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "control_name",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "control: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a2-prod",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "2",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "A2-dev",
+								},
+							},
+						},
+					},
+				},
+				{
+					NodeID: "3",
+					Profiles: []relaxting.ESInSpecReportProfile{
+						{
+							Controls: []relaxting.ESInSpecReportControl{
+								{
+									Title: "a1-dev",
+								},
+							},
+						},
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "control_name",
+						Values: []string{"A2-*"},
 					},
 				},
 			},

@@ -39,7 +39,7 @@ func New(es *relaxting.ES2Backend) *Server {
 func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*reporting.Reports, error) {
 	var reports reporting.Reports
 	var SORT_FIELDS = map[string]string{
-		"node_name":                              "node_name.lower",
+		"node_name":                              "node_name",
 		"latest_report.end_time":                 "end_time",
 		"latest_report.status":                   "status",
 		"latest_report.controls.failed.total":    "controls_sums.failed.total",
@@ -108,8 +108,8 @@ func (srv *Server) ListSuggestions(ctx context.Context, in *reporting.Suggestion
 func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*reporting.ProfileMins, error) {
 	var profileMins reporting.ProfileMins
 	var SORT_FIELDS = map[string]string{
-		"name":  "name.lower",
-		"title": "title.lower",
+		"name":  "name",
+		"title": "title",
 	}
 	from, perPage, sort, asc, err := validatePaginationAndSorting(in, SORT_FIELDS, "title")
 	if err != nil {
@@ -258,9 +258,9 @@ func csvExport(stream reporting.ReportingService_ExportServer) exportHandler {
 func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporting.Nodes, error) {
 	var nodes reporting.Nodes
 	var SORT_FIELDS = map[string]string{
-		"name":                                   "node_name.lower",
-		"environment":                            "environment.lower",
-		"platform":                               "platform.name.lower",
+		"name":                                   "node_name",
+		"environment":                            "environment",
+		"platform":                               "platform.name",
 		"status":                                 "status",
 		"latest_report.status":                   "status",
 		"latest_report.end_time":                 "end_time",
