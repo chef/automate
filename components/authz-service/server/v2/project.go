@@ -367,7 +367,7 @@ func (s *state) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (*api.Up
 }
 
 func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
-	resp, err := s.store.GetStagedOrCurrentRule(ctx, req.Id)
+	resp, err := s.store.GetStagedOrAppliedRule(ctx, req.Id)
 	if err != nil {
 		if err == storage_errors.ErrNotFound {
 			return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)

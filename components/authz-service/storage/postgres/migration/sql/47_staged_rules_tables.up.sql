@@ -66,9 +66,9 @@ CREATE OR REPLACE FUNCTION
   RETURNS TEXT[] AS $$
 
   SELECT ARRAY(
-    SELECT 'current' as TableName from iam_project_rules c where c.id=_id
+    SELECT 'applied' as TableName from iam_project_rules a where a.id=_id
     UNION
-    SELECT 'staged' as TableName from iam_staged_project_rules a where a.id=_id
+    SELECT 'staged' as TableName from iam_staged_project_rules s where s.id=_id
     );
 
 $$ LANGUAGE sql;

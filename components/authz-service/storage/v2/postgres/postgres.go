@@ -1103,7 +1103,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	return nil
 }
 
-func (p *pg) GetStagedOrCurrentRule(ctx context.Context, id string) (*v2.Rule, error) {
+func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
