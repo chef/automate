@@ -146,14 +146,14 @@ func (s *CfgMgmtServer) GetAttributes(ctx context.Context, request *cfgReq.Node)
 		ChefEnvironment:     attribute.ChefEnvironment,
 		RunList:             attribute.RunList,
 		Normal:              attribute.Normal,
-		NormalValueCount:    int32(attribute.NormalValueCount),
+		NormalValueCount:    attribute.NormalValueCount,
 		Default:             attribute.Default,
-		DefaultValueCount:   int32(attribute.DefaultValueCount),
+		DefaultValueCount:   attribute.DefaultValueCount,
 		Override:            attribute.Override,
-		OverrideValueCount:  int32(attribute.OverrideValueCount),
+		OverrideValueCount:  attribute.OverrideValueCount,
 		Automatic:           attribute.Automatic,
-		AutomaticValueCount: int32(attribute.AutomaticValueCount),
-		AllValueCount:       int32(attribute.AllValueCount),
+		AutomaticValueCount: attribute.AutomaticValueCount,
+		AllValueCount:       attribute.AllValueCount,
 	}, nil
 }
 

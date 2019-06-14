@@ -79,7 +79,7 @@ func (c *client) Handle(ctx context.Context, subjects []string, _ []string,
 }
 
 type resp struct {
-	ctx        context.Context
+	ctx context.Context
 	*authz.IsAuthorizedResp
 }
 
@@ -90,7 +90,7 @@ func (r *resp) Ctx() context.Context {
 func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, action string,
 	_ []string, // projects aren't used
 ) (middleware.AuthorizationResponse, error) {
-	r, err :=  c.client.IsAuthorized(ctx, &authz.IsAuthorizedReq{
+	r, err := c.client.IsAuthorized(ctx, &authz.IsAuthorizedReq{
 		Subjects: subjects,
 		Resource: resource,
 		Action:   action,

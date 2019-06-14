@@ -74,43 +74,6 @@ func TestHeaderAuthValidForClientAndPeer(t *testing.T) {
 	}
 }
 
-func TestGetProjectsFromMetadata(t *testing.T) {
-	cases := map[string]struct {
-		input    []string
-		expected []string
-	}{
-		"no projects": {
-			input:    []string{""},
-			expected: []string{""},
-		},
-		"a single project": {
-			input:    []string{"pikachu"},
-			expected: []string{"pikachu"},
-		},
-		"multiple projects": {
-			input:    []string{"pichchu, abra"},
-			expected: []string{"pichchu", "abra"},
-		},
-		"multiple project in separate headers": {
-			input:    []string{"pichchu, abra", "kadabra"},
-			expected: []string{"pichchu", "abra", "kadabra"},
-		},
-		"multiple project in separate headers and whitespace": {
-			input:    []string{"pichchu, abra", "   kadabra  , alakazam  "},
-			expected: []string{"pichchu", "abra", "kadabra", "alakazam"},
-		},
-		"multiple project in separate headers, whitespace, and repeats": {
-			input:    []string{"abra, pichchu, abra", "   kadabra, kadabra  , alakazam  "},
-			expected: []string{"abra", "pichchu", "kadabra", "alakazam"},
-		},
-	}
-	for desc, tc := range cases {
-		t.Run(desc, func(t *testing.T) {
-			require.Equal(t, tc.expected, getProjectsFromMetadata(tc.input))
-		})
-	}
-}
-
 func devCertToEncodedAndPeer(t *testing.T, service string) (string, *peer.Peer) {
 	t.Helper()
 

@@ -149,11 +149,11 @@ func (s *Server) ApplyRulesStatus(ctx context.Context,
 		return nil, err
 	}
 	return &pb_resp.ApplyRulesStatusResp{
-		State: resp.State,
 		EstimatedTimeComplete: resp.EstimatedTimeComplete,
 		PercentageComplete:    resp.PercentageComplete,
 		Failed:                resp.Failed,
 		FailureMessage:        resp.FailureMessage,
+		State:                 resp.State,
 	}, nil
 }
 
@@ -182,6 +182,9 @@ func fromExternalUpdate(req *pb_req.UpdateRuleReq) (*authz.UpdateRuleReq, error)
 		return nil, err
 	}
 	conditions, err := fromExternalConditions(req.Conditions)
+	if err != nil {
+		return nil, err
+	}
 	return &authz.UpdateRuleReq{
 		Id:         req.Id,
 		Name:       req.Name,

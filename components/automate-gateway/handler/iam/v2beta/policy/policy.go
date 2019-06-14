@@ -85,13 +85,13 @@ func (p *Server) ListPolicies(
 		return nil, err
 	}
 
-	var policies []*pb_common.Policy
-	for _, authzPol := range resp.Policies {
+	policies := make([]*pb_common.Policy, len(resp.Policies), len(resp.Policies))
+	for i, authzPol := range resp.Policies {
 		policy, err := convertDomainPolicyToAPIPolicy(authzPol)
 		if err != nil {
 			return nil, status.Error(codes.Internal, err.Error())
 		}
-		policies = append(policies, policy)
+		policies[i] = policy
 	}
 
 	return &pb_resp.ListPoliciesResp{
@@ -242,7 +242,13 @@ func (p *Server) GetPolicyVersion(
 	}
 
 	major, err := versionFromInternalVersion(resp.Version.Major)
+	if err != nil {
+		return nil, err
+	}
 	minor, err := versionFromInternalVersion(resp.Version.Minor)
+	if err != nil {
+		return nil, err
+	}
 
 	return &pb_resp.GetPolicyVersionResp{
 		Version: &pb_common.Version{
@@ -528,8 +534,8 @@ func convertDomainPolicyToAPIPolicy(policy *authz.Policy) (*pb_common.Policy, er
 
 // These methods are mostly needed because we can't cast between Effect enums.
 func convertAPIStatementSliceToDomain(external []*pb_common.Statement) ([]*authz.Statement, error) {
-	var internal []*authz.Statement
-	for _, statement := range external {
+	internal := make([]*authz.Statement, len(external), len(external))
+	for i, statement := range external {
 		// lest former v1 users attempt to create policy with resources (which are ignored)
 		if len(statement.Resources) > 0 {
 			return nil, errors.New("cannot define resources on v2 policy")
@@ -540,31 +546,31 @@ func convertAPIStatementSliceToDomain(external []*pb_common.Statement) ([]*authz
 		}
 
 		// Note: this is where we ignore the request's statements' resources
-		internal = append(internal, &authz.Statement{
+		internal[i] = &authz.Statement{
 			Effect:   authz.Statement_Effect(effectValue),
 			Actions:  statement.Actions,
 			Role:     statement.Role,
 			Projects: statement.Projects,
-		})
+		}
 	}
 	return internal, nil
 }
 
 func convertDomainStatementSliceToAPI(internal []*authz.Statement) ([]*pb_common.Statement, error) {
-	var external []*pb_common.Statement
-	for _, statement := range internal {
+	external := make([]*pb_common.Statement, len(internal), len(internal))
+	for i, statement := range internal {
 		effectValue, ok := pb_common.Statement_Effect_value[statement.Effect.String()]
 		if !ok {
 			return nil, errors.New("could not convert effect response from backend")
 		}
 		effect := pb_common.Statement_Effect(effectValue)
-		external = append(external, &pb_common.Statement{
+		external[i] = &pb_common.Statement{
 			Effect:    effect,
 			Actions:   statement.Actions,
 			Role:      statement.Role,
 			Resources: statement.Resources,
 			Projects:  statement.Projects,
-		})
+		}
 	}
 	return external, nil
 }

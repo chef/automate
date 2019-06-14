@@ -88,7 +88,6 @@ type resp struct {
 	authorized bool
 }
 
-
 func (r *resp) Ctx() context.Context {
 	return r.ctx
 }

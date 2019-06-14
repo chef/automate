@@ -228,10 +228,11 @@ steps:
       executor:
         docker:
 
-  # TODO: (@afiune) Add 'lint' and 'fmt'
   - label: "[unit] automate-gateway"
     command:
       - hab studio run "source .studiorc && go_component_unit api && go_component_unit automate-gateway"
+      - cd components/automate-gateway
+      - make lint fmt
     timeout_in_minutes: 10
     retry:
       automatic:

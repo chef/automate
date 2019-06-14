@@ -36,8 +36,8 @@ func main() {
 		reader := bufio.NewReader(f)
 		writer := bufio.NewWriter(out)
 
-		writer.WriteString("package api\n\nfunc init() {\n")
-		writer.WriteString("	Swagger.Add(\"" + prefix + "_" + name + "\", `")
+		writer.WriteString("package api\n\nfunc init() {\n")                  // nolint: errcheck
+		writer.WriteString("	Swagger.Add(\"" + prefix + "_" + name + "\", `") // nolint: errcheck
 
 		for {
 			line, isPrefix, err := reader.ReadLine()
@@ -49,13 +49,13 @@ func main() {
 			if isPrefix || err != nil {
 				logrus.Fatalf("Failed with isPrefix=%t err=%v", isPrefix, err)
 			}
-			writer.WriteString(strings.Replace(string(line), "`", "` + \"`\" + `", -1))
-			writer.WriteString("\n")
+			writer.WriteString(strings.Replace(string(line), "`", "` + \"`\" + `", -1)) // nolint: errcheck
+			writer.WriteString("\n")                                                    // nolint: errcheck
 		}
 
-		writer.WriteString("`)\n")
-		writer.WriteString("}\n")
-		writer.Flush()
+		writer.WriteString("`)\n") // nolint: errcheck
+		writer.WriteString("}\n")  // nolint: errcheck
+		writer.Flush()             // nolint: errcheck
 
 		fail(f.Close())
 		fail(out.Close())

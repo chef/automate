@@ -3,6 +3,7 @@ include ../../Makefile.common_go
 
 BIN=automate-gateway
 DOCS_PATH=../automate-chef-io/data/docs/api_chef_automate
+LINTERARGS:=--skip-files .*\.pb\.swagger\.go
 
 run:
 	@go run cmd/automate-gateway/automate-gateway.go serve --config config/config.toml
