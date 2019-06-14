@@ -5,7 +5,7 @@
 // make it easier for folks to tweak the styles if needed
 // during implementation.
 chef-badge {
-  badge {
+  .badge {
     background: transparent;
     border: 0px solid transparent;
     color: inherit;
@@ -19,7 +19,6 @@ chef-badge {
     font-family: inherit;
     height: inherit;
     line-height: inherit;
-    margin: 0;
     padding: 0 5px;
     pointer-events: inherit;
     text-decoration: inherit;
@@ -56,7 +55,9 @@ chef-badge {
   flex-wrap: nowrap;
   font-size: 10px;
   font-weight: 600;
-  margin: 5px;
+  letter-spacing: .2px;
+  line-height: 16px;
+  margin: 0px 5px;
   min-height: 15px;
   min-width: 15px;
   text-align: center;
