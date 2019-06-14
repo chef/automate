@@ -316,6 +316,32 @@ function applications_populate_database() {
       --origin custom --version "1.9.2" --release "20190115181111" --health 0\
       --sup-id "$(uuidgen)"
   done
+
+  # We have a custom visual treatment when application, environment, or channel
+  # are blank. Create one of each
+  applications_publish_supervisor_message --name "blank-app" --group "default"\
+    --origin custom --version "0.0.1" --release "20190115184890" --health 1\
+    --sup-id "$(uuidgen)" --site "default" --channel "stable" \
+    --application ""
+
+  applications_publish_supervisor_message --name "blank-env" --group "default"\
+    --origin custom --version "0.0.1" --release "20190115184890" --health 1\
+    --sup-id "$(uuidgen)" --site "default" --channel "stable" \
+    --environment ""
+
+  applications_publish_supervisor_message --name "blank-channel" --group "default"\
+    --origin custom --version "0.0.1" --release "20190115184890" --health 1\
+    --sup-id "$(uuidgen)" --site "default" --channel ""
+
+  ##
+  # Make enough service groups to force pagination. We need at least 26 groups
+  # to force pagination to happen. We also don't want to have to remember to
+  # update this part of the code if we modify the stuff above. So we just make
+  # 26 here and pagination will always happen.
+  for i in $(seq 26); do
+    applications_publish_supervisor_message --name "example$i" --group "acceptance"\
+      --origin custom --version "0.0.1" --health 0 --sup-id "$(uuidgen)"
+  done
 }
 
 function app_service_origin() {
