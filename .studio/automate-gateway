@@ -280,11 +280,17 @@ DOC
 function send_inspec_example() {
   install_if_missing core/curl curl;
 
-  local examples_path="/src/";
   local endpoint="/events/data-collector"
+  local examples_json_path=${JSON_FILE:-/src/components/compliance-service/ingest/examples/compliance-success-tiny-report.json};
 
-  curl -f --insecure -H "api-token: $(get_api_token)" \
-       --data @$examples_path/${JSON_FILE:-components/compliance-service/ingest/examples/compliance-success-tiny-report.json} "${GATEWAY_URL}${endpoint}"
+  local uuid=$(uuidgen)
+  local report_uuid=$(uuidgen)
+  local rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
+
+  tmp_inspec_json="$(jq --arg id "$uuid" --arg report_uuid "$report_uuid" --arg rfc_time "$rfc_time" '.node_uuid = $id | .report_uuid = $report_uuid | .end_time = $rfc_time' <$examples_json_path)"
+
+  echo "$tmp_inspec_json" | curl -f --insecure -H "api-token: $(get_admin_token)" \
+       --data "@-" "${GATEWAY_URL}${endpoint}"
 }
 
 document "send_inspec_failure_example" <<DOC

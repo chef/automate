@@ -31,7 +31,7 @@ export class ReportQueryService {
 
   addFilter(filter) {
     const filters = this.filters.getValue();
-    if (filter.type.name === 'profile') {
+    if (filter.type.name === 'profile' && filter.value.version ) {
       // append version to text to ensure we display version of profile
       filter.value.text = `${filter.value.text}, v${filter.value.version}`;
     }

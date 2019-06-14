@@ -134,6 +134,54 @@ describe('StatsService', () => {
         {type: 'start_time', values: ['2017-11-14T00:00:00Z']}
       ]);
     });
+
+    it('returns profile_name not profile_id', () => {
+      expect(service.formatFilters([
+        {type: {name: 'profile'}, value: {text: '123'}}
+      ])).toEqual([
+        {type: 'profile_name', values: ['123']}
+      ]);
+    });
+
+    it('returns profile_id not profile_name, when there is no value id', () => {
+      expect(service.formatFilters([
+        {type: {name: 'profile'}, value: {id: '123', text: '456'}}
+      ])).toEqual([
+        {type: 'profile_id', values: ['123']}
+      ]);
+    });
+
+    it('returns node_name not node_id', () => {
+      expect(service.formatFilters([
+        {type: {name: 'node'}, value: {text: '123'}}
+      ])).toEqual([
+        {type: 'node_name', values: ['123']}
+      ]);
+    });
+
+    it('returns node_id not node_name, when there is no value id', () => {
+      expect(service.formatFilters([
+        {type: {name: 'node'}, value: {id: '123', text: '456'}}
+      ])).toEqual([
+        {type: 'node_id', values: ['123']}
+      ]);
+    });
+
+    it('returns control_name not control', () => {
+      expect(service.formatFilters([
+        {type: {name: 'control'}, value: {text: '123'}}
+      ])).toEqual([
+        {type: 'control_name', values: ['123']}
+      ]);
+    });
+
+    it('returns control not control_name, when there is no value id', () => {
+      expect(service.formatFilters([
+        {type: {name: 'control'}, value: {id: '123', text: '456'}}
+      ])).toEqual([
+        {type: 'control', values: ['123']}
+      ]);
+    });
   });
 
   describe('addDateRange', () => {
