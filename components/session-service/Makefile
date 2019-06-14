@@ -29,8 +29,7 @@ start: build
 	./bin/session-service examples/config.yml
 
 test:
-	@go test -v -i $(packages)
-	@go test -v $(packages) -cover
+	@go test -v -count=1 $(packages) -cover
 
 # this command lists all the changes since master, and looks for modifications
 # to the migration files -- if there's any of (M)odify, (R)ename, or (D)elete,
