@@ -38,3 +38,5 @@ message DeleteRuleReq {
 message ApplyRulesStartReq {}
 
 message ApplyRulesCancelReq {}
+
+message ApplyRulesStatusReq {}
