@@ -188,6 +188,7 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 		Query(boolQueryDailyLatestThisNodeNotThisReport).
 		Script(script).
 		Refresh("false").
+		ProceedOnVersionConflict().
 		Do(ctx)
 
 	return err
