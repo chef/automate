@@ -67,7 +67,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
       this.selectedHealth = getOr('total', 'health', servicesFilters);
       this.currentPage    = getOr(1, 'page', servicesFilters);
       this.totalServices  = getOr(0, this.selectedHealth, this.servicesHealthSummary);
-      this.telemetryService.track('applicationServiceCount', {
+      this.telemetryService.track('applicationsServiceCount', {
          serviceGroupId: this.serviceGroupId,
          totalServices: this.totalServices,
          statusFilter: this.selectedHealth
@@ -88,7 +88,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     }
 
     this.currentPage = 1;
-    this.telemetryService.track('applicationStatusFilter',
+    this.telemetryService.track('applicationsStatusFilter',
      { entity: 'service', statusFilter: this.selectedHealth});
     this.updateServicesFilters();
   }
@@ -96,7 +96,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public updatePageNumber(pageNumber: number) {
     this.currentPage = pageNumber;
     const totalPages = Math.ceil(this.totalServices / this.pageSize) || 1;
-    this.telemetryService.track('applicationPageChange',
+    this.telemetryService.track('applicationsPageChange',
      { entity: 'service', pageNumber: pageNumber, totalPages: totalPages});
     this.updateServicesFilters();
   }

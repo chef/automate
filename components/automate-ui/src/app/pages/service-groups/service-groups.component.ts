@@ -128,7 +128,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
           this.selectedStatus = 'total';
           this.totalServiceGroups = get('total', this.sgHealthSummary);
       }
-      this.telemetryService.track('applicationServiceGroupCount', {
+      this.telemetryService.track('applicationsServiceGroupCount', {
         totalServiceGroups: this.totalServiceGroups,
         statusFilter: status
       });
@@ -207,7 +207,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     const queryParams = {...this.route.snapshot.queryParams};
     if ( includes(status, this.allowedStatus) ) {
       queryParams['status'] = [status];
-      this.telemetryService.track('applicationStatusFilter',
+      this.telemetryService.track('applicationsStatusFilter',
         { entity: 'serviceGroup', statusFilter: status});
     } else {
       delete queryParams['status'];
@@ -263,7 +263,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   onPageChange(pageNumber: number) {
     const queryParams = { ...this.route.snapshot.queryParams, page: pageNumber };
     const totalPages = Math.ceil(this.totalServiceGroups / this.pageSize) || 1;
-    this.telemetryService.track('applicationPageChange',
+    this.telemetryService.track('applicationsPageChange',
      { entity: 'serviceGroup', pageNumber: pageNumber, totalPages: totalPages});
     if (pageNumber <= 1) {
       delete queryParams['page'];
@@ -287,7 +287,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   onUpdateSort(event): void {
     const {field, fieldDirection} = event;
-    this.telemetryService.track('applicationSort',
+    this.telemetryService.track('applicationsSort',
       { field: field, fieldDirection: fieldDirection});
     if (this.defaultFieldDirection.hasOwnProperty(field) &&
       this.allowedSortDirections.includes(fieldDirection) ) {
