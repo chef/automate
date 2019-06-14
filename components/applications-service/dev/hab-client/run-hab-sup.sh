@@ -21,6 +21,7 @@ main() {
     esac
   done
 
+  ensure_required_opts_given
   ensure_container_build || exit 1
   run_hab_in_container || exit 1
 }
@@ -42,6 +43,14 @@ FLAGS:
     -t    Chef Automate API token
 
 USAGE
+}
+
+ensure_required_opts_given() {
+  if [[ "$token" == "" ]]; then
+    echo "ERROR: Required argument \`token\` ( -t ) not given"
+    exit 1
+  fi
+
 }
 
 ensure_container_build() {
