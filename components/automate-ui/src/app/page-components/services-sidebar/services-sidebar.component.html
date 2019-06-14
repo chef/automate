@@ -8,7 +8,7 @@
     </chef-heading>
     <chef-subheading>All services running in a service group.</chef-subheading>
   </chef-page-header>
-  <div class="services-panel-body" *ngIf="serviceGroupId">
+  <div *ngIf="serviceGroupId && (servicesStatus$ | async) === 'loadingSuccess'">
     <div class="status-filter-bar">
       <chef-status-filter-group [value]="selectedHealth" lean>
         <chef-option class="filter general" value="total" (click)="updateHealthFilter('total')" selected>
@@ -61,17 +61,9 @@
         </div>
       </li>
     </ul>
+    <!-- Loading Success + Empty Services: Displayed when there are NO services from the selected filter -->
     <div class="no-services" *ngIf="(services$ | async)?.length === 0">
-      No available services with <b>{{ selectedHealth }}</b> status
-    </div>
-    <div class="services-panel-body no-services">
-      <div class="status-statement" *ngIf="'!serviceGroupId' && (servicesStatus$ | async) == 'notLoaded' ">
-          Add service groups to see more service details
-      </div>
-      <div class="status-statement" *ngIf="(servicesStatus$ | async) == 'loading'">
-          <chef-loading-spinner size='50'></chef-loading-spinner>
-        <h3>Loading Services...</h3>
-      </div>
+      No services with <b>{{ selectedHealth }}</b> status
     </div>
     <app-page-picker
       [total]="totalServices"
@@ -79,5 +71,16 @@
       [page]="currentPage"
       (pageChanged)="updatePageNumber($event)">
     </app-page-picker>
+  </div>
+
+  <!-- Loading State: Displayed only when the services are loading -->
+  <div class="no-services" *ngIf="(servicesStatus$ | async) === 'loading'">
+      <chef-loading-spinner size='50'></chef-loading-spinner>
+    <h3>Loading Services...</h3>
+  </div>
+
+  <!-- NotLoaded State: Displayed only when there are no service-groups and therefore, NO ID -->
+  <div class="no-services" *ngIf="(servicesStatus$ | async) === 'notLoaded'">
+      Add service groups to see more service details
   </div>
 </div>

@@ -269,15 +269,13 @@ chef-tr.sg-row {
 
 .empty-status {
   display: flex;
+  flex-flow: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
   height: 400px;
 
-  .status-statement {
-    p {
-      color: $chef-dark-grey;
-    }
+  p {
+    color: $chef-dark-grey;
   }
 }
 

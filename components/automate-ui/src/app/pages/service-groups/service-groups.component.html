@@ -30,7 +30,7 @@
       <div class="filter-total">{{ sgHealthSummary["unknown"] }}</div>
     </chef-option>
   </chef-status-filter-group>
-  <chef-table class="service-group-list" *ngIf="(serviceGroupStatus$ | async) == 'loadingSuccess'">
+  <chef-table class="service-group-list" *ngIf="(serviceGroupStatus$ | async) === 'loadingSuccess' && (serviceGroups$ | async).length !== 0">
     <chef-thead>
         <chef-tr>
           <chef-th class="health sort" (click)="onToggleSort('percent_ok')">
@@ -128,15 +128,30 @@
     [page]="currentPage"
     (pageChanged)="onPageChange($event)">
   </app-page-picker>
-  <div class="empty-status">
-    <div class="status-statement" *ngIf="(serviceGroupStatus$ | async) == 'loading'">
-        <chef-loading-spinner size='50'></chef-loading-spinner>
-      <h3>Loading Service Groups...</h3>
-    </div>
-    <div class="status-statement" *ngIf="(serviceGroupStatus$ | async) == 'notLoaded'">
-      <h3>Add service groups</h3>
-      <p>Contact your account representative to find out more about adding service groups.</p>
-    </div>
+
+  <!-- Loading State: Displayed only when the main status is loading -->
+  <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loading'">
+      <chef-loading-spinner size='50'></chef-loading-spinner>
+    <h3>Loading Service Groups...</h3>
+  </div>
+
+  <!-- LoadingFailure State: Displayed only when the main status is a failure -->
+  <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loadingFailure'">
+      <chef-loading-spinner size='50'></chef-loading-spinner>
+    <h3>Loading Service Groups...</h3>
+  </div>
+
+  <!--
+    Loading Success + Empty ServiceGroups: This state will be displayed when the main status is
+    a success, that is that the request to the backend was made successfuly and the returned
+    response is empty, when there are NO service-groups to display.
+  -->
+  <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total === 0">
+    <h3>Add service groups</h3>
+    <p>Contact your account representative to find out more about adding service groups.</p>
+  </div>
+  <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total !== 0 && (serviceGroups$ | async).length === 0">
+    <h3>None of the service groups returned {{ selectedStatus$ | async }}</h3>
   </div>
 </div>
 <app-services-sidebar
