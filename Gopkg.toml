@@ -208,7 +208,7 @@ required = [
 # more easily.)
 [[constraint]]
   name = "github.com/open-policy-agent/opa"
-  version = "=0.10.7"
+  revision = "7864d60dd78d748dbce54b569e939f5b0dc07486"
 
 [[constraint]]
   name = "github.com/chef/toml"

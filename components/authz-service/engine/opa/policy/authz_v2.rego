@@ -73,9 +73,13 @@ match[[effect, pol_id, statement_id]] {
 	has_action[[pol_id, statement_id]]
 }
 
-allow = match[["allow", _, _]]
+allow {
+	match[["allow", _, _]]
+}
 
-deny = match[["deny", _, _]]
+deny {
+	match[["deny", _, _]]
+}
 
 authorized {
 	allow
