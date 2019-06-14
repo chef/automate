@@ -15,6 +15,7 @@ type Rule struct {
 	Name       string      `json:"name"`
 	Type       RuleType    `json:"type"`
 	Conditions []Condition `json:"conditions"`
+	Deleted	   bool        `json:"deleted"`
 }
 
 // Scan implements pq Scan interface for a Rule reference
@@ -46,6 +47,7 @@ func NewRule(id string, projectID string, name string,
 		Name:       name,
 		Type:       ruleType,
 		Conditions: conditions,
+		Deleted:    false,
 	}, nil
 }
 
