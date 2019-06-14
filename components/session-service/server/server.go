@@ -262,13 +262,6 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// remove used relay_state
-	if err := sess.Remove(w, relayStateKey+"_"+state); err != nil { // nolint: vetshadow
-		s.log.Debugf("failed to remove relay state: %v", err)
-		http.Error(w, errors.Wrap(err, "failed to remove relay state").Error(), http.StatusInternalServerError)
-		return
-	}
-
 	if token.RefreshToken != "" {
 		err = sess.PutString(w, "refresh_token", token.RefreshToken)
 		if err != nil {
@@ -278,11 +271,23 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	clientState, err := sess.GetString(clientStateKey)
+	clientState, err := sess.GetString(clientStateKey + "_" + state)
 	s.log.Debugf("retrieved clientState %q", clientState)
 	if err != nil {
 		s.log.Debugf("bad session data (client state): %v", err)
 		http.Error(w, "bad session data (client state)", http.StatusBadRequest)
+		return
+	}
+
+	// remove used relay_state + client_state
+	if err := sess.Remove(w, relayStateKey+"_"+state); err != nil { // nolint: vetshadow
+		s.log.Debugf("failed to remove relay state: %v", err)
+		http.Error(w, errors.Wrap(err, "failed to remove relay state").Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := sess.Remove(w, clientStateKey+"_"+state); err != nil { // nolint: vetshadow
+		s.log.Debugf("failed to remove client state: %v", err)
+		http.Error(w, errors.Wrap(err, "failed to remove client state").Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -574,7 +579,7 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 	// take state we've gotten from the client, store it
 	if clientState := r.FormValue("state"); clientState != "" {
 		s.log.Debugf("storing clientState %s", clientState)
-		if err := sess.PutString(w, clientStateKey, clientState); err != nil {
+		if err := sess.PutString(w, clientStateKey+"_"+relayState, clientState); err != nil {
 			http.Error(w, "failed to set client state", http.StatusInternalServerError)
 			return
 		}

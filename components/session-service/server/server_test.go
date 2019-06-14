@@ -95,19 +95,9 @@ func TestNewHandler(t *testing.T) {
 			err = json.Unmarshal(data, &cookie)
 			require.Nil(t, err)
 			assert.Equal(t, 2, len(cookie.Data), "expecting 2 keys in cookie data")
-			cs, ok := cookie.Data["client_state"]
-			require.True(t, ok)
 
-			// find relay state
-			rs := ""
-			for k, v := range cookie.Data {
-				if x, ok := v.(bool); ok {
-					assert.True(t, x, "expected relay state stored as map: rs => bool (true)")
-					require.True(t, strings.HasPrefix(k, "relay_state_"))
-					rs = k[len("relay_state_"):]
-				}
-			}
-			require.NotEmpty(t, rs)
+			rs := findRelayStateInCookieData(t, cookie.Data)
+			cs := findClientStateInCookieData(t, cookie.Data, rs)
 			require.Contains(t, resp.Header.Get("Location"), rs)
 			require.Equal(t, "/nodes", cs)
 		},
@@ -155,8 +145,7 @@ func TestNewHandler(t *testing.T) {
 			}
 			err = json.Unmarshal(data, &cookie)
 			require.Nil(t, err)
-			assert.Equal(t, 3, len(cookie.Data), "expecting 3 keys in cookie data")
-			require.NotEmpty(t, cookie.Data["client_state"])
+			assert.Equal(t, 4, len(cookie.Data), "expecting 4 keys in cookie data")
 
 			// find relay states
 			rs := 0
@@ -168,6 +157,15 @@ func TestNewHandler(t *testing.T) {
 				}
 			}
 			assert.Equal(t, 2, rs, "expecting 2 relay_state keys")
+
+			// find client states
+			var vals []string
+			for k, v := range cookie.Data {
+				if x, ok := v.(string); ok && strings.HasPrefix(k, "client_state_") {
+					vals = append(vals, x)
+				}
+			}
+			assert.ElementsMatch(t, []string{"/nodes", "/settings"}, vals)
 		},
 		"GET /new from builder is redirected to dex, stores generated relay_state xyz": func(t *testing.T) {
 			reqStr := fmt.Sprintf("/new?state=xyz&client_id=bldr-client&redirect_uri=%s&response_type=code&scope=openid&nonce=0",
@@ -199,19 +197,9 @@ func TestNewHandler(t *testing.T) {
 			assert.Equal(t, 3, len(cookie.Data), "expecting 3 keys in cookie data")
 			ru, ok := cookie.Data["redirect_uri"]
 			require.True(t, ok)
-			cs, ok := cookie.Data["client_state"]
-			require.True(t, ok)
 
-			// find relay state
-			rs := ""
-			for k, v := range cookie.Data {
-				if x, ok := v.(bool); ok {
-					assert.True(t, x, "expected relay state stored as map: rs => bool (true)")
-					require.True(t, strings.HasPrefix(k, "relay_state_"))
-					rs = k[len("relay_state_"):]
-				}
-			}
-			require.NotEmpty(t, rs)
+			rs := findRelayStateInCookieData(t, cookie.Data)
+			cs := findClientStateInCookieData(t, cookie.Data, rs)
 			require.Contains(t, resp.Header.Get("Location"), rs)
 			require.Equal(t, "xyz", cs)
 			require.Equal(t, bldrURLString, ru)
@@ -506,17 +494,19 @@ func TestCallbackHandler(t *testing.T) {
 			assert.Zero(t, rs, "expecting no relay_state keys")
 		},
 
-		`GET /callback?code=X&state=Y with a session cookie and two relay_state when code exchange
+		`GET /callback?code=X&state=Y with a session cookie and two state pairs when code exchange
      succeeds, stores refresh_token and redirects to signin, removes one relay state, keeps the other`: func(t *testing.T) {
 			code := "randomstringcode"
 			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
 			relayState0 := "relaaay"
 			relayState1 := "relaaaytwo"
-			clientState := "/nodes"
+			clientState0 := "/nodes"
+			clientState1 := "/settings"
 			sessionData := map[string]interface{}{
-				"relay_state_" + relayState0: true,
-				"relay_state_" + relayState1: true,
-				"client_state":               clientState,
+				"relay_state_" + relayState0:  true,
+				"relay_state_" + relayState1:  true,
+				"client_state_" + relayState0: clientState0,
+				"client_state_" + relayState1: clientState1,
 			}
 			if err := addSessionDataToStore(ms, sessionID, sessionData, nil); err != nil {
 				t.Fatal(err)
@@ -536,7 +526,7 @@ func TestCallbackHandler(t *testing.T) {
 			resp := w.Result()
 
 			require.Equal(t, http.StatusSeeOther, resp.StatusCode)
-			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#id_token=%s&state=%s", newIDToken, clientState))
+			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#id_token=%s&state=%s", newIDToken, clientState1))
 
 			// this process gives us a new session id, so we just check that the old one
 			// is no more, and find new one
@@ -563,17 +553,10 @@ func TestCallbackHandler(t *testing.T) {
 			err = json.Unmarshal(data, &cookie)
 			require.Nil(t, err)
 
-			// check that there's exactly one relay state left
-			rs := 0
-			for k, v := range cookie.Data {
-				if x, ok := v.(bool); ok {
-					assert.True(t, x, "expected relay state stored as map: rs => bool (true)")
-					require.True(t, strings.HasPrefix(k, "relay_state_"))
-					rs++
-				}
-			}
-			assert.Equal(t, 1, rs, "expecting one relay_state keys")
+			// check that there's exactly one state pair left
+			assert.Equal(t, 3, len(cookie.Data)) // refresh_token + the other state pair
 			assert.NotEmpty(t, cookie.Data["relay_state_relaaay"])
+			assert.NotEmpty(t, cookie.Data["client_state_relaaay"])
 		},
 
 		`GET /callback?code=X&state=Y with a session cookie
@@ -1038,9 +1021,32 @@ func addSessionDataToStore(store scs.Store, sessionID string, sessionData interf
 
 func sessionData(rs, cs string) map[string]interface{} {
 	return map[string]interface{}{
-		"relay_state_" + rs: true,
-		"client_state":      cs,
+		"relay_state_" + rs:  true,
+		"client_state_" + rs: cs,
 	}
+}
+
+func findRelayStateInCookieData(t *testing.T, d map[string]interface{}) string {
+	t.Helper()
+	rs := ""
+	for k, v := range d {
+		if x, ok := v.(bool); ok {
+			assert.True(t, x, "expected relay state stored as map: rs => bool (true)")
+			require.True(t, strings.HasPrefix(k, "relay_state_"))
+			rs = k[len("relay_state_"):]
+		}
+	}
+	require.NotEmpty(t, rs)
+	return rs
+}
+
+func findClientStateInCookieData(t *testing.T, d map[string]interface{}, rs string) string {
+	t.Helper()
+	x, ok := d["client_state_"+rs]
+	require.True(t, ok)
+	cs, ok := x.(string)
+	require.True(t, ok)
+	return cs
 }
 
 func newTestServer(t *testing.T, store scs.Store) *Server {
