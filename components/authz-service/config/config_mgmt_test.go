@@ -65,6 +65,7 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 func TestManagerBadFile(t *testing.T) {
 	_, err := config.NewManager("")
 	assert.Error(t, err)
+	assert.NoError(t, os.Remove(".tmp.."), "cleanup tmp file")
 }
 
 func TestManagerConfigProjectUpdateConfigDefault(t *testing.T) {
