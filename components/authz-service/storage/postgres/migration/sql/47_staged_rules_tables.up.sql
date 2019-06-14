@@ -19,10 +19,11 @@ CREATE TABLE iam_staged_rule_conditions (
 );
 
 CREATE OR REPLACE FUNCTION
-  query_staged_rule(_rule_db_id TEXT, _project_filter TEXT[])
+  query_staged_rule(_rule_id TEXT, _project_filter TEXT[])
   RETURNS json AS $$
 
   WITH t AS (
+    -- check for staged rule
     SELECT
       r.id,
       r.project_id,
@@ -35,8 +36,26 @@ CREATE OR REPLACE FUNCTION
     FROM iam_staged_project_rules AS r
     LEFT OUTER JOIN iam_staged_rule_conditions
     AS rc ON rc.rule_db_id=r.db_id
-    WHERE id=_rule_db_id AND projects_match_for_rule(project_id, _project_filter)
+    WHERE id=_rule_id AND projects_match_for_rule(project_id, _project_filter)
     GROUP BY r.id, r.project_id, r.name, r.type, r.deleted
+
+    UNION ALL
+
+    -- check for applied rule
+    SELECT 
+      r.id,
+      r.project_id,
+      r.name,
+      r.type,
+      false as deleted,
+      json_agg(rc) AS conditions
+      FROM iam_project_rules AS r
+      LEFT OUTER JOIN iam_rule_conditions
+      AS rc ON rc.rule_db_id=r.db_id
+      WHERE id=_rule_id AND projects_match_for_rule(project_id, _project_filter)
+      AND
+        NOT EXISTS (SELECT 1 FROM iam_staged_project_rules WHERE id=_rule_id)
+      GROUP BY r.id, r.project_id, r.name, r.type, deleted
   )
   SELECT row_to_json(t) AS rule FROM t;
 
