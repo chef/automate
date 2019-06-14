@@ -153,6 +153,22 @@ func (pg *PostgresBackend) Init() error {
 	}
 	// defer m.Close() I don't think we want to call close here because it'll close our db instance
 
+	version, dirty, err := m.Version()
+	if err != nil && err != migrate.ErrNilVersion {
+		return errors.Wrap(err, "init migrator - error getting migration version")
+	}
+
+	if dirty {
+		// force to prior version to reattempt migration
+		err := m.Force(int(version) - 1)
+		if err != nil {
+			return errors.Wrap(err, "force to working schema version")
+		}
+		logrus.Infof("Forced to previous version: %v to reattempt migration", int(version)-1)
+	} else {
+		logrus.Infof("Current workflow schema version: %v", version)
+	}
+
 	err = m.Up()
 	if err == migrate.ErrNoChange {
 		logrus.Info("No database migration required")
