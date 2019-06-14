@@ -470,10 +470,110 @@ func TestCallbackHandler(t *testing.T) {
 			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#id_token=%s&state=%s", newIDToken, clientState))
 
 			// this process gives us a new session id, so we just check that the old one
-			// is no more, and SOME other one is set
+			// is no more, and find new one
 			hasNoCookieWithSessionID(t, resp, sessionID)
 			hasCookieWithAnySessionID(t, resp)
 			hasCookieWithSecureSessionSettings(t, resp)
+
+			var newSessionID string
+			for _, k := range resp.Cookies() {
+				if k.Name == "session" {
+					newSessionID = k.Value
+				}
+			}
+			require.NotEmpty(t, newSessionID, "there is a new session ID cookie")
+
+			// relay_state was removed from session data
+			data, exists, err := ms.Find(newSessionID)
+			require.Nil(t, err)
+			require.True(t, exists, "there is a stored session")
+
+			var cookie struct {
+				Data map[string]interface{} `json:"data"`
+			}
+			err = json.Unmarshal(data, &cookie)
+			require.Nil(t, err)
+
+			// check that there's no relay state whatsoever
+			rs := 0
+			for k, v := range cookie.Data {
+				if x, ok := v.(bool); ok {
+					assert.True(t, x, "expected relay state stored as map: rs => bool (true)")
+					require.True(t, strings.HasPrefix(k, "relay_state_"))
+					rs++
+				}
+			}
+			assert.Zero(t, rs, "expecting no relay_state keys")
+		},
+
+		`GET /callback?code=X&state=Y with a session cookie and two relay_state when code exchange
+     succeeds, stores refresh_token and redirects to signin, removes one relay state, keeps the other`: func(t *testing.T) {
+			code := "randomstringcode"
+			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
+			relayState0 := "relaaay"
+			relayState1 := "relaaaytwo"
+			clientState := "/nodes"
+			sessionData := map[string]interface{}{
+				"relay_state_" + relayState0: true,
+				"relay_state_" + relayState1: true,
+				"client_state":               clientState,
+			}
+			if err := addSessionDataToStore(ms, sessionID, sessionData, nil); err != nil {
+				t.Fatal(err)
+			}
+
+			newRefreshToken := "somethingopaqueandnewforrefresh"
+			newIDToken := "somethingopaqueandnew" // it's a JWT, but we don't care here
+			t1 := oauth2.Token{RefreshToken: newRefreshToken}
+			t2 := t1.WithExtra(map[string]interface{}{"id_token": newIDToken})
+			s.setTestToken(t2, nil)
+
+			r := httptest.NewRequest("GET", fmt.Sprintf("/callback?code=%s&state=%s", code, relayState1), nil)
+			r.AddCookie(&http.Cookie{Name: "session", Value: sessionID})
+
+			w := httptest.NewRecorder()
+			hdlr.ServeHTTP(w, r)
+			resp := w.Result()
+
+			require.Equal(t, http.StatusSeeOther, resp.StatusCode)
+			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#id_token=%s&state=%s", newIDToken, clientState))
+
+			// this process gives us a new session id, so we just check that the old one
+			// is no more, and find new one
+			hasNoCookieWithSessionID(t, resp, sessionID)
+			hasCookieWithAnySessionID(t, resp)
+			hasCookieWithSecureSessionSettings(t, resp)
+
+			var newSessionID string
+			for _, k := range resp.Cookies() {
+				if k.Name == "session" {
+					newSessionID = k.Value
+				}
+			}
+			require.NotEmpty(t, newSessionID, "there is a new session ID cookie")
+
+			// relay_state was removed from session data
+			data, exists, err := ms.Find(newSessionID)
+			require.Nil(t, err)
+			require.True(t, exists, "there is a stored session")
+
+			var cookie struct {
+				Data map[string]interface{} `json:"data"`
+			}
+			err = json.Unmarshal(data, &cookie)
+			require.Nil(t, err)
+
+			// check that there's exactly one relay state left
+			rs := 0
+			for k, v := range cookie.Data {
+				if x, ok := v.(bool); ok {
+					assert.True(t, x, "expected relay state stored as map: rs => bool (true)")
+					require.True(t, strings.HasPrefix(k, "relay_state_"))
+					rs++
+				}
+			}
+			assert.Equal(t, 1, rs, "expecting one relay_state keys")
+			assert.NotEmpty(t, cookie.Data["relay_state_relaaay"])
 		},
 
 		`GET /callback?code=X&state=Y with a session cookie

@@ -262,6 +262,13 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// remove used relay_state
+	if err := sess.Remove(w, relayStateKey+"_"+state); err != nil { // nolint: vetshadow
+		s.log.Debugf("failed to remove relay state: %v", err)
+		http.Error(w, errors.Wrap(err, "failed to remove relay state").Error(), http.StatusInternalServerError)
+		return
+	}
+
 	if token.RefreshToken != "" {
 		err = sess.PutString(w, "refresh_token", token.RefreshToken)
 		if err != nil {
