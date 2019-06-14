@@ -1,6 +1,9 @@
 ALTER TABLE service ADD COLUMN full_pkg_ident TEXT NOT NULL DEFAULT '';
 
-CREATE OR REPLACE VIEW service_groups AS
+UPDATE service SET full_pkg_ident =
+  CONCAT (service.origin, '/', service.name, '/', service.version, '/', service.release);
+
+CREATE OR REPLACE VIEW service_group_health AS
 SELECT *
        ,(CASE WHEN health_critical > 0 THEN '1_CRITICAL'
               WHEN health_unknown  > 0 THEN '2_UNKNOWN'
