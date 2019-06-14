@@ -379,6 +379,39 @@ control 'iam-v2-1' do
       expect(resp.parsed_response_body[:tokens].map {|t| t[:id]}).to_not include(id)
     end
 
+    it "CREATE sets active to True when not passed" do
+      resp = automate_api_request("/apis/iam/v2beta/tokens")
+      expect(resp.http_status).to eq 200
+      init_token_count = resp.parsed_response_body[:tokens].length
+
+      id = "inspec-token-#{Time.now.utc.to_i}"
+      resp = automate_api_request("/apis/iam/v2beta/tokens",
+        http_method: 'POST',
+        request_body: {
+          id: id,
+          name: "my neat token",
+          projects: ["project-1"]
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:token][:id]).to eq id
+      expect(resp.parsed_response_body[:token][:name]).to eq 'my neat token'
+      expect(resp.parsed_response_body[:token][:active]).to be true
+      expect(resp.parsed_response_body[:token][:projects]).to eq ["project-1"]
+
+      resp = automate_api_request("/apis/iam/v2beta/tokens/#{id}")
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:token][:active]).to eq true
+
+      resp = automate_api_request("/apis/iam/v2beta/tokens")
+      expect(resp.parsed_response_body[:tokens].length).to eq init_token_count + 1
+      expect(resp.parsed_response_body[:tokens].map {|t| t[:id]}).to include(id)
+
+      # cleanup
+      resp = automate_api_request("/apis/iam/v2beta/tokens/#{id}", http_method: 'DELETE')
+      expect(resp.http_status).to eq 200
+    end
+
     it "LIST tokens returns list of tokens" do
       resp = automate_api_request("/apis/iam/v2beta/tokens")
       expect(resp.http_status).to eq 200
@@ -401,6 +434,42 @@ control 'iam-v2-1' do
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:token][:name]).to eq "inspec test token updated"
       expect(resp.parsed_response_body[:token][:projects]).to eq ["project-1", "my-new-project"]
+    end
+
+    it "UPDATE token defaults active to true if not specified" do
+      # precondition: set active to false
+      resp = automate_api_request("/apis/iam/v2beta/tokens/#{CUSTOM_TOKEN_ID}",
+        http_method: 'PUT',
+        request_body: {
+          active: false,
+          name: "inspec test token updated",
+          projects: ["project-1", "my-new-project"]
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:token][:name]).to eq "inspec test token updated"
+      expect(resp.parsed_response_body[:token][:active]).to eq false
+      expect(resp.parsed_response_body[:token][:projects]).to eq ["project-1", "my-new-project"]
+
+      resp = automate_api_request("/apis/iam/v2beta/tokens/#{CUSTOM_TOKEN_ID}")
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:token][:active]).to eq false
+
+      resp = automate_api_request("/apis/iam/v2beta/tokens/#{CUSTOM_TOKEN_ID}",
+        http_method: 'PUT',
+        request_body: {
+          name: "inspec test token updated",
+          projects: ["project-1", "my-new-project"]
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:token][:name]).to eq "inspec test token updated"
+      expect(resp.parsed_response_body[:token][:active]).to eq true
+      expect(resp.parsed_response_body[:token][:projects]).to eq ["project-1", "my-new-project"]
+
+      resp = automate_api_request("/apis/iam/v2beta/tokens/#{CUSTOM_TOKEN_ID}")
+      expect(resp.http_status).to eq 200
+      expect(resp.parsed_response_body[:token][:active]).to eq true
     end
 
     it "UPDATE token succeeds if update does not include projects" do
