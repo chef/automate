@@ -73,7 +73,11 @@ func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
 	for _, job := range dueJobs {
 		err := a.pushWorkflow(job)
 		if err != nil {
-			logrus.Errorf("Error handling job %q: %v", job.Id, err)
+			if err == workflow.ErrWorkflowInstanceExists {
+				logrus.Infof("Job %q is still/already running", job.Id)
+			} else {
+				logrus.Errorf("Error handling job %q: %v", job.Id, err)
+			}
 		}
 	}
 }
