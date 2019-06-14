@@ -70,7 +70,7 @@ func TestNewHandler(t *testing.T) {
 	hdlr := s.mux
 
 	cases := map[string]func(*testing.T){
-		"GET /new?state=xyz is redirected to dex, stores generated relay_state xyz": func(t *testing.T) {
+		"GET /new?state=xyz is redirected to dex, stores generated relay_state": func(t *testing.T) {
 			r := httptest.NewRequest("GET", "/new?state=%2Fnodes", nil) // = "/nodes"
 			w := httptest.NewRecorder()
 
@@ -94,6 +94,7 @@ func TestNewHandler(t *testing.T) {
 			}
 			err = json.Unmarshal(data, &cookie)
 			require.Nil(t, err)
+			assert.Equal(t, 2, len(cookie.Data), "expecting 2 keys in cookie data")
 			cs, ok := cookie.Data["client_state"]
 			require.True(t, ok)
 
@@ -109,6 +110,64 @@ func TestNewHandler(t *testing.T) {
 			require.NotEmpty(t, rs)
 			require.Contains(t, resp.Header.Get("Location"), rs)
 			require.Equal(t, "/nodes", cs)
+		},
+		"GET /new?state=xyz when requested twice, stores two generated relay_state keys": func(t *testing.T) {
+			r := httptest.NewRequest("GET", "/new?state=%2Fnodes", nil) // = "/nodes"
+			w := httptest.NewRecorder()
+
+			hdlr.ServeHTTP(w, r)
+			resp := w.Result()
+			require.Equal(t, http.StatusSeeOther, resp.StatusCode, "is redirected")
+			require.Contains(t, resp.Header.Get("Location"), "dex/auth", "to dex auth endpoint")
+
+			// find first request's session cookie from response
+			var sessionID string
+			for _, k := range resp.Cookies() {
+				if k.Name == "session" {
+					sessionID = k.Value
+				}
+			}
+			require.NotEmpty(t, sessionID, "there is a session ID cookie")
+
+			r2 := httptest.NewRequest("GET", "/new?state=%2Fsettings", nil) // = "/settings"
+			r2.AddCookie(&http.Cookie{Name: "session", Value: sessionID})
+			w2 := httptest.NewRecorder()
+			hdlr.ServeHTTP(w2, r2)
+			resp2 := w2.Result()
+			require.Equal(t, http.StatusSeeOther, resp2.StatusCode, "is redirected")
+			require.Contains(t, resp2.Header.Get("Location"), "dex/auth", "to dex auth endpoint")
+
+			// sessionID got updated, fetch session id from 2nd response
+			var sessionID2 string
+			for _, k := range resp2.Cookies() {
+				if k.Name == "session" {
+					sessionID2 = k.Value
+				}
+			}
+			require.NotEmpty(t, sessionID2, "there is a session ID cookie")
+			assert.NotEqual(t, sessionID, sessionID2, "session ID has changed")
+
+			data, exists, err := ms.Find(sessionID2)
+			require.Nil(t, err)
+			require.True(t, exists, "there is a stored session")
+			var cookie struct {
+				Data map[string]interface{} `json:"data"`
+			}
+			err = json.Unmarshal(data, &cookie)
+			require.Nil(t, err)
+			assert.Equal(t, 3, len(cookie.Data), "expecting 3 keys in cookie data")
+			require.NotEmpty(t, cookie.Data["client_state"])
+
+			// find relay states
+			rs := 0
+			for k, v := range cookie.Data {
+				if x, ok := v.(bool); ok {
+					assert.True(t, x, "expected relay state stored as map: rs => bool (true)")
+					require.True(t, strings.HasPrefix(k, "relay_state_"))
+					rs++
+				}
+			}
+			assert.Equal(t, 2, rs, "expecting 2 relay_state keys")
 		},
 		"GET /new from builder is redirected to dex, stores generated relay_state xyz": func(t *testing.T) {
 			reqStr := fmt.Sprintf("/new?state=xyz&client_id=bldr-client&redirect_uri=%s&response_type=code&scope=openid&nonce=0",
@@ -137,6 +196,7 @@ func TestNewHandler(t *testing.T) {
 			}
 			err = json.Unmarshal(data, &cookie)
 			require.Nil(t, err)
+			assert.Equal(t, 3, len(cookie.Data), "expecting 3 keys in cookie data")
 			ru, ok := cookie.Data["redirect_uri"]
 			require.True(t, ok)
 			cs, ok := cookie.Data["client_state"]
