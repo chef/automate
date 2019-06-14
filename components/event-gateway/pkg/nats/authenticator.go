@@ -104,6 +104,18 @@ func newAutomateAuthenticator(c *config.EventGatewayConfig) (*automateAuthentica
 	}, nil
 }
 
+// Check is a callback function that NATS will call to authenticate connection
+// requests. We use this behavior to integrate Automate's token authentication
+// with NATS. We do the following:
+// * check for a special health check token that the event gateway creates.
+//   This token is (re-)generated on service start and is used by the hab
+//   health check. If the token given is the health check token, give the
+//   connection just the permissions needed to run the health check.
+// * check the token with the authn service and then the authz service. The
+//   token has to be valid and have the correct ingest permissions to pass.
+// * If the token is valid, assign it a NATS user object. This sets NATS-level
+//   authorization on the connection to limit the topics the client can
+//   publish/subscribe to.
 func (a *automateAuthenticator) Check(client natsd.ClientAuthentication) bool {
 	log.WithFields(log.Fields{"client": client.RemoteAddress()}).Debug("authenticating NATS connection request")
 	token := client.GetOpts().Authorization
@@ -116,7 +128,7 @@ func (a *automateAuthenticator) Check(client natsd.ClientAuthentication) bool {
 	}
 
 	err := a.checkToken(token)
-	if err == nil {
+	if err == nil { // success
 		client.RegisterUser(habNatsUser())
 		log.WithFields(log.Fields{"client": client.RemoteAddress()}).Debug("successfully authenticated NATS connection request")
 		return true
@@ -127,8 +139,26 @@ func (a *automateAuthenticator) Check(client natsd.ClientAuthentication) bool {
 	return false
 }
 
+// habNatsUser makes a *natsd.User struct that we can pass to the
+// natsd.ClientAuthentication.RegisterUser() method. We use this RegisterUser
+// callback to set NATS-level authorization permissions on clients that have
+// presented a valid Automate token. This is intended to restrict the
+// privileges of clients and reduce the damage a malicious actor could inflect
+// if they came to possess a valid ingestion API token.
+//
+// Note that the API that NATS provides for us to do this requires us to pass a
+// natsd.User struct which contains fields for username and password, and we
+// cannot set these fields to nil because they're not pointer fields. For
+// paranoia reasons, we set the password to a randomly generated string, but in
+// the current NATS implementation this user and password can never be used to
+// log in, as password auth is disabled due to the presence of the custom
+// authenticator.
 func habNatsUser() *natsd.User {
 	habClient := &natsd.User{
+		// Username and Password should be completely ignored by NATS, as we are
+		// only using this data structure for the authorization part, but we assign
+		// a big random password just in case some future change in NATS modifies
+		// this behavior.
 		Username: "hab_client",
 		Password: randomPassword(),
 		Permissions: &natsd.Permissions{

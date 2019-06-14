@@ -170,6 +170,7 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 		rego.ParsedQuery(s.queries[authzV2Query]),
 		rego.Compiler(compiler),
 		rego.Store(s.v2Store),
+		rego.DisableInlining([]string{"data.authz_v2.deny"}),
 	)
 	v2Partial, err := r.PartialResult(ctx)
 	if err != nil {

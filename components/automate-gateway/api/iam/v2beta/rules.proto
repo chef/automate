@@ -63,4 +63,20 @@ service Rules {
     option (chef.automate.api.iam.policy).resource = "iam:rules:{id}";
     option (chef.automate.api.iam.policy).action = "iam:rules:delete";
   };
+
+  rpc ApplyRulesStart (ApplyRulesStartReq) returns (ApplyRulesStartResp) {
+    option (google.api.http).get = "/iam/v2beta/apply-rules-start";
+    option (chef.automate.api.policy).resource = "auth:rules";
+    option (chef.automate.api.policy).action = "apply-rules-start";
+    option (chef.automate.api.iam.policy).resource = "iam:rules";
+    option (chef.automate.api.iam.policy).action = "iam:rules:apply";
+  };
+
+  rpc ApplyRulesCancel (ApplyRulesCancelReq) returns (ApplyRulesCancelResp) {
+    option (google.api.http).get = "/iam/v2beta/apply-rules-cancel";
+    option (chef.automate.api.policy).resource = "auth:rules";
+    option (chef.automate.api.policy).action = "apply-rules-cancel";
+    option (chef.automate.api.iam.policy).resource = "iam:rules";
+    option (chef.automate.api.iam.policy).action = "iam:rules:cancel";
+  };
 }

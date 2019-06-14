@@ -8,6 +8,9 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for upgrade-to-v2
+- name: skip-policy-migration
+  default_value: "false"
+  usage: Do not migrate policies from IAM v1.
 inherited_options:
 - name: debug
   shorthand: d

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/open-policy-agent/opa/ast"
-	"github.com/open-policy-agent/opa/storage"
 	"github.com/open-policy-agent/opa/storage/inmem"
 	"github.com/stretchr/testify/require"
 
@@ -313,69 +312,76 @@ func BenchmarkInitPartialResultV2(b *testing.B) {
 	require.NoError(b, err, "init logger")
 	store := inmem.NewFromReader(f)
 
-	for d := 0; d < 5; d++ {
-		b.Run(fmt.Sprintf("default policies, run %d times", d), func(b *testing.B) {
-			s, err := New(ctx, l)
-			require.NoError(b, err, "init state")
-			s.v2Store = store
+	b.Run("default policies", func(b *testing.B) {
+		s, err := New(ctx, l)
+		require.NoError(b, err, "init state")
+		s.v2Store = store
 
-			for n := 0; n < b.N; n++ {
-				for e := 0; e <= d; e++ {
-					r = s.initPartialResultV2(ctx)
-					if r != nil {
-						b.Error(r)
-					}
-				}
+		for n := 0; n < b.N; n++ {
+			r = s.initPartialResultV2(ctx)
+			if r != nil {
+				b.Error(r)
 			}
-			errResult = r
-		})
+		}
+		errResult = r
+	})
+
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+	s.v2Store = store
+
+	r = s.initPartialResultV2(ctx)
+	if r != nil {
+		b.Error(r)
 	}
 
-	for k := 0; k < 5; k++ {
-		m := k * 25
-		store = storeWithDummyPolicies(b, m)
-		b.Run(fmt.Sprintf("%d dummy policies", m), func(b *testing.B) {
-			for n := 0; n < b.N; n++ {
-				s, err := New(ctx, l)
-				require.NoError(b, err, "init state")
-				s.v2Store = store
-
-				r = s.initPartialResultV2(ctx)
-				if r != nil {
-					b.Error(r)
-				}
+	b.Run("IsAuthorized(allow) with the result of BenchmarkInitPartialResultV2", func(b *testing.B) {
+		var resp bool
+		var err error
+		for n := 0; n < b.N; n++ {
+			resp, err = s.V2IsAuthorized(ctx, []string{"user:local:test@example.com"}, "iam:policies:get", "iam:policyVersion")
+			if err != nil {
+				b.Error(err)
 			}
-			errResult = r
-		})
-	}
+			if !resp {
+				b.Error("expected authorized = true")
+			}
+		}
+		authzResponse = resp
+	})
+
+	b.Run("IsAuthorized(deny) with the result of BenchmarkInitPartialResultV2", func(b *testing.B) {
+		var resp bool
+		var err error
+		for n := 0; n < b.N; n++ {
+			resp, err = s.V2IsAuthorized(ctx, []string{"user:local:test@example.com"}, "iam:policies:delete", "iam:policies:administrator-access")
+			if err != nil {
+				b.Error(err)
+			}
+			if resp {
+				b.Error("expected authorized = false")
+			}
+		}
+		authzResponse = resp
+	})
+
+	b.Run("IsAuthorized(default deny) with the result of BenchmarkInitPartialResultV2", func(b *testing.B) {
+		var resp bool
+		var err error
+		for n := 0; n < b.N; n++ {
+			resp, err = s.V2IsAuthorized(ctx, []string{"user:local:test@example.com"}, "iam:policies:delete", "iam:policies:whatever-access")
+			if err != nil {
+				b.Error(err)
+			}
+			if resp {
+				b.Error("expected authorized = false")
+			}
+		}
+		authzResponse = resp
+	})
 }
 
 // helpers
-
-func storeWithDummyPolicies(b *testing.B, k int) storage.Store {
-	data := map[string]interface{}{
-		"roles": map[string]interface{}{},
-		"rules": map[string][]interface{}{},
-	}
-	policies := map[string]interface{}{}
-	for i := 0; i <= k; i++ {
-		policies[fmt.Sprintf("pol_id%d", i)] = map[string]interface{}{
-			"members": []string{"user:local:alice"},
-			"statements": map[string]interface{}{
-				fmt.Sprintf("sid%d", i): map[string]interface{}{
-					"actions":   []string{"iam:project:delete"},
-					"resources": []string{"*"},
-					"effect":    "allow",
-					"projects":  []string{"~~ALL-PROJECTS~~"},
-				},
-			},
-			"type": "custom",
-		}
-	}
-	data["policies"] = policies
-	// b.Log(data)
-	return inmem.NewFromObject(data)
-}
 
 func randomTeams(c int) []string {
 	ret := make([]string, c)

@@ -24,6 +24,7 @@ export interface Service {
 export interface ServiceGroup {
   id: string;
   name: string;
+  package: string;
   release: string;
   status: string;
   health_percentage: boolean;

@@ -46,7 +46,7 @@ func (x ProjectRuleTypes) String() string {
 	return proto.EnumName(ProjectRuleTypes_name, int32(x))
 }
 func (ProjectRuleTypes) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{0}
+	return fileDescriptor_project_64e53386ae54a73e, []int{0}
 }
 
 type ProjectRuleConditionAttributes int32
@@ -84,7 +84,7 @@ func (x ProjectRuleConditionAttributes) String() string {
 	return proto.EnumName(ProjectRuleConditionAttributes_name, int32(x))
 }
 func (ProjectRuleConditionAttributes) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{1}
+	return fileDescriptor_project_64e53386ae54a73e, []int{1}
 }
 
 type ProjectRuleConditionOperators int32
@@ -107,7 +107,7 @@ func (x ProjectRuleConditionOperators) String() string {
 	return proto.EnumName(ProjectRuleConditionOperators_name, int32(x))
 }
 func (ProjectRuleConditionOperators) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{2}
+	return fileDescriptor_project_64e53386ae54a73e, []int{2}
 }
 
 type Project struct {
@@ -124,7 +124,7 @@ func (m *Project) Reset()         { *m = Project{} }
 func (m *Project) String() string { return proto.CompactTextString(m) }
 func (*Project) ProtoMessage()    {}
 func (*Project) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{0}
+	return fileDescriptor_project_64e53386ae54a73e, []int{0}
 }
 func (m *Project) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Project.Unmarshal(m, b)
@@ -184,7 +184,7 @@ func (m *CreateProjectReq) Reset()         { *m = CreateProjectReq{} }
 func (m *CreateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*CreateProjectReq) ProtoMessage()    {}
 func (*CreateProjectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{1}
+	return fileDescriptor_project_64e53386ae54a73e, []int{1}
 }
 func (m *CreateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectReq.Unmarshal(m, b)
@@ -229,7 +229,7 @@ func (m *CreateProjectResp) Reset()         { *m = CreateProjectResp{} }
 func (m *CreateProjectResp) String() string { return proto.CompactTextString(m) }
 func (*CreateProjectResp) ProtoMessage()    {}
 func (*CreateProjectResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{2}
+	return fileDescriptor_project_64e53386ae54a73e, []int{2}
 }
 func (m *CreateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateProjectResp.Unmarshal(m, b)
@@ -267,7 +267,7 @@ func (m *GetProjectReq) Reset()         { *m = GetProjectReq{} }
 func (m *GetProjectReq) String() string { return proto.CompactTextString(m) }
 func (*GetProjectReq) ProtoMessage()    {}
 func (*GetProjectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{3}
+	return fileDescriptor_project_64e53386ae54a73e, []int{3}
 }
 func (m *GetProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectReq.Unmarshal(m, b)
@@ -305,7 +305,7 @@ func (m *GetProjectResp) Reset()         { *m = GetProjectResp{} }
 func (m *GetProjectResp) String() string { return proto.CompactTextString(m) }
 func (*GetProjectResp) ProtoMessage()    {}
 func (*GetProjectResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{4}
+	return fileDescriptor_project_64e53386ae54a73e, []int{4}
 }
 func (m *GetProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetProjectResp.Unmarshal(m, b)
@@ -342,7 +342,7 @@ func (m *ListProjectsReq) Reset()         { *m = ListProjectsReq{} }
 func (m *ListProjectsReq) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsReq) ProtoMessage()    {}
 func (*ListProjectsReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{5}
+	return fileDescriptor_project_64e53386ae54a73e, []int{5}
 }
 func (m *ListProjectsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsReq.Unmarshal(m, b)
@@ -373,7 +373,7 @@ func (m *ListProjectsResp) Reset()         { *m = ListProjectsResp{} }
 func (m *ListProjectsResp) String() string { return proto.CompactTextString(m) }
 func (*ListProjectsResp) ProtoMessage()    {}
 func (*ListProjectsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{6}
+	return fileDescriptor_project_64e53386ae54a73e, []int{6}
 }
 func (m *ListProjectsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListProjectsResp.Unmarshal(m, b)
@@ -412,7 +412,7 @@ func (m *UpdateProjectReq) Reset()         { *m = UpdateProjectReq{} }
 func (m *UpdateProjectReq) String() string { return proto.CompactTextString(m) }
 func (*UpdateProjectReq) ProtoMessage()    {}
 func (*UpdateProjectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{7}
+	return fileDescriptor_project_64e53386ae54a73e, []int{7}
 }
 func (m *UpdateProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectReq.Unmarshal(m, b)
@@ -457,7 +457,7 @@ func (m *UpdateProjectResp) Reset()         { *m = UpdateProjectResp{} }
 func (m *UpdateProjectResp) String() string { return proto.CompactTextString(m) }
 func (*UpdateProjectResp) ProtoMessage()    {}
 func (*UpdateProjectResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{8}
+	return fileDescriptor_project_64e53386ae54a73e, []int{8}
 }
 func (m *UpdateProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateProjectResp.Unmarshal(m, b)
@@ -495,7 +495,7 @@ func (m *DeleteProjectReq) Reset()         { *m = DeleteProjectReq{} }
 func (m *DeleteProjectReq) String() string { return proto.CompactTextString(m) }
 func (*DeleteProjectReq) ProtoMessage()    {}
 func (*DeleteProjectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{9}
+	return fileDescriptor_project_64e53386ae54a73e, []int{9}
 }
 func (m *DeleteProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectReq.Unmarshal(m, b)
@@ -532,7 +532,7 @@ func (m *DeleteProjectResp) Reset()         { *m = DeleteProjectResp{} }
 func (m *DeleteProjectResp) String() string { return proto.CompactTextString(m) }
 func (*DeleteProjectResp) ProtoMessage()    {}
 func (*DeleteProjectResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{10}
+	return fileDescriptor_project_64e53386ae54a73e, []int{10}
 }
 func (m *DeleteProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteProjectResp.Unmarshal(m, b)
@@ -552,97 +552,157 @@ func (m *DeleteProjectResp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteProjectResp proto.InternalMessageInfo
 
-type ProjectUpdateCancelReq struct {
+type ApplyRulesStartReq struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
 }
 
-func (m *ProjectUpdateCancelReq) Reset()         { *m = ProjectUpdateCancelReq{} }
-func (m *ProjectUpdateCancelReq) String() string { return proto.CompactTextString(m) }
-func (*ProjectUpdateCancelReq) ProtoMessage()    {}
-func (*ProjectUpdateCancelReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{11}
+func (m *ApplyRulesStartReq) Reset()         { *m = ApplyRulesStartReq{} }
+func (m *ApplyRulesStartReq) String() string { return proto.CompactTextString(m) }
+func (*ApplyRulesStartReq) ProtoMessage()    {}
+func (*ApplyRulesStartReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_64e53386ae54a73e, []int{11}
 }
-func (m *ProjectUpdateCancelReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ProjectUpdateCancelReq.Unmarshal(m, b)
+func (m *ApplyRulesStartReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ApplyRulesStartReq.Unmarshal(m, b)
 }
-func (m *ProjectUpdateCancelReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ProjectUpdateCancelReq.Marshal(b, m, deterministic)
+func (m *ApplyRulesStartReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ApplyRulesStartReq.Marshal(b, m, deterministic)
 }
-func (dst *ProjectUpdateCancelReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ProjectUpdateCancelReq.Merge(dst, src)
+func (dst *ApplyRulesStartReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplyRulesStartReq.Merge(dst, src)
 }
-func (m *ProjectUpdateCancelReq) XXX_Size() int {
-	return xxx_messageInfo_ProjectUpdateCancelReq.Size(m)
+func (m *ApplyRulesStartReq) XXX_Size() int {
+	return xxx_messageInfo_ApplyRulesStartReq.Size(m)
 }
-func (m *ProjectUpdateCancelReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_ProjectUpdateCancelReq.DiscardUnknown(m)
+func (m *ApplyRulesStartReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplyRulesStartReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ProjectUpdateCancelReq proto.InternalMessageInfo
+var xxx_messageInfo_ApplyRulesStartReq proto.InternalMessageInfo
 
-type ProjectUpdateCancelResp struct {
+type ApplyRulesStartResp struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
 }
 
-func (m *ProjectUpdateCancelResp) Reset()         { *m = ProjectUpdateCancelResp{} }
-func (m *ProjectUpdateCancelResp) String() string { return proto.CompactTextString(m) }
-func (*ProjectUpdateCancelResp) ProtoMessage()    {}
-func (*ProjectUpdateCancelResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{12}
+func (m *ApplyRulesStartResp) Reset()         { *m = ApplyRulesStartResp{} }
+func (m *ApplyRulesStartResp) String() string { return proto.CompactTextString(m) }
+func (*ApplyRulesStartResp) ProtoMessage()    {}
+func (*ApplyRulesStartResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_64e53386ae54a73e, []int{12}
 }
-func (m *ProjectUpdateCancelResp) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ProjectUpdateCancelResp.Unmarshal(m, b)
+func (m *ApplyRulesStartResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ApplyRulesStartResp.Unmarshal(m, b)
 }
-func (m *ProjectUpdateCancelResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ProjectUpdateCancelResp.Marshal(b, m, deterministic)
+func (m *ApplyRulesStartResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ApplyRulesStartResp.Marshal(b, m, deterministic)
 }
-func (dst *ProjectUpdateCancelResp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ProjectUpdateCancelResp.Merge(dst, src)
+func (dst *ApplyRulesStartResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplyRulesStartResp.Merge(dst, src)
 }
-func (m *ProjectUpdateCancelResp) XXX_Size() int {
-	return xxx_messageInfo_ProjectUpdateCancelResp.Size(m)
+func (m *ApplyRulesStartResp) XXX_Size() int {
+	return xxx_messageInfo_ApplyRulesStartResp.Size(m)
 }
-func (m *ProjectUpdateCancelResp) XXX_DiscardUnknown() {
-	xxx_messageInfo_ProjectUpdateCancelResp.DiscardUnknown(m)
+func (m *ApplyRulesStartResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplyRulesStartResp.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ProjectUpdateCancelResp proto.InternalMessageInfo
+var xxx_messageInfo_ApplyRulesStartResp proto.InternalMessageInfo
 
-type ProjectUpdateStatusReq struct {
+type ApplyRulesCancelReq struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
 }
 
-func (m *ProjectUpdateStatusReq) Reset()         { *m = ProjectUpdateStatusReq{} }
-func (m *ProjectUpdateStatusReq) String() string { return proto.CompactTextString(m) }
-func (*ProjectUpdateStatusReq) ProtoMessage()    {}
-func (*ProjectUpdateStatusReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{13}
+func (m *ApplyRulesCancelReq) Reset()         { *m = ApplyRulesCancelReq{} }
+func (m *ApplyRulesCancelReq) String() string { return proto.CompactTextString(m) }
+func (*ApplyRulesCancelReq) ProtoMessage()    {}
+func (*ApplyRulesCancelReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_64e53386ae54a73e, []int{13}
 }
-func (m *ProjectUpdateStatusReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ProjectUpdateStatusReq.Unmarshal(m, b)
+func (m *ApplyRulesCancelReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ApplyRulesCancelReq.Unmarshal(m, b)
 }
-func (m *ProjectUpdateStatusReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ProjectUpdateStatusReq.Marshal(b, m, deterministic)
+func (m *ApplyRulesCancelReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ApplyRulesCancelReq.Marshal(b, m, deterministic)
 }
-func (dst *ProjectUpdateStatusReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ProjectUpdateStatusReq.Merge(dst, src)
+func (dst *ApplyRulesCancelReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplyRulesCancelReq.Merge(dst, src)
 }
-func (m *ProjectUpdateStatusReq) XXX_Size() int {
-	return xxx_messageInfo_ProjectUpdateStatusReq.Size(m)
+func (m *ApplyRulesCancelReq) XXX_Size() int {
+	return xxx_messageInfo_ApplyRulesCancelReq.Size(m)
 }
-func (m *ProjectUpdateStatusReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_ProjectUpdateStatusReq.DiscardUnknown(m)
+func (m *ApplyRulesCancelReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplyRulesCancelReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ProjectUpdateStatusReq proto.InternalMessageInfo
+var xxx_messageInfo_ApplyRulesCancelReq proto.InternalMessageInfo
 
-type ProjectUpdateStatusResp struct {
+type ApplyRulesCancelResp struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *ApplyRulesCancelResp) Reset()         { *m = ApplyRulesCancelResp{} }
+func (m *ApplyRulesCancelResp) String() string { return proto.CompactTextString(m) }
+func (*ApplyRulesCancelResp) ProtoMessage()    {}
+func (*ApplyRulesCancelResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_64e53386ae54a73e, []int{14}
+}
+func (m *ApplyRulesCancelResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ApplyRulesCancelResp.Unmarshal(m, b)
+}
+func (m *ApplyRulesCancelResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ApplyRulesCancelResp.Marshal(b, m, deterministic)
+}
+func (dst *ApplyRulesCancelResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplyRulesCancelResp.Merge(dst, src)
+}
+func (m *ApplyRulesCancelResp) XXX_Size() int {
+	return xxx_messageInfo_ApplyRulesCancelResp.Size(m)
+}
+func (m *ApplyRulesCancelResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplyRulesCancelResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplyRulesCancelResp proto.InternalMessageInfo
+
+type ApplyRulesStatusReq struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *ApplyRulesStatusReq) Reset()         { *m = ApplyRulesStatusReq{} }
+func (m *ApplyRulesStatusReq) String() string { return proto.CompactTextString(m) }
+func (*ApplyRulesStatusReq) ProtoMessage()    {}
+func (*ApplyRulesStatusReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_64e53386ae54a73e, []int{15}
+}
+func (m *ApplyRulesStatusReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ApplyRulesStatusReq.Unmarshal(m, b)
+}
+func (m *ApplyRulesStatusReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ApplyRulesStatusReq.Marshal(b, m, deterministic)
+}
+func (dst *ApplyRulesStatusReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplyRulesStatusReq.Merge(dst, src)
+}
+func (m *ApplyRulesStatusReq) XXX_Size() int {
+	return xxx_messageInfo_ApplyRulesStatusReq.Size(m)
+}
+func (m *ApplyRulesStatusReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplyRulesStatusReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ApplyRulesStatusReq proto.InternalMessageInfo
+
+type ApplyRulesStatusResp struct {
 	State                 string               `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty" toml:"state,omitempty" mapstructure:"state,omitempty"`
 	EstimatedTimeComplete *timestamp.Timestamp `protobuf:"bytes,2,opt,name=estimated_time_complete,json=estimatedTimeComplete,proto3" json:"estimated_time_complete,omitempty" toml:"estimated_time_complete,omitempty" mapstructure:"estimated_time_complete,omitempty"`
 	PercentageComplete    float32              `protobuf:"fixed32,3,opt,name=percentage_complete,json=percentageComplete,proto3" json:"percentage_complete,omitempty" toml:"percentage_complete,omitempty" mapstructure:"percentage_complete,omitempty"`
@@ -653,59 +713,59 @@ type ProjectUpdateStatusResp struct {
 	XXX_sizecache         int32                `json:"-" toml:"-" mapstructure:"-,omitempty"`
 }
 
-func (m *ProjectUpdateStatusResp) Reset()         { *m = ProjectUpdateStatusResp{} }
-func (m *ProjectUpdateStatusResp) String() string { return proto.CompactTextString(m) }
-func (*ProjectUpdateStatusResp) ProtoMessage()    {}
-func (*ProjectUpdateStatusResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{14}
+func (m *ApplyRulesStatusResp) Reset()         { *m = ApplyRulesStatusResp{} }
+func (m *ApplyRulesStatusResp) String() string { return proto.CompactTextString(m) }
+func (*ApplyRulesStatusResp) ProtoMessage()    {}
+func (*ApplyRulesStatusResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_project_64e53386ae54a73e, []int{16}
 }
-func (m *ProjectUpdateStatusResp) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ProjectUpdateStatusResp.Unmarshal(m, b)
+func (m *ApplyRulesStatusResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ApplyRulesStatusResp.Unmarshal(m, b)
 }
-func (m *ProjectUpdateStatusResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ProjectUpdateStatusResp.Marshal(b, m, deterministic)
+func (m *ApplyRulesStatusResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ApplyRulesStatusResp.Marshal(b, m, deterministic)
 }
-func (dst *ProjectUpdateStatusResp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ProjectUpdateStatusResp.Merge(dst, src)
+func (dst *ApplyRulesStatusResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ApplyRulesStatusResp.Merge(dst, src)
 }
-func (m *ProjectUpdateStatusResp) XXX_Size() int {
-	return xxx_messageInfo_ProjectUpdateStatusResp.Size(m)
+func (m *ApplyRulesStatusResp) XXX_Size() int {
+	return xxx_messageInfo_ApplyRulesStatusResp.Size(m)
 }
-func (m *ProjectUpdateStatusResp) XXX_DiscardUnknown() {
-	xxx_messageInfo_ProjectUpdateStatusResp.DiscardUnknown(m)
+func (m *ApplyRulesStatusResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_ApplyRulesStatusResp.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ProjectUpdateStatusResp proto.InternalMessageInfo
+var xxx_messageInfo_ApplyRulesStatusResp proto.InternalMessageInfo
 
-func (m *ProjectUpdateStatusResp) GetState() string {
+func (m *ApplyRulesStatusResp) GetState() string {
 	if m != nil {
 		return m.State
 	}
 	return ""
 }
 
-func (m *ProjectUpdateStatusResp) GetEstimatedTimeComplete() *timestamp.Timestamp {
+func (m *ApplyRulesStatusResp) GetEstimatedTimeComplete() *timestamp.Timestamp {
 	if m != nil {
 		return m.EstimatedTimeComplete
 	}
 	return nil
 }
 
-func (m *ProjectUpdateStatusResp) GetPercentageComplete() float32 {
+func (m *ApplyRulesStatusResp) GetPercentageComplete() float32 {
 	if m != nil {
 		return m.PercentageComplete
 	}
 	return 0
 }
 
-func (m *ProjectUpdateStatusResp) GetFailed() bool {
+func (m *ApplyRulesStatusResp) GetFailed() bool {
 	if m != nil {
 		return m.Failed
 	}
 	return false
 }
 
-func (m *ProjectUpdateStatusResp) GetFailureMessage() string {
+func (m *ApplyRulesStatusResp) GetFailureMessage() string {
 	if m != nil {
 		return m.FailureMessage
 	}
@@ -722,7 +782,7 @@ func (m *ListRulesForAllProjectsReq) Reset()         { *m = ListRulesForAllProje
 func (m *ListRulesForAllProjectsReq) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForAllProjectsReq) ProtoMessage()    {}
 func (*ListRulesForAllProjectsReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{15}
+	return fileDescriptor_project_64e53386ae54a73e, []int{17}
 }
 func (m *ListRulesForAllProjectsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForAllProjectsReq.Unmarshal(m, b)
@@ -753,7 +813,7 @@ func (m *ListRulesForAllProjectsResp) Reset()         { *m = ListRulesForAllProj
 func (m *ListRulesForAllProjectsResp) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForAllProjectsResp) ProtoMessage()    {}
 func (*ListRulesForAllProjectsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{16}
+	return fileDescriptor_project_64e53386ae54a73e, []int{18}
 }
 func (m *ListRulesForAllProjectsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForAllProjectsResp.Unmarshal(m, b)
@@ -791,7 +851,7 @@ func (m *ProjectRules) Reset()         { *m = ProjectRules{} }
 func (m *ProjectRules) String() string { return proto.CompactTextString(m) }
 func (*ProjectRules) ProtoMessage()    {}
 func (*ProjectRules) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{17}
+	return fileDescriptor_project_64e53386ae54a73e, []int{19}
 }
 func (m *ProjectRules) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRules.Unmarshal(m, b)
@@ -833,7 +893,7 @@ func (m *ProjectRule) Reset()         { *m = ProjectRule{} }
 func (m *ProjectRule) String() string { return proto.CompactTextString(m) }
 func (*ProjectRule) ProtoMessage()    {}
 func (*ProjectRule) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{18}
+	return fileDescriptor_project_64e53386ae54a73e, []int{20}
 }
 func (m *ProjectRule) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ProjectRule.Unmarshal(m, b)
@@ -901,7 +961,7 @@ func (m *Condition) Reset()         { *m = Condition{} }
 func (m *Condition) String() string { return proto.CompactTextString(m) }
 func (*Condition) ProtoMessage()    {}
 func (*Condition) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{19}
+	return fileDescriptor_project_64e53386ae54a73e, []int{21}
 }
 func (m *Condition) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Condition.Unmarshal(m, b)
@@ -959,7 +1019,7 @@ func (m *CreateRuleReq) Reset()         { *m = CreateRuleReq{} }
 func (m *CreateRuleReq) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleReq) ProtoMessage()    {}
 func (*CreateRuleReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{20}
+	return fileDescriptor_project_64e53386ae54a73e, []int{22}
 }
 func (m *CreateRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleReq.Unmarshal(m, b)
@@ -1025,7 +1085,7 @@ func (m *CreateRuleResp) Reset()         { *m = CreateRuleResp{} }
 func (m *CreateRuleResp) String() string { return proto.CompactTextString(m) }
 func (*CreateRuleResp) ProtoMessage()    {}
 func (*CreateRuleResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{21}
+	return fileDescriptor_project_64e53386ae54a73e, []int{23}
 }
 func (m *CreateRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateRuleResp.Unmarshal(m, b)
@@ -1067,7 +1127,7 @@ func (m *UpdateRuleReq) Reset()         { *m = UpdateRuleReq{} }
 func (m *UpdateRuleReq) String() string { return proto.CompactTextString(m) }
 func (*UpdateRuleReq) ProtoMessage()    {}
 func (*UpdateRuleReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{22}
+	return fileDescriptor_project_64e53386ae54a73e, []int{24}
 }
 func (m *UpdateRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateRuleReq.Unmarshal(m, b)
@@ -1133,7 +1193,7 @@ func (m *UpdateRuleResp) Reset()         { *m = UpdateRuleResp{} }
 func (m *UpdateRuleResp) String() string { return proto.CompactTextString(m) }
 func (*UpdateRuleResp) ProtoMessage()    {}
 func (*UpdateRuleResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{23}
+	return fileDescriptor_project_64e53386ae54a73e, []int{25}
 }
 func (m *UpdateRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateRuleResp.Unmarshal(m, b)
@@ -1171,7 +1231,7 @@ func (m *GetRuleReq) Reset()         { *m = GetRuleReq{} }
 func (m *GetRuleReq) String() string { return proto.CompactTextString(m) }
 func (*GetRuleReq) ProtoMessage()    {}
 func (*GetRuleReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{24}
+	return fileDescriptor_project_64e53386ae54a73e, []int{26}
 }
 func (m *GetRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRuleReq.Unmarshal(m, b)
@@ -1209,7 +1269,7 @@ func (m *GetRuleResp) Reset()         { *m = GetRuleResp{} }
 func (m *GetRuleResp) String() string { return proto.CompactTextString(m) }
 func (*GetRuleResp) ProtoMessage()    {}
 func (*GetRuleResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{25}
+	return fileDescriptor_project_64e53386ae54a73e, []int{27}
 }
 func (m *GetRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRuleResp.Unmarshal(m, b)
@@ -1246,7 +1306,7 @@ func (m *ListRulesReq) Reset()         { *m = ListRulesReq{} }
 func (m *ListRulesReq) String() string { return proto.CompactTextString(m) }
 func (*ListRulesReq) ProtoMessage()    {}
 func (*ListRulesReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{26}
+	return fileDescriptor_project_64e53386ae54a73e, []int{28}
 }
 func (m *ListRulesReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesReq.Unmarshal(m, b)
@@ -1277,7 +1337,7 @@ func (m *ListRulesResp) Reset()         { *m = ListRulesResp{} }
 func (m *ListRulesResp) String() string { return proto.CompactTextString(m) }
 func (*ListRulesResp) ProtoMessage()    {}
 func (*ListRulesResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{27}
+	return fileDescriptor_project_64e53386ae54a73e, []int{29}
 }
 func (m *ListRulesResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesResp.Unmarshal(m, b)
@@ -1315,7 +1375,7 @@ func (m *ListRulesForProjectReq) Reset()         { *m = ListRulesForProjectReq{}
 func (m *ListRulesForProjectReq) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForProjectReq) ProtoMessage()    {}
 func (*ListRulesForProjectReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{28}
+	return fileDescriptor_project_64e53386ae54a73e, []int{30}
 }
 func (m *ListRulesForProjectReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForProjectReq.Unmarshal(m, b)
@@ -1353,7 +1413,7 @@ func (m *ListRulesForProjectResp) Reset()         { *m = ListRulesForProjectResp
 func (m *ListRulesForProjectResp) String() string { return proto.CompactTextString(m) }
 func (*ListRulesForProjectResp) ProtoMessage()    {}
 func (*ListRulesForProjectResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{29}
+	return fileDescriptor_project_64e53386ae54a73e, []int{31}
 }
 func (m *ListRulesForProjectResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ListRulesForProjectResp.Unmarshal(m, b)
@@ -1391,7 +1451,7 @@ func (m *DeleteRuleReq) Reset()         { *m = DeleteRuleReq{} }
 func (m *DeleteRuleReq) String() string { return proto.CompactTextString(m) }
 func (*DeleteRuleReq) ProtoMessage()    {}
 func (*DeleteRuleReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{30}
+	return fileDescriptor_project_64e53386ae54a73e, []int{32}
 }
 func (m *DeleteRuleReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteRuleReq.Unmarshal(m, b)
@@ -1428,7 +1488,7 @@ func (m *DeleteRuleResp) Reset()         { *m = DeleteRuleResp{} }
 func (m *DeleteRuleResp) String() string { return proto.CompactTextString(m) }
 func (*DeleteRuleResp) ProtoMessage()    {}
 func (*DeleteRuleResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_project_f5b8b249a87a3630, []int{31}
+	return fileDescriptor_project_64e53386ae54a73e, []int{33}
 }
 func (m *DeleteRuleResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteRuleResp.Unmarshal(m, b)
@@ -1460,10 +1520,12 @@ func init() {
 	proto.RegisterType((*UpdateProjectResp)(nil), "chef.automate.domain.authz.v2.UpdateProjectResp")
 	proto.RegisterType((*DeleteProjectReq)(nil), "chef.automate.domain.authz.v2.DeleteProjectReq")
 	proto.RegisterType((*DeleteProjectResp)(nil), "chef.automate.domain.authz.v2.DeleteProjectResp")
-	proto.RegisterType((*ProjectUpdateCancelReq)(nil), "chef.automate.domain.authz.v2.ProjectUpdateCancelReq")
-	proto.RegisterType((*ProjectUpdateCancelResp)(nil), "chef.automate.domain.authz.v2.ProjectUpdateCancelResp")
-	proto.RegisterType((*ProjectUpdateStatusReq)(nil), "chef.automate.domain.authz.v2.ProjectUpdateStatusReq")
-	proto.RegisterType((*ProjectUpdateStatusResp)(nil), "chef.automate.domain.authz.v2.ProjectUpdateStatusResp")
+	proto.RegisterType((*ApplyRulesStartReq)(nil), "chef.automate.domain.authz.v2.ApplyRulesStartReq")
+	proto.RegisterType((*ApplyRulesStartResp)(nil), "chef.automate.domain.authz.v2.ApplyRulesStartResp")
+	proto.RegisterType((*ApplyRulesCancelReq)(nil), "chef.automate.domain.authz.v2.ApplyRulesCancelReq")
+	proto.RegisterType((*ApplyRulesCancelResp)(nil), "chef.automate.domain.authz.v2.ApplyRulesCancelResp")
+	proto.RegisterType((*ApplyRulesStatusReq)(nil), "chef.automate.domain.authz.v2.ApplyRulesStatusReq")
+	proto.RegisterType((*ApplyRulesStatusResp)(nil), "chef.automate.domain.authz.v2.ApplyRulesStatusResp")
 	proto.RegisterType((*ListRulesForAllProjectsReq)(nil), "chef.automate.domain.authz.v2.ListRulesForAllProjectsReq")
 	proto.RegisterType((*ListRulesForAllProjectsResp)(nil), "chef.automate.domain.authz.v2.ListRulesForAllProjectsResp")
 	proto.RegisterMapType((map[string]*ProjectRules)(nil), "chef.automate.domain.authz.v2.ListRulesForAllProjectsResp.ProjectRulesEntry")
@@ -1505,11 +1567,10 @@ type ProjectsClient interface {
 	DeleteProject(ctx context.Context, in *DeleteProjectReq, opts ...grpc.CallOption) (*DeleteProjectResp, error)
 	ListProjects(ctx context.Context, in *ListProjectsReq, opts ...grpc.CallOption) (*ListProjectsResp, error)
 	ListProjectsForIntrospection(ctx context.Context, in *ListProjectsReq, opts ...grpc.CallOption) (*ListProjectsResp, error)
-	// Note: POC functions that are not ready to expose outside of our
-	// spike (aka keep them out of the gateway for now).
 	HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error)
-	ProjectUpdateStatus(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateStatusResp, error)
-	ProjectUpdateCancel(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateCancelResp, error)
+	ApplyRulesStart(ctx context.Context, in *ApplyRulesStartReq, opts ...grpc.CallOption) (*ApplyRulesStartResp, error)
+	ApplyRulesCancel(ctx context.Context, in *ApplyRulesCancelReq, opts ...grpc.CallOption) (*ApplyRulesCancelResp, error)
+	ApplyRulesStatus(ctx context.Context, in *ApplyRulesStatusReq, opts ...grpc.CallOption) (*ApplyRulesStatusResp, error)
 	// "proper" methods go here (and the ones above will be phased out eventually)
 	CreateRule(ctx context.Context, in *CreateRuleReq, opts ...grpc.CallOption) (*CreateRuleResp, error)
 	UpdateRule(ctx context.Context, in *UpdateRuleReq, opts ...grpc.CallOption) (*UpdateRuleResp, error)
@@ -1591,18 +1652,27 @@ func (c *projectsClient) HandleEvent(ctx context.Context, in *event.EventMsg, op
 	return out, nil
 }
 
-func (c *projectsClient) ProjectUpdateStatus(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateStatusResp, error) {
-	out := new(ProjectUpdateStatusResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.authz.v2.Projects/ProjectUpdateStatus", in, out, opts...)
+func (c *projectsClient) ApplyRulesStart(ctx context.Context, in *ApplyRulesStartReq, opts ...grpc.CallOption) (*ApplyRulesStartResp, error) {
+	out := new(ApplyRulesStartResp)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.authz.v2.Projects/ApplyRulesStart", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *projectsClient) ProjectUpdateCancel(ctx context.Context, in *ProjectUpdateStatusReq, opts ...grpc.CallOption) (*ProjectUpdateCancelResp, error) {
-	out := new(ProjectUpdateCancelResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.authz.v2.Projects/ProjectUpdateCancel", in, out, opts...)
+func (c *projectsClient) ApplyRulesCancel(ctx context.Context, in *ApplyRulesCancelReq, opts ...grpc.CallOption) (*ApplyRulesCancelResp, error) {
+	out := new(ApplyRulesCancelResp)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.authz.v2.Projects/ApplyRulesCancel", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *projectsClient) ApplyRulesStatus(ctx context.Context, in *ApplyRulesStatusReq, opts ...grpc.CallOption) (*ApplyRulesStatusResp, error) {
+	out := new(ApplyRulesStatusResp)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.authz.v2.Projects/ApplyRulesStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1680,11 +1750,10 @@ type ProjectsServer interface {
 	DeleteProject(context.Context, *DeleteProjectReq) (*DeleteProjectResp, error)
 	ListProjects(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
 	ListProjectsForIntrospection(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
-	// Note: POC functions that are not ready to expose outside of our
-	// spike (aka keep them out of the gateway for now).
 	HandleEvent(context.Context, *event.EventMsg) (*event.EventResponse, error)
-	ProjectUpdateStatus(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
-	ProjectUpdateCancel(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateCancelResp, error)
+	ApplyRulesStart(context.Context, *ApplyRulesStartReq) (*ApplyRulesStartResp, error)
+	ApplyRulesCancel(context.Context, *ApplyRulesCancelReq) (*ApplyRulesCancelResp, error)
+	ApplyRulesStatus(context.Context, *ApplyRulesStatusReq) (*ApplyRulesStatusResp, error)
 	// "proper" methods go here (and the ones above will be phased out eventually)
 	CreateRule(context.Context, *CreateRuleReq) (*CreateRuleResp, error)
 	UpdateRule(context.Context, *UpdateRuleReq) (*UpdateRuleResp, error)
@@ -1825,38 +1894,56 @@ func _Projects_HandleEvent_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Projects_ProjectUpdateStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProjectUpdateStatusReq)
+func _Projects_ApplyRulesStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplyRulesStartReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProjectsServer).ProjectUpdateStatus(ctx, in)
+		return srv.(ProjectsServer).ApplyRulesStart(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.authz.v2.Projects/ProjectUpdateStatus",
+		FullMethod: "/chef.automate.domain.authz.v2.Projects/ApplyRulesStart",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectsServer).ProjectUpdateStatus(ctx, req.(*ProjectUpdateStatusReq))
+		return srv.(ProjectsServer).ApplyRulesStart(ctx, req.(*ApplyRulesStartReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Projects_ProjectUpdateCancel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProjectUpdateStatusReq)
+func _Projects_ApplyRulesCancel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplyRulesCancelReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProjectsServer).ProjectUpdateCancel(ctx, in)
+		return srv.(ProjectsServer).ApplyRulesCancel(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.authz.v2.Projects/ProjectUpdateCancel",
+		FullMethod: "/chef.automate.domain.authz.v2.Projects/ApplyRulesCancel",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectsServer).ProjectUpdateCancel(ctx, req.(*ProjectUpdateStatusReq))
+		return srv.(ProjectsServer).ApplyRulesCancel(ctx, req.(*ApplyRulesCancelReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Projects_ApplyRulesStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplyRulesStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProjectsServer).ApplyRulesStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.authz.v2.Projects/ApplyRulesStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProjectsServer).ApplyRulesStatus(ctx, req.(*ApplyRulesStatusReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2020,12 +2107,16 @@ var _Projects_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Projects_HandleEvent_Handler,
 		},
 		{
-			MethodName: "ProjectUpdateStatus",
-			Handler:    _Projects_ProjectUpdateStatus_Handler,
+			MethodName: "ApplyRulesStart",
+			Handler:    _Projects_ApplyRulesStart_Handler,
 		},
 		{
-			MethodName: "ProjectUpdateCancel",
-			Handler:    _Projects_ProjectUpdateCancel_Handler,
+			MethodName: "ApplyRulesCancel",
+			Handler:    _Projects_ApplyRulesCancel_Handler,
+		},
+		{
+			MethodName: "ApplyRulesStatus",
+			Handler:    _Projects_ApplyRulesStatus_Handler,
 		},
 		{
 			MethodName: "CreateRule",
@@ -2061,98 +2152,100 @@ var _Projects_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_f5b8b249a87a3630)
+	proto.RegisterFile("api/interservice/authz/v2/project.proto", fileDescriptor_project_64e53386ae54a73e)
 }
 
-var fileDescriptor_project_f5b8b249a87a3630 = []byte{
-	// 1411 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x58, 0x4d, 0x6f, 0x1b, 0xc5,
-	0x1b, 0xf7, 0xfa, 0x25, 0x8d, 0x9f, 0x24, 0xee, 0x66, 0xf2, 0x6f, 0xe3, 0xbf, 0x69, 0x20, 0x5a,
-	0x2a, 0x1a, 0xd2, 0xc6, 0x2e, 0xa6, 0x94, 0xbe, 0x40, 0xd5, 0xc4, 0xdd, 0xa4, 0x91, 0xe2, 0x38,
-	0x1d, 0x27, 0x11, 0x10, 0x81, 0xb5, 0xb1, 0x27, 0xc9, 0x52, 0x7b, 0x77, 0xb3, 0x33, 0xb6, 0x94,
-	0x22, 0x0e, 0x20, 0xc4, 0x07, 0xa8, 0xc4, 0xf7, 0xe0, 0xcc, 0x89, 0xcf, 0xc1, 0x85, 0x33, 0x1f,
-	0x80, 0x03, 0x17, 0x84, 0x66, 0xf6, 0xc5, 0xbb, 0x8e, 0x93, 0xb5, 0x8d, 0xd5, 0x13, 0x17, 0x6b,
-	0x67, 0xe6, 0x79, 0x9b, 0xf9, 0x3d, 0xaf, 0x86, 0x5b, 0x9a, 0xa5, 0x17, 0x74, 0x83, 0x11, 0x9b,
-	0x12, 0xbb, 0xa3, 0xd7, 0x49, 0x41, 0x6b, 0xb3, 0x93, 0x57, 0x85, 0x4e, 0xb1, 0x60, 0xd9, 0xe6,
-	0xd7, 0xa4, 0xce, 0xf2, 0x96, 0x6d, 0x32, 0x13, 0x2d, 0xd4, 0x4f, 0xc8, 0x51, 0x5e, 0x6b, 0x33,
-	0xb3, 0xa5, 0x31, 0x92, 0x6f, 0x98, 0x2d, 0x4d, 0x37, 0xf2, 0x82, 0x38, 0xdf, 0x29, 0xe6, 0xe6,
-	0x3b, 0x5a, 0x53, 0x6f, 0x68, 0x8c, 0x14, 0xbc, 0x0f, 0x87, 0x2f, 0x77, 0xf3, 0x62, 0x05, 0xec,
-	0xcc, 0xf2, 0xa8, 0x94, 0x73, 0x54, 0xa4, 0x43, 0x0c, 0xe6, 0xfc, 0xba, 0x34, 0xef, 0x1c, 0x9b,
-	0xe6, 0x71, 0x93, 0x14, 0xc4, 0xea, 0xb0, 0x7d, 0x54, 0x60, 0x7a, 0x8b, 0x50, 0xa6, 0xb5, 0x2c,
-	0x87, 0x40, 0xf9, 0x5e, 0x82, 0x2b, 0x3b, 0x8e, 0xd1, 0x08, 0x41, 0xd2, 0xd0, 0x5a, 0x24, 0x2b,
-	0x2d, 0x4a, 0x4b, 0x69, 0x2c, 0xbe, 0x51, 0x06, 0xe2, 0x7a, 0x23, 0x1b, 0x17, 0x3b, 0x71, 0xbd,
-	0x81, 0x3e, 0x86, 0x24, 0x37, 0x21, 0x9b, 0x58, 0x94, 0x96, 0x32, 0xc5, 0x77, 0xf3, 0x97, 0xde,
-	0x30, 0xbf, 0x7b, 0x66, 0x11, 0x2c, 0x18, 0x50, 0x0e, 0x26, 0xdd, 0xc7, 0xa1, 0xd9, 0xe4, 0x62,
-	0x62, 0x29, 0x8d, 0xfd, 0xb5, 0x82, 0x41, 0x2e, 0xd9, 0x44, 0x63, 0xc4, 0xb5, 0x04, 0x93, 0xd3,
-	0xbe, 0xc6, 0x2c, 0x77, 0x8d, 0x59, 0xcb, 0xfd, 0xf2, 0xc7, 0xaf, 0x89, 0x6b, 0xf6, 0x5c, 0x71,
-	0xf6, 0xab, 0x03, 0x6d, 0xe5, 0xd5, 0xdd, 0x95, 0x87, 0x2b, 0x5f, 0x7e, 0xf3, 0xc1, 0x9d, 0xfb,
-	0xf7, 0xbe, 0xbd, 0xc9, 0x0d, 0x55, 0xf6, 0x60, 0xb6, 0x47, 0x26, 0xb5, 0xd0, 0x53, 0xb8, 0xe2,
-	0x2a, 0x15, 0x72, 0xa7, 0x8a, 0xef, 0x45, 0x5c, 0xc0, 0x63, 0xf6, 0xd8, 0x94, 0xc7, 0x30, 0xb3,
-	0x41, 0x58, 0xc0, 0x4e, 0xc7, 0x26, 0x69, 0x20, 0x9b, 0x30, 0x64, 0x82, 0xcc, 0x63, 0x31, 0x68,
-	0x16, 0xae, 0x6e, 0xe9, 0xd4, 0x13, 0x4a, 0x31, 0x39, 0x55, 0xf6, 0x41, 0x0e, 0x6f, 0x51, 0x0b,
-	0xad, 0x05, 0x9e, 0x5f, 0x5a, 0x4c, 0x0c, 0xa1, 0x29, 0x04, 0xd3, 0x9e, 0xd5, 0x18, 0x3b, 0x4c,
-	0x3d, 0x32, 0xc7, 0xf2, 0x2a, 0x4f, 0x40, 0x7e, 0x46, 0x9a, 0x24, 0x64, 0xea, 0x30, 0x48, 0xcd,
-	0xc1, 0x6c, 0x0f, 0x3f, 0xb5, 0x94, 0x2c, 0x5c, 0x77, 0x97, 0x8e, 0xc9, 0x25, 0xcd, 0xa8, 0x93,
-	0x26, 0x7f, 0xf1, 0xff, 0xc3, 0x7c, 0xdf, 0x93, 0x3e, 0x4c, 0x55, 0xa6, 0xb1, 0xb6, 0x80, 0xe9,
-	0x4f, 0xa9, 0x87, 0xcb, 0x3b, 0xa2, 0x16, 0xfa, 0x1f, 0xa4, 0x28, 0xd3, 0x98, 0xf7, 0xae, 0xce,
-	0x02, 0x61, 0x98, 0x27, 0x94, 0xe9, 0xfc, 0x09, 0x1a, 0x35, 0x1e, 0xc9, 0xb5, 0xba, 0xd9, 0xb2,
-	0xb8, 0x99, 0xe2, 0xb5, 0xa7, 0x8a, 0xb9, 0xbc, 0x13, 0xef, 0x79, 0x2f, 0xde, 0xf3, 0xbb, 0x5e,
-	0xbc, 0xe3, 0x6b, 0x3e, 0x2b, 0xdf, 0x2b, 0xb9, 0x8c, 0xa8, 0x00, 0x73, 0x16, 0xb1, 0xeb, 0xc4,
-	0x60, 0xda, 0x71, 0x40, 0x1e, 0x8f, 0xef, 0x38, 0x46, 0xdd, 0x23, 0x9f, 0xe1, 0x3a, 0x4c, 0x1c,
-	0x69, 0x7a, 0x93, 0x34, 0xb2, 0xc9, 0x45, 0x69, 0x69, 0x12, 0xbb, 0x2b, 0x74, 0x0b, 0xae, 0xf2,
-	0xaf, 0xb6, 0x4d, 0x6a, 0x2d, 0x42, 0xa9, 0x76, 0x4c, 0xb2, 0x29, 0x61, 0x7c, 0xc6, 0xdd, 0x2e,
-	0x3b, 0xbb, 0xca, 0x0d, 0xc8, 0x71, 0xf7, 0xc4, 0xed, 0x26, 0xa1, 0xeb, 0xa6, 0xbd, 0xda, 0x6c,
-	0x06, 0x9d, 0xf7, 0x6f, 0x09, 0xde, 0xba, 0xf0, 0x98, 0x5a, 0xe8, 0x14, 0x66, 0x5c, 0x90, 0x6b,
-	0x36, 0x27, 0xc9, 0xc6, 0x85, 0x37, 0x6f, 0x45, 0x78, 0xc8, 0x25, 0x22, 0x7d, 0xef, 0xe1, 0xc7,
-	0xaa, 0xc1, 0xec, 0x33, 0x3c, 0x6d, 0x05, 0xb6, 0x72, 0x4d, 0x98, 0x3d, 0x47, 0x82, 0x64, 0x48,
-	0xbc, 0x24, 0x67, 0x2e, 0x3e, 0xfc, 0x13, 0xad, 0x42, 0xaa, 0xa3, 0x35, 0xdb, 0x1e, 0x16, 0xb7,
-	0x07, 0xf4, 0x59, 0x2e, 0x12, 0x3b, 0x9c, 0x8f, 0xe2, 0x0f, 0x24, 0x65, 0x07, 0xa6, 0x83, 0x47,
-	0xe8, 0x29, 0xa4, 0x82, 0x17, 0x5d, 0x1e, 0x5c, 0x2c, 0x76, 0x18, 0x95, 0xdf, 0x25, 0x98, 0x0a,
-	0x6c, 0xbb, 0x39, 0x5d, 0xf2, 0x73, 0xfa, 0x02, 0x80, 0xf7, 0xa4, 0x7e, 0xae, 0x4f, 0xbb, 0x3b,
-	0x9b, 0x0d, 0x3f, 0xc4, 0x13, 0x81, 0x10, 0x2f, 0xb9, 0x65, 0x20, 0x29, 0xca, 0x40, 0x61, 0x70,
-	0x9b, 0x78, 0x45, 0xa0, 0x6e, 0x49, 0x78, 0x0e, 0x50, 0x37, 0x8d, 0x86, 0xce, 0x74, 0xd3, 0xa0,
-	0xd9, 0x94, 0xb8, 0xde, 0x52, 0x84, 0xa8, 0x92, 0xc7, 0x80, 0x03, 0xbc, 0xca, 0x6f, 0x12, 0xa4,
-	0xfd, 0x13, 0x74, 0x00, 0x69, 0x8d, 0x31, 0x5b, 0x3f, 0x6c, 0xbb, 0x01, 0x94, 0x29, 0x7e, 0x3a,
-	0xb8, 0x85, 0xbe, 0x9c, 0x55, 0x4f, 0x06, 0xc5, 0x5d, 0x79, 0xdc, 0xfd, 0x05, 0x56, 0x0e, 0x1e,
-	0x69, 0xec, 0xae, 0xd0, 0x67, 0x30, 0x69, 0x5a, 0xc4, 0xd6, 0x98, 0x69, 0xbb, 0xc5, 0xf1, 0x93,
-	0x11, 0x74, 0x56, 0x5c, 0x11, 0x14, 0xfb, 0xd2, 0x94, 0x9f, 0xe3, 0x30, 0xe3, 0x94, 0x32, 0x01,
-	0xea, 0x70, 0x99, 0x0c, 0x3d, 0x3c, 0x0f, 0xee, 0xa5, 0x3c, 0x01, 0xe0, 0x17, 0x82, 0xc0, 0xaf,
-	0xa5, 0x39, 0x53, 0xd2, 0x8e, 0xcb, 0xd2, 0x38, 0x7d, 0x60, 0xf7, 0xdf, 0xf8, 0xc0, 0x1a, 0x70,
-	0x9b, 0x52, 0xaf, 0xa5, 0xf8, 0xa4, 0x14, 0xf2, 0x87, 0x1d, 0xc8, 0x04, 0x5f, 0x8c, 0x5a, 0xe8,
-	0x09, 0x24, 0x79, 0x30, 0xb8, 0xf5, 0x64, 0x98, 0x20, 0x12, 0x7c, 0x02, 0x04, 0x27, 0x4b, 0xff,
-	0x07, 0xc2, 0xe0, 0x20, 0x04, 0x5f, 0x6c, 0x0c, 0x20, 0x3c, 0x00, 0xd8, 0x20, 0x6c, 0x04, 0x00,
-	0x94, 0x32, 0x4c, 0xf9, 0x9c, 0x63, 0x30, 0x24, 0x03, 0xd3, 0x7e, 0x41, 0xe1, 0x45, 0xeb, 0x05,
-	0xcc, 0x04, 0xd6, 0xa2, 0x83, 0x71, 0x93, 0xb6, 0x34, 0x6a, 0xd2, 0x7e, 0x06, 0xd7, 0x83, 0x35,
-	0x6b, 0xc4, 0x3e, 0xe6, 0x00, 0xe6, 0xfb, 0x4a, 0x19, 0x8b, 0x89, 0x8f, 0x61, 0xc6, 0x69, 0x92,
-	0x46, 0x41, 0x44, 0x86, 0x4c, 0x90, 0x99, 0x5a, 0xcb, 0xb7, 0x40, 0xee, 0xf5, 0x4f, 0x34, 0x09,
-	0xc9, 0xed, 0xca, 0x33, 0x55, 0x8e, 0xa1, 0x34, 0xa4, 0xd4, 0x7d, 0x75, 0x7b, 0x57, 0x96, 0x96,
-	0x7f, 0x92, 0xe0, 0xed, 0xcb, 0x13, 0x36, 0x92, 0x61, 0xba, 0xf4, 0x5c, 0x5d, 0xaf, 0x55, 0x55,
-	0xbc, 0xaf, 0xe2, 0xaa, 0x1c, 0x43, 0x33, 0x90, 0x16, 0x3b, 0x15, 0xbc, 0x51, 0x95, 0x25, 0x74,
-	0x0d, 0x66, 0xc5, 0x52, 0xdd, 0xde, 0xdf, 0xc4, 0x95, 0xed, 0xb2, 0xba, 0xbd, 0x5b, 0x95, 0xe3,
-	0x5c, 0x0b, 0xae, 0x6c, 0xa9, 0x55, 0x39, 0xe1, 0x33, 0xec, 0xae, 0x6e, 0x54, 0xe5, 0x24, 0x97,
-	0xb8, 0x53, 0xd9, 0xda, 0x2c, 0x7d, 0x5e, 0xdb, 0xc0, 0x95, 0xbd, 0x1d, 0x39, 0x85, 0xae, 0xc2,
-	0x94, 0xbb, 0xb3, 0xbd, 0x5a, 0x56, 0xe5, 0x89, 0xe5, 0x47, 0xb0, 0x70, 0x69, 0x4e, 0xe7, 0x22,
-	0xcb, 0x6a, 0x79, 0x4d, 0xc5, 0xb5, 0xca, 0xba, 0x1c, 0x43, 0x00, 0x13, 0xea, 0x8b, 0xbd, 0xd5,
-	0xad, 0xaa, 0x2c, 0x15, 0xff, 0xca, 0xc0, 0xa4, 0xd7, 0x94, 0x20, 0xe6, 0xe5, 0x1a, 0x6f, 0x32,
-	0x8b, 0x8a, 0xeb, 0xde, 0xb6, 0x3c, 0x77, 0x77, 0x38, 0x06, 0x6a, 0x29, 0x31, 0xae, 0x35, 0x34,
-	0x31, 0x45, 0x6a, 0xed, 0x9d, 0xd9, 0x22, 0xb5, 0x9e, 0x1b, 0xc8, 0x94, 0x18, 0x7a, 0x29, 0x62,
-	0xda, 0x53, 0x79, 0x27, 0x42, 0x42, 0x68, 0xf6, 0xca, 0xad, 0x0c, 0x41, 0xed, 0x5d, 0x31, 0xd4,
-	0xd6, 0x47, 0x5e, 0xb1, 0x77, 0x88, 0x88, 0xbc, 0xe2, 0xf9, 0xa9, 0x21, 0x86, 0x4e, 0x9d, 0x6c,
-	0xe1, 0xc3, 0x9b, 0x1f, 0xa0, 0x57, 0x0d, 0xb4, 0xc4, 0xb9, 0xc2, 0x50, 0xf4, 0x42, 0xe5, 0x77,
-	0x12, 0xdc, 0x08, 0x6e, 0xaf, 0x9b, 0xf6, 0xa6, 0xc1, 0x6c, 0x93, 0x5a, 0xa4, 0x2e, 0x7a, 0xa4,
-	0x37, 0x60, 0xc3, 0x11, 0x4c, 0x3d, 0xd7, 0x8c, 0x46, 0x93, 0xa8, 0x1d, 0x62, 0x30, 0x74, 0x41,
-	0x41, 0x71, 0xfe, 0xad, 0xd0, 0x2c, 0x3d, 0x2f, 0xc8, 0xca, 0xf4, 0xf8, 0x22, 0x58, 0x7b, 0x28,
-	0xb9, 0x16, 0xd3, 0xa0, 0x04, 0xfd, 0x20, 0xc1, 0x5c, 0x9f, 0x39, 0x0a, 0x7d, 0x34, 0x58, 0x46,
-	0xeb, 0x19, 0xcb, 0x72, 0xf7, 0x47, 0x61, 0xa3, 0xd6, 0x79, 0x33, 0x9c, 0x21, 0xf0, 0x8d, 0x98,
-	0xd1, 0x9d, 0x37, 0x79, 0x3c, 0x75, 0x5b, 0x9f, 0xc8, 0x78, 0x0a, 0xf5, 0x95, 0x91, 0xf1, 0x14,
-	0xee, 0xa9, 0x9c, 0xe0, 0xed, 0x96, 0xf8, 0x48, 0x65, 0xa1, 0xfe, 0x29, 0x52, 0x59, 0xb8, 0x77,
-	0x50, 0x62, 0xe8, 0x10, 0xae, 0xb8, 0x35, 0x1c, 0xbd, 0x1f, 0x1d, 0xf8, 0x9e, 0x9a, 0xe5, 0x41,
-	0x49, 0x85, 0x8e, 0x13, 0x48, 0xfb, 0xf5, 0x12, 0xdd, 0x1e, 0x74, 0xa6, 0xe4, 0x7a, 0xee, 0x0c,
-	0x4e, 0x2c, 0x34, 0xfd, 0x28, 0xc1, 0x5c, 0x9f, 0xd2, 0x1c, 0xe9, 0x2e, 0xfd, 0x9b, 0x82, 0x48,
-	0x77, 0xb9, 0xa0, 0x0b, 0x70, 0x30, 0xec, 0x16, 0xe2, 0x48, 0x0c, 0x43, 0x05, 0x3f, 0x12, 0xc3,
-	0x70, 0x85, 0x57, 0x62, 0xe8, 0xb5, 0x14, 0x6e, 0x48, 0x02, 0xa3, 0x38, 0x7a, 0x38, 0xea, 0x08,
-	0x7f, 0x9a, 0x7b, 0x34, 0xfa, 0xf4, 0xaf, 0xc4, 0xd6, 0xee, 0x7d, 0x51, 0x3c, 0xd6, 0xd9, 0x49,
-	0xfb, 0x30, 0x5f, 0x37, 0x5b, 0x05, 0x2e, 0xa9, 0xe0, 0x49, 0x2a, 0x5c, 0xf8, 0x4f, 0xec, 0xe1,
-	0x84, 0xf8, 0x8f, 0xe5, 0xc3, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x06, 0xaf, 0x27, 0xd7, 0x0e,
-	0x16, 0x00, 0x00,
+var fileDescriptor_project_64e53386ae54a73e = []byte{
+	// 1447 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x58, 0x5b, 0x6f, 0x1b, 0x45,
+	0x14, 0xf6, 0xfa, 0x92, 0xc6, 0x27, 0x89, 0xb3, 0x99, 0x34, 0xad, 0x65, 0x1a, 0x88, 0x96, 0x8a,
+	0x86, 0xb4, 0xb1, 0x5b, 0xb7, 0x94, 0x5e, 0xa0, 0xaa, 0xe3, 0x6e, 0xd2, 0x48, 0x71, 0x9c, 0x8e,
+	0x93, 0x08, 0xa8, 0xc0, 0xda, 0xd8, 0x93, 0x64, 0xa9, 0xbd, 0xbb, 0xd9, 0x19, 0x5b, 0x4a, 0x2b,
+	0x1e, 0xe0, 0x81, 0x1f, 0x50, 0x89, 0xff, 0xc1, 0x33, 0x4f, 0xfc, 0x0e, 0x5e, 0x10, 0x8f, 0xbc,
+	0xf2, 0x03, 0x10, 0x9a, 0xd9, 0x4b, 0x76, 0xed, 0x26, 0x6b, 0x1b, 0x8b, 0x27, 0x5e, 0x2c, 0xcf,
+	0xd9, 0x73, 0x9b, 0xf9, 0xce, 0x9c, 0xcb, 0xc0, 0x0d, 0xcd, 0xd2, 0x0b, 0xba, 0xc1, 0x88, 0x4d,
+	0x89, 0xdd, 0xd5, 0x1b, 0xa4, 0xa0, 0x75, 0xd8, 0xf1, 0xeb, 0x42, 0xb7, 0x58, 0xb0, 0x6c, 0xf3,
+	0x5b, 0xd2, 0x60, 0x79, 0xcb, 0x36, 0x99, 0x89, 0x16, 0x1b, 0xc7, 0xe4, 0x30, 0xaf, 0x75, 0x98,
+	0xd9, 0xd6, 0x18, 0xc9, 0x37, 0xcd, 0xb6, 0xa6, 0x1b, 0x79, 0xc1, 0x9c, 0xef, 0x16, 0x73, 0x57,
+	0xbb, 0x5a, 0x4b, 0x6f, 0x6a, 0x8c, 0x14, 0xbc, 0x3f, 0x8e, 0x5c, 0xee, 0xfa, 0xf9, 0x06, 0xd8,
+	0xa9, 0xe5, 0x71, 0x29, 0x7d, 0x5c, 0xa4, 0x4b, 0x0c, 0xe6, 0xfc, 0xba, 0x3c, 0x1f, 0x1c, 0x99,
+	0xe6, 0x51, 0x8b, 0x14, 0xc4, 0xea, 0xa0, 0x73, 0x58, 0x60, 0x7a, 0x9b, 0x50, 0xa6, 0xb5, 0x2d,
+	0x87, 0x41, 0xf9, 0x41, 0x82, 0x4b, 0x3b, 0x8e, 0xd3, 0x08, 0x41, 0xd2, 0xd0, 0xda, 0x24, 0x2b,
+	0x2d, 0x49, 0xcb, 0x69, 0x2c, 0xfe, 0xa3, 0x0c, 0xc4, 0xf5, 0x66, 0x36, 0x2e, 0x28, 0x71, 0xbd,
+	0x89, 0x3e, 0x85, 0x24, 0x77, 0x21, 0x9b, 0x58, 0x92, 0x96, 0x33, 0xc5, 0x0f, 0xf3, 0x17, 0xee,
+	0x30, 0xbf, 0x7b, 0x6a, 0x11, 0x2c, 0x04, 0x50, 0x0e, 0x26, 0xdd, 0xc3, 0xa1, 0xd9, 0xe4, 0x52,
+	0x62, 0x39, 0x8d, 0xfd, 0xb5, 0x82, 0x41, 0x2e, 0xdb, 0x44, 0x63, 0xc4, 0xf5, 0x04, 0x93, 0x93,
+	0x77, 0x3a, 0xb3, 0x72, 0xe6, 0xcc, 0x5a, 0xee, 0x97, 0x3f, 0x7f, 0x4d, 0x2c, 0xd8, 0xf3, 0xc5,
+	0xb9, 0x6f, 0x5e, 0x6a, 0xab, 0xaf, 0x6f, 0xaf, 0x3e, 0x5c, 0xfd, 0xfa, 0xcd, 0x9d, 0x5b, 0xf7,
+	0xef, 0x7d, 0x77, 0x9d, 0x3b, 0xaa, 0xec, 0xc1, 0x5c, 0x8f, 0x4e, 0x6a, 0xa1, 0xa7, 0x70, 0xc9,
+	0x35, 0x2a, 0xf4, 0x4e, 0x15, 0x3f, 0x8a, 0xd8, 0x80, 0x27, 0xec, 0x89, 0x29, 0x8f, 0x61, 0x66,
+	0x83, 0xb0, 0x80, 0x9f, 0x8e, 0x4f, 0xd2, 0x40, 0x3e, 0x61, 0xc8, 0x04, 0x85, 0xc7, 0xe2, 0xd0,
+	0x1c, 0xcc, 0x6e, 0xe9, 0xd4, 0x53, 0x4a, 0x31, 0x39, 0x51, 0xf6, 0x41, 0x0e, 0x93, 0xa8, 0x85,
+	0xd6, 0x02, 0xc7, 0x2f, 0x2d, 0x25, 0x86, 0xb0, 0x14, 0x82, 0x69, 0xcf, 0x6a, 0x8e, 0x1d, 0xa6,
+	0x1e, 0x9d, 0x63, 0x39, 0x95, 0x27, 0x20, 0x3f, 0x23, 0x2d, 0x12, 0x72, 0x75, 0x18, 0xa4, 0xe6,
+	0x61, 0xae, 0x47, 0x9e, 0x5a, 0xca, 0x65, 0x40, 0x25, 0xcb, 0x6a, 0x9d, 0xe2, 0x4e, 0x8b, 0xd0,
+	0x1a, 0xd3, 0x6c, 0xae, 0x56, 0x59, 0x80, 0xf9, 0x3e, 0x2a, 0xb5, 0xc2, 0xe4, 0xb2, 0x66, 0x34,
+	0x48, 0x8b, 0x73, 0x5f, 0x81, 0xcb, 0xfd, 0xe4, 0x5e, 0xf6, 0x1a, 0xd3, 0x58, 0x47, 0x40, 0xf9,
+	0x97, 0x14, 0xe4, 0xf7, 0xe8, 0xd4, 0x42, 0x97, 0x21, 0x45, 0x99, 0xc6, 0xbc, 0x83, 0x77, 0x16,
+	0x08, 0xc3, 0x55, 0x42, 0x99, 0xce, 0xcf, 0xa8, 0x59, 0xe7, 0x57, 0xbd, 0xde, 0x30, 0xdb, 0x16,
+	0xdf, 0x87, 0x80, 0x63, 0xaa, 0x98, 0xcb, 0x3b, 0x09, 0x21, 0xef, 0x25, 0x84, 0xfc, 0xae, 0x97,
+	0x10, 0xf0, 0x82, 0x2f, 0xca, 0x69, 0x65, 0x57, 0x10, 0x15, 0x60, 0xde, 0x22, 0x76, 0x83, 0x18,
+	0x4c, 0x3b, 0x0a, 0xe8, 0xe3, 0x09, 0x20, 0x8e, 0xd1, 0xd9, 0x27, 0x5f, 0xe0, 0x0a, 0x4c, 0x1c,
+	0x6a, 0x7a, 0x8b, 0x34, 0xb3, 0xc9, 0x25, 0x69, 0x79, 0x12, 0xbb, 0x2b, 0x74, 0x03, 0x66, 0xf9,
+	0xbf, 0x8e, 0x4d, 0xea, 0x6d, 0x42, 0xa9, 0x76, 0x44, 0xb2, 0x29, 0xe1, 0x7c, 0xc6, 0x25, 0x57,
+	0x1c, 0xaa, 0x72, 0x0d, 0x72, 0x3c, 0x7e, 0xc5, 0x96, 0xd7, 0x4d, 0xbb, 0xd4, 0x6a, 0x05, 0xa3,
+	0xfb, 0x6f, 0x09, 0xde, 0x3b, 0xf7, 0x33, 0xb5, 0xd0, 0x09, 0xcc, 0xb8, 0x51, 0x50, 0xb7, 0x39,
+	0x4b, 0x36, 0x2e, 0xc2, 0x7d, 0x2b, 0x22, 0x84, 0x2e, 0x50, 0xe9, 0x87, 0x17, 0xff, 0xac, 0x1a,
+	0xcc, 0x3e, 0xc5, 0xd3, 0x56, 0x80, 0x94, 0x6b, 0xc1, 0x5c, 0x1f, 0x0b, 0x92, 0x21, 0xf1, 0x8a,
+	0x9c, 0xba, 0xf8, 0xf0, 0xbf, 0xa8, 0x04, 0xa9, 0xae, 0xd6, 0xea, 0x78, 0x58, 0xdc, 0x1c, 0x30,
+	0xa8, 0xb9, 0x4a, 0xec, 0x48, 0x3e, 0x8a, 0x3f, 0x90, 0x94, 0x1d, 0x98, 0x0e, 0x7e, 0x42, 0x4f,
+	0x21, 0x15, 0xdc, 0xe8, 0xca, 0xe0, 0x6a, 0xb1, 0x23, 0xa8, 0xfc, 0x2e, 0xc1, 0x54, 0x80, 0xec,
+	0x26, 0x7d, 0xc9, 0x4f, 0xfa, 0x8b, 0x00, 0xde, 0x91, 0xfa, 0xc5, 0x20, 0xed, 0x52, 0x36, 0x9b,
+	0x7e, 0x0e, 0x48, 0x04, 0x72, 0x40, 0xd9, 0xad, 0x13, 0x49, 0x51, 0x27, 0x0a, 0x83, 0xfb, 0xc4,
+	0x4b, 0x06, 0x75, 0x6b, 0xc6, 0x73, 0x80, 0x86, 0x69, 0x34, 0x75, 0xa6, 0x9b, 0x06, 0xcd, 0xa6,
+	0xc4, 0xf6, 0x96, 0x23, 0x54, 0x95, 0x3d, 0x01, 0x1c, 0x90, 0x55, 0x7e, 0x93, 0x20, 0xed, 0x7f,
+	0x41, 0x2f, 0x21, 0xad, 0x31, 0x66, 0xeb, 0x07, 0x1d, 0xf7, 0x02, 0x65, 0x8a, 0x9f, 0x0f, 0xee,
+	0xa1, 0xaf, 0xa7, 0xe4, 0xe9, 0xa0, 0xf8, 0x4c, 0x1f, 0x0f, 0x7f, 0x81, 0x95, 0x83, 0x47, 0x1a,
+	0xbb, 0x2b, 0xf4, 0x05, 0x4c, 0x9a, 0x16, 0xb1, 0x35, 0x66, 0xda, 0x6e, 0xf5, 0xfc, 0x6c, 0x04,
+	0x9b, 0x55, 0x57, 0x05, 0xc5, 0xbe, 0x36, 0xe5, 0xe7, 0x38, 0xcc, 0x38, 0xb5, 0x4e, 0x80, 0x3a,
+	0x5c, 0xaa, 0x43, 0x0f, 0xfb, 0xc1, 0xbd, 0x50, 0x26, 0x00, 0xfc, 0x62, 0x10, 0xf8, 0xb5, 0x34,
+	0x17, 0x4a, 0xda, 0x71, 0x59, 0x1a, 0x67, 0x0c, 0xec, 0xfe, 0x9b, 0x18, 0x58, 0x03, 0xee, 0x53,
+	0xea, 0xad, 0x14, 0x9f, 0x94, 0x42, 0xf1, 0xb0, 0x03, 0x99, 0xe0, 0x89, 0x51, 0x0b, 0x3d, 0x81,
+	0x24, 0xbf, 0x0c, 0x6e, 0xc1, 0x19, 0xe6, 0x12, 0x09, 0x39, 0x01, 0x82, 0x53, 0xc9, 0xfe, 0x07,
+	0x61, 0x70, 0x10, 0x82, 0x27, 0x36, 0x06, 0x10, 0x1e, 0x00, 0x6c, 0x10, 0x36, 0x02, 0x00, 0x4a,
+	0x05, 0xa6, 0x7c, 0xc9, 0x31, 0x38, 0x92, 0x81, 0x69, 0xbf, 0xa0, 0xf0, 0xa2, 0xf5, 0x02, 0x66,
+	0x02, 0x6b, 0xd1, 0xe2, 0xb8, 0x49, 0x5b, 0x1a, 0x35, 0x69, 0x3f, 0x83, 0x2b, 0xc1, 0x9a, 0x35,
+	0x62, 0xa3, 0xf3, 0x12, 0xae, 0xbe, 0x53, 0xcb, 0x58, 0x5c, 0x7c, 0x0c, 0x33, 0x4e, 0x17, 0x35,
+	0x0a, 0x22, 0x32, 0x64, 0x82, 0xc2, 0xd4, 0x5a, 0xb9, 0x01, 0x72, 0x6f, 0x7c, 0xa2, 0x49, 0x48,
+	0x6e, 0x57, 0x9f, 0xa9, 0x72, 0x0c, 0xa5, 0x21, 0xa5, 0xee, 0xab, 0xdb, 0xbb, 0xb2, 0xb4, 0xf2,
+	0x93, 0x04, 0xef, 0x5f, 0x9c, 0xb0, 0x91, 0x0c, 0xd3, 0xe5, 0xe7, 0xea, 0x7a, 0xbd, 0xa6, 0xe2,
+	0x7d, 0x15, 0xd7, 0xe4, 0x18, 0x9a, 0x81, 0xb4, 0xa0, 0x54, 0xf1, 0x46, 0x4d, 0x96, 0xd0, 0x02,
+	0xcc, 0x89, 0xa5, 0xba, 0xbd, 0xbf, 0x89, 0xab, 0xdb, 0x15, 0x75, 0x7b, 0xb7, 0x26, 0xc7, 0xb9,
+	0x15, 0x5c, 0xdd, 0x52, 0x6b, 0x72, 0xc2, 0x17, 0xd8, 0x2d, 0x6d, 0xd4, 0xe4, 0x24, 0xd7, 0xb8,
+	0x53, 0xdd, 0xda, 0x2c, 0x7f, 0x59, 0xdf, 0xc0, 0xd5, 0xbd, 0x1d, 0x39, 0x85, 0x66, 0x61, 0xca,
+	0xa5, 0x6c, 0x97, 0x2a, 0xaa, 0x3c, 0xb1, 0xf2, 0x08, 0x16, 0x2f, 0xcc, 0xe9, 0x5c, 0x65, 0x45,
+	0xad, 0xac, 0xa9, 0xb8, 0x5e, 0x5d, 0x97, 0x63, 0x08, 0x60, 0x42, 0x7d, 0xb1, 0x57, 0xda, 0xaa,
+	0xc9, 0x52, 0xf1, 0x8f, 0x59, 0x98, 0xf4, 0x9a, 0x12, 0xc4, 0xbc, 0x5c, 0xe3, 0x8d, 0x6e, 0x51,
+	0xf7, 0xba, 0xb7, 0x6f, 0xcf, 0xdd, 0x1e, 0x4e, 0x80, 0x5a, 0x4a, 0x8c, 0x5b, 0x0d, 0x8d, 0x54,
+	0x91, 0x56, 0x7b, 0x87, 0xba, 0x48, 0xab, 0x7d, 0x13, 0x9b, 0x12, 0x43, 0xaf, 0xc4, 0x9d, 0xf6,
+	0x4c, 0xde, 0x8a, 0xd0, 0x10, 0x1a, 0xce, 0x72, 0xab, 0x43, 0x70, 0x7b, 0x5b, 0x0c, 0xf5, 0xfd,
+	0x91, 0x5b, 0xec, 0x9d, 0x32, 0x22, 0xb7, 0xd8, 0x3f, 0x56, 0xc4, 0xd0, 0x89, 0x93, 0x2d, 0x7c,
+	0x78, 0xf3, 0x03, 0xf4, 0xaa, 0x81, 0x96, 0x38, 0x57, 0x18, 0x8a, 0x5f, 0x98, 0xfc, 0x5e, 0x82,
+	0x6b, 0x41, 0xf2, 0xba, 0x69, 0x6f, 0x1a, 0xcc, 0x36, 0xa9, 0x45, 0x1a, 0xa2, 0x47, 0xfa, 0x0f,
+	0x7c, 0x38, 0x84, 0xa9, 0xe7, 0x9a, 0xd1, 0x6c, 0x11, 0xb5, 0x4b, 0x0c, 0x86, 0xce, 0x29, 0x28,
+	0xce, 0x73, 0x86, 0x66, 0xe9, 0x79, 0xc1, 0x56, 0xa1, 0x47, 0xe7, 0xc1, 0xda, 0xc3, 0xc9, 0xad,
+	0x98, 0x06, 0x25, 0xe8, 0x35, 0xcc, 0xf6, 0x4c, 0x68, 0xe8, 0x4e, 0x84, 0xb7, 0xfd, 0x73, 0x5e,
+	0xae, 0x38, 0xac, 0x88, 0xd8, 0xe3, 0x1b, 0x90, 0x7b, 0xe7, 0x3d, 0x34, 0xb8, 0x26, 0x7f, 0x6e,
+	0xcc, 0xdd, 0x1d, 0x5a, 0x86, 0x5a, 0x61, 0xe3, 0xce, 0xf0, 0x88, 0x86, 0xda, 0x86, 0x33, 0x85,
+	0x0e, 0x61, 0x3c, 0x30, 0xa1, 0xbe, 0x02, 0x38, 0x6b, 0xb1, 0x22, 0xef, 0x6d, 0xa8, 0x7f, 0x8d,
+	0xbc, 0xb7, 0xe1, 0xde, 0xcd, 0x49, 0x12, 0x67, 0xad, 0x44, 0xa4, 0xb1, 0x50, 0x9f, 0x16, 0x69,
+	0x2c, 0xdc, 0xa3, 0x28, 0x31, 0x74, 0x00, 0x97, 0xdc, 0x5e, 0x01, 0x7d, 0x1c, 0x9d, 0x60, 0x3c,
+	0x33, 0x2b, 0x83, 0xb2, 0x0a, 0x1b, 0xc7, 0x90, 0xf6, 0xeb, 0x32, 0xba, 0x39, 0xe8, 0xec, 0xca,
+	0xed, 0xdc, 0x1a, 0x9c, 0x59, 0x58, 0xfa, 0x51, 0x82, 0xf9, 0x77, 0xb4, 0x00, 0xe8, 0x93, 0x21,
+	0x06, 0xe6, 0x40, 0xfe, 0xbb, 0x3f, 0x8a, 0x98, 0x87, 0xe1, 0x59, 0xc1, 0x8f, 0xc4, 0x30, 0xd4,
+	0x58, 0x44, 0x62, 0x18, 0xee, 0x24, 0x94, 0x18, 0x7a, 0x2b, 0x85, 0x1b, 0x9f, 0xc0, 0xc8, 0x8f,
+	0x1e, 0x8e, 0xfa, 0x54, 0x70, 0x92, 0x7b, 0x34, 0xfa, 0x2b, 0x83, 0x12, 0x5b, 0xbb, 0xf7, 0x55,
+	0xf1, 0x48, 0x67, 0xc7, 0x9d, 0x83, 0x7c, 0xc3, 0x6c, 0x17, 0xb8, 0xa6, 0x82, 0xa7, 0xa9, 0x70,
+	0xee, 0x93, 0xf0, 0xc1, 0x84, 0x78, 0xcb, 0xb9, 0xfb, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x35,
+	0x3a, 0xd1, 0xd2, 0x97, 0x16, 0x00, 0x00,
 }

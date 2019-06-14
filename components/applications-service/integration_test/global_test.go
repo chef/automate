@@ -232,6 +232,10 @@ func assertServiceGroupsEqual(t *testing.T, expected, actual *applications.Servi
 				actual.ServiceGroups[i].Name,
 				"The service_group name is not the expected one")
 			assert.Equal(t,
+				expected.ServiceGroups[i].Package,
+				actual.ServiceGroups[i].Package,
+				"The service_group package is not the expected one")
+			assert.Equal(t,
 				expected.ServiceGroups[i].Release,
 				actual.ServiceGroups[i].Release,
 				"The service_group release is not the expected one")

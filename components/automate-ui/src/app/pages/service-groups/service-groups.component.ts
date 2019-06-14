@@ -233,32 +233,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // TODO: @afiune change the backend to send the values already splitted
-  public getPackageNameFromFullRelease(release: string): string {
-    const brokenRel = this.splitFullRelease(release);
-    return brokenRel[0].concat('/', brokenRel[1]);
-  }
-
-  // TODO: @afiune change the backend to send the values already splitted
-  public getShortReleaseFromFullRelease(release: string): string {
-    const brokenRel = this.splitFullRelease(release);
-    return brokenRel[2].concat('/', brokenRel[3]);
-  }
-
-  private splitFullRelease(release: string): string[] {
-    if (release) {
-      const releaseVars = release.split('/');
-      if (releaseVars.length === 4) {
-        return releaseVars;
-      }
-
-      // these returns should never happen, but just to be safe
-      return new Array('-', '-', '-', '-');
-    }
-
-    return new Array('-', '-', '-', '-');
-  }
-
   private getSelectedStatus(allParameters: Chicklet[]): RollupServiceStatus {
     const status = find((chicklet) => {
         return chicklet.type === 'status';

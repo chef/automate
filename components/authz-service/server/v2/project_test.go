@@ -16,7 +16,6 @@ import (
 	"github.com/chef/automate/lib/logger"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/prng"
@@ -24,6 +23,7 @@ import (
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
+	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"
@@ -78,7 +78,7 @@ func TestUpdateProject(t *testing.T) {
 				require.Equal(t, 1, len(resp.Project.GetProjects()))
 				assert.Equal(t, id, resp.Project.Projects[0])
 			}},
-		{"when a project is updated an event is published",
+		{"when a project is updated an event is NOT published",
 			func(t *testing.T) {
 				cl, store, eventServiceClient := setupProjects(t)
 				numberOfPublishes := eventServiceClient.PublishedEvents
@@ -86,20 +86,40 @@ func TestUpdateProject(t *testing.T) {
 				addProjectToStore(t, store, id, "original name", storage.ChefManaged)
 
 				_, _ = cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: id, Name: updatedName})
+				assert.Equal(t, numberOfPublishes, eventServiceClient.PublishedEvents)
+			}},
+	}
 
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+	}
+}
+
+func TestApplyStart(t *testing.T) {
+	ctx := context.Background()
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"when rules are applied an event is published",
+			func(t *testing.T) {
+				cl, store, eventServiceClient := setupProjects(t)
+				numberOfPublishes := eventServiceClient.PublishedEvents
+				addProjectToStore(t, store, "my-foo", "original name", storage.ChefManaged)
+
+				_, err := cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				require.Nil(t, err)
 				assert.Equal(t, numberOfPublishes+1, eventServiceClient.PublishedEvents)
 				assert.NotNil(t, eventServiceClient.LastestPublishedEvent.EventID)
 				assert.NotNil(t, eventServiceClient.LastestPublishedEvent.Published)
 				assert.NotNil(t,
 					eventServiceClient.LastestPublishedEvent.Data.Fields["ProjectUpdateID"].GetStringValue())
 			}},
-		{"when a project is not updated an event is not published", func(t *testing.T) {
-			cl, _, eventServiceClient := setupProjects(t)
-			numberOfPublishes := eventServiceClient.PublishedEvents
-			_, _ = cl.UpdateProject(ctx,
-				&api.UpdateProjectReq{Id: "false-project", Name: "my other foo"})
-			assert.Equal(t, numberOfPublishes, eventServiceClient.PublishedEvents)
-		}},
 	}
 
 	rand.Shuffle(len(cases), func(i, j int) {
@@ -417,13 +437,13 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 	}
 }
 
-func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, *mockEventServiceClient) {
+func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, *testhelpers.MockEventServiceClient) {
 	cl, ca, _, mc, _ := setupProjectsAndRules(t)
 	return cl, ca, mc
 }
 
 func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cache.Cache,
-	*mockEventServiceClient, int64) {
+	*testhelpers.MockEventServiceClient, int64) {
 	t.Helper()
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
@@ -432,12 +452,12 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	require.NoError(t, err, "init logger for storage")
 
 	mem_v2 := memstore_v2.New()
-	eventServiceClient := &mockEventServiceClient{}
+	eventServiceClient := &testhelpers.MockEventServiceClient{}
 	configFile := "/tmp/.authz-delete-me"
 	err = os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
-	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testProjectRulesRetriever{},
+	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testhelpers.TestProjectRulesRetriever{},
 		eventServiceClient, configMgr)
 	require.NoError(t, err)
 
@@ -459,43 +479,4 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	}
 
 	return api.NewProjectsClient(conn), mem_v2.ProjectsCache(), mem_v2.RulesCache(), eventServiceClient, seed
-}
-
-// TODO More testing
-type testProjectRulesRetriever struct{}
-
-func (t *testProjectRulesRetriever) ListProjectMappings(
-	context.Context) (map[string][]storage.Rule, error) {
-	return make(map[string][]storage.Rule, 0), nil
-}
-
-type mockEventServiceClient struct {
-	PublishedEvents       int
-	LastestPublishedEvent *automate_event.EventMsg
-}
-
-func (t *mockEventServiceClient) Publish(ctx context.Context,
-	in *automate_event.PublishRequest,
-	opts ...grpc.CallOption) (*automate_event.PublishResponse, error) {
-	t.PublishedEvents++
-	t.LastestPublishedEvent = in.Msg
-	return &automate_event.PublishResponse{}, nil
-}
-
-func (t *mockEventServiceClient) Subscribe(ctx context.Context,
-	in *automate_event.SubscribeRequest,
-	opts ...grpc.CallOption) (*automate_event.SubscribeResponse, error) {
-	return &automate_event.SubscribeResponse{}, nil
-}
-
-func (t *mockEventServiceClient) Start(ctx context.Context,
-	in *automate_event.StartRequest,
-	opts ...grpc.CallOption) (*automate_event.StartResponse, error) {
-	return &automate_event.StartResponse{}, nil
-}
-
-func (t *mockEventServiceClient) Stop(ctx context.Context,
-	in *automate_event.StopRequest,
-	opts ...grpc.CallOption) (*automate_event.StopResponse, error) {
-	return &automate_event.StopResponse{}, nil
 }
