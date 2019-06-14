@@ -89,6 +89,7 @@ CREATE TABLE workflow_results (
     parameters BYTEA,
     start_at TIMESTAMPTZ NOT NULL,
     end_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    error  TEXT,
     result BYTEA
 );
 
@@ -219,16 +220,22 @@ CREATE OR REPLACE FUNCTION complete_workflow(_wid BIGINT, _result BYTEA)
 RETURNS VOID
 LANGUAGE SQL
 AS $$
-    WITH 
-    done_workflows AS (
-        SELECT id, instance_name, workflow_name, parameters, start_at 
-        FROM workflow_instances where id = _wid
-    ),
-    in_vals AS (SELECT
-        _result as result)
     INSERT INTO workflow_results(instance_name, workflow_name, parameters, start_at, result)
-        (SELECT done_workflows.instance_name, done_workflows.workflow_name, done_workflows.parameters, done_workflows.start_at, in_vals.result FROM done_workflows, in_vals);
-    
+        (SELECT instance_name, workflow_name, parameters, start_at, _result FROM workflow_instances WHERE id = _wid);
+
+    DELETE FROM tasks WHERE workflow_instance_id = _wid;
+    DELETE FROM task_results WHERE workflow_instance_id = _wid;
+    DELETE FROM workflow_events WHERE workflow_instance_id = _wid;
+    DELETE FROM workflow_instances WHERE id = _wid;
+$$;
+
+CREATE OR REPLACE FUNCTION fail_workflow(_wid BIGINT, _error TEXT)
+RETURNS VOID
+LANGUAGE SQL
+AS $$
+    INSERT INTO workflow_results(instance_name, workflow_name, parameters, start_at, error)
+        (SELECT instance_name, workflow_name, parameters, start_at, _error FROM workflow_instances WHERE id = _wid);
+
     DELETE FROM tasks WHERE workflow_instance_id = _wid;
     DELETE FROM task_results WHERE workflow_instance_id = _wid;
     DELETE FROM workflow_events WHERE workflow_instance_id = _wid;
@@ -274,19 +281,13 @@ CREATE OR REPLACE FUNCTION complete_task(_tid BIGINT, _status task_status, _erro
 RETURNS VOID
 LANGUAGE SQL
 AS $$
-    WITH in_vals AS (SELECT
-        _tid as id,
-        _status as status,
-        _error as error,
-        _result as result),
-    tres AS (
+    WITH tres AS (
         INSERT INTO task_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
-            (SELECT workflow_instance_id, parameters, task_name, enqueued_at, in_vals.status, in_vals.error, in_vals.result
-            FROM tasks JOIN in_vals ON in_vals.id = tasks.id WHERE tasks.id = _tid) RETURNING id, workflow_instance_id
+            (SELECT workflow_instance_id, parameters, task_name, enqueued_at, _status, _error, _result
+            FROM tasks WHERE id = _tid) RETURNING id, workflow_instance_id
     )
     INSERT INTO workflow_events(event_type, task_result_id, workflow_instance_id)
-        VALUES('task_complete', (select id from tres), (select workflow_instance_id from tres));
-    ;
+        (SELECT 'task_complete', id, workflow_instance_id FROM tres);
     DELETE FROM tasks WHERE id = _tid
 $$;
 
