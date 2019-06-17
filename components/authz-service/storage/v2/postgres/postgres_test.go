@@ -3300,16 +3300,16 @@ func TestCreateRule(t *testing.T) {
 	ctx := context.Background()
 
 	cases := map[string]func(*testing.T){
-		"when the project doesn't exist, return Err": func(t *testing.T) {
+		"when the project doesn't exist, return error": func(t *testing.T) {
 			condition1, err := storage.NewCondition(storage.Node, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
 			rule, err := storage.NewRule("new-id-1", "project-not-found", "name", storage.Node, []storage.Condition{condition1})
 			require.NoError(t, err)
 			resp, err := store.CreateRule(ctx, &rule)
 			assert.Nil(t, resp)
-			assert.Error(t, storage_errors.ErrForeignKey, err)
+			assert.Equal(t, storage_errors.ErrForeignKey, err)
 		},
-		"when rule exists in the applied rules table, return Err": func(t *testing.T) {
+		"when rule exists in the applied rules table, return error": func(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
@@ -3320,9 +3320,9 @@ func TestCreateRule(t *testing.T) {
 			insertAppliedRule(t, db, rule)
 			resp, err := store.CreateRule(ctx, &rule)
 			assert.Nil(t, resp)
-			assert.Error(t, storage_errors.ErrConflict, err)
+			assert.Equal(t, storage_errors.ErrConflict, err)
 		},
-		"when rule exists in the staging rules table, return Err": func(t *testing.T) {
+		"when rule exists in the staging rules table, return error": func(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
@@ -3333,7 +3333,7 @@ func TestCreateRule(t *testing.T) {
 			require.NoError(t, err)
 			resp, err := store.CreateRule(ctx, &rule)
 			assert.Nil(t, resp)
-			assert.Error(t, storage_errors.ErrConflict, err)
+			assert.Equal(t, storage_errors.ErrConflict, err)
 		},
 		"cannot use improper condition attributes for events": func(t *testing.T) {
 			_, err := storage.NewCondition(storage.Event, []string{"chef-server-1"}, storage.ChefTag, storage.MemberOf)
@@ -3393,7 +3393,6 @@ func TestCreateRule(t *testing.T) {
 		"create node rule with multiple conditions": func(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
-
 			ruleType := storage.Node
 			condition1, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
@@ -3404,20 +3403,20 @@ func TestCreateRule(t *testing.T) {
 			condition3, err := storage.NewCondition(ruleType,
 				[]string{"role1"}, storage.ChefRole, storage.MemberOf)
 			require.NoError(t, err)
-
-			rule, err := storage.NewRule("new-id-1", "project-1", "name", ruleType,
+			ruleID := "new-id-1"
+			rule, err := storage.NewRule(ruleID, "project-1", "name", ruleType,
 				[]storage.Condition{condition1, condition2, condition3})
 			require.NoError(t, err)
-			
+
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+			assertCount(t, 3, db.QueryRow(
+				`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, ruleID))
 		},
 		"create event rule with multiple conditions": func(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
-
 			ruleType := storage.Node
 			condition1, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
@@ -3432,13 +3431,14 @@ func TestCreateRule(t *testing.T) {
 			rule, err := storage.NewRule(ruleID, "project-1", "name", ruleType,
 				[]storage.Condition{condition1, condition2, condition3})
 			require.NoError(t, err)
+
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4 AND deleted=$5`,
 				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name, false))
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`,
-				ruleID))
+			assertCount(t, 3, db.QueryRow(
+				`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, ruleID))
 		},
 	}
 
@@ -3932,12 +3932,12 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
-				ID: rule.ID,
-				ProjectID: rule.ProjectID,
-				Name: rule.Name,
-				Type: rule.Type,
+				ID:         rule.ID,
+				ProjectID:  rule.ProjectID,
+				Name:       rule.Name,
+				Type:       rule.Type,
 				Conditions: rule.Conditions,
-				Deleted: false,
+				Deleted:    false,
 			}
 			assert.Equal(t, &expectedRule, resp)
 		},
@@ -3954,12 +3954,12 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
-				ID: rule.ID,
-				ProjectID: rule.ProjectID,
-				Name: rule.Name,
-				Type: rule.Type,
+				ID:         rule.ID,
+				ProjectID:  rule.ProjectID,
+				Name:       rule.Name,
+				Type:       rule.Type,
 				Conditions: rule.Conditions,
-				Deleted: false,
+				Deleted:    false,
 			}
 			assert.Equal(t, &expectedRule, resp)
 		},
@@ -3980,12 +3980,12 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
-				ID: stagedRule.ID,
-				ProjectID: stagedRule.ProjectID,
-				Name: stagedRule.Name,
-				Type: stagedRule.Type,
+				ID:         stagedRule.ID,
+				ProjectID:  stagedRule.ProjectID,
+				Name:       stagedRule.Name,
+				Type:       stagedRule.Type,
 				Conditions: stagedRule.Conditions,
-				Deleted: false,
+				Deleted:    false,
 			}
 			assert.Equal(t, &expectedRule, resp)
 		},
@@ -6361,8 +6361,7 @@ func insertTestPolicy(t *testing.T, db *testhelpers.TestDB, policyName string) s
 		"RETURNING id", policyName))
 	require.NotNil(t, row)
 	var polID string
-	err := row.Scan(&polID)
-	require.NoError(t, err)
+	require.NoError(t, row.Scan(&polID))
 	return polID
 }
 
@@ -6387,8 +6386,7 @@ func insertTestRole(t *testing.T,
 	RETURNING db_id;`,
 		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
 	var dbID string
-	err := row.Scan(&dbID)
-	require.NoError(t, err)
+	require.NoError(t, row.Scan(&dbID))
 
 	for _, project := range role.Projects {
 		_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id) VALUES ($1, $2)`,
@@ -6433,10 +6431,9 @@ func insertAppliedRule(t *testing.T, db *testhelpers.TestDB, rule storage.Rule) 
 		INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
 		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
 	var dbID string
-	err := row.Scan(&dbID)
-	require.NoError(t, err)
+	require.NoError(t, row.Scan(&dbID))
 	for _, c := range rule.Conditions {
-		_, err = db.Exec(`
+		_, err := db.Exec(`
 			INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
 			dbID, pq.Array(c.Value), c.Attribute.String(), c.Operator.String())
 		require.NoError(t, err)
@@ -6449,10 +6446,9 @@ func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule storage.Rule) {
 		INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
 		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false)
 	var dbID string
-	err := row.Scan(&dbID)
-	require.NoError(t, err)
+	require.NoError(t, row.Scan(&dbID))
 	for _, c := range rule.Conditions {
-		_, err = db.Exec(`
+		_, err := db.Exec(`
 			INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator, deleted) VALUES ($1, $2, $3, $4, $5);`,
 			dbID, pq.Array(c.Value), c.Attribute.String(), c.Operator.String(), false)
 		require.NoError(t, err)
