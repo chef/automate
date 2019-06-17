@@ -12,5 +12,5 @@ message="$(awk -v l="$BUILDKITE_LABEL" -v n="$BUILDKITE_RETRY_COUNT"\
 
 if command -v buildkite-agent
 then
-    buildkite-agent annotate --style "warning" --context "job-retries-$BUILDKITE_LABEL" <<<"[$message]($url)"
+    buildkite-agent annotate --style "warning" --context "job-retries-$BUILDKITE_LABEL" "[$message]($url)"
 fi
