@@ -1,6 +1,6 @@
-ALTER TABLE service ADD COLUMN full_pkg_ident TEXT NOT NULL DEFAULT '';
+ALTER TABLE service ADD COLUMN package_ident TEXT NOT NULL DEFAULT '';
 
-UPDATE service SET full_pkg_ident =
+UPDATE service SET package_ident =
   CONCAT (service.origin, '/', service.name, '/', service.version, '/', service.release);
 
 CREATE OR REPLACE VIEW service_group_health AS
@@ -19,7 +19,7 @@ SELECT *
                ,COUNT(s.health) AS health_total
                ,round((COUNT(s.health) FILTER (WHERE s.health = 'OK')
                      / COUNT(s.health)::float) * 100) as percent_ok
-               ,(SELECT array_agg(DISTINCT CONCAT (s.full_pkg_ident))
+               ,(SELECT array_agg(DISTINCT CONCAT (s.package_ident))
                    FROM service AS s
                   WHERE s.group_id = sg.id) AS releases
                ,d.app_name as app_name
