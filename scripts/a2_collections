@@ -41,7 +41,8 @@
 
 authQuery () {
   # prerequisites
-  ([ -z "$TOK" ] || [ -z "$TARGET_HOST" ]) && { echo "Need TOK and TARGET_HOST variables"; return; }
+  local token=${TOK:?Need this env variable to contain ChefAutomate admin token}
+  local host=${TARGET_HOST:?Need this env variable to point to your ChefAutomate host}
   if ! type jq &> /dev/null
   then
     echo "Need jq installed"; return;
@@ -63,19 +64,19 @@ authQuery () {
   done
 
   # generate jq script
-  if [ "$3" != "" ]; then
+  if [[ "$3" != "" ]]; then
     jq_script=".$1[] | select (.$2 == \"$3\")"
-  elif [ "$jq_option" == "-c" ]; then 
+  elif [[ "$jq_option" == "-c" ]]; then 
     jq_script=".$1[]"
   else
     jq_script="."
   fi
 
   # execute
-  if [ "$show_cmd" == 1 ]; then 
-    echo "curl -sSkH \"api-token: \$TOK\" -H \"$projects\" \"$TARGET_HOST/$auth_path/$1\" | jq $jq_option '$jq_script'"
+  if [[ "$show_cmd" == 1 ]]; then 
+    echo "curl -sSkH \"api-token: \$token\" -H \"$projects\" \"$host/$auth_path/$1\" | jq $jq_option '$jq_script'"
   fi
-  curl -sSkH "api-token: $TOK" -H "$projects" "$TARGET_HOST/$auth_path/$1" | jq $jq_option "$jq_script"
+  curl -sSkH "api-token: $token" -H "$projects" "$host/$auth_path/$1" | jq $jq_option "$jq_script"
 }
 
 
@@ -107,8 +108,9 @@ authLoad() {
   done
 
   # prerequisites
-  ([ -z "$TOK" ] || [ -z "$TARGET_HOST" ]) && { echo "Need TOK and TARGET_HOST variables"; return; }
-  [ -z "$2" ] && { echo "usage: authLoad [ <options> ] <resource> <filename>"; return; }
+  local token=${TOK:?Need this env variable to contain ChefAutomate admin token}
+  local host=${TARGET_HOST:?Need this env variable to point to your ChefAutomate host}
+  [[ -z "$2" ]] && { echo "usage: authLoad [ <options> ] <resource> <filename>"; return; }
   if ! type jq &> /dev/null
   then
     echo "Need jq installed"; return;
@@ -116,25 +118,20 @@ authLoad() {
   RESOURCE=$1
   FILE=$2
 
-  # file-lines-to-array
-  old_IFS=$IFS
-  IFS=$'\n'
-  lines=($(cat $FILE))
-  IFS=$old_IFS
-
+  readarray -t lines <"$FILE"
   for line in "${lines[@]}"
   do
-    if [ ! -z "$line" ]; then
+    if [[ -n "$line" ]]; then
       # v1 resources work by just re-using output of authQuery except for users, which need a password added
       # TODO: check that all v2 resources work
-      if [ "$RESOURCE" == "users" ]; then
+      if [[ "$RESOURCE" == "users" ]]; then
         line=$(jq -c '. += {"password": "chefautomate"}' <<< $line)
       fi
-      if [ "$show_cmd" == 1 ] || [ "$dry_run" == 1 ]; then 
-        echo "curl -sSkH \"api-token: \$TOK\" \"$TARGET_HOST/$auth_path/$RESOURCE\" -d '$line'"
+      if [[ "$show_cmd" == 1 ]] || [[ "$dry_run" == 1 ]]; then 
+        echo "curl -sSkH \"api-token: \$token\" \"$host/$auth_path/$RESOURCE\" -d '$line'"
       fi
-      if [ "$dry_run" == "" ]; then 
-        curl -sSkH "api-token: $TOK" $TARGET_HOST/$auth_path/$RESOURCE -d "$line"
+      if [[ "$dry_run" == "" ]]; then 
+        curl -sSkH "api-token: $token" $host/$auth_path/$RESOURCE -d "$line"
         echo
       fi
     fi
