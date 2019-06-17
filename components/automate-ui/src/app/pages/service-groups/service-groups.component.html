@@ -138,7 +138,8 @@
   <!-- LoadingFailure State: Displayed only when the main status is a failure -->
   <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loadingFailure'">
       <chef-loading-spinner size='50'></chef-loading-spinner>
-    <h3>Loading Service Groups...</h3>
+    <h3>Looks like we are having some troubles.</h3>
+    {{ (serviceGroupError$ | async).status }}: {{ (serviceGroupError$ | async).statusText }}
   </div>
 
   <!--
