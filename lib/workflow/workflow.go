@@ -155,6 +155,11 @@ type WorkflowInstance interface {
 	// this workflow instance is processed by a WorkflowExecutor next.
 	Continue(payload interface{}) Decision
 
+	// Fail returns a decision to end the execution of the
+	// workflow because of an error that occurred when processing
+	// the workflow event.
+	Fail(error) Decision
+
 	// InstanceName returns the workflow instance name
 	InstanceName() string
 
@@ -236,6 +241,13 @@ func (w *workflowInstanceImpl) Continue(payload interface{}) Decision {
 	}
 }
 
+func (w *workflowInstanceImpl) Fail(err error) Decision {
+	return Decision{
+		failed: true,
+		err:    err,
+	}
+}
+
 type ImmutableWorkflowInstance interface {
 	// GetPayload unmarshals the payload of the workflow instance into the
 	// value pointed at by obj. This payload is any state the user wishes
@@ -249,6 +261,8 @@ type ImmutableWorkflowInstance interface {
 	IsRunning() bool
 
 	GetResult(obj interface{}) error
+
+	Err() error
 }
 
 type immutableWorkflowInstanceImpl struct {
@@ -279,6 +293,10 @@ func (w *immutableWorkflowInstanceImpl) GetResult(obj interface{}) error {
 	return nil
 }
 
+func (w *immutableWorkflowInstanceImpl) Err() error {
+	return w.instance.Err
+}
+
 func (w *immutableWorkflowInstanceImpl) IsRunning() bool {
 	return w.instance.Status != backend.WorkflowInstanceStatusCompleted
 }
@@ -289,8 +307,10 @@ func (w *immutableWorkflowInstanceImpl) IsRunning() bool {
 type Decision struct {
 	complete   bool
 	continuing bool
+	failed     bool
 	payload    interface{}
 	result     interface{}
+	err        error
 	tasks      []backend.Task
 }
 
@@ -735,32 +755,44 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 		panic("WTF")
 	}
 	s.End("user")
-
-	if decision.complete {
-		s.Begin("complete")
+	logctx := logrus.WithFields(logrus.Fields{
+		"enqueued_tasks":  wevt.EnqueuedTaskCount,
+		"completed_tasks": wevt.CompletedTaskCount,
+	})
+	if decision.failed {
+		s.Begin("failed")
 		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
-			logrus.WithFields(logrus.Fields{
-				"enqueued":  wevt.EnqueuedTaskCount,
-				"completed": wevt.CompletedTaskCount,
-			}).Info("Abandoning workflow")
+			logctx.WithError(decision.err).Info(
+				"Abandoning workflow because it returned an error and has pending tasks")
 			if err := completer.Abandon(); err != nil {
-				logrus.WithError(err).Error("failed to abandon workflow")
+				logctx.WithError(err).Error("failed to abandon workflow")
 			}
 		} else {
-			logrus.WithFields(logrus.Fields{
-				"enqueued":  wevt.EnqueuedTaskCount,
-				"completed": wevt.CompletedTaskCount,
-			}).Info("Completing workflow")
-
+			logctx.WithError(decision.err).Info("Ending workflow because of an error")
+			err = completer.Fail(decision.err)
+			if err != nil {
+				logctx.WithError(err).Error("failed to complete workflow")
+			}
+		}
+		s.End("failed")
+	} else if decision.complete {
+		s.Begin("complete")
+		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
+			logctx.Info("Abandoning workflow because it has pending tasks")
+			if err := completer.Abandon(); err != nil {
+				logctx.WithError(err).Error("failed to abandon workflow")
+			}
+		} else {
+			logctx.Info("Completing workflow")
 			jsonResult, err := jsonify(decision.result)
 			if err != nil {
-				logrus.WithError(err).Error("failed to jsonify workflow result")
+				logctx.WithError(err).Error("failed to jsonify workflow result")
 				jsonResult = nil
 			}
 
 			err = completer.Done(jsonResult)
 			if err != nil {
-				logrus.WithError(err).Error("failed to complete workflow")
+				logctx.WithError(err).Error("failed to complete workflow")
 			}
 		}
 		s.End("complete")

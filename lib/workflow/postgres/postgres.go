@@ -26,6 +26,7 @@ const (
 	enqueueWorkflowQuery  = `SELECT enqueue_workflow($1, $2, $3)`
 	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow(VARIADIC $1)`
 	completeWorkflowQuery = `SELECT complete_workflow($1, $2)`
+	failWorkflowQuery     = `SELECT fail_workflow($1, $2)`
 	continueWorkflowQuery = `SELECT continue_workflow($1, $2, $3, $4, $5)`
 	abandonWorkflowQuery  = `SELECT abandon_workflow($1, $2, $3)`
 
@@ -53,15 +54,15 @@ const (
         FOR UPDATE SKIP LOCKED LIMIT 1
         `
 	updateRecurringWorkflowQuery = `
-		UPDATE recurring_workflow_schedules 
-		SET next_run_at = $2, 
+		UPDATE recurring_workflow_schedules
+		SET next_run_at = $2,
 		last_enqueued_at = $3,
 		enabled = $4
 		WHERE id = $1
         `
 
 	updateSlowRecurringWorkflowQuery = `
-		UPDATE recurring_workflow_schedules 
+		UPDATE recurring_workflow_schedules
 		SET next_run_at = $2,
 		enabled = $3
 		WHERE id = $1
@@ -453,18 +454,23 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 	if err != nil {
 		if err == sql.ErrNoRows {
 			row := tx.QueryRowContext(ctx,
-				"SELECT parameters, result FROM workflow_results WHERE workflow_name = $1 AND instance_name = $2 ORDER BY id DESC",
+				"SELECT parameters, result, error FROM workflow_results WHERE workflow_name = $1 AND instance_name = $2 ORDER BY id DESC",
 				workflowName, instanceName,
 			)
+			var errStr sql.NullString
 			err := row.Scan(
 				&workflowInstance.Parameters,
 				&workflowInstance.Result,
+				&errStr,
 			)
 			if err != nil {
 				if err == sql.ErrNoRows {
 					return nil, workflow.ErrWorkflowInstanceNotFound
 				}
 				return nil, err
+			}
+			if errStr.Valid {
+				workflowInstance.Err = errors.New(errStr.String)
 			}
 			workflowInstance.Status = backend.WorkflowInstanceStatusCompleted
 		} else {
@@ -698,6 +704,18 @@ func (workc *PostgresWorkflowCompleter) Done(result []byte) error {
 	}
 
 	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow %d as complete", workc.wid)
+}
+
+func (workc *PostgresWorkflowCompleter) Fail(workflowErr error) error {
+	ctx := workc.ctx
+	defer workc.cancel()
+
+	_, err := workc.tx.ExecContext(ctx, failWorkflowQuery, workc.wid, workflowErr.Error())
+	if err != nil {
+		return errors.Wrapf(err, "failed to mark workflow %d as failed", workc.wid)
+	}
+
+	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow %d as failed", workc.wid)
 }
 
 func (workc *PostgresWorkflowCompleter) Continue(payload []byte) error {
