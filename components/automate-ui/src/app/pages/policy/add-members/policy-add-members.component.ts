@@ -196,10 +196,22 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.router.navigate(this.backRoute(), { fragment: 'members' });
   }
 
+  getHeading() {
+    return this.policy
+      ? `Add Members to ${this.policy.name}`
+      : '';
+  }
+
   getMemberConfirmBtnText() {
-    return (this.membersToAddValues().length < 2)
-      ? 'Add Member'
-      : `Add ${this.membersToAddValues().length} Members`;
+    if (this.addingMembers) {
+      return (this.membersToAddValues().length < 2)
+        ? 'Adding Member...'
+        : `Adding ${this.membersToAddValues().length} Members...`;
+    } else {
+      return (this.membersToAddValues().length < 2)
+        ? 'Add Member'
+        : `Add ${this.membersToAddValues().length} Members`;
+    }
   }
 
   getErrorMessage() {

@@ -1,7 +1,8 @@
 <chef-page
-  heading="Add Members to Administrator"
   subheading="Automate only displays local users and local teams. For other types of members add a member expression."
   secondary-btn-text="Add Member Expression"
+  [attr.secondary-btn-show]="sortedMembersAvailable && sortedMembersAvailable.length > 0"
+  [attr.heading]="getHeading()"
   [attr.confirm-btn-text]="getMemberConfirmBtnText()"
   [attr.page-loading]="loading"
   [attr.confirm-loading]="addingMembers"
@@ -51,12 +52,8 @@
             <chef-thead>
               <chef-tr>
                 <chef-th class="checkbox-row"></chef-th>
-                <chef-th>
-                  ID
-                </chef-th>
-                <chef-th>
-                  Type
-                </chef-th>
+                <chef-th>ID</chef-th>
+                <chef-th>Type</chef-th>
               </chef-tr>
             </chef-thead>
             <chef-tbody>

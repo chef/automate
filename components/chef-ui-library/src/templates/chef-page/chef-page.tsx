@@ -17,6 +17,7 @@ import {
  *  heading="Add Members to Administrator"
  *  subheading="Automate only displays local users and local teams. For other types of members add a member expression."
  *  secondary-btn-text="Add Member Expression"
+ *  secondary-btn-show="true"
  *  confirm-btn-text="Add Member"
  *  disable-confirm="true"
  *  cancel-btn-text="Cancel"
@@ -30,7 +31,7 @@ import {
  *       </chef-tr>
  *    </chef-thead>
  *    <chef-tbody>
- *      <chef-tr >
+ *      <chef-tr>
  *        <chef-td>
  *         <chef-checkbox></chef-checkbox>
  *        </chef-td>
@@ -66,6 +67,11 @@ export class ChefPage {
    * Text for secondary button
    */
   @Prop({ reflectToAttr: true }) secondaryBtnText: string;
+
+  /**
+   * Show secondary button
+   */
+  @Prop({ reflectToAttr: true }) secondaryBtnShow = false;
 
   /**
    * Text for confirm button
@@ -130,7 +136,7 @@ export class ChefPage {
 
         <div id="page-footer">
 
-          {this.secondaryBtnText
+          {(this.secondaryBtnText && this.secondaryBtnShow)
             ? <chef-button
                 secondary
                 onClick={this.handleSecondaryConfirm.bind(this)}>
