@@ -56,7 +56,7 @@ Now, you can [create a new policy]({{< ref "authorization-overview.md#common-use
 To create a Chef Automate team, you'll need to provide a name and description. Team names must be unique.
 
 ```bash
-curl -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name":"Team Name", "description":"My Chef Team"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams | jq
+curl -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name":"Team Name", "description":"My Chef Team"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams?pretty
 ```
 
 ### Fetching Teams
@@ -64,13 +64,13 @@ curl -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name":"Team 
 You can fetch a team by its ID:
 
 ```bash
-curl -H  "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{id} | jq
+curl -H  "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{id}?pretty
 ```
 
 You can also fetch all teams, collectively:
 
 ```bash
-curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams | jq
+curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams?pretty
 ```
 
 ### Updating Teams
@@ -78,7 +78,7 @@ curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/te
 To update a team, you must supply its name and description:
 
 ```bash
-curl -X PUT -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name":"An Updated Team Name", "description": "An updated description"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{ID} | jq
+curl -X PUT -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name":"An Updated Team Name", "description": "An updated description"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{ID}?pretty
 ```
 
 ### Deleting Teams
@@ -96,7 +96,7 @@ curl -X DELETE -H "api-token: $TOK" -H "Content-Type: application/json" https://
 To view a user's teams, you will need the user's ID:
 
 ```bash
-curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{user_ID}/teams | jq
+curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{user_ID}/teams?pretty
 ```
 
 ### Viewing a Team's Users
@@ -104,7 +104,7 @@ curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/us
 To view a team's users, you will need the team's ID. This returns JSON that contains an array of user IDs associated with the team:
 
 ```bash
-curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{team_ID}/users | jq
+curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{team_ID}/users?pretty
 ```
 
 ### Adding Users to a Team
@@ -112,7 +112,7 @@ curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/te
 To add users to a team, you will need both the team ID and the IDs of the users you will add:
 
 ```bash
-curl -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"user_ids":["userID", "secondUserID"]}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{team_ID}/users | jq
+curl -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"user_ids":["userID", "secondUserID"]}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{team_ID}/users?pretty
 ```
 
 ### Removing Users from a Team
@@ -158,17 +158,17 @@ You may also complete this operation from the command line.
     Fetch all users (with IDs):
 
     ```bash
-    curl -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/users | jq
+    curl -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/users?pretty
     ```
 
 1. Add the user(s) to the `admins` team:
 
     ```bash
-    curl -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"user_ids":["userID", "secondUserID]}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/$ID/users | jq
+    curl -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"user_ids":["userID", "secondUserID]}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/$ID/users?pretty
     ```
 
 1. Verify that the user is a member of the team by listing all members of the `admins` team:
 
     ```bash
-    curl -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/$ID/users | jq
+    curl -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/$ID/users?pretty
     ```

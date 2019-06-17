@@ -125,5 +125,5 @@ compliance resource.
 
    ```bash
    export TOK=<your_admin_api_token>
-   curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["token:95aef20b-0a4e-4698-bd69-ce2cf44c2e35"], "action":"read", "resource":"compliance:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies | jq
+   curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["token:95aef20b-0a4e-4698-bd69-ce2cf44c2e35"], "action":"read", "resource":"compliance:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
    ```

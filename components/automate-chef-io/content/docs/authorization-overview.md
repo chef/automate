@@ -71,14 +71,14 @@ but for most instances, restricting at the uppermost namespace will suffice.
 A command to create a policy has this form:
 
 ```bash
-curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["subject1", "subject2"], "action":"whatever_action", "resource":"whatever_resource"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies | jq
+curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["subject1", "subject2"], "action":"whatever_action", "resource":"whatever_resource"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
 ```
 
 Here is a concrete example, granting `read` permission for the user `user@example.com`
 and for the members of `team:ldap:ops` on resource `cfgmgmt:nodes:*`:
 
 ```bash
-curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["user:local:user@example.com"], "action":"read", "resource":"cfgmgmt:nodes:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies | jq
+curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["user:local:user@example.com"], "action":"read", "resource":"cfgmgmt:nodes:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
 ```
 
 ### Action
@@ -356,7 +356,7 @@ Before exercising any of the commands in the remainder of this document:
 Use the following `curl` command to list all existing policies:
 
 ```bash
-curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies | jq
+curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
 ```
 
 ### List Specific Existing Policies
@@ -392,7 +392,7 @@ This may be a policy that gives permissions directly to a user, but more likely 
 1. Use the ID of the policy to delete it (replace the `{id}` placeholder with the actual ID):
 
     ```bash
-    curl -s -X DELETE -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies/{id} | jq
+    curl -s -X DELETE -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies/{id}?pretty
     ```
 
 ## Common Use Cases
@@ -420,7 +420,7 @@ access to all resources with the command below.
 and it grants full access to all of Chef Automate's resources.
 
 ```bash
-curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["user:ldap:example_user@example.com"], "action":"*", "resource":"*"}' https:/{{< example_fqdn "automate" >}}/api/v0/auth/policies | jq
+curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["user:ldap:example_user@example.com"], "action":"*", "resource":"*"}' https:/{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
 ```
 
 *NOTE*: Use [chef-automate iam admin-access restore]({{< relref "cli-chef-automate.md" >}}) if you wish to restore the factory default administrator access settings after modifying the `admins` team or `Local Administrator` .
@@ -470,7 +470,7 @@ To remove that access, delete policies permitting all users to access `cfgmgmt` 
 1. Delete those policies using their IDs, one at a time (replace the `{id}` placeholder with the actual ID):
 
     ```bash
-    curl -s -X DELETE -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies/{id} | jq
+    curl -s -X DELETE -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies/{id}?pretty
     ```
 
    Now only users with admin-level permissions have access to anything related
@@ -488,7 +488,7 @@ here's how you would give that permission to a specific user or team:
 1. Create a new policy permitting the specified teams/users to access Configuration Management:
 
     ```bash
-    curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["team:saml:ops"], "action":"*", "resource":"cfgmgmt:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies | jq
+    curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["team:saml:ops"], "action":"*", "resource":"cfgmgmt:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
     ```
 
    Now only members of the `ops` team may access Configuration Management data and functionality.
@@ -509,15 +509,15 @@ In this situation, you'll want to delete the default policies for both Configura
 1. Delete each of those policies using their IDs (replace the `{id}` placeholder with the actual ID):
 
     ```bash
-    curl -s -X DELETE -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies/{id} | jq
+    curl -s -X DELETE -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies/{id}?pretty
     ```
 
 1. Create policies permitting the specified teams/users to access `cfgmgmt` and `compliance` as necessary:
 
     ```bash
-    curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["team:ldap:ops"], "action":"*", "resource":"cfgmgmt:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies | jq
+    curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["team:ldap:ops"], "action":"*", "resource":"cfgmgmt:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
 
-    curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["team:ldap:sec"], "action":"*", "resource":"compliance:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies | jq
+    curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["team:ldap:sec"], "action":"*", "resource":"compliance:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
     ```
 
 In this example, only members of the `ops` LDAP team can access Configuration Management data
@@ -540,5 +540,5 @@ and functionality, while members of the `sec` LDAP team can access Compliance da
 1. Create policies to permit that client to read `compliance:*`
 
     ```bash
-    curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["token:95aef20b-0a4e-4698-bd69-ce2cf44c2e35"], "action":"read", "resource":"compliance:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies | jq
+    curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["token:95aef20b-0a4e-4698-bd69-ce2cf44c2e35"], "action":"read", "resource":"compliance:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
     ```
