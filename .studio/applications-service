@@ -317,6 +317,22 @@ function applications_populate_database() {
       --sup-id "$(uuidgen)"
   done
 
+  ##
+  # Service groups with a larger set of health statuses. This excercises some
+  # filtering cases, such as whether a service group with 1 service in critical
+  # and 1 warning shows up when filtering for warning.
+  for health_code in $(seq 0 3); do
+    applications_publish_supervisor_message --name "pos-terminal" --group "us-east-1" \
+      --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
+      --sup-id "$(uuidgen)"
+  done
+
+  for health_code in 0 1 3 ; do
+    applications_publish_supervisor_message --name "pos-terminal" --group "us-east-2" \
+      --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
+      --sup-id "$(uuidgen)"
+  done
+
   # We have a custom visual treatment when application, environment, or channel
   # are blank. Create one of each
   applications_publish_supervisor_message --name "blank-app" --group "default"\
