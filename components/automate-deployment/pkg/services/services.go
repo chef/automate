@@ -58,7 +58,7 @@ func AllServices() ([]habpkg.HabPkg, error) {
 	return ServicesInCollections(names)
 }
 
-func ListCollections() []string {
+func ListProducts() []string {
 	collections := make([]string, len(serviceCollections))
 	i := 0
 	for k := range serviceCollections {

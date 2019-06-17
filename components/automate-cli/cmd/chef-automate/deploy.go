@@ -50,7 +50,7 @@ var deployCmdFlags = struct {
 	enableChefServer                bool
 	enableDeploymentOrderStressMode bool
 	enableWorkflow                  bool
-	collections                     []string
+	products                        []string
 }{}
 
 // deployCmd represents the new command
@@ -149,10 +149,10 @@ func newDeployCmd() *cobra.Command {
 		false,
 		"Deploy Workflow services along with Chef Automate")
 	cmd.PersistentFlags().StringSliceVar(
-		&deployCmdFlags.collections,
-		"collection",
+		&deployCmdFlags.products,
+		"product",
 		nil,
-		"Collections to deploy")
+		"Product to deploy")
 
 	if !isDevMode() {
 		for _, flagName := range []string{
@@ -166,7 +166,7 @@ func newDeployCmd() *cobra.Command {
 			"enable-chef-server",
 			"enable-deploy-order-stress-mode",
 			"enable-workflow",
-			"collection",
+			"product",
 		} {
 			err := cmd.PersistentFlags().MarkHidden(flagName)
 			if err != nil {
@@ -324,8 +324,8 @@ func mergeFlagOverrides(conf *dc.AutomateConfig) error {
 		overrideOpts = append(overrideOpts, dc.WithWorkflowEnabled(true))
 	}
 
-	if len(deployCmdFlags.collections) > 0 {
-		overrideOpts = append(overrideOpts, dc.WithCollections(deployCmdFlags.collections))
+	if len(deployCmdFlags.products) > 0 {
+		overrideOpts = append(overrideOpts, dc.WithProducts(deployCmdFlags.products))
 	}
 
 	return dc.WithConfigOptions(conf, overrideOpts...)

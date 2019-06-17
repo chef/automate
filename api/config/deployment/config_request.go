@@ -94,11 +94,11 @@ func (c *ConfigRequest) Validate() error {
 		}
 	}
 
-	if desiredCollections := c.V1.Svc.GetCollections(); len(desiredCollections) > 0 {
-		availableCollections := services.ListCollections()
-		for _, desiredCollection := range desiredCollections {
-			if !stringutils.SliceContains(availableCollections, desiredCollection) {
-				err.AddInvalidValue("deployment.v1.svc.collections", fmt.Sprintf("Valid collections are %s", strings.Join(availableCollections, ", ")))
+	if desiredProducts := c.V1.Svc.GetProducts(); len(desiredProducts) > 0 {
+		availableProducts := services.ListProducts()
+		for _, desiredProduct := range desiredProducts {
+			if !stringutils.SliceContains(availableProducts, desiredProduct) {
+				err.AddInvalidValue("deployment.v1.svc.products", fmt.Sprintf("Valid products are %s", strings.Join(availableProducts, ", ")))
 			}
 		}
 	}

@@ -155,9 +155,9 @@ func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig) error 
 }
 
 func ContainsAutomateCollection(c *dc.ConfigRequest) bool {
-	collections := c.GetV1().GetSvc().GetCollections()
-	if len(collections) > 0 {
-		return stringutils.SliceContains(collections, "automate-full")
+	products := c.GetV1().GetSvc().GetProducts()
+	if len(products) > 0 {
+		return stringutils.SliceContains(products, "automate-full")
 	}
 	return true
 }
@@ -165,8 +165,8 @@ func ContainsAutomateCollection(c *dc.ConfigRequest) bool {
 func ExpectedServiceIDsForConfig(c *dc.ConfigRequest) ([]habpkg.HabPkg, error) {
 	var collections []string
 
-	if len(c.GetV1().GetSvc().GetCollections()) > 0 {
-		collections = c.GetV1().GetSvc().GetCollections()
+	if len(c.GetV1().GetSvc().GetProducts()) > 0 {
+		collections = c.GetV1().GetSvc().GetProducts()
 	} else {
 		collections = []string{"automate-full"}
 

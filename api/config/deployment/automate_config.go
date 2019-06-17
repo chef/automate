@@ -211,10 +211,10 @@ func WithChefServerEnabled(enabled bool) func(*AutomateConfig) error {
 	}
 }
 
-func WithCollections(collections []string) func(*AutomateConfig) error {
+func WithProducts(products []string) func(*AutomateConfig) error {
 	return func(c *AutomateConfig) error {
 		svc := c.GetDeployment().GetV1().GetSvc()
-		svc.Collections = collections
+		svc.Products = products
 		return nil
 	}
 }
