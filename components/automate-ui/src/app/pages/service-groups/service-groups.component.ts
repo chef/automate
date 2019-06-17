@@ -3,7 +3,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, Observable, combineLatest } from 'rxjs';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Chicklet, RollupServiceStatus, SortDirection } from '../../types/types';
 import { EntityStatus } from '../../entities/entities';
@@ -14,11 +13,7 @@ import {
   ServiceGroup, ServiceGroupFilters, FieldDirection, HealthSummary, ServicesFilters
 } from '../../entities/service-groups/service-groups.model';
 import {
-  serviceGroupStatus,
-  allServiceGroups,
-  serviceGroupState,
-  allServiceGroupHealth,
-  serviceGroupErrorResp
+  serviceGroupStatus, allServiceGroups, serviceGroupState, allServiceGroupHealth
 } from '../../entities/service-groups/service-groups.selector';
 import { find, includes, get } from 'lodash/fp';
 
@@ -31,7 +26,6 @@ import { find, includes, get } from 'lodash/fp';
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
-  public serviceGroupError$: Observable<HttpErrorResponse>;
   public sgHealthSummary: HealthSummary;
 
   // The selected service-group id that will be sent to the services-sidebar
@@ -105,7 +99,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     .subscribe(([queryParams]) => this.detailParamsChange(queryParams));
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
-    this.serviceGroupError$ = this.store.select(serviceGroupErrorResp);
     this.serviceGroups$ = this.store.select(allServiceGroups);
     this.serviceGroups$.pipe(
       withLatestFrom(this.route.queryParamMap),
