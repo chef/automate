@@ -663,21 +663,31 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 func (backend ES2Backend) getESFieldName(filterType string) string {
 	ESFieldName := filterType
 	switch filterType {
-	case "organization":
-		ESFieldName = "organization_name"
 	case "chef_server":
-		ESFieldName = "source_fqdn"
-	case "platform":
-		ESFieldName = "platform.name"
-	case "role":
-		ESFieldName = "roles"
-	case "recipe":
-		ESFieldName = "recipes"
+		ESFieldName = "source_fqdn.lower"
 	case "inspec_version":
-		ESFieldName = "version"
+		ESFieldName = "version.lower"
+	case "organization":
+		ESFieldName = "organization_name.lower"
+	case "platform":
+		ESFieldName = "platform.name.lower"
+	case "recipe":
+		ESFieldName = "recipes.lower"
+	case "role":
+		ESFieldName = "roles.lower"
+	case "environment":
+		ESFieldName = "environment.lower"
+	case "chef_tags":
+		ESFieldName = "chef_tags.lower"
+	case "policy_group":
+		ESFieldName = "policy_group.lower"
+	case "policy_name":
+		ESFieldName = "policy_name.lower"
+	case "node_name":
+		ESFieldName = "node_name.lower"
 	}
 
-	return ESFieldName + ".lower"
+	return ESFieldName
 }
 
 func (backend ES2Backend) newTermQueryFromFilter(ESField string,

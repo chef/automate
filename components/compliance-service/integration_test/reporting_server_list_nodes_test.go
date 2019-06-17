@@ -361,7 +361,7 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 			expectedIds: []string{"3", "2"},
 		},
 		{
-			description: "chef_server: case insensitive wildcard 1",
+			description: "chef server: case insensitive wildcard 1",
 			reports: []*relaxting.ESInSpecReport{
 				{
 					NodeID:     "1",
