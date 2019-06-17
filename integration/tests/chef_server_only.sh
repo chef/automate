@@ -26,7 +26,7 @@ EOF
 
 do_deploy() {
     chef-automate deploy config.toml \
-        --collection chef-server \
+        --product chef-server \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
         --manifest-dir "$test_manifest_path" \
