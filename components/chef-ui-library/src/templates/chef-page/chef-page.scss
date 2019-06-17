@@ -1,0 +1,66 @@
+chef-page {
+  background-color: var(--chef-white);
+  display: block;
+  height: 100vh;
+  min-height: 450px;
+  overflow: hidden;
+  padding: 64px;
+  position: relative;
+  width: 100vw;
+
+  &.example-page-width {
+    width: 100%;
+  }
+
+  #page-header {
+    #header-description {
+      chef-page-header {
+        padding-left: 0px;
+      }
+    }
+
+    #close-button {
+      margin-top: -32px;
+    }
+  }
+
+  #page-container {
+    position: relative;
+  }
+
+  #page-footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin: 64px;
+    width: 93%;
+
+    #right-buttons {
+      float: right;
+
+      .add-member-button {
+        margin-left: 64px;
+        width: 175px;
+      }
+
+      chef-error {
+        display: inline-block;
+      }
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .flex {
+    display: flex;
+
+    .flex-right {
+      margin-left: auto;
+    }
+  }
+
+}

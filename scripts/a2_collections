@@ -1,8 +1,21 @@
 #!/bin/bash
 
+# Prerequisites:
+#    jq preprocessor
+#       https://stedolan.github.io/jq/
+#    variable $TOK
+#       An admin token obtained from `get_admin_token` or `chef-automate admin-token`
+#    variable $TARGET_HOST
+#       A host running A2, typically `https://a2-dev.test`
+#
+# These works either inside or outside Habitat Studio.
+
+
+#############
+# authQuery
+#############
 # Purpose:
-#     Provide a very concise way to fetch collections of a2 auth entities at the API level.
-#     This works either inside or outside Habitat Studio.
+#     Provide a very concise way to fetch collections of a2 auth resources at the API level.
 #
 # Usage:
 #     a2 [ <options> ] <collection> [ <name> <value> ]
@@ -13,16 +26,8 @@
 # Options:
 #    -o or --one-line     output each entity on one-line
 #    -s or --show         show the executed curl command
-#    -2 or --v2           use Auth V2 endpoints (pre-release, not to be disclosed to customers)
+#    -2 or --v2           use IAM V2 endpoints
 #    -p or --projects     project filter; a comma-separate list as a single argument
-#
-# Prerequisites:
-#    jq preprocessor
-#       https://stedolan.github.io/jq/
-#    variable $TOK
-#       An admin token obtained from `get_admin_token` or `chef-automate admin-token`
-#    variable $TARGET_HOST
-#       A host running A2, typically `https://a2-dev.test`
 #
 # Examples:
 #     a2 users
@@ -34,9 +39,10 @@
 #     To run on a different environment you can adjust the env vars for a single invocation. Example:
 #     TARGET_HOST=https://a2-local-fresh-install-dev.cd.chef.co TOK=stV8b5NqP6qepD9I23OFn_U2OME= a2 -s policies
 
-a2 () {
+authQuery () {
   # prerequisites
-  ([ -z "$TOK" ] || [ -z "$TARGET_HOST" ]) && { echo "Need TOK and TARGET_HOST variables"; return; }
+  local token=${TOK:?Need this env variable to contain ChefAutomate admin token}
+  local host=${TARGET_HOST:?Need this env variable to point to your ChefAutomate host}
   if ! type jq &> /dev/null
   then
     echo "Need jq installed"; return;
@@ -58,18 +64,76 @@ a2 () {
   done
 
   # generate jq script
-  if [ "$3" != "" ]; then
+  if [[ "$3" != "" ]]; then
     jq_script=".$1[] | select (.$2 == \"$3\")"
-  elif [ "$jq_option" == "-c" ]; then 
+  elif [[ "$jq_option" == "-c" ]]; then 
     jq_script=".$1[]"
   else
     jq_script="."
   fi
 
   # execute
-  if [ "$show_cmd" == 1 ]; then 
-    echo "curl -sSkH \"api-token: \$TOK\" -H \"$projects\" \"$TARGET_HOST/$auth_path/$1\" | jq $jq_option '$jq_script'"
+  if [[ "$show_cmd" == 1 ]]; then 
+    echo "curl -sSkH \"api-token: \$token\" -H \"$projects\" \"$host/$auth_path/$1\" | jq $jq_option '$jq_script'"
   fi
-  curl -sSkH "api-token: $TOK" -H "$projects" "$TARGET_HOST/$auth_path/$1" | jq $jq_option "$jq_script"
+  curl -sSkH "api-token: $token" -H "$projects" "$host/$auth_path/$1" | jq $jq_option "$jq_script"
 }
 
+
+#############
+# authLoad
+#############
+# Purpose:
+#     Load a list of a2 auth resources.
+#     You can copy resources from one machine to another (e.g. for debugging or backup)
+#     by storing the output of authQuery into a file and feeding that file to authLoad.
+#
+# Options:
+#    -s or --show         show the executed curl commands
+#    -d or --dry-run      show the curl commands but do not execute them
+#    -2 or --v2           use IAM V2 endpoints
+#
+authLoad() {
+  # process options
+  dry_run=
+  show_cmd=
+  auth_path="api/v0/auth"
+  while [[ "$1" =~ ^- ]]; do
+    case "$1" in
+      -s|--show) show_cmd=1; shift;;
+      -d|--dry-run) dry_run=1; shift;;
+      -2|--v2) auth_path="apis/iam/v2beta"; shift;;
+      -*) echo "'$1' unknown"; return 1;;
+    esac
+  done
+
+  # prerequisites
+  local token=${TOK:?Need this env variable to contain ChefAutomate admin token}
+  local host=${TARGET_HOST:?Need this env variable to point to your ChefAutomate host}
+  [[ -z "$2" ]] && { echo "usage: authLoad [ <options> ] <resource> <filename>"; return; }
+  if ! type jq &> /dev/null
+  then
+    echo "Need jq installed"; return;
+  fi
+  RESOURCE=$1
+  FILE=$2
+
+  readarray -t lines <"$FILE"
+  for line in "${lines[@]}"
+  do
+    if [[ -n "$line" ]]; then
+      # v1 resources work by just re-using output of authQuery except for users, which need a password added
+      # TODO: check that all v2 resources work
+      if [[ "$RESOURCE" == "users" ]]; then
+        line=$(jq -c '. += {"password": "chefautomate"}' <<< $line)
+      fi
+      if [[ "$show_cmd" == 1 ]] || [[ "$dry_run" == 1 ]]; then 
+        echo "curl -sSkH \"api-token: \$token\" \"$host/$auth_path/$RESOURCE\" -d '$line'"
+      fi
+      if [[ "$dry_run" == "" ]]; then 
+        curl -sSkH "api-token: $token" $host/$auth_path/$RESOURCE -d "$line"
+        echo
+      fi
+    fi
+  done
+}
