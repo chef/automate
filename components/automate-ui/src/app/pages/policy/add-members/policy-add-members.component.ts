@@ -192,6 +192,32 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
+  closePage() {
+    this.router.navigate(this.backRoute(), { fragment: 'members' });
+  }
+
+  getHeading() {
+    return this.policy
+      ? `Add Members to ${this.policy.name}`
+      : '';
+  }
+
+  getMemberConfirmBtnText() {
+    if (this.addingMembers) {
+      return (this.membersToAddValues().length < 2)
+        ? 'Adding Member...'
+        : `Adding ${this.membersToAddValues().length} Members...`;
+    } else {
+      return (this.membersToAddValues().length < 2)
+        ? 'Add Member'
+        : `Add ${this.membersToAddValues().length} Members`;
+    }
+  }
+
+  getErrorMessage() {
+    return this.addMembersFailed.length > 0 ? this.addMembersFailed : undefined;
+  }
+
   backRoute(): string[] {
     return ['/settings', 'policies', this.policy.id];
   }

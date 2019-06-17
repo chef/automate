@@ -1,6 +1,10 @@
 @import "~styles/variables";
 @import "~styles/mixins";
 
+chef-subheading {
+  max-width: 610px;
+}
+
 .reporting-header {
   display: flex;
   align-items: flex-start;
