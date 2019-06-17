@@ -3,8 +3,11 @@ package cs_nginx
 import (
 	"crypto/md5"
 	"encoding/base64"
+	fmt "fmt"
 	"io/ioutil"
-	"strings"
+	"net/url"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/pkg/errors"
 
@@ -112,20 +115,31 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	}
 
 	if gExternalAutomate := g.GetV1().GetExternal().GetAutomate(); gExternalAutomate.GetEnable().GetValue() {
-		uri := gExternalAutomate.GetNode().GetValue()
-		var isSSL bool
-		var endpoint string
-		if strings.HasPrefix(uri, "http://") {
-			isSSL = false
-			endpoint = strings.TrimPrefix(uri, "http://")
-		} else {
-			isSSL = true
-			endpoint = strings.TrimPrefix(uri, "https://")
+		externalAutoamteURL, err := url.Parse(gExternalAutomate.GetNode().GetValue())
+		if err != nil {
+			logrus.WithError(err).Error("failed to parse external automate url")
+			return
 		}
+		host := externalAutoamteURL.Host
+		port := externalAutoamteURL.Port()
+		scheme := externalAutoamteURL.Scheme
+		if scheme == "" {
+			scheme = "https"
+		}
+		if port == "" {
+			switch scheme {
+			case "https":
+				port = "443"
+			case "http":
+				port = "80"
+			}
+		}
+
+		endpoint := fmt.Sprintf("%s:%s", host, port)
 
 		c.V1.Sys.ExternalAutomate = &ConfigRequest_V1_System_ExternalAutomate{
 			Enable:      w.Bool(true),
-			SslUpstream: w.Bool(isSSL),
+			SslUpstream: w.Bool(scheme == "https"),
 			Endpoint:    w.String(endpoint),
 			RootCert:    gExternalAutomate.GetSsl().GetRootCert(),
 			ServerName:  gExternalAutomate.GetSsl().GetServerName(),

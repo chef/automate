@@ -162,6 +162,19 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 		}
 	}
 
+	if rawURL := c.GetV1().GetExternal().GetAutomate().GetNode().GetValue(); rawURL != "" {
+		externalAutomateURL, err := url.Parse(rawURL)
+		if err != nil {
+			cfgErr.AddInvalidValue("global.v1.external.automate.node", "must be url")
+		} else {
+			scheme := externalAutomateURL.Scheme
+			switch scheme {
+			case "", "http", "https":
+			default:
+				cfgErr.AddInvalidValue("global.v1.external.automate.node", "only https and http are supported")
+			}
+		}
+	}
 	switch c.GetV1().GetExternal().GetAutomate().GetAuth().GetScheme().GetValue() {
 	case "", "token":
 		break

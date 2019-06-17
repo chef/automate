@@ -521,7 +521,7 @@ steps:
   - label: "[integration] chef server only"
     command:
       - integration/run_test integration/tests/chef_server_only.sh
-    timeout_in_minutes: 30 # longer timeout for chef-server
+    timeout_in_minutes: 20
     expeditor:
       executor:
         linux:
