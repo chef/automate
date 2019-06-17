@@ -379,7 +379,6 @@ func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleR
 		return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
 	}
 
-
 	apiRule, err := fromStorageRule(resp)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal,

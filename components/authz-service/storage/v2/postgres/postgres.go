@@ -962,12 +962,10 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	if err != nil {
 		return nil, p.processError(err)
 	}
-	
-	row:= tx.QueryRowContext(ctx,
+
+	row := tx.QueryRowContext(ctx,
 		`SELECT query_rule_table_associations($1);`, rule.ID)
-	if err != nil {
-		return nil, p.processError(err)
-	}
+
 	var associations []string
 	if err := row.Scan(pq.Array(&associations)); err != nil {
 		return nil, p.processError(err)
