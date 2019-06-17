@@ -762,12 +762,13 @@ func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []s
 	if decision.failed {
 		s.Begin("failed")
 		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
-			logctx.Info("Abandoning workflow because it has pending tasks")
+			logctx.WithError(decision.err).Info(
+				"Abandoning workflow because it returned an error and has pending tasks")
 			if err := completer.Abandon(); err != nil {
 				logctx.WithError(err).Error("failed to abandon workflow")
 			}
 		} else {
-			logctx.Info("Ending workflow because of an error")
+			logctx.WithError(decision.err).Info("Ending workflow because of an error")
 			err = completer.Fail(decision.err)
 			if err != nil {
 				logctx.WithError(err).Error("failed to complete workflow")
