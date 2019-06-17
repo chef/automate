@@ -208,24 +208,30 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sess := s.mgr.Load(r)
-	relayState, err := sess.GetString(relayStateKey)
-	if err != nil {
-		s.log.Debugf("bad session data (relay state): %v", err)
-		http.Error(w, "bad session data (relay state)", http.StatusBadRequest)
-		return
-	}
-	s.log.Debugf("retrieved relay state %q", relayState)
 	code := r.FormValue("code")
 	if code == "" {
 		s.log.Debugf("no code in request: %q", r.Form)
 		http.Error(w, fmt.Sprintf("no code in request: %q", r.Form), http.StatusBadRequest)
 		return
 	}
-	if state := r.FormValue("state"); state != relayState {
-		s.log.Debugf("expected state %q got %q", relayState, state)
-		http.Error(w, fmt.Sprintf("expected state %q got %q", relayState, state), http.StatusBadRequest)
+	state := r.FormValue("state")
+	if state == "" {
+		s.log.Debugf("no state in request: %q", r.Form)
+		http.Error(w, fmt.Sprintf("no state in request: %q", r.Form), http.StatusBadRequest)
 		return
 	}
+	knownRelayState, err := sess.GetBool(relayStateKey + "_" + state)
+	if err != nil {
+		s.log.Debugf("bad session data (relay state): %v", err)
+		http.Error(w, "bad session data (relay state)", http.StatusBadRequest)
+		return
+	}
+	if !knownRelayState {
+		s.log.Debugf("unknown relay state: %q", state)
+		http.Error(w, fmt.Sprintf("unknown relay state in request: %q", state), http.StatusBadRequest)
+		return
+	}
+	s.log.Debugf("relay state %q known", state)
 
 	token, err := s.client.Exchange(r.Context(), code)
 	if err != nil {
@@ -265,11 +271,23 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	clientState, err := sess.GetString(clientStateKey)
+	clientState, err := sess.GetString(clientStateKey + "_" + state)
 	s.log.Debugf("retrieved clientState %q", clientState)
 	if err != nil {
 		s.log.Debugf("bad session data (client state): %v", err)
 		http.Error(w, "bad session data (client state)", http.StatusBadRequest)
+		return
+	}
+
+	// remove used relay_state + client_state
+	if err := sess.Remove(w, relayStateKey+"_"+state); err != nil { // nolint: vetshadow
+		s.log.Debugf("failed to remove relay state: %v", err)
+		http.Error(w, errors.Wrap(err, "failed to remove relay state").Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := sess.Remove(w, clientStateKey+"_"+state); err != nil { // nolint: vetshadow
+		s.log.Debugf("failed to remove client state: %v", err)
+		http.Error(w, errors.Wrap(err, "failed to remove client state").Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -561,14 +579,14 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 	// take state we've gotten from the client, store it
 	if clientState := r.FormValue("state"); clientState != "" {
 		s.log.Debugf("storing clientState %s", clientState)
-		if err := sess.PutString(w, clientStateKey, clientState); err != nil {
+		if err := sess.PutString(w, clientStateKey+"_"+relayState, clientState); err != nil {
 			http.Error(w, "failed to set client state", http.StatusInternalServerError)
 			return
 		}
 	}
 
 	// bind relay state to session
-	if err := sess.PutString(w, relayStateKey, relayState); err != nil {
+	if err := sess.PutBool(w, relayStateKey+"_"+relayState, true); err != nil {
 		s.log.Errorf("couldn't put relay state into session: %s", err)
 		httpError(w, http.StatusInternalServerError)
 		return
