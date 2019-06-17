@@ -126,6 +126,7 @@ var v1PoliciesToSkip = map[string]struct{}{
 	constants_v1.OcErchefIngestEventsPolicyID:           {},
 	constants_v1.CSNginxComplianceProfilesPolicyID:      {},
 	constants_v1.CSNginxComplianceDataCollectorPolicyID: {},
+	constants_v1.ApplicationsServiceGroupsPolicyID:      {},
 }
 
 var v1CfgmgmtPolicies = map[string]struct{}{

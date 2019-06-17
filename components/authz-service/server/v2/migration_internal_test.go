@@ -2279,6 +2279,10 @@ func TestV1PolicyMigration(t *testing.T) {
 			wellknown(t, constants_v1.CSNginxComplianceDataCollectorPolicyID),
 			checks(isSkipped()),
 		},
+		"v1 default application policy": {
+			wellknown(t, constants_v1.ApplicationsServiceGroupsPolicyID),
+			checks(isSkipped()),
+		},
 	}
 
 	for desc, test := range cases {
