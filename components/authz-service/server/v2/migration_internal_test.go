@@ -2239,6 +2239,21 @@ func TestV1PolicyMigration(t *testing.T) {
 				}),
 			),
 		},
+		"service_groups,list": {
+			storage_v1.Policy{
+				ID:       polID,
+				Subjects: []string{"user:local:albertine", "team:local:admins"},
+				Action:   "list",
+				Resource: "service_groups",
+			},
+			checks(
+				hasStatements(storage_v2.Statement{
+					Effect:    storage_v2.Allow,
+					Resources: []string{"applications:serviceGroups"},
+					Actions:   []string{"*:list"},
+				}),
+			),
+		},
 		"v1 default compliance token upload profile policy": {
 			wellknown(t, constants_v1.ComplianceTokenUploadProfilesPolicyID),
 			checks(hasID(constants_v2.ComplianceTokenPolicyID)),

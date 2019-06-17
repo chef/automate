@@ -506,6 +506,8 @@ func convertV1Resource(resource string) ([]string, error) {
 		return combineTermsIntoResourceSlice(terms), nil
 	case "*":
 		return []string{"*"}, nil
+	case "service_groups":
+		return []string{"applications:serviceGroups"}, nil
 	default:
 		return nil, fmt.Errorf("did not recognize base v1 resource term: %s", terms[0])
 	}
