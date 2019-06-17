@@ -615,6 +615,20 @@ For others, it will be necessary to add and remove policies
 to lock the system down so that known users are authorized to access
 specific resources.
 
+#### Adding New Default Policies
+
+To add a new default policy, the following is needed:
+
+1. A new IAM v1 policy: these are defined in [migrations](storage/postgres/migration/sql/),
+   and the [v1 constants package](constants/v1/constants.go#L3-L4).
+2. A new IAM v2 (system) policy: they are defined in [server/v2/system](server/v2/system.go#L31).
+3. A new IAM v2 default policy (which can be deleted by users), or any additions
+   to default roles, are done in [datamigrations](storage/postgres/datamigration/sql/).
+3. Migration logic: When upgrading from IAM v1 to v2 (v2.1), v1 policies are
+   converted. The conversion logic needs to be made aware of the new v1 policies, and
+   how (and if) they are to be migrated (if they haven't been deleted). The procedure for
+   converting legacy policies is defined in [server/v2/migration](server/v2/migration.go).
+
 ### Policy API
 
 Documentation of the complete Policy API are available [here](TBD).
