@@ -507,8 +507,6 @@ func convertV1Resource(resource string) ([]string, error) {
 	case "*":
 		return []string{"*"}, nil
 	default:
-		// TODO: should we just warn the logs in this case and not crash the whole migration on the off
-		// chance that the user created a policy where they mistyped a resource name?
 		return nil, fmt.Errorf("did not recognize base v1 resource term: %s", terms[0])
 	}
 }
