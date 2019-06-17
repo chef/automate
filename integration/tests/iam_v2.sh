@@ -32,14 +32,25 @@ hab_curl() {
 
 do_test_deploy() {
     log_info "Adding v1 policy (that should be migrated)"
-    local token
+    local token output
     token=$(chef-automate admin-token)
     hab_curl --fail -s -k -H "api-token: $token" \
       -d "$(jo subjects="$(jo -a user:local:alice team:local:ops)" action=read resource=auth:users)" \
       https://localhost/api/v0/auth/policies
 
     log_info "run chef-automate iam upgrade-to-v2"
-    chef-automate iam upgrade-to-v2 || return 1
+    if ! output=$(chef-automate iam upgrade-to-v2); then
+        log_error "Non-zero exit code, output:"
+        log_error "$output"
+        return 1
+    else
+        # in CI, we don't want any policies to be skipped
+        if grep -q "Skipped policies" <<< "$output"; then
+            log_error "Expected no skipped policies, output:"
+            log_error "$output"
+            return 1
+        fi
+    fi
 
     # ensure service startup works with IAM v2:
     # - kill authz-service to force startup,
