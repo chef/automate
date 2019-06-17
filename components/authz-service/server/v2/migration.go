@@ -390,7 +390,7 @@ func customPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	// Note: v1 only had (custom) allow policies
-	statement, err := storage.NewStatement(storage.Allow, "", []string{}, resource, action)
+	statement, err := storage.NewStatement(storage.Allow, "", []string{}, []string{resource}, action)
 	if err != nil {
 		return nil, errors.Wrap(err, "format v2 statement")
 	}
@@ -420,133 +420,127 @@ func customPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 
 // Basically implements "Current Resource" -> "New Resource Names (RFR)" column of
 // https://docs.google.com/spreadsheets/d/1ccaYDJdMnHBfFgmNC1n2_S1YOnMJ-OgkYd8ySbb-mS0/edit#gid=363200100
-func convertV1Resource(resource string) ([]string, error) {
+func convertV1Resource(resource string) (string, error) {
 	terms := strings.Split(resource, ":")
 	if len(terms) == 0 {
-		return nil, errors.New("there was no resource passed")
+		return "", errors.New("there was no resource passed")
+	}
+
+	if len(terms) == 1 && terms[0] == "*" {
+		return "*", nil
 	}
 
 	switch terms[0] {
 	case "service_info":
 		switch terms[1] {
 		case "version":
-			return combineTermsIntoResourceSlice([]string{"system", "service", "version"}), nil
+			return "system:service:version", nil
 		case "health":
-			return combineTermsIntoResourceSlice([]string{"system", "health"}), nil
+			return "system:health", nil
 		}
-		return combineTermsIntoResourceSlice([]string{"system", "*"}), nil
+		return "system:*", nil
 	case "auth":
 		terms = changeTerm(terms, "auth", "iam")
 		terms = changeTerm(terms, "api_tokens", "tokens")
-		return combineTermsIntoResourceSlice(terms), nil
+		return combineTermsIntoResource(terms...), nil
 	case "users":
 		// "users" -> "iam:usersSelf"
 		terms[0] = "usersSelf"
-		terms = append([]string{"iam"}, terms...)
-		return combineTermsIntoResourceSlice(terms), nil
+		return combineTermsIntoResource(prefixTerms("iam", terms)...), nil
 	case "auth_introspection":
 		// Special case
 		if terms[1] == "*" {
-			return combineTermsIntoResourceSlice([]string{"iam", "introspect"}), nil
+			return "iam:introspect", nil
 		}
 		terms = changeTerm(terms, "auth_introspection", "iam")
 		terms = changeTerm(terms, "introspect_all", "introspect")
 		terms = changeTerm(terms, "introspect_some", "introspect")
-		return combineTermsIntoResourceSlice(terms), nil
+		return combineTermsIntoResource(terms...), nil
 	case "cfgmgmt":
 		return convertV1Cfgmgmt(terms)
 	case "compliance":
 		// Special case
 		if resource == "compliance:profiles:market" {
-			return combineTermsIntoResourceSlice([]string{"compliance", "marketProfiles"}), nil
+			return "compliance:marketProfiles", nil
 		}
-		terms = deleteTerm(terms, "storage")
-		return combineTermsIntoResourceSlice(terms), nil
+		return combineTermsIntoResource(deleteTerm(terms, "storage")...), nil
 	case "events":
 		return convertV1Events(terms)
 	case "ingest":
 		// Special case: "ingest:status" -> "infra:ingest:status" (no wildcards to worry about)
 		if terms[1] == "status" {
-			terms := []string{"infra", "ingest", "status"}
-			return combineTermsIntoResourceSlice(terms), nil
+			return "infra:ingest:status", nil
 		}
 
 		// Special case: "ingest:unified_events" -> "infra:unifiedEvents" (no wildcards to worry about)
 		if terms[1] == "unified_events" {
-			terms := []string{"infra", "unifiedEvents"}
-			return combineTermsIntoResourceSlice(terms), nil
+			return "infra:unifiedEvents", nil
 		}
 
 		terms = changeTerm(terms, "ingest", "infra")
 		terms = changeTerm(terms, "unified_events", "unifiedEvents")
-		return combineTermsIntoResourceSlice(terms), nil
+		return combineTermsIntoResource(terms...), nil
 	case "license":
 		if len(terms) == 1 {
-			return []string{"system:license"}, nil
+			return "system:license", nil
 		}
 		// if len(terms) == 2 aka license:* or license:status
-		return []string{"system:status"}, nil
+		return "system:status", nil
 	case "nodemanagers":
 		// "nodemanagers" -> "infra:nodeManagers"
-		terms[0] = "nodeManagers"
-		terms = append([]string{"infra"}, terms...)
-		return combineTermsIntoResourceSlice(terms), nil
+		return combineTermsIntoResource(prefixTerms("infra", changeTerm(terms, "nodemanagers", "nodeManagers"))...),
+			nil
 	case "nodes":
 		// "nodes" -> "infra:nodes"
-		terms = append([]string{"infra"}, terms...)
-		return combineTermsIntoResourceSlice(terms), nil
+		return combineTermsIntoResource(prefixTerms("infra", terms)...), nil
 	case "secrets":
 		// "secrets" -> "secrets:secrets"
-		terms = append([]string{"secrets"}, terms...)
-		return combineTermsIntoResourceSlice(terms), nil
+		return combineTermsIntoResource(prefixTerms("secrets", terms)...), nil
 	case "telemetry":
 		// either telemetry:config or telemetry:* maps to system:config
-		return combineTermsIntoResourceSlice([]string{"system", "config"}), nil
+		return "system:config", nil
 	case "notifications":
-		return combineTermsIntoResourceSlice(terms), nil
-	case "*":
-		return []string{"*"}, nil
+		return resource, nil // unchanged
 	case "service_groups":
-		return []string{"applications:serviceGroups"}, nil
+		return "applications:serviceGroups", nil
 	default:
-		return nil, fmt.Errorf("did not recognize base v1 resource term: %s", terms[0])
+		return "", fmt.Errorf("did not recognize base v1 resource term: %s", terms[0])
 	}
 }
 
-func convertV1Cfgmgmt(terms []string) ([]string, error) {
+func convertV1Cfgmgmt(terms []string) (string, error) {
 	if terms[1] == "stats" {
-		return combineTermsIntoResourceSlice([]string{"infra", "nodes"}), nil
+		return "infra:nodes", nil
 	}
 	// cfgmgmt:nodes:{node_id}:runs -> infra:nodes:{node_id}
 	// cfgmgmt:nodes:{node_id}:runs:{run_id}" -> infra:nodes:{node_id}
 	if len(terms) >= 4 && terms[3] == "runs" {
-		return combineTermsIntoResourceSlice([]string{"infra", "nodes", terms[2]}), nil
+		return combineTermsIntoResource("infra", "nodes", terms[2]), nil
 	}
 	// cfgmgmt:nodes:{node_id}:attribute -> infra:nodes:{node_id}
 	if len(terms) >= 4 && terms[3] == "attribute" {
-		return combineTermsIntoResourceSlice([]string{"infra", "nodes", terms[2]}), nil
+		return combineTermsIntoResource("infra", "nodes", terms[2]), nil
 	}
 	// cfgmgmt:nodes:{node_id}:* -> infra:nodes:{node_id}
 	if len(terms) >= 3 && terms[2] == "node_id" {
-		return combineTermsIntoResourceSlice([]string{"infra", "nodes", terms[2]}), nil
+		return combineTermsIntoResource("infra", "nodes", terms[2]), nil
 	}
 	terms = changeTerm(terms, "cfgmgmt", "infra")
 	terms = changeTerm(terms, "marked-nodes", "markedNodes")
-	return combineTermsIntoResourceSlice(terms), nil
+	return combineTermsIntoResource(terms...), nil
 }
 
-func convertV1Events(terms []string) ([]string, error) {
+func convertV1Events(terms []string) (string, error) {
 	// "events:*" -> "event:events"
 	if len(terms) == 1 {
-		return combineTermsIntoResourceSlice([]string{"event:events"}), nil
+		return "event:events", nil
 	}
 
 	switch terms[1] {
 	case "types", "tasks", "strings":
-		return combineTermsIntoResourceSlice([]string{"event:events"}), nil
+		return "event:events", nil
 	default:
-		terms = changeTerm(terms, "event", "events")
-		return combineTermsIntoResourceSlice(terms), nil
+		return combineTermsIntoResource(changeTerm(terms, "event", "events")...), nil
 	}
 }
 
@@ -559,6 +553,10 @@ func changeTerm(terms []string, original, updated string) []string {
 	return terms
 }
 
+func prefixTerms(prefix string, terms []string) []string {
+	return append([]string{prefix}, terms...)
+}
+
 func deleteTerm(terms []string, original string) []string {
 	for i, term := range terms {
 		if term == original {
@@ -568,8 +566,8 @@ func deleteTerm(terms []string, original string) []string {
 	return terms
 }
 
-func combineTermsIntoResourceSlice(terms []string) []string {
-	return []string{strings.Join(terms, ":")}
+func combineTermsIntoResource(terms ...string) string {
+	return strings.Join(terms, ":")
 }
 
 func convertV1Action(action string, resource string) ([]string, error) {
