@@ -4,6 +4,7 @@ package chef.automate.api.iam.v2beta;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response";
 
 import "components/automate-gateway/api/iam/v2beta/common/rules.proto";
+import "google/protobuf/timestamp.proto";
 
 message CreateRuleResp {
   Rule rule = 1;
@@ -30,3 +31,11 @@ message DeleteRuleResp {}
 message ApplyRulesStartResp {}
 
 message ApplyRulesCancelResp {}
+
+message ApplyRulesStatusResp {
+  string state = 1;
+  google.protobuf.Timestamp estimated_time_complete = 2;
+  float percentage_complete = 3;
+  bool failed = 4;
+  string failure_message = 5;
+}

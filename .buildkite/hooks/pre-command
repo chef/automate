@@ -12,19 +12,23 @@ git fetch origin master
 # Fetch the git tags to see if that addresses the weird smart build behavior for Habitat
 git fetch --tags --force
 
-# rebase onto current master to ensure this PR is closer to what happens when it's merged
-git config user.email "you@example.com" # these are needed for the rebase attempt
-git config user.name "Your Name"
-master=$(git show-ref -s --abbrev origin/master)
-pr_head=$(git show-ref -s --abbrev HEAD)
-github="https://github.com/chef/automate/commit/"
-if output=$(git rebase origin/master); then
-  buildkite-agent annotate --style success --context rebase-pr-branch-${master} \
-    "Rebased onto master ([${master}](${github}${master}))."
-else
-  git rebase --abort
-  buildkite-agent annotate --style warning --context rebase-pr-branch-${master} \
-    "Couldn't rebase onto master ([${master}](${github}${master})), building PR HEAD ([${pr_head}](${github}${pr_head}))."
+# Rebase onto current master to ensure this PR is closer to what happens when it's merged.
+# Only do this if it's actually a branch (i.e. a PR or a manually created build), not a
+# post-merge CI run of master.
+if [[ "$BUILDKITE_BRANCH" != "master" ]]; then
+  git config user.email "you@example.com" # these are needed for the rebase attempt
+  git config user.name "Your Name"
+  master=$(git show-ref -s --abbrev origin/master)
+  pr_head=$(git show-ref -s --abbrev HEAD)
+  github="https://github.com/chef/automate/commit/"
+  if output=$(git rebase origin/master); then
+    buildkite-agent annotate --style success --context rebase-pr-branch-${master} \
+      "Rebased onto master ([${master}](${github}${master}))."
+  else
+    git rebase --abort
+    buildkite-agent annotate --style warning --context rebase-pr-branch-${master} \
+      "Couldn't rebase onto master ([${master}](${github}${master})), building PR HEAD ([${pr_head}](${github}${pr_head}))."
+  fi
 fi
 
 # Count retries as BK annotations; don't make all jobs explode if the script

@@ -39,6 +39,7 @@ type RulesServerMock struct {
 	DeleteRuleFunc          func(context.Context, *request.DeleteRuleReq) (*response.DeleteRuleResp, error)
 	ApplyRulesStartFunc     func(context.Context, *request.ApplyRulesStartReq) (*response.ApplyRulesStartResp, error)
 	ApplyRulesCancelFunc    func(context.Context, *request.ApplyRulesCancelReq) (*response.ApplyRulesCancelResp, error)
+	ApplyRulesStatusFunc    func(context.Context, *request.ApplyRulesStatusReq) (*response.ApplyRulesStatusResp, error)
 }
 
 func (m *RulesServerMock) CreateRule(ctx context.Context, req *request.CreateRuleReq) (*response.CreateRuleResp, error) {
@@ -137,6 +138,18 @@ func (m *RulesServerMock) ApplyRulesCancel(ctx context.Context, req *request.App
 	return nil, status.Error(codes.Internal, "mock: 'ApplyRulesCancel' not implemented")
 }
 
+func (m *RulesServerMock) ApplyRulesStatus(ctx context.Context, req *request.ApplyRulesStatusReq) (*response.ApplyRulesStatusResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.ApplyRulesStatusFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'ApplyRulesStatus' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *RulesServerMock) Reset() {
 	m.CreateRuleFunc = nil
@@ -147,4 +160,5 @@ func (m *RulesServerMock) Reset() {
 	m.DeleteRuleFunc = nil
 	m.ApplyRulesStartFunc = nil
 	m.ApplyRulesCancelFunc = nil
+	m.ApplyRulesStatusFunc = nil
 }

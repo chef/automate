@@ -43,6 +43,7 @@ type WorkflowInstance struct {
 	Payload      []byte
 
 	IsRunning bool
+	Err       error
 	Result    []byte
 }
 
@@ -102,6 +103,7 @@ type WorkflowCompleter interface {
 
 	Continue(payload []byte) error
 	Abandon() error
+	Fail(err error) error
 	Done(result []byte) error
 	Close() error
 }

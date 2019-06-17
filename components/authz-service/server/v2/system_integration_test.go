@@ -97,24 +97,24 @@ func TestListRulesForAllProjects(t *testing.T) {
 	type1 := api_v2.ProjectRuleTypes_NODE
 	conditions1 := []*api_v2.Condition{
 		{
-			Attribute:     api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
-			Values:   values1,
-			Operator: api_v2.ProjectRuleConditionOperators_MEMBER_OF,
+			Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    values1,
+			Operator:  api_v2.ProjectRuleConditionOperators_MEMBER_OF,
 		},
 	}
 	type2 := api_v2.ProjectRuleTypes_EVENT
 	conditions2 := []*api_v2.Condition{
 		{
-			Attribute:     api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
-			Values:   values2,
-			Operator: api_v2.ProjectRuleConditionOperators_EQUALS,
+			Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    values2,
+			Operator:  api_v2.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	conditions3 := []*api_v2.Condition{
 		{
-			Attribute:     api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
-			Values:   values3,
-			Operator: api_v2.ProjectRuleConditionOperators_MEMBER_OF,
+			Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    values3,
+			Operator:  api_v2.ProjectRuleConditionOperators_MEMBER_OF,
 		},
 	}
 
@@ -159,14 +159,6 @@ func TestListRulesForAllProjects(t *testing.T) {
 
 		expectedRules1 := []*api_v2.ProjectRule{createResp1.Rule, createResp2.Rule}
 		expectedRules2 := []*api_v2.ProjectRule{createResp3.Rule}
-		expectedMap := map[string]*api_v2.ProjectRules{
-			pid1: &api_v2.ProjectRules{
-				Rules: expectedRules1,
-			},
-			pid2: &api_v2.ProjectRules{
-				Rules: expectedRules2,
-			},
-		}
 
 		list, err := ts.projects.ListRules(ctx, &api_v2.ListRulesReq{})
 		require.Equal(t, 3, len(list.Rules))
@@ -174,7 +166,12 @@ func TestListRulesForAllProjects(t *testing.T) {
 
 		resp, err := ts.projects.ListRulesForAllProjects(ctx, &api_v2.ListRulesForAllProjectsReq{})
 		require.NoError(t, err)
-		assert.EqualValues(t, expectedMap, resp.ProjectRules)
+		actualPid1Rules, ok := resp.ProjectRules[pid1]
+		require.True(t, ok)
+		actualPid2Rules, ok := resp.ProjectRules[pid2]
+		require.True(t, ok)
+		assert.ElementsMatch(t, expectedRules1, actualPid1Rules.Rules)
+		assert.ElementsMatch(t, expectedRules2, actualPid2Rules.Rules)
 	})
 }
 

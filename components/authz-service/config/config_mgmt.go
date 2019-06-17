@@ -5,10 +5,12 @@ import (
 	"os"
 	"time"
 
+	toml "github.com/pelletier/go-toml"
+	// TODO: should use the service's logger
+	log "github.com/sirupsen/logrus"
+
 	base_config "github.com/chef/automate/lib/config"
 	event_ids "github.com/chef/automate/lib/event"
-	toml "github.com/pelletier/go-toml"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -53,7 +55,7 @@ func NewManager(configFile string) (*Manager, error) {
 
 	// Testing Updating
 	baseManager := base_config.NewManager(configFile, storedConfig)
-	err = baseManager.UpdateConfig(func(config interface{}) (interface{}, error) {
+	err = baseManager.UpdateConfig(func(interface{}) (interface{}, error) {
 		return storedConfig, nil
 	})
 	if err != nil {
@@ -62,7 +64,7 @@ func NewManager(configFile string) (*Manager, error) {
 
 	return &Manager{
 		baseConfigManager: baseManager,
-	}, err
+	}, nil
 }
 
 // Close - to close out the channel for this object.
@@ -75,8 +77,7 @@ func (manager *Manager) Close() {
 func (manager *Manager) GetProjectUpdateStage() ProjectUpdateStage {
 	aggregateConfig, ok := manager.baseConfigManager.Config.(aggregateConfig)
 	if !ok {
-		log.Error("baseConfigManager.Config is not of type 'aggregateConfig'")
-		os.Exit(1)
+		panic("baseConfigManager.Config is not of type 'aggregateConfig'")
 	}
 	return aggregateConfig.ProjectUpdateStage
 }

@@ -573,6 +573,45 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	boolQuery := elastic.NewBoolQuery()
 	boolQuery = boolQuery.Must(typeQuery)
 
+	filterTypes := []string{"environment", "organization", "chef_server", "chef_tags",
+		"policy_group", "policy_name", "status", "node_name", "platform", "role", "recipe",
+		"inspec_version"}
+
+	for _, filterType := range filterTypes {
+		ESFieldName := backend.getESFieldName(filterType)
+		termQuery := backend.newTermQueryFromFilter(ESFieldName, filters[filterType])
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
+	if len(filters["control_name"]) > 0 {
+		termQuery := backend.newNestedTermQueryFromFilter("profiles.controls.title", "profiles.controls",
+			filters["control_name"])
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
+	if len(filters["profile_name"]) > 0 {
+		termQuery := backend.newNestedTermQueryFromFilter("profiles.title", "profiles", filters["profile_name"])
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
+	if len(filters["node_id"]) > 0 {
+		termQuery := elastic.NewTermsQuery("node_uuid", stringArrayToInterfaceArray(filters["node_id"])...)
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
+	numberOfProfiles := len(filters["profile_id"])
+	numberOfControls := len(filters["control"])
+	if numberOfProfiles > 0 || numberOfControls > 0 {
+		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
+		profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
+		controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status",
+			"profiles.controls.impact"}
+
+		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes,
+			profileLevelFscIncludes, controlLevelFscIncludes)
+		boolQuery = boolQuery.Must(profileAndControlQuery)
+	}
+
 	if len(filters["start_time"]) > 0 || len(filters["end_time"]) > 0 {
 		endTime := firstOrEmpty(filters["end_time"])
 		startTime := firstOrEmpty(filters["start_time"])
@@ -609,82 +648,6 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		boolQuery = boolQuery.Filter(projectsQuery)
 	}
 
-	if len(filters["environment"]) > 0 {
-		termQuery := elastic.NewTermsQuery("environment", stringArrayToInterfaceArray(filters["environment"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["organization"]) > 0 {
-		termQuery := elastic.NewTermsQuery("organization_name", stringArrayToInterfaceArray(filters["organization"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["chef_server"]) > 0 {
-		termQuery := elastic.NewTermsQuery("source_fqdn", stringArrayToInterfaceArray(filters["chef_server"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["chef_tags"]) > 0 {
-		termQuery := elastic.NewTermsQuery("chef_tags", stringArrayToInterfaceArray(filters["chef_tags"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["policy_group"]) > 0 {
-		termQuery := elastic.NewTermsQuery("policy_group", stringArrayToInterfaceArray(filters["policy_group"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["policy_name"]) > 0 {
-		termQuery := elastic.NewTermsQuery("policy_name", stringArrayToInterfaceArray(filters["policy_name"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["status"]) > 0 {
-		termQuery := elastic.NewTermsQuery("status", stringArrayToInterfaceArray(filters["status"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["node_id"]) > 0 {
-		termQuery := elastic.NewTermsQuery("node_uuid", stringArrayToInterfaceArray(filters["node_id"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["node_name"]) > 0 {
-		termQuery := elastic.NewTermsQuery("node_name", stringArrayToInterfaceArray(filters["node_name"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["platform"]) > 0 {
-		termQuery := elastic.NewTermsQuery("platform.name", stringArrayToInterfaceArray(filters["platform"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	numberOfProfiles := len(filters["profile_id"])
-	numberOfControls := len(filters["control"])
-	if numberOfProfiles > 0 || numberOfControls > 0 {
-		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
-		profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
-		controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status", "profiles.controls.impact"}
-
-		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes, profileLevelFscIncludes, controlLevelFscIncludes)
-		boolQuery = boolQuery.Must(profileAndControlQuery)
-	}
-
-	if len(filters["role"]) > 0 {
-		termQuery := elastic.NewTermsQuery("roles", stringArrayToInterfaceArray(filters["role"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["recipe"]) > 0 {
-		termQuery := elastic.NewTermsQuery("recipes", stringArrayToInterfaceArray(filters["recipe"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["inspec_version"]) > 0 {
-		termQuery := elastic.NewTermsQuery("version", stringArrayToInterfaceArray(filters["inspec_version"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
 	if len(filters["job_id"]) > 0 {
 		termQuery := elastic.NewTermsQuery("job_uuid", stringArrayToInterfaceArray(filters["job_id"])...)
 		boolQuery = boolQuery.Must(termQuery)
@@ -695,6 +658,80 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	}
 
 	return boolQuery
+}
+
+func (backend ES2Backend) getESFieldName(filterType string) string {
+	switch filterType {
+	case "organization":
+		return "organization_name"
+	case "chef_server":
+		return "source_fqdn"
+	case "platform":
+		return "platform.name"
+	case "role":
+		return "roles"
+	case "recipe":
+		return "recipes"
+	case "inspec_version":
+		return "version"
+	default:
+		return filterType
+	}
+}
+
+func (backend ES2Backend) newTermQueryFromFilter(ESField string,
+	filters []string) *elastic.BoolQuery {
+	refinedValues := make([]string, 0, 0)
+	filterQuery := elastic.NewBoolQuery()
+
+	for _, value := range filters {
+		if containsWildcardChar(value) {
+			wildQuery := elastic.NewWildcardQuery(ESField, value)
+			filterQuery = filterQuery.Should(wildQuery)
+		} else {
+			refinedValues = append(refinedValues, value)
+		}
+	}
+	if len(refinedValues) > 0 {
+		termQuery := elastic.NewTermsQuery(ESField, stringArrayToInterfaceArray(refinedValues)...)
+		filterQuery = filterQuery.Should(termQuery)
+	}
+	return filterQuery
+}
+
+func (backend ES2Backend) newNestedTermQueryFromFilter(ESField string, ESFieldPath string,
+	filters []string) *elastic.BoolQuery {
+	refinedValues := make([]string, 0, 0)
+	filterQuery := elastic.NewBoolQuery()
+
+	for _, value := range filters {
+		if containsWildcardChar(value) {
+			wildQuery := elastic.NewWildcardQuery(ESField, value)
+			nestedQuery := elastic.NewNestedQuery(ESFieldPath, wildQuery)
+			filterQuery = filterQuery.Should(nestedQuery)
+		} else {
+			refinedValues = append(refinedValues, value)
+		}
+	}
+	if len(refinedValues) > 0 {
+		termQuery := elastic.NewTermsQuery(ESField, stringArrayToInterfaceArray(refinedValues)...)
+		nestedQuery := elastic.NewNestedQuery(ESFieldPath, termQuery)
+		filterQuery = filterQuery.Should(nestedQuery)
+	}
+
+	return filterQuery
+}
+
+func containsWildcardChar(value string) bool {
+	wildcardValues := []string{"*", "?"}
+
+	for _, wildcard := range wildcardValues {
+		if strings.Contains(value, wildcard) {
+			return true
+		}
+	}
+
+	return false
 }
 
 //  getFiltersQueryForDeepReport - builds up an elasticsearch query filter based on the reportId filters map passed in.

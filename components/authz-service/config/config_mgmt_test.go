@@ -5,9 +5,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/chef/automate/components/authz-service/config"
 	event_ids "github.com/chef/automate/lib/event"
-	"github.com/stretchr/testify/assert"
 )
 
 const cFile = "/tmp/.authz-service-test-delete-me.toml"
@@ -42,7 +43,7 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
   `)
 	err := ioutil.WriteFile(cFile, data, 0644)
 	defer os.Remove(cFile)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// New config should load the file
 	configMgr, err := config.NewManager(cFile)
@@ -65,6 +66,7 @@ func TestManagerConfigProjectUpdateConfig(t *testing.T) {
 func TestManagerBadFile(t *testing.T) {
 	_, err := config.NewManager("")
 	assert.Error(t, err)
+	assert.NoError(t, os.Remove(".tmp.."), "cleanup tmp file")
 }
 
 func TestManagerConfigProjectUpdateConfigDefault(t *testing.T) {

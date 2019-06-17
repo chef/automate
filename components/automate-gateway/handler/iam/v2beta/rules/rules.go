@@ -123,7 +123,7 @@ func (s *Server) DeleteRule(ctx context.Context, req *pb_req.DeleteRuleReq) (*pb
 	return &pb_resp.DeleteRuleResp{}, nil
 }
 
-func (s *Server) ApplyRulesStart(ctx context.Context, req *pb_req.ApplyRulesStartReq) (*pb_resp.ApplyRulesStartResp, error) {
+func (s *Server) ApplyRulesStart(ctx context.Context, _ *pb_req.ApplyRulesStartReq) (*pb_resp.ApplyRulesStartResp, error) {
 	_, err := s.projects.ApplyRulesStart(ctx, &authz.ApplyRulesStartReq{})
 	if err != nil {
 		return nil, err
@@ -132,13 +132,29 @@ func (s *Server) ApplyRulesStart(ctx context.Context, req *pb_req.ApplyRulesStar
 }
 
 func (s *Server) ApplyRulesCancel(ctx context.Context,
-	req *pb_req.ApplyRulesCancelReq) (*pb_resp.ApplyRulesCancelResp, error) {
+	_ *pb_req.ApplyRulesCancelReq) (*pb_resp.ApplyRulesCancelResp, error) {
 
 	_, err := s.projects.ApplyRulesCancel(ctx, &authz.ApplyRulesCancelReq{})
 	if err != nil {
 		return nil, err
 	}
 	return &pb_resp.ApplyRulesCancelResp{}, nil
+}
+
+func (s *Server) ApplyRulesStatus(ctx context.Context,
+	_ *pb_req.ApplyRulesStatusReq) (*pb_resp.ApplyRulesStatusResp, error) {
+
+	resp, err := s.projects.ApplyRulesStatus(ctx, &authz.ApplyRulesStatusReq{})
+	if err != nil {
+		return nil, err
+	}
+	return &pb_resp.ApplyRulesStatusResp{
+		State: resp.State,
+		EstimatedTimeComplete: resp.EstimatedTimeComplete,
+		PercentageComplete:    resp.PercentageComplete,
+		Failed:                resp.Failed,
+		FailureMessage:        resp.FailureMessage,
+	}, nil
 }
 
 func fromExternalCreate(req *pb_req.CreateRuleReq) (*authz.CreateRuleReq, error) {
