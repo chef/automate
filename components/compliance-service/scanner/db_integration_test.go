@@ -1,7 +1,6 @@
 package scanner
 
 import (
-	"context"
 	"testing"
 
 	"github.com/golang/protobuf/ptypes"
@@ -61,63 +60,6 @@ func (suite *ScannerDBSuite) TestUpdateJobStatus() {
 	s.UpdateJobStatus(id, "running", nil, nil)
 
 	suite.Equal("completed", job.Status)
-}
-
-func (suite *ScannerDBSuite) TestCheckForHungJobs() {
-	s := Scanner{DB: suite.Database}
-
-	// add two exec jobs
-	id, err := suite.Database.AddJob(&jobs.Job{
-		Name:       "my job 1",
-		Recurrence: "",
-		Type:       "exec",
-		EndTime:    ptypes.TimestampNow(),
-	})
-	suite.Require().NoError(err)
-
-	// update job to running
-	s.UpdateJobStatus(id, "running", nil, nil)
-
-	id2, err := suite.Database.AddJob(&jobs.Job{
-		Name:       "my job 2",
-		Recurrence: "",
-		Type:       "exec",
-		EndTime:    ptypes.TimestampNow(),
-	})
-	suite.Require().NoError(err)
-
-	// update job to scheduled
-	s.UpdateJobStatus(id2, "scheduled", nil, nil)
-
-	// add one detect job
-	id3, err := suite.Database.AddJob(&jobs.Job{
-		Name:       "my detect job",
-		Recurrence: "",
-		Type:       "detect",
-		EndTime:    ptypes.TimestampNow(),
-	})
-	suite.Require().NoError(err)
-
-	// update job to scheduled
-	s.UpdateJobStatus(id3, "scheduled", nil, nil)
-
-	scheduledJobs, err := s.CheckForHungJobs(context.Background())
-	suite.Require().NoError(err)
-
-	// add a job and then delete it
-	id4, err := suite.Database.AddJob(&jobs.Job{
-		Name:       "my job 2",
-		Recurrence: "",
-		Type:       "exec",
-		EndTime:    ptypes.TimestampNow(),
-	})
-	suite.Require().NoError(err)
-	err = suite.Database.DeleteJob(id4)
-	suite.Require().NoError(err)
-
-	// we only expect job with id2 here. the other exec job was running, and
-	// we are explicitly not picking up detect jobs
-	suite.Equal([]string{id2}, scheduledJobs)
 }
 
 func (suite *ScannerDBSuite) TestIsJobDeleted() {
