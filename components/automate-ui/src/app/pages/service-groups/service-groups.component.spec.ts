@@ -63,9 +63,7 @@ describe('ServiceGroupsComponent', () => {
 
       describe('and OK status filter update', () => {
         beforeEach(() => {
-          this.ngrxStore.dispatch(new UpdateServiceGroupFilters({filters: {
-            status: 'ok',
-          }}));
+          this.ngrxStore.dispatch(new UpdateServiceGroupFilters({filters: {status: 'ok'}}));
         });
 
         it('should update the total number of service groups and selected status', fakeAsync(() => {
