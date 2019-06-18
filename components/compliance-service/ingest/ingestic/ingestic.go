@@ -1,7 +1,6 @@
 package ingestic
 
 import (
-	"math/rand"
 	"time"
 
 	"fmt"
@@ -183,25 +182,18 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 		MustNot(termQueryNotThisReport)
 
 	script := elastic.NewScript("ctx._source.daily_latest = false")
-
-	retries := 3
-	err := errors.New("init")
-	for retries > 0 && err != nil {
-		time.Sleep(time.Duration(rand.Intn(5)) * time.Second)
-		_, err = elastic.NewUpdateByQueryService(backend.client).
-			Index(index).
-			Query(boolQueryDailyLatestThisNodeNotThisReport).
-			Script(script).
-			Refresh("false").
-			Do(ctx)
-		retries -= 1
-	}
-	logrus.Infof("Ran NewUpdateByQueryService for index %s node %s w/ report %s retries %d", index, nodeId, reportId, retries)
+	_, err := elastic.NewUpdateByQueryService(backend.client).
+		Index(index).
+		Query(boolQueryDailyLatestThisNodeNotThisReport).
+		Script(script).
+		Refresh("false").
+		ProceedOnVersionConflict().
+		Do(ctx)
 	if err != nil {
-		err = errors.Wrap(err, "daily_latest update failed")
+		logrus.Errorf("daily_latest update for index %s node, %s, report %s failed with error: %s", index, nodeId, reportId, err.Error())
 	}
 
-	return err
+	return nil
 }
 
 func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
