@@ -65,8 +65,9 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 	var job jobs.Job
 	err := w.GetParameters(&job)
 	if err != nil {
-		logrus.WithError(err).Error("Failed to unmarshal job!")
-		return w.Complete()
+		err = errors.Wrap(err, "failed to unmarshal job from parameters")
+		logrus.WithError(err).Error()
+		return w.Fail(err)
 	}
 
 	if job.Recurrence != "" {
@@ -89,36 +90,41 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 	var payload ScanJobWorkflowPayload
 
 	if err := w.GetPayload(&payload); err != nil {
-		logrus.WithError(err).Fatal("Could not decode payload")
+		err = errors.Wrap(err, "failed to unmarshal scan-job payload")
+		logrus.WithError(err).Error()
+		return w.Fail(err)
 	}
 
 	logrus.Debugf("Entered ScanJobWorkflow > OnTaskComplete with payload %+v", payload)
 	switch ev.TaskName {
 	case "create-child":
 		if ev.Result.Err() != nil {
-			return w.Complete()
+			logrus.WithError(ev.Result.Err()).Error("create-child failed with error")
+			return w.Fail(ev.Result.Err())
 		}
 
 		var childJob jobs.Job
 		err := ev.Result.Get(&childJob)
 		if err != nil {
-			logrus.WithError(err).Error("Failed to unmarshal job!")
-			return w.Complete()
+			err = errors.Wrap(err, "failed to unmarshal child job")
+			logrus.WithError(err).Error()
+			return w.Fail(err)
 		}
 		payload.ChildJobID = childJob.Id
 		w.EnqueueTask("resolve-job", childJob)
 		return w.Continue(&payload)
 	case "resolve-job":
 		if ev.Result.Err() != nil {
-			logrus.WithError(ev.Result.Err()).Debug("resolve-job failed with error")
-			return w.Complete()
+			logrus.WithError(ev.Result.Err()).Error("resolve-job failed with error")
+			return w.Fail(ev.Result.Err())
 		}
 
 		jobs := []*types.InspecJob{}
 		err := ev.Result.Get(&jobs)
 		if err != nil {
-			logrus.WithError(err).Error("Failed to unmarshal jobs!")
-			return w.Complete()
+			err = errors.Wrap(err, "failed to unmarshal resolved jobs")
+			logrus.WithError(err).Error("")
+			return w.Fail(err)
 		}
 		logrus.Debugf("resolve-job returned %d job(s)", len(jobs))
 
@@ -137,14 +143,18 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 		payload.OutstandingJobs--
 
 		var childJobStatus string
-		if err := ev.Result.Get(&childJobStatus); err != nil {
-			logrus.WithError(err).Error("Could not decode childJobStatus")
-		}
-		logrus.Debugf("ScanJobWorkflow > OnTaskComplete with %d outstanding jobs and childJobStatus of %s", payload.OutstandingJobs, childJobStatus)
 
-		if childJobStatus == types.StatusFailed {
-			payload.OverallJobStatus = types.StatusFailed
+		if ev.Result.Err() != nil {
+			logrus.WithError(ev.Result.Err()).Error("scan-job failed with abnormal error")
+			childJobStatus = types.StatusFailed
+		} else {
+			if err := ev.Result.Get(&childJobStatus); err != nil {
+				logrus.WithError(err).Error("could not decode scan-job result, marking as failed")
+				childJobStatus = types.StatusFailed
+			}
 		}
+
+		logrus.Debugf("ScanJobWorkflow > OnTaskComplete with %d outstanding jobs and childJobStatus of %s", payload.OutstandingJobs, childJobStatus)
 		switch childJobStatus {
 		case types.StatusFailed:
 			payload.OverallJobStatus = types.StatusFailed
@@ -198,13 +208,11 @@ type ResolveTask struct {
 func (t *ResolveTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
 	var job jobs.Job
 	if err := task.GetParameters(&job); err != nil {
-		logrus.WithError(err).Error("could not unmarshal job parameters")
-		return nil, err
+		return nil, errors.Wrap(err, "could not unmarshal job to resolve")
 	}
 
 	nodeJobs, err := t.resolver.ResolveJob(ctx, &job)
 	if err != nil {
-		logrus.WithError(err).Errorf("failed to resolve job %s", job.Id)
 		// TODO(ssd) 2019-06-07: As far as I can tell
 		// the current code just returns, but it seems
 		// like we should update the job status with
@@ -229,7 +237,7 @@ func (t *ResolveTask) Run(ctx context.Context, task workflow.Task) (interface{},
 
 	for _, job := range nodeJobs {
 		if job == nil {
-			return nil, errors.New("Nil job returned from ResolveJob")
+			return nil, errors.New("nil job returned from ResolveJob")
 		}
 
 		job.Status = types.StatusScheduled
@@ -248,8 +256,7 @@ func (t *ResolveTask) Run(ctx context.Context, task workflow.Task) (interface{},
 func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
 	var job types.InspecJob
 	if err := task.GetParameters(&job); err != nil {
-		logrus.WithError(err).Error("could not unmarshal job parameters")
-		return nil, err
+		return nil, errors.Wrap(err, "could not unmarshal inspec job")
 	}
 
 	logrus.Debugf("working on job %s for node %s", job.JobID, job.NodeID)
@@ -420,8 +427,7 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (int
 	var jobsPayload ScanJobWorkflowPayload
 
 	if err := task.GetParameters(&jobsPayload); err != nil {
-		logrus.WithError(err).Error("could not unmarshal summary job parameters")
-		return nil, err
+		return nil, errors.Wrap(err, "could not unmarshal summary job parameters")
 	}
 
 	// If this is a /recurring/ job, then we will have a
@@ -440,8 +446,7 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (int
 func (t *CreateChildTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
 	var job jobs.Job
 	if err := task.GetParameters(&job); err != nil {
-		logrus.WithError(err).Error("could not unmarshal job")
-		return nil, err
+		return nil, errors.Wrap(err, "could not unmarshal parent job")
 	}
 
 	job.JobCount++
@@ -449,7 +454,7 @@ func (t *CreateChildTask) Run(ctx context.Context, task workflow.Task) (interfac
 
 	childJob, err := t.scanner.CreateChildJob(&job)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to create child job")
+		return nil, errors.Wrap(err, "failed to create child job")
 	}
 
 	return childJob, nil
