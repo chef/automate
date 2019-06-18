@@ -112,6 +112,28 @@ describe('ServiceGroupsComponent', () => {
   });
 
   describe('onToggleSort', () => {
+    describe('with defaults', () => {
+      it('should return "name" as sorting field', () => {
+        expect(component.defaultSortField ).toEqual('percent_ok');
+        expect(component.currentSortField ).toEqual('percent_ok');
+        expect(component.currentFieldDirection).toEqual('ASC');
+      });
+
+      it('should change sort direction on already selected sorting field', () => {
+        spyOn(component.router, 'navigate');
+        component.onToggleSort('percent_ok');
+        expect(component.router.navigate).toHaveBeenCalledWith(
+          [], {queryParams: { sortField: ['percent_ok'], sortDirection: ['DESC'] }});
+      });
+    });
+
+    it('when set to an allowed value', () => {
+      spyOn(component.router, 'navigate');
+      component.onToggleSort('environment');
+      expect(component.router.navigate).toHaveBeenCalledWith(
+        [], {queryParams: { sortField: ['environment'], sortDirection: ['ASC'] }});
+    });
+
     it('when set to an allowed value', () => {
       spyOn(component.router, 'navigate');
       component.onToggleSort('name');
@@ -121,9 +143,9 @@ describe('ServiceGroupsComponent', () => {
 
     it('when set to an allowed value', () => {
       spyOn(component.router, 'navigate');
-      component.onToggleSort('percent_ok');
+      component.onToggleSort('app_name');
       expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { sortField: ['percent_ok'], sortDirection: ['ASC'] }});
+        [], {queryParams: { sortField: ['app_name'], sortDirection: ['ASC'] }});
     });
   });
 
