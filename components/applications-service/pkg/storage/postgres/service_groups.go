@@ -48,24 +48,24 @@ const (
                AND health_warning  = 0
                AND health_unknown  = 0
        ) AS ok
-FROM service_groups_health AS service_groups_health_counts
+FROM service_group_health AS service_group_health_counts
 `
 
 	selectServiceGroupHealthWithPageSort = `
-SELECT * FROM service_groups_health AS service_groups_health
+SELECT * FROM service_group_health AS service_group_health
  ORDER BY %s
  LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterCRITICAL = `
-SELECT * FROM service_groups_health AS service_groups_health
+SELECT * FROM service_group_health AS service_group_health
  WHERE health_critical > 0
  ORDER BY %s
  LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterUNKNOWN = `
-SELECT * FROM service_groups_health AS service_groups_health
+SELECT * FROM service_group_health AS service_group_health
  WHERE health_unknown  > 0
    AND health_critical = 0
  ORDER BY %s
@@ -73,7 +73,7 @@ SELECT * FROM service_groups_health AS service_groups_health
 OFFSET $2
 `
 	selectServiceGroupHealthFilterWARNING = `
-SELECT * FROM service_groups_health AS service_groups_health
+SELECT * FROM service_group_health AS service_group_health
  WHERE health_warning  > 0
    AND health_critical = 0
    AND health_unknown  = 0
@@ -82,7 +82,7 @@ SELECT * FROM service_groups_health AS service_groups_health
 OFFSET $2
 `
 	selectServiceGroupHealthFilterOK = `
-SELECT * FROM service_groups_health AS service_groups_health
+SELECT * FROM service_group_health AS service_group_health
  WHERE health_ok > 0
    AND health_critical = 0
    AND health_warning  = 0
