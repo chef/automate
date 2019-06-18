@@ -65,7 +65,7 @@ service Rules {
   };
 
   rpc ApplyRulesStart (ApplyRulesStartReq) returns (ApplyRulesStartResp) {
-    option (google.api.http).get = "/iam/v2beta/apply-rules-start";
+    option (google.api.http).post = "/iam/v2beta/apply-rules";
     option (chef.automate.api.policy).resource = "auth:rules";
     option (chef.automate.api.policy).action = "apply-rules-start";
     option (chef.automate.api.iam.policy).resource = "iam:rules";
@@ -73,7 +73,7 @@ service Rules {
   };
 
   rpc ApplyRulesCancel (ApplyRulesCancelReq) returns (ApplyRulesCancelResp) {
-    option (google.api.http).get = "/iam/v2beta/apply-rules-cancel";
+    option (google.api.http).delete = "/iam/v2beta/apply-rules";
     option (chef.automate.api.policy).resource = "auth:rules";
     option (chef.automate.api.policy).action = "apply-rules-cancel";
     option (chef.automate.api.iam.policy).resource = "iam:rules";
@@ -81,7 +81,7 @@ service Rules {
   };
 
   rpc ApplyRulesStatus (ApplyRulesStatusReq) returns (ApplyRulesStatusResp) {
-    option (google.api.http).get = "/iam/v2beta/apply-rules-status";
+    option (google.api.http).get = "/iam/v2beta/apply-rules";
     option (chef.automate.api.policy).resource = "auth:rules";
     option (chef.automate.api.policy).action = "apply-rules-status";
     option (chef.automate.api.iam.policy).resource = "iam:rules";
