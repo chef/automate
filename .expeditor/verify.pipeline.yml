@@ -90,6 +90,7 @@ steps:
       - service postgresql start
       - psql -c 'create database authn_test;' -U postgres
       - cd components/authn-service
+      - date
       - make static unit
     timeout_in_minutes: 10
     retry:
