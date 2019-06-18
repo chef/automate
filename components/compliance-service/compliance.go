@@ -428,9 +428,15 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	// these are all inspec-agent packages
 	scanner := scanner.New(mgrClient, nodesClient, db)
 	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient)
-	runner.InitWorkflowManager(workflowManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
+	err = runner.InitWorkflowManager(workflowManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
+	if err != nil {
+		return errors.Wrap(err, "failed to initialize workflow manager")
+	}
 
-	workflowManager.Start(ctx)
+	err = workflowManager.Start(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to start workflow manager")
+	}
 	schedulerServer := scheduler.New(scanner, workflowManager)
 
 	// start polling for jobs with a recurrence schedule that are due to run.

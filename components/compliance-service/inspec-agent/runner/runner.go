@@ -32,21 +32,37 @@ import (
 var ListenPort int = 2133
 
 func InitWorkflowManager(w *workflow.WorkflowManager, workerCount int, ingestClient ingest.ComplianceIngesterClient,
-	scanner *scanner.Scanner, resolver *resolver.Resolver, remoteInspecVersion string) {
-	w.RegisterWorkflowExecutor("scan-job-workflow", &ScanJobWorkflow{})
-	w.RegisterTaskExecutor("create-child", &CreateChildTask{
+	scanner *scanner.Scanner, resolver *resolver.Resolver, remoteInspecVersion string) error {
+	err := w.RegisterWorkflowExecutor("scan-job-workflow", &ScanJobWorkflow{})
+	if err != nil {
+		return err
+	}
+
+	err = w.RegisterTaskExecutor("create-child", &CreateChildTask{
 		scanner,
 	}, workflow.TaskExecutorOpts{Workers: 1})
-	w.RegisterTaskExecutor("resolve-job", &ResolveTask{
+	if err != nil {
+		return err
+	}
+
+	err = w.RegisterTaskExecutor("resolve-job", &ResolveTask{
 		remoteInspecVersion,
 		scanner,
 		resolver,
 	}, workflow.TaskExecutorOpts{Workers: 1})
-	w.RegisterTaskExecutor("scan-job", &InspecJobTask{
+	if err != nil {
+		return err
+	}
+
+	err = w.RegisterTaskExecutor("scan-job", &InspecJobTask{
 		ingestClient,
 		scanner,
 	}, workflow.TaskExecutorOpts{Workers: workerCount})
-	w.RegisterTaskExecutor("scan-job-summary", &InspecJobSummaryTask{
+	if err != nil {
+		return err
+	}
+
+	return w.RegisterTaskExecutor("scan-job-summary", &InspecJobSummaryTask{
 		scanner,
 	}, workflow.TaskExecutorOpts{Workers: 1})
 }
@@ -70,10 +86,18 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 		return w.Fail(err)
 	}
 
+	// If we don't have a recurrence, it means this job isn't a
+	// scheduled job and thus doesn't need a child job created in
+	// the database.
+	taskName := "create-child"
 	if job.Recurrence != "" {
-		w.EnqueueTask("create-child", job)
-	} else {
-		w.EnqueueTask("resolve-job", job)
+		taskName = "resolve-job"
+	}
+	err = w.EnqueueTask(taskName, job)
+	if err != nil {
+		err = errors.Wrapf(err, "failed to enqueue task %q", taskName)
+		logrus.WithError(err).Error()
+		return w.Fail(err)
 	}
 
 	return w.Continue(&ScanJobWorkflowPayload{
@@ -110,8 +134,16 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 			logrus.WithError(err).Error()
 			return w.Fail(err)
 		}
+
 		payload.ChildJobID = childJob.Id
-		w.EnqueueTask("resolve-job", childJob)
+
+		err = w.EnqueueTask("resolve-job", childJob)
+		if err != nil {
+			err = errors.Wrap(err, "failed to enqueue resolve-job task")
+			logrus.WithError(err)
+			return w.Fail(err)
+		}
+
 		return w.Continue(&payload)
 	case "resolve-job":
 		if ev.Result.Err() != nil {
@@ -134,7 +166,12 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 
 		for _, job := range jobs {
 			logrus.Infof("Enqueueing individual scan job %q for %q (child of %q)", job.JobID, payload.ChildJobID, payload.ParentJobID)
-			w.EnqueueTask("scan-job", job)
+			err = w.EnqueueTask("scan-job", job)
+			if err != nil {
+				err = errors.Wrap(err, "failed to enqueue scan-job task")
+				logrus.WithError(err)
+				return w.Fail(err)
+			}
 		}
 
 		payload.OutstandingJobs = len(jobs)
@@ -169,7 +206,12 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 			if payload.OverallJobStatus == types.StatusRunning {
 				payload.OverallJobStatus = types.StatusCompleted
 			}
-			w.EnqueueTask("scan-job-summary", payload)
+			err := w.EnqueueTask("scan-job-summary", payload)
+			if err != nil {
+				err = errors.Wrap(err, "failed to enqueue scan-job-summary task")
+				logrus.WithError(err)
+				return w.Fail(err)
+			}
 		}
 		return w.Continue(&payload)
 	case "scan-job-summary":
