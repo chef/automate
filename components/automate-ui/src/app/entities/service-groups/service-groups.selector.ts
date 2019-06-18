@@ -9,6 +9,11 @@ export const serviceGroupStatus = createSelector(
   (state) => state.status
 );
 
+export const servicesStatus = createSelector(
+  serviceGroupState,
+  (state) => state.servicesStatus
+);
+
 export const allServiceGroups = createSelector(
   serviceGroupState,
   (state) => state.serviceGroups
