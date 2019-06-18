@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	address = "localhost:9200"
+	address = "localhost:10121"
 )
 
 func getClientConn() (*grpc.ClientConn, error) {
