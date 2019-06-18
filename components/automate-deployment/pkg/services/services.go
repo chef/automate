@@ -3,212 +3,232 @@
 package services
 
 import (
+	"encoding/json"
+	"strings"
+
+	"github.com/chef/automate/lib/product"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/assets"
 	"github.com/chef/automate/components/automate-deployment/pkg/bind"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
-	"github.com/chef/automate/components/automate-deployment/pkg/services/parser"
+	"github.com/chef/automate/components/automate-deployment/pkg/services/internal/generated"
 )
 
-var servicesByCollection map[string][]habpkg.HabPkg
-
-var supplementaryPackagesByCollection map[string][]habpkg.HabPkg
-
-var serviceCollections map[string]parser.ServiceCollection
+//go:generate go run ../../tools/services-pkg-gen/main.go ../../../../ internal/generated/gen.go
 
 // AllBinds contains all the bindings that the deployment service is aware of
 var AllBinds bind.Binds
 
-// automateFull is the full ServiceCollection object with all the data on
-// packages and services we install/manage
-var automateFull parser.ServiceCollection
-
-// AllPackages returns a list of all packages (service, binary, or whatever) that
-// were specified in the manifest
-func AllPackages() []habpkg.HabPkg {
-	pkgs := []habpkg.HabPkg{}
-	mark := make(map[string]bool)
-	for _, serviceCollection := range serviceCollections {
-		for _, section := range [][]string{
-			serviceCollection.AllServices,
-			serviceCollection.ExtraPkgs,
-			serviceCollection.Pins,
-			serviceCollection.DataServices} {
-			for _, pkgStr := range section {
-				if !mark[pkgStr] {
-					mark[pkgStr] = true
-					pkg, err := habpkg.FromString(pkgStr)
-					if err != nil {
-						panic(errors.Wrapf(err, "failed to parse hab pkg name '%s' in services list", pkgStr))
-					}
-					pkgs = append(pkgs, pkg)
-				}
-			}
-		}
-	}
-	return pkgs
-}
+var serviceList []habpkg.HabPkg
+var productList []string
+var packageMetadataMap map[string]*product.Package
+var collectionMap map[string]*product.Collection
 
 func AllServices() ([]habpkg.HabPkg, error) {
-	names := []string{}
-	for name := range servicesByCollection {
-		names = append(names, name)
-	}
-	return ServicesInCollections(names)
+	return serviceList, nil
 }
 
-func ListProducts() []string {
-	collections := make([]string, len(serviceCollections))
-	i := 0
-	for k := range serviceCollections {
-		collections[i] = k
-		i++
-	}
-	return collections
-}
-
-func ServicesInCollections(collections []string) ([]habpkg.HabPkg, error) {
-	combined := []habpkg.HabPkg{}
-	for _, collectionName := range collections {
-		serviceIDs, err := ServicesInCollection(collectionName)
-		if err != nil {
-			return combined, err
-		}
-		combined = append(combined, serviceIDs...)
-	}
-	return combined, nil
-}
-
-func ServicesInCollection(collection string) ([]habpkg.HabPkg, error) {
-	list, ok := servicesByCollection[collection]
-	if !ok {
-		return nil, errors.Errorf("services collection '%s' not found", collection)
-	}
-	return list, nil
-}
-
-func SupplementaryPackagesInCollection(collection string) ([]habpkg.HabPkg, error) {
-	list, ok := supplementaryPackagesByCollection[collection]
-	if !ok {
-		return []habpkg.HabPkg{}, errors.Errorf("services collection '%s' not found", collection)
-	}
-	return list, nil
-}
-
-// IsDataService is used during A1 -> A2 upgrades to start postgres/elasticsearch
-// separately from the domain services.
-func IsDataService(candidate string) bool {
-	serviceIDs, err := habpkg.FromList(automateFull.DataServices)
-
-	if err != nil {
-		panic(err.Error())
+func ContainsCollection(needle string, haystack []string) bool {
+	desiredCollection := collectionMap[needle]
+	if desiredCollection == nil {
+		return false
 	}
 
-	for _, iter := range serviceIDs {
-		if iter.Name() == candidate {
-			return true
+	visited := map[string]bool{}
+
+	for _, collectionName := range haystack {
+		collection := collectionMap[collectionName]
+		if collection != nil {
+			if collection == desiredCollection {
+				return true
+			}
+			deps := getRequiredCollections(collectionName, visited)
+			for _, d := range deps {
+				if d.Type != product.ProductType && desiredCollection == d {
+					return true
+				}
+			}
 		}
 	}
 	return false
 }
 
-var binlinkMap map[string][]string
-
-func BinlinksForService(serviceName string) []string {
-	return binlinkMap[serviceName]
+func ListProducts() []string {
+	return productList
 }
 
-func loadServiceCollections() map[string]parser.ServiceCollection {
-	bytes := assets.MustAsset("data/services.json")
-	collections, err := parser.ServiceCollectionsFromJSON(bytes)
-	if err != nil {
-		panic(err.Error())
+func ValidateProductDeployment(products []string) error {
+	visited := map[string]bool{}
+	requiredCollectionSet := make(map[string]*product.Collection)
+	desiredCollectionSet := make(map[string]*product.Collection)
+	for _, p := range products {
+		collection := collectionMap[p]
+		if collection == nil || collection.Type != product.ProductType {
+			return errors.Errorf("Unknown product %q. Must be one of (%s)", p, strings.Join(ListProducts(), ", "))
+		}
+		desiredCollectionSet[collection.Name] = collection
+		deps := getRequiredCollections(p, visited)
+		for _, d := range deps {
+			requiredCollectionSet[d.Name] = d
+		}
 	}
 
-	collectionMap := make(map[string]parser.ServiceCollection)
+	for requiredCollectionName, requiredCollection := range requiredCollectionSet {
+		if desiredCollectionSet[requiredCollectionName] == nil &&
+			requiredCollection.Type == product.ProductType {
+			return errors.Errorf("You must deploy %q to deploy %s", requiredCollectionName, strings.Join(products, ", "))
+		}
+	}
 
+	return nil
+}
+
+func ServicesInCollection(collection string) ([]habpkg.HabPkg, error) {
+	return ServicesInCollections([]string{collection})
+}
+
+func ServicesInCollections(collections []string) ([]habpkg.HabPkg, error) {
+	requiredServices := map[string]bool{}
+	visited := map[string]bool{}
 	for _, collection := range collections {
-		// IsDataService panics on invalid data; force the panic to happen in init if
-		// the data is bad.
-		for _, s := range collection.AllServices {
-			pkg, err := habpkg.FromString(s)
-			if err != nil {
-				panic(errors.Wrapf(err, "failed to parse hab pkg name '%s' in services list", s))
-			}
-			_ = IsDataService(pkg.Name())
+		if collectionMap[collection] == nil {
+			return nil, errors.Errorf("unknown collection %q", collection)
 		}
-		collectionMap[collection.Name] = collection
-	}
-
-	return collectionMap
-}
-
-func loadAutomateServiceCollection() parser.ServiceCollection {
-	return serviceCollections["automate-full"]
-}
-
-func loadServiceIDs() map[string][]habpkg.HabPkg {
-	serviceMap := make(map[string][]habpkg.HabPkg)
-	for name, collection := range serviceCollections {
-		serviceIDs, err := habpkg.FromList(collection.AllServices)
-		if err != nil {
-			panic(err.Error())
-		}
-		serviceMap[name] = removeDeploymentService(name, serviceIDs)
-	}
-	return serviceMap
-}
-
-func removeDeploymentService(collectionName string, serviceIDs []habpkg.HabPkg) []habpkg.HabPkg {
-	// remove deployment-services from Services slice
-	for i := range serviceIDs {
-		if serviceIDs[i].Name() == "deployment-service" {
-			serviceIDs = append(serviceIDs[:i], serviceIDs[i+1:]...)
-			return serviceIDs
+		deps := getRequiredServices(collection, visited)
+		for _, d := range deps {
+			requiredServices[d.Name] = true
 		}
 	}
-	return serviceIDs
+	return sortServices(requiredServices), nil
 }
 
-func loadSupplementaryPackages() map[string][]habpkg.HabPkg {
-	pkgMap := make(map[string][]habpkg.HabPkg)
-	for name, collection := range serviceCollections {
-		rawPackageList := collection.ExtraPkgs
-		pkgIDs, err := habpkg.FromList(rawPackageList)
-		if err != nil {
-			panic(err.Error())
-		}
-		pkgMap[name] = pkgIDs
+func SupplementaryPackagesInCollection(collection string) ([]habpkg.HabPkg, error) {
+	if collectionMap[collection] == nil {
+		return nil, errors.Errorf("unknown collection %q", collection)
 	}
-	return pkgMap
+
+	visited := map[string]bool{}
+	deps := getRequiredCollections(collection, visited)
+	pkgs := []habpkg.HabPkg{}
+	for _, c := range deps {
+		for _, p := range c.Packages {
+			pkgs = append(pkgs, habpkg.New(p.Origin, p.Name))
+		}
+	}
+
+	return pkgs, nil
+}
+
+// IsDataService is used during A1 -> A2 upgrades to start postgres/elasticsearch
+// separately from the domain services.
+func IsDataService(pkgName string) bool {
+	if packageMetadataMap[pkgName].Metadata != nil {
+		return packageMetadataMap[pkgName].Metadata.DataService
+	}
+	return false
+}
+
+func BinlinksForPackage(pkgName string) []string {
+	if packageMetadataMap[pkgName] == nil {
+		return nil
+	}
+	if packageMetadataMap[pkgName].Metadata != nil {
+		return packageMetadataMap[pkgName].Metadata.Binlinks
+	}
+	return nil
 }
 
 // loadServiceBinds parses the bindings for the services
 func loadServiceBinds() bind.Binds {
 	data := assets.MustAsset("data/binds.txt")
-	b, err := parser.ParseServiceBinds(data)
+
+	b, err := bind.ParseData(data)
 	if err != nil {
 		panic(errors.Wrap(err, "binds.txt is not parsable"))
 	}
 	return b
 }
 
-func loadBinlinkMap() map[string][]string {
-	m := make(map[string][]string)
-	for _, collection := range serviceCollections {
-		for pkgName, binlinks := range collection.Binlinks {
-			m[pkgName] = binlinks
+func getRequiredServices(collectionName string, visitedCollections map[string]bool) []product.PackageName {
+	if visitedCollections[collectionName] {
+		return []product.PackageName{}
+	}
+
+	visitedCollections[collectionName] = true
+	requiredServices := []product.PackageName{}
+	collection := collectionMap[collectionName]
+	for _, c := range collection.Dependencies {
+		services := getRequiredServices(c, visitedCollections)
+		requiredServices = append(requiredServices, services...)
+	}
+
+	requiredServices = append(requiredServices, collection.Services...)
+	return requiredServices
+
+}
+
+func sortServices(requiredServices map[string]bool) []habpkg.HabPkg {
+	sortedRequiredServices := make([]habpkg.HabPkg, 0, len(requiredServices))
+	for _, s := range serviceList {
+		if requiredServices[s.Name()] {
+			sortedRequiredServices = append(sortedRequiredServices, s)
 		}
 	}
-	return m
+	return sortedRequiredServices
+}
+
+func getRequiredCollections(collectionName string, visitedCollections map[string]bool) []*product.Collection {
+	collection := collectionMap[collectionName]
+
+	if visitedCollections[collection.Name] {
+		return []*product.Collection{}
+	}
+
+	visitedCollections[collection.Name] = true
+	requiredCollections := []*product.Collection{}
+	for _, c := range collection.Dependencies {
+		collections := getRequiredCollections(c, visitedCollections)
+		requiredCollections = append(requiredCollections, collections...)
+	}
+
+	requiredCollections = append(requiredCollections, collection)
+	return requiredCollections
+
 }
 
 func init() {
-	serviceCollections = loadServiceCollections()
-	automateFull = loadAutomateServiceCollection()
 	AllBinds = loadServiceBinds()
-	servicesByCollection = loadServiceIDs()
-	supplementaryPackagesByCollection = loadSupplementaryPackages()
-	binlinkMap = loadBinlinkMap()
+
+	packageMetadataMap = make(map[string]*product.Package)
+	collectionMap = make(map[string]*product.Collection)
+
+	metadata := product.Metadata{}
+	err := json.Unmarshal([]byte(generated.ProductMetadataJSON), &metadata)
+	if err != nil {
+		panic(err)
+	}
+
+	serviceSet := make(map[product.PackageName]bool)
+	for _, c := range metadata.Collections {
+		if c.Type == product.ProductType && !c.Hidden {
+			productList = append(productList, c.Name)
+		}
+
+		collectionMap[c.Name] = c
+		for _, alias := range c.Aliases {
+			collectionMap[alias] = c
+		}
+
+		for _, s := range c.Services {
+			serviceSet[s] = true
+		}
+	}
+
+	for _, p := range metadata.Packages {
+		packageMetadataMap[p.Name.Name] = p
+		if serviceSet[p.Name] {
+			serviceList = append(serviceList, habpkg.New(p.Name.Origin, p.Name.Name))
+		}
+	}
 }

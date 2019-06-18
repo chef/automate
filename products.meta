@@ -1,0 +1,142 @@
+{
+  "packages": [
+    "chef/backup-gateway",
+    "chef/automate-postgresql",
+    "chef/automate-pg-gateway",
+    "chef/automate-elasticsearch",
+    "chef/automate-es-gateway",
+    "chef/automate-ui",
+    "chef/pg-sidecar-service",
+    "chef/event-service",
+    "chef/authz-service",
+    "chef/es-sidecar-service",
+    "chef/automate-dex",
+    "chef/teams-service",
+    "chef/authn-service",
+    "chef/secrets-service",
+    "chef/applications-service",
+    "chef/notifications-service",
+    "chef/nodemanager-service",
+    "chef/compliance-service",
+    "chef/license-control-service",
+    "chef/local-user-service",
+    "chef/session-service",
+    "chef/ingest-service",
+    "chef/config-mgmt-service",
+    "chef/deployment-service",
+    "chef/data-feed-service",
+    "chef/data-lifecycle-service",
+    "chef/event-gateway",
+    "chef/automate-gateway",
+    "chef/automate-load-balancer",
+    "chef/automate-cs-bookshelf",
+    "chef/automate-cs-oc-bifrost",
+    "chef/automate-cs-oc-erchef",
+    "chef/automate-cs-nginx",
+    "chef/automate-workflow-server",
+    "chef/automate-workflow-nginx",
+    "chef/automate-prometheus",
+    "chef/automate-cli",
+    "core/rsync"
+  ],
+
+  "collections": [
+    {
+      "name": "core",
+      "type": "base",
+      "services": [
+        "chef/backup-gateway",
+        "chef/deployment-service",
+        "chef/license-control-service",
+        "chef/automate-load-balancer"
+      ],
+      "packages": [
+        "chef/automate-cli",
+        "core/rsync"
+      ]
+    },
+    {
+      "name": "postgresql",
+      "type": "base",
+      "services": [
+        "chef/automate-postgresql",
+        "chef/automate-pg-gateway",
+        "chef/pg-sidecar-service"
+      ]
+    },
+    {
+      "name": "elasticsearch",
+      "type": "base",
+      "services": [
+        "chef/automate-elasticsearch",
+        "chef/automate-es-gateway",
+        "chef/es-sidecar-service"
+      ]
+    },
+    {
+      "name": "auth",
+      "type": "base",
+      "dependencies": ["core", "postgresql"],
+      "services": [
+        "chef/authz-service",
+        "chef/authn-service",
+        "chef/automate-dex",
+        "chef/local-user-service",
+        "chef/session-service"
+      ]
+    },
+    {
+      "name": "automate",
+      "type": "product",
+      "dependencies": ["core", "postgresql", "elasticsearch", "auth"],
+      "aliases": ["automate-full"],
+      "services": [
+        "chef/automate-ui",
+        "chef/event-service",
+        "chef/teams-service",
+        "chef/authn-service",
+        "chef/secrets-service",
+        "chef/applications-service",
+        "chef/notifications-service",
+        "chef/nodemanager-service",
+        "chef/compliance-service",
+        "chef/ingest-service",
+        "chef/config-mgmt-service",
+        "chef/data-feed-service",
+        "chef/data-lifecycle-service",
+        "chef/event-gateway",
+        "chef/automate-gateway"
+      ]
+    },
+    {
+      "name": "chef-server",
+      "type": "product",
+      "aliases": ["chef-infra-server"],
+      "dependencies": ["core", "postgresql", "elasticsearch"],
+      "services": [
+        "chef/automate-cs-bookshelf",
+        "chef/automate-cs-oc-bifrost",
+        "chef/automate-cs-oc-erchef",
+        "chef/automate-cs-nginx"
+      ]
+    },
+    {
+      "name": "workflow",
+      "type": "product",
+      "dependencies": ["automate"],
+      "services": [
+        "chef/automate-workflow-server",
+        "chef/automate-workflow-nginx"
+      ]
+    },
+    {
+      "name": "monitoring",
+      "type": "product",
+      "hidden": true,
+      "dependencies": ["automate"],
+      "services": [
+        "chef/automate-prometheus"
+      ]
+    }
+  ]
+}
