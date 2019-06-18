@@ -195,8 +195,11 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 		Script(script).
 		Refresh("true").
 		Do(ctx)
-	//	retries -= 1
-	//}
+		//	retries -= 1
+		//}
+	if err != nil {
+		errors.Wrap(err, "daily_latest update failed")
+	}
 
 	return err
 }
