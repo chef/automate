@@ -398,7 +398,7 @@ func (t *LocalTarget) RemoveService(svc habpkg.VersionedPackage) error {
 }
 
 func supplementaryPackages() ([]habpkg.HabPkg, error) {
-	return services.SupplementaryPackagesInCollection("automate-full")
+	return services.SupplementaryPackagesInCollection("core")
 }
 
 // InstallSupPackages installs non-service Habitat packages included
