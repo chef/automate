@@ -58,8 +58,8 @@ type displayNode struct {
 	SourceFqdn         string                  `csv:"Source FQDN" json:"source_fqdn"`
 	IpAddress          string                  `csv:"IP Address" json:"ip_address"`
 	Deprecations       []backend.Deprecation   `csv:"-" json:"deprecations"`
-	Error              backend.ChefError       `csv:"-" json:"error"`
 	ExpandedRunList    backend.ExpandedRunList `csv:"-" json:"expanded_run_list"`
+	ErrorMessage       string                  `csv:"Error Message" json:"error_message"`
 }
 
 // === missing fields ===
@@ -264,8 +264,8 @@ func nodeToDisplayNode(node backend.Node) displayNode {
 		PolicyGroup:        node.PolicyGroup,
 		PolicyRevision:     node.PolicyRevision,
 		SourceFqdn:         node.SourceFqdn,
-		Error:              backend.ChefError(node.Error),
 		ExpandedRunList:    backend.ExpandedRunList(node.ExpandedRunList),
 		Deprecations:       deprecations,
+		ErrorMessage:       node.ErrorMessage,
 	}
 }
