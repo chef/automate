@@ -584,13 +584,13 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	}
 
 	if len(filters["control_name"]) > 0 {
-		termQuery := backend.newNestedTermQueryFromFilter("profiles.controls.title", "profiles.controls",
+		termQuery := backend.newNestedTermQueryFromFilter("profiles.controls.title.lower", "profiles.controls",
 			filters["control_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["profile_name"]) > 0 {
-		termQuery := backend.newNestedTermQueryFromFilter("profiles.title", "profiles", filters["profile_name"])
+		termQuery := backend.newNestedTermQueryFromFilter("profiles.title.lower", "profiles", filters["profile_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
@@ -661,22 +661,33 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 }
 
 func (backend ES2Backend) getESFieldName(filterType string) string {
+	ESFieldName := filterType
 	switch filterType {
-	case "organization":
-		return "organization_name"
 	case "chef_server":
-		return "source_fqdn"
-	case "platform":
-		return "platform.name"
-	case "role":
-		return "roles"
-	case "recipe":
-		return "recipes"
+		ESFieldName = "source_fqdn.lower"
 	case "inspec_version":
-		return "version"
-	default:
-		return filterType
+		ESFieldName = "version.lower"
+	case "organization":
+		ESFieldName = "organization_name.lower"
+	case "platform":
+		ESFieldName = "platform.name.lower"
+	case "recipe":
+		ESFieldName = "recipes.lower"
+	case "role":
+		ESFieldName = "roles.lower"
+	case "environment":
+		ESFieldName = "environment.lower"
+	case "chef_tags":
+		ESFieldName = "chef_tags.lower"
+	case "policy_group":
+		ESFieldName = "policy_group.lower"
+	case "policy_name":
+		ESFieldName = "policy_name.lower"
+	case "node_name":
+		ESFieldName = "node_name.lower"
 	}
+
+	return ESFieldName
 }
 
 func (backend ES2Backend) newTermQueryFromFilter(ESField string,
