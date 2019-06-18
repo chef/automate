@@ -53,6 +53,26 @@ service Deployment {
 	rpc InfrastructureNodeDelete(InfrastructureNodeDeleteRequest) returns (InfrastructureNodeDeleteResponse);
 	rpc Usage(UsageRequest) returns (UsageResponse);
 	rpc GetCLIExecutable(GetCLIExecutableRequest) returns (stream GetCLIExecutableResponse);
+	rpc BootstrapBundle (BootstrapBundleRequest) returns (BootstrapBundleResponse);
+	rpc BootstrapBundleDownload (BootstrapBundleDownloadRequest) returns (stream BootstrapBundleDownloadResponse);
+}
+
+message BootstrapBundleRequest {
+        string collection_name = 1;
+}
+
+message BootstrapBundleResponse {
+        string bundle_name     = 1;
+        string bundle_checksum = 2;
+        int64  bundle_size     = 3;
+}
+
+message BootstrapBundleDownloadRequest {
+        string bundle_name = 1;
+}
+
+message BootstrapBundleDownloadResponse {
+        bytes data = 1;
 }
 
 message GetCLIExecutableRequest {
