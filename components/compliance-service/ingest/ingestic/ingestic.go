@@ -1,6 +1,7 @@
 package ingestic
 
 import (
+	"math/rand"
 	"time"
 
 	"fmt"
@@ -183,23 +184,21 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 
 	script := elastic.NewScript("ctx._source.daily_latest = false")
 
-	//retries := 3
-	//err := errors.New("init")
-	//sec := rand.Intn(60)
-	//time.Sleep(time.Duration(sec) * time.Second)
-	logrus.Infof("Running NewUpdateByQueryService for index %s node %s w/ report %s", index, nodeId, reportId)
-	//for retries > 0 && err != nil {
-	_, err := elastic.NewUpdateByQueryService(backend.client).
-		Index(index).
-		Query(boolQueryDailyLatestThisNodeNotThisReport).
-		Script(script).
-		Refresh("true").
-		Do(ctx)
-		//	retries -= 1
-		//}
+	retries := 3
+	err := errors.New("init")
+	for retries > 0 && err != nil {
+		time.Sleep(time.Duration(rand.Intn(5)) * time.Second)
+		_, err = elastic.NewUpdateByQueryService(backend.client).
+			Index(index).
+			Query(boolQueryDailyLatestThisNodeNotThisReport).
+			Script(script).
+			Refresh("false").
+			Do(ctx)
+		retries -= 1
+	}
+	logrus.Infof("Ran NewUpdateByQueryService for index %s node %s w/ report %s retries %d", index, nodeId, reportId, retries)
 	if err != nil {
-		logrus.Errorf("!!!!!!!!!daily_latest update failed: %s", err.Error())
-		errors.Wrap(err, "daily_latest update failed")
+		err = errors.Wrap(err, "daily_latest update failed")
 	}
 
 	return err
