@@ -29,6 +29,9 @@ pkg_binds=(
   [automate-cs-bookshelf]="http-port"
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
+)
+
+pkg_binds_optional=(
   [automate-gateway]="port"
 )
 
@@ -50,3 +53,6 @@ scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_na
 scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/init-es"
 )
+
+chef_automate_hab_binding_mode="relaxed"
+

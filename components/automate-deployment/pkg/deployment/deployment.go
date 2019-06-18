@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/chef/automate/lib/stringutils"
+
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
@@ -152,19 +154,33 @@ func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig) error 
 	return nil
 }
 
+func ContainsAutomateCollection(c *dc.ConfigRequest) bool {
+	products := c.GetV1().GetSvc().GetProducts()
+	if len(products) > 0 {
+		return stringutils.SliceContains(products, "automate-full")
+	}
+	return true
+}
+
 func ExpectedServiceIDsForConfig(c *dc.ConfigRequest) ([]habpkg.HabPkg, error) {
-	collections := []string{"automate-full"}
+	var collections []string
 
-	if c.GetV1().GetSvc().GetEnableChefServer().GetValue() {
-		collections = append(collections, "chef-server")
-	}
+	if len(c.GetV1().GetSvc().GetProducts()) > 0 {
+		collections = c.GetV1().GetSvc().GetProducts()
+	} else {
+		collections = []string{"automate-full"}
 
-	if c.GetV1().GetSvc().GetEnableWorkflow().GetValue() {
-		collections = append(collections, "workflow")
-	}
+		if c.GetV1().GetSvc().GetEnableChefServer().GetValue() {
+			collections = append(collections, "chef-server")
+		}
 
-	if c.GetV1().GetSvc().GetEnableDevMonitoring().GetValue() {
-		collections = append(collections, "monitoring")
+		if c.GetV1().GetSvc().GetEnableWorkflow().GetValue() {
+			collections = append(collections, "workflow")
+		}
+
+		if c.GetV1().GetSvc().GetEnableDevMonitoring().GetValue() {
+			collections = append(collections, "monitoring")
+		}
 	}
 
 	serviceIDs, err := services.ServicesInCollections(collections)
@@ -308,22 +324,24 @@ func (d *Deployment) UpdateExpectedServicesFromManifest() error {
 
 	// NOTE(ssd) 2018-07-16: Fix for A1 upgrade bug where services are stuck in
 	// Skip state since they were added post-upgrade.
-	a2ServicesWayBackWhen := map[string]bool{"authn-service": true, "authz-service": true, "automate-cli": true, "automate-dex": true, "automate-elasticsearch": true, "automate-gateway": true, "automate-load-balancer": true, "automate-postgresql": true, "automate-ui": true, "compliance-service": true, "config-mgmt-service": true, "data-lifecycle-service": true, "deployment-service": true, "es-sidecar-service": true, "ingest-service": true, "license-control-service": true, "local-user-service": true, "notifications-service": true, "session-service": true, "teams-service": true}
-	diff := make([]string, 0, len(serviceMap))
-	for key := range serviceMap {
-		if _, ok := a2ServicesWayBackWhen[key]; !ok {
-			diff = append(diff, key)
+	if ContainsAutomateCollection(d.Config.GetDeployment()) {
+		a2ServicesWayBackWhen := map[string]bool{"authn-service": true, "authz-service": true, "automate-cli": true, "automate-dex": true, "automate-elasticsearch": true, "automate-gateway": true, "automate-load-balancer": true, "automate-postgresql": true, "automate-ui": true, "compliance-service": true, "config-mgmt-service": true, "data-lifecycle-service": true, "deployment-service": true, "es-sidecar-service": true, "ingest-service": true, "license-control-service": true, "local-user-service": true, "notifications-service": true, "session-service": true, "teams-service": true}
+		diff := make([]string, 0, len(serviceMap))
+		for key := range serviceMap {
+			if _, ok := a2ServicesWayBackWhen[key]; !ok {
+				diff = append(diff, key)
+			}
 		}
-	}
 
-	for _, svc := range diff {
-		_, found := serviceMap[svc]
-		if found {
-			if serviceMap["automate-gateway"].DeploymentState == Running &&
-				serviceMap[svc].DeploymentState == Skip {
-				logrus.Warnf("Detected %s in Skip state with automate-gateway in Running. Applying fix", svc)
-				d.Deployed = true
-				serviceMap[svc].DeploymentState = Running
+		for _, svc := range diff {
+			_, found := serviceMap[svc]
+			if found {
+				if serviceMap["automate-gateway"].DeploymentState == Running &&
+					serviceMap[svc].DeploymentState == Skip {
+					logrus.Warnf("Detected %s in Skip state with automate-gateway in Running. Applying fix", svc)
+					d.Deployed = true
+					serviceMap[svc].DeploymentState = Running
+				}
 			}
 		}
 	}

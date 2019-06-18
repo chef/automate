@@ -58,6 +58,16 @@ func AllServices() ([]habpkg.HabPkg, error) {
 	return ServicesInCollections(names)
 }
 
+func ListProducts() []string {
+	collections := make([]string, len(serviceCollections))
+	i := 0
+	for k := range serviceCollections {
+		collections[i] = k
+		i++
+	}
+	return collections
+}
+
 func ServicesInCollections(collections []string) ([]habpkg.HabPkg, error) {
 	combined := []habpkg.HabPkg{}
 	for _, collectionName := range collections {
@@ -151,10 +161,6 @@ func loadServiceIDs() map[string][]habpkg.HabPkg {
 }
 
 func removeDeploymentService(collectionName string, serviceIDs []habpkg.HabPkg) []habpkg.HabPkg {
-	if collectionName != "automate-full" {
-		return serviceIDs
-	}
-
 	// remove deployment-services from Services slice
 	for i := range serviceIDs {
 		if serviceIDs[i].Name() == "deployment-service" {
@@ -162,7 +168,7 @@ func removeDeploymentService(collectionName string, serviceIDs []habpkg.HabPkg) 
 			return serviceIDs
 		}
 	}
-	panic("never found deployment-service")
+	return serviceIDs
 }
 
 func loadSupplementaryPackages() map[string][]habpkg.HabPkg {

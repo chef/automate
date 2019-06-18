@@ -518,6 +518,15 @@ steps:
         linux:
           privileged: true
 
+  - label: "[integration] chef server only"
+    command:
+      - integration/run_test integration/tests/chef_server_only.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
   - label: "[integration] workflow"
     command:
       - integration/run_test integration/tests/workflow.sh

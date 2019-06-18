@@ -71,6 +71,7 @@ message ConfigRequest {
 			google.protobuf.StringValue package_cleanup_mode = 14;
 
 			google.protobuf.BoolValue enable_dev_monitoring = 15;
+			repeated string products = 16;
 		}
 
 		message AdminUser {

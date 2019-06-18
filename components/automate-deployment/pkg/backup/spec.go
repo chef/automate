@@ -2,6 +2,7 @@ package backup
 
 import (
 	"github.com/chef/automate/lib/platform/command"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 // Spec describes the operations required to backup a given service
@@ -137,7 +138,7 @@ func (s *Spec) FinalizingOps() []Operation {
 }
 
 // DefaultSpecs returns a list of backup specifications
-func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
+func DefaultSpecs(serviceNames []string) []Spec {
 	specs := []Spec{
 		{
 			Name:          "authn-service",
@@ -364,151 +365,142 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		{Name: "local-user-service", WriteMetadata: false},
 		{Name: "pg-sidecar-service", WriteMetadata: false},
 		{Name: "data-feed-service", WriteMetadata: false},
-	}
 
-	if chefServerEnabled {
-		chefServerSpecs := []Spec{
-			{
-				Name:          "automate-cs-bookshelf",
-				WriteMetadata: true,
-				SyncDbsV2: []DatabaseDumpOperationV2{
-					{
-						Name: "automate-cs-bookshelf",
-						User: "automate-cs-bookshelf",
+		// Chef Server Stuff
+		{
+			Name:          "automate-cs-bookshelf",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "automate-cs-bookshelf",
+					User: "automate-cs-bookshelf",
+				},
+			},
+		},
+		{
+			Name:          "automate-cs-oc-bifrost",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "automate-cs-oc-bifrost",
+					User: "automate-cs-oc-bifrost",
+				},
+			},
+		},
+		{
+			Name:          "automate-cs-oc-erchef",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "automate-cs-oc-erchef",
+					User: "automate-cs-oc-erchef",
+				},
+			},
+			SyncEsIndices: []ElasticsearchOperation{
+				{
+					ServiceName:    "automate-cs-oc-erchef",
+					MultiIndexSpec: "chef",
+				},
+			},
+			SyncPaths: []PathCopyOperation{
+				{
+					Name:    "pivotal.pem",
+					SrcPath: "/hab/svc/automate-cs-oc-erchef/data",
+					RsyncMatchers: []RsyncMatcher{
+						Include("pivotal.pem"),
+						Exclude("*"),
+					},
+				},
+				{
+					Name:    "webui_priv.pem",
+					SrcPath: "/hab/svc/automate-cs-oc-erchef/data",
+					RsyncMatchers: []RsyncMatcher{
+						Include("webui_priv.pem"),
+						Exclude("*"),
+					},
+				},
+				{
+					Name:    "webui_pub.pem",
+					SrcPath: "/hab/svc/automate-cs-oc-erchef/data",
+					RsyncMatchers: []RsyncMatcher{
+						Include("webui_pub.pem"),
+						Exclude("*"),
+					},
+				},
+				{
+					Name:    "pivotal.pub.pem",
+					SrcPath: "/hab/svc/automate-cs-oc-erchef/data",
+					RsyncMatchers: []RsyncMatcher{
+						Include("pivotal.pub.pem"),
+						Exclude("*"),
 					},
 				},
 			},
-			{
-				Name:          "automate-cs-oc-bifrost",
-				WriteMetadata: true,
-				SyncDbsV2: []DatabaseDumpOperationV2{
-					{
-						Name: "automate-cs-oc-bifrost",
-						User: "automate-cs-oc-bifrost",
-					},
-				},
-			},
-			{
-				Name:          "automate-cs-oc-erchef",
-				WriteMetadata: true,
-				SyncDbsV2: []DatabaseDumpOperationV2{
-					{
-						Name: "automate-cs-oc-erchef",
-						User: "automate-cs-oc-erchef",
-					},
-				},
-				SyncEsIndices: []ElasticsearchOperation{
-					{
-						ServiceName:    "automate-cs-oc-erchef",
-						MultiIndexSpec: "chef",
-					},
-				},
-				SyncPaths: []PathCopyOperation{
-					{
-						Name:    "pivotal.pem",
-						SrcPath: "/hab/svc/automate-cs-oc-erchef/data",
-						RsyncMatchers: []RsyncMatcher{
-							Include("pivotal.pem"),
-							Exclude("*"),
-						},
-					},
-					{
-						Name:    "webui_priv.pem",
-						SrcPath: "/hab/svc/automate-cs-oc-erchef/data",
-						RsyncMatchers: []RsyncMatcher{
-							Include("webui_priv.pem"),
-							Exclude("*"),
-						},
-					},
-					{
-						Name:    "webui_pub.pem",
-						SrcPath: "/hab/svc/automate-cs-oc-erchef/data",
-						RsyncMatchers: []RsyncMatcher{
-							Include("webui_pub.pem"),
-							Exclude("*"),
-						},
-					},
-					{
-						Name:    "pivotal.pub.pem",
-						SrcPath: "/hab/svc/automate-cs-oc-erchef/data",
-						RsyncMatchers: []RsyncMatcher{
-							Include("pivotal.pub.pem"),
-							Exclude("*"),
-						},
-					},
-				},
-			},
-			{
-				Name: "automate-cs-nginx", WriteMetadata: false,
-			},
-		}
-		specs = append(specs, chefServerSpecs...)
-	}
+		},
+		{
+			Name: "automate-cs-nginx", WriteMetadata: false,
+		},
 
-	if workflowEnabled {
-		workflowSpecs := []Spec{
-			{
-				Name:          "automate-workflow-server",
-				WriteMetadata: true,
-				SyncDbsV2: []DatabaseDumpOperationV2{
-					{
-						Name: "chef_workflow",
-						User: "workflow",
+		// Workflow stuff
+		{
+			Name:          "automate-workflow-server",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "chef_workflow",
+					User: "workflow",
+				},
+			},
+			SyncPaths: []PathCopyOperation{
+				{
+					Name:    "git-server-ssh-keys",
+					SrcPath: "/hab/svc/automate-workflow-server/data",
+					RsyncMatchers: []RsyncMatcher{
+						Include("ssh_git_server_keys"),
+						Exclude("*"),
 					},
 				},
-				SyncPaths: []PathCopyOperation{
-					{
-						Name:    "git-server-ssh-keys",
-						SrcPath: "/hab/svc/automate-workflow-server/data",
-						RsyncMatchers: []RsyncMatcher{
-							Include("ssh_git_server_keys"),
-							Exclude("*"),
-						},
+				{
+					Name:    "git-repos",
+					SrcPath: "/hab/svc/automate-workflow-server/data/git/repos",
+				},
+				{
+					Name:    "git-workspace",
+					SrcPath: "/hab/svc/automate-workflow-server/data/git/workspace",
+				},
+				{
+					Name:    "git-template",
+					SrcPath: "/hab/svc/automate-workflow-server/files/git_repo_template",
+				},
+				{
+					Name:    "builder_key",
+					SrcPath: "/hab/svc/automate-workflow-server/var/etc",
+					RsyncMatchers: []RsyncMatcher{
+						Include("builder_key"),
+						Exclude("*"),
 					},
-					{
-						Name:    "git-repos",
-						SrcPath: "/hab/svc/automate-workflow-server/data/git/repos",
+				},
+				{
+					Name:    "builder_key.pub",
+					SrcPath: "/hab/svc/automate-workflow-server/var/etc",
+					RsyncMatchers: []RsyncMatcher{
+						Include("builder_key.pub"),
+						Exclude("*"),
 					},
-					{
-						Name:    "git-workspace",
-						SrcPath: "/hab/svc/automate-workflow-server/data/git/workspace",
-					},
-					{
-						Name:    "git-template",
-						SrcPath: "/hab/svc/automate-workflow-server/files/git_repo_template",
-					},
-					{
-						Name:    "builder_key",
-						SrcPath: "/hab/svc/automate-workflow-server/var/etc",
-						RsyncMatchers: []RsyncMatcher{
-							Include("builder_key"),
-							Exclude("*"),
-						},
-					},
-					{
-						Name:    "builder_key.pub",
-						SrcPath: "/hab/svc/automate-workflow-server/var/etc",
-						RsyncMatchers: []RsyncMatcher{
-							Include("builder_key.pub"),
-							Exclude("*"),
-						},
-					},
-					{
-						Name:    "delivery.pem",
-						SrcPath: "/hab/svc/automate-workflow-server/var/etc",
-						RsyncMatchers: []RsyncMatcher{
-							Include("delivery.pem"),
-							Exclude("*"),
-						},
+				},
+				{
+					Name:    "delivery.pem",
+					SrcPath: "/hab/svc/automate-workflow-server/var/etc",
+					RsyncMatchers: []RsyncMatcher{
+						Include("delivery.pem"),
+						Exclude("*"),
 					},
 				},
 			},
-			{
-				Name: "automate-workflow-nginx", WriteMetadata: false,
-			},
-		}
-
-		specs = append(specs, workflowSpecs...)
+		},
+		{
+			Name: "automate-workflow-nginx", WriteMetadata: false,
+		},
 	}
 
 	for _, spec := range specs {
@@ -520,7 +512,13 @@ func DefaultSpecs(chefServerEnabled bool, workflowEnabled bool) []Spec {
 		SetCommandExecutor(spec, cmd)
 	}
 
-	return specs
+	filtered := []Spec{}
+	for _, defaultSpec := range specs {
+		if defaultSpec.Name == "deployment-service" || stringutils.SliceContains(serviceNames, defaultSpec.Name) {
+			filtered = append(filtered, defaultSpec)
+		}
+	}
+	return filtered
 }
 
 func setDefaults(spec Spec) {

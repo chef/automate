@@ -100,8 +100,26 @@ message External {
 		SSL ssl = 5;
 	}
 
+	message Automate {
+		message Authentication {
+			google.protobuf.StringValue scheme = 1;
+			google.protobuf.StringValue token = 2;
+		};
+
+		message SSL {
+			google.protobuf.StringValue root_cert = 1;
+			google.protobuf.StringValue server_name = 2;
+		};
+
+		google.protobuf.BoolValue enable = 1;
+		google.protobuf.StringValue node = 2;
+		Authentication auth = 3;
+		SSL ssl = 4;
+	};
+
 	Elasticsearch elasticsearch = 1;
 	Postgresql postgresql = 2;
+	Automate automate = 3;
 }
 
 message Mlsa {

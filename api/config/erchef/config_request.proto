@@ -30,6 +30,7 @@ message ConfigRequest {
 			Depsolver depsolver = 10;
 			chef.automate.infra.config.TLSCredentials tls = 11;
 			Memory memory = 12;
+			chef.automate.infra.config.External.Automate external_automate = 13;
 
 			message Network {
 				google.protobuf.Int32Value port = 1 [ (chef.automate.api.port) = { name: "service", default: 10203, protocol: "https" } ];

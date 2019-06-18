@@ -8,118 +8,140 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/lib/platform/command"
 )
 
 // TestDefaultSpecs tests that all service specs have their desired backup
 // operations.
 func TestDefaultSpecs(t *testing.T) {
-	chefServerEnabled := true
-	workflowEnabled := true
 	t.Run("authn-service", func(t *testing.T) {
-		spec := testSpecFor(t, "authn-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "authn-service")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "chef_authn_service", "authn")
 	})
 	t.Run("authz-service", func(t *testing.T) {
-		spec := testSpecFor(t, "authz-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "authz-service")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "chef_authz_service", "authz")
 	})
 	t.Run("automate-dex", func(t *testing.T) {
-		spec := testSpecFor(t, "automate-dex", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "automate-dex")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "dex", "dex")
 	})
 	t.Run("automate-elasticsearch", func(t *testing.T) {
-		testSpecFor(t, "automate-elasticsearch", chefServerEnabled, workflowEnabled)
+		testSpecFor(t, "automate-elasticsearch")
 	})
 	t.Run("automate-gateway", func(t *testing.T) {
-		testSpecFor(t, "automate-gateway", chefServerEnabled, workflowEnabled)
+		testSpecFor(t, "automate-gateway")
 	})
 	t.Run("automate-load-balancer", func(t *testing.T) {
-		testSpecFor(t, "automate-load-balancer", chefServerEnabled, workflowEnabled)
+		testSpecFor(t, "automate-load-balancer")
 	})
 	t.Run("automate-postgresql", func(t *testing.T) {
-		testSpecFor(t, "automate-postgresql", chefServerEnabled, workflowEnabled)
+		testSpecFor(t, "automate-postgresql")
 	})
 	t.Run("automate-ui", func(t *testing.T) {
-		testSpecFor(t, "automate-ui", chefServerEnabled, workflowEnabled)
+		testSpecFor(t, "automate-ui")
 	})
 	t.Run("compliance-service", func(t *testing.T) {
-		spec := testSpecFor(t, "compliance-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "compliance-service")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "chef_compliance_service", "compliance")
 		testRequireEs(t, spec, "sync", "compliance-service", "comp-*")
 	})
 	t.Run("config-mgmt-service", func(t *testing.T) {
-		testSpecFor(t, "config-mgmt-service", chefServerEnabled, workflowEnabled)
+		testSpecFor(t, "config-mgmt-service")
 	})
 	t.Run("data-lifecycle-service", func(t *testing.T) {
-		testSpecFor(t, "data-lifecycle-service", chefServerEnabled, workflowEnabled)
+		testSpecFor(t, "data-lifecycle-service")
 	})
 	t.Run("deployment-service", func(t *testing.T) {
-		spec := testSpecFor(t, "deployment-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "deployment-service")
 		testRequireMetadata(t, spec)
 		testRequirePath(t, spec, "sync", "/hab/user/deployment-service/config")
 		testRequirePath(t, spec, "sync", "/hab/svc/deployment-service/data", Exclude("bolt.db"))
 		testRequireCmd(t, spec, "sync", "deployment-service dumpdb", "deployment-service restoredb")
 	})
 	t.Run("es-sidecar-service", func(t *testing.T) {
-		testSpecFor(t, "es-sidecar-service", chefServerEnabled, workflowEnabled)
+		testSpecFor(t, "es-sidecar-service")
 	})
 	t.Run("ingest-service", func(t *testing.T) {
-		spec := testSpecFor(t, "ingest-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "ingest-service")
 		testRequireMetadata(t, spec)
 		testRequirePath(t, spec, "sync", "/hab/svc/ingest-service/data")
 		testRequireEs(t, spec, "sync", "ingest-service", "node-state-6,node-attribute,converge-history-*,actions-*")
 	})
 	t.Run("license-control-service", func(t *testing.T) {
-		spec := testSpecFor(t, "license-control-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "license-control-service")
 		testRequireMetadata(t, spec)
 		testRequirePath(t, spec, "sync", "/hab/svc/license-control-service/data")
 		testRequirePath(t, spec, "sync", "/hab/svc/license-control-service/config", Include("opt_out"), Exclude("*"))
 	})
 	t.Run("local-user-service", func(t *testing.T) {
-		testSpecFor(t, "local-user-service", chefServerEnabled, workflowEnabled)
+		testSpecFor(t, "local-user-service")
 	})
 	t.Run("notifications-service", func(t *testing.T) {
-		spec := testSpecFor(t, "notifications-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "notifications-service")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "notifications_service", "notifications")
 	})
 	t.Run("teams-service", func(t *testing.T) {
-		spec := testSpecFor(t, "teams-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "teams-service")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "chef_teams_service", "teams")
 	})
 	t.Run("session-service", func(t *testing.T) {
-		spec := testSpecFor(t, "session-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "session-service")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "chef_session_service", "session")
 	})
 	t.Run("automate-cs-bookshelf", func(t *testing.T) {
-		spec := testSpecFor(t, "automate-cs-bookshelf", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "automate-cs-bookshelf")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "automate-cs-bookshelf", "automate-cs-bookshelf")
 	})
 	t.Run("automate-cs-oc-bifrost", func(t *testing.T) {
-		spec := testSpecFor(t, "automate-cs-oc-bifrost", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "automate-cs-oc-bifrost")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "automate-cs-oc-bifrost", "automate-cs-oc-bifrost")
 	})
 	t.Run("automate-cs-oc-erchef", func(t *testing.T) {
-		spec := testSpecFor(t, "automate-cs-oc-erchef", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "automate-cs-oc-erchef")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "automate-cs-oc-erchef", "automate-cs-oc-erchef")
 		testRequireEs(t, spec, "sync", "automate-cs-oc-erchef", "chef")
 	})
 	t.Run("nodemanager-service", func(t *testing.T) {
-		spec := testSpecFor(t, "nodemanager-service", chefServerEnabled, workflowEnabled)
+		spec := testSpecFor(t, "nodemanager-service")
 		testRequireMetadata(t, spec)
 		testRequireDb(t, spec, "sync", "nodemanager_service", "nodemanager")
 	})
+}
+
+func TestDeploymentServiceAlways(t *testing.T) {
+	specs := DefaultSpecs([]string{"authn-service", "authn-service", "authn-service", "authn-service", "authn-service", "authn-service"})
+	found := false
+	for _, s := range specs {
+		if s.Name == "deployment-service" {
+			found = true
+			break
+		}
+	}
+	assert.True(t, found)
+}
+
+func TestDeduplication(t *testing.T) {
+	specs := DefaultSpecs([]string{"authn-service", "authn-service", "authn-service", "authn-service", "authn-service", "authn-service"})
+	assert.Len(t, specs, 2)
+	found := false
+	for _, s := range specs {
+		if s.Name == "authn-service" {
+			found = true
+			break
+		}
+	}
+	assert.True(t, found)
 }
 
 func TestSetCommandExecutor(t *testing.T) {
@@ -212,52 +234,6 @@ func TestSetDefaults(t *testing.T) {
 		require.Equal(t, "chef", s.SyncCmds[0].PkgOrigin)
 		require.Equal(t, "postgres", s.SyncCmds[0].PkgName)
 	})
-}
-
-func TestChefServerDisabled(t *testing.T) {
-	usualServices, err := services.ServicesInCollection("automate-full")
-	require.NoError(t, err)
-
-	chefServerServices, err := services.ServicesInCollection("chef-server")
-	require.NoError(t, err)
-	chefServerEnabled := false
-	workflowEnabled := false
-
-	// Expect all of the usual a2 services to have a backup spec.
-	for _, svcpkg := range usualServices {
-		svcname := svcpkg.Name()
-		require.Truef(t, hasSpec(svcname, chefServerEnabled, workflowEnabled), "%s should have a spec", svcname)
-	}
-
-	// When the chef-server is not enabled, expect all of the chef-server services not
-	// to have a backup spec
-	for _, svcpkg := range chefServerServices {
-		svcname := svcpkg.Name()
-		assert.Falsef(t, hasSpec(svcname, chefServerEnabled, workflowEnabled), "%s should not have a spec", svcname)
-	}
-}
-
-func TestWorkflowDisabled(t *testing.T) {
-	usualServices, err := services.ServicesInCollection("automate-full")
-	require.NoError(t, err)
-
-	workflowServices, err := services.ServicesInCollection("workflow")
-	require.NoError(t, err)
-	chefServerEnabled := false
-	workflowEnabled := false
-
-	// Expect all of the usual a2 services to have a backup spec.
-	for _, svcpkg := range usualServices {
-		svcname := svcpkg.Name()
-		require.Truef(t, hasSpec(svcname, chefServerEnabled, workflowEnabled), "%s should have a spec", svcname)
-	}
-
-	// When Workflow is not enabled, expect all of the Workflow services not
-	// to have a backup spec
-	for _, svcpkg := range workflowServices {
-		svcname := svcpkg.Name()
-		assert.Falsef(t, hasSpec(svcname, chefServerEnabled, workflowEnabled), "%s should not have a spec", svcname)
-	}
 }
 
 func testRequirePath(t *testing.T, spec Spec, mode, path string, matchers ...RsyncMatcher) {
@@ -398,8 +374,8 @@ func testRequireEs(t *testing.T, spec Spec, mode, serviceName string, multiIndex
 	assert.Equal(t, multiIndexSpec, op.MultiIndexSpec, "incorrect index spec for %s", serviceName)
 }
 
-func testSpecFor(t *testing.T, desired string, chefServerEnabled bool, workflowEnabled bool) Spec {
-	for _, s := range DefaultSpecs(chefServerEnabled, workflowEnabled) {
+func testSpecFor(t *testing.T, desired string) Spec {
+	for _, s := range DefaultSpecs([]string{desired}) {
 		if s.Name == desired {
 			return s
 		}
@@ -409,8 +385,8 @@ func testSpecFor(t *testing.T, desired string, chefServerEnabled bool, workflowE
 	return Spec{}
 }
 
-func hasSpec(desired string, chefServerEnabled bool, workflowEnabled bool) bool {
-	for _, s := range DefaultSpecs(chefServerEnabled, workflowEnabled) {
+func hasSpec(desired string) bool {
+	for _, s := range DefaultSpecs([]string{desired}) {
 		if s.Name == desired {
 			return true
 		}
