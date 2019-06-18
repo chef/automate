@@ -187,7 +187,7 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 	//err := errors.New("init")
 	//sec := rand.Intn(60)
 	//time.Sleep(time.Duration(sec) * time.Second)
-	logrus.Infof("Running NewUpdateByQueryService for node %s w/ report %s", nodeId, reportId)
+	logrus.Infof("Running NewUpdateByQueryService for index %s node %s w/ report %s", index, nodeId, reportId)
 	//for retries > 0 && err != nil {
 	_, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
@@ -198,6 +198,7 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 		//	retries -= 1
 		//}
 	if err != nil {
+		logrus.Errorf("!!!!!!!!!daily_latest update failed: %s", err.Error())
 		errors.Wrap(err, "daily_latest update failed")
 	}
 
