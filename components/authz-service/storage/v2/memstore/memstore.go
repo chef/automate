@@ -271,7 +271,7 @@ func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 	return rule, nil
 }
 
-func (s *State) GetRule(_ context.Context, id string) (*storage.Rule, error) {
+func (s *State) GetStagedOrAppliedRule(_ context.Context, id string) (*storage.Rule, error) {
 	item, exists := s.rules.Get(id)
 	if !exists {
 		return nil, storage_errors.ErrNotFound
@@ -314,7 +314,7 @@ func (s *State) ListRulesForProject(_ context.Context, projectID string) ([]*sto
 }
 
 func (s *State) DeleteRule(ctx context.Context, id string) error {
-	_, err := s.GetRule(ctx, id)
+	_, err := s.GetStagedOrAppliedRule(ctx, id)
 
 	if err != nil {
 		return err

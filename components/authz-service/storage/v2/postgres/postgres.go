@@ -964,8 +964,20 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	}
 
 	row := tx.QueryRowContext(ctx,
-		`INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
-		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
+		`SELECT query_rule_table_associations($1);`, rule.ID)
+
+	var associations []string
+	if err := row.Scan(pq.Array(&associations)); err != nil {
+		return nil, p.processError(err)
+	}
+	// If any associations return, then the rule already exists in current, staged, or both tables
+	if len(associations) > 0 {
+		return nil, storage_errors.ErrConflict
+	}
+
+	row = tx.QueryRowContext(ctx,
+		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false)
 	var ruleDbID string
 	if err := row.Scan(&ruleDbID); err != nil {
 		return nil, p.processError(err)
@@ -973,8 +985,8 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	for _, condition := range rule.Conditions {
 		_, err := tx.ExecContext(ctx,
-			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
-			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
+			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator, deleted) VALUES ($1, $2, $3, $4, $5);`,
+			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(), false,
 		)
 		if err != nil {
 			return nil, p.processError(err)
@@ -1089,7 +1101,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	return nil
 }
 
-func (p *pg) GetRule(ctx context.Context, id string) (*v2.Rule, error) {
+func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, p.processError(err)
@@ -1104,7 +1116,7 @@ func (p *pg) GetRule(ctx context.Context, id string) (*v2.Rule, error) {
 	}
 
 	var rule v2.Rule
-	row := tx.QueryRowContext(ctx, `SELECT query_rule from query_rule($1, $2);`,
+	row := tx.QueryRowContext(ctx, `SELECT query_staged_rule($1, $2);`,
 		id, pq.Array(projectsFilter),
 	)
 	err = row.Scan(&rule)

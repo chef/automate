@@ -46,3 +46,4 @@
 - [`44_policy_rules.up.sql`](44_policy_rules.up.sql)
 - [`45_query_rules_for_project.up.sql`](45_query_rules_for_project.up.sql)
 - [`46_add_application_policies.up.sql`](46_add_application_policies.up.sql)
+- [`47_staged_rules_tables.up.sql`](47_staged_rules_tables.up.sql)
