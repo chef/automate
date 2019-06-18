@@ -1,4 +1,4 @@
-import { StoreModule } from '@ngrx/store';
+import { StoreModule, Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { ServiceGroupsComponent  } from './service-groups.component';
 import { ServiceStatusIconPipe } from '../../pipes/service-status-icon.pipe';
@@ -6,7 +6,11 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { serviceGroupEntityReducer } from 'app/entities/service-groups/service-groups.reducer';
-import { UpdateServiceGroupFilters } from 'app/entities/service-groups/service-groups.actions';
+import {
+  UpdateServiceGroupFilters,
+  GetServiceGroupsCountsSuccess
+} from 'app/entities/service-groups/service-groups.actions';
+
 
 describe('ServiceGroupsComponent', () => {
   let fixture, component;
@@ -31,6 +35,45 @@ describe('ServiceGroupsComponent', () => {
     fixture = TestBed.createComponent(ServiceGroupsComponent);
     component = fixture.componentInstance;
     router = TestBed.get(Router);
+    this.ngrxStore = TestBed.get(Store);
+    component.ngOnInit();
+  });
+
+  describe('when the page first loads', () => {
+    describe('with defaults', () => {
+      it('should return 0 for the total number of service groups', fakeAsync(() => {
+        expect(component.totalServiceGroups).toEqual(0);
+      }));
+    });
+
+    describe('with ServiceGroupsCounts', () => {
+      beforeEach(() => {
+        this.ngrxStore.dispatch(new GetServiceGroupsCountsSuccess({
+          total: 21,
+          ok: 10,
+          warning: 5,
+          critical: 5,
+          unknown: 1
+        }));
+      });
+
+      it('should update the total number of service groups', fakeAsync(() => {
+        expect(component.totalServiceGroups).toEqual(21);
+      }));
+
+      describe('and OK status filter update', () => {
+        beforeEach(() => {
+          this.ngrxStore.dispatch(new UpdateServiceGroupFilters({filters: {
+            status: 'ok',
+          }}));
+        });
+
+        it('should update the total number of service groups and selected status', fakeAsync(() => {
+          expect(component.selectedStatus ).toEqual('ok');
+          expect(component.totalServiceGroups).toEqual(10);
+        }));
+      });
+    });
   });
 
   describe('statusFilter', () => {
@@ -86,6 +129,7 @@ describe('ServiceGroupsComponent', () => {
 
   describe('onPageChange', () => {
     it('when the first page is selected remove page from URL', fakeAsync(() => {
+      component.sgHealthSummary = { total: 30, ok: 30 };
       router.navigate([''], {queryParams: { }});
 
       tick();
