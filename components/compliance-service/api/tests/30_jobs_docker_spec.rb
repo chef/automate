@@ -175,15 +175,23 @@ describe File.basename(__FILE__) do
     job_id2 = job2['id']
     assert_uuid(job_id2)
 
-    sleep 1 # time for the status to turn running
-
-    # Get all jobs
-    all_jobs = GRPC jobs, :list, Jobs::Query.new()
-
-    all_jobs['jobs'].each {|j|
-      assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, j, 'start_time'))
-      j['status'] = 'good' if j['status'] == 'running' || j['status'] == 'scheduled'
-    }
+    # Testing that jobs start from the initial state of 'new'
+    sleep_count = 0
+    while sleep_count < 10 do
+      sleep 2
+      sleep_count += 1
+      updated_statues = 0
+      all_jobs = GRPC jobs, :list, Jobs::Query.new()
+      all_jobs['jobs'].each do |job|
+        if %w(running scheduled failed completed).include?(job['status'])
+          job['status'] = 'GOOOOD'
+          assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, job, 'start_time'))
+          updated_statues += 1
+        end
+      end
+      break if updated_statues > 1
+      puts "> #{sleep_count} < waiting for jobs to start..."
+    end
     expected_jobs = {
       "jobs": [
         {
@@ -201,7 +209,7 @@ describe File.basename(__FILE__) do
             }
           ],
           "endTime": "0001-01-01T00:00:00Z",
-          "status": "good",
+          "status": "GOOOOD",
           "nodeCount": 2,
           "scheduledTime": "0001-01-01T00:00:00Z",
           "parentId": "123"
@@ -211,7 +219,7 @@ describe File.basename(__FILE__) do
           "name": "My Exec Job For Existing node",
           "type": "exec",
           "endTime": "0001-01-01T00:00:00Z",
-          "status": "good",
+          "status": "GOOOOD",
           "nodeCount": 1,
           "profileCount": 1,
           "scheduledTime": "0001-01-01T00:00:00Z"
@@ -224,7 +232,7 @@ describe File.basename(__FILE__) do
     # Get job by id with all details
     job1 = GRPC jobs, :read, Jobs::Id.new(id: job_id1)
     assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, job1, 'start_time'))
-    job1['status'] = 'good' if job1['status'] == 'running' || job1['status'] == 'scheduled'
+    job1['status'] = 'GOOOOD' if job1['status'] == 'running' || job1['status'] == 'scheduled'
     expected_job1 = {
       "id": job_id1,
       "name": "my Detect Job For two nodes",
@@ -241,7 +249,7 @@ describe File.basename(__FILE__) do
         }
       ],
       "endTime": "0001-01-01T00:00:00Z",
-      "status": "good",
+      "status": "GOOOOD",
       "retries": 1,
       "retriesLeft": 1,
       "nodes": [@docker_node_id1, @docker_node_id2],
