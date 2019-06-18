@@ -86,11 +86,11 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 		return w.Fail(err)
 	}
 
-	// If we don't have a recurrence, it means this job isn't a
-	// scheduled job and thus doesn't need a child job created in
-	// the database.
 	taskName := "create-child"
-	if job.Recurrence != "" {
+	if job.Recurrence == "" {
+		// If we don't have a recurrence, it means this job isn't a
+		// scheduled job and thus doesn't need a child job created in
+		// the database.
 		taskName = "resolve-job"
 	}
 	err = w.EnqueueTask(taskName, job)
