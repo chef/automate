@@ -295,6 +295,7 @@ paths = [
   "lib/tracing/*",
   "lib/uuid4/*",
   "lib/version/*",
+  "lib/workflow/*",
   "Gopkg.lock"
 ]
 
