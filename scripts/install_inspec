@@ -3,6 +3,7 @@ set -euo pipefail
 
 export HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
+export HAB_LICENSE="accept-no-persist"
 
 desired_inspec_version() {
     local top_level
