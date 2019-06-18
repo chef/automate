@@ -1,12 +1,14 @@
 #!/bin/bash
 
 # Prerequisites:
-#    jq preprocessor
+#    jq post-processor
 #       https://stedolan.github.io/jq/
+#    jo pre-processor (for authGen function)
+#       https://github.com/jpmens/jo
 #    variable $TOK
 #       An admin token obtained from `get_admin_token` or `chef-automate admin-token`
 #    variable $TARGET_HOST
-#       A host running A2, typically `https://a2-dev.test`
+#       A host running A2, either `https://a2-dev.test` or a remote machine.
 #
 # These works either inside or outside Habitat Studio.
 
@@ -36,8 +38,8 @@
 #     a2 -o --show users name bob
 #     a2 --v2 -o --show -p proj1,proj2 roles
 #
-#     To run on a different environment you can adjust the env vars for a single invocation. Example:
-#     TARGET_HOST=https://a2-local-fresh-install-dev.cd.chef.co TOK=stV8b5NqP6qepD9I23OFn_U2OME= a2 -s policies
+# To run on a different environment you can adjust the env vars for a single invocation. Example:
+# TARGET_HOST=https://fresh-install-dev.cd.chef.co TOK=stVpD9I23OFn_U2OME= a2 -s policies
 
 authQuery () {
   # prerequisites
@@ -93,6 +95,9 @@ authQuery () {
 #    -d or --dry-run      show the curl commands but do not execute them
 #    -2 or --v2           use IAM V2 endpoints
 #
+# Example:
+#    authLoad teams captured/teams-from-acceptance.txt
+#
 authLoad() {
   # process options
   dry_run=
@@ -136,4 +141,98 @@ authLoad() {
       fi
     fi
   done
+}
+
+#############
+# authGen
+#############
+# Purpose:
+#     Generate a list of a2 auth resources.
+#     This generates dummy data that is not particularly realistic
+#     but can be used to observe general performance characteristics.
+#     NB: When generating policies, it builds one policy per token,
+#     so you should also generate a set of tokens with the same parameters.
+#     This function also allows you to delete your generated resources just as easily.
+# 
+# Example:
+#     Create 500 policies starting with a seed of 101:
+#         $ authGen policies create 500 101
+#     Per above note, those policies need these members:
+#         $ authGen tokens create 500 101
+#     Now, just for illustration, delete the last 100 of those 500 policies:
+#         $ authGen policies delete 100 501
+#
+# Options:
+#    -2 or --v2           use IAM V2 endpoints
+#
+# TODO: Except for common things (e.g. teams) this supports only IAM v1 so far.
+#
+authGen() {
+  # process options
+  auth_path="api/v0/auth"
+  while [[ "$1" =~ ^- ]]; do
+    case "$1" in
+      -2|--v2) auth_path="apis/iam/v2beta"; shift;;
+      -*) echo "'$1' unknown"; return 1;;
+    esac
+  done
+
+  # prerequisites
+  ([ -z "$TOK" ] || [ -z "$TARGET_HOST" ]) && { echo "Need TOK and TARGET_HOST variables"; return; }
+  [ -z "$4" ] && { echo "usage: authGen [ <options> ] <resource> <mode> <count> <seed>"; return; }
+  if ! type jo &> /dev/null
+  then
+    echo "Need jo installed"; return;
+  fi
+  RESOURCE=$1
+  MODE=$2
+  COUNT=$3
+  SEED=$4
+  ID_PREFIX=test-$RESOURCE
+  [[ ! $MODE =~ ^(create|delete)$ ]] && { echo "mode must be 'create' or 'delete'"; return; }
+  [[ ! $RESOURCE =~ ^(tokens|users|teams|policies)$ ]] && { echo "resource must be in: tokens, users, teams, policies"; return; }
+
+  if [[ $MODE == create ]]; then
+    echo "Creating $COUNT $RESOURCE..."
+    for (( i = 0; i < $COUNT; i++ )) 
+    do
+      local id_index=$(($i+$SEED))
+      local id=$ID_PREFIX-$id_index
+      local name="$ID_PREFIX $id_index"
+      local json=""
+      case "$RESOURCE" in
+        tokens) 
+          json=$(jo -p id=$id name="$name" description="test token for $name" active=true) ;;
+        users) 
+          json=$(jo -p id=$id name="$name" username=$id password=chefautomate active=true) ;;
+        teams) 
+          json=$(jo name="$name" description="test team for $name") ;;
+        policies) 
+          json=$(jo subjects=$(jo -a token:test-tokens-$id_index) action=read resource="compliance:*") ;;
+      esac
+      curl -sSkH "api-token: $TOK" $TARGET_HOST/$auth_path/$RESOURCE -X POST --data "$json"
+      echo
+    done
+ 
+  elif [[ $MODE == delete ]]; then
+    echo "Removing $COUNT $RESOURCE..."
+    for (( i = 0; i < $COUNT; i++ )) 
+    do
+      local id_index=$(($i+$SEED))
+      local name="$ID_PREFIX $id_index"
+      local id=$ID_PREFIX-$id_index
+      case "$RESOURCE" in
+        tokens)  ;;
+        users)  ;;
+        teams) 
+          local teams=$(curl -sSkH "api-token: $TOK" "$TARGET_HOST/$auth_path/$RESOURCE")
+          id=$(echo $teams | jq -r --arg name "$name" '.teams[] | select (.name==$name).id') ;;
+        policies) 
+          local policies=$(curl -sSkH "api-token: $TOK" "$TARGET_HOST/$auth_path/$RESOURCE")
+          id=$(echo $policies | jq -r --arg name "token:test-tokens-$id_index" '.policies[] | select (.subjects==[$name]).id') ;;
+      esac
+      curl -sSkH "api-token: $TOK" $TARGET_HOST/$auth_path/$RESOURCE/$id -X DELETE
+      echo
+    done
+  fi
 }
