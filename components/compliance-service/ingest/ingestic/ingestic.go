@@ -183,13 +183,17 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 
 	script := elastic.NewScript("ctx._source.daily_latest = false")
 
-	_, err := elastic.NewUpdateByQueryService(backend.client).
-		Index(index).
-		Query(boolQueryDailyLatestThisNodeNotThisReport).
-		Script(script).
-		Refresh("false").
-		ProceedOnVersionConflict().
-		Do(ctx)
+	retries := 3
+	err := errors.New("init")
+	for retries > 0 && err != nil {
+		_, err = elastic.NewUpdateByQueryService(backend.client).
+			Index(index).
+			Query(boolQueryDailyLatestThisNodeNotThisReport).
+			Script(script).
+			Refresh("false").
+			Do(ctx)
+		retries -= 1
+	}
 
 	return err
 }
