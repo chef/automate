@@ -36,8 +36,8 @@ func main() {
 			reader := bufio.NewReader(f)
 			writer := bufio.NewWriter(out)
 
-			_, _ = writer.WriteString("package api\n\nfunc init() {\n")
-			_, _ = writer.WriteString("	Swagger.Add(\"" + name + "\", `")
+			_, _ = writer.WriteString("package api\n\nfunc init() {\n")   // nolint: errcheck
+			_, _ = writer.WriteString("	Swagger.Add(\"" + name + "\", `") // nolint: errcheck
 
 			for {
 				line, is_prefix, err := reader.ReadLine()

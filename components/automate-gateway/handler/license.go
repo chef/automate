@@ -57,7 +57,7 @@ func (t *LicenseServer) ApplyLicense(ctx context.Context,
 		LicenseId:      st.LicenseId,
 		ConfiguredAt:   st.ConfiguredAt,
 		CustomerName:   st.CustomerName,
-		LicensedPeriod: (*license.GetStatusResp_DateRange)(st.LicensedPeriod),
+		LicensedPeriod: st.LicensedPeriod,
 	}
 	return &license.ApplyLicenseResp{Status: &status}, nil
 }
@@ -124,7 +124,7 @@ func (t *LicenseServer) RequestLicense(ctx context.Context,
 		LicenseId:      st.LicenseId,
 		ConfiguredAt:   st.ConfiguredAt,
 		CustomerName:   st.CustomerName,
-		LicensedPeriod: (*license.GetStatusResp_DateRange)(st.LicensedPeriod),
+		LicensedPeriod: st.LicensedPeriod,
 	}
 	return &resp, nil
 }

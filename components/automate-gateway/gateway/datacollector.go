@@ -63,7 +63,7 @@ func (s *Server) dataCollectorHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Read the body in bytes
 	body, err := ioutil.ReadAll(r.Body)
-	r.Body.Close()
+	r.Body.Close() // nolint: errcheck
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -323,6 +323,8 @@ func getInt32IfExists(fieldName string, body []byte) int32 {
 func getStringArray(fieldName string, body []byte) []string {
 	strs := make([]string, 0)
 
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(body, func(value []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			strs = append(strs, string(value))
@@ -336,6 +338,8 @@ func getStringArray(fieldName string, body []byte) []string {
 func getResources(body []byte) []*ingestProto.Resource {
 	resources := make([]*ingestProto.Resource, 0)
 
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(body, func(resource []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			rReq := &ingestProto.Resource{
@@ -419,33 +423,6 @@ func getError(body []byte) *ingestProto.Error {
 	return pErr
 }
 
-func getExpandedRunList(body []byte) *ingestProto.ExpandedRunList {
-	var expandedRunList *ingestProto.ExpandedRunList
-	expandedRunListBytes, _, _, err := jsonparser.Get(body, "expanded_run_list")
-	if err == nil {
-
-		pRunLists := make([]*ingestProto.RunList, 0)
-		jsonparser.ArrayEach(body, func(runlist []byte, _ jsonparser.ValueType, _ int, err error) {
-			if err != nil {
-				pRunList := &ingestProto.RunList{
-					Type:    getStringIfExists("type", runlist),
-					Name:    getStringIfExists("name", runlist),
-					Version: getStringIfExists("version", runlist),
-					Skipped: getBoolIfExists("skipped", runlist),
-				}
-				pRunLists = append(pRunLists, pRunList)
-			}
-		}, "deprecation")
-
-		expandedRunList = &ingestProto.ExpandedRunList{
-			Id:      getStringIfExists("id", expandedRunListBytes),
-			RunList: pRunLists,
-		}
-
-	}
-	return expandedRunList
-}
-
 // Returns an empty struct if field does not exist
 func getStructIfExists(fieldName string, body []byte) *structpb.Struct {
 	fieldBytes, dataType, _, err := jsonparser.Get(body, fieldName)
@@ -459,9 +436,15 @@ func getStructIfExists(fieldName string, body []byte) *structpb.Struct {
 			if err != nil {
 				return &structpb.Struct{}
 			}
+			// TODO (tc): Is this err intended to be evaluated below in the if statement?
+			// It's currently scoped to the switch statement.
+			// nolint: ineffassign
 			err = UnmarshalProtoFromString(stringBytes, &pbStruct)
 		case jsonparser.Object:
 			// If the field is an Object, we can directly unmarshal it from the bytes array
+			// TODO (tc): Is this err intended to be evaluated below in the if statement?
+			// It's currently scoped to the switch statement.
+			// nolint: ineffassign
 			err = UnmarshalProtoFromBytes(fieldBytes, &pbStruct)
 		default:
 			// Anything else, we can't convert into a Struct, return empty
@@ -510,6 +493,8 @@ func getFloat32IfExists(fieldName string, body []byte) float32 {
 func getInspecProfiles(body []byte) []*inspecEvent.Profile {
 	inspecProfiles := make([]*inspecEvent.Profile, 0)
 
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(body, func(profile []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			inspecProfile := &inspecEvent.Profile{
@@ -540,6 +525,8 @@ func getInspecProfiles(body []byte) []*inspecEvent.Profile {
 
 func getInspecSupports(profile []byte) []*inspecEvent.Support {
 	inspecSupports := make([]*inspecEvent.Support, 0)
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(profile, func(support []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			inspecSupport := &inspecEvent.Support{
@@ -556,6 +543,8 @@ func getInspecSupports(profile []byte) []*inspecEvent.Support {
 
 func getInspecAttributes(profile []byte) []*inspecEvent.Attribute {
 	inspecAttributes := make([]*inspecEvent.Attribute, 0)
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(profile, func(attribute []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			inspecAttribute := &inspecEvent.Attribute{
@@ -570,6 +559,8 @@ func getInspecAttributes(profile []byte) []*inspecEvent.Attribute {
 
 func getInspecDependencies(profile []byte) []*inspecEvent.Dependency {
 	inspecDependencies := make([]*inspecEvent.Dependency, 0)
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(profile, func(dependency []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			inspecDependency := &inspecEvent.Dependency{
@@ -592,6 +583,8 @@ func getInspecDependencies(profile []byte) []*inspecEvent.Dependency {
 
 func getInspecGroups(profile []byte) []*inspecEvent.Group {
 	inspecGroups := make([]*inspecEvent.Group, 0)
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(profile, func(group []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			inspecGroup := &inspecEvent.Group{
@@ -607,6 +600,8 @@ func getInspecGroups(profile []byte) []*inspecEvent.Group {
 
 func getInspecControls(profile []byte) []*inspecEvent.Control {
 	inspecControls := make([]*inspecEvent.Control, 0)
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(profile, func(control []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			inspecControl := &inspecEvent.Control{
@@ -628,6 +623,8 @@ func getInspecControls(profile []byte) []*inspecEvent.Control {
 
 func getInspecResults(control []byte) []*inspecEvent.Result {
 	inspecResults := make([]*inspecEvent.Result, 0)
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(control, func(result []byte, _ jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			inspecResult := &inspecEvent.Result{
@@ -659,6 +656,8 @@ func getInspecSourceLocation(control []byte) *inspecEvent.SourceLocation {
 
 func getStructArray(fieldName string, body []byte) []*structpb.Struct {
 	pStructs := make([]*structpb.Struct, 0)
+	// TODO (tc): Seems like we should check if the json fails to parse?
+	// nolint: errcheck
 	jsonparser.ArrayEach(body, func(structBytes []byte, dataType jsonparser.ValueType, _ int, err error) {
 		if err == nil {
 			var pStruct structpb.Struct
@@ -668,6 +667,9 @@ func getStructArray(fieldName string, body []byte) []*structpb.Struct {
 				// If the field is a String we will parse it to remove the scaped characters
 				stringBytes, err := jsonparser.ParseString(structBytes)
 				if err == nil {
+					// TODO (tc): Is this err intended to be evaluated below in the if statement?
+					// It's currently scoped to this case statement due to the assignment from jsonparser.ParseString.
+					// nolint: ineffassign
 					err = UnmarshalProtoFromString(stringBytes, &pStruct)
 				}
 			case jsonparser.Object:

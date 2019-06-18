@@ -344,9 +344,6 @@ type ProfileRequest struct {
 }
 
 func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithCancel(r.Context())
-	defer cancel()
-
 	var fileData []byte
 	var cType, profileName, profileVersion string
 	contentTypeString := strings.Split(r.Header.Get("Content-type"), ";")
@@ -369,7 +366,7 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		defer file.Close()
+		defer file.Close() // nolint: errcheck
 
 		_, err = io.Copy(&content, file)
 		if err != nil {
@@ -433,13 +430,10 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Write(data)
+	w.Write(data) // nolint: errcheck
 }
 
 func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithCancel(r.Context())
-	defer cancel()
-
 	var profileOwner, profileName, profileVersion string
 
 	url := r.URL.Path
@@ -510,14 +504,11 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Length", contentLength)
 		w.Header().Set("Content-Type", "application/x-gzip")
 		w.Header().Set("Accept-Ranges", "bytes")
-		w.Write(data.GetData())
+		w.Write(data.GetData()) // nolint: errcheck
 	}
 }
 
 func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithCancel(r.Context())
-	defer cancel()
-
 	// Node: from glancing at the code, I don't believe this is using query.Id, so
 	// we can't be more specific. Also, we can do this before looking at the
 	// request body.
@@ -560,14 +551,11 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
-		w.Write(data.GetContent())
+		w.Write(data.GetContent()) // nolint: errcheck
 	}
 }
 
 func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithCancel(r.Context())
-	defer cancel()
-
 	const (
 		actionV1   = "read"
 		resourceV1 = "cfgmgmt:nodes"
@@ -608,7 +596,7 @@ func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Requ
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
-		w.Write(data.GetContent())
+		w.Write(data.GetContent()) // nolint: errcheck
 	}
 }
 

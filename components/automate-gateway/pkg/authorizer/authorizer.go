@@ -83,9 +83,9 @@ func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
 		resp, err = a.v1.FilterAuthorizedPairs(ctx, subjects, pairsV1)
 		if err == nil {
 			return &middleware.FilterPairsResponse{
-				Pairs:                  resp,
 				MapByResourceAndAction: mapByResourceAndActionV1, // passed back as-is
 				MethodsInfo:            methodsInfoV1,            // to simplify processing
+				Pairs:                  resp,
 			}, nil
 		}
 	case a.v2:
@@ -93,9 +93,9 @@ func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
 		resp, err = a.v2.FilterAuthorizedPairs(ctx, subjects, pairsV2)
 		if err == nil {
 			return &middleware.FilterPairsResponse{
-				Pairs:                  resp,
 				MapByResourceAndAction: mapByResourceAndActionV2,
 				MethodsInfo:            methodsInfoV2,
+				Pairs:                  resp,
 			}, nil
 		}
 	}

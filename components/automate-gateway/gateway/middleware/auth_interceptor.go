@@ -165,24 +165,6 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	}
 }
 
-func getProjectsFromMetadata(projectHeaderEntries []string) []string {
-	if projectHeaderEntries == nil {
-		projectHeaderEntries = []string{}
-	}
-	projects := []string{}
-	keys := make(map[string]bool)
-	for _, entry := range projectHeaderEntries {
-		for _, project := range strings.Split(entry, ",") {
-			newProject := strings.TrimSpace(project)
-			if !keys[newProject] {
-				keys[newProject] = true
-				projects = append(projects, newProject)
-			}
-		}
-	}
-	return projects
-}
-
 func (a *authInterceptor) StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		// This is the only method of the reflection service, see

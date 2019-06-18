@@ -6,9 +6,9 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/api/external/common/version"
 	ingestReq "github.com/chef/automate/api/external/ingest/request"
 	ingestResp "github.com/chef/automate/api/external/ingest/response"
-	"github.com/chef/automate/api/external/common/version"
 
 	"github.com/chef/automate/api/interservice/ingest"
 

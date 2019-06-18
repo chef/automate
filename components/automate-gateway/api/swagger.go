@@ -38,7 +38,7 @@ func (m *swagger) Get(scope string) string {
 func (m *swagger) HandleSwaggerSpec(w http.ResponseWriter, r *http.Request) {
 	name := nameFromPath(r.URL.Path)
 	if docs := m.Get(name); docs != "" {
-		io.Copy(w, strings.NewReader(docs))
+		io.Copy(w, strings.NewReader(docs)) // nolint: errcheck
 		return
 	}
 	w.WriteHeader(http.StatusNotFound)
@@ -72,7 +72,7 @@ func (m *swagger) HandleSwaggerUIConfig(w http.ResponseWriter, r *http.Request) 
 	sort.Sort(swaggerUIConfigURLs(config.Urls))
 	js, _ := json.Marshal(&config)
 	w.Header().Set("Content-Type", "application/json")
-	io.Copy(w, bytes.NewReader(js))
+	io.Copy(w, bytes.NewReader(js)) // nolint: errcheck
 }
 
 // "/notifications.json" => "notifications"
