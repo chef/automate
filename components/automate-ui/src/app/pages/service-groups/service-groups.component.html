@@ -4,7 +4,7 @@
   <chef-subheading>Group of Habitat services running the same package and configuration.</chef-subheading>
 </chef-page-header>
 <div class="page-body">
-  <chef-status-filter-group [value]="selectedStatus$ | async">
+  <chef-status-filter-group [value]="selectedStatus">
     <chef-option class="filter general" value="total" (click)="statusFilter('total')" selected>
       <chef-icon class="filter-icon">group_work</chef-icon>
       <div class="filter-label">Total</div>
