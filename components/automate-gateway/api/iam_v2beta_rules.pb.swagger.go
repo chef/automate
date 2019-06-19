@@ -18,8 +18,22 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/iam/v2beta/apply-rules-cancel": {
+    "/iam/v2beta/apply-rules": {
       "get": {
+        "operationId": "ApplyRulesStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v2betaApplyRulesStatusResp"
+            }
+          }
+        },
+        "tags": [
+          "Rules"
+        ]
+      },
+      "delete": {
         "operationId": "ApplyRulesCancel",
         "responses": {
           "200": {
@@ -32,32 +46,14 @@ func init() {
         "tags": [
           "Rules"
         ]
-      }
-    },
-    "/iam/v2beta/apply-rules-start": {
-      "get": {
+      },
+      "post": {
         "operationId": "ApplyRulesStart",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/v2betaApplyRulesStartResp"
-            }
-          }
-        },
-        "tags": [
-          "Rules"
-        ]
-      }
-    },
-    "/iam/v2beta/apply-rules-status": {
-      "get": {
-        "operationId": "ApplyRulesStatus",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v2betaApplyRulesStatusResp"
             }
           }
         },
