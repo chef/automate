@@ -1235,8 +1235,6 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 		return p.processError(err)
 	}
 
-	fmt.Println("1")
-
 	// Upsert all staged rules into applied rules marked for update, returning the id and db_id
 	// of all rules affected so we can update their conditions below.
 	rows, err := tx.QueryContext(ctx,
@@ -1256,9 +1254,8 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 		return p.processError(err)
 	}
 
-	fmt.Println("2")
-
 	// For every staged rule updated, we need to update conditions.
+	ids := make(map[string]string)
 	for rows.Next() {
 		var id string
 		var dbID string
@@ -1266,21 +1263,16 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 		if err != nil {
 			return p.processError(err)
 		}
+		ids[id] = dbID
+	}
 
-		fmt.Println("3")
-
+	for id, dbID := range ids {
 		_, err = tx.ExecContext(ctx,
 			`DELETE FROM iam_rule_conditions WHERE rule_db_id=$1;`, dbID)
 		if err != nil {
-			fmt.Println("wtf")
-			fmt.Println(err.Error())
 			return p.processError(err)
 		}
 
-		fmt.Println("4")
-
-		// TODO hitting an error that looks like the below in this function.
-		// https://github.com/lib/pq/issues/635
 		_, err = tx.ExecContext(ctx,
 			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator)
 					SELECT $2, cond.value, cond.attribute, cond.operator FROM iam_staged_project_rules AS r
@@ -1290,13 +1282,9 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 			id, dbID,
 		)
 		if err != nil {
-			fmt.Println("wtf")
-			fmt.Println(err.Error())
 			return p.processError(err)
 		}
 	}
-
-	fmt.Println("5")
 
 	_, err = tx.ExecContext(ctx,
 		`DELETE FROM iam_project_rules WHERE id IN(
@@ -1307,8 +1295,6 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 	if err != nil {
 		return p.processError(err)
 	}
-
-	fmt.Println("6")
 
 	_, err = tx.ExecContext(ctx, `DELETE FROM iam_staged_project_rules;`)
 	if err != nil {
