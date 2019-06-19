@@ -193,20 +193,12 @@ authGen() {
   [[ ! $MODE =~ ^(create|delete)$ ]] && { echo "mode must be 'create' or 'delete'"; return; }
   [[ ! $RESOURCE =~ ^(tokens|users|teams|policies)$ ]] && { echo "resource must be in: tokens, users, teams, policies"; return; }
 
-  if [[ $MODE == create ]]; then
-    echo "Creating $COUNT $RESOURCE..."
-    for (( i = 0; i < COUNT; i++ )) 
-    do
-      create_resource "$token" "$host" $i
-   done
- 
-  elif [[ $MODE == delete ]]; then
-    echo "Removing $COUNT $RESOURCE..."
-    for (( i = 0; i < COUNT; i++ )) 
-    do
-      delete_resource "$token" "$host" $i
-    done
-  fi
+  operation="${MODE}_resource"
+  echo "$MODE $COUNT $RESOURCE..."
+  for (( i = 0; i < COUNT; i++ )) 
+  do
+    $operation "$token" "$host" $i
+  done
 }
 
 function create_resource {
@@ -234,8 +226,8 @@ function delete_resource {
   local token=$1
   local host=$2
   local id_index=$(($3 + SEED))
-  local name="$ID_PREFIX $id_index"
   local id=$ID_PREFIX-$id_index
+  local name="$ID_PREFIX $id_index"
   case "$RESOURCE" in
     tokens)  ;;
     users)  ;;
