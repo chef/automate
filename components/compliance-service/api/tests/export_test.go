@@ -49,6 +49,10 @@ func TestJSONExportWithEndTime(t *testing.T) {
 	require.NoError(t, err)
 
 	data := make([]byte, 0)
+	//the gateway wraps the response in [] because it's a json array
+	//since we are not using the gateway in this test, we need to do that wrapping
+	//here's the '[' (open wrapper)
+	data = append([]byte("["), data...)
 	for {
 		tdata, err := stream.Recv()
 		if err != nil && err == io.EOF {
@@ -59,11 +63,14 @@ func TestJSONExportWithEndTime(t *testing.T) {
 		require.NoError(t, err)
 		data = append(data, tdata.GetContent()...)
 	}
+	//and here's the ']' (close wrapper)
+	data = append(data, []byte("]")...)
 
-	var report rs.Report
-	err = json.Unmarshal(data, &report)
+	var reports []rs.Report
+	err = json.Unmarshal(data, &reports)
 	require.NoError(t, err)
 
+	report := reports[0]
 	assert.Equal(t, 3, len(report.GetProfiles()))
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", report.GetId())
 	assert.Equal(t, "10.3.4.5", report.Ipaddress)
@@ -93,6 +100,10 @@ func TestJSONExportWithProfileFilter(t *testing.T) {
 	require.NoError(t, err)
 
 	data := make([]byte, 0)
+	//the gateway wraps the response in [] because it's a json array
+	//since we are not using the gateway in this test, we need to do that wrapping
+	//here's the '[' (open wrapper)
+	data = append([]byte("["), data...)
 	for {
 		tdata, err := stream.Recv()
 		if err != nil && err == io.EOF {
@@ -103,11 +114,14 @@ func TestJSONExportWithProfileFilter(t *testing.T) {
 		require.NoError(t, err)
 		data = append(data, tdata.GetContent()...)
 	}
+	//and here's the ']' (close wrapper)
+	data = append(data, []byte("]")...)
 
-	var report rs.Report
-	err = json.Unmarshal(data, &report)
+	var reports []rs.Report
+	err = json.Unmarshal(data, &reports)
 	require.NoError(t, err)
 
+	report := reports[0]
 	assert.Equal(t, 1, len(report.GetProfiles()))
 	assert.Equal(t, "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988", report.GetProfiles()[0].GetSha256())
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", report.GetId())
@@ -286,6 +300,10 @@ func TestJSONExportWithControlFilter(t *testing.T) {
 	require.NoError(t, err)
 
 	data := make([]byte, 0)
+	//the gateway wraps the response in [] because it's a json array
+	//since we are not using the gateway in this test, we need to do that wrapping
+	//here's the '[' (open wrapper)
+	data = append([]byte("["), data...)
 	for {
 		tdata, err := stream.Recv()
 		if err != nil && err == io.EOF {
@@ -296,11 +314,14 @@ func TestJSONExportWithControlFilter(t *testing.T) {
 		require.NoError(t, err)
 		data = append(data, tdata.GetContent()...)
 	}
+	//and here's the ']' (close wrapper)
+	data = append(data, []byte("]")...)
 
-	var report rs.Report
-	err = json.Unmarshal(data, &report)
+	var reports []rs.Report
+	err = json.Unmarshal(data, &reports)
 	require.NoError(t, err)
 
+	report := reports[0]
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", report.GetId())
 	assert.Equal(t, 1, len(report.GetProfiles()))
 	assert.Equal(t, "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988", report.GetProfiles()[0].GetSha256())
