@@ -95,6 +95,33 @@ func init() {
         ]
       }
     },
+    "/compliance/reporting/report-ids": {
+      "post": {
+        "summary": "should cover /reportids",
+        "operationId": "ListReportIds",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ReportIds"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/compliance/reporting/reports": {
       "post": {
         "summary": "should cover /reports",
@@ -752,6 +779,21 @@ func init() {
         },
         "fqdn": {
           "type": "string"
+        }
+      }
+    },
+    "v1ReportIds": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

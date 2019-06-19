@@ -63,6 +63,49 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 	return &reports, nil
 }
 
+// ListReports returns a list of reports based on query
+func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*reporting.ReportIds, error) {
+	var ids reporting.ReportIds
+
+	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(formattedFilters["profile_name"]) > 0 && len(formattedFilters["profile_id"]) > 0 {
+		return nil, status.Error(codes.InvalidArgument, "Invalid: Cannot specify both 'profile_name' and 'profile_id' filters")
+	}
+
+	if len(formattedFilters["profile_name"]) > 1 {
+		return nil, status.Error(codes.InvalidArgument, "Invalid: Only one 'profile_name' filter is allowed")
+	}
+
+	if len(formattedFilters["profile_id"]) > 1 {
+		return nil, status.Error(codes.InvalidArgument, "Invalid: Only one 'profile_id' filter is allowed")
+	}
+
+	if len(formattedFilters["control"]) > 1 {
+		return nil, status.Error(codes.InvalidArgument, "Invalid: Only one 'control' filter is allowed")
+	}
+
+	// Step 1: Retrieving the latest report ID for each node based on the provided filters
+	esIndex, err := relaxting.GetEsIndex(formattedFilters, false, true)
+	if err != nil {
+		return nil, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
+	}
+
+	reportIDs, err := srv.es.GetReportIds(esIndex, formattedFilters)
+	if err != nil {
+		return nil, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
+	}
+
+	ids.Ids = reportIDs
+	ids.Total = int32(len(reportIDs))
+
+	return &ids, nil
+}
+
 // ReadReport returns a reports based on id
 func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*reporting.Report, error) {
 	formattedFilters := formatFilters(in.Filters)

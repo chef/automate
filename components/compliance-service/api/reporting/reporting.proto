@@ -8,6 +8,7 @@ import "google/protobuf/timestamp.proto";
 
 service ReportingService {
 	rpc ListReports(Query) returns (Reports) {};
+	rpc ListReportIds(Query) returns (ReportIds) {};
 	rpc ReadReport(Query) returns (Report) {};
 	rpc ListSuggestions(SuggestionRequest) returns (Suggestions) {};
 	rpc ListProfiles(Query) returns (ProfileMins) {};
@@ -55,6 +56,10 @@ message ControlSummary {
 }
 message Reports {
 	repeated Report reports = 1;
+	int32 total = 2;
+}
+message ReportIds {
+	repeated string ids = 1;
 	int32 total = 2;
 }
 message Report {

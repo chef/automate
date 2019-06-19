@@ -46,6 +46,20 @@ func (a *Reporting) ListReports(ctx context.Context, in *reporting.Query) (*repo
 	return out, nil
 }
 
+// should cover /reportIds
+func (a *Reporting) ListReportIds(ctx context.Context, in *reporting.Query) (*reporting.ReportIds, error) {
+	inDomain := &reportingService.Query{}
+	out := &reporting.ReportIds{}
+	f := func() (proto.Message, error) {
+		return a.client.ListReportIds(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // should cover /reports/:reportid
 func (a *Reporting) ReadReport(ctx context.Context, in *reporting.Query) (*reporting.Report, error) {
 	inDomain := &reportingService.Query{}
