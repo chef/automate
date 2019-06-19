@@ -1025,23 +1025,18 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	}
 
 	row := tx.QueryRowContext(ctx,
-		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5)
-		 ON CONFLICT DO
-		 UPDATE iam_staged_project_rules SET (name, type) = ($3, $4)
-	   WHERE id = $1 AND projects_match_for_rule(project_id, $6) RETURNING db_id, project_id;`,
+		`SELECT update_rule($1, $2, $3, $4, $5, $6)`,
 		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false, pq.Array(projectsFilter))
-	var ruleDbID, projectID string
-	if err := row.Scan(&ruleDbID, &projectID); err != nil {
+	var ruleDbID int
+	if err := row.Scan(&ruleDbID); err != nil {
 		if err == sql.ErrNoRows {
+			// TODO for testing only
+			spew.Printf("HEY! no rows error here %#v\n\n", err)
 			return nil, storage_errors.ErrNotFound
 		}
-		spew.Printf("HEY! error here %#v\n\n", err)
+		// TODO for testing only
+		spew.Printf("HEY! other error here %#v\n\n", err)
 		return nil, p.processError(err)
-	}
-
-	// If they tried to change the project_id, abort the transaction with an error.
-	if projectID != rule.ProjectID {
-		return nil, storage_errors.ErrChangeProjectForRule
 	}
 
 	// Delete the existing conditions. Don't need to worry about not found case since a rule must have conditions.
@@ -1062,6 +1057,7 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	err = tx.Commit()
 	if err != nil {
+		spew.Printf("HEY! tx error here %#v\n\n", err)
 		return nil, storage_errors.NewErrTxCommit(err)
 	}
 

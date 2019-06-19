@@ -6,9 +6,9 @@ RETURNS TEXT
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  rule_id TEXT;
+  rule_db_id INTEGER;
 BEGIN
-    IF (EXISTS (SELECT id FROM iam_project_rules ipr WHERE id=in_rule_id AND projects_match_for_rule(ipr.project_id, projects_filter)) THEN -- cannot 'update' a non-existed applied rule
+    IF (EXISTS (SELECT id FROM iam_project_rules ipr WHERE id=in_rule_id AND projects_match_for_rule(ipr.project_id, projects_filter))) THEN -- cannot 'update' a non-existed applied rule
             INSERT INTO iam_staged_project_rules as ispr (id, project_id, name, type, deleted)
             VALUES (in_rule_id, in_project_id, in_name, in_type, false)
             ON CONFLICT (id) -- applied rule has already been updated, so update the staged version of it
@@ -20,14 +20,14 @@ BEGIN
                         type   = in_type,
                         deleted    = in_deleted
             WHERE ispr.id = in_rule_id AND projects_match_for_rule(ispr.project_id, projects_filter)
-        RETURNING ispr.id INTO rule_id;
-        RETURN rule_id;
+        RETURNING ispr.db_id INTO rule_db_id;
+        RETURN rule_db_id;
     -- TODO: add conditions
     ELSE
         RAISE EXCEPTION 'noooooot found %', in_rule_id USING -- do we need this? maybe we can just return null or something?
         ERRCODE='NOAPPLIEDRULE';
     END IF;
-    RETURN rule_id;
+    RETURN rule_db_id;
 END;
 $$;
 
@@ -54,3 +54,5 @@ CREATE TRIGGER verify_not_deleted BEFORE UPDATE ON iam_staged_project_rules
 FOR EACH ROW
 WHEN (OLD.deleted = true)
 EXECUTE PROCEDURE fn_deleted_rule_check();
+
+COMMIT;
