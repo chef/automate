@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
@@ -1024,15 +1025,17 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	}
 
 	row := tx.QueryRowContext(ctx,
-		`UPDATE iam_project_rules SET (name, type) = ($1, $2)
-			WHERE id = $3 AND projects_match_for_rule(project_id, $4) RETURNING db_id, project_id`,
-		rule.Name, rule.Type.String(), rule.ID, pq.Array(projectsFilter))
-	var ruleDbID string
-	var projectID string
+		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5)
+		 ON CONFLICT DO
+		 UPDATE iam_staged_project_rules SET (name, type) = ($3, $4)
+	   WHERE id = $1 AND projects_match_for_rule(project_id, $6) RETURNING db_id, project_id;`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false, pq.Array(projectsFilter))
+	var ruleDbID, projectID string
 	if err := row.Scan(&ruleDbID, &projectID); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, storage_errors.ErrNotFound
 		}
+		spew.Printf("HEY! error here %#v\n\n", err)
 		return nil, p.processError(err)
 	}
 
@@ -1042,14 +1045,14 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	}
 
 	// Delete the existing conditions. Don't need to worry about not found case since a rule must have conditions.
-	_, err = tx.ExecContext(ctx, `DELETE FROM iam_rule_conditions WHERE rule_db_id=$1;`, ruleDbID)
+	_, err = tx.ExecContext(ctx, `DELETE FROM iam_staged_rule_conditions WHERE rule_db_id=$1;`, ruleDbID)
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
 	for _, condition := range rule.Conditions {
 		_, err := tx.ExecContext(ctx,
-			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
 			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
 		)
 		if err != nil {
