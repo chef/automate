@@ -321,6 +321,7 @@ func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFe
 func muxFromRegisterMap(grpcURI string, dopts []grpc.DialOption, localEndpoints map[string]registerFunc) (*runtime.ServeMux, error) {
 	opts := []runtime.ServeMuxOption{
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
+		runtime.WithMarshalerOption("application/json+pretty", &runtime.JSONPb{OrigName: true, EmitDefaults: true, Indent: "  "}),
 		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: true, EmitDefaults: true}),
 		runtime.WithMetadata(middleware.CertificatePasser),
 	}

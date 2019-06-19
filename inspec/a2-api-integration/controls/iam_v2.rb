@@ -48,6 +48,60 @@ control 'iam-v2-1' do
       expect(resp.http_status).to eq 200
     end
 
+    # Note: all endpoints provided by grpc-gateway satisfy this. We're using
+    # this specific test case as a canary.
+    # Also note that we set up a test policy here that has at most one element
+    # in each embedded array, to sidestep ordering issues.
+    it "supports ?pretty for enabling pretty-printed JSON responses" do
+      id = "inspec-test-policy-0-#{Time.now.utc.to_i}"
+      resp = automate_api_request("/apis/iam/v2beta/policies",
+        http_method: 'POST',
+        request_body: {
+          id: id,
+          name: 'Name',
+          members: ["user:local:member"],
+          statements: [
+            {
+              effect: "DENY",
+              role: "test"
+            },
+          ]
+        }.to_json()
+      )
+      expect(resp.http_status).to eq 200
+      resp = automate_api_request("/apis/iam/v2beta/policies/#{id}?pretty")
+      expect(resp.raw_response_body).to eq <<EOF.chomp
+{
+  "policy": {
+    "name": "Name",
+    "id": "#{id}",
+    "type": "CUSTOM",
+    "members": [
+      "user:local:member"
+    ],
+    "statements": [
+      {
+        "effect": "DENY",
+        "actions": [
+        ],
+        "role": "test",
+        "resources": [
+          "*"
+        ],
+        "projects": [
+        ]
+      }
+    ],
+    "projects": [
+    ]
+  }
+}
+EOF
+
+      resp = automate_api_request("/apis/iam/v2beta/policies/#{id}", http_method: "DELETE")
+      expect(resp.http_status).to eq 200
+    end
+
     it "CREATE and DELETE policy properly respond to happy path inputs" do
       resp = automate_api_request("/apis/iam/v2beta/policies")
       expect(resp.http_status).to eq 200

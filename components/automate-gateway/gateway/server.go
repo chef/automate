@@ -355,13 +355,13 @@ func (s *Server) Serve() error {
 	if err != nil {
 		return errors.Wrap(err, "registering v0 REST gateway services")
 	}
-	mux.Handle("/", v0Mux)
+	mux.Handle("/", prettifier(v0Mux))
 
 	versionedMux, err := versionedRESTMux(grpcURILocal, s.connFactory.DialOptions("automate-gateway"), s.gwRouteFeatureFlags)
 	if err != nil {
 		return errors.Wrap(err, "registering versioned REST gateway services")
 	}
-	mux.Handle("/apis/", http.StripPrefix("/apis", versionedMux))
+	mux.Handle("/apis/", http.StripPrefix("/apis", prettifier(versionedMux)))
 
 	// custom mux route for data-collector
 	// Note: automate-load-balancer rewrites
@@ -485,4 +485,27 @@ func (s *Server) Serve() error {
 	}()
 
 	return errors.Wrap(<-errc, "Serve")
+}
+
+// prettifier strips the ?pretty query argument, and uses it to indicate that
+// grpc-gateway should use a pretty-printing marshaller (outbound) instead, by
+// changing the request's "Accept" header to "application/json+pretty".
+// If a specific "Accept" header is already provided (i.e. not "*/*"), this will
+// not touch it. Note that we leave the query params intact, so the handlers
+// will still see the ?pretty. Let's deal with removing that if we have to.
+func prettifier(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer h.ServeHTTP(w, r)
+
+		// if the "Accept" is set and NOT */* (sent by curl)
+		if accept := r.Header.Get("Accept"); accept != "" && accept != "*/*" {
+			return
+		}
+
+		// checking Values as map[string][]string also catches ?pretty and ?pretty=
+		// r.URL.Query().Get("pretty") would not.
+		if _, ok := r.URL.Query()["pretty"]; ok {
+			r.Header.Set("Accept", "application/json+pretty")
+		}
+	})
 }

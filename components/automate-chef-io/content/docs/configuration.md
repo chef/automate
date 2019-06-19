@@ -86,7 +86,7 @@ and copy the User ID, then use:
 ```bash
 export TOK=`chef-automate admin-token`
 
-curl -X PUT -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name":"Local Administrator", "id": "<admin user ID>", "password":"<password>"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users/admin | jq
+curl -X PUT -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name":"Local Administrator", "id": "<admin user ID>", "password":"<password>"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users/admin?pretty
 ```
 
 #### Load Balancer Certificate and Private Key

@@ -33,7 +33,7 @@ See the [IAM v2 User's Guide]({{< relref "iam-v2-guide.md" >}}) for more informa
 ### Listing Policies
 
 ```bash
-curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies | jq
+curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies?pretty
 ```
 
 The output includes both `Chef-managed` and `custom` policies.
@@ -51,7 +51,7 @@ Find the `id` field for the policy of interest--for example, the ID from the def
 Plug that in to the URL as shown:
 
 ```bash
-curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/administrator-access | jq
+curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/administrator-access?pretty
 ```
 
 In the browser: Navigate to the *Policies* page under the **Settings**  tab, and then select an individual policy to open its details.
@@ -88,7 +88,7 @@ You can see the actions contained in the `editor` role in the [Roles section]({{
 Assuming you stored the above JSON in the file "policy.json", pass it to `curl` to create the policy:
 
 ```bash
-curl -s -H "api-token: $TOK" -d @policy.json https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies | jq
+curl -s -H "api-token: $TOK" -d @policy.json https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies?pretty
 ```
 
 ### Updating a Policy
@@ -129,13 +129,13 @@ As an example, to update the example policy to keep the first policy statement a
 To update your policy, replace the last component of the path in the command with the ID of the target policy.
 
 ```bash
-curl -s -H "api-token: $TOK" -d @policy.json -X PUT https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id} | jq
+curl -s -H "api-token: $TOK" -d @policy.json -X PUT https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pretty
 ```
 
 You can also make the change specifying the data inline:
 
 ```bash
-curl -s -H "api-token: $TOK" -d '{"name":"Test Policy", "id":"test-policy", "members":["team:local:alpha","team:ldap:beta"], "statements": [{"actions": [ "iam:users:list"], "effect": "ALLOW"}]}' -X PUT https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id} | jq
+curl -s -H "api-token: $TOK" -d '{"name":"Test Policy", "id":"test-policy", "members":["team:local:alpha","team:ldap:beta"], "statements": [{"actions": [ "iam:users:list"], "effect": "ALLOW"}]}' -X PUT https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pretty
 ```
 
 ### Policy Membership
@@ -153,7 +153,7 @@ From the command line, specifying a complete list of members is often simpler th
 This command *replaces* the policy's membership.
 
 ```bash
-curl -s -H "api-token: $TOK" -X PUT -d '{"members":["team:local:admins","token:admin-token"]}' https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members | jq
+curl -s -H "api-token: $TOK" -X PUT -d '{"members":["team:local:admins","token:admin-token"]}' https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members?pretty
 ```
 
 #### Adding Members to Policies
@@ -163,7 +163,7 @@ The `members` property must be an array argument, even if supplying only one mem
 Note that both the HTTP method (PUT above and POST here) and the URL are different than the command used for [setting policy membership]({{< relref "iam-v2-api-reference.md#setting-policy-membership" >}}).
 
 ```bash
-curl -s -H "api-token: $TOK" -X POST -d '{"members":["team:local:editors"]}' https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members:add | jq
+curl -s -H "api-token: $TOK" -X POST -d '{"members":["team:local:editors"]}' https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members:add?pretty
 ```
 
 In the browser: Navigate to the *Policies* page under the **Settings** tab. and select an individual policy to open its detail view.
@@ -179,7 +179,7 @@ This example removes the `team:local:admins` team from the policy.
 Note that the `members` property must be an array argument, even if only supplying one member.
 
 ```bash
-curl -s -H "api-token: $TOK" -X POST -d '{"members":["team:local:admins"]}' https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members:remove | jq
+curl -s -H "api-token: $TOK" -X POST -d '{"members":["team:local:admins"]}' https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members:remove?pretty
 ```
 
 In the browser: Navigate to the *Policies* page under the **Settings** tab., and then select an individual policy to open its detail view.
@@ -194,7 +194,7 @@ See [Listing Policies]({{< relref "iam-v2-api-reference.md#listing-policies" >}}
 Use the policy ID as the final path component to delete a policy:
 
 ```bash
-curl -s -H "api-token: $TOK" -X DELETE https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id} | jq
+curl -s -H "api-token: $TOK" -X DELETE https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pretty
 ```
 
 In the browser: Navigate to the *Policies* page under the **Settings** tab., and then find the policy you wish to delete.
@@ -216,7 +216,7 @@ Ingest      | ingest      | `infra:ingest:*`, `compliance:profiles:get`, `compli
 ### Listing Roles
 
 ```bash
-curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles | jq
+curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles?pretty
 ```
 
 The output details each role name, role type, and actions it contains.
@@ -231,7 +231,7 @@ This may be obtained by first fetching the list of all roles; see [Listing Roles
 Use the role ID as the final path component to fetch a role:
 
 ```bash
-curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/editor | jq
+curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/editor?pretty
 ```
 
 In the browser: Navigate to the *Roles* page under the **Settings** tab, and then select an individual role to open its detail view.
@@ -242,7 +242,7 @@ In the IAM v2 beta, custom roles must be created on the command line.
 Use the following `curl` command to create a role combining some editor actions with some administrator actions:
 
 ```bash
-curl -s -H "api-token: $TOK" -d '{"name": "Test Role", "id": "test-role-1", "actions": ["infra:*", "compliance:*", "teams:*", "users:*"] }' https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles | jq
+curl -s -H "api-token: $TOK" -d '{"name": "Test Role", "id": "test-role-1", "actions": ["infra:*", "compliance:*", "teams:*", "users:*"] }' https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles?pretty
 ```
 
 ### Updating a Role
@@ -251,7 +251,7 @@ In the IAM v2 beta, custom roles must be updated on the command line.
 Use the following command to update the previously created role to remove the action `infra:*`:
 
 ```bash
-curl -s -H "api-token: $TOK" -d '{"name": "Test Role", "actions": ["compliance:*", "teams:*", "users:*"] }' -X PUT https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/test-role-1 | jq
+curl -s -H "api-token: $TOK" -d '{"name": "Test Role", "actions": ["compliance:*", "teams:*", "users:*"] }' -X PUT https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/test-role-1?pretty
 ```
 
 It is important to note that for the `actions` property in the JSON you must specify the complete list of actions.
@@ -264,7 +264,7 @@ Use the following command to delete the previously created role.
 Use the role ID as the final path component to delete a role:
 
 ```bash
-curl -s -H "api-token: $TOK" -X DELETE https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/test-role-1 | jq
+curl -s -H "api-token: $TOK" -X DELETE https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/test-role-1?pretty
 ```
 
 ## Tokens
@@ -277,7 +277,7 @@ To specify tokens in a [member expression]({{< relref "iam-v2-overview.md#member
 List all tokens with this command:
 
 ```bash
-curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/tokens | jq
+curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/tokens?pretty
 ```
 
 ## Restoring Admin Access
