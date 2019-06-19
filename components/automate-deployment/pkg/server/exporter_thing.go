@@ -3,14 +3,10 @@ package server
 import (
 	"archive/tar"
 	"compress/gzip"
-	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -35,6 +31,7 @@ type servicesForExport struct {
 	Services []serviceForExport `json:"services"`
 }
 
+//
 // We want to be able to gather up files installed on one node and package them up so they can be made available when installing a second node.
 // Then we want to unpackage them and put them in the right place, with the right ownership.
 // LATER: We need to make sure a new version of the package gets generated when a file in that thing changes, but that is beyond
@@ -44,8 +41,7 @@ type servicesForExport struct {
 //
 
 // BootstrapBundleCreate makes a bootstrap bundle
-func (s *server) BootstrapBundle(ctx context.Context,
-	req *api.BootstrapBundleRequest) (*api.BootstrapBundleResponse, error) {
+func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Deployment_BootstrapBundleServer) error {
 	collection := req.CollectionName
 	logrus.Infof("COLLECTION NAME is %s\n", collection)
 
@@ -56,7 +52,7 @@ func (s *server) BootstrapBundle(ctx context.Context,
 	logrus.Infof("STAGING DIR is %s\n", stagingDir)
 	archiveRoot, err := createTempDir(stagingDir, "bootstrap_bundle")
 	if err != nil {
-		return nil, err
+		return err
 	}
 	logrus.Infof("ARCHIVE ROOT is %s\n", archiveRoot)
 	defer os.RemoveAll(archiveRoot)
@@ -70,7 +66,7 @@ func (s *server) BootstrapBundle(ctx context.Context,
 	svcsInCollection, err := services.ServicesInCollection(collection)
 	logrus.Infof("SVCSINCOLLECTION is %+v", svcsInCollection)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	for _, svc := range svcsInCollection {
 		svcName := svc.Name()
@@ -109,43 +105,35 @@ func (s *server) BootstrapBundle(ctx context.Context,
 	fmt.Printf("TARBALL FILEPATH: %s\n", tgzFilepath)
 	tarAndGzipDirectory(archiveRoot, tgzFilepath)
 
-	tgzInfo, err := os.Stat(tgzFilepath)
-	if err != nil {
-		return nil, err
-	}
+	// tgzInfo, err := os.Stat(tgzFilepath)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// Is there a way to compute the checksum as we go instead of opening the file again? (not sure it matters, though)
-	f, err := os.Open(tgzFilepath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
+	//f, err := os.Open(tgzFilepath)
+	//if err != nil {
+	//	return err
+	//}
+	//defer f.Close()
 
-	hasher := sha256.New()
-	if _, err := io.Copy(hasher, f); err != nil {
-		return nil, err
-	}
-	cksum := hex.EncodeToString(hasher.Sum(nil))
+	// hasher := sha256.New()
+	//if _, err := io.Copy(hasher, f); err != nil {
+	//	return err
+	//}
+	// cksum := hex.EncodeToString(hasher.Sum(nil))
 
-	return &api.BootstrapBundleResponse{
-		BundleName:     filepath.Base(tgzFilepath),
-		BundleChecksum: cksum,
-		BundleSize:     tgzInfo.Size(),
-	}, nil
-
-}
-
-func (s *server) BootstrapBundleDownload(req *api.BootstrapBundleDownloadRequest, stream api.Deployment_BootstrapBundleDownloadServer) error {
-	bundlePath := path.Join(stagingDir(s.serverConfig), req.BundleName)
+	// This is a mistake
+	// bundlePath := path.Join(stagingDir, tgzFilepath)
 
 	defer func() {
-		err := os.Remove(bundlePath)
+		err := os.Remove(tgzFilepath)
 		if err != nil {
-			log.WithError(err).Warn("Failed to remove support bundle file.")
+			log.WithError(err).Warn("Failed to remove bootstrap bundle file.")
 		}
 	}()
 
-	file, err := os.Open(bundlePath)
+	file, err := os.Open(tgzFilepath)
 	if err != nil {
 		return err
 	}
@@ -153,7 +141,7 @@ func (s *server) BootstrapBundleDownload(req *api.BootstrapBundleDownloadRequest
 
 	buffer := make([]byte, defaultChunkSize)
 	writer := chunks.NewWriter(defaultChunkSize, func(p []byte) error {
-		return stream.Send(&api.BootstrapBundleDownloadResponse{Data: p})
+		return stream.Send(&api.BootstrapBundleResponse{Data: p})
 	})
 	_, err = io.CopyBuffer(writer, file, buffer)
 	return err
