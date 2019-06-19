@@ -4614,6 +4614,64 @@ func TestDeleteRule(t *testing.T) {
 	}
 }
 
+func TestApplyStagedRules(t *testing.T) {
+	store, db, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
+	defer store.Close()
+	// No project filter concerns in these tests so safe to re-use context.
+	ctx := context.Background()
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"when there are no staged rules, applied rules are unchanged", func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			rule := insertAppliedRuleWithMultipleConditions(t, db, projID, storage.Node)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules
+				WHERE id=$1 AND project_id=$2 AND name=$3 AND type=$4`, rule.ID, rule.ProjectID, rule.Name, rule.Type.String()))
+
+			err := store.ApplyStagedRules(ctx)
+			assert.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules
+				WHERE id=$1 AND project_id=$2 AND name=$3 AND type=$4`, rule.ID, rule.ProjectID, rule.Name, rule.Type.String()))
+		}},
+		{"when there are n staged rules marked for update but no applied rules, it creates n staged rules", func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ruleType := storage.Node
+			rule1 := insertStagedRuleWithMultipleConditions(t, db, projID, ruleType)
+			condition, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			rule2, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition})
+			require.NoError(t, err)
+			insertStagedRule(t, db, rule2)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule1.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule2.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+
+			err = store.ApplyStagedRules(ctx)
+			assert.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		db.Flush(t)
+	}
+}
+
 func TestCreateProject(t *testing.T) {
 	store, db, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)

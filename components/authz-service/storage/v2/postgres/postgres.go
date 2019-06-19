@@ -1226,6 +1226,103 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	return rules, nil
 }
 
+func (p *pg) ApplyStagedRules(ctx context.Context) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	fmt.Println("1")
+
+	// Upsert all staged rules into applied rules marked for update, returning the id and db_id
+	// of all rules affected so we can update their conditions below.
+	rows, err := tx.QueryContext(ctx,
+		`INSERT INTO iam_project_rules (id, project_id, name, type)
+				SELECT s.id, s.project_id, s.name, s.type
+					FROM iam_staged_project_rules AS s
+					WHERE deleted=false
+				ON CONFLICT (id) DO UPDATE
+				SET name=excluded.name, type=excluded.type
+				RETURNING id, db_id;`)
+	defer func() {
+		if err := rows.Close(); err != nil {
+			p.logger.Warnf("failed to close db rows: %s", err.Error())
+		}
+	}()
+	if err != nil {
+		return p.processError(err)
+	}
+
+	fmt.Println("2")
+
+	// For every staged rule updated, we need to update conditions.
+	for rows.Next() {
+		var id string
+		var dbID string
+		err = rows.Scan(&id, &dbID)
+		if err != nil {
+			return p.processError(err)
+		}
+
+		fmt.Println("3")
+
+		_, err = tx.ExecContext(ctx,
+			`DELETE FROM iam_rule_conditions WHERE rule_db_id=$1;`, dbID)
+		if err != nil {
+			fmt.Println("wtf")
+			fmt.Println(err.Error())
+			return p.processError(err)
+		}
+
+		fmt.Println("4")
+
+		// TODO hitting an error that looks like the below in this function.
+		// https://github.com/lib/pq/issues/635
+		_, err = tx.ExecContext(ctx,
+			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator)
+					SELECT $2, cond.value, cond.attribute, cond.operator FROM iam_staged_project_rules AS r
+					LEFT OUTER JOIN iam_staged_rule_conditions AS cond
+					ON rule_db_id=r.db_id
+					WHERE r.id=$1;`,
+			id, dbID,
+		)
+		if err != nil {
+			fmt.Println("wtf")
+			fmt.Println(err.Error())
+			return p.processError(err)
+		}
+	}
+
+	fmt.Println("5")
+
+	_, err = tx.ExecContext(ctx,
+		`DELETE FROM iam_project_rules WHERE id IN(
+			SELECT a.id FROM iam_project_rules AS a
+			LEFT OUTER JOIN iam_staged_project_rules AS s
+			ON s.id=a.id
+			WHERE s.deleted=true);`)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	fmt.Println("6")
+
+	_, err = tx.ExecContext(ctx, `DELETE FROM iam_staged_project_rules;`)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewErrTxCommit(err)
+	}
+
+	return nil
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * *   PROJECTS  * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

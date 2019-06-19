@@ -339,6 +339,11 @@ func (s *State) DeleteRule(ctx context.Context, id string) error {
 	return nil
 }
 
+func (s *State) ApplyStagedRules(ctx context.Context) error {
+	// TODO
+	return nil
+}
+
 func (s *State) CreateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {
 	if project.Type == storage.Custom {
 		items := s.projects.Items()

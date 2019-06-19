@@ -76,6 +76,7 @@ type ruleStorage interface {
 	ListStagedAndAppliedRules(context.Context) ([]*Rule, error)
 	DeleteRule(context.Context, string) error
 	ListRulesForProject(context.Context, string) ([]*Rule, error)
+	ApplyStagedRules(context.Context) error
 }
 
 type MigrationStatusProvider interface {
