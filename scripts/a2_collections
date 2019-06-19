@@ -130,13 +130,13 @@ authLoad() {
       # v1 resources work by just re-using output of authQuery except for users, which need a password added
       # TODO: check that all v2 resources work
       if [[ "$RESOURCE" == "users" ]]; then
-        line=$(jq -c '. += {"password": "chefautomate"}' <<< $line)
+        line=$(jq -c '. += {"password": "chefautomate"}' <<< "$line")
       fi
       if [[ "$show_cmd" == 1 ]] || [[ "$dry_run" == 1 ]]; then 
         echo "curl -sSkH \"api-token: \$token\" \"$host/$auth_path/$RESOURCE\" -d '$line'"
       fi
       if [[ "$dry_run" == "" ]]; then 
-        curl -sSkH "api-token: $token" $host/$auth_path/$RESOURCE -d "$line"
+        curl -sSkH "api-token: $token" "$host/$auth_path/$RESOURCE" -d "$line"
         echo
       fi
     fi
@@ -178,7 +178,8 @@ authGen() {
   done
 
   # prerequisites
-  ([ -z "$TOK" ] || [ -z "$TARGET_HOST" ]) && { echo "Need TOK and TARGET_HOST variables"; return; }
+  local token=${TOK:?Need this env variable to contain ChefAutomate admin token}
+  local host=${TARGET_HOST:?Need this env variable to point to your ChefAutomate host}
   [ -z "$4" ] && { echo "usage: authGen [ <options> ] <resource> <mode> <count> <seed>"; return; }
   if ! type jo &> /dev/null
   then
@@ -194,45 +195,59 @@ authGen() {
 
   if [[ $MODE == create ]]; then
     echo "Creating $COUNT $RESOURCE..."
-    for (( i = 0; i < $COUNT; i++ )) 
+    for (( i = 0; i < COUNT; i++ )) 
     do
-      local id_index=$(($i+$SEED))
-      local id=$ID_PREFIX-$id_index
-      local name="$ID_PREFIX $id_index"
-      local json=""
-      case "$RESOURCE" in
-        tokens) 
-          json=$(jo -p id=$id name="$name" description="test token for $name" active=true) ;;
-        users) 
-          json=$(jo -p id=$id name="$name" username=$id password=chefautomate active=true) ;;
-        teams) 
-          json=$(jo name="$name" description="test team for $name") ;;
-        policies) 
-          json=$(jo subjects=$(jo -a token:test-tokens-$id_index) action=read resource="compliance:*") ;;
-      esac
-      curl -sSkH "api-token: $TOK" $TARGET_HOST/$auth_path/$RESOURCE -X POST --data "$json"
-      echo
-    done
+      create_resource "$token" "$host" $i
+   done
  
   elif [[ $MODE == delete ]]; then
     echo "Removing $COUNT $RESOURCE..."
-    for (( i = 0; i < $COUNT; i++ )) 
+    for (( i = 0; i < COUNT; i++ )) 
     do
-      local id_index=$(($i+$SEED))
-      local name="$ID_PREFIX $id_index"
-      local id=$ID_PREFIX-$id_index
-      case "$RESOURCE" in
-        tokens)  ;;
-        users)  ;;
-        teams) 
-          local teams=$(curl -sSkH "api-token: $TOK" "$TARGET_HOST/$auth_path/$RESOURCE")
-          id=$(echo $teams | jq -r --arg name "$name" '.teams[] | select (.name==$name).id') ;;
-        policies) 
-          local policies=$(curl -sSkH "api-token: $TOK" "$TARGET_HOST/$auth_path/$RESOURCE")
-          id=$(echo $policies | jq -r --arg name "token:test-tokens-$id_index" '.policies[] | select (.subjects==[$name]).id') ;;
-      esac
-      curl -sSkH "api-token: $TOK" $TARGET_HOST/$auth_path/$RESOURCE/$id -X DELETE
-      echo
+      delete_resource "$token" "$host" $i
     done
   fi
+}
+
+function create_resource {
+  local token=$1
+  local host=$2
+  local id_index=$(($3 + SEED))
+  local id=$ID_PREFIX-$id_index
+  local name="$ID_PREFIX $id_index"
+  local json=""
+  case "$RESOURCE" in
+    tokens) 
+      json=$(jo -p id="$id" name="$name" description="test token for $name" active=true) ;;
+    users) 
+      json=$(jo -p id="$id" name="$name" username="$id" password=chefautomate active=true) ;;
+    teams) 
+      json=$(jo name="$name" description="test team for $name") ;;
+    policies) 
+      json=$(jo subjects="$(jo -a token:test-tokens-$id_index)" action=read resource="compliance:*") ;;
+  esac
+  curl -sSkH "api-token: $token" "$host/$auth_path/$RESOURCE" -X POST --data "$json"
+  echo
+}
+ 
+function delete_resource {
+  local token=$1
+  local host=$2
+  local id_index=$(($3 + SEED))
+  local name="$ID_PREFIX $id_index"
+  local id=$ID_PREFIX-$id_index
+  case "$RESOURCE" in
+    tokens)  ;;
+    users)  ;;
+    teams) 
+      local teams
+      teams=$(curl -sSkH "api-token: $token" "$host/$auth_path/$RESOURCE")
+      id=$(echo "$teams" | jq -r --arg name "$name" '.teams[] | select (.name==$name).id') ;;
+    policies) 
+      local policies
+      policies=$(curl -sSkH "api-token: $token" "$host/$auth_path/$RESOURCE")
+      id=$(echo "$policies" | jq -r --arg name "token:test-tokens-$id_index" '.policies[] | select (.subjects==[$name]).id') ;;
+  esac
+  curl -sSkH "api-token: $token" "$host/$auth_path/$RESOURCE/$id" -X DELETE
+  echo
 }
