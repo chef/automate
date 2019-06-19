@@ -60,7 +60,6 @@ message Reports {
 }
 message ReportIds {
 	repeated string ids = 1;
-	int32 total = 2;
 }
 message Report {
 	string id = 1;

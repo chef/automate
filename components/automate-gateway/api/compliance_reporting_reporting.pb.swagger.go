@@ -790,10 +790,6 @@ func init() {
           "items": {
             "type": "string"
           }
-        },
-        "total": {
-          "type": "integer",
-          "format": "int32"
         }
       }
     },

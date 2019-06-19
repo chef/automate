@@ -101,7 +101,6 @@ func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*rep
 	}
 
 	ids.Ids = reportIDs
-	ids.Total = int32(len(reportIDs))
 
 	return &ids, nil
 }
