@@ -17,7 +17,7 @@ func MigrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*mi
 
 	// If in ciMode, use the default
 	if ciMode {
-		pgURL, err := url.Parse("postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable")
+		pgURL, err := url.Parse("postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable&timezone=UTC")
 		return &migration.Config{
 			Path:   migrationPath,
 			Logger: l,
