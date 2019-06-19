@@ -34,6 +34,24 @@ control 'notifications-alert' do
       end
     end
 
+    #converge-failure-with-ignored-failure-report_run_converge
+    let(:failed_ccr_message_with_ignored_failure) do
+      return @failed_ccr_json ||= begin
+        content = inspec.profile.file("fixtures/converge/converge-failure-report_with_ignored_failure_run_converge.json")
+        json = JSON.parse(content, :symbolize_names => true)
+        json[:id] = SecureRandom.uuid
+        request = JSON.generate(json)
+      end
+    end
+
+    let(:send_failed_ccr_with_ignored_failure) do
+      automate_api_request(
+        '/data-collector/v0',
+        http_method: 'POST',
+        request_body: failed_ccr_message_with_ignored_failure
+      )
+    end
+
     let(:send_failed_ccr) do
       automate_api_request(
         '/data-collector/v0',
@@ -178,6 +196,36 @@ control 'notifications-alert' do
         request = inspec.http("#{requestbin_url}/#{requestbin_name}")
         after_request_count = JSON.parse(request.body, symbolize_names: true)[:request_count]
         expect(after_request_count).to eq(before_request_count + 1)
+      end
+
+      it "the webhook receives an alert with the correct non ignored failed resource" do
+        # Get the current request count on the requestbin service
+        request = inspec.http("#{requestbin_url}/#{requestbin_name}")
+        before_request_count = JSON.parse(request.body, symbolize_names: true)[:request_count]
+
+        # Create the CCR Rule
+        expect(create_ccr_rule.http_status).to eq(200)
+        sleep (5)
+
+        # Send Failed CCR
+        expect(send_failed_ccr_with_ignored_failure.http_status).to eq(200)
+        sleep (5)
+
+        # Check if the requestbin received the alert
+        request = inspec.http("#{requestbin_url}/#{requestbin_name}")
+        after_request_count = JSON.parse(request.body, symbolize_names: true)[:request_count]
+        expect(after_request_count).to eq(before_request_count + 1)
+
+        # get the last sent notification
+        notification = JSON.parse(request.body, symbolize_names: true)[:requests][before_request_count]
+
+        # Test that the correct cookbook was sent in the slack notification
+        # The first failed resource was with the cookbook 'insights-ignored' but it 
+        # was marked 'ignored_failed' = true. The second failed resource cookbook was 'insights-real'
+        notificationFieldValues = JSON.parse(notification[:body], 
+          symbolize_names: true)[:attachments][0][:fields].map { |field| field[:value] }
+
+        expect(notificationFieldValues).to include("insights-real::default")
       end
 
       it "the webhook does not receives an alert when a successful CCR is processed" do
