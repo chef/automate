@@ -144,6 +144,11 @@ func TestReportingServerExport(t *testing.T) {
 			require.NotNil(t, response)
 
 			data := make([]byte, 0)
+
+			//the gateway wraps the response in [] because it's a json array
+			//since we are not using the gateway in this test, we need to do that wrapping
+			//here's the '[' (open wrapper)
+			data = append([]byte("["), data...)
 			for {
 				tdata, err := response.Recv()
 				if err != nil && err == io.EOF {
@@ -154,16 +159,20 @@ func TestReportingServerExport(t *testing.T) {
 				require.NoError(t, err)
 				data = append(data, tdata.GetContent()...)
 			}
+			//and here's the ']' (close wrapper)
+			data = append(data, []byte("]")...)
 
 			actualIds := make([]string, 0)
-
 			dec := json.NewDecoder(bytes.NewReader(data))
 			for dec.More() {
-				var report reporting.Report
-				err := dec.Decode(&report)
-
+				var reports []reporting.Report
+				err := dec.Decode(&reports)
 				require.NoError(t, err)
-				actualIds = append(actualIds, report.Id)
+
+				for _, report := range reports {
+					actualIds = append(actualIds, report.Id)
+				}
+
 			}
 
 			assert.ElementsMatch(t, test.expectedIds, actualIds)
