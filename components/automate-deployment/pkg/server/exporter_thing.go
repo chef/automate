@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -42,11 +41,9 @@ type servicesForExport struct {
 
 // BootstrapBundleCreate makes a bootstrap bundle
 func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Deployment_BootstrapBundleServer) error {
-	collection := req.CollectionName
-	logrus.Infof("COLLECTION NAME is %s\n", collection)
+	collection := "chef-server"
 
-	// TODO: Check the collection is actually deployed.
-
+	// TODO: make this go away
 	// Create (and clean up) a staging area to copy files to
 	stagingDir := stagingDir(s.serverConfig)
 	logrus.Infof("STAGING DIR is %s\n", stagingDir)
@@ -57,10 +54,6 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	logrus.Infof("ARCHIVE ROOT is %s\n", archiveRoot)
 	defer os.RemoveAll(archiveRoot)
 
-	// Jay will be providing a file where I can put package metadata; exportables should probably go in there.
-	// For now, we have a variable that lists exportables.
-	// (Yes, but not sure how yet.): Do you want to keep track of filepath and permissions?
-
 	var svcsForExport servicesForExport
 	err = json.Unmarshal([]byte(servicesJSON), &svcsForExport)
 	svcsInCollection, err := services.ServicesInCollection(collection)
@@ -68,6 +61,7 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	if err != nil {
 		return err
 	}
+
 	for _, svc := range svcsInCollection {
 		svcName := svc.Name()
 		logrus.Infof("SVCNAME is %s\n", svcName)
@@ -82,6 +76,7 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 					}
 					defer from.Close()
 
+					// TODO: we want to preserve file ownership and permissions
 					target := filepath.Join(archiveRoot, b.Filename)
 					to, err := os.OpenFile(target, os.O_RDWR|os.O_CREATE, 0666)
 					if err != nil {
@@ -93,7 +88,6 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 					if err != nil {
 						panic(err)
 					}
-					logrus.Infof("COPIED FILE: %s\n", target)
 				}
 			} else {
 				continue
@@ -102,7 +96,7 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	}
 
 	tgzFilepath := filepath.Join(stagingDir, "bootstrap-bundle.tgz")
-	fmt.Printf("TARBALL FILEPATH: %s\n", tgzFilepath)
+	logrus.Infof("TARBALL FILEPATH: %s\n", tgzFilepath)
 	tarAndGzipDirectory(archiveRoot, tgzFilepath)
 
 	// tgzInfo, err := os.Stat(tgzFilepath)
@@ -122,9 +116,6 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	//	return err
 	//}
 	// cksum := hex.EncodeToString(hasher.Sum(nil))
-
-	// This is a mistake
-	// bundlePath := path.Join(stagingDir, tgzFilepath)
 
 	defer func() {
 		err := os.Remove(tgzFilepath)
@@ -148,7 +139,7 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 }
 
 func tarAndGzipDirectory(inDir string, tgzFilepath string) error {
-	fmt.Println("MAKING THE TARBALL")
+	logrus.Info("MAKING THE TARBALL")
 	f, _ := os.Create(tgzFilepath)
 
 	zw := gzip.NewWriter(f)
@@ -168,6 +159,7 @@ func tarAndGzipDirectory(inDir string, tgzFilepath string) error {
 		}
 
 		header.Name = filepath.Join(inDir, strings.TrimPrefix(path, inDir))
+		// Add owner, group, and permissions here
 
 		if err := tw.WriteHeader(header); err != nil {
 			return err

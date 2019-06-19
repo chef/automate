@@ -28,7 +28,7 @@ func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	stream, err := connection.BootstrapBundle(context.Background(), &api.BootstrapBundleRequest{CollectionName: "chef-server"})
+	stream, err := connection.BootstrapBundle(context.Background(), &api.BootstrapBundleRequest{})
 	// if err != nil {
 	//	fmt.Println("bundle creation failed")
 	//	return err

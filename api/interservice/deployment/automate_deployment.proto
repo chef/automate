@@ -57,7 +57,6 @@ service Deployment {
 }
 
 message BootstrapBundleRequest {
-        string collection_name = 1;
 }
 
 message BootstrapBundleResponse {
