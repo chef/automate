@@ -1155,13 +1155,8 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, e
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
 	var rule v2.Rule
-	row := tx.QueryRowContext(ctx, `SELECT query_staged_rule($1, $2);`,
+	row := p.db.QueryRowContext(ctx, `SELECT query_staged_rule($1, $2);`,
 		id, pq.Array(projectsFilter),
 	)
 	err = row.Scan(&rule)
@@ -1170,11 +1165,6 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, e
 			return nil, storage_errors.ErrNotFound
 		}
 		return nil, p.processError(err)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
 	return &rule, nil
@@ -1188,11 +1178,6 @@ func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, p.processError(err)
-	}
 
 	var rules []*v2.Rule
 	rows, err := p.db.QueryContext(ctx, `SELECT query_rules from query_rules($1);`, pq.Array(projectsFilter))
@@ -1215,11 +1200,6 @@ func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
 		rules = append(rules, &rule)
 	}
 
-	err = tx.Commit()
-	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
-	}
-
 	return rules, nil
 }
 
@@ -1230,11 +1210,6 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
-	}
-
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, p.processError(err)
 	}
 
 	var rules []*v2.Rule
@@ -1257,11 +1232,6 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 			return nil, p.processError(err)
 		}
 		rules = append(rules, &rule)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
 	return rules, nil
