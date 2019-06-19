@@ -1171,6 +1171,14 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, e
 }
 
 func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
+	return p.listRulesUsingFunction(ctx, "SELECT query_rules($1)")
+}
+
+func (p *pg) ListStagedAndAppliedRules(ctx context.Context) ([]*v2.Rule, error) {
+	return p.listRulesUsingFunction(ctx, "SELECT query_staged_and_applied_rules($1)")
+}
+
+func (p *pg) listRulesUsingFunction(ctx context.Context, query string) ([]*v2.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -1180,7 +1188,7 @@ func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
 	defer cancel()
 
 	var rules []*v2.Rule
-	rows, err := p.db.QueryContext(ctx, `SELECT query_rules from query_rules($1);`, pq.Array(projectsFilter))
+	rows, err := p.db.QueryContext(ctx, query, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -1213,7 +1221,7 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	}
 
 	var rules []*v2.Rule
-	rows, err := p.db.QueryContext(ctx, `SELECT query_rules_for_project from query_rules_for_project($1, $2);`,
+	rows, err := p.db.QueryContext(ctx, `SELECT query_rules_for_project($1, $2);`,
 		projectID, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)

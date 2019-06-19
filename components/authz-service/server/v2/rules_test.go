@@ -143,6 +143,7 @@ func TestCreateRule(t *testing.T) {
 							Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 						},
 					},
+					Status: "applied",
 				},
 			}, resp)
 		}},
@@ -470,6 +471,7 @@ func TestGetRule(t *testing.T) {
 				Type:       api.ProjectRuleTypes_NODE,
 				ProjectId:  projectID,
 				Conditions: apiConditions,
+				Status:     "applied",
 			}
 
 			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: id})
@@ -544,6 +546,7 @@ func TestListRules(t *testing.T) {
 				Type:       api.ProjectRuleTypes_NODE,
 				ProjectId:  projectID,
 				Conditions: apiConditions1,
+				Status:     "applied",
 			}
 			expected2 := api.ProjectRule{
 				Id:         id2,
@@ -551,6 +554,7 @@ func TestListRules(t *testing.T) {
 				Type:       api.ProjectRuleTypes_EVENT,
 				ProjectId:  projectID,
 				Conditions: apiConditions2,
+				Status:     "applied",
 			}
 			expected := []*api.ProjectRule{&expected1, &expected2}
 
@@ -584,9 +588,9 @@ func TestListRulesForProject(t *testing.T) {
 	}
 	apiConditions2 := []*api.Condition{
 		{
-			Attribute:     api.ProjectRuleConditionAttributes_CHEF_ORGS,
-			Values:   []string{"chef"},
-			Operator: api.ProjectRuleConditionOperators_EQUALS,
+			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    []string{"chef"},
+			Operator:  api.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	storageConditions2 := []storage.Condition{
@@ -599,9 +603,9 @@ func TestListRulesForProject(t *testing.T) {
 	}
 	apiConditions3 := []*api.Condition{
 		{
-			Attribute:     api.ProjectRuleConditionAttributes_CHEF_ORGS,
-			Values:   []string{"other", "org"},
-			Operator: api.ProjectRuleConditionOperators_MEMBER_OF,
+			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Values:    []string{"other", "org"},
+			Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 		},
 	}
 	storageConditions3 := []storage.Condition{
@@ -643,6 +647,7 @@ func TestListRulesForProject(t *testing.T) {
 				Type:       api.ProjectRuleTypes_EVENT,
 				ProjectId:  projectID2,
 				Conditions: apiConditions2,
+				Status:     "applied",
 			}
 			expected3 := api.ProjectRule{
 				Id:         id3,
@@ -650,6 +655,7 @@ func TestListRulesForProject(t *testing.T) {
 				Type:       api.ProjectRuleTypes_EVENT,
 				ProjectId:  projectID2,
 				Conditions: apiConditions3,
+				Status:     "applied",
 			}
 			expected := []*api.ProjectRule{&expected2, &expected3}
 
@@ -746,6 +752,7 @@ func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType 
 		Type:       ruleType,
 		ProjectID:  projectID,
 		Conditions: conditions,
+		Status:     "applied",
 	}
 	store.Add(id, rule, 0)
 }

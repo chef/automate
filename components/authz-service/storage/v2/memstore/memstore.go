@@ -243,6 +243,7 @@ func (s *State) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNot
 }
 
 func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule, error) {
+	rule.Status = "applied"
 	if err := s.rules.Add(rule.ID, rule, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}
@@ -285,12 +286,25 @@ func (s *State) GetStagedOrAppliedRule(_ context.Context, id string) (*storage.R
 	return rule, nil
 }
 
-func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
+func (s *State) ListStagedAndAppliedRules(_ context.Context) ([]*storage.Rule, error) {
 	items := s.rules.Items()
 	rules := []*storage.Rule{}
 
 	for _, item := range items {
 		if rule, ok := item.Object.(*storage.Rule); ok {
+			rules = append(rules, rule)
+		}
+	}
+
+	return rules, nil
+}
+
+func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
+	items := s.rules.Items()
+	rules := []*storage.Rule{}
+
+	for _, item := range items {
+		if rule, ok := item.Object.(*storage.Rule); ok && rule.Status == "applied" {
 			rules = append(rules, rule)
 		}
 	}

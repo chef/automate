@@ -73,6 +73,7 @@ type ruleStorage interface {
 	GetStagedOrAppliedRule(context.Context, string) (*Rule, error)
 	UpdateRule(context.Context, *Rule) (*Rule, error)
 	ListRules(context.Context) ([]*Rule, error)
+	ListStagedAndAppliedRules(context.Context) ([]*Rule, error)
 	DeleteRule(context.Context, string) error
 	ListRulesForProject(context.Context, string) ([]*Rule, error)
 }
