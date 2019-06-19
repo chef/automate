@@ -42,6 +42,7 @@ func TestJSONExportWithEndTime(t *testing.T) {
 	query := rs.Query{
 		Type: "json",
 		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
 			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
 		},
 	}
@@ -91,6 +92,7 @@ func TestJSONExportWithProfileFilter(t *testing.T) {
 	profileFilterQuery := rs.Query{
 		Type: "json",
 		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
 			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
 			{Type: "profile_id", Values: []string{"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"}},
 		},
@@ -141,6 +143,7 @@ func TestJSONExportWithTwoProfileFiltersReturnsError(t *testing.T) {
 	profileFilterQuery := rs.Query{
 		Type: "json",
 		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
 			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
 			{Type: "profile_id", Values: []string{"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"}},
 			{Type: "profile_id", Values: []string{"41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9"}},
@@ -158,6 +161,7 @@ func TestJSONExportWithTwoProfileFiltersReturnsError(t *testing.T) {
 	profileFilterQuery = rs.Query{
 		Type: "json",
 		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
 			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
 			{Type: "profile_name", Values: []string{"apache-baseline"}},
 			{Type: "profile_name", Values: []string{"fake-baseline"}},
@@ -175,6 +179,7 @@ func TestJSONExportWithTwoProfileFiltersReturnsError(t *testing.T) {
 	profileFilterQuery = rs.Query{
 		Type: "json",
 		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
 			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
 			{Type: "profile_id", Values: []string{"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"}},
 			{Type: "profile_name", Values: []string{"fake-baseline"}},
@@ -203,6 +208,7 @@ func TestCSVExportWithEndTime(t *testing.T) {
 	profileFilterQuery := rs.Query{
 		Type: "csv",
 		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
 			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
 		},
 	}
@@ -246,6 +252,7 @@ func TestCSVExportWithEndTimeAndMissingFields(t *testing.T) {
 	profileFilterQuery := rs.Query{
 		Type: "csv",
 		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
 			{Type: "end_time", Values: []string{"2018-03-04T23:18:41Z"}},
 			{Type: "node_id", Values: []string{"a0ddd774-cbbb-49be-8730-49c92f3fc2a0"}},
 		},
@@ -290,6 +297,7 @@ func TestJSONExportWithControlFilter(t *testing.T) {
 	profileFilterQuery := rs.Query{
 		Type: "json",
 		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
 			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
 			{Type: "control", Values: []string{"nginx-02"}},
 			{Type: "profile_id", Values: []string{"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"}},
@@ -344,6 +352,7 @@ func TestJSONExportWithTwoControlFiltersReturnsError(t *testing.T) {
 	profileFilterQuery := rs.Query{
 		Type: "json",
 		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
 			{Type: "end_time", Values: []string{"2018-03-04T09:18:41Z"}},
 			{Type: "control", Values: []string{"nginx-01"}},
 			{Type: "control", Values: []string{"nginx-02"}},
