@@ -20,4 +20,4 @@ const UnassignedProjectID = "(unassigned)"
 const AllProjectsExternalID = "*"
 
 // TestPgURL is the URL to connect to the authn test DB
-const TestPgURL = "postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable"
+const TestPgURL = "postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable&timezone=UTC"
