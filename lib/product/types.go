@@ -2,6 +2,7 @@ package product
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -93,6 +94,35 @@ func (c *Collection) validate(allowedPackageSet map[PackageName]bool) error {
 	return nil
 }
 
+type BootstrapType string
+
+var (
+	BootstrapTypeFile BootstrapType = "file"
+)
+
+type BootstrapSpec struct {
+	Type     BootstrapType `json:"type"`
+	Path     string        `json:"path"`
+	Optional bool          `json:"optional"`
+}
+
+func (b *BootstrapSpec) validate() error {
+	switch b.Type {
+	case BootstrapTypeFile:
+		if b.Path == "" {
+			return errors.Errorf("Must provide a path file type %s", BootstrapTypeFile)
+		}
+		if filepath.IsAbs(b.Path) {
+			return errors.Errorf("path must be a relative path inside the services /hab/svc/svc-name directory")
+		}
+		// TODO: validate that the path stays in the service directory
+	default:
+		return errors.Errorf("%q is not a valid bootstrap type", b.Type)
+	}
+
+	return nil
+}
+
 type PackageMetadata struct {
 	Name PackageName `json:"name"`
 	// DataService is set to true if this service is a a data service.
@@ -100,6 +130,8 @@ type PackageMetadata struct {
 	DataService bool `json:"data_service"`
 
 	Binlinks []string `json:"binlinks"`
+
+	Bootstrap []BootstrapSpec `json:"bootstrap"`
 }
 
 func (p *PackageMetadata) validate() error {

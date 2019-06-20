@@ -190,7 +190,7 @@ func dataBindsTxt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/binds.txt", size: 4215, mode: os.FileMode(420), modTime: time.Unix(1560529638, 0)}
+	info := bindataFileInfo{name: "data/binds.txt", size: 4215, mode: os.FileMode(420), modTime: time.Unix(1560949001, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
