@@ -173,27 +173,20 @@ export class StatsService {
 
   downloadReport(format: string, filters: any[]): Observable<string> {
     const url = `${CC_API_URL}/reporting/export`;
-
-    filters = this.formatFilters(filters);
-
     // for export, we want to send the start_time as the beg of day of end time
     // so we find the endtime in the filters, and then set start time to beg of that day
-    const filtersCopy = [];
-    const endtime = filters.find(function (filt) {
-      return filt['type'] === 'end_time';
-    });
-    filters.forEach(function (filt) {
-      if (filt['type'] === 'start_time') {
-        const val = moment(endtime['values'][0]).startOf('day');
-        filt['values'] = [val.format('YYYY-MM-DDTHH:mm:ssZ')];
+    const endtime = filters.find(filter => filter['end_time']);
+    const filtersCopy = filters.map(filter => {
+      if (filter['start_time']) {
+        filter['start_time'] = moment(endtime).startOf('day');
       }
-      filtersCopy.push(filt);
+      return filter;
     });
 
-    const body = { type: format,
-                   filters: filtersCopy};
+    const body = { type: format, filters: this.formatFilters(filtersCopy)};
     return this.httpClient.post(url, body, {responseType: 'text'});
   }
+
 
   getSingleReport(reportID: string, filters: any[]): Observable<any> {
     const url = `${CC_API_URL}/reporting/reports/id/${reportID}`;
