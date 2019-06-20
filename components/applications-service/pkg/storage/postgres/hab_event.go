@@ -24,6 +24,7 @@ type packageIdent struct {
 	Name    string
 	Version string
 	Release string
+	Full    string
 }
 
 func newPackageIdentFromString(ident string) (*packageIdent, error) {
@@ -36,7 +37,7 @@ func newPackageIdentFromString(ident string) (*packageIdent, error) {
 		)
 	}
 
-	return &packageIdent{fields[0], fields[1], fields[2], fields[3]}, nil
+	return &packageIdent{fields[0], fields[1], fields[2], fields[3], ident}, nil
 }
 
 var (
@@ -225,6 +226,7 @@ func newService(pkgIdent *packageIdent, health string, did, sid, gid int32) *ser
 		GroupID:      gid,
 		DeploymentID: did,
 		SupID:        sid,
+		FullPkgIdent: pkgIdent.Full,
 	}
 }
 
