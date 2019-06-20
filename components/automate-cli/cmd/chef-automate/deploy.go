@@ -51,6 +51,7 @@ var deployCmdFlags = struct {
 	enableDeploymentOrderStressMode bool
 	enableWorkflow                  bool
 	products                        []string
+	bootstrapBundlePath             string
 }{}
 
 // deployCmd represents the new command
@@ -153,6 +154,11 @@ func newDeployCmd() *cobra.Command {
 		"product",
 		nil,
 		"Product to deploy")
+	cmd.PersistentFlags().StringVar(
+		&deployCmdFlags.bootstrapBundlePath,
+		"bootstrap-bundle",
+		"",
+		"Path to bootstrap bundle")
 
 	if !isDevMode() {
 		for _, flagName := range []string{
@@ -167,6 +173,7 @@ func newDeployCmd() *cobra.Command {
 			"enable-deploy-order-stress-mode",
 			"enable-workflow",
 			"product",
+			"bootstrap-bundle",
 		} {
 			err := cmd.PersistentFlags().MarkHidden(flagName)
 			if err != nil {
@@ -267,7 +274,7 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		conf.Deployment.GetV1().GetSvc().GetHartifactsPath().GetValue(),
 		conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
 
-	err = client.Deploy(writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode)
+	err = client.Deploy(writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath)
 	if err != nil && !status.IsStatusError(err) {
 		return status.Annotate(err, status.DeployError)
 	}

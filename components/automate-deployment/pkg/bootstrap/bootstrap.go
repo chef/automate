@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"os"
+
 	"github.com/pkg/errors"
 
 	dc "github.com/chef/automate/api/config/deployment"
@@ -29,6 +31,7 @@ func NewCompatBootstrapper(t target.Target) target.Bootstrapper {
 func FullBootstrap(b target.Bootstrapper,
 	m manifest.ReleaseManifest,
 	config *dc.ConfigRequest,
+	bootstrapBundlePath string,
 	writer cli.FormatWriter) error {
 
 	writer.Body("Installing Habitat")
@@ -57,6 +60,20 @@ func FullBootstrap(b target.Bootstrapper,
 	err = b.DeployDeploymentService(config, m, writer)
 	if err != nil {
 		return err
+	}
+
+	if bootstrapBundlePath != "" {
+		writer.Body("Unpacking bootstrap file")
+
+		f, err := os.Open(bootstrapBundlePath)
+		if err != nil {
+			return err
+		}
+		defer f.Close() // nolint: errcheck
+		bundleCreator := NewBundleCreator()
+		if err := bundleCreator.Unpack(f); err != nil {
+			return err
+		}
 	}
 
 	return nil

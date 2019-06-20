@@ -173,6 +173,7 @@ type deployer struct {
 	a1BackupNameMemoized string
 	uninstallOpts        UninstallOpts
 	airgap               bool
+	bootstrapBundlePath  string
 }
 
 type UninstallOpts struct {
@@ -253,9 +254,11 @@ func Deploy(writer cli.FormatWriter,
 	skipPreflight bool,
 	manifestProvider manifest.ReleaseManifestProvider,
 	cliVersion string,
-	airgap bool) error {
+	airgap bool,
+	bootstrapBundlePath string) error {
 
 	d := newDeployer(writer, overrideConfig, manifestProvider, cliVersion, airgap)
+	d.bootstrapBundlePath = bootstrapBundlePath
 	d.genMergedConfig()
 	if !skipPreflight {
 		d.preflight(false)
@@ -708,7 +711,7 @@ func (d *deployer) bootstrap() {
 	}
 
 	b := bootstrap.NewCompatBootstrapper(d.target)
-	d.err = bootstrap.FullBootstrap(b, m, d.mergedCfg.Deployment, d.writer)
+	d.err = bootstrap.FullBootstrap(b, m, d.mergedCfg.Deployment, d.bootstrapBundlePath, d.writer)
 }
 
 func (d *deployer) waitForDeploymentService() {
