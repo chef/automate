@@ -195,6 +195,10 @@ func (b *BundleCreator) Create(pkgNames []string, out io.Writer) error {
 		}
 	}
 
+	if len(allDirs)+len(files) <= 0 {
+		return errors.New("No files to bundle")
+	}
+
 	tarWriter := tar.NewWriter(out)
 	for _, hdr := range allDirs {
 		if err := tarWriter.WriteHeader(hdr); err != nil {
