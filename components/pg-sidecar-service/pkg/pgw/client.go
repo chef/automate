@@ -63,6 +63,9 @@ func NewClient(opts ...ClientOpt) (*Client, error) {
 	err = client.DB.Ping()
 	if err != nil {
 		log.WithError(err).Error("failed to ping to database")
+		if closeErr := client.DB.Close(); closeErr != nil {
+			log.WithError(closeErr).Error("failed to close database")
+		}
 		return nil, err
 	}
 
@@ -225,7 +228,6 @@ func (client *Client) Close() error {
 
 // CreateDB takes a database name and role and creates a database
 func (client *Client) CreateDB(db, role string) error {
-	var err error
 	log := client.log().WithFields(logrus.Fields{
 		"action": "create_db",
 		"db":     db,
@@ -234,8 +236,7 @@ func (client *Client) CreateDB(db, role string) error {
 
 	if !client.platformConfig.IsExternalPG() {
 		// We will not create roles and change passwords for external PG
-		err = client.DB.CreateRole(role)
-		if err != nil {
+		if err := client.DB.CreateRole(role); err != nil {
 			log.WithError(err).Error("failed to create role")
 			return err
 		}
@@ -244,8 +245,8 @@ func (client *Client) CreateDB(db, role string) error {
 		// that has a password. Remove that just in case to make sure we clean that
 		// up.
 		log.Infof("Removing password for %s", role)
-		err = client.DB.RemovePassword(role)
-		if err != nil {
+
+		if err := client.DB.RemovePassword(role); err != nil {
 			log.WithError(err).Error("failed to remove password from role")
 			return err
 		}
@@ -278,7 +279,6 @@ func (client *Client) CreateDB(db, role string) error {
 		WithDb(db),
 		WithPlatformConfig(client.platformConfig),
 	)
-	defer chownClient.Close() // nolint: errcheck
 
 	if err != nil {
 		log.WithFields(logrus.Fields{
@@ -288,6 +288,7 @@ func (client *Client) CreateDB(db, role string) error {
 
 		return err
 	}
+	defer chownClient.Close() // nolint: errcheck
 
 	if err := chownClient.SetPublicSchemaRole(role); err != nil {
 		log.WithFields(logrus.Fields{
