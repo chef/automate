@@ -1,0 +1,25 @@
+{
+  "name": "chef/automate-cs-oc-erchef",
+  "bootstrap": [
+    {
+      "type": "file",
+      "path": "data/pivotal.pem"
+    },
+    {
+      "type": "file",
+      "path": "data/pivotal.pub.pem"
+    },
+    {
+      "type": "file",
+      "path": "data/webui_priv.pem"
+    },
+    {
+      "type": "file",
+      "path": "data/webui_pub.pem"
+    },
+    {
+      "type": "file",
+      "path": "data/dark_launch_features.json"
+    }
+  ]
+}

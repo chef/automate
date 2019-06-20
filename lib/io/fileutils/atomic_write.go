@@ -15,6 +15,9 @@ const defaultCreateMode os.FileMode = 0644
 type atomicWriteOpts struct {
 	mode   os.FileMode
 	noSync bool
+	chown  bool
+	uid    int
+	gid    int
 }
 
 // AtomicWriteOpt allows setting options for writing a file
@@ -24,6 +27,14 @@ type AtomicWriteOpt func(*atomicWriteOpts)
 func WithAtomicWriteFileMode(mode os.FileMode) AtomicWriteOpt {
 	return func(opts *atomicWriteOpts) {
 		opts.mode = mode
+	}
+}
+
+func WithAtomicWriteChown(uid int, gid int) AtomicWriteOpt {
+	return func(opts *atomicWriteOpts) {
+		opts.uid = uid
+		opts.gid = gid
+		opts.chown = true
 	}
 }
 
@@ -73,6 +84,14 @@ func NewAtomicWriter(p string, opts ...AtomicWriteOpt) (WriteCloserFailer, error
 	f, err := os.OpenFile(tmpPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, writeOpts.mode)
 	if err != nil {
 		return nil, err
+	}
+
+	if writeOpts.chown {
+		err := os.Chown(tmpPath, writeOpts.uid, writeOpts.gid)
+		if err != nil {
+			f.Close() // nolint: err-check
+			return nil, err
+		}
 	}
 
 	return &atomicWriter{
