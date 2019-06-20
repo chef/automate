@@ -510,6 +510,10 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
+	if true {
+		http.Error(w, "DROPME just want to see if we have tests for this method", http.StatusInternalServerError)
+		return
+	}
 	// Node: from glancing at the code, I don't believe this is using query.Id, so
 	// we can't be more specific. Also, we can do this before looking at the
 	// request body.
