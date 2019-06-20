@@ -66,7 +66,7 @@ let UID = 0;
  *     color: var(--chef-unknown);
  *   }
  * </style>
- * <chef-radial-chart style="width: 220px; height: 220px;">
+ * <chef-radial-chart gap-size=".05" style="width: 220px; height: 220px;">
  *   <span slot="innerText">Text for the center of the chart</span>
  *
  *   <chef-data-point value="4" class="failed">4 Failed</chef-data-point>
@@ -87,6 +87,11 @@ export class ChefRadialChart {
   @Prop() id: string;
 
   /**
+   * The width of the gap to apply between chart segments.
+   */
+  @Prop({ reflectToAttr: true }) gapSize = .03;
+
+  /**
    * Optionally hide tooltips. They are shown by default.
    */
   @Prop() tooltips = true;
@@ -105,7 +110,9 @@ export class ChefRadialChart {
 
   @Method() updateDataPoints() {
     const dataPoints = Array.from(this.el.querySelectorAll('chef-data-point'));
-    this.dataPoints = groupBy((d) => d.secondary ? 'secondary' : 'primary', dataPoints);
+    const dataPointsWithValues = [];
+    dataPoints.forEach((d) => (Number(d.value) > 0) ? dataPointsWithValues.push(d) : null);
+    this.dataPoints = groupBy((d) => d.secondary ? 'secondary' : 'primary', dataPointsWithValues);
   }
 
   componentWillLoad() {
@@ -113,7 +120,7 @@ export class ChefRadialChart {
   }
 
   render() {
-    const pieChart = pie().sort(null).value((d) => d.value);
+    const pieChart = pie().sort(null).value((d) => d.value).padAngle(this.gapSize);
     const { primary, secondary } = this.dataPoints;
     const hasSecondaryPoints = this.dataPoints.secondary !== undefined;
     const primarySegments = zip(pieChart(primary), primary);
