@@ -81,7 +81,7 @@ func (b *BundleCreator) Unpack(in io.Reader) error {
 	if err != nil {
 		return err
 	}
-	hUid, err := strconv.Atoi(habUser.Uid)
+	hUID, err := strconv.Atoi(habUser.Uid)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (b *BundleCreator) Unpack(in io.Reader) error {
 	if err != nil {
 		return err
 	}
-	hGid, err := strconv.Atoi(habGroup.Gid)
+	hGID, err := strconv.Atoi(habGroup.Gid)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (b *BundleCreator) Unpack(in io.Reader) error {
 	if err != nil {
 		return err
 	}
-	rUid, err := strconv.Atoi(rootUser.Uid)
+	rUID, err := strconv.Atoi(rootUser.Uid)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (b *BundleCreator) Unpack(in io.Reader) error {
 	if err != nil {
 		return err
 	}
-	rGid, err := strconv.Atoi(rootGroup.Gid)
+	rGID, err := strconv.Atoi(rootGroup.Gid)
 	if err != nil {
 		return err
 	}
@@ -129,18 +129,18 @@ func (b *BundleCreator) Unpack(in io.Reader) error {
 		}
 		switch hdr.Uid {
 		case habUserID:
-			hdr.Uid = hUid
+			hdr.Uid = hUID
 		case rootUserID:
-			hdr.Uid = rUid
+			hdr.Uid = rUID
 		default:
 			return errors.New("Unknown user id")
 		}
 
 		switch hdr.Gid {
 		case habGroupID:
-			hdr.Gid = hGid
+			hdr.Gid = hGID
 		case rootUserID:
-			hdr.Gid = rGid
+			hdr.Gid = rGID
 		default:
 			return errors.New("Unknown user id")
 		}
