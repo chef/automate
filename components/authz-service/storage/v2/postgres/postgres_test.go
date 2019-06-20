@@ -4100,10 +4100,11 @@ func TestDeleteRule(t *testing.T) {
 			err = store.DeleteRule(ctx, ruleToDelete.ID)
 			assert.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
-		"when multiple staged rules exists with a matching project filter, delete rule and associated conditions": func(t *testing.T) {
+		"when multiple staged rules exists with a matching project filter and no applied rules, delete rule and associated conditions": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"

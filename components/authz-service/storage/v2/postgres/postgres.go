@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
+// These must match what SQL function query_rule_table_associations returns.
 const (
 	pgApplied = "applied"
 	pgStaged  = "staged"
@@ -1084,55 +1085,52 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		return p.processError(err)
 	}
 
-	_, ruleStaged := assocMap[pgStaged]
-	_, ruleApplied := assocMap[pgApplied]
+	ruleStaged := assocMap[pgStaged]
+	ruleApplied := assocMap[pgApplied]
 
 	if !ruleStaged && !ruleApplied {
 		return storage_errors.ErrNotFound
 	}
 
-	if ruleApplied {
-		if ruleStaged {
-			res, err := tx.ExecContext(ctx,
-				`UPDATE iam_staged_project_rules
-					SET deleted=true
-					WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
-				id, pq.Array(projectsFilter),
-			)
-			if err != nil {
-				return p.processError(err)
-			}
-			err = p.singleRowResultOrNotFoundErr(res)
-			if err != nil {
-				return err
-			}
-		} else {
-			// check if filtered by project filter
-			res, err := tx.ExecContext(ctx,
-				`SELECT db_id FROM iam_project_rules
-					WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
-				id, pq.Array(projectsFilter),
-			)
-			if err != nil {
-				return p.processError(err)
-			}
-			err = p.singleRowResultOrNotFoundErr(res)
-			if err != nil {
-				return err
-			}
-
-			_, err = tx.ExecContext(ctx,
-				`INSERT INTO iam_staged_project_rules
-					SELECT s.db_id, s.id, s.project_id, s.name, s.type, 'true'
-					FROM iam_project_rules AS s
-					WHERE s.id=$1 AND projects_match_for_rule(s.project_id, $2);`,
-				id, pq.Array(projectsFilter),
-			)
-			if err != nil {
-				return p.processError(err)
-			}
+	if ruleApplied && ruleStaged {
+		res, err := tx.ExecContext(ctx,
+			`UPDATE iam_staged_project_rules
+				SET deleted=true
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+			id, pq.Array(projectsFilter),
+		)
+		if err != nil {
+			return p.processError(err)
 		}
-	} else if ruleStaged { // if only staged and not applied
+		err = p.singleRowResultOrNotFoundErr(res)
+		if err != nil {
+			return err
+		}
+	} else if ruleApplied {
+		res, err := tx.ExecContext(ctx,
+			`SELECT db_id FROM iam_project_rules
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+			id, pq.Array(projectsFilter),
+		)
+		if err != nil {
+			return p.processError(err)
+		}
+		err = p.singleRowResultOrNotFoundErr(res)
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.ExecContext(ctx,
+			`INSERT INTO iam_staged_project_rules
+				SELECT a.db_id, a.id, a.project_id, a.name, a.type, 'true'
+				FROM iam_project_rules AS a
+				WHERE a.id=$1 AND projects_match_for_rule(a.project_id, $2);`,
+			id, pq.Array(projectsFilter),
+		)
+		if err != nil {
+			return p.processError(err)
+		}
+	} else if ruleStaged {
 		res, err := tx.ExecContext(ctx,
 			`DELETE FROM iam_staged_project_rules
 				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
@@ -1454,8 +1452,11 @@ func (p *pg) singleRowResultOrNotFoundErr(result sql.Result) error {
 	if err != nil {
 		return p.processError(err)
 	}
-	if count != 1 {
+	if count == 0 {
 		return storage_errors.ErrNotFound
+	}
+	if count > 1 {
+		return storage_errors.ErrDatabase
 	}
 	return nil
 }
