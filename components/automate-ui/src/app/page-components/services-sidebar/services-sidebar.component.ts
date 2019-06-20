@@ -8,7 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import {
   servicesStatus,
   serviceGroupState,
-  serviceGroupErrorResp
+  servicesErrorResp
 } from '../../entities/service-groups/service-groups.selector';
 import { createSelector } from '@ngrx/store';
 import { EntityStatus } from '../../entities/entities';
@@ -54,7 +54,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.services$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.servicesList));
     this.servicesStatus$ = this.store.select(servicesStatus);
-    this.servicesError$ = this.store.select(serviceGroupErrorResp);
+    this.servicesError$ = this.store.select(servicesErrorResp);
     this.serviceGroupName$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.selectedServiceGroupName));
 

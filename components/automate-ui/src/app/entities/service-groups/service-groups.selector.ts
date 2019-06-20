@@ -28,3 +28,8 @@ export const serviceGroupErrorResp = createSelector(
   serviceGroupState,
   (state) => state.errorResp
 );
+
+export const servicesErrorResp = createSelector(
+  serviceGroupState,
+  (state) => state.servicesErrorResp
+);

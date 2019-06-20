@@ -19,6 +19,7 @@ export interface ServiceGroupEntityState {
   servicesFilters: ServicesFilters;
   servicesList: Service[];
   servicesHealthSummary: HealthSummary;
+  servicesErrorResp: HttpErrorResponse;
   selectedServiceGroupName: string;
 }
 
@@ -47,6 +48,7 @@ export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
     critical: 0,
     unknown: 0
   },
+  servicesErrorResp: null,
   selectedServiceGroupName: undefined
 };
 
@@ -103,7 +105,7 @@ export function serviceGroupEntityReducer(
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_FAILURE:
       return pipe(
         set('servicesStatus', EntityStatus.loadingFailure),
-        set('errorResp', action.payload))(state);
+        set('servicesErrorResp', action.payload))(state);
 
     default:
       return state;
