@@ -1,19 +1,14 @@
 package server
 
 import (
-	"archive/tar"
-	"compress/gzip"
-	"encoding/json"
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	api "github.com/chef/automate/api/interservice/deployment"
-	"github.com/chef/automate/components/automate-deployment/pkg/services"
+	"github.com/chef/automate/components/automate-deployment/pkg/bootstrap"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 )
 
 type bootstrapFile struct {
@@ -41,94 +36,27 @@ type servicesForExport struct {
 
 // BootstrapBundleCreate makes a bootstrap bundle
 func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Deployment_BootstrapBundleServer) error {
-	collection := "chef-server"
-
-	// TODO: make this go away
-	// Create (and clean up) a staging area to copy files to
+	// staging directory is where the tarball lands
 	stagingDir := stagingDir(s.serverConfig)
-	logrus.Infof("STAGING DIR is %s\n", stagingDir)
-	archiveRoot, err := createTempDir(stagingDir, "bootstrap_bundle")
+	logrus.Infof("STAGING IS %s", stagingDir)
+	tgzFilepath := filepath.Join(stagingDir, "bootstrap-bundle.tar")
+	logrus.Infof("TARBALL IS %s", tgzFilepath)
+	f, _ := os.Create(tgzFilepath)
+
+	bundleCreator := bootstrap.NewBundleCreator()
+	pkgs := []string{"chef/automate-cs-oc-erchef"}
+	err := bundleCreator.Create(pkgs, f)
 	if err != nil {
 		return err
 	}
-	logrus.Infof("ARCHIVE ROOT is %s\n", archiveRoot)
-	defer os.RemoveAll(archiveRoot)
-
-	var svcsForExport servicesForExport
-	err = json.Unmarshal([]byte(servicesJSON), &svcsForExport)
-	svcsInCollection, err := services.ServicesInCollection(collection)
-	logrus.Infof("SVCSINCOLLECTION is %+v", svcsInCollection)
-	if err != nil {
-		return err
-	}
-
-	for _, svc := range svcsInCollection {
-		svcName := svc.Name()
-		logrus.Infof("SVCNAME is %s\n", svcName)
-		for _, s := range svcsForExport.Services {
-			if svcName == s.Service {
-				logrus.Infof("MATCHED ON service name: %s\n", svcName)
-				for _, b := range s.BootstrapFiles {
-
-					from, err := os.Open(b.Path)
-					if err != nil {
-						panic(err)
-					}
-					defer from.Close()
-
-					// TODO: we want to preserve file ownership and permissions
-					target := filepath.Join(archiveRoot, b.Filename)
-					to, err := os.OpenFile(target, os.O_RDWR|os.O_CREATE, 0666)
-					if err != nil {
-						panic(err)
-					}
-					defer to.Close()
-
-					_, err = io.Copy(to, from)
-					if err != nil {
-						panic(err)
-					}
-				}
-			} else {
-				continue
-			}
-		}
-	}
-
-	tgzFilepath := filepath.Join(stagingDir, "bootstrap-bundle.tgz")
-	logrus.Infof("TARBALL FILEPATH: %s\n", tgzFilepath)
-	tarAndGzipDirectory(archiveRoot, tgzFilepath)
-
-	// tgzInfo, err := os.Stat(tgzFilepath)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// Is there a way to compute the checksum as we go instead of opening the file again? (not sure it matters, though)
-	//f, err := os.Open(tgzFilepath)
-	//if err != nil {
-	//	return err
-	//}
-	//defer f.Close()
-
-	// hasher := sha256.New()
-	//if _, err := io.Copy(hasher, f); err != nil {
-	//	return err
-	//}
-	// cksum := hex.EncodeToString(hasher.Sum(nil))
-
-	defer func() {
-		err := os.Remove(tgzFilepath)
-		if err != nil {
-			log.WithError(err).Warn("Failed to remove bootstrap bundle file.")
-		}
-	}()
+	f.Close()
 
 	file, err := os.Open(tgzFilepath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
+	// need to remove the tarball
 
 	buffer := make([]byte, defaultChunkSize)
 	writer := chunks.NewWriter(defaultChunkSize, func(p []byte) error {
@@ -137,84 +65,3 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	_, err = io.CopyBuffer(writer, file, buffer)
 	return err
 }
-
-func tarAndGzipDirectory(inDir string, tgzFilepath string) error {
-	logrus.Info("MAKING THE TARBALL")
-	f, _ := os.Create(tgzFilepath)
-
-	zw := gzip.NewWriter(f)
-	defer zw.Close()
-
-	tw := tar.NewWriter(zw)
-	defer tw.Close()
-
-	// I need to self-review this more carefully.
-	return filepath.Walk(inDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		header, err := tar.FileInfoHeader(info, info.Name())
-		if err != nil {
-			return err
-		}
-
-		header.Name = filepath.Join(inDir, strings.TrimPrefix(path, inDir))
-		// Add owner, group, and permissions here
-
-		if err := tw.WriteHeader(header); err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		file, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-
-		if _, err = io.Copy(tw, file); err != nil {
-			return err
-		}
-
-		// close each file as you deal with it
-		file.Close()
-		return nil
-	})
-
-}
-
-// TODO: move to products.json.
-// Not guaranteed to be complete/correct right now. The idea is to export *something*.
-const servicesJSON = `
-{
-  "services": [
-	{
-      "service": "automate-cs-oc-erchef",
-      "bootstrap_files": [
-		  {
-			"filename": "pivotal.pem",
-			"path": "/hab/svc/automate-cs-oc-erchef/data/pivotal.pem"
-		  },
-		  {
-			"filename": "pivotal.pub.pem",
-		  	"path": "/hab/svc/automate-cs-oc-erchef/data/pivotal.pub.pem"
-		  },
-		  {
-			"filename": "webui_priv.pem",
-			"path": "/hab/svc/automate-cs-oc-erchef/data/webui_priv.pem"
-		  },
-		  {
-			"filename": "webui_pub.pem",
-			"path": "/hab/svc/automate-cs-oc-erchef/data/webui_pub.pem"
-		  },
-		  {
-			"filename": "dark_launch_features.json",
-			"path": "/hab/svc/automate-cs-oc-erchef/data/dark_launch_features.json"
-		  }
-        ]
-    }
-  ]
-}
-`
