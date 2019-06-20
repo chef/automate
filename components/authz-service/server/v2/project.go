@@ -36,6 +36,7 @@ type state struct {
 	store                storage.Storage
 	engine               engine.ProjectRulesRetriever
 	projectUpdateManager *ProjectUpdateManager
+	policyRefresher      PolicyRefresher
 }
 
 // NewMemstoreProjectsServer returns an instance of api.ProjectsServer
@@ -45,9 +46,10 @@ func NewMemstoreProjectsServer(
 	e engine.ProjectRulesRetriever,
 	eventServiceClient automate_event.EventServiceClient,
 	configManager *config.Manager,
+	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
-	return NewProjectsServer(ctx, l, memstore.New(), e, eventServiceClient, configManager)
+	return NewProjectsServer(ctx, l, memstore.New(), e, eventServiceClient, configManager, pr)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
@@ -59,13 +61,14 @@ func NewPostgresProjectsServer(
 	e engine.ProjectRulesRetriever,
 	eventServiceClient automate_event.EventServiceClient,
 	configManager *config.Manager,
+	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
 	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	return NewProjectsServer(ctx, l, s, e, eventServiceClient, configManager)
+	return NewProjectsServer(ctx, l, s, e, eventServiceClient, configManager, pr)
 }
 
 func NewProjectsServer(
@@ -75,6 +78,7 @@ func NewProjectsServer(
 	e engine.ProjectRulesRetriever,
 	eventServiceClient automate_event.EventServiceClient,
 	configManager *config.Manager,
+	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
 	return &state{
@@ -82,6 +86,7 @@ func NewProjectsServer(
 		store:                s,
 		engine:               e,
 		projectUpdateManager: NewProjectUpdateManager(eventServiceClient, configManager),
+		policyRefresher:      pr,
 	}, nil
 }
 
@@ -158,9 +163,22 @@ func (s *state) UpdateProject(ctx context.Context,
 }
 
 func (s *state) ApplyRulesStart(
-	context.Context, *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
+	ctx context.Context, _ *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
 	s.log.Info("apply project rules: START")
-	err := s.projectUpdateManager.Start()
+
+	err := s.store.ApplyStagedRules(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal,
+			"error applying staged projects: %s", err.Error())
+	}
+
+	err = s.policyRefresher.Refresh(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal,
+			"error refreshing policy cache: %s", err.Error())
+	}
+
+	err = s.projectUpdateManager.Start()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal,
 			"error starting project update: %s", err.Error())

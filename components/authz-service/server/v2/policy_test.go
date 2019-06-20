@@ -2977,14 +2977,14 @@ func setupV2WithMigrationState(t *testing.T,
 		require.NoError(t, migration(mem_v2)) // this is IAM v2
 	}
 
-	polV2, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
+	polV2, _, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
 	require.NoError(t, err)
 
 	eventServiceClient := &testhelpers.MockEventServiceClient{}
 	configMgr, err := config.NewManager("/tmp/.authz-delete-me")
 	require.NoError(t, err)
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
-		rulesRetriever, eventServiceClient, configMgr)
+		rulesRetriever, eventServiceClient, configMgr, v2.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	vSwitch := v2.NewSwitch(vChan)

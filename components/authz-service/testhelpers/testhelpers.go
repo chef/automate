@@ -56,7 +56,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (api.ProjectsClient, *TestDB, sto
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, &TestProjectRulesRetriever{},
-		eventServiceClient, configMgr)
+		eventServiceClient, configMgr, server.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")

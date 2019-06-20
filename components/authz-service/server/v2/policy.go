@@ -48,7 +48,7 @@ func NewMemstorePolicyServer(
 	l logger.Logger,
 	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
-	vChan chan api.Version) (PolicyServer, error) {
+	vChan chan api.Version) (PolicyServer, PolicyRefresher, error) {
 
 	return NewPoliciesServer(ctx, l, memstore.New(), e, pl, vChan)
 }
@@ -61,11 +61,11 @@ func NewPostgresPolicyServer(
 	migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config,
 	pl storage_v1.PoliciesLister,
-	vChan chan api.Version) (PolicyServer, error) {
+	vChan chan api.Version) (PolicyServer, PolicyRefresher, error) {
 
 	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize v2 store state")
+		return nil, nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
 	return NewPoliciesServer(ctx, l, s, e, pl, vChan)
 }
@@ -77,11 +77,11 @@ func NewPoliciesServer(
 	s storage.Storage,
 	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
-	vChan chan api.Version) (PolicyServer, error) {
+	vChan chan api.Version) (PolicyServer, PolicyRefresher, error) {
 
 	policyRefresher, err := NewPolicyRefresher(ctx, l, s, e)
 	if err != nil {
-		return nil, errors.Wrap(err, "start policy refresher")
+		return nil, nil, errors.Wrap(err, "start policy refresher")
 	}
 
 	srv := &policyServer{
@@ -102,7 +102,7 @@ func NewPoliciesServer(
 	// check migration status
 	ms, err := srv.store.MigrationStatus(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "retrieve migration status from storage")
+		return nil, nil, errors.Wrap(err, "retrieve migration status from storage")
 	}
 	var v api.Version
 	switch ms {
@@ -117,16 +117,16 @@ func NewPoliciesServer(
 
 	if v.Major == api.Version_V2 {
 		if err := srv.store.ApplyV2DataMigrations(ctx); err != nil {
-			return nil, errors.Wrap(err, "error migrating v2 data")
+			return nil, nil, errors.Wrap(err, "error migrating v2 data")
 		}
 	}
 
 	// now that the data is all set, attempt to feed it into OPA:
 	if err := srv.updateEngineStore(ctx); err != nil {
-		return nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
+		return nil, nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
 	}
 
-	return srv, nil
+	return srv, policyRefresher, nil
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
