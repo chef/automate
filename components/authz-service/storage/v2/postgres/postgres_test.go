@@ -3329,7 +3329,7 @@ func TestCreateRule(t *testing.T) {
 			condition1, err := storage.NewCondition(storage.Node, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
 			rule, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{condition1})
-			insertStagedRule(t, db, rule)
+			insertStagedRule(t, db, rule, false)
 			require.NoError(t, err)
 			resp, err := store.CreateRule(ctx, &rule)
 			assert.Nil(t, resp)
@@ -3837,7 +3837,7 @@ func TestUpdateRule(t *testing.T) {
 			originalRule, err := storage.NewRule("foo-rule", projID, "foo", storage.Event, conditions)
 			require.NoError(t, err)
 			insertStagedRule(t, db, originalRule)
-			
+
 			newCondition, err := storage.NewCondition(storage.Event,
 				[]string{"new-chef-server-2"}, storage.ChefServer, storage.Equals)
 			updatedRule, err := storage.NewRule(originalRule.ID, projID, "foo bar", originalRule.Type, append(conditions, newCondition))
@@ -3845,7 +3845,7 @@ func TestUpdateRule(t *testing.T) {
 			resp, err := store.UpdateRule(ctx, &updatedRule)
 			require.NoError(t, err)
 			assert.Equal(t, &updatedRule, resp)
-			
+
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
 				updatedRule.ID, updatedRule.Name, updatedRule.Type.String(), updatedRule.ProjectID))
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`,
@@ -3973,7 +3973,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			condition1, err := storage.NewCondition(storage.Node, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
 			rule, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{condition1})
-			insertStagedRule(t, db, rule)
+			insertStagedRule(t, db, rule, false)
 			require.NoError(t, err)
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
 			assert.NotNil(t, resp)
@@ -4023,7 +4023,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 
 			stagedRule, err := storage.NewRule(rule.ID, rule.ProjectID, "update: staged name", rule.Type, rule.Conditions)
 			require.NoError(t, err)
-			insertStagedRule(t, db, stagedRule)
+			insertStagedRule(t, db, stagedRule, false)
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
@@ -6633,11 +6633,11 @@ func insertAppliedRule(t *testing.T, db *testhelpers.TestDB, rule storage.Rule) 
 	assertCount(t, len(rule.Conditions), db.QueryRow(`SELECT count(*) FROM iam_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_project_rules r WHERE r.id=$1)`, rule.ID))
 }
 
-func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule storage.Rule) {
+func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule storage.Rule, deleted bool) {
 	t.Helper()
 	row := db.QueryRow(`
 		INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
-		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false)
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), deleted)
 	var dbID string
 	require.NoError(t, row.Scan(&dbID))
 	for _, c := range rule.Conditions {
