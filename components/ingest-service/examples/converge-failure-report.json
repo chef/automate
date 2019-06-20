@@ -3127,7 +3127,7 @@
       "before": {},
       "duration": "0",
       "delta": "",
-      "ignore_failure": false,
+      "ignore_failure": true,
       "result": "nothing",
       "status": "skipped",
       "cookbook_name": "insights-test",
