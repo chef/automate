@@ -26,22 +26,17 @@ control 'notifications-alert' do
     end
 
     let(:failed_ccr_message) do
-      return @failed_ccr_json ||= begin
-        content = inspec.profile.file("fixtures/converge/converge-failure-report_run_converge.json")
-        json = JSON.parse(content, :symbolize_names => true)
-        json[:id] = SecureRandom.uuid
-        request = JSON.generate(json)
-      end
+      content = inspec.profile.file("fixtures/converge/converge-failure-report_run_converge.json")
+      json = JSON.parse(content, :symbolize_names => true)
+      json[:id] = SecureRandom.uuid
+      request = JSON.generate(json)
     end
 
-    #converge-failure-with-ignored-failure-report_run_converge
     let(:failed_ccr_message_with_ignored_failure) do
-      return @failed_ccr_json ||= begin
-        content = inspec.profile.file("fixtures/converge/converge-failure-report_with_ignored_failure_run_converge.json")
-        json = JSON.parse(content, :symbolize_names => true)
-        json[:id] = SecureRandom.uuid
-        request = JSON.generate(json)
-      end
+      content = inspec.profile.file("fixtures/converge/converge-failure-report_with_ignored_failure_run_converge.json")
+      json = JSON.parse(content, :symbolize_names => true)
+      json[:id] = SecureRandom.uuid
+      JSON.generate(json)
     end
 
     let(:send_failed_ccr_with_ignored_failure) do
@@ -117,7 +112,7 @@ control 'notifications-alert' do
     end
 
     let(:requestbin_name) do
-      return @requestbin_name ||= "#{TEST_RULE_NAME_PREFIX}-#{SecureRandom.rand(1<<20)}"
+      "#{TEST_RULE_NAME_PREFIX}-#{SecureRandom.rand(1<<20)}"
     end
 
     let(:create_ccr_rule) do
@@ -217,7 +212,7 @@ control 'notifications-alert' do
         expect(after_request_count).to eq(before_request_count + 1)
 
         # get the last sent notification
-        notification = JSON.parse(request.body, symbolize_names: true)[:requests][before_request_count]
+        notification = JSON.parse(request.body, symbolize_names: true)[:requests].last
 
         # Test that the correct cookbook was sent in the slack notification
         # The first failed resource was with the cookbook 'insights-ignored' but it 

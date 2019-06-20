@@ -385,7 +385,7 @@ func getBoolIfExists(fieldName string, body []byte) bool {
 	fieldBytes, _, _, err := jsonparser.Get(body, fieldName)
 	if err == nil {
 		b, err := jsonparser.ParseBoolean(fieldBytes)
-		// If there is no error (err == nil) return that value else return false.
+		// If there is no error (err == nil) return the parsed boolean else return false.
 		if err == nil {
 			return b
 		}
