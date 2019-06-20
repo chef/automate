@@ -1,3 +1,6 @@
+<chef-alert type="error" *ngIf="(servicesStatus$ | async) === 'loadingFailure'">
+  {{ (servicesError$ | async).status }}: {{ (servicesError$ | async).statusText }}
+</chef-alert>
 <div id="services-panel" class="services-panel">
   <chef-page-header>
     <chef-heading>
@@ -75,7 +78,13 @@
 
   <!-- Loading State: Displayed only when the services are loading -->
   <div class="no-services" *ngIf="(servicesStatus$ | async) === 'loading'">
-      <chef-loading-spinner size='50'></chef-loading-spinner>
+    <chef-loading-spinner size='50'></chef-loading-spinner>
+    <h3>Loading services...</h3>
+  </div>
+
+  <!-- LoadingFailure State: Displayed only when the services status has a failure -->
+  <div class="no-services" *ngIf="(servicesStatus$ | async) === 'loadingFailure'">
+    <chef-loading-spinner size='50'></chef-loading-spinner>
     <h3>Loading services...</h3>
   </div>
 
