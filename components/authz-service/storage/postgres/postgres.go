@@ -81,6 +81,8 @@ func parsePQError(err *pq.Error) error {
 		return storage.ErrNotFound
 	case "PRJTR": // custom code for when a user tries to change a rule's project
 		return storage.ErrChangeProjectForRule
+	case "RDLTD": // object is staged for deletion and cannot be updated
+		return storage.ErrMarkedForDeletion
 	}
 
 	return storage.ErrDatabase
