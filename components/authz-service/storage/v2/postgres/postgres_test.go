@@ -3737,7 +3737,7 @@ func TestUpdateRule(t *testing.T) {
 
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
 			assert.NoError(t, err)
-			assert.Equal(t, resp, &ruleUpdated)
+			assert.Equal(t, &ruleUpdated, resp)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, rule.ID))
 		},
@@ -3771,7 +3771,7 @@ func TestUpdateRule(t *testing.T) {
 
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
 			assert.NoError(t, err)
-			assert.Equal(t, resp, &ruleUpdated)
+			assert.Equal(t, &ruleUpdated, resp)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3`,
 				ruleUpdated.ID, ruleUpdated.Name, ruleUpdated.Type.String()))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, ruleUpdated.ID))
@@ -3796,14 +3796,61 @@ func TestUpdateRule(t *testing.T) {
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
 			assert.Nil(t, resp)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
 				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
 		},
-		// when project filter doesn't match, returns not found
-		// when the rule exists in applied but not staged, adds a new rule to staged
+		"when the rule exists in applied but not staged, adds a new rule to staged": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
-		// when the rule exists in staged but not applied, updates the staged rule
+			ruleType := storage.Node
+			ruleOriginal := insertAppliedRuleWithMultipleConditions(t, db, projID, ruleType)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
 
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"new-chef-server"}, storage.ChefServer, storage.MemberOf)
+			conditions := []storage.Condition{condition4}
+			updatedRule, err := storage.NewRule(ruleOriginal.ID, projID, "new name", ruleType, append(conditions, ruleOriginal.Conditions...))
+			require.NoError(t, err)
+
+			resp, err := store.UpdateRule(ctx, &updatedRule)
+			assert.NoError(t, err)
+			assert.Equal(t, &updatedRule, resp)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				updatedRule.ID, updatedRule.Name, updatedRule.Type.String(), updatedRule.ProjectID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`,
+				updatedRule.ID))
+		},
+		"when the rule exists in staged but not applied, updates the staged rule": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			condition, err := storage.NewCondition(storage.Event,
+				[]string{"new-chef-server"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			conditions := []storage.Condition{condition}
+			originalRule, err := storage.NewRule("foo-rule", projID, "foo", storage.Event, conditions)
+			require.NoError(t, err)
+			insertStagedRule(t, db, originalRule)
+			
+			newCondition, err := storage.NewCondition(storage.Event,
+				[]string{"new-chef-server-2"}, storage.ChefServer, storage.Equals)
+			updatedRule, err := storage.NewRule(originalRule.ID, projID, "foo bar", originalRule.Type, append(conditions, newCondition))
+
+			resp, err := store.UpdateRule(ctx, &updatedRule)
+			require.NoError(t, err)
+			assert.Equal(t, &updatedRule, resp)
+			
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				updatedRule.ID, updatedRule.Name, updatedRule.Type.String(), updatedRule.ProjectID))
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`,
+				updatedRule.ID))
+		},
 		// when the rule exists in both staged and applied, updates the staged rule
 
 		// If in staged & marked ‘deleted’, return not found
@@ -6600,9 +6647,9 @@ func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule storage.Rule) {
 		require.NoError(t, err)
 	}
 
-	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
 		rule.ID, rule.Name, rule.Type.String(), rule.ProjectID))
-	assertCount(t, len(rule.Conditions), db.QueryRow(`SELECT count(*) FROM iam_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_project_rules r WHERE r.id=$1)`, rule.ID))
+	assertCount(t, len(rule.Conditions), db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, rule.ID))
 }
 
 func insertAppliedRuleWithMultipleConditions(t *testing.T, db *testhelpers.TestDB, projID string, ruleType storage.RuleType) *storage.Rule {

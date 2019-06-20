@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
@@ -1030,12 +1029,8 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	var ruleDbID int
 	if err := row.Scan(&ruleDbID); err != nil {
 		if err == sql.ErrNoRows {
-			// TODO for testing only
-			spew.Printf("HEY! no rows error here %#v\n\n", err)
 			return nil, storage_errors.ErrNotFound
 		}
-		// TODO for testing only
-		spew.Printf("HEY! other error here %#v\n\n", err)
 		return nil, p.processError(err)
 	}
 
@@ -1051,7 +1046,6 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		spew.Printf("HEY! tx error here %#v\n\n", err)
 		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
