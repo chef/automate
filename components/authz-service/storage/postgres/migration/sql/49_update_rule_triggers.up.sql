@@ -8,29 +8,28 @@ AS $$
 DECLARE
   rule_db_id INTEGER;
 BEGIN
-    IF (EXISTS (SELECT id FROM iam_project_rules ipr WHERE id=in_rule_id AND projects_match_for_rule(ipr.project_id, projects_filter))) THEN -- cannot 'update' a non-existed applied rule
-            IF (NOT EXISTS (SELECT id, project_id FROM iam_project_rules ipr WHERE id=in_rule_id AND project_id=in_project_id)) THEN
-                RAISE EXCEPTION 'incoming project does not match rule project %', in_rule_id USING -- do we need this? maybe we can just return null or something?
-                ERRCODE='PRJTR';
-            END IF;
-
-            INSERT INTO iam_staged_project_rules as ispr (id, project_id, name, type, deleted)
-            VALUES (in_rule_id, in_project_id, in_name, in_type, false)
-            ON CONFLICT (id) -- applied rule has already been updated, so update the staged version of it
-                DO UPDATE
-                        SET
-                        id = in_rule_id,
-                        project_id = in_project_id,
-                        name          = in_name,
-                        type   = in_type,
-                        deleted    = in_deleted
-            WHERE ispr.id = in_rule_id AND projects_match_for_rule(ispr.project_id, projects_filter)
-        RETURNING ispr.db_id INTO rule_db_id;
-        RETURN rule_db_id;
-    -- TODO: add conditions
+    IF (NOT EXISTS (SELECT id FROM iam_project_rules ipr WHERE id=in_rule_id AND projects_match_for_rule(ipr.project_id, projects_filter))) AND
+        (NOT EXISTS (SELECT id FROM iam_staged_project_rules ipr WHERE id=in_rule_id AND projects_match_for_rule(ipr.project_id, projects_filter))) THEN
+            RAISE EXCEPTION 'not found %', in_rule_id USING
+            ERRCODE='case_not_found'; -- do we need this more specific? can we just return 20000?
+    ELSIF (NOT EXISTS (SELECT id, project_id FROM iam_project_rules ipr WHERE id=in_rule_id AND project_id=in_project_id)) AND
+        (NOT EXISTS (SELECT id, project_id FROM iam_staged_project_rules ipr WHERE id=in_rule_id AND project_id=in_project_id)) THEN
+            RAISE EXCEPTION 'incoming project does not match rule project %', in_rule_id USING -- do we need this? maybe we can just return null or something?
+            ERRCODE='PRJTR';
     ELSE
-        RAISE EXCEPTION 'not found %', in_rule_id USING -- do we need this? maybe we can just return null or something?
-        ERRCODE='case_not_found';
+        INSERT INTO iam_staged_project_rules as ispr (id, project_id, name, type, deleted)
+        VALUES (in_rule_id, in_project_id, in_name, in_type, false)
+        ON CONFLICT (id) -- applied rule has already been updated, so update the staged version of it
+            DO UPDATE
+                    SET
+                    id = in_rule_id,
+                    project_id = in_project_id,
+                    name          = in_name,
+                    type   = in_type,
+                    deleted    = in_deleted
+        WHERE ispr.id = in_rule_id AND projects_match_for_rule(ispr.project_id, projects_filter)
+        RETURNING ispr.db_id INTO rule_db_id;
+    RETURN rule_db_id;
     END IF;
     RETURN rule_db_id;
 END;
@@ -42,10 +41,10 @@ BEGIN
         ERRCODE='PRJID';
 END$$ LANGUAGE plpgsql;
 
--- cannot update project it
+-- cannot update project id
 CREATE TRIGGER verify_project_id BEFORE UPDATE OF project_id ON iam_staged_project_rules
 FOR EACH ROW
-WHEN (OLD.project_id != NEW.project_id) 
+WHEN (OLD.project_id != NEW.project_id)
 EXECUTE PROCEDURE fn_project_id_check();
 
 CREATE OR REPLACE FUNCTION fn_deleted_rule_check() RETURNS TRIGGER AS $$

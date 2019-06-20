@@ -3836,11 +3836,11 @@ func TestUpdateRule(t *testing.T) {
 			conditions := []storage.Condition{condition}
 			originalRule, err := storage.NewRule("foo-rule", projID, "foo", storage.Event, conditions)
 			require.NoError(t, err)
-			insertStagedRule(t, db, originalRule)
+			insertStagedRule(t, db, originalRule, false)
 
 			newCondition, err := storage.NewCondition(storage.Event,
 				[]string{"new-chef-server-2"}, storage.ChefServer, storage.Equals)
-			updatedRule, err := storage.NewRule(originalRule.ID, projID, "foo bar", originalRule.Type, append(conditions, newCondition))
+			updatedRule, err := storage.NewRule(originalRule.ID, originalRule.ProjectID, "foo bar", originalRule.Type, append(conditions, newCondition))
 
 			resp, err := store.UpdateRule(ctx, &updatedRule)
 			require.NoError(t, err)
@@ -3851,9 +3851,61 @@ func TestUpdateRule(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`,
 				updatedRule.ID))
 		},
-		// when the rule exists in both staged and applied, updates the staged rule
+		"when the rule exists in both staged and applied, updates the staged rule": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
-		// If in staged & marked ‘deleted’, return not found
+			condition, err := storage.NewCondition(storage.Event,
+				[]string{"new-chef-server"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			conditions := []storage.Condition{condition}
+			originalRule, err := storage.NewRule("foo-rule", projID, "foo", storage.Event, conditions)
+			require.NoError(t, err)
+			insertAppliedRule(t, db, originalRule)
+			insertStagedRule(t, db, originalRule, false)
+
+			newCondition, err := storage.NewCondition(storage.Event,
+				[]string{"new-chef-server-2"}, storage.ChefServer, storage.Equals)
+			updatedRule, err := storage.NewRule(originalRule.ID, originalRule.ProjectID, "foo bar", originalRule.Type, append(conditions, newCondition))
+
+			resp, err := store.UpdateRule(ctx, &updatedRule)
+			require.NoError(t, err)
+			assert.Equal(t, &updatedRule, resp)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				updatedRule.ID, updatedRule.Name, updatedRule.Type.String(), updatedRule.ProjectID))
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`,
+				updatedRule.ID))
+		},
+		"when the rule exists in applied but is marked for deletion in staged, returns marked for deletion": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			condition, err := storage.NewCondition(storage.Event,
+				[]string{"new-chef-server"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			conditions := []storage.Condition{condition}
+			originalRule, err := storage.NewRule("foo-rule", projID, "foo", storage.Event, conditions)
+			require.NoError(t, err)
+			insertAppliedRule(t, db, originalRule)
+			deletedUpdatedRule, err := storage.NewRule(originalRule.ID, originalRule.ProjectID, "foo bar", originalRule.Type, conditions)
+			insertStagedRule(t, db, deletedUpdatedRule, true)
+
+			newCondition, err := storage.NewCondition(storage.Event,
+				[]string{"new-chef-server-2"}, storage.ChefServer, storage.Equals)
+			updatedRule, err := storage.NewRule(originalRule.ID, originalRule.ProjectID, "this better not work", originalRule.Type, append(conditions, newCondition))
+
+			resp, err := store.UpdateRule(ctx, &updatedRule)
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrMarkedForDeletion, err)
+
+			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				updatedRule.ID, updatedRule.Name, updatedRule.Type.String(), updatedRule.ProjectID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`,
+				updatedRule.ID))
+		},
 	}
 
 	for name, test := range cases {
