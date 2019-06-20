@@ -587,7 +587,7 @@ steps:
   - label: "[integration] upgrade current -> master"
     command:
       - integration/run_test integration/tests/upgrade_current_master.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -596,7 +596,7 @@ steps:
   - label: "[integration] manual upgrade current -> master"
     command:
       - integration/run_test integration/tests/manual_upgrade.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
