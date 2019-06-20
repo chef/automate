@@ -46,10 +46,10 @@
     "@types/puppeteer": "1.11.2",
     "jest": "23.6.0",
     "jest-cli": "23.6.0",
-    "node-sass": "^4.10.0",
+    "node-sass": "^4.12.0",
     "puppeteer": "1.11.0",
     "sass-lint": "^1.12.1",
-    "tslint": "^5.12.1",
+    "tslint": "^5.17.0",
     "tslint-ionic-rules": "0.0.21",
     "typedoc": "^0.14.2",
     "typescript": "3.2.2"
