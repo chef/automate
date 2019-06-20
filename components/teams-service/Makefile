@@ -27,9 +27,6 @@ bin:
 
 build: ${BINS}
 
-start: build
-	./bin/teams-service examples/config.yml
-
 # Regenerate all *.pb.go files
 proto:
 	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component teams-service'

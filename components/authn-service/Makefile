@@ -31,9 +31,6 @@ bin:
 
 build: ${BINS}
 
-start: build
-	./bin/authn-service serve examples/config.yml
-
 build_prod:
 	go build --tags prod ${GO_LDFLAGS} ${PACKAGE_PATH}/cmd/authn-service
 

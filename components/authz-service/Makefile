@@ -34,9 +34,6 @@ bin:
 
 build: ${BINS}
 
-start: build
-	./bin/authz-service examples/config.yml
-
 test:
 	@go test -i $(packages)
 	@go test $(verbose) -cover -count=1 -parallel=1 -p 1 $(packages)
