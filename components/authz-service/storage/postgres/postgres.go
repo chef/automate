@@ -77,6 +77,10 @@ func parsePQError(err *pq.Error) error {
 		return storage.ErrConflict
 	case "23503": // Foreign key violation
 		return storage.ErrForeignKey
+	case "20000": // not found
+		return storage.ErrNotFound
+	case "PRJTR": // custom code for when a user tries to change a rule's project
+		return storage.ErrChangeProjectForRule
 	}
 
 	return storage.ErrDatabase

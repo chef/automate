@@ -9,6 +9,11 @@ DECLARE
   rule_db_id INTEGER;
 BEGIN
     IF (EXISTS (SELECT id FROM iam_project_rules ipr WHERE id=in_rule_id AND projects_match_for_rule(ipr.project_id, projects_filter))) THEN -- cannot 'update' a non-existed applied rule
+            IF (NOT EXISTS (SELECT id, project_id FROM iam_project_rules ipr WHERE id=in_rule_id AND project_id=in_project_id)) THEN
+                RAISE EXCEPTION 'incoming project does not match rule project %', in_rule_id USING -- do we need this? maybe we can just return null or something?
+                ERRCODE='PRJTR';
+            END IF;
+
             INSERT INTO iam_staged_project_rules as ispr (id, project_id, name, type, deleted)
             VALUES (in_rule_id, in_project_id, in_name, in_type, false)
             ON CONFLICT (id) -- applied rule has already been updated, so update the staged version of it
@@ -24,8 +29,8 @@ BEGIN
         RETURN rule_db_id;
     -- TODO: add conditions
     ELSE
-        RAISE EXCEPTION 'noooooot found %', in_rule_id USING -- do we need this? maybe we can just return null or something?
-        ERRCODE='NOAPPLIEDRULE';
+        RAISE EXCEPTION 'not found %', in_rule_id USING -- do we need this? maybe we can just return null or something?
+        ERRCODE='case_not_found';
     END IF;
     RETURN rule_db_id;
 END;
@@ -34,7 +39,7 @@ $$;
 CREATE OR REPLACE FUNCTION fn_project_id_check() RETURNS TRIGGER AS $$
 BEGIN 
     RAISE EXCEPTION 'cannot change project_id: % -> %', OLD.project_id, NEW.project_id USING
-        ERRCODE='PROJID';
+        ERRCODE='PRJID';
 END$$ LANGUAGE plpgsql;
 
 -- cannot update project it
@@ -46,7 +51,7 @@ EXECUTE PROCEDURE fn_project_id_check();
 CREATE OR REPLACE FUNCTION fn_deleted_rule_check() RETURNS TRIGGER AS $$
 BEGIN 
     RAISE EXCEPTION 'rule with id % has been deleted', NEW.id USING
-        ERRCODE='RULEDELETED'; 
+        ERRCODE='RDLTD'; 
 END$$ LANGUAGE plpgsql;
 
 -- cannot update a rule that is staged for deletion 

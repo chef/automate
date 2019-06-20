@@ -31,7 +31,7 @@ var (
 
 	// ErrChangeProjectForRule indicates that an update operation attempted to change
 	// the project for a rule, which is not allowed.
-	ErrChangeProjectForRule = errors.New("cannot change rule")
+	ErrChangeProjectForRule = errors.New("cannot change rule project")
 )
 
 // ErrTxCommit occurs when the database attempts to commit a transaction and
