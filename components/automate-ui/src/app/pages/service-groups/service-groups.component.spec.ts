@@ -10,7 +10,13 @@ import {
   UpdateServiceGroupFilters,
   GetServiceGroupsCountsSuccess
 } from 'app/entities/service-groups/service-groups.actions';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
+class MockTelemetryService {
+  track(_event?: string, _properties?: any): void {
+
+  }
+}
 
 describe('ServiceGroupsComponent', () => {
   let fixture, component;
@@ -22,7 +28,7 @@ describe('ServiceGroupsComponent', () => {
         ServiceStatusIconPipe,
         ServiceGroupsComponent
       ],
-      providers: [],
+      providers: [  { provide: TelemetryService, useClass: MockTelemetryService }],
       imports: [
         StoreModule.forRoot({
           serviceGroups: serviceGroupEntityReducer

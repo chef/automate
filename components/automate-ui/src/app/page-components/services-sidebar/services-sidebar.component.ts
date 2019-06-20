@@ -12,6 +12,7 @@ import {
   Service, ServicesFilters, HealthSummary
 } from '../../entities/service-groups/service-groups.model';
 import { includes, getOr } from 'lodash/fp';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -42,7 +43,8 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private router: Router
+    private router: Router,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit() {
@@ -65,6 +67,11 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
       this.selectedHealth = getOr('total', 'health', servicesFilters);
       this.currentPage    = getOr(1, 'page', servicesFilters);
       this.totalServices  = getOr(0, this.selectedHealth, this.servicesHealthSummary);
+      this.telemetryService.track('applicationsServiceCount', {
+         serviceGroupId: this.serviceGroupId,
+         totalServices: this.totalServices,
+         statusFilter: this.selectedHealth
+      });
     });
   }
 
@@ -81,11 +88,16 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     }
 
     this.currentPage = 1;
+    this.telemetryService.track('applicationsStatusFilter',
+     { entity: 'service', statusFilter: this.selectedHealth});
     this.updateServicesFilters();
   }
 
   public updatePageNumber(pageNumber: number) {
     this.currentPage = pageNumber;
+    const totalPages = Math.ceil(this.totalServices / this.pageSize) || 1;
+    this.telemetryService.track('applicationsPageChange',
+     { entity: 'service', pageNumber: pageNumber, totalPages: totalPages});
     this.updateServicesFilters();
   }
 
