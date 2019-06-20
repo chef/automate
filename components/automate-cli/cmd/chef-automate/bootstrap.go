@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/bootstrap"
+
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -16,25 +18,22 @@ import (
 
 var bootstrapBundleCmdFlags = struct {
 	overwriteFile bool
+	rootDir       string
 }{}
 
 func newBootstrapBundleCmd() *cobra.Command {
-	var bootstrapCmd = &cobra.Command{
+	bootstrapCmd := &cobra.Command{
 		Use:    "bootstrap COMMAND",
 		Hidden: true,
 	}
 
-	var bundleCmd = &cobra.Command{
+	bundleCmd := &cobra.Command{
 		Use:    "bundle COMMAND",
 		Hidden: true,
 	}
 
-	var createCmd = &cobra.Command{
-		Use: "create [/path/to/bundle.abb]",
-		Annotations: map[string]string{
-			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
-			NoRequireRootAnnotation:  NoRequireRootAnnotation,
-		},
+	createCmd := &cobra.Command{
+		Use:    "create [/path/to/bundle.abb]",
 		Args:   cobra.RangeArgs(0, 1),
 		RunE:   runBootstrapBundleCreate,
 		Hidden: true,
@@ -48,8 +47,23 @@ func newBootstrapBundleCmd() *cobra.Command {
 		"Overwrite existing bootstrap bundle file if one exists",
 	)
 
+	unpackCmd := &cobra.Command{
+		Use:    "unpack /path/to/bundle.tar",
+		Args:   cobra.ExactArgs(1),
+		RunE:   runBootstrapBundleUnpack,
+		Hidden: true,
+	}
+
+	unpackCmd.PersistentFlags().StringVar(
+		&bootstrapBundleCmdFlags.rootDir,
+		"root-dir",
+		"",
+		"Set the directory where the bundle will be unpacked",
+	)
+
 	bootstrapCmd.AddCommand(bundleCmd)
 	bundleCmd.AddCommand(createCmd)
+	bundleCmd.AddCommand(unpackCmd)
 
 	return bootstrapCmd
 }
@@ -130,6 +144,20 @@ func runBootstrapBundleCreate(cmd *cobra.Command, args []string) error {
 	}
 	writer.Printf("Bootstrap bundle written to: %s\n", outfile)
 
+	return nil
+}
+
+func runBootstrapBundleUnpack(cmd *cobra.Command, args []string) error {
+	b := bootstrap.NewBundleCreator(
+		bootstrap.WithBundleCreatorRootDir(bootstrapBundleCmdFlags.rootDir))
+	f, err := os.Open(args[0])
+	if err != nil {
+		return status.Wrapf(err, status.FileAccessError, "could not open %q", args[0])
+	}
+	defer f.Close()
+	if err := b.Unpack(f); err != nil {
+		return err
+	}
 	return nil
 }
 

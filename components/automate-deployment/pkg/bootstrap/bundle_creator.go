@@ -21,6 +21,16 @@ const habSvcDir = "/hab/svc"
 var ErrNoFiles = errors.New("No files to bundle")
 var ErrMalformedBundle = errors.New("Malformed install bundle file")
 
+type BundleCreatorOpt func(*BundleCreator)
+
+func WithBundleCreatorRootDir(rootDir string) BundleCreatorOpt {
+	return func(b *BundleCreator) {
+		if rootDir != "" {
+			b.rootDir = rootDir
+		}
+	}
+}
+
 // BundleCreator creates installation bundles
 type BundleCreator struct {
 	rootDir       string
@@ -28,12 +38,16 @@ type BundleCreator struct {
 	allowedGroups []string
 }
 
-func NewBundleCreator() *BundleCreator {
-	return &BundleCreator{
+func NewBundleCreator(opts ...BundleCreatorOpt) *BundleCreator {
+	b := &BundleCreator{
 		rootDir:       habSvcDir,
 		allowedUsers:  []string{"root", "hab"},
 		allowedGroups: []string{"root", "hab"},
 	}
+	for _, f := range opts {
+		f(b)
+	}
+	return b
 }
 
 func (b *BundleCreator) writeFile(tarReader *tar.Reader, hdr *tar.Header) error {

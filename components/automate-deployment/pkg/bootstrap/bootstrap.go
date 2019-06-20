@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"context"
+	"os"
 
 	"github.com/pkg/errors"
 
@@ -32,6 +33,7 @@ func FullBootstrap(ctx context.Context,
 	b target.Bootstrapper,
 	m manifest.ReleaseManifest,
 	config *dc.ConfigRequest,
+	bootstrapBundlePath string,
 	writer cli.FormatWriter) error {
 
 	writer.Body("Installing Habitat")
@@ -60,6 +62,20 @@ func FullBootstrap(ctx context.Context,
 	err = b.DeployDeploymentService(ctx, config, m, writer)
 	if err != nil {
 		return err
+	}
+
+	if bootstrapBundlePath != "" {
+		writer.Body("Unpacking bootstrap file")
+
+		f, err := os.Open(bootstrapBundlePath)
+		if err != nil {
+			return err
+		}
+		defer f.Close() // nolint: errcheck
+		bundleCreator := NewBundleCreator()
+		if err := bundleCreator.Unpack(f); err != nil {
+			return err
+		}
 	}
 
 	return nil
