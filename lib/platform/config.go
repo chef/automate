@@ -232,9 +232,11 @@ func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInf
 					user, c.GetPostgresql().GetIp(), c.GetPostgresql().GetCfg().GetPort(), strings.Join(opts, "&"))
 
 				return &PGConnInfo{
-					debugStr:    debugStr,
-					fmtStr:      fmtStr,
-					environment: []command.Opt{},
+					debugStr: debugStr,
+					fmtStr:   fmtStr,
+					environment: []command.Opt{
+						command.Envvar("PGTZ", "UTC"),
+					},
 				}, nil
 			default:
 				return nil, errors.Errorf("Unsupported postgres auth mode %s", auth.GetScheme().GetValue())
@@ -262,6 +264,7 @@ func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInf
 			command.Envvar("PGSSLCERT", certPath),
 			command.Envvar("PGSSLROOTCERT", rootCertPath),
 			command.Envvar("PGSSLMODE", "verify-ca"),
+			command.Envvar("PGTZ", "UTC"),
 		}
 
 		return &PGConnInfo{

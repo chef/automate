@@ -83,6 +83,7 @@ func (c *A2ConnInfo) PsqlCmdOptions() []command.Opt {
 		command.Envvar("PGSSLKEY", c.Certs.Key),
 		command.Envvar("PGSSLCERT", c.Certs.Cert),
 		command.Envvar("PGSSLROOTCERT", c.Certs.RootCert),
+		command.Envvar("PGTZ", "UTC"),
 	}
 }
 
