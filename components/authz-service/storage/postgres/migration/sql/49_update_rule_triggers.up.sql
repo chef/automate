@@ -35,18 +35,6 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION fn_project_id_check() RETURNS TRIGGER AS $$
-BEGIN 
-    RAISE EXCEPTION 'cannot change project_id: % -> %', OLD.project_id, NEW.project_id USING
-        ERRCODE='PRJID';
-END$$ LANGUAGE plpgsql;
-
--- cannot update project id
-CREATE TRIGGER verify_project_id BEFORE UPDATE OF project_id ON iam_staged_project_rules
-FOR EACH ROW
-WHEN (OLD.project_id != NEW.project_id)
-EXECUTE PROCEDURE fn_project_id_check();
-
 CREATE OR REPLACE FUNCTION fn_deleted_rule_check() RETURNS TRIGGER AS $$
 BEGIN 
     RAISE EXCEPTION 'rule with id % has been deleted', NEW.id USING
