@@ -355,7 +355,7 @@ func (s *state) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (*api.Up
 				"cannot change project_id for existing rule with ID %q ", req.Id)
 		}
 		return nil, status.Errorf(codes.Internal,
-			"error creating rule with ID %q: %s", req.Id, err.Error())
+			"error updating rule with ID %q: %s", req.Id, err.Error())
 	}
 
 	apiRule, err := fromStorageRule(resp)
@@ -376,7 +376,7 @@ func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleR
 			"error retrieving rule with ID %q: %s", req.Id, err.Error())
 	}
 	if resp.Deleted {
-		return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
+		return nil, status.Errorf(codes.NotFound, "rule with ID %q marked for deletion", req.Id)
 	}
 
 	apiRule, err := fromStorageRule(resp)

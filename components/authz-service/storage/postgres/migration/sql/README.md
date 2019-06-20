@@ -49,4 +49,3 @@
 - [`47_staged_rules_tables.up.sql`](47_staged_rules_tables.up.sql)
 - [`48_remove_deleted_staged_conditions_column.up.sql`](48_remove_deleted_staged_conditions_column.up.sql)
 - [`49_update_rule_triggers.up.sql`](49_update_rule_triggers.up.sql)
-
