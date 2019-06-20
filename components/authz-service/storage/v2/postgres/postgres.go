@@ -1034,6 +1034,12 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		return nil, p.processError(err)
 	}
 
+	// Delete the existing conditions. Don't need to worry about not found case since a rule must have conditions.
+	_, err = tx.ExecContext(ctx, `DELETE FROM iam_staged_rule_conditions WHERE rule_db_id=$1;`, ruleDbID)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
 	for _, condition := range rule.Conditions {
 		_, err := tx.ExecContext(ctx,
 			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
