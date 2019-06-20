@@ -11,7 +11,6 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/platform/sys"
 	"github.com/chef/automate/lib/product"
 	"github.com/pkg/errors"
 )
@@ -51,6 +50,11 @@ func (b *BundleCreator) writeFile(tarReader *tar.Reader, hdr *tar.Header) error 
 	if err != nil {
 		return err
 	}
+	// atomic write respects the umask, so we do this one non atomic thing
+	// to get the right mode
+	if err := os.Chmod(absPath, hdr.FileInfo().Mode()); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -71,9 +75,6 @@ func (b *BundleCreator) mkdir(tarReader *tar.Reader, hdr *tar.Header) error {
 }
 
 func (b *BundleCreator) Unpack(in io.Reader) error {
-	oldUmask := sys.SetUmask(000)
-	defer sys.SetUmask(oldUmask)
-
 	tarReader := tar.NewReader(in)
 
 	habUser, err := user.Lookup(habUname)
