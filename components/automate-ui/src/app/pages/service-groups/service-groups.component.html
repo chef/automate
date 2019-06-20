@@ -1,3 +1,6 @@
+<chef-alert type="error" *ngIf="(serviceGroupStatus$ | async) === 'loadingFailure'">
+  {{ (serviceGroupError$ | async).status }}: {{ (serviceGroupError$ | async).statusText }}
+</chef-alert>
 <chef-page-header>
   <chef-heading>Service Groups</chef-heading>
   <chef-subheading>Service groups are Habitat services ordered by package identifiers and configurations.</chef-subheading>
