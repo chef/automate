@@ -41,7 +41,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public totalServiceGroups = 0;
 
   // The currently selected health status filter
-  public selectedStatus$: Observable<string>;
+  public selectedStatus = 'total';
+  private selectedStatus$: Observable<string>;
 
   // The collection of allowable status
   private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
@@ -113,21 +114,28 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.healthSummary$ = this.store.select(allServiceGroupHealth);
-    this.healthSummary$.pipe(takeUntil(this.isDestroyed))
-      .subscribe(sgHealthSummary => this.sgHealthSummary = sgHealthSummary);
-
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.status));
     this.selectedStatus$.pipe(takeUntil(this.isDestroyed)).subscribe((status) => {
-      // This code enables the pagination of service groups correctly, when the user selects
+      // This code enables pagination of service groups correctly, when the user selects
       // a Health Filter, we adjust the total number of service groups
       if ( includes(status, this.allowedStatus) ) {
+          this.selectedStatus = status;
           this.totalServiceGroups = get(status, this.sgHealthSummary);
       } else {
+          this.selectedStatus = 'total';
           this.totalServiceGroups = get('total', this.sgHealthSummary);
       }
     });
+
+    this.healthSummary$ = this.store.select(allServiceGroupHealth);
+    this.healthSummary$.pipe(takeUntil(this.isDestroyed))
+      .subscribe((sgHealthSummary) => {
+        this.sgHealthSummary = sgHealthSummary;
+        // On first load or any health summary change, we update the total number of service groups
+        this.totalServiceGroups = get(this.selectedStatus, this.sgHealthSummary);
+      });
+
 
     this.selectedFieldDirection$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.sortDirection));
