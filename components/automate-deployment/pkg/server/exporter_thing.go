@@ -1,6 +1,7 @@
 package server
 
 import (
+	"compress/gzip"
 	"io"
 	"os"
 	"path/filepath"
@@ -42,9 +43,11 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	tgzFilepath := filepath.Join(stagingDir, "bootstrap-bundle.tar")
 	logrus.Infof("TARBALL IS %s", tgzFilepath)
 	f, _ := os.Create(tgzFilepath)
+	gzw := gzip.NewWriter(f)
+	defer gzw.Close()
 
 	bundleCreator := bootstrap.NewBundleCreator()
-	pkgs := []string{"chef/automate-cs-oc-erchef"}
+	pkgs := []string{"automate-cs-oc-erchef"}
 	err := bundleCreator.Create(pkgs, f)
 	if err != nil {
 		return err
