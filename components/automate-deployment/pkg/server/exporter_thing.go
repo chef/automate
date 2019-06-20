@@ -26,28 +26,21 @@ type servicesForExport struct {
 	Services []serviceForExport `json:"services"`
 }
 
-//
-// We want to be able to gather up files installed on one node and package them up so they can be made available when installing a second node.
-// Then we want to unpackage them and put them in the right place, with the right ownership.
-// LATER: We need to make sure a new version of the package gets generated when a file in that thing changes, but that is beyond
-// current scope.
-// PUT IT ELSEWHERE: For now I'm going to stuff the list of files in here, but we should probably put it elsewhere.
-// Also, we probably need to do it per service, which means we need to know who the running services in the installation are.
-//
-
-// BootstrapBundleCreate makes a bootstrap bundle
+// BootstrapBundle makes and downloads a bootstrap bundle
 func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Deployment_BootstrapBundleServer) error {
 	// staging directory is where the tarball lands
 	stagingDir := stagingDir(s.serverConfig)
-	logrus.Infof("STAGING IS %s", stagingDir)
-	tgzFilepath := filepath.Join(stagingDir, "bootstrap-bundle.tar")
-	logrus.Infof("TARBALL IS %s", tgzFilepath)
+	tgzFilepath := filepath.Join(stagingDir, "bootstrap-bundle.tgz")
 	f, _ := os.Create(tgzFilepath)
 	gzw := gzip.NewWriter(f)
 	defer gzw.Close()
 
 	bundleCreator := bootstrap.NewBundleCreator()
-	pkgs := []string{"automate-cs-oc-erchef"}
+
+	pkgs := make([]string, 0)
+	for _, e := range s.deployment.ExpectedServices {
+		pkgs = append(pkgs, e.Name())
+	}
 	err := bundleCreator.Create(pkgs, f)
 	if err != nil {
 		return err
@@ -59,7 +52,13 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 		return err
 	}
 	defer file.Close()
-	// need to remove the tarball
+	defer func() {
+		err := os.Remove(tgzFilepath)
+		if err != nil {
+			// Do something with the error.
+			logrus.WithError(err).Warn("Failed to remove bootstrap bundle tarball.")
+		}
+	}()
 
 	buffer := make([]byte, defaultChunkSize)
 	writer := chunks.NewWriter(defaultChunkSize, func(p []byte) error {
