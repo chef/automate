@@ -1221,11 +1221,22 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	return rules, nil
 }
 
+// ApplyStagedRules begins a db transaction, locks the rule tables, moves all staged rule updates
+// and deletes into the applied rule table, and returns the database transaction. The transaction is returned
+// so that other non-database concerns can be completed before freeing the lock to avoid race conditions.
 func (p *pg) ApplyStagedRules(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx,
+		`LOCK TABLE iam_project_rules; LOCK TABLE iam_rule_conditions;
+			LOCK TABLE iam_staged_project_rules; LOCK TABLE iam_staged_rule_conditions; `,
+	)
 	if err != nil {
 		return p.processError(err)
 	}

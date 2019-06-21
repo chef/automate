@@ -37,6 +37,7 @@ type state struct {
 	engine               engine.ProjectRulesRetriever
 	projectUpdateManager *ProjectUpdateManager
 	policyRefresher      PolicyRefresher
+	applyRuleMux         sync.Mutex
 }
 
 // NewMemstoreProjectsServer returns an instance of api.ProjectsServer
@@ -164,7 +165,24 @@ func (s *state) UpdateProject(ctx context.Context,
 
 func (s *state) ApplyRulesStart(
 	ctx context.Context, _ *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
-	s.log.Info("apply project rules: START")
+	// NOTE (tc): Only one call to ApplyRulesStart can happen at a time.
+	// This should be good enough to prevent race conditions for single node,
+	// in conjunction with the table locking that happens in store.ApplyStagedRules.
+	// Can still get into a weird state if we panic, but a re-apply will fix things up.
+	// We will be refactoring for multi-node using workflow tooling in the near future.
+	s.applyRuleMux.Lock()
+	defer s.applyRuleMux.Unlock()
+
+	switch s.projectUpdateManager.State() {
+	case config.NotRunningState:
+		break
+	case config.RunningState:
+		return nil, status.Error(codes.FailedPrecondition,
+			"cannot apply rules: apply already in progress")
+	default:
+		return nil, status.Error(codes.Internal,
+			"failed to parse apply state")
+	}
 
 	err := s.store.ApplyStagedRules(ctx)
 	if err != nil {
@@ -172,17 +190,21 @@ func (s *state) ApplyRulesStart(
 			"error applying staged projects: %s", err.Error())
 	}
 
+	// TODO (tc): If we panic between here and manager Start, we will be in a state where the rules
+	// have been updated in the database but Refresh has not been kicked off.
+	// We will be refactoring with workflow to make this safer soon.
 	err = s.policyRefresher.Refresh(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal,
-			"error refreshing policy cache: %s", err.Error())
+			"error refreshing policy cache: %s\nthe rules were updated but the apply was not started, please try again", err.Error())
 	}
 
 	err = s.projectUpdateManager.Start()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal,
-			"error starting project update: %s", err.Error())
+			"error starting project update: %s\nthe rules and cache were updated but the apply was not started, please try again", err.Error())
 	}
+
 	return &api.ApplyRulesStartResp{}, nil
 }
 
