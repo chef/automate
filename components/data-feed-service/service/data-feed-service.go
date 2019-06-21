@@ -105,7 +105,7 @@ func Start(dataFeedConfig *config.DataFeedConfig) {
 					log.Debugf("Rule Name %v", assetRules[rule].Name)
 					log.Debugf("Rule Event %v", assetRules[rule].Event)
 					log.Debugf("Rule Action %v", assetRules[rule].Action)
-					switch action := rules[rule].Action.(type) {
+					switch action := assetRules[rule].Action.(type) {
 					case *notifications.Rule_ServiceNowAlert:
 						log.Debugf("Service now alert URL  %v", action.ServiceNowAlert.Url)
 						log.Debugf("Service now alert secret  %v", action.ServiceNowAlert.SecretId)
