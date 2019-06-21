@@ -50,8 +50,10 @@ CREATE OR REPLACE FUNCTION
 
 $$ LANGUAGE sql;
 
+DROP FUNCTION IF EXISTS query_staged_rule(_rule_id TEXT, _project_filter TEXT[]);
+
 CREATE OR REPLACE FUNCTION
-  query_staged_rule(_rule_id TEXT, _project_filter TEXT[])
+  query_staged_or_applied_rule(_rule_id TEXT, _project_filter TEXT[])
   RETURNS json AS $$
 
   -- check for applied rule

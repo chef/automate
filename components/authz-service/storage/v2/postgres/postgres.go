@@ -1156,7 +1156,7 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, e
 	defer cancel()
 
 	var rule v2.Rule
-	row := p.db.QueryRowContext(ctx, `SELECT query_staged_rule($1, $2);`,
+	row := p.db.QueryRowContext(ctx, "SELECT query_staged_or_applied_rule($1, $2)",
 		id, pq.Array(projectsFilter),
 	)
 	err = row.Scan(&rule)
