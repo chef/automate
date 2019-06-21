@@ -178,7 +178,7 @@ export class StatsService {
     const endtime = filters.find(filter => filter['end_time']);
     const filtersCopy = filters.map(filter => {
       if (filter['start_time']) {
-        filter['start_time'] = moment(endtime).startOf('day');
+        filter['start_time'] = moment(endtime['end_time']).startOf('day');
       }
       return filter;
     });
