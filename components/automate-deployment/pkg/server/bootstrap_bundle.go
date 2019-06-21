@@ -8,6 +8,7 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/bootstrap"
 	"github.com/chef/automate/lib/io/chunks"
+	"github.com/pkg/errors"
 )
 
 type bootstrapFile struct {
@@ -36,7 +37,7 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	}
 	err := bundleCreator.Create(pkgs, tarWriter)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to create the bootstrap bundle.")
 	}
 
 	tarWriter.Flush()

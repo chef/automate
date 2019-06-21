@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -36,7 +37,11 @@ func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
 		)
 	}
 
-	downloadedBundlePath := "./bootstrap-bundle.tar"
+	cwd, err := os.Getwd()
+	if err != nil {
+		status.Annotate(err, status.FileAccessError)
+	}
+	downloadedBundlePath := filepath.Join(cwd, "bootstrap-bundle.tar")
 	downloadedBundleFile, err := os.OpenFile(downloadedBundlePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return status.Annotate(err, status.FileAccessError)
@@ -66,7 +71,7 @@ func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	_ = w.Flush()
+	w.Flush()
 	writer.Printf("Bootstrap bundle written to: %s\n", downloadedBundlePath)
 
 	return nil
