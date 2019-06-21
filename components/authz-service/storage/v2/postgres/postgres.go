@@ -1024,32 +1024,25 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	}
 
 	row := tx.QueryRowContext(ctx,
-		`UPDATE iam_project_rules SET (name, type) = ($1, $2)
-			WHERE id = $3 AND projects_match_for_rule(project_id, $4) RETURNING db_id, project_id`,
-		rule.Name, rule.Type.String(), rule.ID, pq.Array(projectsFilter))
-	var ruleDbID string
-	var projectID string
-	if err := row.Scan(&ruleDbID, &projectID); err != nil {
+		`SELECT update_rule($1, $2, $3, $4, $5)`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), pq.Array(projectsFilter))
+	var ruleDbID int
+	if err := row.Scan(&ruleDbID); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, storage_errors.ErrNotFound
 		}
 		return nil, p.processError(err)
 	}
 
-	// If they tried to change the project_id, abort the transaction with an error.
-	if projectID != rule.ProjectID {
-		return nil, storage_errors.ErrChangeProjectForRule
-	}
-
-	// Delete the existing conditions. Don't need to worry about not found case since a rule must have conditions.
-	_, err = tx.ExecContext(ctx, `DELETE FROM iam_rule_conditions WHERE rule_db_id=$1;`, ruleDbID)
+	// Delete the existing conditions. Don't need to worry about "not found" case since a rule must have conditions.
+	_, err = tx.ExecContext(ctx, `DELETE FROM iam_staged_rule_conditions WHERE rule_db_id=$1;`, ruleDbID)
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
 	for _, condition := range rule.Conditions {
 		_, err := tx.ExecContext(ctx,
-			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
 			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
 		)
 		if err != nil {
