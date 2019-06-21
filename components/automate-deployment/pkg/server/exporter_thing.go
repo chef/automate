@@ -1,7 +1,6 @@
 package server
 
 import (
-	"compress/gzip"
 	"io"
 	"os"
 	"path/filepath"
@@ -9,7 +8,6 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/bootstrap"
 	"github.com/chef/automate/lib/io/chunks"
-	"github.com/sirupsen/logrus"
 )
 
 type bootstrapFile struct {
@@ -30,10 +28,8 @@ type servicesForExport struct {
 func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Deployment_BootstrapBundleServer) error {
 	// staging directory is where the tarball lands
 	stagingDir := stagingDir(s.serverConfig)
-	tgzFilepath := filepath.Join(stagingDir, "bootstrap-bundle.tgz")
-	f, _ := os.Create(tgzFilepath)
-	gzw := gzip.NewWriter(f)
-	defer gzw.Close()
+	tarFilepath := filepath.Join(stagingDir, "bootstrap-bundle.tar")
+	f, _ := os.Create(tarFilepath)
 
 	bundleCreator := bootstrap.NewBundleCreator()
 
@@ -47,18 +43,11 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	}
 	f.Close()
 
-	file, err := os.Open(tgzFilepath)
+	file, err := os.Open(tarFilepath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	defer func() {
-		err := os.Remove(tgzFilepath)
-		if err != nil {
-			// Do something with the error.
-			logrus.WithError(err).Warn("Failed to remove bootstrap bundle tarball.")
-		}
-	}()
 
 	buffer := make([]byte, defaultChunkSize)
 	writer := chunks.NewWriter(defaultChunkSize, func(p []byte) error {

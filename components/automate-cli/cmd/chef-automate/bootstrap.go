@@ -29,18 +29,6 @@ func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	stream, err := connection.BootstrapBundle(context.Background(), &api.BootstrapBundleRequest{})
-	// if err != nil {
-	//	fmt.Println("bundle creation failed")
-	//	return err
-	//}
-
-	// Download the bundle via gRPC stream
-	//stream, err := connection.BootstrapBundleDownload(
-	//	context.Background(),
-	//	&api.BootstrapBundleDownloadRequest{
-	//		BundleName: bundleInfo.BundleName,
-	//	},
-	//)
 	if err != nil {
 		return status.WithRecovery(
 			status.Wrap(err, status.DeploymentServiceCallError, "Request to download bootstrap bundle failed"),
@@ -48,7 +36,7 @@ func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
 		)
 	}
 
-	downloadedBundlePath := "./bootstrap-bundle.tgz"
+	downloadedBundlePath := "./bootstrap-bundle.tar"
 	downloadedBundleFile, err := os.OpenFile(downloadedBundlePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return status.Annotate(err, status.FileAccessError)
