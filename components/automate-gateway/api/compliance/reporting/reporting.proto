@@ -30,6 +30,7 @@ service ReportingService {
 			action: "compliance:reports:list"
 		};
 	};
+
 	// should cover /reportids
     rpc ListReportIds(Query) returns (ReportIds) {
    		option (google.api.http) = {
