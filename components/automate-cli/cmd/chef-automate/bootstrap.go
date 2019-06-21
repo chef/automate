@@ -63,8 +63,8 @@ func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
 		}
 
 		data := resp.GetData()
-		if data == nil {
-			break
+		if len(data) <= 0 {
+			continue
 		}
 		if _, err := w.Write(data); err != nil {
 			return status.Annotate(err, status.FileAccessError)
