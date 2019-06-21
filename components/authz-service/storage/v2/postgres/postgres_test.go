@@ -3509,7 +3509,7 @@ func TestListRules(t *testing.T) {
 			rule2, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			insertStagedRule(t, db, &rule2)
+			insertStagedRule(t, db, &rule2, false)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule2.ID))
@@ -3591,7 +3591,7 @@ func TestListStagedAndAppliedRules(t *testing.T) {
 			rule4, err := storage.NewRule("new-id-4", projID, "name4", ruleType,
 				[]storage.Condition{condition8})
 			require.NoError(t, err)
-			insertStagedRule(t, db, &rule4)
+			insertStagedRule(t, db, &rule4, false)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule3.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule4.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
@@ -3627,7 +3627,7 @@ func TestListStagedAndAppliedRules(t *testing.T) {
 			rule4, err := storage.NewRule("new-id-4", projID2, "name4", ruleType,
 				[]storage.Condition{condition8})
 			require.NoError(t, err)
-			insertStagedRule(t, db, &rule4)
+			insertStagedRule(t, db, &rule4, false)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule3.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule4.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
@@ -3732,7 +3732,7 @@ func TestListRulesForProject(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{"project-3", projID2})
 
 			ruleType := storage.Node
-			insertAppliedRuleWithMultipleConditions(t, db, projID, ruleType)
+			rule1 := insertAppliedRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
@@ -3866,7 +3866,7 @@ func TestUpdateRule(t *testing.T) {
 			ruleOriginal, err := storage.NewRule("new-id-1", "project-1", "rule name", ruleType,
 				[]storage.Condition{condition})
 			require.NoError(t, err)
-			insertAppliedRule(t, db, ruleOriginal)
+			insertAppliedRule(t, db, &ruleOriginal)
 
 			condition.Type = storage.Event
 			ruleUpdated, err := storage.NewRule(ruleOriginal.ID, projID, ruleOriginal.Name, storage.Event,
@@ -3995,7 +3995,7 @@ func TestUpdateRule(t *testing.T) {
 			conditions := []storage.Condition{condition}
 			originalRule, err := storage.NewRule("foo-rule", projID, "foo", storage.Event, conditions)
 			require.NoError(t, err)
-			insertStagedRule(t, db, originalRule, false)
+			insertStagedRule(t, db, &originalRule, false)
 
 			newCondition, err := storage.NewCondition(storage.Event,
 				[]string{"new-chef-server-2"}, storage.ChefServer, storage.Equals)
@@ -4021,8 +4021,8 @@ func TestUpdateRule(t *testing.T) {
 			conditions := []storage.Condition{condition}
 			originalRule, err := storage.NewRule("foo-rule", projID, "foo", storage.Event, conditions)
 			require.NoError(t, err)
-			insertAppliedRule(t, db, originalRule)
-			insertStagedRule(t, db, originalRule, false)
+			insertAppliedRule(t, db, &originalRule)
+			insertStagedRule(t, db, &originalRule, false)
 
 			newCondition, err := storage.NewCondition(storage.Event,
 				[]string{"new-chef-server-2"}, storage.ChefServer, storage.Equals)
@@ -4048,9 +4048,9 @@ func TestUpdateRule(t *testing.T) {
 			conditions := []storage.Condition{condition}
 			originalRule, err := storage.NewRule("foo-rule", projID, "foo", storage.Event, conditions)
 			require.NoError(t, err)
-			insertAppliedRule(t, db, originalRule)
+			insertAppliedRule(t, db, &originalRule)
 			deletedUpdatedRule, err := storage.NewRule(originalRule.ID, originalRule.ProjectID, "foo bar", originalRule.Type, conditions)
-			insertStagedRule(t, db, deletedUpdatedRule, true)
+			insertStagedRule(t, db, &deletedUpdatedRule, true)
 
 			newCondition, err := storage.NewCondition(storage.Event,
 				[]string{"new-chef-server-2"}, storage.ChefServer, storage.Equals)
@@ -4233,10 +4233,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			insertAppliedRule(t, db, &rule)
 
 			stagedRule, err := storage.NewRule(rule.ID, rule.ProjectID, "update: staged name", rule.Type, rule.Conditions)
-
-			insertStagedRule(t, db, &stagedRule)
-			require.NoError(t, err)
-			insertStagedRule(t, db, stagedRule, false)
+			insertStagedRule(t, db, &stagedRule, false)
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
