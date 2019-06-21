@@ -15,6 +15,10 @@ BEGIN
         (NOT EXISTS (SELECT id, project_id FROM iam_staged_project_rules WHERE id=_in_rule_id AND project_id=_in_project_id)) THEN
             RAISE EXCEPTION 'incoming project does not match rule project %', _in_rule_id
             USING ERRCODE='PRJTR';
+    ELSIF (NOT EXISTS (SELECT id, type FROM iam_project_rules WHERE id=_in_rule_id AND type=_in_type)) AND
+        (NOT EXISTS (SELECT id, type FROM iam_staged_project_rules WHERE id=_in_rule_id AND type=_in_type)) THEN
+            RAISE EXCEPTION 'incoming type does not match rule type %', _in_rule_id
+            USING ERRCODE='RLTYP';
     ELSE
         INSERT INTO iam_staged_project_rules as ispr (id, project_id, name, type, deleted)
         VALUES (_in_rule_id, _in_project_id, _in_name, _in_type, false)

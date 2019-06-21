@@ -83,6 +83,8 @@ func parsePQError(err *pq.Error) error {
 		return storage.ErrChangeProjectForRule
 	case "RDLTD": // Custom code: attempt to update a rule that is staged for deletion
 		return storage.ErrMarkedForDeletion
+	case "RLTYP": // Custom code: attempt to update a rule's type that is immutable
+		return storage.ErrChangeTypeForRule
 	}
 
 	return storage.ErrDatabase

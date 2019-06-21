@@ -3721,6 +3721,33 @@ func TestUpdateRule(t *testing.T) {
 			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
 				ruleUpdated.ID, ruleUpdated.Name, ruleUpdated.Type.String(), ruleUpdated.ProjectID))
 		},
+		"when the update attempts to change the type, throw an error": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "project name", storage.Custom)
+
+			ruleType := storage.Node
+			condition, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			ruleOriginal, err := storage.NewRule("new-id-1", "project-1", "rule name", ruleType,
+				[]storage.Condition{condition})
+			require.NoError(t, err)
+			insertAppliedRule(t, db, ruleOriginal)
+
+			condition.Type = storage.Event
+			ruleUpdated, err := storage.NewRule(ruleOriginal.ID, projID, ruleOriginal.Name, storage.Event,
+				[]storage.Condition{condition})
+			require.NoError(t, err)
+
+			resp, err := store.UpdateRule(ctx, &ruleUpdated)
+			assert.Nil(t, resp)
+			assert.Equal(t, storage_errors.ErrChangeTypeForRule, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+				ruleUpdated.ID, ruleUpdated.Name, ruleUpdated.Type.String(), ruleUpdated.ProjectID))
+		},
 		"when there is no project filter, update node rule with multiple conditions to have more conditions": func(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
@@ -3741,7 +3768,7 @@ func TestUpdateRule(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, rule.ID))
 		},
-		"when the project filter matches, update node rule with multiple conditions to have less conditions, different name and type": func(t *testing.T) {
+		"when the project filter matches, update node rule with multiple conditions to have fewer conditions, different name": func(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
@@ -3762,10 +3789,9 @@ func TestUpdateRule(t *testing.T) {
 			require.NoError(t, err)
 			insertAppliedRule(t, db, rule)
 
-			newRuleType := storage.Event
-			condition4, err := storage.NewCondition(newRuleType,
+			condition4, err := storage.NewCondition(rule.Type,
 				[]string{"new-chef-server"}, storage.ChefServer, storage.MemberOf)
-			ruleUpdated, err := storage.NewRule("new-id-1", projID, "updated", newRuleType,
+			ruleUpdated, err := storage.NewRule("new-id-1", projID, "updated", rule.Type,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
 
