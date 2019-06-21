@@ -24,7 +24,8 @@ var ComplianceRepDate = Mapping{
           "min_gram": 2,
           "token_chars": [
             "letter",
-            "digit"
+            "digit",
+            "punctuation"
           ],
           "type": "edge_ngram"
         }
