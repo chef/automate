@@ -165,7 +165,11 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 		}
 
 		for _, job := range jobs {
-			logrus.Infof("Enqueueing individual scan job %q for %q (child of %q)", job.JobID, payload.ChildJobID, payload.ParentJobID)
+			if payload.ChildJobID != "" {
+				logrus.Debugf("Enqueueing individual scan job %s for %s (child of %s)", job.JobID, payload.ChildJobID, payload.ParentJobID)
+			} else {
+				logrus.Debugf("Enqueueing individual scan job %s for %s", job.JobID, payload.ParentJobID)
+			}
 			err = w.EnqueueTask("scan-job", job)
 			if err != nil {
 				err = errors.Wrap(err, "failed to enqueue scan-job task")
