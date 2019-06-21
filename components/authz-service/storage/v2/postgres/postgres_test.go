@@ -23,6 +23,8 @@ import (
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
+const applied = "applied"
+
 // Note: to set up PG locally for running these tests,
 // run the following from your command line from the components/authz-service folder:
 //
@@ -3892,8 +3894,7 @@ func TestUpdateRule(t *testing.T) {
 			conditions := []storage.Condition{condition4}
 			ruleUpdated, err := storage.NewRule("new-id-1", projID, "name", ruleType, append(conditions, rule.Conditions...))
 			require.NoError(t, err)
-
-			ruleUpdated.Status = "applied"
+			ruleUpdated.Status = applied
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
 			assert.NoError(t, err)
 			assert.Equal(t, &ruleUpdated, resp)
@@ -4217,7 +4218,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 				Type:       rule.Type,
 				Conditions: rule.Conditions,
 				Deleted:    false,
-				Status:     "applied",
+				Status:     applied,
 			}
 			assert.Equal(t, &expectedRule, resp)
 		},
@@ -6842,6 +6843,7 @@ func insertAppliedRule(t *testing.T, db *testhelpers.TestDB, rule *storage.Rule)
 	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
 		rule.ID, rule.Name, rule.Type.String(), rule.ProjectID))
 	assertCount(t, len(rule.Conditions), db.QueryRow(`SELECT count(*) FROM iam_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_project_rules r WHERE r.id=$1)`, rule.ID))
+	rule.Status = applied
 }
 
 func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule *storage.Rule, deleted bool) {
@@ -6866,7 +6868,7 @@ func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule *storage.Rule, 
 
 func insertAppliedRuleWithMultipleConditions(t *testing.T, db *testhelpers.TestDB, projID string, ruleType storage.RuleType) *storage.Rule {
 	t.Helper()
-	return insertRuleWithMultipleConditionsIntoTable(t, db, projID, ruleType, "iam_project_rules", "iam_rule_conditions", "applied")
+	return insertRuleWithMultipleConditionsIntoTable(t, db, projID, ruleType, "iam_project_rules", "iam_rule_conditions", applied)
 }
 
 func insertStagedRuleWithMultipleConditions(t *testing.T, db *testhelpers.TestDB, projID string, ruleType storage.RuleType) *storage.Rule {
