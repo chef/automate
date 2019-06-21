@@ -1024,8 +1024,8 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	}
 
 	row := tx.QueryRowContext(ctx,
-		`SELECT update_rule($1, $2, $3, $4, $5, $6)`,
-		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false, pq.Array(projectsFilter))
+		`SELECT update_rule($1, $2, $3, $4, $5)`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), pq.Array(projectsFilter))
 	var ruleDbID int
 	if err := row.Scan(&ruleDbID); err != nil {
 		if err == sql.ErrNoRows {

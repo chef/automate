@@ -1,6 +1,6 @@
 BEGIN;
 
-CREATE OR REPLACE FUNCTION update_rule(_in_rule_id text, _in_project_id text, _in_name text, _in_type text, _in_deleted boolean, projects_filter TEXT[])
+CREATE OR REPLACE FUNCTION update_rule(_in_rule_id text, _in_project_id text, _in_name text, _in_type text, projects_filter TEXT[])
 RETURNS TEXT
 LANGUAGE plpgsql
 AS $$
@@ -27,8 +27,7 @@ BEGIN
                 id          = _in_rule_id,
                 project_id  = _in_project_id,
                 name        = _in_name,
-                type        = _in_type,
-                deleted     = _in_deleted
+                type        = _in_type
             WHERE ispr.id = _in_rule_id AND projects_match_for_rule(ispr.project_id, projects_filter)
         RETURNING ispr.db_id INTO rule_db_id;
     RETURN rule_db_id;
