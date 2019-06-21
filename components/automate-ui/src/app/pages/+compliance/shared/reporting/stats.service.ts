@@ -175,6 +175,13 @@ export class StatsService {
     const url = `${CC_API_URL}/reporting/export`;
     // for export, we want to send the start_time as the beg of day of end time
     // so we find the endtime in the filters, and then set start time to beg of that day
+    const filtersCopy = this.setStartTimeToBegDayEndTime(filters);
+
+    const body = { type: format, filters: this.formatFilters(filtersCopy) };
+    return this.httpClient.post(url, body, { responseType: 'text' });
+  }
+
+  setStartTimeToBegDayEndTime(filters) {
     const endtime = filters.find(filter => filter['end_time']);
     const filtersCopy = filters.map(filter => {
       if (filter['start_time']) {
@@ -182,11 +189,8 @@ export class StatsService {
       }
       return filter;
     });
-
-    const body = { type: format, filters: this.formatFilters(filtersCopy)};
-    return this.httpClient.post(url, body, {responseType: 'text'});
+    return filtersCopy;
   }
-
 
   getSingleReport(reportID: string, filters: any[]): Observable<any> {
     const url = `${CC_API_URL}/reporting/reports/id/${reportID}`;
