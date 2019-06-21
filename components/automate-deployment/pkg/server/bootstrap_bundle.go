@@ -41,11 +41,10 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	}
 
 	tarWriter.Flush()
-	buffer := make([]byte, defaultChunkSize)
 	writer := chunks.NewWriter(defaultChunkSize, func(p []byte) error {
 		return stream.Send(&api.BootstrapBundleResponse{Data: p})
 	})
 
-	_, err = io.CopyBuffer(writer, &b, buffer)
+	_, err = io.Copy(writer, &b)
 	return err
 }
