@@ -16,6 +16,8 @@ import (
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
+const applied = "applied"
+
 func TestCreateRule(t *testing.T) {
 	ctx := context.Background()
 	cl, store, _, _ := setupRules(t)
@@ -143,7 +145,7 @@ func TestCreateRule(t *testing.T) {
 							Operator:  api.ProjectRuleConditionOperators_MEMBER_OF,
 						},
 					},
-					Status: "applied",
+					Status: applied,
 				},
 			}, resp)
 		}},
@@ -471,7 +473,7 @@ func TestGetRule(t *testing.T) {
 				Type:       api.ProjectRuleTypes_NODE,
 				ProjectId:  projectID,
 				Conditions: apiConditions,
-				Status:     "applied",
+				Status:     applied,
 			}
 
 			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: id})
@@ -546,7 +548,7 @@ func TestListRules(t *testing.T) {
 				Type:       api.ProjectRuleTypes_NODE,
 				ProjectId:  projectID,
 				Conditions: apiConditions1,
-				Status:     "applied",
+				Status:     applied,
 			}
 			expected2 := api.ProjectRule{
 				Id:         id2,
@@ -554,7 +556,7 @@ func TestListRules(t *testing.T) {
 				Type:       api.ProjectRuleTypes_EVENT,
 				ProjectId:  projectID,
 				Conditions: apiConditions2,
-				Status:     "applied",
+				Status:     applied,
 			}
 			expected := []*api.ProjectRule{&expected1, &expected2}
 
@@ -647,7 +649,7 @@ func TestListRulesForProject(t *testing.T) {
 				Type:       api.ProjectRuleTypes_EVENT,
 				ProjectId:  projectID2,
 				Conditions: apiConditions2,
-				Status:     "applied",
+				Status:     applied,
 			}
 			expected3 := api.ProjectRule{
 				Id:         id3,
@@ -655,7 +657,7 @@ func TestListRulesForProject(t *testing.T) {
 				Type:       api.ProjectRuleTypes_EVENT,
 				ProjectId:  projectID2,
 				Conditions: apiConditions3,
-				Status:     "applied",
+				Status:     applied,
 			}
 			expected := []*api.ProjectRule{&expected2, &expected3}
 
@@ -752,7 +754,7 @@ func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType 
 		Type:       ruleType,
 		ProjectID:  projectID,
 		Conditions: conditions,
-		Status:     "applied",
+		Status:     applied,
 	}
 	store.Add(id, rule, 0)
 }
