@@ -21,115 +21,74 @@ import (
 // OK        | Else if all services are 'Ok'
 // ---------------------------------------------------------------------
 const (
-	// The service-group health calculation query that:
+	// The service-group queries are based on a view which:
 	// 1) Counts health of services (How many ok, critical, warning and unknown) and its total
 	// 2) Calculates the percentage of services with an ok health.
-	// 3) Concatenates all services releases
-	selectServiceGroupHealthCalculation = `
-SELECT sg.id
-  , sg.deployment_id
-  , sg.name as name
-  , COUNT(s.health) FILTER (WHERE s.health = 'OK') AS health_ok
-  , COUNT(s.health) FILTER (WHERE s.health = 'CRITICAL') AS health_critical
-  , COUNT(s.health) FILTER (WHERE s.health = 'WARNING') AS health_warning
-  , COUNT(s.health) FILTER (WHERE s.health = 'UNKNOWN') AS health_unknown
-  , COUNT(s.health) AS health_total
-  , round((COUNT(s.health) FILTER (WHERE s.health = 'OK') / COUNT(s.health)::float) * 100) as percent_ok
-  , (
-      SELECT array_agg( DISTINCT CONCAT (s.origin, '/', s.name, '/', s.version, '/', s.release) )
-      FROM service AS s
-      WHERE s.group_id = sg.id
-    ) AS releases
-  , d.app_name as app_name
-  , d.environment as environment
-FROM service_group AS sg
-JOIN service AS s
-ON s.group_id = sg.id
-JOIN deployment as d
-ON sg.deployment_id = d.id
-GROUP BY sg.id, sg.deployment_id, sg.name, d.app_name, d.environment
-`
-	// conditional expression to calculate the overall health of the service group
-	// NOTE: @afiune We are adding a number to order the health statuses ('X_') so
-	// that we don't have to do a custom ORDER BY statement, this number must be
-	// removed before sending back any objects to the caller. (grpc functions)
-	conditionalOverallHealth = `
-CASE WHEN health_critical > 0 THEN '1_CRITICAL'
-     WHEN health_unknown  > 0 THEN '2_UNKNOWN'
-     WHEN health_warning  > 0 THEN '3_WARNING'
-     ELSE '4_OK'
-END
-`
-	// Service group health main query. Here we add the overall health calculation.
-	// NOTE: This query has NO pagination and sorting since it is reused for the HealthCounts.
-	// @afiune maybe in the future we could create a sql view so we don't have it here.
-	selectServiceGroupHealth = `
-SELECT *,(` + conditionalOverallHealth + `) health
-FROM (` + selectServiceGroupHealthCalculation + `) AS service_groups_health_calculation
-`
+	// 3) Provides an array of all service releases within a service group
+	// 4) Determines the overall status of the service group
 
 	// TODO: Update this query once we understand better the deploying status
 	selectServiceGroupsHealthCounts = `
-SELECT COUNT(*) AS total
-  , COUNT(*) FILTER (
-      WHERE health_critical > 0
-    ) AS critical
-  , COUNT(*) FILTER (
-      WHERE health_unknown  > 0
-        AND health_critical = 0
-    ) AS unknown
-  , COUNT(*) FILTER (
-      WHERE health_warning  > 0
-        AND health_critical = 0
-        AND health_unknown  = 0
-    ) AS warning
-  , COUNT(*) FILTER (
-      WHERE health_ok > 0
-        AND health_critical = 0
-        AND health_warning  = 0
-        AND health_unknown  = 0
-    ) AS ok
-FROM (` + selectServiceGroupHealth + `) AS service_groups_health_counts
+  SELECT COUNT(*) AS total
+  ,COUNT(*) FILTER (
+             WHERE health_critical > 0
+       ) AS critical
+  ,COUNT(*) FILTER (
+             WHERE health_unknown  > 0
+               AND health_critical = 0
+      ) AS unknown
+  ,COUNT(*) FILTER (
+             WHERE health_warning  > 0
+               AND health_critical = 0
+               AND health_unknown  = 0
+       ) AS warning
+  ,COUNT(*) FILTER (
+             WHERE health_ok > 0
+               AND health_critical = 0
+               AND health_warning  = 0
+               AND health_unknown  = 0
+       ) AS ok
+FROM service_group_health AS service_group_health_counts
 `
 
 	selectServiceGroupHealthWithPageSort = `
-SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
-ORDER BY %s
-LIMIT $1
+SELECT * FROM service_group_health AS service_group_health
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterCRITICAL = `
-SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
-WHERE health_critical > 0
-ORDER BY %s
-LIMIT $1
+SELECT * FROM service_group_health AS service_group_health
+ WHERE health_critical > 0
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterUNKNOWN = `
-SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
-WHERE health_unknown  > 0
-  AND health_critical = 0
-ORDER BY %s
-LIMIT $1
+SELECT * FROM service_group_health AS service_group_health
+ WHERE health_unknown  > 0
+   AND health_critical = 0
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterWARNING = `
-SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
-WHERE health_warning  > 0
-  AND health_critical = 0
-  AND health_unknown  = 0
-ORDER BY %s
-LIMIT $1
+SELECT * FROM service_group_health AS service_group_health
+ WHERE health_warning  > 0
+   AND health_critical = 0
+   AND health_unknown  = 0
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterOK = `
-SELECT * FROM (` + selectServiceGroupHealth + `) AS service_groups_health
-WHERE health_ok > 0
-  AND health_critical = 0
-  AND health_warning  = 0
-  AND health_unknown  = 0
-ORDER BY %s
-LIMIT $1
+SELECT * FROM service_group_health AS service_group_health
+ WHERE health_ok > 0
+   AND health_critical = 0
+   AND health_warning  = 0
+   AND health_unknown  = 0
+ ORDER BY %s
+ LIMIT $1
 OFFSET $2
 `
 )

@@ -21,6 +21,7 @@ import {
   serviceGroupErrorResp
 } from '../../entities/service-groups/service-groups.selector';
 import { find, includes, get } from 'lodash/fp';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
   selector: 'app-service-groups',
@@ -47,7 +48,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public totalServiceGroups = 0;
 
   // The currently selected health status filter
-  public selectedStatus$: Observable<string>;
+  public selectedStatus = 'total';
+  private selectedStatus$: Observable<string>;
 
   // The collection of allowable status
   private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
@@ -77,7 +79,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private telemetryService: TelemetryService
   ) { }
 
   ngOnInit() {
@@ -120,21 +123,32 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.healthSummary$ = this.store.select(allServiceGroupHealth);
-    this.healthSummary$.pipe(takeUntil(this.isDestroyed))
-      .subscribe(sgHealthSummary => this.sgHealthSummary = sgHealthSummary);
-
     this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.status));
     this.selectedStatus$.pipe(takeUntil(this.isDestroyed)).subscribe((status) => {
-      // This code enables the pagination of service groups correctly, when the user selects
+      // This code enables pagination of service groups correctly, when the user selects
       // a Health Filter, we adjust the total number of service groups
       if ( includes(status, this.allowedStatus) ) {
+          this.selectedStatus = status;
           this.totalServiceGroups = get(status, this.sgHealthSummary);
       } else {
+          this.selectedStatus = 'total';
           this.totalServiceGroups = get('total', this.sgHealthSummary);
       }
+      this.telemetryService.track('applicationsServiceGroupCount', {
+        totalServiceGroups: this.totalServiceGroups,
+        statusFilter: status
+      });
     });
+
+    this.healthSummary$ = this.store.select(allServiceGroupHealth);
+    this.healthSummary$.pipe(takeUntil(this.isDestroyed))
+      .subscribe((sgHealthSummary) => {
+        this.sgHealthSummary = sgHealthSummary;
+        // On first load or any health summary change, we update the total number of service groups
+        this.totalServiceGroups = get(this.selectedStatus, this.sgHealthSummary);
+      });
+
 
     this.selectedFieldDirection$ = this.store.select(createSelector(serviceGroupState,
       (state) => state.filters.sortDirection));
@@ -200,6 +214,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     const queryParams = {...this.route.snapshot.queryParams};
     if ( includes(status, this.allowedStatus) ) {
       queryParams['status'] = [status];
+      this.telemetryService.track('applicationsStatusFilter',
+        { entity: 'serviceGroup', statusFilter: status});
     } else {
       delete queryParams['status'];
     }
@@ -253,7 +269,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   onPageChange(pageNumber: number) {
     const queryParams = { ...this.route.snapshot.queryParams, page: pageNumber };
-
+    const totalPages = Math.ceil(this.totalServiceGroups / this.pageSize) || 1;
+    this.telemetryService.track('applicationsPageChange',
+     { entity: 'serviceGroup', pageNumber: pageNumber, totalPages: totalPages});
     if (pageNumber <= 1) {
       delete queryParams['page'];
     }
@@ -276,6 +294,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   onUpdateSort(event): void {
     const {field, fieldDirection} = event;
+    this.telemetryService.track('applicationsSort',
+      { field: field, fieldDirection: fieldDirection});
     if (this.defaultFieldDirection.hasOwnProperty(field) &&
       this.allowedSortDirections.includes(fieldDirection) ) {
       const queryParams = {...this.route.snapshot.queryParams,

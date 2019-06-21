@@ -68,3 +68,4 @@ automate-workflow-web components/automate-workflow-web
 # Not managed by our generator yet
 # automate-chef-io components/automate-chef-io
 data-feed-service components/data-feed-service
+event-feed-service components/event-feed-service

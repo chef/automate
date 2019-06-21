@@ -163,7 +163,7 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 	}
 
 	// Step 1: Retrieving the latest report ID for each node based on the provided filters
-	esIndex, err := relaxting.GetEsIndex(formattedFilters, false, false)
+	esIndex, err := relaxting.GetEsIndex(formattedFilters, false, true)
 	if err != nil {
 		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}

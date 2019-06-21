@@ -4008,7 +4008,7 @@ func TestDeleteRule(t *testing.T) {
 			err := store.DeleteRule(ctx, "not-found")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
-		"when the wrong id requested, returns NotFoundErr": func(t *testing.T) {
+		"when an applied rule exists but the wrong id requested, returns NotFoundErr": func(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
@@ -4029,33 +4029,194 @@ func TestDeleteRule(t *testing.T) {
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 		},
-		"when multiple rules exists with no project filter, delete rule and associated conditions": func(t *testing.T) {
+		"when an applied and staged rule exists but the wrong id requested, returns NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", projID, "name", ruleType, []storage.Condition{condition1})
+			require.NoError(t, err)
+			insertAppliedRule(t, db, rule)
+			insertStagedRule(t, db, rule)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+
+			err = store.DeleteRule(ctx, "not-found")
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+		},
+		"when only staged rule exists but the wrong id requested, returns NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+
+			ruleType := storage.Node
+			condition1, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("new-id-1", projID, "name", ruleType, []storage.Condition{condition1})
+			require.NoError(t, err)
+			insertStagedRule(t, db, rule)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+
+			err = store.DeleteRule(ctx, "not-found")
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+		},
+		"when multiple staged rules exists with no project filter, delete rule and associated conditions": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
 			ruleType := storage.Node
-			ruleToDelete := insertAppliedRuleWithMultipleConditions(t, db, projID, ruleType)
+			ruleToDelete := insertStagedRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
 			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
-			insertAppliedRule(t, db, ruleToSave)
+			insertStagedRule(t, db, ruleToSave)
 
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToSave.ID))
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 
 			err = store.DeleteRule(ctx, ruleToDelete.ID)
 			assert.NoError(t, err)
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
-		"when multiple rules exists with a matching project filter, delete rule and associated conditions": func(t *testing.T) {
+		"when multiple staged rules exists with a matching project filter and no applied rules, delete rule and associated conditions": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{projID, "project-2"})
+
+			ruleType := storage.Node
+			ruleToDelete := insertStagedRuleWithMultipleConditions(t, db, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			insertStagedRule(t, db, ruleToSave)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+
+			err = store.DeleteRule(ctx, ruleToDelete.ID)
+			assert.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+		},
+		"when multiple staged rules exists with a non-matching project filter, do not delete anything": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{"project-3", "project-2"})
+
+			ruleType := storage.Node
+			ruleToDelete := insertStagedRuleWithMultipleConditions(t, db, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			insertStagedRule(t, db, ruleToSave)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+
+			err = store.DeleteRule(ctx, ruleToDelete.ID)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+		},
+		"when multiple staged and applied rules exist with a non-matching project filter, do not delete anything": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{"project-3", "project-2"})
+
+			ruleType := storage.Node
+			ruleToDelete := insertStagedRuleWithMultipleConditions(t, db, projID, ruleType)
+			insertAppliedRuleWithMultipleConditions(t, db, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			insertStagedRule(t, db, ruleToSave)
+			insertAppliedRule(t, db, ruleToSave)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+
+			err = store.DeleteRule(ctx, ruleToDelete.ID)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+		},
+		"when multiple staged and applied rules exist with a matching project filter, mark for delete": func(t *testing.T) {
+			ctx := context.Background()
+
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			ctx = insertProjectsIntoContext(ctx, []string{projID, "project-2"})
+
+			ruleType := storage.Node
+			ruleToDelete := insertStagedRuleWithMultipleConditions(t, db, projID, ruleType)
+			insertAppliedRuleWithMultipleConditions(t, db, projID, ruleType)
+
+			condition4, err := storage.NewCondition(ruleType,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			ruleToSave, err := storage.NewRule("new-id-2", projID, "name2", ruleType,
+				[]storage.Condition{condition4})
+			require.NoError(t, err)
+			insertStagedRule(t, db, ruleToSave)
+			insertAppliedRule(t, db, ruleToSave)
+
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+
+			err = store.DeleteRule(ctx, ruleToDelete.ID)
+			assert.NoError(t, err)
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=true`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
+			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+		},
+		"when multiple applied rules exist with a matching project filter, mark for delete": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -4072,22 +4233,22 @@ func TestDeleteRule(t *testing.T) {
 			require.NoError(t, err)
 			insertAppliedRule(t, db, ruleToSave)
 
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToSave.ID))
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 
 			err = store.DeleteRule(ctx, ruleToDelete.ID)
 			assert.NoError(t, err)
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=true`, ruleToDelete.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
-		"when multiple rules exists with a non-matching project filter, do not delete anything": func(t *testing.T) {
+		"when multiple applied rules exist with a non-matching project filter, do nothing and return NotFoundErr": func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{"project-3", "project-2"})
+			ctx = insertProjectsIntoContext(ctx, []string{"wrong-project", "project-2"})
 
 			ruleType := storage.Node
 			ruleToDelete := insertAppliedRuleWithMultipleConditions(t, db, projID, ruleType)
@@ -4099,15 +4260,15 @@ func TestDeleteRule(t *testing.T) {
 			require.NoError(t, err)
 			insertAppliedRule(t, db, ruleToSave)
 
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToSave.ID))
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 
 			err = store.DeleteRule(ctx, ruleToDelete.ID)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, ruleToDelete.ID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
 	}
 
@@ -6449,8 +6610,8 @@ func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule storage.Rule) {
 	require.NoError(t, row.Scan(&dbID))
 	for _, c := range rule.Conditions {
 		_, err := db.Exec(`
-			INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator, deleted) VALUES ($1, $2, $3, $4, $5);`,
-			dbID, pq.Array(c.Value), c.Attribute.String(), c.Operator.String(), false)
+			INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			dbID, pq.Array(c.Value), c.Attribute.String(), c.Operator.String())
 		require.NoError(t, err)
 	}
 }
@@ -6470,18 +6631,26 @@ func insertAppliedRuleWithMultipleConditions(t *testing.T, db *testhelpers.TestD
 		[]storage.Condition{condition1, condition2, condition3})
 	require.NoError(t, err)
 
-	row := db.QueryRow(`
-		INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
-		rule.ID, projID, rule.Name, ruleType.String())
-	var dbID string
-	err = row.Scan(&dbID)
+	insertAppliedRule(t, db, rule)
+	return &rule
+}
+
+func insertStagedRuleWithMultipleConditions(t *testing.T, db *testhelpers.TestDB, projID string, ruleType storage.RuleType) *storage.Rule {
+	t.Helper()
+	condition1, err := storage.NewCondition(ruleType,
+		[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 	require.NoError(t, err)
-	for _, c := range rule.Conditions {
-		_, err = db.Exec(`
-			INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
-			dbID, pq.Array(c.Value), c.Attribute.String(), c.Operator.String())
-		require.NoError(t, err)
-	}
+	condition2, err := storage.NewCondition(ruleType,
+		[]string{"org1", "org2", "org3"}, storage.Organization, storage.MemberOf)
+	require.NoError(t, err)
+	condition3, err := storage.NewCondition(ruleType,
+		[]string{"chef-server-2"}, storage.ChefServer, storage.Equals)
+	require.NoError(t, err)
+	rule, err := storage.NewRule("new-id-1", projID, "name", ruleType,
+		[]storage.Condition{condition1, condition2, condition3})
+	require.NoError(t, err)
+
+	insertStagedRule(t, db, rule)
 	return &rule
 }
 

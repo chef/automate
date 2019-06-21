@@ -19,6 +19,12 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
+// These must match what SQL function query_rule_table_associations returns.
+const (
+	pgApplied = "applied"
+	pgStaged  = "staged"
+)
+
 type pg struct {
 	db          *sql.DB
 	logger      logger.Logger
@@ -802,11 +808,9 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 		return p.processError(err)
 	}
 
-	count, err := res.RowsAffected()
+	err = p.singleRowResultOrNotFoundErr(res)
 	if err != nil {
-		return p.processError(err)
-	} else if count != 1 {
-		return storage_errors.ErrNotFound
+		return err
 	}
 
 	err = p.notifyPolicyChange(ctx, tx)
@@ -963,19 +967,17 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		return nil, p.processError(err)
 	}
 
-	row := tx.QueryRowContext(ctx,
-		`SELECT query_rule_table_associations($1);`, rule.ID)
-
-	var associations []string
-	if err := row.Scan(pq.Array(&associations)); err != nil {
+	assocMap, err := p.getMapOfRuleAssociations(ctx, tx, rule.ID)
+	if err != nil {
 		return nil, p.processError(err)
 	}
+
 	// If any associations return, then the rule already exists in current, staged, or both tables
-	if len(associations) > 0 {
+	if len(assocMap) > 0 {
 		return nil, storage_errors.ErrConflict
 	}
 
-	row = tx.QueryRowContext(ctx,
+	row := tx.QueryRowContext(ctx,
 		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
 		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false)
 	var ruleDbID string
@@ -985,8 +987,8 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	for _, condition := range rule.Conditions {
 		_, err := tx.ExecContext(ctx,
-			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator, deleted) VALUES ($1, $2, $3, $4, $5);`,
-			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(), false,
+			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator) VALUES ($1, $2, $3, $4);`,
+			ruleDbID, pq.Array(condition.Value), condition.Attribute.String(), condition.Operator.String(),
 		)
 		if err != nil {
 			return nil, p.processError(err)
@@ -1078,19 +1080,69 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		return p.processError(err)
 	}
 
-	res, err := tx.ExecContext(ctx,
-		`DELETE FROM iam_project_rules WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
-		id, pq.Array(projectsFilter),
-	)
+	assocMap, err := p.getMapOfRuleAssociations(ctx, tx, id)
 	if err != nil {
 		return p.processError(err)
 	}
 
-	count, err := res.RowsAffected()
-	if err != nil {
-		return p.processError(err)
-	} else if count == 0 {
+	ruleStaged := assocMap[pgStaged]
+	ruleApplied := assocMap[pgApplied]
+
+	if !ruleStaged && !ruleApplied {
 		return storage_errors.ErrNotFound
+	}
+
+	if ruleApplied && ruleStaged {
+		res, err := tx.ExecContext(ctx,
+			`UPDATE iam_staged_project_rules
+				SET deleted=true
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+			id, pq.Array(projectsFilter),
+		)
+		if err != nil {
+			return p.processError(err)
+		}
+		err = p.singleRowResultOrNotFoundErr(res)
+		if err != nil {
+			return err
+		}
+	} else if ruleApplied {
+		res, err := tx.ExecContext(ctx,
+			`SELECT db_id FROM iam_project_rules
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+			id, pq.Array(projectsFilter),
+		)
+		if err != nil {
+			return p.processError(err)
+		}
+		err = p.singleRowResultOrNotFoundErr(res)
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.ExecContext(ctx,
+			`INSERT INTO iam_staged_project_rules
+				SELECT a.db_id, a.id, a.project_id, a.name, a.type, 'true'
+				FROM iam_project_rules AS a
+				WHERE a.id=$1 AND projects_match_for_rule(a.project_id, $2);`,
+			id, pq.Array(projectsFilter),
+		)
+		if err != nil {
+			return p.processError(err)
+		}
+	} else if ruleStaged {
+		res, err := tx.ExecContext(ctx,
+			`DELETE FROM iam_staged_project_rules
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+			id, pq.Array(projectsFilter),
+		)
+		if err != nil {
+			return p.processError(err)
+		}
+		err = p.singleRowResultOrNotFoundErr(res)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = tx.Commit()
@@ -1279,11 +1331,9 @@ func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		return nil, p.processError(err)
 	}
 
-	count, err := res.RowsAffected()
+	err = p.singleRowResultOrNotFoundErr(res)
 	if err != nil {
-		return nil, p.processError(err)
-	} else if count != 1 {
-		return nil, storage_errors.ErrNotFound
+		return nil, err
 	}
 
 	// Currently, we don't change anything from what is passed in.
@@ -1323,11 +1373,9 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 		return p.processError(err)
 	}
 
-	count, err := res.RowsAffected()
+	err = p.singleRowResultOrNotFoundErr(res)
 	if err != nil {
-		return p.processError(err)
-	} else if count != 1 {
-		return storage_errors.ErrNotFound
+		return err
 	}
 
 	return nil
@@ -1397,6 +1445,34 @@ func (p *pg) Close() error {
 
 func (p *pg) Pristine(ctx context.Context) error {
 	return p.recordMigrationStatus(ctx, enumPristine)
+}
+
+func (p *pg) singleRowResultOrNotFoundErr(result sql.Result) error {
+	count, err := result.RowsAffected()
+	if err != nil {
+		return p.processError(err)
+	}
+	if count == 0 {
+		return storage_errors.ErrNotFound
+	}
+	if count > 1 {
+		return storage_errors.ErrDatabase
+	}
+	return nil
+}
+
+func (p *pg) getMapOfRuleAssociations(ctx context.Context, q Querier, id string) (map[string]bool, error) {
+	assocRow := q.QueryRowContext(ctx, `SELECT query_rule_table_associations($1);`, id)
+	var associations []string
+	if err := assocRow.Scan(pq.Array(&associations)); err != nil {
+		return nil, err
+	}
+
+	set := make(map[string]bool, len(associations))
+	for _, s := range associations {
+		set[s] = true
+	}
+	return set, nil
 }
 
 func (p *pg) recordMigrationStatusAndNotifyPG(ctx context.Context, ms string) error {

@@ -924,9 +924,13 @@ func (db *DB) UpdateNodeDetectInfo(ctx context.Context, nodeDetectInfo *nodes.No
 			} else {
 				updated, err = db.Exec(sqlUpdateNodeExecCompleted, nodeStatus(nodeDetectInfo.NodeStatus), time, nodeDetectInfo.JobId, nodeDetectInfo.NodeId)
 			}
+		default:
+			return errors.Errorf("UpdateNodeDetectInfo unknown node JobType %s", nodeDetectInfo.JobType)
 		}
 	case types.StatusFailed:
 		updated, err = db.Exec(sqlUpdateNodeDetectFailed, nodeStatus(nodeDetectInfo.NodeStatus), nodeDetectInfo.JobId, nodeDetectInfo.NodeId, now)
+	default:
+		return errors.Errorf("UpdateNodeDetectInfo unknown NodeStatus %s", nodeDetectInfo.NodeStatus)
 	}
 	if err != nil {
 		return errors.Wrapf(err, "UpdateNodeDetectInfo unable to update node %s", nodeDetectInfo.NodeId)

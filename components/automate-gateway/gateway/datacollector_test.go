@@ -126,19 +126,19 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 	expectedDescription := &ingestProto.Description{
 		Title: "Error executing action `create` on resource 'file[/failed/file/resource]'",
 		Sections: []*structpb.Struct{
-			&structpb.Struct{
+			{
 				Fields: map[string]*structpb.Value{
 					"Chef::Exceptions::EnclosingDirectoryDoesNotExist": {
 						Kind: &structpb.Value_StringValue{"Parent directory /failed/file does not exist."}},
 				},
 			},
-			&structpb.Struct{
+			{
 				Fields: map[string]*structpb.Value{
 					"Resource Declaration:": {
 						Kind: &structpb.Value_StringValue{"# In /Users/bob/file_cache_path/cookbooks/insights-test/recipes/default.rb\n\n 26: file '/failed/file/resource' do\n 27:   action :create\n 28:   not_if { ENV['MID_RUN_FAILURE_IS_OK'].nil? }\n 29: end\n 30: \n"}},
 				},
 			},
-			&structpb.Struct{
+			{
 				Fields: map[string]*structpb.Value{
 					"Compiled Resource:": {
 						Kind: &structpb.Value_StringValue{"# Declared in /Users/bob/file_cache_path/cookbooks/insights-test/recipes/default.rb:26:in `from_file'\n\nfile(\"/failed/file/resource\") do\n  action [:create]\n  retries 0\n  retry_delay 2\n  default_guard_interpreter :default\n  declared_type :file\n  cookbook_name \"insights-test\"\n  recipe_name \"default\"\n  path \"/failed/file/resource\"\n  atomic_update true\n  not_if { #code block }\nend\n"}},
@@ -169,7 +169,7 @@ func TestDataCollectorParseBytesToChefRunFailure(t *testing.T) {
 	assert.Equal(t, "", res1.Delta)
 	assert.Equal(t, "insights-test", res1.CookbookName)
 	assert.Equal(t, "0.1.1", res1.CookbookVersion)
-	assert.Equal(t, false, res1.IgnoreFailure.GetBoolValue())
+	assert.Equal(t, true, res1.IgnoreFailure.GetBoolValue())
 	assert.Equal(t, "skipped", res1.Status)
 	assert.Equal(t, "", res1.RecipeName)
 	assert.Equal(t, "not_if { action == :nothing }", res1.Conditional)
@@ -446,11 +446,11 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	assert.Equal(t, "", p1.SkipMessage)
 	assert.Equal(t, "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27", p1.Sha256)
 	assert.Len(t, p1.Controls, 2)
-	expectedP1Support := []*inspecEvent.Support{&inspecEvent.Support{Inspec: "~> 1.0"}}
+	expectedP1Support := []*inspecEvent.Support{{Inspec: "~> 1.0"}}
 	assert.Len(t, p1.Supports, 1)
 	assert.Equal(t, expectedP1Support, p1.Supports)
 	expectedP1Attributes := []*inspecEvent.Attribute{
-		&inspecEvent.Attribute{
+		{
 			Name: "role_name",
 			Options: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
@@ -459,7 +459,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 				},
 			},
 		},
-		&inspecEvent.Attribute{
+		{
 			Name: "profile_id",
 			Options: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
@@ -468,7 +468,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 				},
 			},
 		},
-		&inspecEvent.Attribute{
+		{
 			Name: "do.this?",
 			Options: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
@@ -477,21 +477,21 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 				},
 			},
 		},
-		&inspecEvent.Attribute{
+		{
 			Name: "take_this",
 			Options: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
 					"default": {Kind: &structpb.Value_ListValue{
 						&structpb.ListValue{Values: []*structpb.Value{
-							&structpb.Value{Kind: &structpb.Value_StringValue{"oh"}},
-							&structpb.Value{Kind: &structpb.Value_StringValue{"hear"}},
+							{Kind: &structpb.Value_StringValue{"oh"}},
+							{Kind: &structpb.Value_StringValue{"hear"}},
 						}},
 					}},
 					"description": {Kind: &structpb.Value_StringValue{"A bloody array"}},
 				},
 			},
 		},
-		&inspecEvent.Attribute{
+		{
 			Name: "bloody_hash",
 			Options: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
@@ -505,7 +505,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 				},
 			},
 		},
-		&inspecEvent.Attribute{
+		{
 			Name: "no_default",
 			Options: &structpb.Struct{
 				Fields: map[string]*structpb.Value{
@@ -519,7 +519,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	expectedP1Dependencies := make([]*inspecEvent.Dependency, 0)
 	assert.Equal(t, expectedP1Dependencies, p1.Depends)
 	expectedP1Groups := []*inspecEvent.Group{
-		&inspecEvent.Group{
+		{
 			Id:    "controls/success.rb",
 			Title: "",
 			Controls: []string{
@@ -545,7 +545,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	assert.Equal(t, "loaded", p2.Status)
 	assert.Equal(t, "", p2.SkipMessage)
 	expectedP2Controls := []*inspecEvent.Control{
-		&inspecEvent.Control{
+		{
 			Id:     "/etc/services must exist",
 			Title:  "Checking for /etc/services",
 			Code:   "control '/etc/services must exist' do\n  title 'Checking for /etc/services'\n  desc 'Checking for /etc/services desc'\n  impact 0.3\n  describe file('/etc/services') do\n    it { should be_file }\n  end\nend\n",
@@ -559,20 +559,20 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 				},
 			},
 			Refs: []*structpb.Struct{
-				&structpb.Struct{
+				{
 					Fields: map[string]*structpb.Value{
 						"url": {Kind: &structpb.Value_StringValue{"https://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf"}},
 						"ref": {Kind: &structpb.Value_StringValue{"NSA-RH6-STIG - Section 3.5.2.1"}},
 					},
 				},
-				&structpb.Struct{
+				{
 					Fields: map[string]*structpb.Value{
 						"ref": {Kind: &structpb.Value_StringValue{"http://people.redhat.com/swells/scap-security-guide/RHEL/6/output/ssg-centos6-guide-C2S.html"}},
 					},
 				},
 			},
 			Results: []*inspecEvent.Result{
-				&inspecEvent.Result{
+				{
 					Status:    "passed",
 					CodeDesc:  "File /etc/services should be file",
 					RunTime:   float32(0.000076582),
@@ -596,7 +596,7 @@ func TestDataCollectorParseBytesToComplianceReport(t *testing.T) {
 	assert.Len(t, p2.Depends, 0)
 	assert.Equal(t, expectedP2Dependencies, p2.Depends)
 	expectedP2Groups := []*inspecEvent.Group{
-		&inspecEvent.Group{
+		{
 			Id:       "controls/success.rb",
 			Title:    "",
 			Controls: []string{"/etc/services must exist"},

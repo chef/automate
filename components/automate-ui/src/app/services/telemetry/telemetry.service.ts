@@ -44,6 +44,8 @@ export class TelemetryService {
   private maxNodes;
   private instanceId;
   private buildVersion;
+  private previousUrl: string;
+  private currentUrl: string;
 
   constructor(private httpClient: HttpClient,
     private configService: ConfigService,
@@ -55,7 +57,9 @@ export class TelemetryService {
     // browsing of the user.
     router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.page(event.url);
+        this.previousUrl = this.currentUrl;
+        this.currentUrl = event.url;
+        this.page(this.currentUrl, {previousUrl: this.previousUrl});
       }
     });
 

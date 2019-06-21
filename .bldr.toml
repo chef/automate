@@ -830,6 +830,21 @@ paths = [
   "lib/version/*",
   "Gopkg.lock"
 ]
+
+[event-feed-service]
+plan_path = "components/event-feed-service"
+paths = [
+  "components/event-feed-service/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
