@@ -400,4 +400,16 @@ describe('StatsService', () => {
       req.flush(text);
     });
   });
+
+  describe('setStartTimeToBegDayEndTime()', () => {
+    it('sets start time to beg of day of end time date', () => {
+      expect(service.setStartTimeToBegDayEndTime([
+        { 'end_time': moment('2017-11-15T23:59:59Z').utcOffset(0) },
+        { 'start_time': moment().format('YYYY-MM-DDTHH:mm:ssZ') }
+      ])).toEqual([
+        { 'end_time': moment('2017-11-15T23:59:59Z').utcOffset(0) },
+        { 'start_time': moment('2017-11-15T23:59:59Z').utcOffset(0).startOf('day') }
+      ]);
+    });
+  });
 });
