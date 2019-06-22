@@ -17,9 +17,11 @@ func (nc *NatsClient) Subscribe(eventsCh chan<- []byte) (stan.Subscription, erro
 	return nc.conn.Subscribe(nc.subject, func(msg *stan.Msg) {
 
 		log.WithFields(log.Fields{
-			"protocol": "nats",
-			"data":     string(msg.Data),
-			"subject":  nc.subject,
+			"protocol":          "nats",
+			"message_data":      string(msg.Data),
+			"message_timestamp": msg.Timestamp,
+			"message_subject":   msg.Subject,
+			"message_sequence":  msg.Sequence,
 		}).Debug("Message received")
 
 		eventsCh <- msg.Data
