@@ -112,7 +112,7 @@ run: clean create-ss-config create-event-config
 	@printf "\n===> ${blue}Running event-service in background${reset} with logs redirected to ${yellow}$(EVENT_LOG_PATH)${reset}\n"
 	$(RUN_EVENT_SERVICE_COMMAND) &> $(EVENT_LOG_PATH)&
 	@printf "\n===> ${blue}Running nodemanager-service in background${reset} with logs redirected to ${yellow}$(MANAGER_LOG_PATH)${reset}\n"
-	go run cmd/nodemanager-service/nodemanager.go run --port $(PORT) --cert $(SSL_CERT) --key $(SSL_KEY) --root-cert $(SSL_ROOT_CERT) --postgres-uri $(POSTGRES_URI) --secrets-port $(SS_PORT) --event-endpoint $(EVENT_ENDPOINT) &> $(MANAGER_LOG_PATH)&
+	go run cmd/nodemanager-service/nodemanager.go run --port $(PORT) --cert $(SSL_CERT) --key $(SSL_KEY) --root-cert $(SSL_ROOT_CERT) --postgres-uri $(POSTGRES_URI) --secrets-port $(SS_PORT) --event-endpoint $(EVENT_ENDPOINT) --log-level debug &> $(MANAGER_LOG_PATH)&
 	@$(MAKE) wait-for-nodemanager-service
 
 run-compliance-service:

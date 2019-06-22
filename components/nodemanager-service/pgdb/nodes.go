@@ -57,6 +57,7 @@ FROM nodes n
   LEFT JOIN projects p on np.project_id = p.id
 %s
 GROUP BY n.id
+%s
 ORDER BY %s %s
 LIMIT $1
 OFFSET $2;
@@ -76,6 +77,7 @@ USING nodes n
   LEFT JOIN nodes_tags nt ON n.id = nt.node_id
   LEFT JOIN tags t ON t.id = nt.tag_id
   LEFT JOIN node_managers_nodes m on n.id = m.node_id
+%s
 %s
 AND nodes.id = n.id
 RETURNING nodes.name
@@ -483,7 +485,7 @@ func (db *DB) GetNodes(sortField string, insortOrder nodes.Query_OrderType, page
 		return nil, nil, errors.Wrapf(err, "GetNodes error validating node filters")
 	}
 
-	whereFilter, err := buildWhereFilter(filters, "n", nodesFilterField)
+	whereFilter, havingFilter, err := buildWhereHavingFilter(filters, "n", nodesFilterField)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "GetNodes error building where filter")
 	}
@@ -491,7 +493,7 @@ func (db *DB) GetNodes(sortField string, insortOrder nodes.Query_OrderType, page
 	nodes := make([]*nodes.Node, 0)
 
 	var nodesDaos []*dbNode
-	query := fmt.Sprintf(selectNodes, whereFilter, nodesSortFields[sortField], sortOrder)
+	query := fmt.Sprintf(selectNodes, whereFilter, havingFilter, nodesSortFields[sortField], sortOrder)
 	logrus.Debugf("SQL: %s %d %d", query, perPage, pageNr*perPage)
 	_, err = db.Select(&nodesDaos, query, perPage, pageNr*perPage)
 
@@ -557,14 +559,14 @@ func (db *DB) DeleteNodesWithQuery(filters []*common.Filter) ([]string, error) {
 		return nil, errors.Wrapf(err, "DeleteNodesWithQuery error validating node filters")
 	}
 
-	whereFilter, err := buildWhereFilter(filters, "n", nodesFilterField)
+	whereFilter, havingFilter, err := buildWhereHavingFilter(filters, "n", nodesFilterField)
 	if err != nil {
 		return nil, errors.Wrap(err, "DeleteNodesWithQuery error building where filter")
 	}
 
 	var names []string
 
-	_, err = db.Select(&names, fmt.Sprintf(deleteNodesWithQuery, whereFilter))
+	_, err = db.Select(&names, fmt.Sprintf(deleteNodesWithQuery, whereFilter, havingFilter))
 	if err != nil {
 		return []string{}, errors.Wrap(err, "DeleteNodesWithQuery unable to delete nodes")
 	}
@@ -697,7 +699,7 @@ func (db *DB) GetNode(ctx context.Context, id string) (*nodes.Node, error) {
 
 	logrus.Debugf("Getting node %s", id)
 	// Args are the where clause, order field, order direction
-	query := fmt.Sprintf(selectNodes, "WHERE n.id = $3", "name", "desc")
+	query := fmt.Sprintf(selectNodes, "WHERE n.id = $3", "", "name", "desc")
 	// Args are the query, limit, offset, node id
 	err := db.SelectOne(&node, query, 1, 0, id)
 	if err != nil {

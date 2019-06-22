@@ -303,7 +303,7 @@ func (db *DB) GetNodeManagers(sortField string, insortOrder manager.Query_OrderT
 	if err != nil {
 		return nil, 0, errors.Wrapf(err, "GetNodeManagers error validating node manager filters")
 	}
-	whereFilter, err := buildWhereFilter(filters, "nm", mgrFilterField)
+	whereFilter, _, err := buildWhereHavingFilter(filters, "nm", mgrFilterField)
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "GetNodeManagers error building where filter")
 	}

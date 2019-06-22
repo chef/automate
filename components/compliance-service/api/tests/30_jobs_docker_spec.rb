@@ -383,7 +383,7 @@ describe File.basename(__FILE__) do
     sleep_count = 1
     # Status will be completed initially from the previous run. Then it turns running and then completed again with a new end_time
     while rerun_job.status != "completed" || job2_orig_end_time == rerun_job.end_time.seconds do
-      puts "> #{sleep_count} < waiting for rerun job status 'completed', current status '#{rerun_job.status}'"
+      puts "> #{sleep_count} < waiting for rerun job status 'completed', current status '#{rerun_job.status}', job end time '#{job2_orig_end_time}', rerun end time '#{rerun_job.end_time.seconds}'"
       sleep 3
       sleep_count += 1
       rerun_job = GRPC jobs, :read, Jobs::Id.new(id: job_id2)
@@ -690,6 +690,61 @@ describe File.basename(__FILE__) do
       Common::Filter.new(key: "group", values: ["mak", "do"])
     ])
     assert_equal(1, filtered_nodes_by_tags.total)
+
+    filtered_nodes_by_tags['nodes'].each {|n|
+      assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, n, 'last_contact'))
+      n.scan_data.end_time = Google::Protobuf::Timestamp.new()
+      n.scan_data.id = "some-id"
+    }
+    expected_filtered_nodes = {
+      "nodes": [
+        {
+          "id": "#{node1.id}",
+          "name": "My Existing Docker Node",
+          "platform": "debian",
+          "platformVersion": "9.7",
+          "manager": "automate",
+          "tags": [
+            {
+              "key": "environment",
+              "value": "trouble"
+            },
+            {
+              "key": "group",
+              "value": "makers"
+            },
+            {
+              "key": "group",
+              "value": "doers"
+            },
+            {
+              "key": "_no_auto_detect",
+              "value": "true"
+            }
+          ],
+          "status": "unreachable",
+          "lastJob": {
+            "nodeId": "#{node1.id}",
+            "status": "failed",
+            "jobId": "#{job_id2}"
+          },
+          "managerIds": [
+            "e69dc612-7e67-43f2-9b19-256afd385820"
+          ],
+          "state": "TERMINATED",
+          "runData": {},
+          "scanData": {
+            "id": "some-id",
+            "status": "SKIPPED",
+            "penultimateStatus": "SKIPPED",
+            "endTime": "1970-01-01T00:00:00Z"
+          }
+        }
+      ],
+      "total": 1,
+      "totalUnreachable": 2
+    }
+    assert_equal_json_sorted(expected_filtered_nodes.to_json, filtered_nodes_by_tags.to_json)
   end
 
   it "does not include deleted jobs in job list" do
