@@ -32,6 +32,8 @@ service ReportingService {
 	};
 
 	// should cover /reportids
+	// NB - ListReportIds is not limited to the 10k like some of the other reporting apis
+	// This api is useful for getting a complete list of runids for latest runs.  It also honors all reporting filters
     rpc ListReportIds(Query) returns (ReportIds) {
    		option (google.api.http) = {
    			post: "/compliance/reporting/report-ids"

@@ -94,7 +94,7 @@
     },
     "/compliance/reporting/report-ids": {
       "post": {
-        "summary": "should cover /reportids",
+        "summary": "should cover /reportids\nNB - ListReportIds is not limited to the 10k like some of the other reporting apis\nThis api is useful for getting a complete list of runids for latest runs.  It also honors all reporting filters",
         "operationId": "ListReportIds",
         "responses": {
           "200": {
