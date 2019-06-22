@@ -46,12 +46,12 @@ describe File.basename(__FILE__) do
       "Assign one global unicast IPv6 addresses to each interface--sysctl-28--",
       "Disable Core Dumps--sysctl-31--",
       "Disable log martians--sysctl-17--",
-      "Disable TRACE-methods--apache-09--",
       "Disable Source Routing--sysctl-13--",
+      "Disable TRACE-methods--apache-09--",
       "Disable IPv6 if it is not needed--sysctl-18--",
       "Disable learning Hop limit from router advertisement--sysctl-24--",
       "Disable the system`s acceptance of router advertisement--sysctl-25--",
-      "Disable insecure HTTP-methods--apache-10--" ]
+      "Disable loading kernel modules--sysctl-29--" ]
     assert_suggestions_text_id_version(expected, actual_data)
 
 
@@ -199,8 +199,8 @@ describe File.basename(__FILE__) do
     assert_suggestions_text_id_version( [
       "redhat(2)-alpha-nginx(f)-apache(s)-failed--9b9f4e51-b049-4b10-9555-10578916e111--",
       "windows(1)-zeta-apache(s)-skipped--a0ddd774-cbbb-49be-8730-49c92f3fc2a0--",
-      "RedHat(2)-beta-nginx(f)-apache(s)-failed--9b9f4e51-b049-4b10-9555-10578916e222--",
-      "redhat(2)-alpha-nginx(f)-apache(f)-failed--9b9f4e51-b049-4b10-9555-10578916e112--"
+      "redhat(2)-alpha-nginx(f)-apache(f)-failed--9b9f4e51-b049-4b10-9555-10578916e112--",
+      "RedHat(2)-beta-nginx(f)-apache(s)-failed--9b9f4e51-b049-4b10-9555-10578916e222--"
     ], actual_data )
 
       # suggest nodes with invalid filters
