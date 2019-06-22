@@ -30,6 +30,24 @@ service ReportingService {
 			action: "compliance:reports:list"
 		};
 	};
+
+	// should cover /reportids
+	// NB - ListReportIds is not limited to the 10k like some of the other reporting apis
+	// This api is useful for getting a complete list of runids for latest runs.  It also honors all reporting filters
+    rpc ListReportIds(Query) returns (ReportIds) {
+   		option (google.api.http) = {
+   			post: "/compliance/reporting/report-ids"
+   			body: "*"
+   		};
+   		option (chef.automate.api.policy) = {
+   			resource: "compliance:reporting:report-ids"
+   			action: "search"
+   		};
+   		option (chef.automate.api.iam.policy) = {
+   			resource: "compliance:reporting:report-ids"
+   			action: "compliance:reportids:list"
+   		};
+   	};
 	// should cover /reports/:reportid
 	rpc ReadReport(Query) returns (Report) {
 		option (google.api.http) = {
@@ -180,6 +198,10 @@ message ControlSummary {
 message Reports {
 	repeated Report reports = 1;
 	int32 total = 2;
+}
+
+message ReportIds {
+	repeated string ids = 1;
 }
 
 message Report {
