@@ -50,7 +50,7 @@ var serveCmd = &cobra.Command{
 		conf.SetStorage(dbClient)
 
 		if conf.Service.Enabled {
-			ingester := ingest.New(conf, dbClient)
+			ingester := ingest.New(conf, conf.GetStorage())
 			err = ingester.Connect()
 			if err != nil {
 				return err

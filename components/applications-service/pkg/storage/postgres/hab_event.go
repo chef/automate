@@ -119,6 +119,8 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 		return err
 	}
 
+	// @afiune are we changing the grouping of a service group based of the application
+	// and environment names?
 	svc, exist := db.getServiceFromUniqueFields(
 		pkgIdent.Origin,
 		pkgIdent.Name,
@@ -126,6 +128,11 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	)
 
 	// If the service already exists, we just do a simple update
+	//
+	// Fields that needs to be updated:
+	// - Health
+	// - Package ident (without name. the name of a service can't be changed!)
+	// - Update strategy
 	if exist {
 		svc.Version = pkgIdent.Version
 		svc.Release = pkgIdent.Release

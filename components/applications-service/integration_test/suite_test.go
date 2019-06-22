@@ -11,6 +11,7 @@ import (
 
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/config"
+	"github.com/chef/automate/components/applications-service/pkg/ingest"
 	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
@@ -25,8 +26,10 @@ import (
 // This struct holds:
 // * ApplicationsServer: This is our main RPC server we want to test against
 // * StorageClient: Lets us manipulate our database to add or remove things from it
+// * Ingester: The mechanism to ingest messages to our system
 type Suite struct {
 	ApplicationsServer *server.ApplicationsServer
+	Ingester           *ingest.Ingester
 	StorageClient      storage.Client
 }
 
@@ -46,13 +49,15 @@ func NewSuite(database string) *Suite {
 
 	var (
 		s = new(Suite)
-		c = config.Postgres{
-			URI:        uri,
-			Database:   database,
-			SchemaPath: "/src/components/applications-service/pkg/storage/postgres/schema/sql",
+		c = &config.Applications{
+			Postgres: config.Postgres{
+				URI:        uri,
+				Database:   database,
+				SchemaPath: "/src/components/applications-service/pkg/storage/postgres/schema/sql",
+			},
 		}
 	)
-	dbClient, err := postgres.New(&c)
+	dbClient, err := postgres.New(&c.Postgres)
 	if err != nil {
 		fmt.Printf("Could not create postgres client: %s\n", err)
 		os.Exit(1)
@@ -65,6 +70,17 @@ func NewSuite(database string) *Suite {
 	// svcsHealthCounts, err := suite.StorageClient.GetServicesHealthCounts()
 	// ```
 	s.StorageClient = dbClient
+
+	// A global Ingester instance to ingest any "message" into our system
+	//
+	// From any test you can directly call:
+	// ```
+	// res, err := suite.Ingester.IgestMessage(msg)
+	// ```
+	s.Ingester = ingest.New(c, s.StorageClient)
+
+	// Start processing messages as they are sended to the ingest events channel
+	go s.Ingester.Run()
 
 	// A global ApplicationsServer instance to call any rpc function
 	//

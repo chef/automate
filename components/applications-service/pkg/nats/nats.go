@@ -166,7 +166,7 @@ func (nc *NatsClient) tryConnect(tlsConf *tls.Config) (stan.Conn, error) {
 
 // ConnectAndSubscribe will attempt to connect to the NATS Server and then
 // subscribe to the subject that the client was configured
-func (nc *NatsClient) ConnectAndSubscribe(eventsCh chan<- *stan.Msg) error {
+func (nc *NatsClient) ConnectAndSubscribe(eventsCh chan<- []byte) error {
 
 	err := nc.Connect()
 	if err != nil {

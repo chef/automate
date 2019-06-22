@@ -3,13 +3,12 @@ package ingest
 import (
 	"fmt"
 
-	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
-	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
+	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 )
@@ -20,22 +19,22 @@ const (
 )
 
 type Ingester struct {
-	Cfg              *config.Applications
-	DBClient         *postgres.Postgres
+	cfg              *config.Applications
+	storageClient    storage.Client
 	natsClient       *nats.NatsClient
-	EventsCh         chan *stan.Msg
+	eventsCh         chan []byte
 	workerInputQueue chan<- *habitat.HealthCheckEvent
 	workerTaskQueue  <-chan *habitat.HealthCheckEvent
 }
 
-func New(c *config.Applications, db *postgres.Postgres) *Ingester {
+func New(c *config.Applications, client storage.Client) *Ingester {
 
 	q := make(chan *habitat.HealthCheckEvent)
 
 	return &Ingester{
-		Cfg:              c,
-		DBClient:         db,
-		EventsCh:         make(chan *stan.Msg, eventsBufferSize),
+		cfg:              c,
+		storageClient:    client,
+		eventsCh:         make(chan []byte, eventsBufferSize),
 		workerInputQueue: q,
 		workerTaskQueue:  q,
 	}
@@ -47,13 +46,13 @@ func New(c *config.Applications, db *postgres.Postgres) *Ingester {
 // ingester in a goroutine.
 func (i *Ingester) Connect() error {
 	natsClient := nats.NewDefaults(
-		fmt.Sprintf("nats://%s:%d", i.Cfg.Events.Host, i.Cfg.Events.Port),
-		i.Cfg.Events.ClusterID,
-		*i.Cfg.TLSConfig,
+		fmt.Sprintf("nats://%s:%d", i.cfg.Events.Host, i.cfg.Events.Port),
+		i.cfg.Events.ClusterID,
+		*i.cfg.TLSConfig,
 	)
 
 	// Trigger NATS Subscription
-	err := natsClient.ConnectAndSubscribe(i.EventsCh)
+	err := natsClient.ConnectAndSubscribe(i.eventsCh)
 	if err != nil {
 		return errors.Wrapf(err, "could not connect to nats-streaming")
 	}
@@ -70,15 +69,15 @@ func (i *Ingester) Run() {
 	// TODO @afiune Move this logic into an ingestion pipeline
 	for {
 		select {
-		case event := <-i.EventsCh:
+		case eventBytes := <-i.eventsCh:
 
 			// TODO: @afiune We should have a way to have multi-message-type ingestion
 			// Unmarshal the data and send the message to the channel
 			var habMsg habitat.HealthCheckEvent
-			err := proto.Unmarshal(event.Data, &habMsg)
+			err := proto.Unmarshal(eventBytes, &habMsg)
 			if err != nil {
 				log.WithFields(log.Fields{
-					"data":    string(event.Data),
+					"data":    string(eventBytes),
 					"subject": i.natsClient.Subject(),
 				}).Error("Unknown message, dropping")
 				continue
@@ -93,10 +92,15 @@ func (i *Ingester) runWorkerLoop() {
 	for {
 		select {
 		case event := <-i.workerTaskQueue:
-			err := i.DBClient.IngestHealthCheckEvent(event)
+			err := i.storageClient.IngestHealthCheckEvent(event)
 			if err != nil {
 				log.WithError(err).Error("Unable to ingest habitat event")
 			}
 		}
 	}
+}
+
+// Sends a message through the ingestion "pipeline" (aka our events channel)
+func (i *Ingester) IngestMessage(msg []byte) {
+	i.eventsCh <- msg
 }

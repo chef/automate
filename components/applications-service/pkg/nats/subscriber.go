@@ -5,7 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (nc *NatsClient) Subscribe(eventsCh chan<- *stan.Msg) (stan.Subscription, error) {
+func (nc *NatsClient) Subscribe(eventsCh chan<- []byte) (stan.Subscription, error) {
 
 	log.WithFields(log.Fields{
 		"subject":    nc.subject,
@@ -22,6 +22,6 @@ func (nc *NatsClient) Subscribe(eventsCh chan<- *stan.Msg) (stan.Subscription, e
 			"subject":  nc.subject,
 		}).Debug("Message received")
 
-		eventsCh <- msg
+		eventsCh <- msg.Data
 	}, stan.DurableName(nc.durableID))
 }
