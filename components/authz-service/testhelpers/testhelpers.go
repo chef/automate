@@ -56,7 +56,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (api.ProjectsClient, *TestDB, sto
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, &TestProjectRulesRetriever{},
-		eventServiceClient, configMgr, server.NewMockPolicyRefresher())
+		eventServiceClient, configMgr, NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -210,4 +210,18 @@ type TestProjectRulesRetriever struct{}
 func (t *TestProjectRulesRetriever) ListProjectMappings(
 	context.Context) (map[string][]storage.Rule, error) {
 	return make(map[string][]storage.Rule, 0), nil
+}
+
+type mockPolicyRefresher struct{}
+
+func NewMockPolicyRefresher() server.PolicyRefresher {
+	return &mockPolicyRefresher{}
+}
+
+func (*mockPolicyRefresher) Refresh(context.Context) error {
+	return nil
+}
+
+func (refresher *mockPolicyRefresher) RefreshAsync() error {
+	return nil
 }

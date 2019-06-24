@@ -299,17 +299,3 @@ func (refresher *policyRefresher) getRuleMap(ctx context.Context) (map[string][]
 func pretty(vsn api.Version) string {
 	return fmt.Sprintf("IAM v%d.%d", int32(vsn.Major), int32(vsn.Minor))
 }
-
-type mockPolicyRefresher struct{}
-
-func NewMockPolicyRefresher() PolicyRefresher {
-	return &mockPolicyRefresher{}
-}
-
-func (*mockPolicyRefresher) Refresh(context.Context) error {
-	return nil
-}
-
-func (refresher *mockPolicyRefresher) RefreshAsync() error {
-	return nil
-}

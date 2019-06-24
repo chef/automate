@@ -186,6 +186,7 @@ func (s *state) ApplyRulesStart(
 
 	err := s.store.ApplyStagedRules(ctx)
 	if err != nil {
+		s.log.Warnf("error applying staged projects: %s", err.Error())
 		return nil, status.Errorf(codes.Internal,
 			"error applying staged projects: %s", err.Error())
 	}
@@ -195,14 +196,16 @@ func (s *state) ApplyRulesStart(
 	// We will be refactoring with workflow to make this safer soon.
 	err = s.policyRefresher.Refresh(ctx)
 	if err != nil {
+		s.log.Warnf("error refreshing policy cache: %s", err.Error())
 		return nil, status.Errorf(codes.Internal,
-			"error refreshing policy cache: %s\nthe rules were updated but the apply was not started, please try again", err.Error())
+			"error refreshing policy cache. the rules were updated but the apply was not started, please try again.")
 	}
 
 	err = s.projectUpdateManager.Start()
 	if err != nil {
+		s.log.Warnf("error starting project update: %s", err.Error())
 		return nil, status.Errorf(codes.Internal,
-			"error starting project update: %s\nthe rules and cache were updated but the apply was not started, please try again", err.Error())
+			"error starting project update. the rules and cache were updated but the apply was not started, please try again.")
 	}
 
 	return &api.ApplyRulesStartResp{}, nil

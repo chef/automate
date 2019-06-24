@@ -1251,14 +1251,14 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 				ON CONFLICT (id) DO UPDATE
 				SET name=excluded.name, type=excluded.type
 				RETURNING id, db_id;`)
+	if err != nil {
+		return p.processError(err)
+	}
 	defer func() {
 		if err := rows.Close(); err != nil {
 			p.logger.Warnf("failed to close db rows: %s", err.Error())
 		}
 	}()
-	if err != nil {
-		return p.processError(err)
-	}
 
 	// For every staged rule updated, we need to update conditions.
 	ids := make(map[string]string)

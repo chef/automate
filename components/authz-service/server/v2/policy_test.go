@@ -2984,7 +2984,7 @@ func setupV2WithMigrationState(t *testing.T,
 	configMgr, err := config.NewManager("/tmp/.authz-delete-me")
 	require.NoError(t, err)
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
-		rulesRetriever, eventServiceClient, configMgr, v2.NewMockPolicyRefresher())
+		rulesRetriever, eventServiceClient, configMgr, testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	vSwitch := v2.NewSwitch(vChan)
