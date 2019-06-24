@@ -23,7 +23,10 @@
 
 chef-page-header {
   position: relative;
-  padding-bottom: 35px;
+
+  chef-subheading {
+    padding-bottom: 32px;
+  }
 }
 
 app-client-runs-search-bar {

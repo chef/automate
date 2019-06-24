@@ -271,7 +271,7 @@ export class ClientRunsSearchBarComponent implements OnChanges {
           return `Enter ${normal_type} name`;
       }
     } else {
-      return 'Enter name';
+      return 'Filter by...';
     }
   }
 
