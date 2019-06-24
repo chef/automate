@@ -14,6 +14,8 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/sirupsen/logrus"
 
+	"sort"
+
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/utils"
@@ -710,6 +712,7 @@ func (db *DB) GetNode(ctx context.Context, id string) (*nodes.Node, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "GetNode unable to translate node from db struct")
 	}
+	sort.Strings(n.Projects)
 
 	return n, nil
 }

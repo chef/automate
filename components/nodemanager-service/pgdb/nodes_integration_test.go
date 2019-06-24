@@ -357,7 +357,7 @@ func (suite *NodesIntegrationSuite) TestProjectsAreRoundtrippedThroughNodeLifecy
 
 	controlNode, err := suite.Database.GetNode(ctx, controlNodeID)
 	suite.Require().NoError(err)
-	suite.Equal([]string{"Mexican Restaurant Menu", "Best Soups"}, controlNode.Projects)
+	suite.Equal([]string{"Best Soups", "Mexican Restaurant Menu"}, controlNode.Projects)
 
 	// Update the projects on the original node.
 	err = suite.Database.UpdateNode(&nodes.Node{Id: testNodeID, Name: "Updated Taco Node", Projects: []string{"Favorite Food", "Mexican Restaurant Menu"}})
@@ -371,7 +371,7 @@ func (suite *NodesIntegrationSuite) TestProjectsAreRoundtrippedThroughNodeLifecy
 	// The projects on the control node should be the same
 	controlNode, err = suite.Database.GetNode(ctx, controlNodeID)
 	suite.Require().NoError(err)
-	suite.Equal([]string{"Mexican Restaurant Menu", "Best Soups"}, controlNode.Projects)
+	suite.Equal([]string{"Best Soups", "Mexican Restaurant Menu"}, controlNode.Projects)
 }
 
 var nowTime = ptypes.TimestampNow()
