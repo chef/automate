@@ -66,7 +66,8 @@ func initializePG() (*pg.Config, error) {
 	// If in CI mode, use the default
 	if ciMode {
 		return &pg.Config{
-			PGURL: constants.TestPgURL,
+			PGURL:          constants.TestPgURL,
+			MigrationsPath: "sql/",
 		}, nil
 	}
 
@@ -79,7 +80,8 @@ func initializePG() (*pg.Config, error) {
 	}
 
 	return &pg.Config{
-		PGURL: customPGURL,
+		PGURL:          customPGURL,
+		MigrationsPath: "sql/",
 	}, nil
 }
 
