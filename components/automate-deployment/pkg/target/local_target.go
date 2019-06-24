@@ -402,7 +402,7 @@ func supplementaryPackages() ([]habpkg.HabPkg, error) {
 }
 
 // InstallSupPackages installs non-service Habitat packages included
-// in automate-deployment's data/services.json
+// in product.meta core
 func (t *LocalTarget) InstallSupPackages(releaseManifest manifest.ReleaseManifest, writer cli.BodyWriter) error {
 	writer.Body("Installing supplementary Habitat packages")
 	packages, err := supplementaryPackages()
