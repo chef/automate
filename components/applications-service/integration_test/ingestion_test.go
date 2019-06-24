@@ -126,31 +126,31 @@ func TestIngestMultiServicesSameServiceGroup(t *testing.T) {
 			withStrategyAtOnce("stable"),
 			withApplication("test-app"),
 			withEnvironment("development"),
-			withFqdn("db.example.com"),
-			withHealth(HealthCheckIntToString(0)), // -> OK
-			withSite("us"),
+			withFqdn("db.example.eu.com"),
+			withHealth(HealthCheckIntToString(1)), // -> WARNING
+			withSite("eu"),
 		),
 		NewHabitatEvent(
 			withSupervisorId("4f1un3"),
-			withPackageIdent("test/db/0.1.0/20200101121212"),
+			withPackageIdent("dev/db/0.1.0/20200101121212"),
 			withServiceGroup("db.default"),
 			withStrategyAtOnce("stable"),
 			withApplication("test-app"),
 			withEnvironment("development"),
-			withFqdn("db.example.com"),
-			withHealth(HealthCheckIntToString(0)), // -> OK
+			withFqdn("db.example.us.com"),
+			withHealth(HealthCheckIntToString(2)), // -> CRITICAL
 			withSite("us"),
 		),
 		NewHabitatEvent(
 			withSupervisorId("m4y4"),
-			withPackageIdent("test/db/0.1.0/20200101121213"),
+			withPackageIdent("personal/db/0.1.0/20200101121213"),
 			withServiceGroup("db.default"),
 			withStrategyAtOnce("stable"),
 			withApplication("test-app"),
 			withEnvironment("development"),
-			withFqdn("db.example.com"),
-			withHealth(HealthCheckIntToString(0)), // -> OK
-			withSite("us"),
+			withFqdn("db.example.mx.com"),
+			withHealth(HealthCheckIntToString(3)), // -> UNKNOWN
+			withSite("mx"),
 		),
 	}
 
