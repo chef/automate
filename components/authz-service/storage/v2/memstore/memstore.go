@@ -339,7 +339,7 @@ func (s *State) DeleteRule(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *State) ApplyStagedRules(ctx context.Context) error {
+func (*State) ApplyStagedRules(context.Context) error {
 	// TODO
 	return nil
 }
