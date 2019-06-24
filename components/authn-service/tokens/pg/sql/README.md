@@ -12,3 +12,4 @@
 - [`10_drop_constraint.up.sql`](10_drop_constraint.up.sql)
 - [`11_add_default_empty_array_for_project_ids.up.sql`](11_add_default_empty_array_for_project_ids.up.sql)
 - [`12_add_filter_function_for_token_projects.up.sql`](12_add_filter_function_for_token_projects.up.sql)
+- [`13_add_db_id_column_to_tokens.up.sql`](13_add_db_id_column_to_tokens.up.sql)
