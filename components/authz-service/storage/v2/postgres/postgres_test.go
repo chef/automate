@@ -3686,7 +3686,7 @@ func TestListRulesForProject(t *testing.T) {
 			assert.Nil(t, resp)
 			assert.Zero(t, len(resp))
 		}},
-		{"when multiple rules exist with no project filter, returns the rules for the project", func(t *testing.T) {
+		{"when multiple rules exist with no project filter, returns the most up-to-date rules for the project", func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3700,6 +3700,7 @@ func TestListRulesForProject(t *testing.T) {
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
 			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
@@ -3707,6 +3708,7 @@ func TestListRulesForProject(t *testing.T) {
 
 			condition5, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-3", "chef-server-4"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
 			rule3, err := storage.NewRule("new-id-3", projID2, "name3", ruleType,
 				[]storage.Condition{condition5})
 			require.NoError(t, err)
@@ -3736,6 +3738,7 @@ func TestListRulesForProject(t *testing.T) {
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
 			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
@@ -3743,6 +3746,7 @@ func TestListRulesForProject(t *testing.T) {
 
 			condition5, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-3", "chef-server-4"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
 			rule3, err := storage.NewRule("new-id-3", projID2, "name3", ruleType,
 				[]storage.Condition{condition5})
 			require.NoError(t, err)
@@ -3771,6 +3775,7 @@ func TestListRulesForProject(t *testing.T) {
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
 			rule2, err := storage.NewRule("new-id-2", projID2, "name2", ruleType,
 				[]storage.Condition{condition4})
 			require.NoError(t, err)
@@ -3790,6 +3795,76 @@ func TestListRulesForProject(t *testing.T) {
 			resp, err := store.ListRulesForProject(ctx, projID2)
 			assert.NoError(t, err)
 			assert.Zero(t, len(resp))
+		}},
+		{"when there are staged changes for the project's rules, returns the latest changes to the rules", func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "first project", storage.Custom)
+			
+			condition, err := storage.NewCondition(storage.Node,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("first-rule", projID, "the very first rule", condition.Type,
+				[]storage.Condition{condition})
+			require.NoError(t, err)
+			insertAppliedRule(t, db, &rule)
+
+			updatedCondition, err := storage.NewCondition(storage.Node,
+				[]string{"new-chef-server"}, storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			updatedRule, err := storage.NewRule(rule.ID, projID, "updated rule name", condition.Type,
+				[]storage.Condition{updatedCondition})
+			insertStagedRule(t, db, &updatedRule, false)
+
+			resp, err := store.ListRulesForProject(ctx, projID)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []*storage.Rule{&updatedRule}, resp)
+		}},
+		{"when there are staged changes for some of the project's rules, returns mix of staged and applied rules", func(t *testing.T) {
+			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "first project", storage.Custom)
+
+			condition, err := storage.NewCondition(storage.Node,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("first-rule", projID, "the very first rule", condition.Type,
+				[]storage.Condition{condition})
+			require.NoError(t, err)
+			insertAppliedRule(t, db, &rule)
+
+			updatedCondition, err := storage.NewCondition(storage.Node,
+				[]string{"new-chef-server"}, storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			updatedRule, err := storage.NewRule(rule.ID, projID, "updated rule name", updatedCondition.Type,
+				[]storage.Condition{updatedCondition})
+			require.NoError(t, err)
+			insertStagedRule(t, db, &updatedRule, false)
+
+			appliedRule := insertAppliedRuleWithMultipleConditions(t, db, projID, condition.Type)
+
+			resp, err := store.ListRulesForProject(ctx, projID)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []*storage.Rule{&updatedRule, appliedRule}, resp)
+		}},
+		{"when a project's rule has been marked for deletion, it will not be returned", func(t *testing.T) {
+			ctx := context.Background()
+			projID := "foo-project"
+			insertTestProject(t, db, projID, "first project", storage.Custom)
+
+			condition, err := storage.NewCondition(storage.Node,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("foo-rule", projID, "coo foo rule", condition.Type, []storage.Condition{condition})
+			assert.NoError(t, err)
+			insertAppliedRule(t, db, &rule)
+
+			// mark for deletion
+			insertStagedRule(t, db, &rule, true)
+
+			resp, err := store.ListRulesForProject(ctx, projID)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []*storage.Rule{}, resp)
 		}},
 	}
 
