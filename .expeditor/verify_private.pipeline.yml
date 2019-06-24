@@ -494,7 +494,7 @@ steps:
   - label: "[integration] airgap upgrade"
     command:
       - integration/run_test integration/tests/airgap_upgrade.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 30
     expeditor:
       executor:
         linux:
