@@ -138,7 +138,7 @@ Whenever you make a change to a `*.proto` file, you'll need to run `make proto` 
 
 ### DB (Postgres)
 
-We are using https://github.com/mattes/migrate for migration. It happens in-code, triggered from the `dao/pgdb/db.go`. The code for the migration bits is in `lib/db/migrator`.
+We are using https://github.com/golang-migrate/migrate for migration. It happens in-code, triggered from the `dao/pgdb/db.go`. The code for the migration bits is in `lib/db/migrator`.
 To make a change to the schema, create an `up` and `down` file in `dao/pgdb/migration/sql` following the established pattern.
 
 ## Repo structure and services information

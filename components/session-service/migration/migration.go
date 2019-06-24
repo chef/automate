@@ -3,9 +3,9 @@ package migration
 import (
 	"net/url"
 
-	"github.com/mattes/migrate"
-	_ "github.com/mattes/migrate/database/postgres"
-	_ "github.com/mattes/migrate/source/file"
+	"github.com/golang-migrate/migrate"
+	_ "github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/source/file"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/logger"
