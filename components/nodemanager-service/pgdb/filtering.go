@@ -101,9 +101,8 @@ func buildWhereHavingFilter(mergeableFilters []*common.Filter, tableAbbrev strin
 		conditions = append(conditions, newCondition)
 	}
 
-	tagConditions := make([]string, 0)
 	if len(tagFilters) > 0 {
-		tagConditions, err = handleTagFilters(tagFilters)
+		tagConditions, err := handleTagFilters(tagFilters)
 		if err != nil {
 			return "", "", errors.Wrap(err, "buildWhereHavingFilter error building tags")
 		}
