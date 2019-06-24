@@ -15,11 +15,19 @@ import (
 )
 
 var bootstrapBundleCmd = &cobra.Command{
-	Use:    "bootstrap",
-	Short:  "Bundle bootstrap files.",
-	Long:   "Bundle files needed to bootstrap a new node.",
-	RunE:   runBootstrapBundleCmd,
+	Use:    "bootstrap COMMAND",
+	Short:  "Collect files needed for bootstrap.",
 	Hidden: true,
+}
+
+func newExportBootstrapBundleCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "export",
+		Short: "Export bundle of files needed to bootstrap a new node.",
+		RunE:  runBootstrapBundleCmd,
+	}
+
+	return cmd
 }
 
 func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
@@ -78,5 +86,6 @@ func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
+	bootstrapBundleCmd.AddCommand(newExportBootstrapBundleCmd())
 	RootCmd.AddCommand(bootstrapBundleCmd)
 }
