@@ -253,7 +253,7 @@ func TestGetToken(t *testing.T) {
 func TestGetTokens(t *testing.T) {
 	store, db := setup(t)
 
-	//DB time and Golang time are rounded differently
+	// DB time and Golang time are rounded differently
 	tme := time.Now().UTC().Round(time.Second)
 	testTokens := []*tokens.Token{
 		{
@@ -287,7 +287,7 @@ func TestGetTokens(t *testing.T) {
 			ID:          "token-with-no-project",
 			Description: "TokenX",
 			Active:      true,
-			Value:       "other",
+			Value:       "andanother",
 			Created:     tme,
 			Updated:     tme,
 			Projects:    []string{},
