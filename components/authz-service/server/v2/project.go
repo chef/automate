@@ -388,7 +388,14 @@ func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleR
 }
 
 func (s *state) ListRules(ctx context.Context, req *api.ListRulesReq) (*api.ListRulesResp, error) {
-	resp, err := s.store.ListRules(ctx)
+	if req.IncludeStaged {
+		return s.listRulesWithFunction(ctx, req, s.store.ListStagedAndAppliedRules)
+	}
+	return s.listRulesWithFunction(ctx, req, s.store.ListRules)
+}
+
+func (s *state) listRulesWithFunction(ctx context.Context, req *api.ListRulesReq, list func(context.Context) ([]*storage.Rule, error)) (*api.ListRulesResp, error) {
+	resp, err := list(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
 	}
@@ -491,6 +498,8 @@ func fromStorageRule(r *storage.Rule) (*api.ProjectRule, error) {
 		Type:       t,
 		ProjectId:  r.ProjectID,
 		Conditions: cs,
+		Deleted:    r.Deleted,
+		Status:     r.Status,
 	}, nil
 }
 

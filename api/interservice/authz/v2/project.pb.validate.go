@@ -1512,6 +1512,10 @@ func (m *ProjectRule) Validate() error {
 
 	}
 
+	// no validation rules for Deleted
+
+	// no validation rules for Status
+
 	return nil
 }
 
@@ -2170,6 +2174,8 @@ func (m *ListRulesReq) Validate() error {
 	if m == nil {
 		return nil
 	}
+
+	// no validation rules for IncludeStaged
 
 	return nil
 }

@@ -143,7 +143,7 @@ SELECT array_agg(policy_id) FROM pol_ids`,
 func (p *pg) ListPolicies(ctx context.Context) ([]*v2.Policy, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	var pols []*v2.Policy
@@ -419,7 +419,7 @@ func (p *pg) notifyPolicyChange(ctx context.Context, q Querier) error {
 func (p *pg) queryPolicy(ctx context.Context, id string, q Querier) (*v2.Policy, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	var pol v2.Policy
@@ -717,7 +717,7 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	var roles []*v2.Role
@@ -750,7 +750,7 @@ func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
 
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
@@ -787,7 +787,7 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return p.processError(err)
+		return err
 	}
 
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
@@ -832,7 +832,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
@@ -1012,7 +1012,7 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -1062,7 +1062,7 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return p.processError(err)
+		return err
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -1149,19 +1149,14 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
 	var rule v2.Rule
-	row := tx.QueryRowContext(ctx, `SELECT query_staged_rule($1, $2);`,
+	row := p.db.QueryRowContext(ctx, "SELECT query_staged_or_applied_rule($1, $2)",
 		id, pq.Array(projectsFilter),
 	)
 	err = row.Scan(&rule)
@@ -1172,30 +1167,28 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, e
 		return nil, p.processError(err)
 	}
 
-	err = tx.Commit()
-	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
-	}
-
 	return &rule, nil
 }
 
 func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
+	return p.listRulesUsingFunction(ctx, "SELECT query_rules($1)")
+}
+
+func (p *pg) ListStagedAndAppliedRules(ctx context.Context) ([]*v2.Rule, error) {
+	return p.listRulesUsingFunction(ctx, "SELECT query_staged_and_applied_rules($1)")
+}
+
+func (p *pg) listRulesUsingFunction(ctx context.Context, query string) ([]*v2.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
 	var rules []*v2.Rule
-	rows, err := p.db.QueryContext(ctx, `SELECT query_rules from query_rules($1);`, pq.Array(projectsFilter))
+	rows, err := p.db.QueryContext(ctx, query, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -1215,11 +1208,6 @@ func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
 		rules = append(rules, &rule)
 	}
 
-	err = tx.Commit()
-	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
-	}
-
 	return rules, nil
 }
 
@@ -1229,16 +1217,11 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
-	}
-
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	var rules []*v2.Rule
-	rows, err := p.db.QueryContext(ctx, `SELECT query_rules_for_project from query_rules_for_project($1, $2);`,
+	rows, err := p.db.QueryContext(ctx, `SELECT query_rules_for_project($1, $2);`,
 		projectID, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
@@ -1257,11 +1240,6 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 			return nil, p.processError(err)
 		}
 		rules = append(rules, &rule)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
 	return rules, nil
@@ -1311,7 +1289,7 @@ func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	// Update project if ID found AND intersection between projects and projectsFilter,
@@ -1336,7 +1314,7 @@ func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 func (p *pg) GetProject(ctx context.Context, id string) (*v2.Project, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	var project v2.Project
@@ -1353,7 +1331,7 @@ func (p *pg) GetProject(ctx context.Context, id string) (*v2.Project, error) {
 func (p *pg) DeleteProject(ctx context.Context, id string) error {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return p.processError(err)
+		return err
 	}
 
 	// Delete project if ID found AND intersection between projects and projectsFilter,
@@ -1377,7 +1355,7 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, err
 	}
 
 	// List all projects that have intersection between projects and projectsFilter,

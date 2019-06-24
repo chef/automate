@@ -111,6 +111,8 @@ message ProjectRule {
     string name = 3;
     ProjectRuleTypes type = 4;
     repeated Condition conditions = 5;
+    bool deleted = 6;
+    string status = 7;
 }
 
 enum ProjectRuleTypes {
@@ -173,7 +175,9 @@ message GetRuleResp {
     ProjectRule rule = 1;
 }
 
-message ListRulesReq {}
+message ListRulesReq {
+    bool include_staged = 1;
+}
 
 message ListRulesResp {
     repeated ProjectRule rules = 1;
