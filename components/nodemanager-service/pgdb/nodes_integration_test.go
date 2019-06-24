@@ -3,15 +3,17 @@ package pgdb_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/chef/automate/components/nodemanager-service/pgdb/dbtest"
-	"github.com/golang/protobuf/ptypes"
 
+	"time"
+
+	"github.com/golang/protobuf/ptypes"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -174,7 +176,7 @@ func (suite *NodesIntegrationSuite) TestGetNodesReturnsErrorWithConflictingInclu
 	}
 	_, _, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter, filter2})
 
-	message := "GetNodes error building where filter: buildWhereFilter error: Filters are not allowed to be inclusive and exclusive on the same field."
+	message := "GetNodes error building where filter: buildWhereHavingFilter error: Filters are not allowed to be inclusive and exclusive on the same field."
 	suite.EqualError(err, message)
 }
 
@@ -200,6 +202,7 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByTags() {
 }
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
+	logrus.SetLevel(logrus.DebugLevel)
 	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
 	suite.Require().NoError(err)
 
@@ -210,20 +213,18 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
 	suite.Require().NoError(err)
 
 	filter1 := &common.Filter{
-		Key:    "tacos",
-		Values: []string{"yes"},
-	}
-	filter2 := &common.Filter{
 		Key:    "nachos",
-		Values: []string{"yes"},
+		Values: []string{"no", "yes"},
 	}
-	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1, filter2})
+	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1})
 	suite.Require().NoError(err)
-
+	logrus.Infof("!!!!!running, len(fetchedNodes)=%d", len(fetchedNodes))
 	suite.Equal(2, len(fetchedNodes))
 	suite.Equal(&pgdb.TotalCount{Total: 2, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
-	suite.Equal("Nacho Node", fetchedNodes[0].GetName())
-	suite.Equal("Taco Node", fetchedNodes[1].GetName())
+	if len(fetchedNodes) >= 2 {
+		suite.Equal("Nacho Node", fetchedNodes[0].GetName())
+		suite.Equal("No Nacho Node", fetchedNodes[1].GetName())
+	}
 }
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByProjects() {
