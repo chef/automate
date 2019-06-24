@@ -306,7 +306,7 @@ func NewMockPolicyRefresher() PolicyRefresher {
 	return &mockPolicyRefresher{}
 }
 
-func (refresher *mockPolicyRefresher) Refresh(context.Context) error {
+func (*mockPolicyRefresher) Refresh(context.Context) error {
 	return nil
 }
 
