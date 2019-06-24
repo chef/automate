@@ -1297,7 +1297,7 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 			SELECT a.id FROM iam_project_rules AS a
 			LEFT OUTER JOIN iam_staged_project_rules AS s
 			ON s.id=a.id
-			WHERE s.deleted=true);`)
+			WHERE s.deleted)`)
 	if err != nil {
 		return p.processError(err)
 	}
