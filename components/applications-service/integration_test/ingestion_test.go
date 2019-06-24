@@ -259,7 +259,6 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 
 	UpdateHabitatEvent(event,
 		withHealth(HealthCheckIntToString(2)), // -> CRITICAL
-		// TODO @afiune fix ingestion to remove the channel when there is no update strategy
 		withStrategyAtOnce("unstable"),
 		withPackageIdent("changed/db/3.2.1/20201212000000"),
 	)
@@ -319,5 +318,22 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 			"the total number of services in this service_group is not the expected one")
 		assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Critical,
 			"the OK number of services in this service_group is not the expected one")
+	}
+
+	// 3) Extra update to verify that the update strategy is updated
+	UpdateHabitatEvent(event,
+		withoutUpdateStrategy(),
+	)
+
+	bytes, err = proto.Marshal(event)
+	if assert.Nil(t, err) {
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		svcList := suite.GetServices()
+		assert.Equal(t, 1, len(svcList))
+		assert.Equal(t, "", svcList[0].Channel,
+			"the service channel name is not the expected one")
 	}
 }

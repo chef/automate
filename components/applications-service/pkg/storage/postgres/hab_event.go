@@ -144,9 +144,12 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 		svc.Release = pkgIdent.Release
 		svc.FullPkgIdent = pkgIdent.FullPackageIdent()
 
-		// Update Channel if the update config exist
+		// Update Channel
+		// TODO @afiune do we want to store the strategy?
 		if svcMetadata.GetUpdateConfig() != nil {
 			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
+		} else {
+			svc.Channel = ""
 		}
 
 		if _, err := db.DbMap.Update(svc); err != nil {
