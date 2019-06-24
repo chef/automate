@@ -34,26 +34,24 @@ bin:
 
 build: ${BINS}
 
-start: build
-	./bin/authz-service examples/config.yml
-
 test:
 	@go test -i $(packages)
 	@go test $(verbose) -cover -count=1 -parallel=1 -p 1 $(packages)
 
-test_with_db:
-	@docker ps | grep authz-postgres || (echo "Docker postgres not up. Run make setup_docker_pg and try this command again."; exit 1)
-	psql -d "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable" -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""
-	go test -i $(packages)
-	@PG_URL="postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable" go test -cover -count=1 -parallel=1 -p 1 $(packages)
+PG_URL ?= "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable&timezone=UTC"
+
+test_with_db: db_container
+	@PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages)
 	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
 
-test_properties_with_db:
-	@docker ps | grep authz-postgres || (echo "Docker postgres not up. Run make setup_docker_pg and try this command again."; exit 1)
-	psql -d "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable" -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""
-	go test -i $(packages)
-	@PG_URL="postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable" go test -cover -count=1 -parallel=1 -p 1 $(packages) -run Properties
+test_properties_with_db: db_container
+	@PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages) -run Properties
 	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
+
+.PHONY: db_container
+db_container:
+	@docker ps | grep authz-postgres || (echo "Docker postgres not up. Run make setup_docker_pg and try this command again."; exit 1)
+	psql -d $(PG_URL) -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""
 
 setup_docker_pg:
 	docker run --name authz-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=authz_test -p 5432:5432 -d postgres:9

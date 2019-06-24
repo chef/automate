@@ -1,5 +1,3 @@
-// +build darwin
-
 // Right now we don't have an implementation for Darwin. If we ever actually
 // need cross compilation support we can shared almost everything with linux
 // and darwin except that Stat_t uses uint16 rather than uint32 on linux.

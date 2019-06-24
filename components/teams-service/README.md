@@ -29,7 +29,7 @@ make test_with_db
 If you wish to run the tests in VSCode or elsewhere, set the following in the proper environment:
 
 ```
-export PG_URL="postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable"
+export PG_URL="postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable&timezone=UTC"
 ```
 
 Once you are done testing against the database, kill the container

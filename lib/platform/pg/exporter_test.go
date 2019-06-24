@@ -38,7 +38,8 @@ var testExpectedEnv = []string{
 	"PGSSLMODE=verify-ca",
 	"PGSSLKEY=/hab/svc/automate-postgresql/config/server.key",
 	"PGSSLCERT=/hab/svc/automate-postgresql/config/server.crt",
-	"PGSSLROOTCERT=/hab/svc/automate-postgresql/config/root.crt"}
+	"PGSSLROOTCERT=/hab/svc/automate-postgresql/config/root.crt",
+	"PGTZ=UTC"}
 
 var connInfo = &pg.A2ConnInfo{
 	Host:  "test-db.example.com",
