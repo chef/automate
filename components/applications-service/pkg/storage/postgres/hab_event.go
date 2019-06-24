@@ -129,9 +129,9 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	// If the service already exists, we just do a simple update
 	//
 	// Fields that needs to be updated:
-	// - Health
 	// - Package ident (without name. the name of a service can't be changed!)
 	// - Update strategy
+	// - Health, Application, Environment, Site and Fqdn
 	if exist {
 		// Update Health
 		// @afiune all our backend was designed for the health check to be all

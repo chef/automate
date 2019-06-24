@@ -82,7 +82,7 @@ func NewSuite(database string) *Suite {
 	// ```
 	s.Ingester = ingest.New(c, s.StorageClient)
 
-	// Start processing messages as they are sended to the ingest events channel
+	// Start processing messages as they are sent to the ingest events channel
 	go s.Ingester.Run()
 
 	// A global ApplicationsServer instance to call any rpc function
