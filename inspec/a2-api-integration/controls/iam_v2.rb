@@ -1074,12 +1074,11 @@ EOF
         expect(resp.http_status.to_s).to match(/200|404/)
       end
 
-      # TODO uncomment once ListRulesForProject has been refactored with staged rules
-      # it "GET /iam/v2beta/projects/:id/rules returns the rules for the project" do
-      #   resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules")
-      #   expect(resp.http_status).to eq 200
-      #   expect(resp.parsed_response_body[:rules]).to match_array([CUSTOM_RULE_1, CUSTOM_RULE_2])
-      # end
+      it "GET /iam/v2beta/projects/:id/rules returns the most up-to-date rules for the project" do
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules")
+        expect(resp.http_status).to eq 200
+        expect(resp.parsed_response_body[:rules]).to match_array([CUSTOM_RULE_1, CUSTOM_RULE_2])
+      end
 
       # TODO uncomment once ListRules has been refactored with staged rules
       # it "GET /iam/v2beta/rules returns all the rules" do
