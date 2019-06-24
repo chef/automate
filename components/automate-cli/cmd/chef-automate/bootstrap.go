@@ -39,7 +39,7 @@ func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		status.Annotate(err, status.FileAccessError)
+		return status.Annotate(err, status.FileAccessError)
 	}
 	downloadedBundlePath := filepath.Join(cwd, "bootstrap-bundle.tar")
 	downloadedBundleFile, err := os.OpenFile(downloadedBundlePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)

@@ -11,20 +11,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type bootstrapFile struct {
-	Filename string `json:"filename"`
-	Path     string `json:"path"`
-}
-
-type serviceForExport struct {
-	Service        string          `json:"service"`
-	BootstrapFiles []bootstrapFile `json:"bootstrap_files"`
-}
-
-type servicesForExport struct {
-	Services []serviceForExport `json:"services"`
-}
-
 // BootstrapBundle makes and downloads a bootstrap bundle
 func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Deployment_BootstrapBundleServer) error {
 	var b bytes.Buffer
