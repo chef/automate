@@ -226,6 +226,28 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 			"the service channel name is not the expected one")
 		assert.Equal(t, "us", svcList[0].Site,
 			"the service site name is not the expected one")
+
+		sgList := suite.GetServiceGroups()
+		assert.Equal(t, 1, len(sgList), "wrong number of service groups")
+
+		assert.Equal(t, "db.default", sgList[0].Name,
+			"the service_group name is not the expected one")
+		assert.Equal(t, "test/db", sgList[0].Package,
+			"the service_group package is not the expected one")
+		assert.Equal(t, "0.1.0/20200101121212", sgList[0].Release,
+			"the service_group release is not the expected one")
+		assert.Equal(t, "OK", sgList[0].HealthStatus,
+			"the service_group health status is not the expected one")
+		assert.Equal(t, int32(100), sgList[0].HealthPercentage,
+			"the service_group health percentage is not the expected one")
+		assert.Equal(t, "test-app", sgList[0].Application,
+			"the service_group application name is not the expected one")
+		assert.Equal(t, "development", sgList[0].Environment,
+			"the service_group environment name is not the expected one")
+		assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Total,
+			"the total number of services in this service_group is not the expected one")
+		assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Ok,
+			"the OK number of services in this service_group is not the expected one")
 	}
 
 	// 2) Update same service
@@ -277,5 +299,28 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 			"the service channel name is not the expected one")
 		assert.Equal(t, "us", svcList[0].Site,
 			"the service site name is not the expected one")
+
+		sgList := suite.GetServiceGroups()
+		assert.Equal(t, 1, len(sgList), "wrong number of service groups")
+
+		assert.Equal(t, "db.default", sgList[0].Name,
+			"the service_group name is not the expected one")
+		assert.Equal(t, "test/db", sgList[0].Package,
+			"the service_group package is not the expected one")
+		// TODO @afiune fix ingestion to update the new package_ident field in the database
+		//assert.Equal(t, "3.2.1/20201212000000", sgList[0].Release,
+		//"the service_group release is not the expected one")
+		assert.Equal(t, "CRITICAL", sgList[0].HealthStatus,
+			"the service_group health status is not the expected one")
+		assert.Equal(t, int32(0), sgList[0].HealthPercentage,
+			"the service_group health percentage is not the expected one")
+		assert.Equal(t, "test-app", sgList[0].Application,
+			"the service_group application name is not the expected one")
+		assert.Equal(t, "development", sgList[0].Environment,
+			"the service_group environment name is not the expected one")
+		assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Total,
+			"the total number of services in this service_group is not the expected one")
+		assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Critical,
+			"the OK number of services in this service_group is not the expected one")
 	}
 }
