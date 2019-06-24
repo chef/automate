@@ -19,24 +19,35 @@ const (
 )
 
 type Ingester struct {
-	cfg              *config.Applications
-	storageClient    storage.Client
-	natsClient       *nats.NatsClient
-	eventsCh         chan []byte
-	workerInputQueue chan<- *habitat.HealthCheckEvent
-	workerTaskQueue  <-chan *habitat.HealthCheckEvent
+	cfg                   *config.Applications
+	storageClient         storage.Client
+	natsClient            *nats.NatsClient
+	eventsCh              chan []byte
+	workerInputQueue      chan<- *habitat.HealthCheckEvent
+	workerTaskQueue       <-chan *habitat.HealthCheckEvent
+	workerOutputQueue     chan error
+	totalEventsFailed     int64
+	totalEventsSuccessful int64
+	totalEventsProcessed  int64
 }
 
 func New(c *config.Applications, client storage.Client) *Ingester {
-
-	q := make(chan *habitat.HealthCheckEvent)
+	var (
+		events = make(chan []byte, eventsBufferSize)
+		queue  = make(chan *habitat.HealthCheckEvent)
+		out    = make(chan error, eventsBufferSize)
+	)
 
 	return &Ingester{
-		cfg:              c,
-		storageClient:    client,
-		eventsCh:         make(chan []byte, eventsBufferSize),
-		workerInputQueue: q,
-		workerTaskQueue:  q,
+		cfg:                   c,
+		storageClient:         client,
+		eventsCh:              events,
+		workerInputQueue:      queue,
+		workerTaskQueue:       queue,
+		workerOutputQueue:     out,
+		totalEventsFailed:     0,
+		totalEventsSuccessful: 0,
+		totalEventsProcessed:  0,
 	}
 
 }
@@ -69,9 +80,8 @@ func (i *Ingester) Run() {
 	// TODO @afiune Move this logic into an ingestion pipeline
 	for {
 		select {
+		// TODO: @afiune We should have a way to have multi-message-type ingestion
 		case eventBytes := <-i.eventsCh:
-
-			// TODO: @afiune We should have a way to have multi-message-type ingestion
 			// Unmarshal the data and send the message to the channel
 			var habMsg habitat.HealthCheckEvent
 			err := proto.Unmarshal(eventBytes, &habMsg)
@@ -93,9 +103,22 @@ func (i *Ingester) runWorkerLoop() {
 		select {
 		case event := <-i.workerTaskQueue:
 			err := i.storageClient.IngestHealthCheckEvent(event)
+			i.workerOutputQueue <- err
+		case err := <-i.workerOutputQueue:
+			i.totalEventsProcessed++
+
 			if err != nil {
 				log.WithError(err).Error("Unable to ingest habitat event")
+				i.totalEventsFailed++
+			} else {
+				i.totalEventsSuccessful++
 			}
+
+			log.WithFields(log.Fields{
+				"total_events_processed":  i.totalEventsProcessed,
+				"total_events_failed":     i.totalEventsFailed,
+				"total_events_successful": i.totalEventsSuccessful,
+			}).Debug("event processed")
 		}
 	}
 }
@@ -103,4 +126,14 @@ func (i *Ingester) runWorkerLoop() {
 // Sends a message through the ingestion "pipeline" (aka our events channel)
 func (i *Ingester) IngestMessage(msg []byte) {
 	i.eventsCh <- msg
+}
+
+// Returns the total number of events processed by the ingestor client
+func (i *Ingester) EventsProcessed() int64 {
+	return i.totalEventsProcessed
+}
+
+// Returns the total number of event messages in the ingestor client queue
+func (i *Ingester) QueueLen() int {
+	return len(i.eventsCh)
 }

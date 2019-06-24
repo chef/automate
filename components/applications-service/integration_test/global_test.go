@@ -28,8 +28,13 @@ var (
 	c = "stable"
 )
 
-// Used to generate random strings
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const (
+	// Used to generate random strings
+	letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+	// The maximum time that an ingestion test could wait
+	maxWaitTimeMs = 5000 // 5 seconds
+)
 
 // func type to override the HealthCheckEvent message
 type MessageOverrides func(*habitat.HealthCheckEvent) error
@@ -86,6 +91,16 @@ func NewHabitatEvent(overrides ...MessageOverrides) *habitat.HealthCheckEvent {
 	}
 
 	return event
+}
+
+// Updates the provided HealthCheckEvent message with the provided overrides
+func UpdateHabitatEvent(event *habitat.HealthCheckEvent, overrides ...MessageOverrides) {
+	for _, f := range overrides {
+		err := f(event)
+		if err != nil {
+			fmt.Printf("Error trying to create habitat event message: %s\n", err)
+		}
+	}
 }
 
 // Creates a new HealthCheckEvent message with all its fields randomized
