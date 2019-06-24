@@ -28,8 +28,7 @@ var ComplianceProfiles = Mapping{
           "max_gram": 20,
           "token_chars": [
             "letter",
-            "digit",
-            "punctuation"
+            "digit"
           ]
         }
       },

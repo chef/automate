@@ -16,10 +16,25 @@ var ComplianceRepDate = Mapping{
             "lowercase"
           ],
           "tokenizer": "autocomplete_tokenizer"
+        },
+        "autocomplete_version_numbers": {
+          "filter": [
+            "lowercase"
+          ],
+          "tokenizer": "autocomplete_version_number_tokenizer"
         }
       },
       "tokenizer": {
         "autocomplete_tokenizer": {
+          "max_gram": 20,
+          "min_gram": 2,
+          "token_chars": [
+            "letter",
+            "digit"
+          ],
+          "type": "edge_ngram"
+        },
+        "autocomplete_version_number_tokenizer": {
           "max_gram": 20,
           "min_gram": 2,
           "token_chars": [
@@ -344,7 +359,7 @@ var ComplianceRepDate = Mapping{
           "fields": {
             "engram": {
               "type": "text",
-              "analyzer": "autocomplete"
+              "analyzer": "autocomplete_version_numbers"
             },
             "lower": {
               "normalizer": "case_insensitive",
