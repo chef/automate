@@ -303,11 +303,10 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 
 		assert.Equal(t, "db.default", sgList[0].Name,
 			"the service_group name is not the expected one")
-		assert.Equal(t, "test/db", sgList[0].Package,
+		assert.Equal(t, "changed/db", sgList[0].Package,
 			"the service_group package is not the expected one")
-		// TODO @afiune fix ingestion to update the new package_ident field in the database
-		//assert.Equal(t, "3.2.1/20201212000000", sgList[0].Release,
-		//"the service_group release is not the expected one")
+		assert.Equal(t, "3.2.1/20201212000000", sgList[0].Release,
+			"the service_group release is not the expected one")
 		assert.Equal(t, "CRITICAL", sgList[0].HealthStatus,
 			"the service_group health status is not the expected one")
 		assert.Equal(t, int32(0), sgList[0].HealthPercentage,

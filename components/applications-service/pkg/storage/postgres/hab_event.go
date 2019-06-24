@@ -133,12 +133,17 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	// - Package ident (without name. the name of a service can't be changed!)
 	// - Update strategy
 	if exist {
+		// Update Health
+		// @afiune all our backend was designed for the health check to be all
+		// uppercases but habitat is actually sending case sensitive strings
+		svc.Health = strings.ToUpper(event.GetResult().String())
+
+		// Update Package Identifier
 		svc.Origin = pkgIdent.Origin
 		svc.Version = pkgIdent.Version
 		svc.Release = pkgIdent.Release
-		// @afiune all our backend was designed for the health check to be all uppercases
-		// but habitat is actually sending case sensitive strings
-		svc.Health = strings.ToUpper(event.GetResult().String())
+		svc.FullPkgIdent = pkgIdent.FullPackageIdent()
+
 		// Update Channel if the update config exist
 		if svcMetadata.GetUpdateConfig() != nil {
 			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
