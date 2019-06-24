@@ -494,7 +494,7 @@ steps:
   - label: "[integration] airgap upgrade"
     command:
       - integration/run_test integration/tests/airgap_upgrade.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -569,7 +569,7 @@ steps:
   - label: "[integration] upgrade dev -> master"
     command:
       - integration/run_test integration/tests/upgrade.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -578,7 +578,7 @@ steps:
   - label: "[integration] upgrade acceptance -> master"
     command:
       - integration/run_test integration/tests/upgrade_acceptance_master.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -605,7 +605,7 @@ steps:
   - label: "[integration] deep upgrades"
     command:
       - integration/run_test integration/tests/deep_upgrade.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -614,7 +614,7 @@ steps:
   - label: "[integration] deep migrate upgrade"
     command:
       - integration/run_test integration/tests/migrate_upgrade.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
