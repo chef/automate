@@ -120,9 +120,8 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	}
 
 	// @afiune are we changing the grouping of a service group based of the application
-	// and environment names?
+	// and environment names? if not, should we update those fields?
 	svc, exist := db.getServiceFromUniqueFields(
-		pkgIdent.Origin,
 		pkgIdent.Name,
 		eventMetadata.GetSupervisorId(),
 	)
@@ -134,6 +133,7 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	// - Package ident (without name. the name of a service can't be changed!)
 	// - Update strategy
 	if exist {
+		svc.Origin = pkgIdent.Origin
 		svc.Version = pkgIdent.Version
 		svc.Release = pkgIdent.Release
 		// @afiune all our backend was designed for the health check to be all uppercases

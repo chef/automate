@@ -261,9 +261,7 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 		withHealth(HealthCheckIntToString(2)), // -> CRITICAL
 		// TODO @afiune fix ingestion to remove the channel when there is no update strategy
 		withStrategyAtOnce("unstable"),
-		// TODO @afiune fix ingestion to accept origin updates
-		//withPackageIdent("changed/db/3.2.1/20201212000000"),
-		withPackageIdent("test/db/3.2.1/20201212000000"),
+		withPackageIdent("changed/db/3.2.1/20201212000000"),
 	)
 
 	bytes, err = proto.Marshal(event)
@@ -277,7 +275,7 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 
 		assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
 			"the service supervisor_id is not the expected one")
-		assert.Equal(t, "test", svcList[0].Origin,
+		assert.Equal(t, "changed", svcList[0].Origin,
 			"the service origin name is not the expected one")
 		assert.Equal(t, "db", svcList[0].Name,
 			"the service name is not the expected one")
