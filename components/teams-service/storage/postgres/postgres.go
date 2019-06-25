@@ -357,53 +357,33 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 // server code before we get here if the team in question was filtered, but if we call this
 // from a different context we should apply project filtering in this function as well.
 // Not doing it to save us a database call since it's not needed currently.
-
 func (p *postgres) AddUsers(ctx context.Context,
 	teamID uuid.UUID,
 	userIDs []string) (storage.Team, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	tx, err := p.db.BeginTx(ctx, nil)
+	if len(userIDs) == 0 {
+		return storage.Team{}, nil
+	}
+
+	var t storage.Team
+	err := p.db.QueryRowContext(ctx,
+		`WITH moved_rows AS (
+			INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
+				SELECT db_id, unnest($2::TEXT[]), now()
+				FROM teams
+				WHERE id=$1
+			RETURNING team_db_id
+		)
+		UPDATE teams SET updated_at=NOW()
+		WHERE db_id in (SELECT * FROM moved_rows)
+		RETURNING id, name, description, projects, created_at, updated_at;`, teamID, pq.Array(userIDs)).Scan(
+		&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
-
-	doneSomething := false
-	for _, userID := range userIDs {
-		res, err := tx.ExecContext(ctx,
-			`INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
-			SELECT db_id, $2, now()
-			FROM teams
-			WHERE id=$1`, teamID, userID)
-		if err != nil {
-			return storage.Team{}, p.processError(err)
-		}
-		num, err := res.RowsAffected()
-		if err != nil {
-			return storage.Team{}, p.processError(err)
-		}
-		if num > 0 {
-			doneSomething = true
-		}
-	}
-	var team storage.Team
-
-	if !doneSomething {
-		team, err = p.getTeam(ctx, tx, teamID)
-
-	} else {
-		team, err = p.touchTeam(ctx, tx, teamID)
-	}
-	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-	return team, nil
+	return t, nil
 }
 
 // GetUserIDsForTeam returns the user IDs for all members of the team.
