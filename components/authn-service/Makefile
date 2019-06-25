@@ -19,11 +19,7 @@ unit: build test
 
 .PHONY: ${MIGRATION_READMES}
 ${MIGRATION_READMES}:
-	@echo '## SQL migrations\n' > $@
-	@for file in $$(dirname $@)/*.up.sql; do f=$$(basename $$file); echo "- [\`$$f\`]($$f)" >> $@; done
-	@git diff --exit-code $@; CODE=$$?;\
-	  if ! [[ $$CODE -eq 0 ]]; then echo "$@ index not committed; please commit $@"; fi;\
-	  exit $$CODE
+	../../scripts/generate_and_check_migration_files $@
 
 ${BINS}: bin
 	@echo "GO $@"
