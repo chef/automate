@@ -32,6 +32,7 @@
       "chef/config-mgmt-service",
       "chef/deployment-service",
       "chef/data-feed-service",
+      "chef/event-feed-service",
       "chef/data-lifecycle-service",
       "chef/event-gateway",
       "chef/automate-gateway",

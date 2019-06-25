@@ -50,6 +50,11 @@ func TestDefaultSpecs(t *testing.T) {
 		testRequireDb(t, spec, "sync", "chef_compliance_service", "compliance")
 		testRequireEs(t, spec, "sync", "compliance-service", "comp-*")
 	})
+	t.Run("event-feed-service", func(t *testing.T) {
+		spec := testSpecFor(t, "event-feed-service")
+		testRequireMetadata(t, spec)
+		testRequireEs(t, spec, "sync", "event-feed-service", "event-feed-*")
+	})
 	t.Run("config-mgmt-service", func(t *testing.T) {
 		testSpecFor(t, "config-mgmt-service")
 	})
