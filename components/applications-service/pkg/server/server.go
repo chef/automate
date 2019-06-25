@@ -230,9 +230,24 @@ func (app *ApplicationsServer) GetServices(
 	}, nil
 }
 
-func (a *ApplicationsServer) GetServicesStats(c context.Context,
+func (app *ApplicationsServer) GetServicesStats(c context.Context,
 	request *applications.ServicesStatsReq) (*applications.ServicesStatsRes, error) {
-	return nil, nil
+
+	servicesCount, err := app.storageClient.GetServicesCount()
+	if err != nil {
+		log.WithError(err).Error("Error retrieving services count")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	serviceGroupsCount, err := app.storageClient.GetServiceGroupsCount()
+	if err != nil {
+		log.WithError(err).Error("Error retrieving service groups count")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &applications.ServicesStatsRes{
+		TotalServices:      servicesCount,
+		TotalServiceGroups: serviceGroupsCount,
+	}, nil
 }
 
 // Convert storage.Service array to applications.Service array

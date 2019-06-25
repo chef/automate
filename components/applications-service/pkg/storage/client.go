@@ -22,6 +22,9 @@ type Client interface {
 	GetServicesHealthCounts(map[string][]string) (*HealthCounts, error)
 	GetServiceGroupsHealthCounts() (*HealthCounts, error)
 
+	GetServicesCount() (int32, error)
+	GetServiceGroupsCount() (int32, error)
+
 	// Used by our Integration Tests
 	EmptyStorage() error
 }
