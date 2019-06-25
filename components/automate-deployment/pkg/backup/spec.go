@@ -200,16 +200,6 @@ func DefaultSpecs(serviceNames []string) []Spec {
 			},
 		},
 		{
-			Name:          "event-feed-service",
-			WriteMetadata: true,
-			SyncEsIndices: []ElasticsearchOperation{
-				{
-					ServiceName:    "event-feed-service",
-					MultiIndexSpec: "event-feed-*",
-				},
-			},
-		},
-		{
 			Name:          "deployment-service",
 			WriteMetadata: true,
 			SyncPaths: []PathCopyOperation{

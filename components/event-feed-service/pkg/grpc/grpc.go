@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/config"
 	"github.com/chef/automate/components/event-feed-service/pkg/server"
 	"github.com/chef/automate/lib/grpc/health"
@@ -52,7 +53,7 @@ func NewGRPCServer(connFactory *secureconn.Factory, c *config.EventFeed,
 
 	eventFeedServer := server.New(esClient)
 
-	// eventFeed.RegisterApplicationsServiceServer(grpcServer, eventFeedServer)
+	event_feed.RegisterEventFeedServiceServer(grpcServer, eventFeedServer)
 
 	health.RegisterHealthServer(grpcServer, eventFeedServer.Health())
 

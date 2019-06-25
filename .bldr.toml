@@ -850,6 +850,7 @@ paths = [
 plan_path = "components/event-feed-service"
 paths = [
   "components/event-feed-service/*",
+  "api/interservice/event_feed/*",
   "components/automate-gateway/api/authz/*",
   "components/automate-gateway/authz/policy_v2/*",
   "components/automate-grpc/*",
