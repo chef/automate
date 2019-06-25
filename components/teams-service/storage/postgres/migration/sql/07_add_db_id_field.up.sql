@@ -19,7 +19,7 @@ ALTER TABLE teams_users_associations ADD CONSTRAINT teams_db_id_fkey
   FOREIGN KEY (team_db_id) REFERENCES teams(db_id) ON DELETE CASCADE;
 
 -- add helper for team db_id lookup
-CREATE FUNCTION team_id(_id UUID) RETURNS INTEGER AS
+CREATE FUNCTION team_db_id(_id UUID) RETURNS INTEGER AS
 $$
   SELECT db_id FROM teams WHERE id=_id;
 $$ LANGUAGE SQL;
