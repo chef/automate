@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
 
 	dc "github.com/chef/automate/api/config/deployment"
@@ -26,24 +28,25 @@ func NewCompatBootstrapper(t target.Target) target.Bootstrapper {
 	}
 }
 
-func FullBootstrap(b target.Bootstrapper,
+func FullBootstrap(ctx context.Context,
+	b target.Bootstrapper,
 	m manifest.ReleaseManifest,
 	config *dc.ConfigRequest,
 	writer cli.FormatWriter) error {
 
 	writer.Body("Installing Habitat")
-	err := b.InstallHabitat(m, writer)
+	err := b.InstallHabitat(ctx, m, writer)
 	if err != nil {
 		return err
 	}
 
 	writer.Body("Installing the Chef Automate deployment-service")
-	err = b.InstallDeploymentService(config, m)
+	err = b.InstallDeploymentService(ctx, config, m)
 	if err != nil {
 		return err
 	}
 
-	err = b.SetupSupervisor(config, m, writer)
+	err = b.SetupSupervisor(ctx, config, m, writer)
 	if err != nil {
 		return err
 	}
@@ -54,7 +57,7 @@ func FullBootstrap(b target.Bootstrapper,
 	}
 
 	writer.Title("Bootstrapping deployment-service on localhost")
-	err = b.DeployDeploymentService(config, m, writer)
+	err = b.DeployDeploymentService(ctx, config, m, writer)
 	if err != nil {
 		return err
 	}
@@ -64,14 +67,14 @@ func FullBootstrap(b target.Bootstrapper,
 
 // InstallHabitat installs the Habitat binary. This always runs
 // directly on the target.
-func (b *compatBootstrapper) InstallHabitat(m manifest.ReleaseManifest, writer cli.BodyWriter) error {
-	return b.target.InstallHabitat(m, writer)
+func (b *compatBootstrapper) InstallHabitat(ctx context.Context, m manifest.ReleaseManifest, writer cli.BodyWriter) error {
+	return b.target.InstallHabitat(ctx, m, writer)
 }
 
 // InstallDeploymentService installs the deployment-service.  This
 // always runs directly on the target.
-func (b *compatBootstrapper) InstallDeploymentService(config *dc.ConfigRequest, m manifest.ReleaseManifest) error {
-	return b.target.InstallDeploymentService(config, m)
+func (b *compatBootstrapper) InstallDeploymentService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest) error {
+	return b.target.InstallDeploymentService(ctx, config, m)
 }
 
 // SetHabitatEnvironment sets Habitat related environment variables in
@@ -85,7 +88,7 @@ func (b *compatBootstrapper) SetHabitatEnvironment(m manifest.ReleaseManifest) e
 // SetupSupervisor configures and starts the top-level supervisor
 // configuration. It prefers to do this via the `deployment-service
 // setup-supervisor` command.
-func (b *compatBootstrapper) SetupSupervisor(config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.FormatWriter) error {
+func (b *compatBootstrapper) SetupSupervisor(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.FormatWriter) error {
 	dsPkg := manifest.VersionedPackageFromManifest(m, "deployment-service")
 	if dsPkg == nil {
 		return errors.New("deployment-service was not found in the manifest")
@@ -93,16 +96,16 @@ func (b *compatBootstrapper) SetupSupervisor(config *dc.ConfigRequest, m manifes
 
 	dsCmd := b.getDSCmd(dsPkg, b.target)
 	if dsCmd.CanBootstrap() {
-		return dsCmd.SetupSupervisor(config, m)
+		return dsCmd.SetupSupervisor(ctx, config, m)
 	}
-	return b.target.SetupSupervisor(config, m, writer)
+	return b.target.SetupSupervisor(ctx, config, m, writer)
 }
 
 // DeployDeploymentService configures and starts the
 // deployment-service. It assumes a running Habitat supervisor.  If
 // available, it delegates this task to `deployment-service
 // setup-service`.
-func (b *compatBootstrapper) DeployDeploymentService(config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.BodyWriter) error {
+func (b *compatBootstrapper) DeployDeploymentService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.BodyWriter) error {
 	dsPkg := manifest.VersionedPackageFromManifest(m, "deployment-service")
 	if dsPkg == nil {
 		return errors.New("deployment-service was not found in the manifest")
@@ -110,9 +113,9 @@ func (b *compatBootstrapper) DeployDeploymentService(config *dc.ConfigRequest, m
 
 	dsCmd := b.getDSCmd(dsPkg, b.target)
 	if dsCmd.CanBootstrap() {
-		return dsCmd.DeployService(config, m)
+		return dsCmd.DeployService(ctx, config, m)
 	}
-	return b.target.DeployDeploymentService(config, m, writer)
+	return b.target.DeployDeploymentService(ctx, config, m, writer)
 }
 
 func (b *compatBootstrapper) getDSCmd(dsPkg habpkg.VersionedPackage, target target.Target) *DeploymentServiceCommand {

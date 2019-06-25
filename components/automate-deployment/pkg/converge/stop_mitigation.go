@@ -1,6 +1,7 @@
 package converge
 
 import (
+	"context"
 	"time"
 
 	"github.com/pkg/errors"
@@ -55,7 +56,7 @@ func NewSafeServiceShutdownRunner() *safeServiceShutdownRunner {
 	return &safeServiceShutdownRunner{
 		stoppedServices: []stoppedService{},
 		stopServiceFunc: func(t target.Target, pkg habpkg.Installable) error {
-			return t.UnloadService(pkg)
+			return t.UnloadService(context.TODO(), pkg)
 		},
 	}
 }
@@ -64,7 +65,7 @@ func NewSafeServiceRestartRunner() *safeServiceRestartRunner {
 	return &safeServiceRestartRunner{
 		safeServiceShutdownRunner: &safeServiceShutdownRunner{
 			stopServiceFunc: func(t target.Target, pkg habpkg.Installable) error {
-				return t.StopService(pkg)
+				return t.StopService(context.TODO(), pkg)
 			},
 		},
 	}
@@ -130,7 +131,7 @@ func (r *safeServiceRestartRunner) RestartServices() error {
 		logrus.Infof("Restarting %s which was stopped by restartMitigation", svc.Name())
 		// StartService is safe to call on a started service,
 		// so we don't filter based on current status.
-		err := svc.target.StartService(&svc.pkg)
+		err := svc.target.StartService(context.TODO(), &svc.pkg)
 		if err != nil {
 			// We are going to try to restart as much as
 			// possible so we collect up the errors here.

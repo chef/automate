@@ -164,26 +164,26 @@ func (t *LocalTarget) HabSup() HabSup {
 	return t.habSup
 }
 
-func (t *LocalTarget) InstallHabitat(m manifest.ReleaseManifest, writer cli.BodyWriter) error {
+func (t *LocalTarget) InstallHabitat(ctx context.Context, m manifest.ReleaseManifest, writer cli.BodyWriter) error {
 	found, requiredVersion := m.PackageForServiceName("hab")
 	if !found {
 		return errors.New("could not find hab in release manifest")
 	}
 
 	writer.Bodyf("Installing Habitat %s", habpkg.VersionString(&requiredVersion))
-	if t.habBinaryInstalled() {
-		err := t.installHabViaHab(requiredVersion)
+	if t.habBinaryInstalled(ctx) {
+		err := t.installHabViaHab(ctx, requiredVersion)
 		if err != nil {
 			return err
 		}
 	} else {
-		err := t.installHabViaInstallScript(&requiredVersion)
+		err := t.installHabViaInstallScript(ctx, &requiredVersion)
 		if err != nil {
 			return err
 		}
 	}
 
-	output, err := t.HabCmd.BinlinkPackage(&requiredVersion, "hab")
+	output, err := t.HabCmd.BinlinkPackage(ctx, &requiredVersion, "hab")
 	if err != nil {
 		ident := habpkg.Ident(&requiredVersion)
 		logrus.Debugf("Binlink of %s failed with output: %s", ident, output)
@@ -193,21 +193,21 @@ func (t *LocalTarget) InstallHabitat(m manifest.ReleaseManifest, writer cli.Body
 	return nil
 }
 
-func (t *LocalTarget) InstallDeploymentService(c *dc.ConfigRequest, m manifest.ReleaseManifest) error {
+func (t *LocalTarget) InstallDeploymentService(ctx context.Context, c *dc.ConfigRequest, m manifest.ReleaseManifest) error {
 	pkg := manifest.InstallableFromManifest(m, "deployment-service")
 	if pkg == nil {
 		return errors.New("deployment-service was not found in the manifest")
 	}
 
-	return t.InstallService(pkg, c.GetV1().GetSvc().GetChannel().GetValue())
+	return t.InstallService(ctx, pkg, c.GetV1().GetSvc().GetChannel().GetValue())
 }
 
-func (t *LocalTarget) SetupSupervisor(config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.FormatWriter) error {
-	if err := t.InstallSupPackages(m, writer); err != nil {
+func (t *LocalTarget) SetupSupervisor(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.FormatWriter) error {
+	if err := t.InstallSupPackages(ctx, m, writer); err != nil {
 		return err
 	}
 
-	if err := t.installHabComponents(m, writer); err != nil {
+	if err := t.installHabComponents(ctx, m, writer); err != nil {
 		return err
 	}
 
@@ -231,20 +231,20 @@ func (t *LocalTarget) SetupSupervisor(config *dc.ConfigRequest, m manifest.Relea
 		}
 	}
 
-	return t.waitForHabSupToStart(m)
+	return t.waitForHabSupToStart(ctx, m)
 }
 
-func (t *LocalTarget) LoadDeploymentService(svc habpkg.VersionedPackage) error {
+func (t *LocalTarget) LoadDeploymentService(ctx context.Context, svc habpkg.VersionedPackage) error {
 	if svc.Name() != "deployment-service" {
 		logrus.Fatal("Invalid package name")
 	}
 	if !habpkg.IsFullyQualified(svc) {
 		return errors.New("Expected fully qualified deployment service package")
 	}
-	return t.LoadService(svc)
+	return t.LoadService(ctx, svc)
 }
 
-func (t *LocalTarget) DeployDeploymentService(config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.BodyWriter) error {
+func (t *LocalTarget) DeployDeploymentService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.BodyWriter) error {
 	pkg := manifest.InstallableFromManifest(m, "deployment-service")
 	if pkg == nil {
 		return errors.New("deployment-service was not found in the manifest")
@@ -262,12 +262,12 @@ func (t *LocalTarget) DeployDeploymentService(config *dc.ConfigRequest, m manife
 	}
 
 	writer.Body("Starting deployment-service")
-	err = t.UnloadService(pkg)
+	err = t.UnloadService(ctx, pkg)
 	if err != nil {
 		return err
 	}
 
-	err = t.LoadService(pkg)
+	err = t.LoadService(ctx, pkg)
 	return err
 }
 
@@ -334,14 +334,14 @@ func (t *LocalTarget) SetUserToml(name, config string) error {
 
 // InstallService installs an automate service. Returns an error if
 // the install failed for any reason.
-func (t *LocalTarget) InstallService(svc habpkg.Installable, channel string) error {
-	return t.installPackage(svc, channel)
+func (t *LocalTarget) InstallService(ctx context.Context, svc habpkg.Installable, channel string) error {
+	return t.installPackage(ctx, svc, channel)
 }
 
 // unloadServiceWithHabVersion unloads the given service with a
 // particular version of hab and hab-sup. This is used during the
 // Habitat upgrade process to unload services before upgrading hab.
-func (t *LocalTarget) unloadServiceWithHabVersion(svc habpkg.VersionedPackage, binPkg habpkg.HabPkg, habSupPkg habpkg.HabPkg) error {
+func (t *LocalTarget) unloadServiceWithHabVersion(ctx context.Context, svc habpkg.VersionedPackage, binPkg habpkg.HabPkg, habSupPkg habpkg.HabPkg) error {
 	svcIdent := habpkg.Ident(svc)
 
 	habSupBin, err := t.getBinPath(habSupPkg, "hab-sup")
@@ -349,12 +349,26 @@ func (t *LocalTarget) unloadServiceWithHabVersion(svc habpkg.VersionedPackage, b
 		return errors.Wrap(err, "could not retrieve path of require hab-sup binary")
 	}
 
+	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
+	defer cancel()
+
 	output, err := t.Executor.CombinedOutput("hab",
 		command.Args("pkg", "exec", habpkg.Ident(&binPkg),
 			"hab", "svc", "unload", svcIdent),
 		command.Envvar("HAB_LICENSE", "accept-no-persist"),
-		command.Envvar("HAB_SUP_BINARY", habSupBin))
+		command.Context(ctx),
+		command.Envvar("HAB_SUP_BINARY", habSupBin),
+	)
+
 	if err != nil {
+		// NOTE: hab <= 0.79 returned 0 if the service was already unloaded.
+		// Beginning with 0.80, hab will exit 1 if the service was already unloaded.
+		// As we need to support mixed versions because of upgrades we'll do our
+		// best to handle backwards compatibility of this interface.
+		if strings.Contains(output, "not loaded") {
+			return nil
+		}
+
 		logrus.WithError(err).WithFields(logrus.Fields{
 			"package": svcIdent,
 			"output":  output,
@@ -367,7 +381,7 @@ func (t *LocalTarget) unloadServiceWithHabVersion(svc habpkg.VersionedPackage, b
 
 // RemoveService removes the given service from this target. It
 // returns an error if any portion of the removal fails.
-func (t *LocalTarget) RemoveService(svc habpkg.VersionedPackage) error {
+func (t *LocalTarget) RemoveService(ctx context.Context, svc habpkg.VersionedPackage) error {
 	ident := habpkg.Ident(svc)
 
 	// A malformed ident would likely cause the sup unload to fail
@@ -380,7 +394,7 @@ func (t *LocalTarget) RemoveService(svc habpkg.VersionedPackage) error {
 		return errors.Errorf("cannot remove service with invalid identifier %s", ident)
 	}
 
-	err := t.UnloadService(svc)
+	err := t.UnloadService(ctx, svc)
 	if err != nil {
 		return err
 	}
@@ -403,7 +417,7 @@ func supplementaryPackages() ([]habpkg.HabPkg, error) {
 
 // InstallSupPackages installs non-service Habitat packages included
 // in product.meta core
-func (t *LocalTarget) InstallSupPackages(releaseManifest manifest.ReleaseManifest, writer cli.BodyWriter) error {
+func (t *LocalTarget) InstallSupPackages(ctx context.Context, releaseManifest manifest.ReleaseManifest, writer cli.BodyWriter) error {
 	writer.Body("Installing supplementary Habitat packages")
 	packages, err := supplementaryPackages()
 	if err != nil {
@@ -412,7 +426,7 @@ func (t *LocalTarget) InstallSupPackages(releaseManifest manifest.ReleaseManifes
 
 	for _, id := range packages {
 		writer.Bodyf("Installing Habitat package %s", id.Name())
-		err = t.installHabPackageFromReleaseManifest(releaseManifest, id.Name())
+		err = t.installHabPackageFromReleaseManifest(ctx, releaseManifest, id.Name())
 		if err != nil {
 			return err
 		}
@@ -420,35 +434,26 @@ func (t *LocalTarget) InstallSupPackages(releaseManifest manifest.ReleaseManifes
 	return nil
 }
 
-func (t *LocalTarget) installHabPackageFromReleaseManifest(releaseManifest manifest.ReleaseManifest, name string) error {
+func (t *LocalTarget) installHabPackageFromReleaseManifest(ctx context.Context, releaseManifest manifest.ReleaseManifest, name string) error {
 	var p habpkg.HabPkg
 	var found bool
-	var err error
 
 	found, p = releaseManifest.PackageForServiceName(name)
 	if !found {
-		// TODO(jaym) 2018-05-03: SHIM so that this can pass unit tests
-		// until the change for updating the release manifest lands
-		if name == "rsync" {
-			p, err = habpkg.FromString("core/rsync")
-			if err != nil {
-				return errors.Wrap(err, "could not construct habpkg for core/rsync. If you are seeing this error message we have done something very silly")
-			}
-		} else {
-			return errors.Errorf("could not find %s in release manifest", name)
-		}
+		return errors.Errorf("could not find %s in release manifest", name)
 	}
-	return t.installPackage(&p, "")
+
+	return t.installPackage(ctx, &p, "")
 }
 
-func (t *LocalTarget) installPackage(pkg habpkg.Installable, channel string) error {
+func (t *LocalTarget) installPackage(ctx context.Context, pkg habpkg.Installable, channel string) error {
 	logrus.WithFields(logrus.Fields{
 		"package": pkg.InstallIdent(),
 		"channel": channel,
 		"action":  "install",
 	}).Debug()
 
-	output, err := t.HabCmd.InstallPackage(pkg, channel)
+	output, err := t.HabCmd.InstallPackage(ctx, pkg, channel)
 	if err != nil {
 		logrus.WithError(err).WithFields(logrus.Fields{
 			"package": pkg.InstallIdent(),
@@ -462,14 +467,14 @@ func (t *LocalTarget) installPackage(pkg habpkg.Installable, channel string) err
 
 // StartService starts an already loaded service. Service startup is
 // asynchronous.
-func (t *LocalTarget) StartService(svc habpkg.VersionedPackage) error {
+func (t *LocalTarget) StartService(ctx context.Context, svc habpkg.VersionedPackage) error {
 	ident := habpkg.Ident(svc)
 	logrus.WithFields(logrus.Fields{
 		"package": ident,
 		"action":  "start",
 	}).Debug()
 
-	output, err := t.HabCmd.StartService(svc)
+	output, err := t.HabCmd.StartService(ctx, svc)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to start service %s\nOutput:\n%s",
 			ident, output)
@@ -478,14 +483,14 @@ func (t *LocalTarget) StartService(svc habpkg.VersionedPackage) error {
 	return nil
 }
 
-func (t *LocalTarget) StopService(svc habpkg.VersionedPackage) error {
+func (t *LocalTarget) StopService(ctx context.Context, svc habpkg.VersionedPackage) error {
 	ident := habpkg.Ident(svc)
 	logrus.WithFields(logrus.Fields{
 		"package": ident,
 		"action":  "stop",
 	}).Debug()
 
-	output, err := t.HabCmd.StopService(svc)
+	output, err := t.HabCmd.StopService(ctx, svc)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to stop service %s\nOutput:\n%s",
 			ident, output)
@@ -497,14 +502,14 @@ func (t *LocalTarget) StopService(svc habpkg.VersionedPackage) error {
 // UnloadService unloads the given service from this target. It
 // returns an error if any portion of the removal fails. Packages are
 // not deleted for unload
-func (t *LocalTarget) UnloadService(svc habpkg.VersionedPackage) error {
+func (t *LocalTarget) UnloadService(ctx context.Context, svc habpkg.VersionedPackage) error {
 	ident := habpkg.ShortIdent(svc)
 	logrus.WithFields(logrus.Fields{
 		"package": ident,
 		"action":  "unload",
 	}).Debug()
 
-	output, err := t.HabCmd.UnloadService(svc)
+	output, err := t.HabCmd.UnloadService(ctx, svc)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to unload service %s\nOutput:\n%s",
 			ident, output)
@@ -515,14 +520,14 @@ func (t *LocalTarget) UnloadService(svc habpkg.VersionedPackage) error {
 
 // LoadService starts the package in the supervisor, either via load or start
 // as appropriate for the startStyle
-func (t *LocalTarget) LoadService(svc habpkg.VersionedPackage, opts ...LoadOption) error {
+func (t *LocalTarget) LoadService(ctx context.Context, svc habpkg.VersionedPackage, opts ...LoadOption) error {
 	ident := habpkg.Ident(svc)
 
 	logrus.WithFields(logrus.Fields{
 		"pkg": ident,
 	}).Info("Loading service")
 
-	output, err := t.HabCmd.LoadService(svc, opts...)
+	output, err := t.HabCmd.LoadService(ctx, svc, opts...)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to load service %s\nOutput:\n%s",
 			ident, output)
@@ -703,14 +708,14 @@ func (t *LocalTarget) HabSupRestartRequired(desiredPkg habpkg.HabPkg) (bool, err
 // change a bit since right now this assumes all clients of postgresql
 // & ES are on the same machine.
 //
-func (t *LocalTarget) HabSupRestart(sortedServiceList []string) (bool, error) {
+func (t *LocalTarget) HabSupRestart(ctx context.Context, sortedServiceList []string) (bool, error) {
 	habSupP, err := t.habSup.SupPkg()
 	if err != nil {
 		return false, errors.Wrap(err, "determining running hab-sup version")
 	}
 
 	if SupportsSupHup(habSupP) {
-		if err := t.habSup.Hup(context.Background()); err != nil {
+		if err := t.habSup.Hup(ctx); err != nil {
 			return false, errors.Wrap(err, "Failed to send sighup")
 		}
 		return false, nil
@@ -735,7 +740,7 @@ func (t *LocalTarget) HabSupRestart(sortedServiceList []string) (bool, error) {
 	// version of hab should be installed, but just in case we
 	// attempt an install.
 	binPkg := habpkg.NewWithVersion("core", "hab", supPkg.Version())
-	err = t.installHabViaHab(binPkg)
+	err = t.installHabViaHab(ctx, binPkg)
 	if err != nil {
 		logrus.WithError(err).Warn("failed to install hab version required for unload")
 	}
@@ -762,7 +767,7 @@ func (t *LocalTarget) HabSupRestart(sortedServiceList []string) (bool, error) {
 
 		svc := habpkg.New(svcInfo.Pkg.Origin, svcInfo.Pkg.Name)
 		logrus.WithField("service", svcName).Info("Unloading service before supervisor shutdown")
-		err := t.unloadServiceWithHabVersion(&svc, binPkg, supPkg)
+		err := t.unloadServiceWithHabVersion(ctx, &svc, binPkg, supPkg)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"svc":   habpkg.Ident(&svc),
@@ -777,7 +782,10 @@ func (t *LocalTarget) HabSupRestart(sortedServiceList []string) (bool, error) {
 		//
 		//  https://github.com/habitat-sh/habitat/blob/85fcde682ca2bab01e9174bb75cc5364319c7369/components/launcher/src/sys/unix/service.rs#L47-L86
 		//
-		err = t.waitForUnload(svcName, 10*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+
+		err = t.waitForUnload(ctx, svcName)
 		if err != nil {
 			logrus.WithError(err).WithField("service", svcName).Warn("Failed waiting for service to unload")
 		}
@@ -787,12 +795,10 @@ func (t *LocalTarget) HabSupRestart(sortedServiceList []string) (bool, error) {
 	return true, errors.Wrap(err, "failed to restart habitat supervisor")
 }
 
-func (t *LocalTarget) waitForUnload(name string, timeout time.Duration) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
+func (t *LocalTarget) waitForUnload(ctx context.Context, name string) error {
 	for {
 		_, err := t.HabClient.ServiceInfo(ctx, name, "default")
+
 		if err == habapi.ErrServiceNotFound {
 			return nil
 		}
@@ -800,6 +806,7 @@ func (t *LocalTarget) waitForUnload(name string, timeout time.Duration) error {
 		if err != nil {
 			return err
 		}
+
 		time.Sleep(500 * time.Millisecond)
 	}
 }
@@ -841,9 +848,9 @@ func (t *LocalTarget) SystemdReload() error {
 }
 
 // Stop stops the A2 services
-func (t *LocalTarget) Stop() error {
+func (t *LocalTarget) Stop(ctx context.Context) error {
 	logrus.Info("Calling hab sup term")
-	err := t.SupTerm()
+	err := t.SupTerm(ctx)
 	if err != nil {
 		return errors.Wrap(err, "failed to stop Chef Automate via hab sup term")
 	}
@@ -1209,7 +1216,7 @@ func (t *LocalTarget) startHabSupFromLauncher(m manifest.ReleaseManifest, writer
 // called from places where we don't have a hab-controlled PATH and
 // where we might not be able to set up the correct environment ahead
 // of time because the correct versions of hab are not installed yet.
-func (t *LocalTarget) waitForHabSupToStart(releaseManifest manifest.ReleaseManifest) error {
+func (t *LocalTarget) waitForHabSupToStart(ctx context.Context, releaseManifest manifest.ReleaseManifest) error {
 	habSupBin, err := t.getHabSupBin(releaseManifest)
 	if err != nil {
 		return errors.Wrap(err, "failed to find hab-sup binary")
@@ -1222,6 +1229,9 @@ func (t *LocalTarget) waitForHabSupToStart(releaseManifest manifest.ReleaseManif
 
 	tries := 0
 	var lastErr error
+	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
+	defer cancel()
+
 	for {
 		if tries >= 5 {
 			m := "Habitat supervisor failed to report healthy status; run `journalctl -u chef-automate` for logs"
@@ -1231,6 +1241,7 @@ func (t *LocalTarget) waitForHabSupToStart(releaseManifest manifest.ReleaseManif
 		output, err := t.Executor.CombinedOutput(habBin,
 			command.Args("svc", "status"),
 			command.Envvar("HAB_LICENSE", "accept-no-persist"),
+			command.Context(ctx),
 			command.Envvar("HAB_SUP_BINARY", habSupBin))
 		if err != nil {
 			lastErr = errors.Wrapf(err, "hab svc status failed with output: %s", output)
@@ -1261,16 +1272,16 @@ func downloadInstallScript() (*os.File, error) {
 	return file, nil
 }
 
-func (t *LocalTarget) habBinaryInstalled() bool {
-	_, err := t.Executor.CombinedOutput("bash", command.Args("-c", "command -v hab"))
+func (t *LocalTarget) habBinaryInstalled(ctx context.Context) bool {
+	_, err := t.Executor.CombinedOutput("bash", command.Args("-c", "command -v hab"), command.Context(ctx))
 	return err == nil
 }
 
-func (t *LocalTarget) installHabViaHab(requiredVersion habpkg.HabPkg) error {
-	return t.installPackage(&requiredVersion, "")
+func (t *LocalTarget) installHabViaHab(ctx context.Context, requiredVersion habpkg.HabPkg) error {
+	return t.installPackage(ctx, &requiredVersion, "")
 }
 
-func (t *LocalTarget) installHabViaInstallScript(requiredVersion habpkg.VersionedArtifact) error {
+func (t *LocalTarget) installHabViaInstallScript(ctx context.Context, requiredVersion habpkg.VersionedArtifact) error {
 	script, downloadErr := downloadInstallScript()
 	if downloadErr != nil {
 		return downloadErr
@@ -1284,7 +1295,9 @@ func (t *LocalTarget) installHabViaInstallScript(requiredVersion habpkg.Versione
 	output, execErr := t.Executor.CombinedOutput(
 		"bash",
 		command.Args(script.Name(), "-v", habpkg.VersionString(requiredVersion)),
-		command.Envvar("TMPDIR", t.habTmpDir()))
+		command.Envvar("TMPDIR", t.habTmpDir()),
+		command.Context(ctx),
+	)
 	if execErr != nil {
 		return errors.Wrapf(execErr, "Habitat install failed\nOUTPUT:\n%s", output)
 	}
@@ -1292,11 +1305,11 @@ func (t *LocalTarget) installHabViaInstallScript(requiredVersion habpkg.Versione
 	return nil
 }
 
-func (t *LocalTarget) installHabComponents(releaseManifest manifest.ReleaseManifest, writer cli.BodyWriter) error {
+func (t *LocalTarget) installHabComponents(ctx context.Context, releaseManifest manifest.ReleaseManifest, writer cli.BodyWriter) error {
 	pkgs := []string{"hab-sup", "hab-launcher"}
 	for _, name := range pkgs {
 		writer.Bodyf("Installing Habitat package %s", name)
-		err := t.installHabPackageFromReleaseManifest(releaseManifest, name)
+		err := t.installHabPackageFromReleaseManifest(ctx, releaseManifest, name)
 		if err != nil {
 			return err
 		}

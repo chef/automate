@@ -593,6 +593,11 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 			}
 		}
 	}
+
+	deadline := time.Now().Add(time.Duration(backupCmdFlags.restoreWaitTimeout) * time.Second)
+	ctx, cancel := context.WithDeadline(context.Background(), deadline)
+	defer cancel()
+
 	// uri will look something like:
 	// s3://bucketname/foo/bar/20180901000000
 	// or
@@ -653,9 +658,6 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	// Find matching backup
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(backupCmdFlags.restoreWaitTimeout)*time.Second)
-	defer cancel()
-
 	backups, err := listBackupsLocally(ctx, locationSpec)
 	if err != nil {
 		return status.Wrap(err, status.BackupRestoreError, "Listing backups failed")
@@ -692,7 +694,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 		client.WithDeploymentRestoreAirgapInstallBundle(backupCmdFlags.airgap),
 	)
 
-	if err := dsRestore.Restore(); err != nil {
+	if err := dsRestore.Restore(ctx); err != nil {
 		return status.Annotate(err, status.BackupError)
 	}
 
@@ -718,7 +720,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	writer.Title("Restoring Chef Automate")
 	res, err := client.RestoreBackup(
 		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-		time.Duration(backupCmdFlags.restoreWaitTimeout)*time.Second,
+		time.Until(deadline),
 		rt,
 	)
 	if err != nil {
@@ -732,7 +734,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	writer.Body("Connecting to deployment-service to finish restoration")
 	_, err = client.StreamBackupStatus(
 		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
-		time.Duration(backupCmdFlags.restoreWaitTimeout)*time.Second,
+		time.Until(deadline),
 		res.Restore.TaskID(),
 		writer,
 	)

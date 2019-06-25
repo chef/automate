@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"os"
@@ -46,7 +47,7 @@ func (ds *DeploymentServiceCommand) CanBootstrap() bool {
 	return ds.HasCapability("bootstrap")
 }
 
-func (ds *DeploymentServiceCommand) DeployService(config *dc.ConfigRequest, m manifest.ReleaseManifest) error {
+func (ds *DeploymentServiceCommand) DeployService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest) error {
 	configFile, err := ds.configToFile(config)
 	if err != nil {
 		return err
@@ -65,10 +66,12 @@ func (ds *DeploymentServiceCommand) DeployService(config *dc.ConfigRequest, m ma
 		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Envvar("CHEF_AUTOMATE_LOG_LEVEL", logrus.GetLevel().String()),
 		command.Stdout(os.Stdout),
-		command.Stderr(os.Stderr))
+		command.Stderr(os.Stderr),
+		command.Context(ctx),
+	)
 }
 
-func (ds *DeploymentServiceCommand) SetupSupervisor(config *dc.ConfigRequest, m manifest.ReleaseManifest) error {
+func (ds *DeploymentServiceCommand) SetupSupervisor(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest) error {
 	configFile, err := ds.configToFile(config)
 	if err != nil {
 		return err
@@ -87,7 +90,9 @@ func (ds *DeploymentServiceCommand) SetupSupervisor(config *dc.ConfigRequest, m 
 		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Envvar("CHEF_AUTOMATE_LOG_LEVEL", logrus.GetLevel().String()),
 		command.Stdout(os.Stdout),
-		command.Stderr(os.Stderr))
+		command.Stderr(os.Stderr),
+		command.Context(ctx),
+	)
 }
 
 func (ds *DeploymentServiceCommand) manifestToFile(m manifest.ReleaseManifest) (string, error) {

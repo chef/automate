@@ -187,8 +187,11 @@ func (r *DeploymentRestore) loadService() error {
 	return nil
 }
 
-func (r *DeploymentRestore) stopDeploymentService() error {
-	if err := r.target.UnloadService(r.service); err != nil {
+func (r *DeploymentRestore) stopDeploymentService(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	if err := r.target.UnloadService(ctx, r.service); err != nil {
 		return status.Wrap(
 			err,
 			status.ServiceUnloadError,
@@ -196,51 +199,61 @@ func (r *DeploymentRestore) stopDeploymentService() error {
 		)
 	}
 
-	startTime := time.Now()
-	timeout := 10 * time.Second
-	sleepTime := 500 * time.Millisecond
-	ctx := context.Background()
+	ticker := time.NewTicker(500 * time.Millisecond)
+	defer ticker.Stop()
 
-	// Wait for Habitat to "unload" the process
-	for {
-		deployed, err := r.target.DeployedServices(ctx)
-		if err == nil {
-			alive := false
-			for _, svc := range deployed {
-				if svc.Pkg.Name() == deploymentServiceName {
-					alive = true
-				}
-			}
+	deploymentServiceRunning := func() (bool, error) {
+		var (
+			deployed map[string]target.DeployedService
+			err      error
+			con      *DSClient
+		)
 
-			if !alive {
-				// There's a small delay between hab "unloading" the service and terminating
-				// it's PID. To ensure that it's dead enough we'll ping the service until
-				// the connection fails.
-				con, err := Connection(500 * time.Millisecond)
-				// If we can't connect to the service we can assume it's down
-				if err != nil {
-					break
-				}
-
-				// Ping the service. If it fails we can assume the service isn't
-				// accepting new request.
-				_, err = con.Ping(ctx, &api.PingRequest{})
-
-				if err != nil {
-					break
-				}
-			}
-
-			if time.Since(startTime) > timeout {
-				return errors.New("Timed out waiting for deployment-service to shut down")
-			}
-
-			time.Sleep(sleepTime)
+		deployed, err = r.target.DeployedServices(ctx)
+		if err != nil {
+			// We're unable to determine what services are running because the
+			// hab API returned an error. We can't be sure if this is a hab-sup
+			// API issue or if the hab-sup isn't running at all so we'll return
+			// the error.
+			return true, err
 		}
 
+		for _, svc := range deployed {
+			if svc.Pkg.Name() == deploymentServiceName {
+				return true, err
+			}
+		}
+
+		// There's a small delay between hab "unloading" the service and terminating
+		// its PID. To ensure that it's dead enough we'll ping the service until
+		// the connection fails.
+		con, err = Connection(500 * time.Millisecond)
+		// If we can't connect to the service we can assume it's down
+		if err != nil {
+			return false, nil
+		}
+
+		// Ping the service. If it fails we can assume the service isn't
+		// accepting new request.
+		_, err = con.Ping(ctx, &api.PingRequest{})
+		if err != nil {
+			return false, nil
+		}
+
+		return true, err
 	}
 
-	return nil
+	for {
+		select {
+		case <-ctx.Done():
+			return errors.New("Timed out waiting for deployment-service to shut down")
+		case <-ticker.C:
+			running, err := deploymentServiceRunning()
+			if !running && err == nil {
+				return nil
+			}
+		}
+	}
 }
 
 func (r *DeploymentRestore) serviceRelease() (string, error) {
@@ -272,8 +285,8 @@ func (r *DeploymentRestore) serviceRelease() (string, error) {
 	return release, nil
 }
 
-func (r *DeploymentRestore) startDeploymentService() error {
-	if err := r.target.LoadService(r.service); err != nil {
+func (r *DeploymentRestore) startDeploymentService(ctx context.Context) error {
+	if err := r.target.LoadService(ctx, r.service); err != nil {
 		return status.Wrap(
 			err,
 			status.ServiceStartError,
@@ -366,7 +379,7 @@ func (r *DeploymentRestore) installAirgapBundle() error {
 }
 
 // Restore bootstraps the deployment-service and restores the backup
-func (r *DeploymentRestore) Restore() error {
+func (r *DeploymentRestore) Restore(ctx context.Context) error {
 	preflightCheckOpts := preflight.DeployPreflightCheckOptions{
 		SkipA2DeployedCheck: true,
 	}
@@ -425,7 +438,7 @@ func (r *DeploymentRestore) Restore() error {
 	if !r.skipBootrap {
 		r.writer.Title("Bootstrapping Chef Automate")
 		r.writer.Body("Installing Habitat")
-		err := b.InstallHabitat(r.a2Manifest, r.writer)
+		err := b.InstallHabitat(ctx, r.a2Manifest, r.writer)
 		if err != nil {
 			return status.Wrap(
 				err,
@@ -434,7 +447,7 @@ func (r *DeploymentRestore) Restore() error {
 			)
 		}
 
-		err = b.SetupSupervisor(r.mergedCfg.Deployment, r.a2Manifest, r.writer)
+		err = b.SetupSupervisor(ctx, r.mergedCfg.Deployment, r.a2Manifest, r.writer)
 		if err != nil {
 			return status.Wrap(
 				err,
@@ -448,7 +461,7 @@ func (r *DeploymentRestore) Restore() error {
 		return err
 	}
 
-	if err := r.stopDeploymentService(); err != nil {
+	if err := r.stopDeploymentService(ctx); err != nil {
 		return err
 	}
 
@@ -480,7 +493,7 @@ func (r *DeploymentRestore) Restore() error {
 	)
 
 	r.writer.Title("Restoring deployment-service")
-	if err := r.stopDeploymentService(); err != nil {
+	if err := r.stopDeploymentService(ctx); err != nil {
 		return err
 	}
 
@@ -490,7 +503,7 @@ func (r *DeploymentRestore) Restore() error {
 	}
 
 	r.writer.Body("Installing deployment-service")
-	if err := b.InstallDeploymentService(r.mergedCfg.Deployment, r.a2Manifest); err != nil {
+	if err := b.InstallDeploymentService(ctx, r.mergedCfg.Deployment, r.a2Manifest); err != nil {
 		return status.Wrap(
 			err,
 			status.PackageInstallError,
@@ -504,7 +517,7 @@ func (r *DeploymentRestore) Restore() error {
 	}
 
 	r.writer.Body("Starting deployment-service")
-	if err := r.startDeploymentService(); err != nil {
+	if err := r.startDeploymentService(ctx); err != nil {
 		return err
 	}
 

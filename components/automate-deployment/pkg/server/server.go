@@ -1470,11 +1470,11 @@ func (s *server) shutItAllDown() error {
 
 	// Do not use the incoming context. We want to go through with the entire process
 	// regardless of if the user disconnects
-	timeout, cancel := context.WithTimeout(context.Background(), defaultWaitForDownTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), defaultWaitForDownTimeout)
 	defer cancel()
 	select {
-	case <-timeout.Done():
-		return timeout.Err()
+	case <-ctx.Done():
+		return ctx.Err()
 	case err := <-taskStop.C:
 		if err != nil {
 			logrus.WithError(err).Error("Failed to stop services")
@@ -1486,7 +1486,7 @@ func (s *server) shutItAllDown() error {
 		return err
 	}
 
-	if err := s.target().Stop(); err != nil {
+	if err := s.target().Stop(ctx); err != nil {
 		return err
 	}
 

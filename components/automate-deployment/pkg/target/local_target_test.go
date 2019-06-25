@@ -201,7 +201,7 @@ func TestLocalTarget_StartService(t *testing.T) {
 				mockExec.Expect("CombinedOutput", mock.expectedCommand).Return(mock.output, mock.err).Once()
 			}
 
-			if err := h.LoadService(&testSvc, Binds(tt.binds), BindMode(tt.bindMode)); (err != nil) != tt.wantErr {
+			if err := h.LoadService(context.Background(), &testSvc, Binds(tt.binds), BindMode(tt.bindMode)); (err != nil) != tt.wantErr {
 				t.Errorf("LocalTarget.StartService() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
@@ -376,7 +376,7 @@ func TestInstallHabitat(t *testing.T) {
 			tgt.HabBaseDir = tempDir
 
 			tt.mockFun(t, mockExec, tempDir)
-			if err := tgt.InstallHabitat(manifest, writer); (err != nil) != tt.wantErr {
+			if err := tgt.InstallHabitat(context.Background(), manifest, writer); (err != nil) != tt.wantErr {
 				t.Errorf("ensureHab() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			finish(t)
@@ -415,7 +415,7 @@ func Test_installHabComponents(t *testing.T) {
 			for _, mock := range tt.mocks {
 				mockExec.Expect("CombinedOutput", mock.expectedCommand).Return(mock.output, mock.err).Once()
 			}
-			if err := tgt.installHabComponents(manifest, writer); (err != nil) != tt.wantErr {
+			if err := tgt.installHabComponents(context.Background(), manifest, writer); (err != nil) != tt.wantErr {
 				t.Errorf("ensureHab() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			finish(t)
@@ -443,7 +443,7 @@ func TestStop(t *testing.T) {
 			for _, mock := range tt.mocks {
 				mockExec.Expect("Start", mock.expectedCommand).Return(mock.err).Once()
 			}
-			if err := h.Stop(); (err != nil) != tt.wantErr {
+			if err := h.Stop(context.Background()); (err != nil) != tt.wantErr {
 				t.Errorf("Stop() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			finish(t)
@@ -649,7 +649,7 @@ func TestLocalTarget_InstallService(t *testing.T) {
 			for _, mock := range tt.mocks {
 				mockExec.Expect("CombinedOutput", mock.expectedCommand).Return(mock.output, mock.err).Once()
 			}
-			if err := h.InstallService(&testSvc, "stable"); (err != nil) != tt.wantErr {
+			if err := h.InstallService(context.Background(), &testSvc, "stable"); (err != nil) != tt.wantErr {
 				t.Errorf("LocalTarget.InstallService() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			finish(t)
@@ -673,7 +673,7 @@ func TestRemoveService(t *testing.T) {
 	mockExec.Expect("CombinedOutput", expectHabCommand("hab", "svc", "unload", "origin/name")).Return("", nil).Once()
 
 	svc := habpkg.New("origin", "name")
-	err := tgt.RemoveService(&svc)
+	err := tgt.RemoveService(context.Background(), &svc)
 	_, statErr := os.Stat(testPkgDir)
 
 	assert.Nil(t, err)
@@ -687,7 +687,7 @@ func TestRemoveServiceSupUnloadFail(t *testing.T) {
 	mockExec.Expect("CombinedOutput", expectHabCommand("hab", "svc", "unload", "origin/name")).Return("some error output", errors.New("command failed")).Once()
 	svc := habpkg.New("origin", "name")
 
-	err := tgt.RemoveService(&svc)
+	err := tgt.RemoveService(context.Background(), &svc)
 	assert.Error(t, err)
 }
 
@@ -709,14 +709,14 @@ func TestRemoveServicePkgDeleteFails(t *testing.T) {
 	mockExec.Expect("CombinedOutput", expectHabCommand("hab", "svc", "unload", "origin/name")).Return("", nil).Once()
 
 	svc := habpkg.New("origin", "name")
-	err := tgt.RemoveService(&svc)
+	err := tgt.RemoveService(context.Background(), &svc)
 	assert.Error(t, err)
 }
 
 func TestRemoveServiceBadIdent(t *testing.T) {
 	pkg := habpkg.New("", "")
 	tgt := NewLocalTarget(false)
-	err := tgt.RemoveService(&pkg)
+	err := tgt.RemoveService(context.Background(), &pkg)
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "cannot remove service with invalid identifier /")
 }
