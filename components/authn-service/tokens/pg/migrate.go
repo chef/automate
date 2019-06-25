@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/golang-migrate/migrate"
-	_ "github.com/golang-migrate/migrate/database/postgres" // make database available
-	_ "github.com/golang-migrate/migrate/source/file"       // make source available
 	"github.com/pkg/errors"
+
+	"github.com/chef/automate/lib/db/migrator"
+	"github.com/chef/automate/lib/logger"
 )
 
 // runMigrations tries to execute all the migrations we know of
@@ -64,16 +64,5 @@ LANGUAGE plpgsql;`
 		return errors.Wrap(err, "commit migration table migration")
 	}
 
-	m, err := migrate.New("file://"+path, url)
-	if err != nil {
-		return errors.Wrap(err, "init migrations")
-	}
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		return errors.Wrap(err, "execute migrations")
-	}
-
-	// The first error is trying to Close() the source. For our file source,
-	// that's always nil
-	_, err = m.Close() // nolint: gas
-	return errors.Wrap(err, "close migrations connection")
+	return errors.Wrap(migrator.Migrate(url, path, logger.NewLogrusStandardLogger(), false), "run migrations")
 }
