@@ -60,7 +60,7 @@ The `/nodes` endpoint supports filtering by:
 - statechange_timerange (supports two timestamps of type "2019-03-05T00:00:00Z")
 - status
 - tags
-- last_run_timerange (last time reported on ingested ccr: supports two timestamps of type "2019-03-05T00:00:00Z" (RFC3339)) 
+- last_run_timerange (last time reported on ingested ccr: supports two timestamps of type "2019-03-05T00:00:00Z" (RFC3339))
 - last_scan_timerange (last time reported on ingested scan: supports two timestamps of type "2019-03-05T00:00:00Z" (RFC3339))
 - last_run_status (status on last ingested ccr)
 - last_scan_status (status on last ingested scan)
@@ -69,7 +69,7 @@ The `/nodes` endpoint supports filtering by:
 
 ## Examples
 
-Show me all nodes whose last scan had a status of failed and a penultimate status of passed
+* Show me all nodes whose last scan had a status of failed and a penultimate status of passed
 
 _or in other words, which nodes were previously passing their scans and just started failing?_
 
@@ -91,7 +91,7 @@ sample truncated response:
 ```
 
 
-Show me all nodes whose last ccr passed and last scan failed, that had a penultimate ccr status of failed
+* Show me all nodes whose last ccr passed and last scan failed, that had a penultimate ccr status of failed
 
 _or in other words, which nodes just started passing their ccrs but are failing their scans?_
 
@@ -108,7 +108,7 @@ https://a2-dev.test/api/v0/nodes/search -d '{
 ```
 
 
-Show me all nodes that had a last scan ingested sometime in the last 48 hours with a status of failed
+* Show me all nodes that had a last scan ingested sometime in the last 48 hours with a status of failed
 
 _or in other words, which nodes that were ingested in the last 48 hours failed their scans?_
 
@@ -120,6 +120,33 @@ https://a2-dev.test/api/v0/nodes/search -d '{
     {"key": "last_scan_status", "values": ["FAILED"]},
     {"key": "last_scan_timerange", "values": ["2019-05-12T00:00:00Z", "2019-05-16T00:00:00Z" ]}
   ]
+}'
+```
+
+
+* Show me all nodes tagged with `deployment:staging` OR `deployment:test`. We OR between multiple values of the same key
+
+sample request:
+```bash
+curl -s --insecure -H "api-token: $token_val"
+https://a2-dev.test/api/v0/nodes/search -d '{
+ "filters": [
+   {"key": "deployment", "values": ["staging", "test"]}
+ ]
+}'
+```
+
+
+* Show me all nodes tagged with `deployment:prod` AND `org:marketing`. We AND between different tag key filters
+
+sample request:
+```bash
+curl -s --insecure -H "api-token: $token_val"
+https://a2-dev.test/api/v0/nodes/search -d '{
+ "filters": [
+   {"key": "deployment", "values": ["prod"]},
+   {"key": "org", "values": ["marketing"]}
+ ]
 }'
 ```
 
