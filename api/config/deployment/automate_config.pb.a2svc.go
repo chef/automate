@@ -21,6 +21,7 @@ import (
 	essidecar "github.com/chef/automate/api/config/es_sidecar"
 	esgateway "github.com/chef/automate/api/config/esgateway"
 	event "github.com/chef/automate/api/config/event"
+	eventfeed "github.com/chef/automate/api/config/event_feed"
 	eventgateway "github.com/chef/automate/api/config/event_gateway"
 	gateway "github.com/chef/automate/api/config/gateway"
 	ingest "github.com/chef/automate/api/config/ingest"
@@ -45,86 +46,88 @@ import (
 // NewAutomateConfig returns a new instance of AutomateConfig with zero values.
 func NewAutomateConfig() *AutomateConfig {
 	return &AutomateConfig{
-		Applications:    applications.NewConfigRequest(),
-		AuthN:           authn.NewConfigRequest(),
-		AuthZ:           authz.NewConfigRequest(),
-		BackupGateway:   backupgateway.NewConfigRequest(),
-		Bifrost:         bifrost.NewConfigRequest(),
-		Bookshelf:       bookshelf.NewConfigRequest(),
-		Compliance:      compliance.NewConfigRequest(),
-		ConfigMgmt:      cfgmgmt.NewConfigRequest(),
-		CsNginx:         csnginx.NewConfigRequest(),
-		DataFeedService: datafeed.NewConfigRequest(),
-		DataLifecycle:   datalifecycle.NewConfigRequest(),
-		Deployment:      NewConfigRequest(),
-		Dex:             dex.NewConfigRequest(),
-		Elasticsearch:   elasticsearch.NewConfigRequest(),
-		Erchef:          erchef.NewConfigRequest(),
-		EsSidecar:       essidecar.NewConfigRequest(),
-		Esgateway:       esgateway.NewConfigRequest(),
-		EventGateway:    eventgateway.NewConfigRequest(),
-		EventService:    event.NewConfigRequest(),
-		Gateway:         gateway.NewConfigRequest(),
-		Global:          shared.NewGlobalConfig(),
-		Ingest:          ingest.NewConfigRequest(),
-		LicenseControl:  licensecontrol.NewConfigRequest(),
-		LoadBalancer:    loadbalancer.NewConfigRequest(),
-		LocalUser:       localuser.NewConfigRequest(),
-		Nodemanager:     nodemanager.NewConfigRequest(),
-		Notifications:   notifications.NewConfigRequest(),
-		PgGateway:       pggateway.NewConfigRequest(),
-		PgSidecar:       pgsidecar.NewConfigRequest(),
-		Postgresql:      postgresql.NewConfigRequest(),
-		Prometheus:      prometheus.NewConfigRequest(),
-		Secrets:         secrets.NewConfigRequest(),
-		Session:         session.NewConfigRequest(),
-		Teams:           teams.NewConfigRequest(),
-		UI:              ui.NewConfigRequest(),
-		Workflow:        workflowserver.NewConfigRequest(),
-		WorkflowNginx:   workflownginx.NewConfigRequest(),
+		Applications:     applications.NewConfigRequest(),
+		AuthN:            authn.NewConfigRequest(),
+		AuthZ:            authz.NewConfigRequest(),
+		BackupGateway:    backupgateway.NewConfigRequest(),
+		Bifrost:          bifrost.NewConfigRequest(),
+		Bookshelf:        bookshelf.NewConfigRequest(),
+		Compliance:       compliance.NewConfigRequest(),
+		ConfigMgmt:       cfgmgmt.NewConfigRequest(),
+		CsNginx:          csnginx.NewConfigRequest(),
+		DataFeedService:  datafeed.NewConfigRequest(),
+		DataLifecycle:    datalifecycle.NewConfigRequest(),
+		Deployment:       NewConfigRequest(),
+		Dex:              dex.NewConfigRequest(),
+		Elasticsearch:    elasticsearch.NewConfigRequest(),
+		Erchef:           erchef.NewConfigRequest(),
+		EsSidecar:        essidecar.NewConfigRequest(),
+		Esgateway:        esgateway.NewConfigRequest(),
+		EventFeedService: eventfeed.NewConfigRequest(),
+		EventGateway:     eventgateway.NewConfigRequest(),
+		EventService:     event.NewConfigRequest(),
+		Gateway:          gateway.NewConfigRequest(),
+		Global:           shared.NewGlobalConfig(),
+		Ingest:           ingest.NewConfigRequest(),
+		LicenseControl:   licensecontrol.NewConfigRequest(),
+		LoadBalancer:     loadbalancer.NewConfigRequest(),
+		LocalUser:        localuser.NewConfigRequest(),
+		Nodemanager:      nodemanager.NewConfigRequest(),
+		Notifications:    notifications.NewConfigRequest(),
+		PgGateway:        pggateway.NewConfigRequest(),
+		PgSidecar:        pgsidecar.NewConfigRequest(),
+		Postgresql:       postgresql.NewConfigRequest(),
+		Prometheus:       prometheus.NewConfigRequest(),
+		Secrets:          secrets.NewConfigRequest(),
+		Session:          session.NewConfigRequest(),
+		Teams:            teams.NewConfigRequest(),
+		UI:               ui.NewConfigRequest(),
+		Workflow:         workflowserver.NewConfigRequest(),
+		WorkflowNginx:    workflownginx.NewConfigRequest(),
 	}
 }
 
 // DefaultAutomateConfig returns a new instance of Automate config with default values.
 func DefaultAutomateConfig() *AutomateConfig {
 	return &AutomateConfig{
-		Applications:    applications.DefaultConfigRequest(),
-		AuthN:           authn.DefaultConfigRequest(),
-		AuthZ:           authz.DefaultConfigRequest(),
-		BackupGateway:   backupgateway.DefaultConfigRequest(),
-		Bifrost:         bifrost.DefaultConfigRequest(),
-		Bookshelf:       bookshelf.DefaultConfigRequest(),
-		Compliance:      compliance.DefaultConfigRequest(),
-		ConfigMgmt:      cfgmgmt.DefaultConfigRequest(),
-		CsNginx:         csnginx.DefaultConfigRequest(),
-		DataFeedService: datafeed.DefaultConfigRequest(),
-		DataLifecycle:   datalifecycle.DefaultConfigRequest(),
-		Deployment:      DefaultConfigRequest(),
-		Dex:             dex.DefaultConfigRequest(),
-		Elasticsearch:   elasticsearch.DefaultConfigRequest(),
-		Erchef:          erchef.DefaultConfigRequest(),
-		EsSidecar:       essidecar.DefaultConfigRequest(),
-		Esgateway:       esgateway.DefaultConfigRequest(),
-		EventGateway:    eventgateway.DefaultConfigRequest(),
-		EventService:    event.DefaultConfigRequest(),
-		Gateway:         gateway.DefaultConfigRequest(),
-		Global:          shared.DefaultGlobalConfig(),
-		Ingest:          ingest.DefaultConfigRequest(),
-		LicenseControl:  licensecontrol.DefaultConfigRequest(),
-		LoadBalancer:    loadbalancer.DefaultConfigRequest(),
-		LocalUser:       localuser.DefaultConfigRequest(),
-		Nodemanager:     nodemanager.DefaultConfigRequest(),
-		Notifications:   notifications.DefaultConfigRequest(),
-		PgGateway:       pggateway.DefaultConfigRequest(),
-		PgSidecar:       pgsidecar.DefaultConfigRequest(),
-		Postgresql:      postgresql.DefaultConfigRequest(),
-		Prometheus:      prometheus.DefaultConfigRequest(),
-		Secrets:         secrets.DefaultConfigRequest(),
-		Session:         session.DefaultConfigRequest(),
-		Teams:           teams.DefaultConfigRequest(),
-		UI:              ui.DefaultConfigRequest(),
-		Workflow:        workflowserver.DefaultConfigRequest(),
-		WorkflowNginx:   workflownginx.DefaultConfigRequest(),
+		Applications:     applications.DefaultConfigRequest(),
+		AuthN:            authn.DefaultConfigRequest(),
+		AuthZ:            authz.DefaultConfigRequest(),
+		BackupGateway:    backupgateway.DefaultConfigRequest(),
+		Bifrost:          bifrost.DefaultConfigRequest(),
+		Bookshelf:        bookshelf.DefaultConfigRequest(),
+		Compliance:       compliance.DefaultConfigRequest(),
+		ConfigMgmt:       cfgmgmt.DefaultConfigRequest(),
+		CsNginx:          csnginx.DefaultConfigRequest(),
+		DataFeedService:  datafeed.DefaultConfigRequest(),
+		DataLifecycle:    datalifecycle.DefaultConfigRequest(),
+		Deployment:       DefaultConfigRequest(),
+		Dex:              dex.DefaultConfigRequest(),
+		Elasticsearch:    elasticsearch.DefaultConfigRequest(),
+		Erchef:           erchef.DefaultConfigRequest(),
+		EsSidecar:        essidecar.DefaultConfigRequest(),
+		Esgateway:        esgateway.DefaultConfigRequest(),
+		EventFeedService: eventfeed.DefaultConfigRequest(),
+		EventGateway:     eventgateway.DefaultConfigRequest(),
+		EventService:     event.DefaultConfigRequest(),
+		Gateway:          gateway.DefaultConfigRequest(),
+		Global:           shared.DefaultGlobalConfig(),
+		Ingest:           ingest.DefaultConfigRequest(),
+		LicenseControl:   licensecontrol.DefaultConfigRequest(),
+		LoadBalancer:     loadbalancer.DefaultConfigRequest(),
+		LocalUser:        localuser.DefaultConfigRequest(),
+		Nodemanager:      nodemanager.DefaultConfigRequest(),
+		Notifications:    notifications.DefaultConfigRequest(),
+		PgGateway:        pggateway.DefaultConfigRequest(),
+		PgSidecar:        pgsidecar.DefaultConfigRequest(),
+		Postgresql:       postgresql.DefaultConfigRequest(),
+		Prometheus:       prometheus.DefaultConfigRequest(),
+		Secrets:          secrets.DefaultConfigRequest(),
+		Session:          session.DefaultConfigRequest(),
+		Teams:            teams.DefaultConfigRequest(),
+		UI:               ui.DefaultConfigRequest(),
+		Workflow:         workflowserver.DefaultConfigRequest(),
+		WorkflowNginx:    workflownginx.DefaultConfigRequest(),
 	}
 }
 
@@ -135,7 +138,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.DataLifecycle.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.DataLifecycle.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate())
 	if err == nil {
 		return nil
 	}
@@ -186,6 +189,7 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.EventGateway.SetGlobalConfig(c.Global)
 	c.Prometheus.SetGlobalConfig(c.Global)
 	c.DataFeedService.SetGlobalConfig(c.Global)
+	c.EventFeedService.SetGlobalConfig(c.Global)
 }
 
 // PlatformServiceConfigForService gets the config for the service by name
@@ -263,6 +267,8 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.Prometheus, true
 	case "data-feed-service":
 		return c.DataFeedService, true
+	case "event-feed-service":
+		return c.EventFeedService, true
 	default:
 		return nil, false
 	}

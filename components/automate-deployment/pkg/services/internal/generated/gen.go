@@ -49,6 +49,10 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/event-feed-service",
+      "metadata": null
+    },
+    {
       "name": "chef/authz-service",
       "metadata": null
     },
@@ -258,6 +262,7 @@ var ProductMetadataJSON = `
       "services": [
         "chef/automate-ui",
         "chef/event-service",
+        "chef/event-feed-service",
         "chef/teams-service",
         "chef/authn-service",
         "chef/secrets-service",

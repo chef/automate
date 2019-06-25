@@ -8,6 +8,7 @@
     "chef/automate-ui",
     "chef/pg-sidecar-service",
     "chef/event-service",
+    "chef/event-feed-service",
     "chef/authz-service",
     "chef/es-sidecar-service",
     "chef/automate-dex",
@@ -93,6 +94,7 @@
       "services": [
         "chef/automate-ui",
         "chef/event-service",
+        "chef/event-feed-service",
         "chef/teams-service",
         "chef/authn-service",
         "chef/secrets-service",

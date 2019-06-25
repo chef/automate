@@ -41,6 +41,7 @@ import "api/config/workflow_nginx/config_request.proto";
 import "api/config/workflow_server/config_request.proto";
 import "api/config/event_gateway/config_request.proto";
 import "api/config/data_feed/config_request.proto";
+import "api/config/event_feed/config_request.proto";
 
 message AutomateConfig {
 	reserved 26; // automate-blob-store
@@ -86,4 +87,5 @@ message AutomateConfig {
 
 	chef.automate.infra.prometheus.ConfigRequest prometheus = 32;
 	chef.automate.domain.data_feed.ConfigRequest data_feed_service = 38;
+	chef.automate.domain.event_feed.ConfigRequest event_feed_service = 39;
 }

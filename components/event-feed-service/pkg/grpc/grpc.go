@@ -8,9 +8,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/config"
-	// "github.com/chef/automate/lib/grpc/health"
+	"github.com/chef/automate/components/event-feed-service/pkg/server"
+	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
+
+	"github.com/olivere/elastic"
 )
 
 // Spawn starts a grpc server using the provided host and port.
@@ -24,21 +28,34 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		return err
 	}
 
-	grpcServer := NewGRPCServer(connFactory, c)
+	esClient, err := elastic.NewClient(
+		elastic.SetURL(c.ElasticSearchURL),
+		elastic.SetSniff(false),
+	)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"url":   c.ElasticSearchURL,
+			"error": err.Error(),
+		}).Error("could not connect to elasticsearch")
+		return err
+	}
+
+	grpcServer := NewGRPCServer(connFactory, c, esClient)
 	return grpcServer.Serve(conn)
 }
 
 // NewGRPCServer returns a server that provides our services:
-// * applications
+// * event feed
 // * health
-func NewGRPCServer(connFactory *secureconn.Factory, c *config.EventFeed) *grpc.Server {
+func NewGRPCServer(connFactory *secureconn.Factory, c *config.EventFeed,
+	esClient *elastic.Client) *grpc.Server {
 	grpcServer := connFactory.NewServer()
 
-	log.Info("Creating Server and starting it")
-	// applicationsServer := server.New(c.GetStorage())
-	// applications.RegisterApplicationsServiceServer(grpcServer, applicationsServer)
+	eventFeedServer := server.New(esClient)
 
-	// health.RegisterHealthServer(grpcServer, applicationsServer.Health())
+	event_feed.RegisterEventFeedServiceServer(grpcServer, eventFeedServer)
+
+	health.RegisterHealthServer(grpcServer, eventFeedServer.Health())
 
 	reflection.Register(grpcServer)
 

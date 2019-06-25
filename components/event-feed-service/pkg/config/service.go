@@ -10,6 +10,7 @@ import (
 type EventFeed struct {
 	Service          `mapstructure:"service"`
 	*certs.TLSConfig `mapstructure:"tls"`
+	ElasticSearch    `mapstructure:"elasticsearch"`
 }
 
 // Service is a base config options struct for all services
@@ -17,6 +18,11 @@ type Service struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
 	LogLevel string `mapstructure:"log_level"`
+}
+
+// Elasticsearch configurations
+type ElasticSearch struct {
+	ElasticSearchURL string `mapstructure:"url"`
 }
 
 // SetLogLevel sets the log level for the service
