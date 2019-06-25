@@ -3696,7 +3696,7 @@ func TestListRulesForProject(t *testing.T) {
 			insertTestProject(t, db, projID2, "pika p", storage.Custom)
 
 			ruleType := storage.Node
-			rule1 := insertAppliedRuleWithMultipleConditions(t, db, projID, ruleType)
+			insertAppliedRuleWithMultipleConditions(t, db, projID, ruleType)
 
 			condition4, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-2"}, storage.ChefServer, storage.MemberOf)
@@ -3713,11 +3713,6 @@ func TestListRulesForProject(t *testing.T) {
 				[]storage.Condition{condition5})
 			require.NoError(t, err)
 			insertAppliedRule(t, db, &rule3)
-
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule2.ID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule3.ID))
-			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
 
 			resp, err := store.ListRulesForProject(ctx, projID2)
 			assert.NoError(t, err)
@@ -3800,7 +3795,7 @@ func TestListRulesForProject(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
 			insertTestProject(t, db, projID, "first project", storage.Custom)
-			
+
 			condition, err := storage.NewCondition(storage.Node,
 				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
