@@ -3861,6 +3861,33 @@ func TestListRulesForProject(t *testing.T) {
 			assert.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{}, resp)
 		}},
+		{"when multiple projects exist, only the requested project's rules are returned", func(t *testing.T) {
+			ctx := context.Background()
+			projID1 := "foo-project"
+			insertTestProject(t, db, projID1, "first project", storage.Custom)
+
+			condition1, err := storage.NewCondition(storage.Node,
+				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule1, err := storage.NewRule("foo-rule", projID1, "coo foo rule", condition1.Type, []storage.Condition{condition1})
+			assert.NoError(t, err)
+			insertAppliedRule(t, db, &rule1)
+
+			projID2 := "bar-project"
+			insertTestProject(t, db, projID2, "second project", storage.Custom)
+
+			condition2, err := storage.NewCondition(storage.Node,
+				[]string{"chef-server-2"}, storage.ChefServer, storage.Equals)
+			require.NoError(t, err)
+			rule2, err := storage.NewRule("bar-rule", projID2, "coo foo rule", condition2.Type, []storage.Condition{condition2})
+			assert.NoError(t, err)
+			insertAppliedRule(t, db, &rule2)
+
+			resp, err := store.ListRulesForProject(ctx, projID1)
+			assert.NoError(t, err)
+			assert.ElementsMatch(t, []*storage.Rule{&rule1}, resp)
+			assert.NotContains(t, resp, &rule2)
+		}},
 	}
 
 	rand.Shuffle(len(cases), func(i, j int) {
