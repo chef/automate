@@ -1074,13 +1074,8 @@ EOF
         expect(resp.http_status.to_s).to match(/200|404/)
       end
 
-      it "GET /iam/v2beta/projects/:id/rules returns the most up-to-date rules for the project" do
-        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules")
-        expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rules]).to match_array([CUSTOM_RULE_1, CUSTOM_RULE_2])
-      end
-
-      # TODO uncomment once ListRules has been refactored with staged rules
+      # TODO uncomment once we can apply staged changes
+      # this API call currently only returns applied rules
       # it "GET /iam/v2beta/rules returns all the rules" do
       #   resp = automate_api_request("/apis/iam/v2beta/rules")
       #   expect(resp.http_status).to eq 200
@@ -1091,6 +1086,33 @@ EOF
         resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_1[:id]}")
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rule]).to eq(CUSTOM_RULE_1)
+      end
+
+      it "GET /iam/v2beta/projects/:id/rules returns the most up-to-date rules for the project" do
+        updated_rule = {
+          id: CUSTOM_RULE_2[:id],
+          name: "updated display name",
+          project_id: CUSTOM_RULE_2[:project_id],
+          type: "EVENT",
+          conditions: [
+            {
+              attribute: "CHEF_SERVERS",
+              operator: "EQUALS",
+              values: ["brand new server"]
+            }
+           ]
+         }
+
+        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_2[:id]}",
+          http_method: 'PUT',
+          request_body: updated_rule.to_json
+        )
+        expect(resp.http_status).to eq 200
+        expect(resp.parsed_response_body[:rule]).to eq(updated_rule)
+
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules")
+        expect(resp.http_status).to eq 200
+        expect(resp.parsed_response_body[:rules]).to match_array([CUSTOM_RULE_1, updated_rule])
       end
 
       it "DELETE /iam/v2beta/rules/:id deletes the specific rule" do
@@ -1128,7 +1150,6 @@ EOF
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rule]).to eq(updated_rule)
       end
-
     end
   end
 end
