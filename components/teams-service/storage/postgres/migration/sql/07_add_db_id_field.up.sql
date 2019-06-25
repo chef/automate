@@ -17,6 +17,8 @@ ALTER TABLE teams_users_associations DROP COLUMN team_id;
 -- add new constraints
 ALTER TABLE teams_users_associations ADD CONSTRAINT teams_db_id_fkey
   FOREIGN KEY (team_db_id) REFERENCES teams(db_id) ON DELETE CASCADE;
+ALTER TABLE teams_users_associations ADD CONSTRAINT teams_users_pkey
+  PRIMARY KEY (team_db_id, user_id);
 
 -- add helper for team db_id lookup
 CREATE FUNCTION team_db_id(_id UUID) RETURNS INTEGER AS
