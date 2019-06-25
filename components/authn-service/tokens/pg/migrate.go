@@ -13,8 +13,9 @@ import (
 // runMigrations tries to execute all the migrations we know of
 func runMigrations(db *sql.DB, url, path string) error {
 	// We're migrating to golang-migrate/migrate instead of this hand-rolled code:
-	// If it exists, we're migrating the existing migration table a golang-migrate conform
-	// schema_migrations table.
+	//
+	// If it exists, we're migrating the existing migration table to a 'schema_migrations'
+	// table conforming to what golang-migrate expects.
 	// When this is done, we drop that table, so the code here will only run once.
 	// We then run the usual "up" migration code, which will pick up where we've left off.
 	// Existing migrations have been converted into up.sql files accordingly, keeping
@@ -35,7 +36,7 @@ func runMigrations(db *sql.DB, url, path string) error {
 	// have already been dropped (i.e. on all but the first run), and such checks can only
 	// happen in functions. Just letting it crash is not an option since it aborts our
 	// transaction.
-	if _, err := tx.ExecContext(ctx, `CREATE OR REPLACE FUNCTION move_if_exists() RETURNS void AS
+	const defineMigrationFunction = `CREATE OR REPLACE FUNCTION move_if_exists() RETURNS void AS
 $$
 BEGIN
   IF EXISTS(SELECT * FROM information_schema.tables
@@ -47,7 +48,9 @@ BEGIN
   END IF;
 END;
 $$
-LANGUAGE plpgsql;`); err != nil {
+LANGUAGE plpgsql;`
+
+	if _, err := tx.ExecContext(ctx, defineMigrationFunction); err != nil {
 		return errors.Wrap(err, "create move_if_exists function")
 	}
 	if _, err := tx.ExecContext(ctx, "SELECT move_if_exists()"); err != nil {
