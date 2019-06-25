@@ -97,11 +97,10 @@ WHERE nodes.id = ANY($1)
 RETURNING nodes.name;
 `
 
+// Delete all the tags references for node_id
+// Leaving the tags alone as they might be used by other nodes
 const deleteNodeTags = `
-DELETE FROM tags
-WHERE id IN (SELECT tag_id
-             FROM nodes_tags
-             WHERE node_id = $1);
+DELETE FROM nodes_tags WHERE node_id = $1;
 `
 
 const deleteNodesSecretsByNodeId = `
@@ -727,6 +726,9 @@ func (db *DB) GetNode(ctx context.Context, id string) (*nodes.Node, error) {
 		return nil, errors.Wrap(err, "GetNode unable to translate node from db struct")
 	}
 	sort.Strings(n.Projects)
+	sort.Slice(n.Tags, func(i, j int) bool {
+		return n.Tags[i].Key < n.Tags[j].Key
+	})
 
 	return n, nil
 }
