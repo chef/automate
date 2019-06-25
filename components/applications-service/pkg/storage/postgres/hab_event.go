@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -24,7 +25,6 @@ type packageIdent struct {
 	Name    string
 	Version string
 	Release string
-	Full    string
 }
 
 func newPackageIdentFromString(ident string) (*packageIdent, error) {
@@ -37,7 +37,11 @@ func newPackageIdentFromString(ident string) (*packageIdent, error) {
 		)
 	}
 
-	return &packageIdent{fields[0], fields[1], fields[2], fields[3], ident}, nil
+	return &packageIdent{fields[0], fields[1], fields[2], fields[3]}, nil
+}
+
+func (p packageIdent) FullPackageIdent() string {
+	return fmt.Sprintf("%s/%s/%s/%s", p.Origin, p.Name, p.Version, p.Release)
 }
 
 var (
@@ -115,22 +119,37 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 		return err
 	}
 
+	// @afiune are we changing the grouping of a service group based of the application
+	// and environment names? if not, should we update those fields?
 	svc, exist := db.getServiceFromUniqueFields(
-		pkgIdent.Origin,
 		pkgIdent.Name,
 		eventMetadata.GetSupervisorId(),
 	)
 
 	// If the service already exists, we just do a simple update
+	//
+	// Fields that needs to be updated:
+	// - Package ident (without name. the name of a service can't be changed!)
+	// - Update strategy
+	// - Health, Application, Environment, Site and Fqdn
 	if exist {
+		// Update Health
+		// @afiune all our backend was designed for the health check to be all
+		// uppercases but habitat is actually sending case sensitive strings
+		svc.Health = strings.ToUpper(event.GetResult().String())
+
+		// Update Package Identifier
+		svc.Origin = pkgIdent.Origin
 		svc.Version = pkgIdent.Version
 		svc.Release = pkgIdent.Release
-		// @afiune all our backend was designed for the health check to be all uppercases
-		// but habitat is actually sending case sensitive strings
-		svc.Health = strings.ToUpper(event.GetResult().String())
-		// Update Channel if the update config exist
+		svc.FullPkgIdent = pkgIdent.FullPackageIdent()
+
+		// Update Channel
+		// TODO @afiune do we want to store the strategy?
 		if svcMetadata.GetUpdateConfig() != nil {
 			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
+		} else {
+			svc.Channel = ""
 		}
 
 		if _, err := db.DbMap.Update(svc); err != nil {
@@ -226,7 +245,7 @@ func newService(pkgIdent *packageIdent, health string, did, sid, gid int32) *ser
 		GroupID:      gid,
 		DeploymentID: did,
 		SupID:        sid,
-		FullPkgIdent: pkgIdent.Full,
+		FullPkgIdent: pkgIdent.FullPackageIdent(),
 	}
 }
 

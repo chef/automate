@@ -8,13 +8,16 @@ package integration_test
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/config"
+	"github.com/chef/automate/components/applications-service/pkg/ingest"
 	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
 	"github.com/chef/automate/lib/platform"
+	"github.com/golang/protobuf/proto"
 )
 
 // Suite helps you manipulate various stages of your tests, it provides common
@@ -25,8 +28,10 @@ import (
 // This struct holds:
 // * ApplicationsServer: This is our main RPC server we want to test against
 // * StorageClient: Lets us manipulate our database to add or remove things from it
+// * Ingester: The mechanism to ingest messages to our system
 type Suite struct {
 	ApplicationsServer *server.ApplicationsServer
+	Ingester           *ingest.Ingester
 	StorageClient      storage.Client
 }
 
@@ -46,13 +51,15 @@ func NewSuite(database string) *Suite {
 
 	var (
 		s = new(Suite)
-		c = config.Postgres{
-			URI:        uri,
-			Database:   database,
-			SchemaPath: "/src/components/applications-service/pkg/storage/postgres/schema/sql",
+		c = &config.Applications{
+			Postgres: config.Postgres{
+				URI:        uri,
+				Database:   database,
+				SchemaPath: "/src/components/applications-service/pkg/storage/postgres/schema/sql",
+			},
 		}
 	)
-	dbClient, err := postgres.New(&c)
+	dbClient, err := postgres.New(&c.Postgres)
 	if err != nil {
 		fmt.Printf("Could not create postgres client: %s\n", err)
 		os.Exit(1)
@@ -65,6 +72,18 @@ func NewSuite(database string) *Suite {
 	// svcsHealthCounts, err := suite.StorageClient.GetServicesHealthCounts()
 	// ```
 	s.StorageClient = dbClient
+
+	// A global Ingester instance to ingest any "message" into our system
+	//
+	// From any test you can directly call:
+	// ```
+	// suite.Ingester.IngestMessage(msg)
+	// suite.WaitForEventsToProcess(1)
+	// ```
+	s.Ingester = ingest.New(c, s.StorageClient)
+
+	// Start processing messages as they are sent to the ingest events channel
+	go s.Ingester.Run()
 
 	// A global ApplicationsServer instance to call any rpc function
 	//
@@ -113,9 +132,62 @@ func (s *Suite) GetServiceGroups() []*storage.ServiceGroupDisplay {
 	return sgList
 }
 
+// GetServices retrieve the services from the database
+func (s *Suite) GetServices() []*storage.Service {
+	svcList, err := s.StorageClient.GetServices("name", true, 1, 100, nil)
+	if err != nil {
+		fmt.Printf("Error trying to retrieve services from db: %s\n", err)
+	}
+	return svcList
+}
+
 // IngestServices ingests multiple HealthCheckEvent messages into the database
 func (s *Suite) IngestServices(events []*habitat.HealthCheckEvent) {
 	for _, e := range events {
 		s.IngestService(e)
+	}
+}
+
+// Ingest messages through the Ingester client, waits for all events to be processed
+func (s *Suite) IngestMessagesViaIngester(events ...*habitat.HealthCheckEvent) {
+
+	var (
+		// Store the number of events that the ingester has already processed
+		eventsProcessed = suite.Ingester.EventsProcessed()
+
+		// Number of events to process
+		eventsToProcess = int64(len(events))
+	)
+
+	for _, e := range events {
+		bytes, err := proto.Marshal(e)
+		if err != nil {
+			fmt.Printf("Error trying to marshal event: %s\n", err)
+			continue
+		}
+		suite.Ingester.IngestMessage(bytes)
+	}
+
+	// Wait until all events have been processed
+	s.WaitForEventsToProcess(eventsProcessed + eventsToProcess)
+}
+
+// Lock function to wait for a number of events to process through the ingester client
+func (s *Suite) WaitForEventsToProcess(n int64) {
+	wait := 0
+
+	for {
+		if suite.Ingester.EventsProcessed() >= n {
+			break
+		}
+
+		time.Sleep(10 * time.Millisecond)
+
+		wait = wait + 10
+
+		if wait >= maxWaitTimeMs {
+			fmt.Printf("Error: wait time exceeded (time:%dms) [WaitForEventsToProcess]\n", wait)
+			os.Exit(1)
+		}
 	}
 }

@@ -12,11 +12,10 @@ import (
 const (
 	selectService = `
 SELECT * FROM service
-WHERE origin = $1
-  AND name = $2
+WHERE name = $1
   AND sup_id IN (
     SELECT id FROM supervisor
-    WHERE member_id = $3
+    WHERE member_id = $2
   )
 `
 	selectServiceByServiceGroupID = `
@@ -117,10 +116,11 @@ func (db *Postgres) GetServices(
 	return services, err
 }
 
-// getServiceFromUniqueFields retrieves a service from the db without the need of an id
-func (db *Postgres) getServiceFromUniqueFields(origin, name, member string) (*service, bool) {
+// getServiceFromUniqueFields retrieves a service from the db without the need
+// of an id, it is based on the unique fields, name and member id
+func (db *Postgres) getServiceFromUniqueFields(name, member string) (*service, bool) {
 	var svc service
-	err := db.SelectOne(&svc, selectService, origin, name, member)
+	err := db.SelectOne(&svc, selectService, name, member)
 	if err != nil {
 		return nil, false
 	}
