@@ -14,6 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var bootstrapBundleCmdFlags = struct {
+	overwriteFile bool
+}{}
+
 func newBootstrapBundleCmd() *cobra.Command {
 	var bootstrapCmd = &cobra.Command{
 		Use:    "bootstrap COMMAND",
@@ -26,14 +30,23 @@ func newBootstrapBundleCmd() *cobra.Command {
 	}
 
 	var createCmd = &cobra.Command{
-		Use: "create <current working dir>/bootstrap_bundle.tar",
+		Use: "create [/path/to/bundle.tar]",
 		Annotations: map[string]string{
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
 		},
+		Args:   cobra.RangeArgs(0, 1),
 		RunE:   runBootstrapBundleCreate,
 		Hidden: true,
 	}
+
+	createCmd.PersistentFlags().BoolVarP(
+		&bootstrapBundleCmdFlags.overwriteFile,
+		"overwrite",
+		"o",
+		false,
+		"Overwrite existing bootstrap bundle file if one exists",
+	)
 
 	bootstrapCmd.AddCommand(bundleCmd)
 	bundleCmd.AddCommand(createCmd)
@@ -44,10 +57,10 @@ func newBootstrapBundleCmd() *cobra.Command {
 func runBootstrapBundleCreate(cmd *cobra.Command, args []string) error {
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
-		fmt.Println("Connection failed")
-		return err
+		return status.Wrap(err, status.APIUnreachableError, "Failed to create a connection")
 	}
 
+	// TODO: add timeout
 	stream, err := connection.BootstrapBundle(context.Background(), &api.BootstrapBundleRequest{})
 	if err != nil {
 		return status.WithRecovery(
@@ -56,17 +69,40 @@ func runBootstrapBundleCreate(cmd *cobra.Command, args []string) error {
 		)
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return status.Annotate(err, status.FileAccessError)
+	outfile := ""
+	if len(args) > 0 && args[0] != "" {
+		outfile, err = filepath.Abs(args[0])
+		if err != nil {
+			return status.Annotate(err, status.FileAccessError)
+		}
+	} else {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return status.Annotate(err, status.FileAccessError)
+		}
+		outfile = filepath.Join(cwd, "bootstrap-bundle.tar")
 	}
-	downloadedBundlePath := filepath.Join(cwd, "bootstrap-bundle.tar")
-	downloadedBundleFile, err := os.OpenFile(downloadedBundlePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+
+	if _, err := os.Stat(outfile); err == nil {
+		if !bootstrapBundleCmdFlags.overwriteFile {
+			ok, err := writer.Confirm(fmt.Sprintf("%s file already exists. Do you wish to overwrite it?", outfile))
+			if err != nil {
+				return status.Annotate(err, status.FileAccessError)
+			}
+			if !ok {
+				return status.New(status.FileAccessError, "Bootstrap bundle cannot be overwritten")
+			}
+		}
+	}
+
+	downloadedBundleFile, err := os.OpenFile(outfile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return status.Annotate(err, status.FileAccessError)
 	}
 
-	defer downloadedBundleFile.Close()
+	defer func() {
+		_ = downloadedBundleFile.Close()
+	}()
 
 	w := bufio.NewWriter(downloadedBundleFile)
 	for {
@@ -90,8 +126,11 @@ func runBootstrapBundleCreate(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	w.Flush()
-	writer.Printf("Bootstrap bundle written to: %s\n", downloadedBundlePath)
+	err = w.Flush()
+	if err != nil {
+		return status.Annotate(err, status.FileAccessError)
+	}
+	writer.Printf("Bootstrap bundle written to: %s\n", outfile)
 
 	return nil
 }
