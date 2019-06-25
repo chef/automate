@@ -7,10 +7,10 @@ import (
 
 	"github.com/teambition/rrule-go"
 
-	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/cereal"
 )
 
-func (suite *WorkflowTestSuite) TestSimpleScheduleWorkflow() {
+func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 	taskName := randName("simple_schedule")
 	workflowName := randName("simple_schedule")
 	instanceName := randName("instance")
@@ -24,13 +24,13 @@ func (suite *WorkflowTestSuite) TestSimpleScheduleWorkflow() {
 	m := suite.newManager(
 		WithTaskExecutorF(
 			taskName,
-			func(context.Context, workflow.Task) (interface{}, error) {
+			func(context.Context, cereal.Task) (interface{}, error) {
 				return nil, nil
 			}),
 		WithWorkflowExecutor(
 			workflowName,
 			&workflowExecutorWrapper{
-				onStart: func(w workflow.WorkflowInstance, ev workflow.StartEvent) workflow.Decision {
+				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 					suite.Assert().WithinDuration(
 						dtStart.Add(time.Duration(10*count)*time.Second),
 						time.Now(), 2*time.Second)
@@ -42,7 +42,7 @@ func (suite *WorkflowTestSuite) TestSimpleScheduleWorkflow() {
 					suite.Assert().NoError(err, "failed to enqueue task")
 					return w.Continue(nil)
 				},
-				onTaskComplete: func(w workflow.WorkflowInstance, ev workflow.TaskCompleteEvent) workflow.Decision {
+				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
 					wgWorkflow.Done()
 					return w.Complete()
 				},
@@ -85,7 +85,7 @@ func (suite *WorkflowTestSuite) TestSimpleScheduleWorkflow() {
 	suite.NoError(err)
 }
 
-func (suite *WorkflowTestSuite) TestCreateExpiredSchedule() {
+func (suite *CerealTestSuite) TestCreateExpiredSchedule() {
 	workflowName := randName("expired_schedule")
 	instanceName := randName("instance")
 
@@ -114,11 +114,11 @@ func (suite *WorkflowTestSuite) TestCreateExpiredSchedule() {
 		true,
 		recurrence)
 
-	suite.Assert().Equal(workflow.ErrInvalidSchedule, err)
+	suite.Assert().Equal(cereal.ErrInvalidSchedule, err)
 
 }
 
-func (suite *WorkflowTestSuite) TestExpiringSchedule() {
+func (suite *CerealTestSuite) TestExpiringSchedule() {
 	taskName := randName("expiring_schedule")
 	workflowName := randName("expiring_schedule")
 	instanceName := randName("instance")
@@ -129,18 +129,18 @@ func (suite *WorkflowTestSuite) TestExpiringSchedule() {
 	m := suite.newManager(
 		WithTaskExecutorF(
 			taskName,
-			func(context.Context, workflow.Task) (interface{}, error) {
+			func(context.Context, cereal.Task) (interface{}, error) {
 				return nil, nil
 			}),
 		WithWorkflowExecutor(
 			workflowName,
 			&workflowExecutorWrapper{
-				onStart: func(w workflow.WorkflowInstance, ev workflow.StartEvent) workflow.Decision {
+				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 					err := w.EnqueueTask(taskName, nil)
 					suite.Assert().NoError(err, "failed to enqueue task")
 					return w.Continue(nil)
 				},
-				onTaskComplete: func(w workflow.WorkflowInstance, ev workflow.TaskCompleteEvent) workflow.Decision {
+				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
 					wgWorkflow.Done()
 					return w.Complete()
 				},

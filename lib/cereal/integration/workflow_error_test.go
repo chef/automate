@@ -8,12 +8,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/cereal"
 )
 
 // TestWorkflowFail tests that a call to w.Fail ends the workflow
 // with an error that can be recovered.
-func (suite *WorkflowTestSuite) TestWorkflowFail() {
+func (suite *CerealTestSuite) TestWorkflowFail() {
 	workflowName := randName("failing")
 	instanceName := randName("instance")
 
@@ -22,11 +22,11 @@ func (suite *WorkflowTestSuite) TestWorkflowFail() {
 		WithWorkflowExecutor(
 			workflowName,
 			&workflowExecutorWrapper{
-				onStart: func(w workflow.WorkflowInstance, ev workflow.StartEvent) workflow.Decision {
+				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 					close(doneChan)
 					return w.Fail(errors.New("expected test error"))
 				},
-				onTaskComplete: func(w workflow.WorkflowInstance, ev workflow.TaskCompleteEvent) workflow.Decision {
+				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
 					return w.Complete()
 				},
 			},

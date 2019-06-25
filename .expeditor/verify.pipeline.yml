@@ -85,10 +85,7 @@ steps:
   - label: "[unit] authn-service"
     command:
       - scripts/install_golang
-      - sed -i 's|^local.*|local   all   all   trust|' /etc/postgresql/9.6/main/pg_hba.conf
-      - sed -i 's|^host.*127.0.0.1.*|host   all   all   127.0.0.1/32   trust|' /etc/postgresql/9.6/main/pg_hba.conf
-      - service postgresql start
-      - psql -c 'create database authn_test;' -U postgres
+      - scripts/setup_buildkite_pg authn_test
       - cd components/authn-service
       - make static unit
     timeout_in_minutes: 10
@@ -117,11 +114,7 @@ steps:
   - label: "[unit] authz-service"
     command:
       - scripts/install_golang
-      - sed -i 's|^local.*|local   all   all   trust|' /etc/postgresql/9.6/main/pg_hba.conf
-      - sed -i 's|^host.*127.0.0.1.*|host   all   all   127.0.0.1/32   trust|' /etc/postgresql/9.6/main/pg_hba.conf
-      - service postgresql start
-      - psql -c 'create database authz_test;' -U postgres
-      - psql -c 'create extension "uuid-ossp";' -d "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
+      - scripts/setup_buildkite_pg authz_test
       - cd components/authz-service
       - make static unit
     timeout_in_minutes: 10
@@ -135,11 +128,7 @@ steps:
   - label: "[unit] teams-service"
     command:
       - scripts/install_golang
-      - sed -i 's|^local.*|local   all   all   trust|' /etc/postgresql/9.6/main/pg_hba.conf
-      - sed -i 's|^host.*127.0.0.1.*|host   all   all   127.0.0.1/32   trust|' /etc/postgresql/9.6/main/pg_hba.conf
-      - service postgresql start
-      - psql -c 'create database teams_test;' -U postgres
-      - psql -c 'create extension "uuid-ossp";' -d "postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable"
+      - scripts/setup_buildkite_pg teams_test
       - cd components/teams-service
       - make static unit
     timeout_in_minutes: 10
@@ -153,8 +142,9 @@ steps:
   - label: "[unit] automate lib"
     command:
       - scripts/install_golang
+      - scripts/setup_buildkite_pg cereal_test
       - cd lib
-      - PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH make lint unit
+      - PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH make lint unit cereal_integration
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -415,10 +405,7 @@ steps:
   - label: "[unit] session-service"
     command:
       - scripts/install_golang
-      - sed -i 's|^local.*|local   all   all   trust|' /etc/postgresql/9.6/main/pg_hba.conf
-      - sed -i 's|^host.*127.0.0.1.*|host   all   all   127.0.0.1/32   trust|' /etc/postgresql/9.6/main/pg_hba.conf
-      - service postgresql start
-      - psql -c 'create database sessions_test;' -U postgres
+      - scripts/setup_buildkite_pg sessions_test
       - cd components/session-service
       - make static migrations-append-only-check unit
     timeout_in_minutes: 10

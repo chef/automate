@@ -8,45 +8,53 @@ import (
 	"os"
 	"testing"
 
-	"github.com/chef/automate/lib/workflow"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/chef/automate/lib/platform/pg"
-	"github.com/chef/automate/lib/workflow/backend"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
+	"github.com/chef/automate/lib/platform/pg"
 )
 
-const defaultDatabaseName = "workflow_test"
+const (
+	defaultTestDatabaseName  = "cereal_test"
+	defaultAdminDatabaseName = "template1"
+)
 
-func defaultConnURIForDatabase(dbname string) string {
-	if os.Getenv("PG_URI") != "" {
-		return os.Getenv("PG_URI")
+var defaultA2ConnInfo = pg.A2ConnInfo{
+	Host:  "localhost",
+	Port:  5432,
+	User:  "automate",
+	Certs: pg.A2SuperuserCerts,
+}
+
+func adminDBURL() string {
+	if os.Getenv("PG_ADMIN_URL") != "" {
+		return os.Getenv("PG_ADMIN_URL")
 	}
-	connInfo := pg.A2ConnInfo{
-		Host:  "localhost",
-		Port:  5432,
-		User:  "automate",
-		Certs: pg.A2SuperuserCerts,
+	return defaultA2ConnInfo.ConnURI(defaultAdminDatabaseName)
+}
+
+func testDBURL() string {
+	if os.Getenv("PG_URL") != "" {
+		return os.Getenv("PG_URL")
 	}
-	return connInfo.ConnURI(dbname)
+	return defaultA2ConnInfo.ConnURI(defaultTestDatabaseName)
 }
 
 func runResetDB() error {
-	dbName := defaultDatabaseName
-
-	db, err := sql.Open("postgres", defaultConnURIForDatabase("template1"))
+	db, err := sql.Open("postgres", adminDBURL())
 	if err != nil {
 		return errors.Wrap(err, "could not initialize db connection")
 	}
 	defer db.Close()
-	_, err = db.Exec(pg.DropDatabaseQuery(dbName))
+	_, err = db.Exec(pg.DropDatabaseQuery(defaultTestDatabaseName))
 	if err != nil {
 		return errors.Wrap(err, "could not drop database")
 	}
-	_, err = db.Exec(pg.CreateDatabaseQuery(dbName))
+	_, err = db.Exec(pg.CreateDatabaseQuery(defaultTestDatabaseName))
 	if err != nil {
 		return errors.Wrap(err, "could not create database")
 	}
@@ -57,7 +65,7 @@ func TestNoAvailableTasks(t *testing.T) {
 	taskName := "task_name"
 	err := runResetDB()
 	require.NoError(t, err)
-	b1 := NewPostgresBackend(defaultConnURIForDatabase(defaultDatabaseName))
+	b1 := NewPostgresBackend(testDBURL())
 	err = b1.Init()
 	require.NoError(t, err)
 	defer b1.Close()
@@ -66,7 +74,7 @@ func TestNoAvailableTasks(t *testing.T) {
 	defer cancel()
 
 	_, _, err = b1.DequeueTask(ctx, taskName)
-	require.Equal(t, workflow.ErrNoTasks, err)
+	require.Equal(t, cereal.ErrNoTasks, err)
 }
 
 func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
@@ -74,17 +82,17 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	workflowName := "workflow_name"
 	err := runResetDB()
 	require.NoError(t, err)
-	b1 := NewPostgresBackend(defaultConnURIForDatabase(defaultDatabaseName))
+	b1 := NewPostgresBackend(testDBURL())
 	err = b1.Init()
 	require.NoError(t, err)
 	defer b1.Close()
 
-	b2 := NewPostgresBackend(defaultConnURIForDatabase(defaultDatabaseName))
+	b2 := NewPostgresBackend(testDBURL())
 	err = b2.Init()
 	require.NoError(t, err)
 	defer b2.Close()
 
-	b3 := NewPostgresBackend(defaultConnURIForDatabase(defaultDatabaseName))
+	b3 := NewPostgresBackend(testDBURL())
 	err = b3.Init()
 	require.NoError(t, err)
 	defer b3.Close()
@@ -127,7 +135,7 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	require.NoError(t, err)
 
 	_, _, err = b3.dequeueTask(tx3, taskName)
-	require.Equal(t, workflow.ErrNoTasks, err)
+	require.Equal(t, cereal.ErrNoTasks, err)
 
 	assert.NotZero(t, b1TID)
 	assert.NotZero(t, b2TID)
@@ -145,12 +153,12 @@ func TestTaskCompleteWhileWorkflowIsRunning(t *testing.T) {
 	workflowName := "workflow_name"
 	err := runResetDB()
 	require.NoError(t, err)
-	b1 := NewPostgresBackend(defaultConnURIForDatabase(defaultDatabaseName))
+	b1 := NewPostgresBackend(testDBURL())
 	err = b1.Init()
 	require.NoError(t, err)
 	defer b1.Close()
 
-	b2 := NewPostgresBackend(defaultConnURIForDatabase(defaultDatabaseName))
+	b2 := NewPostgresBackend(testDBURL())
 	err = b2.Init()
 	require.NoError(t, err)
 	defer b2.Close()

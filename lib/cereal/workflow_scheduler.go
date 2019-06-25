@@ -1,15 +1,14 @@
-package workflow
+package cereal
 
 import (
 	"context"
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 
-	"github.com/chef/automate/lib/workflow/backend"
-
-	"github.com/sirupsen/logrus"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 var (
@@ -65,7 +64,7 @@ func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duratio
 }
 
 func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration, error) {
-	s, completer, err := w.backend.GetDueRecurringWorkflow(ctx)
+	s, completer, err := w.backend.GetDueScheduledWorkflow(ctx)
 	if err != nil {
 		if err == ErrNoDueWorkflows {
 			s, err2 := w.backend.GetNextScheduledWorkflow(ctx)
@@ -107,17 +106,17 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	logrus.Infof("Starting scheduled workflow %q", workflowInstanceName)
 	s.NextDueAt = nextDueAt
 	s.LastEnqueuedAt = nowUTC
-	err = completer.EnqueueRecurringWorkflow(s)
+	err = completer.EnqueueScheduledWorkflow(s)
 	if err != nil {
 		if err == ErrWorkflowInstanceExists {
 			logrus.Warnf(
-				"Recurring workflow %q still running, consider increasing recurrence interval",
+				"Scheduled workflow %q still running, consider increasing recurrence interval",
 				s.InstanceName)
 			// TODO(jaym): what do we want to do here? i think we're going to keep trying
 			//             until we succeed here? Maybe we want to skip this interval?
 			return maxWakeupInterval, nil
 		}
-		logrus.WithError(err).Error("could not update recurring workflow record")
+		logrus.WithError(err).Error("could not update scheduled workflow record")
 		return sleepTime, err
 	}
 

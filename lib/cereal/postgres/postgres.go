@@ -13,56 +13,56 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/lib/workflow"
-	"github.com/chef/automate/lib/workflow/backend"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 const (
-	enqueueTaskQuery   = `SELECT enqueue_task($1, $2, $3, $4, $5)`
-	dequeueTaskQuery   = `SELECT * FROM dequeue_task($1)`
-	completeTaskQuery  = `SELECT complete_task($1::bigint, $2::task_status, $3::text, $4)`
-	getTaskResultQuery = `SELECT task_name, parameters, status, error, result FROM task_results WHERE id = $1`
+	enqueueTaskQuery   = `SELECT cereal_enqueue_task($1, $2, $3, $4, $5)`
+	dequeueTaskQuery   = `SELECT * FROM cereal_dequeue_task($1)`
+	completeTaskQuery  = `SELECT cereal_complete_task($1, $2, $3, $4)`
+	getTaskResultQuery = `SELECT task_name, parameters, status, error, result FROM cereal_task_results WHERE id = $1`
 
-	enqueueWorkflowQuery  = `SELECT enqueue_workflow($1, $2, $3)`
-	dequeueWorkflowQuery  = `SELECT * FROM dequeue_workflow(VARIADIC $1)`
-	completeWorkflowQuery = `SELECT complete_workflow($1, $2)`
-	failWorkflowQuery     = `SELECT fail_workflow($1, $2)`
-	continueWorkflowQuery = `SELECT continue_workflow($1, $2, $3, $4, $5)`
-	abandonWorkflowQuery  = `SELECT abandon_workflow($1, $2, $3)`
+	enqueueWorkflowQuery  = `SELECT cereal_enqueue_workflow($1, $2, $3)`
+	dequeueWorkflowQuery  = `SELECT * FROM cereal_dequeue_workflow(VARIADIC $1)`
+	completeWorkflowQuery = `SELECT cereal_complete_workflow($1, $2)`
+	failWorkflowQuery     = `SELECT cereal_fail_workflow($1, $2)`
+	continueWorkflowQuery = `SELECT cereal_continue_workflow($1, $2, $3, $4, $5)`
+	abandonWorkflowQuery  = `SELECT cereal_abandon_workflow($1, $2, $3)`
 
-	listRecurringWorkflowsQuery = `
+	listScheduledWorkflowsQuery = `
 		WITH res AS
-			(SELECT DISTINCT ON (instance_name, workflow_name) * FROM workflow_results
+			(SELECT DISTINCT ON (instance_name, workflow_name) * FROM cereal_workflow_results
 			ORDER BY instance_name, workflow_name, end_at DESC)
 		SELECT s.id, enabled, s.instance_name, s.workflow_name, s.parameters, recurrence,
 			next_run_at, start_at last_start, end_at last_end
-			FROM recurring_workflow_schedules s LEFT JOIN res
+			FROM cereal_workflow_schedules s LEFT JOIN res
 			ON s.instance_name = res.instance_name AND s.workflow_name = res.workflow_name;
 		`
 
-	getNextRecurringWorkflowQuery = `
+	getNextScheduledWorkflowQuery = `
         SELECT id, enabled, instance_name, workflow_name, parameters, recurrence, next_run_at
-        FROM recurring_workflow_schedules
+        FROM cereal_workflow_schedules
         WHERE enabled = TRUE
         ORDER BY next_run_at LIMIT 1
         `
-	getDueRecurringWorkflowQuery = `
+	getDueScheduledWorkflowQuery = `
         SELECT id, enabled, instance_name, workflow_name, parameters, recurrence, next_run_at
-        FROM recurring_workflow_schedules
+        FROM cereal_workflow_schedules
         WHERE next_run_at < NOW() AND enabled = TRUE
         ORDER BY next_run_at
         FOR UPDATE SKIP LOCKED LIMIT 1
         `
-	updateRecurringWorkflowQuery = `
-		UPDATE recurring_workflow_schedules
+	updateScheduledWorkflowQuery = `
+		UPDATE cereal_workflow_schedules
 		SET next_run_at = $2,
 		last_enqueued_at = $3,
 		enabled = $4
 		WHERE id = $1
         `
 
-	updateSlowRecurringWorkflowQuery = `
-		UPDATE recurring_workflow_schedules
+	updateSlowScheduledWorkflowQuery = `
+		UPDATE cereal_workflow_schedules
 		SET next_run_at = $2,
 		enabled = $3
 		WHERE id = $1
@@ -107,7 +107,7 @@ type PostgresWorkflowCompleter struct {
 	completedTaskCount int
 }
 
-type PostgresRecurringWorkflowCompleter struct {
+type PostgresScheduledWorkflowCompleter struct {
 	tx     *sql.Tx
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -115,7 +115,7 @@ type PostgresRecurringWorkflowCompleter struct {
 
 var _ backend.Driver = &PostgresBackend{}
 var _ backend.TaskCompleter = &PostgresTaskCompleter{}
-var _ backend.RecurringWorkflowCompleter = &PostgresRecurringWorkflowCompleter{}
+var _ backend.ScheduledWorkflowCompleter = &PostgresScheduledWorkflowCompleter{}
 
 func NewPostgresBackend(connURI string) *PostgresBackend {
 	return &PostgresBackend{
@@ -137,7 +137,7 @@ func (pg *PostgresBackend) Init() error {
 	}
 
 	dbInstance, err := postgres.WithInstance(pg.db, &postgres.Config{
-		MigrationsTable: "workflow_schema_version",
+		MigrationsTable: "cereal_schema_version",
 	})
 	if err != nil {
 		return err
@@ -188,7 +188,7 @@ func (pg *PostgresBackend) Close() error {
 }
 
 func (pg *PostgresBackend) GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string) ([]byte, error) {
-	row := pg.db.QueryRowContext(ctx, "SELECT parameters FROM recurring_workflow_schedules WHERE instance_name = $1 and workflow_name = $2",
+	row := pg.db.QueryRowContext(ctx, "SELECT parameters FROM cereal_workflow_schedules WHERE instance_name = $1 and workflow_name = $2",
 		instanceName, workflowName)
 	var data []byte
 
@@ -201,7 +201,7 @@ func (pg *PostgresBackend) GetScheduledWorkflowParameters(ctx context.Context, i
 }
 
 func (pg *PostgresBackend) GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (string, error) {
-	row := pg.db.QueryRowContext(ctx, "SELECT recurrence FROM recurring_workflow_schedules WHERE instance_name = $1 and workflow_name = $2",
+	row := pg.db.QueryRowContext(ctx, "SELECT recurrence FROM cereal_workflow_schedules WHERE instance_name = $1 and workflow_name = $2",
 		instanceName, workflowName)
 
 	var data string
@@ -217,9 +217,9 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
 	defer cancel()
 
-	rows, err := pg.db.QueryContext(ctx, listRecurringWorkflowsQuery)
+	rows, err := pg.db.QueryContext(ctx, listScheduledWorkflowsQuery)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not query recurring workflows")
+		return nil, errors.Wrap(err, "could not query scheduled workflows")
 	}
 
 	defer rows.Close() // nolint: errcheck
@@ -250,7 +250,7 @@ func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*backe
 	ctx, cancel := context.WithCancel(ctx) // nolint: govet
 	defer cancel()
 
-	row := pg.db.QueryRowContext(ctx, getNextRecurringWorkflowQuery)
+	row := pg.db.QueryRowContext(ctx, getNextScheduledWorkflowQuery)
 
 	var scheduledWorkflow backend.Schedule
 	err := row.Scan(
@@ -264,23 +264,23 @@ func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*backe
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, workflow.ErrNoScheduledWorkflows
+			return nil, cereal.ErrNoScheduledWorkflows
 		}
 		return nil, err
 	}
 	return &scheduledWorkflow, err
 }
 
-func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*backend.Schedule, backend.RecurringWorkflowCompleter, error) {
+func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backend.Schedule, backend.ScheduledWorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx) // nolint: govet
 
 	tx, err := pg.db.BeginTx(ctx, nil)
 	if err != nil {
 		cancel()
-		return nil, nil, errors.Wrap(err, "could not start GetDueRecurringWorkflow transaction")
+		return nil, nil, errors.Wrap(err, "could not start GetDueScheduledWorkflow transaction")
 	}
 
-	row := tx.QueryRowContext(ctx, getDueRecurringWorkflowQuery)
+	row := tx.QueryRowContext(ctx, getDueScheduledWorkflowQuery)
 
 	var scheduledWorkflow backend.Schedule
 	err = row.Scan(
@@ -296,12 +296,12 @@ func (pg *PostgresBackend) GetDueRecurringWorkflow(ctx context.Context) (*backen
 	if err != nil {
 		cancel()
 		if err == sql.ErrNoRows {
-			return nil, nil, workflow.ErrNoDueWorkflows
+			return nil, nil, cereal.ErrNoDueWorkflows
 		}
 		return nil, nil, errors.Wrap(err, "error fetching due workflows")
 	}
 
-	completer := &PostgresRecurringWorkflowCompleter{
+	completer := &PostgresScheduledWorkflowCompleter{
 		tx:     tx,
 		ctx:    ctx,
 		cancel: cancel,
@@ -322,7 +322,7 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByName(
 	}
 
 	// Lock row to update
-	r := tx.QueryRow("SELECT id FROM recurring_workflow_schedules WHERE instance_name = $1 AND workflow_name = $2 FOR UPDATE",
+	r := tx.QueryRow("SELECT id FROM cereal_workflow_schedules WHERE instance_name = $1 AND workflow_name = $2 FOR UPDATE",
 		instanceName, workflowName)
 	var id int64
 	if err := r.Scan(&id); err != nil {
@@ -352,7 +352,7 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByID(ctx context.Context, id in
 	}
 
 	// Lock row to update
-	r := tx.QueryRow("SELECT id FROM recurring_workflow_schedules WHERE id = $1 FOR UPDATE", id)
+	r := tx.QueryRow("SELECT id FROM cereal_workflow_schedules WHERE id = $1 FOR UPDATE", id)
 	var throwaway int64
 	if err := r.Scan(&throwaway); err != nil {
 		if err != sql.ErrNoRows {
@@ -374,21 +374,21 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByID(ctx context.Context, id in
 
 func (pg *PostgresBackend) updateWorkflowScheduleByID(tx *sql.Tx, id int64, o *backend.WorkflowScheduleUpdateOpts) error {
 	if o.UpdateEnabled {
-		_, err := tx.Exec("SELECT update_recurring_workflow_enabled($1, $2)", id, o.Enabled)
+		_, err := tx.Exec("SELECT cereal_update_scheduled_workflow_enabled($1, $2)", id, o.Enabled)
 		if err != nil {
 			return err
 		}
 	}
 
 	if o.UpdateParameters {
-		_, err := tx.Exec("SELECT update_recurring_workflow_parameters($1, $2)", id, o.Parameters)
+		_, err := tx.Exec("SELECT cereal_update_scheduled_workflow_parameters($1, $2)", id, o.Parameters)
 		if err != nil {
 			return err
 		}
 	}
 
 	if o.UpdateRecurrence {
-		_, err := tx.Exec("SELECT update_recurring_workflow_recurrence($1, $2, $3)",
+		_, err := tx.Exec("SELECT cereal_update_scheduled_workflow_recurrence($1, $2, $3)",
 			id, o.Recurrence, o.NextRunAt)
 		if err != nil {
 			return err
@@ -404,7 +404,7 @@ func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, instanceN
 		if pqErr, ok := err.(*pq.Error); ok {
 			// unique violation
 			if pqErr.Code == "23505" {
-				return workflow.ErrWorkflowScheduleExists
+				return cereal.ErrWorkflowScheduleExists
 			}
 		}
 
@@ -419,7 +419,7 @@ func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, instanceN
 	}
 
 	_, err = pg.db.ExecContext(context.TODO(), `
-INSERT INTO recurring_workflow_schedules(instance_name, workflow_name, parameters, recurrence, enabled, next_run_at)
+INSERT INTO cereal_workflow_schedules(instance_name, workflow_name, parameters, recurrence, enabled, next_run_at)
 VALUES ($1, $2, $3, $4, $5, $6)`,
 		instanceName, workflowName, parameters, recurrence, enabled, nextRunAt)
 	if err != nil {
@@ -439,7 +439,7 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 	}
 
 	row := tx.QueryRowContext(ctx,
-		"SELECT status, parameters, payload FROM workflow_instances WHERE workflow_name = $1 AND instance_name = $2",
+		"SELECT status, parameters, payload FROM cereal_workflow_instances WHERE workflow_name = $1 AND instance_name = $2",
 		workflowName, instanceName,
 	)
 	workflowInstance := backend.WorkflowInstance{
@@ -454,7 +454,7 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 	if err != nil {
 		if err == sql.ErrNoRows {
 			row := tx.QueryRowContext(ctx,
-				"SELECT parameters, result, error FROM workflow_results WHERE workflow_name = $1 AND instance_name = $2 ORDER BY id DESC",
+				"SELECT parameters, result, error FROM cereal_workflow_results WHERE workflow_name = $1 AND instance_name = $2 ORDER BY id DESC",
 				workflowName, instanceName,
 			)
 			var errStr sql.NullString
@@ -465,7 +465,7 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 			)
 			if err != nil {
 				if err == sql.ErrNoRows {
-					return nil, workflow.ErrWorkflowInstanceNotFound
+					return nil, cereal.ErrWorkflowInstanceNotFound
 				}
 				return nil, err
 			}
@@ -505,7 +505,7 @@ func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.Workf
 		return wrapErr(err, "failed to commit enqueue workflow")
 	}
 	if count.Int64 == 0 {
-		return workflow.ErrWorkflowInstanceExists
+		return cereal.ErrWorkflowInstanceExists
 	}
 	return nil
 }
@@ -550,7 +550,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	if err == sql.ErrNoRows {
 		tx.Commit() // nolint: errcheck
 		cancel()
-		return nil, nil, workflow.ErrNoWorkflowInstances
+		return nil, nil, cereal.ErrNoWorkflowInstances
 
 	} else if err != nil {
 		cancel()
@@ -607,7 +607,7 @@ func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *bac
 	var tid int64
 	err := row.Scan(&tid, &task.WorkflowInstanceID, &task.Parameters)
 	if err == sql.ErrNoRows {
-		return 0, nil, workflow.ErrNoTasks
+		return 0, nil, cereal.ErrNoTasks
 	} else if err != nil {
 		return 0, nil, errors.Wrap(err, "failed to dequeue task")
 	}
@@ -749,13 +749,13 @@ func (workc *PostgresWorkflowCompleter) Close() error {
 }
 
 // TODO(ssd) 2019-05-14: We should probably allow bulk insertion of workflows and tasks
-func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(s *backend.Schedule) error {
+func (c *PostgresScheduledWorkflowCompleter) EnqueueScheduledWorkflow(s *backend.Schedule) error {
 	defer c.cancel()
 	wrapErr := func(err error, msg string) error {
 		if pqErr, ok := err.(*pq.Error); ok {
 			// unique violation
 			if pqErr.Code == "23505" {
-				return workflow.ErrWorkflowInstanceExists
+				return cereal.ErrWorkflowInstanceExists
 			}
 		}
 
@@ -778,7 +778,7 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(s *backend
 	if count.Int64 == 0 {
 		_, err = c.tx.ExecContext(
 			c.ctx,
-			updateSlowRecurringWorkflowQuery,
+			updateSlowScheduledWorkflowQuery,
 			s.ID,
 			s.NextDueAt,
 			s.Enabled)
@@ -790,11 +790,11 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(s *backend
 		if err != nil {
 			return errors.Wrap(err, "failed to commit workflow instance")
 		}
-		return workflow.ErrWorkflowInstanceExists
+		return cereal.ErrWorkflowInstanceExists
 	} else {
 		_, err = c.tx.ExecContext(
 			c.ctx,
-			updateRecurringWorkflowQuery,
+			updateScheduledWorkflowQuery,
 			s.ID,
 			s.NextDueAt,
 			s.LastEnqueuedAt,
@@ -807,6 +807,6 @@ func (c *PostgresRecurringWorkflowCompleter) EnqueueRecurringWorkflow(s *backend
 	}
 }
 
-func (c *PostgresRecurringWorkflowCompleter) Close() {
+func (c *PostgresScheduledWorkflowCompleter) Close() {
 	c.cancel()
 }

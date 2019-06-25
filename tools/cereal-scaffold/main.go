@@ -12,9 +12,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/teambition/rrule-go"
 
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
-	"github.com/chef/automate/lib/workflow"
-	"github.com/chef/automate/lib/workflow/postgres"
 )
 
 var opts = struct {
@@ -146,7 +146,7 @@ type SimpleTaskParams struct {
 	Sleepy int
 }
 
-func (t *SimpleTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+func (t *SimpleTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	params := SimpleTaskParams{}
 	if err := task.GetParameters(&params); err != nil {
 		panic(err)
@@ -165,8 +165,8 @@ type SimpleWorkflowParams struct {
 
 type SimpleWorkflow struct{}
 
-func (p *SimpleWorkflow) OnStart(w workflow.WorkflowInstance,
-	ev workflow.StartEvent) workflow.Decision {
+func (p *SimpleWorkflow) OnStart(w cereal.WorkflowInstance,
+	ev cereal.StartEvent) cereal.Decision {
 
 	logrus.Info("SimpleWorkflow got OnStart")
 
@@ -190,8 +190,8 @@ func (p *SimpleWorkflow) OnStart(w workflow.WorkflowInstance,
 
 var done = false
 
-func (p *SimpleWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
-	ev workflow.TaskCompleteEvent) workflow.Decision {
+func (p *SimpleWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
+	ev cereal.TaskCompleteEvent) cereal.Decision {
 	var mycount int
 
 	if err := w.GetPayload(&mycount); err != nil {
@@ -238,7 +238,7 @@ func (p *SimpleWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 	}
 }
 
-func (SimpleWorkflow) OnCancel(w workflow.WorkflowInstance, ev workflow.CancelEvent) workflow.Decision {
+func (SimpleWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
 	return w.Complete()
 }
 
@@ -248,22 +248,22 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	workflowManager, err := workflow.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
+	manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
 	if err != nil {
 		return err
 	}
 
-	workflowManager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
-	workflowManager.RegisterTaskExecutor("test task", &SimpleTask{}, workflow.TaskExecutorOpts{
+	manager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
+	manager.RegisterTaskExecutor("test task", &SimpleTask{}, cereal.TaskExecutorOpts{
 		Workers: simpleWorkflowOpts.DequeueWorkerCount})
 
 	params := SimpleWorkflowParams{
 		simpleWorkflowOpts.TaskCount,
 	}
 
-	workflowManager.Start(context.Background())
+	manager.Start(context.Background())
 	instanceName := fmt.Sprintf("simple-workflow-%s", time.Now())
-	err = workflowManager.EnqueueWorkflow(context.TODO(),
+	err = manager.EnqueueWorkflow(context.TODO(),
 		"simple-workflow", instanceName,
 		&params,
 	)
@@ -281,15 +281,15 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 
 type ScheduleTestTask struct{}
 
-func (t *ScheduleTestTask) Run(ctx context.Context, _ workflow.Task) (interface{}, error) {
+func (t *ScheduleTestTask) Run(ctx context.Context, _ cereal.Task) (interface{}, error) {
 	logrus.Info("Running schedule test task")
 	return nil, nil
 }
 
 type ScheduleTestWorkflow struct{}
 
-func (p *ScheduleTestWorkflow) OnStart(w workflow.WorkflowInstance,
-	ev workflow.StartEvent) workflow.Decision {
+func (p *ScheduleTestWorkflow) OnStart(w cereal.WorkflowInstance,
+	ev cereal.StartEvent) cereal.Decision {
 	var params string
 	err := w.GetParameters(&params)
 	if err != nil {
@@ -301,8 +301,8 @@ func (p *ScheduleTestWorkflow) OnStart(w workflow.WorkflowInstance,
 	return w.Continue(0)
 }
 
-func (p *ScheduleTestWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
-	ev workflow.TaskCompleteEvent) workflow.Decision {
+func (p *ScheduleTestWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
+	ev cereal.TaskCompleteEvent) cereal.Decision {
 
 	logrus.WithFields(logrus.Fields{
 		"task_name": ev.TaskName,
@@ -312,8 +312,8 @@ func (p *ScheduleTestWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 	return w.Complete()
 }
 
-func (p *ScheduleTestWorkflow) OnCancel(w workflow.WorkflowInstance,
-	ev workflow.CancelEvent) workflow.Decision {
+func (p *ScheduleTestWorkflow) OnCancel(w cereal.WorkflowInstance,
+	ev cereal.CancelEvent) cereal.Decision {
 	return w.Complete()
 }
 
@@ -323,12 +323,12 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	workflowManager, err := workflow.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
+	manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
 	if err != nil {
 		return err
 	}
-	workflowManager.RegisterWorkflowExecutor("schedule-test", &ScheduleTestWorkflow{})
-	workflowManager.RegisterTaskExecutor("test task", &ScheduleTestTask{}, workflow.TaskExecutorOpts{
+	manager.RegisterWorkflowExecutor("schedule-test", &ScheduleTestWorkflow{})
+	manager.RegisterTaskExecutor("test task", &ScheduleTestTask{}, cereal.TaskExecutorOpts{
 		Workers: simpleWorkflowOpts.DequeueWorkerCount,
 	})
 
@@ -340,17 +340,17 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		panic(err)
 	}
 
-	err = workflowManager.CreateWorkflowSchedule(
+	err = manager.CreateWorkflowSchedule(
 		"every minute", "schedule-test", "youfail", true, recRule)
 	if err != nil {
-		if err == workflow.ErrWorkflowScheduleExists {
+		if err == cereal.ErrWorkflowScheduleExists {
 			logrus.Info("workflow schedule exists...ignoring")
 		} else {
 			logrus.WithError(err).Warn("could not create workflow schedule")
 		}
 	}
 
-	schedules, err := workflowManager.ListWorkflowSchedules(context.Background())
+	schedules, err := manager.ListWorkflowSchedules(context.Background())
 	if err != nil {
 		logrus.WithError(err).Error("Failed to list workflow schedules")
 	}
@@ -358,13 +358,13 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		logrus.WithField("sched", s).Info("Found schedule")
 	}
 
-	workflowManager.UpdateWorkflowScheduleByName(context.Background(),
-		schedules[0].InstanceName, schedules[0].WorkflowName, workflow.UpdateParameters("youwin"))
+	manager.UpdateWorkflowScheduleByName(context.Background(),
+		schedules[0].InstanceName, schedules[0].WorkflowName, cereal.UpdateParameters("youwin"))
 
-	workflowManager.Start(context.Background())
+	manager.Start(context.Background())
 
 	for {
-		schedules, err := workflowManager.ListWorkflowSchedules(context.Background())
+		schedules, err := manager.ListWorkflowSchedules(context.Background())
 		if err != nil {
 			logrus.WithError(err).Error("Failed to list workflow schedules")
 		}
