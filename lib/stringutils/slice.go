@@ -1,5 +1,9 @@
 package stringutils
 
+import "errors"
+
+var ErrNotFound = errors.New("Not found")
+
 func SliceContains(haystack []string, needle string) bool {
 	for _, s := range haystack {
 		if s == needle {
@@ -20,4 +24,13 @@ func SliceFilter(in []string, f func(string) bool) []string {
 		}
 	}
 	return list
+}
+
+func IndexOf(haystack []string, needle string) (int, error) {
+	for i := range haystack {
+		if needle == haystack[i] {
+			return i, nil
+		}
+	}
+	return -1, ErrNotFound
 }

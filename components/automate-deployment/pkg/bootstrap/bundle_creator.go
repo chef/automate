@@ -12,30 +12,24 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/product"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
-)
-
-var (
-	rootUname   = "root"
-	rootGname   = "root"
-	rootUserID  = 0
-	rootGroupID = 0
-	habUname    = "hab"
-	habGname    = "hab"
-	habUserID   = 1
-	habGroupID  = 1
 )
 
 const habSvcDir = "/hab/svc"
 
 // BundleCreator creates installation bundles
 type BundleCreator struct {
-	rootDir string
+	rootDir       string
+	allowedUsers  []string
+	allowedGroups []string
 }
 
 func NewBundleCreator() *BundleCreator {
 	return &BundleCreator{
-		rootDir: habSvcDir,
+		rootDir:       habSvcDir,
+		allowedUsers:  []string{"root", "hab"},
+		allowedGroups: []string{"root", "hab"},
 	}
 }
 
@@ -77,40 +71,31 @@ func (b *BundleCreator) mkdir(tarReader *tar.Reader, hdr *tar.Header) error {
 func (b *BundleCreator) Unpack(in io.Reader) error {
 	tarReader := tar.NewReader(in)
 
-	habUser, err := user.Lookup(habUname)
-	if err != nil {
-		return err
-	}
-	hUid, err := strconv.Atoi(habUser.Uid)
-	if err != nil {
-		return err
+	users := map[string]int{}
+	groups := map[string]int{}
+
+	for _, uname := range b.allowedUsers {
+		u, err := user.Lookup(uname)
+		if err != nil {
+			return errors.Wrapf(err, "Expected user %q to exist", uname)
+		}
+		uid, err := strconv.Atoi(u.Uid)
+		if err != nil {
+			return err
+		}
+		users[uname] = uid
 	}
 
-	habGroup, err := user.LookupGroup(habGname)
-	if err != nil {
-		return err
-	}
-	hGid, err := strconv.Atoi(habGroup.Gid)
-	if err != nil {
-		return err
-	}
-
-	rootUser, err := user.Lookup(rootUname)
-	if err != nil {
-		return err
-	}
-	rUid, err := strconv.Atoi(rootUser.Uid)
-	if err != nil {
-		return err
-	}
-
-	rootGroup, err := user.LookupGroup(rootGname)
-	if err != nil {
-		return err
-	}
-	rGid, err := strconv.Atoi(rootGroup.Gid)
-	if err != nil {
-		return err
+	for _, gname := range b.allowedGroups {
+		g, err := user.LookupGroup(gname)
+		if err != nil {
+			return errors.Wrapf(err, "Expected group %q to exist", gname)
+		}
+		gid, err := strconv.Atoi(g.Gid)
+		if err != nil {
+			return err
+		}
+		groups[gname] = gid
 	}
 
 	exists, err := fileutils.PathExists(b.rootDir)
@@ -127,22 +112,17 @@ func (b *BundleCreator) Unpack(in io.Reader) error {
 				break
 			}
 		}
-		switch hdr.Uid {
-		case habUserID:
-			hdr.Uid = hUid
-		case rootUserID:
-			hdr.Uid = rUid
-		default:
-			return errors.New("Unknown user id")
+
+		if uid, found := users[hdr.Uname]; found {
+			hdr.Uid = uid
+		} else {
+			return errors.Errorf("Unknown user %q", hdr.Uname)
 		}
 
-		switch hdr.Gid {
-		case habGroupID:
-			hdr.Gid = hGid
-		case rootUserID:
-			hdr.Gid = rGid
-		default:
-			return errors.New("Unknown user id")
+		if gid, found := groups[hdr.Gname]; found {
+			hdr.Gid = gid
+		} else {
+			return errors.Errorf("Unknown user %q", hdr.Uname)
 		}
 
 		if hdr.Typeflag == tar.TypeDir {
@@ -248,22 +228,16 @@ func (b *BundleCreator) headerForFile(relPath string) (*tar.Header, error) {
 
 		header.Name = relPath
 
-		switch header.Uname {
-		case habUname:
-			header.Uid = habUserID
-		case rootUname:
-			header.Uid = rootUserID
-		default:
-			return nil, errors.Errorf("%q owner is not root or hab", absPath)
+		if uid, err := stringutils.IndexOf(b.allowedUsers, header.Uname); err != nil {
+			return nil, errors.Errorf("%q is not an allowed user", header.Uname)
+		} else {
+			header.Uid = uid
 		}
 
-		switch header.Gname {
-		case habGname:
-			header.Gid = habGroupID
-		case rootGname:
-			header.Gid = rootGroupID
-		default:
-			return nil, errors.Errorf("%q group is not root or hab", absPath)
+		if gid, err := stringutils.IndexOf(b.allowedGroups, header.Gname); err != nil {
+			return nil, errors.Errorf("%q is not an allowed group", header.Gname)
+		} else {
+			header.Gid = gid
 		}
 
 		return header, nil
