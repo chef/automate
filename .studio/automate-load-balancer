@@ -1,0 +1,20 @@
+#!/bin/bash
+
+document "automate_load_balancer_integration" <<DOC
+  Runs some integration tests for automate-load-balancer
+DOC
+automate_load_balancer_integration() {
+  local target=${1:-"https://127.0.0.1"}
+  local output
+
+  install_if_missing core/curl curl
+  if ! output=$(curl --http2 -vk "$target" 2>&1); then
+    echo "non-zero exit code from curl: ${output}"
+    return 1
+  fi
+  if ! grep -q "ALPN, server accepted to use h2" <<< "${output}"; then
+    echo "server did NOT accept to use HTTP/2"
+    return 1
+  fi
+}
+
