@@ -109,6 +109,26 @@ steps:
   # or take a long time.
   - wait
 
+  - label: "[integration] automate-load-balancer"
+    command:
+      - . scripts/verify_setup
+      - |
+        hab studio run "source scripts/verify_studio_init &&
+          start_deployment_service &&
+          chef-automate dev deploy-some chef/automate-load-balancer --with-deps &&
+          automate_load_balancer_integration"
+    timeout_in_minutes: 20
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
   - label: "[integration] applications-service"
     command:
       - . scripts/verify_setup
