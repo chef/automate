@@ -13,6 +13,7 @@ import (
 
 	"github.com/chef/automate/components/secrets-service/config"
 	"github.com/chef/automate/lib/db/migrator"
+	"github.com/chef/automate/lib/logger"
 )
 
 var validOrderFields = []string{"asc", "desc"}
@@ -83,7 +84,7 @@ func initPostgresDB(conf *config.Postgres) (*gorp.DbMap, error) {
 	}
 
 	// Run the migrations
-	if err := migrator.Migrate(pgURI, conf.MigrationsPath); err != nil {
+	if err := migrator.Migrate(pgURI, conf.MigrationsPath, logger.NewLogrusStandardLogger(), false); err != nil {
 		return nil, errors.Wrapf(err, "Unable to complete database migrations")
 	}
 

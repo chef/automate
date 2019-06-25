@@ -30,12 +30,14 @@ authenticators:
       type: postgresql
       config:
         database: {{cfg.storage.database}}
+        migrations: {{pkg.path}}/migrations
         max_connections: {{cfg.storage.max_connections}}
 
 tokens:
   type: postgresql
   config:
     database: {{cfg.storage.database}}
+    migrations: {{pkg.path}}/migrations
 
 {{~#eachAlive bind.teams-service.members as |teams-service|}}
 {{~#if @last}}

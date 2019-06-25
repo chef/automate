@@ -66,7 +66,8 @@ func initializePG() (*pg.Config, error) {
 	// If in CI mode, use the default
 	if ciMode {
 		return &pg.Config{
-			PGURL: constants.TestPgURL,
+			PGURL:          constants.TestPgURL,
+			MigrationsPath: "sql/",
 		}, nil
 	}
 
@@ -79,7 +80,8 @@ func initializePG() (*pg.Config, error) {
 	}
 
 	return &pg.Config{
-		PGURL: customPGURL,
+		PGURL:          customPGURL,
+		MigrationsPath: "sql/",
 	}, nil
 }
 
@@ -251,7 +253,7 @@ func TestGetToken(t *testing.T) {
 func TestGetTokens(t *testing.T) {
 	store, db := setup(t)
 
-	//DB time and Golang time are rounded differently
+	// DB time and Golang time are rounded differently
 	tme := time.Now().UTC().Round(time.Second)
 	testTokens := []*tokens.Token{
 		{
@@ -285,7 +287,7 @@ func TestGetTokens(t *testing.T) {
 			ID:          "token-with-no-project",
 			Description: "TokenX",
 			Active:      true,
-			Value:       "other",
+			Value:       "andanother",
 			Created:     tme,
 			Updated:     tme,
 			Projects:    []string{},
