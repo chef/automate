@@ -21,7 +21,7 @@ CREATE OR REPLACE FUNCTION
   ) AS rule
   FROM iam_staged_project_rules AS r
   INNER JOIN iam_staged_rule_conditions AS rc ON rc.rule_db_id=r.db_id
-  WHERE projects_match_for_rule(project_id, _project_filter) AND r.deleted=false
+  WHERE _project_id=project_id AND projects_match_for_rule(project_id, _project_filter) AND r.deleted=false
   GROUP BY r.id, r.project_id, r.name, r.type
 
   UNION ALL
