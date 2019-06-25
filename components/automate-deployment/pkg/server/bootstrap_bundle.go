@@ -5,6 +5,10 @@ import (
 	"bytes"
 	"io"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/services"
+
+	"github.com/chef/automate/lib/product"
+
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/bootstrap"
 	"github.com/chef/automate/lib/io/chunks"
@@ -17,11 +21,14 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	tarWriter := bufio.NewWriter(&b)
 	bundleCreator := bootstrap.NewBundleCreator()
 
-	pkgs := make([]string, len(s.deployment.ExpectedServices))
-	for i, e := range s.deployment.ExpectedServices {
-		pkgs[i] = e.Name()
+	pkgsMeta := make([]*product.PackageMetadata, 0, len(s.deployment.ExpectedServices))
+	for _, e := range s.deployment.ExpectedServices {
+		if metadata := services.MetadataForPackage(e.Name()); metadata != nil {
+			pkgsMeta = append(pkgsMeta, metadata)
+		}
 	}
-	err := bundleCreator.Create(pkgs, tarWriter)
+
+	err := bundleCreator.Create(pkgsMeta, tarWriter)
 	if err != nil {
 		return errors.Wrap(err, "Failed to create the bootstrap bundle.")
 	}

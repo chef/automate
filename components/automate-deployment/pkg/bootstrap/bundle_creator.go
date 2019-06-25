@@ -9,12 +9,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/product"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 )
+
+var ErrNoFiles = errors.New("No files to bundle")
 
 const habSvcDir = "/hab/svc"
 
@@ -140,13 +141,13 @@ func (b *BundleCreator) Unpack(in io.Reader) error {
 	return nil
 }
 
-func (b *BundleCreator) Create(pkgNames []string, out io.Writer) error {
+func (b *BundleCreator) Create(pkgMetadatas []*product.PackageMetadata, out io.Writer) error {
 	allDirsSet := make(map[string]*tar.Header)
 	allDirs := []*tar.Header{}
 	files := make(map[string]*tar.Header)
-	for _, svc := range pkgNames {
-		metadata := services.MetadataForPackage(svc)
+	for _, metadata := range pkgMetadatas {
 		if metadata != nil && len(metadata.Bootstrap) > 0 {
+			svc := metadata.Name.Name
 			for _, bootstrapSepc := range metadata.Bootstrap {
 				if bootstrapSepc.Type != product.BootstrapTypeFile {
 					return errors.New("Unknown type")
@@ -177,7 +178,7 @@ func (b *BundleCreator) Create(pkgNames []string, out io.Writer) error {
 	}
 
 	if len(allDirs)+len(files) <= 0 {
-		return errors.New("No files to bundle")
+		return ErrNoFiles
 	}
 
 	tarWriter := tar.NewWriter(out)
