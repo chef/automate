@@ -23,7 +23,4 @@ addNoProxy {{teams-service.sys.ip}}
 {{~/if}}
 {{~/eachAlive}}
 
-rm -rf {{pkg.svc_static_path}}/migrations
-cp -r {{pkg.path}}/migrations {{pkg.svc_static_path}}
-
 exec authn-service serve {{pkg.svc_config_path}}/config.yml
