@@ -100,9 +100,7 @@ func runBootstrapBundleCreate(cmd *cobra.Command, args []string) error {
 		return status.Annotate(err, status.FileAccessError)
 	}
 
-	defer func() {
-		_ = downloadedBundleFile.Close()
-	}()
+	defer downloadedBundleFile.Close() // nolint: errcheck
 
 	w := bufio.NewWriter(downloadedBundleFile)
 	for {

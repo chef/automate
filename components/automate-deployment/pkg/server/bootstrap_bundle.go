@@ -18,8 +18,8 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	bundleCreator := bootstrap.NewBundleCreator()
 
 	pkgs := make([]string, len(s.deployment.ExpectedServices))
-	for _, e := range s.deployment.ExpectedServices {
-		pkgs = append(pkgs, e.Name())
+	for i, e := range s.deployment.ExpectedServices {
+		pkgs[i] = e.Name()
 	}
 	err := bundleCreator.Create(pkgs, tarWriter)
 	if err != nil {
