@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-workflow-server",
+  "binlinks": ["workflow-ctl"]
+}

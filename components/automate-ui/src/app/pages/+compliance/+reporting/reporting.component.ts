@@ -57,6 +57,12 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'placeholder': 'Name'
     },
     {
+      'name': 'inspec_version',
+      'title': 'InSpec Version',
+      'description': '',
+      'placeholder': 'InSpec Version'
+    },
+    {
       'name': 'node',
       'title': 'Node',
       'description':

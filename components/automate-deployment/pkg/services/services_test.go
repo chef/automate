@@ -3,8 +3,6 @@
 package services
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"strings"
 	"testing"
 
@@ -13,9 +11,16 @@ import (
 
 	"github.com/chef/automate/components/automate-deployment/pkg/bind"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
-	"github.com/chef/automate/components/automate-deployment/pkg/services/parser"
 )
 
+func TestServicesSorted(t *testing.T) {
+	ids, err := ServicesInCollections(productList)
+	require.NoError(t, err)
+
+	sortedServices, err := bind.TopoSortAll(ids, AllBinds)
+	require.Nil(t, err, "Services are no longer topologically sortable.  Please check any newly added binds")
+	assert.Equal(t, sortedServices, ids)
+}
 func TestServicesSortable(t *testing.T) {
 	ids, err := ServicesInCollection("automate-full")
 	require.NoError(t, err)
@@ -38,58 +43,6 @@ func TestChefServices(t *testing.T) {
 
 	require.Equalf(t, 0, len(nonChefPackages),
 		"services.json can only contain service packages in the chef origin: %s", strings.Join(nonChefPackages, ","))
-}
-
-func TestLoadServices(t *testing.T) {
-	ids, err := ServicesInCollection("automate-full")
-	require.NoError(t, err)
-
-	expectedServices := expectedServices()
-	assert.Equal(t, expectedServices, ids)
-}
-
-func expectedServices() []habpkg.HabPkg {
-	raw, err := ioutil.ReadFile("../assets/data/services.json")
-	if err != nil {
-		panic("unable to read data/services.json")
-	}
-
-	var collections []parser.ServiceCollection
-
-	err = json.Unmarshal(raw, &collections)
-
-	if err != nil {
-		panic(err.Error)
-	}
-
-	var paths []string
-
-	for _, c := range collections {
-		if c.Name == "automate-full" {
-			paths = c.AllServices
-		}
-	}
-
-	if paths == nil {
-		panic("unable to load the services paths from data/services.json")
-	}
-
-	sPaths := make([]habpkg.HabPkg, 0, len(paths))
-	for _, path := range paths {
-		path = strings.Trim(path, "\t\n ")
-		if len(path) == 0 {
-			continue
-		}
-		sp, err := habpkg.FromString(path)
-		if err != nil {
-			panic("bad path for service")
-		}
-		if sp.Name() == "deployment-service" {
-			continue
-		}
-		sPaths = append(sPaths, sp)
-	}
-	return sPaths
 }
 
 func TestServicePathsByCollection(t *testing.T) {
@@ -175,7 +128,6 @@ func TestSupplementaryPackages(t *testing.T) {
 	}
 
 	mustExist := []habpkg.HabPkg{
-		habpkg.New("chef", "automate-debug"),
 		habpkg.New("core", "rsync"),
 	}
 
@@ -216,19 +168,20 @@ func TestDoLoadServiceBinds(t *testing.T) {
 func TestBinlinksLoad(t *testing.T) {
 	t.Run("a service with no binlinks has an empty list of binlinks", func(t *testing.T) {
 		var nilSlice []string
-		assert.Equal(t, nilSlice, BinlinksForService("compliance-service"))
+		assert.Equal(t, nilSlice, BinlinksForPackage("compliance-service"))
 	})
 
 	t.Run("automate-cli has a binlink entry for chef-automate exe", func(t *testing.T) {
-		assert.Equal(t, []string{"chef-automate"}, BinlinksForService("automate-cli"))
+		assert.Equal(t, []string{"chef-automate"}, BinlinksForPackage("automate-cli"))
 	})
 	t.Run("automate-cs-nginx has a binlink entry for knife", func(t *testing.T) {
-		assert.Equal(t, []string{"knife", "chef-server-ctl"}, BinlinksForService("automate-cs-nginx"))
+		assert.Equal(t, []string{"knife", "chef-server-ctl"}, BinlinksForPackage("automate-cs-nginx"))
 	})
 }
 
 func TestAllPackagesUniq(t *testing.T) {
-	packageIDs := AllPackages()
+	packageIDs, err := ServicesInCollections([]string{"automate-full", "chef-server", "workflow"})
+	require.NoError(t, err)
 	assert.True(t, len(packageIDs) > 0)
 
 	pkgSet := make(map[habpkg.HabPkg]struct{})
@@ -236,4 +189,96 @@ func TestAllPackagesUniq(t *testing.T) {
 		pkgSet[p] = struct{}{}
 	}
 	assert.Equal(t, len(packageIDs), len(pkgSet))
+}
+
+func TestServicesUniq(t *testing.T) {
+	packageIDs, err := ServicesInCollections([]string{"automate-full", "core"})
+	require.NoError(t, err)
+	assert.True(t, len(packageIDs) > 0)
+
+	pkgSet := make(map[habpkg.HabPkg]struct{})
+	for _, p := range packageIDs {
+		pkgSet[p] = struct{}{}
+	}
+	assert.Equal(t, len(packageIDs), len(pkgSet))
+}
+
+func TestServicesUniqWithAliases(t *testing.T) {
+	packageIDs, err := ServicesInCollections([]string{"automate-full", "automate"})
+	require.NoError(t, err)
+	assert.True(t, len(packageIDs) > 0)
+
+	pkgSet := make(map[habpkg.HabPkg]struct{})
+	for _, p := range packageIDs {
+		pkgSet[p] = struct{}{}
+	}
+	assert.Equal(t, len(packageIDs), len(pkgSet))
+}
+
+func TestAutomateFullAliases(t *testing.T) {
+	packageIDsAutomateFull, err := ServicesInCollections([]string{"automate-full"})
+	require.NoError(t, err)
+	packageIDsAutomate, err := ServicesInCollections([]string{"automate"})
+	require.NoError(t, err)
+	assert.Equal(t, packageIDsAutomate, packageIDsAutomateFull)
+}
+
+func TestListProducts(t *testing.T) {
+	assert.Subset(t, ListProducts(), []string{"automate", "chef-server", "workflow"})
+	assert.NotContains(t, ListProducts(), "monitoring")
+}
+
+func TestValidateProductDeployment(t *testing.T) {
+	t.Run("error unknown product", func(t *testing.T) {
+		assert.Error(t, ValidateProductDeployment([]string{"foo"}))
+		assert.Error(t, ValidateProductDeployment([]string{"automate", "foo", "bar"}))
+	})
+	t.Run("error on base collection", func(t *testing.T) {
+		assert.Error(t, ValidateProductDeployment([]string{"automate", "core"}))
+	})
+	t.Run("error unspecified product dependencies", func(t *testing.T) {
+		assert.Error(t, ValidateProductDeployment([]string{"workflow"}))
+	})
+	t.Run("specified product dependencies", func(t *testing.T) {
+		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "workflow"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow"}))
+	})
+	t.Run("we support these for sure", func(t *testing.T) {
+		assert.NoError(t, ValidateProductDeployment([]string{"automate", "monitoring"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate", "workflow", "chef-server"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate", "chef-server"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"chef-server"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "workflow"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "workflow", "chef-server"}))
+		assert.NoError(t, ValidateProductDeployment([]string{"automate-full", "chef-server"}))
+	})
+}
+
+func TestContainsCollection(t *testing.T) {
+	t.Run("returns false if desired collection is unknown", func(t *testing.T) {
+		assert.False(t, ContainsCollection("asdf", []string{"automate", "chef-server"}))
+	})
+	t.Run("returns false if desired collection is not in the list", func(t *testing.T) {
+		assert.False(t, ContainsCollection("workflow", []string{"automate", "chef-server"}))
+	})
+	t.Run("returns false if desired collection is not in the list and not a base dependency", func(t *testing.T) {
+		assert.False(t, ContainsCollection("automate", []string{"workflow"}))
+	})
+	t.Run("returns false list is empty", func(t *testing.T) {
+		assert.False(t, ContainsCollection("core", []string{}))
+		assert.False(t, ContainsCollection("core", nil))
+	})
+	t.Run("returns true when product is in the list", func(t *testing.T) {
+		assert.True(t, ContainsCollection("workflow", []string{"workflow"}))
+		assert.True(t, ContainsCollection("automate", []string{"automate"}))
+		assert.True(t, ContainsCollection("automate-full", []string{"automate"}))
+		assert.True(t, ContainsCollection("automate-full", []string{"automate-full"}))
+		assert.True(t, ContainsCollection("automate", []string{"automate-full"}))
+	})
+	t.Run("returns true if a base component is implicitly included", func(t *testing.T) {
+		assert.True(t, ContainsCollection("core", []string{"automate"}))
+		assert.True(t, ContainsCollection("core", []string{"automate-full"}))
+	})
 }

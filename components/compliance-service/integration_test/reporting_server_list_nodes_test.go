@@ -116,6 +116,52 @@ func TestListNodesFiltering(t *testing.T) {
 			expectedIds: []string{},
 		},
 
+		// inspec_version
+		{
+			description: "Filter out one of the nodes by chef servers",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:        "1",
+					InSpecVersion: "3.1.0",
+				},
+				{
+					NodeID:        "2",
+					InSpecVersion: "3.1.3",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "inspec_version",
+						Values: []string{"3.1.0"},
+					},
+				},
+			},
+			expectedIds: []string{"1"},
+		},
+		{
+			description: "Filter out all of the nodes by chef servers",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:        "1",
+					InSpecVersion: "3.1.0",
+				},
+				{
+					NodeID:        "2",
+					InSpecVersion: "3.1.3",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "inspec_version",
+						Values: []string{"3.1.4"},
+					},
+				},
+			},
+			expectedIds: []string{},
+		},
+
 		// chef tags
 		{
 			description: "Filter out one of the nodes with chef tags",
@@ -307,6 +353,61 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 		query       reporting.Query
 		expectedIds []string
 	}{
+
+		// inspec_version
+		{
+			description: "inspec_version: '*' wildcard",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:        "1",
+					InSpecVersion: "3.1.0",
+				},
+				{
+					NodeID:        "2",
+					InSpecVersion: "3.1.3",
+				},
+				{
+					NodeID:        "3",
+					InSpecVersion: "4.1.3",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "inspec_version",
+						Values: []string{"3.*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "inspec_version: '?' wildcard",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID:        "1",
+					InSpecVersion: "3.1.0",
+				},
+				{
+					NodeID:        "2",
+					InSpecVersion: "3.1.3",
+				},
+				{
+					NodeID:        "3",
+					InSpecVersion: "4.1.3",
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "inspec_version",
+						Values: []string{"?.1.3"},
+					},
+				},
+			},
+			expectedIds: []string{"3", "2"},
+		},
+
 		// chef server
 		{
 			description: "chef server: '*' wildcard",

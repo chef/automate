@@ -52,3 +52,11 @@ do_prepare() {
     export GO_LDFLAGS
     build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
 }
+
+do_install() {
+  # Scaffolding go install callback
+  scaffolding_go_install
+
+  build_line "Copying migration files"
+  cp -r tokens/pg/sql "${pkg_prefix}/migrations"
+}

@@ -20,6 +20,7 @@ type Config struct {
 	PGURL          string `json:"pg_url"`
 	Database       string `json:"database"`
 	MaxConnections int    `json:"max_connections"`
+	MigrationsPath string `json:"migrations"`
 }
 
 // adapter carries the adapter's state
@@ -50,7 +51,7 @@ func (c *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger) (tokens.Storage
 	if err != nil {
 		return nil, errors.Wrap(err, "connect to database")
 	}
-	if err := migrate(db); err != nil {
+	if err := runMigrations(db, u.String(), c.MigrationsPath); err != nil {
 		return nil, errors.Wrap(err, "failed to setup database schema")
 	}
 

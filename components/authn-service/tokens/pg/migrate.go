@@ -1,183 +1,68 @@
 package pg
 
 import (
+	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/components/authn-service/constants"
+	"github.com/chef/automate/lib/db/migrator"
+	"github.com/chef/automate/lib/logger"
 )
 
-// migrate tries to execute all the migrations we know of
-func migrate(c *sql.DB) error {
-	// Acquire advisory lock
-	_, err := c.Exec("SELECT pg_advisory_lock($1);", constants.AdvisoryLockID)
+// runMigrations tries to execute all the migrations we know of
+func runMigrations(db *sql.DB, url, path string) error {
+	// We're migrating to golang-migrate/migrate instead of this hand-rolled code:
+	//
+	// If it exists, we're migrating the existing migration table to a 'schema_migrations'
+	// table conforming to what golang-migrate expects.
+	// When this is done, we drop that table, so the code here will only run once.
+	// We then run the usual "up" migration code, which will pick up where we've left off.
+	// Existing migrations have been converted into up.sql files accordingly, keeping
+	// the numbering intact.
+
+	ctx := context.TODO()
+	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
-		return errors.Wrapf(err, "acquiring advisory lock %d", constants.AdvisoryLockID)
+		return errors.Wrap(err, "beginning transaction")
 	}
 
-	_, err = c.Exec(`
-  CREATE TABLE IF NOT EXISTS migrations (
-    num INTEGER NOT NULL,
-    descr TEXT,
-    at TIMESTAMPTZ NOT NULL
-  );
-`)
-	if err != nil {
-		return errors.Wrap(err, "creating migration table")
+	if _, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS schema_migrations
+(version BIGINT NOT NULL PRIMARY KEY, dirty BOOLEAN NOT NULL)`); err != nil {
+		return errors.Wrap(err, "create new migration table 'schema_migrations'")
 	}
 
-	i := 0
-	done := false
-	var tx *sql.Tx
-	for {
+	// Note(sr) This needs to happen in a function because the "migrations" table might
+	// have already been dropped (i.e. on all but the first run), and such checks can only
+	// happen in functions. Just letting it crash is not an option since it aborts our
+	// transaction.
+	const defineMigrationFunction = `CREATE OR REPLACE FUNCTION move_if_exists() RETURNS void AS
+$$
+BEGIN
+  IF EXISTS(SELECT * FROM information_schema.tables
+              WHERE table_schema = current_schema()
+              AND table_name = 'migrations') THEN
+     INSERT INTO schema_migrations (
+       SELECT MAX(num) AS version, FALSE AS dirty FROM migrations
+     );
+  END IF;
+END;
+$$
+LANGUAGE plpgsql;`
 
-		tx, err = c.Begin()
-		if err != nil {
-			break
-		}
-
-		// Within a transaction, perform a single migration.
-		var num sql.NullInt64
-		n := 0
-
-		if err = tx.QueryRow(`SELECT MAX(num) FROM migrations;`).Scan(&num); err != nil {
-			err = errors.Wrap(err, "select max migration")
-			break
-		}
-		if num.Valid { // if not, n will still be 0
-			n = int(num.Int64)
-		}
-
-		if n >= len(migrations) {
-			done = true
-		} else {
-			migrationNum := n + 1
-			m := migrations[n]
-			if _, err = tx.Exec(m.statement); err != nil {
-				err = errors.Wrapf(err, "migration '%s' (%d) failed", m.descr, migrationNum)
-				break
-			}
-
-			q := `INSERT INTO migrations (num, descr, at) VALUES ($1, $2, now());`
-			if _, err = tx.Exec(q, migrationNum, m.descr); err != nil {
-				err = errors.Wrap(err, "update migration table")
-				break
-			}
-		}
-		// done with one migration, commit transaction
-		if err = tx.Commit(); err != nil {
-			break
-		}
-
-		if done {
-			break
-		}
-		i++ // rinse and repeat for next migration
+	if _, err := tx.ExecContext(ctx, defineMigrationFunction); err != nil {
+		return errors.Wrap(err, "create move_if_exists function")
+	}
+	if _, err := tx.ExecContext(ctx, "SELECT move_if_exists()"); err != nil {
+		return errors.Wrap(err, "converting migration table columns")
+	}
+	if _, err := tx.ExecContext(ctx, "DROP TABLE IF EXISTS migrations"); err != nil {
+		return errors.Wrap(err, "dropping migration table")
 	}
 
-	if err != nil {
-		// This adapter will go away soon. No need to fix this.
-		tx.Rollback() // nolint
+	if err := tx.Commit(); err != nil {
+		return errors.Wrap(err, "commit migration table migration")
 	}
 
-	// Release advisory lock
-	_, releaseErr := c.Exec("SELECT pg_advisory_unlock($1);", constants.AdvisoryLockID)
-	if releaseErr != nil {
-		releaseErr = errors.Wrapf(releaseErr, "releasing advisory lock %d", constants.AdvisoryLockID)
-		// Want to report back on both the migration error and also the advisory release error, if there are both.
-		if err != nil {
-			return errors.New(err.Error() + releaseErr.Error())
-		}
-		return releaseErr
-	}
-
-	return err
-}
-
-type migration struct {
-	descr     string
-	statement string
-}
-
-var migrations = []migration{
-	{
-		descr: "create clients table",
-		statement: `CREATE TABLE IF NOT EXISTS chef_authn_clients (
-                  id TEXT NOT NULL PRIMARY KEY,
-                  token TEXT NOT NULL,
-                  created TIMESTAMPTZ,
-                  updated TIMESTAMPTZ
-                );`,
-	},
-	{
-		descr:     "add 'active' column to clients table",
-		statement: `ALTER TABLE chef_authn_clients ADD COLUMN active BOOLEAN NOT NULL DEFAULT TRUE;`,
-	},
-	{
-		descr:     "change id to type UUID",
-		statement: `ALTER TABLE chef_authn_clients ALTER COLUMN id TYPE uuid USING id::uuid;`,
-	},
-	{
-		descr:     "add 'description' column to clients table",
-		statement: `ALTER TABLE chef_authn_clients ADD COLUMN description TEXT NOT NULL CHECK (description <> '');`,
-	},
-	{
-		descr:     "rename clients table tokens table",
-		statement: `ALTER TABLE chef_authn_clients RENAME TO chef_authn_tokens;`,
-	},
-	{
-		descr:     "rename 'token' column of tokens table to 'value'",
-		statement: `ALTER TABLE chef_authn_tokens RENAME COLUMN token TO value;`,
-	},
-	{
-		descr:     "change id to type text",
-		statement: `ALTER TABLE chef_authn_tokens ALTER COLUMN id TYPE TEXT USING id::TEXT;`,
-	},
-	// This migration will add '{"default"}' project in everywhere, as old tokens need
-	// to start with a project.
-	{
-		descr: "add column project_ids",
-		statement: fmt.Sprintf(
-			`ALTER TABLE chef_authn_tokens ADD COLUMN project_ids TEXT[] NOT NULL DEFAULT '{%s}' CHECK (project_ids <> '{}');`,
-			"default"),
-	},
-	// This migration will remove adding '{"default"}' in, as we don't assume you want to add to the
-	// default project. If someone tries to add a token without a project, they should fail based
-	// on the above constraint. We have validation in the domain to prevent that from ever happening though.
-	{
-		descr:     "remove default project_ids",
-		statement: `ALTER TABLE chef_authn_tokens ALTER COLUMN project_ids DROP DEFAULT;`,
-	},
-	// tokens no longer have to have projects
-	{
-		descr:     "drop constraint",
-		statement: `ALTER TABLE chef_authn_tokens DROP CONSTRAINT IF EXISTS chef_authn_tokens_project_ids_check;`,
-	},
-	// we default to [] instead of null
-	{
-		descr:     "add default empty array for project_ids",
-		statement: `ALTER TABLE chef_authn_tokens ALTER COLUMN project_ids SET DEFAULT '{}';`,
-	},
-	// adds function to query for tokens with projects matching the authorized projects
-	{
-		descr: "add filter function for token projects",
-		statement: `
-		CREATE OR REPLACE FUNCTION
-		  projects_match(_token_projects TEXT[], _projects_filter TEXT[])
-		  RETURNS BOOLEAN AS $$
-			BEGIN
-			  RETURN (
-				-- no projects filter requested (length 0) will be the case for v1.0 or v2.1 ["*"]
-				array_length(_projects_filter, 1) IS NULL
-				-- projects filter intersects with projects for row
-				OR _token_projects && _projects_filter
-				-- projects for row is an empty array, check if (unassigned) in project filter
-				OR (array_length(_token_projects, 1) IS NULL AND '{(unassigned)}' && _projects_filter)
-			  );
-			END
-		$$ LANGUAGE PLPGSQL;
-		`,
-	},
+	return errors.Wrap(migrator.Migrate(url, path, logger.NewLogrusStandardLogger(), false), "run migrations")
 }

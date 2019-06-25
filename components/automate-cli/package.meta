@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-cli",
+  "binlinks": ["chef-automate"]
+}

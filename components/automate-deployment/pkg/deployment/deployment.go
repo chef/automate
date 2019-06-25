@@ -6,8 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/lib/stringutils"
-
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
@@ -157,7 +155,7 @@ func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig) error 
 func ContainsAutomateCollection(c *dc.ConfigRequest) bool {
 	products := c.GetV1().GetSvc().GetProducts()
 	if len(products) > 0 {
-		return stringutils.SliceContains(products, "automate-full")
+		return services.ContainsCollection("automate", products)
 	}
 	return true
 }
@@ -168,7 +166,7 @@ func ExpectedServiceIDsForConfig(c *dc.ConfigRequest) ([]habpkg.HabPkg, error) {
 	if len(c.GetV1().GetSvc().GetProducts()) > 0 {
 		collections = c.GetV1().GetSvc().GetProducts()
 	} else {
-		collections = []string{"automate-full"}
+		collections = []string{"automate"}
 
 		if c.GetV1().GetSvc().GetEnableChefServer().GetValue() {
 			collections = append(collections, "chef-server")

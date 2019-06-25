@@ -1,12 +1,10 @@
 package migrate
 
 import (
-	"bufio"
+	"errors"
 	"fmt"
-	"io"
 	nurl "net/url"
 	"strings"
-	"time"
 )
 
 // MultiError holds multiple errors.
@@ -46,44 +44,35 @@ func suint(n int) uint {
 	return uint(n)
 }
 
-// newSlowReader turns an io.ReadCloser into a slow io.ReadCloser.
-// Use this to simulate a slow internet connection.
-func newSlowReader(r io.ReadCloser) io.ReadCloser {
-	return &slowReader{
-		rx:     r,
-		reader: bufio.NewReader(r),
-	}
-}
+var errNoScheme = errors.New("no scheme")
+var errEmptyURL = errors.New("URL cannot be empty")
 
-type slowReader struct {
-	rx     io.ReadCloser
-	reader *bufio.Reader
-}
-
-func (b *slowReader) Read(p []byte) (n int, err error) {
-	time.Sleep(10 * time.Millisecond)
-	c, err := b.reader.ReadByte()
+func sourceSchemeFromUrl(url string) (string, error) {
+	u, err := schemeFromUrl(url)
 	if err != nil {
-		return 0, err
-	} else {
-		copy(p, []byte{c})
-		return 1, nil
+		return "", fmt.Errorf("source: %v", err)
 	}
+	return u, nil
 }
 
-func (b *slowReader) Close() error {
-	return b.rx.Close()
+func databaseSchemeFromUrl(url string) (string, error) {
+	u, err := schemeFromUrl(url)
+	if err != nil {
+		return "", fmt.Errorf("database: %v", err)
+	}
+	return u, nil
 }
-
-var errNoScheme = fmt.Errorf("no scheme")
 
 // schemeFromUrl returns the scheme from a URL string
 func schemeFromUrl(url string) (string, error) {
+	if url == "" {
+		return "", errEmptyURL
+	}
+
 	u, err := nurl.Parse(url)
 	if err != nil {
 		return "", err
 	}
-
 	if len(u.Scheme) == 0 {
 		return "", errNoScheme
 	}

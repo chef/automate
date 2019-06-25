@@ -23,6 +23,13 @@ type Logger interface {
 	logrus.FieldLogger
 }
 
+// NewLogrusStandardLogger returns a new logger.Logger wrapping the logrus
+// standard logger (i.e. what you get when calling the package-level methods,
+// like `logrus.Info(...)`).
+func NewLogrusStandardLogger() Logger {
+	return &wrap{Logger: logrus.StandardLogger()}
+}
+
 // KV is the type for field literals. These are key/value pairs, hence
 // "KV". We declare it as an alias to the logrus.Fields type which is
 // a type defined as map[string]interface{}.

@@ -46,7 +46,7 @@ setup_docker_pg:
 	sleep 5 # let docker come up
 	# This creates the extension we need to use UUIDs in the migrations.
 	# Done in habitat in prod. Not done in code because you must be a superuser.
-	docker exec teams-postgres -- psql -d "postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable" -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""
+	docker exec teams-postgres psql -d "postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable" -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""
 
 kill_docker_pg:
 	docker rm -f teams-postgres || true

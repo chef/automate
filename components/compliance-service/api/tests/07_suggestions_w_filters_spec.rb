@@ -174,6 +174,16 @@ describe File.basename(__FILE__) do
     )
     assert_suggestions_text(["nagios::fix", "apache_extras", "apache_extras::harden"], actual_data)
 
+    # suggest inspec version
+    actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
+      type: 'inspec_version',
+      text: '3.1',
+      filters: [
+        Reporting::ListFilter.new(type: 'start_time', values: ['2016-02-02T23:59:59Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2019-03-04T23:59:59Z'])
+      ]
+    )
+    assert_suggestions_text(["3.1.0", "3.1.3"], actual_data)
 
     # suggest nodes with valid filters
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(

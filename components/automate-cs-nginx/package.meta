@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-cs-nginx",
+  "binlinks": ["knife", "chef-server-ctl"]
+}

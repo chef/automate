@@ -35,17 +35,16 @@ bin:
 build: ${BINS}
 
 test:
-	@go test -i $(packages)
 	@go test $(verbose) -cover -count=1 -parallel=1 -p 1 $(packages)
 
-PG_URL ?= "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable&timezone=UTC"
+PG_URL ?= "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
 
 test_with_db: db_container
-	@PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages)
+	@PGTZ=UTC PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages)
 	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
 
 test_properties_with_db: db_container
-	@PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages) -run Properties
+	@PGTZ=UTC PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages) -run Properties
 	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
 
 .PHONY: db_container

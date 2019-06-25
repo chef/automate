@@ -634,7 +634,7 @@ func (r *Runner) restoreServices(desiredServices []*deployment.Service, restoreC
 		}
 
 		// Install any binlinks for this package
-		binlinks := services.BinlinksForService(svc.Name())
+		binlinks := services.BinlinksForPackage(svc.Name())
 		for _, cmd := range binlinks {
 			cmdOutput, err := r.target.BinlinkPackage(svc, cmd)
 			if err != nil {

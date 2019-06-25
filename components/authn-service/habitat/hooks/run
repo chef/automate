@@ -23,5 +23,4 @@ addNoProxy {{teams-service.sys.ip}}
 {{~/if}}
 {{~/eachAlive}}
 
-
 exec authn-service serve {{pkg.svc_config_path}}/config.yml

@@ -64,8 +64,8 @@ wait_for_upgrade() {
 
     log_info "Waiting for services to upgrade"
     upgrade_complete="false"
-    for try in {1..60}; do
-        log_info "Checking upgrade status (try $try/60)"
+    for try in {1..90}; do
+        log_info "Checking upgrade status (try $try/90)"
         local upgrade_status_output
         local errcode
         errcode="0"
