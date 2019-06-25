@@ -1,5 +1,5 @@
 <chef-alert type="error" *ngIf="(serviceGroupStatus$ | async) === 'loadingFailure'">
-  {{ (serviceGroupError$ | async).status }}: {{ (serviceGroupError$ | async).statusText }}
+  {{ (serviceGroupError$ | async).status }}: {{ (serviceGroupError$ | async).error.message }}
 </chef-alert>
 <chef-page-header>
   <chef-heading>Service Groups</chef-heading>
