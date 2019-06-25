@@ -295,13 +295,13 @@ func (db *Postgres) GetServiceGroupsHealthCounts() (*storage.HealthCounts, error
 
 // ServiceGroupExists returns the name of the service group if it exists
 func (db *Postgres) ServiceGroupExists(id string) (string, bool) {
-	var sg serviceGroup
-	err := db.SelectOne(&sg, "SELECT * FROM service_group WHERE id = $1", id)
+	var sgName string
+	err := db.SelectOne(&sgName, "SELECT name FROM service_group WHERE id = $1", id)
 	if err != nil {
 		return "", false
 	}
 
-	return sg.Name, true
+	return sgName, true
 }
 
 func queryFromStatusFilter(text string) (string, error) {

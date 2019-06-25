@@ -11,7 +11,19 @@ import (
 
 const (
 	selectService = `
-SELECT * FROM service
+SELECT id
+  , origin
+  , name
+  , version
+  , release
+  , status
+  , health
+  , group_id
+  , deployment_id
+  , sup_id
+  , channel
+  , package_ident
+FROM service
 WHERE name = $1
   AND sup_id IN (
     SELECT id FROM supervisor
