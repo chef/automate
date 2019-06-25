@@ -357,6 +357,7 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 // server code before we get here if the team in question was filtered, but if we call this
 // from a different context we should apply project filtering in this function as well.
 // Not doing it to save us a database call since it's not needed currently.
+
 func (p *postgres) AddUsers(ctx context.Context,
 	teamID uuid.UUID,
 	userIDs []string) (storage.Team, error) {
@@ -372,7 +373,9 @@ func (p *postgres) AddUsers(ctx context.Context,
 	for _, userID := range userIDs {
 		res, err := tx.ExecContext(ctx,
 			`INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
-			VALUES (team_db_id($1), $2, now())`, teamID, userID)
+			SELECT db_id, $2, now()
+			FROM teams
+			WHERE id=$1`, teamID, userID)
 		if err != nil {
 			return storage.Team{}, p.processError(err)
 		}
@@ -384,7 +387,6 @@ func (p *postgres) AddUsers(ctx context.Context,
 			doneSomething = true
 		}
 	}
-
 	var team storage.Team
 
 	if !doneSomething {
