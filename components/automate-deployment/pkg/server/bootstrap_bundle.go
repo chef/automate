@@ -17,7 +17,7 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 	tarWriter := bufio.NewWriter(&b)
 	bundleCreator := bootstrap.NewBundleCreator()
 
-	pkgs := make([]string, 0)
+	pkgs := make([]string, len(s.deployment.ExpectedServices))
 	for _, e := range s.deployment.ExpectedServices {
 		pkgs = append(pkgs, e.Name())
 	}
@@ -26,7 +26,10 @@ func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Dep
 		return errors.Wrap(err, "Failed to create the bootstrap bundle.")
 	}
 
-	tarWriter.Flush()
+	err = tarWriter.Flush()
+	if err != nil {
+		return errors.Wrap(err, "Failed to flush the bootstrap bundle.")
+	}
 	writer := chunks.NewWriter(defaultChunkSize, func(p []byte) error {
 		return stream.Send(&api.BootstrapBundleResponse{Data: p})
 	})
