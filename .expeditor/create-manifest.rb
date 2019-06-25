@@ -11,8 +11,7 @@ require 'open3'
 BLDR_API_HOST="bldr.habitat.sh"
 BLDR_API_USER_AGENT="Chef Expeditor"
 
-# Packages that are present in
-# components/automate-deployment/pkg/assets/data/services.json but we wish to
+# Packages that are present in products.meta but we wish to
 # exclude from the manifest (probably because they are not yet published to the
 # depot).
 #
@@ -164,42 +163,25 @@ raise "Failed to get git_sha: exitcode=#{status.exitstatus} stderr=#{err}" if st
 manifest["git_sha"] = out.strip
 
 
-collections = File.open("components/automate-deployment/pkg/assets/data/services.json") do |f|
+products_meta = File.open("products.meta") do |f|
   JSON.parse(f.read)
 end
 
-pkg_paths_by_collection = {}
-
-non_package_data_keys = %w{ collection binlinks }
-
-collections.each do |collection|
-  paths_for_collection = []
-  collection.each do |pkg_type, pkg_list|
-    next if non_package_data_keys.include?(pkg_type)
-    paths_for_collection += pkg_list
-  end
-  collection_name = collection["collection"]
-  pkg_paths_by_collection[collection_name] = paths_for_collection
-end
-
 manifest["packages"] = []
-pkg_paths_by_collection.each do |name, pkg_paths|
+products_meta["packages"].each do |pkg_path|
+  next if SKIP_PACKAGES.include?(pkg_path)
 
-  pkg_paths.each do |pkg_path|
-    next if SKIP_PACKAGES.include?(pkg_path)
+  package_ident = pkg_path.split("/")
+  pkg_origin = package_ident[0]
+  pkg_name = package_ident[1]
 
-    package_ident = pkg_path.split("/")
-    pkg_origin = package_ident[0]
-    pkg_name = package_ident[1]
+  latest_release = get_latest(channel_for_origin(pkg_origin), pkg_origin, pkg_name)
 
-    latest_release = get_latest(channel_for_origin(pkg_origin), pkg_origin, pkg_name)
+  pkg_version = latest_release["version"]
+  pkg_release = latest_release["release"]
 
-    pkg_version = latest_release["version"]
-    pkg_release = latest_release["release"]
-
-    puts "  Adding package #{pkg_origin}/#{pkg_name}/#{pkg_version}/#{pkg_release} from collection #{name}"
-    manifest["packages"] << "#{pkg_origin}/#{pkg_name}/#{pkg_version}/#{pkg_release}"
-  end
+  puts "  Adding package #{pkg_origin}/#{pkg_name}/#{pkg_version}/#{pkg_release}"
+  manifest["packages"] << "#{pkg_origin}/#{pkg_name}/#{pkg_version}/#{pkg_release}"
 end
 
 # Add extra packages to manifest that deployment-service doesn't need to manage

@@ -1,5 +1,3 @@
-// +build !windows !darwin
-
 // The following functions are an attempt at determining file access for specific
 // users without requiring programs to Setuid or Setgid to a user to use the
 // the faccess system call. One major caveat here is that the implementation

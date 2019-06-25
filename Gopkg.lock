@@ -381,6 +381,20 @@
   version = "v1.2.1"
 
 [[projects]]
+  digest = "1:f0f71c590c424da41a7c02c75046711876714eba021427a18b86fffe890be472"
+  name = "github.com/golang-migrate/migrate"
+  packages = [
+    ".",
+    "database",
+    "database/postgres",
+    "source",
+    "source/file",
+  ]
+  pruneopts = "NUT"
+  revision = "93d53a5ae84d81945eedadfe8f6865530d61d51c"
+  version = "v3.5.1"
+
+[[projects]]
   digest = "1:e2b86e41f3d669fc36b50d31d32d22c8ac656c75aa5ea89717ce7177e134ff2a"
   name = "github.com/golang/glog"
   packages = ["."]
@@ -694,20 +708,6 @@
   ]
   pruneopts = "NUT"
   revision = "32fa128f234d041f196a9f3e0fea5ac9772c08e1"
-
-[[projects]]
-  branch = "master"
-  digest = "1:825ef273deba10022f86488d8d663d3e310551a97600cae4219757babc299a0d"
-  name = "github.com/mattes/migrate"
-  packages = [
-    ".",
-    "database",
-    "database/postgres",
-    "source",
-    "source/file",
-  ]
-  pruneopts = "NUT"
-  revision = "4768a648fbd9e04389a73a21139d14a4ccb1a61a"
 
 [[projects]]
   digest = "1:08c231ec84231a7e23d67e4b58f975e1423695a32467a362ee55a803f9de8061"
@@ -1515,6 +1515,10 @@
     "github.com/go-gorp/gorp",
     "github.com/gocarina/gocsv",
     "github.com/gofrs/uuid",
+    "github.com/golang-migrate/migrate",
+    "github.com/golang-migrate/migrate/database/postgres",
+    "github.com/golang-migrate/migrate/source",
+    "github.com/golang-migrate/migrate/source/file",
     "github.com/golang/mock/gomock",
     "github.com/golang/mock/mockgen",
     "github.com/golang/protobuf/jsonpb",
@@ -1556,10 +1560,6 @@
     "github.com/lyft/protoc-gen-star/lang/go",
     "github.com/lyft/protoc-gen-validate",
     "github.com/lyft/protoc-gen-validate/validate",
-    "github.com/mattes/migrate",
-    "github.com/mattes/migrate/database/postgres",
-    "github.com/mattes/migrate/source",
-    "github.com/mattes/migrate/source/file",
     "github.com/mitchellh/mapstructure",
     "github.com/muesli/crunchy",
     "github.com/nats-io/gnatsd/server",

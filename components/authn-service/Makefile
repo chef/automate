@@ -3,7 +3,7 @@ include ../../Makefile.common_go
 PACKAGE_PATH = github.com/chef/automate/components/authn-service
 
 BINS = ${PACKAGE_PATH}/cmd/authn-service ${PACKAGE_PATH}/cmd/migrate-tokens
-
+MIGRATION_READMES = tokens/pg/sql/README.md
 VERSION ?= $(shell git rev-pasrse HEAD)
 BUILD_TIME ?= $(shell date -u '+%Y%m%d%H%M%S')
 GO_LDFLAGS = --ldflags "-X ${LIBRARY_PATH}/version.Version=${BUILD_TIME} -X ${LIBRARY_PATH}/version.GitSHA=${GIT_SHA}"
@@ -14,9 +14,16 @@ ifdef CI
 endif
 
 all: lint build test
-
-static: lint
+static: lint ${MIGRATION_READMES}
 unit: build test
+
+.PHONY: ${MIGRATION_READMES}
+${MIGRATION_READMES}:
+	@echo '## SQL migrations\n' > $@
+	@for file in $$(dirname $@)/*.up.sql; do f=$$(basename $$file); echo "- [\`$$f\`]($$f)" >> $@; done
+	@git diff --exit-code $@; CODE=$$?;\
+	  if ! [[ $$CODE -eq 0 ]]; then echo "$@ index not committed; please commit $@"; fi;\
+	  exit $$CODE
 
 ${BINS}: bin
 	@echo "GO $@"
@@ -30,9 +37,6 @@ bin:
 	mkdir -p bin
 
 build: ${BINS}
-
-start: build
-	./bin/authn-service serve examples/config.yml
 
 build_prod:
 	go build --tags prod ${GO_LDFLAGS} ${PACKAGE_PATH}/cmd/authn-service
@@ -52,7 +56,7 @@ test:
 test_with_db:
 	@docker ps | grep authn-postgres || (echo "Docker postgres not up. Run 'make setup_docker_pg' and try this command again."; exit 1)
 	go test -i $(packages)
-	@PG_URL="postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable" go test -cover -count=1 -parallel=1 -p 1 $(packages)
+	@PG_URL="postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable&timezone=UTC" go test -cover -count=1 -parallel=1 -p 1 $(packages)
 	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
 
 setup_docker_pg:

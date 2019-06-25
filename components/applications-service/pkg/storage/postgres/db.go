@@ -3,12 +3,14 @@ package postgres
 import (
 	gosql "database/sql"
 
-	"github.com/chef/automate/components/applications-service/pkg/config"
-	"github.com/chef/automate/lib/db/migrator"
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/applications-service/pkg/config"
+	"github.com/chef/automate/lib/db/migrator"
+	"github.com/chef/automate/lib/logger"
 )
 
 // Postgres is a wrapping struct that will hold the database mapping object
@@ -69,7 +71,8 @@ func (db *Postgres) connect() error {
 func (db *Postgres) initDB() error {
 	// Create the schema
 	// @afiune Can we rename this library?
-	if err := migrator.Migrate(db.URI, db.SchemaPath); err != nil {
+	// @sr Just do it ;)
+	if err := migrator.Migrate(db.URI, db.SchemaPath, logger.NewLogrusStandardLogger(), false); err != nil {
 		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", db.SchemaPath)
 	}
 

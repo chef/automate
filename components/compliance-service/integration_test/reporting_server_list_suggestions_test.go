@@ -95,6 +95,74 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			expectedTerms: []string{},
 		},
 
+		// inspec_version
+		{
+			description: "Only two versions are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:        "1",
+					InSpecVersion: "3.1.0",
+				},
+				{
+					NodeID:        "2",
+					InSpecVersion: "3.1.1",
+				},
+				{
+					NodeID:        "3",
+					InSpecVersion: "4.1.0",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "inspec_version",
+				Text: "3.1",
+			},
+			expectedTerms: []string{"3.1.0", "3.1.1"},
+		},
+		{
+			description: "All inspec_version are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:        "1",
+					InSpecVersion: "3.1.0",
+				},
+				{
+					NodeID:        "2",
+					InSpecVersion: "3.1.1",
+				},
+				{
+					NodeID:        "3",
+					InSpecVersion: "4.1.0",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "inspec_version",
+				Text: "",
+			},
+			expectedTerms: []string{"3.1.0", "3.1.1", "4.1.0"},
+		},
+		{
+			description: "No inspec_version are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID:        "1",
+					InSpecVersion: "3.1.0",
+				},
+				{
+					NodeID:        "2",
+					InSpecVersion: "3.1.1",
+				},
+				{
+					NodeID:        "3",
+					InSpecVersion: "4.1.0",
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "inspec_version",
+				Text: "1.0",
+			},
+			expectedTerms: []string{},
+		},
+
 		// chef_server
 		{
 			description: "Only two chef servers are returned",

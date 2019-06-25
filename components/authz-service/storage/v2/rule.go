@@ -16,6 +16,7 @@ type Rule struct {
 	Type       RuleType    `json:"type"`
 	Conditions []Condition `json:"conditions"`
 	Deleted    bool        `json:"deleted"`
+	Status     string      `json:"status"`
 }
 
 // Scan implements pq Scan interface for a Rule reference

@@ -140,7 +140,7 @@ determining what packages to build. Add your package to the
 
 ### Manifest Chicken and Egg Issue
 
-"The manifest" is a JSON file which is created by the script `.expeditor/create-manifest.rb`. The manifest contains exact versions of habitat packages that comprise an Automate release. The package versions are determined by querying the habitat depot/bldr for the versions of every package described in the `services.json` file (more on that below). The reason we must query the depot is because we do not build every package on every build, so instead we build the manifest based on what exists in the depot. During tests we rely on the deployment service preferring packages from local disk to upgrade just those packages with changes.
+"The manifest" is a JSON file which is created by the script `.expeditor/create-manifest.rb`. The manifest contains exact versions of habitat packages that comprise an Automate release. The package versions are determined by querying the habitat depot/bldr for the versions of every package described in the `product.meta` file (more on that below). The reason we must query the depot is because we do not build every package on every build, so instead we build the manifest based on what exists in the depot. During tests we rely on the deployment service preferring packages from local disk to upgrade just those packages with changes.
 
 When introducing a new service, the manifest is a problem because there are initially zero version of your new package in the depot, so a query for the current version of that package will fail and the manifest can't be generated. One way around this is to merge your new service in two pull requests. The first just needs to have a buildable package so that there's something in the depot to query. If you've followed this guide in order, you should be able to submit and merge your first pull request now and then follow up with a second pull request which includes the work described below (along with whatever other test suites, etc. you need).
 
@@ -150,6 +150,6 @@ Note: deployment-team has added some code that makes tests use a locally-generat
 
 You need to run `make update-bindings` from `components/automate-deployment` whenever you add/change/remove bindings. You don't necessarily need to change the bindings when first adding your service, but when you start to wire up your new service to other services this will be needed.
 
-### The Services File
+### The product.meta File
 
-The list of services and other mandatory packages that comprise Automate 2 is maintained in `components/automate-deployment/pkg/assets/data/services.json`. This file is also used to generate the manifest file that represents a Chef Automate 2 release as described above. Edit this file and add your service. In general, you will want to add it to the "automate-full" collection; the other collections are optional additions.
+The list of services and other mandatory packages that comprise Automate 2 and other Chef products is maintained in `product.meta`. This file is also used to generate the manifest file that represents a Chef Automate 2 release as described above. Edit this file and add your service. Services may also define extra metadata for their service in a `package.meta` for their component. See https://godoc.org/github.com/chef/automate/lib/product for more information.

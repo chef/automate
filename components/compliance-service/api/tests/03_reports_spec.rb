@@ -25,6 +25,77 @@ describe File.basename(__FILE__) do
       ], id: '44024b50-2e0d-42fa-a57c-25e05e48a1b5')
     end
 
+
+    ##### Success tests #####
+    # Get one specific node_id
+    actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'node_id', values: ['a0ddd774-cbbb-49be-8730-49c92f3fc2a0'])
+    ])
+    expected_json =
+        {
+            "ids" => ["3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"]
+        }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
+    # Get stuff since march 4th
+    actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-10-25T00:00:00Z'])
+    ])
+    expected_json =
+        {
+            "ids" => ["3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc05",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc08",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc10"
+            ]
+        }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
+    # Get all until march 4th up to and including beginning of day
+    actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T00:00:00Z'])
+    ])
+    expected_json =
+        {
+            "ids" => [
+                "44024b50-2e0d-42fa-a57c-dddddddddddd"
+            ]
+        }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
+
+    # Get those from a tiny window of time
+    actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-04T09:18:41Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T09:18:41Z'])
+    ])
+    expected_json =
+        {
+            "ids" => [
+                "bb93e1b2-36d6-439e-ac70-cccccccccc04"
+            ]
+        }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
+    # Get all
+    actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new()
+    expected_json =
+        {
+            "ids" => ["3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
+                      "44024b50-2e0d-42fa-a57c-dddddddddddd",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc05",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc08",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc10"
+            ]
+        }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
+
     ##### Success tests #####
     # Get all reports
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new()

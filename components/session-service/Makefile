@@ -23,11 +23,6 @@ bin:
 
 build: ${BINS}
 
-# first, in another tab bring up 
-# `docker run --name session-postgres -e POSTGRES_PASSWORD=session -e POSTGRES_USER=session -e POSTGRES_DB=chef_session -p 15432:5432 -d postgres:9`
-start: build
-	./bin/session-service examples/config.yml
-
 test:
 	@go test -v -count=1 $(packages) -cover
 

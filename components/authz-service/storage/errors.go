@@ -31,7 +31,15 @@ var (
 
 	// ErrChangeProjectForRule indicates that an update operation attempted to change
 	// the project for a rule, which is not allowed.
-	ErrChangeProjectForRule = errors.New("cannot change rule")
+	ErrChangeProjectForRule = errors.New("cannot change rule project")
+
+	// ErrMarkedForDeletion indicates an update was attempted on a rule that
+	// is staged for deletion (cannot be "un-deleted")
+	ErrMarkedForDeletion = errors.New("rule marked for deletion")
+
+	// ErrChangeTypeForRule indicates that an update operation attempted to change
+	// the type for a rule, which is not allowed.
+	ErrChangeTypeForRule = errors.New("cannot change rule type")
 )
 
 // ErrTxCommit occurs when the database attempts to commit a transaction and

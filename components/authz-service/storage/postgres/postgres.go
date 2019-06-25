@@ -71,12 +71,20 @@ func ProcessError(err error) error {
 // parsePQError is able to parse pq specific errors into storage interface errors.
 func parsePQError(err *pq.Error) error {
 	switch err.Code {
-	case "DRPPC": // Our custom error code for non-deletable policies defined in migration 02.
+	case "DRPPC": // Custom code: attempt to delete a non-deletable policy defined in migration 02
 		return storage.ErrCannotDelete
 	case "23505": // Unique violation
 		return storage.ErrConflict
 	case "23503": // Foreign key violation
 		return storage.ErrForeignKey
+	case "20000": // Not found
+		return storage.ErrNotFound
+	case "PRJTR": // Custom code: attempt to change a rule's projects that are immutable
+		return storage.ErrChangeProjectForRule
+	case "RDLTD": // Custom code: attempt to update a rule that is staged for deletion
+		return storage.ErrMarkedForDeletion
+	case "RLTYP": // Custom code: attempt to update a rule's type that is immutable
+		return storage.ErrChangeTypeForRule
 	}
 
 	return storage.ErrDatabase

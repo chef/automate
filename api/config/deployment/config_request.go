@@ -95,11 +95,9 @@ func (c *ConfigRequest) Validate() error {
 	}
 
 	if desiredProducts := c.V1.Svc.GetProducts(); len(desiredProducts) > 0 {
-		availableProducts := services.ListProducts()
-		for _, desiredProduct := range desiredProducts {
-			if !stringutils.SliceContains(availableProducts, desiredProduct) {
-				err.AddInvalidValue("deployment.v1.svc.products", fmt.Sprintf("Valid products are %s", strings.Join(availableProducts, ", ")))
-			}
+		validationErr := services.ValidateProductDeployment(desiredProducts)
+		if validationErr != nil {
+			err.AddInvalidValue("deployment.v1.svc.products", validationErr.Error())
 		}
 	}
 

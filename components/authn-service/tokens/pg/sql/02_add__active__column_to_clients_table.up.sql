@@ -1,0 +1,1 @@
+ALTER TABLE chef_authn_clients ADD COLUMN active BOOLEAN NOT NULL DEFAULT TRUE;

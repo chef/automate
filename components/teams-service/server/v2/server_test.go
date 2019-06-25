@@ -44,20 +44,13 @@ func TestTeamsGRPC(t *testing.T) {
 	if err != nil {
 		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
 	}
-	var convertedConfig *datamigration.Config
-	if dataMigrationConfig != nil {
-		casted := datamigration.Config(*dataMigrationConfig)
-		convertedConfig = &casted
-	} else {
-		convertedConfig = nil
-	}
 
 	if migrationConfig == nil {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil, nil)
 		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
 	} else {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx,
-			t, l, migrationConfig, convertedConfig)
+			t, l, migrationConfig, (*datamigration.Config)(dataMigrationConfig))
 		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
 
 		// If ciMode, run in-memory AND PG

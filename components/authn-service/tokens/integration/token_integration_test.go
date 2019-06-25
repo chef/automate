@@ -62,7 +62,8 @@ func TestChefClientAuthn(t *testing.T) {
 
 	pgURLGiven := false
 	pgCfg := pg.Config{
-		PGURL: constants.TestPgURL,
+		PGURL:          constants.TestPgURL,
+		MigrationsPath: "../pg/sql/",
 	}
 	if v, found := os.LookupEnv("PG_URL"); found {
 		pgCfg.PGURL = v

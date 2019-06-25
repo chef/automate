@@ -8,7 +8,6 @@
 // data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key
 // data/binds.txt
 // data/init-config.toml
-// data/services.json
 // DO NOT EDIT!
 
 package assets
@@ -91,7 +90,7 @@ func dataA1_elasticsearch_mappingsComplianceTemplateJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/compliance-template.json", size: 5111, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/compliance-template.json", size: 5111, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -111,7 +110,7 @@ func dataA1_elasticsearch_mappingsInsightsTemplateJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/insights-template.json", size: 2705, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/insights-template.json", size: 2705, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -131,7 +130,7 @@ func dataA1stub_certsChefautomateupgradefromv1selftestCrl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crl", size: 958, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crl", size: 958, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -151,7 +150,7 @@ func dataA1stub_certsChefautomateupgradefromv1selftestCrt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crt", size: 1826, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crt", size: 1826, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -171,7 +170,7 @@ func dataA1stub_certsChefautomateupgradefromv1selftestKey() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key", size: 3243, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key", size: 3243, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -191,7 +190,7 @@ func dataBindsTxt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/binds.txt", size: 4254, mode: os.FileMode(420), modTime: time.Unix(1561076241, 0)}
+	info := bindataFileInfo{name: "data/binds.txt", size: 4254, mode: os.FileMode(420), modTime: time.Unix(1561380282, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -211,27 +210,7 @@ func dataInitConfigToml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/init-config.toml", size: 1823, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _dataServicesJson = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xdc\x54\xdd\x6e\xdb\x3c\x0c\xbd\xcf\x53\x08\xbe\xae\xd0\xfb\xbe\x4a\x51\x14\x34\x4d\x2b\x84\x69\xd1\x9f\x28\x37\xcd\x57\xf4\xdd\x07\xe7\x77\xce\xa6\x38\xd9\x56\x60\xd8\x95\x01\xf1\x1c\xfe\x1c\xf3\xf0\x79\xe5\xdc\xc7\xca\x39\xe7\x2a\x54\x11\xc2\xcc\x1a\xab\x27\x57\xc1\x98\xb5\x87\x4c\xbe\x1d\x45\xaa\x87\x3d\xa4\x81\x0c\xaf\x46\xe9\x8d\x91\xac\x7a\x72\xcf\xbb\xe7\x89\xbb\xa6\xf6\xb1\x06\xec\xc6\xc1\x07\xc8\xb4\x81\xed\x81\x73\x0c\x9e\xf2\x0d\x6a\x39\x24\xb2\xff\xa4\x84\x20\x01\xcb\x8c\x46\x90\x70\x5d\xed\x30\x2f\x87\x06\x40\xe4\xeb\xeb\x0f\x61\x29\xc7\xbc\xc3\x12\xc8\x96\xd2\x8c\x7c\x11\x19\x82\x37\x6e\x08\x21\xf9\xc3\x94\x17\x00\x7a\xa3\x98\x0b\x31\x18\xf3\xfa\xff\x12\xcf\x16\x12\x9f\x7a\x6a\xe8\xfd\x22\x94\x09\x7a\xbb\x52\x33\x16\x62\x46\x98\x28\x17\x99\xc3\x20\x8c\x30\xad\x5b\x09\x12\x35\x73\xbb\x88\x69\xa8\x87\x08\x81\x4a\x93\xa1\xf6\x83\x30\x44\xa4\x02\x40\x18\x29\x1a\x79\xd4\x98\x93\x4a\x09\xa5\x08\xe2\x47\x2b\xd6\x31\x32\x63\x2d\x89\xc1\x31\x90\x95\xfe\x1c\x6a\x6c\x39\xf8\x3e\xf4\x25\x44\x43\x83\xe8\xb6\x2f\xff\xfc\xc9\x99\xbe\x25\x6a\xae\xc5\x85\x5b\xc2\x2d\x4a\x49\x89\xfd\x76\x2d\x2c\xed\x42\x58\x14\x1a\x5f\x83\x4c\x82\xa7\xb9\x79\x07\x8e\x91\x9a\xd7\x01\xb0\x83\xf0\x13\xff\x9e\x72\xa0\xf0\x9c\x49\xef\x39\xc1\x0d\xc4\x86\xea\x31\x7c\xd7\x99\x26\x7a\x4c\xb6\x8d\x38\x4f\x57\x73\x14\x8e\xdd\x94\xe8\xe3\x88\x9d\x15\x3f\x17\x38\x94\xf0\xc7\x70\x75\x78\x7f\xd9\x7d\x3f\x57\xce\x7d\x3e\x94\x4e\xe8\x8e\x38\x29\x4d\xe9\x1f\x38\xa0\x8b\x2b\xf8\x17\x5d\xd8\xe5\x3b\x7a\xf3\x3d\x44\xf3\xb5\x6a\x67\x6b\x92\xf6\x0a\x46\xd1\xd7\xdc\x26\xb5\x7c\x1d\x44\x69\x7a\xbd\x82\x89\x81\xe3\xe5\x05\xfe\x45\x73\x95\xdd\xf3\x27\x8d\xf0\xf0\x23\xf1\x38\xc5\x8c\xdd\x45\x6e\xcf\x2a\xbb\x99\x3d\x3c\x66\xb9\xc7\x59\x1b\x4d\x5d\x2b\xba\x29\xda\xea\xa6\x75\x3f\x35\x7c\x4c\x37\x37\x6b\x19\xb6\x9f\xee\x8b\xe5\xbf\x6c\x6a\x26\xe6\x29\x78\xa7\x70\xbd\x46\xce\x9a\x38\x86\xdb\x2e\xd2\xd9\xb1\x49\x7b\xca\x6b\x1a\xed\x8e\x7b\xb2\xc8\xfe\x6d\xd5\x76\xd3\xae\x5e\x56\xdf\x02\x00\x00\xff\xff\xfd\x46\xa5\xda\xc7\x0a\x00\x00")
-
-func dataServicesJsonBytes() ([]byte, error) {
-	return bindataRead(
-		_dataServicesJson,
-		"data/services.json",
-	)
-}
-
-func dataServicesJson() (*asset, error) {
-	bytes, err := dataServicesJsonBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "data/services.json", size: 2759, mode: os.FileMode(420), modTime: time.Unix(1561076245, 0)}
+	info := bindataFileInfo{name: "data/init-config.toml", size: 1823, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -295,7 +274,6 @@ var _bindata = map[string]func() (*asset, error){
 	"data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key": dataA1stub_certsChefautomateupgradefromv1selftestKey,
 	"data/binds.txt":        dataBindsTxt,
 	"data/init-config.toml": dataInitConfigToml,
-	"data/services.json":    dataServicesJson,
 }
 
 // AssetDir returns the file names below a certain
@@ -351,7 +329,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"binds.txt":        &bintree{dataBindsTxt, map[string]*bintree{}},
 		"init-config.toml": &bintree{dataInitConfigToml, map[string]*bintree{}},
-		"services.json":    &bintree{dataServicesJson, map[string]*bintree{}},
 	}},
 }}
 

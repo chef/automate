@@ -24,9 +24,6 @@ bin:
 
 build: ${BINS}
 
-start: build
-	./bin/users serve examples/config.yml
-
 test:
 	@go test -i $(packages)
 	@go test $(packages) -cover

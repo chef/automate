@@ -287,7 +287,7 @@ func (phase *InstallPhase) Run(writer *eventWriter) error {
 			modified = true
 		}
 
-		binlinks := services.BinlinksForService(step.pkg.Name())
+		binlinks := services.BinlinksForPackage(step.pkg.Name())
 		for _, cmd := range binlinks {
 			isBinlinked, err := step.target.IsBinlinked(step.pkg, cmd)
 			if err != nil {

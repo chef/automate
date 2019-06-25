@@ -12,7 +12,7 @@ import (
 
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/components/applications-service/pkg/grpc"
-	"github.com/chef/automate/components/applications-service/pkg/server"
+	"github.com/chef/automate/components/applications-service/pkg/ingest"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/platform"
@@ -50,7 +50,7 @@ var serveCmd = &cobra.Command{
 		conf.SetStorage(dbClient)
 
 		if conf.Service.Enabled {
-			ingester := server.NewIngester(conf, dbClient)
+			ingester := ingest.New(conf, conf.GetStorage())
 			err = ingester.Connect()
 			if err != nil {
 				return err

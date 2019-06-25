@@ -20,9 +20,10 @@
     Failed to retrieve data.
   </chef-notification>
   <main>
-    <h1 class="visually-hidden">Node Converge State Page</h1>
     <div class="node-list-container">
       <chef-page-header>
+        <chef-heading>Client Runs</chef-heading>
+        <chef-subheading>Nodes connected to Chef Automate by way of chef-client.</chef-subheading>
 
         <app-client-runs-search-bar
           [numberOfFilters]="numberOfSearchBarFilters$ | async"

@@ -15,6 +15,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const connectionRetries = 5
+
 // The subject is the topic this subscriber will be listening to,
 // right now we will hardcode this value but in the future it could
 // be configurable.
@@ -39,7 +41,6 @@ type NatsClient struct {
 	certs.TLSConfig
 	conn               stan.Conn
 	retries            int
-	EventsCh           chan *habitat.HealthCheckEvent // TODO: @afiune make a pipeline instead
 	InsecureSkipVerify bool
 	DisableTLS         bool
 }
@@ -51,8 +52,7 @@ func NewExternalClient(url, cluster, client, durable, subject string) *NatsClien
 		clientID:  client,
 		durableID: durable,
 		subject:   subject,
-		EventsCh:  make(chan *habitat.HealthCheckEvent), // buffered channel?
-		retries:   5,
+		retries:   connectionRetries,
 	}
 }
 
@@ -64,8 +64,7 @@ func New(url, cluster, client, durable, subject string, tlsConfig certs.TLSConfi
 		clientID:  client,
 		durableID: durable,
 		subject:   subject,
-		EventsCh:  make(chan *habitat.HealthCheckEvent), // buffered channel?
-		retries:   5,
+		retries:   connectionRetries,
 		TLSConfig: tlsConfig,
 	}
 }
@@ -167,14 +166,14 @@ func (nc *NatsClient) tryConnect(tlsConf *tls.Config) (stan.Conn, error) {
 
 // ConnectAndSubscribe will attempt to connect to the NATS Server and then
 // subscribe to the subject that the client was configured
-func (nc *NatsClient) ConnectAndSubscribe() error {
+func (nc *NatsClient) ConnectAndSubscribe(eventsCh chan<- []byte) error {
 
 	err := nc.Connect()
 	if err != nil {
 		return err
 	}
 
-	_, err = nc.Subscribe()
+	_, err = nc.Subscribe(eventsCh)
 	if err != nil {
 		return err
 	}
@@ -243,4 +242,9 @@ func (nc *NatsClient) natsTLSConfig() (*tls.Config, error) {
 
 	return t, nil
 
+}
+
+// Returns the configured subject
+func (nc *NatsClient) Subject() string {
+	return nc.subject
 }

@@ -105,9 +105,9 @@ fallbacks:
     - name: github.com/magiconair/properties
       license_id: BSD-2-Clause
       license_content: https://raw.githubusercontent.com/magiconair/properties/master/LICENSE
-    - name: github.com/mattes/migrate
+    - name: github.com/golang-migrate/migrate
       license_id: MIT
-      license_content: https://raw.githubusercontent.com/mattes/migrate/master/LICENSE
+      license_content: https://raw.githubusercontent.com/golang-migrate/migrate/master/LICENSE
     - name: github.com/pmezard/go-difflib
       license_id: BSD-3-Clause
       license_content: https://raw.githubusercontent.com/pmezard/go-difflib/master/LICENSE

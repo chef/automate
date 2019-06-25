@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-prometheus",
+  "data_service": true
+}

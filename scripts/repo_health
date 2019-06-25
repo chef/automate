@@ -35,7 +35,7 @@ done
 echo "Checking for up-to-date bldr config"
 go run ./tools/bldr-config-gen
 if ! git diff --exit-code --ignore-submodules=all; then
-    echo "The blr config appears to be out of date!"
+    echo "The bldr config appears to be out of date!"
     echo "To fix this, run:"
     echo ""
     echo "   hab studio run \"source .studiorc && generate_bldr_config\""

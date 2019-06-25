@@ -70,16 +70,9 @@ func TestStorage(t *testing.T) {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
-	dataMigrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../../storage/postgres/datamigration/sql")
+	dataMigrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../postgres/datamigration/sql")
 	if err != nil {
 		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
-	}
-	var convertedConfig *datamigration.Config
-	if dataMigrationConfig != nil {
-		casted := datamigration.Config(*dataMigrationConfig)
-		convertedConfig = &casted
-	} else {
-		convertedConfig = nil
 	}
 
 	if migrationConfig == nil {
@@ -87,7 +80,7 @@ func TestStorage(t *testing.T) {
 		require.NoError(t, err)
 		adapters["memstore"] = mem
 	} else {
-		adp, err := postgres.New(l, *migrationConfig, *convertedConfig, true)
+		adp, err := postgres.New(l, *migrationConfig, *(*datamigration.Config)(dataMigrationConfig), true)
 		require.NoError(t, err)
 		adapters["postgres"] = adp
 
