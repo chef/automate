@@ -370,7 +370,15 @@ func (db *DB) BulkAddNodes(inNodes []*nodes.Node) (nodeIDs []string, err error) 
 		if err != nil {
 			return nodeIDs, errors.Wrap(err, "BulkAddNodes unable to translate node to db struct")
 		}
-		for _, host := range inNode.GetTargetConfig().GetHosts() {
+
+		hosts := inNode.GetTargetConfig().GetHosts()
+		if inNode.GetTargetConfig().Host != "" {
+			hosts = append(hosts, inNode.GetTargetConfig().Host)
+		}
+		if len(hosts) < 1 {
+			return nodeIDs, errors.New("BulkAddNodes unable find TargetConfig hosts")
+		}
+		for _, host := range hosts {
 			err = Transact(db, func(tx *DBTrans) error {
 				node.ID = createUUID()
 				if inNode.Name == "" {

@@ -388,6 +388,31 @@ func (suite *NodesIntegrationSuite) TestProjectsAreRoundtrippedThroughNodeLifecy
 	suite.Equal([]string{"Best Soups", "Mexican Restaurant Menu"}, controlNode.Projects)
 }
 
+func (suite *NodesIntegrationSuite) TestBulkAddNodesAndTagsUpdate() {
+	//ctx := context.Background()
+	//logrus.SetLevel(logrus.DebugLevel)
+
+	node1 := &nodes.Node{Name: "Bulky One",
+		Tags: []*common.Kv{{Key: "bleep", Value: "bloop"}}}
+
+	testNodeIDs, err := suite.Database.BulkAddNodes([]*nodes.Node{node1})
+	suite.Equal(0, len(testNodeIDs))
+	suite.EqualError(err, "BulkAddNodes unable find TargetConfig hosts")
+
+	// Setting up node1 with Host
+	node1.TargetConfig = &nodes.TargetConfig{Host: "127.0.0.1"}
+
+	// Setting up node2 with Hosts
+	node2 := &nodes.Node{Name: "Bulky Two",
+		TargetConfig: &nodes.TargetConfig{Hosts: []string{"127.0.0.2"}},
+		Tags:         []*common.Kv{{Key: "bleep", Value: "bloop"}, {Key: "bada", Value: "bing"}}}
+
+	// Add the nodes we're going to test with
+	testNodeIDs, err = suite.Database.BulkAddNodes([]*nodes.Node{node1, node2})
+	suite.Require().NoError(err)
+	suite.Equal(2, len(testNodeIDs))
+}
+
 var nowTime = ptypes.TimestampNow()
 var baseNodeData = manager.NodeMetadata{
 	Uuid:            "1223-4254-2424-1322",
