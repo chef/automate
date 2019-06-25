@@ -203,27 +203,47 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByTags() {
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
 	logrus.SetLevel(logrus.DebugLevel)
-	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate",
+		Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
 	suite.Require().NoError(err)
 
-	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "automate", Tags: []*common.Kv{{Key: "nachos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "automate",
+		Tags: []*common.Kv{{Key: "nachos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
 	suite.Require().NoError(err)
 
-	_, err = suite.Database.AddNode(&nodes.Node{Name: "No Nacho Node", Manager: "automate", Tags: []*common.Kv{{Key: "nachos", Value: "no"}}, TargetConfig: &nodes.TargetConfig{}})
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "No Nacho Node", Manager: "automate",
+		Tags: []*common.Kv{{Key: "nachos", Value: "no"}, {Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
 	suite.Require().NoError(err)
 
+	// Testing the OR of filters with the same key
 	filter1 := &common.Filter{
 		Key:    "nachos",
 		Values: []string{"no", "yes"},
 	}
 	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1})
 	suite.Require().NoError(err)
-	logrus.Infof("!!!!!running, len(fetchedNodes)=%d", len(fetchedNodes))
 	suite.Equal(2, len(fetchedNodes))
 	suite.Equal(&pgdb.TotalCount{Total: 2, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
 	if len(fetchedNodes) >= 2 {
 		suite.Equal("Nacho Node", fetchedNodes[0].GetName())
 		suite.Equal("No Nacho Node", fetchedNodes[1].GetName())
+	}
+
+	// Testing the AND of filters with different keys
+	filter1 = &common.Filter{
+		Key:    "nachos",
+		Values: []string{"no"},
+	}
+	filter2 := &common.Filter{
+		Key:    "tacos",
+		Values: []string{"yes"},
+	}
+	fetchedNodes, count, err = suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1, filter2})
+	suite.Require().NoError(err)
+	suite.Equal(1, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 1, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	if len(fetchedNodes) >= 1 {
+		suite.Equal("No Nacho Node", fetchedNodes[0].GetName())
 	}
 }
 
@@ -283,7 +303,7 @@ func (suite *NodesIntegrationSuite) TestDeleteNodesWithQuery() {
 	}
 	filter2 := &common.Filter{
 		Key:    "name",
-		Values: []string{"Tostada"},
+		Values: []string{"Tostada*"},
 	}
 	names, err := suite.Database.DeleteNodesWithQuery([]*common.Filter{filter, filter2})
 	suite.Require().NoError(err)
