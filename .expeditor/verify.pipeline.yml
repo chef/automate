@@ -154,7 +154,7 @@ steps:
     command:
       - scripts/install_golang
       - cd lib
-      - make lint unit
+      - PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH make lint unit
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -219,7 +219,7 @@ steps:
     command:
       - scripts/install_golang
       - cd components/automate-deployment
-      - REAL_USERADD_TESTS=true PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH make ci
+      - REAL_USERADD_TESTS=true make ci
     timeout_in_minutes: 10
     retry:
       automatic:
