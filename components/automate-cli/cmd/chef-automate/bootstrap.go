@@ -14,23 +14,34 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var bootstrapBundleCmd = &cobra.Command{
-	Use:    "bootstrap COMMAND",
-	Short:  "Collect files needed for bootstrap.",
-	Hidden: true,
-}
-
-func newExportBootstrapBundleCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "export",
-		Short: "Export bundle of files needed to bootstrap a new node.",
-		RunE:  runBootstrapBundleCmd,
+func newBootstrapBundleCmd() *cobra.Command {
+	var bootstrapCmd = &cobra.Command{
+		Use:    "bootstrap COMMAND",
+		Hidden: true,
 	}
 
-	return cmd
+	var bundleCmd = &cobra.Command{
+		Use:    "bundle COMMAND",
+		Hidden: true,
+	}
+
+	var createCmd = &cobra.Command{
+		Use: "create <current working dir>/bootstrap_bundle.tar",
+		Annotations: map[string]string{
+			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
+			NoRequireRootAnnotation:  NoRequireRootAnnotation,
+		},
+		RunE:   runBootstrapBundleCreate,
+		Hidden: true,
+	}
+
+	bootstrapCmd.AddCommand(bundleCmd)
+	bundleCmd.AddCommand(createCmd)
+
+	return bootstrapCmd
 }
 
-func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
+func runBootstrapBundleCreate(cmd *cobra.Command, args []string) error {
 	connection, err := client.Connection(client.DefaultClientTimeout)
 	if err != nil {
 		fmt.Println("Connection failed")
@@ -86,6 +97,5 @@ func runBootstrapBundleCmd(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
-	bootstrapBundleCmd.AddCommand(newExportBootstrapBundleCmd())
-	RootCmd.AddCommand(bootstrapBundleCmd)
+	RootCmd.AddCommand(newBootstrapBundleCmd())
 }
