@@ -181,8 +181,8 @@ required = [
   name = "github.com/boltdb/bolt"
 
 [[constraint]]
-  name = "github.com/mattes/migrate"
-  branch = "master"
+  name = "github.com/golang-migrate/migrate"
+  version = "3"
 
 # Compliance Service
 [[constraint]]

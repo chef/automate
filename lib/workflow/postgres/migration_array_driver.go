@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mattes/migrate/source"
+	"github.com/golang-migrate/migrate/source"
 )
 
 func init() {

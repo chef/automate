@@ -3,9 +3,9 @@ package migration
 import (
 	"net/url"
 
-	"github.com/mattes/migrate"
-	_ "github.com/mattes/migrate/database/postgres" // make driver available
-	_ "github.com/mattes/migrate/source/file"       // make source available
+	"github.com/golang-migrate/migrate"
+	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
+	_ "github.com/golang-migrate/migrate/source/file"       // make source available
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/logger"

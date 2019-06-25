@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/golang-migrate/migrate"
+	"github.com/golang-migrate/migrate/database/postgres"
+	"github.com/golang-migrate/migrate/source"
 	"github.com/lib/pq"
-	"github.com/mattes/migrate"
-	"github.com/mattes/migrate/database/postgres"
-	"github.com/mattes/migrate/source"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
