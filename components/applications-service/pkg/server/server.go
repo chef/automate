@@ -230,6 +230,11 @@ func (app *ApplicationsServer) GetServices(
 	}, nil
 }
 
+func (a *ApplicationsServer) GetServicesStats(c context.Context,
+	request *applications.ServicesStatsReq) (*applications.ServicesStatsRes, error) {
+	return nil, nil
+}
+
 // Convert storage.Service array to applications.Service array
 func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*applications.Service {
 	services := make([]*applications.Service, len(svcs))

@@ -55,6 +55,15 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
   };
+
+  rpc GetServicesStats(ServicesStatsReq) returns (ServicesStatsRes) {
+    option (google.api.http).get = "/beta/applications/stats";
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+  }
+
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/beta/applications/version";
     option (chef.automate.api.policy).resource = "service_info:version";
@@ -85,6 +94,14 @@ message ServicesBySGRes {
 
 message ServicesRes {
   repeated Service services = 1;
+}
+
+message ServicesStatsReq {
+}
+
+message ServicesStatsRes {
+  int32 total_service_groups = 1;
+  int32 total_services = 2;
 }
 
 message Service {
