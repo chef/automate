@@ -13,6 +13,7 @@ import (
 
 	"github.com/chef/automate/components/nodemanager-service/config"
 	"github.com/chef/automate/lib/db/migrator"
+	"github.com/chef/automate/lib/logger"
 )
 
 type DB struct {
@@ -94,7 +95,9 @@ func InitDB(connectionString string) (*DB, error) {
 }
 
 func runMigrations(connectionString string, migrationsPath string) error {
-	if err := migrator.Migrate(connectionString, migrationsPath); err != nil {
+	if err := migrator.Migrate(connectionString, migrationsPath,
+		logger.NewLogrusStandardLogger(), false,
+	); err != nil {
 		return errors.Wrapf(err, "Unable to complete database migrations")
 	}
 	return nil
