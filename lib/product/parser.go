@@ -30,7 +30,11 @@ func parsePackageMetadata(packagePath string) (*PackageMetadata, error) {
 }
 
 type productsmeta struct {
-	Packages    []PackageName `json:"packages"`
+	// Packages is a list of the root level packages/services that will
+	// make up a release of automate.
+	Packages []PackageName `json:"packages"`
+	// Collections is a list of collections that automate is broken down
+	// into. Some of these are deployable by the user.
 	Collections []*Collection `json:"collections"`
 }
 
@@ -108,6 +112,8 @@ func parseProductsMeta(filePath string) (*productsmeta, error) {
 	return &val, nil
 }
 
+// Parse parses the root level product.meta along with the package.meta files that
+// may be provided by each component.
 func Parse(repoRootPath string) (*Metadata, error) {
 	componentsPath := path.Join(repoRootPath, "components")
 	packageMetadataMap := make(map[PackageName]*PackageMetadata)

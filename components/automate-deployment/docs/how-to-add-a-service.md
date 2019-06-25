@@ -150,6 +150,6 @@ Note: deployment-team has added some code that makes tests use a locally-generat
 
 You need to run `make update-bindings` from `components/automate-deployment` whenever you add/change/remove bindings. You don't necessarily need to change the bindings when first adding your service, but when you start to wire up your new service to other services this will be needed.
 
-### The Services File
+### The product.meta File
 
-The list of services and other mandatory packages that comprise Automate 2 and other Chef products is maintained in `product.meta`. This file is also used to generate the manifest file that represents a Chef Automate 2 release as described above. Edit this file and add your service.
+The list of services and other mandatory packages that comprise Automate 2 and other Chef products is maintained in `product.meta`. This file is also used to generate the manifest file that represents a Chef Automate 2 release as described above. Edit this file and add your service. Services may also define extra metadata for their service in a `package.meta` for their component. See https://godoc.org/github.com/chef/automate/lib/product for more information.
