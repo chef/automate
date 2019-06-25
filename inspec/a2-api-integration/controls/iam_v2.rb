@@ -1088,7 +1088,7 @@ EOF
         expect(resp.parsed_response_body[:rule]).to eq(CUSTOM_RULE_1)
       end
 
-      it "GET /iam/v2beta/projects/:id/rules returns the most up-to-date rules for the project" do
+      it "GET /iam/v2beta/projects/:id/rules returns any staged rules and applied rules with no staged changes for the project" do
         updated_rule = {
           id: CUSTOM_RULE_2[:id],
           name: "updated display name",
