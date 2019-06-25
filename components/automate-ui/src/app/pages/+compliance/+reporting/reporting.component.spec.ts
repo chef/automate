@@ -65,7 +65,7 @@ describe('ReportingComponent', () => {
 
       const expected = [
         'chef_server', 'chef_tags', 'control', 'environment', 'node', 'organization', 'platform',
-        'policy_group', 'policy_name', 'profile', 'recipe', 'role'];
+        'policy_group', 'policy_name', 'profile', 'recipe', 'role', 'inspec_version'];
 
       expect(expected.sort()).toEqual(availableFilterTypesNames.sort());
     });
