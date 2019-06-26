@@ -105,8 +105,8 @@ func TestStorageGetServiceFromUniqueFieldsExistUpdateLastEventOccurredAt(t *test
 		initialOccurredAtTimestamp = svc.LastEventOccurredAt
 	}
 
-	// Trigger an update but wait for a second before creating the new event
-	time.Sleep(1 * time.Second)
+	// Trigger an update but wait for half a second before creating the new event
+	time.Sleep(500 * time.Millisecond)
 	suite.IngestService(
 		NewHabitatEvent(
 			withSupervisorId("1q2w3e4r"),
@@ -120,10 +120,11 @@ func TestStorageGetServiceFromUniqueFieldsExistUpdateLastEventOccurredAt(t *test
 	if assert.True(t, exist) {
 		updatedOccurredAtTimestamp = svc.LastEventOccurredAt
 
-		// thea substraction from the initial and the updated timestamp should be greater than a second
+		// the updated timestamp must be after the initial one
 		assert.Truef(t, updatedOccurredAtTimestamp.After(initialOccurredAtTimestamp),
 			"last_event_occurred_at time was not updated after an update")
-		// update testify go package to use this
-		//assert.LessOrEqual(t, 1*time.Second, updatedOccurredAtTimestamp.Sub(initialOccurredAtTimestamp))
+		// TODO update testify go package to use this
+		// the substraction of the initial and the updated timestamp should be greater than a second
+		//assert.LessOrEqual(t, 500*time.Millisecond, updatedOccurredAtTimestamp.Sub(initialOccurredAtTimestamp))
 	}
 }
