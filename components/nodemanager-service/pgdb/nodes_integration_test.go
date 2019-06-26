@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -202,7 +201,6 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByTags() {
 }
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
-	logrus.SetLevel(logrus.DebugLevel)
 	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate",
 		Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
 	suite.Require().NoError(err)
@@ -222,12 +220,10 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
 	}
 	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1})
 	suite.Require().NoError(err)
-	suite.Equal(2, len(fetchedNodes))
+	suite.Require().Equal(2, len(fetchedNodes))
 	suite.Equal(&pgdb.TotalCount{Total: 2, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
-	if len(fetchedNodes) >= 2 {
-		suite.Equal("Nacho Node", fetchedNodes[0].GetName())
-		suite.Equal("No Nacho Node", fetchedNodes[1].GetName())
-	}
+	suite.Equal("Nacho Node", fetchedNodes[0].GetName())
+	suite.Equal("No Nacho Node", fetchedNodes[1].GetName())
 
 	// Testing the AND of filters with different keys
 	filter1 = &common.Filter{
@@ -240,11 +236,9 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
 	}
 	fetchedNodes, count, err = suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1, filter2})
 	suite.Require().NoError(err)
-	suite.Equal(1, len(fetchedNodes))
+	suite.Require().Equal(1, len(fetchedNodes))
 	suite.Equal(&pgdb.TotalCount{Total: 1, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
-	if len(fetchedNodes) >= 1 {
-		suite.Equal("No Nacho Node", fetchedNodes[0].GetName())
-	}
+	suite.Equal("No Nacho Node", fetchedNodes[0].GetName())
 }
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByProjects() {
