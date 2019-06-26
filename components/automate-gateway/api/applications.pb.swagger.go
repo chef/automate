@@ -421,6 +421,10 @@ func init() {
         "total_services": {
           "type": "integer",
           "format": "int32"
+        },
+        "total_supervisors": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

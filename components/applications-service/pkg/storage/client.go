@@ -24,6 +24,7 @@ type Client interface {
 
 	GetServicesCount() (int32, error)
 	GetServiceGroupsCount() (int32, error)
+	GetSupervisorsCount() (int32, error)
 
 	// Used by our Integration Tests
 	EmptyStorage() error

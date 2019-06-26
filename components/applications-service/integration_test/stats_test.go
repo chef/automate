@@ -20,6 +20,7 @@ func TestStatsWhenEmpty(t *testing.T) {
 		expected = &applications.ServicesStatsRes{
 			TotalServices:      0,
 			TotalServiceGroups: 0,
+			TotalSupervisors:   0,
 		}
 	)
 	response, err := suite.ApplicationsServer.GetServicesStats(ctx, request)
@@ -34,6 +35,7 @@ func TestStatsWithOne(t *testing.T) {
 		expected = &applications.ServicesStatsRes{
 			TotalServices:      1,
 			TotalServiceGroups: 1,
+			TotalSupervisors:   1,
 		}
 		mockHabService = NewHabitatEvent(
 			withSupervisorId("sup2"),
@@ -57,6 +59,7 @@ func TestStatsWithSeveral(t *testing.T) {
 		expected = &applications.ServicesStatsRes{
 			TotalServices:      10,
 			TotalServiceGroups: 4,
+			TotalSupervisors:   4,
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)

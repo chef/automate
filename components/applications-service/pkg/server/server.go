@@ -243,10 +243,16 @@ func (app *ApplicationsServer) GetServicesStats(c context.Context,
 		log.WithError(err).Error("Error retrieving service groups count")
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+	supervisorsCount, err := app.storageClient.GetSupervisorsCount()
+	if err != nil {
+		log.WithError(err).Error("Error retrieving supervisors count")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
 	return &applications.ServicesStatsRes{
 		TotalServices:      servicesCount,
 		TotalServiceGroups: serviceGroupsCount,
+		TotalSupervisors:   supervisorsCount,
 	}, nil
 }
 
