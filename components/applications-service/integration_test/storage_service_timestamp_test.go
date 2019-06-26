@@ -37,9 +37,21 @@ func TestStorageGetServiceFromUniqueFieldsExist(t *testing.T) {
 
 	svc, exist := suite.StorageClient.GetServiceFromUniqueFields("postgres", "1q2w3e4r")
 	if assert.True(t, exist) {
-		// TODO add the rest
+		assert.NotEmpty(t, svc.ID)
+		assert.Equal(t, "1q2w3e4r", svc.SupMemberID)
+		assert.Equal(t, "core", svc.Origin)
 		assert.Equal(t, "postgres", svc.Name)
+		assert.Equal(t, "0.1.0", svc.Version)
+		assert.Equal(t, "20190101121212", svc.Release)
+		assert.Equal(t, "CRITICAL", svc.Health)
+		assert.Equal(t, "postgres.default", svc.Group)
+		assert.Equal(t, "app.example.com", svc.Fqdn)
+		assert.Equal(t, "cool-app", svc.Application)
 		assert.Equal(t, "development", svc.Environment)
+		assert.Equal(t, "stable", svc.Channel)
+		assert.Equal(t, "us", svc.Site)
+		assert.NotEmpty(t, svc.LastEventOccurredAt)
+		assert.True(t, svc.LastEventOccurredAt.Before(time.Now()))
 	}
 }
 
