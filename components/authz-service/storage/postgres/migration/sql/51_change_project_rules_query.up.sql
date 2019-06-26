@@ -22,7 +22,7 @@ CREATE OR REPLACE FUNCTION
   FROM iam_staged_project_rules AS r
   INNER JOIN iam_staged_rule_conditions AS rc 
   ON rc.rule_db_id=r.db_id
-  WHERE _project_id=r.project_id AND projects_match_for_rule(project_id, _project_filter) AND r.deleted=false
+  WHERE _project_id=r.project_id AND projects_match_for_rule(r.project_id, _project_filter) AND r.deleted=false
   GROUP BY r.id, r.project_id, r.name, r.type
 
   UNION ALL
@@ -45,7 +45,7 @@ CREATE OR REPLACE FUNCTION
   FROM iam_project_rules AS r
   INNER JOIN iam_rule_conditions AS rc
   ON rc.rule_db_id=r.db_id
-  WHERE _project_id=r.project_id AND projects_match_for_rule(project_id, _project_filter)
+  WHERE _project_id=r.project_id AND projects_match_for_rule(r.project_id, _project_filter)
     -- return applied rule only if no staged changes exist
     AND NOT EXISTS (SELECT 1 FROM iam_staged_project_rules WHERE id=r.id)
   GROUP BY r.id, r.project_id, r.name, r.type;
