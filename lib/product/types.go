@@ -124,7 +124,7 @@ func (c *Collection) validate(allowedPackageSet map[PackageName]bool) error {
 
 type BootstrapType string
 
-var (
+const (
 	BootstrapTypeFile BootstrapType = "file"
 )
 
