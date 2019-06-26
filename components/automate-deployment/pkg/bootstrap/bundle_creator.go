@@ -41,13 +41,9 @@ func (b *BundleCreator) writeFile(tarReader *tar.Reader, hdr *tar.Header) error 
 		tarReader,
 		fileutils.WithAtomicWriteFileMode(hdr.FileInfo().Mode()),
 		fileutils.WithAtomicWriteChown(hdr.Uid, hdr.Gid),
+		fileutils.WithAtomicWriteChmod(hdr.FileInfo().Mode()),
 	)
 	if err != nil {
-		return err
-	}
-	// atomic write respects the umask, so we do this one non atomic thing
-	// to get the right mode
-	if err := os.Chmod(absPath, hdr.FileInfo().Mode()); err != nil {
 		return err
 	}
 	return nil
