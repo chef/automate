@@ -1,6 +1,7 @@
 import { takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, Observable, combineLatest } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,7 +14,11 @@ import {
   ServiceGroup, ServiceGroupFilters, FieldDirection, HealthSummary, ServicesFilters
 } from '../../entities/service-groups/service-groups.model';
 import {
-  serviceGroupStatus, allServiceGroups, serviceGroupState, allServiceGroupHealth
+  serviceGroupStatus,
+  allServiceGroups,
+  serviceGroupState,
+  allServiceGroupHealth,
+  serviceGroupErrorResp
 } from '../../entities/service-groups/service-groups.selector';
 import { find, includes, get } from 'lodash/fp';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -27,6 +32,7 @@ import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroups$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
+  public serviceGroupError$: Observable<HttpErrorResponse>;
   public sgHealthSummary: HealthSummary;
 
   // The selected service-group id that will be sent to the services-sidebar
@@ -102,6 +108,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     .subscribe(([queryParams]) => this.detailParamsChange(queryParams));
 
     this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
+    this.serviceGroupError$ = this.store.select(serviceGroupErrorResp);
     this.serviceGroups$ = this.store.select(allServiceGroups);
     this.serviceGroups$.pipe(
       withLatestFrom(this.route.queryParamMap),

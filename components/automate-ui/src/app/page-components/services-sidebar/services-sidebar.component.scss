@@ -22,6 +22,11 @@ app-page-picker {
   padding-bottom: 35px;
 }
 
+chef-alert {
+  align-items: left;
+  justify-content: left;
+}
+
 .service-item {
   @include modal-box();
   display: block;

@@ -1,3 +1,9 @@
+<chef-notification
+  *ngIf="(servicesStatus$ | async) === 'loadingFailure'"
+  [type]="'error'"
+  [timeout]="10">
+  {{ (servicesError$ | async).status }}: {{ (servicesError$ | async).error.message }}
+</chef-notification>
 <div id="services-panel" class="services-panel">
   <chef-page-header>
     <chef-heading>
@@ -75,12 +81,18 @@
 
   <!-- Loading State: Displayed only when the services are loading -->
   <div class="no-services" *ngIf="(servicesStatus$ | async) === 'loading'">
-      <chef-loading-spinner size='50'></chef-loading-spinner>
+    <chef-loading-spinner size='50'></chef-loading-spinner>
+    <h3>Loading services...</h3>
+  </div>
+
+  <!-- LoadingFailure State: Displayed only when the services status has a failure -->
+  <div class="no-services" *ngIf="(servicesStatus$ | async) === 'loadingFailure'">
+    <chef-loading-spinner size='50'></chef-loading-spinner>
     <h3>Loading services...</h3>
   </div>
 
   <!-- NotLoaded State: Displayed only when there are no service-groups and therefore, NO ID -->
   <div class="no-services" *ngIf="(servicesStatus$ | async) === 'notLoaded'">
-      Add service groups to see more service details
+    Add service groups to see more service details
   </div>
 </div>

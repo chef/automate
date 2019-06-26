@@ -1,3 +1,9 @@
+<chef-notification
+  *ngIf="(serviceGroupStatus$ | async) === 'loadingFailure'"
+  [type]="'error'"
+  [timeout]="10">
+  {{ (serviceGroupError$ | async).status }}: {{ (serviceGroupError$ | async).error.message }}
+</chef-notification>
 <chef-page-header>
   <chef-heading>Service Groups</chef-heading>
   <chef-subheading>Service groups are Habitat services ordered by package identifiers and configurations.</chef-subheading>
@@ -131,13 +137,13 @@
 
   <!-- Loading State: Displayed only when the main status is loading -->
   <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loading'">
-      <chef-loading-spinner size='50'></chef-loading-spinner>
+    <chef-loading-spinner size='50'></chef-loading-spinner>
     <h3>Loading service groups...</h3>
   </div>
 
   <!-- LoadingFailure State: Displayed only when the main status is a failure -->
   <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loadingFailure'">
-      <chef-loading-spinner size='50'></chef-loading-spinner>
+    <chef-loading-spinner size='50'></chef-loading-spinner>
     <h3>Loading service groups...</h3>
   </div>
 
