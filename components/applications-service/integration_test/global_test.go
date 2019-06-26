@@ -13,8 +13,10 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
-	uuid "github.com/chef/automate/lib/uuid4"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+
+	uuid "github.com/chef/automate/lib/uuid4"
 )
 
 var (
@@ -67,6 +69,7 @@ func DefaultHabitatEvent() *habitat.HealthCheckEvent {
 			Application: a,
 			Environment: e,
 			Site:        s,
+			OccurredAt:  ptypes.TimestampNow(),
 		},
 		ServiceMetadata: &habitat.ServiceMetadata{
 			UpdateConfig: &habitat.UpdateConfig{

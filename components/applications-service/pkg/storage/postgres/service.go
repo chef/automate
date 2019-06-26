@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	selectService = `
+	selectServiceInternal = `
 SELECT id
   , origin
   , name
@@ -23,12 +23,39 @@ SELECT id
   , sup_id
   , channel
   , package_ident
+  , last_event_occurred_at
 FROM service
 WHERE name = $1
   AND sup_id IN (
     SELECT id FROM supervisor
     WHERE member_id = $2
   )
+`
+	selectServiceFromUniqueFields = `
+SELECT s.id
+  , s.origin AS origin
+  , s.name AS name
+  , s.version AS version
+  , s.release AS release
+  , s.status AS status
+  , s.health AS health
+  , sg.name AS group
+  , d.app_name AS application
+  , d.environment AS environment
+  , sup.member_id AS sup_member_id
+  , sup.fqdn AS fqdn
+  , s.channel as channel
+  , sup.site as site
+  , s.last_event_occurred_at as last_event_occurred_at
+FROM service AS s
+LEFT JOIN service_group AS sg
+  ON s.group_id = sg.id
+LEFT JOIN deployment AS d
+  ON s.deployment_id = d.id
+LEFT JOIN supervisor AS sup
+  ON s.sup_id = sup.id
+WHERE s.name = $1
+  AND sup.member_id = $2
 `
 	selectServiceByServiceGroupID = `
 SELECT s.id
@@ -45,6 +72,7 @@ SELECT s.id
   , sup.fqdn AS fqdn
   , s.channel as channel
   , sup.site as site
+  , s.last_event_occurred_at as last_event_occurred_at
 FROM service AS s
 LEFT JOIN service_group AS sg
   ON s.group_id = sg.id
@@ -128,11 +156,27 @@ func (db *Postgres) GetServices(
 	return services, err
 }
 
-// getServiceFromUniqueFields retrieves a service from the db without the need
+// GetServiceFromUniqueFields retrieves a service from the db without the need
 // of an id, it is based on the unique fields, name and member id
+func (db *Postgres) GetServiceFromUniqueFields(name, member string) (*storage.Service, bool) {
+	if name == "" || member == "" {
+		return nil, false
+	}
+
+	var svc storage.Service
+	err := db.SelectOne(&svc, selectServiceFromUniqueFields, name, member)
+	if err != nil {
+		return nil, false
+	}
+
+	return &svc, true
+}
+
+// getServiceFromUniqueFields is used to ingest/update services internally and it
+// selects a single service from the database with IDs
 func (db *Postgres) getServiceFromUniqueFields(name, member string) (*service, bool) {
 	var svc service
-	err := db.SelectOne(&svc, selectService, name, member)
+	err := db.SelectOne(&svc, selectServiceInternal, name, member)
 	if err != nil {
 		return nil, false
 	}

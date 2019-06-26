@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/chef/automate/api/external/habitat"
 )
@@ -9,6 +10,8 @@ import (
 type Client interface {
 	// @param (event)
 	IngestHealthCheckEvent(*habitat.HealthCheckEvent) error
+	// @param (name, memeber_id)
+	GetServiceFromUniqueFields(string, string) (*Service, bool)
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServices(string, bool, int32, int32, map[string][]string) ([]*Service, error)
 	// @param (sortField, sortAsc, page, pageSize, filters)
@@ -31,20 +34,21 @@ const (
 )
 
 type Service struct {
-	ID          int32  `db:"id"`
-	SupMemberID string `db:"sup_member_id"`
-	Origin      string
-	Name        string
-	Version     string
-	Release     string
-	Status      string
-	Health      string
-	Group       string
-	Fqdn        string
-	Application string
-	Environment string
-	Channel     string
-	Site        string
+	ID                  int32  `db:"id"`
+	SupMemberID         string `db:"sup_member_id"`
+	Origin              string
+	Name                string
+	Version             string
+	Release             string
+	Status              string
+	Health              string
+	Group               string
+	Fqdn                string
+	Application         string
+	Environment         string
+	Channel             string
+	Site                string
+	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
 }
 
 func (s *Service) FullReleaseString() string {
