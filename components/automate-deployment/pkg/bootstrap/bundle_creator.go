@@ -52,6 +52,9 @@ func (b *BundleCreator) writeFile(tarReader *tar.Reader, hdr *tar.Header) error 
 func (b *BundleCreator) mkdir(tarReader *tar.Reader, hdr *tar.Header) error {
 	absPath := path.Join(b.rootDir, hdr.Name)
 	// TODO (jaym): make atomic?
+	// This is not MkdirAll because we don't want to create the root directory.
+	// Our bundle does not keep track of the correct ownership and permissions
+	// of it.
 	err := os.Mkdir(absPath, hdr.FileInfo().Mode())
 	if err != nil {
 		if os.IsExist(err) {
@@ -100,7 +103,7 @@ func (b *BundleCreator) Unpack(in io.Reader) error {
 		return err
 	}
 	if !exists {
-		return errors.Errorf("cannot unpack into %q because it does not", b.rootDir)
+		return errors.Errorf("cannot unpack into %q because it does not exist", b.rootDir)
 	}
 	for {
 		hdr, err := tarReader.Next()
@@ -144,11 +147,11 @@ func (b *BundleCreator) Create(pkgMetadatas []*product.PackageMetadata, out io.W
 	for _, metadata := range pkgMetadatas {
 		if metadata != nil && len(metadata.Bootstrap) > 0 {
 			svc := metadata.Name.Name
-			for _, bootstrapSepc := range metadata.Bootstrap {
-				if bootstrapSepc.Type != product.BootstrapTypeFile {
+			for _, bootstrapSpec := range metadata.Bootstrap {
+				if bootstrapSpec.Type != product.BootstrapTypeFile {
 					return errors.New("Unknown type")
 				}
-				dname, fname := path.Split(bootstrapSepc.Path)
+				dname, fname := path.Split(bootstrapSpec.Path)
 				if fname == "" {
 					return errors.New("Not a file")
 				}
@@ -163,7 +166,7 @@ func (b *BundleCreator) Create(pkgMetadatas []*product.PackageMetadata, out io.W
 						allDirs = append(allDirs, d)
 					}
 				}
-				fpath := path.Join(svc, bootstrapSepc.Path)
+				fpath := path.Join(svc, bootstrapSpec.Path)
 				f, err := b.headerForFile(fpath)
 				if err != nil {
 					return err
