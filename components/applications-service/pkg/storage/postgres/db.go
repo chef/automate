@@ -2,6 +2,7 @@ package postgres
 
 import (
 	gosql "database/sql"
+	"time"
 
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
@@ -88,38 +89,47 @@ func (db *Postgres) initDB() error {
 
 // service struct is the representation of the service table inside the db
 type service struct {
-	ID           int32  `db:"id"`
-	Origin       string `db:"origin"`
-	Name         string `db:"name"`
-	Version      string `db:"version"`
-	Release      string `db:"release"`
-	Status       string `db:"status"`
-	Health       string `db:"health"`
-	GroupID      int32  `db:"group_id"`
-	DeploymentID int32  `db:"deployment_id"`
-	SupID        int32  `db:"sup_id"`
-	Channel      string `db:"channel"`
-	FullPkgIdent string `db:"package_ident"`
+	ID                  int32     `db:"id"`
+	Origin              string    `db:"origin"`
+	Name                string    `db:"name"`
+	Version             string    `db:"version"`
+	Release             string    `db:"release"`
+	Status              string    `db:"status"`
+	Health              string    `db:"health"`
+	GroupID             int32     `db:"group_id"`
+	DeploymentID        int32     `db:"deployment_id"`
+	SupID               int32     `db:"sup_id"`
+	Channel             string    `db:"channel"`
+	FullPkgIdent        string    `db:"package_ident"`
+	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
+	CreatedAt           time.Time `db:"-"`
+	UpdatedAt           time.Time `db:"-"`
 }
 
 // supervisor struct is the representation of the supervisor table inside the db
 type supervisor struct {
-	ID       int32  `db:"id"`
-	MemberID string `db:"member_id"`
-	Fqdn     string `db:"fqdn"`
-	Site     string `db:"site"`
+	ID        int32     `db:"id"`
+	MemberID  string    `db:"member_id"`
+	Fqdn      string    `db:"fqdn"`
+	Site      string    `db:"site"`
+	CreatedAt time.Time `db:"-"`
+	UpdatedAt time.Time `db:"-"`
 }
 
 // serviceGroup struct is the representation of the service_group table inside the db
 type serviceGroup struct {
-	ID           int32  `db:"id"`
-	Name         string `db:"name"`
-	DeploymentID int32  `db:"deployment_id"`
+	ID           int32     `db:"id"`
+	Name         string    `db:"name"`
+	DeploymentID int32     `db:"deployment_id"`
+	CreatedAt    time.Time `db:"-"`
+	UpdatedAt    time.Time `db:"-"`
 }
 
 // deployment struct is the representation of the deployment table inside the db
 type deployment struct {
-	ID          int32  `db:"id"`
-	AppName     string `db:"app_name"`
-	Environment string `db:"environment"`
+	ID          int32     `db:"id"`
+	AppName     string    `db:"app_name"`
+	Environment string    `db:"environment"`
+	CreatedAt   time.Time `db:"-"`
+	UpdatedAt   time.Time `db:"-"`
 }
