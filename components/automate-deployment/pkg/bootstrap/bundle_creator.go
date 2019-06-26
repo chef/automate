@@ -15,9 +15,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-var ErrNoFiles = errors.New("No files to bundle")
-
+const magicHeader = "ABB-1\n\n"
 const habSvcDir = "/hab/svc"
+
+var ErrNoFiles = errors.New("No files to bundle")
+var ErrMalformedBundle = errors.New("Malformed install bundle file")
 
 // BundleCreator creates installation bundles
 type BundleCreator struct {
@@ -69,7 +71,23 @@ func (b *BundleCreator) mkdir(tarReader *tar.Reader, hdr *tar.Header) error {
 	return nil
 }
 
+func (b *BundleCreator) readHeader(in io.Reader) error {
+	header := make([]byte, len(magicHeader))
+	if _, err := io.ReadFull(in, header); err != nil {
+		return errors.Wrap(err, "failed to read bootstrap bundle header")
+	}
+
+	if string(header) != magicHeader {
+		return ErrMalformedBundle
+	}
+
+	return nil
+}
+
 func (b *BundleCreator) Unpack(in io.Reader) error {
+	if err := b.readHeader(in); err != nil {
+		return err
+	}
 	tarReader := tar.NewReader(in)
 
 	users := map[string]int{}
@@ -179,6 +197,10 @@ func (b *BundleCreator) Create(pkgMetadatas []*product.PackageMetadata, out io.W
 
 	if len(allDirs)+len(files) <= 0 {
 		return ErrNoFiles
+	}
+
+	if _, err := io.WriteString(out, magicHeader); err != nil {
+		return errors.Wrap(err, "Could not write archive header")
 	}
 
 	tarWriter := tar.NewWriter(out)
