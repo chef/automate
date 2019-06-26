@@ -29,6 +29,13 @@ func AllServices() ([]habpkg.HabPkg, error) {
 	return serviceList, nil
 }
 
+func MetadataForPackage(pkgName string) *product.PackageMetadata {
+	if packageMetadataMap[pkgName] != nil {
+		return packageMetadataMap[pkgName].Metadata
+	}
+	return nil
+}
+
 func ContainsCollection(needle string, haystack []string) bool {
 	desiredCollection := collectionMap[needle]
 	if desiredCollection == nil {

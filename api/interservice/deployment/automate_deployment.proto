@@ -53,6 +53,14 @@ service Deployment {
 	rpc InfrastructureNodeDelete(InfrastructureNodeDeleteRequest) returns (InfrastructureNodeDeleteResponse);
 	rpc Usage(UsageRequest) returns (UsageResponse);
 	rpc GetCLIExecutable(GetCLIExecutableRequest) returns (stream GetCLIExecutableResponse);
+	rpc BootstrapBundle (BootstrapBundleRequest) returns (stream BootstrapBundleResponse);
+}
+
+message BootstrapBundleRequest {
+}
+
+message BootstrapBundleResponse {
+        bytes data = 1;
 }
 
 message GetCLIExecutableRequest {

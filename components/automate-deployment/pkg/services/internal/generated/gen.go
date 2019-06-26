@@ -9,7 +9,8 @@ var ProductMetadataJSON = `
       "metadata": {
         "name": "chef/backup-gateway",
         "data_service": true,
-        "binlinks": null
+        "binlinks": null,
+        "bootstrap": null
       }
     },
     {
@@ -17,7 +18,8 @@ var ProductMetadataJSON = `
       "metadata": {
         "name": "chef/automate-postgresql",
         "data_service": true,
-        "binlinks": null
+        "binlinks": null,
+        "bootstrap": null
       }
     },
     {
@@ -29,7 +31,8 @@ var ProductMetadataJSON = `
       "metadata": {
         "name": "chef/automate-elasticsearch",
         "data_service": true,
-        "binlinks": null
+        "binlinks": null,
+        "bootstrap": null
       }
     },
     {
@@ -138,7 +141,38 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/automate-cs-oc-erchef",
-      "metadata": null
+      "metadata": {
+        "name": "chef/automate-cs-oc-erchef",
+        "data_service": false,
+        "binlinks": null,
+        "bootstrap": [
+          {
+            "type": "file",
+            "path": "data/pivotal.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/pivotal.pub.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/webui_priv.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/webui_pub.pem",
+            "optional": false
+          },
+          {
+            "type": "file",
+            "path": "data/dark_launch_features.json",
+            "optional": false
+          }
+        ]
+      }
     },
     {
       "name": "chef/automate-cs-nginx",
@@ -148,7 +182,8 @@ var ProductMetadataJSON = `
         "binlinks": [
           "knife",
           "chef-server-ctl"
-        ]
+        ],
+        "bootstrap": null
       }
     },
     {
@@ -158,7 +193,8 @@ var ProductMetadataJSON = `
         "data_service": false,
         "binlinks": [
           "workflow-ctl"
-        ]
+        ],
+        "bootstrap": null
       }
     },
     {
@@ -174,7 +210,8 @@ var ProductMetadataJSON = `
       "metadata": {
         "name": "chef/automate-prometheus",
         "data_service": true,
-        "binlinks": null
+        "binlinks": null,
+        "bootstrap": null
       }
     },
     {
@@ -184,7 +221,8 @@ var ProductMetadataJSON = `
         "data_service": false,
         "binlinks": [
           "chef-automate"
-        ]
+        ],
+        "bootstrap": null
       }
     },
     {
