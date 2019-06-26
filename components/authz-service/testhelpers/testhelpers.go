@@ -3,11 +3,13 @@ package testhelpers
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/url"
 	"os"
 	"path"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -15,11 +17,14 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
+	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	server "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
+	postgres_v1 "github.com/chef/automate/components/authz-service/storage/v1/postgres"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -28,13 +33,20 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
-type TestDB struct {
-	*sql.DB
+type TestFramework struct {
+	Policy                api.PoliciesClient
+	Authz                 api.AuthorizationClient
+	Projects              api.ProjectsClient
+	TestDB                *TestDB
+	Engine                engine.Engine
+	Seed                  int64
+	PolicyRefresher       server.PolicyRefresher
+	ConfigManager         *config.Manager
+	ConfigManagerFilename string
 }
 
-type MockEventServiceClient struct {
-	PublishedEvents       int
-	LastestPublishedEvent *automate_event.EventMsg
+type TestDB struct {
+	*sql.DB
 }
 
 const resetDatabaseStatement = `DROP SCHEMA public CASCADE;
@@ -42,21 +54,36 @@ CREATE SCHEMA public;
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO public;`
 
-func SetupProjectsAndRulesWithDB(t *testing.T) (api.ProjectsClient, *TestDB, storage.Storage,
-	*MockEventServiceClient, int64) {
+func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	t.Helper()
-	ctx := context.Background()
 	seed := prng.GenSeed(t)
 
-	pg, testDB, _ := SetupTestDB(t)
+	pg, testDB, _, migrationConfig := SetupTestDB(t)
 	eventServiceClient := &MockEventServiceClient{}
-	configMgr, err := config.NewManager("/tmp/.authz-delete-me")
+	configMgrFilename := fmt.Sprintf("/tmp/.authz-delete-me-%d", time.Now().UTC().Unix())
+	configMgr, err := config.NewManager(configMgrFilename)
 	require.NoError(t, err)
 
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
-	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, &TestProjectRulesRetriever{},
-		eventServiceClient, configMgr, NewMockPolicyRefresher())
+
+	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig)
+	require.NoError(t, err)
+
+	opaInstance, err := opa.New(ctx, l)
+	require.NoError(t, err, "init OPA")
+
+	vChan := make(chan api.Version, 1)
+	vSwitch := server.NewSwitch(vChan)
+
+	polSrv, polRefresher, err := server.NewPoliciesServer(ctx, l, pg, opaInstance, pgV1, vChan)
+	require.NoError(t, err)
+
+	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, opaInstance,
+		eventServiceClient, configMgr, polRefresher)
+	require.NoError(t, err)
+
+	authzSrv, err := server.NewAuthzServer(l, opaInstance, vSwitch, projectsSrv)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -68,6 +95,8 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (api.ProjectsClient, *TestDB, sto
 		grpc_server.InputValidationInterceptor(),
 	))
 	api.RegisterProjectsServer(serv, projectsSrv)
+	api.RegisterAuthorizationServer(serv, authzSrv)
+	api.RegisterPoliciesServer(serv, polSrv)
 
 	grpcServ := grpctest.NewServer(serv)
 
@@ -76,10 +105,43 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (api.ProjectsClient, *TestDB, sto
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
 
-	return api.NewProjectsClient(conn), testDB, pg, eventServiceClient, seed
+	return &TestFramework{
+		Policy:                api.NewPoliciesClient(conn),
+		Authz:                 api.NewAuthorizationClient(conn),
+		Projects:              api.NewProjectsClient(conn),
+		TestDB:                testDB,
+		Engine:                opaInstance,
+		Seed:                  seed,
+		PolicyRefresher:       polRefresher,
+		ConfigManager:         configMgr,
+		ConfigManagerFilename: configMgrFilename,
+	}
 }
 
-func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng) {
+func (tf *TestFramework) Flush(t *testing.T, ctx context.Context) {
+	t.Helper()
+	tf.TestDB.Flush(t)
+	// TODO (tc): Do we have a way to flush the OPA / engine cache back to its initial state?
+	// Probably would be good to do here.
+}
+
+// Shutdown must be called at the end of a test that uses TestFramework
+// otherwise strange things might happen with the authz-service/config.Manager
+// because other tests might accidentally get state to its config file
+// if we don't kill the goroutine that writes to it.
+func (tf *TestFramework) Shutdown(t *testing.T, ctx context.Context) {
+	t.Helper()
+	// The ConfigManager goroutine will panic if it's already closed.
+	// defer func() {
+	// 	recover()
+	// }()
+	tf.Flush(t, ctx)
+	tf.ConfigManager.Close()
+	err := os.Remove(tf.ConfigManagerFilename)
+	require.NoError(t, err)
+}
+
+func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng, *migration.Config) {
 	t.Helper()
 
 	ctx := context.Background()
@@ -112,7 +174,7 @@ func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng) {
 
 	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
 	require.NoError(t, err)
-	return backend, &TestDB{DB: db}, prng.Seed(t)
+	return backend, &TestDB{DB: db}, prng.Seed(t), migrationConfig
 }
 
 func (d *TestDB) Flush(t *testing.T) {
@@ -176,6 +238,11 @@ func openDB(t *testing.T) *sql.DB {
 	require.NoError(t, err, "error pinging db")
 
 	return db
+}
+
+type MockEventServiceClient struct {
+	PublishedEvents       int
+	LastestPublishedEvent *automate_event.EventMsg
 }
 
 func (t *MockEventServiceClient) Publish(ctx context.Context,

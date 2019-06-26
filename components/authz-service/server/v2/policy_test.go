@@ -2925,14 +2925,15 @@ func assertRolesMatch(t *testing.T, storageRole storage.Role, apiRole api_v2.Rol
 }
 
 type testSetup struct {
-	policy       api_v2.PoliciesClient
-	authz        api_v2.AuthorizationClient
-	projects     api_v2.ProjectsClient
-	policyCache  *cache.Cache
-	roleCache    *cache.Cache
-	projectCache *cache.Cache
-	status       storage.MigrationStatusProvider
-	switcher     *v2.VersionSwitch
+	policy         api_v2.PoliciesClient
+	authz          api_v2.AuthorizationClient
+	projects       api_v2.ProjectsClient
+	policyCache    *cache.Cache
+	roleCache      *cache.Cache
+	projectCache   *cache.Cache
+	status         storage.MigrationStatusProvider
+	switcher       *v2.VersionSwitch
+	rulesRetriever engine.ProjectRulesRetriever
 }
 
 func setupV2WithWriter(t *testing.T,
@@ -3017,14 +3018,15 @@ func setupV2WithMigrationState(t *testing.T,
 	}
 
 	return testSetup{
-		policy:       api_v2.NewPoliciesClient(conn),
-		authz:        api_v2.NewAuthorizationClient(conn),
-		projects:     api_v2.NewProjectsClient(conn),
-		policyCache:  mem_v2.PoliciesCache(),
-		roleCache:    mem_v2.RolesCache(),
-		projectCache: mem_v2.ProjectsCache(),
-		status:       mem_v2,
-		switcher:     vSwitch,
+		policy:         api_v2.NewPoliciesClient(conn),
+		authz:          api_v2.NewAuthorizationClient(conn),
+		projects:       api_v2.NewProjectsClient(conn),
+		policyCache:    mem_v2.PoliciesCache(),
+		roleCache:      mem_v2.RolesCache(),
+		projectCache:   mem_v2.ProjectsCache(),
+		status:         mem_v2,
+		switcher:       vSwitch,
+		rulesRetriever: rulesRetriever,
 	}
 }
 

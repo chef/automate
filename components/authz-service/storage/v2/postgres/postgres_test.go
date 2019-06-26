@@ -44,7 +44,7 @@ const (
 // make kill_docker_pg
 
 func TestGetPolicy(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -363,7 +363,7 @@ func TestGetPolicy(t *testing.T) {
 }
 
 func TestListPolicyMembers(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -499,7 +499,7 @@ func TestListPolicyMembers(t *testing.T) {
 }
 
 func TestListPolicies(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -954,7 +954,7 @@ func TestListPolicies(t *testing.T) {
 }
 
 func TestDeletePolicy(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -1182,7 +1182,7 @@ func TestDeletePolicy(t *testing.T) {
 }
 
 func TestCreatePolicy(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -1732,7 +1732,7 @@ func TestCreatePolicy(t *testing.T) {
 }
 
 func TestReplacePolicyMembers(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -2006,7 +2006,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 }
 
 func TestRemovePolicyMembers(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -2253,7 +2253,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 }
 
 func TestAddPolicyMembers(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -2594,7 +2594,7 @@ func TestAddPolicyMembers(t *testing.T) {
 }
 
 func TestUpdatePolicy(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3299,7 +3299,7 @@ func TestUpdatePolicy(t *testing.T) {
 }
 
 func TestCreateRule(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -3454,7 +3454,7 @@ func TestCreateRule(t *testing.T) {
 }
 
 func TestListRules(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3558,7 +3558,7 @@ func TestListRules(t *testing.T) {
 	}
 }
 func TestListStagedAndAppliedRules(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3649,7 +3649,7 @@ func TestListStagedAndAppliedRules(t *testing.T) {
 }
 
 func TestListRulesForProject(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3906,7 +3906,7 @@ func TestListRulesForProject(t *testing.T) {
 }
 
 func TestUpdateRule(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -4176,7 +4176,7 @@ func TestUpdateRule(t *testing.T) {
 }
 
 func TestGetStagedOrAppliedRule(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -4358,7 +4358,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 }
 
 func TestDeleteRule(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -4618,7 +4618,7 @@ func TestDeleteRule(t *testing.T) {
 }
 
 func TestApplyStagedRules(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	// No project filter concerns in these tests so safe to re-use context.
@@ -4785,7 +4785,7 @@ func TestApplyStagedRules(t *testing.T) {
 }
 
 func TestCreateProject(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -4899,7 +4899,7 @@ func TestCreateProject(t *testing.T) {
 }
 
 func TestUpdateProject(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -4992,7 +4992,7 @@ func TestUpdateProject(t *testing.T) {
 }
 
 func TestGetProject(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -5074,7 +5074,7 @@ func TestGetProject(t *testing.T) {
 }
 
 func TestDeleteProject(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -5174,7 +5174,7 @@ func TestDeleteProject(t *testing.T) {
 }
 
 func TestListProjects(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -5370,7 +5370,7 @@ func TestListProjects(t *testing.T) {
 }
 
 func TestCreateRole(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -5505,7 +5505,7 @@ func TestCreateRole(t *testing.T) {
 }
 
 func TestListRoles(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -5842,7 +5842,7 @@ func TestListRoles(t *testing.T) {
 }
 
 func TestGetRole(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -6064,7 +6064,7 @@ func TestGetRole(t *testing.T) {
 }
 
 func TestReset(t *testing.T) {
-	store, db, prngSeed := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -6111,7 +6111,7 @@ func TestReset(t *testing.T) {
 }
 
 func TestDeleteRole(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -6343,7 +6343,7 @@ func TestDeleteRole(t *testing.T) {
 }
 
 func TestUpdateRole(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	nonexistingRole := storage.Role{
@@ -6725,7 +6725,7 @@ func TestUpdateRole(t *testing.T) {
 }
 
 func TestMigrationStatusProvider(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -6841,7 +6841,7 @@ func TestMigrationStatusProvider(t *testing.T) {
 }
 
 func TestPurgeSubjectFromPolicies(t *testing.T) {
-	store, db, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
