@@ -126,6 +126,9 @@ func (s *Server) UpdateTeam(ctx context.Context, req *teams.UpdateTeamReq) (*tea
 func (s *Server) AddTeamMembers(ctx context.Context,
 	req *teams.AddTeamMembersReq) (*teams.AddTeamMembersResp, error) {
 
+	if len(req.UserIds) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "missing user ids")
+	}
 	// TODO (tc): The storage interface is still using V1 verbiage, so
 	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
 	//

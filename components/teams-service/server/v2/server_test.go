@@ -807,7 +807,6 @@ func runAllServerTests(
 					"299ea25b-62d4-4660-965a-e25870298792",
 					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
 				}, "multiple users"},
-				{[]string{}, "no users"},
 			}
 			for _, test := range tests {
 				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
@@ -851,7 +850,6 @@ func runAllServerTests(
 					"299ea25b-62d4-4660-965a-e25870298792",
 					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
 				}, "multiple users"},
-				{[]string{}, "no users"},
 			}
 			for _, test := range tests {
 				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
@@ -895,7 +893,6 @@ func runAllServerTests(
 					"299ea25b-62d4-4660-965a-e25870298792",
 					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
 				}, "multiple users"},
-				{[]string{}, "no users"},
 			}
 			for _, test := range tests {
 				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
@@ -939,7 +936,6 @@ func runAllServerTests(
 					"299ea25b-62d4-4660-965a-e25870298792",
 					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
 				}, "multiple users"},
-				{[]string{}, "no users"},
 			}
 			for _, test := range tests {
 				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
@@ -983,7 +979,6 @@ func runAllServerTests(
 					"299ea25b-62d4-4660-965a-e25870298792",
 					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
 				}, "multiple users"},
-				{[]string{}, "no users"},
 			}
 			for _, test := range tests {
 				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
@@ -1046,18 +1041,25 @@ func runAllServerTests(
 			cleanupTeamV2(t, cl, createTeam.Team.Id)
 		})
 
-		t.Run("when team does not exist, returns Not Found error", func(t *testing.T) {
+		t.Run("when no user ids provided, returns invalid request", func(t *testing.T) {
 			ctx := context.Background()
-			users := []string{"some-id"}
+			req := &teams.CreateTeamReq{
+				Name:     "with, learning, & wisdom",
+				Id:       "ravenclaw",
+				Projects: []string{"project1", "project2"},
+			}
+			_, err := cl.CreateTeam(ctx, req)
+			require.NoError(t, err)
+
 			addReq := &teams.AddTeamMembersReq{
 				Id:      "not-found-id",
-				UserIds: users,
+				UserIds: []string{},
 			}
 
 			resp, err := cl.AddTeamMembers(ctx, addReq)
 
 			require.Nil(t, resp)
-			grpctest.AssertCode(t, codes.NotFound, err)
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 	})
 

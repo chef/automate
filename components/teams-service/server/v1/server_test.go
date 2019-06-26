@@ -603,7 +603,6 @@ func runAllServerTests(ctx context.Context,
 					"299ea25b-62d4-4660-965a-e25870298792",
 					"d1f642c8-8907-4e8b-a9a0-b998a44dc4bf",
 				}, "multiple users"},
-				{[]string{}, "no users"},
 			}
 			for _, test := range tests {
 				t.Run("when provided valid team and "+test.desc, func(t *testing.T) {
@@ -691,22 +690,14 @@ func runAllServerTests(ctx context.Context,
 			resp, err := cl.CreateTeam(ctx, req)
 			require.NoError(t, err)
 
-			users := []string{}
 			addReq := &teams.AddUsersReq{
 				Id:      resp.GetTeam().GetId(),
-				UserIds: users,
+				UserIds: []string{},
 			}
 
 			updatedTeam, err := cl.AddUsers(ctx, addReq)
-			require.NoError(t, err)
-			require.NotNil(t, updatedTeam)
-
-			usersReq := &teams.GetUsersReq{
-				Id: resp.GetTeam().GetId(),
-			}
-			usersResp, err := cl.GetUsers(ctx, usersReq)
-			require.NoError(t, err)
-			assert.ElementsMatch(t, users, usersResp.UserIds)
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Nil(t, updatedTeam)
 
 			// Cleanup
 			cleanupTeam(ctx, t, cl, resp.Team.Id)

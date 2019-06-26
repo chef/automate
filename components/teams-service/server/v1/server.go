@@ -180,6 +180,10 @@ func (s *Server) UpdateTeam(ctx context.Context, req *teams.UpdateTeamReq) (*tea
 
 // AddUsers associates an array of users with an existing team
 func (s *Server) AddUsers(ctx context.Context, req *teams.AddUsersReq) (*teams.AddUsersResp, error) {
+	if len(req.UserIds) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "missing user ids")
+	}
+
 	id, err := uuid.FromString(req.Id)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid team id")

@@ -363,10 +363,6 @@ func (p *postgres) AddUsers(ctx context.Context,
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if len(userIDs) == 0 {
-		return storage.Team{}, nil
-	}
-
 	var t storage.Team
 	err := p.db.QueryRowContext(ctx,
 		`WITH moved_rows AS (
