@@ -18,6 +18,20 @@ func TestStorageGetServiceFromUniqueFieldsNotExist(t *testing.T) {
 	assert.Nil(t, svc)
 }
 
+func TestStorageGetServiceFromUniqueFieldsEmptyParameters(t *testing.T) {
+	svc, exist := suite.StorageClient.GetServiceFromUniqueFields("", "")
+	assert.False(t, exist)
+	assert.Nil(t, svc)
+
+	svc, exist = suite.StorageClient.GetServiceFromUniqueFields("foo", "")
+	assert.False(t, exist)
+	assert.Nil(t, svc)
+
+	svc, exist = suite.StorageClient.GetServiceFromUniqueFields("", "123")
+	assert.False(t, exist)
+	assert.Nil(t, svc)
+}
+
 func TestStorageGetServiceFromUniqueFieldsExist(t *testing.T) {
 	defer suite.DeleteDataFromStorage()
 
@@ -66,10 +80,11 @@ func TestStorageGetServiceFromUniqueFieldsExistUpdateLastEventOccurredAt(t *test
 		),
 	)
 	var (
-		svc, exist                 = suite.StorageClient.GetServiceFromUniqueFields("postgres", "1q2w3e4r")
 		initialOccurredAtTimestamp time.Time
 		updatedOccurredAtTimestamp time.Time
 	)
+
+	svc, exist := suite.StorageClient.GetServiceFromUniqueFields("postgres", "1q2w3e4r")
 	if assert.True(t, exist) {
 		initialOccurredAtTimestamp = svc.LastEventOccurredAt
 	}
