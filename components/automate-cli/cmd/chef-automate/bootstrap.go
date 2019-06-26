@@ -30,7 +30,7 @@ func newBootstrapBundleCmd() *cobra.Command {
 	}
 
 	var createCmd = &cobra.Command{
-		Use: "create [/path/to/bundle.tar]",
+		Use: "create [/path/to/bundle.abb]",
 		Annotations: map[string]string{
 			NoCheckVersionAnnotation: NoCheckVersionAnnotation,
 			NoRequireRootAnnotation:  NoRequireRootAnnotation,
@@ -80,7 +80,7 @@ func runBootstrapBundleCreate(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return status.Annotate(err, status.FileAccessError)
 		}
-		outfile = filepath.Join(cwd, "bootstrap-bundle.tar")
+		outfile = filepath.Join(cwd, "bootstrap-bundle.abb")
 	}
 
 	if _, err := os.Stat(outfile); err == nil {
