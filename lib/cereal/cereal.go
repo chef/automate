@@ -1,4 +1,4 @@
-package workflow
+package cereal
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 
-	"github.com/chef/automate/lib/workflow/backend"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 var (
@@ -363,10 +363,10 @@ type TaskExecutor interface {
 	Run(ctx context.Context, task Task) (result interface{}, err error)
 }
 
-// WorkflowManager is responsible for for calling WorkflowExecutors and
+// Manager is responsible for for calling WorkflowExecutors and
 // TaskExecutors when they need to be processed, along with managing
 // the scheduling of workflows.
-type WorkflowManager struct {
+type Manager struct {
 	workflowExecutors map[string]WorkflowExecutor
 	taskExecutors     map[string]registeredExecutor
 	workflowScheduler *workflowScheduler
@@ -375,14 +375,14 @@ type WorkflowManager struct {
 	wg                sync.WaitGroup
 }
 
-// NewManager creates a new WorkflowManager with the given Driver. If
+// NewManager creates a new Manager with the given Driver. If
 // the driver fails to initialize, an error is returned.
-func NewManager(backend backend.Driver) (*WorkflowManager, error) {
+func NewManager(backend backend.Driver) (*Manager, error) {
 	err := backend.Init()
 	if err != nil {
 		return nil, err
 	}
-	return &WorkflowManager{
+	return &Manager{
 		backend:           backend,
 		workflowExecutors: make(map[string]WorkflowExecutor),
 		taskExecutors:     make(map[string]registeredExecutor),
@@ -393,7 +393,7 @@ func NewManager(backend backend.Driver) (*WorkflowManager, error) {
 // RegisterWorkflowExecutor registers a WorkflowExecutor to execute workflows
 // of type workflowName. This is not safe to call concurrently and should be
 // done from only one thread of the process. This must be called before Start.
-func (m *WorkflowManager) RegisterWorkflowExecutor(workflowName string,
+func (m *Manager) RegisterWorkflowExecutor(workflowName string,
 	workflowExecutor WorkflowExecutor) error {
 	m.workflowExecutors[workflowName] = workflowExecutor
 	return nil
@@ -403,7 +403,7 @@ func (m *WorkflowManager) RegisterWorkflowExecutor(workflowName string,
 type TaskExecutorOpts struct {
 	// Timeout is how long to wait before canceling a running task.
 	Timeout time.Duration
-	// Workers specifies the max concurrently executing tasks the WorkflowManager
+	// Workers specifies the max concurrently executing tasks the Manager
 	// will launch for the registered TaskExecutor.
 	Workers int
 }
@@ -416,7 +416,7 @@ type registeredExecutor struct {
 // RegisterTaskExecutor registers a TaskExecutor to execute tasks of type taskName.
 // This is not safe to call concurrently and should be done from only one thread
 // of the process. This must be called before Start.
-func (m *WorkflowManager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
+func (m *Manager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
 	m.taskExecutors[taskName] = registeredExecutor{
 		executor: executor,
 		opts:     opts,
@@ -424,9 +424,9 @@ func (m *WorkflowManager) RegisterTaskExecutor(taskName string, executor TaskExe
 	return nil
 }
 
-// Start starts the WorkflowManager. No workflows, tasks, or schedules will be
+// Start starts the Manager. No workflows, tasks, or schedules will be
 // processed before Start is called. This should only be called once.
-func (m *WorkflowManager) Start(ctx context.Context) error {
+func (m *Manager) Start(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	m.cancel = cancel
 	m.startTaskExecutors(ctx)
@@ -435,7 +435,7 @@ func (m *WorkflowManager) Start(ctx context.Context) error {
 	return nil
 }
 
-func (m *WorkflowManager) Stop() error {
+func (m *Manager) Stop() error {
 	m.cancel()
 	m.wg.Wait()
 	return nil
@@ -444,7 +444,7 @@ func (m *WorkflowManager) Stop() error {
 // CreateWorkflowSchedule creates a recurring workflow based on the recurrence
 // rule provided. The first run will happen during when the recurrence is first
 // due from Now.
-func (m *WorkflowManager) CreateWorkflowSchedule(
+func (m *Manager) CreateWorkflowSchedule(
 	instanceName string,
 	workflowName string,
 	parameters interface{},
@@ -500,7 +500,7 @@ func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
 
 // UpdateWorkflowScheduleByName updates the scheduled workflow identified by
 // (instanceName, workflowName).
-func (m *WorkflowManager) UpdateWorkflowScheduleByName(ctx context.Context,
+func (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
 	instanceName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error {
 
 	o := backend.WorkflowScheduleUpdateOpts{}
@@ -514,7 +514,7 @@ func (m *WorkflowManager) UpdateWorkflowScheduleByName(ctx context.Context,
 }
 
 // ListWorkflowSchedules list all the scheduled workflows.
-func (m *WorkflowManager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
+func (m *Manager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
 	backendScheds, err := m.backend.ListWorkflowSchedules(ctx)
 	if err != nil {
 		return nil, err
@@ -528,7 +528,7 @@ func (m *WorkflowManager) ListWorkflowSchedules(ctx context.Context) ([]*Schedul
 
 // GetScheduledWorkflowParameters returns the parameters that the scheduled workflow
 // identified by (instanceName, workflowName) will be started with.
-func (m *WorkflowManager) GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string, out interface{}) error {
+func (m *Manager) GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string, out interface{}) error {
 	data, err := m.backend.GetScheduledWorkflowParameters(ctx, instanceName, workflowName)
 	if err != nil {
 		return errors.Wrap(err, "could not retrieve parameters for workflow")
@@ -543,7 +543,7 @@ func (m *WorkflowManager) GetScheduledWorkflowParameters(ctx context.Context, in
 
 // GetScheduledWorkflowRecurrence returns the recurrence rule for the scheduled workflow
 // identified by (instanceName, workflowName)
-func (m *WorkflowManager) GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (*rrule.RRule, error) {
+func (m *Manager) GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (*rrule.RRule, error) {
 	ruleStr, err := m.backend.GetScheduledWorkflowRecurrence(ctx, instanceName, workflowName)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not retrieve parameters for workflow")
@@ -556,7 +556,7 @@ func (m *WorkflowManager) GetScheduledWorkflowRecurrence(ctx context.Context, in
 	return rrule.StrToRRule(ruleStr)
 }
 
-func (m *WorkflowManager) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (ImmutableWorkflowInstance, error) {
+func (m *Manager) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (ImmutableWorkflowInstance, error) {
 	workflowInstance, err := m.backend.GetWorkflowInstanceByName(ctx, instanceName, workflowName)
 	if err != nil {
 		return nil, err
@@ -569,7 +569,7 @@ func (m *WorkflowManager) GetWorkflowInstanceByName(ctx context.Context, instanc
 
 // EnqueueWorkflow enqueues a workflow of type workflowName. Only one instance of
 // (workflowName, instanceName) can be running at a time.
-func (m *WorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName string,
+func (m *Manager) EnqueueWorkflow(ctx context.Context, workflowName string,
 	instanceName string, parameters interface{}) error {
 	paramsData, err := jsonify(parameters)
 	if err != nil {
@@ -583,7 +583,7 @@ func (m *WorkflowManager) EnqueueWorkflow(ctx context.Context, workflowName stri
 	return err
 }
 
-func (m *WorkflowManager) startTaskExecutors(ctx context.Context) {
+func (m *Manager) startTaskExecutors(ctx context.Context) {
 	for taskName, exec := range m.taskExecutors {
 		workerCount := exec.opts.Workers
 		if workerCount == 0 {
@@ -598,7 +598,7 @@ func (m *WorkflowManager) startTaskExecutors(ctx context.Context) {
 
 // TODO(ssd) 2019-05-10: Why does Task need the WorkflowInstanceID?
 // TODO(jaym): should this be private?
-func (m *WorkflowManager) RunTaskExecutor(ctx context.Context, taskName string, workerID int, timeout time.Duration, exec TaskExecutor) {
+func (m *Manager) RunTaskExecutor(ctx context.Context, taskName string, workerID int, timeout time.Duration, exec TaskExecutor) {
 	workerName := fmt.Sprintf("%s/%d", taskName, workerID)
 	logrus.Infof("starting task executor %s", workerName)
 
@@ -658,7 +658,7 @@ LOOP:
 	m.wg.Done()
 }
 
-func (m *WorkflowManager) runWorkflowExecutor(ctx context.Context) {
+func (m *Manager) runWorkflowExecutor(ctx context.Context) {
 	workflowNames := make([]string, 0, len(m.workflowExecutors))
 	for k := range m.workflowExecutors {
 		workflowNames = append(workflowNames, k)
@@ -681,7 +681,7 @@ LOOP:
 	m.wg.Done()
 }
 
-func (m *WorkflowManager) processWorkflow(ctx context.Context, workflowNames []string) bool {
+func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) bool {
 	m.wg.Add(1)
 	defer m.wg.Done()
 

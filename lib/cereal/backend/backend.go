@@ -12,7 +12,7 @@ type Driver interface {
 	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 
 	CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
-	GetDueRecurringWorkflow(ctx context.Context) (*Schedule, RecurringWorkflowCompleter, error)
+	GetDueScheduledWorkflow(ctx context.Context) (*Schedule, ScheduledWorkflowCompleter, error)
 	GetNextScheduledWorkflow(ctx context.Context) (*Schedule, error)
 	UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts WorkflowScheduleUpdateOpts) error
 	UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
@@ -108,8 +108,8 @@ type WorkflowCompleter interface {
 	Close() error
 }
 
-type RecurringWorkflowCompleter interface {
-	EnqueueRecurringWorkflow(s *Schedule) error
+type ScheduledWorkflowCompleter interface {
+	EnqueueScheduledWorkflow(s *Schedule) error
 	Close()
 }
 

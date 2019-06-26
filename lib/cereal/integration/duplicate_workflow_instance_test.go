@@ -7,12 +7,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/cereal"
 )
 
 // TestEnqueueDuplicateWorkflowInstance tries the enqueue the same workflow
 // instance twice. The first one must be accepted, the second one must fail
-func (suite *WorkflowTestSuite) TestEnqueueDuplicateWorkflowInstance() {
+func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
 	taskName := randName("duplicate_test")
 	workflowName := randName("duplicate_test")
 	instanceName := randName("instance")
@@ -29,19 +29,19 @@ func (suite *WorkflowTestSuite) TestEnqueueDuplicateWorkflowInstance() {
 	m := suite.newManager(
 		WithTaskExecutorF(
 			taskName,
-			func(context.Context, workflow.Task) (interface{}, error) {
+			func(context.Context, cereal.Task) (interface{}, error) {
 				wgBarrier.Wait()
 				return nil, nil
 			}),
 		WithWorkflowExecutor(
 			workflowName,
 			&workflowExecutorWrapper{
-				onStart: func(w workflow.WorkflowInstance, ev workflow.StartEvent) workflow.Decision {
+				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 					err := w.EnqueueTask(taskName, nil)
 					suite.Require().NoError(err, "failed to enqueue task")
 					return w.Continue(nil)
 				},
-				onTaskComplete: func(w workflow.WorkflowInstance, ev workflow.TaskCompleteEvent) workflow.Decision {
+				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
 					wgTask.Done()
 					return w.Complete()
 				},
@@ -52,7 +52,7 @@ func (suite *WorkflowTestSuite) TestEnqueueDuplicateWorkflowInstance() {
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	err = m.EnqueueWorkflow(context.Background(), workflowName, instanceName, "dummy")
-	suite.Assert().Equal(workflow.ErrWorkflowInstanceExists, err)
+	suite.Assert().Equal(cereal.ErrWorkflowInstanceExists, err)
 	wgBarrier.Done()
 	wgTask.Wait()
 	time.Sleep(20 * time.Millisecond)

@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/cereal"
 )
 
 // TestCountToNWorkflow launches 2 workflow instances that do
@@ -15,7 +15,7 @@ import (
 // makes sure you can have multiple workflows with the same
 // workflow name but different workflow instance names.
 // Also tests the handling of workflow parameters
-func (suite *WorkflowTestSuite) TestCountToNWorkflow() {
+func (suite *CerealTestSuite) TestCountToNWorkflow() {
 	taskName := randName("count1")
 	workflowName := randName("countN")
 	instance100Name := "instance100"
@@ -29,7 +29,7 @@ func (suite *WorkflowTestSuite) TestCountToNWorkflow() {
 	m := suite.newManager(
 		WithTaskExecutorF(
 			taskName,
-			func(ctx context.Context, task workflow.Task) (interface{}, error) {
+			func(ctx context.Context, task cereal.Task) (interface{}, error) {
 				var toAdd int
 				suite.Require().NoError(task.GetParameters(&toAdd))
 				return toAdd, nil
@@ -37,7 +37,7 @@ func (suite *WorkflowTestSuite) TestCountToNWorkflow() {
 		WithWorkflowExecutor(
 			workflowName,
 			&workflowExecutorWrapper{
-				onStart: func(w workflow.WorkflowInstance, ev workflow.StartEvent) workflow.Decision {
+				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 					var countTo int
 					suite.Require().NoError(w.GetParameters(&countTo))
 
@@ -48,7 +48,7 @@ func (suite *WorkflowTestSuite) TestCountToNWorkflow() {
 
 					return w.Continue(0)
 				},
-				onTaskComplete: func(w workflow.WorkflowInstance, ev workflow.TaskCompleteEvent) workflow.Decision {
+				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
 					var countTo int
 					var currentCount int
 					var taskResult int
@@ -64,7 +64,7 @@ func (suite *WorkflowTestSuite) TestCountToNWorkflow() {
 							instance10Count = currentCount
 						}
 						wgWorkflow.Done()
-						return w.Complete(workflow.WithResult(currentCount))
+						return w.Complete(cereal.WithResult(currentCount))
 					}
 					return w.Continue(currentCount)
 				},
