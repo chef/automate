@@ -630,7 +630,7 @@ describe File.basename(__FILE__) do
     )
     assert_equal(["M$", "test-auto-job-creation"], nodes_list["nodes"])
 
-    # Get the nodes tagged market:market% or market:missing-in-action%:
+    # Get the nodes tagged department:market% or department:missing-in-action%:
     nodes_list = MANAGER_GRPC manager, :search_nodes, Manager::NodeQuery.new(
       node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
       query: Manager::Query.new(
@@ -639,8 +639,9 @@ describe File.basename(__FILE__) do
         ]
       )
     )
+    assert_equal(["betamaniac"], nodes_list["nodes"])
 
-    # Get the nodes NOT tagged market:market% or market:missing-in-action%:
+    # Get the nodes NOT tagged department:market% or department:missing-in-action%:
     nodes_list = MANAGER_GRPC manager, :search_nodes, Manager::NodeQuery.new(
       node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
       query: Manager::Query.new(
