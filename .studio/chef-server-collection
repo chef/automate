@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export CHEF_LICENSE="accept-no-persist"
+
 document "start_chef_server" <<DOC
   Reconfigures deployment service to enable the chef server collection. Deployment service must be running to use it.
 DOC
@@ -44,7 +46,7 @@ function bootstrap_chef_user_data() {
     return 1
   fi
 
-  hab pkg install chef/chef-dk
+  hab pkg install --channel unstable chef/chef-dk
   hab pkg binlink -f chef/chef-dk chef-client
   hab pkg binlink -f chef/chef-dk berks
 
