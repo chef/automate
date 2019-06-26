@@ -19,15 +19,31 @@ func TestStorageGetServiceFromUniqueFieldsNotExist(t *testing.T) {
 }
 
 func TestStorageGetServiceFromUniqueFieldsEmptyParameters(t *testing.T) {
+	defer suite.DeleteDataFromStorage()
+
+	suite.IngestService(
+		NewHabitatEvent(
+			withSupervisorId("1q2w3e4r"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			withStrategyAtOnce("stable"),
+			withApplication("cool-app"),
+			withEnvironment("development"),
+			withFqdn("app.example.com"),
+			withHealth("CRITICAL"),
+			withSite("us"),
+		),
+	)
+
 	svc, exist := suite.StorageClient.GetServiceFromUniqueFields("", "")
 	assert.False(t, exist)
 	assert.Nil(t, svc)
 
-	svc, exist = suite.StorageClient.GetServiceFromUniqueFields("foo", "")
+	svc, exist = suite.StorageClient.GetServiceFromUniqueFields("postgres", "")
 	assert.False(t, exist)
 	assert.Nil(t, svc)
 
-	svc, exist = suite.StorageClient.GetServiceFromUniqueFields("", "123")
+	svc, exist = suite.StorageClient.GetServiceFromUniqueFields("", "1q2w3e4r")
 	assert.False(t, exist)
 	assert.Nil(t, svc)
 }
