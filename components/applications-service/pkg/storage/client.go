@@ -10,7 +10,7 @@ import (
 type Client interface {
 	// @param (event)
 	IngestHealthCheckEvent(*habitat.HealthCheckEvent) error
-	// @param (name, memeber_id)
+	// @param (name, member_id)
 	GetServiceFromUniqueFields(string, string) (*Service, bool)
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServices(string, bool, int32, int32, map[string][]string) ([]*Service, error)
