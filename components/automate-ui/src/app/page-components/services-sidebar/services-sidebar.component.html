@@ -1,6 +1,9 @@
-<chef-alert type="error" *ngIf="(servicesStatus$ | async) === 'loadingFailure'">
+<chef-notification
+  *ngIf="(servicesStatus$ | async) === 'loadingFailure'"
+  [type]="'error'"
+  [timeout]="10">
   {{ (servicesError$ | async).status }}: {{ (servicesError$ | async).error.message }}
-</chef-alert>
+</chef-notification>
 <div id="services-panel" class="services-panel">
   <chef-page-header>
     <chef-heading>
