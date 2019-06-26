@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { remove } from 'lodash';
 import { StatsService } from './stats.service';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
 interface ReportingSummary {
   stats: {
@@ -39,7 +40,8 @@ export class ReportDataService {
   };
 
   constructor(
-    private statsService: StatsService
+    private statsService: StatsService,
+    private telemetryService: TelemetryService
   ) {}
 
   getReportingSummary(filters) {
@@ -47,6 +49,12 @@ export class ReportDataService {
       .subscribe(data => {
         this.reportingSummaryEmpty = this.isAllZeros(data.stats);
         this.reportingSummary = data;
+        // Data will give us nodes, platforms, profiles and environments
+        // We will also report filters so that we know when these counts are constrained.
+        if (data !== null) {
+          var summaryStats = data.stats
+          this.telemetryService.track("complianceCountsWithFilters", {summaryStats, filters})
+        }
       });
   }
 

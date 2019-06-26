@@ -6,7 +6,11 @@ import { CookieModule } from 'ngx-cookie';
 import { ReportingNodesComponent } from './reporting-nodes.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
+class MockTelemetryService {
+  track() { }
+}
 describe('ReportingNodesComponent', () => {
   let fixture: ComponentFixture<ReportingNodesComponent>;
   let component: ReportingNodesComponent;
@@ -23,6 +27,7 @@ describe('ReportingNodesComponent', () => {
         ReportingNodesComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         ChefSessionService,
         StatsService,
         ReportQueryService,

@@ -15,7 +15,11 @@ import {
   ReportQueryService,
   ReportDataService
 } from '../shared/reporting';
+import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 
+class MockTelemetryService {
+  track() { }
+}
 describe('ReportingComponent', () => {
   let fixture: ComponentFixture<ReportingComponent>,
     component: ReportingComponent,
@@ -36,6 +40,7 @@ describe('ReportingComponent', () => {
         ReportingComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         ChefSessionService,
         StatsService,
         SuggestionsService,

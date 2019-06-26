@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Subject, Observable, combineLatest } from 'rxjs';
+import { distinctUntilChanged, distinctUntilKeyChanged } from 'rxjs/operators';
 import { Chicklet, NodeCount, RollupState, SortDirection } from '../../types/types';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
@@ -314,6 +315,20 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
 
     this.loadedStatus$ = this.store.select(clientRunsLoading);
 
+      // We want to report total nodes to telemetry, but only when there are no
+    // filters. This way we can see how many nodes a customer has connected to
+    // automate in total.
+    combineLatest(
+      this.nodeCounts$.pipe(distinctUntilKeyChanged('total')),
+      this.numberOfSearchBarFilters$.pipe(distinctUntilChanged())
+    )
+    .pipe(takeUntil(this.isDestroyed))
+    .subscribe(([nodeCounts, filterCount]) => {
+      if (filterCount === 0 && nodeCounts.total > 0){
+        this.telemetryService.track('clientRunPureCount', nodeCounts);
+      }
+    });
+
     this.authorizedChecker = new AuthorizedChecker(this.store);
     this.authorizedChecker.setPermissions([
       {
@@ -323,6 +338,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       }
     ], []);
   }
+
 
   hideNotification() {
     this.notificationVisible = false;
