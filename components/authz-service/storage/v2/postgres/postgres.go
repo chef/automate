@@ -1234,8 +1234,10 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 	}
 
 	_, err = tx.ExecContext(ctx,
-		`LOCK TABLE iam_project_rules; LOCK TABLE iam_rule_conditions;
-			LOCK TABLE iam_staged_project_rules; LOCK TABLE iam_staged_rule_conditions; `,
+		`LOCK TABLE iam_project_rules;
+			LOCK TABLE iam_rule_conditions;
+			LOCK TABLE iam_staged_project_rules;
+			LOCK TABLE iam_staged_rule_conditions; `,
 	)
 	if err != nil {
 		return p.processError(err)
@@ -1281,10 +1283,11 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 
 		_, err = tx.ExecContext(ctx,
 			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator)
-					SELECT $2, cond.value, cond.attribute, cond.operator FROM iam_staged_project_rules AS r
+					SELECT $2, cond.value, cond.attribute, cond.operator
+						FROM iam_staged_project_rules AS r
 					LEFT OUTER JOIN iam_staged_rule_conditions AS cond
-					ON rule_db_id=r.db_id
-					WHERE r.id=$1;`,
+						ON rule_db_id=r.db_id
+						WHERE r.id=$1;`,
 			id, dbID,
 		)
 		if err != nil {
@@ -1293,11 +1296,8 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 	}
 
 	_, err = tx.ExecContext(ctx,
-		`DELETE FROM iam_project_rules WHERE id IN(
-			SELECT a.id FROM iam_project_rules AS a
-			LEFT OUTER JOIN iam_staged_project_rules AS s
-			ON s.id=a.id
-			WHERE s.deleted)`)
+		`DELETE FROM iam_project_rules
+				WHERE id IN (SELECT id FROM iam_staged_project_rules WHERE deleted)`)
 	if err != nil {
 		return p.processError(err)
 	}

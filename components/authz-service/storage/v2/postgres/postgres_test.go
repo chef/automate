@@ -6730,6 +6730,9 @@ func TestMigrationStatusProvider(t *testing.T) {
 	defer store.Close()
 	ctx := context.Background()
 
+	_, err := db.Exec(`DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
+	require.NoError(t, err)
+
 	cases := map[string]func(*testing.T){
 		"when nothing was ever stored, returns pristine": func(t *testing.T) {
 			ms, err := store.MigrationStatus(ctx)
@@ -6837,6 +6840,8 @@ func TestMigrationStatusProvider(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, test)
 		db.Flush(t)
+		_, err := db.Exec(`DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
+		require.NoError(t, err)
 	}
 }
 

@@ -30,12 +30,12 @@ import (
 	event "github.com/chef/automate/components/event-service/server"
 )
 
-// state the server state for projects
-type state struct {
+// ProjectState the server state for projects
+type ProjectState struct {
 	log                  logger.Logger
 	store                storage.Storage
 	engine               engine.ProjectRulesRetriever
-	projectUpdateManager *ProjectUpdateManager
+	ProjectUpdateManager *ProjectUpdateManager
 	policyRefresher      PolicyRefresher
 	applyRuleMux         sync.Mutex
 }
@@ -82,16 +82,16 @@ func NewProjectsServer(
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
-	return &state{
+	return &ProjectState{
 		log:                  l,
 		store:                s,
 		engine:               e,
-		projectUpdateManager: NewProjectUpdateManager(eventServiceClient, configManager),
+		ProjectUpdateManager: NewProjectUpdateManager(eventServiceClient, configManager),
 		policyRefresher:      pr,
 	}, nil
 }
 
-func (s *state) GetProject(ctx context.Context,
+func (s *ProjectState) GetProject(ctx context.Context,
 	req *api.GetProjectReq) (*api.GetProjectResp, error) {
 	p, err := s.store.GetProject(ctx, req.Id)
 	if err != nil {
@@ -110,7 +110,7 @@ func (s *state) GetProject(ctx context.Context,
 	return &api.GetProjectResp{Project: apiProject}, nil
 }
 
-func (s *state) CreateProject(ctx context.Context,
+func (s *ProjectState) CreateProject(ctx context.Context,
 	req *api.CreateProjectReq) (*api.CreateProjectResp, error) {
 	p, err := storage.NewProject(req.Id, req.Name, storage.Custom)
 	if err != nil {
@@ -137,7 +137,7 @@ func (s *state) CreateProject(ctx context.Context,
 	return &api.CreateProjectResp{Project: apiProject}, nil
 }
 
-func (s *state) UpdateProject(ctx context.Context,
+func (s *ProjectState) UpdateProject(ctx context.Context,
 	req *api.UpdateProjectReq) (*api.UpdateProjectResp, error) {
 	p, err := storage.NewProject(req.Id, req.Name, storage.Custom)
 	if err != nil {
@@ -163,7 +163,7 @@ func (s *state) UpdateProject(ctx context.Context,
 	return &api.UpdateProjectResp{Project: apiProject}, nil
 }
 
-func (s *state) ApplyRulesStart(
+func (s *ProjectState) ApplyRulesStart(
 	ctx context.Context, _ *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
 	// NOTE (tc): Only one call to ApplyRulesStart can happen at a time.
 	// This should be good enough to prevent race conditions for single node,
@@ -173,7 +173,7 @@ func (s *state) ApplyRulesStart(
 	s.applyRuleMux.Lock()
 	defer s.applyRuleMux.Unlock()
 
-	switch s.projectUpdateManager.State() {
+	switch s.ProjectUpdateManager.State() {
 	case config.NotRunningState:
 		break
 	case config.RunningState:
@@ -201,7 +201,7 @@ func (s *state) ApplyRulesStart(
 			"error refreshing policy cache. the rules were updated but the apply was not started, please try again.")
 	}
 
-	err = s.projectUpdateManager.Start()
+	err = s.ProjectUpdateManager.Start()
 	if err != nil {
 		s.log.Warnf("error starting project update: %s", err.Error())
 		return nil, status.Errorf(codes.Internal,
@@ -211,33 +211,33 @@ func (s *state) ApplyRulesStart(
 	return &api.ApplyRulesStartResp{}, nil
 }
 
-func (s *state) ApplyRulesCancel(
+func (s *ProjectState) ApplyRulesCancel(
 	context.Context, *api.ApplyRulesCancelReq) (*api.ApplyRulesCancelResp, error) {
 	s.log.Info("apply project rules: CANCEL")
-	err := s.projectUpdateManager.Cancel()
+	err := s.ProjectUpdateManager.Cancel()
 	if err != nil {
 		s.log.Errorf("Could not cancel project update: %v", err.Error())
 	}
 	return &api.ApplyRulesCancelResp{}, nil
 }
 
-func (s *state) ApplyRulesStatus(
+func (s *ProjectState) ApplyRulesStatus(
 	context.Context, *api.ApplyRulesStatusReq) (*api.ApplyRulesStatusResp, error) {
-	time, err := ptypes.TimestampProto(s.projectUpdateManager.EstimatedTimeComplete())
+	time, err := ptypes.TimestampProto(s.ProjectUpdateManager.EstimatedTimeComplete())
 	if err != nil {
 		s.log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
 	return &api.ApplyRulesStatusResp{
-		State:                 s.projectUpdateManager.State(),
-		PercentageComplete:    float32(s.projectUpdateManager.PercentageComplete()),
+		State:                 s.ProjectUpdateManager.State(),
+		PercentageComplete:    float32(s.ProjectUpdateManager.PercentageComplete()),
 		EstimatedTimeComplete: time,
-		Failed:                s.projectUpdateManager.Failed(),
-		FailureMessage:        s.projectUpdateManager.FailureMessage(),
+		Failed:                s.ProjectUpdateManager.Failed(),
+		FailureMessage:        s.ProjectUpdateManager.FailureMessage(),
 	}, nil
 }
 
-func (s *state) ListProjects(
+func (s *ProjectState) ListProjects(
 	ctx context.Context, _ *api.ListProjectsReq) (*api.ListProjectsResp, error) {
 	ps, err := s.store.ListProjects(ctx)
 	if err != nil {
@@ -265,7 +265,7 @@ func (s *state) ListProjects(
 	return &resp, nil
 }
 
-func (s *state) ListProjectsForIntrospection(
+func (s *ProjectState) ListProjectsForIntrospection(
 	ctx context.Context, req *api.ListProjectsReq) (*api.ListProjectsResp, error) {
 
 	// Introspection needs unfiltered access.
@@ -297,7 +297,7 @@ func (s *state) ListProjectsForIntrospection(
 	return &resp, nil
 }
 
-func (s *state) DeleteProject(ctx context.Context,
+func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
 	err := s.store.DeleteProject(ctx, req.Id)
 	switch err {
@@ -311,7 +311,7 @@ func (s *state) DeleteProject(ctx context.Context,
 	}
 }
 
-func (s *state) ListRulesForAllProjects(ctx context.Context,
+func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
 	req *api.ListRulesForAllProjectsReq) (*api.ListRulesForAllProjectsResp, error) {
 
 	ruleMap, err := s.engine.ListProjectMappings(ctx)
@@ -339,18 +339,18 @@ func (s *state) ListRulesForAllProjects(ctx context.Context,
 	}, nil
 }
 
-func (s *state) HandleEvent(ctx context.Context,
+func (s *ProjectState) HandleEvent(ctx context.Context,
 	req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
 	s.log.Debugf("authz is handling your event %s", req.EventID)
 
 	response := &automate_event.EventResponse{}
 	if req.Type.Name == event.ProjectRulesUpdateStatus {
-		err := s.projectUpdateManager.ProcessStatusEvent(req)
+		err := s.ProjectUpdateManager.ProcessStatusEvent(req)
 		if err != nil {
 			return response, err
 		}
 	} else if req.Type.Name == event.ProjectRulesUpdateFailed {
-		err := s.projectUpdateManager.ProcessFailEvent(req)
+		err := s.ProjectUpdateManager.ProcessFailEvent(req)
 		if err != nil {
 			return response, err
 		}
@@ -359,7 +359,7 @@ func (s *state) HandleEvent(ctx context.Context,
 	return response, nil
 }
 
-func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.CreateRuleResp, error) {
+func (s *ProjectState) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.CreateRuleResp, error) {
 	r, err := s.prepareStorageRule(req.Id, req.ProjectId, req.Name, req.Type, req.Conditions)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "error processing request: %s", err.Error())
@@ -382,7 +382,7 @@ func (s *state) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.Cr
 	return &api.CreateRuleResp{Rule: apiRule}, nil
 }
 
-func (s *state) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (*api.UpdateRuleResp, error) {
+func (s *ProjectState) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (*api.UpdateRuleResp, error) {
 	r, err := s.prepareStorageRule(req.Id, req.ProjectId, req.Name, req.Type, req.Conditions)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "error processing request: %s", err.Error())
@@ -409,7 +409,7 @@ func (s *state) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (*api.Up
 	return &api.UpdateRuleResp{Rule: apiRule}, nil
 }
 
-func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
+func (s *ProjectState) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
 	resp, err := s.store.GetStagedOrAppliedRule(ctx, req.Id)
 	if err != nil {
 		if err == storage_errors.ErrNotFound {
@@ -430,14 +430,14 @@ func (s *state) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleR
 	return &api.GetRuleResp{Rule: apiRule}, nil
 }
 
-func (s *state) ListRules(ctx context.Context, req *api.ListRulesReq) (*api.ListRulesResp, error) {
+func (s *ProjectState) ListRules(ctx context.Context, req *api.ListRulesReq) (*api.ListRulesResp, error) {
 	if req.IncludeStaged {
 		return s.listRulesWithFunction(ctx, req, s.store.ListStagedAndAppliedRules)
 	}
 	return s.listRulesWithFunction(ctx, req, s.store.ListRules)
 }
 
-func (s *state) listRulesWithFunction(ctx context.Context, req *api.ListRulesReq, list func(context.Context) ([]*storage.Rule, error)) (*api.ListRulesResp, error) {
+func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListRulesReq, list func(context.Context) ([]*storage.Rule, error)) (*api.ListRulesResp, error) {
 	resp, err := list(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
@@ -456,7 +456,7 @@ func (s *state) listRulesWithFunction(ctx context.Context, req *api.ListRulesReq
 	return &api.ListRulesResp{Rules: rules}, nil
 }
 
-func (s *state) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
+func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
 	resp, err := s.store.ListRulesForProject(ctx, req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
@@ -475,7 +475,7 @@ func (s *state) ListRulesForProject(ctx context.Context, req *api.ListRulesForPr
 	return &api.ListRulesForProjectResp{Rules: rules}, nil
 }
 
-func (s *state) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
+func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
 	err := s.store.DeleteRule(ctx, req.Id)
 	switch err {
 	case nil:
@@ -659,7 +659,7 @@ func fromAPIType(t api.ProjectRuleTypes) (storage.RuleType, error) {
 	}
 }
 
-func (s *state) prepareStorageRule(inID, projectID, name string,
+func (s *ProjectState) prepareStorageRule(inID, projectID, name string,
 	inType api.ProjectRuleTypes, inConditions []*api.Condition) (*storage.Rule, error) {
 
 	ruleType, err := fromAPIType(inType)

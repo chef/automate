@@ -22,7 +22,8 @@ const (
 )
 
 func TestCreateRuleProperties(t *testing.T) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	testFW := testhelpers.NewTestFramework(t, ctx)
 	cl := testFW.Projects
 	testDB := testFW.TestDB
