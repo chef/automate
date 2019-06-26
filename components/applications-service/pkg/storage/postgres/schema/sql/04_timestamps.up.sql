@@ -1,3 +1,7 @@
+-- Add last_event_occurred_at column to service table, this will be the timestamp of last
+-- event received from habitat, the actual timestamp is sent from the habitat supervisor
+ALTER TABLE service       ADD COLUMN last_event_occurred_at TIMESTAMP NOT NULL DEFAULT NOW();
+
 -- Add created_at column to all tables in database
 ALTER TABLE deployment    ADD COLUMN created_at TIMESTAMP NOT NULL DEFAULT NOW();
 ALTER TABLE service_group ADD COLUMN created_at TIMESTAMP NOT NULL DEFAULT NOW();

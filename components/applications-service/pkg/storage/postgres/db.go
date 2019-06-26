@@ -89,20 +89,21 @@ func (db *Postgres) initDB() error {
 
 // service struct is the representation of the service table inside the db
 type service struct {
-	ID           int32     `db:"id"`
-	Origin       string    `db:"origin"`
-	Name         string    `db:"name"`
-	Version      string    `db:"version"`
-	Release      string    `db:"release"`
-	Status       string    `db:"status"`
-	Health       string    `db:"health"`
-	GroupID      int32     `db:"group_id"`
-	DeploymentID int32     `db:"deployment_id"`
-	SupID        int32     `db:"sup_id"`
-	Channel      string    `db:"channel"`
-	FullPkgIdent string    `db:"package_ident"`
-	CreatedAt    time.Time `db:"-"`
-	UpdatedAt    time.Time `db:"-"`
+	ID                  int32     `db:"id"`
+	Origin              string    `db:"origin"`
+	Name                string    `db:"name"`
+	Version             string    `db:"version"`
+	Release             string    `db:"release"`
+	Status              string    `db:"status"`
+	Health              string    `db:"health"`
+	GroupID             int32     `db:"group_id"`
+	DeploymentID        int32     `db:"deployment_id"`
+	SupID               int32     `db:"sup_id"`
+	Channel             string    `db:"channel"`
+	FullPkgIdent        string    `db:"package_ident"`
+	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
+	CreatedAt           time.Time `db:"-"`
+	UpdatedAt           time.Time `db:"-"`
 }
 
 // supervisor struct is the representation of the supervisor table inside the db

@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	"github.com/chef/automate/lib/tls/certs"
+	"github.com/golang/protobuf/ptypes"
 )
 
 var usageStr = `
@@ -85,7 +86,9 @@ func main() {
 		// applications-publisher binary to have multiple commands/sub-commands to send
 		// and do multiple things/messages
 		event = habitat.HealthCheckEvent{
-			EventMetadata:   &habitat.EventMetadata{},
+			EventMetadata: &habitat.EventMetadata{
+				OccurredAt: ptypes.TimestampNow(),
+			},
 			ServiceMetadata: &habitat.ServiceMetadata{},
 		}
 	)

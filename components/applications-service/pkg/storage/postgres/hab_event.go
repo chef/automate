@@ -6,12 +6,14 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/external/habitat"
-	dblib "github.com/chef/automate/lib/db"
 	"github.com/go-gorp/gorp"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 
+	dblib "github.com/chef/automate/lib/db"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -132,6 +134,7 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	// - Package ident (without name. the name of a service can't be changed!)
 	// - Update strategy
 	// - Health, Application, Environment, Site and Fqdn
+	// - Timestamp of last event received (occurred_at)
 	if exist {
 		// Update Health
 		// @afiune all our backend was designed for the health check to be all
@@ -152,6 +155,9 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 			svc.Channel = ""
 		}
 
+		// Update the timestamp of the last event received
+		svc.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
+
 		if _, err := db.DbMap.Update(svc); err != nil {
 			return errors.Wrap(err, "unable to update service")
 		}
@@ -165,6 +171,15 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 		pkgIdent,
 		strings.ToUpper(event.GetResult().String()),
 	)
+}
+
+func convertOrCreateTimestamp(t *timestamp.Timestamp) time.Time {
+	goTime, err := ptypes.Timestamp(t)
+	if err != nil {
+		log.WithError(err).Error("malformed protobuf timestamp, using time now")
+		return time.Now()
+	}
+	return goTime
 }
 
 // insertNewServiceFromHealthCheckEvent assumes the service to be inserted doesn't exist already,
@@ -221,7 +236,19 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 		}
 
 		// 4) Service
-		svc := newService(pkgIdent, health, did, sid, gid)
+		svc := &service{
+			Origin:              pkgIdent.Origin,
+			Name:                pkgIdent.Name,
+			Version:             pkgIdent.Version,
+			Release:             pkgIdent.Release,
+			Health:              health,
+			GroupID:             gid,
+			DeploymentID:        did,
+			SupID:               sid,
+			FullPkgIdent:        pkgIdent.FullPackageIdent(),
+			LastEventOccurredAt: convertOrCreateTimestamp(eventMetadata.GetOccurredAt()),
+		}
+
 		if svcMetadata.GetUpdateConfig() != nil {
 			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
 		}
@@ -233,20 +260,6 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 		return nil
 	})
 
-}
-
-func newService(pkgIdent *packageIdent, health string, did, sid, gid int32) *service {
-	return &service{
-		Origin:       pkgIdent.Origin,
-		Name:         pkgIdent.Name,
-		Version:      pkgIdent.Version,
-		Release:      pkgIdent.Release,
-		Health:       health,
-		GroupID:      gid,
-		DeploymentID: did,
-		SupID:        sid,
-		FullPkgIdent: pkgIdent.FullPackageIdent(),
-	}
 }
 
 const selectDeploymentID = `
