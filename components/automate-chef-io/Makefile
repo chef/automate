@@ -10,6 +10,8 @@ themes/chef:
 clean:
 	rm -rf site/themes/chef
 	rm -f $(SWAGGER_RESULT_FILE)
+	rm -rf themes/
+	rm -rf public/
 
 sync: themes/chef
 	pushd themes/chef && git fetch && git reset --hard origin/master && popd
@@ -53,3 +55,6 @@ serve: sync generate_swagger
 
 lint: themes/chef
 	hugo -D
+
+build: themes/chef generate_swagger
+	hugo
