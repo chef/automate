@@ -9,6 +9,8 @@ if [[ "$CI" != "true" ]]; then
     echo "WARNING: This script is intended to run in buildkite.  It will likely fail outside of buildkite."
 fi
 
+HAB_LICENSE="accept-no-persist"
+
 sudo hab pkg install core/ruby
 export PATH=$PATH:$(hab pkg path core/ruby)/bin
 sudo $(hab pkg path core/ruby)/bin/gem install toml
