@@ -1,15 +1,16 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
-	"net"
-
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"net"
 
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/config"
+	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-feed-service/pkg/server"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -40,7 +41,15 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		return err
 	}
 
-	grpcServer := NewGRPCServer(connFactory, c, esClient)
+	feedStore := persistence.NewFeedStore(esClient)
+
+	err = feedStore.InitializeStore(context.Background())
+	if err != nil {
+		log.WithError(err).Error("Failed initializing elasticsearch")
+		return err
+	}
+
+	grpcServer := NewGRPCServer(connFactory, c, feedStore)
 	return grpcServer.Serve(conn)
 }
 
@@ -48,10 +57,10 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 // * event feed
 // * health
 func NewGRPCServer(connFactory *secureconn.Factory, c *config.EventFeed,
-	esClient *elastic.Client) *grpc.Server {
+	feedStore persistence.FeedStore) *grpc.Server {
 	grpcServer := connFactory.NewServer()
 
-	eventFeedServer := server.New(esClient)
+	eventFeedServer := server.New(feedStore)
 
 	event_feed.RegisterEventFeedServiceServer(grpcServer, eventFeedServer)
 
