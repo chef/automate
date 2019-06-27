@@ -452,6 +452,12 @@ func runGatherLogsLocalCmd(outfileOverride string, logLines uint64) error {
 	g.AddCopiesFromPath("config", "/hab/svc")
 	g.AddCopiesFromPath("logs", "/hab/svc")
 
+	// A2-chef-server-related files
+	g.AddCopiesFromPath("etc", "/hab/svc/automate-cs-bookshelf")
+	g.AddCopiesFromPath("etc", "/hab/svc/automate-cs-nginx")
+	g.AddCopiesFromPath("etc", "/hab/svc/automate-cs-oc-bifrost")
+	g.AddCopiesFromPath("etc", "/hab/svc/automate-cs-oc-erchef")
+
 	// local status
 	g.AddCommand("df_h", "df", "-h")
 	g.AddCommand("df_i", "df", "-i")
