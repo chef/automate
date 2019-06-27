@@ -217,6 +217,7 @@ steps:
     expeditor:
       executor:
         docker:
+          privileged: true
 
   - label: "[unit] automate-gateway"
     command:
