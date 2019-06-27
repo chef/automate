@@ -31,12 +31,18 @@ func setupCmd() *cobra.Command {
 	}
 }
 
+var deployCmdOpts struct {
+	bootstrapBundlePath string
+}
+
 func deployCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "deploy-service",
+	cmd := &cobra.Command{
+		Use:   "deploy-service cfgPath manifestPath",
 		Short: "Configure and start deployment-service",
 		Run:   runDeploy,
 	}
+	cmd.PersistentFlags().StringVar(&deployCmdOpts.bootstrapBundlePath, "bootstrap-bundle-path", "", "path to bootstrap bundle")
+	return cmd
 }
 
 // This is the same path that systemd will use for our service at startup
@@ -63,7 +69,7 @@ func runDeploy(cmd *cobra.Command, args []string) {
 	setupEnvironment()
 
 	target := target.NewLocalTarget(airgap.AirgapInUse())
-	err := target.DeployDeploymentService(context.TODO(), conf, manifest, writer)
+	err := target.DeployDeploymentService(context.TODO(), conf, manifest, deployCmdOpts.bootstrapBundlePath, writer)
 	if err != nil {
 		writer.FailWrap(err, "setup failed")
 		os.Exit(1)

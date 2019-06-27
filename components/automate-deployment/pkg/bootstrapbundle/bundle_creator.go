@@ -1,4 +1,4 @@
-package bootstrap
+package bootstrapbundle
 
 import (
 	"archive/tar"
@@ -21,25 +21,25 @@ const habSvcDir = "/hab/svc"
 var ErrNoFiles = errors.New("No files to bundle")
 var ErrMalformedBundle = errors.New("Malformed install bundle file")
 
-type BundleCreatorOpt func(*BundleCreator)
+type CreatorOpt func(*Creator)
 
-func WithBundleCreatorRootDir(rootDir string) BundleCreatorOpt {
-	return func(b *BundleCreator) {
+func WithRootDir(rootDir string) CreatorOpt {
+	return func(b *Creator) {
 		if rootDir != "" {
 			b.rootDir = rootDir
 		}
 	}
 }
 
-// BundleCreator creates installation bundles
-type BundleCreator struct {
+// Creator creates and unpacks bootstrap bundles
+type Creator struct {
 	rootDir       string
 	allowedUsers  []string
 	allowedGroups []string
 }
 
-func NewBundleCreator(opts ...BundleCreatorOpt) *BundleCreator {
-	b := &BundleCreator{
+func NewCreator(opts ...CreatorOpt) *Creator {
+	b := &Creator{
 		rootDir:       habSvcDir,
 		allowedUsers:  []string{"root", "hab"},
 		allowedGroups: []string{"root", "hab"},
@@ -50,7 +50,7 @@ func NewBundleCreator(opts ...BundleCreatorOpt) *BundleCreator {
 	return b
 }
 
-func (b *BundleCreator) writeFile(tarReader *tar.Reader, hdr *tar.Header) error {
+func (b *Creator) writeFile(tarReader *tar.Reader, hdr *tar.Header) error {
 	absPath := path.Join(b.rootDir, hdr.Name)
 	err := fileutils.AtomicWrite(
 		absPath,
@@ -65,7 +65,7 @@ func (b *BundleCreator) writeFile(tarReader *tar.Reader, hdr *tar.Header) error 
 	return nil
 }
 
-func (b *BundleCreator) mkdir(tarReader *tar.Reader, hdr *tar.Header) error {
+func (b *Creator) mkdir(tarReader *tar.Reader, hdr *tar.Header) error {
 	absPath := path.Join(b.rootDir, hdr.Name)
 	// TODO (jaym): make atomic?
 	// This is not MkdirAll because we don't want to create the root directory.
@@ -84,7 +84,7 @@ func (b *BundleCreator) mkdir(tarReader *tar.Reader, hdr *tar.Header) error {
 	return nil
 }
 
-func (b *BundleCreator) readHeader(in io.Reader) error {
+func (b *Creator) readHeader(in io.Reader) error {
 	header := make([]byte, len(magicHeader))
 	if _, err := io.ReadFull(in, header); err != nil {
 		return errors.Wrap(err, "failed to read bootstrap bundle header")
@@ -97,7 +97,7 @@ func (b *BundleCreator) readHeader(in io.Reader) error {
 	return nil
 }
 
-func (b *BundleCreator) Unpack(in io.Reader) error {
+func (b *Creator) Unpack(in io.Reader) error {
 	if err := b.readHeader(in); err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func (b *BundleCreator) Unpack(in io.Reader) error {
 	return nil
 }
 
-func (b *BundleCreator) Create(pkgMetadatas []*product.PackageMetadata, out io.Writer) error {
+func (b *Creator) Create(pkgMetadatas []*product.PackageMetadata, out io.Writer) error {
 	allDirsSet := make(map[string]*tar.Header)
 	allDirs := []*tar.Header{}
 	files := make(map[string]*tar.Header)
@@ -236,7 +236,7 @@ func (b *BundleCreator) Create(pkgMetadatas []*product.PackageMetadata, out io.W
 	return tarWriter.Close()
 }
 
-func (b *BundleCreator) copyFile(tarWriter *tar.Writer, fpath string) error {
+func (b *Creator) copyFile(tarWriter *tar.Writer, fpath string) error {
 	absPath := path.Join(b.rootDir, fpath)
 	f, err := os.Open(absPath)
 	if err != nil {
@@ -249,7 +249,7 @@ func (b *BundleCreator) copyFile(tarWriter *tar.Writer, fpath string) error {
 	return nil
 }
 
-func (b *BundleCreator) headerForFile(relPath string) (*tar.Header, error) {
+func (b *Creator) headerForFile(relPath string) (*tar.Header, error) {
 	absPath := path.Join(b.rootDir, relPath)
 	fileInfo, err := os.Stat(absPath)
 	if err != nil {
@@ -282,7 +282,7 @@ func (b *BundleCreator) headerForFile(relPath string) (*tar.Header, error) {
 	return nil, errors.New("unsupported file type")
 }
 
-func (b *BundleCreator) headersForDirectory(dname string) ([]*tar.Header, error) {
+func (b *Creator) headersForDirectory(dname string) ([]*tar.Header, error) {
 	headers := []*tar.Header{}
 	parts := strings.Split(dname, "/")
 	for i := range parts {

@@ -24,6 +24,7 @@ import (
 
 	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/bootstrapbundle"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/components/automate-deployment/pkg/depot"
 	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
@@ -244,7 +245,7 @@ func (t *LocalTarget) LoadDeploymentService(ctx context.Context, svc habpkg.Vers
 	return t.LoadService(ctx, svc)
 }
 
-func (t *LocalTarget) DeployDeploymentService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.BodyWriter) error {
+func (t *LocalTarget) DeployDeploymentService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, bootstrapBundlePath string, writer cli.BodyWriter) error {
 	pkg := manifest.InstallableFromManifest(m, "deployment-service")
 	if pkg == nil {
 		return errors.New("deployment-service was not found in the manifest")
@@ -268,6 +269,22 @@ func (t *LocalTarget) DeployDeploymentService(ctx context.Context, config *dc.Co
 	}
 
 	err = t.LoadService(ctx, pkg)
+	if err != nil {
+		return err
+	}
+
+	if bootstrapBundlePath != "" {
+		writer.Body("Unpacking bootstrap bundle")
+		c := bootstrapbundle.NewCreator()
+		f, err := os.Open(bootstrapBundlePath)
+		if err != nil {
+			return errors.Wrapf(err, "failed to open bootstrap bundle %q", bootstrapBundlePath)
+		}
+		if err := c.Unpack(f); err != nil {
+			return err
+		}
+	}
+
 	return err
 }
 

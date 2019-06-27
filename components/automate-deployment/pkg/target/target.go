@@ -47,7 +47,8 @@ type Bootstrapper interface {
 	// DeployDeploymentService configures and starts the
 	// deployment-service. If this function exits without an
 	// error, the deployment-service should be loaded via Habitat.
-	DeployDeploymentService(context.Context, *dc.ConfigRequest, manifest.ReleaseManifest, cli.BodyWriter) error
+	DeployDeploymentService(ctx context.Context, cfg *dc.ConfigRequest, releaseManifest manifest.ReleaseManifest,
+		bootstrapBundlePath string, writer cli.BodyWriter) error
 	// SetHabitatEnvironment is a work-around for backwards
 	// compatibility. It should set the PATH and HAB_SUP_BINARY
 	// environment variables in the current process to ensure that

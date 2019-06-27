@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/bootstrap"
+	"github.com/chef/automate/components/automate-deployment/pkg/bootstrapbundle"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -148,8 +148,8 @@ func runBootstrapBundleCreate(cmd *cobra.Command, args []string) error {
 }
 
 func runBootstrapBundleUnpack(cmd *cobra.Command, args []string) error {
-	b := bootstrap.NewBundleCreator(
-		bootstrap.WithBundleCreatorRootDir(bootstrapBundleCmdFlags.rootDir))
+	b := bootstrapbundle.NewCreator(
+		bootstrapbundle.WithRootDir(bootstrapBundleCmdFlags.rootDir))
 	f, err := os.Open(args[0])
 	if err != nil {
 		return status.Wrapf(err, status.FileAccessError, "could not open %q", args[0])
