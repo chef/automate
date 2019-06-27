@@ -682,7 +682,7 @@ func runAllServerTests(ctx context.Context,
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
 
-		t.Run("when empty array provided in request, no users are added", func(t *testing.T) {
+		t.Run("when no user ids provided, fails with invalid arg", func(t *testing.T) {
 			req := &teams.CreateTeamReq{
 				Description: "Guard the galaxy",
 				Name:        "Guardians of the Galaxy",

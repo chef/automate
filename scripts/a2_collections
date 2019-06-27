@@ -222,8 +222,7 @@ function create_resource {
     team-members)
       # just add a 100 members to each team
       json=$(jq -n --argjson n 100 'reduce range(1; $n) as $i (.; .user_ids += ["test-user-\($i)"])')
-      resource="teams/test-teams-$id_index/users:add"
-      ;;
+      resource="teams/test-teams-$id_index/users:add" ;;
     policies)
       json=$(jo subjects="$(jo -a token:test-tokens-$id_index)" action=read resource="compliance:*")
       resource=$RESOURCE ;;

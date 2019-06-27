@@ -1040,6 +1040,19 @@ func runAllServerTests(
 
 			cleanupTeamV2(t, cl, createTeam.Team.Id)
 		})
+		t.Run("when team does not exist, returns Not Found error", func(t *testing.T) {
+			ctx := context.Background()
+
+			addReq := &teams.AddTeamMembersReq{
+				Id:      "not-found",
+				UserIds: []string{"a-user"},
+			}
+
+			resp, err := cl.AddTeamMembers(ctx, addReq)
+
+			require.Nil(t, resp)
+			grpctest.AssertCode(t, codes.NotFound, err)
+		})
 
 		t.Run("when no user ids provided, returns invalid request", func(t *testing.T) {
 			ctx := context.Background()
@@ -1052,7 +1065,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 
 			addReq := &teams.AddTeamMembersReq{
-				Id:      "not-found-id",
+				Id:      "ravenclaw",
 				UserIds: []string{},
 			}
 

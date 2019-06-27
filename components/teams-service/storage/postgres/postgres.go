@@ -313,13 +313,13 @@ func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.
 // returning an array of teamIDs for the teams that initially had the provided user
 func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uuid.UUID, error) {
 	rows, err := p.db.QueryContext(ctx,
-		`WITH moved_rows AS (
+		`WITH moved_row_ids AS (
 			DELETE FROM teams_users_associations
 				WHERE user_id=$1
 			RETURNING team_db_id
 		)
 		UPDATE teams SET updated_at=NOW()
-		WHERE db_id in (SELECT * FROM moved_rows)
+		WHERE db_id in (SELECT * FROM moved_row_ids)
 		RETURNING id;`, userID)
 
 	if err != nil {
@@ -359,7 +359,7 @@ func (p *postgres) AddUsers(ctx context.Context,
 	userIDs []string) (storage.Team, error) {
 	var t storage.Team
 	err := p.db.QueryRowContext(ctx,
-		`WITH moved_rows AS (
+		`WITH moved_row_ids AS (
 			INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
 				SELECT db_id, unnest($2::TEXT[]), now()
 				FROM teams
@@ -367,7 +367,7 @@ func (p *postgres) AddUsers(ctx context.Context,
 			RETURNING team_db_id
 		)
 		UPDATE teams SET updated_at=NOW()
-		WHERE db_id in (SELECT * FROM moved_rows)
+		WHERE db_id in (SELECT DISTINCT * FROM moved_row_ids)
 		RETURNING id, name, description, projects, created_at, updated_at;`, teamID, pq.Array(userIDs)).Scan(
 		&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
