@@ -409,37 +409,34 @@ func (suite *NodesIntegrationSuite) TestBulkAddNodesAndTagsUpdate() {
 	// Add the nodes we're going to test with
 	testNodeIDs, err = suite.Database.BulkAddNodes([]*nodes.Node{node1, node2})
 	suite.Require().NoError(err)
-	suite.Equal(2, len(testNodeIDs))
+	suite.Require().Equal(2, len(testNodeIDs))
+	suite.Require().NotEmpty(testNodeIDs[0])
+	suite.Require().NoError(err)
 
-	if len(testNodeIDs) >= 2 {
-		suite.Require().NotEmpty(testNodeIDs[0])
-		suite.Require().NoError(err)
+	testNode, err := suite.Database.GetNode(ctx, testNodeIDs[0])
+	suite.Require().NoError(err)
+	suite.Equal([]*common.Kv{{Key: "bleep", Value: "bloop"}}, testNode.Tags)
 
-		testNode, err := suite.Database.GetNode(ctx, testNodeIDs[0])
-		suite.Require().NoError(err)
-		suite.Equal([]*common.Kv{{Key: "bleep", Value: "bloop"}}, testNode.Tags)
+	testNode, err = suite.Database.GetNode(ctx, testNodeIDs[1])
+	suite.Require().NoError(err)
+	suite.Equal([]*common.Kv{{Key: "bada", Value: "bing"}, {Key: "bleep", Value: "bloop"}}, testNode.Tags)
 
-		testNode, err = suite.Database.GetNode(ctx, testNodeIDs[1])
-		suite.Require().NoError(err)
-		suite.Equal([]*common.Kv{{Key: "bada", Value: "bing"}, {Key: "bleep", Value: "bloop"}}, testNode.Tags)
+	// Update the tags on node one
+	err = suite.Database.UpdateNode(&nodes.Node{Id: testNodeIDs[0], Name: "Bulky One - Updated",
+		Tags: []*common.Kv{{Key: "bleep", Value: "new"}}})
+	suite.Require().NoError(err)
 
-		// Update the tags on node one
-		err = suite.Database.UpdateNode(&nodes.Node{Id: testNodeIDs[0], Name: "Bulky One - Updated",
-			Tags: []*common.Kv{{Key: "bleep", Value: "new"}}})
-		suite.Require().NoError(err)
+	// Name and Tags on one should be updated.
+	testNode, err = suite.Database.GetNode(ctx, testNodeIDs[0])
+	suite.Require().NoError(err)
+	suite.Equal("Bulky One - Updated", testNode.Name)
+	suite.Equal([]*common.Kv{{Key: "bleep", Value: "new"}}, testNode.Tags)
 
-		// Name and Tags on one should be updated.
-		testNode, err = suite.Database.GetNode(ctx, testNodeIDs[0])
-		suite.Require().NoError(err)
-		suite.Equal("Bulky One - Updated", testNode.Name)
-		suite.Equal([]*common.Kv{{Key: "bleep", Value: "new"}}, testNode.Tags)
-
-		// Name and Tags on second node should be the same.
-		testNode, err = suite.Database.GetNode(ctx, testNodeIDs[1])
-		suite.Require().NoError(err)
-		suite.Equal("Bulky Two", testNode.Name)
-		suite.Equal([]*common.Kv{{Key: "bada", Value: "bing"}, {Key: "bleep", Value: "bloop"}}, testNode.Tags)
-	}
+	// Name and Tags on second node should be the same.
+	testNode, err = suite.Database.GetNode(ctx, testNodeIDs[1])
+	suite.Require().NoError(err)
+	suite.Equal("Bulky Two", testNode.Name)
+	suite.Equal([]*common.Kv{{Key: "bada", Value: "bing"}, {Key: "bleep", Value: "bloop"}}, testNode.Tags)
 }
 
 var nowTime = ptypes.TimestampNow()
