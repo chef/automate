@@ -105,6 +105,8 @@ func convertHealthStatusToProto(healthStatus string) applications.HealthStatus {
 		return applications.HealthStatus_WARNING
 	case storage.Ok:
 		return applications.HealthStatus_OK
+	case storage.None:
+		return applications.HealthStatus_NONE
 	default:
 		// default to unknown, which will catch unexpected values
 		return applications.HealthStatus_UNKNOWN
@@ -236,14 +238,14 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			SupervisorId:        svc.SupMemberID,
 			Release:             svc.FullReleaseString(),
 			Group:               svc.Group,
-			HealthCheck:         applications.HealthStatus(applications.HealthStatus_value[svc.Health]),
+			HealthCheck:         convertHealthStatusToProto(svc.Health),
 			Status:              applications.ServiceStatus(applications.ServiceStatus_value[svc.Status]),
 			Application:         svc.Application,
 			Environment:         svc.Environment,
 			Fqdn:                svc.Fqdn,
 			Channel:             svc.Channel,
 			Site:                svc.Site,
-			PreviousHealthCheck: applications.HealthStatus(applications.HealthStatus_value[svc.PreviousHealth]),
+			PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
 		}
 	}
 	return services

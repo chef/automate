@@ -31,6 +31,7 @@ const (
 	Warning  = "WARNING"
 	Unknown  = "UNKNOWN"
 	Ok       = "OK"
+	None     = "NONE"
 )
 
 type Service struct {
