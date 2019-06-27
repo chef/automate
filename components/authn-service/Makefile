@@ -50,12 +50,10 @@ mock:
 # seemingly mysterious ways. Since the overall test run still does not take too
 # long, this seems acceptable.
 test:
-	@go test -i $(packages)
 	@go test $(verbose) -p 1 $(packages) -cover
 
 test_with_db:
 	@docker ps | grep authn-postgres || (echo "Docker postgres not up. Run 'make setup_docker_pg' and try this command again."; exit 1)
-	go test -i $(packages)
 	@PG_URL="postgresql://postgres@127.0.0.1:5432/authn_test?sslmode=disable&timezone=UTC" go test -cover -count=1 -parallel=1 -p 1 $(packages)
 	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
 
