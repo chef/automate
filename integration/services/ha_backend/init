@@ -64,13 +64,6 @@ ha_backend_setup() {
     #Use the CSR to generate the signed admin Certificate:
     openssl x509 -req -in $certdir/odfe-admin.csr -CA $certdir/MyRootCA.pem -CAkey $certdir/MyRootCA.key -CAcreateserial -out $certdir/odfe-admin.pem -sha256
 
-    local openssl_cnf
-    openssl_cnf="$(hab pkg path core/openssl)/ssl/openssl.cnf"
-    if [ ! -f "$openssl_cnf" ]; then
-        echo "Could not find default openssl config at $openssl_cnf"
-        return 1
-    fi
-
     docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container1}:/setup.sh"
     docker cp "$HA_BACKEND_DIR/setup.sh" "${ha_backend_container2}:/setup.sh"
     docker cp "$certdir" "${ha_backend_container1}:/certificates"
