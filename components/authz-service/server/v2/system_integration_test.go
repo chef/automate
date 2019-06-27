@@ -26,6 +26,7 @@ func TestIntegrationSystemPolicies(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	ts := setupWithOPAV2p1(t)
+	defer ts.Shutdown(t, ctx)
 	cl := ts.Authz
 
 	isAuthorized := func(subject, action, resource string) func(*testing.T) {
@@ -58,20 +59,19 @@ func TestIntegrationSystemPolicies(t *testing.T) {
 		t.Run(desc, test)
 		ts.TestDB.Flush(t)
 	}
-
-	ts.Shutdown(t, ctx)
 }
 
 func TestIntegrationFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	ts := setupWithOPAV2p1(t)
+	defer ts.Shutdown(t, ctx)
+
 	cases := []struct {
 		desc string
 		f    func(*testing.T)
 	}{
 		{"user should only get projects they have non-system level access to", func(t *testing.T) {
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
-			ts := setupWithOPAV2p1(t)
-
 			_, err := ts.Projects.CreateProject(ctx, &api_v2.CreateProjectReq{
 				Id:   "project-1",
 				Name: "name1",
@@ -104,8 +104,6 @@ func TestIntegrationFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.ElementsMatch(t, []string{"project-1"}, resp.Projects)
-
-			ts.Shutdown(t, ctx)
 		}},
 	}
 
@@ -148,25 +146,23 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 		desc string
 		f    func(*testing.T)
 	}{
-		{"if no rules rules exist, returns nothing is put in the cache", func(t *testing.T) {
+		{"when no rules exist, returns an empty list", func(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			ts := setupWithOPAV2p1(t)
-
+			defer ts.Shutdown(t, ctx)
 			resp, err := ts.Projects.ApplyRulesStart(ctx, &api_v2.ApplyRulesStartReq{})
 			assert.Equal(t, &api_v2.ApplyRulesStartResp{}, resp)
 			assert.NoError(t, err)
 			rules, err := ts.Engine.ListProjectMappings(ctx)
 			assert.NoError(t, err)
 			assert.Equal(t, 0, len(rules))
-
-			ts.Shutdown(t, ctx)
 		}},
-		{"if no rules exist, insert some, apply them, then return the complete rule map", func(t *testing.T) {
+		{"when applied rules exist, returns a rule map with all applied rules", func(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			ts := setupWithOPAV2p1(t)
-
+			defer ts.Shutdown(t, ctx)
 			id1, id2, id3 := "rule-number-1", "rule-number-2", "rule-number-3"
 			pid1, pid2 := "foo-project", "bar-project"
 			name := "you don't talk about fight club"
@@ -234,14 +230,13 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 			require.True(t, ok)
 			rulesEqual(t, expectedRules1, actualPid1Rules.Rules)
 			rulesEqual(t, expectedRules2, actualPid2Rules.Rules)
-
-			ts.Shutdown(t, ctx)
 		}},
-		{"when some rules exist, update and modify them, re-apply and list the updated rules from the cache", func(t *testing.T) {
+		{"when some rule updates are applied, returns updated rule map", func(t *testing.T) {
+
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			ts := setupWithOPAV2p1(t)
-
+			defer ts.Shutdown(t, ctx)
 			id1, id2, id3 := "rule-number-1", "rule-number-2", "rule-number-3"
 			pid1, pid2 := "foo-project", "bar-project"
 			name := "you don't talk about fight club"
@@ -373,7 +368,7 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 					Status:     "applied",
 				},
 			}
-			eexpectedAfterApplyRules2 := []*api_v2.ProjectRule{createResp3.Rule}
+			expectedAfterApplyRules2 := []*api_v2.ProjectRule{createResp3.Rule}
 
 			resp2, err := ts.Projects.ListRulesForAllProjects(ctx, &api_v2.ListRulesForAllProjectsReq{})
 			require.NoError(t, err)
@@ -382,9 +377,7 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 			actualAfterApplyPid2Rules, ok := resp2.ProjectRules[pid2]
 			require.True(t, ok)
 			rulesEqual(t, expectedAfterApplyRules1, actualAfterApplyPid1Rules.Rules)
-			rulesEqual(t, eexpectedAfterApplyRules2, actualAfterApplyPid2Rules.Rules)
-
-			ts.Shutdown(t, ctx)
+			rulesEqual(t, expectedAfterApplyRules2, actualAfterApplyPid2Rules.Rules)
 		}},
 	}
 
@@ -404,8 +397,12 @@ func rulesEqual(t *testing.T, expected, actual []*api_v2.ProjectRule) {
 		fmt.Printf("expected len %d != actual len %d", len(expected), len(actual))
 	}
 
-	for i, expectedRule := range expected {
-		actualRule := actual[i]
+	expectedMap := make(map[string]*api_v2.ProjectRule, len(expected))
+	for _, expectedRule := range expected {
+		expectedMap[expectedRule.Id] = expectedRule
+	}
+	for _, actualRule := range actual {
+		expectedRule := expectedMap[actualRule.Id]
 		assert.Equal(t, expectedRule.Id, actualRule.Id)
 		assert.Equal(t, expectedRule.ProjectId, actualRule.ProjectId)
 		assert.Equal(t, expectedRule.Type, actualRule.Type)

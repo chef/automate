@@ -181,7 +181,7 @@ func (s *ProjectState) ApplyRulesStart(
 			"cannot apply rules: apply already in progress")
 	default:
 		return nil, status.Error(codes.Internal,
-			"failed to parse apply state")
+			"failed to parse state of rule apply")
 	}
 
 	err := s.store.ApplyStagedRules(ctx)
@@ -196,16 +196,16 @@ func (s *ProjectState) ApplyRulesStart(
 	// We will be refactoring with workflow to make this safer soon.
 	err = s.policyRefresher.Refresh(ctx)
 	if err != nil {
-		s.log.Warnf("error refreshing policy cache: %s", err.Error())
+		s.log.Warnf("error refreshing policy cache. the rules were updated but the apply was not started, please try again.")
 		return nil, status.Errorf(codes.Internal,
-			"error refreshing policy cache. the rules were updated but the apply was not started, please try again.")
+			"error refreshing policy cache: %s", err.Error())
 	}
 
 	err = s.ProjectUpdateManager.Start()
 	if err != nil {
-		s.log.Warnf("error starting project update: %s", err.Error())
+		s.log.Warnf("error starting project update. the rules and cache were updated but the apply was not started, please try again.")
 		return nil, status.Errorf(codes.Internal,
-			"error starting project update. the rules and cache were updated but the apply was not started, please try again.")
+			"error starting project update: %s", err.Error())
 	}
 
 	return &api.ApplyRulesStartResp{}, nil
