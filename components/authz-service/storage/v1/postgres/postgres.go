@@ -128,7 +128,9 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*storage.Policy, error) {
 
 		storagePolicies = append(storagePolicies, toStoragePolicy(pol))
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return storagePolicies, nil
 }
 
@@ -154,7 +156,9 @@ func (p *pg) ListPoliciesWithSubjects(ctx context.Context) ([]*storage.Policy, e
 
 		storagePolicies = append(storagePolicies, toStoragePolicy(pol))
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return storagePolicies, nil
 }
 
@@ -203,7 +207,9 @@ func (p *pg) PurgeSubjectFromPolicies(ctx context.Context, sub string) ([]uuid.U
 
 		polIDs = append(polIDs, id)
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return polIDs, nil
 }
 

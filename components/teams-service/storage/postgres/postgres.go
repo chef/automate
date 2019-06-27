@@ -237,7 +237,9 @@ func (p *postgres) GetTeams(ctx context.Context) ([]storage.Team, error) {
 		}
 		teams = append(teams, team)
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return teams, nil
 }
 
@@ -335,19 +337,21 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 	for rows.Next() {
 		var teamID uuid.UUID
 		if err := rows.Scan(&teamID); err != nil {
-			return nil, err // TODO
+			return nil, p.processError(err)
 		}
 		teamsIDsUpdated = append(teamsIDsUpdated, teamID)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
+
 	// touch affected teams
 	for _, teamID := range teamsIDsUpdated {
-		_, err := p.touchTeam(ctx, tx, teamID)
-		if err != nil {
+		if _, err := p.touchTeam(ctx, tx, teamID); err != nil {
 			return nil, p.processError(err)
 		}
 	}
-	err = tx.Commit()
-	if err != nil {
+	if err := tx.Commit(); err != nil {
 		return nil, p.processError(err)
 	}
 
@@ -459,7 +463,9 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 		}
 		teams = append(teams, t)
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return teams, nil
 }
 

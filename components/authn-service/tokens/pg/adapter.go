@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/lib/pq"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -192,6 +193,9 @@ func (a *adapter) GetTokens(ctx context.Context) ([]*tokens.Token, error) {
 			return nil, err
 		}
 		ts = append(ts, &t)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
 	}
 	return ts, nil
 }

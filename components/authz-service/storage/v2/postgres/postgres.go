@@ -148,11 +148,10 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*v2.Policy, error) {
 
 	var pols []*v2.Policy
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT query_policies from query_policies($1);`, pq.Array(projectsFilter))
+		"SELECT query_policies from query_policies($1)", pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
 	}
-
 	defer func() {
 		if err := rows.Close(); err != nil {
 			p.logger.Warnf("failed to close db rows: %s", err.Error())
@@ -161,13 +160,14 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*v2.Policy, error) {
 
 	for rows.Next() {
 		var pol v2.Policy
-		err = rows.Scan(&pol)
-		if err != nil {
+		if err := rows.Scan(&pol); err != nil {
 			return nil, p.processError(err)
 		}
 		pols = append(pols, &pol)
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return pols, nil
 }
 
@@ -227,8 +227,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 
 	// Project filtering handled in here. We'll return a 404 right away if we can't find
 	// the policy via ID as filtered by projects.
-	_, err = p.queryPolicy(ctx, pol.ID, tx)
-	if err != nil {
+	if _, err = p.queryPolicy(ctx, pol.ID, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
@@ -237,73 +236,50 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	// policy row to preserve that record / id.
 	//
 	// This will cascade delete all related statements.
-	_, err = tx.ExecContext(ctx,
-		`DELETE FROM iam_policy_statements WHERE policy_id=$1;`,
+	if _, err := tx.ExecContext(ctx,
+		"DELETE FROM iam_policy_statements WHERE policy_id=$1",
 		pol.ID,
-	)
-	if err != nil {
-		err = p.processError(err)
-		switch err {
-		// Ignore not found errors here since a policy doesn't have to have statements.
-		case storage_errors.ErrNotFound: // continue
-		default:
+	); err != nil {
+		if err := p.processError(err); err != storage_errors.ErrNotFound {
 			return nil, err
 		}
 	}
 
-	rows, err := tx.QueryContext(ctx,
-		`UPDATE iam_policies SET (name, type) =
-			($2, $3) WHERE id = $1 RETURNING id;`,
+	res, err := tx.ExecContext(ctx,
+		"UPDATE iam_policies SET (name, type) = ($2, $3) WHERE id = $1 RETURNING id",
 		pol.ID, pol.Name, pol.Type.String(),
 	)
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
-	// Close is idempotent so no worries if it gets called twice.
-	defer func() {
-		if err := rows.Close(); err != nil {
-			p.logger.Warnf("failed to close db rows: %s", err.Error())
-		}
-	}()
-
-	if !rows.Next() {
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return nil, p.processError(err)
+	}
+	if affected == 0 {
 		return nil, storage_errors.ErrNotFound
 	}
 
-	// Must close all rows of a transaction before opening new rows below.
-	// Otherwise, you get a super unhelpful error from pq like:
-	// pq: unexpected Parse response 'C'
-	err = rows.Close()
-	if err != nil {
-		p.logger.Warnf("failed to close db rows: %s", err.Error())
-		return nil, p.processError(err)
-	}
-
 	// Update policy's projects
-	err = p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, tx)
-	if err != nil {
+	if err := p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
 	// Also replace any existing policy members and update with new members.
-	err = p.replacePolicyMembersWithQuerier(ctx, pol.ID, pol.Members, tx)
-	if err != nil {
+	if err := p.replacePolicyMembersWithQuerier(ctx, pol.ID, pol.Members, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
-	err = p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, tx)
-	if err != nil {
+	if err := p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
-	err = p.notifyPolicyChange(ctx, tx)
-	if err != nil {
+	if err := p.notifyPolicyChange(ctx, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	if err := tx.Commit(); err != nil {
 		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
@@ -659,7 +635,7 @@ func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Queri
 	rows, err := q.QueryContext(ctx,
 		`SELECT m.id, m.name FROM iam_policy_members AS pm
 			INNER JOIN iam_members AS m ON pm.member_id=m.id
-			WHERE pm.policy_id=$1 ORDER BY m.name ASC;`, id)
+			WHERE pm.policy_id=$1 ORDER BY m.name ASC`, id)
 
 	if err != nil {
 		return nil, err
@@ -674,11 +650,13 @@ func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Queri
 	members := []v2.Member{}
 	for rows.Next() {
 		var member v2.Member
-		err = rows.Scan(&member.ID, &member.Name)
-		if err != nil {
+		if err := rows.Scan(&member.ID, &member.Name); err != nil {
 			return nil, p.processError(err)
 		}
 		members = append(members, member)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
 	}
 	return members, nil
 }
@@ -721,7 +699,7 @@ func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
 	}
 
 	var roles []*v2.Role
-	rows, err := p.db.QueryContext(ctx, `SELECT query_roles from query_roles($1);`, pq.Array(projectsFilter))
+	rows, err := p.db.QueryContext(ctx, "SELECT query_roles($1)", pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -734,13 +712,14 @@ func (p *pg) ListRoles(ctx context.Context) ([]*v2.Role, error) {
 
 	for rows.Next() {
 		var role v2.Role
-		err = rows.Scan(&role)
-		if err != nil {
+		if err := rows.Scan(&role); err != nil {
 			return nil, p.processError(err)
 		}
 		roles = append(roles, &role)
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return roles, nil
 }
 
@@ -1179,13 +1158,13 @@ func (p *pg) ListStagedAndAppliedRules(ctx context.Context) ([]*v2.Rule, error) 
 }
 
 func (p *pg) listRulesUsingFunction(ctx context.Context, query string) ([]*v2.Rule, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
 
 	var rules []*v2.Rule
 	rows, err := p.db.QueryContext(ctx, query, pq.Array(projectsFilter))
@@ -1201,13 +1180,14 @@ func (p *pg) listRulesUsingFunction(ctx context.Context, query string) ([]*v2.Ru
 
 	for rows.Next() {
 		var rule v2.Rule
-		err = rows.Scan(&rule)
-		if err != nil {
+		if err := rows.Scan(&rule); err != nil {
 			return nil, p.processError(err)
 		}
 		rules = append(rules, &rule)
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return rules, nil
 }
 
@@ -1221,7 +1201,7 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	}
 
 	var rules []*v2.Rule
-	rows, err := p.db.QueryContext(ctx, `SELECT query_rules_for_project($1, $2);`,
+	rows, err := p.db.QueryContext(ctx, "SELECT query_rules_for_project($1, $2)",
 		projectID, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
@@ -1235,13 +1215,14 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 
 	for rows.Next() {
 		var rule v2.Rule
-		err = rows.Scan(&rule)
-		if err != nil {
+		if err := rows.Scan(&rule); err != nil {
 			return nil, p.processError(err)
 		}
 		rules = append(rules, &rule)
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return rules, nil
 }
 
@@ -1360,7 +1341,7 @@ func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
 
 	// List all projects that have intersection between projects and projectsFilter,
 	// unless the projectsFilter is empty (v2.0 case).
-	rows, err := p.db.QueryContext(ctx, `SELECT query_projects($1)`, pq.Array(projectsFilter))
+	rows, err := p.db.QueryContext(ctx, "SELECT query_projects($1)", pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -1374,13 +1355,14 @@ func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
 	var projects []*v2.Project
 	for rows.Next() {
 		var project v2.Project
-		err = rows.Scan(&project)
-		if err != nil {
+		if err := rows.Scan(&project); err != nil {
 			return nil, p.processError(err)
 		}
 		projects = append(projects, &project)
 	}
-
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error retrieving result rows")
+	}
 	return projects, nil
 }
 
