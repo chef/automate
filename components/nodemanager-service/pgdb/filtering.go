@@ -38,23 +38,24 @@ func mergeFilters(mergeableFilters []*common.Filter) ([]common.Filter, error) {
 	return filters, nil
 }
 
-func handleTagFilters(tagFilters []common.Filter) ([]string, error) {
-	tagConditions := make([]string, 0)
-	for _, filter := range tagFilters {
+func tagFiltersToSQLConditions(tagFilters []common.Filter) ([]string, error) {
+	sqlTagConditions := make([]string, len(tagFilters))
+	for i, filter := range tagFilters {
 		tagKeyFilter := strings.TrimPrefix(filter.Key, "tags:")
-		newTagCondition, err := patternMatchTags(tagKeyFilter, filter.Values, "t")
+		newSqlTagCondition, err := patternMatchTags(tagKeyFilter, filter.Values, TagsTableAbbrev)
 		if err != nil {
-			return tagConditions, errors.Wrap(err, "buildWhereHavingFilter error")
+			return sqlTagConditions, errors.Wrap(err, "tagFiltersToSQLConditions error")
 		}
 		if filter.Exclude {
-			newTagCondition = fmt.Sprintf("NOT %s", newTagCondition)
+			newSqlTagCondition = fmt.Sprintf("NOT %s", newSqlTagCondition)
 		}
-		tagConditions = append(tagConditions, newTagCondition)
+		sqlTagConditions[i] = newSqlTagCondition
 	}
-	return tagConditions, nil
+	return sqlTagConditions, nil
 }
 
-// Takes a filter map (should be validated for content) and table abbreviation and returns a wherefilter
+// Takes a filter map (should be validated for content) and table abbreviation
+// and returns WHERE and HAVING SQL conditions
 func buildWhereHavingFilter(mergeableFilters []*common.Filter, tableAbbrev string, filterField map[string]string) (whereFilter string, havingFilter string, err error) {
 	if len(mergeableFilters) == 0 {
 		return "", "", nil
@@ -102,7 +103,7 @@ func buildWhereHavingFilter(mergeableFilters []*common.Filter, tableAbbrev strin
 	}
 
 	if len(tagFilters) > 0 {
-		tagConditions, err := handleTagFilters(tagFilters)
+		tagConditions, err := tagFiltersToSQLConditions(tagFilters)
 		if err != nil {
 			return "", "", errors.Wrap(err, "buildWhereHavingFilter error building tags")
 		}

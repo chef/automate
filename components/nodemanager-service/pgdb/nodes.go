@@ -24,6 +24,12 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 )
 
+const (
+	NodesTableAbbrev        = "n"
+	TagsTableAbbrev         = "t"
+	NodeManagersTableAbbrev = "nm"
+)
+
 const selectSecretIdsFromNodes = `
 SELECT secret_id
 FROM nodes_secrets
@@ -487,7 +493,7 @@ func (db *DB) GetNodes(sortField string, insortOrder nodes.Query_OrderType, page
 		return nil, nil, errors.Wrapf(err, "GetNodes error validating node filters")
 	}
 
-	whereFilter, havingFilter, err := buildWhereHavingFilter(filters, "n", nodesFilterField)
+	whereFilter, havingFilter, err := buildWhereHavingFilter(filters, NodesTableAbbrev, nodesFilterField)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "GetNodes error building where filter")
 	}
@@ -561,7 +567,7 @@ func (db *DB) DeleteNodesWithQuery(filters []*common.Filter) ([]string, error) {
 		return nil, errors.Wrapf(err, "DeleteNodesWithQuery error validating node filters")
 	}
 
-	whereFilter, havingFilter, err := buildWhereHavingFilter(filters, "n", nodesFilterField)
+	whereFilter, havingFilter, err := buildWhereHavingFilter(filters, NodesTableAbbrev, nodesFilterField)
 	if err != nil {
 		return nil, errors.Wrap(err, "DeleteNodesWithQuery error building where filter")
 	}
