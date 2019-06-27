@@ -87,8 +87,22 @@ func TestCreateRuleProperties(t *testing.T) {
 		rules []api.CreateRuleReq
 	}
 
+	createProjectAndRuleGen := gopter.CombineGens(
+		createProjectReqGen,
+		createRuleReqGen,
+	).Map(func(vals []interface{}) projectAndRuleReq {
+		p := vals[0].(api.CreateProjectReq)
+		r := vals[1].(api.CreateRuleReq)
+		r.ProjectId = p.Id
+		return projectAndRuleReq{
+			CreateProjectReq: p,
+			rules:            []api.CreateRuleReq{r},
+		}
+	})
+
 	params := gopter.DefaultTestParametersWithSeed(seed)
 	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
+	params.MinSuccessfulTests = 5
 	properties := gopter.NewProperties(params)
 
 	properties.Property("creates a staged rule", prop.ForAll(
@@ -114,14 +128,6 @@ func TestCreateRuleProperties(t *testing.T) {
 				return false
 			}
 
-			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
-
-			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
-			if err != nil {
-				t.Error(err.Error())
-				return false
-			}
-
 			// Note: we're ignoring type conversion, as asserting that would require us
 			// to replicate the mapping logic in tests.
 			// Instead, as we add ReadRule, and ListRules etc, methods, we can use this
@@ -130,22 +136,109 @@ func TestCreateRuleProperties(t *testing.T) {
 				rStaged.Rule.Id == reqs.rules[0].Id &&
 				rStaged.Rule.Name == reqs.rules[0].Name &&
 				rStaged.Rule.ProjectId == reqs.rules[0].ProjectId &&
+				rStaged.Rule.Status == "staged"
+			return result
+		},
+		createProjectAndRuleGen,
+	))
+
+	properties.Property("creates a staged rule and applies it", prop.ForAll(
+		func(reqs projectAndRuleReq) bool {
+			defer testDB.Flush(t)
+			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.CreateRule(ctx, &reqs.rules[0])
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			result := len(rStaged.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
+				rStaged.Rule.Id == reqs.rules[0].Id &&
+				rStaged.Rule.Name == reqs.rules[0].Name &&
+				rStaged.Rule.ProjectId == reqs.rules[0].ProjectId &&
 				rStaged.Rule.Status == "staged" &&
+				len(rApplied.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
+				rApplied.Rule.Id == reqs.rules[0].Id &&
+				rApplied.Rule.Name == reqs.rules[0].Name &&
+				rApplied.Rule.ProjectId == reqs.rules[0].ProjectId &&
 				rApplied.Rule.Status == "applied"
 			return result
 		},
-		gopter.CombineGens(createProjectReqGen, createRuleReqGen).Map(func(vals []interface{}) projectAndRuleReq {
-			p := vals[0].(api.CreateProjectReq)
-			r := vals[1].(api.CreateRuleReq)
-			r.ProjectId = p.Id
-			return projectAndRuleReq{
-				CreateProjectReq: p,
-				rules:            []api.CreateRuleReq{r},
-			}
-		}),
+		createProjectAndRuleGen,
 	))
 
-	properties.Property("ensures IDs are unique", prop.ForAll(
+	properties.Property("creates a staged rule, updates it, and applies it", prop.ForAll(
+		func(reqs projectAndRuleReq) bool {
+			defer testDB.Flush(t)
+			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.CreateRule(ctx, &reqs.rules[0])
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			rUpdated, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:         reqs.rules[0].Id,
+				ProjectId:  reqs.rules[0].ProjectId,
+				Name:       reqs.rules[0].Name + " updated",
+				Type:       reqs.rules[0].Type,
+				Conditions: reqs.rules[0].Conditions,
+			})
+
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+			result := rStaged.Rule.Status == "staged" &&
+				len(rUpdated.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
+				rUpdated.Rule.Id == reqs.rules[0].Id &&
+				rUpdated.Rule.Name == reqs.rules[0].Name+" updated" &&
+				rUpdated.Rule.ProjectId == reqs.rules[0].ProjectId &&
+				//rUpdated.Rule.Status == "staged" &&  <-- not true; do we care?
+				len(rApplied.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
+				rApplied.Rule.Id == reqs.rules[0].Id &&
+				rApplied.Rule.Name == reqs.rules[0].Name+" updated" &&
+				rApplied.Rule.ProjectId == reqs.rules[0].ProjectId &&
+				rApplied.Rule.Status == "applied"
+			return result
+		},
+		createProjectAndRuleGen,
+	))
+
+	properties.Property("ensures rule IDs are unique", prop.ForAll(
 		func(reqs projectAndRuleReq) bool {
 			defer testDB.Flush(t)
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
