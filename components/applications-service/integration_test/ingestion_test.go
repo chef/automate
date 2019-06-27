@@ -63,6 +63,8 @@ func TestIngestSigleService(t *testing.T) {
 			"the service channel name is not the expected one")
 		assert.Equal(t, "us", svcList[0].Site,
 			"the service site name is not the expected one")
+		assert.Equal(t, "", svcList[0].PreviousHealth,
+			"the previous service health is not the expected one")
 	}
 }
 
@@ -226,6 +228,8 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 			"the service channel name is not the expected one")
 		assert.Equal(t, "us", svcList[0].Site,
 			"the service site name is not the expected one")
+		assert.Equal(t, "", svcList[0].PreviousHealth,
+			"the previous service health is not the expected one")
 
 		sgList := suite.GetServiceGroups()
 		assert.Equal(t, 1, len(sgList), "wrong number of service groups")
@@ -296,6 +300,8 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 			"the service channel name is not the expected one")
 		assert.Equal(t, "us", svcList[0].Site,
 			"the service site name is not the expected one")
+		assert.Equal(t, "OK", svcList[0].PreviousHealth,
+			"the previous service health is not the expected one")
 
 		sgList := suite.GetServiceGroups()
 		assert.Equal(t, 1, len(sgList), "wrong number of service groups")
@@ -321,8 +327,10 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 	}
 
 	// 3) Extra update to verify that the update strategy is updated
+	// as well as the previous_health
 	UpdateHabitatEvent(event,
 		withoutUpdateStrategy(),
+		withHealth(HealthCheckIntToString(3)), // -> UNKNOWN
 	)
 
 	bytes, err = proto.Marshal(event)
@@ -335,5 +343,7 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 		assert.Equal(t, 1, len(svcList))
 		assert.Equal(t, "", svcList[0].Channel,
 			"the service channel name is not the expected one")
+		assert.Equal(t, "CRITICAL", svcList[0].PreviousHealth,
+			"the previous service health is not the expected one")
 	}
 }

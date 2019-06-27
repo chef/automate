@@ -137,9 +137,17 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	// - Timestamp of last event received (occurred_at)
 	if exist {
 		// Update Health
+		//
 		// @afiune all our backend was designed for the health check to be all
 		// uppercases but habitat is actually sending case sensitive strings
-		svc.Health = strings.ToUpper(event.GetResult().String())
+		newHealth := strings.ToUpper(event.GetResult().String())
+
+		// Verify if the service health changed, if so, save the current health
+		// into the previous_health and update it with the new one
+		if svc.Health != newHealth {
+			svc.PreviousHealth = svc.Health
+			svc.Health = strings.ToUpper(event.GetResult().String())
+		}
 
 		// Update Package Identifier
 		svc.Origin = pkgIdent.Origin
