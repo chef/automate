@@ -176,6 +176,7 @@ func TestCreateRuleProperties(t *testing.T) {
 				rStaged.Rule.Name == reqs.rules[0].Name &&
 				rStaged.Rule.ProjectId == reqs.rules[0].ProjectId &&
 				rStaged.Rule.Status == "staged" &&
+
 				len(rApplied.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
 				rApplied.Rule.Id == reqs.rules[0].Id &&
 				rApplied.Rule.Name == reqs.rules[0].Name &&
@@ -222,17 +223,87 @@ func TestCreateRuleProperties(t *testing.T) {
 				t.Error(err.Error())
 				return false
 			}
+
 			result := rStaged.Rule.Status == "staged" &&
+
 				len(rUpdated.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
 				rUpdated.Rule.Id == reqs.rules[0].Id &&
 				rUpdated.Rule.Name == reqs.rules[0].Name+" updated" &&
 				rUpdated.Rule.ProjectId == reqs.rules[0].ProjectId &&
-				//rUpdated.Rule.Status == "staged" &&  <-- not true; do we care?
+				//rUpdated.Rule.Status == "staged" &&  <-- TODO: not true!
+
 				len(rApplied.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
 				rApplied.Rule.Id == reqs.rules[0].Id &&
 				rApplied.Rule.Name == reqs.rules[0].Name+" updated" &&
 				rApplied.Rule.ProjectId == reqs.rules[0].ProjectId &&
 				rApplied.Rule.Status == "applied"
+			return result
+		},
+		createProjectAndRuleGen,
+	))
+
+	properties.Property("creates a staged rule, applies it, deletes it, applies deletion", prop.ForAll(
+		func(reqs projectAndRuleReq) bool {
+			defer testDB.Flush(t)
+			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.CreateRule(ctx, &reqs.rules[0])
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{
+				Id: reqs.rules[0].Id,
+			})
+
+			rStagedDeleted, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err == nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			result :=
+				len(rApplied.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
+					rApplied.Rule.Id == reqs.rules[0].Id &&
+					rApplied.Rule.Name == reqs.rules[0].Name &&
+					rApplied.Rule.ProjectId == reqs.rules[0].ProjectId &&
+					rApplied.Rule.Status == "applied" &&
+					!rApplied.Rule.Deleted &&
+
+					len(rStagedDeleted.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
+					rStagedDeleted.Rule.Id == reqs.rules[0].Id &&
+					rStagedDeleted.Rule.Name == reqs.rules[0].Name &&
+					rStagedDeleted.Rule.ProjectId == reqs.rules[0].ProjectId
+				// rStagedDeleted.Rule.Status == "staged" // TODO: wrong!
+				// rApplied.Rule.Deleted // TODO: wrong!
+
 			return result
 		},
 		createProjectAndRuleGen,
