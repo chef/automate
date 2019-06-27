@@ -312,9 +312,6 @@ func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.
 // PurgeUserMembership removes all teams_users_associations with the userID provided,
 // returning an array of teamIDs for the teams that initially had the provided user
 func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uuid.UUID, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	rows, err := p.db.QueryContext(ctx,
 		`WITH moved_rows AS (
 			DELETE FROM teams_users_associations
@@ -360,9 +357,6 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 func (p *postgres) AddUsers(ctx context.Context,
 	teamID uuid.UUID,
 	userIDs []string) (storage.Team, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	var t storage.Team
 	err := p.db.QueryRowContext(ctx,
 		`WITH moved_rows AS (
