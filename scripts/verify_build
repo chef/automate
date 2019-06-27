@@ -9,7 +9,9 @@ if [[ "$CI" != "true" ]]; then
     echo "WARNING: This script is intended to run in buildkite.  It will likely fail outside of buildkite."
 fi
 
-HAB_LICENSE="accept-no-persist"
+export HAB_NONINTERACTIVE=true
+export HAB_NOCOLORING=true
+export HAB_LICENSE="accept-no-persist"
 
 sudo -E hab pkg install core/ruby
 export PATH=$PATH:$(hab pkg path core/ruby)/bin
