@@ -436,7 +436,9 @@ func (m *Manager) Start(ctx context.Context) error {
 }
 
 func (m *Manager) Stop() error {
-	m.cancel()
+	if m.cancel != nil {
+		m.cancel()
+	}
 	m.wg.Wait()
 	return nil
 }
