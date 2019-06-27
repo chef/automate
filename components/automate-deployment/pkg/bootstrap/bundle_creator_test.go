@@ -6,6 +6,9 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
+	"strconv"
+	"syscall"
 	"testing"
 
 	"github.com/chef/automate/lib/product"
@@ -17,15 +20,35 @@ import (
 func createBundleCreator(t *testing.T) *BundleCreator {
 	t.Helper()
 
-	curUser, err := user.Current()
-	require.NoError(t, err)
-	curGroup, err := user.LookupGroupId(curUser.Gid)
-	require.NoError(t, err)
+	allowedUsers := []string{}
+	allowedGroups := []string{}
+
+	uids := make(map[uint32]bool)
+	gids := make(map[uint32]bool)
+	filepath.Walk("testdata/bootstrap-test", func(path string, info os.FileInfo, err error) error {
+		stat := info.Sys().(*syscall.Stat_t)
+
+		uids[stat.Uid] = true
+		gids[stat.Gid] = true
+		return nil
+	})
+
+	for uid := range uids {
+		u, err := user.LookupId(strconv.Itoa(int(uid)))
+		require.NoError(t, err)
+		allowedUsers = append(allowedUsers, u.Username)
+	}
+
+	for gid := range gids {
+		g, err := user.LookupGroupId(strconv.Itoa(int(gid)))
+		require.NoError(t, err)
+		allowedGroups = append(allowedUsers, g.Name)
+	}
 
 	return &BundleCreator{
 		rootDir:       "testdata/bootstrap-test",
-		allowedUsers:  []string{curUser.Username},
-		allowedGroups: []string{curGroup.Name},
+		allowedUsers:  allowedUsers,
+		allowedGroups: allowedGroups,
 	}
 }
 
