@@ -263,9 +263,11 @@ func init() {
         "OK",
         "WARNING",
         "CRITICAL",
-        "UNKNOWN"
+        "UNKNOWN",
+        "NONE"
       ],
       "default": "OK",
+      "description": "- NONE: The representation of NO health check status\nTODO @afiune how much effort would be to change\nthe OK enum to be NONE",
       "title": "The HealthStatus enum matches the habitat implementation for health-check status:\n=\u003e https://www.habitat.sh/docs/reference/#health-check"
     },
     "applicationsService": {

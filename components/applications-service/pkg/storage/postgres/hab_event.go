@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/go-gorp/gorp"
 	"github.com/golang/protobuf/ptypes"
@@ -255,6 +256,7 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 			SupID:               sid,
 			FullPkgIdent:        pkgIdent.FullPackageIdent(),
 			LastEventOccurredAt: convertOrCreateTimestamp(eventMetadata.GetOccurredAt()),
+			PreviousHealth:      applications.HealthStatus_NONE.String(),
 		}
 
 		if svcMetadata.GetUpdateConfig() != nil {

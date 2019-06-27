@@ -169,4 +169,9 @@ enum HealthStatus {
   WARNING = 1;
   CRITICAL = 2;
   UNKNOWN = 3;
+
+  // The representation of NO health check status
+  // TODO @afiune how much effort would be to change
+  // the OK enum to be NONE
+  NONE = 17;
 }

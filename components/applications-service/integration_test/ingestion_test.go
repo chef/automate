@@ -63,7 +63,7 @@ func TestIngestSigleService(t *testing.T) {
 			"the service channel name is not the expected one")
 		assert.Equal(t, "us", svcList[0].Site,
 			"the service site name is not the expected one")
-		assert.Equal(t, "", svcList[0].PreviousHealth,
+		assert.Equal(t, "NONE", svcList[0].PreviousHealth,
 			"the previous service health is not the expected one")
 	}
 }
@@ -228,7 +228,7 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 			"the service channel name is not the expected one")
 		assert.Equal(t, "us", svcList[0].Site,
 			"the service site name is not the expected one")
-		assert.Equal(t, "", svcList[0].PreviousHealth,
+		assert.Equal(t, "NONE", svcList[0].PreviousHealth,
 			"the previous service health is not the expected one")
 
 		sgList := suite.GetServiceGroups()
