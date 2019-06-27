@@ -1273,6 +1273,9 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 		}
 		ids[id] = dbID
 	}
+	if err := rows.Err(); err != nil {
+		return errors.Wrap(err, "error retrieving result rows")
+	}
 
 	for id, dbID := range ids {
 		_, err = tx.ExecContext(ctx,
