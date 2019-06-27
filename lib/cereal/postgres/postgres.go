@@ -374,21 +374,21 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByID(ctx context.Context, id in
 
 func (pg *PostgresBackend) updateWorkflowScheduleByID(tx *sql.Tx, id int64, o *backend.WorkflowScheduleUpdateOpts) error {
 	if o.UpdateEnabled {
-		_, err := tx.Exec("SELECT cereal_update_scheduled_workflow_enabled($1, $2)", id, o.Enabled)
+		_, err := tx.Exec("SELECT cereal_update_workflow_schedule_enabled($1, $2)", id, o.Enabled)
 		if err != nil {
 			return err
 		}
 	}
 
 	if o.UpdateParameters {
-		_, err := tx.Exec("SELECT cereal_update_scheduled_workflow_parameters($1, $2)", id, o.Parameters)
+		_, err := tx.Exec("SELECT cereal_update_workflow_schedule_parameters($1, $2)", id, o.Parameters)
 		if err != nil {
 			return err
 		}
 	}
 
 	if o.UpdateRecurrence {
-		_, err := tx.Exec("SELECT cereal_update_scheduled_workflow_recurrence($1, $2, $3)",
+		_, err := tx.Exec("SELECT cereal_update_workflow_schedule_recurrence($1, $2, $3)",
 			id, o.Recurrence, o.NextRunAt)
 		if err != nil {
 			return err

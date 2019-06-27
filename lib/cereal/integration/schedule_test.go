@@ -85,6 +85,64 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 	suite.NoError(err)
 }
 
+func (suite *CerealTestSuite) TestScheduleUpdates() {
+	workflowName := randName("test_schedule")
+	instanceName := randName("test_instance")
+
+	m := suite.newManager(
+		WithWorkflowExecutor(
+			workflowName,
+			&workflowExecutorWrapper{
+				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
+					return w.Continue(nil)
+				},
+				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
+					return w.Complete()
+				},
+			},
+		),
+		WithNoStart(),
+	)
+	defer m.Stop()
+
+	recurrence, err := rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.SECONDLY,
+		Interval: 10,
+	})
+	suite.Require().NoError(err)
+
+	err = m.CreateWorkflowSchedule(
+		instanceName,
+		workflowName,
+		"testparams",
+		false,
+		recurrence)
+
+	suite.Require().NoError(err, "Failed to enqueue workflow")
+
+	found := false
+	schedules, err := m.ListWorkflowSchedules(context.Background())
+	for _, s := range schedules {
+		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
+			found = true
+		}
+	}
+	suite.Require().True(found, "schedule was not found after creation")
+
+	updateRecurrence, err := rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.SECONDLY,
+		Interval: 20,
+	})
+	suite.Require().NoError(err)
+
+	err = m.UpdateWorkflowScheduleByName(context.Background(), instanceName, workflowName, cereal.UpdateRecurrence(updateRecurrence))
+	suite.Require().NoError(err, "Failed to update scheduled workflow")
+
+	newRecurrence, err := m.GetScheduledWorkflowRecurrence(context.Background(), instanceName, workflowName)
+	suite.Require().NoError(err, "Failed to update scheduled workflow")
+	suite.Assert().Equal(20, newRecurrence.OrigOptions.Interval)
+}
+
 func (suite *CerealTestSuite) TestCreateExpiredSchedule() {
 	workflowName := randName("expired_schedule")
 	instanceName := randName("instance")
