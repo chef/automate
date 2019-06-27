@@ -300,6 +300,9 @@ func init() {
         },
         "site": {
           "type": "string"
+        },
+        "previous_health_check": {
+          "$ref": "#/definitions/applicationsHealthStatus"
         }
       }
     },

@@ -98,6 +98,7 @@ message Service {
   string fqdn = 8;
   string channel = 9;
   string site = 17;
+  HealthStatus previous_health_check = 18;
 }
 
 message ServiceGroupsHealthCountsReq {}
