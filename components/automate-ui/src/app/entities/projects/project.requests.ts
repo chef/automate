@@ -41,4 +41,16 @@ export class ProjectRequests {
       `${env.auth_v2_url}/projects/${id}`,
       { name });
   }
+
+  public applyRulesStart(): Observable<any> {
+    return this.http.post<any>(`${env.auth_v2_url}/apply-rules`, '{}');
+  }
+
+  public applyRulesStop(): Observable<any> {
+    return this.http.delete<any>(`${env.auth_v2_url}/apply-rules`);
+  }
+
+  public getApplyRulesStatus(): Observable<any> {
+    return this.http.get<any>(`${env.auth_v2_url}/apply-rules`);
+  }
 }

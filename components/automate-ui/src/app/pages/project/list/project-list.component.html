@@ -18,11 +18,14 @@
         <chef-toolbar>
           <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
             <chef-button [disabled]="(sortedProjects$ | async)?.length >= MAX_PROJECTS" id="create-button" primary (click)="openCreateModal()">Create Project</chef-button>
-            <chef-button secondary [disabled]="projectsUpdating" (click)="openConfirmUpdateStartModal()">
-              <span *ngIf="!projectsUpdating">Update Projects</span>
-              <span *ngIf="projectsUpdating">Updating Projects 20%...</span>
+          </app-authorized>
+          <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'post']">
+            <chef-button secondary [disabled]="(projects.applyRulesStatus$ | async)?.state === 'running'" id="update-start-button" (click)="openConfirmUpdateStartModal()">
+              {{ applyRulesButtonText$ | async }}
             </chef-button>
-            <chef-button *ngIf="projectsUpdating" tertiary (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
+          </app-authorized>
+          <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'delete']">
+            <chef-button *ngIf="(projects.applyRulesStatus$ | async)?.state === 'running'" tertiary id="update-stop-button" (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
           </app-authorized>
         </chef-toolbar>
         <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
@@ -42,8 +45,8 @@
                   <a [routerLink]="['/settings/projects', project.id]">{{ project.name }}</a>
                 </chef-td>
                 <chef-td>{{ project.id }}</chef-td>
-                <chef-td>Edits pending</chef-td>
-                <chef-td>Needs updating</chef-td>
+                <chef-td>Applied</chef-td>
+                <chef-td>OK</chef-td>
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
                     <chef-control-menu>
@@ -95,31 +98,17 @@
       (deleteClicked)="deleteProject()">
     </app-delete-object-modal>
 
-    <chef-modal id="confirm-update-start-modal" [visible]="confirmUpdateStartModalVisible" (close)="closeConfirmUpdateStartModal()">
-      <h2 slot="title">Update Projects?</h2>
-      <div class="modal-content">
-        <p>Updating projects will apply all pending edits and move ingested resources into the correct projects. This background process can take up to <strong>12 hours</strong> to complete.</p>
-        <div class="options">
-          <chef-button primary (click)="confirmUpdateStart()">
-            Update Projects
-          </chef-button>
-          <chef-button tertiary (click)="closeConfirmUpdateStartModal()">Cancel</chef-button>
-        </div>
-      </div>
-    </chef-modal>
+    <app-confirm-apply-start-modal
+      *ngIf="confirmApplyStartModalVisible"
+      (confirm)="confirmApplyStart()"
+      (cancel)="cancelApplyStart()">
+    </app-confirm-apply-start-modal>
 
-    <chef-modal id="confirm-update-stop-modal" [visible]="confirmUpdateStopModalVisible" (close)="closeConfirmUpdateStopModal()">
-      <h2 slot="title">Stop Updating Projects?</h2>
-      <div class="modal-content">
-        <chef-progress-bar value="20" prefix-text="20% complete" suffix-text="00:00:00 until finished"></chef-progress-bar>
-        <p>Stopping the project update early <strong>cannot be undone</strong> and will leave some ingested resources in the wrong projects.</p>
-        <div class="options">
-          <chef-button primary caution (click)="confirmUpdateStop()">
-            Stop Updating Projects
-          </chef-button>
-          <chef-button tertiary (click)="closeConfirmUpdateStopModal()">Cancel</chef-button>
-        </div>
-      </div>
-    </chef-modal>
+    <app-confirm-apply-stop-modal
+      *ngIf="confirmApplyStopModalVisible"
+      [applyRulesStatus]="projects.applyRulesStatus$ | async"
+      (confirm)="confirmApplyStop()"
+      (cancel)="cancelApplyStop()">
+    </app-confirm-apply-stop-modal>
   </main>
 </div>

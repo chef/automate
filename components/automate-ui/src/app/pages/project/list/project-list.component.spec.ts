@@ -9,6 +9,7 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { ProjectService } from 'app/entities/projects/project.service';
 import { IAMType } from 'app/entities/policies/policy.model';
 import { GetProjectsSuccess } from 'app/entities/projects/project.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
@@ -19,6 +20,7 @@ describe('ProjectListComponent', () => {
   let component: ProjectListComponent;
   let fixture: ComponentFixture<ProjectListComponent>;
   let element: HTMLElement;
+  let projectService: ProjectService;
 
   beforeEach(async(() => {
 
@@ -44,7 +46,16 @@ describe('ProjectListComponent', () => {
           inputs: ['creating', 'createForm', 'visible', 'objectNoun', 'conflictErrorEvent'],
           outputs: ['close', 'deleteClicked']
         }),
-       MockComponent({ selector: 'chef-control-menu' }),
+        MockComponent({
+          selector: 'app-confirm-apply-start-modal',
+          outputs: ['confirm', 'cancel']
+        }),
+        MockComponent({
+          selector: 'app-confirm-apply-stop-modal',
+          inputs: ['applyRulesStatus'],
+          outputs: ['confirm', 'cancel']
+        }),
+        MockComponent({ selector: 'chef-control-menu' }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
@@ -69,7 +80,8 @@ describe('ProjectListComponent', () => {
         })
       ],
       providers: [
-        FeatureFlagsService
+        FeatureFlagsService,
+        ProjectService
       ]
     }).compileComponents();
   }));
@@ -94,6 +106,8 @@ describe('ProjectListComponent', () => {
         }
       ]
     }));
+
+    projectService = TestBed.get(ProjectService);
 
     jasmine.addMatchers(customMatchers);
     fixture = TestBed.createComponent(ProjectListComponent);
@@ -244,6 +258,82 @@ describe('ProjectListComponent', () => {
         expect(projects[3]).toEqual(jasmine.objectContaining({ name: 'Project3' }));
         expect(projects[4]).toEqual(jasmine.objectContaining({ name: 'Project300' }));
       });
+    });
+  });
+
+  describe('when update-start-confirmation modal emits a cancellation', () => {
+    it('hides the modal', () => {
+      component.confirmApplyStartModalVisible = true;
+      fixture.detectChanges();
+
+      component.cancelApplyStart();
+      fixture.detectChanges();
+
+      const modal = fixture.nativeElement.querySelector('app-confirm-apply-start-modal');
+      expect(modal).toBeNull();
+      expect(component.confirmApplyStartModalVisible).toEqual(false);
+    });
+  });
+
+  describe('when update-start-confirmation modal emits a confirmation', () => {
+    beforeEach(() => {
+      spyOn(projectService, 'applyRulesStart');
+      component.confirmApplyStartModalVisible = true;
+      fixture.detectChanges();
+    });
+
+    it('hides the modal', () => {
+      component.confirmApplyStart();
+      fixture.detectChanges();
+
+      const modal = fixture.nativeElement.querySelector('app-confirm-apply-start-modal');
+      expect(modal).toBeNull();
+      expect(component.confirmApplyStartModalVisible).toEqual(false);
+    });
+
+    it('has the projectService start the rule updates', () => {
+      component.confirmApplyStart();
+      fixture.detectChanges();
+
+      expect(projectService.applyRulesStart).toHaveBeenCalled();
+    });
+  });
+
+  describe('when update-stop-confirmation modal emits a cancellation', () => {
+    it('hides the modal', () => {
+      component.confirmApplyStopModalVisible = true;
+      fixture.detectChanges();
+
+      component.cancelApplyStop();
+      fixture.detectChanges();
+
+      const modal = fixture.nativeElement.querySelector('app-confirm-apply-stop-modal');
+      expect(modal).toBeNull();
+      expect(component.confirmApplyStopModalVisible).toEqual(false);
+    });
+  });
+
+  describe('when update-stop-confirmation modal emits a confirmation', () => {
+    beforeEach(() => {
+      spyOn(projectService, 'applyRulesStop');
+      component.confirmApplyStopModalVisible = true;
+      fixture.detectChanges();
+    });
+
+    it('hides the modal', () => {
+      component.confirmApplyStop();
+      fixture.detectChanges();
+
+      const modal = fixture.nativeElement.querySelector('app-confirm-apply-stop-modal');
+      expect(modal).toBeNull();
+      expect(component.confirmApplyStopModalVisible).toEqual(false);
+    });
+
+    it('has the projectService stop the rule updates', () => {
+      component.confirmApplyStop();
+      fixture.detectChanges();
+
+      expect(projectService.applyRulesStop).toHaveBeenCalled();
     });
   });
 });

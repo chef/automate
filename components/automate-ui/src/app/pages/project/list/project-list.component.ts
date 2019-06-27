@@ -8,6 +8,7 @@ import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
+import { ProjectService } from 'app/entities/projects/project.service';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
 import {
   allProjects, getAllStatus, createStatus, createError
@@ -34,18 +35,20 @@ export class ProjectListComponent implements OnInit {
   public creatingProject = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   public MAX_PROJECTS = 6;
-  public confirmUpdateStartModalVisible = false;
-  public confirmUpdateStopModalVisible = false;
-  public projectsUpdating = false;
+  public confirmApplyStartModalVisible = false;
+  public confirmApplyStopModalVisible = false;
+
+  public applyRulesButtonText$: Observable<string>;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
+    public projects: ProjectService,
     fb: FormBuilder
   ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
     this.sortedProjects$ = store.select(allProjects).pipe(
-      map((projects: Project[]) => projects.sort(
+      map((unsorted: Project[]) => unsorted.sort(
         (a, b) => {
           const opts = { numeric: true, sensitivity: 'base' };
           return a.name.localeCompare(b.name, undefined, opts)
@@ -56,6 +59,17 @@ export class ProjectListComponent implements OnInit {
     this.iamMajorVersion$ = store.select(iamMajorVersion);
     this.iamMinorVersion$ = store.select(iamMinorVersion);
 
+    this.applyRulesButtonText$ = this.projects.applyRulesStatus$.pipe(
+      map(({ state, percentageComplete }) => {
+        switch (state) {
+          case 'not_running':
+            return 'Update Projects';
+          case 'running':
+            return `Updating Projects ${Math.round(percentageComplete * 100)}%...`;
+        }
+      })
+    );
+
     this.createProjectForm = fb.group({
       name: ['', Validators.required],
       id: ['', [Validators.required, Validators.pattern(ID_PATTERN), Validators.maxLength(64)]]
@@ -64,6 +78,7 @@ export class ProjectListComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.dispatch(new GetProjects());
+    this.projects.getApplyRulesStatus();
   }
 
   public closeDeleteModal(): void {
@@ -142,28 +157,36 @@ export class ProjectListComponent implements OnInit {
   }
 
   openConfirmUpdateStartModal() {
-    this.confirmUpdateStartModalVisible = true;
+    this.confirmApplyStartModalVisible = true;
   }
 
-  closeConfirmUpdateStartModal() {
-    this.confirmUpdateStartModalVisible = false;
+  closeConfirmApplyStartModal() {
+    this.confirmApplyStartModalVisible = false;
   }
 
-  confirmUpdateStart() {
-    this.confirmUpdateStartModalVisible = false;
-    this.projectsUpdating = true;
+  confirmApplyStart() {
+    this.confirmApplyStartModalVisible = false;
+    this.projects.applyRulesStart();
+  }
+
+  cancelApplyStart() {
+    this.closeConfirmApplyStartModal();
   }
 
   openConfirmUpdateStopModal() {
-    this.confirmUpdateStopModalVisible = true;
+    this.confirmApplyStopModalVisible = true;
   }
 
-  closeConfirmUpdateStopModal() {
-    this.confirmUpdateStopModalVisible = false;
+  closeConfirmApplyStopModal() {
+    this.confirmApplyStopModalVisible = false;
   }
 
-  confirmUpdateStop() {
-    this.confirmUpdateStopModalVisible = false;
-    this.projectsUpdating = false;
+  confirmApplyStop() {
+    this.confirmApplyStopModalVisible = false;
+    this.projects.applyRulesStop();
+  }
+
+  cancelApplyStop() {
+    this.closeConfirmApplyStopModal();
   }
 }
