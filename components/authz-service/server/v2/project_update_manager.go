@@ -36,6 +36,18 @@ type update struct {
 	errc chan error
 }
 
+type ProjectUpdateMgr interface {
+	Cancel() error
+	Start() error
+	ProcessFailEvent(eventMessage *automate_event.EventMsg) error
+	ProcessStatusEvent(eventMessage *automate_event.EventMsg) error
+	Failed() bool
+	FailureMessage() string
+	PercentageComplete() float64
+	EstimatedTimeComplete() time.Time
+	State() string
+}
+
 // ProjectUpdateManager - project update manager
 type ProjectUpdateManager struct {
 	stage              config.ProjectUpdateStage

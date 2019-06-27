@@ -30,12 +30,12 @@ import (
 	event "github.com/chef/automate/components/event-service/server"
 )
 
-// ProjectState the server state for projects
-type ProjectState struct {
+// state holds the server state for projects
+type state struct {
 	log                  logger.Logger
 	store                storage.Storage
 	engine               engine.ProjectRulesRetriever
-	ProjectUpdateManager *ProjectUpdateManager
+	projectUpdateManager ProjectUpdateMgr
 	policyRefresher      PolicyRefresher
 	applyRuleMux         sync.Mutex
 }
@@ -50,7 +50,8 @@ func NewMemstoreProjectsServer(
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
-	return NewProjectsServer(ctx, l, memstore.New(), e, eventServiceClient, configManager, pr)
+	projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
+	return NewProjectsServer(ctx, l, memstore.New(), e, projectUpdateManager, pr)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
@@ -69,7 +70,8 @@ func NewPostgresProjectsServer(
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	return NewProjectsServer(ctx, l, s, e, eventServiceClient, configManager, pr)
+	projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
+	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
 }
 
 func NewProjectsServer(
@@ -77,8 +79,7 @@ func NewProjectsServer(
 	l logger.Logger,
 	s storage.Storage,
 	e engine.ProjectRulesRetriever,
-	eventServiceClient automate_event.EventServiceClient,
-	configManager *config.Manager,
+	projectUpdateManager ProjectUpdateMgr,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
@@ -86,7 +87,7 @@ func NewProjectsServer(
 		log:                  l,
 		store:                s,
 		engine:               e,
-		ProjectUpdateManager: NewProjectUpdateManager(eventServiceClient, configManager),
+		projectUpdateManager: projectUpdateManager,
 		policyRefresher:      pr,
 	}, nil
 }

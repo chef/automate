@@ -90,7 +90,8 @@ func TestCreateRuleProperties(t *testing.T) {
 	params := gopter.DefaultTestParametersWithSeed(seed)
 	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
 	properties := gopter.NewProperties(params)
-	properties.Property("creates a rule in storage", prop.ForAll(
+
+	properties.Property("creates a staged rule", prop.ForAll(
 		func(reqs projectAndRuleReq) bool {
 			defer testDB.Flush(t)
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
@@ -107,7 +108,15 @@ func TestCreateRuleProperties(t *testing.T) {
 				return false // bad run
 			}
 
-			r, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
 				t.Error(err.Error())
 				return false
@@ -117,10 +126,13 @@ func TestCreateRuleProperties(t *testing.T) {
 			// to replicate the mapping logic in tests.
 			// Instead, as we add ReadRule, and ListRules etc, methods, we can use this
 			// testing approach to write meaningful assertions.
-			return len(r.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
-				r.Rule.Id == reqs.rules[0].Id &&
-				r.Rule.Name == reqs.rules[0].Name &&
-				r.Rule.ProjectId == reqs.rules[0].ProjectId
+			result := len(rStaged.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
+				rStaged.Rule.Id == reqs.rules[0].Id &&
+				rStaged.Rule.Name == reqs.rules[0].Name &&
+				rStaged.Rule.ProjectId == reqs.rules[0].ProjectId &&
+				rStaged.Rule.Status == "staged" &&
+				rApplied.Rule.Status == "applied"
+			return result
 		},
 		gopter.CombineGens(createProjectReqGen, createRuleReqGen).Map(func(vals []interface{}) projectAndRuleReq {
 			p := vals[0].(api.CreateProjectReq)
@@ -132,6 +144,7 @@ func TestCreateRuleProperties(t *testing.T) {
 			}
 		}),
 	))
+
 	properties.Property("ensures IDs are unique", prop.ForAll(
 		func(reqs projectAndRuleReq) bool {
 			defer testDB.Flush(t)
