@@ -406,7 +406,7 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.created_at, t.updated_at
 		FROM teams t
-		LEFT JOIN teams_users_associations tu ON tu.team_db_id=team_db_id(t.id)
+		LEFT JOIN teams_users_associations tu ON tu.team_db_id=t.db_id
 		WHERE tu.user_id=$1 AND projects_match(t.projects, $2::TEXT[])
 		GROUP BY t.id, t.name, t.description, t.projects, t.created_at, t.updated_at`,
 		userID, pq.Array(projectsFilter))
