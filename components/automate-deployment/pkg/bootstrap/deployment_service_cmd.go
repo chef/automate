@@ -48,7 +48,7 @@ func (ds *DeploymentServiceCommand) CanBootstrap() bool {
 }
 
 func (ds *DeploymentServiceCommand) CanUnpackBootstrapBundle() bool {
-	return ds.HasCapability("bootstrap")
+	return ds.HasCapability("bootstrap-bundle")
 }
 
 func (ds *DeploymentServiceCommand) DeployService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, bootstrapBundlePath string) error {
