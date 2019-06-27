@@ -11,9 +11,9 @@ fi
 
 HAB_LICENSE="accept-no-persist"
 
-sudo hab pkg install core/ruby
+sudo -E hab pkg install core/ruby
 export PATH=$PATH:$(hab pkg path core/ruby)/bin
-sudo $(hab pkg path core/ruby)/bin/gem install toml
+sudo -E $(hab pkg path core/ruby)/bin/gem install toml
 
 if [[ $EUID -eq 0 ]]; then
     key_cache="/hab/cache/keys"
