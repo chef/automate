@@ -291,7 +291,7 @@ describe File.basename(__FILE__) do
     }
     assert_equal_json_sorted(expected_node2.to_json, node2.to_json)
 
-    # # Get node by id with all details
+    # Get node by id with all details
     node3 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id3)
     node3['last_contact'] = nil
     expected_node3 = {
@@ -596,6 +596,73 @@ describe File.basename(__FILE__) do
       )
     )
     assert_equal(["Donkey Kong", "M$", "test-auto-job-creation"], nodes_list["nodes"])
+
+    # Get the nodes with a department tag without passing the values array:
+    nodes_list = MANAGER_GRPC manager, :search_nodes, Manager::NodeQuery.new(
+      node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
+      query: Manager::Query.new(
+        filter_map: [
+          Common::Filter.new(key: "department"),
+        ]
+      )
+    )
+    assert_equal(["betamaniac", "Donkey Kong"], nodes_list["nodes"])
+
+    # Get the nodes with a department tag:
+    nodes_list = MANAGER_GRPC manager, :search_nodes, Manager::NodeQuery.new(
+      node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
+      query: Manager::Query.new(
+        filter_map: [
+          Common::Filter.new(key: "department", values: [""]),
+        ]
+      )
+    )
+    assert_equal(["betamaniac", "Donkey Kong"], nodes_list["nodes"])
+
+    # Get the nodes without a department tag:
+    nodes_list = MANAGER_GRPC manager, :search_nodes, Manager::NodeQuery.new(
+      node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
+      query: Manager::Query.new(
+        filter_map: [
+          Common::Filter.new(key: "department", values: [""], exclude: true),
+        ]
+      )
+    )
+    assert_equal(["M$", "test-auto-job-creation"], nodes_list["nodes"])
+
+    # Get the nodes tagged department:market% or department:missing-in-action%:
+    nodes_list = MANAGER_GRPC manager, :search_nodes, Manager::NodeQuery.new(
+      node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
+      query: Manager::Query.new(
+        filter_map: [
+          Common::Filter.new(key: "department", values: ["market", "missing-in-action"]),
+        ]
+      )
+    )
+    assert_equal(["betamaniac"], nodes_list["nodes"])
+
+    # Get the nodes NOT tagged department:market% or department:missing-in-action%:
+    nodes_list = MANAGER_GRPC manager, :search_nodes, Manager::NodeQuery.new(
+      node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
+      query: Manager::Query.new(
+        filter_map: [
+          Common::Filter.new(key: "department", values: ["market", "missing-in-action"], exclude: true),
+        ]
+      )
+    )
+    assert_equal(["Donkey Kong", "M$", "test-auto-job-creation"], nodes_list["nodes"])
+
+    # Get the nodes NOT tagged with something:else but tagged boss:Joh%
+    nodes_list = MANAGER_GRPC manager, :search_nodes, Manager::NodeQuery.new(
+      node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
+      query: Manager::Query.new(
+        filter_map: [
+          Common::Filter.new(key: "something", values: ["else"], exclude: true),
+          Common::Filter.new(key: "boss", values: ["Joh%"]),
+        ]
+      )
+    )
+    assert_equal(["betamaniac"], nodes_list["nodes"])
 
     nodes_list = MANAGER_GRPC manager, :search_nodes, Manager::NodeQuery.new(
       node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",

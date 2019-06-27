@@ -3,15 +3,16 @@ package pgdb_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/chef/automate/components/nodemanager-service/pgdb/dbtest"
-	"github.com/golang/protobuf/ptypes"
 
+	"time"
+
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -174,7 +175,7 @@ func (suite *NodesIntegrationSuite) TestGetNodesReturnsErrorWithConflictingInclu
 	}
 	_, _, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter, filter2})
 
-	message := "GetNodes error building where filter: buildWhereFilter error: Filters are not allowed to be inclusive and exclusive on the same field."
+	message := "GetNodes error building where filter: buildWhereHavingFilter error: Filters are not allowed to be inclusive and exclusive on the same field."
 	suite.EqualError(err, message)
 }
 
@@ -200,30 +201,44 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByTags() {
 }
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByMultipleTags() {
-	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate",
+		Tags: []*common.Kv{{Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
 	suite.Require().NoError(err)
 
-	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "automate", Tags: []*common.Kv{{Key: "nachos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "Nacho Node", Manager: "automate",
+		Tags: []*common.Kv{{Key: "nachos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
 	suite.Require().NoError(err)
 
-	_, err = suite.Database.AddNode(&nodes.Node{Name: "No Nacho Node", Manager: "automate", Tags: []*common.Kv{{Key: "nachos", Value: "no"}}, TargetConfig: &nodes.TargetConfig{}})
+	_, err = suite.Database.AddNode(&nodes.Node{Name: "No Nacho Node", Manager: "automate",
+		Tags: []*common.Kv{{Key: "nachos", Value: "no"}, {Key: "tacos", Value: "yes"}}, TargetConfig: &nodes.TargetConfig{}})
 	suite.Require().NoError(err)
 
+	// Testing the OR of filters with the same key
 	filter1 := &common.Filter{
+		Key:    "nachos",
+		Values: []string{"no", "yes"},
+	}
+	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1})
+	suite.Require().NoError(err)
+	suite.Require().Equal(2, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 2, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	suite.Equal("Nacho Node", fetchedNodes[0].GetName())
+	suite.Equal("No Nacho Node", fetchedNodes[1].GetName())
+
+	// Testing the AND of filters with different keys
+	filter1 = &common.Filter{
+		Key:    "nachos",
+		Values: []string{"no"},
+	}
+	filter2 := &common.Filter{
 		Key:    "tacos",
 		Values: []string{"yes"},
 	}
-	filter2 := &common.Filter{
-		Key:    "nachos",
-		Values: []string{"yes"},
-	}
-	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1, filter2})
+	fetchedNodes, count, err = suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter1, filter2})
 	suite.Require().NoError(err)
-
-	suite.Equal(2, len(fetchedNodes))
-	suite.Equal(&pgdb.TotalCount{Total: 2, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
-	suite.Equal("Nacho Node", fetchedNodes[0].GetName())
-	suite.Equal("Taco Node", fetchedNodes[1].GetName())
+	suite.Require().Equal(1, len(fetchedNodes))
+	suite.Equal(&pgdb.TotalCount{Total: 1, Unreachable: 0, Reachable: 0, Unknown: 3}, count)
+	suite.Equal("No Nacho Node", fetchedNodes[0].GetName())
 }
 
 func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByProjects() {
@@ -282,7 +297,7 @@ func (suite *NodesIntegrationSuite) TestDeleteNodesWithQuery() {
 	}
 	filter2 := &common.Filter{
 		Key:    "name",
-		Values: []string{"Tostada"},
+		Values: []string{"Tostada*"},
 	}
 	names, err := suite.Database.DeleteNodesWithQuery([]*common.Filter{filter, filter2})
 	suite.Require().NoError(err)
@@ -356,7 +371,7 @@ func (suite *NodesIntegrationSuite) TestProjectsAreRoundtrippedThroughNodeLifecy
 
 	controlNode, err := suite.Database.GetNode(ctx, controlNodeID)
 	suite.Require().NoError(err)
-	suite.Equal([]string{"Mexican Restaurant Menu", "Best Soups"}, controlNode.Projects)
+	suite.Equal([]string{"Best Soups", "Mexican Restaurant Menu"}, controlNode.Projects)
 
 	// Update the projects on the original node.
 	err = suite.Database.UpdateNode(&nodes.Node{Id: testNodeID, Name: "Updated Taco Node", Projects: []string{"Favorite Food", "Mexican Restaurant Menu"}})
@@ -370,7 +385,7 @@ func (suite *NodesIntegrationSuite) TestProjectsAreRoundtrippedThroughNodeLifecy
 	// The projects on the control node should be the same
 	controlNode, err = suite.Database.GetNode(ctx, controlNodeID)
 	suite.Require().NoError(err)
-	suite.Equal([]string{"Mexican Restaurant Menu", "Best Soups"}, controlNode.Projects)
+	suite.Equal([]string{"Best Soups", "Mexican Restaurant Menu"}, controlNode.Projects)
 }
 
 var nowTime = ptypes.TimestampNow()

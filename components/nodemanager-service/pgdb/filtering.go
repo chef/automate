@@ -38,31 +38,32 @@ func mergeFilters(mergeableFilters []*common.Filter) ([]common.Filter, error) {
 	return filters, nil
 }
 
-func handleTagFilters(tagFilters []common.Filter) (string, error) {
-	var tagConditions []string
-	for _, filter := range tagFilters {
+func tagFiltersToSQLConditions(tagFilters []common.Filter) ([]string, error) {
+	sqlTagConditions := make([]string, len(tagFilters))
+	for i, filter := range tagFilters {
 		tagKeyFilter := strings.TrimPrefix(filter.Key, "tags:")
-		newTagCondition, err := wherePatternMatchTags(tagKeyFilter, filter.Values, "t")
+		newSqlTagCondition, err := patternMatchTags(tagKeyFilter, filter.Values, TagsTableAbbrev)
 		if err != nil {
-			return "", errors.Wrap(err, "buildWhereFilter error")
+			return sqlTagConditions, errors.Wrap(err, "tagFiltersToSQLConditions error")
 		}
 		if filter.Exclude {
-			newTagCondition = fmt.Sprintf("NOT (%s)", newTagCondition)
+			newSqlTagCondition = fmt.Sprintf("NOT %s", newSqlTagCondition)
 		}
-		tagConditions = append(tagConditions, newTagCondition)
+		sqlTagConditions[i] = newSqlTagCondition
 	}
-	return strings.Join(tagConditions, " OR "), nil
+	return sqlTagConditions, nil
 }
 
-// Takes a filter map (should be validated for content) and table abbreviation and returns a wherefilter
-func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, filterField map[string]string) (whereFilter string, err error) {
+// Takes a filter map (should be validated for content) and table abbreviation
+// and returns WHERE and HAVING SQL conditions
+func buildWhereHavingFilter(mergeableFilters []*common.Filter, tableAbbrev string, filterField map[string]string) (whereFilter string, havingFilter string, err error) {
 	if len(mergeableFilters) == 0 {
-		return "", nil
+		return "", "", nil
 	}
 
 	filters, err := mergeFilters(mergeableFilters)
 	if err != nil {
-		return "", errors.Wrap(err, "buildWhereFilter error")
+		return "", "", errors.Wrap(err, "buildWhereHavingFilter error")
 	}
 
 	var conditions []string
@@ -76,7 +77,7 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 		} else {
 			switch filterField[filter.Key] {
 			case "":
-				return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported filter field: %s", filter.Key)}
+				return "", "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported filter field: %s", filter.Key)}
 			case "source_region", "name":
 				newCondition, err = wherePatternMatch(filterField[filter.Key], filter.Values, tableAbbrev)
 			case "statechange_timestamp", "last_contact", "last_run ->> 'EndTime'", "last_scan ->> 'EndTime'":
@@ -91,7 +92,7 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 		}
 
 		if err != nil {
-			return "", errors.Wrap(err, "buildWhereFilter error")
+			return "", "", errors.Wrap(err, "buildWhereHavingFilter error")
 		}
 
 		if filter.Exclude {
@@ -102,16 +103,17 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 	}
 
 	if len(tagFilters) > 0 {
-		tagCondition, err := handleTagFilters(tagFilters)
+		tagConditions, err := tagFiltersToSQLConditions(tagFilters)
 		if err != nil {
-			return "", errors.Wrap(err, "buildWhereFilter error building tags")
+			return "", "", errors.Wrap(err, "buildWhereHavingFilter error building tags")
 		}
-		conditions = append(conditions, tagCondition)
+		havingFilter = fmt.Sprintf("HAVING (%s)", strings.Join(tagConditions, ") AND ("))
 	}
-
-	whereFilter = fmt.Sprintf("WHERE (%s)", strings.Join(conditions, " AND "))
-	logrus.Debugf("buildWhereFilter, whereFilter=%s", whereFilter)
-	return whereFilter, nil
+	if len(conditions) > 0 {
+		whereFilter = fmt.Sprintf("WHERE (%s)", strings.Join(conditions, " AND "))
+	}
+	logrus.Debugf("buildWhereHavingFilter, whereFilter=%s, havingFilter=%s", whereFilter, havingFilter)
+	return whereFilter, havingFilter, nil
 }
 
 // Builds an IN where condition like: j.parent_id IN ('e57605ed-bb8a-49b8-606c-af0e2b31b139')
@@ -173,24 +175,26 @@ func whereFieldBetween(field string, arr []string, tableAbbrev string) (conditio
 	return condition, nil
 }
 
-func wherePatternMatchTags(field string, arr []string, tableAbbrev string) (condition string, err error) {
+// because of the n:m with the tags table and the ability to pass any number of tag queries
+// that are ANDed or ORed, we use string_agg to denormalize the tags into a single string that
+// can take multiple AND and OR conditions
+func patternMatchTags(field string, arr []string, tableAbbrev string) (condition string, err error) {
 	if !utils.IsSqlSafe(field) {
 		return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
 	}
-	condition += fmt.Sprintf("%s.key LIKE '%s' AND %s.value LIKE ", tableAbbrev, field, tableAbbrev)
 
+	// if no value is provided for the tag, we query for any value
 	if len(arr) == 0 {
-		condition += "''"
-		return condition, nil
-	}
-	for index, item := range arr {
-		condition += fmt.Sprintf("'%s%%'", utils.EscapeLiteralForPGPatternMatch(item))
-		if index < len(arr)-1 {
-			condition += fmt.Sprintf(" OR %s.value LIKE ", tableAbbrev)
-		}
+		arr = append(arr, "")
 	}
 
-	return condition, nil
+	valueLikes := make([]string, len(arr))
+	for index, item := range arr {
+		// concat needed as string_agg returns NULL when no tags exist and LIKE on NULL is not working
+		valueLikes[index] = fmt.Sprintf("concat('',string_agg(',' || %s.key || ':' || %s.value, '')) LIKE '%%,%s:%s%%'", tableAbbrev, tableAbbrev, field, item)
+	}
+
+	return strings.Join(valueLikes, " OR "), nil
 }
 
 func wherePatternMatch(field string, arr []string, tableAbbrev string) (condition string, err error) {
