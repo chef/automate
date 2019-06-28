@@ -2,7 +2,6 @@ include ../../Makefile.common_go
 .PHONY: docs run proto unit
 
 BIN=automate-gateway
-DOCS_PATH=../automate-chef-io/data/docs/api_chef_automate
 LINTERARGS:=--skip-files .*\.pb\.swagger\.go
 
 run:
@@ -23,8 +22,3 @@ proto:
 
 unit:
 	@go test -v $(shell go list ./... | grep -v '/vendor/' | grep -v '/integration') -cover
-
-docs:
-	mkdir -p ${DOCS_PATH}
-	find ${DOCS_PATH} -name *.swagger.json -delete
-	find api -name *.swagger.json | xargs -I{} cp -vf {} ${DOCS_PATH}

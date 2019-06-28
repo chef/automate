@@ -123,6 +123,7 @@ subscriptions:
       - bash:.expeditor/generate-automate-api-docs.sh:
           post_commit: false
           only_if_modified:
+            - /api/external/**/*.swagger.json
             - components/automate-gateway/api/**/*.swagger.json
       - trigger_pipeline:habitat/build:
           post_commit: true
