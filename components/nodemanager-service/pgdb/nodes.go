@@ -374,7 +374,7 @@ func (db *DB) BulkAddNodes(inNodes []*nodes.Node) (nodeIDs []string, err error) 
 		}
 		hosts := inNode.GetTargetConfig().GetHosts()
 		if len(hosts) < 1 {
-			return nodeIDs, errors.New("BulkAddNodes unable find TargetConfig hosts")
+			return nodeIDs, errors.New("BulkAddNodes requests require hosts in TargetConfig")
 		}
 		for _, host := range hosts {
 			err = Transact(db, func(tx *DBTrans) error {
