@@ -3,6 +3,7 @@ package v2_test
 import (
 	"context"
 	"reflect"
+	"strings"
 	"testing"
 	"unicode"
 
@@ -165,6 +166,10 @@ func TestUpdateRuleProperties(t *testing.T) {
 				Conditions: reqs.rules[0].Conditions,
 			}
 			rUpdated, err := cl.UpdateRule(ctx, &updateReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
@@ -215,6 +220,10 @@ func TestUpdateRuleProperties(t *testing.T) {
 				Conditions: reqs.rules[0].Conditions,
 			}
 			rUpdated, err := cl.UpdateRule(ctx, &updateReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
@@ -264,9 +273,14 @@ func TestDeleteRuleProperties(t *testing.T) {
 			}
 
 			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
-			found := err == nil
+			deletedWhenStaged := err != nil && strings.Contains(err.Error(), "could not find")
 
-			return !found
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			deletedWhenApplied := err != nil && strings.Contains(err.Error(), "could not find")
+
+			return deletedWhenStaged && deletedWhenApplied
 		},
 		createProjectAndRuleGen,
 	))
@@ -295,6 +309,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 				return false
 			}
 
+			// Can still find a staged-deleted rule if the rule was previously applied!
 			rDeleted, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
 				t.Error(err.Error())
@@ -304,12 +319,62 @@ func TestDeleteRuleProperties(t *testing.T) {
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
-			found := err == nil
+			deletedWhenApplied := err != nil && strings.Contains(err.Error(), "could not find")
 
-			return !found &&
+			return deletedWhenApplied &&
 				RuleMatches(reqs.rules[0], *rDeleted.Rule) &&
 				rDeleted.Rule.Status == "applied" && // TODO: wrong!
 				!rDeleted.Rule.Deleted // TODO: wrong!
+		},
+		createProjectAndRuleGen,
+	))
+
+	properties.Property("deletes an applied and staged rule and applies deletion", prop.ForAll(
+		func(reqs projectAndRuleReq) bool {
+			defer testDB.Flush(t)
+
+			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.CreateRule(ctx, &reqs.rules[0])
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			updateReq := api.UpdateRuleReq{
+				Id:         reqs.rules[0].Id,
+				ProjectId:  reqs.rules[0].ProjectId,
+				Name:       reqs.rules[0].Name + " updated",
+				Type:       reqs.rules[0].Type,
+				Conditions: reqs.rules[0].Conditions,
+			}
+			_, err = cl.UpdateRule(ctx, &updateReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			markedforDeletion := err != nil && strings.Contains(err.Error(), "marked for deletion")
+
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			fullyDeleted := err != nil && strings.Contains(err.Error(), "could not find")
+
+			return markedforDeletion && fullyDeleted
 		},
 		createProjectAndRuleGen,
 	))
@@ -321,6 +386,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 func getGopterParams(seed int64) *gopter.Properties {
 	params := gopter.DefaultTestParametersWithSeed(seed)
 	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
+	params.MinSuccessfulTests = 10
 	return gopter.NewProperties(params)
 }
 
