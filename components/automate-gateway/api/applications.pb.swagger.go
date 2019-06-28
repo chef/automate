@@ -263,11 +263,17 @@ func init() {
         "OK",
         "WARNING",
         "CRITICAL",
+<<<<<<< HEAD
         "UNKNOWN",
         "NONE"
       ],
       "default": "OK",
       "description": "- NONE: The representation of NO health check status\nTODO @afiune how much effort would be to change\nthe OK enum to be NONE",
+=======
+        "UNKNOWN"
+      ],
+      "default": "OK",
+>>>>>>> Update api swagger files
       "title": "The HealthStatus enum matches the habitat implementation for health-check status:\n=\u003e https://www.habitat.sh/docs/reference/#health-check"
     },
     "applicationsService": {
@@ -302,9 +308,12 @@ func init() {
         },
         "site": {
           "type": "string"
+<<<<<<< HEAD
         },
         "previous_health_check": {
           "$ref": "#/definitions/applicationsHealthStatus"
+=======
+>>>>>>> Update api swagger files
         }
       }
     },
