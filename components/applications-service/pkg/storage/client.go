@@ -51,7 +51,7 @@ type Service struct {
 	Site                string
 	PreviousHealth      string    `db:"previous_health"`
 	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
-	LastHealthChange    string    `db:"last_health_change"`
+	HealthUpdatedAt     time.Time `db:"health_updated_at"`
 }
 
 func (s *Service) FullReleaseString() string {

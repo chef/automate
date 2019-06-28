@@ -50,7 +50,7 @@ SELECT s.id
   , sup.site as site
   , s.last_event_occurred_at as last_event_occurred_at
   , s.previous_health as previous_health
-  , justify_hours(age(now(), s.health_updated_at)) as last_health_change
+  , s.health_updated_at as health_updated_at
 FROM service AS s
 LEFT JOIN service_group AS sg
   ON s.group_id = sg.id
@@ -78,7 +78,7 @@ SELECT s.id
   , sup.site as site
   , s.last_event_occurred_at as last_event_occurred_at
   , s.previous_health as previous_health
-  , justify_hours(age(now(), s.health_updated_at)) as last_health_change
+  , s.health_updated_at as health_updated_at
 FROM service AS s
 LEFT JOIN service_group AS sg
   ON s.group_id = sg.id
