@@ -118,16 +118,10 @@ func (suite *CerealTestSuite) TestScheduleUpdates() {
 		false,
 		recurrence)
 
-	suite.Require().NoError(err, "Failed to enqueue workflow")
+	suite.Require().NoError(err, "Failed to create workflow schedule")
 
-	found := false
-	schedules, err := m.ListWorkflowSchedules(context.Background())
-	for _, s := range schedules {
-		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
-			found = true
-		}
-	}
-	suite.Require().True(found, "schedule was not found after creation")
+	_, err = m.GetWorkflowScheduleByName(context.Background(), instanceName, workflowName)
+	suite.Require().NoError(err, "workflow schedule was not found after creation")
 
 	updateRecurrence, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
@@ -138,8 +132,10 @@ func (suite *CerealTestSuite) TestScheduleUpdates() {
 	err = m.UpdateWorkflowScheduleByName(context.Background(), instanceName, workflowName, cereal.UpdateRecurrence(updateRecurrence))
 	suite.Require().NoError(err, "Failed to update scheduled workflow")
 
-	newRecurrence, err := m.GetScheduledWorkflowRecurrence(context.Background(), instanceName, workflowName)
-	suite.Require().NoError(err, "Failed to update scheduled workflow")
+	schedule, err := m.GetWorkflowScheduleByName(context.Background(), instanceName, workflowName)
+	suite.Require().NoError(err, "Failed to retrieve updated scheduled workflow")
+	newRecurrence, err := schedule.GetRRule()
+	suite.Require().NoError(err, "Failed to parse rrule in scheduled workflow")
 	suite.Assert().Equal(20, newRecurrence.OrigOptions.Interval)
 }
 
