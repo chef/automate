@@ -89,12 +89,14 @@ describe File.basename(__FILE__) do
         {
           "name": "nginx-baseline",
           "version": "2.1.0",
-          "id": "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
+          "id": "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+          "status": "failed"
         },
         {
           "name": "apache-baseline",
           "version": "2.0.1",
-          "id": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9"
+          "id": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+          "status": "failed"
         }
       ]
     }.to_json
@@ -248,7 +250,7 @@ describe File.basename(__FILE__) do
       # assert_equal('skipped', res['profiles'][0]['depends'][0]['status'])
       # assert_equal("Skipping profile: 'myprofile1' on unsupported platform: 'mac_os_x/17.7.0'.", res['profiles'][0]['depends'][0]['skip_message'])
 
-      assert_equal('loaded', res['profiles'][1]['status'])
+      assert_equal('failed', res['profiles'][1]['status'])
       assert_equal('', res['profiles'][1]['skip_message'])
     end
 
