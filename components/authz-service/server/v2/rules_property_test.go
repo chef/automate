@@ -39,22 +39,19 @@ func TestCreateRuleProperties(t *testing.T) {
 
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false // bad run
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.CreateRule(ctx, &reqs.rules[0])
 			// Note: this could be very noisy, but it's hard to figure out what went
 			// wrong without the error
 			if err != nil {
-				t.Error(err.Error())
-				return false // bad run
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			// Note: we're ignoring type conversion, as asserting that would require us
@@ -62,7 +59,7 @@ func TestCreateRuleProperties(t *testing.T) {
 			// Instead, as we add GetRule, ListRules, etc., we can use this
 			// testing approach to write meaningful assertions.
 			return rStaged.Rule.Status == "staged" &&
-				RuleMatches(reqs.rules[0], *rStaged.Rule)
+				ruleMatches(reqs.rules[0], *rStaged.Rule)
 		},
 		createProjectAndRuleGen,
 	))
@@ -73,26 +70,23 @@ func TestCreateRuleProperties(t *testing.T) {
 
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.CreateRule(ctx, &reqs.rules[0])
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			return rApplied.Rule.Status == "applied" &&
-				RuleMatches(reqs.rules[0], *rApplied.Rule)
+				ruleMatches(reqs.rules[0], *rApplied.Rule)
 		},
 		createProjectAndRuleGen,
 	))
@@ -103,13 +97,11 @@ func TestCreateRuleProperties(t *testing.T) {
 
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false // bad run
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			if _, err := cl.CreateRule(ctx, &reqs.rules[0]); err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.CreateRule(ctx, &reqs.rules[1])
@@ -148,14 +140,12 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.CreateRule(ctx, &reqs.rules[0])
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			updateReq := api.UpdateRuleReq{
@@ -167,22 +157,20 @@ func TestUpdateRuleProperties(t *testing.T) {
 			}
 			rUpdated, err := cl.UpdateRule(ctx, &updateReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			return rApplied.Rule.Status == "applied" &&
-				RuleMatches(updateReq, *rApplied.Rule) &&
+				ruleMatches(updateReq, *rApplied.Rule) &&
 				rUpdated.Rule.Status == "" && // TODO: this is wrong; should be "staged"
-				RuleMatches(updateReq, *rUpdated.Rule)
+				ruleMatches(updateReq, *rUpdated.Rule)
 		},
 		createProjectAndRuleGen,
 	))
@@ -193,22 +181,19 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.CreateRule(ctx, &reqs.rules[0])
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 			statusBeforeSecondUpdate := rApplied.Rule.Status
 
@@ -221,23 +206,21 @@ func TestUpdateRuleProperties(t *testing.T) {
 			}
 			rUpdated, err := cl.UpdateRule(ctx, &updateReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 			rApplied, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			return statusBeforeSecondUpdate == "applied" &&
 				rUpdated.Rule.Status == "" && // TODO: this is wrong; should be "staged"
 				rApplied.Rule.Status == "applied" &&
-				RuleMatches(updateReq, *rApplied.Rule) &&
-				RuleMatches(updateReq, *rUpdated.Rule)
+				ruleMatches(updateReq, *rApplied.Rule) &&
+				ruleMatches(updateReq, *rUpdated.Rule)
 		},
 		createProjectAndRuleGen,
 	))
@@ -256,20 +239,17 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.CreateRule(ctx, &reqs.rules[0])
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
@@ -291,29 +271,25 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.CreateRule(ctx, &reqs.rules[0])
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 			_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			// Can still find a staged-deleted rule if the rule was previously applied!
 			rDeleted, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
@@ -322,7 +298,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 			deletedWhenApplied := err != nil && strings.Contains(err.Error(), "could not find")
 
 			return deletedWhenApplied &&
-				RuleMatches(reqs.rules[0], *rDeleted.Rule) &&
+				ruleMatches(reqs.rules[0], *rDeleted.Rule) &&
 				rDeleted.Rule.Status == "applied" && // TODO: wrong!
 				!rDeleted.Rule.Deleted // TODO: wrong!
 		},
@@ -335,14 +311,12 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.CreateRule(ctx, &reqs.rules[0])
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
@@ -356,14 +330,12 @@ func TestDeleteRuleProperties(t *testing.T) {
 			}
 			_, err = cl.UpdateRule(ctx, &updateReq)
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
-				t.Error(err.Error())
-				return false
+				return reportErrorAndYieldFalse(t, err)
 			}
 
 			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
@@ -386,7 +358,6 @@ func TestDeleteRuleProperties(t *testing.T) {
 func getGopterParams(seed int64) *gopter.Properties {
 	params := gopter.DefaultTestParametersWithSeed(seed)
 	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
-	params.MinSuccessfulTests = 10
 	return gopter.NewProperties(params)
 }
 
@@ -459,7 +430,13 @@ func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 	return createRuleReqGen, createProjectReqGen, createProjectAndRuleGen
 }
 
-func RuleMatches(req interface{}, actual api.ProjectRule) bool {
+func reportErrorAndYieldFalse(t *testing.T, err error) bool {
+	t.Helper()
+	t.Error(err.Error())
+	return false
+}
+
+func ruleMatches(req interface{}, actual api.ProjectRule) bool {
 	if _, ok := req.(api.CreateRuleReq); ok {
 		ruleReq, _ := req.(api.CreateRuleReq)
 		return len(actual.Conditions) == len(ruleReq.Conditions) &&
