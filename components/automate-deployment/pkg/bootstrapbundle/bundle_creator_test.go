@@ -1,4 +1,4 @@
-package bootstrap
+package bootstrapbundle
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createBundleCreator(t *testing.T) *BundleCreator {
+func createBundleCreator(t *testing.T) *Creator {
 	t.Helper()
 
 	allowedUsers := []string{}
@@ -45,7 +45,7 @@ func createBundleCreator(t *testing.T) *BundleCreator {
 		allowedGroups = append(allowedUsers, g.Name)
 	}
 
-	return &BundleCreator{
+	return &Creator{
 		rootDir:       "testdata/bootstrap-test",
 		allowedUsers:  allowedUsers,
 		allowedGroups: allowedGroups,
@@ -128,7 +128,7 @@ func TestRoundTrip(t *testing.T) {
 
 	bundleCreator := createBundleCreator(t)
 
-	bundleUnpacker := &BundleCreator{
+	bundleUnpacker := &Creator{
 		rootDir:       tmpdir,
 		allowedUsers:  bundleCreator.allowedUsers,
 		allowedGroups: bundleCreator.allowedGroups,

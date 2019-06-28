@@ -32,6 +32,7 @@ func FullBootstrap(ctx context.Context,
 	b target.Bootstrapper,
 	m manifest.ReleaseManifest,
 	config *dc.ConfigRequest,
+	bootstrapBundlePath string,
 	writer cli.FormatWriter) error {
 
 	writer.Body("Installing Habitat")
@@ -57,7 +58,7 @@ func FullBootstrap(ctx context.Context,
 	}
 
 	writer.Title("Bootstrapping deployment-service on localhost")
-	err = b.DeployDeploymentService(ctx, config, m, writer)
+	err = b.DeployDeploymentService(ctx, config, m, bootstrapBundlePath, writer)
 	if err != nil {
 		return err
 	}
@@ -105,17 +106,20 @@ func (b *compatBootstrapper) SetupSupervisor(ctx context.Context, config *dc.Con
 // deployment-service. It assumes a running Habitat supervisor.  If
 // available, it delegates this task to `deployment-service
 // setup-service`.
-func (b *compatBootstrapper) DeployDeploymentService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, writer cli.BodyWriter) error {
+func (b *compatBootstrapper) DeployDeploymentService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, bootstrapBundlePath string, writer cli.BodyWriter) error {
 	dsPkg := manifest.VersionedPackageFromManifest(m, "deployment-service")
 	if dsPkg == nil {
 		return errors.New("deployment-service was not found in the manifest")
 	}
 
 	dsCmd := b.getDSCmd(dsPkg, b.target)
-	if dsCmd.CanBootstrap() {
-		return dsCmd.DeployService(ctx, config, m)
+	if bootstrapBundlePath != "" && !dsCmd.CanUnpackBootstrapBundle() {
+		return errors.New("deployment-service does not support the bootstrap bundle")
 	}
-	return b.target.DeployDeploymentService(ctx, config, m, writer)
+	if dsCmd.CanBootstrap() {
+		return dsCmd.DeployService(ctx, config, m, bootstrapBundlePath)
+	}
+	return b.target.DeployDeploymentService(ctx, config, m, bootstrapBundlePath, writer)
 }
 
 func (b *compatBootstrapper) getDSCmd(dsPkg habpkg.VersionedPackage, target target.Target) *DeploymentServiceCommand {

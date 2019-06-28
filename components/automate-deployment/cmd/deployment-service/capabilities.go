@@ -12,6 +12,7 @@ func init() {
 
 var Capabilities = []string{
 	"bootstrap",
+	"bootstrap-bundle",
 }
 
 func capabilitiesCmd() *cobra.Command {

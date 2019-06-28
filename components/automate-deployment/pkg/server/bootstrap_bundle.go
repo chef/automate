@@ -5,12 +5,12 @@ import (
 	"bytes"
 	"io"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/bootstrapbundle"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 
 	"github.com/chef/automate/lib/product"
 
 	api "github.com/chef/automate/api/interservice/deployment"
-	"github.com/chef/automate/components/automate-deployment/pkg/bootstrap"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/pkg/errors"
 )
@@ -19,7 +19,7 @@ import (
 func (s *server) BootstrapBundle(req *api.BootstrapBundleRequest, stream api.Deployment_BootstrapBundleServer) error {
 	var b bytes.Buffer
 	tarWriter := bufio.NewWriter(&b)
-	bundleCreator := bootstrap.NewBundleCreator()
+	bundleCreator := bootstrapbundle.NewCreator()
 
 	pkgsMeta := make([]*product.PackageMetadata, 0, len(s.deployment.ExpectedServices))
 	for _, e := range s.deployment.ExpectedServices {

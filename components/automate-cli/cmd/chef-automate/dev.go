@@ -138,7 +138,7 @@ func runBootstrapCmd(cmd *cobra.Command, args []string) error {
 	client.SetProxyEnvironment(conf.Deployment)
 
 	b := bootstrap.NewCompatBootstrapper(tgt)
-	err = bootstrap.FullBootstrap(context.TODO(), b, m, mergedCfg.GetDeployment(), writer)
+	err = bootstrap.FullBootstrap(context.TODO(), b, m, mergedCfg.GetDeployment(), "", writer)
 	if err != nil {
 		return status.Annotate(err, status.DeployError)
 	}

@@ -177,7 +177,7 @@ func ExpectServiceReload(m *target.MockTarget, pkg habpkg.VersionedPackage) {
 	m.
 		On("UnloadService", context.Background(), pkg).
 		Return(nil).
-		On("LoadService", pkg, mock.Anything, mock.Anything).
+		On("LoadService", context.Background(), pkg, mock.Anything, mock.Anything).
 		Return(nil)
 }
 

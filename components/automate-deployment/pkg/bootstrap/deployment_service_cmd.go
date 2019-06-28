@@ -47,7 +47,11 @@ func (ds *DeploymentServiceCommand) CanBootstrap() bool {
 	return ds.HasCapability("bootstrap")
 }
 
-func (ds *DeploymentServiceCommand) DeployService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest) error {
+func (ds *DeploymentServiceCommand) CanUnpackBootstrapBundle() bool {
+	return ds.HasCapability("bootstrap-bundle")
+}
+
+func (ds *DeploymentServiceCommand) DeployService(ctx context.Context, config *dc.ConfigRequest, m manifest.ReleaseManifest, bootstrapBundlePath string) error {
 	configFile, err := ds.configToFile(config)
 	if err != nil {
 		return err
@@ -60,9 +64,17 @@ func (ds *DeploymentServiceCommand) DeployService(ctx context.Context, config *d
 	}
 	defer os.Remove(manifestFile)
 
+	args := []string{
+		"pkg", "exec", habpkg.Ident(ds.dsPkg), "deployment-service",
+		"deploy-service", configFile, manifestFile,
+	}
+
+	if bootstrapBundlePath != "" {
+		args = append(args, "--bootstrap-bundle-path", bootstrapBundlePath)
+	}
+
 	return ds.CmdExecutor.Run("hab",
-		command.Args("pkg", "exec", habpkg.Ident(ds.dsPkg), "deployment-service",
-			"deploy-service", configFile, manifestFile),
+		command.Args(args...),
 		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Envvar("CHEF_AUTOMATE_LOG_LEVEL", logrus.GetLevel().String()),
 		command.Stdout(os.Stdout),
@@ -87,6 +99,22 @@ func (ds *DeploymentServiceCommand) SetupSupervisor(ctx context.Context, config 
 	return ds.CmdExecutor.Run("hab",
 		command.Args("pkg", "exec", habpkg.Ident(ds.dsPkg), "deployment-service",
 			"setup-supervisor", configFile, manifestFile),
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
+		command.Envvar("CHEF_AUTOMATE_LOG_LEVEL", logrus.GetLevel().String()),
+		command.Stdout(os.Stdout),
+		command.Stderr(os.Stderr),
+		command.Context(ctx),
+	)
+}
+
+func (ds *DeploymentServiceCommand) UnpackBootstrapBundle(ctx context.Context, bundlePath string) error {
+	if bundlePath == "" {
+		return nil
+	}
+
+	return ds.CmdExecutor.Run("hab",
+		command.Args("pkg", "exec", habpkg.Ident(ds.dsPkg), "deployment-service",
+			"unpack-bootstrap-bundle", bundlePath),
 		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Envvar("CHEF_AUTOMATE_LOG_LEVEL", logrus.GetLevel().String()),
 		command.Stdout(os.Stdout),
