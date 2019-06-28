@@ -17,8 +17,7 @@ type Driver interface {
 	UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts WorkflowScheduleUpdateOpts) error
 	UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
 
-	GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string) ([]byte, error)
-	GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (string, error)
+	GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*Schedule, error)
 	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
 
 	GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*WorkflowInstance, error)

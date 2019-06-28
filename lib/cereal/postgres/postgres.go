@@ -40,6 +40,22 @@ const (
 			ON s.instance_name = res.instance_name AND s.workflow_name = res.workflow_name;
 		`
 
+	getScheduledWorkflowQuery = `
+WITH res AS (
+    SELECT DISTINCT ON (instance_name, workflow_name) *
+    FROM cereal_workflow_results
+    ORDER BY workflow_name, instance_name, end_at DESC
+)
+SELECT s.id, enabled, s.instance_name, s.workflow_name, s.parameters,
+    recurrence, next_run_at, start_at last_start, end_at last_end
+FROM
+    cereal_workflow_schedules s
+    LEFT JOIN res ON s.instance_name = res.instance_name
+        AND s.workflow_name = res.workflow_name
+WHERE
+    s.instance_name = $1
+    AND s.workflow_name = $2;
+`
 	getNextScheduledWorkflowQuery = `
         SELECT id, enabled, instance_name, workflow_name, parameters, recurrence, next_run_at
         FROM cereal_workflow_schedules
@@ -187,30 +203,25 @@ func (pg *PostgresBackend) Close() error {
 	return nil
 }
 
-func (pg *PostgresBackend) GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string) ([]byte, error) {
-	row := pg.db.QueryRowContext(ctx, "SELECT parameters FROM cereal_workflow_schedules WHERE instance_name = $1 and workflow_name = $2",
-		instanceName, workflowName)
-	var data []byte
-
-	err := row.Scan(&data)
+func (pg *PostgresBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*backend.Schedule, error) {
+	scheduledWorkflow := backend.Schedule{}
+	row := pg.db.QueryRowContext(ctx, getScheduledWorkflowQuery, instanceName, workflowName)
+	err := row.Scan(
+		&scheduledWorkflow.ID,
+		&scheduledWorkflow.Enabled,
+		&scheduledWorkflow.InstanceName,
+		&scheduledWorkflow.WorkflowName,
+		&scheduledWorkflow.Parameters,
+		&scheduledWorkflow.Recurrence,
+		&scheduledWorkflow.NextDueAt,
+		&scheduledWorkflow.LastStart,
+		&scheduledWorkflow.LastEnd,
+	)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "could not read workflow schedule")
 	}
 
-	return data, nil
-}
-
-func (pg *PostgresBackend) GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (string, error) {
-	row := pg.db.QueryRowContext(ctx, "SELECT recurrence FROM cereal_workflow_schedules WHERE instance_name = $1 and workflow_name = $2",
-		instanceName, workflowName)
-
-	var data string
-	err := row.Scan(&data)
-	if err != nil {
-		return "", err
-	}
-
-	return data, nil
+	return &scheduledWorkflow, nil
 }
 
 func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
@@ -243,6 +254,10 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 		}
 		schedules = append(schedules, &scheduledWorkflow)
 	}
+	if rows.Err() != nil {
+		return nil, errors.Wrap(err, "could not read workflow schedules")
+	}
+
 	return schedules, nil
 }
 

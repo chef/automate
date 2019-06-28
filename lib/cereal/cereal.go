@@ -33,6 +33,21 @@ var (
 // for the parameters
 type Schedule backend.Schedule
 
+func (s *Schedule) GetParameters(out interface{}) error {
+	if s.Parameters != nil {
+		return json.Unmarshal(s.Parameters, out)
+	}
+	return nil
+}
+
+func (s *Schedule) GetRRule() (*rrule.RRule, error) {
+	if s.Recurrence == "" {
+		return nil, errors.New("no recurrence data")
+	}
+
+	return rrule.StrToRRule(s.Recurrence)
+}
+
 // Task is an interface to an object representing a running Task. This will be
 // provided to TaskExecutor implementations when the Run method is called.
 type Task interface {
@@ -528,34 +543,13 @@ func (m *Manager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error
 	return ret, nil
 }
 
-// GetScheduledWorkflowParameters returns the parameters that the scheduled workflow
-// identified by (instanceName, workflowName) will be started with.
-func (m *Manager) GetScheduledWorkflowParameters(ctx context.Context, instanceName string, workflowName string, out interface{}) error {
-	data, err := m.backend.GetScheduledWorkflowParameters(ctx, instanceName, workflowName)
+func (m *Manager) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*Schedule, error) {
+	backendSched, err := m.backend.GetWorkflowScheduleByName(ctx, instanceName, workflowName)
 	if err != nil {
-		return errors.Wrap(err, "could not retrieve parameters for workflow")
+		return nil, err
 	}
 
-	if data != nil {
-		return json.Unmarshal(data, out)
-	}
-
-	return nil
-}
-
-// GetScheduledWorkflowRecurrence returns the recurrence rule for the scheduled workflow
-// identified by (instanceName, workflowName)
-func (m *Manager) GetScheduledWorkflowRecurrence(ctx context.Context, instanceName string, workflowName string) (*rrule.RRule, error) {
-	ruleStr, err := m.backend.GetScheduledWorkflowRecurrence(ctx, instanceName, workflowName)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not retrieve parameters for workflow")
-	}
-
-	if ruleStr == "" {
-		return nil, errors.New("no recurrence data")
-	}
-
-	return rrule.StrToRRule(ruleStr)
+	return (*Schedule)(backendSched), nil
 }
 
 func (m *Manager) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (ImmutableWorkflowInstance, error) {
