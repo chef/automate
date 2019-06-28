@@ -400,6 +400,12 @@ func (suite *NodesIntegrationSuite) TestBulkAddNodesAndTagsUpdate() {
 
 	// Setting up node1 with Host
 	node1.TargetConfig = &nodes.TargetConfig{Host: "127.0.0.1"}
+	testNodeIDs, err = suite.Database.BulkAddNodes([]*nodes.Node{node1})
+	suite.Equal(0, len(testNodeIDs))
+	suite.EqualError(err, "BulkAddNodes does not support TargetConfig.Host, use Hosts instead")
+
+	// Setting up node1 with Hosts
+	node1.TargetConfig = &nodes.TargetConfig{Hosts: []string{"127.0.0.1"}}
 
 	// Setting up node2 with Hosts
 	node2 := &nodes.Node{Name: "Bulky Two",

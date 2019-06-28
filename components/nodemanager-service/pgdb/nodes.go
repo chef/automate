@@ -369,11 +369,10 @@ func (db *DB) BulkAddNodes(inNodes []*nodes.Node) (nodeIDs []string, err error) 
 		if err != nil {
 			return nodeIDs, errors.Wrap(err, "BulkAddNodes unable to translate node to db struct")
 		}
-
-		hosts := inNode.GetTargetConfig().GetHosts()
 		if inNode.GetTargetConfig().Host != "" {
-			hosts = append(hosts, inNode.GetTargetConfig().Host)
+			return nodeIDs, errors.New("BulkAddNodes does not support TargetConfig.Host, use Hosts instead")
 		}
+		hosts := inNode.GetTargetConfig().GetHosts()
 		if len(hosts) < 1 {
 			return nodeIDs, errors.New("BulkAddNodes unable find TargetConfig hosts")
 		}
