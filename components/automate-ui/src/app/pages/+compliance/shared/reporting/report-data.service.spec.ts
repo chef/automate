@@ -18,7 +18,7 @@ describe('ReportDataService', () => {
       providers: [
         StatsService,
         ReportDataService,
-        { provide: TelemetryService, useClass: MockTelemetryService },
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         HttpClientTestingModule

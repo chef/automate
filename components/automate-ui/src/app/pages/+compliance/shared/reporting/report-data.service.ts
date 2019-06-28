@@ -52,8 +52,8 @@ export class ReportDataService {
         // Data will give us nodes, platforms, profiles and environments
         // We will also report filters so that we know when these counts are constrained.
         if (data !== null) {
-          var summaryStats = data.stats
-          this.telemetryService.track("complianceCountsWithFilters", {summaryStats, filters})
+          const summaryStats = data.stats;
+          this.telemetryService.track('complianceCountsWithFilters', {summaryStats, filters});
         }
       });
   }

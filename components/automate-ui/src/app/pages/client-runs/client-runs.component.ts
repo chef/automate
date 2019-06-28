@@ -1,9 +1,14 @@
-import { map, takeUntil, finalize } from 'rxjs/operators';
+import {
+  map,
+  takeUntil,
+  finalize,
+  distinctUntilChanged,
+  distinctUntilKeyChanged
+} from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Subject, Observable, combineLatest } from 'rxjs';
-import { distinctUntilChanged, distinctUntilKeyChanged } from 'rxjs/operators';
 import { Chicklet, NodeCount, RollupState, SortDirection } from '../../types/types';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
@@ -324,7 +329,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     )
     .pipe(takeUntil(this.isDestroyed))
     .subscribe(([nodeCounts, filterCount]) => {
-      if (filterCount === 0 && nodeCounts.total > 0){
+      if ( filterCount === 0 && nodeCounts.total > 0 ) {
         this.telemetryService.track('clientRunPureCount', nodeCounts);
       }
     });
