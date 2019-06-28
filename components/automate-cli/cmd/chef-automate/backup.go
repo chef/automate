@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/user"
@@ -695,6 +696,20 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 
 	if err := dsRestore.Restore(ctx); err != nil {
 		return status.Annotate(err, status.BackupError)
+	}
+
+	manifest, err := dsRestore.ResolvedManifest()
+	if err != nil {
+		return status.Annotate(err, status.BackupError)
+	}
+
+	jsManifest, err := json.Marshal(manifest)
+	if err != nil {
+		return status.Wrap(err, status.BackupError, "Failed to marshal package manifest to JSON")
+	}
+
+	rt.Manifest = &api.ReleaseManifest{
+		Json: jsManifest,
 	}
 
 	// Return the task ID if we don't want to follow restore updates

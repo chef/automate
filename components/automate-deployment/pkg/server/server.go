@@ -1761,46 +1761,6 @@ func (s *server) ManifestVersion(ctx context.Context, d *api.ManifestVersionRequ
 	}, nil
 }
 
-// SetManifest sets the current package manifest
-func (s *server) SetManifest(ctx context.Context, req *api.SetManifestRequest) (*api.SetManifestResponse, error) {
-	if !s.HasConfiguredDeployment() {
-		return nil, ErrorNotConfigured
-	}
-
-	var (
-		err             error
-		manifestClient  manifest.ReleaseManifestProvider
-		desiredManifest *manifest.A2
-		jsonManifest    []byte
-	)
-
-	jsonManifest = req.GetManifest().GetJson()
-	if jsonManifest == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "failed to parse the manifest json")
-	}
-	manifestClient = client.NewInMemoryClient(jsonManifest)
-	desiredManifest, err = manifestClient.GetCurrentManifest(ctx, "")
-
-	_, ok := err.(*manifest.ErrCannotParse)
-	if ok {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
-	} else if err != nil {
-		return nil, err
-	}
-
-	if err = s.acquireLock(ctx); err != nil {
-		return nil, err
-	}
-	defer s.deployment.Unlock()
-
-	s.deployment.CurrentReleaseManifest = desiredManifest
-	if err = s.persistDeployment(); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to persist deployment database: %s", err.Error())
-	}
-
-	return &api.SetManifestResponse{}, nil
-}
-
 // Upgrade requests the deployment-service pulls down the latest manifest and applies it
 func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.UpgradeResponse, error) {
 	if !s.HasConfiguredDeployment() {

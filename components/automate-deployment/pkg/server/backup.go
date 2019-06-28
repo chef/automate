@@ -10,6 +10,8 @@ import (
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/backup"
+	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
+	"github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 )
 
 // CreateBackup creates an Automate Backup
@@ -116,22 +118,70 @@ func (s *server) DeleteBackups(ctx context.Context, req *api.DeleteBackupsReques
 
 // Restore backup restore an Automate backup
 func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupRequest) (*api.RestoreBackupResponse, error) {
-	res := &api.RestoreBackupResponse{}
+	var (
+		err               error
+		manifestClient    manifest.ReleaseManifestProvider
+		desiredManifest   *manifest.A2
+		jsonManifest      []byte
+		bgwLocationSpec   backup.LocationSpecification
+		remoteRestoreSpec backup.LocationSpecification
+
+		// In local mode the default bucket is backups
+		bucket   = "backups"
+		basePath = ""
+
+		res = &api.RestoreBackupResponse{}
+	)
+
+	if !s.HasConfiguredDeployment() {
+		return nil, ErrorNotConfigured
+	}
+
+	// If a manifest has been provided we should persist it before starting the
+	// the restoration of services.
+	jsonManifest = req.GetRestore().GetManifest().GetJson()
+	if jsonManifest != nil {
+		manifestClient = client.NewInMemoryClient(jsonManifest)
+		desiredManifest, err = manifestClient.GetCurrentManifest(ctx, "")
+
+		if err != nil {
+			_, ok := err.(*manifest.ErrCannotParse)
+			if ok {
+				return nil, status.Errorf(codes.InvalidArgument, err.Error())
+			}
+
+			return nil, err
+		}
+
+		persistManifest := func() error {
+			if err = s.acquireLock(ctx); err != nil {
+				return err
+			}
+			defer s.deployment.Unlock()
+
+			s.deployment.CurrentReleaseManifest = desiredManifest
+			if err = s.persistDeployment(); err != nil {
+				return status.Errorf(codes.Internal, "failed to persist deployment database: %s", err.Error())
+			}
+
+			return nil
+		}
+
+		if err = persistManifest(); err != nil {
+			return res, err
+		}
+	}
 
 	// Update the config and reload the backup runner because our config has
 	// changed.
-	if err := s.updateUserOverrideConfigFromRestoreBackupRequest(req); err != nil {
+	if err = s.updateUserOverrideConfigFromRestoreBackupRequest(req); err != nil {
 		return res, err
 	}
 
-	if err := s.reloadBackupRunner(); err != nil {
+	if err = s.reloadBackupRunner(); err != nil {
 		logrus.WithError(err).Error("failed to load backup runner")
 		return res, status.Error(codes.Internal, err.Error())
 	}
-
-	// In local mode the default bucket is backups
-	bucket := "backups"
-	basePath := ""
 
 	// If we are restoring from S3 we'll override the bucket and base path
 	// with the configuration that has been given.
@@ -140,7 +190,7 @@ func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupReques
 		basePath = req.Restore.GetS3BackupLocation().GetBasePath()
 	}
 
-	bgwLocationSpec, err := backup.NewBackupGatewayLocationSpec(
+	bgwLocationSpec, err = backup.NewBackupGatewayLocationSpec(
 		s.deployment.BackupGatewayEndpoint(),
 		bucket,
 		basePath,
@@ -152,8 +202,7 @@ func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupReques
 		return res, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	remoteRestoreSpec := backup.NewRemoteLocationSpecificationFromRestoreTask(req.Restore)
-
+	remoteRestoreSpec = backup.NewRemoteLocationSpecificationFromRestoreTask(req.Restore)
 	sender := s.newEventSender()
 
 	// Lock the deployment and stop the converge loop. The runner will

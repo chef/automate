@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -165,13 +164,32 @@ func (r *DeploymentRestore) loadMetadata(ctx context.Context, bucket backup.Buck
 }
 
 func (r *DeploymentRestore) loadManifest(ctx context.Context, bucket backup.Bucket) error {
-	man, err := backup.LoadBackupManifest(ctx, bucket, r.restoreTask)
+	var (
+		manifestLocation backup.ReleaseManifestLocation
+		manifest         manifest.ReleaseManifest
+		err              error
+	)
 
-	if err != nil {
-		return wrapBackupOrChecksumErr(err, "Loading backup manifest from the backup directory failed")
+	if r.restoreTask.GetAirgap() {
+		manifestLocation = backup.NewOnDiskManifestLocation(api.AirgapManifestPath)
+	} else if r.restoreTask.GetUpgrade() {
+		manifestLocation = backup.NewLatestManifestLocation(
+			r.restoreTask.GetHartifactsPath(),
+			r.restoreTask.GetOverrideOrigin(),
+		)
+	} else {
+		manifestLocation, err = backup.NewBucketManifestLocation(ctx, bucket)
+		if err != nil {
+			return wrapBackupOrChecksumErr(err, "Loading manifest from the backup bucket failed")
+		}
 	}
 
-	r.a2Manifest = man
+	manifest, err = manifestLocation.Provider().GetCurrentManifest(ctx, r.restoreTask.GetChannel())
+	if err != nil {
+		return wrapBackupOrChecksumErr(err, "Loading the current manifest failed")
+	}
+
+	r.a2Manifest = manifest
 	return nil
 }
 
@@ -299,7 +317,7 @@ func (r *DeploymentRestore) startDeploymentService(ctx context.Context) error {
 
 	var (
 		sleepTime  = 500 * time.Millisecond
-		currentRel = "unknown"
+		currentRel string
 		desiredRel = deployment.ServiceFromManifest(r.a2Manifest, deploymentServiceName).Release()
 		err        error
 	)
@@ -312,8 +330,13 @@ func (r *DeploymentRestore) startDeploymentService(ctx context.Context) error {
 		// that status can be delayed for up to 30 seconds if
 		// the first health check happens to fail.
 		currentRel, err = r.serviceRelease(ctx)
-		if err != nil && currentRel == desiredRel {
+		if err == nil && (currentRel == desiredRel) {
 			return nil
+		}
+
+		// Make there error message pretty
+		if currentRel == "" {
+			currentRel = "unknown"
 		}
 
 		select {
@@ -329,7 +352,6 @@ func (r *DeploymentRestore) startDeploymentService(ctx context.Context) error {
 		Disconnect()
 		time.Sleep(sleepTime)
 	}
-
 }
 
 func (r *DeploymentRestore) writeConvergeDisableFile() error {
@@ -522,57 +544,18 @@ func (r *DeploymentRestore) Restore(ctx context.Context) error {
 		return err
 	}
 
-	// We've already resolved/loaded the desired A2 manifest and used it to
-	// bootstrap habitat and deployment-service. Since the manifest that was
-	// persisted deployment-services backup may be different we'll set it to
-	// the version that we've resolved and that'll allow us to skip resolving
-	// it again in the restore gRPC call and having to persist it.
-	r.writer.Body("Updating service manifest")
-	if err := r.setManifest(ctx); err != nil {
-		return err
-	}
-
 	return nil
 }
 
-func (r *DeploymentRestore) setManifest(ctx context.Context) error {
+func (r *DeploymentRestore) ResolvedManifest() (manifest.ReleaseManifest, error) {
 	if r.a2Manifest == nil {
-		return status.New(
+		return nil, status.New(
 			status.BackupRestoreError,
-			"failed to update to the desired A2 manifest",
+			"manifest has not been loaded",
 		)
 	}
 
-	js, err := json.Marshal(r.a2Manifest)
-	if err != nil {
-		return status.Wrap(err, status.MarshalError, "Failed to marshal package manifest to JSON")
-	}
-
-	deadline, ok := ctx.Deadline()
-	if !ok {
-		deadline = time.Now().Add(5 * time.Second)
-	}
-
-	con, err := Connection(time.Until(deadline))
-	if err != nil {
-		return status.Annotate(err, status.DeploymentServiceUnreachableError)
-	}
-
-	_, err = con.SetManifest(ctx, &api.SetManifestRequest{
-		Manifest: &api.ReleaseManifest{
-			Json: js,
-		},
-	})
-
-	if err != nil {
-		return status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"Request to update manifest failed",
-		)
-	}
-
-	return nil
+	return r.a2Manifest, nil
 }
 
 func wrapBackupOrChecksumErr(err error, message string) error {
