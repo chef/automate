@@ -305,6 +305,9 @@ func init() {
         },
         "previous_health_check": {
           "$ref": "#/definitions/applicationsHealthStatus"
+        },
+        "last_health_change": {
+          "type": "string"
         }
       }
     },

@@ -246,6 +246,7 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			Channel:             svc.Channel,
 			Site:                svc.Site,
 			PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
+			LastHealthChange:    svc.LastHealthChange,
 		}
 	}
 	return services
