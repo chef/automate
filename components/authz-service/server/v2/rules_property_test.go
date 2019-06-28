@@ -21,89 +21,16 @@ const (
 	idRegex = "^[a-z0-9-]{1,64}$"
 )
 
+type projectAndRuleReq struct {
+	api.CreateProjectReq
+	rules []api.CreateRuleReq
+}
+
 func TestCreateRuleProperties(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	testFW := testhelpers.NewTestFramework(t, ctx)
-	cl := testFW.Projects
-	testDB := testFW.TestDB
-	seed := testFW.Seed
-
-	graphicRange := rangetable.Merge(unicode.GraphicRanges...)
-
-	conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
-		"Type": gen.OneConstOf(
-			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
-			api.ProjectRuleConditionAttributes_CHEF_ORGS,
-			api.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
-			api.ProjectRuleConditionAttributes_ROLES,
-			api.ProjectRuleConditionAttributes_CHEF_TAGS,
-			api.ProjectRuleConditionAttributes_POLICY_GROUP,
-			api.ProjectRuleConditionAttributes_POLICY_NAME,
-		),
-		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
-	})
-	conditionsGenEvent := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
-		"Type": gen.OneConstOf(
-			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
-			api.ProjectRuleConditionAttributes_CHEF_ORGS,
-		),
-		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
-	})
-	createRuleReqGenEvent := gen.Struct(reflect.TypeOf(&api.CreateRuleReq{}), map[string]gopter.Gen{
-		"Id":         gen.RegexMatch(idRegex),
-		"Name":       gen.UnicodeString(graphicRange),
-		"ProjectId":  gen.RegexMatch(idRegex),
-		"Type":       gen.Const(api.ProjectRuleTypes_EVENT),
-		"Conditions": gen.SliceOf(conditionsGenEvent),
-	})
-	createRuleReqGenNode := gen.Struct(reflect.TypeOf(&api.CreateRuleReq{}), map[string]gopter.Gen{
-		"Id":         gen.RegexMatch(idRegex),
-		"Name":       gen.UnicodeString(graphicRange),
-		"ProjectId":  gen.RegexMatch(idRegex),
-		"Type":       gen.Const(api.ProjectRuleTypes_NODE),
-		"Conditions": gen.SliceOf(conditionsGenNode),
-	})
-
-	createRuleReqGen := gopter.CombineGens(
-		gen.Bool(), // event or node?
-		createRuleReqGenEvent,
-		createRuleReqGenNode,
-	).Map(func(values []interface{}) api.CreateRuleReq {
-		if values[0].(bool) {
-			return values[1].(api.CreateRuleReq)
-		} else {
-			return values[2].(api.CreateRuleReq)
-		}
-	})
-
-	createProjectReqGen := gen.Struct(reflect.TypeOf(&api.CreateProjectReq{}), map[string]gopter.Gen{
-		"Id":   gen.RegexMatch(idRegex),
-		"Name": gen.UnicodeString(graphicRange),
-	})
-
-	type projectAndRuleReq struct {
-		api.CreateProjectReq
-		rules []api.CreateRuleReq
-	}
-
-	createProjectAndRuleGen := gopter.CombineGens(
-		createProjectReqGen,
-		createRuleReqGen,
-	).Map(func(vals []interface{}) projectAndRuleReq {
-		p := vals[0].(api.CreateProjectReq)
-		r := vals[1].(api.CreateRuleReq)
-		r.ProjectId = p.Id
-		return projectAndRuleReq{
-			CreateProjectReq: p,
-			rules:            []api.CreateRuleReq{r},
-		}
-	})
-
-	params := gopter.DefaultTestParametersWithSeed(seed)
-	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
-	params.MinSuccessfulTests = 5
-	properties := gopter.NewProperties(params)
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+	createRuleReqGen, createProjectReqGen, createProjectAndRuleGen := getGenerators()
 
 	properties.Property("creates a staged rule", prop.ForAll(
 		func(reqs projectAndRuleReq) bool {
@@ -353,7 +280,9 @@ func TestCreateRuleProperties(t *testing.T) {
 			return grpctest.AssertCode(t, codes.AlreadyExists, err)
 		},
 		// TODO(sr): deduplicate with the combinegen above?
-		gopter.CombineGens(createProjectReqGen, createRuleReqGen, createRuleReqGen).Map(func(vals []interface{}) projectAndRuleReq {
+		gopter.CombineGens(
+			createProjectReqGen, createRuleReqGen, createRuleReqGen,
+		).Map(func(vals []interface{}) projectAndRuleReq {
 			p := vals[0].(api.CreateProjectReq)
 			// we "fix" the second req to use the same ID as the first one
 			r0 := vals[1].(api.CreateRuleReq)
@@ -369,6 +298,82 @@ func TestCreateRuleProperties(t *testing.T) {
 	))
 	properties.TestingRun(t)
 	testFW.Shutdown(t, ctx)
+}
+
+func getGopterParams(seed int64) *gopter.Properties {
+	params := gopter.DefaultTestParametersWithSeed(seed)
+	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
+	params.MinSuccessfulTests = 5
+	return gopter.NewProperties(params)
+}
+
+func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
+	graphicRange := rangetable.Merge(unicode.GraphicRanges...)
+
+	conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
+		"Type": gen.OneConstOf(
+			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+			api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			api.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+			api.ProjectRuleConditionAttributes_ROLES,
+			api.ProjectRuleConditionAttributes_CHEF_TAGS,
+			api.ProjectRuleConditionAttributes_POLICY_GROUP,
+			api.ProjectRuleConditionAttributes_POLICY_NAME,
+		),
+		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
+	})
+	conditionsGenEvent := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
+		"Type": gen.OneConstOf(
+			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
+			api.ProjectRuleConditionAttributes_CHEF_ORGS,
+		),
+		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
+	})
+	createRuleReqGenEvent := gen.Struct(reflect.TypeOf(&api.CreateRuleReq{}), map[string]gopter.Gen{
+		"Id":         gen.RegexMatch(idRegex),
+		"Name":       gen.UnicodeString(graphicRange),
+		"ProjectId":  gen.RegexMatch(idRegex),
+		"Type":       gen.Const(api.ProjectRuleTypes_EVENT),
+		"Conditions": gen.SliceOf(conditionsGenEvent),
+	})
+	createRuleReqGenNode := gen.Struct(reflect.TypeOf(&api.CreateRuleReq{}), map[string]gopter.Gen{
+		"Id":         gen.RegexMatch(idRegex),
+		"Name":       gen.UnicodeString(graphicRange),
+		"ProjectId":  gen.RegexMatch(idRegex),
+		"Type":       gen.Const(api.ProjectRuleTypes_NODE),
+		"Conditions": gen.SliceOf(conditionsGenNode),
+	})
+
+	createRuleReqGen := gopter.CombineGens(
+		gen.Bool(), // event or node?
+		createRuleReqGenEvent,
+		createRuleReqGenNode,
+	).Map(func(values []interface{}) api.CreateRuleReq {
+		if values[0].(bool) {
+			return values[1].(api.CreateRuleReq)
+		} else {
+			return values[2].(api.CreateRuleReq)
+		}
+	})
+
+	createProjectReqGen := gen.Struct(reflect.TypeOf(&api.CreateProjectReq{}), map[string]gopter.Gen{
+		"Id":   gen.RegexMatch(idRegex),
+		"Name": gen.UnicodeString(graphicRange),
+	})
+
+	createProjectAndRuleGen := gopter.CombineGens(
+		createProjectReqGen, createRuleReqGen,
+	).Map(func(vals []interface{}) projectAndRuleReq {
+		p := vals[0].(api.CreateProjectReq)
+		r := vals[1].(api.CreateRuleReq)
+		r.ProjectId = p.Id
+		return projectAndRuleReq{
+			CreateProjectReq: p,
+			rules:            []api.CreateRuleReq{r},
+		}
+	})
+
+	return createRuleReqGen, createProjectReqGen, createProjectAndRuleGen
 }
 
 func RuleMatches(req interface{}, actual api.ProjectRule) bool {
