@@ -64,9 +64,10 @@ type Server struct {
 }
 
 const (
+	aliveKey                 = "alive"
 	refreshTokenKey          = "refresh_token"
-	relayStateKey            = "relay_state"  // random, passed to OIDC IdP
-	clientStateKey           = "client_state" // coming from the browser, passed back on success
+	relayStateKeyPrefix      = "relay_state_"  // random, passed to OIDC IdP
+	clientStateKeyPrefix     = "client_state_" // coming from the browser, passed back on success
 	numRelayStateRandomBytes = 10
 	redirectURIKey           = "redirect_uri"
 )
@@ -220,7 +221,7 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("no state in request: %q", r.Form), http.StatusBadRequest)
 		return
 	}
-	knownRelayState, err := sess.GetBool(relayStateKey + "_" + state)
+	knownRelayState, err := sess.GetBool(relayStateKeyPrefix + state)
 	if err != nil {
 		s.log.Debugf("bad session data (relay state): %v", err)
 		http.Error(w, "bad session data (relay state)", http.StatusBadRequest)
@@ -271,7 +272,7 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	clientState, err := sess.GetString(clientStateKey + "_" + state)
+	clientState, err := sess.GetString(clientStateKeyPrefix + state)
 	s.log.Debugf("retrieved clientState %q", clientState)
 	if err != nil {
 		s.log.Debugf("bad session data (client state): %v", err)
@@ -280,12 +281,12 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// remove used relay_state + client_state
-	if err := sess.Remove(w, relayStateKey+"_"+state); err != nil { // nolint: vetshadow
+	if err := sess.Remove(w, relayStateKeyPrefix+state); err != nil { // nolint: vetshadow
 		s.log.Debugf("failed to remove relay state: %v", err)
 		http.Error(w, errors.Wrap(err, "failed to remove relay state").Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := sess.Remove(w, clientStateKey+"_"+state); err != nil { // nolint: vetshadow
+	if err := sess.Remove(w, clientStateKeyPrefix+state); err != nil { // nolint: vetshadow
 		s.log.Debugf("failed to remove client state: %v", err)
 		http.Error(w, errors.Wrap(err, "failed to remove client state").Error(), http.StatusInternalServerError)
 		return
@@ -454,17 +455,19 @@ func (s *Server) refreshHandler(w http.ResponseWriter, r *http.Request) {
 	// maybeExchangeRefreshTokenForIDToken will return the still-valid idToken.
 
 	// Check if the session exists
-	// Note 2018/01/05 (sr): Couldn't find a better way.
-	if keys, err := sess.Keys(); err != nil { // nolint: vetshadow
+	if alive, err := sess.GetBool(aliveKey); err != nil {
+		s.log.Error("error retrieving session alive key")
 		httpError(w, http.StatusInternalServerError)
 		return
-	} else if len(keys) == 0 {
+	} else if !alive {
+		s.log.Info("no session found")
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
 
 	idToken, err := util.ExtractBearerToken(r)
 	if err != nil {
+		s.log.Debug("no bearer token")
 		httpError(w, http.StatusUnauthorized)
 		return
 	}
@@ -579,20 +582,27 @@ func (s *Server) newHandler(w http.ResponseWriter, r *http.Request) {
 	// take state we've gotten from the client, store it
 	if clientState := r.FormValue("state"); clientState != "" {
 		s.log.Debugf("storing clientState %s", clientState)
-		if err := sess.PutString(w, clientStateKey+"_"+relayState, clientState); err != nil {
+		if err := sess.PutString(w, clientStateKeyPrefix+relayState, clientState); err != nil {
 			http.Error(w, "failed to set client state", http.StatusInternalServerError)
 			return
 		}
 	}
 
 	// bind relay state to session
-	if err := sess.PutBool(w, relayStateKey+"_"+relayState, true); err != nil {
+	if err := sess.PutBool(w, relayStateKeyPrefix+relayState, true); err != nil {
 		s.log.Errorf("couldn't put relay state into session: %s", err)
 		httpError(w, http.StatusInternalServerError)
 		return
 	}
 	s.log.Debugf("stored relayState %s", relayState)
 	authCodeURL := s.client.AuthCodeURL(relayState)
+
+	if err := sess.PutBool(w, aliveKey, true); err != nil {
+		s.log.Errorf("couldn't put aliveness state into session: %s", err)
+		httpError(w, http.StatusInternalServerError)
+		return
+	}
+
 	http.Redirect(w, r, authCodeURL, http.StatusSeeOther)
 }
 

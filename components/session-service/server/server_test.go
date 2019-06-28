@@ -13,11 +13,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/patrickmn/go-cache"
-
 	"github.com/alexedwards/scs"
 	"github.com/alexedwards/scs/stores/memstore"
 	go_oidc "github.com/coreos/go-oidc"
+	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -33,23 +32,23 @@ const bldrURLString = "https://builder.test/"
 
 func TestSafeCmpStrings(t *testing.T) {
 	t.Run("when the strings are the same, it returns true", func(t *testing.T) {
-		require.Equal(t, safeCmpStrings("teststring", "teststring"), true)
+		assert.True(t, safeCmpStrings("teststring", "teststring"))
 	})
 
 	t.Run("when the strings are the same length but have different content, returns false", func(t *testing.T) {
-		require.Equal(t, safeCmpStrings("length7", "7length"), false)
+		assert.False(t, safeCmpStrings("length7", "7length"))
 	})
 
 	t.Run("when the strings are the different lengths, returns false", func(t *testing.T) {
-		require.Equal(t, safeCmpStrings("somestring", "wrong"), false)
+		assert.False(t, safeCmpStrings("somestring", "wrong"))
 	})
 
 	t.Run("when one string is empty, returns false", func(t *testing.T) {
-		require.Equal(t, safeCmpStrings("", "wrong"), false)
+		assert.False(t, safeCmpStrings("", "wrong"))
 	})
 
 	t.Run("when both strings are empty, returns true", func(t *testing.T) {
-		require.Equal(t, safeCmpStrings("", ""), true)
+		assert.True(t, safeCmpStrings("", ""))
 	})
 }
 
@@ -94,8 +93,9 @@ func TestNewHandler(t *testing.T) {
 			}
 			err = json.Unmarshal(data, &cookie)
 			require.Nil(t, err)
-			assert.Equal(t, 2, len(cookie.Data), "expecting 2 keys in cookie data")
+			assert.Equal(t, 3, len(cookie.Data), "expecting 3 keys in cookie data")
 
+			aliveStateInCookieData(t, cookie.Data)
 			rs := findRelayStateInCookieData(t, cookie.Data)
 			cs := findClientStateInCookieData(t, cookie.Data, rs)
 			require.Contains(t, resp.Header.Get("Location"), rs)
@@ -145,14 +145,13 @@ func TestNewHandler(t *testing.T) {
 			}
 			err = json.Unmarshal(data, &cookie)
 			require.Nil(t, err)
-			assert.Equal(t, 4, len(cookie.Data), "expecting 4 keys in cookie data")
+			assert.Equal(t, 5, len(cookie.Data), "expecting 5 keys in cookie data")
 
 			// find relay states
 			rs := 0
 			for k, v := range cookie.Data {
-				if x, ok := v.(bool); ok {
+				if x, ok := v.(bool); ok && strings.HasPrefix(k, "relay_state_") {
 					assert.True(t, x, "expected relay state stored as map: rs => bool (true)")
-					require.True(t, strings.HasPrefix(k, "relay_state_"))
 					rs++
 				}
 			}
@@ -166,6 +165,8 @@ func TestNewHandler(t *testing.T) {
 				}
 			}
 			assert.ElementsMatch(t, []string{"/nodes", "/settings"}, vals)
+
+			aliveStateInCookieData(t, cookie.Data)
 		},
 		"GET /new from builder is redirected to dex, stores generated relay_state xyz": func(t *testing.T) {
 			reqStr := fmt.Sprintf("/new?state=xyz&client_id=bldr-client&redirect_uri=%s&response_type=code&scope=openid&nonce=0",
@@ -194,7 +195,7 @@ func TestNewHandler(t *testing.T) {
 			}
 			err = json.Unmarshal(data, &cookie)
 			require.Nil(t, err)
-			assert.Equal(t, 3, len(cookie.Data), "expecting 3 keys in cookie data")
+			assert.Equal(t, 4, len(cookie.Data), "expecting 4 keys in cookie data")
 			ru, ok := cookie.Data["redirect_uri"]
 			require.True(t, ok)
 
@@ -317,7 +318,8 @@ func TestRefreshHandler(t *testing.T) {
 
 			sessionData := struct {
 				RT string `json:"refresh_token"` // should equal refreshTokenKey const
-			}{refreshToken}
+				Alive bool `json:"alive"`
+			}{RT: refreshToken, Alive: true}
 			if err := addSessionDataToStore(ms, sessionID, sessionData, nil); err != nil {
 				t.Fatal(err)
 			}
@@ -347,11 +349,10 @@ func TestRefreshHandler(t *testing.T) {
 			t1 := (&oauth2.Token{}).WithExtra(map[string]interface{}{"id_token": incomingIDToken})
 			s.setTestToken(t1, nil)
 
-			// anything, just so it doesn't trigger "no session found" (which happens if
-			// there's no keys at all in session data)
+			// set "alive" so that the session is known
 			sessionData := struct {
-				Foo string `json:"foo"`
-			}{"bar"}
+				Alive bool `json:"alive"`
+			}{true}
 			if err := addSessionDataToStore(ms, sessionID, sessionData, nil); err != nil {
 				t.Fatal(err)
 			}
@@ -378,7 +379,8 @@ func TestRefreshHandler(t *testing.T) {
 
 			sessionData := struct {
 				RT string `json:"refresh_token"` // should equal refreshTokenKey const
-			}{refreshToken}
+				Alive bool `json:"alive"`
+			}{RT: refreshToken, Alive: true}
 			if err := addSessionDataToStore(ms, sessionID, sessionData, nil); err != nil {
 				t.Fatal(err)
 			}
@@ -1030,14 +1032,22 @@ func findRelayStateInCookieData(t *testing.T, d map[string]interface{}) string {
 	t.Helper()
 	rs := ""
 	for k, v := range d {
-		if x, ok := v.(bool); ok {
+		if x, ok := v.(bool); ok && strings.HasPrefix(k, "relay_state_") {
 			assert.True(t, x, "expected relay state stored as map: rs => bool (true)")
-			require.True(t, strings.HasPrefix(k, "relay_state_"))
 			rs = k[len("relay_state_"):]
 		}
 	}
 	require.NotEmpty(t, rs)
 	return rs
+}
+
+func aliveStateInCookieData(t *testing.T, d map[string]interface{}) {
+	t.Helper()
+	x, ok := d["alive"]
+	require.True(t, ok, "alive key exists")
+	y, ok := x.(bool)
+	require.True(t, ok, "alive value is of type bool")
+	require.True(t, y, "alive value is true")
 }
 
 func findClientStateInCookieData(t *testing.T, d map[string]interface{}, rs string) string {
