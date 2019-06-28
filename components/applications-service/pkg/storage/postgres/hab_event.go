@@ -73,6 +73,7 @@ var (
 	)
 )
 
+// process a habitat HealthCheck event and store it into the database
 func (db *Postgres) IngestHealthCheckEvent(event *habitat.HealthCheckEvent) error {
 	opsInFlight.Inc()
 	defer opsInFlight.Dec()
@@ -96,7 +97,7 @@ func (db *Postgres) IngestHealthCheckEvent(event *habitat.HealthCheckEvent) erro
 	return err
 }
 
-// IngestHabEvents process habitat events and store them into the database
+// same as IngestHealthCheckEvent but without metrics
 func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCheckEvent) error {
 	log.WithFields(log.Fields{
 		"storage": "postgres",
@@ -129,59 +130,33 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 		eventMetadata.GetSupervisorId(),
 	)
 
+	// @afiune all our backend was designed for the health check to be all
+	// uppercases but habitat is actually sending case sensitive strings
+	newHealth := strings.ToUpper(event.GetResult().String())
+	// TODO @afiune verify health
+
 	// If the service already exists, we just do a simple update
-	//
-	// Fields that needs to be updated:
-	// - Package ident (without name. the name of a service can't be changed!)
-	// - Update strategy
-	// - Health, Application, Environment, Site and Fqdn
-	// - Timestamp of last event received (occurred_at)
 	if exist {
-		// Update Health
-		//
-		// @afiune all our backend was designed for the health check to be all
-		// uppercases but habitat is actually sending case sensitive strings
-		newHealth := strings.ToUpper(event.GetResult().String())
-
-		// Verify if the service health changed, if so, save the current health
-		// into the previous_health and update it with the new one
-		if svc.Health != newHealth {
-			svc.PreviousHealth = svc.Health
-			svc.Health = strings.ToUpper(event.GetResult().String())
-		}
-
-		// Update Package Identifier
-		svc.Origin = pkgIdent.Origin
-		svc.Version = pkgIdent.Version
-		svc.Release = pkgIdent.Release
-		svc.FullPkgIdent = pkgIdent.FullPackageIdent()
-
-		// Update Channel
-		// TODO @afiune do we want to store the strategy?
-		if svcMetadata.GetUpdateConfig() != nil {
-			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
-		} else {
-			svc.Channel = ""
-		}
-
-		// Update the timestamp of the last event received
-		svc.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
-
-		if _, err := db.DbMap.Update(svc); err != nil {
-			return errors.Wrap(err, "unable to update service")
-		}
-		return nil
+		return db.updateService(
+			svc,
+			eventMetadata,
+			svcMetadata,
+			pkgIdent,
+			newHealth,
+		)
 	}
 
 	// But if the service doesn't exist, we will handle it as a new service insertion
-	return db.insertNewServiceFromHealthCheckEvent(
+	return db.insertNewService(
 		eventMetadata,
 		svcMetadata,
 		pkgIdent,
-		strings.ToUpper(event.GetResult().String()),
+		newHealth,
 	)
 }
 
+// convert a proto timestamp to native go time,
+// on any error return the current time (now)
 func convertOrCreateTimestamp(t *timestamp.Timestamp) time.Time {
 	goTime, err := ptypes.Timestamp(t)
 	if err != nil {
@@ -191,10 +166,74 @@ func convertOrCreateTimestamp(t *timestamp.Timestamp) time.Time {
 	return goTime
 }
 
-// insertNewServiceFromHealthCheckEvent assumes the service to be inserted doesn't exist already,
+// updates the provided service from a HealthCheck event
+//
+// fields that needs to be updated:
+// - Package ident (without name. the name of a service can't be changed!)
+// - Update strategy
+// - Health, Application, Environment, Site and Fqdn
+// - Timestamp of last event received (occurred_at)
+func (db *Postgres) updateService(
+	svc *service,
+	eventMetadata *habitat.EventMetadata,
+	svcMetadata *habitat.ServiceMetadata,
+	pkgIdent *packageIdent,
+	health string) error {
+
+	// Verify if the service health changed, if so, save the current health
+	// into the previous_health and update it with the new one
+	if svc.Health != health {
+		svc.PreviousHealth = svc.Health
+		svc.Health = health
+		svc.needUpdate = true
+	}
+
+	// Update Package Identifier
+	if svc.FullPkgIdent != pkgIdent.FullPackageIdent() {
+		svc.Origin = pkgIdent.Origin
+		svc.Version = pkgIdent.Version
+		svc.Release = pkgIdent.Release
+		svc.FullPkgIdent = pkgIdent.FullPackageIdent()
+		svc.needUpdate = true
+	}
+
+	// Update Channel
+	updateServiceChannel(svc, svcMetadata.GetUpdateConfig())
+
+	// update only if there is something to update
+	if svc.needUpdate {
+		// Update the timestamp of the last event received
+		svc.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
+
+		if _, err := db.DbMap.Update(svc); err != nil {
+			return errors.Wrap(err, "unable to update service")
+		}
+	}
+
+	return nil
+}
+
+// update the service channel from the provided habitat update config
+// TODO @afiune do we want to store the strategy?
+func updateServiceChannel(svc *service, updateConfig *habitat.UpdateConfig) {
+	if updateConfig == nil && svc.Channel != "" {
+		svc.Channel = ""
+		svc.needUpdate = true
+	}
+
+	if updateConfig != nil {
+		channel := updateConfig.GetChannel()
+		if svc.Channel != channel {
+			svc.Channel = channel
+			svc.needUpdate = true
+		}
+	}
+}
+
+// insertNewService assumes the service to be inserted doesn't exist already,
 // this function is wrapped with a transaction func since it could do multiple things
 // like insert a supervisor, service_group, deployment and the service itself.
-func (db *Postgres) insertNewServiceFromHealthCheckEvent(
+func (db *Postgres) insertNewService(
 	eventMetadata *habitat.EventMetadata,
 	svcMetadata *habitat.ServiceMetadata,
 	pkgIdent *packageIdent,
@@ -255,8 +294,8 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 			DeploymentID:        did,
 			SupID:               sid,
 			FullPkgIdent:        pkgIdent.FullPackageIdent(),
-			LastEventOccurredAt: convertOrCreateTimestamp(eventMetadata.GetOccurredAt()),
 			PreviousHealth:      applications.HealthStatus_NONE.String(),
+			LastEventOccurredAt: convertOrCreateTimestamp(eventMetadata.GetOccurredAt()),
 		}
 
 		if svcMetadata.GetUpdateConfig() != nil {
@@ -272,15 +311,11 @@ func (db *Postgres) insertNewServiceFromHealthCheckEvent(
 
 }
 
-const selectDeploymentID = `
-SELECT id FROM deployment
-WHERE app_name = $1
-  AND environment = $2
-`
-
 func (db *Postgres) getDeploymentID(app, env string) (int32, bool) {
 	var id int32
-	err := db.SelectOne(&id, selectDeploymentID, app, env)
+	err := db.SelectOne(&id,
+		"SELECT id FROM deployment WHERE app_name = $1 AND environment = $2",
+		app, env)
 	if err != nil {
 		return id, false
 	}
@@ -288,14 +323,12 @@ func (db *Postgres) getDeploymentID(app, env string) (int32, bool) {
 	return id, true
 }
 
-const selectSupervisorID = `
-SELECT id FROM supervisor
-WHERE member_id = $1
-`
-
 func (db *Postgres) getSupervisorID(member string) (int32, bool) {
 	var sid int32
-	err := db.SelectOne(&sid, selectSupervisorID, member)
+	err := db.SelectOne(&sid,
+		"SELECT id FROM supervisor WHERE member_id = $1",
+		member,
+	)
 	if err != nil {
 		return sid, false
 	}
@@ -303,14 +336,12 @@ func (db *Postgres) getSupervisorID(member string) (int32, bool) {
 	return sid, true
 }
 
-const selectServiceGroupID = `
-SELECT id FROM service_group
-WHERE name = $1
-`
-
 func (db *Postgres) getServiceGroupID(name string) (int32, bool) {
 	var gid int32
-	err := db.SelectOne(&gid, selectServiceGroupID, name)
+	err := db.SelectOne(&gid,
+		"SELECT id FROM service_group WHERE name = $1",
+		name,
+	)
 	if err != nil {
 		return gid, false
 	}

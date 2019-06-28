@@ -105,6 +105,9 @@ type service struct {
 	PreviousHealth      string    `db:"previous_health"`
 	CreatedAt           time.Time `db:"-"`
 	UpdatedAt           time.Time `db:"-"`
+
+	// (internal) use it to know if the service needs an update or not
+	needUpdate bool `db:"-"`
 }
 
 // supervisor struct is the representation of the supervisor table inside the db
