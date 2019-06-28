@@ -192,8 +192,8 @@ func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string)
 		"platform",
 		"profiles.name",
 		"profiles.version",
-		"profiles.namespace",
 		"profiles.sha256",
+		"profiles.status",
 		"end_time",
 		"report_uuid",
 		"status",
@@ -245,6 +245,7 @@ func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string)
 							Name:    profileMin.Name,
 							Version: profileMin.Version,
 							Id:      profileMin.SHA256,
+							Status:  profileMin.Status,
 						})
 					}
 					node := reportingapi.Node{
