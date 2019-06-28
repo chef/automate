@@ -183,6 +183,7 @@ func (db *Postgres) updateService(
 	// Verify if the service health changed, if so, save the current health
 	// into the previous_health and update it with the new one
 	if svc.Health != health {
+		svc.HealthUpdatedAt = time.Now()
 		svc.PreviousHealth = svc.Health
 		svc.Health = health
 		svc.needUpdate = true

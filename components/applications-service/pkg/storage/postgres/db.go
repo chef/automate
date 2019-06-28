@@ -101,13 +101,21 @@ type service struct {
 	SupID               int32     `db:"sup_id"`
 	Channel             string    `db:"channel"`
 	FullPkgIdent        string    `db:"package_ident"`
-	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
 	PreviousHealth      string    `db:"previous_health"`
+	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
+	HealthUpdatedAt     time.Time `db:"health_updated_at"`
 	CreatedAt           time.Time `db:"-"`
 	UpdatedAt           time.Time `db:"-"`
 
 	// (internal) use it to know if the service needs an update or not
 	needUpdate bool `db:"-"`
+}
+
+// implement the PreInsert hook for the service struct/table
+// TODO @afiune should we do this instead of SQL functions/triggers
+func (svc *service) PreInsert(s gorp.SqlExecutor) error {
+	svc.HealthUpdatedAt = time.Now()
+	return nil
 }
 
 // supervisor struct is the representation of the supervisor table inside the db
