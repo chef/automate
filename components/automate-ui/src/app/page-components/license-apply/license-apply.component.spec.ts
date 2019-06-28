@@ -13,11 +13,11 @@ import { ApplyStatus } from 'app/entities/license/license.reducer';
 import { LicenseStatus } from 'app/entities/license/license.model';
 import { LicenseApplyComponent } from './license-apply.component';
 
-function genErrorResp(statusCode: number, msg: string): any /* HttpErrorResponse */ {
+function genErrorResp(status: number, msg: string): any /* HttpErrorResponse */ {
   // not a full-fledged HttpErrorResponse but enough for our needs
   return {
-    status: statusCode,
-    statusText: 'Bad Request',
+    status,
+    statusText: 'Bad Request', // Note: always "OK" when using HTTP2
     url: 'https://a2-dev.test/api/v0/license/apply',
     ok: false,
     name: 'HttpErrorResponse',

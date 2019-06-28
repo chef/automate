@@ -47,7 +47,9 @@ describe('ConfigService', () => {
 
       expect(req.request.method).toEqual('GET');
 
-      req.flush(errorMsg, { status: 404, statusText: 'Not Found' });
+      // Note 2019/06/27 (sr): When using HTTP/2, statusText will always be "OK"
+      // so our logic shouldn't depend on it.
+      req.flush(errorMsg, { status: 404, statusText: 'OK' });
     });
   });
 });

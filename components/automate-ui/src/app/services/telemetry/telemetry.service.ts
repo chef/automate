@@ -1,6 +1,6 @@
 import { map, filter } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Router, NavigationEnd } from '@angular/router';
 import { ReplaySubject, Observable, Subject } from 'rxjs';
 import * as Sniffr from 'sniffr';
@@ -176,8 +176,8 @@ export class TelemetryService {
            });
 
         },
-        error => {
-          console.log(`Error retrieving Segment API key: ${error.status}/${error.statusText}`);
+        ({ status, error: { message } }: HttpErrorResponse) => {
+          console.log(`Error retrieving Segment API key: ${status}/${message}`);
         });
   }
 
@@ -258,8 +258,8 @@ export class TelemetryService {
          _response => {
            // WooHoo! we successfully submitted our telemetry event to the pipeline!
          },
-         error => {
-           console.log(`Error emitting telemetry event: ${error.status} - ${error.statusText}`);
+         ({ status, error: { message } }: HttpErrorResponse) => {
+           console.log(`Error emitting telemetry event: ${status} - ${message}`);
          }
        );
   }

@@ -79,6 +79,8 @@ export class ChefSessionService implements CanActivate {
       } else {
         // TODO 2017/12/15 (sr): is there anything we could do that's better than
         // this?
+        // NOTE 2019/06/27 (sr): this defaults to OK when using HTTP2; not worth
+        // messing with, though, this all needs to be redone.
         console.log(`Session refresh failed: ${xhr.statusText}`);
       }
     }

@@ -39,7 +39,9 @@ describe('HttpClientAuthInterceptor', () => {
       httpClient.get('/endpoint').subscribe(null, done);
 
       const httpRequest = httpMock.expectOne('/endpoint');
-      httpRequest.flush('response', { status: 401, statusText: 'Not Authorized' });
+      // Note 2019/06/27 (sr): When using HTTP/2, statusText will always be "OK"
+      // so our logic shouldn't depend on it.
+      httpRequest.flush('response', { status: 401, statusText: 'OK' });
 
       expect(chefSession.logout).toHaveBeenCalled();
     });
