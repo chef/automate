@@ -37,7 +37,27 @@ describe File.basename(__FILE__) do
                         },
                         "failed" => {}
                     }
-                }
+                },
+                "profiles" => [
+                  {
+                    "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                    "name" => "nginx-baseline",
+                    "status" => "passed",
+                    "version" => "2.1.0"
+                  },
+                  {
+                    "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                    "name" => "apache-baseline",
+                    "status" => "skipped",
+                    "version" => "2.0.1"
+                  },
+                  {
+                    "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                    "name" => "fake-baseline",
+                    "status" => "skipped",
+                    "version" => "2.0.1"
+                  }
+                ]
             }
         ],
         "total" => 1
@@ -73,7 +93,27 @@ describe File.basename(__FILE__) do
                             "skipped" => {},
                             "failed" => {}
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "passed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      },
+                      {
+                        "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "fake-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -96,7 +136,21 @@ describe File.basename(__FILE__) do
                                 "major" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "failed",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -119,7 +173,21 @@ describe File.basename(__FILE__) do
                                 "major" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -142,7 +210,21 @@ describe File.basename(__FILE__) do
                                 "major" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 }
             ],
             "total" => 4
@@ -185,7 +267,27 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "passed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      },
+                      {
+                        "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "fake-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -212,7 +314,21 @@ describe File.basename(__FILE__) do
                                 "major" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "failed",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -240,7 +356,21 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -268,7 +398,21 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 }
             ],
             "total" => 4
@@ -303,7 +447,27 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "passed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      },
+                      {
+                        "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "fake-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -328,7 +492,21 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "failed",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -350,7 +528,21 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -372,7 +564,21 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "a0ddd774-cbbb-49be-8730-49c92f3fc2a0",
@@ -394,7 +600,15 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 }
             ],
             "total" => 5
@@ -431,7 +645,27 @@ describe File.basename(__FILE__) do
                             },
                             "failed" => {}
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "passed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      },
+                      {
+                        "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "fake-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e112",
@@ -459,7 +693,21 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "failed",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e111",
@@ -487,7 +735,21 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 },
                 {
                     "id" => "9b9f4e51-b049-4b10-9555-10578916e222",
@@ -515,7 +777,21 @@ describe File.basename(__FILE__) do
                                 "critical" => 1
                             }
                         }
-                    }
+                    },
+                    "profiles" => [
+                      {
+                        "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                        "name" => "nginx-baseline",
+                        "status" => "failed",
+                        "version" => "2.1.0"
+                      },
+                      {
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "name" => "apache-baseline",
+                        "status" => "skipped",
+                        "version" => "2.0.1"
+                      }
+                    ]
                 }
             ],
             "total" => 4

@@ -53,6 +53,10 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		"environment",
 		"platform.name",
 		"platform.release",
+		"profiles.name",
+		"profiles.version",
+		"profiles.sha256",
+		"profiles.status",
 		"report_uuid",
 		"end_time")
 
@@ -102,10 +106,21 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 			if hit.Source != nil {
 				err := json.Unmarshal(*hit.Source, &item)
 				if err == nil {
+					// read all profiles
+					profiles := make([]*reportingapi.ProfileMeta, 0)
+					for _, profileMin := range item.Profiles {
+						profiles = append(profiles, &reportingapi.ProfileMeta{
+							Name:    profileMin.Name,
+							Version: profileMin.Version,
+							Id:      profileMin.SHA256,
+							Status:  profileMin.Status,
+						})
+					}
 					node := reportingapi.Node{
 						Id:          item.NodeID,
 						Name:        item.NodeName,
 						Environment: item.Environment,
+						Profiles:    profiles,
 					}
 
 					var platform reportingapi.Platform
