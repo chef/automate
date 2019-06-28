@@ -11,6 +11,15 @@ clean:
 sync: themes/chef
 	pushd themes/chef && git fetch && git reset --hard origin/master && popd
 
+SWAGGER_DIR=data/docs/api_chef_automate
+
+clean_swagger_files:
+	rm -rf ./$(SWAGGER_DIR)/*
+
+sync_swagger_files: clean_swagger_files
+	pushd ../../api/external && find . -name '*.swagger.json' | cpio -p -dumv ../../components/automate-chef-io/$(SWAGGER_DIR) && popd
+	pushd ../automate-gateway/api/ && find . -name '*.swagger.json' | cpio -p -dumv ../../automate-chef-io/$(SWAGGER_DIR) && popd
+
 serve: sync
 	hugo server --buildDrafts --noHTTPCache
 
