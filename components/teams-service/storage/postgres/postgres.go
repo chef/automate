@@ -113,7 +113,7 @@ func (p *postgres) getTeam(ctx context.Context, q querier, teamID uuid.UUID) (st
 	err := q.QueryRowContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.updated_at, t.created_at
 		FROM teams t
-		WHERE t.id=$1`, teamID).
+		WHERE t.db_id=team_db_id($1)`, teamID).
 		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
@@ -262,7 +262,7 @@ func (p *postgres) RemoveUsers(ctx context.Context, teamID uuid.UUID, userIDs []
 
 	res, err := tx.ExecContext(ctx,
 		`DELETE FROM teams_users_associations
-		WHERE user_id = ANY($1) AND team_id = $2`,
+		WHERE user_id = ANY($1) AND team_db_id = team_db_id($2)`,
 		pq.Array(userIDs), teamID)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
@@ -312,21 +312,20 @@ func (p *postgres) GetTeamByName(ctx context.Context, teamName string) (storage.
 // PurgeUserMembership removes all teams_users_associations with the userID provided,
 // returning an array of teamIDs for the teams that initially had the provided user
 func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uuid.UUID, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	rows, err := p.db.QueryContext(ctx,
+		`WITH moved_row_ids AS (
+			DELETE FROM teams_users_associations
+				WHERE user_id=$1
+			RETURNING team_db_id
+		)
+		UPDATE teams SET updated_at=NOW()
+		WHERE db_id in (SELECT * FROM moved_row_ids)
+		RETURNING id;`, userID)
 
-	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
-	rows, err := tx.QueryContext(ctx,
-		`DELETE FROM teams_users_associations
-		WHERE user_id=$1
-		RETURNING team_id`, userID)
-	if err != nil {
-		return nil, p.processError(err)
-	}
 	defer func() {
 		if err := rows.Close(); err != nil {
 			p.logger.Warnf("failed to close db rows: %s", err.Error())
@@ -344,17 +343,6 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 	if err := rows.Err(); err != nil {
 		return nil, errors.Wrap(err, "error retrieving result rows")
 	}
-
-	// touch affected teams
-	for _, teamID := range teamsIDsUpdated {
-		if _, err := p.touchTeam(ctx, tx, teamID); err != nil {
-			return nil, p.processError(err)
-		}
-	}
-	if err := tx.Commit(); err != nil {
-		return nil, p.processError(err)
-	}
-
 	return teamsIDsUpdated, nil
 }
 
@@ -369,48 +357,23 @@ func (p *postgres) PurgeUserMembership(ctx context.Context, userID string) ([]uu
 func (p *postgres) AddUsers(ctx context.Context,
 	teamID uuid.UUID,
 	userIDs []string) (storage.Team, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	tx, err := p.db.BeginTx(ctx, nil)
+	var t storage.Team
+	err := p.db.QueryRowContext(ctx,
+		`WITH moved_row_ids AS (
+			INSERT INTO teams_users_associations (team_db_id, user_id, created_at)
+				SELECT db_id, unnest($2::TEXT[]), now()
+				FROM teams
+				WHERE id=$1
+			RETURNING team_db_id
+		)
+		UPDATE teams SET updated_at=NOW()
+		WHERE db_id in (SELECT DISTINCT * FROM moved_row_ids)
+		RETURNING id, name, description, projects, created_at, updated_at;`, teamID, pq.Array(userIDs)).Scan(
+		&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
-
-	doneSomething := false
-	for _, userID := range userIDs {
-		res, err := tx.ExecContext(ctx,
-			`INSERT INTO teams_users_associations (team_id, user_id, created_at)
-			VALUES ($1, $2, now())`, teamID, userID)
-		if err != nil {
-			return storage.Team{}, p.processError(err)
-		}
-		num, err := res.RowsAffected()
-		if err != nil {
-			return storage.Team{}, p.processError(err)
-		}
-		if num > 0 {
-			doneSomething = true
-		}
-	}
-
-	var team storage.Team
-
-	if !doneSomething {
-		team, err = p.getTeam(ctx, tx, teamID)
-
-	} else {
-		team, err = p.touchTeam(ctx, tx, teamID)
-	}
-	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return storage.Team{}, p.processError(err)
-	}
-	return team, nil
+	return t, nil
 }
 
 // GetUserIDsForTeam returns the user IDs for all members of the team.
@@ -423,7 +386,7 @@ func (p *postgres) AddUsers(ctx context.Context,
 func (p *postgres) GetUserIDsForTeam(ctx context.Context, teamID uuid.UUID) ([]string, error) {
 	var users []string
 	row := p.db.QueryRowContext(ctx,
-		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_id=$1`,
+		`SELECT array_agg(user_id) FROM teams_users_associations WHERE team_db_id=team_db_id($1)`,
 		teamID.String())
 	err := row.Scan(pq.Array(&users))
 	if err != nil {
@@ -443,9 +406,8 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT t.id, t.name, t.description, t.projects, t.created_at, t.updated_at
 		FROM teams t
-		LEFT JOIN teams_users_associations tu ON tu.team_id=t.id
-		WHERE tu.user_id=$1 AND projects_match(t.projects, $2::TEXT[])
-		GROUP BY t.id`,
+		LEFT JOIN teams_users_associations tu ON tu.team_db_id=t.db_id
+		WHERE tu.user_id=$1 AND projects_match(t.projects, $2::TEXT[])`,
 		userID, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
@@ -474,7 +436,7 @@ func (p *postgres) touchTeam(ctx context.Context, q querier, teamID uuid.UUID) (
 	err := q.QueryRowContext(ctx,
 		`UPDATE teams
 		SET updated_at = now()
-		WHERE id = $1
+		WHERE db_id = team_db_id($1)
 		RETURNING id, name, description, projects, created_at, updated_at`,
 		teamID).
 		Scan(&t.ID, &t.Name, &t.Description, pq.Array(&t.Projects), &t.CreatedAt, &t.UpdatedAt)

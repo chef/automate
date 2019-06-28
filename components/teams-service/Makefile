@@ -3,7 +3,7 @@ include ../../Makefile.common_go
 PACKAGE_PATH = github.com/chef/automate/components/teams-service
 
 BINS = ${PACKAGE_PATH}/cmd/teams-service
-
+MIGRATION_READMES = storage/postgres/migration/sql/README.md storage/postgres/datamigration/sql/README.md
 GIT_SHA = $(shell git rev-parse HEAD)
 BUILD_TIME ?= $(shell date -u '+%Y%m%d%H%M%S')
 GO_LDFLAGS = --ldflags "-X ${LIBRARY_PATH}/version.Version=${BUILD_TIME} -X ${LIBRARY_PATH}/version.GitSHA=${GIT_SHA} -X ${LIBRARY_PATH}/version.BuildTime=${BUILD_TIME}"
@@ -15,8 +15,12 @@ endif
 
 all: lint build test
 
-static: lint
+static: lint ${MIGRATION_READMES}
 unit: build test
+
+.PHONY: ${MIGRATION_READMES}
+${MIGRATION_READMES}:
+	../../scripts/generate_and_check_migration_files $@
 
 ${BINS}: bin
 	@echo "GO $@"

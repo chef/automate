@@ -180,7 +180,7 @@ authGen() {
   # prerequisites
   local token=${TOK:?Need this env variable to contain ChefAutomate admin token}
   local host=${TARGET_HOST:?Need this env variable to point to your ChefAutomate host}
-  [ -z "$4" ] && { echo "usage: authGen [ <options> ] <resource> <mode> <count> <seed>"; return; }
+  if [[ -z "$4" ]]; then echo "usage: authGen [ <options> ] <resource> <mode> <count> <seed>"; return; fi
   if ! type jo &> /dev/null
   then
     echo "Need jo installed"; return;
@@ -190,8 +190,8 @@ authGen() {
   COUNT=$3
   SEED=$4
   ID_PREFIX=test-$RESOURCE
-  [[ ! $MODE =~ ^(create|delete)$ ]] && { echo "mode must be 'create' or 'delete'"; return; }
-  [[ ! $RESOURCE =~ ^(tokens|users|teams|policies)$ ]] && { echo "resource must be in: tokens, users, teams, policies"; return; }
+  if [[ ! $MODE =~ ^(create|delete)$ ]]; then echo "mode must be 'create' or 'delete'"; return; fi
+  if [[ ! $RESOURCE =~ ^(tokens|users|teams|team-members|policies)$ ]]; then echo "resource must be in: tokens, users, teams, team-members, policies"; return; fi
 
   operation="${MODE}_resource"
   echo "$MODE $COUNT $RESOURCE..."
@@ -209,16 +209,25 @@ function create_resource {
   local name="$ID_PREFIX $id_index"
   local json=""
   case "$RESOURCE" in
-    tokens) 
-      json=$(jo -p id="$id" name="$name" description="test token for $name" active=true) ;;
-    users) 
-      json=$(jo -p id="$id" name="$name" username="$id" password=chefautomate active=true) ;;
-    teams) 
-      json=$(jo name="$name" description="test team for $name") ;;
-    policies) 
-      json=$(jo subjects="$(jo -a token:test-tokens-$id_index)" action=read resource="compliance:*") ;;
+    tokens)
+      json=$(jo -p id="$id" name="$name" description="test token for $name" active=true)
+      resource=$RESOURCE ;;
+    users)
+      json=$(jo -p id="$id" name="$name" username="$id" password=chefautomate active=true)
+      resource=$RESOURCE ;;
+    teams)
+      # v1 ignores id, v2 ignores description
+      json=$(jo id="$id" name="$name" description="test team for $name")
+      resource=$RESOURCE ;;
+    team-members)
+      # just add a 100 members to each team
+      json=$(jq -n --argjson n 100 'reduce range(1; $n) as $i (.; .user_ids += ["test-user-\($i)"])')
+      resource="teams/test-teams-$id_index/users:add" ;;
+    policies)
+      json=$(jo subjects="$(jo -a token:test-tokens-$id_index)" action=read resource="compliance:*")
+      resource=$RESOURCE ;;
   esac
-  curl -sSkH "api-token: $token" "$host/$auth_path/$RESOURCE" -X POST --data "$json"
+  curl -sSkH "api-token: $token" "$host/$auth_path/$resource" -X POST --data "$json"
   echo
 }
  
