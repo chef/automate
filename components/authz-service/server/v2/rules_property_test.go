@@ -96,6 +96,51 @@ func TestCreateRuleProperties(t *testing.T) {
 		createProjectAndRuleGen,
 	))
 
+	properties.Property("ensures rule IDs are unique", prop.ForAll(
+		func(reqs projectAndRuleReq) bool {
+			defer testDB.Flush(t)
+
+			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false // bad run
+			}
+
+			if _, err := cl.CreateRule(ctx, &reqs.rules[0]); err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.CreateRule(ctx, &reqs.rules[1])
+			return grpctest.AssertCode(t, codes.AlreadyExists, err)
+		},
+		// TODO(sr): deduplicate with the combinegen above?
+		gopter.CombineGens(
+			createProjectReqGen, createRuleReqGen, createRuleReqGen,
+		).Map(func(vals []interface{}) projectAndRuleReq {
+			p := vals[0].(api.CreateProjectReq)
+			// we "fix" the second req to use the same ID as the first one
+			r0 := vals[1].(api.CreateRuleReq)
+			r1 := vals[2].(api.CreateRuleReq)
+			r1.Id = r0.Id
+			r0.ProjectId = p.Id
+			r1.ProjectId = p.Id
+			return projectAndRuleReq{
+				CreateProjectReq: p,
+				rules:            []api.CreateRuleReq{r0, r1},
+			}
+		}),
+	))
+
+	properties.TestingRun(t)
+}
+
+func TestUpdateRuleProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+	_, _, createProjectAndRuleGen := getGenerators()
+
 	properties.Property("updates a staged rule and applies update", prop.ForAll(
 		func(reqs projectAndRuleReq) bool {
 			defer testDB.Flush(t)
@@ -187,6 +232,14 @@ func TestCreateRuleProperties(t *testing.T) {
 		},
 		createProjectAndRuleGen,
 	))
+	properties.TestingRun(t)
+}
+
+func TestDeleteRuleProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+	_, _, createProjectAndRuleGen := getGenerators()
 
 	properties.Property("deletes a staged rule and applies deletion", prop.ForAll(
 		func(reqs projectAndRuleReq) bool {
@@ -261,41 +314,6 @@ func TestCreateRuleProperties(t *testing.T) {
 		createProjectAndRuleGen,
 	))
 
-	properties.Property("ensures rule IDs are unique", prop.ForAll(
-		func(reqs projectAndRuleReq) bool {
-			defer testDB.Flush(t)
-
-			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
-			if err != nil {
-				t.Error(err.Error())
-				return false // bad run
-			}
-
-			if _, err := cl.CreateRule(ctx, &reqs.rules[0]); err != nil {
-				t.Error(err.Error())
-				return false
-			}
-
-			_, err = cl.CreateRule(ctx, &reqs.rules[1])
-			return grpctest.AssertCode(t, codes.AlreadyExists, err)
-		},
-		// TODO(sr): deduplicate with the combinegen above?
-		gopter.CombineGens(
-			createProjectReqGen, createRuleReqGen, createRuleReqGen,
-		).Map(func(vals []interface{}) projectAndRuleReq {
-			p := vals[0].(api.CreateProjectReq)
-			// we "fix" the second req to use the same ID as the first one
-			r0 := vals[1].(api.CreateRuleReq)
-			r1 := vals[2].(api.CreateRuleReq)
-			r1.Id = r0.Id
-			r0.ProjectId = p.Id
-			r1.ProjectId = p.Id
-			return projectAndRuleReq{
-				CreateProjectReq: p,
-				rules:            []api.CreateRuleReq{r0, r1},
-			}
-		}),
-	))
 	properties.TestingRun(t)
 	testFW.Shutdown(t, ctx)
 }
@@ -303,7 +321,6 @@ func TestCreateRuleProperties(t *testing.T) {
 func getGopterParams(seed int64) *gopter.Properties {
 	params := gopter.DefaultTestParametersWithSeed(seed)
 	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
-	params.MinSuccessfulTests = 5
 	return gopter.NewProperties(params)
 }
 
