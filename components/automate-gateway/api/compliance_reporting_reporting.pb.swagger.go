@@ -652,6 +652,9 @@ func init() {
         },
         "id": {
           "type": "string"
+        },
+        "status": {
+          "type": "string"
         }
       }
     },

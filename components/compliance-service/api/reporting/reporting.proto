@@ -225,4 +225,5 @@ message ProfileMeta {
 	string name = 1;
 	string version = 2;
 	string id = 3;
+	string status = 4;
 }

@@ -18,7 +18,8 @@ describe File.basename(__FILE__) do
     end
 
     ##### Success tests #####
-    # sort by node name now
+
+    # List all nodes sorted by node name
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']), # start_time is ignored for this call. Only end_time is used
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
@@ -914,16 +915,18 @@ describe File.basename(__FILE__) do
             {
                 "name" => "nginx-baseline",
                 "version" => "2.1.0",
-                "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
+                "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                "status": "failed"
             },
             {
                 "name" => "apache-baseline",
                 "version" => "2.0.1",
-                "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9"
+                "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                "status": "failed"
             }
         ]
-    }.to_json
-    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+    }
+    assert_equal_json_sorted(actual_node.to_json, expected_node.to_json)
 
     # sort by node name ASC when a profile filter is used
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
