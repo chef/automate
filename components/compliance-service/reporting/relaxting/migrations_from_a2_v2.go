@@ -214,7 +214,7 @@ func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) *ESInSpecSummary {
 		profileStatus := srcProfileSum.Status
 		if profileStatus == "" || profileStatus == "loaded" {
 			// needed because A1 data didn't have profile level status
-			// also overriding the recent inspec "loaded" state with actual profile run status
+			// also overwriting the inspec report "loaded" state with actual profile run status
 			profileStatus = ReportComplianceStatus(&dstControlSums)
 		}
 		dstSum.Profiles[i] = ESInSpecSummaryProfile{
@@ -277,7 +277,7 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 			profileTitle = profilesMetaMap[srcProfileMin.SHA256].Title
 			if profileStatus == "" || profileStatus == "loaded" {
 				// needed because A1 data didn't have profile level status
-				// also overriding the recent inspec "loaded" state with actual profile run status
+				// also overwriting the inspec report "loaded" state with actual profile run status
 				profileStatus = profilesStatusMap[srcProfileMin.SHA256]
 			}
 		}
