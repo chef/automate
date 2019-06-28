@@ -18,9 +18,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
-	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
-	"github.com/chef/automate/components/compliance-service/feed/util"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
+	"github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
+	"github.com/chef/automate/components/event-feed-service/pkg/util"
 	"github.com/chef/automate/lib/grpc/grpctest"
 
 	"github.com/chef/automate/components/event-service/server"
@@ -29,8 +29,8 @@ import (
 
 type testCase struct {
 	description    string
-	request        automate_feed.FeedSummaryRequest
-	expectedCounts *automate_feed.FeedSummaryResponse
+	request        event_feed.FeedSummaryRequest
+	expectedCounts *event_feed.FeedSummaryResponse
 }
 
 func TestFeedCountsReturnErrorWithWrongParameters(t *testing.T) {
@@ -39,7 +39,7 @@ func TestFeedCountsReturnErrorWithWrongParameters(t *testing.T) {
 		date = time.Now()
 	)
 
-	_, err := feedService.GetFeedSummary(ctx, &automate_feed.FeedSummaryRequest{
+	_, err := testSuite.feedServer.GetFeedSummary(ctx, &event_feed.FeedSummaryRequest{
 		End:   date.AddDate(0, 0, -6).Unix() * 1000,
 		Start: date.Unix() * 1000,
 	})
@@ -59,7 +59,7 @@ func TestFeedCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
 	expectedCounts := entriesToTypeCounts(entries)
@@ -67,12 +67,12 @@ func TestFeedCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 	cases := []testCase{
 		{
 			description:    "should count 10 events (default)",
-			request:        automate_feed.FeedSummaryRequest{CountCategory: "entity_type"},
+			request:        event_feed.FeedSummaryRequest{CountCategory: "entity_type"},
 			expectedCounts: expectedCounts,
 		},
 		{
 			description: "should count all 10 events",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "entity_type",
 				Start:         startDate.AddDate(0, 0, -11).Unix() * 1000,
 			},
@@ -80,7 +80,7 @@ func TestFeedCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 		},
 		{
 			description: "should count only first event",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "entity_type",
 				End:           startDate.AddDate(0, 0, -1).Unix() * 1000,
 			},
@@ -88,7 +88,7 @@ func TestFeedCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 		},
 		{
 			description: "should count only one event",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "entity_type",
 				Start:         startDate.AddDate(0, 0, -5).Unix() * 1000,
 				End:           startDate.AddDate(0, 0, -5).Unix() * 1000,
@@ -108,7 +108,7 @@ func TestFeedCountsReturnCountOverAThousandActions(t *testing.T) {
 		startDate    = time.Now().UTC()
 		timeDiff     = int(time.Minute) * -1
 		entries      = createEntries(startDate, totalEntries, timeDiff)
-		request      = automate_feed.FeedSummaryRequest{
+		request      = event_feed.FeedSummaryRequest{
 			CountCategory: "entity_type",
 			Start:         startDate.AddDate(0, 0, -11).Unix() * 1000,
 		}
@@ -118,12 +118,12 @@ func TestFeedCountsReturnCountOverAThousandActions(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
 	t.Run("Test to see if 1001 actions were counted",
 		func(t *testing.T) {
-			res, err := feedService.GetFeedSummary(ctx, &request)
+			res, err := testSuite.feedServer.GetFeedSummary(ctx, &request)
 			if assert.Nil(t, err) {
 				assert.Equal(t, int64(1001), res.TotalEntries)
 
@@ -154,13 +154,13 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
 	cases := []testCase{
 		{
 			description: "should count only 'User' events",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "entity_type",
 				Filters:       []string{"requestorName:User"},
 			},
@@ -170,7 +170,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 		},
 		{
 			description: "should count only 'UI User' actions",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "entity_type",
 				Filters:       []string{"requestorName:UI User"},
 			},
@@ -180,7 +180,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 		},
 		{
 			description: "should count 'User' and 'UI User' actions",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "entity_type",
 				Filters:       []string{"requestorName:UI User", "requestorName:User"},
 			},
@@ -206,7 +206,7 @@ func TestTaskCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
 	expectedCounts := entriesToTaskCounts(entries)
@@ -214,12 +214,12 @@ func TestTaskCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 	cases := []testCase{
 		{
 			description:    "should count 10 events (default)",
-			request:        automate_feed.FeedSummaryRequest{CountCategory: "task"},
+			request:        event_feed.FeedSummaryRequest{CountCategory: "task"},
 			expectedCounts: expectedCounts,
 		},
 		{
 			description: "should count all 10 events",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
 				Start:         startDate.AddDate(0, 0, -11).Unix() * 1000,
 			},
@@ -227,7 +227,7 @@ func TestTaskCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 		},
 		{
 			description: "should count only first event",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
 				End:           startDate.AddDate(0, 0, -1).Unix() * 1000,
 			},
@@ -235,7 +235,7 @@ func TestTaskCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 		},
 		{
 			description: "should count only one event",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
 				Start:         startDate.AddDate(0, 0, -5).Unix() * 1000,
 				End:           startDate.AddDate(0, 0, -5).Unix() * 1000,
@@ -260,13 +260,13 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
 	cases := []testCase{
 		{
 			description: "should count only 'User' events",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
 				Filters:       []string{"requestorName:User"},
 			},
@@ -276,7 +276,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 		},
 		{
 			description: "should count only 'UI User' actions",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
 				Filters:       []string{"requestorName:UI User"},
 			},
@@ -286,7 +286,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 		},
 		{
 			description: "should count 'User' and 'UI User' actions",
-			request: automate_feed.FeedSummaryRequest{
+			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
 				Filters:       []string{"requestorName:UI User", "requestorName:User"},
 			},
@@ -381,7 +381,7 @@ func createEntries(startDate time.Time, amountToCreate int, timeDiff int) []*uti
 	return entries
 }
 
-func entriesToTypeCounts(entries []*util.FeedEntry) *automate_feed.FeedSummaryResponse {
+func entriesToTypeCounts(entries []*util.FeedEntry) *event_feed.FeedSummaryResponse {
 	typeCounts := map[string]int{}
 
 	for _, entry := range entries {
@@ -393,24 +393,24 @@ func entriesToTypeCounts(entries []*util.FeedEntry) *automate_feed.FeedSummaryRe
 		}
 	}
 
-	entryCounts := make([]*automate_feed.EntryCount, len(typeCounts))
+	entryCounts := make([]*event_feed.EntryCount, len(typeCounts))
 
 	index := 0
 	for key, value := range typeCounts {
-		entryCounts[index] = &automate_feed.EntryCount{
+		entryCounts[index] = &event_feed.EntryCount{
 			Category: key,
 			Count:    int64(value),
 		}
 		index++
 	}
 
-	return &automate_feed.FeedSummaryResponse{
+	return &event_feed.FeedSummaryResponse{
 		TotalEntries: int64(len(entries)),
 		EntryCounts:  entryCounts,
 	}
 }
 
-func entriesToTaskCounts(entries []*util.FeedEntry) *automate_feed.FeedSummaryResponse {
+func entriesToTaskCounts(entries []*util.FeedEntry) *event_feed.FeedSummaryResponse {
 	taskCounts := map[string]int{}
 
 	for _, entry := range entries {
@@ -422,18 +422,18 @@ func entriesToTaskCounts(entries []*util.FeedEntry) *automate_feed.FeedSummaryRe
 		}
 	}
 
-	entryCounts := make([]*automate_feed.EntryCount, len(taskCounts))
+	entryCounts := make([]*event_feed.EntryCount, len(taskCounts))
 
 	index := 0
 	for key, value := range taskCounts {
-		entryCounts[index] = &automate_feed.EntryCount{
+		entryCounts[index] = &event_feed.EntryCount{
 			Category: key,
 			Count:    int64(value),
 		}
 		index++
 	}
 
-	return &automate_feed.FeedSummaryResponse{
+	return &event_feed.FeedSummaryResponse{
 		TotalEntries: int64(len(entries)),
 		EntryCounts:  entryCounts,
 	}
@@ -444,7 +444,7 @@ func runCases(t *testing.T, cases []testCase) {
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
-				res, err := feedService.GetFeedSummary(ctx, &test.request)
+				res, err := testSuite.feedServer.GetFeedSummary(ctx, &test.request)
 				if assert.Nil(t, err) {
 					assert.Equal(t, test.expectedCounts.TotalEntries, res.TotalEntries)
 
@@ -467,7 +467,7 @@ func runCases(t *testing.T, cases []testCase) {
 	}
 }
 
-func findCount(counts []*automate_feed.EntryCount, matchingCount *automate_feed.EntryCount) (*automate_feed.EntryCount, bool) {
+func findCount(counts []*event_feed.EntryCount, matchingCount *event_feed.EntryCount) (*event_feed.EntryCount, bool) {
 	for _, count := range counts {
 		if count.Category == matchingCount.Category {
 			return count, true

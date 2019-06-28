@@ -335,6 +335,21 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
+  - label: "[unit] event-feed-service"
+    command:
+      - hab studio run "source .studiorc && go_component_unit event-feed-service && go_component_static_tests event-feed-service"
+    timeout_in_minutes: 10
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
   - label: "[unit] ingest-service"
     command:
       - hab studio run "source .studiorc && go_component_unit ingest-service && go_component_static_tests ingest-service"

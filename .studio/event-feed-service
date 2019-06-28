@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Helper methods specific for the event-feed-service
+
+# Run Integration tests for the feeds service
+document "event_feed_integration" <<DOC
+  Runs the integration tests for the event feeds service
+DOC
+function event_feed_integration() {
+  go_test "github.com/chef/automate/components/event-feed-service/pkg/integration_test"
+}

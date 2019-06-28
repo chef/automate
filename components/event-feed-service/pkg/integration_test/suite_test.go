@@ -1,8 +1,3 @@
-//
-//  Author:: Salim Afiune <afiune@chef.io>, Gina Peers <gpeers@chef.io>
-//  Copyright:: Copyright 2017, Chef Software Inc.
-//
-
 package integration_test
 
 import (
@@ -10,12 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
-	fserver "github.com/chef/automate/components/compliance-service/api/automate-feed/server"
-	"github.com/chef/automate/components/compliance-service/config"
-	"github.com/chef/automate/components/compliance-service/feed/persistence"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
-	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
+	"github.com/chef/automate/components/event-feed-service/pkg/server"
 	olivere "github.com/olivere/elastic"
 )
 
@@ -30,9 +21,8 @@ import (
 // * An Elasticsearch client for ES queries.
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 type Suite struct {
-	feedServer  automate_feed.FeedServiceServer
+	feedServer  *server.EventFeedServer
 	feedBackend persistence.FeedStore
-	esBackend   relaxting.ES2Backend
 	esClient    *olivere.Client
 	indices     []string
 	types       []string
@@ -46,26 +36,28 @@ type Suite struct {
 func NewSuite(url string) *Suite {
 	s := new(Suite)
 
-	esBackend := relaxting.ES2Backend{
-		ESUrl: elasticsearchUrl,
-	}
-
-	// for non-grpc calls
-	s.feedBackend = persistence.NewFeedStore(&esBackend)
-
-	// create olivere elastic client
-	client, err := esBackend.ES2Client()
-
+	esClient, err := olivere.NewClient(
+		olivere.SetURL(url),
+		olivere.SetSniff(false),
+	)
 	if err != nil {
-		fmt.Printf("Could not create Elasticsearch client from '%s': %s\n", url, err)
+		fmt.Printf("could not connect to elasticsearch (%s)", url)
 		os.Exit(1)
 	}
 
-	s.esClient = client
-	s.indices = []string{mappings.IndexNameFeeds}
-	s.types = []string{mappings.DocType}
+	s.feedBackend = persistence.NewFeedStore(esClient)
 
-	s.feedServer = fserver.New(&config.FeedConfig{}, &esBackend)
+	err = s.feedBackend.InitializeStore(context.Background())
+	if err != nil {
+		fmt.Printf("Failed initializing elasticsearch (%s)", url)
+		os.Exit(1)
+	}
+
+	s.esClient = esClient
+	s.indices = []string{persistence.IndexNameFeeds}
+	s.types = []string{persistence.DocType}
+
+	s.feedServer = server.New(s.feedBackend)
 	return s
 }
 

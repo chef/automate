@@ -1,8 +1,3 @@
-//
-//  Author:: Salim Afiune <afiune@chef.io>, Gina Peers <gpeers@chef.io>
-//  Copyright:: Copyright 2018, Chef Software Inc.
-//
-
 package integration_test
 
 import (
@@ -18,10 +13,11 @@ import (
 	"math/rand"
 	"strconv"
 
-	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
-	"github.com/chef/automate/components/compliance-service/feed/util"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
-	"github.com/chef/automate/components/event-service/server"
+	"github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
+	"github.com/chef/automate/components/event-feed-service/pkg/util"
+
+	event_server "github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
@@ -43,17 +39,17 @@ func TestEventStringsNormalRequest(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
-	request := &automate_feed.FeedTimelineRequest{
+	request := &event_feed.FeedTimelineRequest{
 		Interval: 3,
 		Start:    startDate.AddDate(0, 0, -6).Format("2006-01-02"),
 		End:      startDate.Format("2006-01-02"),
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := feedService.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -98,9 +94,9 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		)
 
 		if entityType == "scanjobs" {
-			eventType = server.ScanJobCreated
+			eventType = event_server.ScanJobCreated
 		} else {
-			eventType = server.ProfileCreated
+			eventType = event_server.ProfileCreated
 		}
 
 		tags = append(tags, user, eventType)
@@ -134,17 +130,17 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
 	cases := []struct {
 		description string
-		request     automate_feed.FeedTimelineRequest
+		request     event_feed.FeedTimelineRequest
 		expected    map[string]int
 	}{
 		{
 			description: "should contain all 24 items on create string",
-			request: automate_feed.FeedTimelineRequest{
+			request: event_feed.FeedTimelineRequest{
 				Interval: 1,
 				Start:    startDate.Format("2006-01-02"),
 				End:      endDate.Format("2006-01-02"),
@@ -157,7 +153,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		},
 		{
 			description: "should return only the 12 profiles items on the string",
-			request: automate_feed.FeedTimelineRequest{
+			request: event_feed.FeedTimelineRequest{
 				Filters:  []string{"entity_type:profile"},
 				Interval: 1,
 				Start:    startDate.Format("2006-01-02"),
@@ -170,7 +166,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		},
 		{
 			description: "should return only the 12 scanjob items on the string",
-			request: automate_feed.FeedTimelineRequest{
+			request: event_feed.FeedTimelineRequest{
 				Filters:  []string{"entity_type:scanjobs"},
 				Interval: 1,
 				Start:    startDate.Format("2006-01-02"),
@@ -183,7 +179,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		},
 		{
 			description: "should return no items on the string",
-			request: automate_feed.FeedTimelineRequest{
+			request: event_feed.FeedTimelineRequest{
 				Filters:  []string{"entity_type:fake"},
 				Interval: 1,
 				Start:    startDate.Format("2006-01-02"),
@@ -198,7 +194,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
-				res, err := feedService.GetFeedTimeline(ctx, &test.request)
+				res, err := testSuite.feedServer.GetFeedTimeline(ctx, &test.request)
 				if assert.Nil(t, err) {
 					for _, line := range res.ActionLines {
 						if line.Action == verb {
@@ -241,14 +237,14 @@ func TestEventStringsDayZoneActionsRequest(t *testing.T) {
 		totalActions    = 0
 	)
 
-	request := &automate_feed.FeedTimelineRequest{
+	request := &event_feed.FeedTimelineRequest{
 		Interval: 1,
 		Start:    startDate.Format("2006-01-02"),
 		End:      startDate.Format("2006-01-02"),
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := feedService.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -273,7 +269,7 @@ func TestEventStringsIncorrectHoursBetween(t *testing.T) {
 		t.Run(fmt.Sprintf("with parameters hours between=%d it should return an error",
 			bucketSize), func(t *testing.T) {
 
-			_, err := feedService.GetFeedTimeline(ctx, &automate_feed.FeedTimelineRequest{
+			_, err := testSuite.feedServer.GetFeedTimeline(ctx, &event_feed.FeedTimelineRequest{
 				Start:    "2018-01-01",
 				End:      "2018-01-06",
 				Interval: int32(bucketSize),
@@ -304,20 +300,20 @@ func TestEventStringsVaryingBucketsSizeRequest(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
 	for _, bucketSize := range []int{1, 2, 3, 4, 6, 8, 12, 24} {
 		numberOfBuckets := int(math.Ceil(24.0 * 3.0 / float64(bucketSize)))
 
-		request := &automate_feed.FeedTimelineRequest{
+		request := &event_feed.FeedTimelineRequest{
 			Interval: int32(bucketSize),
 			Start:    endDate.AddDate(0, 0, -2).Format("2006-01-02"),
 			End:      endDate.Format("2006-01-02"),
 			Timezone: timezone,
 		}
 
-		feedTimeline, err := feedService.GetFeedTimeline(ctx, request)
+		feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
 
 		assert.Nil(t, err)
 		totalItems := 0
@@ -349,14 +345,14 @@ func TestEventStringsVaryingBucketsSizeNoActionsRequest(t *testing.T) {
 	for _, bucketSize := range []int{1, 2, 3, 4, 6, 8, 12, 24} {
 		numberOfBuckets := int(math.Ceil(24.0 * 3.0 / float64(bucketSize)))
 
-		request := &automate_feed.FeedTimelineRequest{
+		request := &event_feed.FeedTimelineRequest{
 			Interval: int32(bucketSize),
 			Start:    endDate.AddDate(0, 0, -2).Format("2006-01-02"),
 			End:      endDate.Format("2006-01-02"),
 			Timezone: timezone,
 		}
 
-		feedTimeline, err := feedService.GetFeedTimeline(ctx, request)
+		feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
 
 		assert.Nil(t, err)
 		totalItems := 0
@@ -393,7 +389,7 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ProfileDeleted,
+			EventType:          event_server.ProfileDeleted,
 			Tags:               []string{"profile", "delete"},
 			Published:          endDate,
 			ActorID:            "actorId",
@@ -415,7 +411,7 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobUpdated,
+			EventType:          event_server.ScanJobUpdated,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -437,7 +433,7 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ProfileCreated,
+			EventType:          event_server.ProfileCreated,
 			Tags:               []string{"profile", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -458,17 +454,17 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
-	request := &automate_feed.FeedTimelineRequest{
+	request := &event_feed.FeedTimelineRequest{
 		Interval: 1,
 		Start:    endDate.AddDate(0, 0, -2).Format("2006-01-02"),
 		End:      endDate.Format("2006-01-02"),
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := feedService.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -535,7 +531,7 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ProfileDeleted,
+			EventType:          event_server.ProfileDeleted,
 			Tags:               []string{"profile", "delete"},
 			Published:          endDate,
 			ActorID:            "actorId",
@@ -557,7 +553,7 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobUpdated,
+			EventType:          event_server.ScanJobUpdated,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -579,7 +575,7 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ProfileCreated,
+			EventType:          event_server.ProfileCreated,
 			Tags:               []string{"profile", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -600,17 +596,17 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
-	request := &automate_feed.FeedTimelineRequest{
+	request := &event_feed.FeedTimelineRequest{
 		Interval: 1,
 		Start:    endDate.AddDate(0, 0, -2).Format("2006-01-02"),
 		End:      endDate.Format("2006-01-02"),
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := feedService.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -676,17 +672,17 @@ func TestEventStringsDayOneActionsOutsideOfRequest(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
-	request := &automate_feed.FeedTimelineRequest{
+	request := &event_feed.FeedTimelineRequest{
 		Interval: 1,
 		Start:    startDate.AddDate(0, 0, -1).Format("2006-01-02"),
 		End:      startDate.AddDate(0, 0, -1).Format("2006-01-02"),
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := feedService.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -722,17 +718,17 @@ func TestEventStringsDayRequest(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
-	request := &automate_feed.FeedTimelineRequest{
+	request := &event_feed.FeedTimelineRequest{
 		Interval: 1,
 		Start:    startDate.Format("2006-01-02"),
 		End:      startDate.Format("2006-01-02"),
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := feedService.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -751,7 +747,7 @@ func TestEventStringsDayRequest(t *testing.T) {
 
 func TestEventStringsIncorrectTimezone(t *testing.T) {
 	var ctx = context.Background()
-	cases := []automate_feed.FeedTimelineRequest{
+	cases := []event_feed.FeedTimelineRequest{
 		{
 			Start:    "2018-01-01",
 			End:      "2018-01-06",
@@ -770,7 +766,7 @@ func TestEventStringsIncorrectTimezone(t *testing.T) {
 		t.Run(fmt.Sprintf("with parameters timezone=%s it should return an error",
 			test.Timezone), func(t *testing.T) {
 
-			_, err := feedService.GetFeedTimeline(ctx, &test)
+			_, err := testSuite.feedServer.GetFeedTimeline(ctx, &test)
 
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
@@ -779,7 +775,7 @@ func TestEventStringsIncorrectTimezone(t *testing.T) {
 
 func TestEventStringsIncorrectTimes(t *testing.T) {
 	var ctx = context.Background()
-	cases := []automate_feed.FeedTimelineRequest{
+	cases := []event_feed.FeedTimelineRequest{
 		{
 			Start:    "2018-01-06",
 			End:      "2018-01-01",
@@ -853,14 +849,14 @@ func TestEventStringsIncorrectTimes(t *testing.T) {
 		t.Run(fmt.Sprintf("with parameters start=%s end=%s it should return an error",
 			test.Start, test.End), func(t *testing.T) {
 
-			_, err := feedService.GetFeedTimeline(ctx, &test)
+			_, err := testSuite.feedServer.GetFeedTimeline(ctx, &test)
 
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 	}
 }
 
-func countItems(line *automate_feed.ActionLine) int {
+func countItems(line *event_feed.ActionLine) int {
 	totalItems := 0
 	for _, item := range line.Slots {
 		if len(item.Counts) > 0 {
@@ -872,7 +868,7 @@ func countItems(line *automate_feed.ActionLine) int {
 	return totalItems
 }
 
-func printFeedTimeline(timeline *automate_feed.FeedTimelineResponse, request *automate_feed.FeedTimelineRequest) {
+func printFeedTimeline(timeline *event_feed.FeedTimelineResponse, request *event_feed.FeedTimelineRequest) {
 
 	counts := make([]int, len(timeline.ActionLines))
 
@@ -977,7 +973,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ProfileDeleted,
+			EventType:          event_server.ProfileDeleted,
 			Tags:               []string{"profile", "delete"},
 			Published:          endDate,
 			ActorID:            "actorId",
@@ -999,7 +995,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobDeleted,
+			EventType:          event_server.ScanJobDeleted,
 			Tags:               []string{"scanjobs", "delete"},
 			Published:          endDate,
 			ActorID:            "actorId",
@@ -1022,7 +1018,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobUpdated,
+			EventType:          event_server.ScanJobUpdated,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1044,7 +1040,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobUpdated,
+			EventType:          event_server.ScanJobUpdated,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1066,7 +1062,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobUpdated,
+			EventType:          event_server.ScanJobUpdated,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1088,7 +1084,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobUpdated,
+			EventType:          event_server.ScanJobUpdated,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1110,7 +1106,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobUpdated,
+			EventType:          event_server.ScanJobUpdated,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1133,7 +1129,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ProfileCreated,
+			EventType:          event_server.ProfileCreated,
 			Tags:               []string{"profile", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -1155,7 +1151,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ProfileCreated,
+			EventType:          event_server.ProfileCreated,
 			Tags:               []string{"profile", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -1177,7 +1173,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobCreated,
+			EventType:          event_server.ScanJobCreated,
 			Tags:               []string{"scanjobs", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -1199,7 +1195,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          server.ScanJobCreated,
+			EventType:          event_server.ScanJobCreated,
 			Tags:               []string{"scanjobs", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -1220,17 +1216,17 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 		testSuite.feedBackend.CreateFeedEntry(entry)
 	}
 
-	testSuite.RefreshIndices(mappings.IndexNameFeeds)
+	testSuite.RefreshIndices(persistence.IndexNameFeeds)
 	defer GetTestSuite().DeleteAllDocuments()
 
-	request := &automate_feed.FeedTimelineRequest{
+	request := &event_feed.FeedTimelineRequest{
 		Interval: 1,
 		Start:    endDate.AddDate(0, 0, -2).Format("2006-01-02"),
 		End:      endDate.Format("2006-01-02"),
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := feedService.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 	totalItems := 0

@@ -53,7 +53,7 @@ func (eventFeedServer *EventFeedServer) GetFeed(ctx context.Context,
 		return nil, err
 	}
 
-	fe, err := fromInternalFormatToList(feedEntries)
+	fe, err := FromInternalFormatToList(feedEntries)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (eventFeedServer *EventFeedServer) HandleEvent(ctx context.Context,
 	return response, nil
 }
 
-func fromInternalFormatToList(entries []*util.FeedEntry) ([]*event_feed.FeedEntry, error) {
+func FromInternalFormatToList(entries []*util.FeedEntry) ([]*event_feed.FeedEntry, error) {
 	tl := make([]*event_feed.FeedEntry, len(entries))
 
 	for i, entry := range entries {
