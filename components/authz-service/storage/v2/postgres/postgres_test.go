@@ -3750,7 +3750,7 @@ func TestListRulesForProject(t *testing.T) {
 			ctx := context.Background()
 			projID1 := "foo-project"
 			insertTestProject(t, db, projID1, "first project", storage.Custom)
-			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID1, storage.Event)
+			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID1, storage.Node)
 
 			projID2 := "bar-project"
 			insertTestProject(t, db, projID2, "second project", storage.Custom)
@@ -4440,7 +4440,7 @@ func TestApplyStagedRules(t *testing.T) {
 			projID := "project-1"
 			id1 := "project-1-rule"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
-			
+
 			ruleType := storage.Node
 			rule1 := insertAppliedRuleWithMultipleConditions(t, db, id1, projID, storage.Node)
 			insertStagedRuleWithMultipleConditions(t, db, id1, projID, ruleType, true)
@@ -6875,18 +6875,18 @@ func insertDeletedStagedRule(t *testing.T, db *testhelpers.TestDB, rule *storage
 func insertAppliedRuleWithMultipleConditions(t *testing.T, db *testhelpers.TestDB, id, projID string, ruleType storage.RuleType) *storage.Rule {
 	t.Helper()
 	rule := createRuleObjectWithMultipleConditions(t, id, projID, ruleType, Applied, false)
-	insertAppliedRule(t, db, rule)
-	return rule
+	insertAppliedRule(t, db, &rule)
+	return &rule
 }
 
 func insertStagedRuleWithMultipleConditions(t *testing.T, db *testhelpers.TestDB, id, projID string, ruleType storage.RuleType, deleted bool) *storage.Rule {
 	t.Helper()
 	rule := createRuleObjectWithMultipleConditions(t, id, projID, ruleType, Staged, deleted)
-	insertStagedRule(t, db, rule, deleted)
-	return rule
+	insertStagedRule(t, db, &rule, deleted)
+	return &rule
 }
 
-func createRuleObjectWithMultipleConditions(t *testing.T, id, projID string, ruleType storage.RuleType, status string, deleted bool) *storage.Rule {
+func createRuleObjectWithMultipleConditions(t *testing.T, id, projID string, ruleType storage.RuleType, status string, deleted bool) storage.Rule {
 	t.Helper()
 	condition1, err := storage.NewCondition(ruleType,
 		[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
@@ -6901,7 +6901,7 @@ func createRuleObjectWithMultipleConditions(t *testing.T, id, projID string, rul
 		[]storage.Condition{condition1, condition2, condition3})
 	require.NoError(t, err)
 	rule.Status = status
-	return &rule
+	return rule
 }
 
 func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
