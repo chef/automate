@@ -14,7 +14,7 @@ sync: themes/chef
 SWAGGER_DIR=data/docs/api_chef_automate
 
 clean_swagger_files:
-	rm -rf $(SWAGGER_DIR)/*
+	rm -rf ./$(SWAGGER_DIR)/*
 
 sync_swagger_files: clean_swagger_files
 	pushd ../../api/external && find . -name '*.swagger.json' | cpio -p -dumv ../../components/automate-chef-io/$(SWAGGER_DIR) && popd
